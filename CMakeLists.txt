@@ -15,12 +15,10 @@ set(WDESKTOP_VERSION ${WDESKTOP_VERSION_MAJOR}.${WDESKTOP_VERSION_MINOR}.${WDESK
 find_package(Qt4 REQUIRED)
 
 # Destination directories
-set(WDESKTOP_RUNTIME_DIR bin CACHE STRING "wDesktop runtime directory.")
-set(WDESKTOP_LIBRARY_DIR lib CACHE STRING "wDesktop library directory.")
 set(WDESKTOP_PLUGINS_DIR lib/${PROJECT_NAME} CACHE STRING "wDesktop plugins directory.")
 
 # Path definitions
-relative_path(WDESKTOP_PLUGINS_PATH ${WDESKTOP_RUNTIME_DIR} ${WDESKTOP_PLUGINS_DIR})
+relative_path(WDESKTOP_PLUGINS_PATH bin ${WDESKTOP_PLUGINS_DIR})
 
 # Extra runtime dependencies
 if(APPLE)
@@ -37,7 +35,7 @@ if(WIN32)
 		${QT_PLUGINS_DIR}/imageformats/qgif4.dll
 		${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
 endif(WIN32)
-install(FILES ${WDESKTOP_EXTRA_RUNTIME} DESTINATION ${WDESKTOP_RUNTIME_DIR})
+install(FILES ${WDESKTOP_EXTRA_RUNTIME} DESTINATION bin)
 install(FILES ${WDESKTOP_EXTRA_PLUGINS} DESTINATION ${WDESKTOP_PLUGINS_DIR}/imageformats)
 
 # Packaging

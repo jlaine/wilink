@@ -3,6 +3,6 @@
 BUNDLE="`echo "$0" | sed -e 's/\/Contents\/MacOS\/.*//'`"
 RESOURCES="$BUNDLE/Contents/Resources"
 
-export DYLD_LIBRARY_PATH=$RESOURCES/@BOC_LIBRARY_DIR@
+export DYLD_LIBRARY_PATH=$RESOURCES/lib
 
-exec "$RESOURCES/@BOC_RUNTIME_DIR@/wDesktop"
+exec "$RESOURCES/bin/wDesktop"

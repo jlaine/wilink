@@ -29,4 +29,4 @@ if(WIN32)
 endif(WIN32)
 
 ship_depends(wDesktop)
-install(TARGETS wDesktop DESTINATION ${WDESKTOP_RUNTIME_DIR})
+install(TARGETS wDesktop DESTINATION bin)
