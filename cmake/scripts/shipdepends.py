@@ -3,6 +3,9 @@ import os
 import re
 import shutil
 
+# 0.1 : initial version
+# 0.2 : fix detection of 64-bit Mach-O files
+
 def copy_lib(base, lib, dest):
 	sourcefile = os.path.join(base, lib)
 	destfile = os.path.join(dest, lib)
@@ -39,6 +42,10 @@ def get_type(bin):
 	if magic == '\x7fELF':
 		return "elf"
 	elif magic == '\xce\xfa\xed\xfe':
+        # 32-bit
+		return "mach-o"
+	elif magic == '\xcf\xfa\xed\xfe':
+        # 64-bit
 		return "mach-o"
 
 	return None
