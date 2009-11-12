@@ -1,0 +1,3 @@
+[submodule "src/qnetio"]
+	path = src/qnetio
+	url = git://git.bolloretelecom.eu/qnetio.git
