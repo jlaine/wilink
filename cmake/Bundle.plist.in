@@ -19,6 +19,6 @@
 	<key>CFBundleVersion</key>
 	<string>@CPACK_PACKAGE_VERSION@</string>
 	<key>CFBundleIconFile</key>
-	<string>boc-utils.icns</string>
+	<string>wDesktop.icns</string>
 </dict>
 </plist>
