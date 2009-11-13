@@ -24,6 +24,18 @@ endif(WIN32)
 
 add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${WDESKTOP_RESOURCE})
 target_link_libraries(wDesktop qnetio ${QT_LIBRARIES})
+if(APPLE)
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE TRUE)
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER "net.wifirst.wDesktop")
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_ICON_FILE "wDesktop.icns")
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "wDesktop")
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${CPACK_PACKAGE_VERSION})
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION})
+	add_custom_command(TARGET wDesktop POST_BUILD
+		COMMAND ${QT_BINARY_DIR}/macdeployqt ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app
+		COMMAND cp ${CMAKE_SOURCE_DIR}/data/wDesktop.icns ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app/Contents/Resources
+		DEPENDS wDesktop)
+endif(APPLE)
 if(WIN32)
 	set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
 endif(WIN32)
