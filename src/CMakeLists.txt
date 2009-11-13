@@ -31,9 +31,11 @@ if(APPLE)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME "wDesktop")
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION})
+	set(BUNDLE_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app)
 	add_custom_command(TARGET wDesktop POST_BUILD
-		COMMAND ${QT_BINARY_DIR}/macdeployqt ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app
-		COMMAND cp ${CMAKE_SOURCE_DIR}/data/wDesktop.icns ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app/Contents/Resources
+		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
+		COMMAND cp ${CMAKE_SOURCE_DIR}/data/wDesktop.icns ${BUNDLE_LOCATION}/Contents/Resources
+		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.bundle ${QT_PLUGINS_DIR}/imageformats/libqjpeg.bundle
 		DEPENDS wDesktop)
 endif(APPLE)
 if(WIN32)
