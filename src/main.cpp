@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 
     /* Create application */
     QApplication app(argc, argv);
+    app.setApplicationName("wDesktop");
     app.setQuitOnLastWindowClosed(false);
 
     /* Install signal handler */
