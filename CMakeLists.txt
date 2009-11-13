@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 include(CheckIncludeFiles)
 include(RelativePath)
-include(ShipDepends)
 
 # Project and version
 project(wDesktop)

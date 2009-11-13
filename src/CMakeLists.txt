@@ -40,5 +40,4 @@ if(WIN32)
 	set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
 endif(WIN32)
 
-ship_depends(wDesktop)
 install(TARGETS wDesktop DESTINATION bin)
