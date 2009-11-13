@@ -143,7 +143,7 @@ void TrayIcon::uploadPhotos()
     if (!photos)
     {
         QAction *action = qobject_cast<QAction *>(sender());
-        photos = new Photos("photo://www.wifirst.net/w", action->icon());
+        photos = new Photos("wifirst://www.wifirst.net/w", action->icon());
     }
     photos->show();
     photos->raise();
