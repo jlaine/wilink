@@ -36,7 +36,7 @@ if(APPLE)
 	add_custom_command(TARGET wDesktop POST_BUILD
 		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/${BUNDLE_ICON_NAME}
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.bundle ${QT_PLUGINS_DIR}/imageformats/libqjpeg.bundle
+		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.* ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
 		DEPENDS wDesktop)
 endif(APPLE)
 if(WIN32)
