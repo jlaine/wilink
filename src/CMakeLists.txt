@@ -39,7 +39,7 @@ if(APPLE)
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/${BUNDLE_ICON_NAME}
 		COMMAND ${CMAKE_SOURCE_DIR}/cmake/fixplist ${BUNDLE_LOCATION}/Contents/Info.plist
 		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.* ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
+		COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.* ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
 		DEPENDS wDesktop)
     # image generation
     set(_dmg_temp ${BUNDLE_DMG}.temp)
@@ -53,7 +53,7 @@ if(APPLE)
     add_custom_target(dmg DEPENDS ${BUNDLE_DMG})
 endif(APPLE)
 if(WIN32)
-	set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
+    set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
 endif(WIN32)
 
 install(TARGETS wDesktop DESTINATION bin)
