@@ -26,18 +26,31 @@ add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${WDESKTOP_R
 target_link_libraries(wDesktop qnetio ${QT_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
+    set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin.dmg)
 	set(BUNDLE_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE TRUE)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_ICON_FILE ${BUNDLE_ICON_NAME})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME ${CPACK_BUNDLE_NAME})
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION ${CPACK_PACKAGE_VERSION})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	add_custom_command(TARGET wDesktop POST_BUILD
-		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/${BUNDLE_ICON_NAME}
+		COMMAND ${CMAKE_SOURCE_DIR}/cmake/fixplist ${BUNDLE_LOCATION}/Contents/Info.plist
+		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
 		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.* ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
 		DEPENDS wDesktop)
+    # image generation
+    set(_dmg_temp ${BUNDLE_DMG}.temp)
+    add_custom_command(OUTPUT ${BUNDLE_DMG}
+        COMMAND mkdir ${_dmg_temp}
+        COMMAND cp -r ${BUNDLE_LOCATION} ${_dmg_temp}
+        COMMAND ln -s /Applications ${_dmg_temp}/Applications
+        COMMAND hdiutil create ${BUNDLE_DMG} -srcdir ${_dmg_temp} -fs HFS+ -volname "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${CPACK_PACKAGE_VERSION}"
+        COMMAND rm -rf ${_dmg_temp}
+        DEPENDS wDesktop)
+    add_custom_target(dmg DEPENDS ${BUNDLE_DMG})
 endif(APPLE)
 if(WIN32)
 	set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
