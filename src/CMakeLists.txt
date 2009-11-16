@@ -32,12 +32,14 @@ if(APPLE)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_ICON_FILE ${BUNDLE_ICON_NAME})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME ${CPACK_BUNDLE_NAME})
+	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION ${CPACK_PACKAGE_VERSION})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	add_custom_command(TARGET wDesktop POST_BUILD
-		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/${BUNDLE_ICON_NAME}
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.bundle ${QT_PLUGINS_DIR}/imageformats/libqjpeg.bundle
+		COMMAND ${CMAKE_SOURCE_DIR}/cmake/fixplist ${BUNDLE_LOCATION}/Contents/Info.plist
+		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
+		COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.bundle ${QT_PLUGINS_DIR}/imageformats/libqjpeg.bundle
 		DEPENDS wDesktop)
     # image generation
     set(_dmg_temp ${BUNDLE_DMG}.temp)

@@ -1,0 +1,17 @@
+#!/bin/sh
+plist=$1
+[ -n "$plist" ] || exit 0
+
+grep -q LSUIElement $plist && exit 0
+
+cp $plist $plist.bak
+awk '{
+    if ($1 == "</dict>") {
+        print "\t<key>LSUIElement</key>";
+        print "\t<string>1</string>";
+        print
+    } else {
+        print
+    }
+}' $plist.bak > $plist
+rm -f $plist.bak
