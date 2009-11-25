@@ -64,6 +64,7 @@ protected slots:
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
+    void putProgress(qint64 done, qint64 total);
 
 private:
     bool busy;

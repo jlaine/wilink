@@ -31,6 +31,8 @@
 
 #include "photos.h"
 
+#define PROGRESS_STEPS 100
+
 PhotosList::PhotosList(QWidget *parent)
     : QListWidget(parent)
 {
@@ -110,6 +112,7 @@ Photos::Photos(const QString &url, const QIcon &folderIcon, QWidget *parent)
     /* open filesystem */
     fs = FileSystem::factory(remoteUrl, this);
     connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+    connect(fs, SIGNAL(putProgress(qint64, qint64)), this, SLOT(putProgress(qint64, qint64)));
     fs->open(remoteUrl);
 }
 
@@ -147,7 +150,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         refresh();
         break;
     case FileSystem::Put:
-        progressBar->setValue(progressBar->value() + 1);
+        progressBar->setValue(PROGRESS_STEPS * ((progressBar->value() / PROGRESS_STEPS) + 1));
         busy = false;
         processQueue();
         break;
@@ -181,7 +184,7 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
         QFileInfo file(url.path());
         queue.append(QPair<QUrl, QUrl>(url, base + "/" + file.fileName()));
     }
-    progressBar->setMaximum(progressBar->maximum() + files.size());
+    progressBar->setMaximum(progressBar->maximum() + PROGRESS_STEPS * files.size());
     progressBar->show();
     processQueue();
 }
@@ -207,6 +210,13 @@ void Photos::processQueue()
     statusLabel->setText(tr("Uploading %1").arg(QFileInfo(file->fileName()).fileName()));
     busy = true;
     fs->put(file, item.second.toString());
+}
+
+void Photos::putProgress(qint64 done, qint64 total)
+{
+    if (!total)
+        return;
+    progressBar->setValue(PROGRESS_STEPS * (int(progressBar->value() / PROGRESS_STEPS) + double(done) / double(total)));
 }
 
 void Photos::refresh()
