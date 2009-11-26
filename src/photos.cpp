@@ -112,7 +112,7 @@ Photos::Photos(const QString &url, const QIcon &folderIcon, QWidget *parent)
     /* open filesystem */
     fs = FileSystem::factory(remoteUrl, this);
     connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this, SLOT(commandFinished(int, bool, const FileInfoList&)));
-    connect(fs, SIGNAL(putProgress(qint64, qint64)), this, SLOT(putProgress(qint64, qint64)));
+    connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
     fs->open(remoteUrl);
 }
 
@@ -212,7 +212,7 @@ void Photos::processQueue()
     fs->put(file, item.second.toString());
 }
 
-void Photos::putProgress(qint64 done, qint64 total)
+void Photos::putProgress(int done, int total)
 {
     if (!total)
         return;
