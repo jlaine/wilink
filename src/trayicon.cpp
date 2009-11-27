@@ -18,9 +18,15 @@
  */
 
 #include <QApplication>
+#include <QAuthenticator>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDialog>
 #include <QDomDocument>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QMenu>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -31,11 +37,13 @@
 #include "trayicon.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
+static const QString authSuffix = "@wifirst.net";
 
 TrayIcon::TrayIcon()
     : photos(NULL)
 {
     network = new QNetworkAccessManager(this);
+    connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)), Wallet::instance(), SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> &)));
 
@@ -58,6 +66,49 @@ void TrayIcon::fetchIcon()
     QPair<QUrl, QAction*> entry = icons.first();
     QNetworkReply *reply = network->get(QNetworkRequest(entry.first));
     connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
+}
+
+/** Prompt the user for credentials.
+ */
+void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticator)
+{
+    const QString prompt("Please enter your credentials.");
+
+    /* create dialog */
+    QDialog *dialog = new QDialog;
+    QGridLayout *layout = new QGridLayout;
+
+    layout->addWidget(new QLabel(prompt), 0, 0, 1, 2);
+
+    layout->addWidget(new QLabel("User:"), 1, 0);
+    QLineEdit *user = new QLineEdit();
+    layout->addWidget(user, 1, 1);
+
+    layout->addWidget(new QLabel("Password:"), 2, 0);
+    QLineEdit *password = new QLineEdit();
+    password->setEchoMode(QLineEdit::Password);
+    layout->addWidget(password, 2, 1);
+
+    QPushButton *btn = new QPushButton("OK");
+    dialog->connect(btn, SIGNAL(clicked()), dialog, SLOT(accept()));
+    layout->addWidget(btn, 3, 1);
+
+    dialog->setLayout(layout);
+
+    /* prompt user */
+    while (user->text().isEmpty() || password->text().isEmpty())
+    {
+        if (!dialog->exec())
+            return;
+    }
+    QString userName = user->text();
+    if (realm == baseUrl.host() && !userName.endsWith(authSuffix))
+        userName += authSuffix;
+    authenticator->setUser(userName);
+    authenticator->setPassword(password->text());
+
+    /* store credentials */
+    QNetIO::Wallet::instance()->setCredentials(realm, userName, password->text());
 }
 
 void TrayIcon::openUrl()

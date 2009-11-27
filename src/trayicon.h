@@ -26,6 +26,7 @@
 
 class Photos;
 class QAction;
+class QAuthenticator;
 class QNetworkAccessManager;
 class QNetworkReply;
 
@@ -39,6 +40,7 @@ public:
     TrayIcon();
 
 protected slots:
+    void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void openUrl();
     void showIcon();
     void showMenu();
