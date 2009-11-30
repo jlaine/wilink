@@ -45,7 +45,11 @@ TrayIcon::TrayIcon()
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
     show();
+
+#ifndef Q_WS_MAC
+    /* convert left clicks to right clicks, except on OS X */
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
+#endif
 
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
@@ -141,14 +145,11 @@ void TrayIcon::showIcon()
     fetchIcon();
 }
 
-/** Catch left-clicks on Linux and Windows.
- */
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
     QMenu *menu = contextMenu();
-    if (!menu)
-        return;
-    menu->show();
+    if (menu && reason == QSystemTrayIcon::Trigger)
+        menu->popup(geometry().bottomLeft());
 }
 
 void TrayIcon::showMenu()
