@@ -36,6 +36,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName("wDesktop");
     app.setQuitOnLastWindowClosed(false);
+    app.setWindowIcon(QIcon(":/wDesktop.png"));
 
     /* Install signal handler */
     signal(SIGINT, signal_handler);
