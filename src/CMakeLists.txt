@@ -4,6 +4,9 @@ set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
+set(wDesktop_RCCS
+    ${CMAKE_SOURCE_DIR}/data/wDesktop.qrc)
+
 set(wDesktop_SOURCES
     main.cpp
     photos.cpp
@@ -13,6 +16,7 @@ set(wDesktop_MOC_HEADERS
     photos.h
     trayicon.h)
 
+qt4_add_resources(wDesktop_RCC_SOURCES ${wDesktop_RCCS})
 qt4_wrap_cpp(wDesktop_MOC_SOURCES ${wDesktop_MOC_HEADERS})
 
 if(WIN32)
@@ -22,7 +26,7 @@ if(WIN32)
     set(WDESKTOP_RESOURCE wDesktop.rc)
 endif(WIN32)
 
-add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${WDESKTOP_RESOURCE})
+add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_RCC_SOURCES} ${WDESKTOP_RESOURCE})
 target_link_libraries(wDesktop qnetio ${QT_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)

@@ -47,9 +47,9 @@ TrayIcon::TrayIcon()
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)), Wallet::instance(), SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> &)));
 
-    /* icons */
-    icons.append(qMakePair(baseUrl.resolved(QUrl("images/shared/url_icon.png")), (QAction*)NULL));
-    fetchIcon();
+    /* set icon */
+    setIcon(QIcon(":/wDesktop.png"));
+    show();
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
@@ -133,12 +133,7 @@ void TrayIcon::showIcon()
         qWarning() << "could not load icon" << entry.first;
         return;
     }
-    if (entry.second) {
-        entry.second->setIcon(QIcon(pixmap));
-    } else {
-        setIcon(QIcon(pixmap));
-        show();
-    }
+    entry.second->setIcon(QIcon(pixmap));
 
     /* fetch next icon */
     fetchIcon();
