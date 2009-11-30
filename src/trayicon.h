@@ -42,6 +42,7 @@ public:
 protected slots:
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void openUrl();
+    void onActivated(QSystemTrayIcon::ActivationReason reason);
     void showIcon();
     void showMenu();
     void uploadPhotos();

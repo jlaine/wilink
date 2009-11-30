@@ -42,14 +42,16 @@ static const QString authSuffix = "@wifirst.net";
 TrayIcon::TrayIcon()
     : photos(NULL)
 {
+    /* set icon */
+    setIcon(QIcon(":/wDesktop.png"));
+    show();
+    connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
+
+    /* prepare network manager */
     network = new QNetworkAccessManager(this);
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)), Wallet::instance(), SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> &)));
-
-    /* set icon */
-    setIcon(QIcon(":/wDesktop.png"));
-    show();
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
@@ -137,6 +139,16 @@ void TrayIcon::showIcon()
 
     /* fetch next icon */
     fetchIcon();
+}
+
+/** Catch left-clicks on Linux and Windows.
+ */
+void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    QMenu *menu = contextMenu();
+    if (!menu)
+        return;
+    menu->show();
 }
 
 void TrayIcon::showMenu()
