@@ -149,7 +149,11 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
     QMenu *menu = contextMenu();
     if (menu && reason == QSystemTrayIcon::Trigger)
-        menu->popup(geometry().bottomLeft());
+    {
+        // FIXME: this implies that the system tray is at the bottom of the screen..
+        QPoint delta = QPoint(0, menu->sizeHint().height());
+        menu->popup(geometry().topLeft() - delta);
+    }
 }
 
 void TrayIcon::showMenu()
