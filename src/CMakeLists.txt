@@ -36,7 +36,7 @@ if(APPLE)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${CPACK_PACKAGE_VERSION})
 	add_custom_command(TARGET wDesktop POST_BUILD
-		COMMAND mkdir ${BUNDLE_LOCATION}/Contents/Resources/
+		COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
 		COMMAND ${CMAKE_SOURCE_DIR}/cmake/fixplist ${BUNDLE_LOCATION}/Contents/Info.plist
 		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}

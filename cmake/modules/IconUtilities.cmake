@@ -47,6 +47,20 @@ macro(generate_ico OUTPUT)
 	endforeach()
 endmacro(generate_ico)
 
+# GENERATE_PNG(OUTPUT SVGS..)
+#
+# Generate PNG icons from SVG files.
+#
+macro(generate_png OUTPUT)
+	set(${OUTPUT})
+	foreach(_this_svg ${ARGN})
+		generate_name(_this_png ${_this_svg} png)
+		add_custom_command(OUTPUT ${_this_png} DEPENDS ${_this_svg}
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=32 --export-height=32)
+		list(APPEND ${OUTPUT} ${_this_png})
+	endforeach()
+endmacro(generate_png)
+
 # GENERATE_XPM(OUTPUT SVGS..)
 #
 # Generate XPM icons from SVG files.
