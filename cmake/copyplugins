@@ -14,7 +14,8 @@ for input in "$@"; do
     echo "Copying $name"
     mkdir -p `dirname $plugin`
     cp $input $plugin
-    for dep in `otool -L $plugin | grep '\t/' | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
+    filter=`basename $input`
+    for dep in `otool -L $plugin | grep -v $filter | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
         reldep=`echo $dep | sed -e 's/.*\/lib\///'`
         install_name_tool -change $dep @executable_path/../Frameworks/$reldep $plugin
     done
