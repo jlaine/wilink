@@ -72,7 +72,7 @@ void TrayIcon::fetchIcon()
  */
 void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticator)
 {
-    const QString prompt("Please enter your credentials.");
+    const QString prompt = QString("Please enter your credentials for '%1'.").arg(realm);
 
     /* create dialog */
     QDialog *dialog = new QDialog;
