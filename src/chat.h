@@ -30,7 +30,7 @@ public:
     Chat(QObject *parent=0);
 
 public slots:
-    bool open(const QString &jid);
+    bool open(const QString &jid, const QString &password);
 };
 
 #endif

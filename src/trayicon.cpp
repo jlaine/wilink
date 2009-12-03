@@ -33,6 +33,7 @@
 #include <QNetworkRequest>
 
 #include "qnetio/wallet.h"
+#include "chat.h"
 #include "photos.h"
 #include "trayicon.h"
 
@@ -50,6 +51,14 @@ TrayIcon::TrayIcon()
     /* convert left clicks to right clicks, except on OS X */
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 #endif
+
+    /* get password */
+    QAuthenticator auth;
+    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+
+    /* start chat */
+    chat = new Chat(this);
+    chat->open(auth.user(), auth.password());
 
     /* prepare network manager */
     network = new QNetworkAccessManager(this);

@@ -24,6 +24,7 @@
 #include <QSystemTrayIcon>
 #include <QUrl>
 
+class Chat;
 class Photos;
 class QAction;
 class QAuthenticator;
@@ -51,6 +52,7 @@ private:
     void fetchIcon();
 
 private:
+    Chat *chat;
     Photos *photos;
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;

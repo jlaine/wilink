@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAuthenticator>
 #include <QDebug>
 #include <QList>
 #include <QStringList>
@@ -27,7 +26,6 @@
 #include "qxmpp/QXmppMessage.h"
 
 #include "qnetio/dns.h"
-#include "qnetio/wallet.h"
 #include "chat.h"
 
 using namespace QNetIO;
@@ -37,7 +35,7 @@ Chat::Chat(QObject *parent)
 {
 }
 
-bool Chat::open(const QString &jid)
+bool Chat::open(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
     config.setResource("BocChat");
@@ -64,13 +62,8 @@ bool Chat::open(const QString &jid)
         config.setHost(config.getDomain());
     }
 
-    /* get password */
-    QAuthenticator auth;
-    auth.setUser(config.getUser());
-    Wallet::instance()->onAuthenticationRequired(config.getHost(), &auth);
-    config.setPasswd(auth.password());
-
     /* connect to server */
+    config.setPasswd(password);
     connectToServer(config);
     return true;
 }
