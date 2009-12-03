@@ -1,4 +1,5 @@
 add_subdirectory(qnetio)
+add_subdirectory(qxmpp)
 
 set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTXML 1)
@@ -8,11 +9,13 @@ set(wDesktop_RCCS
     ${CMAKE_SOURCE_DIR}/data/wDesktop.qrc)
 
 set(wDesktop_SOURCES
+    chat.cpp
     main.cpp
     photos.cpp
     trayicon.cpp)
 
 set(wDesktop_MOC_HEADERS
+    chat.h
     photos.h
     trayicon.h)
 
@@ -27,7 +30,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_RCC_SOURCES} ${WDESKTOP_RESOURCE})
-target_link_libraries(wDesktop qnetio ${QT_LIBRARIES})
+target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
     set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin.dmg)
