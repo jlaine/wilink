@@ -22,10 +22,17 @@
 
 #include <QDialog>
 
+class QTextEdit;
+
 class Diagnostics : public QDialog
 {
     Q_OBJECT
 
+public:
+    Diagnostics(QWidget *parent=0);
+
+private:
+    QTextEdit *text;
 };
 
 #endif

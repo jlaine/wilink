@@ -19,3 +19,50 @@
 
 #include "diagnostics.h"
 
+#include <QTextEdit>
+#include <QLayout>
+#include <QNetworkInterface>
+#include <QScrollArea>
+
+Diagnostics::Diagnostics(QWidget *parent)
+    : QDialog(parent)
+{
+    text = new QTextEdit;
+
+/*
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setWidget(text);
+*/
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(text);
+    setLayout(layout);
+
+    /* system info */
+#ifdef Q_OS_LINUX
+    text->setText("OS: Linux");
+#endif
+#ifdef Q_OS_MAC
+    text->setText("OS: Mac OS");
+#endif
+#ifdef Q_OS_WIN
+    text->setText("OS: Windows");
+#endif
+
+    /* network info */
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if (interface.flags() & QNetworkInterface::IsLoopBack)
+            continue;
+        QString info = QString("<b>Interface: ") + interface.humanReadableName() + QString("</b>");
+        info += "<ul>";
+        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+        {
+            info += "<li>IP address: " + entry.ip().toString() + "</li>";
+            info += "<li>Netmask: " + entry.netmask().toString() + "</li>";
+        }
+        info += "</ul>";
+        text->append(info);
+    }
+}
+
