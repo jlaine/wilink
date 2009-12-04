@@ -22,15 +22,22 @@
 
 #include "qxmpp/QXmppClient.h"
 
+class QSystemTrayIcon;
+
 class Chat : public QXmppClient
 {
     Q_OBJECT
 
 public:
     Chat(QObject *parent=0);
-
-public slots:
     bool open(const QString &jid, const QString &password);
+    void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
+
+protected slots:
+    void handleMessage(const QXmppMessage &msg);
+
+private:
+    QSystemTrayIcon *systemTrayIcon;
 };
 
 #endif

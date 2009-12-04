@@ -59,6 +59,7 @@ TrayIcon::TrayIcon()
 
     /* start chat */
     chat = new Chat(this);
+    chat->setSystemTrayIcon(this);
     chat->open(auth.user(), auth.password());
 
     /* prepare network manager */
@@ -227,6 +228,7 @@ void TrayIcon::uploadPhotos()
     {
         QAction *action = qobject_cast<QAction *>(sender());
         photos = new Photos("wifirst://www.wifirst.net/w", action->icon());
+        photos->setSystemTrayIcon(this);
     }
     photos->show();
     photos->raise();
