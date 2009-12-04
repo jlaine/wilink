@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QList>
 #include <QStringList>
+#include <QSystemTrayIcon>
 
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
@@ -31,8 +32,21 @@
 using namespace QNetIO;
 
 Chat::Chat(QObject *parent)
-    : QXmppClient(parent)
+    : QXmppClient(parent), systemTrayIcon(NULL)
 {
+    connect(this, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
+}
+
+void Chat::handleMessage(const QXmppMessage &msg)
+{
+    const QString body = msg.getBody();
+    const QString from = msg.getFrom().split("@")[0];
+
+    if (body.isEmpty())
+        return;
+    
+    if (systemTrayIcon)
+        systemTrayIcon->showMessage(from, body);
 }
 
 bool Chat::open(const QString &jid, const QString &password)
@@ -66,5 +80,10 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setPasswd(password);
     connectToServer(config);
     return true;
+}
+
+void Chat::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
+{
+    systemTrayIcon = trayIcon;
 }
 

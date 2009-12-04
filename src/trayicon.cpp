@@ -58,6 +58,7 @@ TrayIcon::TrayIcon()
 
     /* start chat */
     chat = new Chat(this);
+    chat->setSystemTrayIcon(this);
     chat->open(auth.user(), auth.password());
 
     /* prepare network manager */
