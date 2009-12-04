@@ -27,6 +27,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QSystemTrayIcon>
 #include <QUrl>
 
 #include "photos.h"
@@ -80,7 +81,8 @@ void PhotosList::dropEvent(QDropEvent *event)
 }
 
 Photos::Photos(const QString &url, const QIcon &folderIcon, QWidget *parent)
-    : QWidget(parent), busy(false), icon(folderIcon), remoteUrl(url)
+    : QWidget(parent), busy(false), icon(folderIcon), remoteUrl(url),
+    systemTrayIcon(NULL)
 {
     /* create UI */
     helpLabel = new QLabel(tr("To upload your photos, simply drag and drop them to a folder."));
@@ -197,7 +199,10 @@ void Photos::processQueue()
     /* if the queue is empty, hide progress bar and reset it */
     if (queue.empty())
     {
-        statusLabel->setText(tr("Upload complete."));
+        statusLabel->setText(tr("Photos upload complete."));
+        if (systemTrayIcon)
+            systemTrayIcon->showMessage(tr("Photos upload complete."),
+                tr("Your photos have been uploaded"));
         progressBar->hide();
         progressBar->setValue(0);
         progressBar->setMaximum(0);
@@ -223,5 +228,10 @@ void Photos::refresh()
 {
     statusLabel->setText(tr("Loading your folders.."));
     fs->list(remoteUrl);
+}
+
+void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
+{
+    systemTrayIcon = trayIcon;
 }
 

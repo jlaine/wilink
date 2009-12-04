@@ -216,6 +216,7 @@ void TrayIcon::uploadPhotos()
     {
         QAction *action = qobject_cast<QAction *>(sender());
         photos = new Photos("wifirst://www.wifirst.net/w", action->icon());
+        photos->setSystemTrayIcon(this);
     }
     photos->show();
     photos->raise();

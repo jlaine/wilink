@@ -30,6 +30,7 @@ using namespace QNetIO;
 
 class QLabel;
 class QProgressBar;
+class QSystemTrayIcon;
 
 class PhotosList : public QListWidget
 {
@@ -55,6 +56,7 @@ class Photos : public QWidget
 
 public:
     Photos(const QString &url, const QIcon &folderIcon, QWidget *parent = NULL);
+    void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
 protected:
     void processQueue();
@@ -77,6 +79,7 @@ private:
     QProgressBar *progressBar;
     QString remoteUrl;
     QLabel *statusLabel;
+    QSystemTrayIcon *systemTrayIcon;
 };
 
 #endif
