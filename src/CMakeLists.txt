@@ -10,12 +10,14 @@ set(wDesktop_RCCS
 
 set(wDesktop_SOURCES
     chat.cpp
+    diagnostics.cpp
     main.cpp
     photos.cpp
     trayicon.cpp)
 
 set(wDesktop_MOC_HEADERS
     chat.h
+    diagnostics.h
     photos.h
     trayicon.h)
 

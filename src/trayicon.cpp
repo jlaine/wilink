@@ -34,6 +34,7 @@
 
 #include "qnetio/wallet.h"
 #include "chat.h"
+#include "diagnostics.h"
 #include "photos.h"
 #include "trayicon.h"
 
@@ -41,7 +42,7 @@ static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 
 TrayIcon::TrayIcon()
-    : photos(NULL)
+    : chat(NULL), photos(NULL)
 {
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
@@ -165,6 +166,12 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
+void TrayIcon::showDiagnostics()
+{
+    Diagnostics diag;
+    diag.exec();
+}
+
 void TrayIcon::showMenu()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -198,6 +205,10 @@ void TrayIcon::showMenu()
 
     /* add static entries */
     menu->addSeparator();
+
+    action = menu->addAction(tr("&Diagnostics"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
+
     action = menu->addAction(tr("&Upload photos"));
     icons.append(QPair<QUrl, QAction*>(baseUrl.resolved(QString("images/wfox/album.png")), action));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(uploadPhotos()));

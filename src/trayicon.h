@@ -26,6 +26,7 @@
 
 class Chat;
 class Photos;
+
 class QAction;
 class QAuthenticator;
 class QNetworkAccessManager;
@@ -45,6 +46,7 @@ protected slots:
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
     void showIcon();
+    void showDiagnostics();
     void showMenu();
     void uploadPhotos();
 
