@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QList>
+#include <QMessageBox>
 #include <QStringList>
 #include <QSystemTrayIcon>
 
@@ -45,6 +46,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 {
     client = new QXmppClient(this);
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(handlePresence(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
 
     /* assemble UI */
@@ -74,6 +76,22 @@ void Chat::handleMessage(const QXmppMessage &msg)
     
     if (systemTrayIcon)
         systemTrayIcon->showMessage(from, body);
+}
+
+void Chat::handlePresence(const QXmppPresence &presence)
+{
+    if (presence.getType() != QXmppPresence::Subscribe)
+        return;
+    qDebug() << "Subscribe received from" << presence.getFrom();
+    if (QMessageBox::question(this, tr("Subscribe request"),
+        tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        qDebug("Subscribe accepted");
+    } else {
+        qDebug("Subscribe refused");
+    }
+
 }
 
 bool Chat::open(const QString &jid, const QString &password)
