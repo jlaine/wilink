@@ -433,7 +433,7 @@ WirelessNetwork WirelessInterface::currentNetwork()
     network.setSsid(QString::fromAscii(QByteArray(
         (const char*)&wlanAttributes->dot11Ssid.ucSSID[0],
         wlanAttributes->dot11Ssid.uSSIDLength)));
-    network.setRssi(-100 + 2 * wlanAttributes->wlanSignalQuality);
+    network.setRssi(-100 + 0.5 * wlanAttributes->wlanSignalQuality);
     local_WlanFreeMemory(connectionAttributes);
 
     return network;
