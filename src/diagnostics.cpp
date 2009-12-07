@@ -41,22 +41,26 @@ static QString osName()
     return QString::fromLatin1("Unknown");
 }
 
-static bool ping(const QHostAddress &host)
+static bool ping(const QHostAddress &host, float &averageRtt)
 {
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
     {
         QString program = "ping";
         QStringList arguments;
-        arguments << "-c" << "1" << host.toString();
+        arguments << "-c" << "2" << host.toString();
         qDebug() << "Running:" << program << arguments;
 
         QProcess process;
         process.start(program, arguments, QIODevice::ReadOnly);
         process.waitForFinished();
-        QByteArray result = process.readAllStandardOutput();
-        qDebug() << "Got:" << result;
 
-        return true;
+        /* process stats */
+        QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
+        QRegExp regex("round-trip min/avg/max/stddev = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
+        if (regex.indexIn(result))
+            averageRtt = regex.cap(2).toFloat();
+
+        return (process.exitCode() == 0);
     }
     return false;
 }
@@ -68,6 +72,7 @@ class NetworkReport
 public:
     QHostAddress gateway_address;
     bool gateway_ping;
+    float gateway_time;
 };
 
 typedef QPair<QNetworkInterface, NetworkReport> NetworkResult;
@@ -94,7 +99,7 @@ void NetworkThread::run()
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 report.gateway_address = entry.ip();
-                report.gateway_ping = ping(report.gateway_address);
+                report.gateway_ping = ping(report.gateway_address, report.gateway_time);
                 break;
             }
         }
@@ -165,6 +170,15 @@ void Diagnostics::networkFinished()
                     continue;
                 info += "<li>" + protocol + " address: " + entry.ip().toString() + "</li>";
                 info += "<li>" + protocol + " netmask: " + entry.netmask().toString() + "</li>";
+                if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                {
+                    info += "<li>" + protocol + " gateway: " + pair.second.gateway_address.toString();
+                    if (pair.second.gateway_ping)
+                        info += " (ping: " + QString::number(pair.second.gateway_time) + " ms)";
+                    else
+                        info += " (unreachable)";
+                    info += "</li>";
+                }
             }
             info += "</ul>";
         } else {
