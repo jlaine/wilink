@@ -47,6 +47,7 @@ public:
 protected slots:
     void connected();
     void handleMessage(const QXmppMessage &msg);
+    void rosterReceived();
 
 private:
     QXmppClient *client;

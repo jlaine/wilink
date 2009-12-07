@@ -27,6 +27,7 @@
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
+#include "qxmpp/QXmppRoster.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
@@ -36,6 +37,7 @@ using namespace QNetIO;
 ContactsList::ContactsList(QWidget *parent)
     : QListWidget(parent)
 {
+    setMinimumSize(QSize(140, 140));
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
@@ -59,6 +61,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 void Chat::connected()
 {
     statusLabel->setText(tr("Connected"));
+    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 }
 
 void Chat::handleMessage(const QXmppMessage &msg)
@@ -76,7 +79,7 @@ void Chat::handleMessage(const QXmppMessage &msg)
 bool Chat::open(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
-    config.setResource("BocChat");
+    config.setResource("wDesktop");
 
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
 
@@ -105,5 +108,23 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setPasswd(password);
     client->connectToServer(config);
     return true;
+}
+
+void Chat::rosterReceived()
+{
+    QMap<QString, QXmppRoster::QXmppRosterEntry> entries = client->getRoster().getRosterEntries();
+
+    QIcon icon(":/contact.png");
+    foreach (const QString &key, entries.keys())
+    {
+        QListWidgetItem *newItem = new QListWidgetItem;
+        newItem->setData(Qt::UserRole, key);
+        newItem->setIcon(icon);
+        QString name = entries[key].getName();
+        if (name.isEmpty())
+            name = key.split("@")[0];
+        newItem->setText(name);
+        contacts->addItem(newItem);
+    }
 }
 

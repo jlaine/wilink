@@ -1,5 +1,5 @@
 include(IconUtilities)
 generate_icns(icns wDesktop.svg)
 generate_ico(ico wDesktop.svg)
-generate_png(png wDesktop.svg)
+generate_png(png contact.svg wDesktop.svg)
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png})
