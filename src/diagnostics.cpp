@@ -17,11 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QTextEdit>
 #include <QLayout>
 #include <QNetworkInterface>
+#include <QPushButton>
+#include <QPrintDialog>
+#include <QPrinter>
 #include <QProcess>
-#include <QScrollArea>
+#include <QTextEdit>
 #include <QThread>
 
 #include "diagnostics.h"
@@ -139,23 +141,42 @@ void WirelessThread::run()
     }
 }
 
-Diagnostics::Diagnostics(QWidget *parent)
-    : QDialog(parent), wirelessThread(NULL)
-{
-    text = new QTextEdit;
+/* GUI */
 
+Diagnostics::Diagnostics(QWidget *parent)
+    : QDialog(parent), networkThread(NULL), wirelessThread(NULL)
+{
     QVBoxLayout *layout = new QVBoxLayout;
+
+    text = new QTextEdit;
+    text->setReadOnly(true);
     layout->addWidget(text);
+
+    printButton = new QPushButton(tr("Print"));
+    printButton->setEnabled(false);
+    connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
+    layout->addWidget(printButton);
+
     setLayout(layout);
     setMinimumSize(QSize(450, 400));
 
-    /* system info */
+    /* show system info */
     text->setText("<h1>Diagnostics for " + osName() + "</h1>");
 
     /* get network info */
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     networkThread->start();
+}
+
+void Diagnostics::print()
+{
+    QPrintDialog dialog;
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        text->print(dialog.printer());
+        qDebug("finished printing");
+    }
 }
 
 void Diagnostics::networkFinished()
@@ -215,5 +236,8 @@ void Diagnostics::wirelessFinished()
         info += "</table>";
     }
     text->append(info);
+
+    /* enable print button */
+    printButton->setEnabled(true);
 }
 

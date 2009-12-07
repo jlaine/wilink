@@ -22,6 +22,7 @@
 
 #include <QDialog>
 
+class QPushButton;
 class QTextEdit;
 
 class NetworkThread;
@@ -35,11 +36,14 @@ public:
     Diagnostics(QWidget *parent=0);
 
 protected slots:
+    void print();
     void networkFinished();
     void wirelessFinished();
 
 private:
+    QPushButton *printButton;
     QTextEdit *text;
+
     NetworkThread *networkThread;
     WirelessThread *wirelessThread;
 };
