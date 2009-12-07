@@ -405,9 +405,28 @@ QList<WirelessNetwork> WirelessInterface::availableNetworks()
 {
     QList<WirelessNetwork> results;
 
-    WirelessNetwork bogus;
-    bogus.setSsid("bogus");
-    results.append(bogus);
+    WLAN_AVAILABLE_NETWORK_LIST *networkList;
+    DWORD result = local_WlanGetAvailableNetworkList(d->handle, &d->interfaceGuid,
+                                               3, 0, &networkList);
+    if (result != ERROR_SUCCESS) {
+        qWarning("%s: WlanGetAvailableNetworkList failed with error %ld\n",
+                 __FUNCTION__, result);
+        return results;
+    }
+
+    for (unsigned int i = 0; i < networkList->dwNumberOfItems; ++i)
+    {
+        const WLAN_AVAILABLE_NETWORK &wlanNetwork = networkList->Network[i];
+
+        WirelessNetwork network;
+        network.setRssi(-100 + 2 * wlanNetwork.wlanSignalQuality);
+        network.setSsid(QString::fromAscii(QByteArray(
+            (const char*)&wlanNetwork.dot11Ssid.ucSSID[0],
+            wlanNetwork.dot11Ssid.uSSIDLength)));
+        results.append(network);
+    }
+
+    local_WlanFreeMemory(networkList);
 
     return results;
 }
@@ -418,8 +437,7 @@ WirelessNetwork WirelessInterface::currentNetwork()
 
     DWORD dataSize;
     WLAN_CONNECTION_ATTRIBUTES *connectionAttributes;
-    DWORD result;
-    result = local_WlanQueryInterface(d->handle, &d->interfaceGuid,
+    DWORD result = local_WlanQueryInterface(d->handle, &d->interfaceGuid,
                                       wlan_intf_opcode_current_connection, 0, &dataSize,
                                       reinterpret_cast<PVOID *>(&connectionAttributes), 0);
     if (result != ERROR_SUCCESS) {
@@ -429,11 +447,11 @@ WirelessNetwork WirelessInterface::currentNetwork()
         return network;
     }
 
-    WLAN_ASSOCIATION_ATTRIBUTES *wlanAttributes = &connectionAttributes->wlanAssociationAttributes;
+    const WLAN_ASSOCIATION_ATTRIBUTES &wlanAttributes = connectionAttributes->wlanAssociationAttributes;
+    network.setRssi(-100 + 2 * wlanAttributes.wlanSignalQuality);
     network.setSsid(QString::fromAscii(QByteArray(
-        (const char*)&wlanAttributes->dot11Ssid.ucSSID[0],
-        wlanAttributes->dot11Ssid.uSSIDLength)));
-    network.setRssi(-100 + 2 * wlanAttributes->wlanSignalQuality);
+        (const char*)&wlanAttributes.dot11Ssid.ucSSID[0],
+        wlanAttributes.dot11Ssid.uSSIDLength)));
     local_WlanFreeMemory(connectionAttributes);
 
     return network;
