@@ -255,7 +255,8 @@ void Diagnostics::wirelessFinished()
             info += "<ul>";
             info += "<li>SSID: "+ result.currentNetwork.ssid() + "</li>";
             info += "<li>RSSI: " + QString::number(result.currentNetwork.rssi()) + "</li>";
-            info += "<li>CINR: " + QString::number(result.currentNetwork.cinr()) + "</li>";
+            if (result.currentNetwork.cinr())
+                info += "<li>CINR: " + QString::number(result.currentNetwork.cinr()) + "</li>";
             info += "</ul>";
         }
 
@@ -265,7 +266,13 @@ void Diagnostics::wirelessFinished()
         foreach (const WirelessNetwork &network, result.availableNetworks)
         {
             if (network != result.currentNetwork)
-                info += "<tr><td>" + network.ssid() + "</td><td>" + QString::number(network.rssi()) + "</td><td>" + QString::number(network.cinr()) + "</td></tr>";
+            {
+                info += "<tr>";
+                info += "<td>" + network.ssid() + "</td>";
+                info += "<td>" + QString::number(network.rssi()) + "</td>";
+                info += "<td>" + (network.cinr() ? QString::number(network.cinr()) : QString()) + "</td>";
+                info += "</tr>";
+            }
         }
         info += "</table>";
     }
