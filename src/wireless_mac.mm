@@ -36,6 +36,11 @@ inline NSString *qstringToNSString(const QString &qstr)
     return [reinterpret_cast<const NSString *>(qstringToCFStringRef(qstr)) autorelease];
 }
 
+inline int nsnumberToInt(const NSNumber *nsnum)
+{
+    return nsnum ? [nsnum intValue] : 0;
+}
+
 inline QString nsstringToQString(const NSString *nsstr)
 {
     return cfstringRefToQstring(reinterpret_cast<const CFStringRef>(nsstr));
@@ -65,8 +70,11 @@ QList<WirelessNetwork> WirelessInterface::networks()
     if(!err) {
         for(uint row=0; row < [apArray count]; row++ ) {
             CWNetwork *apNetwork = [apArray objectAtIndex:row];
+            NSNumber *num;
+
             WirelessNetwork info;
             info.setSsid(nsstringToQString([apNetwork ssid]));
+            info.setRssi(nsnumberToInt([apNetwork rssi]));
             results.append(info);
         }
     } else {
