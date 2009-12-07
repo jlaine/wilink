@@ -52,7 +52,7 @@ void WirelessThread::run()
 {
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
-        const QString &interfaceName = interface.humanReadableName();
+        const QString &interfaceName = interface.name();
         WirelessInterface wireless(interfaceName);
         if (!wireless.isValid())
             continue;
@@ -68,6 +68,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(text);
     setLayout(layout);
+    setMinimumSize(QSize(400, 300));
 
     /* system info */
     text->setText("<h1>Diagnostics for " + osName() + "</h1>");
@@ -104,7 +105,8 @@ void Diagnostics::wirelessFinished()
     QString info;
     foreach (const QString &interfaceName, wirelessThread->results.keys())
     {
-        info += "<h2>Wireless interface " + interfaceName + "</h2>";
+        QNetworkInterface interface = QNetworkInterface::interfaceFromName(interfaceName);
+        info += "<h2>Wireless interface " + interface.humanReadableName() + "</h2>";
         info += "<ul>";
         foreach (const WirelessNetwork &network, wirelessThread->results[interfaceName])
             info += "<li>SSID " + network.ssid() + " (RSSI: " + QString::number(network.rssi()) + ", CINR: " + QString::number(network.cinr()) + ")";
