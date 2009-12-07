@@ -24,6 +24,7 @@
 class WirelessNetwork
 {
 public:
+    WirelessNetwork() : w_cinr(0), w_rssi(0) {};
     bool isValid() const { return !w_ssid.isEmpty(); };
 
     int cinr() const { return w_cinr; };
