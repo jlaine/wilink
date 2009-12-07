@@ -73,8 +73,9 @@ QList<WirelessNetwork> WirelessInterface::networks()
             NSNumber *num;
 
             WirelessNetwork info;
-            info.setSsid(nsstringToQString([apNetwork ssid]));
+            info.setCinr(nsnumberToInt([apNetwork noise]));
             info.setRssi(nsnumberToInt([apNetwork rssi]));
+            info.setSsid(nsstringToQString([apNetwork ssid]));
             results.append(info);
         }
     } else {

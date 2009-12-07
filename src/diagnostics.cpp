@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "diagnostics.h"
-
 #include <QTextEdit>
 #include <QLayout>
 #include <QNetworkInterface>
 #include <QScrollArea>
+
+#include "diagnostics.h"
+#include "wireless.h"
 
 Diagnostics::Diagnostics(QWidget *parent)
     : QDialog(parent)
@@ -60,6 +61,12 @@ Diagnostics::Diagnostics(QWidget *parent)
         {
             info += "<li>IP address: " + entry.ip().toString() + "</li>";
             info += "<li>Netmask: " + entry.netmask().toString() + "</li>";
+        }
+        WirelessInterface wireless(interface.humanReadableName());
+        if (wireless.isValid())
+        {
+            foreach (const WirelessNetwork &network, wireless.networks())
+                qDebug() << "SSID" << network.ssid() << "RSSI" << network.rssi() << "CINR" << network.cinr();
         }
         info += "</ul>";
         text->append(info);

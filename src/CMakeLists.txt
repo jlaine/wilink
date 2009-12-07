@@ -23,6 +23,8 @@ set(wDesktop_MOC_HEADERS
 
 if(APPLE)
   set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
+else(APPLE)
+  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_stub.cpp)
 endif(APPLE)
 
 qt4_add_resources(wDesktop_RCC_SOURCES ${wDesktop_RCCS})
