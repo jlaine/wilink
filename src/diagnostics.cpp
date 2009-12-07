@@ -66,7 +66,7 @@ Diagnostics::Diagnostics(QWidget *parent)
         if (wireless.isValid())
         {
             foreach (const WirelessNetwork &network, wireless.networks())
-                qDebug() << "SSID" << network.ssid() << "RSSI" << network.rssi() << "CINR" << network.cinr();
+                info += "<li>SSID " + network.ssid() + " (RSSI: " + QString::number(network.rssi()) + ", CINR: " + QString::number(network.cinr()) + ")";
         }
         info += "</ul>";
         text->append(info);

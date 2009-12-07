@@ -53,7 +53,12 @@ WirelessInterface::WirelessInterface(const QString &name)
 
 bool WirelessInterface::isValid() const
 {
-    return true;
+#ifdef USE_COREWLAN
+    CWInterface *defaultInterface = [CWInterface interfaceWithName: qstringToNSString(interfaceName)];
+    if([defaultInterface power])
+        return true;
+#endif
+    return false;
 }
 
 QList<WirelessNetwork> WirelessInterface::networks()
