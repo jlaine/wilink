@@ -120,13 +120,20 @@ void NetworkThread::run()
 
 /* WIRELESS */
 
-typedef QPair<QNetworkInterface, QList<WirelessNetwork> > WirelessResult;
+class WirelessResult
+{
+public:
+    QNetworkInterface interface;
+    QList<WirelessNetwork> availableNetworks;
+    WirelessNetwork currentNetwork;
+};
 
 class WirelessThread : public QThread
 {
 public:
     WirelessThread(QObject *parent) : QThread(parent) {};
     void run();
+
     QList<WirelessResult> results;
 };
 
@@ -137,7 +144,12 @@ void WirelessThread::run()
         WirelessInterface wireless(interface);
         if (!wireless.isValid())
             continue;
-        results.append(qMakePair(interface, wireless.networks()));
+
+        WirelessResult result;
+        result.interface = interface;
+        result.availableNetworks = wireless.availableNetworks();
+        result.currentNetwork = wireless.currentNetwork();
+        results.append(result);
     }
 }
 
@@ -226,13 +238,28 @@ void Diagnostics::networkFinished()
 void Diagnostics::wirelessFinished()
 {
     QString info;
-    foreach (const WirelessResult &pair, wirelessThread->results)
+    foreach (const WirelessResult &result, wirelessThread->results)
     {
-        info += "<h2>Wireless interface " + interfaceName(pair.first) + "</h2>";
+        info += "<h2>Wireless interface " + interfaceName(result.interface) + "</h2>";
+
+        info += "<h3>Current network</h3>";
+        if (result.currentNetwork.isValid())
+        {
+            info += "<ul>";
+            info += "<li>SSID: "+ result.currentNetwork.ssid() + "</li>";
+            info += "<li>RSSI: " + QString::number(result.currentNetwork.rssi()) + "</li>";
+            info += "<li>CINR: " + QString::number(result.currentNetwork.cinr()) + "</li>";
+            info += "</ul>";
+        }
+
+        info += "<h3>Available networks</h3>";
         info += "<table>";
         info += "<tr><th>SSID</th><th>RSSI</th><th>CINR</th></tr>";
-        foreach (const WirelessNetwork &network, pair.second)
-            info += "<tr><td>" + network.ssid() + "</td><td>" + QString::number(network.rssi()) + "</td><td>" + QString::number(network.cinr()) + "</td></tr>";
+        foreach (const WirelessNetwork &network, result.availableNetworks)
+        {
+            if (network != result.currentNetwork)
+                info += "<tr><td>" + network.ssid() + "</td><td>" + QString::number(network.rssi()) + "</td><td>" + QString::number(network.cinr()) + "</td></tr>";
+        }
         info += "</table>";
     }
     text->append(info);

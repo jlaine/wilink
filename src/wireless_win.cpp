@@ -366,13 +366,7 @@ WirelessInterface::~WirelessInterface()
     delete d;
 }
 
-
-bool WirelessInterface::isValid() const
-{
-    return (d->handle != NULL);
-}
-
-QList<WirelessNetwork> WirelessInterface::networks()
+QList<WirelessNetwork> WirelessInterface::availableNetworks()
 {
     QList<WirelessNetwork> results;
 
@@ -383,4 +377,13 @@ QList<WirelessNetwork> WirelessInterface::networks()
     return results;
 }
 
+WirelessNetwork WirelessInterface::currentNetwork()
+{
+    return WirelessNetwork();
+}
+
+bool WirelessInterface::isValid() const
+{
+    return (d->handle != NULL);
+}
 

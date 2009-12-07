@@ -33,8 +33,13 @@ bool WirelessInterface::isValid() const
     return false;
 }
 
-QList<WirelessNetwork> WirelessInterface::networks()
+QList<WirelessNetwork> WirelessInterface::availableNetworks()
 {
     return QList<WirelessNetwork>();
+}
+
+WirelessNetwork WirelessInterface::currentNetwork()
+{
+    return WirelessNetwork();
 }
 

@@ -24,6 +24,8 @@
 class WirelessNetwork
 {
 public:
+    bool isValid() const { return !w_ssid.isEmpty(); };
+
     int cinr() const { return w_cinr; };
     int rssi() const { return w_rssi; };
     QString ssid() const { return w_ssid; };
@@ -31,6 +33,9 @@ public:
     void setCinr(int cinr) { w_cinr = cinr; };
     void setRssi(int rssi) { w_rssi = rssi; };
     void setSsid(const QString &ssid) { w_ssid = ssid; };
+
+    bool operator==(const WirelessNetwork &other) const { return w_ssid == other.w_ssid; };
+    bool operator!=(const WirelessNetwork &other) const { return w_ssid != other.w_ssid; };
 
 private:
     int w_cinr;
@@ -46,8 +51,9 @@ public:
     WirelessInterface(const QNetworkInterface &networkInterface);
     ~WirelessInterface();
 
+    WirelessNetwork currentNetwork();
     bool isValid() const;
-    QList<WirelessNetwork> networks();
+    QList<WirelessNetwork> availableNetworks();
 
 private:
     WirelessInterfacePrivate *d;

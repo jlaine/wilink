@@ -83,17 +83,7 @@ WirelessInterface::~WirelessInterface()
     delete d;
 }
 
-bool WirelessInterface::isValid() const
-{
-#ifdef USE_COREWLAN
-    CWInterface *defaultInterface = [CWInterface interfaceWithName: qstringToNSString(d->interfaceName)];
-    if([defaultInterface power])
-        return true;
-#endif
-    return false;
-}
-
-QList<WirelessNetwork> WirelessInterface::networks()
+QList<WirelessNetwork> WirelessInterface::availableNetworks()
 {
     QList<WirelessNetwork> results;
 #ifdef USE_COREWLAN
@@ -122,5 +112,27 @@ QList<WirelessNetwork> WirelessInterface::networks()
     [autoreleasepool release];
 #endif
     return results;
+}
+
+WirelessNetwork WirelessInterface::currentNetwork()
+{
+    WirelessNetwork network;
+#ifdef USE_COREWLAN
+    CWInterface *currentInterface = [CWInterface interfaceWithName:qstringToNSString(d->interfaceName)];
+    network.setCinr(nsnumberToInt([currentInterface noise]));
+    network.setRssi(nsnumberToInt([currentInterface rssi]));
+    network.setSsid(nsstringToQString([currentInterface ssid]));
+#endif
+    return network;
+}
+
+bool WirelessInterface::isValid() const
+{
+#ifdef USE_COREWLAN
+    CWInterface *defaultInterface = [CWInterface interfaceWithName: qstringToNSString(d->interfaceName)];
+    if([defaultInterface power])
+        return true;
+#endif
+    return false;
 }
 
