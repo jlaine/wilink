@@ -27,6 +27,15 @@
 #include "diagnostics.h"
 #include "wireless.h"
 
+static QString interfaceName(const QNetworkInterface &interface)
+{
+#if QT_VERSION >= 0x040500
+    return interface.humanReadableName();
+#else
+    return interface.name();
+#endif
+}
+
 static QString osName()
 {
 #ifdef Q_OS_LINUX
@@ -155,7 +164,7 @@ void Diagnostics::networkFinished()
     {
         QNetworkInterface interface(pair.first);
 
-        QString info = "<h2>Network interface " + interface.humanReadableName() + QString("</h2>");
+        QString info = "<h2>Network interface " + interfaceName(interface) + QString("</h2>");
         if (interface.addressEntries().size())
         {
             info += "<ul>";
@@ -198,7 +207,7 @@ void Diagnostics::wirelessFinished()
     QString info;
     foreach (const WirelessResult &pair, wirelessThread->results)
     {
-        info += "<h2>Wireless interface " + pair.first.humanReadableName() + "</h2>";
+        info += "<h2>Wireless interface " + interfaceName(pair.first) + "</h2>";
         info += "<table>";
         info += "<tr><th>SSID</th><th>RSSI</th><th>CINR</th></tr>";
         foreach (const WirelessNetwork &network, pair.second)
