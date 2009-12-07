@@ -21,11 +21,15 @@ set(wDesktop_MOC_HEADERS
     photos.h
     trayicon.h)
 
-if(APPLE)
-  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
-else(APPLE)
-  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_stub.cpp)
-endif(APPLE)
+if(WIN32)
+  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
+else(WIN32)
+  if(APPLE)
+    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
+  else(APPLE)
+    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_stub.cpp)
+  endif(APPLE)
+endif(WIN32)
 
 qt4_add_resources(wDesktop_RCC_SOURCES ${wDesktop_RCCS})
 qt4_wrap_cpp(wDesktop_MOC_SOURCES ${wDesktop_MOC_HEADERS})
