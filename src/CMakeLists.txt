@@ -21,6 +21,10 @@ set(wDesktop_MOC_HEADERS
     photos.h
     trayicon.h)
 
+if(APPLE)
+  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
+endif(APPLE)
+
 qt4_add_resources(wDesktop_RCC_SOURCES ${wDesktop_RCCS})
 qt4_wrap_cpp(wDesktop_MOC_SOURCES ${wDesktop_MOC_HEADERS})
 
@@ -32,7 +36,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_RCC_SOURCES} ${WDESKTOP_RESOURCE})
-target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES})
+target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
     set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin.dmg)

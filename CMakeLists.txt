@@ -13,6 +13,14 @@ set(WDESKTOP_VERSION ${WDESKTOP_VERSION_MAJOR}.${WDESKTOP_VERSION_MINOR}.${WDESK
 # Required
 find_package(Qt4 REQUIRED)
 
+# Wireless
+find_library(COREWLAN_LIBRARY NAMES CoreWLAN)
+if(COREWLAN_LIBRARY)
+    message(STATUS "Found CoreWLAN library: ${COREWLAN_LIBRARY}")
+    add_definitions(-DUSE_COREWLAN)
+    set(WLAN_LIBRARIES ${COREWLAN_LIBRARY})
+endif(COREWLAN_LIBRARY)
+
 # Destination directories
 set(WDESKTOP_PLUGINS_DIR lib/${PROJECT_NAME} CACHE STRING "wDesktop plugins directory.")
 
