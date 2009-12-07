@@ -338,8 +338,8 @@ public:
     HANDLE handle;
 };
 
-WirelessInterface::WirelessInterface(const QString &name)
-    : interfaceName(name), d(NULL)
+WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
+    : d(NULL)
 {
     d = new WirelessInterfacePrivate();
     resolveLibrary();

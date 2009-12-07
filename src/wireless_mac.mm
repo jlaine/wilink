@@ -65,9 +65,16 @@ inline QString nsstringToQString(const NSString *nsstr)
     return cfstringRefToQstring(reinterpret_cast<const CFStringRef>(nsstr));
 }
 
-WirelessInterface::WirelessInterface(const QString &name)
-    : interfaceName(name)
+class WirelessInterfacePrivate
 {
+public:
+    QString interfaceName;
+};
+
+WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
+    : d(NULL)
+{
+    d->interfaceName = networkInterface.name();
 }
 
 WirelessInterface::~WirelessInterface()
