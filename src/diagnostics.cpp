@@ -58,7 +58,11 @@ static bool ping(const QHostAddress &host, float &averageRtt)
     {
         QString program = "ping";
         QStringList arguments;
+#ifdef Q_OS_WIN
+        arguments << "-n" << "2" << host.toString();
+#else
         arguments << "-c" << "2" << host.toString();
+#endif
 
         QProcess process;
         process.start(program, arguments, QIODevice::ReadOnly);
