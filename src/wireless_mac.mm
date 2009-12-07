@@ -70,6 +70,10 @@ WirelessInterface::WirelessInterface(const QString &name)
 {
 }
 
+WirelessInterface::~WirelessInterface()
+{
+}
+
 bool WirelessInterface::isValid() const
 {
 #ifdef USE_COREWLAN

@@ -37,14 +37,19 @@ private:
     QString w_ssid;
 };
 
+class WirelessInterfacePrivate;
+
 class WirelessInterface
 {
 public:
     WirelessInterface(const QString &interfaceName);
+    ~WirelessInterface();
+
     bool isValid() const;
     QList<WirelessNetwork> networks();
 
 private:
     QString interfaceName;
+    WirelessInterfacePrivate *d;
 };
 
