@@ -21,55 +21,95 @@
 #include <QLayout>
 #include <QNetworkInterface>
 #include <QScrollArea>
+#include <QThread>
 
 #include "diagnostics.h"
 #include "wireless.h"
 
+static QString osName()
+{
+#ifdef Q_OS_LINUX
+    return QString::fromLatin1("Linux");
+#endif
+#ifdef Q_OS_MAC
+    return QString::fromLatin1("Mac OS");
+#endif
+#ifdef Q_OS_WIN
+    return QString::fromLatin1("Windows");
+#endif
+    return QString::fromLatin1("Unknown");
+}
+
+class WirelessThread : public QThread
+{
+public:
+    WirelessThread(QObject *parent) : QThread(parent) {};
+    void run();
+    QHash<QString, QList<WirelessNetwork> > results;
+};
+
+void WirelessThread::run()
+{
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        const QString &interfaceName = interface.humanReadableName();
+        WirelessInterface wireless(interfaceName);
+        if (!wireless.isValid())
+            continue;
+        results[interfaceName] = wireless.networks();
+    }
+}
+
 Diagnostics::Diagnostics(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent), wirelessThread(NULL)
 {
     text = new QTextEdit;
-
-/*
-    QScrollArea *scrollArea = new QScrollArea;
-    scrollArea->setWidget(text);
-*/
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(text);
     setLayout(layout);
 
     /* system info */
-#ifdef Q_OS_LINUX
-    text->setText("OS: Linux");
-#endif
-#ifdef Q_OS_MAC
-    text->setText("OS: Mac OS");
-#endif
-#ifdef Q_OS_WIN
-    text->setText("OS: Windows");
-#endif
+    text->setText("<h1>Diagnostics for " + osName() + "</h1>");
 
     /* network info */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
-        if (interface.flags() & QNetworkInterface::IsLoopBack)
+        if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
             continue;
-        QString info = QString("<b>Interface: ") + interface.humanReadableName() + QString("</b>");
-        info += "<ul>";
-        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+        QString info = "<h2>Network interface " + interface.humanReadableName() + QString("</h2>");
+        if (interface.addressEntries().size())
         {
-            info += "<li>IP address: " + entry.ip().toString() + "</li>";
-            info += "<li>Netmask: " + entry.netmask().toString() + "</li>";
+            info += "<ul>";
+            foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+            {
+                info += "<li>IP address: " + entry.ip().toString() + "</li>";
+                info += "<li>Netmask: " + entry.netmask().toString() + "</li>";
+            }
+            info += "</ul>";
+        } else {
+            info += "<p>No address</p>";
         }
-        WirelessInterface wireless(interface.humanReadableName());
-        if (wireless.isValid())
-        {
-            foreach (const WirelessNetwork &network, wireless.networks())
-                info += "<li>SSID " + network.ssid() + " (RSSI: " + QString::number(network.rssi()) + ", CINR: " + QString::number(network.cinr()) + ")";
-        }
-        info += "</ul>";
         text->append(info);
     }
+
+    /* wireless info */
+    wirelessThread = new WirelessThread(this);
+    connect(wirelessThread, SIGNAL(finished()), this, SLOT(wirelessFinished()));
+    wirelessThread->start();
+}
+
+void Diagnostics::wirelessFinished()
+{
+    QString info;
+    foreach (const QString &interfaceName, wirelessThread->results.keys())
+    {
+        info += "<h2>Wireless interface " + interfaceName + "</h2>";
+        info += "<ul>";
+        foreach (const WirelessNetwork &network, wirelessThread->results[interfaceName])
+            info += "<li>SSID " + network.ssid() + " (RSSI: " + QString::number(network.rssi()) + ", CINR: " + QString::number(network.cinr()) + ")";
+        info += "</ul>";
+    }
+    text->append(info);
 }
 
