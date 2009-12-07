@@ -48,7 +48,6 @@ static bool ping(const QHostAddress &host, float &averageRtt)
         QString program = "ping";
         QStringList arguments;
         arguments << "-c" << "2" << host.toString();
-        qDebug() << "Running:" << program << arguments;
 
         QProcess process;
         process.start(program, arguments, QIODevice::ReadOnly);
@@ -56,9 +55,10 @@ static bool ping(const QHostAddress &host, float &averageRtt)
 
         /* process stats */
         QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
-        QRegExp regex("round-trip min/avg/max/stddev = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
+        qDebug() << result;
+        QRegExp regex("min/avg/max/(mdev|stddev) = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
         if (regex.indexIn(result))
-            averageRtt = regex.cap(2).toFloat();
+            averageRtt = regex.cap(3).toFloat();
 
         return (process.exitCode() == 0);
     }
