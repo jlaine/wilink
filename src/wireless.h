@@ -19,6 +19,7 @@
 
 #include <QList>
 #include <QString>
+#include <QNetworkInterface>
 
 class WirelessNetwork
 {
@@ -42,14 +43,13 @@ class WirelessInterfacePrivate;
 class WirelessInterface
 {
 public:
-    WirelessInterface(const QString &interfaceName);
+    WirelessInterface(const QNetworkInterface &networkInterface);
     ~WirelessInterface();
 
     bool isValid() const;
     QList<WirelessNetwork> networks();
 
 private:
-    QString interfaceName;
     WirelessInterfacePrivate *d;
 };
 

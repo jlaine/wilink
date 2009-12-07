@@ -20,6 +20,7 @@
 #include <QTextEdit>
 #include <QLayout>
 #include <QNetworkInterface>
+#include <QProcess>
 #include <QScrollArea>
 #include <QThread>
 
@@ -40,23 +41,87 @@ static QString osName()
     return QString::fromLatin1("Unknown");
 }
 
+static bool ping(const QHostAddress &host)
+{
+    if (host.protocol() == QAbstractSocket::IPv4Protocol)
+    {
+        QString program = "ping";
+        QStringList arguments;
+        arguments << "-c" << "1" << host.toString();
+        qDebug() << "Running:" << program << arguments;
+
+        QProcess process;
+        process.start(program, arguments, QIODevice::ReadOnly);
+        process.waitForFinished();
+        QByteArray result = process.readAllStandardOutput();
+        qDebug() << "Got:" << result;
+
+        return true;
+    }
+    return false;
+}
+
+/* NETWORK */
+
+class NetworkReport
+{
+public:
+    QHostAddress gateway_address;
+    bool gateway_ping;
+};
+
+typedef QPair<QNetworkInterface, NetworkReport> NetworkResult;
+
+class NetworkThread : public QThread
+{
+public:
+    NetworkThread(QObject *parent) : QThread(parent) {};
+    void run();
+    QList<NetworkResult> results;
+};
+
+void NetworkThread::run()
+{
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
+            continue;
+
+        NetworkReport report;
+        report.gateway_ping = false;
+        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+        {
+            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                report.gateway_address = entry.ip();
+                report.gateway_ping = ping(report.gateway_address);
+                break;
+            }
+        }
+        results.append(qMakePair(interface, report));
+    }
+}
+
+/* WIRELESS */
+
+typedef QPair<QNetworkInterface, QList<WirelessNetwork> > WirelessResult;
+
 class WirelessThread : public QThread
 {
 public:
     WirelessThread(QObject *parent) : QThread(parent) {};
     void run();
-    QHash<QString, QList<WirelessNetwork> > results;
+    QList<WirelessResult> results;
 };
 
 void WirelessThread::run()
 {
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
-        const QString &interfaceName = interface.name();
-        WirelessInterface wireless(interfaceName);
+        WirelessInterface wireless(interface);
         if (!wireless.isValid())
             continue;
-        results[interfaceName] = wireless.networks();
+        results.append(qMakePair(interface, wireless.networks()));
     }
 }
 
@@ -68,24 +133,38 @@ Diagnostics::Diagnostics(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(text);
     setLayout(layout);
-    setMinimumSize(QSize(400, 300));
+    setMinimumSize(QSize(450, 400));
 
     /* system info */
     text->setText("<h1>Diagnostics for " + osName() + "</h1>");
 
-    /* network info */
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    /* get network info */
+    networkThread = new NetworkThread(this);
+    connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
+    networkThread->start();
+}
+
+void Diagnostics::networkFinished()
+{
+    foreach (const NetworkResult &pair, networkThread->results)
     {
-        if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
-            continue;
+        QNetworkInterface interface(pair.first);
+
         QString info = "<h2>Network interface " + interface.humanReadableName() + QString("</h2>");
         if (interface.addressEntries().size())
         {
             info += "<ul>";
             foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
             {
-                info += "<li>IP address: " + entry.ip().toString() + "</li>";
-                info += "<li>Netmask: " + entry.netmask().toString() + "</li>";
+                QString protocol;
+                if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                    protocol = "IPv4";
+                else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
+                    protocol = "IPv6";
+                else
+                    continue;
+                info += "<li>" + protocol + " address: " + entry.ip().toString() + "</li>";
+                info += "<li>" + protocol + " netmask: " + entry.netmask().toString() + "</li>";
             }
             info += "</ul>";
         } else {
@@ -94,7 +173,7 @@ Diagnostics::Diagnostics(QWidget *parent)
         text->append(info);
     }
 
-    /* wireless info */
+    /* get wireless info */
     wirelessThread = new WirelessThread(this);
     connect(wirelessThread, SIGNAL(finished()), this, SLOT(wirelessFinished()));
     wirelessThread->start();
@@ -103,12 +182,11 @@ Diagnostics::Diagnostics(QWidget *parent)
 void Diagnostics::wirelessFinished()
 {
     QString info;
-    foreach (const QString &interfaceName, wirelessThread->results.keys())
+    foreach (const WirelessResult &pair, wirelessThread->results)
     {
-        QNetworkInterface interface = QNetworkInterface::interfaceFromName(interfaceName);
-        info += "<h2>Wireless interface " + interface.humanReadableName() + "</h2>";
+        info += "<h2>Wireless interface " + pair.first.humanReadableName() + "</h2>";
         info += "<ul>";
-        foreach (const WirelessNetwork &network, wirelessThread->results[interfaceName])
+        foreach (const WirelessNetwork &network, pair.second)
             info += "<li>SSID " + network.ssid() + " (RSSI: " + QString::number(network.rssi()) + ", CINR: " + QString::number(network.cinr()) + ")";
         info += "</ul>";
     }

@@ -24,7 +24,7 @@
 
 class QTextEdit;
 
-class WirelessNetwork;
+class NetworkThread;
 class WirelessThread;
 
 class Diagnostics : public QDialog
@@ -35,10 +35,12 @@ public:
     Diagnostics(QWidget *parent=0);
 
 protected slots:
+    void networkFinished();
     void wirelessFinished();
 
 private:
     QTextEdit *text;
+    NetworkThread *networkThread;
     WirelessThread *wirelessThread;
 };
 

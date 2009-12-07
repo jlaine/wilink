@@ -19,9 +19,9 @@
 
 #include "wireless.h"
 
-WirelessInterface::WirelessInterface(const QString &name)
-    : interfaceName(name)
+WirelessInterface::WirelessInterface(const QNetworkInterface &name)
 {
+    Q_UNUSED(name);
 }
 
 WirelessInterface::~WirelessInterface()
