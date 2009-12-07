@@ -414,7 +414,29 @@ QList<WirelessNetwork> WirelessInterface::availableNetworks()
 
 WirelessNetwork WirelessInterface::currentNetwork()
 {
-    return WirelessNetwork();
+    WirelessNetwork network;
+
+    DWORD dataSize;
+    WLAN_CONNECTION_ATTRIBUTES *connectionAttributes;
+    DWORD result;
+    result = local_WlanQueryInterface(d->handle, &d->interfaceGuid,
+                                      wlan_intf_opcode_current_connection, 0, &dataSize,
+                                      reinterpret_cast<PVOID *>(&connectionAttributes), 0);
+    if (result != ERROR_SUCCESS) {
+        if (result != ERROR_INVALID_STATE)
+            qWarning("%s: WlanQueryInterface failed with error %ld\n", __FUNCTION__, result);
+
+        return network;
+    }
+
+    WLAN_ASSOCIATION_ATTRIBUTES *wlanAttributes = &connectionAttributes->wlanAssociationAttributes;
+    network.setSsid(QString::fromAscii(QByteArray(
+        (const char*)&wlanAttributes->dot11Ssid.ucSSID[0],
+        wlanAttributes->dot11Ssid.uSSIDLength)));
+    network.setRssi(-100 + 2 * wlanAttributes->wlanSignalQuality);
+    local_WlanFreeMemory(connectionAttributes);
+
+    return network;
 }
 
 bool WirelessInterface::isValid() const
