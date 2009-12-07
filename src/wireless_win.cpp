@@ -19,6 +19,7 @@
 
 #include <windows.h>
 
+#include <QDebug>
 #include <QLibrary>
 
 #include "wireless.h"
@@ -333,9 +334,11 @@ static void resolveLibrary()
 class WirelessInterfacePrivate
 {
 public:
-    WirelessInterfacePrivate() : handle(NULL) {};
+    WirelessInterfacePrivate() : handle(NULL), interfaceFound(false) {};
 
     HANDLE handle;
+    bool interfaceFound;
+    GUID interfaceGuid;
 };
 
 WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
@@ -343,13 +346,14 @@ WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
 {
     d = new WirelessInterfacePrivate();
     resolveLibrary();
-
-    /* open handle */
     if (!local_WlanOpenHandle)
         return;
 
     DWORD clientVersion;
-    DWORD result = local_WlanOpenHandle(1, 0, &clientVersion, &d->handle);
+    DWORD result;
+ 
+    // open handle
+    result  = local_WlanOpenHandle(1, 0, &clientVersion, &d->handle);
     if (result != ERROR_SUCCESS)
     {
         if (result != ERROR_SERVICE_NOT_ACTIVE)
@@ -357,6 +361,37 @@ WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
 
         return;
     }
+
+    // enumerate interfaces
+    WLAN_INTERFACE_INFO_LIST *interfaceList;
+    result = local_WlanEnumInterfaces(d->handle, 0, &interfaceList);
+    if (result != ERROR_SUCCESS) {
+        qWarning("%s: WlanEnumInterfaces failed with error %ld\n", __FUNCTION__, result);
+        return;
+    }
+
+    // find interface with matching GUID
+    qDebug() << "Looking for interface" << networkInterface.humanReadableName() << " with GUID" << networkInterface.name();
+    for (unsigned int i = 0; i < interfaceList->dwNumberOfItems; ++i) {
+        const WLAN_INTERFACE_INFO &wlanInterface = interfaceList->InterfaceInfo[i];
+
+        QString guid("{%1-%2-%3-%4%5-%6%7%8%9%10%11}");
+        guid = guid.arg(wlanInterface.InterfaceGuid.Data1, 8, 16, QChar('0'));
+        guid = guid.arg(wlanInterface.InterfaceGuid.Data2, 4, 16, QChar('0'));
+        guid = guid.arg(wlanInterface.InterfaceGuid.Data3, 4, 16, QChar('0'));
+        for (int i = 0; i < 8; ++i)
+            guid = guid.arg(wlanInterface.InterfaceGuid.Data4[i], 2, 16, QChar('0'));
+        guid = guid.toUpper();
+
+        qDebug() << "Checking WLAN interface with GUID" << guid;
+        if (guid == networkInterface.name())
+        {
+            qDebug() << "Found interface!";
+            d->interfaceFound = true;
+            d->interfaceGuid = wlanInterface.InterfaceGuid;
+        }
+    }
+    local_WlanFreeMemory(interfaceList);
 }
 
 WirelessInterface::~WirelessInterface()
@@ -384,6 +419,6 @@ WirelessNetwork WirelessInterface::currentNetwork()
 
 bool WirelessInterface::isValid() const
 {
-    return (d->handle != NULL);
+    return d->interfaceFound;
 }
 

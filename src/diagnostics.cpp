@@ -145,6 +145,9 @@ void WirelessThread::run()
 {
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
+        if (interface.flags() & QNetworkInterface::IsLoopBack)
+            continue;
+
         WirelessInterface wireless(interface);
         if (!wireless.isValid())
             continue;
