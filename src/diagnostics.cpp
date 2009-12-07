@@ -98,7 +98,7 @@ void NetworkThread::run()
         {
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
-                report.gateway_address = entry.ip();
+                report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
                 report.gateway_ping = ping(report.gateway_address, report.gateway_time);
                 break;
             }
@@ -199,10 +199,11 @@ void Diagnostics::wirelessFinished()
     foreach (const WirelessResult &pair, wirelessThread->results)
     {
         info += "<h2>Wireless interface " + pair.first.humanReadableName() + "</h2>";
-        info += "<ul>";
+        info += "<table>";
+        info += "<tr><th>SSID</th><th>RSSI</th><th>CINR</th></tr>";
         foreach (const WirelessNetwork &network, pair.second)
-            info += "<li>SSID " + network.ssid() + " (RSSI: " + QString::number(network.rssi()) + ", CINR: " + QString::number(network.cinr()) + ")";
-        info += "</ul>";
+            info += "<tr><td>" + network.ssid() + "</td><td>" + QString::number(network.rssi()) + "</td><td>" + QString::number(network.cinr()) + "</td></tr>";
+        info += "</table>";
     }
     text->append(info);
 }
