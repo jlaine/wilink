@@ -18,6 +18,8 @@
  */
 
 #include <QDebug>
+#include <QLabel>
+#include <QLayout>
 #include <QList>
 #include <QStringList>
 #include <QSystemTrayIcon>
@@ -31,10 +33,32 @@
 
 using namespace QNetIO;
 
-Chat::Chat(QObject *parent)
-    : QXmppClient(parent), systemTrayIcon(NULL)
+ContactsList::ContactsList(QWidget *parent)
+    : QListWidget(parent)
 {
-    connect(this, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
+}
+
+Chat::Chat(QSystemTrayIcon *trayIcon)
+    : systemTrayIcon(trayIcon)
+{
+    client = new QXmppClient(this);
+    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
+    connect(client, SIGNAL(connected()), this, SLOT(connected()));
+
+    /* assemble UI */
+    QVBoxLayout *layout = new QVBoxLayout;
+    contacts = new ContactsList;
+    layout->addWidget(contacts);
+
+    statusLabel = new QLabel;
+    layout->addWidget(statusLabel);
+
+    setLayout(layout);
+}
+
+void Chat::connected()
+{
+    statusLabel->setText(tr("Connected"));
 }
 
 void Chat::handleMessage(const QXmppMessage &msg)
@@ -77,13 +101,9 @@ bool Chat::open(const QString &jid, const QString &password)
     }
 
     /* connect to server */
+    statusLabel->setText(tr("Connecting.."));
     config.setPasswd(password);
-    connectToServer(config);
+    client->connectToServer(config);
     return true;
-}
-
-void Chat::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
-{
-    systemTrayIcon = trayIcon;
 }
 

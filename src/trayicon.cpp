@@ -59,7 +59,6 @@ TrayIcon::TrayIcon()
 
     /* start chat */
     chat = new Chat(this);
-    chat->setSystemTrayIcon(this);
     chat->open(auth.user(), auth.password());
 
     /* prepare network manager */
@@ -207,10 +206,13 @@ void TrayIcon::showMenu()
     /* add static entries */
     menu->addSeparator();
 
+    action = menu->addAction(tr("&Chat"));
+    connect(action, SIGNAL(triggered(bool)), chat, SLOT(show()));
+
     action = menu->addAction(tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
-    action = menu->addAction(tr("&Upload photos"));
+    action = menu->addAction(tr("Upload &photos"));
     icons.append(QPair<QUrl, QAction*>(baseUrl.resolved(QString("images/wfox/album.png")), action));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(uploadPhotos()));
 

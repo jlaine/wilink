@@ -20,24 +20,40 @@
 #ifndef __WDESKTOP_CHAT_H__
 #define __WDESKTOP_CHAT_H__
 
+#include <QDialog>
+#include <QListWidget>
+
 #include "qxmpp/QXmppClient.h"
 
+class QLabel;
 class QSystemTrayIcon;
 
-class Chat : public QXmppClient
+class ContactsList : public QListWidget
 {
     Q_OBJECT
 
 public:
-    Chat(QObject *parent=0);
+    ContactsList(QWidget *parent = NULL);
+};
+
+class Chat : public QDialog
+{
+    Q_OBJECT
+
+public:
+    Chat(QSystemTrayIcon *trayIcon);
     bool open(const QString &jid, const QString &password);
-    void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
 protected slots:
+    void connected();
     void handleMessage(const QXmppMessage &msg);
 
 private:
+    QXmppClient *client;
+    ContactsList *contacts;
+    QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
 };
+
 
 #endif
