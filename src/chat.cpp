@@ -264,9 +264,16 @@ bool Chat::open(const QString &jid, const QString &password)
 void Chat::removeContact(const QString &jid)
 {
     qDebug() << "Sending unsubscribe to" << jid;
+    QXmppRosterIq::Item item;
+    item.setBareJid(jid);
+    item.setSubscriptionType(QXmppRosterIq::Item::Remove);
+    QXmppRosterIq packet(QXmppIq::Set);
+    packet.addItem(item);
+/*
     QXmppPresence packet;
     packet.setTo(jid);
     packet.setType(QXmppPresence::Unsubscribe);
+*/
     client->sendPacket(packet);
 }
 
