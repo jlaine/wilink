@@ -25,6 +25,7 @@
 
 #include "qxmpp/QXmppClient.h"
 
+class QContextMenuEvent;
 class QLabel;
 class QSystemTrayIcon;
 
@@ -34,6 +35,15 @@ class ContactsList : public QListWidget
 
 public:
     ContactsList(QWidget *parent = NULL);
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
+
+protected slots:
+    void removeContact();
+
+private:
+    QMenu *contextMenu;
 };
 
 class Chat : public QDialog

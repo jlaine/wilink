@@ -17,10 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QContextMenuEvent>
 #include <QDebug>
 #include <QLabel>
 #include <QLayout>
 #include <QList>
+#include <QMenu>
 #include <QMessageBox>
 #include <QStringList>
 #include <QSystemTrayIcon>
@@ -38,7 +40,36 @@ using namespace QNetIO;
 ContactsList::ContactsList(QWidget *parent)
     : QListWidget(parent)
 {
+    contextMenu = new QMenu(this);
+    QAction *action = contextMenu->addAction(tr("Remove contact"));
+    connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
+
+    setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
+}
+
+void ContactsList::contextMenuEvent(QContextMenuEvent *event)
+{
+    QListWidgetItem *item = itemAt(event->pos());
+    if (!item)
+        return;
+
+    contextMenu->popup(event->globalPos());
+}
+
+void ContactsList::removeContact()
+{
+    QListWidgetItem *item = currentItem();
+    if (!item)
+        return;
+
+    QString jid = item->data(Qt::UserRole).toString();
+    if (QMessageBox::question(this, tr("Remove contact"),
+        tr("Do you want to remove %1 from your contact list?").arg(jid),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        qDebug() << "remove" << jid;
+    }
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
