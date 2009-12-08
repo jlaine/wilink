@@ -19,6 +19,7 @@
 
 #include <QContextMenuEvent>
 #include <QDebug>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -148,15 +149,42 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
     contacts = new ContactsList;
     connect(contacts, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     layout->addWidget(contacts);
 
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setMargin(10);
+    hbox->setSpacing(10);
+
+    QPushButton *addButton = new QPushButton("+");
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
+    hbox->addWidget(addButton);
+    hbox->addStretch();
+
     statusLabel = new QLabel;
-    layout->addWidget(statusLabel);
+    hbox->addWidget(statusLabel);
+    layout->addItem(hbox);
 
     setLayout(layout);
+}
+
+void Chat::addContact()
+{
+    bool ok = false;
+    QString jid = QInputDialog::getText(this, "Add contact", "Enter the ID of the contact you want to add",
+        QLineEdit::Normal, "@wifirst.net", &ok);
+    if (!ok || jid.isEmpty())
+        return;
+
+    QXmppPresence packet;
+    packet.setTo(jid);
+    packet.setType(QXmppPresence::Subscribe);
+    client->sendPacket(packet);
 }
 
 ChatDialog *Chat::chatContact(const QString &jid)

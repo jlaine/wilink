@@ -86,6 +86,7 @@ public:
     bool open(const QString &jid, const QString &password);
 
 protected slots:
+    void addContact();
     ChatDialog *chatContact(const QString &jid);
     void connected();
     void handleMessage(const QXmppMessage &msg);
