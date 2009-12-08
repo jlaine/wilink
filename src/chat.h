@@ -39,6 +39,9 @@ public:
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
+signals:
+    void removeContact(const QString &jid);
+
 protected slots:
     void removeContact();
 
@@ -58,6 +61,7 @@ protected slots:
     void connected();
     void handleMessage(const QXmppMessage &msg);
     void handlePresence(const QXmppPresence &presence);
+    void removeContact(const QString &jid);
     void rosterReceived();
 
 private:

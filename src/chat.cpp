@@ -68,7 +68,7 @@ void ContactsList::removeContact()
         tr("Do you want to remove %1 from your contact list?").arg(jid),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-        qDebug() << "remove" << jid;
+        emit removeContact(jid);
     }
 }
 
@@ -83,6 +83,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     contacts = new ContactsList;
+    connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     layout->addWidget(contacts);
 
     statusLabel = new QLabel;
@@ -113,16 +114,25 @@ void Chat::handlePresence(const QXmppPresence &presence)
 {
     if (presence.getType() != QXmppPresence::Subscribe)
         return;
-    qDebug() << "Subscribe received from" << presence.getFrom();
+
+    QXmppPresence packet;
+    packet.setTo(presence.getFrom());
     if (QMessageBox::question(this, tr("Subscribe request"),
         tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         qDebug("Subscribe accepted");
+        packet.setType(QXmppPresence::Subscribed);
+        client->sendPacket(packet);
+
+        packet.setType(QXmppPresence::Subscribe);
+        client->sendPacket(packet);
     } else {
         qDebug("Subscribe refused");
+        QXmppPresence packet;
+        packet.setType(QXmppPresence::Unsubscribed);
+        client->sendPacket(packet);
     }
-
 }
 
 bool Chat::open(const QString &jid, const QString &password)
@@ -130,7 +140,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
 
     /* get user and domain */
     QStringList bits = jid.split("@");
@@ -157,6 +167,18 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setPasswd(password);
     client->connectToServer(config);
     return true;
+}
+
+void Chat::removeContact(const QString &jid)
+{
+    qDebug() << "Sending unsubscribe to" << jid;
+    QXmppPresence packet;
+    packet.setTo(jid);
+    packet.setType(QXmppPresence::Unsubscribe);
+    client->sendPacket(packet);
+
+    packet.setType(QXmppPresence::Unsubscribed);
+    client->sendPacket(packet);
 }
 
 void Chat::rosterReceived()
