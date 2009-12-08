@@ -161,7 +161,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
 ChatDialog *Chat::chatContact(const QString &jid)
 {
-    qDebug() << "chat contact" << jid;
     if (!chatDialogs.contains(jid))
     {
         chatDialogs[jid] = new ChatDialog(this, jid);
@@ -199,26 +198,32 @@ void Chat::handleMessage(const QXmppMessage &msg)
 
 void Chat::handlePresence(const QXmppPresence &presence)
 {
-    if (presence.getType() != QXmppPresence::Subscribe)
-        return;
-
     QXmppPresence packet;
     packet.setTo(presence.getFrom());
-    if (QMessageBox::question(this, tr("Subscribe request"),
-        tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    switch (presence.getType())
     {
-        qDebug("Subscribe accepted");
-        packet.setType(QXmppPresence::Subscribed);
-        client->sendPacket(packet);
+    case QXmppPresence::Subscribe:
+        {
+            if (QMessageBox::question(this, tr("Subscribe request"),
+                tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
+                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+            {
+                qDebug("Subscribe accepted");
+                packet.setType(QXmppPresence::Subscribed);
+                client->sendPacket(packet);
 
-        packet.setType(QXmppPresence::Subscribe);
-        client->sendPacket(packet);
-    } else {
-        qDebug("Subscribe refused");
-        QXmppPresence packet;
-        packet.setType(QXmppPresence::Unsubscribed);
-        client->sendPacket(packet);
+                packet.setType(QXmppPresence::Subscribe);
+                client->sendPacket(packet);
+            } else {
+                qDebug("Subscribe refused");
+                QXmppPresence packet;
+                packet.setType(QXmppPresence::Unsubscribed);
+                client->sendPacket(packet);
+            }
+        }
+        break;
+    default:
+        break;
     }
 }
 
@@ -262,9 +267,6 @@ void Chat::removeContact(const QString &jid)
     QXmppPresence packet;
     packet.setTo(jid);
     packet.setType(QXmppPresence::Unsubscribe);
-    client->sendPacket(packet);
-
-    packet.setType(QXmppPresence::Unsubscribed);
     client->sendPacket(packet);
 }
 
