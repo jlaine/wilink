@@ -31,6 +31,7 @@
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
+#include "qxmpp/QXmppRosterIq.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
@@ -55,6 +56,19 @@ void ContactsList::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     contextMenu->popup(event->globalPos());
+}
+
+void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
+{
+    QListWidgetItem *newItem = new QListWidgetItem;
+    newItem->setIcon(QIcon(":/contact.png"));
+    QString jid = entry.getBareJid();
+    newItem->setData(Qt::UserRole, jid);
+    QString name = entry.getName();
+    if (name.isEmpty())
+        name = jid.split("@")[0];
+    newItem->setText(name);
+    addItem(newItem);
 }
 
 void ContactsList::removeContact()
@@ -95,6 +109,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 void Chat::connected()
 {
     statusLabel->setText(tr("Connected"));
+    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 }
 
@@ -140,7 +155,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
 
     /* get user and domain */
     QStringList bits = jid.split("@");
@@ -181,21 +196,35 @@ void Chat::removeContact(const QString &jid)
     client->sendPacket(packet);
 }
 
+void Chat::rosterChanged(const QString &jid)
+{
+    QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+    int itemIndex = -1;
+    for (int i = 0; i < contacts->count(); i++)
+    {
+        QListWidgetItem *item = contacts->item(i);
+        if (item->data(Qt::UserRole).toString() == jid)
+        {
+            itemIndex = i;
+            break;
+        }
+    }
+    switch (entry.getSubscriptionType())
+    {
+        case QXmppRosterIq::Item::Remove:
+            if (itemIndex >= 0)
+                contacts->takeItem(itemIndex);
+            break;
+        default:
+            if (itemIndex < 0)
+                contacts->addEntry(entry);
+    }
+}
+
 void Chat::rosterReceived()
 {
     QMap<QString, QXmppRoster::QXmppRosterEntry> entries = client->getRoster().getRosterEntries();
-
-    QIcon icon(":/contact.png");
     foreach (const QString &key, entries.keys())
-    {
-        QListWidgetItem *newItem = new QListWidgetItem;
-        newItem->setData(Qt::UserRole, key);
-        newItem->setIcon(icon);
-        QString name = entries[key].getName();
-        if (name.isEmpty())
-            name = key.split("@")[0];
-        newItem->setText(name);
-        contacts->addItem(newItem);
-    }
+        contacts->addEntry(entries[key]);
 }
 

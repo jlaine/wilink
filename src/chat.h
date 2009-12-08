@@ -24,6 +24,7 @@
 #include <QListWidget>
 
 #include "qxmpp/QXmppClient.h"
+#include "qxmpp/QXmppRoster.h"
 
 class QContextMenuEvent;
 class QLabel;
@@ -35,6 +36,7 @@ class ContactsList : public QListWidget
 
 public:
     ContactsList(QWidget *parent = NULL);
+    void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
@@ -62,6 +64,7 @@ protected slots:
     void handleMessage(const QXmppMessage &msg);
     void handlePresence(const QXmppPresence &presence);
     void removeContact(const QString &jid);
+    void rosterChanged(const QString &jid);
     void rosterReceived();
 
 private:
