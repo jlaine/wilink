@@ -28,7 +28,9 @@
 
 class QContextMenuEvent;
 class QLabel;
+class QLineEdit;
 class QSystemTrayIcon;
+class QTextEdit;
 
 class ContactsList : public QListWidget
 {
@@ -42,13 +44,37 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
+    void chatContact(const QString &jid);
     void removeContact(const QString &jid);
 
 protected slots:
+    void slotItemDoubleClicked(QListWidgetItem *item);
     void removeContact();
 
 private:
     QMenu *contextMenu;
+};
+
+class ChatDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ChatDialog(QWidget *parent, const QString &jid);
+
+public slots:
+    void handleMessage(const QXmppMessage &msg);
+
+protected slots:
+    void send();
+
+signals:
+    void sendMessage(const QString &jid, const QString &message);
+
+private:
+    QTextEdit *chatHistory;
+    QLineEdit *chatInput;
+    QString chatJid;
 };
 
 class Chat : public QDialog
@@ -60,6 +86,7 @@ public:
     bool open(const QString &jid, const QString &password);
 
 protected slots:
+    ChatDialog *chatContact(const QString &jid);
     void connected();
     void handleMessage(const QXmppMessage &msg);
     void handlePresence(const QXmppPresence &presence);
@@ -72,6 +99,7 @@ private:
     ContactsList *contacts;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
+    QHash<QString, ChatDialog*> chatDialogs;
 };
 
 

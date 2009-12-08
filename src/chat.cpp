@@ -21,11 +21,14 @@
 #include <QDebug>
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QList>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QStringList>
 #include <QSystemTrayIcon>
+#include <QTextEdit>
 
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
@@ -45,6 +48,7 @@ ContactsList::ContactsList(QWidget *parent)
     QAction *action = contextMenu->addAction(tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
 
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(slotItemDoubleClicked(QListWidgetItem*)));
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
 }
@@ -86,6 +90,54 @@ void ContactsList::removeContact()
     }
 }
 
+void ContactsList::slotItemDoubleClicked(QListWidgetItem *item)
+{
+    emit chatContact(item->data(Qt::UserRole).toString());
+}
+
+ChatDialog::ChatDialog(QWidget *parent, const QString &jid)
+    : QDialog(parent), chatJid(jid)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
+    chatHistory = new QTextEdit;
+    chatHistory->setReadOnly(true);
+    layout->addWidget(chatHistory);
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setMargin(10);
+    hbox->setSpacing(10);
+    chatInput = new QLineEdit;
+    hbox->addWidget(chatInput);
+
+    QPushButton *sendButton = new QPushButton(tr("Send"));
+    connect(sendButton, SIGNAL(clicked()), this, SLOT(send()));
+    hbox->addWidget(sendButton);
+    layout->addItem(hbox);
+
+    setLayout(layout);
+    setWindowTitle(tr("Chat with %1").arg(jid));
+    chatInput->setFocus();
+}
+
+void ChatDialog::handleMessage(const QXmppMessage &msg)
+{
+    chatHistory->append("<b>Received</b> " + msg.getBody());
+}
+
+void ChatDialog::send()
+{
+    QString text = chatInput->text();
+    if (text.isEmpty())
+        return;
+
+    chatHistory->append("<b>Sent</b> " + text);
+    chatInput->clear();
+    emit sendMessage(chatJid, text);
+}
+
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : systemTrayIcon(trayIcon)
 {
@@ -97,6 +149,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     contacts = new ContactsList;
+    connect(contacts, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     layout->addWidget(contacts);
 
@@ -104,6 +157,19 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     layout->addWidget(statusLabel);
 
     setLayout(layout);
+}
+
+ChatDialog *Chat::chatContact(const QString &jid)
+{
+    qDebug() << "chat contact" << jid;
+    if (!chatDialogs.contains(jid))
+    {
+        chatDialogs[jid] = new ChatDialog(this, jid);
+        connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
+            client, SLOT(sendMessage(const QString&, const QString &)));
+    }
+    chatDialogs[jid]->show();
+    return chatDialogs[jid];
 }
 
 void Chat::connected()
@@ -115,14 +181,20 @@ void Chat::connected()
 
 void Chat::handleMessage(const QXmppMessage &msg)
 {
+    const QString jid = msg.getFrom();
     const QString body = msg.getBody();
-    const QString from = msg.getFrom().split("@")[0];
+    const QString from = jid.split("@")[0];
 
     if (body.isEmpty())
         return;
-    
+
+    ChatDialog *dialog = chatContact(jid.split("/")[0]);
+    dialog->handleMessage(msg);
+  
+/* 
     if (systemTrayIcon)
         systemTrayIcon->showMessage(from, body);
+*/
 }
 
 void Chat::handlePresence(const QXmppPresence &presence)
