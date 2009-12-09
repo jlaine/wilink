@@ -79,13 +79,26 @@ static bool ping(const QHostAddress &host, PingReport &report)
         /* process stats */
         QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
         qDebug() << result;
-        QRegExp regex("min/avg/max/(mdev|stddev) = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
+
+#ifdef Q_OS_WIN
+        /* min max avg */
+        QRegExp regex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
         if (regex.indexIn(result))
         {
-            report.minRtt = regex.cap(2).toFloat();
-            report.averageRtt = regex.cap(3).toFloat();
-            report.maxRtt = regex.cap(4).toFloat();
+            report.minRtt = regex.cap(1).toInt();
+            report.maxRtt = regex.cap(2).toInt();
+            report.averageRtt = regex.cap(3).toInt();
         }
+#else
+        /* min/avg/max/stddev */
+        QRegExp regex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
+        if (regex.indexIn(result))
+        {
+            report.minRtt = regex.cap(1).toFloat();
+            report.averageRtt = regex.cap(2).toFloat();
+            report.maxRtt = regex.cap(3).toFloat();
+        }
+#endif
         return (process.exitCode() == 0);
     }
     return false;
@@ -234,8 +247,11 @@ void Diagnostics::networkFinished()
                 {
                     info += "<li>" + protocol + " gateway: " + pair.second.gateway_address.toString();
                     if (pair.second.gateway_ping)
-                        info += " (ping: " + QString::number(pair.second.gateway_report.averageRtt) + " ms)";
-                    else
+                    {
+                        const PingReport &report = pair.second.gateway_report;
+                        info += QString(" (min: %1 ms, max: %2 ms, avg: %3 ms)").
+                            arg(report.minRtt).arg(report.maxRtt).arg(report.averageRtt);
+                    } else
                         info += " (unreachable)";
                     info += "</li>";
                 }
