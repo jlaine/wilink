@@ -214,12 +214,10 @@ Diagnostics::Diagnostics(QWidget *parent)
 
 void Diagnostics::print()
 {
-    QPrintDialog dialog;
+    QPrinter printer;
+    QPrintDialog dialog(&printer);
     if (dialog.exec() == QDialog::Accepted)
-    {
-        text->print(dialog.printer());
-        qDebug("finished printing");
-    }
+        text->print(&printer);
 }
 
 void Diagnostics::networkFinished()
