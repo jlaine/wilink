@@ -56,7 +56,7 @@ class Ping
 {
 public:
     Ping();
-    Ping(const QHostAddress &host);
+    Ping(const QHostAddress &host, int maxPackets = 1);
 
     // in milliseconds
     float minimumTime;
@@ -73,7 +73,7 @@ Ping::Ping()
 {
 }
 
-Ping::Ping(const QHostAddress &host)
+Ping::Ping(const QHostAddress &host, int maxPackets)
     : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
     sentPackets(0), receivedPackets(0)
 {
@@ -82,9 +82,9 @@ Ping::Ping(const QHostAddress &host)
         QString program = "ping";
         QStringList arguments;
 #ifdef Q_OS_WIN
-        arguments << "-n" << "2" << host.toString();
+        arguments << "-n" << QString::number(maxPackets) << host.toString();
 #else
-        arguments << "-c" << "2" << host.toString();
+        arguments << "-c" << QString::number(maxPackets) << host.toString();
 #endif
 
         QProcess process;
@@ -157,7 +157,7 @@ void NetworkThread::run()
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
-                report.gateway_ping = Ping(report.gateway_address);
+                report.gateway_ping = Ping(report.gateway_address, 3);
                 break;
             }
         }
