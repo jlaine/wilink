@@ -59,11 +59,8 @@ TrayIcon::TrayIcon()
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)), Wallet::instance(), SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> &)));
 
-    /* start chat */
-    QAuthenticator auth;
-    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+    /* prepare chat */
     chat = new Chat(this);
-    chat->open(auth.user(), auth.password());
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
@@ -220,6 +217,11 @@ void TrayIcon::showMenu()
 
     /* load icons */
     fetchIcon();
+
+    /* connect to chat */
+    QAuthenticator auth;
+    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+    chat->open(auth.user(), auth.password());
 }
 
 void TrayIcon::uploadPhotos()
