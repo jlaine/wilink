@@ -52,11 +52,11 @@ static QString osName()
     return QString::fromLatin1("Unknown");
 }
 
-class PingReport
+class Ping
 {
 public:
-    PingReport();
-    PingReport(const QHostAddress &host);
+    Ping();
+    Ping(const QHostAddress &host);
 
     // in milliseconds
     float minimumTime;
@@ -67,13 +67,13 @@ public:
     int receivedPackets;
 };
 
-PingReport::PingReport()
+Ping::Ping()
     : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
     sentPackets(0), receivedPackets(0)
 {
 }
 
-PingReport::PingReport(const QHostAddress &host)
+Ping::Ping(const QHostAddress &host)
     : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
     sentPackets(0), receivedPackets(0)
 {
@@ -131,7 +131,7 @@ class NetworkReport
 {
 public:
     QHostAddress gateway_address;
-    PingReport gateway_ping;
+    Ping gateway_ping;
 };
 
 typedef QPair<QNetworkInterface, NetworkReport> NetworkResult;
@@ -157,7 +157,7 @@ void NetworkThread::run()
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
-                report.gateway_ping = PingReport(report.gateway_address);
+                report.gateway_ping = Ping(report.gateway_address);
                 break;
             }
         }
@@ -263,7 +263,7 @@ void Diagnostics::networkFinished()
                 if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
                 {
                     info += "<li>" + protocol + " gateway: " + pair.second.gateway_address.toString();
-                    const PingReport &report = pair.second.gateway_ping;
+                    const Ping &report = pair.second.gateway_ping;
                     if (true || report.receivedPackets == report.sentPackets)
                     {
                         info += QString("<li>" + protocol + " gateway ping: %1 sent, %2 received (min: %3 ms, max: %4 ms, avg: %5 ms)</li>")
