@@ -53,19 +53,17 @@ TrayIcon::TrayIcon()
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 #endif
 
-    /* get password */
-    QAuthenticator auth;
-    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
-
-    /* start chat */
-    chat = new Chat(this);
-    chat->open(auth.user(), auth.password());
-
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)), Wallet::instance(), SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> &)));
+
+    /* start chat */
+    QAuthenticator auth;
+    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+    chat = new Chat(this);
+    chat->open(auth.user(), auth.password());
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
