@@ -55,13 +55,18 @@ static QString osName()
 class PingReport
 {
 public:
-    float minRtt;
-    float maxRtt;
-    float averageRtt;
+    float minimumTime;
+    float maximumTime;
+    float averageTime;
+
+    int sentPackets;
+    int receivedPackets;
 };
 
-static bool ping(const QHostAddress &host, PingReport &report)
+PingReport ping(const QHostAddress &host)
 {
+    PingReport report;
+
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
     {
         QString program = "ping";
@@ -82,26 +87,25 @@ static bool ping(const QHostAddress &host, PingReport &report)
 
 #ifdef Q_OS_WIN
         /* min max avg */
-        QRegExp regex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
-        if (regex.indexIn(result))
+        QRegExp timeRegex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
+        if (timeRegex.indexIn(result))
         {
-            report.minRtt = regex.cap(1).toInt();
-            report.maxRtt = regex.cap(2).toInt();
-            report.averageRtt = regex.cap(3).toInt();
+            report.minimumTime = timeRegex.cap(1).toInt();
+            report.maximumTime = timeRegex.cap(2).toInt();
+            report.averageTime = timeRegex.cap(3).toInt();
         }
 #else
         /* min/avg/max/stddev */
-        QRegExp regex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
-        if (regex.indexIn(result))
+        QRegExp timeRegex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
+        if (timeRegex.indexIn(result))
         {
-            report.minRtt = regex.cap(1).toFloat();
-            report.averageRtt = regex.cap(2).toFloat();
-            report.maxRtt = regex.cap(3).toFloat();
+            report.minimumTime = timeRegex.cap(1).toFloat();
+            report.averageTime = timeRegex.cap(2).toFloat();
+            report.maximumTime = timeRegex.cap(3).toFloat();
         }
 #endif
-        return (process.exitCode() == 0);
     }
-    return false;
+    return report;
 }
 
 /* NETWORK */
@@ -110,8 +114,7 @@ class NetworkReport
 {
 public:
     QHostAddress gateway_address;
-    bool gateway_ping;
-    PingReport gateway_report;
+    PingReport gateway_ping;
 };
 
 typedef QPair<QNetworkInterface, NetworkReport> NetworkResult;
@@ -132,13 +135,12 @@ void NetworkThread::run()
             continue;
 
         NetworkReport report;
-        report.gateway_ping = false;
         foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
-                report.gateway_ping = ping(report.gateway_address, report.gateway_report);
+                report.gateway_ping = ping(report.gateway_address);
                 break;
             }
         }
@@ -244,11 +246,13 @@ void Diagnostics::networkFinished()
                 if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
                 {
                     info += "<li>" + protocol + " gateway: " + pair.second.gateway_address.toString();
-                    if (pair.second.gateway_ping)
+                    const PingReport &report = pair.second.gateway_ping;
+                    if (report.receivedPackets == report.sentPackets)
                     {
-                        const PingReport &report = pair.second.gateway_report;
-                        info += QString(" (min: %1 ms, max: %2 ms, avg: %3 ms)").
-                            arg(report.minRtt).arg(report.maxRtt).arg(report.averageRtt);
+                        info += QString(" (min: %1 ms, max: %2 ms, avg: %3 ms)")
+                            .arg(report.minimumTime)
+                            .arg(report.maximumTime)
+                            .arg(report.averageTime);
                     } else
                         info += " (unreachable)";
                     info += "</li>";
