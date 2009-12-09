@@ -52,7 +52,15 @@ static QString osName()
     return QString::fromLatin1("Unknown");
 }
 
-static bool ping(const QHostAddress &host, float &averageRtt)
+class PingReport
+{
+public:
+    float minRtt;
+    float maxRtt;
+    float averageRtt;
+};
+
+static bool ping(const QHostAddress &host, PingReport &report)
 {
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
     {
@@ -73,8 +81,11 @@ static bool ping(const QHostAddress &host, float &averageRtt)
         qDebug() << result;
         QRegExp regex("min/avg/max/(mdev|stddev) = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
         if (regex.indexIn(result))
-            averageRtt = regex.cap(3).toFloat();
-
+        {
+            report.minRtt = regex.cap(2).toFloat();
+            report.averageRtt = regex.cap(3).toFloat();
+            report.maxRtt = regex.cap(4).toFloat();
+        }
         return (process.exitCode() == 0);
     }
     return false;
@@ -87,7 +98,7 @@ class NetworkReport
 public:
     QHostAddress gateway_address;
     bool gateway_ping;
-    float gateway_time;
+    PingReport gateway_report;
 };
 
 typedef QPair<QNetworkInterface, NetworkReport> NetworkResult;
@@ -114,7 +125,7 @@ void NetworkThread::run()
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
-                report.gateway_ping = ping(report.gateway_address, report.gateway_time);
+                report.gateway_ping = ping(report.gateway_address, report.gateway_report);
                 break;
             }
         }
@@ -223,7 +234,7 @@ void Diagnostics::networkFinished()
                 {
                     info += "<li>" + protocol + " gateway: " + pair.second.gateway_address.toString();
                     if (pair.second.gateway_ping)
-                        info += " (ping: " + QString::number(pair.second.gateway_time) + " ms)";
+                        info += " (ping: " + QString::number(pair.second.gateway_report.averageRtt) + " ms)";
                     else
                         info += " (unreachable)";
                     info += "</li>";
