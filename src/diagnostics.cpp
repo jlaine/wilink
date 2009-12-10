@@ -114,7 +114,7 @@ class NetworkInfo
 {
 public:
     static Ping ping(const QHostAddress &host, int maxPackets = 1);
-    static QList<Ping> traceroute(const QHostAddress &host);
+    static QList<Ping> traceroute(const QHostAddress &host, int maxPackets = 3);
 };
 
 Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
@@ -122,54 +122,77 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
     Ping info;
     info.hostAddress = host;
 
+    QString program;
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
     {
-        QString program = "ping";
-        QStringList arguments;
-#ifdef Q_OS_WIN
-        arguments << "-n" << QString::number(maxPackets) << host.toString();
-#else
-        arguments << "-c" << QString::number(maxPackets) << host.toString();
-#endif
-
-        QProcess process;
-        process.start(program, arguments, QIODevice::ReadOnly);
-        process.waitForFinished();
-
-        /* process stats */
-        QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
-
-#ifdef Q_OS_WIN
-        /* min max avg */
-        QRegExp timeRegex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
-        if (timeRegex.indexIn(result))
-        {
-            info.minimumTime = timeRegex.cap(1).toInt();
-            info.maximumTime = timeRegex.cap(2).toInt();
-            info.averageTime = timeRegex.cap(3).toInt();
-        }
-        QRegExp packetRegex(" = ([0-9]+), [^ ]+ = ([0-9]+),");
-#else
-        /* min/avg/max/stddev */
-        QRegExp timeRegex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
-        if (timeRegex.indexIn(result))
-        {
-            info.minimumTime = timeRegex.cap(1).toFloat();
-            info.averageTime = timeRegex.cap(2).toFloat();
-            info.maximumTime = timeRegex.cap(3).toFloat();
-        }
-        /* 2 packets transmitted, 1 packets received, 50.0% packet loss */
-        QRegExp packetRegex("([0-9]+) [^ ]+ [^ ]+, ([0-9]+) [^ ]+ [^ ]+, [0-9]+");
-#endif
-        if (packetRegex.indexIn(result))
-        {
-            info.sentPackets = packetRegex.cap(1).toInt();
-            info.receivedPackets = packetRegex.cap(2).toInt();
-        }
+        program = "ping";
     } else {
-        qWarning("IPv6 ping is not supported");
+        program = "ping6";
+    }
+
+    QStringList arguments;
+#ifdef Q_OS_WIN
+    arguments << "-n" << QString::number(maxPackets) << host.toString();
+#else
+    arguments << "-c" << QString::number(maxPackets) << host.toString();
+#endif
+
+    QProcess process;
+    process.start(program, arguments, QIODevice::ReadOnly);
+    process.waitForFinished();
+
+    /* process stats */
+    QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
+
+#ifdef Q_OS_WIN
+    /* min max avg */
+    QRegExp timeRegex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
+    if (timeRegex.indexIn(result))
+    {
+        info.minimumTime = timeRegex.cap(1).toInt();
+        info.maximumTime = timeRegex.cap(2).toInt();
+        info.averageTime = timeRegex.cap(3).toInt();
+    }
+    QRegExp packetRegex(" = ([0-9]+), [^ ]+ = ([0-9]+),");
+#else
+    /* min/avg/max/stddev */
+    QRegExp timeRegex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
+    if (timeRegex.indexIn(result))
+    {
+        info.minimumTime = timeRegex.cap(1).toFloat();
+        info.averageTime = timeRegex.cap(2).toFloat();
+        info.maximumTime = timeRegex.cap(3).toFloat();
+    }
+    /* 2 packets transmitted, 1 packets received, 50.0% packet loss */
+    QRegExp packetRegex("([0-9]+) [^ ]+ [^ ]+, ([0-9]+) [^ ]+ [^ ]+, [0-9]+");
+#endif
+    if (packetRegex.indexIn(result))
+    {
+        info.sentPackets = packetRegex.cap(1).toInt();
+        info.receivedPackets = packetRegex.cap(2).toInt();
     }
     return info;
+}
+
+QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets)
+{
+    QList<Ping> hops;
+    QString program;
+    QStringList arguments;
+
+    if (host.protocol() == QAbstractSocket::IPv4Protocol)
+    {
+        program = "traceroute";
+        arguments << "-n" << "-q" << QString::number(maxPackets);
+    } else {
+        qWarning("IPv6 traceroute is not supported");
+        return hops;
+    }
+
+    QProcess process;
+    process.start(program, arguments, QIODevice::ReadOnly);
+    process.waitForFinished();
+    return hops;
 }
 
 /* NETWORK */
