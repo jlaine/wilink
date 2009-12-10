@@ -143,7 +143,7 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
 
     QProcess process;
     process.start(program, arguments, QIODevice::ReadOnly);
-    process.waitForFinished();
+    process.waitForFinished(60000);
 
     /* process stats */
     QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
