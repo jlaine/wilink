@@ -344,24 +344,25 @@ void Diagnostics::print()
 void Diagnostics::networkFinished()
 {
     QString info = "<h2>Tests</h2>";
-    info += "<ul>";
+    info += "<table>";
+    info += "<tr><th>Host</th><th>Packets received</th><th>Times</th></tr>";
     foreach (const Ping &report, networkThread->pings)
     {
-        info += "<li>ping " + report.hostAddress.toString() + ": ";
+        info += QString("<tr><td>%1</td>").arg(report.hostAddress.toString());
         if (report.receivedPackets)
         {
-            info += QString("%1 sent, %2 received (min: %3 ms, max: %4 ms, avg: %5 ms)")
-                .arg(report.sentPackets)
+            info += QString("<td align=\"center\">%1 / %2</td><td>min: %3 ms, max: %4 ms, avg: %5 ms</td>")
                 .arg(report.receivedPackets)
+                .arg(report.sentPackets)
                 .arg(report.minimumTime)
                 .arg(report.maximumTime)
                 .arg(report.averageTime);
         } else {
-            info += "unreachable";
+            info += "<td colspan=\"2\">unreachable</td>";
         }
-        info += "</li>";
+        info += "</tr>";
     }
-    info += "</ul>";
+    info += "</table>";
     text->append(info);
 
     /* get wireless info */
