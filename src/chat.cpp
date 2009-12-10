@@ -91,6 +91,27 @@ void ContactsList::removeContact()
     }
 }
 
+void ContactsList::setStatus(const QString &jid, const QXmppPresence::Status &status)
+{
+    QString bareJid = jid.split("/").first();
+    QString suffix;
+    switch(status.getType())
+    {
+        case QXmppPresence::Status::Offline:
+           suffix = "-offline";
+           break;
+    }
+    for (int i = 0; i < count(); i++)
+    {
+        QListWidgetItem *entry = item(i);
+        if (entry->data(Qt::UserRole).toString() == bareJid)
+        {
+            entry->setIcon(QIcon(QString(":/contact%1.png").arg(suffix)));
+            break;
+        }
+    }
+}
+
 void ContactsList::slotItemDoubleClicked(QListWidgetItem *item)
 {
     emit chatContact(item->data(Qt::UserRole).toString());
@@ -236,6 +257,9 @@ void Chat::handlePresence(const QXmppPresence &presence)
     packet.setTo(presence.getFrom());
     switch (presence.getType())
     {
+    case QXmppPresence::Available:
+        contacts->setStatus(presence.getFrom(), presence.getStatus());
+        break;
     case QXmppPresence::Subscribe:
         {
             if (QMessageBox::question(this, tr("Subscribe request"),

@@ -39,6 +39,7 @@ class ContactsList : public QListWidget
 public:
     ContactsList(QWidget *parent = NULL);
     void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
+    void setStatus(const QString &jid, const QXmppPresence::Status &entry);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
