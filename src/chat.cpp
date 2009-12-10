@@ -66,7 +66,7 @@ void ContactsList::contextMenuEvent(QContextMenuEvent *event)
 void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
 {
     QListWidgetItem *newItem = new QListWidgetItem;
-    newItem->setIcon(QIcon(":/contact.png"));
+    newItem->setIcon(QIcon(":/contact-offline.png"));
     QString jid = entry.getBareJid();
     newItem->setData(Qt::UserRole, jid);
     QString name = entry.getName();
@@ -97,16 +97,22 @@ void ContactsList::setStatus(const QString &jid, const QXmppPresence::Status &st
     QString suffix;
     switch(status.getType())
     {
-        case QXmppPresence::Status::Offline:
-           suffix = "-offline";
+        case QXmppPresence::Status::Online:
+           suffix = "available";
            break;
+        case QXmppPresence::Status::Offline:
+           suffix = "offline";
+           break;
+        default:
+            suffix = "busy";
+            break;
     }
     for (int i = 0; i < count(); i++)
     {
         QListWidgetItem *entry = item(i);
         if (entry->data(Qt::UserRole).toString() == bareJid)
         {
-            entry->setIcon(QIcon(QString(":/contact%1.png").arg(suffix)));
+            entry->setIcon(QIcon(QString(":/contact-%1.png").arg(suffix)));
             break;
         }
     }
