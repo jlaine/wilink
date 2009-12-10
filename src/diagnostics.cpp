@@ -313,6 +313,7 @@ void NetworkThread::run()
     gateways.append(SERVER_ADDRESS);
 
     /* run DNS tests */
+    QList<QHostAddress> longPing;
     QStringList hostNames;
     hostNames << "wireless.wifirst.fr" << "www.wifirst.net" << "www.google.fr";
     foreach (const QString &hostName, hostNames)
@@ -327,6 +328,8 @@ void NetworkThread::run()
                 {
                     if (!gateways.contains(address))
                         gateways.append(address);
+                    if (hostName == "www.google.fr")
+                        longPing.append(address);
                     break;
                 }
             }
@@ -335,7 +338,7 @@ void NetworkThread::run()
 
     /* run ping tests */
     foreach (const QHostAddress &gateway, gateways)
-        pings.append(NetworkInfo::ping(gateway, 3));
+        pings.append(NetworkInfo::ping(gateway, longPing.contains(gateway) ? 30 : 3));
 
     /* run traceroute */
     traceroute = NetworkInfo::traceroute(SERVER_ADDRESS, 3, 4);
