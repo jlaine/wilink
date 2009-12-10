@@ -25,6 +25,7 @@
 #include <QUrl>
 
 class Chat;
+class Diagnostics;
 class Photos;
 
 class QAction;
@@ -55,6 +56,7 @@ private:
 
 private:
     Chat *chat;
+    Diagnostics *diagnostics;
     Photos *photos;
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;

@@ -42,7 +42,7 @@ static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 
 TrayIcon::TrayIcon()
-    : chat(NULL), photos(NULL)
+    : chat(NULL), diagnostics(NULL), photos(NULL)
 {
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
@@ -163,8 +163,9 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 
 void TrayIcon::showDiagnostics()
 {
-    Diagnostics diag;
-    diag.exec();
+    if (!diagnostics)
+        diagnostics = new Diagnostics;
+    diagnostics->show();
 }
 
 void TrayIcon::showMenu()
