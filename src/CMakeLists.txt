@@ -73,7 +73,7 @@ if(APPLE)
     add_custom_target(dmg DEPENDS ${BUNDLE_DMG})
 endif(APPLE)
 if(WIN32)
-#    set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
+    set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
 endif(WIN32)
 
 install(TARGETS wDesktop DESTINATION bin)
