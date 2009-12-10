@@ -217,37 +217,38 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
     QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
     qDebug() << result;
 
+    QRegExp ipRegex("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
 #ifdef Q_OS_WIN
     /*  1  6.839 ms  19.866 ms  1.134 ms 192.168.99.1*/
-    QRegExp hopRegex(" [0-9]+  (.+) ([^ ]+)");
+    QRegExp hopRegex(" [0-9]+  (.+)");
 #else
     /* 1  192.168.99.1  6.839 ms  19.866 ms  1.134 ms */
     /* 1  192.168.99.1  6.839 ms * 1.134 ms */
-#endif
-    QRegExp hopRegex(" [0-9]+  ([^ ]+)  (.+)");
-    QRegExp timeRegex("([^ ]+) ms");
+    QRegExp hopRegex(" [0-9]+  (.+)");
+    QRegExp timeRegex("([0-9.]+)");
     foreach (const QString &line, result.split("\n"))
     {
         qDebug() << "line" << line;
         if (hopRegex.exactMatch(line))
         {
-            QStringList bits;
             Ping hop;
             float totalTime = 0.0;
 
-#ifdef Q_OS_WIN
-            hop.hostAddress = QHostAddress(hopRegex.cap(2));
-            bits = hopRegex.cap(1).split(" ");
-#else
-            hop.hostAddress = QHostAddress(hopRegex.cap(1));
-            bits = hopRegex.cap(2).split("  ");
-#endif
-            foreach (const QString &packet, bits)
+            foreach (const QString &bit, hopRegex.cap(1).split(QRegExp("\\s+")))
             {
-                hop.sentPackets += 1;
-                if (timeRegex.exactMatch(packet))
+                qDebug() << "bit" << bit;
+                if (bit == "ms")
+                    continue;
+                if (ipRegex.exactMatch(bit))
                 {
-                    float hopTime = timeRegex.cap(1).toFloat();
+                    hop.hostAddress = QHostAddress(bit);
+                    continue;
+                }
+
+                hop.sentPackets += 1;
+                if (timeRegex.exactMatch(bit))
+                {
+                    float hopTime = bit.toFloat();
                     hop.receivedPackets += 1;
                     if (hopTime > hop.maximumTime)
                         hop.maximumTime = hopTime;
@@ -261,6 +262,7 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
             hops.append(hop);
         }
     }
+#endif
     return hops;
 }
 
