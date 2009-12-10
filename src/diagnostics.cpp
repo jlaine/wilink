@@ -219,12 +219,13 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
 
     /*
      * Windows :  1  6.839 ms  19.866 ms  1.134 ms 192.168.99.1
+     * Windows :  2  <1 ms  <1 ms  <1 ms 192.168.99.1
      * *nix    :  1  192.168.99.1  6.839 ms  19.866 ms  1.134 ms
-     *            1  192.168.99.1  6.839 ms * 1.134 ms
+     *            2  192.168.99.1  6.839 ms * 1.134 ms
      */
     QRegExp hopRegex("\\s+[0-9]+\\s+(.+)");
     QRegExp ipRegex("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
-    QRegExp timeRegex("([0-9.]+)");
+    QRegExp timeRegex("([0-9.]+|<1)");
     foreach (const QString &line, result.split("\n"))
     {
         qDebug() << "line" << line;
@@ -247,7 +248,7 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
                 hop.sentPackets += 1;
                 if (timeRegex.exactMatch(bit))
                 {
-                    float hopTime = bit.toFloat();
+                    float hopTime = (bit == "<1") ? 0 : bit.toFloat();
                     hop.receivedPackets += 1;
                     if (hopTime > hop.maximumTime)
                         hop.maximumTime = hopTime;
