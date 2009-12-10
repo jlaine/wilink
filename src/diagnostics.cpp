@@ -52,11 +52,24 @@ static QString osName()
     return QString::fromLatin1("Unknown");
 }
 
+static QString osVersion()
+{
+#ifdef Q_OS_LINUX
+    QProcess process;
+    process.start(QString("uname"), QStringList(QString("-r")), QIODevice::ReadOnly);
+    process.waitForFinished();
+    return QString::fromLocal8Bit(process.readAllStandardOutput());
+#endif
+    return QString();
+}
+
 class Ping
 {
 public:
     Ping();
     Ping(const QHostAddress &host, int maxPackets = 1);
+
+    QHostAddress hostAddress;
 
     // in milliseconds
     float minimumTime;
@@ -74,7 +87,8 @@ Ping::Ping()
 }
 
 Ping::Ping(const QHostAddress &host, int maxPackets)
-    : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
+    : hostAddress(host),
+    minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
     sentPackets(0), receivedPackets(0)
 {
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
@@ -93,7 +107,6 @@ Ping::Ping(const QHostAddress &host, int maxPackets)
 
         /* process stats */
         QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
-        qDebug() << result;
 
 #ifdef Q_OS_WIN
         /* min max avg */
@@ -124,6 +137,12 @@ Ping::Ping(const QHostAddress &host, int maxPackets)
         }
     }
 }
+
+class TraceRoute
+{
+public:
+    QList<Ping> hops;
+};
 
 /* NETWORK */
 
@@ -223,7 +242,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     setMinimumSize(QSize(450, 400));
 
     /* show system info */
-    text->setText("<h1>Diagnostics for " + osName() + "</h1>");
+    text->setText("<h1>Diagnostics for " + osName() + " " + osVersion() + "</h1>");
 
     /* get network info */
     networkThread = new NetworkThread(this);
