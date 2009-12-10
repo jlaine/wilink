@@ -37,11 +37,13 @@ public:
 
 protected slots:
     void print();
+    void refresh();
     void networkFinished();
     void wirelessFinished();
 
 private:
     QPushButton *printButton;
+    QPushButton *refreshButton;
     QTextEdit *text;
 
     NetworkThread *networkThread;

@@ -390,13 +390,36 @@ Diagnostics::Diagnostics(QWidget *parent)
     text->setReadOnly(true);
     layout->addWidget(text);
 
-    printButton = new QPushButton(tr("Print"));
-    printButton->setEnabled(false);
-    connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
-    layout->addWidget(printButton);
+    QHBoxLayout *hbox = new QHBoxLayout;
+    refreshButton = new QPushButton(tr("Refresh"));
+    connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
+    hbox->addWidget(refreshButton);
 
+    hbox->addStretch();
+
+    printButton = new QPushButton(tr("Print"));
+    connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
+    hbox->addWidget(printButton);
+
+    layout->addItem(hbox);
     setLayout(layout);
     setMinimumSize(QSize(450, 400));
+
+    refresh();
+}
+
+void Diagnostics::print()
+{
+    QPrinter printer;
+    QPrintDialog dialog(&printer);
+    if (dialog.exec() == QDialog::Accepted)
+        text->print(&printer);
+}
+
+void Diagnostics::refresh()
+{
+    refreshButton->setEnabled(false);
+    printButton->setEnabled(false);
 
     /* show system info */
     text->setText("<h1>Diagnostics for " + osName() + " " + osVersion() + "</h1>");
@@ -433,14 +456,6 @@ Diagnostics::Diagnostics(QWidget *parent)
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     networkThread->start();
-}
-
-void Diagnostics::print()
-{
-    QPrinter printer;
-    QPrintDialog dialog(&printer);
-    if (dialog.exec() == QDialog::Accepted)
-        text->print(&printer);
 }
 
 void Diagnostics::networkFinished()
@@ -518,7 +533,8 @@ void Diagnostics::wirelessFinished()
     }
     text->append(info);
 
-    /* enable print button */
+    /* enable buttons */
+    refreshButton->setEnabled(true);
     printButton->setEnabled(true);
 }
 
