@@ -75,7 +75,7 @@ static QString osVersion()
     }
 #endif
 #ifdef Q_OS_WIN
-    switch (QSysInfo::WinVersion)
+    switch (QSysInfo::WindowsVersion)
     {
     case QSysInfo::WV_XP:
         return QString::fromLatin1("XP");
