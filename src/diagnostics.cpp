@@ -60,6 +60,30 @@ static QString osVersion()
     process.waitForFinished();
     return QString::fromLocal8Bit(process.readAllStandardOutput());
 #endif
+#ifdef Q_OS_MAC
+    switch (QSysInfo::MacintoshVersion)
+    {
+    case QSysInfo::MV_TIGER:
+        return QString::fromLatin1("Tiger");
+    case QSysInfo::MV_LEOPARD:
+        return QString::fromLatin1("Leopard");
+    case QSysInfo::MV_SNOWLEOPARD:
+        return QString::fromLatin1("Snow Leopard");
+    }
+#endif
+#ifdef Q_OS_WIN
+    switch (QSysInfo::WinVersion)
+    {
+    case QSysInfo::WV_XP:
+        return QString::fromLatin1("XP");
+    case QSysInfo::WV_2003:
+        return QString::fromLatin1("Server 2003");
+    case QSysInfo::WV_VISTA:
+        return QString::fromLatin1("Vista");
+    case QSysInfo::WV_WINDOWS7:
+        return QString::fromLatin1("7");
+    }
+#endif
     return QString();
 }
 
