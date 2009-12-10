@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QHostInfo>
 #include <QLayout>
 #include <QNetworkInterface>
 #include <QPushButton>
@@ -208,6 +209,7 @@ public:
     NetworkThread(QObject *parent) : QThread(parent) {};
     void run();
 
+    QList<QHostInfo> lookups;
     QList<Ping> pings;
 };
 
@@ -230,9 +232,30 @@ void NetworkThread::run()
             }
         }
     }
-
-    /* run tests */
     gateways.append(SERVER_ADDRESS);
+
+    /* run DNS tests */
+    QStringList hostNames;
+    hostNames << "wireless.wifirst.fr" << "www.wifirst.net" << "www.google.fr";
+    foreach (const QString &hostName, hostNames)
+    {
+        QHostInfo hostInfo = QHostInfo::fromName(hostName);
+        lookups.append(hostInfo);
+        if (hostInfo.error() == QHostInfo::NoError)
+        {
+            foreach (const QHostAddress &address, hostInfo.addresses())
+            {
+                if (address.protocol() == QAbstractSocket::IPv4Protocol)
+                {
+                    if (!gateways.contains(address))
+                        gateways.append(address);
+                    break;
+                }
+            }
+        }
+    }
+
+    /* run ping tests */
     foreach (const QHostAddress &gateway, gateways)
         pings.append(NetworkInfo::ping(gateway, 3));
 
@@ -344,6 +367,31 @@ void Diagnostics::print()
 void Diagnostics::networkFinished()
 {
     QString info = "<h2>Tests</h2>";
+
+    /* DNS tests */
+    info += "<h3>DNS</h3>";
+    info += "<table>";
+    info += "<tr><th>Host name</th><th>Host address</th></tr>";
+    foreach (const QHostInfo &hostInfo, networkThread->lookups)
+    {
+        QString hostAddress = "not found";
+        foreach (const QHostAddress &address, hostInfo.addresses())
+        {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                hostAddress = address.toString();
+                break;
+            }
+        }
+        info += QString("<tr style=\"background-color: %1\"><td>%2</td><td>%3</td></tr>")
+            .arg(hostInfo.error() == QHostInfo::NoError ? "green" : "red")
+            .arg(hostInfo.hostName())
+            .arg(hostAddress);
+    }
+    info += "</table>";
+
+    /* ping tests */
+    info += "<h3>Ping</h3>";
     info += "<table>";
     info += "<tr><th>Host</th><th>Packets received</th><th>Times</th></tr>";
     foreach (const Ping &report, networkThread->pings)
