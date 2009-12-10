@@ -43,7 +43,7 @@
 using namespace QNetIO;
 
 ContactsList::ContactsList(QWidget *parent)
-    : QListWidget(parent)
+    : QListWidget(parent), showOffline(true)
 {
     contextMenu = new QMenu(this);
     QAction *action = contextMenu->addAction(tr("Remove contact"));
@@ -74,6 +74,8 @@ void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
         name = jid.split("@")[0];
     newItem->setText(name);
     addItem(newItem);
+    if (!showOffline)
+        setItemHidden(newItem, true);
 }
 
 void ContactsList::removeContact()
@@ -94,24 +96,24 @@ void ContactsList::removeContact()
 void ContactsList::presenceReceived(const QXmppPresence &presence)
 {
     QString suffix;
+    bool offline;
     switch (presence.getType())
     {
     case QXmppPresence::Available:
         switch(presence.getStatus().getType())
         {
             case QXmppPresence::Status::Online:
-               suffix = "available";
-               break;
-            case QXmppPresence::Status::Offline:
-               suffix = "offline";
-               break;
+                suffix = "available";
+                break;
             default:
                 suffix = "busy";
                 break;
         }
+        offline = false;
         break;
     case QXmppPresence::Unavailable:
         suffix = "offline";
+        offline = true;
         break;
     default:
         return;
@@ -123,9 +125,17 @@ void ContactsList::presenceReceived(const QXmppPresence &presence)
         if (entry->data(Qt::UserRole).toString() == bareJid)
         {
             entry->setIcon(QIcon(QString(":/contact-%1.png").arg(suffix)));
+            bool hidden = !showOffline && offline;
+            setItemHidden(entry, hidden);
             break;
         }
     }
+}
+
+void ContactsList::setShowOffline(bool show)
+{
+    // FIXME: refresh list
+    showOffline = show;
 }
 
 void ContactsList::slotItemDoubleClicked(QListWidgetItem *item)

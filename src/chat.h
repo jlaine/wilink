@@ -39,6 +39,7 @@ class ContactsList : public QListWidget
 public:
     ContactsList(QWidget *parent = NULL);
     void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
+    void setShowOffline(bool show);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
@@ -56,6 +57,7 @@ protected slots:
 
 private:
     QMenu *contextMenu;
+    bool showOffline;
 };
 
 class ChatDialog : public QDialog
