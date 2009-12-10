@@ -348,19 +348,15 @@ void Diagnostics::networkFinished()
     info += "<tr><th>Host</th><th>Packets received</th><th>Times</th></tr>";
     foreach (const Ping &report, networkThread->pings)
     {
-        info += QString("<tr><td>%1</td>").arg(report.hostAddress.toString());
-        if (report.receivedPackets)
-        {
-            info += QString("<td align=\"center\">%1 / %2</td><td>min: %3 ms, max: %4 ms, avg: %5 ms</td>")
-                .arg(report.receivedPackets)
-                .arg(report.sentPackets)
+        info += QString("<tr style=\"background-color: %1\"><td>%2</td><td align=\"center\">%3 / %4</td><td>%5</td></tr>")
+            .arg(report.receivedPackets == report.sentPackets ? "green" : "red")
+            .arg(report.hostAddress.toString())
+            .arg(report.receivedPackets)
+            .arg(report.sentPackets)
+            .arg(report.receivedPackets == 0 ? "unreachable" : QString("min: %1 ms, max: %2 ms, avg: %3 ms")
                 .arg(report.minimumTime)
                 .arg(report.maximumTime)
-                .arg(report.averageTime);
-        } else {
-            info += "<td colspan=\"2\">unreachable</td>";
-        }
-        info += "</tr>";
+                .arg(report.averageTime));
     }
     info += "</table>";
     text->append(info);
