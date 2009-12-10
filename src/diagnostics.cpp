@@ -110,11 +110,18 @@ Ping::Ping()
 {
 }
 
-Ping::Ping(const QHostAddress &host, int maxPackets)
-    : hostAddress(host),
-    minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
-    sentPackets(0), receivedPackets(0)
+class NetworkInfo
 {
+public:
+    static Ping ping(const QHostAddress &host, int maxPackets = 1);
+    static QList<Ping> traceroute(const QHostAddress &host);
+};
+
+Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
+{
+    Ping info;
+    info.hostAddress = host;
+
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
     {
         QString program = "ping";
@@ -137,9 +144,9 @@ Ping::Ping(const QHostAddress &host, int maxPackets)
         QRegExp timeRegex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
         if (timeRegex.indexIn(result))
         {
-            minimumTime = timeRegex.cap(1).toInt();
-            maximumTime = timeRegex.cap(2).toInt();
-            averageTime = timeRegex.cap(3).toInt();
+            info.minimumTime = timeRegex.cap(1).toInt();
+            info.maximumTime = timeRegex.cap(2).toInt();
+            info.averageTime = timeRegex.cap(3).toInt();
         }
         QRegExp packetRegex(" = ([0-9]+), [^ ]+ = ([0-9]+),");
 #else
@@ -147,26 +154,23 @@ Ping::Ping(const QHostAddress &host, int maxPackets)
         QRegExp timeRegex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
         if (timeRegex.indexIn(result))
         {
-            minimumTime = timeRegex.cap(1).toFloat();
-            averageTime = timeRegex.cap(2).toFloat();
-            maximumTime = timeRegex.cap(3).toFloat();
+            info.minimumTime = timeRegex.cap(1).toFloat();
+            info.averageTime = timeRegex.cap(2).toFloat();
+            info.maximumTime = timeRegex.cap(3).toFloat();
         }
         /* 2 packets transmitted, 1 packets received, 50.0% packet loss */
         QRegExp packetRegex("([0-9]+) [^ ]+ [^ ]+, ([0-9]+) [^ ]+ [^ ]+, [0-9]+");
 #endif
         if (packetRegex.indexIn(result))
         {
-            sentPackets = packetRegex.cap(1).toInt();
-            receivedPackets = packetRegex.cap(2).toInt();
+            info.sentPackets = packetRegex.cap(1).toInt();
+            info.receivedPackets = packetRegex.cap(2).toInt();
         }
+    } else {
+        qWarning("IPv6 ping is not supported");
     }
+    return info;
 }
-
-class TraceRoute
-{
-public:
-    QList<Ping> hops;
-};
 
 /* NETWORK */
 
@@ -200,7 +204,7 @@ void NetworkThread::run()
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
                 report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
-                report.gateway_ping = Ping(report.gateway_address, 3);
+                report.gateway_ping = NetworkInfo::ping(report.gateway_address, 3);
                 break;
             }
         }
