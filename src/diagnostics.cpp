@@ -167,8 +167,9 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
         info.averageTime = timeRegex.cap(2).toFloat();
         info.maximumTime = timeRegex.cap(3).toFloat();
     }
-    /* 2 packets transmitted, 1 packets received, 50.0% packet loss */
-    QRegExp packetRegex("([0-9]+) [^ ]+ [^ ]+, ([0-9]+) [^ ]+ [^ ]+, [0-9]+");
+    /* Linux  : 2 packets transmitted, 2 received, 0% packet loss, time 1001ms */
+    /* Mac OS : 2 packets transmitted, 1 packets received, 50.0% packet loss */
+    QRegExp packetRegex("([0-9]+) [^ ]+ [^ ]+, ([0-9]+) [^ ]+( [^ ]+)?, [0-9]+");
 #endif
     if (packetRegex.indexIn(result))
     {
