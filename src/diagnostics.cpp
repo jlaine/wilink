@@ -117,7 +117,7 @@ class NetworkInfo
 {
 public:
     static Ping ping(const QHostAddress &host, int maxPackets = 1);
-    static QList<Ping> traceroute(const QHostAddress &host, int maxPackets = 3);
+    static QList<Ping> traceroute(const QHostAddress &host, int maxPackets = 1, int maxHops = 0);
 };
 
 Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
@@ -135,10 +135,11 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
 
     QStringList arguments;
 #ifdef Q_OS_WIN
-    arguments << "-n" << QString::number(maxPackets) << host.toString();
+    arguments << "-n" << QString::number(maxPackets);
 #else
-    arguments << "-c" << QString::number(maxPackets) << host.toString();
+    arguments << "-c" << QString::number(maxPackets);
 #endif
+    arguments << host.toString();
 
     QProcess process;
     process.start(program, arguments, QIODevice::ReadOnly);
@@ -177,28 +178,89 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
     return info;
 }
 
-QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets)
+QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, int maxHops)
 {
     QList<Ping> hops;
     QString program;
     QStringList arguments;
 
-    if (host.protocol() == QAbstractSocket::IPv4Protocol)
+    if (host.protocol() != QAbstractSocket::IPv4Protocol)
     {
-        program = "traceroute";
-        arguments << "-n" << "-q" << QString::number(maxPackets) << host.toString();
-    } else {
         qWarning("IPv6 traceroute is not supported");
         return hops;
+    } else {
+#ifdef Q_OS_WIN
+        program = "tracert";
+#else
+        program = "traceroute";
+#endif
     }
+
+    arguments << "-n";
+    if (maxPackets > 0)
+        arguments << "-q" << QString::number(maxPackets);
+    if (maxHops > 0)
+        arguments << "-m" << QString::number(maxHops);
+    arguments << host.toString();
 
     QProcess process;
     process.start(program, arguments, QIODevice::ReadOnly);
     process.waitForFinished();
 
+    /* process results */
     QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
     qDebug() << result;
+
+    /* 1  192.168.99.1  6.839 ms  19.866 ms  1.134 ms */
+    QRegExp hopRegex(" [0-9]+  ([^ ]+)  (.+)");
+    QRegExp timeRegex("([0-9.]+) ms");
+    foreach (const QString &line, result.split("\n"))
+    {
+        if (hopRegex.exactMatch(line))
+        {
+            Ping hop;
+            float totalTime = 0.0;
+            hop.hostAddress = QHostAddress(hopRegex.cap(1));
+            foreach (const QString &packet, hopRegex.cap(2).split("  "))
+            {
+                hop.sentPackets += 1;
+                if (timeRegex.exactMatch(packet))
+                {
+                    float hopTime = timeRegex.cap(1).toFloat();
+                    hop.receivedPackets += 1;
+                    if (hopTime > hop.maximumTime)
+                        hop.maximumTime = hopTime;
+                    if (!hop.minimumTime || hopTime < hop.minimumTime)
+                        hop.minimumTime = hopTime;
+                    totalTime += hopTime;
+                }
+            }
+            if (hop.receivedPackets)
+                hop.averageTime = totalTime / static_cast<float>(hop.receivedPackets);
+            hops.append(hop);
+        }
+    }
     return hops;
+}
+
+static QString dumpPings(const QList<Ping> &pings)
+{
+    QString info = "<table>";
+    info += "<tr><th>Host</th><th>Packets received</th><th>Times</th></tr>";
+    foreach (const Ping &report, pings)
+    {
+        info += QString("<tr style=\"background-color: %1\"><td>%2</td><td align=\"center\">%3 / %4</td><td>%5</td></tr>")
+            .arg(report.receivedPackets == report.sentPackets ? "green" : "red")
+            .arg(report.hostAddress.toString())
+            .arg(report.receivedPackets)
+            .arg(report.sentPackets)
+            .arg(report.receivedPackets == 0 ? "unreachable" : QString("min: %1 ms, max: %2 ms, avg: %3 ms")
+                .arg(report.minimumTime)
+                .arg(report.maximumTime)
+                .arg(report.averageTime));
+    }
+    info += "</table>";
+    return info;
 }
 
 /* NETWORK */
@@ -211,6 +273,7 @@ public:
 
     QList<QHostInfo> lookups;
     QList<Ping> pings;
+    QList<Ping> traceroute;
 };
 
 void NetworkThread::run()
@@ -259,7 +322,8 @@ void NetworkThread::run()
     foreach (const QHostAddress &gateway, gateways)
         pings.append(NetworkInfo::ping(gateway, 3));
 
-    //NetworkInfo::traceroute(SERVER_ADDRESS);
+    /* run traceroute */
+    traceroute = NetworkInfo::traceroute(SERVER_ADDRESS, 3, 4);
 }
 
 /* WIRELESS */
@@ -389,25 +453,13 @@ void Diagnostics::networkFinished()
             .arg(hostAddress);
     }
     info += "</table>";
+    text->append(info);
 
     /* ping tests */
-    info += "<h3>Ping</h3>";
-    info += "<table>";
-    info += "<tr><th>Host</th><th>Packets received</th><th>Times</th></tr>";
-    foreach (const Ping &report, networkThread->pings)
-    {
-        info += QString("<tr style=\"background-color: %1\"><td>%2</td><td align=\"center\">%3 / %4</td><td>%5</td></tr>")
-            .arg(report.receivedPackets == report.sentPackets ? "green" : "red")
-            .arg(report.hostAddress.toString())
-            .arg(report.receivedPackets)
-            .arg(report.sentPackets)
-            .arg(report.receivedPackets == 0 ? "unreachable" : QString("min: %1 ms, max: %2 ms, avg: %3 ms")
-                .arg(report.minimumTime)
-                .arg(report.maximumTime)
-                .arg(report.averageTime));
-    }
-    info += "</table>";
-    text->append(info);
+    text->append("<h3>Ping</h3>" + dumpPings(networkThread->pings));
+
+    /* traceroute tests */
+    text->append("<h3>Traceroute</h3>" + dumpPings(networkThread->traceroute));
 
     /* get wireless info */
     wirelessThread = new WirelessThread(this);
