@@ -48,6 +48,15 @@ TrayIcon::TrayIcon()
     setIcon(QIcon(":/wDesktop.png"));
     show();
 
+    /* set initial menu */
+    QMenu *menu = new QMenu;
+    QAction *action = menu->addAction(tr("&Diagnostics"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
+
+    action = menu->addAction(tr("&Quit"));
+    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    setContextMenu(menu);
+
 #ifndef Q_WS_MAC
     /* convert left clicks to right clicks, except on OS X */
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
@@ -152,10 +161,10 @@ void TrayIcon::showIcon()
 
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    QMenu *menu = contextMenu();
-    if (menu && reason == QSystemTrayIcon::Trigger)
+    if (reason == QSystemTrayIcon::Trigger)
     {
         // FIXME: this implies that the system tray is at the bottom of the screen..
+        QMenu *menu = contextMenu();
         QPoint delta = QPoint(0, menu->sizeHint().height());
         menu->popup(geometry().topLeft() - delta);
     }
@@ -171,8 +180,13 @@ void TrayIcon::showDiagnostics()
 void TrayIcon::showMenu()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    if (!reply)
+    Q_ASSERT(reply != NULL);
+
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        qWarning("Failed to retrieve menu");
         return;
+    }
 
     QMenu *menu = new QMenu;
     QAction *action;
