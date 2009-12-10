@@ -197,11 +197,16 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
 #endif
     }
 
+#ifdef Q_OS_WIN
+    if (maxPackets > 0)
+        arguments << "-h" << QString::number(maxHops);
+#else
     arguments << "-n";
     if (maxPackets > 0)
         arguments << "-q" << QString::number(maxPackets);
     if (maxHops > 0)
         arguments << "-m" << QString::number(maxHops);
+#endif
     arguments << host.toString();
 
     QProcess process;
@@ -214,9 +219,10 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
 
     /* 1  192.168.99.1  6.839 ms  19.866 ms  1.134 ms */
     QRegExp hopRegex(" [0-9]+  ([^ ]+)  (.+)");
-    QRegExp timeRegex("([0-9.]+) ms");
+    QRegExp timeRegex("([^ ]+) ms");
     foreach (const QString &line, result.split("\n"))
     {
+        qDebug() << "line" << line;
         if (hopRegex.exactMatch(line))
         {
             Ping hop;
