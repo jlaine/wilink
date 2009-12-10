@@ -211,11 +211,10 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
 
     QProcess process;
     process.start(program, arguments, QIODevice::ReadOnly);
-    process.waitForFinished();
+    process.waitForFinished(60000);
 
     /* process results */
     QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
-    qDebug() << result;
 
     /*
      * Windows :  1  6.839 ms  19.866 ms  1.134 ms 192.168.99.1
@@ -228,7 +227,6 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
     QRegExp timeRegex("([0-9.]+|<1)");
     foreach (const QString &line, result.split("\n"))
     {
-        qDebug() << "line" << line;
         if (hopRegex.exactMatch(line))
         {
             Ping hop;
@@ -236,19 +234,14 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
 
             foreach (const QString &bit, hopRegex.cap(1).split(QRegExp("\\s+")))
             {
-                if (bit.isEmpty() || bit == "ms")
-                    continue;
-                qDebug() << "bit" << bit;
                 if (ipRegex.exactMatch(bit))
-                {
                     hop.hostAddress = QHostAddress(bit);
-                    continue;
-                }
-
-                hop.sentPackets += 1;
-                if (timeRegex.exactMatch(bit))
+                else if (bit == "*")
+                    hop.sentPackets++;
+                else if (timeRegex.exactMatch(bit))
                 {
                     float hopTime = (bit == "<1") ? 0 : bit.toFloat();
+                    hop.sentPackets += 1;
                     hop.receivedPackets += 1;
                     if (hopTime > hop.maximumTime)
                         hop.maximumTime = hopTime;
