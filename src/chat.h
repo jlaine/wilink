@@ -39,7 +39,6 @@ class ContactsList : public QListWidget
 public:
     ContactsList(QWidget *parent = NULL);
     void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
-    void setStatus(const QString &jid, const QXmppPresence::Status &entry);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
@@ -47,6 +46,9 @@ protected:
 signals:
     void chatContact(const QString &jid);
     void removeContact(const QString &jid);
+
+public slots:
+    void presenceReceived(const QXmppPresence &presence);
 
 protected slots:
     void slotItemDoubleClicked(QListWidgetItem *item);

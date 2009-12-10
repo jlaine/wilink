@@ -91,22 +91,32 @@ void ContactsList::removeContact()
     }
 }
 
-void ContactsList::setStatus(const QString &jid, const QXmppPresence::Status &status)
+void ContactsList::presenceReceived(const QXmppPresence &presence)
 {
-    QString bareJid = jid.split("/").first();
     QString suffix;
-    switch(status.getType())
+    switch (presence.getType())
     {
-        case QXmppPresence::Status::Online:
-           suffix = "available";
-           break;
-        case QXmppPresence::Status::Offline:
-           suffix = "offline";
-           break;
-        default:
-            suffix = "busy";
-            break;
+    case QXmppPresence::Available:
+        switch(presence.getStatus().getType())
+        {
+            case QXmppPresence::Status::Online:
+               suffix = "available";
+               break;
+            case QXmppPresence::Status::Offline:
+               suffix = "offline";
+               break;
+            default:
+                suffix = "busy";
+                break;
+        }
+        break;
+    case QXmppPresence::Unavailable:
+        suffix = "offline";
+        break;
+    default:
+        return;
     }
+    QString bareJid = presence.getFrom().split("/").first();
     for (int i = 0; i < count(); i++)
     {
         QListWidgetItem *entry = item(i);
@@ -169,14 +179,6 @@ void ChatDialog::send()
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : systemTrayIcon(trayIcon)
 {
-    client = new QXmppClient(this);
-    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(handlePresence(const QXmppPresence&)));
-    connect(client, SIGNAL(connected()), this, SLOT(connected()));
-    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
-
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -201,6 +203,16 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     layout->addItem(hbox);
 
     setLayout(layout);
+
+    /* set up client */
+    client = new QXmppClient(this);
+    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(handlePresence(const QXmppPresence&)));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), contacts, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(client, SIGNAL(connected()), this, SLOT(connected()));
+    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
+    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 }
 
 void Chat::addContact()
@@ -263,9 +275,6 @@ void Chat::handlePresence(const QXmppPresence &presence)
     packet.setTo(presence.getFrom());
     switch (presence.getType())
     {
-    case QXmppPresence::Available:
-        contacts->setStatus(presence.getFrom(), presence.getStatus());
-        break;
     case QXmppPresence::Subscribe:
         {
             if (QMessageBox::question(this, tr("Subscribe request"),
