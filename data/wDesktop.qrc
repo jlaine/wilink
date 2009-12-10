@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>contact.png</file>
+    <file>contact-offline.png</file>
     <file>wDesktop.png</file>
 </qresource>
 </RCC>
