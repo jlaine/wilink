@@ -146,6 +146,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(handlePresence(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
+    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
+    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -202,8 +205,11 @@ ChatDialog *Chat::chatContact(const QString &jid)
 void Chat::connected()
 {
     statusLabel->setText(tr("Connected"));
-    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+}
+
+void Chat::disconnected()
+{
+    statusLabel->setText(tr("Disconnected"));
 }
 
 void Chat::handleMessage(const QXmppMessage &msg)
@@ -333,6 +339,7 @@ void Chat::rosterChanged(const QString &jid)
 void Chat::rosterReceived()
 {
     QMap<QString, QXmppRoster::QXmppRosterEntry> entries = client->getRoster().getRosterEntries();
+    contacts->clear();
     foreach (const QString &key, entries.keys())
         contacts->addEntry(entries[key]);
 }

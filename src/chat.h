@@ -89,6 +89,7 @@ protected slots:
     void addContact();
     ChatDialog *chatContact(const QString &jid);
     void connected();
+    void disconnected();
     void handleMessage(const QXmppMessage &msg);
     void handlePresence(const QXmppPresence &presence);
     void removeContact(const QString &jid);
