@@ -29,6 +29,8 @@
 #include "diagnostics.h"
 #include "wireless.h"
 
+#define SERVER_ADDRESS QHostAddress("213.91.4.201")
+
 static QString interfaceName(const QNetworkInterface &interface)
 {
 #if QT_VERSION >= 0x040500
@@ -183,7 +185,7 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets)
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
     {
         program = "traceroute";
-        arguments << "-n" << "-q" << QString::number(maxPackets);
+        arguments << "-n" << "-q" << QString::number(maxPackets) << host.toString();
     } else {
         qWarning("IPv6 traceroute is not supported");
         return hops;
@@ -192,47 +194,49 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets)
     QProcess process;
     process.start(program, arguments, QIODevice::ReadOnly);
     process.waitForFinished();
+
+    QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
+    qDebug() << result;
     return hops;
 }
 
 /* NETWORK */
-
-class NetworkReport
-{
-public:
-    QHostAddress gateway_address;
-    Ping gateway_ping;
-};
-
-typedef QPair<QNetworkInterface, NetworkReport> NetworkResult;
 
 class NetworkThread : public QThread
 {
 public:
     NetworkThread(QObject *parent) : QThread(parent) {};
     void run();
-    QList<NetworkResult> results;
+
+    QList<Ping> pings;
 };
 
 void NetworkThread::run()
 {
+    QList<QHostAddress> gateways;
+
+    /* try to detemine gateways */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
             continue;
 
-        NetworkReport report;
         foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
             {
-                report.gateway_address = QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
-                report.gateway_ping = NetworkInfo::ping(report.gateway_address, 3);
+                gateways.append(QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1));
                 break;
             }
         }
-        results.append(qMakePair(interface, report));
     }
+
+    /* run tests */
+    gateways.append(SERVER_ADDRESS);
+    foreach (const QHostAddress &gateway, gateways)
+        pings.append(NetworkInfo::ping(gateway, 3));
+
+    //NetworkInfo::traceroute(SERVER_ADDRESS);
 }
 
 /* WIRELESS */
@@ -294,8 +298,36 @@ Diagnostics::Diagnostics(QWidget *parent)
 
     /* show system info */
     text->setText("<h1>Diagnostics for " + osName() + " " + osVersion() + "</h1>");
+    text->append("<h2>Network interfaces</h2>");
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
+            continue;
 
-    /* get network info */
+        QString info = "<h3>Interface " + interfaceName(interface) + "</h3>";
+        if (interface.addressEntries().size())
+        {
+            info += "<ul>";
+            foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
+            {
+                QString protocol;
+                if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                    protocol = "IPv4";
+                else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
+                    protocol = "IPv6";
+                else
+                    continue;
+                info += "<li>" + protocol + " address: " + entry.ip().toString() + "</li>";
+                info += "<li>" + protocol + " netmask: " + entry.netmask().toString() + "</li>";
+            }
+            info += "</ul>";
+        } else {
+            info += "<p>No address</p>";
+        }
+        text->append(info);
+    }
+
+    /* run network tests */
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     networkThread->start();
@@ -311,48 +343,26 @@ void Diagnostics::print()
 
 void Diagnostics::networkFinished()
 {
-    foreach (const NetworkResult &pair, networkThread->results)
+    QString info = "<h2>Tests</h2>";
+    info += "<ul>";
+    foreach (const Ping &report, networkThread->pings)
     {
-        QNetworkInterface interface(pair.first);
-
-        QString info = "<h2>Network interface " + interfaceName(interface) + QString("</h2>");
-        if (interface.addressEntries().size())
+        info += "<li>ping " + report.hostAddress.toString() + ": ";
+        if (report.receivedPackets)
         {
-            info += "<ul>";
-            foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
-            {
-                QString protocol;
-                if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                    protocol = "IPv4";
-                else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                    protocol = "IPv6";
-                else
-                    continue;
-                info += "<li>" + protocol + " address: " + entry.ip().toString() + "</li>";
-                info += "<li>" + protocol + " netmask: " + entry.netmask().toString() + "</li>";
-                if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                {
-                    info += "<li>" + protocol + " gateway: " + pair.second.gateway_address.toString();
-                    const Ping &report = pair.second.gateway_ping;
-                    if (true || report.receivedPackets == report.sentPackets)
-                    {
-                        info += QString("<li>" + protocol + " gateway ping: %1 sent, %2 received (min: %3 ms, max: %4 ms, avg: %5 ms)</li>")
-                            .arg(report.sentPackets)
-                            .arg(report.receivedPackets)
-                            .arg(report.minimumTime)
-                            .arg(report.maximumTime)
-                            .arg(report.averageTime);
-                    } else
-                        info += " (unreachable)";
-                    info += "</li>";
-                }
-            }
-            info += "</ul>";
+            info += QString("%1 sent, %2 received (min: %3 ms, max: %4 ms, avg: %5 ms)")
+                .arg(report.sentPackets)
+                .arg(report.receivedPackets)
+                .arg(report.minimumTime)
+                .arg(report.maximumTime)
+                .arg(report.averageTime);
         } else {
-            info += "<p>No address</p>";
+            info += "unreachable";
         }
-        text->append(info);
+        info += "</li>";
     }
+    info += "</ul>";
+    text->append(info);
 
     /* get wireless info */
     wirelessThread = new WirelessThread(this);
