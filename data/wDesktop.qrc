@@ -1,9 +1,12 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>add.png</file>
+    <file>chat.png</file>
     <file>contact-available.png</file>
     <file>contact-busy.png</file>
     <file>contact-offline.png</file>
+    <file>diagnostics.png</file>
+    <file>photos.png</file>
     <file>remove.png</file>
     <file>wDesktop.png</file>
 </qresource>

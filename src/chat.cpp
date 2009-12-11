@@ -214,6 +214,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     layout->addItem(hbox);
 
     setLayout(layout);
+    setWindowIcon(QIcon(":/chat.png"));
 
     /* set up client */
     client = new QXmppClient(this);

@@ -55,7 +55,7 @@ class Photos : public QWidget
     Q_OBJECT
 
 public:
-    Photos(const QString &url, const QIcon &folderIcon, QWidget *parent = NULL);
+    Photos(const QString &url, QWidget *parent = NULL);
     void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
 protected:
@@ -73,7 +73,6 @@ private:
     FileSystem *fs;
     QList< QPair<QUrl, QUrl> > queue;
 
-    QIcon icon;
     QLabel *helpLabel;
     PhotosList *listView;
     QProgressBar *progressBar;

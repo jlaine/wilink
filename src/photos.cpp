@@ -80,8 +80,8 @@ void PhotosList::dropEvent(QDropEvent *event)
     }
 }
 
-Photos::Photos(const QString &url, const QIcon &folderIcon, QWidget *parent)
-    : QWidget(parent), busy(false), icon(folderIcon), remoteUrl(url),
+Photos::Photos(const QString &url, QWidget *parent)
+    : QWidget(parent), busy(false), remoteUrl(url),
     systemTrayIcon(NULL)
 {
     /* create UI */
@@ -110,7 +110,9 @@ Photos::Photos(const QString &url, const QIcon &folderIcon, QWidget *parent)
     hbox->addWidget(statusLabel);
     hbox->addWidget(createButton);
     layout->addItem(hbox);
+
     setLayout(layout);
+    setWindowIcon(QIcon(":/photos.png"));
 
     /* open filesystem */
     fs = FileSystem::factory(remoteUrl, this);
@@ -140,7 +142,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
                 continue;
             QListWidgetItem *newItem = new QListWidgetItem;
             newItem->setData(Qt::UserRole, QUrl(info.url()));
-            newItem->setIcon(icon);
+            newItem->setIcon(QIcon(":/photos.png"));
             newItem->setText(info.name());
             listView->addItem(newItem);
         }

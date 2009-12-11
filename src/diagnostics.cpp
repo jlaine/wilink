@@ -407,6 +407,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     layout->addItem(hbox);
     setLayout(layout);
     setMinimumSize(QSize(450, 400));
+    setWindowIcon(QIcon(":/diagnostics.png"));
 
     refresh();
 }

@@ -50,10 +50,10 @@ TrayIcon::TrayIcon()
 
     /* set initial menu */
     QMenu *menu = new QMenu;
-    QAction *action = menu->addAction(tr("&Diagnostics"));
+    QAction *action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
-    action = menu->addAction(tr("&Quit"));
+    action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
 
@@ -216,21 +216,20 @@ void TrayIcon::showMenu()
     /* add static entries */
     menu->addSeparator();
 
-    action = menu->addAction(tr("&Chat"));
+    action = menu->addAction(QIcon(":/chat.png"), tr("&Chat"));
     connect(action, SIGNAL(triggered(bool)), chat, SLOT(show()));
 
-    action = menu->addAction(tr("&Diagnostics"));
+    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
-    action = menu->addAction(tr("Upload &photos"));
-    icons.append(QPair<QUrl, QAction*>(baseUrl.resolved(QString("images/wfox/album.png")), action));
+    action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(uploadPhotos()));
 
-    action = menu->addAction(tr("&Quit"));
+    action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
 
-    /* load icons */
+    /* fetch icons */
     fetchIcon();
 
     /* connect to chat */
@@ -244,7 +243,7 @@ void TrayIcon::uploadPhotos()
     if (!photos)
     {
         QAction *action = qobject_cast<QAction *>(sender());
-        photos = new Photos("wifirst://www.wifirst.net/w", action->icon());
+        photos = new Photos("wifirst://www.wifirst.net/w");
         photos->setSystemTrayIcon(this);
     }
     photos->show();
