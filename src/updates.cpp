@@ -104,7 +104,7 @@ void Updates::processStatus()
     release.url = QUrl(item.firstChildElement("url").text());
     release.version = item.firstChildElement("version").text();
 
-    if ((release.version != currentVersion) && !release.url.isEmpty())
+    if (compareVersions(release.version, currentVersion) > 0 && !release.url.isEmpty())
         emit updateAvailable(release);
 }
 
