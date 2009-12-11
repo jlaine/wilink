@@ -40,7 +40,9 @@
 #include "updates.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
-static const QUrl updatesUrl("http://updates.bolloretelecom.eu/wDesktop/");
+
+#define WDESKTOP_UPDATES "http://updates.bolloretelecom.eu/wDesktop/"
+#define WDESKTOP_VERSION "0.1.4"
 
 static const QString authSuffix = "@wifirst.net";
 
@@ -73,7 +75,8 @@ TrayIcon::TrayIcon()
 
     /* prepare modules */
     chat = new Chat(this);
-    Updates *updates = new Updates(updatesUrl, this);
+    updates = new Updates(this);
+    connect(updates, SIGNAL(updateAvailable(const Release &)), this, SLOT(updateAvailable(const Release &)));
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
@@ -227,7 +230,7 @@ void TrayIcon::showMenu()
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(uploadPhotos()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
 
     action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
@@ -242,10 +245,11 @@ void TrayIcon::showMenu()
     chat->open(auth.user(), auth.password());
 
     /* check for updates */
-    updates->check();
+    updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
+        QString::fromLatin1(WDESKTOP_VERSION));
 }
 
-void TrayIcon::uploadPhotos()
+void TrayIcon::showPhotos()
 {
     if (!photos)
     {
@@ -257,4 +261,8 @@ void TrayIcon::uploadPhotos()
     photos->raise();
 }
 
+void TrayIcon::updateAvailable(const Release &release)
+{
+    qDebug() << "Update available" << release.version;
+}
 

@@ -17,21 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
+#include <QDomDocument>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QUrl>
 
 #include "updates.h"
 
-Updates::Updates(const QUrl &url, QObject *parent)
-    : QObject(parent), statusUrl(url)
+Updates::Updates(QObject *parent)
+    : QObject(parent)
 {
     network = new QNetworkAccessManager(this);
     connect(network, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestFinished(QNetworkReply*)));
 }
 
-void Updates::check()
+void Updates::check(const QUrl &url, const QString &version)
 {
+    currentVersion = version;
+    statusUrl = url;
+
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
     network->get(req);
@@ -39,6 +45,23 @@ void Updates::check()
 
 void Updates::requestFinished(QNetworkReply *reply)
 {
+    QDomDocument doc;
 
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        qWarning("Failed to check for updates");
+        return;
+    }
+
+    doc.setContent(reply);
+    QDomElement item = doc.documentElement();
+
+    Release release;
+    release.description = item.firstChildElement("description").text();
+    release.url = QUrl(item.firstChildElement("url").text());
+    release.version = item.firstChildElement("version").text();
+
+    if (release.version != currentVersion)
+        emit updateAvailable(release);
 }
 

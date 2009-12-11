@@ -27,6 +27,7 @@
 class Chat;
 class Diagnostics;
 class Photos;
+class Release;
 class Updates;
 
 class QAction;
@@ -50,7 +51,8 @@ protected slots:
     void showIcon();
     void showDiagnostics();
     void showMenu();
-    void uploadPhotos();
+    void showPhotos();
+    void updateAvailable(const Release &release);
 
 private:
     void fetchIcon();

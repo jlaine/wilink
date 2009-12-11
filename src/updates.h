@@ -26,6 +26,14 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
+class Release
+{
+public:
+    QString description;
+    QUrl url;
+    QString version;
+};
+
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
 class Updates : public QObject
@@ -33,16 +41,18 @@ class Updates : public QObject
     Q_OBJECT
 
 public:
-    Updates(const QUrl &url, QObject *parent);
-
-public slots:
-    void check();
+    Updates(QObject *parent);
+    void check(const QUrl &url, const QString &version);
 
 protected slots:
     void requestFinished(QNetworkReply *reply);
 
+signals:
+    void updateAvailable(const Release &release);
+
 private:
     QNetworkAccessManager *network;
+    QString currentVersion;
     QUrl statusUrl;
 };
 
