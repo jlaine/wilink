@@ -297,6 +297,7 @@ void UpdatesDialog::updateAvailable(const Release &release)
 void UpdatesDialog::updateDownloaded(const QUrl &url)
 {
     QDesktopServices::openUrl(url);
+    qApp->quit();
 }
 
 void UpdatesDialog::updateProgress(qint64 done, qint64 total)
