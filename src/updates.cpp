@@ -37,7 +37,12 @@ Updates::Updates(QObject *parent)
 void Updates::check(const QUrl &url, const QString &version)
 {
     currentVersion = version;
-    statusUrl = url;
+
+    QUrl statusUrl = url;
+    QList< QPair<QString, QString> > query;
+    query.append(qMakePair(QString::fromLatin1("platform"), platform()));
+    query.append(qMakePair(QString::fromLatin1("version"), version));
+    statusUrl.setQueryItems(query);
 
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
@@ -66,7 +71,9 @@ void Updates::install(const Release &release)
 {
     QNetworkRequest req(release.url);
     QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(installUpdate()));
+    emit updateStatus(Download);
 }
 
 void Updates::installUpdate()
@@ -80,7 +87,22 @@ void Updates::installUpdate()
         emit updateFailed();
         return;
     }
+
+    emit updateStatus(Install);
     qDebug() << "foo" << QFileInfo(reply->url().path()).fileName();
+}
+
+QString Updates::platform()
+{
+#if defined(Q_OS_WIN)
+    return QString::fromLatin1("win32");
+#elif defined(Q_OS_MAC)
+    return QString::fromLatin1("mac");
+#elif defined(Q_OS_LINUX)
+    return QString::fromLatin1("linux");
+#else
+    return QString();
+#endif
 }
 
 void Updates::processStatus()

@@ -20,7 +20,7 @@
 #ifndef __UPDATES_H__
 #define __UPDATES_H__
 
-#include <QObject>
+#include <QDialog>
 #include <QUrl>
 
 class QNetworkAccessManager;
@@ -35,18 +35,26 @@ public:
     QString version;
 };
 
-/** A TrayIcon is a system tray icon for interacting with a Panel.
+/** The Updates class handling checking for software updates
+ *  and installing them.
  */
 class Updates : public QObject
 {
     Q_OBJECT
 
 public:
+    enum Status {
+        Idle,
+        Download,
+        Install,
+    };
+
     Updates(QObject *parent);
     void check(const QUrl &url, const QString &version);
     void install(const Release &release);
 
     static int compareVersions(const QString &v1, const QString v2);
+    static QString platform();
 
 protected slots:
     void installUpdate();
@@ -56,11 +64,12 @@ signals:
     void updateAvailable(const Release &release);
     void updateComplete();
     void updateFailed();
+    void updateProgress(qint64 done, qint64 total);
+    void updateStatus(int status);
 
 private:
     QNetworkAccessManager *network;
     QString currentVersion;
-    QUrl statusUrl;
 };
 
 #endif
