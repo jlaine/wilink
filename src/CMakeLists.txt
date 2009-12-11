@@ -14,7 +14,6 @@ add_executable(tests updates.cpp tests.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 # wDesktop
-
 set(wDesktop_RCCS
     ${CMAKE_SOURCE_DIR}/data/wDesktop.qrc)
 
@@ -35,12 +34,12 @@ set(wDesktop_MOC_HEADERS
 
 if(WIN32)
   set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
+elseif(APPLE)
+  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
+elseif(UNIX)
+  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_nm.cpp)
 else(WIN32)
-  if(APPLE)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
-  else(APPLE)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_stub.cpp)
-  endif(APPLE)
+  set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_stub.cpp)
 endif(WIN32)
 
 qt4_add_resources(wDesktop_RCC_SOURCES ${wDesktop_RCCS})

@@ -59,7 +59,8 @@ int WirelessInterfacePrivate::percentToRssi(int percent)
 
 WirelessNetwork WirelessInterfacePrivate::getFromDbusObject(QString path)
 {
-    QDBusInterface apInterface("org.freedesktop.NetworkManager", path, "org.freedesktop.NetworkManager.AccessPoint", QDBusConnection::systemBus());
+    QDBusInterface apInterface("org.freedesktop.NetworkManager", path,
+        "org.freedesktop.NetworkManager.AccessPoint", QDBusConnection::systemBus());
     if(!apInterface.isValid())
         return WirelessNetwork();
     WirelessNetwork myNetwork;
@@ -84,18 +85,19 @@ WirelessInterface::~WirelessInterface()
 
 bool WirelessInterface::isValid() const
 {
-    QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName, "org.freedesktop.NetworkManager.Device", QDBusConnection::systemBus());
+    QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName,
+        "org.freedesktop.NetworkManager.Device", QDBusConnection::systemBus());
     return ( interface.isValid() && interface.property("DeviceType").toInt()==2 );
 }
 
 QList<WirelessNetwork> WirelessInterface::availableNetworks()
 {
-    QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName, "org.freedesktop.NetworkManager.Device.Wireless", QDBusConnection::systemBus());
+    QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName,
+        "org.freedesktop.NetworkManager.Device.Wireless", QDBusConnection::systemBus());
     QDBusReply< QList<QDBusObjectPath> > reply = interface.call("GetAccessPoints");
-    if (! reply.isValid()) {
-        qDebug() << "error line" << __LINE__ << QDBusError::errorString(reply.error().type());
+    if (! reply.isValid())
         return QList<WirelessNetwork>();
-    }
+
     QList<WirelessNetwork> result;
     foreach(QDBusObjectPath path, reply.value()) {
         WirelessNetwork myNetwork = WirelessInterfacePrivate::getFromDbusObject(path.path());
@@ -107,13 +109,13 @@ QList<WirelessNetwork> WirelessInterface::availableNetworks()
 
 WirelessNetwork WirelessInterface::currentNetwork()
 {
-    QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName, "org.freedesktop.NetworkManager.Device.Wireless", QDBusConnection::systemBus());
-     /* FIXME: seems to have a bug here... */
-    QDBusReply<QDBusObjectPath> reply = interface.call("ActiveAccessPoint");
-    if (! reply.isValid()) {
-        qDebug() << "error line" << __LINE__ << QDBusError::errorString(reply.error().type());
+    QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName,
+        "org.freedesktop.NetworkManager.Device.Wireless", QDBusConnection::systemBus());
+    if (! interface.isValid()) {
+        qDebug() << d->objectName << "error line" << __LINE__;
         return WirelessNetwork();
     }
-    return WirelessInterfacePrivate::getFromDbusObject(reply.value().path());
+    QDBusObjectPath activeAP = interface.property("ActiveAccessPoint").value<QDBusObjectPath>();
+    return WirelessInterfacePrivate::getFromDbusObject(activeAP.path());
 }
 

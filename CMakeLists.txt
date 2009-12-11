@@ -14,6 +14,9 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_BINARY_DIR}/src/con
 
 # Required
 find_package(Qt4 REQUIRED)
+if(UNIX AND NOT APPLE)
+    set(QT_USE_QTDBUS true)
+endif(UNIX AND NOT APPLE)
 
 # Wireless
 find_library(COREWLAN_LIBRARY NAMES CoreWLAN)
