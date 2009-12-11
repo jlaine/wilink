@@ -28,6 +28,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QMenu>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -263,6 +264,14 @@ void TrayIcon::showPhotos()
 
 void TrayIcon::updateAvailable(const Release &release)
 {
-    qDebug() << "Update available" << release.version;
+    if (QMessageBox::question(NULL,
+        tr("Update available"),
+        tr("Version %1 of %2 is available. Do you want to install it")
+            .arg(release.version)
+            .arg(release.package),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        updates->install(release);
+    }
 }
 

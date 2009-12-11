@@ -19,9 +19,11 @@
 
 #include <QDebug>
 #include <QDomDocument>
+#include <QFileInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QStringList>
 #include <QUrl>
 
 #include "updates.h"
@@ -30,7 +32,6 @@ Updates::Updates(QObject *parent)
     : QObject(parent)
 {
     network = new QNetworkAccessManager(this);
-    connect(network, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestFinished(QNetworkReply*)));
 }
 
 void Updates::check(const QUrl &url, const QString &version)
@@ -40,12 +41,52 @@ void Updates::check(const QUrl &url, const QString &version)
 
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
-    network->get(req);
+    QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(processStatus()));
 }
 
-void Updates::requestFinished(QNetworkReply *reply)
+int Updates::compareVersions(const QString &v1, const QString v2)
 {
-    QDomDocument doc;
+    QStringList bits1 = v1.split(".");
+    QStringList bits2 = v2.split(".");
+    for (int i = 0; i < bits1.size(); ++i)
+    {
+        if (i >= bits2.size())
+            return 1;
+        int cmp = bits1.at(i).compare(bits2.at(i));
+        if (cmp != 0)
+            return cmp;
+    }
+    if (bits2.size() > bits1.size())
+        return -1;
+    return 0;
+}
+
+void Updates::install(const Release &release)
+{
+    QNetworkRequest req(release.url);
+    QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(installUpdate()));
+}
+
+void Updates::installUpdate()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    Q_ASSERT(reply != NULL);
+
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        qWarning("Failed to download update");
+        emit updateFailed();
+        return;
+    }
+    qDebug() << "foo" << QFileInfo(reply->url().path()).fileName();
+}
+
+void Updates::processStatus()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    Q_ASSERT(reply != NULL);
 
     if (reply->error() != QNetworkReply::NoError)
     {
@@ -53,15 +94,17 @@ void Updates::requestFinished(QNetworkReply *reply)
         return;
     }
 
+    QDomDocument doc;
     doc.setContent(reply);
     QDomElement item = doc.documentElement();
 
     Release release;
     release.description = item.firstChildElement("description").text();
+    release.package = item.firstChildElement("package").text();
     release.url = QUrl(item.firstChildElement("url").text());
     release.version = item.firstChildElement("version").text();
 
-    if (release.version != currentVersion)
+    if ((release.version != currentVersion) && !release.url.isEmpty())
         emit updateAvailable(release);
 }
 

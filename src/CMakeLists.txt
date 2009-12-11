@@ -5,6 +5,15 @@ set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
+# tests
+
+set(tests_MOC_HEADERS updates.h tests.h)
+qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
+add_executable(tests updates.cpp tests.cpp ${tests_MOC_SOURCES})
+target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+
+# wDesktop
+
 set(wDesktop_RCCS
     ${CMAKE_SOURCE_DIR}/data/wDesktop.qrc)
 

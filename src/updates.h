@@ -30,6 +30,7 @@ class Release
 {
 public:
     QString description;
+    QString package;
     QUrl url;
     QString version;
 };
@@ -43,12 +44,18 @@ class Updates : public QObject
 public:
     Updates(QObject *parent);
     void check(const QUrl &url, const QString &version);
+    void install(const Release &release);
+
+    static int compareVersions(const QString &v1, const QString v2);
 
 protected slots:
-    void requestFinished(QNetworkReply *reply);
+    void installUpdate();
+    void processStatus();
 
 signals:
     void updateAvailable(const Release &release);
+    void updateComplete();
+    void updateFailed();
 
 private:
     QNetworkAccessManager *network;

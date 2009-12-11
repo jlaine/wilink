@@ -172,7 +172,9 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid)
 
 void ChatDialog::handleMessage(const QXmppMessage &msg)
 {
-    chatHistory->append("<b>Received</b> " + msg.getBody());
+    chatHistory->append(QString("<b>%1</b> %2")
+        .arg(tr("Received"))
+        .arg(msg.getBody()));
 }
 
 void ChatDialog::send()
@@ -181,7 +183,9 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    chatHistory->append("<b>Sent</b> " + text);
+    chatHistory->append(QString("<b>%1</b> %2")
+        .arg(tr("Sent"))
+        .arg(text));
     chatInput->clear();
     emit sendMessage(chatJid, text);
 }
@@ -230,7 +234,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 void Chat::addContact()
 {
     bool ok = false;
-    QString jid = QInputDialog::getText(this, "Add contact", "Enter the ID of the contact you want to add",
+    QString jid = QInputDialog::getText(this, tr("Add contact"),
+        tr("Enter the address of the contact you want to add."),
         QLineEdit::Normal, "@wifirst.net", &ok);
     if (!ok || jid.isEmpty())
         return;
