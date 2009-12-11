@@ -1,0 +1,7 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#cmakedefine WDESKTOP_UPDATES "@WDESKTOP_UPDATES@"
+#cmakedefine WDESKTOP_VERSION "@WDESKTOP_VERSION@"
+
+#endif

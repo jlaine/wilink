@@ -34,17 +34,15 @@
 #include <QNetworkRequest>
 
 #include "qnetio/wallet.h"
+
 #include "chat.h"
+#include "config.h"
 #include "diagnostics.h"
 #include "photos.h"
 #include "trayicon.h"
 #include "updates.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
-
-#define WDESKTOP_UPDATES "http://updates.bolloretelecom.eu/wDesktop/"
-#define WDESKTOP_VERSION "0.1.4"
-
 static const QString authSuffix = "@wifirst.net";
 
 TrayIcon::TrayIcon()
