@@ -32,6 +32,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QProgressBar>
 
 #include "qnetio/wallet.h"
 
@@ -74,8 +75,7 @@ TrayIcon::TrayIcon()
 
     /* prepare modules */
     chat = new Chat(this);
-    updates = new Updates(this);
-    connect(updates, SIGNAL(updateAvailable(const Release &)), this, SLOT(updateAvailable(const Release &)));
+    updates = new UpdatesDialog;
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
@@ -243,9 +243,6 @@ void TrayIcon::showMenu()
     Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
     chat->open(auth.user(), auth.password());
 
-    /* check for updates */
-    updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
-        QString::fromLatin1(WDESKTOP_VERSION));
 }
 
 void TrayIcon::showPhotos()
@@ -260,7 +257,28 @@ void TrayIcon::showPhotos()
     photos->raise();
 }
 
-void TrayIcon::updateAvailable(const Release &release)
+UpdatesDialog::UpdatesDialog(QWidget *parent)
+    : QDialog(parent)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    /* progress */
+    statusLabel = new QLabel;
+    layout->addWidget(statusLabel);
+    progressBar = new QProgressBar;
+    layout->addWidget(progressBar);
+    setLayout(layout);
+
+    /* check for updates */
+    updates = new Updates(this);
+    connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
+    connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
+    connect(updates, SIGNAL(updateStatus(int)), this, SLOT(updateStatus(int)));
+    updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
+        QString::fromLatin1(WDESKTOP_VERSION));
+}
+
+void UpdatesDialog::updateAvailable(const Release &release)
 {
     if (QMessageBox::question(NULL,
         tr("Update available"),
@@ -269,7 +287,28 @@ void TrayIcon::updateAvailable(const Release &release)
             .arg(release.package),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
+        show();
         updates->install(release);
     }
 }
 
+void UpdatesDialog::updateProgress(qint64 done, qint64 total)
+{
+    progressBar->setMaximum(total);
+    progressBar->setValue(done);
+}
+
+void UpdatesDialog::updateStatus(int status)
+{
+    switch (status)
+    {
+    case Updates::Download:
+        statusLabel->setText(tr("Downloading"));
+        break;
+    case Updates::Install:
+        statusLabel->setText(tr("Installing"));
+        break;
+    default:
+        statusLabel->setText(QString());
+    }
+}

@@ -20,20 +20,46 @@
 #ifndef __TRAYICON_H__
 #define __TRAYICON_H__
 
+#include <QDialog>
 #include <QList>
 #include <QSystemTrayIcon>
 #include <QUrl>
+
+#include "updates.h"
 
 class Chat;
 class Diagnostics;
 class Photos;
 class Release;
-class Updates;
 
 class QAction;
 class QAuthenticator;
+class QLabel;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QProgressBar;
+
+class UpdatesDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    UpdatesDialog(QWidget *parent = NULL);
+
+public slots:
+    void updateAvailable(const Release &release);
+    void updateProgress(qint64 done, qint64 total);
+    void updateStatus(int status);
+
+signals:
+    void installRelease(const Release &release);
+
+private:
+    QProgressBar *progressBar;
+    QLabel *statusLabel;
+    Updates *updates;
+};
+
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
@@ -52,7 +78,6 @@ protected slots:
     void showDiagnostics();
     void showMenu();
     void showPhotos();
-    void updateAvailable(const Release &release);
 
 private:
     void fetchIcon();
@@ -61,7 +86,7 @@ private:
     Chat *chat;
     Diagnostics *diagnostics;
     Photos *photos;
-    Updates *updates;
+    UpdatesDialog *updates;
 
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;
