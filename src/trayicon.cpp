@@ -37,8 +37,11 @@
 #include "diagnostics.h"
 #include "photos.h"
 #include "trayicon.h"
+#include "updates.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
+static const QUrl updatesUrl("http://updates.bolloretelecom.eu/wDesktop/");
+
 static const QString authSuffix = "@wifirst.net";
 
 TrayIcon::TrayIcon()
@@ -68,8 +71,9 @@ TrayIcon::TrayIcon()
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     connect(network, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> &)), Wallet::instance(), SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> &)));
 
-    /* prepare chat */
+    /* prepare modules */
     chat = new Chat(this);
+    Updates *updates = new Updates(updatesUrl, this);
 
     /* fetch menu */
     QNetworkRequest req(baseUrl);
@@ -236,6 +240,9 @@ void TrayIcon::showMenu()
     QAuthenticator auth;
     Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
     chat->open(auth.user(), auth.password());
+
+    /* check for updates */
+    updates->check();
 }
 
 void TrayIcon::uploadPhotos()

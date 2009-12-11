@@ -17,10 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QUrl>
+
 #include "updates.h"
 
-Updates::Updates(QObject *parent)
-    : QObject(parent)
+Updates::Updates(const QUrl &url, QObject *parent)
+    : QObject(parent), statusUrl(url)
 {
+    network = new QNetworkAccessManager(this);
+    connect(network, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestFinished(QNetworkReply*)));
+}
+
+void Updates::check()
+{
+    QNetworkRequest req(statusUrl);
+    req.setRawHeader("Accept", "application/xml");
+    network->get(req);
+}
+
+void Updates::requestFinished(QNetworkReply *reply)
+{
+
 }
 

@@ -21,6 +21,10 @@
 #define __UPDATES_H__
 
 #include <QObject>
+#include <QUrl>
+
+class QNetworkAccessManager;
+class QNetworkReply;
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
@@ -29,7 +33,17 @@ class Updates : public QObject
     Q_OBJECT
 
 public:
-    Updates(QObject *parent);
+    Updates(const QUrl &url, QObject *parent);
+
+public slots:
+    void check();
+
+protected slots:
+    void requestFinished(QNetworkReply *reply);
+
+private:
+    QNetworkAccessManager *network;
+    QUrl statusUrl;
 };
 
 #endif

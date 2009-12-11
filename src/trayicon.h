@@ -27,6 +27,7 @@
 class Chat;
 class Diagnostics;
 class Photos;
+class Updates;
 
 class QAction;
 class QAuthenticator;
@@ -58,6 +59,8 @@ private:
     Chat *chat;
     Diagnostics *diagnostics;
     Photos *photos;
+    Updates *updates;
+
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;
 };
