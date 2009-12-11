@@ -17,49 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TRAYICON_H__
-#define __TRAYICON_H__
+#ifndef __UPDATES_H__
+#define __UPDATES_H__
 
-#include <QList>
-#include <QSystemTrayIcon>
-#include <QUrl>
-
-class Chat;
-class Diagnostics;
-class Photos;
-
-class QAction;
-class QAuthenticator;
-class QNetworkAccessManager;
-class QNetworkReply;
+#include <QObject>
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
-class TrayIcon : public QSystemTrayIcon
+class Updates : public QObject
 {
     Q_OBJECT
 
 public:
-    TrayIcon();
-
-protected slots:
-    void getCredentials(const QString &realm, QAuthenticator *authenticator);
-    void openUrl();
-    void onActivated(QSystemTrayIcon::ActivationReason reason);
-    void showIcon();
-    void showDiagnostics();
-    void showMenu();
-    void uploadPhotos();
-
-private:
-    void fetchIcon();
-
-private:
-    Chat *chat;
-    Diagnostics *diagnostics;
-    Photos *photos;
-    QNetworkAccessManager *network;
-    QList< QPair<QUrl, QAction *> > icons;
+    Updates(QObject *parent);
 };
 
 #endif

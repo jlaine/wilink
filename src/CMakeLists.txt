@@ -13,13 +13,15 @@ set(wDesktop_SOURCES
     diagnostics.cpp
     main.cpp
     photos.cpp
-    trayicon.cpp)
+    trayicon.cpp
+    updates.cpp)
 
 set(wDesktop_MOC_HEADERS
     chat.h
     diagnostics.h
     photos.h
-    trayicon.h)
+    trayicon.h
+    updates.h)
 
 if(WIN32)
   set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)

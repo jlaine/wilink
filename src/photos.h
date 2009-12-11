@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __BOC_PHOTOS_H__
-#define __BOC_PHOTOS_H__
+#ifndef __PHOTOS_H__
+#define __PHOTOS_H__
 
 #include <QWidget>
 #include <QListWidget>
