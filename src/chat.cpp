@@ -287,7 +287,8 @@ void Chat::handlePresence(const QXmppPresence &presence)
     {
     case QXmppPresence::Subscribe:
         {
-            if (QMessageBox::question(this, tr("Subscribe request"),
+            if (QMessageBox::question(this,
+                tr("Invitation from %1").arg(presence.getFrom()),
                 tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
                 QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
             {

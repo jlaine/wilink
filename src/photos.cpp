@@ -202,7 +202,7 @@ void Photos::processQueue()
         statusLabel->setText(tr("Photos upload complete."));
         if (systemTrayIcon)
             systemTrayIcon->showMessage(tr("Photos upload complete."),
-                tr("Your photos have been uploaded"));
+                tr("Your photos have been uploaded."));
         progressBar->hide();
         progressBar->setValue(0);
         progressBar->setMaximum(0);
