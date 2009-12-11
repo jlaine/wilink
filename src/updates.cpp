@@ -18,7 +18,6 @@
  */
 
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
 #include <QFileInfo>
@@ -69,10 +68,9 @@ int Updates::compareVersions(const QString &v1, const QString v2)
     return 0;
 }
 
-void Updates::install(const Release &release)
+void Updates::download(const Release &release, const QString &dirPath)
 {
-    QDir downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-    downloadFile.setFileName(downloadDir.filePath(QFileInfo(release.url.path()).fileName()));
+    downloadFile.setFileName(QDir(dirPath).filePath(QFileInfo(release.url.path()).fileName()));
 
     qDebug() << "Downloading to" << downloadFile.fileName();
 
@@ -80,13 +78,6 @@ void Updates::install(const Release &release)
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
-    emit updateStatus(Download);
-}
-
-void Updates::installUpdate()
-{
-    emit updateStatus(Install);
-    QDesktopServices::openUrl(QUrl::fromLocalFile(downloadFile.fileName()));
 }
 
 void Updates::saveUpdate()
@@ -111,7 +102,7 @@ void Updates::saveUpdate()
     downloadFile.write(reply->readAll());
     downloadFile.close();
 
-    installUpdate();
+    emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
 }
 
 QString Updates::platform()

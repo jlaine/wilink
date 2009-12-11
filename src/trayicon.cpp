@@ -272,8 +272,8 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     /* check for updates */
     updates = new Updates(this);
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
+    connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
-    connect(updates, SIGNAL(updateStatus(int)), this, SLOT(updateStatus(int)));
     updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
         QString::fromLatin1(WDESKTOP_VERSION));
 }
@@ -287,9 +287,16 @@ void UpdatesDialog::updateAvailable(const Release &release)
             .arg(release.package),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
+        QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+        statusLabel->setText(tr("Downloading"));
         show();
-        updates->install(release);
+        updates->download(release, downloadDir);
     }
+}
+
+void UpdatesDialog::updateDownloaded(const QUrl &url)
+{
+    QDesktopServices::openUrl(url);
 }
 
 void UpdatesDialog::updateProgress(qint64 done, qint64 total)
@@ -298,17 +305,3 @@ void UpdatesDialog::updateProgress(qint64 done, qint64 total)
     progressBar->setValue(done);
 }
 
-void UpdatesDialog::updateStatus(int status)
-{
-    switch (status)
-    {
-    case Updates::Download:
-        statusLabel->setText(tr("Downloading"));
-        break;
-    case Updates::Install:
-        statusLabel->setText(tr("Installing"));
-        break;
-    default:
-        statusLabel->setText(QString());
-    }
-}

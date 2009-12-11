@@ -43,30 +43,22 @@ class Updates : public QObject
     Q_OBJECT
 
 public:
-    enum Status {
-        Idle,
-        Download,
-        Install,
-    };
-
     Updates(QObject *parent);
     void check(const QUrl &url, const QString &version);
-    void install(const Release &release);
+    void download(const Release &release, const QString &dirPath);
 
     static int compareVersions(const QString &v1, const QString v2);
     static QString platform();
 
 protected slots:
-    void installUpdate();
     void saveUpdate();
     void processStatus();
 
 signals:
     void updateAvailable(const Release &release);
-    void updateComplete();
+    void updateDownloaded(const QUrl &url);
     void updateFailed();
     void updateProgress(qint64 done, qint64 total);
-    void updateStatus(int status);
 
 private:
     QNetworkAccessManager *network;
