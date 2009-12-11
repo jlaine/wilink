@@ -46,7 +46,7 @@ ContactsList::ContactsList(QWidget *parent)
     : QListWidget(parent), showOffline(true)
 {
     contextMenu = new QMenu(this);
-    QAction *action = contextMenu->addAction(tr("Remove contact"));
+    QAction *action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
 
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(slotItemDoubleClicked(QListWidgetItem*)));
@@ -203,7 +203,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     hbox->setMargin(10);
     hbox->setSpacing(10);
 
-    QPushButton *addButton = new QPushButton("+");
+    QPushButton *addButton = new QPushButton;
+    addButton->setIcon(QIcon(":/add.png"));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
     hbox->addWidget(addButton);
     hbox->addStretch();

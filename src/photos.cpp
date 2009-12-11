@@ -98,6 +98,7 @@ Photos::Photos(const QString &url, const QIcon &folderIcon, QWidget *parent)
 
     statusLabel = new QLabel(tr("Connecting.."));
     QPushButton *createButton = new QPushButton(tr("Create a folder"));
+    createButton->setIcon(QIcon(":/add.png"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
 
     /* assemble UI */
