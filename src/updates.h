@@ -20,7 +20,7 @@
 #ifndef __UPDATES_H__
 #define __UPDATES_H__
 
-#include <QDialog>
+#include <QFile>
 #include <QUrl>
 
 class QNetworkAccessManager;
@@ -58,6 +58,7 @@ public:
 
 protected slots:
     void installUpdate();
+    void saveUpdate();
     void processStatus();
 
 signals:
@@ -70,6 +71,7 @@ signals:
 private:
     QNetworkAccessManager *network;
     QString currentVersion;
+    QFile downloadFile;
 };
 
 #endif

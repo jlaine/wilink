@@ -18,6 +18,8 @@
  */
 
 #include <QDebug>
+#include <QDesktopServices>
+#include <QDir>
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QNetworkAccessManager>
@@ -69,14 +71,25 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 
 void Updates::install(const Release &release)
 {
+    QDir downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+    downloadFile.setFileName(downloadDir.filePath(QFileInfo(release.url.path()).fileName()));
+
+    qDebug() << "Downloading to" << downloadFile.fileName();
+
     QNetworkRequest req(release.url);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
-    connect(reply, SIGNAL(finished()), this, SLOT(installUpdate()));
+    connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
     emit updateStatus(Download);
 }
 
 void Updates::installUpdate()
+{
+    emit updateStatus(Install);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(downloadFile.fileName()));
+}
+
+void Updates::saveUpdate()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
@@ -88,8 +101,17 @@ void Updates::installUpdate()
         return;
     }
 
-    emit updateStatus(Install);
-    qDebug() << "foo" << QFileInfo(reply->url().path()).fileName();
+    /* save file */
+    if (!downloadFile.open(QIODevice::WriteOnly))
+    {
+        qWarning() << "Could not write to" << downloadFile.fileName();
+        emit updateFailed();
+        return;
+    }
+    downloadFile.write(reply->readAll());
+    downloadFile.close();
+
+    installUpdate();
 }
 
 QString Updates::platform()
