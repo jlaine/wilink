@@ -19,6 +19,7 @@
 
 #include <QContextMenuEvent>
 #include <QDebug>
+#include <QDateTime>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -147,6 +148,8 @@ void ContactsList::slotItemDoubleClicked(QListWidgetItem *item)
 ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     : QDialog(parent), chatRemoteJid(jid), chatRemoteName(name)
 {
+    chatLocalName = tr("Me");
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
@@ -171,11 +174,27 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     chatInput->setFocus();
 }
 
+void ChatDialog::addMessage(const QString &text, bool local)
+{
+    chatHistory->insertHtml(QString(
+        "<table cellspacing=\"0\" width=\"100%\">"
+        "<tr style=\"background-color: %1\">"
+        "  <td>%2</td>"
+        "  <td align=\"right\">%3</td>"
+        "</tr>"
+        "<tr>"
+        "  <td colspan=\"2\">%4</td>"
+        "</tr>"
+        "</table>")
+        .arg(local ? "#dbdbdb" : "#b6d4ff")
+        .arg(local ? chatLocalName : chatRemoteName)
+        .arg(QDateTime::currentDateTime().toString("hh:mm"))
+        .arg(text));
+}
+
 void ChatDialog::handleMessage(const QXmppMessage &msg)
 {
-    chatHistory->append(QString("<div style=\"background-color: #b6d4ff; width: 100%\">%1</div><div>%2</div>")
-        .arg(chatRemoteName)
-        .arg(msg.getBody()));
+    addMessage(msg.getBody(), false);
 }
 
 void ChatDialog::send()
@@ -184,9 +203,7 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    chatHistory->append(QString("<div style=\"background-color: #dbdbdb; width: 100%\">%1</div><div>%2</div>")
-        .arg(chatLocalName)
-        .arg(text));
+    addMessage(text, true);
     chatInput->clear();
     emit sendMessage(chatRemoteJid, text);
 }

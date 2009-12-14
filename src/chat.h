@@ -77,6 +77,8 @@ signals:
     void sendMessage(const QString &jid, const QString &message);
 
 private:
+    void addMessage(const QString &text, bool local);
+
     QTextEdit *chatHistory;
     QLineEdit *chatInput;
     QString chatLocalName;
