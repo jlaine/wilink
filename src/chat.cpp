@@ -84,7 +84,7 @@ void ContactsList::removeContact()
     if (!item)
         return;
 
-    QString jid = item->data(Qt::UserRole).toString();
+    const QString jid = item->data(Qt::UserRole).toString();
     if (QMessageBox::question(this, tr("Remove contact"),
         tr("Do you want to remove %1 from your contact list?").arg(jid),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
@@ -140,11 +140,12 @@ void ContactsList::setShowOffline(bool show)
 
 void ContactsList::slotItemDoubleClicked(QListWidgetItem *item)
 {
-    emit chatContact(item->data(Qt::UserRole).toString());
+    const QString jid = item->data(Qt::UserRole).toString();
+    emit chatContact(jid);
 }
 
-ChatDialog::ChatDialog(QWidget *parent, const QString &jid)
-    : QDialog(parent), chatJid(jid)
+ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
+    : QDialog(parent), chatRemoteJid(jid), chatRemoteName(name)
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -172,8 +173,8 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid)
 
 void ChatDialog::handleMessage(const QXmppMessage &msg)
 {
-    chatHistory->append(QString("<b>%1</b> %2")
-        .arg(tr("Received"))
+    chatHistory->append(QString("<div style=\"background-color: #b6d4ff; width: 100%\">%1</div><div>%2</div>")
+        .arg(chatRemoteName)
         .arg(msg.getBody()));
 }
 
@@ -183,11 +184,11 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    chatHistory->append(QString("<b>%1</b> %2")
-        .arg(tr("Sent"))
+    chatHistory->append(QString("<div style=\"background-color: #dbdbdb; width: 100%\">%1</div><div>%2</div>")
+        .arg(chatLocalName)
         .arg(text));
     chatInput->clear();
-    emit sendMessage(chatJid, text);
+    emit sendMessage(chatRemoteJid, text);
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
@@ -250,7 +251,12 @@ ChatDialog *Chat::chatContact(const QString &jid)
 {
     if (!chatDialogs.contains(jid))
     {
-        chatDialogs[jid] = new ChatDialog(this, jid);
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+        QString name = entry.getName();
+        if (name.isEmpty())
+            name = jid.split("@")[0];
+
+        chatDialogs[jid] = new ChatDialog(this, jid, name);
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             client, SLOT(sendMessage(const QString&, const QString &)));
     }

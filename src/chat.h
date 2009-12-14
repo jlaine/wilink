@@ -65,7 +65,7 @@ class ChatDialog : public QDialog
     Q_OBJECT
 
 public:
-    ChatDialog(QWidget *parent, const QString &jid);
+    ChatDialog(QWidget *parent, const QString &jid, const QString &name);
 
 public slots:
     void handleMessage(const QXmppMessage &msg);
@@ -79,7 +79,9 @@ signals:
 private:
     QTextEdit *chatHistory;
     QLineEdit *chatInput;
-    QString chatJid;
+    QString chatLocalName;
+    QString chatRemoteJid;
+    QString chatRemoteName;
 };
 
 class Chat : public QDialog
