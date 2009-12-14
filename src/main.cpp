@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
 
     /* Setup system tray icon */
     TrayIcon trayIcon;
+    trayIcon.show();
 
     /* Run application */
     return app.exec();

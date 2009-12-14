@@ -47,6 +47,9 @@ public:
     UpdatesDialog(QWidget *parent = NULL);
 
 public slots:
+    void check();
+
+protected slots:
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
     void updateProgress(qint64 done, qint64 total);

@@ -56,7 +56,6 @@ TrayIcon::TrayIcon()
 {
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
-    show();
 
     /* set initial menu */
     QMenu *menu = new QMenu;
@@ -83,7 +82,7 @@ TrayIcon::TrayIcon()
     updates = new UpdatesDialog;
 
     /* fetch menu */
-    fetchMenu();
+    QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
 void TrayIcon::fetchIcon()
@@ -158,8 +157,7 @@ void TrayIcon::openUrl()
 void TrayIcon::showIcon()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    if (!reply)
-        return;
+    Q_ASSERT(reply != NULL);
 
     /* display current icon */
     QPair<QUrl, QAction*> entry = icons.takeFirst();
@@ -270,7 +268,7 @@ void TrayIcon::showMenu()
     /* fetch icons */
     fetchIcon();
 
-    /* connect to chat */
+    /* connect to chat and check for updates */
     if (!connected)
     {
         connected = true;
@@ -278,6 +276,8 @@ void TrayIcon::showMenu()
         QAuthenticator auth;
         Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
         chat->open(auth.user(), auth.password());
+
+        updates->check();
     }
 }
 
@@ -310,6 +310,10 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
+}
+
+void UpdatesDialog::check()
+{
     updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
         QString::fromLatin1(WDESKTOP_VERSION));
 }
