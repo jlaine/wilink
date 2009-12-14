@@ -24,12 +24,12 @@
         <translation>Invitation de %1</translation>
     </message>
     <message>
-        <source>Add contact</source>
-        <translation type="unfinished"></translation>
+        <source>Enter the address of the contact you want to add.</source>
+        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
     </message>
     <message>
-        <source>Enter the address of the contact you want to add.</source>
-        <translation type="unfinished"></translation>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
     </message>
 </context>
 <context>
@@ -44,7 +44,7 @@
     </message>
     <message>
         <source>Me</source>
-        <translation type="unfinished"></translation>
+        <translation>Moi</translation>
     </message>
 </context>
 <context>
@@ -73,7 +73,7 @@
     <name>Photos</name>
     <message>
         <source>To upload your photos, simply drag and drop them to a folder.</source>
-        <translation></translation>
+        <translation>Pour télécharger vos photos, il vous suffit de les faire glisser sur un dossier.</translation>
     </message>
     <message>
         <source>Connecting..</source>
@@ -127,15 +127,15 @@
     <name>UpdatesDialog</name>
     <message>
         <source>Update available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Version %1 of %2 is available. Do you want to install it</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour disponible</translation>
     </message>
     <message>
         <source>Downloading</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement</translation>
+    </message>
+    <message>
+        <source>Version %1 of %2 is available. Do you want to install it?</source>
+        <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
     </message>
 </context>
 </TS>

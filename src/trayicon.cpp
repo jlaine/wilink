@@ -282,7 +282,7 @@ void UpdatesDialog::updateAvailable(const Release &release)
 {
     if (QMessageBox::question(NULL,
         tr("Update available"),
-        tr("Version %1 of %2 is available. Do you want to install it")
+        tr("Version %1 of %2 is available. Do you want to install it?")
             .arg(release.version)
             .arg(release.package),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)

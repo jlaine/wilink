@@ -252,7 +252,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 void Chat::addContact()
 {
     bool ok = false;
-    QString jid = QInputDialog::getText(this, tr("Add contact"),
+    QString jid = QInputDialog::getText(this, tr("Add a contact"),
         tr("Enter the address of the contact you want to add."),
         QLineEdit::Normal, "@wifirst.net", &ok);
     if (!ok || jid.isEmpty())
