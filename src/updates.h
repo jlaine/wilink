@@ -48,7 +48,6 @@ public:
     void download(const Release &release, const QString &dirPath);
 
     static int compareVersions(const QString &v1, const QString v2);
-    static QString platform();
 
 protected slots:
     void saveUpdate();

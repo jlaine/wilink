@@ -28,6 +28,7 @@
 #include <QThread>
 
 #include "diagnostics.h"
+#include "systeminfo.h"
 #include "wireless.h"
 
 #define SERVER_ADDRESS QHostAddress("213.91.4.201")
@@ -39,55 +40,6 @@ static QString interfaceName(const QNetworkInterface &interface)
 #else
     return interface.name();
 #endif
-}
-
-static QString osName()
-{
-#ifdef Q_OS_LINUX
-    return QString::fromLatin1("Linux");
-#endif
-#ifdef Q_OS_MAC
-    return QString::fromLatin1("Mac OS");
-#endif
-#ifdef Q_OS_WIN
-    return QString::fromLatin1("Windows");
-#endif
-    return QString::fromLatin1("Unknown");
-}
-
-static QString osVersion()
-{
-#ifdef Q_OS_LINUX
-    QProcess process;
-    process.start(QString("uname"), QStringList(QString("-r")), QIODevice::ReadOnly);
-    process.waitForFinished();
-    return QString::fromLocal8Bit(process.readAllStandardOutput());
-#endif
-#ifdef Q_OS_MAC
-    switch (QSysInfo::MacintoshVersion)
-    {
-    case QSysInfo::MV_10_4:
-        return QString::fromLatin1("10.4");
-    case QSysInfo::MV_10_5:
-        return QString::fromLatin1("10.5");
-    case QSysInfo::MV_10_6:
-        return QString::fromLatin1("10.6");
-    }
-#endif
-#ifdef Q_OS_WIN
-    switch (QSysInfo::WindowsVersion)
-    {
-    case QSysInfo::WV_XP:
-        return QString::fromLatin1("XP");
-    case QSysInfo::WV_2003:
-        return QString::fromLatin1("2003");
-    case QSysInfo::WV_VISTA:
-        return QString::fromLatin1("Vista");
-    case QSysInfo::WV_WINDOWS7:
-        return QString::fromLatin1("7");
-    }
-#endif
-    return QString();
 }
 
 class Ping
@@ -426,7 +378,7 @@ void Diagnostics::refresh()
     printButton->setEnabled(false);
 
     /* show system info */
-    text->setText("<h1>Diagnostics for " + osName() + " " + osVersion() + "</h1>");
+    text->setText("<h1>Diagnostics for " + SystemInfo::osName() + " " + SystemInfo::osVersion() + "</h1>");
     text->append("<h2>Network interfaces</h2>");
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {

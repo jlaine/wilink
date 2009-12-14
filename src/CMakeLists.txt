@@ -9,9 +9,9 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # tests
 
-set(tests_MOC_HEADERS updates.h tests.h)
+set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests updates.cpp tests.cpp ${tests_MOC_SOURCES})
+add_executable(tests systeminfo.cpp tests.cpp updates.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 # wDesktop
@@ -21,6 +21,7 @@ set(wDesktop_SOURCES
     diagnostics.cpp
     main.cpp
     photos.cpp
+    systeminfo.cpp
     trayicon.cpp
     updates.cpp)
 

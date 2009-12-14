@@ -27,6 +27,7 @@
 #include <QStringList>
 #include <QUrl>
 
+#include "systeminfo.h"
 #include "updates.h"
 
 Updates::Updates(QObject *parent)
@@ -41,7 +42,8 @@ void Updates::check(const QUrl &url, const QString &version)
 
     QUrl statusUrl = url;
     QList< QPair<QString, QString> > query;
-    query.append(qMakePair(QString::fromLatin1("platform"), platform()));
+    query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
+    query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
     query.append(qMakePair(QString::fromLatin1("version"), version));
     statusUrl.setQueryItems(query);
 
@@ -103,19 +105,6 @@ void Updates::saveUpdate()
     downloadFile.close();
 
     emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
-}
-
-QString Updates::platform()
-{
-#if defined(Q_OS_WIN)
-    return QString::fromLatin1("win32");
-#elif defined(Q_OS_MAC)
-    return QString::fromLatin1("mac");
-#elif defined(Q_OS_LINUX)
-    return QString::fromLatin1("linux");
-#else
-    return QString();
-#endif
 }
 
 void Updates::processStatus()
