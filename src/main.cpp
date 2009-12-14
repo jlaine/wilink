@@ -21,6 +21,8 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QLocale>
+#include <QTranslator>
 
 #include "qnetio/wallet.h"
 #include "trayicon.h"
@@ -37,6 +39,11 @@ int main(int argc, char *argv[])
     app.setApplicationName("wDesktop");
     app.setQuitOnLastWindowClosed(false);
     app.setWindowIcon(QIcon(":/wDesktop.png"));
+
+    /* Load translations */
+    QTranslator translator;
+    translator.load(QString(":/%1.qm").arg(QLocale::system().name().split("_").first()));
+    app.installTranslator(&translator);
 
     /* Install signal handler */
     signal(SIGINT, signal_handler);

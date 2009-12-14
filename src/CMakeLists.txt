@@ -38,8 +38,6 @@ set(wDesktop_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/data/wDesktop.qrc)
 
-add_custom_target(translations DEPENDS ${QM_FILES})
-
 if(WIN32)
   set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
 elseif(APPLE)

@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QLocale>
 #include <QPushButton>
 #include <QMenu>
 #include <QMessageBox>
@@ -80,6 +81,7 @@ TrayIcon::TrayIcon()
     /* fetch menu */
     QNetworkRequest req(baseUrl);
     req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
