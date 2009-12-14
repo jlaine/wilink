@@ -13,5 +13,3 @@ generate_png(png
     wDesktop.svg)
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png})
 
-qt4_add_translation(QM_FILES wDesktop.fr.ts)
-add_custom_target(translations DEPENDS ${QM_FILES})

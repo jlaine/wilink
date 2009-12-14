@@ -1,3 +1,4 @@
+add_subdirectory(data)
 add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
 
@@ -14,8 +15,9 @@ add_executable(tests updates.cpp tests.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 # wDesktop
+
 set(wDesktop_RCCS
-    ${CMAKE_SOURCE_DIR}/data/wDesktop.qrc)
+    ${CMAKE_CURRENT_SOURCE_DIR}/data/wDesktop.qrc)
 
 set(wDesktop_SOURCES
     chat.cpp
@@ -31,6 +33,9 @@ set(wDesktop_MOC_HEADERS
     photos.h
     trayicon.h
     updates.h)
+
+qt4_create_translation(QM_FILES ${wDesktop_SOURCES} data/wDesktop.fr.ts)
+add_custom_target(translations DEPENDS ${QM_FILES})
 
 if(WIN32)
   set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
