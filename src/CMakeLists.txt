@@ -32,7 +32,7 @@ set(wDesktop_MOC_HEADERS
     updates.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
-qt4_create_translation(QM_FILES ${wDesktop_SOURCES} data/fr.ts)
+qt4_create_translation(QM_FILES ${wDesktop_SOURCES} translations/fr.ts)
 
 set(wDesktop_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
