@@ -16,9 +16,6 @@ target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 # wDesktop
 
-set(wDesktop_RCCS
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/wDesktop.qrc)
-
 set(wDesktop_SOURCES
     chat.cpp
     diagnostics.cpp
@@ -34,7 +31,13 @@ set(wDesktop_MOC_HEADERS
     trayicon.h
     updates.h)
 
-qt4_create_translation(QM_FILES ${wDesktop_SOURCES} data/wDesktop.fr.ts)
+configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
+qt4_create_translation(QM_FILES ${wDesktop_SOURCES} data/fr.ts)
+
+set(wDesktop_RCCS
+    ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/data/wDesktop.qrc)
+
 add_custom_target(translations DEPENDS ${QM_FILES})
 
 if(WIN32)

@@ -23,6 +23,14 @@
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
     </message>
+    <message>
+        <source>Add contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the address of the contact you want to add.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChatDialog</name>
@@ -33,6 +41,10 @@
     <message>
         <source>Chat with %1</source>
         <translation>Conversation avec %1</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -109,6 +121,21 @@
     <message>
         <source>Upload &amp;photos</source>
         <translation>Téléchargement &amp;photos</translation>
+    </message>
+</context>
+<context>
+    <name>UpdatesDialog</name>
+    <message>
+        <source>Update available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version %1 of %2 is available. Do you want to install it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
