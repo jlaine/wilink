@@ -50,7 +50,9 @@ static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
 TrayIcon::TrayIcon()
-    : chat(NULL), diagnostics(NULL), photos(NULL)
+    : chat(NULL), diagnostics(NULL), photos(NULL),
+    connected(false),
+    refreshInterval(0)
 {
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
@@ -245,14 +247,38 @@ void TrayIcon::showMenu()
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
 
+    /* parse messages */
+    item = doc.documentElement().firstChildElement("messages").firstChildElement("message");
+    while (!item.isNull())
+    {
+        const QString id = item.firstChildElement("id").text();
+        const QString text = item.firstChildElement("label").text();
+        if (!seenMessages.contains(id))
+        {
+            showMessage("wDesktop", text);
+            seenMessages.append(id);
+        }
+        item = item.nextSiblingElement("message");
+    }
+
+    /* parse preferences */
+    item = doc.documentElement().firstChildElement("preferences");
+    refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
+    if (refreshInterval > 0)
+        QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
+
     /* fetch icons */
     fetchIcon();
 
     /* connect to chat */
-    QAuthenticator auth;
-    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
-    chat->open(auth.user(), auth.password());
+    if (!connected)
+    {
+        connected = true;
 
+        QAuthenticator auth;
+        Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+        chat->open(auth.user(), auth.password());
+    }
 }
 
 void TrayIcon::showPhotos()

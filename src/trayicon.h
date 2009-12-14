@@ -89,8 +89,11 @@ private:
     Photos *photos;
     UpdatesDialog *updates;
 
+    bool connected;
+    int refreshInterval;
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;
+    QStringList seenMessages;
 };
 
 #endif
