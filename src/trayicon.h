@@ -71,6 +71,7 @@ public:
     TrayIcon();
 
 protected slots:
+    void fetchMenu();
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);

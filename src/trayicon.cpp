@@ -34,6 +34,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QProgressBar>
+#include <QTimer>
 
 #include "qnetio/wallet.h"
 
@@ -46,6 +47,7 @@
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
+static int retryInterval = 15000;
 
 TrayIcon::TrayIcon()
     : chat(NULL), diagnostics(NULL), photos(NULL)
@@ -79,11 +81,7 @@ TrayIcon::TrayIcon()
     updates = new UpdatesDialog;
 
     /* fetch menu */
-    QNetworkRequest req(baseUrl);
-    req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
+    fetchMenu();
 }
 
 void TrayIcon::fetchIcon()
@@ -94,6 +92,15 @@ void TrayIcon::fetchIcon()
     QPair<QUrl, QAction*> entry = icons.first();
     QNetworkReply *reply = network->get(QNetworkRequest(entry.first));
     connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
+}
+
+void TrayIcon::fetchMenu()
+{
+    QNetworkRequest req(baseUrl);
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
+    QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
 
 /** Prompt the user for credentials.
@@ -193,6 +200,7 @@ void TrayIcon::showMenu()
     if (reply->error() != QNetworkReply::NoError)
     {
         qWarning("Failed to retrieve menu");
+        QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
         return;
     }
 
