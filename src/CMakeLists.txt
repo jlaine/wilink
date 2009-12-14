@@ -63,7 +63,7 @@ add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_R
 target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
-    set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin.dmg)
+    set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-mac.dmg)
 	set(BUNDLE_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE TRUE)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})
