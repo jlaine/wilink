@@ -66,12 +66,12 @@ static QString osVersion()
 #ifdef Q_OS_MAC
     switch (QSysInfo::MacintoshVersion)
     {
-    case QSysInfo::MV_TIGER:
-        return QString::fromLatin1("Tiger");
-    case QSysInfo::MV_LEOPARD:
-        return QString::fromLatin1("Leopard");
-    case QSysInfo::MV_SNOWLEOPARD:
-        return QString::fromLatin1("Snow Leopard");
+    case QSysInfo::MV_10_4:
+        return QString::fromLatin1("10.4");
+    case QSysInfo::MV_10_5:
+        return QString::fromLatin1("10.5");
+    case QSysInfo::MV_10_6:
+        return QString::fromLatin1("10.6");
     }
 #endif
 #ifdef Q_OS_WIN
@@ -80,7 +80,7 @@ static QString osVersion()
     case QSysInfo::WV_XP:
         return QString::fromLatin1("XP");
     case QSysInfo::WV_2003:
-        return QString::fromLatin1("Server 2003");
+        return QString::fromLatin1("2003");
     case QSysInfo::WV_VISTA:
         return QString::fromLatin1("Vista");
     case QSysInfo::WV_WINDOWS7:
