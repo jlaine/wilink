@@ -251,10 +251,20 @@ void TrayIcon::showMenu()
     while (!item.isNull())
     {
         const QString id = item.firstChildElement("id").text();
-        const QString text = item.firstChildElement("label").text();
+        const QString title = item.firstChildElement("title").text();
+        const QString text = item.firstChildElement("text").text();
+        const int type = item.firstChildElement("type").text().toInt();
+        enum QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
+        switch (type)
+        {
+            case 3: icon = QSystemTrayIcon::Critical; break;
+            case 2: icon = QSystemTrayIcon::Warning; break;
+            case 1: icon = QSystemTrayIcon::Information; break;
+            case 0: icon = QSystemTrayIcon::NoIcon; break;
+        }
         if (!seenMessages.contains(id))
         {
-            showMessage("wDesktop", text);
+            showMessage(title, text, icon);
             seenMessages.append(id);
         }
         item = item.nextSiblingElement("message");
@@ -263,6 +273,7 @@ void TrayIcon::showMenu()
     /* parse preferences */
     item = doc.documentElement().firstChildElement("preferences");
     refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
+    updates->setUrl(QUrl(item.firstChildElement("updates").text()));
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 
@@ -280,7 +291,6 @@ void TrayIcon::showMenu()
         chat->open(auth.user(), auth.password());
 
         /* check for updates */
-        updates->setUrl(QString::fromLatin1(WDESKTOP_UPDATES));
         updates->check();
     }
 }
