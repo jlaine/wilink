@@ -39,15 +39,16 @@ Updates::Updates(QObject *parent)
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 }
 
-void Updates::check(const QUrl &url, const QString &version)
+void Updates::check()
 {
-    currentVersion = version;
+    if (!updatesUrl.isValid())
+        return;
 
-    QUrl statusUrl = url;
+    QUrl statusUrl = updatesUrl;
     QList< QPair<QString, QString> > query = statusUrl.queryItems();
     query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
     query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
-    query.append(qMakePair(QString::fromLatin1("version"), version));
+    query.append(qMakePair(QString::fromLatin1("version"), currentVersion));
     statusUrl.setQueryItems(query);
 
     QNetworkRequest req(statusUrl);
@@ -133,5 +134,15 @@ void Updates::processStatus()
 
     if (compareVersions(release.version, currentVersion) > 0 && !release.url.isEmpty())
         emit updateAvailable(release);
+}
+
+void Updates::setUrl(const QUrl &url)
+{
+    updatesUrl = url;
+}
+
+void Updates::setVersion(const QString &version)
+{
+    currentVersion = version;
 }
 

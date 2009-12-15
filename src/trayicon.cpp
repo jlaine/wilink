@@ -328,18 +328,17 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
 void UpdatesDialog::check()
 {
-    if (updatesUrl.isValid())
-        updates->check(updatesUrl, currentVersion);
+    updates->check();
 }
 
 void UpdatesDialog::setUrl(const QUrl &url)
 {
-    updatesUrl = url;
+    updates->setUrl(url);
 }
 
 void UpdatesDialog::setVersion(const QString &version)
 {
-    currentVersion = version;
+    updates->setVersion(version);
 }
 
 void UpdatesDialog::updateAvailable(const Release &release)

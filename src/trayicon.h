@@ -63,9 +63,6 @@ private:
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;
-
-    QUrl updatesUrl;
-    QString currentVersion;
 };
 
 

@@ -44,8 +44,10 @@ class Updates : public QObject
 
 public:
     Updates(QObject *parent);
-    void check(const QUrl &url, const QString &version);
+    void check();
     void download(const Release &release, const QString &dirPath);
+    void setUrl(const QUrl &url);
+    void setVersion(const QString &url);
 
     static int compareVersions(const QString &v1, const QString v2);
 
@@ -63,6 +65,7 @@ private:
     QNetworkAccessManager *network;
     QString currentVersion;
     QFile downloadFile;
+    QUrl updatesUrl;
 };
 
 #endif
