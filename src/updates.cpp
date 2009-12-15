@@ -43,6 +43,11 @@ void Updates::check()
 {
     if (!updatesUrl.isValid())
         return;
+    if (updatesUrl.scheme() != "https")
+    {
+        qWarning() << "Refusing to check for updates at insecure address" << updatesUrl;
+        return;
+    }
 
     QUrl statusUrl = updatesUrl;
     QList< QPair<QString, QString> > query = statusUrl.queryItems();
