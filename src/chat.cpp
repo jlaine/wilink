@@ -46,11 +46,14 @@ using namespace QNetIO;
 ContactsList::ContactsList(QWidget *parent)
     : QListWidget(parent), showOffline(true)
 {
+    QAction *action;
     contextMenu = new QMenu(this);
-    QAction *action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
+    action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
+    connect(action, SIGNAL(triggered()), this, SLOT(startChat()));
+    action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
 
-    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(slotItemDoubleClicked(QListWidgetItem*)));
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(startChat()));
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
 }
@@ -139,8 +142,12 @@ void ContactsList::setShowOffline(bool show)
     showOffline = show;
 }
 
-void ContactsList::slotItemDoubleClicked(QListWidgetItem *item)
+void ContactsList::startChat()
 {
+    QListWidgetItem *item = currentItem();
+    if (!item)
+        return;
+
     const QString jid = item->data(Qt::UserRole).toString();
     emit chatContact(jid);
 }

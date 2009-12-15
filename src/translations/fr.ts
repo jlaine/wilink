@@ -57,6 +57,10 @@
         <source>Do you want to remove %1 from your contact list?</source>
         <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
+    <message>
+        <source>Start chat</source>
+        <translation>Démarrer conversation</translation>
+    </message>
 </context>
 <context>
     <name>Diagnostics</name>

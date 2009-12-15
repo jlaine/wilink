@@ -52,7 +52,7 @@ public slots:
     void presenceReceived(const QXmppPresence &presence);
 
 protected slots:
-    void slotItemDoubleClicked(QListWidgetItem *item);
+    void startChat();
     void removeContact();
 
 private:
