@@ -190,6 +190,7 @@ void ChatDialog::addMessage(const QString &text, bool local)
         .arg(local ? chatLocalName : chatRemoteName)
         .arg(QDateTime::currentDateTime().toString("hh:mm"))
         .arg(text));
+    chatHistory->ensureCursorVisible();
 }
 
 void ChatDialog::handleMessage(const QXmppMessage &msg)
