@@ -21,6 +21,7 @@
 #define __PHOTOS_H__
 
 #include <QWidget>
+#include <QStackedWidget>
 #include <QListWidget>
 #include <QUrl>
 
@@ -48,7 +49,7 @@ protected:
     void dropEvent(QDropEvent *event);
 };
 
-/** A TrayIcon is a system tray icon for interacting with a Panel.
+/** Main window for photos application
  */
 class Photos : public QWidget
 {
@@ -63,6 +64,7 @@ protected:
     void refresh();
 
 protected slots:
+    void chDir(QListWidgetItem *item);
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
@@ -74,11 +76,12 @@ private:
     QList< QPair<QUrl, QUrl> > queue;
 
     QLabel *helpLabel;
-    PhotosList *listView;
+    QStackedWidget *photosView;
     QProgressBar *progressBar;
     QString remoteUrl;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
+    QIODevice *fdPhoto;
 };
 
 #endif
