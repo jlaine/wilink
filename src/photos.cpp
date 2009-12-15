@@ -27,6 +27,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QStackedWidget>
 #include <QSystemTrayIcon>
 #include <QUrl>
 
@@ -155,6 +156,11 @@ Photos::Photos(const QString &url, QWidget *parent)
     progressBar->hide();
 
     statusLabel = new QLabel(tr("Connecting.."));
+
+    backButton = new QPushButton(tr("Go back"));
+    backButton->setEnabled(false);
+    connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
+
     QPushButton *createButton = new QPushButton(tr("Create a folder"));
     createButton->setIcon(QIcon(":/add.png"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
@@ -165,9 +171,10 @@ Photos::Photos(const QString &url, QWidget *parent)
     layout->addWidget(photosView);
     layout->addWidget(progressBar);
     QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(statusLabel);
+    hbox->addWidget(backButton);
     hbox->addWidget(createButton);
     layout->addItem(hbox);
+    layout->addWidget(statusLabel);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/photos.png"));
@@ -187,25 +194,23 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 
     switch (cmd)
     {
-    case FileSystem::Get: {
-        if (error)
-            return;
+    case FileSystem::Get:
+        if (!error)
+        {
+            /* load image */
+            fdPhoto->reset();
+            QImage img;
+            img.load(fdPhoto, NULL);
+            fdPhoto->close();
 
-        /* load image */
-        fdPhoto->reset();
-        QImage img;
-        img.load(fdPhoto, NULL);
-        fdPhoto->close();
-
-        /* display image */
-        PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
-        Q_ASSERT(listView != NULL);
-        listView->setImage(downloadUrl, img);
-
+            /* display image */
+            PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+            Q_ASSERT(listView != NULL);
+            listView->setImage(downloadUrl, img);
+        }
         /* fetch next thumbnail */
         processDownloadQueue();
         break;
-    }
     case FileSystem::Open:
         if (!error)
             refresh();
@@ -223,6 +228,8 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         /* drag and drop is now allowed */
         statusLabel->setText("");
         listView->setAcceptDrops(true);
+        if (photosView->count() > 1)
+            backButton->setEnabled(true);
 
         /* fetch thumbnails */
         foreach (const FileInfo& info, results)
@@ -289,6 +296,15 @@ void Photos::folderOpened(const QUrl &url)
     connect(listView, SIGNAL(folderOpened(const QUrl&)),
         this, SLOT(folderOpened(const QUrl&)));
     fs->list(url.toString());
+}
+
+void Photos::goBack()
+{
+    if (photosView->count() <= 1)
+        return;
+    photosView->removeWidget(photosView->currentWidget());
+    if (photosView->count() <= 1)
+        backButton->setEnabled(false);
 }
 
 void Photos::processDownloadQueue()

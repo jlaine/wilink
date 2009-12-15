@@ -21,7 +21,6 @@
 #define __PHOTOS_H__
 
 #include <QWidget>
-#include <QStackedWidget>
 #include <QListWidget>
 #include <QUrl>
 
@@ -32,6 +31,8 @@ using namespace QNetIO;
 class QImage;
 class QLabel;
 class QProgressBar;
+class QPushButton;
+class QStackedWidget;
 class QSystemTrayIcon;
 
 class PhotosList : public QListWidget
@@ -82,6 +83,7 @@ protected slots:
     void commandFinished(int cmd, bool error, const FileInfoList &results);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
     void folderOpened(const QUrl &url);
+    void goBack();
     void putProgress(int done, int total);
 
 private:
@@ -90,6 +92,7 @@ private:
     QList<QUrl> downloadQueue;
     QList< QPair<QUrl, QUrl> > uploadQueue;
 
+    QPushButton *backButton;
     QUrl downloadUrl;
     QLabel *helpLabel;
     QStackedWidget *photosView;

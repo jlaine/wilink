@@ -103,6 +103,10 @@
         <source>Your photos have been uploaded.</source>
         <translation>Vos photos ont été envoyées.</translation>
     </message>
+    <message>
+        <source>Go back</source>
+        <translation>Retour</translation>
+    </message>
 </context>
 <context>
     <name>TrayIcon</name>
