@@ -171,7 +171,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         if (!error)
             refresh();
         break;
-    case FileSystem::List:
+    case FileSystem::List: {
         if (error) {
             qDebug() << "Error listing" << remoteUrl;
             return;
@@ -197,6 +197,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         statusLabel->setText("");
         listView->setAcceptDrops(true);
         break;
+    }
     case FileSystem::Mkdir:
         refresh();
         break;
