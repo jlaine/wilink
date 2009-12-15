@@ -34,8 +34,8 @@
 
 #define PROGRESS_STEPS 100
 
-PhotosList::PhotosList(QWidget *parent)
-    : QListWidget(parent)
+PhotosList::PhotosList(const QUrl &url, QWidget *parent)
+    : QListWidget(parent), baseUrl(url)
 {
     setIconSize(QSize(24, 24));
 }
@@ -80,15 +80,20 @@ void PhotosList::dropEvent(QDropEvent *event)
     }
 }
 
+QUrl PhotosList::url()
+{
+    return baseUrl;
+}
+
 Photos::Photos(const QString &url, QWidget *parent)
-    : QWidget(parent), busy(false), remoteUrl(url),
+    : QWidget(parent), busy(false),
     systemTrayIcon(NULL)
 {
     /* create UI */
     helpLabel = new QLabel(tr("To upload your photos, simply drag and drop them to a folder."));
 
     photosView = new QStackedWidget;
-    PhotosList *listView = new PhotosList;
+    PhotosList *listView = new PhotosList(url);
     photosView->addWidget(listView);
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
@@ -119,11 +124,11 @@ Photos::Photos(const QString &url, QWidget *parent)
     setWindowIcon(QIcon(":/photos.png"));
 
     /* open filesystem */
-    fs = FileSystem::factory(remoteUrl, this);
+    fs = FileSystem::factory(url, this);
     connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this,
             SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
-    fs->open(remoteUrl);
+    fs->open(url);
 }
 
 void Photos::chDir(QListWidgetItem *item)
@@ -131,9 +136,8 @@ void Photos::chDir(QListWidgetItem *item)
     QUrl url = item->data(Qt::UserRole).value<QUrl>();
     // FIXME: check this is a directory based on info.isDir()!
     qDebug() << "chDir" << url;
-    remoteUrl = url.toString();
 
-    PhotosList *listView = new PhotosList;
+    PhotosList *listView = new PhotosList(url);
     photosView->setCurrentIndex(photosView->addWidget(listView));
     connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
         this, SLOT(chDir(QListWidgetItem *)));
@@ -238,7 +242,7 @@ void Photos::createFolder()
         PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
         Q_ASSERT(listView != NULL);
         listView->setAcceptDrops(false);
-        fs->mkdir(remoteUrl + "/" + text);
+        fs->mkdir(listView->url().toString() + "/" + text);
     }
 }
 
@@ -303,7 +307,9 @@ void Photos::putProgress(int done, int total)
 void Photos::refresh()
 {
     statusLabel->setText(tr("Loading your folders.."));
-    fs->list(remoteUrl);
+    PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+    Q_ASSERT(listView != NULL);
+    fs->list(listView->url());
 }
 
 void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)

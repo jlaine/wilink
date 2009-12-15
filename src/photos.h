@@ -38,7 +38,8 @@ class PhotosList : public QListWidget
     Q_OBJECT
 
 public:
-    PhotosList(QWidget *parent = NULL);
+    PhotosList(const QUrl &url, QWidget *parent = NULL);
+    QUrl url();
 
 signals:
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
@@ -47,6 +48,9 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
+
+private:
+    QUrl baseUrl;
 };
 
 /** Main window for photos application
@@ -81,7 +85,6 @@ private:
     QLabel *helpLabel;
     QStackedWidget *photosView;
     QProgressBar *progressBar;
-    QString remoteUrl;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
     QIODevice *fdPhoto;
