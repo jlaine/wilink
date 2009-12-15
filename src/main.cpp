@@ -38,7 +38,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName("wDesktop");
     app.setQuitOnLastWindowClosed(false);
+#ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/wDesktop.png"));
+#endif
 
     /* Load translations */
     QTranslator translator;
