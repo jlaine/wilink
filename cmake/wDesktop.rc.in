@@ -22,4 +22,4 @@ BEGIN
     END
 END
 
-IDR_MAINFRAME ICON "${CMAKE_SOURCE_DIR}/data/wDesktop.ico"
+IDR_MAINFRAME ICON "${CMAKE_SOURCE_DIR}/src/data/wDesktop.ico"
