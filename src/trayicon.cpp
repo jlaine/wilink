@@ -80,6 +80,7 @@ TrayIcon::TrayIcon()
     /* prepare modules */
     chat = new Chat(this);
     updates = new UpdatesDialog;
+    updates->setVersion(QString::fromLatin1(WDESKTOP_VERSION));
 
     /* fetch menu */
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
@@ -273,10 +274,13 @@ void TrayIcon::showMenu()
     {
         connected = true;
 
+        /* connect to chat */
         QAuthenticator auth;
         Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
         chat->open(auth.user(), auth.password());
 
+        /* check for updates */
+        updates->setUrl(QString::fromLatin1(WDESKTOP_UPDATES));
         updates->check();
     }
 }
@@ -314,8 +318,18 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
 void UpdatesDialog::check()
 {
-    updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
-        QString::fromLatin1(WDESKTOP_VERSION));
+    if (updatesUrl.isValid())
+        updates->check(updatesUrl, currentVersion);
+}
+
+void UpdatesDialog::setUrl(const QUrl &url)
+{
+    updatesUrl = url;
+}
+
+void UpdatesDialog::setVersion(const QString &version)
+{
+    currentVersion = version;
 }
 
 void UpdatesDialog::updateAvailable(const Release &release)

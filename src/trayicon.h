@@ -45,6 +45,8 @@ class UpdatesDialog : public QDialog
 
 public:
     UpdatesDialog(QWidget *parent = NULL);
+    void setUrl(const QUrl &url);
+    void setVersion(const QString &version);
 
 public slots:
     void check();
@@ -61,6 +63,9 @@ private:
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;
+
+    QUrl updatesUrl;
+    QString currentVersion;
 };
 
 
