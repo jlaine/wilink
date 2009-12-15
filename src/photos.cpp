@@ -84,9 +84,8 @@ void PhotosList::dropEvent(QDropEvent *event)
 
 void PhotosList::setEntries(const FileInfoList &entries)
 {
-    //clear();
-
     fileList = entries;
+    clear();
     foreach (const FileInfo& info, fileList)
     {
         QListWidgetItem *newItem = new QListWidgetItem;
