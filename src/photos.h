@@ -58,6 +58,7 @@ protected slots:
 
 private:
     QUrl baseUrl;
+    FileInfoList fileList;
 };
 
 /** Main window for photos application

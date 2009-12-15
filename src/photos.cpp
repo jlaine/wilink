@@ -85,7 +85,9 @@ void PhotosList::dropEvent(QDropEvent *event)
 void PhotosList::setEntries(const FileInfoList &entries)
 {
     //clear();
-    foreach (const FileInfo& info, entries)
+
+    fileList = entries;
+    foreach (const FileInfo& info, fileList)
     {
         QListWidgetItem *newItem = new QListWidgetItem;
         if (info.isDir()) {
@@ -111,8 +113,15 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
 void PhotosList::slotItemDoubleClicked(QListWidgetItem *item)
 {
     QUrl url = item->data(Qt::UserRole).value<QUrl>();
-    // FIXME: check this is a directory based on info.isDir()!
-    emit folderOpened(url);
+    foreach (const FileInfo &info, fileList)
+    {
+        if (info.url() == url)
+        {
+            if (info.isDir())
+                emit folderOpened(url);
+            break;
+        }
+    }
 }
 
 QUrl PhotosList::url()
