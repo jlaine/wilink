@@ -80,6 +80,32 @@ void PhotosList::dropEvent(QDropEvent *event)
     }
 }
 
+void PhotosList::setEntries(const FileInfoList &entries)
+{
+    //clear();
+    foreach (const FileInfo& info, entries)
+    {
+        QListWidgetItem *newItem = new QListWidgetItem;
+        if (info.isDir()) {
+            newItem->setIcon(QIcon(":/photos.png"));
+        }
+        newItem->setData(Qt::UserRole, QUrl(info.url()));
+        newItem->setText(info.name());
+        addItem(newItem);
+    }
+}
+
+void PhotosList::setImage(const QUrl &url, const QImage &img)
+{
+    for (int i = 0; i < count(); ++i)
+    {
+        QListWidgetItem *currentItem = item(i);
+        if (currentItem->data(Qt::UserRole).value<QUrl>() == url)
+            currentItem->setIcon(QPixmap::fromImage(
+                img.scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    }
+}
+
 QUrl PhotosList::url()
 {
     return baseUrl;
@@ -155,29 +181,16 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         if (error)
             return;
 
-        /* resize image */
+        /* load image */
         fdPhoto->reset();
         QImage img;
         img.load(fdPhoto, NULL);
-        img = img.scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         fdPhoto->close();
 
         /* display image */
         PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
         Q_ASSERT(listView != NULL);
-        for (int i = 0; i < listView->count(); ++i)
-        {
-            QListWidgetItem *item = listView->item(i);
-            if (item->data(Qt::UserRole).value<QUrl>() == downloadUrl)
-                item->setIcon(QPixmap::fromImage(img));
-        }
-/*
-        QLabel *aLabel = new QLabel();
-        //aLabel->setText("foobar");
-        aLabel->setAlignment(Qt::AlignCenter);
-        aLabel->setPixmap(QPixmap::fromImage(img));
-        photosView->setCurrentIndex(photosView->addWidget(aLabel));
-*/
+        listView->setImage(downloadUrl, img);
 
         /* fetch next thumbnail */
         processDownloadQueue();
@@ -191,22 +204,10 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         if (error)
             return;
 
+        /* show entries */
         PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
         Q_ASSERT(listView != NULL);
-        //listView->clear();
-        foreach (const FileInfo& info, results)
-        {
-            QListWidgetItem *newItem = new QListWidgetItem;
-            if (info.isDir()) {
-                newItem->setIcon(QIcon(":/photos.png"));
-            } else {
-                if(info.name().endsWith(".jpg"))
-                    downloadQueue.append(info.url());
-            }
-            newItem->setData(Qt::UserRole, QUrl(info.url()));
-            newItem->setText(info.name());
-            listView->addItem(newItem);
-        }
+        listView->setEntries(results);
         listView->show();
 
         /* drag and drop is now allowed */
@@ -214,6 +215,11 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         listView->setAcceptDrops(true);
 
         /* fetch thumbnails */
+        foreach (const FileInfo& info, results)
+        {
+            if (!info.isDir() && info.name().endsWith(".jpg"))
+                downloadQueue.append(info.url());
+        }
         processDownloadQueue();
         break;
     }

@@ -29,6 +29,7 @@
 
 using namespace QNetIO;
 
+class QImage;
 class QLabel;
 class QProgressBar;
 class QSystemTrayIcon;
@@ -39,6 +40,8 @@ class PhotosList : public QListWidget
 
 public:
     PhotosList(const QUrl &url, QWidget *parent = NULL);
+    void setEntries(const FileInfoList &entries);
+    void setImage(const QUrl &url, const QImage &img);
     QUrl url();
 
 signals:
