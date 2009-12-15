@@ -44,7 +44,7 @@ void Updates::check(const QUrl &url, const QString &version)
     currentVersion = version;
 
     QUrl statusUrl = url;
-    QList< QPair<QString, QString> > query;
+    QList< QPair<QString, QString> > query = statusUrl.queryItems();
     query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
     query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
     query.append(qMakePair(QString::fromLatin1("version"), version));
