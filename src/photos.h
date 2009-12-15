@@ -60,7 +60,8 @@ public:
     void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
 protected:
-    void processQueue();
+    void processDownloadQueue();
+    void processUploadQueue();
     void refresh();
 
 protected slots:
@@ -73,8 +74,10 @@ protected slots:
 private:
     bool busy;
     FileSystem *fs;
-    QList< QPair<QUrl, QUrl> > queue;
+    QList<QUrl> downloadQueue;
+    QList< QPair<QUrl, QUrl> > uploadQueue;
 
+    QUrl downloadUrl;
     QLabel *helpLabel;
     QStackedWidget *photosView;
     QProgressBar *progressBar;

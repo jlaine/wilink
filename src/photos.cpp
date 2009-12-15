@@ -129,18 +129,15 @@ Photos::Photos(const QString &url, QWidget *parent)
 void Photos::chDir(QListWidgetItem *item)
 {
     QUrl url = item->data(Qt::UserRole).value<QUrl>();
+    // FIXME: check this is a directory based on info.isDir()!
     qDebug() << "chDir" << url;
     remoteUrl = url.toString();
-    if(remoteUrl.endsWith(".jpg")) {
-        qDebug() << "Getting" << remoteUrl;
-        fdPhoto = fs->get(remoteUrl);
-    } else {
-        PhotosList *listView = new PhotosList;
-        photosView->setCurrentIndex(photosView->addWidget(listView));
-        connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+
+    PhotosList *listView = new PhotosList;
+    photosView->setCurrentIndex(photosView->addWidget(listView));
+    connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
         this, SLOT(chDir(QListWidgetItem *)));
-        fs->list(url.toString());
-    }
+    fs->list(url.toString());
 }
 
 void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
@@ -151,20 +148,35 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     switch (cmd)
     {
     case FileSystem::Get: {
-        if (error) {
-            qDebug() << "Error Get" << remoteUrl;
+        if (error)
             return;
-        }
+
+        /* resize image */
         fdPhoto->reset();
         QImage img;
         img.load(fdPhoto, NULL);
-        img = img.scaled(50, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        img = img.scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        fdPhoto->close();
+
+        /* display image */
+        PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+        Q_ASSERT(listView != NULL);
+        for (int i = 0; i < listView->count(); ++i)
+        {
+            QListWidgetItem *item = listView->item(i);
+            if (item->data(Qt::UserRole).value<QUrl>() == downloadUrl)
+                item->setIcon(QPixmap::fromImage(img));
+        }
+/*
         QLabel *aLabel = new QLabel();
         //aLabel->setText("foobar");
         aLabel->setAlignment(Qt::AlignCenter);
         aLabel->setPixmap(QPixmap::fromImage(img));
         photosView->setCurrentIndex(photosView->addWidget(aLabel));
-        fdPhoto->close();
+*/
+
+        /* fetch next thumbnail */
+        processDownloadQueue();
         break;
     }
     case FileSystem::Open:
@@ -172,10 +184,9 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             refresh();
         break;
     case FileSystem::List: {
-        if (error) {
-            qDebug() << "Error listing" << remoteUrl;
+        if (error)
             return;
-        }
+
         PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
         Q_ASSERT(listView != NULL);
         //listView->clear();
@@ -185,7 +196,8 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             if (info.isDir()) {
                 newItem->setIcon(QIcon(":/photos.png"));
             } else {
-                qDebug() << info.name() << info.url();
+                if(info.name().endsWith(".jpg"))
+                    downloadQueue.append(info.url());
             }
             newItem->setData(Qt::UserRole, QUrl(info.url()));
             newItem->setText(info.name());
@@ -196,6 +208,9 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         /* drag and drop is now allowed */
         statusLabel->setText("");
         listView->setAcceptDrops(true);
+
+        /* fetch thumbnails */
+        processDownloadQueue();
         break;
     }
     case FileSystem::Mkdir:
@@ -204,7 +219,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     case FileSystem::Put:
         progressBar->setValue(PROGRESS_STEPS * ((progressBar->value() / PROGRESS_STEPS) + 1));
         busy = false;
-        processQueue();
+        processUploadQueue();
         break;
     default:
         qWarning() << fs->commandName(cmd) << "was not expected";
@@ -236,20 +251,29 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
     foreach (const QUrl &url, files)
     {
         QFileInfo file(url.path());
-        queue.append(QPair<QUrl, QUrl>(url, base + "/" + file.fileName()));
+        uploadQueue.append(QPair<QUrl, QUrl>(url, base + "/" + file.fileName()));
     }
     progressBar->setMaximum(progressBar->maximum() + PROGRESS_STEPS * files.size());
     progressBar->show();
-    processQueue();
+    processUploadQueue();
 }
 
-void Photos::processQueue()
+void Photos::processDownloadQueue()
+{
+    if (downloadQueue.empty())
+        return;
+
+    downloadUrl = downloadQueue.takeFirst();
+    fdPhoto = fs->get(downloadUrl);
+}
+
+void Photos::processUploadQueue()
 {
     if (busy)
         return;
 
     /* if the queue is empty, hide progress bar and reset it */
-    if (queue.empty())
+    if (uploadQueue.empty())
     {
         statusLabel->setText(tr("Photos upload complete."));
         if (systemTrayIcon)
@@ -262,7 +286,7 @@ void Photos::processQueue()
     }
 
     /* process the next file to upload */
-    QPair<QUrl, QUrl> item = queue.takeFirst();
+    QPair<QUrl, QUrl> item = uploadQueue.takeFirst();
     QFile *file = new QFile(item.first.toLocalFile(), this);
     statusLabel->setText(tr("Uploading %1").arg(QFileInfo(file->fileName()).fileName()));
     busy = true;
