@@ -38,6 +38,8 @@ PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseUrl(url)
 {
     setIconSize(QSize(24, 24));
+    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+            this, SLOT(slotItemDoubleClicked(QListWidgetItem *)));
 }
 
 void PhotosList::dragEnterEvent(QDragEnterEvent *event)
@@ -106,6 +108,13 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
     }
 }
 
+void PhotosList::slotItemDoubleClicked(QListWidgetItem *item)
+{
+    QUrl url = item->data(Qt::UserRole).value<QUrl>();
+    // FIXME: check this is a directory based on info.isDir()!
+    emit folderOpened(url);
+}
+
 QUrl PhotosList::url()
 {
     return baseUrl;
@@ -123,8 +132,8 @@ Photos::Photos(const QString &url, QWidget *parent)
     photosView->addWidget(listView);
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
-    connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-            this, SLOT(chDir(QListWidgetItem *)));
+    connect(listView, SIGNAL(folderOpened(const QUrl&)),
+            this, SLOT(folderOpened(const QUrl&)));
 
     progressBar = new QProgressBar;
     progressBar->setRange(0, 0);
@@ -155,19 +164,6 @@ Photos::Photos(const QString &url, QWidget *parent)
             SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
     fs->open(url);
-}
-
-void Photos::chDir(QListWidgetItem *item)
-{
-    QUrl url = item->data(Qt::UserRole).value<QUrl>();
-    // FIXME: check this is a directory based on info.isDir()!
-    qDebug() << "chDir" << url;
-
-    PhotosList *listView = new PhotosList(url);
-    photosView->setCurrentIndex(photosView->addWidget(listView));
-    connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
-        this, SLOT(chDir(QListWidgetItem *)));
-    fs->list(url.toString());
 }
 
 void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
@@ -266,6 +262,17 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
     progressBar->setMaximum(progressBar->maximum() + PROGRESS_STEPS * files.size());
     progressBar->show();
     processUploadQueue();
+}
+
+void Photos::folderOpened(const QUrl &url)
+{
+    qDebug() << "folderOpened" << url;
+
+    PhotosList *listView = new PhotosList(url);
+    photosView->setCurrentIndex(photosView->addWidget(listView));
+    connect(listView, SIGNAL(folderOpened(const QUrl&)),
+        this, SLOT(folderOpened(const QUrl&)));
+    fs->list(url.toString());
 }
 
 void Photos::processDownloadQueue()

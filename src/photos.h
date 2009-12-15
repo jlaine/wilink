@@ -46,11 +46,15 @@ public:
 
 signals:
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
+    void folderOpened(const QUrl &url);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
+
+protected slots:
+    void slotItemDoubleClicked(QListWidgetItem *item);
 
 private:
     QUrl baseUrl;
@@ -72,10 +76,10 @@ protected:
     void refresh();
 
 protected slots:
-    void chDir(QListWidgetItem *item);
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
+    void folderOpened(const QUrl &url);
     void putProgress(int done, int total);
 
 private:
