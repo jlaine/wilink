@@ -1,3 +1,6 @@
+wDesktop 0.2.2
+ * Add a button in photos to go back to the previous folder.
+
 wDesktop 0.2.1
  * Fix French translation for "Refresh".
  * Make it possible to keep wDesktop in the dock on OS X.
