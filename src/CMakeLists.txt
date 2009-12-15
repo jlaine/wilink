@@ -12,7 +12,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 add_executable(tests systeminfo.cpp tests.cpp updates.cpp ${tests_MOC_SOURCES})
-target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 # wDesktop
 

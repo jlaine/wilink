@@ -27,6 +27,8 @@
 #include <QStringList>
 #include <QUrl>
 
+#include "qnetio/wallet.h"
+
 #include "systeminfo.h"
 #include "updates.h"
 
@@ -34,6 +36,7 @@ Updates::Updates(QObject *parent)
     : QObject(parent)
 {
     network = new QNetworkAccessManager(this);
+    connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 }
 
 void Updates::check(const QUrl &url, const QString &version)
