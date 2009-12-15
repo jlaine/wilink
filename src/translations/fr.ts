@@ -62,7 +62,7 @@
     <name>Diagnostics</name>
     <message>
         <source>Refresh</source>
-        <translation>Raffraîchir</translation>
+        <translation>Rafraîchir</translation>
     </message>
     <message>
         <source>Print</source>
