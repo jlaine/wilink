@@ -1,3 +1,4 @@
+add_subdirectory(data)
 add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
 
@@ -8,20 +9,19 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # tests
 
-set(tests_MOC_HEADERS updates.h tests.h)
+set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests updates.cpp tests.cpp ${tests_MOC_SOURCES})
+add_executable(tests systeminfo.cpp tests.cpp updates.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 # wDesktop
-set(wDesktop_RCCS
-    ${CMAKE_SOURCE_DIR}/data/wDesktop.qrc)
 
 set(wDesktop_SOURCES
     chat.cpp
     diagnostics.cpp
     main.cpp
     photos.cpp
+    systeminfo.cpp
     trayicon.cpp
     updates.cpp)
 
@@ -31,6 +31,13 @@ set(wDesktop_MOC_HEADERS
     photos.h
     trayicon.h
     updates.h)
+
+configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
+qt4_create_translation(QM_FILES ${wDesktop_SOURCES} translations/fr.ts)
+
+set(wDesktop_RCCS
+    ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/data/wDesktop.qrc)
 
 if(WIN32)
   set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
@@ -56,7 +63,7 @@ add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_R
 target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
-    set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-Darwin.dmg)
+    set(BUNDLE_DMG ${CPACK_BUNDLE_NAME}-${CPACK_PACKAGE_VERSION}-mac.dmg)
 	set(BUNDLE_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/wDesktop.app)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE TRUE)
 	set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})

@@ -23,6 +23,14 @@
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
     </message>
+    <message>
+        <source>Enter the address of the contact you want to add.</source>
+        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
+    </message>
 </context>
 <context>
     <name>ChatDialog</name>
@@ -33,6 +41,10 @@
     <message>
         <source>Chat with %1</source>
         <translation>Conversation avec %1</translation>
+    </message>
+    <message>
+        <source>Me</source>
+        <translation>Moi</translation>
     </message>
 </context>
 <context>
@@ -61,7 +73,7 @@
     <name>Photos</name>
     <message>
         <source>To upload your photos, simply drag and drop them to a folder.</source>
-        <translation></translation>
+        <translation>Pour télécharger vos photos, il vous suffit de les faire glisser sur un dossier.</translation>
     </message>
     <message>
         <source>Connecting..</source>
@@ -109,6 +121,21 @@
     <message>
         <source>Upload &amp;photos</source>
         <translation>Téléchargement &amp;photos</translation>
+    </message>
+</context>
+<context>
+    <name>UpdatesDialog</name>
+    <message>
+        <source>Update available</source>
+        <translation>Mise à jour disponible</translation>
+    </message>
+    <message>
+        <source>Downloading</source>
+        <translation>Téléchargement</translation>
+    </message>
+    <message>
+        <source>Version %1 of %2 is available. Do you want to install it?</source>
+        <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
     </message>
 </context>
 </TS>

@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QLocale>
 #include <QPushButton>
 #include <QMenu>
 #include <QMessageBox>
@@ -33,6 +34,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QProgressBar>
+#include <QTimer>
 
 #include "qnetio/wallet.h"
 
@@ -45,13 +47,15 @@
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
+static int retryInterval = 15000;
 
 TrayIcon::TrayIcon()
-    : chat(NULL), diagnostics(NULL), photos(NULL)
+    : chat(NULL), diagnostics(NULL), photos(NULL),
+    connected(false),
+    refreshInterval(0)
 {
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
-    show();
 
     /* set initial menu */
     QMenu *menu = new QMenu;
@@ -76,12 +80,10 @@ TrayIcon::TrayIcon()
     /* prepare modules */
     chat = new Chat(this);
     updates = new UpdatesDialog;
+    updates->setVersion(QString::fromLatin1(WDESKTOP_VERSION));
 
     /* fetch menu */
-    QNetworkRequest req(baseUrl);
-    req.setRawHeader("Accept", "application/xml");
-    QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
+    QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
 void TrayIcon::fetchIcon()
@@ -92,6 +94,15 @@ void TrayIcon::fetchIcon()
     QPair<QUrl, QAction*> entry = icons.first();
     QNetworkReply *reply = network->get(QNetworkRequest(entry.first));
     connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
+}
+
+void TrayIcon::fetchMenu()
+{
+    QNetworkRequest req(baseUrl);
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
+    QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
 
 /** Prompt the user for credentials.
@@ -147,8 +158,7 @@ void TrayIcon::openUrl()
 void TrayIcon::showIcon()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    if (!reply)
-        return;
+    Q_ASSERT(reply != NULL);
 
     /* display current icon */
     QPair<QUrl, QAction*> entry = icons.takeFirst();
@@ -191,6 +201,7 @@ void TrayIcon::showMenu()
     if (reply->error() != QNetworkReply::NoError)
     {
         qWarning("Failed to retrieve menu");
+        QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
         return;
     }
 
@@ -235,14 +246,53 @@ void TrayIcon::showMenu()
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
 
+    /* parse messages */
+    item = doc.documentElement().firstChildElement("messages").firstChildElement("message");
+    while (!item.isNull())
+    {
+        const QString id = item.firstChildElement("id").text();
+        const QString title = item.firstChildElement("title").text();
+        const QString text = item.firstChildElement("text").text();
+        const int type = item.firstChildElement("type").text().toInt();
+        enum QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
+        switch (type)
+        {
+            case 3: icon = QSystemTrayIcon::Critical; break;
+            case 2: icon = QSystemTrayIcon::Warning; break;
+            case 1: icon = QSystemTrayIcon::Information; break;
+            case 0: icon = QSystemTrayIcon::NoIcon; break;
+        }
+        if (!seenMessages.contains(id))
+        {
+            showMessage(title, text, icon);
+            seenMessages.append(id);
+        }
+        item = item.nextSiblingElement("message");
+    }
+
+    /* parse preferences */
+    item = doc.documentElement().firstChildElement("preferences");
+    refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
+    updates->setUrl(QUrl(item.firstChildElement("updates").text()));
+    if (refreshInterval > 0)
+        QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
+
     /* fetch icons */
     fetchIcon();
 
-    /* connect to chat */
-    QAuthenticator auth;
-    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
-    chat->open(auth.user(), auth.password());
+    /* connect to chat and check for updates */
+    if (!connected)
+    {
+        connected = true;
 
+        /* connect to chat */
+        QAuthenticator auth;
+        Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+        chat->open(auth.user(), auth.password());
+
+        /* check for updates */
+        updates->check();
+    }
 }
 
 void TrayIcon::showPhotos()
@@ -274,15 +324,29 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
-    updates->check(QString::fromLatin1(WDESKTOP_UPDATES),
-        QString::fromLatin1(WDESKTOP_VERSION));
+}
+
+void UpdatesDialog::check()
+{
+    if (updatesUrl.isValid())
+        updates->check(updatesUrl, currentVersion);
+}
+
+void UpdatesDialog::setUrl(const QUrl &url)
+{
+    updatesUrl = url;
+}
+
+void UpdatesDialog::setVersion(const QString &version)
+{
+    currentVersion = version;
 }
 
 void UpdatesDialog::updateAvailable(const Release &release)
 {
     if (QMessageBox::question(NULL,
         tr("Update available"),
-        tr("Version %1 of %2 is available. Do you want to install it")
+        tr("Version %1 of %2 is available. Do you want to install it?")
             .arg(release.version)
             .arg(release.package),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)

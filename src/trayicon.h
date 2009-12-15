@@ -45,8 +45,13 @@ class UpdatesDialog : public QDialog
 
 public:
     UpdatesDialog(QWidget *parent = NULL);
+    void setUrl(const QUrl &url);
+    void setVersion(const QString &version);
 
 public slots:
+    void check();
+
+protected slots:
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
     void updateProgress(qint64 done, qint64 total);
@@ -58,6 +63,9 @@ private:
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;
+
+    QUrl updatesUrl;
+    QString currentVersion;
 };
 
 
@@ -71,6 +79,7 @@ public:
     TrayIcon();
 
 protected slots:
+    void fetchMenu();
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
@@ -88,8 +97,11 @@ private:
     Photos *photos;
     UpdatesDialog *updates;
 
+    bool connected;
+    int refreshInterval;
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;
+    QStringList seenMessages;
 };
 
 #endif
