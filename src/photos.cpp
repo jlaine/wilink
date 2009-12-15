@@ -77,9 +77,22 @@ void PhotosList::dropEvent(QDropEvent *event)
     {
         event->setDropAction(Qt::CopyAction);
         event->accept();
-        emit filesDropped(event->mimeData()->urls(),
-            dropItem->data(Qt::UserRole).toUrl());
+
+        const FileInfo &info = itemEntry(dropItem);
+        if (info.isDir())
+            emit filesDropped(event->mimeData()->urls(), info.url());
     }
+}
+
+FileInfo PhotosList::itemEntry(QListWidgetItem *item)
+{
+    QUrl url = item->data(Qt::UserRole).value<QUrl>();
+    foreach (const FileInfo &info, fileList)
+    {
+        if (info.url() == url)
+            return info;
+    }
+    return FileInfo();
 }
 
 void PhotosList::setEntries(const FileInfoList &entries)
@@ -111,16 +124,9 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
 
 void PhotosList::slotItemDoubleClicked(QListWidgetItem *item)
 {
-    QUrl url = item->data(Qt::UserRole).value<QUrl>();
-    foreach (const FileInfo &info, fileList)
-    {
-        if (info.url() == url)
-        {
-            if (info.isDir())
-                emit folderOpened(url);
-            break;
-        }
-    }
+    const FileInfo &info = itemEntry(item);
+    if (info.isDir())
+        emit folderOpened(info.url());
 }
 
 QUrl PhotosList::url()
@@ -278,6 +284,8 @@ void Photos::folderOpened(const QUrl &url)
 
     PhotosList *listView = new PhotosList(url);
     photosView->setCurrentIndex(photosView->addWidget(listView));
+    connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
+            this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
     connect(listView, SIGNAL(folderOpened(const QUrl&)),
         this, SLOT(folderOpened(const QUrl&)));
     fs->list(url.toString());

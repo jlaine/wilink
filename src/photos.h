@@ -52,6 +52,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
+    FileInfo itemEntry(QListWidgetItem *item);
 
 protected slots:
     void slotItemDoubleClicked(QListWidgetItem *item);
