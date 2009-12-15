@@ -87,9 +87,13 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* create UI */
     helpLabel = new QLabel(tr("To upload your photos, simply drag and drop them to a folder."));
 
-    listView = new PhotosList;
+    photosView = new QStackedWidget;
+    PhotosList *listView = new PhotosList;
+    photosView->addWidget(listView);
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
+    connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+            this, SLOT(chDir(QListWidgetItem *)));
 
     progressBar = new QProgressBar;
     progressBar->setRange(0, 0);
@@ -104,7 +108,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(helpLabel);
-    layout->addWidget(listView);
+    layout->addWidget(photosView);
     layout->addWidget(progressBar);
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(statusLabel);
@@ -116,9 +120,27 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     /* open filesystem */
     fs = FileSystem::factory(remoteUrl, this);
-    connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+    connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this,
+            SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
     fs->open(remoteUrl);
+}
+
+void Photos::chDir(QListWidgetItem *item)
+{
+    QUrl url = item->data(Qt::UserRole).value<QUrl>();
+    qDebug() << "chDir" << url;
+    remoteUrl = url.toString();
+    if(remoteUrl.endsWith(".jpg")) {
+        qDebug() << "Getting" << remoteUrl;
+        fdPhoto = fs->get(remoteUrl);
+    } else {
+        PhotosList *listView = new PhotosList;
+        photosView->setCurrentIndex(photosView->addWidget(listView));
+        connect(listView, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+        this, SLOT(chDir(QListWidgetItem *)));
+        fs->list(url.toString());
+    }
 }
 
 void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
@@ -128,24 +150,48 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 
     switch (cmd)
     {
+    case FileSystem::Get: {
+        if (error) {
+            qDebug() << "Error Get" << remoteUrl;
+            return;
+        }
+        fdPhoto->reset();
+        QImage img;
+        img.load(fdPhoto, NULL);
+        img = img.scaled(50, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        QLabel *aLabel = new QLabel();
+        //aLabel->setText("foobar");
+        aLabel->setAlignment(Qt::AlignCenter);
+        aLabel->setPixmap(QPixmap::fromImage(img));
+        photosView->setCurrentIndex(photosView->addWidget(aLabel));
+        fdPhoto->close();
+        break;
+    }
     case FileSystem::Open:
         if (!error)
             refresh();
         break;
     case FileSystem::List:
-        if (error)
+        if (error) {
+            qDebug() << "Error listing" << remoteUrl;
             return;
-        listView->clear();
+        }
+        PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+        Q_ASSERT(listView != NULL);
+        //listView->clear();
         foreach (const FileInfo& info, results)
         {
-            if (!info.isDir())
-                continue;
             QListWidgetItem *newItem = new QListWidgetItem;
+            if (info.isDir()) {
+                newItem->setIcon(QIcon(":/photos.png"));
+            } else {
+                qDebug() << info.name() << info.url();
+            }
             newItem->setData(Qt::UserRole, QUrl(info.url()));
-            newItem->setIcon(QIcon(":/photos.png"));
             newItem->setText(info.name());
             listView->addItem(newItem);
         }
+        listView->show();
 
         /* drag and drop is now allowed */
         statusLabel->setText("");
@@ -173,6 +219,8 @@ void Photos::createFolder()
                                           "", &ok);
     if (ok && !text.isEmpty())
     {
+        PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+        Q_ASSERT(listView != NULL);
         listView->setAcceptDrops(false);
         fs->mkdir(remoteUrl + "/" + text);
     }
