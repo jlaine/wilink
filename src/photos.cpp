@@ -36,7 +36,7 @@
 #define PROGRESS_STEPS 100
 
 PhotosList::PhotosList(const QUrl &url, QWidget *parent)
-    : QListWidget(parent), baseUrl(url)
+    : QListWidget(parent), baseDrop(true), baseUrl(url)
 {
     setIconSize(QSize(24, 24));
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
@@ -73,20 +73,25 @@ void PhotosList::dragMoveEvent(QDragMoveEvent *event)
 
 void PhotosList::dropEvent(QDropEvent *event)
 {
-    QListWidgetItem *dropItem = itemAt(event->pos());
-    if (event->mimeData()->hasUrls() && dropItem)
+    const FileInfo &info = itemEntry(itemAt(event->pos()));
+    if (!event->mimeData()->hasUrls() || (!info.isDir() && !baseDrop))
     {
-        event->setDropAction(Qt::CopyAction);
-        event->accept();
-
-        const FileInfo &info = itemEntry(dropItem);
-        if (info.isDir())
-            emit filesDropped(event->mimeData()->urls(), info.url());
+        event->ignore();
+        return;
     }
+
+    event->setDropAction(Qt::CopyAction);
+    event->accept();
+
+    emit filesDropped(event->mimeData()->urls(),
+        info.isDir() ? info.url() : baseUrl);
 }
 
 FileInfo PhotosList::itemEntry(QListWidgetItem *item)
 {
+    if (!item)
+        return FileInfo();
+
     QUrl url = item->data(Qt::UserRole).value<QUrl>();
     foreach (const FileInfo &info, fileList)
     {
@@ -94,6 +99,11 @@ FileInfo PhotosList::itemEntry(QListWidgetItem *item)
             return info;
     }
     return FileInfo();
+}
+
+void PhotosList::setBaseDrop(bool accept)
+{
+    baseDrop = accept;
 }
 
 void PhotosList::setEntries(const FileInfoList &entries)
@@ -144,6 +154,7 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
+    listView->setBaseDrop(false);
     photosView->addWidget(listView);
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
@@ -331,6 +342,9 @@ void Photos::processUploadQueue()
         progressBar->hide();
         progressBar->setValue(0);
         progressBar->setMaximum(0);
+
+        /* refresh the current view */
+        refresh();
         return;
     }
 

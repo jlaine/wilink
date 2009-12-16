@@ -41,6 +41,7 @@ class PhotosList : public QListWidget
 
 public:
     PhotosList(const QUrl &url, QWidget *parent = NULL);
+    void setBaseDrop(bool accept);
     void setEntries(const FileInfoList &entries);
     void setImage(const QUrl &url, const QImage &img);
     QUrl url();
@@ -59,6 +60,7 @@ protected slots:
     void slotItemDoubleClicked(QListWidgetItem *item);
 
 private:
+    bool baseDrop;
     QUrl baseUrl;
     FileInfoList fileList;
 };
