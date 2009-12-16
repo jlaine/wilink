@@ -67,20 +67,30 @@ if(APPLE)
 	set(CPACK_BUNDLE_NAME ${PROJECT_NAME})
 	set(CPACK_BUNDLE_ICON ${CMAKE_SOURCE_DIR}/src/data/wDesktop.icns)
 	set(CPACK_BUNDLE_IDENTIFIER net.wifirst.wDesktop)
-	set(CPACK_BUNDLE_PLIST ${CMAKE_BINARY_DIR}/Bundle.plist)
-	set(CPACK_BUNDLE_STARTUP_COMMAND ${CMAKE_BINARY_DIR}/Bundle.start)
+
+    # image generation
+    set(BUNDLE_DMG ${PROJECT_NAME}-${WDESKTOP_VERSION}-mac.dmg)
+	set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wDesktop.app)
+    set(_dmg_temp ${BUNDLE_DMG}.temp)
+    add_custom_command(OUTPUT ${BUNDLE_DMG}
+        COMMAND mkdir ${_dmg_temp}
+        COMMAND cp -r ${BUNDLE_LOCATION} ${_dmg_temp}
+        COMMAND ln -s /Applications ${_dmg_temp}/Applications
+        COMMAND hdiutil create ${BUNDLE_DMG} -srcdir ${_dmg_temp} -fs HFS+ -volname "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${WDESKTOP_VERSION}"
+        COMMAND rm -rf ${_dmg_temp}
+        DEPENDS wDesktop)
+    add_custom_target(package DEPENDS ${BUNDLE_DMG})
+else(APPLE)
+    if(WIN32)
+        set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wDesktop.exe\\\";")
+    endif(WIN32)
+    # Source package
+    set(CPACK_SOURCE_GENERATOR "TBZ2")
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${WDESKTOP_VERSION}")
+    list(APPEND CPACK_SOURCE_IGNORE_FILES "/.git/")
+    list(APPEND CPACK_SOURCE_IGNORE_FILES "/.gitmodules")
+    list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}")
+    include(CPack)
 endif(APPLE)
-if(WIN32)
-    set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wDesktop.exe\\\";")
-endif(WIN32)
-# Source package
-set(CPACK_SOURCE_GENERATOR "TBZ2")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${WDESKTOP_VERSION}")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "/.git/")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "/.gitmodules")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}")
-include(CPack)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/Bundle.start.in ${CMAKE_BINARY_DIR}/Bundle.start)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/Bundle.plist.in ${CMAKE_BINARY_DIR}/Bundle.plist)
 
 add_subdirectory(src)
