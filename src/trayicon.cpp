@@ -272,7 +272,9 @@ void TrayIcon::showMenu()
     /* parse preferences */
     item = doc.documentElement().firstChildElement("preferences");
     refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
-    updates->setUrl(baseUrl.resolved(QUrl(item.firstChildElement("updates").text())));
+    const QString urlString = item.firstChildElement("updates").text();
+    if (!urlString.isEmpty())
+        updates->setUrl(baseUrl.resolved(QUrl(urlString)));
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 

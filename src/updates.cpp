@@ -134,8 +134,10 @@ void Updates::processStatus()
     Release release;
     release.changes = item.firstChildElement("changes").text();
     release.package = item.firstChildElement("package").text();
-    release.url = updatesUrl.resolved(QUrl(item.firstChildElement("url").text()));
     release.version = item.firstChildElement("version").text();
+    const QString urlString = item.firstChildElement("url").text();
+    if (!urlString.isEmpty())
+        release.url = updatesUrl.resolved(QUrl(urlString));
 
     if (compareVersions(release.version, currentVersion) > 0 && !release.url.isEmpty())
         emit updateAvailable(release);
