@@ -142,12 +142,12 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
         QListWidgetItem *currentItem = item(i);
         if (currentItem->data(Qt::UserRole).value<QUrl>() == url)
         {
-            const QImage &scaled = img.scaled(ICON_SIZE, ICON_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
             QPixmap pixmap(ICON_SIZE, ICON_SIZE);
+            const QImage &scaled = img.scaled(pixmap.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
             pixmap.fill();
             QPainter painter(&pixmap);
-            painter.drawImage((ICON_SIZE - scaled.width()) / 2,
-                (ICON_SIZE - scaled.height()) / 2, scaled);
+            painter.drawImage((pixmap.width() - scaled.width()) / 2,
+                (pixmap.height() - scaled.height()) / 2, scaled);
             currentItem->setIcon(pixmap);
         }
     }
