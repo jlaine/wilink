@@ -41,6 +41,12 @@ PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseDrop(true), baseUrl(url)
 {
     setIconSize(QSize(ICON_SIZE, ICON_SIZE));
+    setSpacing(5);
+    setViewMode(QListView::IconMode);
+    setResizeMode(QListView::Adjust);
+    setTextElideMode(Qt::ElideMiddle);
+    setWordWrap(true);
+    setWrapping(true);
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
             this, SLOT(slotItemDoubleClicked(QListWidgetItem *)));
 }
@@ -117,6 +123,10 @@ void PhotosList::setEntries(const FileInfoList &entries)
         QListWidgetItem *newItem = new QListWidgetItem;
         if (info.isDir()) {
             newItem->setIcon(QIcon(":/photos.png"));
+        } else {
+            QPixmap blank(ICON_SIZE, ICON_SIZE);
+            blank.fill();
+            newItem->setIcon(blank);
         }
         newItem->setData(Qt::UserRole, QUrl(info.url()));
         newItem->setText(info.name());
@@ -131,7 +141,7 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
         QListWidgetItem *currentItem = item(i);
         if (currentItem->data(Qt::UserRole).value<QUrl>() == url)
             currentItem->setIcon(QPixmap::fromImage(
-                img));
+                img.scaled(ICON_SIZE, ICON_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
     }
 }
 
@@ -239,13 +249,6 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
         Q_ASSERT(listView != NULL);
         listView->setEntries(results);
-
-        listView->setViewMode(QListView::IconMode);
-        listView->setWrapping(true);
-        listView->setSpacing(5);
-        listView->setResizeMode(QListView::Adjust);
-        listView->setTextElideMode(Qt::ElideMiddle);
-        listView->setWordWrap(true);
 
         /* drag and drop is now allowed */
         statusLabel->setText("");
