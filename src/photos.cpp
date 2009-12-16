@@ -36,12 +36,12 @@
 #include "photos.h"
 
 #define PROGRESS_STEPS 100
-#define ICON_SIZE 128
+#define ICON_SIZE QSize(128, 128)
 
 PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseDrop(true), baseUrl(url)
 {
-    setIconSize(QSize(ICON_SIZE, ICON_SIZE));
+    setIconSize(ICON_SIZE);
     setSpacing(5);
     setViewMode(QListView::IconMode);
     setResizeMode(QListView::Adjust);
@@ -125,7 +125,7 @@ void PhotosList::setEntries(const FileInfoList &entries)
         if (info.isDir()) {
             newItem->setIcon(QIcon(":/photos.png"));
         } else {
-            QPixmap blank(ICON_SIZE, ICON_SIZE);
+            QPixmap blank(ICON_SIZE);
             blank.fill();
             newItem->setIcon(blank);
         }
@@ -142,7 +142,7 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
         QListWidgetItem *currentItem = item(i);
         if (currentItem->data(Qt::UserRole).value<QUrl>() == url)
         {
-            QPixmap pixmap(ICON_SIZE, ICON_SIZE);
+            QPixmap pixmap(ICON_SIZE);
             const QImage &scaled = img.scaled(pixmap.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
             pixmap.fill();
             QPainter painter(&pixmap);
