@@ -35,8 +35,8 @@
 #include <QScrollArea>
 #include "photos.h"
 
-#define PROGRESS_STEPS 100
-#define ICON_SIZE QSize(128, 128)
+static const int PROGRESS_STEPS = 100;
+static const QSize ICON_SIZE(128, 128);
 
 PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseDrop(true), baseUrl(url)
