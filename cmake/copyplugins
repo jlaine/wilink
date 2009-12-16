@@ -10,7 +10,7 @@ for input in "$@"; do
     fi
     inputdir=`dirname $input`
     name=`basename $inputdir`/`basename $input`
-    plugin=$bundle/Contents/Plugins/$name
+    plugin=$bundle/Contents/PlugIns/$name
     echo "Copying $name"
     mkdir -p `dirname $plugin`
     cp $input $plugin
