@@ -36,6 +36,8 @@ public:
     Diagnostics(QWidget *parent=0);
 
 protected slots:
+    void addItem(const QString &title, const QString &value);
+    void addSection(const QString &title);
     void print();
     void refresh();
     void networkFinished();

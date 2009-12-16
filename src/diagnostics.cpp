@@ -27,11 +27,13 @@
 #include <QTextEdit>
 #include <QThread>
 
+#include "config.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
 #include "wireless.h"
 
-#define SERVER_ADDRESS QHostAddress("213.91.4.201")
+static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
+static const QHostAddress serverAddress("213.91.4.201");
 
 static QString interfaceName(const QNetworkInterface &interface)
 {
@@ -262,7 +264,7 @@ void NetworkThread::run()
             }
         }
     }
-    gateways.append(SERVER_ADDRESS);
+    gateways.append(serverAddress);
 
     /* run DNS tests */
     QList<QHostAddress> longPing;
@@ -293,7 +295,7 @@ void NetworkThread::run()
         pings.append(NetworkInfo::ping(gateway, longPing.contains(gateway) ? 30 : 3));
 
     /* run traceroute */
-    traceroute = NetworkInfo::traceroute(SERVER_ADDRESS, 3, 4);
+    traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
 }
 
 /* WIRELESS */
@@ -336,6 +338,18 @@ void WirelessThread::run()
 
 /* GUI */
 
+class TextList : public QStringList
+{
+public:
+    QString render() const {
+        QString info("<ul>");
+        foreach (const QString &bit, *this)
+            info += QString("<li>%1</li>").arg(bit);
+        info += QString("</ul>");
+        return info;
+    };
+};
+
 Diagnostics::Diagnostics(QWidget *parent)
     : QDialog(parent), networkThread(NULL), wirelessThread(NULL)
 {
@@ -364,6 +378,16 @@ Diagnostics::Diagnostics(QWidget *parent)
     refresh();
 }
 
+void Diagnostics::addItem(const QString &title, const QString &value)
+{
+    text->append(QString("<h3>%1</h3>%2").arg(title, value));
+}
+
+void Diagnostics::addSection(const QString &title)
+{
+    text->append(QString("<h2>%1</h2>").arg(title));
+}
+
 void Diagnostics::print()
 {
     QPrinter printer;
@@ -378,34 +402,32 @@ void Diagnostics::refresh()
     printButton->setEnabled(false);
 
     /* show system info */
-    text->setText("<h1>Diagnostics for " + SystemInfo::osName() + " " + SystemInfo::osVersion() + "</h1>");
-    text->append("<h2>Network interfaces</h2>");
+    text->setText("<h2>System information</h2>");
+    TextList list;
+    list << QString("Operating system: %1 %2").arg(SystemInfo::osName(), SystemInfo::osVersion());
+    list << QString("wDesktop: %1").arg(wdesktopVersion);
+    addItem("Software version", list.render());
+
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
             continue;
 
-        QString info = "<h3>Interface " + interfaceName(interface) + "</h3>";
-        if (interface.addressEntries().size())
+        TextList list;
+        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
-            info += "<ul>";
-            foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
-            {
-                QString protocol;
-                if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                    protocol = "IPv4";
-                else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                    protocol = "IPv6";
-                else
-                    continue;
-                info += "<li>" + protocol + " address: " + entry.ip().toString() + "</li>";
-                info += "<li>" + protocol + " netmask: " + entry.netmask().toString() + "</li>";
-            }
-            info += "</ul>";
-        } else {
-            info += "<p>No address</p>";
+            QString protocol;
+            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+                protocol = "IPv4";
+            else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
+                protocol = "IPv6";
+            else
+                continue;
+            list << protocol + " address: " + entry.ip().toString();
+            list << protocol + " netmask: " + entry.netmask().toString();
         }
-        text->append(info);
+        addItem("Interface " + interfaceName(interface),
+            list.size() ? list.render() : "<p>No address</p>");
     }
 
     /* run network tests */
@@ -416,11 +438,10 @@ void Diagnostics::refresh()
 
 void Diagnostics::networkFinished()
 {
-    QString info = "<h2>Tests</h2>";
+    addSection("Tests");
 
     /* DNS tests */
-    info += "<h3>DNS</h3>";
-    info += "<table>";
+    QString info = "<table>";
     info += "<tr><th>Host name</th><th>Host address</th></tr>";
     foreach (const QHostInfo &hostInfo, networkThread->lookups)
     {
@@ -439,13 +460,13 @@ void Diagnostics::networkFinished()
             .arg(hostAddress);
     }
     info += "</table>";
-    text->append(info);
+    addItem("DNS", info);
 
     /* ping tests */
-    text->append("<h3>Ping</h3>" + dumpPings(networkThread->pings));
+    addItem("Ping", dumpPings(networkThread->pings));
 
     /* traceroute tests */
-    text->append("<h3>Traceroute</h3>" + dumpPings(networkThread->traceroute));
+    addItem("Traceroute", dumpPings(networkThread->traceroute));
 
     /* get wireless info */
     wirelessThread = new WirelessThread(this);
@@ -458,21 +479,19 @@ void Diagnostics::wirelessFinished()
     QString info;
     foreach (const WirelessResult &result, wirelessThread->results)
     {
-        info += "<h2>Wireless interface " + interfaceName(result.interface) + "</h2>";
+        addSection("Wireless interface " + interfaceName(result.interface));
 
-        info += "<h3>Current network</h3>";
         if (result.currentNetwork.isValid())
         {
-            info += "<ul>";
-            info += "<li>SSID: "+ result.currentNetwork.ssid() + "</li>";
-            info += "<li>RSSI: " + QString::number(result.currentNetwork.rssi()) + "</li>";
+            TextList list;
+            list << "SSID: " + result.currentNetwork.ssid();
+            list << "RSSI: " + QString::number(result.currentNetwork.rssi());
             if (result.currentNetwork.cinr())
-                info += "<li>CINR: " + QString::number(result.currentNetwork.cinr()) + "</li>";
-            info += "</ul>";
+                list << "CINR: " + QString::number(result.currentNetwork.cinr());
+            addItem("Current network", list.render());
         }
 
-        info += "<h3>Available networks</h3>";
-        info += "<table>";
+        QString info = "<table>";
         info += "<tr><th>SSID</th><th>RSSI</th><th>CINR</th></tr>";
         foreach (const WirelessNetwork &network, result.availableNetworks)
         {
@@ -486,8 +505,8 @@ void Diagnostics::wirelessFinished()
             }
         }
         info += "</table>";
+        addItem("Available networks", info);
     }
-    text->append(info);
 
     /* enable buttons */
     refreshButton->setEnabled(true);
