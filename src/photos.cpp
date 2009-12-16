@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QListWidget>
+#include <QPainter>
 #include <QPushButton>
 #include <QProgressBar>
 #include <QStackedWidget>
@@ -140,8 +141,15 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
     {
         QListWidgetItem *currentItem = item(i);
         if (currentItem->data(Qt::UserRole).value<QUrl>() == url)
-            currentItem->setIcon(QPixmap::fromImage(
-                img.scaled(ICON_SIZE, ICON_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+        {
+            const QImage &scaled = img.scaled(ICON_SIZE, ICON_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            QPixmap pixmap(ICON_SIZE, ICON_SIZE);
+            pixmap.fill();
+            QPainter painter(&pixmap);
+            painter.drawImage((ICON_SIZE - scaled.width()) / 2,
+                (ICON_SIZE - scaled.height()) / 2, scaled);
+            currentItem->setIcon(pixmap);
+        }
     }
 }
 
