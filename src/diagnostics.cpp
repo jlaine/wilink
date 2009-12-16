@@ -476,7 +476,6 @@ void Diagnostics::networkFinished()
 
 void Diagnostics::wirelessFinished()
 {
-    QString info;
     foreach (const WirelessResult &result, wirelessThread->results)
     {
         addSection("Wireless interface " + interfaceName(result.interface));
