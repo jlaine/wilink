@@ -3,6 +3,7 @@ wDesktop 0.2.2
  * Improve display of photo thumbnails.
  * Refresh photos list after photos have been uploaded.
  * Make it possible to run wDesktop at the end of Windows installer.
+ * Display release changes in update prompt.
 
 wDesktop 0.2.1
  * Fix French translation for "Refresh".
