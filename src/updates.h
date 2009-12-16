@@ -29,7 +29,7 @@ class QNetworkReply;
 class Release
 {
 public:
-    QString description;
+    QString changes;
     QString package;
     QUrl url;
     QString version;

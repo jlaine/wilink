@@ -132,7 +132,7 @@ void Updates::processStatus()
     QDomElement item = doc.documentElement();
 
     Release release;
-    release.description = item.firstChildElement("description").text();
+    release.changes = item.firstChildElement("changes").text();
     release.package = item.firstChildElement("package").text();
     release.url = updatesUrl.resolved(QUrl(item.firstChildElement("url").text()));
     release.version = item.firstChildElement("version").text();

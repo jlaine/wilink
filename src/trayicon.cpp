@@ -311,9 +311,16 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
-    /* progress */
+    /* status */
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *statusIcon = new QLabel;
+    statusIcon->setPixmap(QPixmap(":/wDesktop.png"));
+    hbox->addWidget(statusIcon);
     statusLabel = new QLabel;
-    layout->addWidget(statusLabel);
+    hbox->addWidget(statusLabel);
+    layout->addItem(hbox);
+
+    /* progress */
     progressBar = new QProgressBar;
     layout->addWidget(progressBar);
     setLayout(layout);
@@ -342,11 +349,12 @@ void UpdatesDialog::setVersion(const QString &version)
 
 void UpdatesDialog::updateAvailable(const Release &release)
 {
+    const QString message = tr("Version %1 of %2 is available. Do you want to install it?")
+            .arg(release.version)
+            .arg(release.package);
     if (QMessageBox::question(NULL,
         tr("Update available"),
-        tr("Version %1 of %2 is available. Do you want to install it?")
-            .arg(release.version)
-            .arg(release.package),
+        QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre>").arg(message, tr("Changes:"), release.changes),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);

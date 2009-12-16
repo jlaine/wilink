@@ -145,5 +145,9 @@
         <source>Version %1 of %2 is available. Do you want to install it?</source>
         <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
     </message>
+    <message>
+        <source>Changes:</source>
+        <translation>Changements :</translation>
+    </message>
 </context>
 </TS>
