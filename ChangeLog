@@ -1,3 +1,6 @@
+wDesktop 0.2.3
+ * Add a User-Agent for request to portal.
+
 wDesktop 0.2.2
  * Add a button in photos to go back to the previous folder.
  * Improve display of photo thumbnails.

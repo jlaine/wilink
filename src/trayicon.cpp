@@ -46,6 +46,8 @@
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
+static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
+static const QByteArray userAgent("wDesktop/" WDESKTOP_VERSION);
 
 TrayIcon::TrayIcon()
     : chat(NULL), diagnostics(NULL), photos(NULL),
@@ -77,7 +79,7 @@ TrayIcon::TrayIcon()
     /* prepare modules */
     chat = new Chat(this);
     updates = new UpdatesDialog;
-    updates->setVersion(QString::fromLatin1(WDESKTOP_VERSION));
+    updates->setVersion(wdesktopVersion);
 
     /* fetch menu */
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
@@ -89,7 +91,9 @@ void TrayIcon::fetchIcon()
         return;
 
     QPair<QUrl, QAction*> entry = icons.first();
-    QNetworkReply *reply = network->get(QNetworkRequest(entry.first));
+    QNetworkRequest req(entry.first);
+    req.setRawHeader("User-Agent", userAgent);
+    QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
 }
 
@@ -98,6 +102,7 @@ void TrayIcon::fetchMenu()
     QNetworkRequest req(baseUrl);
     req.setRawHeader("Accept", "application/xml");
     req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
+    req.setRawHeader("User-Agent", userAgent);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
