@@ -76,7 +76,7 @@ if(APPLE)
 		COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
 		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
-		COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_PLUGINS_DIR}/imageformats/libqgif.* ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
+		COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${WDESKTOP_EXTRA_PLUGINS}
 		DEPENDS wDesktop)
     # image generation
     set(_dmg_temp ${BUNDLE_DMG}.temp)

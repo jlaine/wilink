@@ -32,19 +32,24 @@ set(WDESKTOP_PLUGINS_DIR lib/${PROJECT_NAME} CACHE STRING "wDesktop plugins dire
 relative_path(WDESKTOP_PLUGINS_PATH bin ${WDESKTOP_PLUGINS_DIR})
 
 # Extra runtime dependencies
+if(APPLE)
+    set(WDESKTOP_EXTRA_PLUGINS
+        ${QT_PLUGINS_DIR}/imageformats/libqgif.*
+        ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*)
+endif(APPLE)
 if(WIN32)
-	set(WDESKTOP_EXTRA_RUNTIME
-		${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
-		${CMAKE_FIND_ROOT_PATH}/bin/libz.dll)
-	set(WDESKTOP_EXTRA_PLUGINS
-		${QT_PLUGINS_DIR}/imageformats/qgif4.dll
-		${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
+    set(WDESKTOP_EXTRA_RUNTIME
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll)
+    set(WDESKTOP_EXTRA_PLUGINS
+        ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
+        ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
     install(FILES ${WDESKTOP_EXTRA_RUNTIME} DESTINATION bin)
     install(FILES ${WDESKTOP_EXTRA_PLUGINS} DESTINATION ${WDESKTOP_PLUGINS_DIR}/imageformats)
 endif(WIN32)
