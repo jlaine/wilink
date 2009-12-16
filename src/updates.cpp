@@ -83,8 +83,6 @@ void Updates::download(const Release &release, const QString &dirPath)
 {
     downloadFile.setFileName(QDir(dirPath).filePath(QFileInfo(release.url.path()).fileName()));
 
-    qDebug() << "Downloading to" << downloadFile.fileName();
-
     QNetworkRequest req(release.url);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
@@ -98,7 +96,7 @@ void Updates::saveUpdate()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        qWarning("Failed to download update");
+        qWarning() << "Failed to download update" << reply->url();
         emit updateFailed();
         return;
     }

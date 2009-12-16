@@ -25,12 +25,11 @@
 #include <QSystemTrayIcon>
 #include <QUrl>
 
-#include "updates.h"
-
 class Chat;
 class Diagnostics;
 class Photos;
 class Release;
+class UpdatesDialog;
 
 class QAction;
 class QAuthenticator;
@@ -38,33 +37,6 @@ class QLabel;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QProgressBar;
-
-class UpdatesDialog : public QDialog
-{
-    Q_OBJECT
-
-public:
-    UpdatesDialog(QWidget *parent = NULL);
-    void setUrl(const QUrl &url);
-    void setVersion(const QString &version);
-
-public slots:
-    void check();
-
-protected slots:
-    void updateAvailable(const Release &release);
-    void updateDownloaded(const QUrl &url);
-    void updateProgress(qint64 done, qint64 total);
-
-signals:
-    void installRelease(const Release &release);
-
-private:
-    QProgressBar *progressBar;
-    QLabel *statusLabel;
-    Updates *updates;
-};
-
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */

@@ -23,14 +23,16 @@ set(wDesktop_SOURCES
     photos.cpp
     systeminfo.cpp
     trayicon.cpp
-    updates.cpp)
+    updates.cpp
+    updatesdialog.cpp)
 
 set(wDesktop_MOC_HEADERS
     chat.h
     diagnostics.h
     photos.h
     trayicon.h
-    updates.h)
+    updates.h
+    updatesdialog.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 qt4_create_translation(QM_FILES ${wDesktop_SOURCES} translations/fr.ts)

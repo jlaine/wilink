@@ -29,11 +29,9 @@
 #include <QLocale>
 #include <QPushButton>
 #include <QMenu>
-#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QProgressBar>
 #include <QTimer>
 
 #include "qnetio/wallet.h"
@@ -43,7 +41,7 @@
 #include "diagnostics.h"
 #include "photos.h"
 #include "trayicon.h"
-#include "updates.h"
+#include "updatesdialog.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
@@ -306,75 +304,5 @@ void TrayIcon::showPhotos()
     }
     photos->show();
     photos->raise();
-}
-
-UpdatesDialog::UpdatesDialog(QWidget *parent)
-    : QDialog(parent)
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-
-    /* status */
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *statusIcon = new QLabel;
-    statusIcon->setPixmap(QPixmap(":/wDesktop.png"));
-    hbox->addWidget(statusIcon);
-    statusLabel = new QLabel;
-    hbox->addWidget(statusLabel);
-    layout->addItem(hbox);
-
-    /* progress */
-    progressBar = new QProgressBar;
-    layout->addWidget(progressBar);
-    setLayout(layout);
-
-    /* check for updates */
-    updates = new Updates(this);
-    connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
-    connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
-    connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
-}
-
-void UpdatesDialog::check()
-{
-    updates->check();
-}
-
-void UpdatesDialog::setUrl(const QUrl &url)
-{
-    updates->setUrl(url);
-}
-
-void UpdatesDialog::setVersion(const QString &version)
-{
-    updates->setVersion(version);
-}
-
-void UpdatesDialog::updateAvailable(const Release &release)
-{
-    const QString message = tr("Version %1 of %2 is available. Do you want to install it?")
-            .arg(release.version)
-            .arg(release.package);
-    if (QMessageBox::question(NULL,
-        tr("Update available"),
-        QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre>").arg(message, tr("Changes:"), release.changes),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-    {
-        QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-        statusLabel->setText(tr("Downloading"));
-        show();
-        updates->download(release, downloadDir);
-    }
-}
-
-void UpdatesDialog::updateDownloaded(const QUrl &url)
-{
-    QDesktopServices::openUrl(url);
-    qApp->quit();
-}
-
-void UpdatesDialog::updateProgress(qint64 done, qint64 total)
-{
-    progressBar->setMaximum(total);
-    progressBar->setValue(done);
 }
 
