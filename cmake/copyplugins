@@ -11,12 +11,19 @@ for input in "$@"; do
     inputdir=`dirname $input`
     name=`basename $inputdir`/`basename $input`
     plugin=$bundle/Contents/PlugIns/$name
-    echo "Copying $name"
+    echo "Copying plugin $name"
     mkdir -p `dirname $plugin`
     cp $input $plugin
     filter=`basename $input`
     for dep in `otool -L $plugin | grep -v $filter | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
-        reldep=`echo $dep | sed -e 's/.*\/lib\///'`
-        install_name_tool -change $dep @executable_path/../Frameworks/$reldep $plugin
+        dep_name=`echo $dep | sed -e 's/.*\/lib\///'`
+        dep_id="@executable_path/../Frameworks/$dep_name"
+        install_name_tool -change $dep $dep_id $plugin
+        dep_inst="$bundle/Contents/Frameworks/$dep_name"
+        if [ ! -e $dep_inst ]; then
+            echo "Copying library $dep"
+            cp $dep $dep_inst
+            install_name_tool -id $dep_id $dep_inst
+        fi
     done
 done
