@@ -31,14 +31,16 @@
 #include <QSystemTrayIcon>
 #include <QUrl>
 
+#include <QScrollArea>
 #include "photos.h"
 
 #define PROGRESS_STEPS 100
+#define ICON_SIZE 128
 
 PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseDrop(true), baseUrl(url)
 {
-    setIconSize(QSize(24, 24));
+    setIconSize(QSize(ICON_SIZE, ICON_SIZE));
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
             this, SLOT(slotItemDoubleClicked(QListWidgetItem *)));
 }
@@ -129,7 +131,7 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
         QListWidgetItem *currentItem = item(i);
         if (currentItem->data(Qt::UserRole).value<QUrl>() == url)
             currentItem->setIcon(QPixmap::fromImage(
-                img.scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+                img));
     }
 }
 
@@ -160,6 +162,9 @@ Photos::Photos(const QString &url, QWidget *parent)
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
     connect(listView, SIGNAL(folderOpened(const QUrl&)),
             this, SLOT(folderOpened(const QUrl&)));
+    QScrollArea *area = new QScrollArea(this);
+    area->setWidget(photosView);
+    area->setWidgetResizable(true);
 
     progressBar = new QProgressBar;
     progressBar->setRange(0, 0);
@@ -179,7 +184,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(helpLabel);
-    layout->addWidget(photosView);
+    layout->addWidget(area);
     layout->addWidget(progressBar);
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(backButton);
@@ -234,7 +239,13 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
         Q_ASSERT(listView != NULL);
         listView->setEntries(results);
-        listView->show();
+
+        listView->setViewMode(QListView::IconMode);
+        listView->setWrapping(true);
+        listView->setSpacing(5);
+        listView->setResizeMode(QListView::Adjust);
+        listView->setTextElideMode(Qt::ElideMiddle);
+        listView->setWordWrap(true);
 
         /* drag and drop is now allowed */
         statusLabel->setText("");
