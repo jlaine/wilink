@@ -1,5 +1,6 @@
 wDesktop 0.2.2
  * Add a button in photos to go back to the previous folder.
+ * Make it possible to run wDesktop at the end of Windows installer.
 
 wDesktop 0.2.1
  * Fix French translation for "Refresh".
