@@ -1,5 +1,6 @@
 wDesktop 0.2.2
  * Add a button in photos to go back to the previous folder.
+ * Improve display of photo thumbnails.
  * Refresh photos list after photos have been uploaded.
  * Make it possible to run wDesktop at the end of Windows installer.
 
