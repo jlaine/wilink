@@ -2,6 +2,10 @@
 bundle=$1
 [ -n "$bundle" ] || exit 0
 
+# generate Qt config file
+mkdir -p $bundle/Contents/Resources
+( echo "[Paths]"; echo "Plugins = PlugIns" ) > $bundle/Contents/Resources/qt.conf
+
 started=''
 for input in "$@"; do
     if [ -z "$started" ]; then
@@ -22,6 +26,7 @@ for input in "$@"; do
         dep_inst="$bundle/Contents/Frameworks/$dep_name"
         if [ ! -e $dep_inst ]; then
             echo "Copying library $dep"
+            mkdir -p `dirname $dep_inst`
             cp $dep $dep_inst
             install_name_tool -id $dep_id $dep_inst
         fi

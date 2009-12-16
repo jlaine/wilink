@@ -75,7 +75,7 @@ if(APPLE)
 	add_custom_command(TARGET wDesktop POST_BUILD
 		COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
 		COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
-		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION}
+		COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION} -no-plugins
 		COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${WDESKTOP_EXTRA_PLUGINS}
 		DEPENDS wDesktop)
     # image generation
