@@ -364,7 +364,7 @@ static QString dumpPings(const QList<Ping> &pings)
 {
     TextTable table;
     TextRow titles(true);
-    titles << "Host" << "Packets received" << "Times";
+    titles << "Host" << "Packets received" << "Min. time" << "Max. time" << "Average";
     table << titles;
     foreach (const Ping &report, pings)
     {
@@ -372,10 +372,14 @@ static QString dumpPings(const QList<Ping> &pings)
         row.setColor(report.receivedPackets == report.sentPackets ? "green" : "red");
         row << report.hostAddress.toString();
         row << QString("%1 / %2").arg(report.receivedPackets).arg(report.sentPackets);
-        row << QString(report.receivedPackets == 0 ? "unreachable" : QString("min: %1 ms, max: %2 ms, avg: %3 ms")
-                .arg(report.minimumTime)
-                .arg(report.maximumTime)
-                .arg(report.averageTime));
+        if (report.receivedPackets)
+        {
+            row << QString("%1 ms").arg(report.minimumTime);
+            row << QString("%1 ms").arg(report.maximumTime);
+            row << QString("%1 ms").arg(report.averageTime);
+        } else {
+            row << "-" << "-" << "-";
+        }
         table << row;
     }
     return table.render();
