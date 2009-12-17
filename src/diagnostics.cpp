@@ -212,26 +212,6 @@ QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, in
     return hops;
 }
 
-static QString dumpPings(const QList<Ping> &pings)
-{
-    QString info = "<table>";
-    info += "<tr><th>Host</th><th>Packets received</th><th>Times</th></tr>";
-    foreach (const Ping &report, pings)
-    {
-        info += QString("<tr style=\"background-color: %1\"><td>%2</td><td align=\"center\">%3 / %4</td><td>%5</td></tr>")
-            .arg(report.receivedPackets == report.sentPackets ? "green" : "red")
-            .arg(report.hostAddress.toString())
-            .arg(report.receivedPackets)
-            .arg(report.sentPackets)
-            .arg(report.receivedPackets == 0 ? "unreachable" : QString("min: %1 ms, max: %2 ms, avg: %3 ms")
-                .arg(report.minimumTime)
-                .arg(report.maximumTime)
-                .arg(report.averageTime));
-    }
-    info += "</table>";
-    return info;
-}
-
 /* NETWORK */
 
 class NetworkThread : public QThread
@@ -345,10 +325,61 @@ public:
         QString info("<ul>");
         foreach (const QString &bit, *this)
             info += QString("<li>%1</li>").arg(bit);
-        info += QString("</ul>");
-        return info;
+        return info + "</ul>";
     };
 };
+
+class TextRow : public QStringList
+{
+public:
+    TextRow(bool title=false) : rowTitle(title) {};
+    QString render() const {
+        QString info = rowColor.isEmpty() ? QString("<tr>") : QString("<tr style=\"background-color: %1\">").arg(rowColor);
+        QString rowTemplate = rowTitle ? QString("<th>%1</th>") : QString("<td>%1</td>");
+        foreach (const QString &bit, *this)
+            info += rowTemplate.arg(bit);
+        return info + "</tr>";
+    };
+    void setColor(const QString &color) {
+        rowColor = color;
+    };
+
+private:
+    QString rowColor;
+    bool rowTitle;
+};
+
+class TextTable : public QList<TextRow>
+{
+public:
+    QString render() const {
+        QString info("<table>");
+        foreach (const TextRow &row, *this)
+            info += row.render();
+        return info + "</table>";
+    };
+};
+
+static QString dumpPings(const QList<Ping> &pings)
+{
+    TextTable table;
+    TextRow titles(true);
+    titles << "Host" << "Packets received" << "Times";
+    table << titles;
+    foreach (const Ping &report, pings)
+    {
+        TextRow row;
+        row.setColor(report.receivedPackets == report.sentPackets ? "green" : "red");
+        row << report.hostAddress.toString();
+        row << QString("%1 / %2").arg(report.receivedPackets).arg(report.sentPackets);
+        row << QString(report.receivedPackets == 0 ? "unreachable" : QString("min: %1 ms, max: %2 ms, avg: %3 ms")
+                .arg(report.minimumTime)
+                .arg(report.maximumTime)
+                .arg(report.averageTime));
+        table << row;
+    }
+    return table.render();
+}
 
 Diagnostics::Diagnostics(QWidget *parent)
     : QDialog(parent), networkThread(NULL), wirelessThread(NULL)
@@ -441,8 +472,10 @@ void Diagnostics::networkFinished()
     addSection("Tests");
 
     /* DNS tests */
-    QString info = "<table>";
-    info += "<tr><th>Host name</th><th>Host address</th></tr>";
+    TextTable table;
+    TextRow titles(true);
+    titles << "Host name" << "Host address";
+    table << titles;
     foreach (const QHostInfo &hostInfo, networkThread->lookups)
     {
         QString hostAddress = "not found";
@@ -454,13 +487,12 @@ void Diagnostics::networkFinished()
                 break;
             }
         }
-        info += QString("<tr style=\"background-color: %1\"><td>%2</td><td>%3</td></tr>")
-            .arg(hostInfo.error() == QHostInfo::NoError ? "green" : "red")
-            .arg(hostInfo.hostName())
-            .arg(hostAddress);
+        TextRow row;
+        row.setColor(hostInfo.error() == QHostInfo::NoError ? "green" : "red");
+        row << hostInfo.hostName() << hostAddress;
+        table << row;
     }
-    info += "</table>";
-    addItem("DNS", info);
+    addItem("DNS", table.render());
 
     /* ping tests */
     addItem("Ping", dumpPings(networkThread->pings));
@@ -490,21 +522,22 @@ void Diagnostics::wirelessFinished()
             addItem("Current network", list.render());
         }
 
-        QString info = "<table>";
-        info += "<tr><th>SSID</th><th>RSSI</th><th>CINR</th></tr>";
+        TextTable table;
+        TextRow titles(true);
+        titles << "SSID" << "RSSI" << "CINR";
+        table << titles;
         foreach (const WirelessNetwork &network, result.availableNetworks)
         {
             if (network != result.currentNetwork)
             {
-                info += "<tr>";
-                info += "<td>" + network.ssid() + "</td>";
-                info += "<td>" + QString::number(network.rssi()) + "</td>";
-                info += "<td>" + (network.cinr() ? QString::number(network.cinr()) : QString()) + "</td>";
-                info += "</tr>";
+                TextRow row;
+                row << network.ssid();
+                row << QString::number(network.rssi());
+                row << (network.cinr() ? QString::number(network.cinr()) : QString());
+                table << row;
             }
         }
-        info += "</table>";
-        addItem("Available networks", info);
+        addItem("Available networks", table.render());
     }
 
     /* enable buttons */
