@@ -192,6 +192,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     statusLabel = new QLabel(tr("Connecting.."));
 
     backButton = new QPushButton(tr("Go back"));
+    backButton->setIcon(QIcon(":/back.png"));
     backButton->setEnabled(false);
     connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
 
