@@ -45,6 +45,7 @@ PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     setSpacing(5);
     setViewMode(QListView::IconMode);
     setResizeMode(QListView::Adjust);
+    setSortingEnabled(true);
     setTextElideMode(Qt::ElideMiddle);
     setWordWrap(true);
     setWrapping(true);
@@ -180,9 +181,6 @@ Photos::Photos(const QString &url, QWidget *parent)
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
     connect(listView, SIGNAL(folderOpened(const QUrl&)),
             this, SLOT(folderOpened(const QUrl&)));
-    QScrollArea *area = new QScrollArea(this);
-    area->setWidget(photosView);
-    area->setWidgetResizable(true);
 
     progressBar = new QProgressBar;
     progressBar->setRange(0, 0);
@@ -203,7 +201,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(helpLabel);
-    layout->addWidget(area);
+    layout->addWidget(photosView);
     layout->addWidget(progressBar);
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(backButton);
