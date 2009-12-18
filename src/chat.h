@@ -31,6 +31,8 @@ class QLabel;
 class QLineEdit;
 class QSystemTrayIcon;
 class QTextEdit;
+class QXmppVCard;
+class QXmppVCardManager;
 
 class ContactsList : public QListWidget
 {
@@ -38,7 +40,7 @@ class ContactsList : public QListWidget
 
 public:
     ContactsList(QWidget *parent = NULL);
-    void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
+    void addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCardManager &VCardManager);
     void setShowOffline(bool show);
 
 protected:
@@ -50,6 +52,7 @@ signals:
 
 public slots:
     void presenceReceived(const QXmppPresence &presence);
+    void vCardReceived(const QXmppVCard&);
 
 protected slots:
     void startChat();

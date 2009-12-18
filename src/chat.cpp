@@ -37,6 +37,7 @@
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppVCardManager.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
@@ -67,7 +68,7 @@ void ContactsList::contextMenuEvent(QContextMenuEvent *event)
     contextMenu->popup(event->globalPos());
 }
 
-void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
+void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCardManager &vCardManager)
 {
     QListWidgetItem *newItem = new QListWidgetItem;
     newItem->setIcon(QIcon(":/contact-offline.png"));
@@ -80,6 +81,7 @@ void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
     addItem(newItem);
     if (!showOffline)
         setItemHidden(newItem, true);
+    vCardManager.requestVCard(jid);
 }
 
 void ContactsList::removeContact()
@@ -150,6 +152,23 @@ void ContactsList::startChat()
 
     const QString jid = item->data(Qt::UserRole).toString();
     emit chatContact(jid);
+}
+
+void ContactsList::vCardReceived(const QXmppVCard& vcard)
+{
+    qDebug() << "vCard received" << vcard.getFullName();
+    QImage image = vcard.getPhotoAsImage();
+
+    QString bareJid = vcard.getFrom().split("/").first();
+    for (int i = 0; i < count(); i++)
+    {
+        QListWidgetItem *entry = item(i);
+        if (entry->data(Qt::UserRole).toString() == bareJid)
+        {
+            entry->setIcon(QIcon(QPixmap::fromImage(image)));
+            break;
+        }
+    }
 }
 
 ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
@@ -255,6 +274,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+
+    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), contacts, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 void Chat::addContact()
@@ -284,7 +305,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
         chatDialogs[jid] = new ChatDialog(this, jid, name);
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             client, SLOT(sendMessage(const QString&, const QString &)));
-    }
+   }
     chatDialogs[jid]->show();
     return chatDialogs[jid];
 }
@@ -420,7 +441,7 @@ void Chat::rosterChanged(const QString &jid)
             break;
         default:
             if (itemIndex < 0)
-                contacts->addEntry(entry);
+                contacts->addEntry(entry, client->getVCardManager());
     }
 }
 
@@ -429,6 +450,6 @@ void Chat::rosterReceived()
     QMap<QString, QXmppRoster::QXmppRosterEntry> entries = client->getRoster().getRosterEntries();
     contacts->clear();
     foreach (const QString &key, entries.keys())
-        contacts->addEntry(entries[key]);
+        contacts->addEntry(entries[key], client->getVCardManager());
 }
 
