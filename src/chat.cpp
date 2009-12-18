@@ -157,7 +157,7 @@ void ContactsList::startChat()
 void ContactsList::vCardReceived(const QXmppVCard& vcard)
 {
     QImage image = vcard.getPhotoAsImage();
-    QString bareJid = vcard.getFrom().split("/").first();
+    const QString bareJid = vcard.getFrom().split("/").first();
     for (int i = 0; i < count(); i++)
     {
         QListWidgetItem *entry = item(i);
@@ -180,11 +180,16 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     layout->setMargin(0);
     layout->setSpacing(0);
 
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *imageLabel = new QLabel;
+    hbox->addWidget(imageLabel);
+    layout->addItem(hbox);
+
     chatHistory = new QTextEdit;
     chatHistory->setReadOnly(true);
     layout->addWidget(chatHistory);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox = new QHBoxLayout;
     hbox->setMargin(10);
     hbox->setSpacing(10);
     chatInput = new QLineEdit;
@@ -219,7 +224,7 @@ void ChatDialog::addMessage(const QString &text, bool local)
     chatHistory->ensureCursorVisible();
 }
 
-void ChatDialog::handleMessage(const QXmppMessage &msg)
+void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     addMessage(msg.getBody(), false);
 }
@@ -233,6 +238,11 @@ void ChatDialog::send()
     addMessage(text, true);
     chatInput->clear();
     emit sendMessage(chatRemoteJid, text);
+}
+
+void ChatDialog::vCardReceived(const QXmppVCard& vcard)
+{
+
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
@@ -267,14 +277,15 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up client */
     client = new QXmppClient(this);
-    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(handleMessage(const QXmppMessage&)));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(handlePresence(const QXmppPresence&)));
+    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), contacts, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 
+    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
     connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), contacts, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
@@ -320,7 +331,7 @@ void Chat::disconnected()
     statusLabel->setText(tr("Disconnected"));
 }
 
-void Chat::handleMessage(const QXmppMessage &msg)
+void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString jid = msg.getFrom();
     const QString body = msg.getBody();
@@ -330,15 +341,10 @@ void Chat::handleMessage(const QXmppMessage &msg)
         return;
 
     ChatDialog *dialog = chatContact(jid.split("/")[0]);
-    dialog->handleMessage(msg);
-  
-/* 
-    if (systemTrayIcon)
-        systemTrayIcon->showMessage(from, body);
-*/
+    dialog->messageReceived(msg);
 }
 
-void Chat::handlePresence(const QXmppPresence &presence)
+void Chat::presenceReceived(const QXmppPresence &presence)
 {
     QXmppPresence packet;
     packet.setTo(presence.getFrom());
@@ -451,5 +457,12 @@ void Chat::rosterReceived()
     contacts->clear();
     foreach (const QString &key, entries.keys())
         contacts->addEntry(entries[key], client->getVCardManager());
+}
+
+void Chat::vCardReceived(const QXmppVCard& vcard)
+{
+    const QString bareJid = vcard.getFrom().split("/").first();
+    if (!chatDialogs.contains(bareJid))
+        return;
 }
 

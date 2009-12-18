@@ -71,7 +71,8 @@ public:
     ChatDialog(QWidget *parent, const QString &jid, const QString &name);
 
 public slots:
-    void handleMessage(const QXmppMessage &msg);
+    void messageReceived(const QXmppMessage &msg);
+    void vCardReceived(const QXmppVCard&);
 
 protected slots:
     void send();
@@ -102,11 +103,12 @@ protected slots:
     ChatDialog *chatContact(const QString &jid);
     void connected();
     void disconnected();
-    void handleMessage(const QXmppMessage &msg);
-    void handlePresence(const QXmppPresence &presence);
+    void messageReceived(const QXmppMessage &msg);
+    void presenceReceived(const QXmppPresence &presence);
     void removeContact(const QString &jid);
     void rosterChanged(const QString &jid);
     void rosterReceived();
+    void vCardReceived(const QXmppVCard&);
 
 private:
     QXmppClient *client;
