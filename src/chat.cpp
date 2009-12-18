@@ -156,9 +156,7 @@ void ContactsList::startChat()
 
 void ContactsList::vCardReceived(const QXmppVCard& vcard)
 {
-    qDebug() << "vCard received" << vcard.getFullName();
     QImage image = vcard.getPhotoAsImage();
-
     QString bareJid = vcard.getFrom().split("/").first();
     for (int i = 0; i < count(); i++)
     {
@@ -166,6 +164,8 @@ void ContactsList::vCardReceived(const QXmppVCard& vcard)
         if (entry->data(Qt::UserRole).toString() == bareJid)
         {
             entry->setIcon(QIcon(QPixmap::fromImage(image)));
+            if(!vcard.getFullName().isEmpty())
+                entry->setText(vcard.getFullName());
             break;
         }
     }
