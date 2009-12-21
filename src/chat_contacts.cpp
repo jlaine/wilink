@@ -38,6 +38,7 @@ RosterModel::RosterModel(QXmppRoster *roster)
 {
     connect(modelRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(modelRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+    //connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const
@@ -67,7 +68,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
             }
         }
         return QIcon(QString(":/contact-%1.png").arg(suffix));
-    } else if (role == Qt::UserRole) {
+    } else if (role == BareJidRole) {
         return entry.getBareJid();
     }
     return QVariant();
@@ -75,10 +76,14 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
 
 void RosterModel::rosterChanged(const QString &jid)
 {
+    QXmppRoster::QXmppRosterEntry entry = modelRoster->getRosterEntry(jid);
     if (rosterKeys.contains(jid))
     {
-        // FIXME : process update
-        qDebug("roster item changed");
+        // FIXME : actually process updates
+        if (entry.getSubscriptionType() == QXmppRosterIq::Item::Remove)
+            qDebug("roster item removed");
+        else
+            qDebug("roster item changed");
     } else {
         rosterKeys.append(jid);
         // FIXME : send notification that a row was added
@@ -96,131 +101,7 @@ int RosterModel::rowCount(const QModelIndex &parent) const
     return rosterKeys.size();
 }
 
-ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent)
-    : QListView(parent),
-    vcardManager(cardManager),
-    xmppRoster(roster)
-{
-    setModel(new RosterModel(roster));
-
-    /* prepare context menu */
-    QAction *action;
-    contextMenu = new QMenu(this);
-    action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
-    connect(action, SIGNAL(triggered()), this, SLOT(startChat()));
-    action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-    connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
-
-    /* connect to XMPP events */
-    connect(xmppRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
-
-    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
-
-    setContextMenuPolicy(Qt::DefaultContextMenu);
-    setMinimumSize(QSize(140, 140));
-}
-
-void ContactsList::contextMenuEvent(QContextMenuEvent *event)
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    contextMenu->popup(event->globalPos());
-}
-
-void ContactsList::presenceReceived(const QXmppPresence &presence)
-{
-#ifdef LEGACY_CONTACTS
-    QString suffix;
-    bool offline;
-    switch (presence.getType())
-    {
-    case QXmppPresence::Available:
-        switch(presence.getStatus().getType())
-        {
-            case QXmppPresence::Status::Online:
-                suffix = "available";
-                break;
-            default:
-                suffix = "busy";
-                break;
-        }
-        offline = false;
-        break;
-    case QXmppPresence::Unavailable:
-        suffix = "offline";
-        offline = true;
-        break;
-    default:
-        return;
-    }
-    QString bareJid = presence.getFrom().split("/").first();
-    for (int i = 0; i < count(); i++)
-    {
-        QListWidgetItem *entry = item(i);
-        if (entry->data(Qt::UserRole).toString() == bareJid)
-        {
-            entry->setIcon(QIcon(QString(":/contact-%1.png").arg(suffix)));
-            bool hidden = !showOffline && offline;
-            setItemHidden(entry, hidden);
-            break;
-        }
-    }
-#endif
-}
-
-void ContactsList::removeContact()
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    const QString &jid = index.data(Qt::UserRole).toString();
-    if (QMessageBox::question(this, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(jid),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-    {
-        emit removeContact(jid);
-    }
-}
-
-void ContactsList::rosterChanged(const QString &jid)
-{
-#ifdef LEGACY_CONTACTS
-    QXmppRoster::QXmppRosterEntry entry = xmppRoster->getRosterEntry(jid);
-    int itemIndex = -1;
-    for (int i = 0; i < count(); i++)
-    {
-        QListWidgetItem *rosterItem = item(i);
-        if (rosterItem->data(Qt::UserRole).toString() == jid)
-        {
-            itemIndex = i;
-            break;
-        }
-    }
-    switch (entry.getSubscriptionType())
-    {
-        case QXmppRosterIq::Item::Remove:
-            if (itemIndex >= 0)
-                takeItem(itemIndex);
-            break;
-        default:
-            if (itemIndex < 0)
-                addEntry(entry);
-    }
-#endif
-}
-
-void ContactsList::startChat()
-{
-    const QModelIndex &index = currentIndex();
-    if (index.isValid())
-        emit chatContact(index.data(Qt::UserRole).toString());
-}
-
-void ContactsList::vCardReceived(const QXmppVCard& vcard)
+void RosterModel::vCardReceived(const QXmppVCard& vcard)
 {
 #ifdef LEGACY_CONTACTS
     QImage image = vcard.getPhotoAsImage();
@@ -228,7 +109,7 @@ void ContactsList::vCardReceived(const QXmppVCard& vcard)
     for (int i = 0; i < count(); i++)
     {
         QListWidgetItem *entry = item(i);
-        if (entry->data(Qt::UserRole).toString() == bareJid)
+        if (entry->data(BareJidRole).toString() == bareJid)
         {
             entry->setIcon(QIcon(QPixmap::fromImage(image)));
             if(!vcard.getFullName().isEmpty())
@@ -239,4 +120,53 @@ void ContactsList::vCardReceived(const QXmppVCard& vcard)
 #endif
 }
 
+RosterView::RosterView(QXmppClient &client, QWidget *parent)
+    : QListView(parent)
+{
+    setModel(new RosterModel(&client.getRoster()));
+
+    /* prepare context menu */
+    QAction *action;
+    contextMenu = new QMenu(this);
+    action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
+    connect(action, SIGNAL(triggered()), this, SLOT(startChat()));
+    action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
+    connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
+
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
+
+    setContextMenuPolicy(Qt::DefaultContextMenu);
+    setMinimumSize(QSize(140, 140));
+}
+
+void RosterView::contextMenuEvent(QContextMenuEvent *event)
+{
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
+        return;
+
+    contextMenu->popup(event->globalPos());
+}
+
+void RosterView::removeContact()
+{
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
+        return;
+
+    const QString &jid = index.data(RosterModel::BareJidRole).toString();
+    if (QMessageBox::question(this, tr("Remove contact"),
+        tr("Do you want to remove %1 from your contact list?").arg(jid),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        emit removeContact(jid);
+    }
+}
+
+void RosterView::startChat()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+        emit chatContact(index.data(RosterModel::BareJidRole).toString());
+}
 

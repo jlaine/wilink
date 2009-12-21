@@ -25,7 +25,7 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
-class ContactsList;
+class RosterView;
 class QLabel;
 class QLineEdit;
 class QSystemTrayIcon;
@@ -80,7 +80,7 @@ protected slots:
 
 private:
     QXmppClient *client;
-    ContactsList *contacts;
+    RosterView *contacts;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
     QHash<QString, ChatDialog*> chatDialogs;

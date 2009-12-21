@@ -23,10 +23,10 @@
 #include <QAbstractListModel>
 #include <QListView>
 
-#include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
 class QContextMenuEvent;
+class QXmppClient;
 class QXmppVCard;
 class QXmppVCardManager;
 
@@ -35,6 +35,10 @@ class RosterModel : public QAbstractListModel
     Q_OBJECT
 
 public:
+    enum Roles {
+        BareJidRole = Qt::UserRole,
+    };
+
     RosterModel(QXmppRoster *roster);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -42,18 +46,19 @@ public:
 protected slots:
     void rosterChanged(const QString &jid);
     void rosterReceived();
+    void vCardReceived(const QXmppVCard&);
 
 private:
     QXmppRoster *modelRoster;
     QStringList rosterKeys;
 };
 
-class ContactsList : public QListView
+class RosterView : public QListView
 {
     Q_OBJECT
 
 public:
-    ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent = NULL);
+    RosterView(QXmppClient &client, QWidget *parent = NULL);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
@@ -62,19 +67,12 @@ signals:
     void chatContact(const QString &jid);
     void removeContact(const QString &jid);
 
-public slots:
-    void presenceReceived(const QXmppPresence &presence);
-
 protected slots:
     void startChat();
     void removeContact();
-    void rosterChanged(const QString &jid);
-    void vCardReceived(const QXmppVCard&);
 
 private:
     QMenu *contextMenu;
-    QXmppVCardManager *vcardManager;
-    QXmppRoster *xmppRoster;
 };
 
 #endif

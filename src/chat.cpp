@@ -128,7 +128,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    contacts = new ContactsList(&client->getRoster(), &client->getVCardManager());
+    contacts = new RosterView(*client);
     connect(contacts, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     layout->addWidget(contacts);
@@ -153,7 +153,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up client */
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), contacts, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
