@@ -76,8 +76,6 @@ protected slots:
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &presence);
     void removeContact(const QString &jid);
-    void rosterChanged(const QString &jid);
-    void rosterReceived();
     void vCardReceived(const QXmppVCard&);
 
 private:

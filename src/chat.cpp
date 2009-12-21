@@ -121,12 +121,14 @@ void ChatDialog::vCardReceived(const QXmppVCard& vcard)
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : systemTrayIcon(trayIcon)
 {
+    client = new QXmppClient(this);
+
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    contacts = new ContactsList;
+    contacts = new ContactsList(&client->getRoster(), &client->getVCardManager());
     connect(contacts, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     layout->addWidget(contacts);
@@ -149,17 +151,13 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowIcon(QIcon(":/chat.png"));
 
     /* set up client */
-    client = new QXmppClient(this);
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), contacts, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 
     connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
-    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), contacts, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 void Chat::addContact()
@@ -297,39 +295,6 @@ void Chat::removeContact(const QString &jid)
     packet.setType(QXmppPresence::Unsubscribe);
 */
     client->sendPacket(packet);
-}
-
-void Chat::rosterChanged(const QString &jid)
-{
-    QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
-    int itemIndex = -1;
-    for (int i = 0; i < contacts->count(); i++)
-    {
-        QListWidgetItem *item = contacts->item(i);
-        if (item->data(Qt::UserRole).toString() == jid)
-        {
-            itemIndex = i;
-            break;
-        }
-    }
-    switch (entry.getSubscriptionType())
-    {
-        case QXmppRosterIq::Item::Remove:
-            if (itemIndex >= 0)
-                contacts->takeItem(itemIndex);
-            break;
-        default:
-            if (itemIndex < 0)
-                contacts->addEntry(entry, client->getVCardManager());
-    }
-}
-
-void Chat::rosterReceived()
-{
-    QMap<QString, QXmppRoster::QXmppRosterEntry> entries = client->getRoster().getRosterEntries();
-    contacts->clear();
-    foreach (const QString &key, entries.keys())
-        contacts->addEntry(entries[key], client->getVCardManager());
 }
 
 void Chat::vCardReceived(const QXmppVCard& vcard)

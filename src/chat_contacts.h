@@ -20,6 +20,7 @@
 #ifndef __WDESKTOP_CHAT_CONTACTS_H__
 #define __WDESKTOP_CHAT_CONTACTS_H__
 
+#include <QAbstractListModel>
 #include <QListWidget>
 
 #include "qxmpp/QXmppClient.h"
@@ -29,16 +30,29 @@ class QContextMenuEvent;
 class QXmppVCard;
 class QXmppVCardManager;
 
+class RosterModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    RosterModel(QXmppRoster *roster);
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+private:
+    QXmppRoster *modelRoster;
+};
+
 class ContactsList : public QListWidget
 {
     Q_OBJECT
 
 public:
-    ContactsList(QWidget *parent = NULL);
-    void addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCardManager &VCardManager);
+    ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent = NULL);
     void setShowOffline(bool show);
 
 protected:
+    void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
     void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
@@ -47,15 +61,19 @@ signals:
 
 public slots:
     void presenceReceived(const QXmppPresence &presence);
-    void vCardReceived(const QXmppVCard&);
 
 protected slots:
     void startChat();
     void removeContact();
+    void rosterChanged(const QString &jid);
+    void rosterReceived();
+    void vCardReceived(const QXmppVCard&);
 
 private:
     QMenu *contextMenu;
     bool showOffline;
+    QXmppVCardManager *vcardManager;
+    QXmppRoster *xmppRoster;
 };
 
 #endif

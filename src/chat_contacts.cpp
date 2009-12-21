@@ -33,8 +33,26 @@
 
 #include "chat_contacts.h"
 
-ContactsList::ContactsList(QWidget *parent)
-    : QListWidget(parent), showOffline(true)
+RosterModel::RosterModel(QXmppRoster *roster)
+    : modelRoster(roster)
+{
+}
+
+QVariant RosterModel::data(const QModelIndex &index, int role) const
+{
+
+}
+
+int RosterModel::rowCount(const QModelIndex &parent) const
+{
+    return modelRoster->getRosterBareJids().count();
+}
+
+ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent)
+    : QListWidget(parent),
+    showOffline(true),
+    vcardManager(cardManager),
+    xmppRoster(roster)
 {
     QAction *action;
     contextMenu = new QMenu(this);
@@ -43,21 +61,17 @@ ContactsList::ContactsList(QWidget *parent)
     action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
 
+    /* connect to XMPP events */
+    connect(xmppRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
+    connect(xmppRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+    connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
+
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(startChat()));
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
 }
 
-void ContactsList::contextMenuEvent(QContextMenuEvent *event)
-{
-    QListWidgetItem *item = itemAt(event->pos());
-    if (!item)
-        return;
-
-    contextMenu->popup(event->globalPos());
-}
-
-void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCardManager &vCardManager)
+void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
 {
     QListWidgetItem *newItem = new QListWidgetItem;
     newItem->setIcon(QIcon(":/contact-offline.png"));
@@ -70,22 +84,16 @@ void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCa
     addItem(newItem);
     if (!showOffline)
         setItemHidden(newItem, true);
-    vCardManager.requestVCard(jid);
+    vcardManager->requestVCard(jid);
 }
 
-void ContactsList::removeContact()
+void ContactsList::contextMenuEvent(QContextMenuEvent *event)
 {
-    QListWidgetItem *item = currentItem();
+    QListWidgetItem *item = itemAt(event->pos());
     if (!item)
         return;
 
-    const QString jid = item->data(Qt::UserRole).toString();
-    if (QMessageBox::question(this, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(jid),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-    {
-        emit removeContact(jid);
-    }
+    contextMenu->popup(event->globalPos());
 }
 
 void ContactsList::presenceReceived(const QXmppPresence &presence)
@@ -125,6 +133,54 @@ void ContactsList::presenceReceived(const QXmppPresence &presence)
             break;
         }
     }
+}
+
+void ContactsList::removeContact()
+{
+    QListWidgetItem *item = currentItem();
+    if (!item)
+        return;
+
+    const QString jid = item->data(Qt::UserRole).toString();
+    if (QMessageBox::question(this, tr("Remove contact"),
+        tr("Do you want to remove %1 from your contact list?").arg(jid),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        emit removeContact(jid);
+    }
+}
+
+void ContactsList::rosterChanged(const QString &jid)
+{
+    QXmppRoster::QXmppRosterEntry entry = xmppRoster->getRosterEntry(jid);
+    int itemIndex = -1;
+    for (int i = 0; i < count(); i++)
+    {
+        QListWidgetItem *rosterItem = item(i);
+        if (rosterItem->data(Qt::UserRole).toString() == jid)
+        {
+            itemIndex = i;
+            break;
+        }
+    }
+    switch (entry.getSubscriptionType())
+    {
+        case QXmppRosterIq::Item::Remove:
+            if (itemIndex >= 0)
+                takeItem(itemIndex);
+            break;
+        default:
+            if (itemIndex < 0)
+                addEntry(entry);
+    }
+}
+
+void ContactsList::rosterReceived()
+{
+    QMap<QString, QXmppRoster::QXmppRosterEntry> entries = xmppRoster->getRosterEntries();
+    clear();
+    foreach (const QString &key, entries.keys())
+        addEntry(entries[key]);
 }
 
 void ContactsList::setShowOffline(bool show)
