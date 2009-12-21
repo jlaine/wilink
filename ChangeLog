@@ -1,4 +1,6 @@
 wDesktop 0.2.3
+ * Display chat window at startup.
+ * Display vCard image for chat contacts.
  * Add a User-Agent for request to portal.
 
 wDesktop 0.2.2

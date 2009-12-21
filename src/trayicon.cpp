@@ -293,6 +293,7 @@ void TrayIcon::showMenu()
         QAuthenticator auth;
         Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
         chat->open(auth.user(), auth.password());
+        chat->show();
 
         /* check for updates */
         updates->check();
