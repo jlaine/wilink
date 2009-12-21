@@ -35,12 +35,8 @@ class RosterModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    enum Roles {
-        BareJidRole = Qt::UserRole,
-        IconRole,
-    };
-
     RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard);
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 

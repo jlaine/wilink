@@ -30,6 +30,12 @@
 
 #include "chat_roster.h"
 
+enum RosterColumns {
+    ContactColumn = 0,
+    ImageColumn,
+    MaxColumn,
+};
+
 RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
     : rosterManager(roster), vcardManager(vcard)
 {
@@ -39,6 +45,11 @@ RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
     connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
+int RosterModel::columnCount(const QModelIndex &parent) const
+{
+    return MaxColumn;
+}
+
 QVariant RosterModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() >= rosterKeys.size())
@@ -46,13 +57,14 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
 
     const QXmppRoster::QXmppRosterEntry &entry = rosterManager->getRosterEntry(rosterKeys.at(index.row()));
     const QString bareJid = entry.getBareJid();
-    if (role == Qt::DisplayRole)
-    {
+    if (role == Qt::UserRole) {
+        return bareJid;
+    } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
         QString name = entry.getName();
         if (name.isEmpty())
             name = bareJid.split("@").first();
         return name;
-    } else if (role == Qt::DecorationRole) {
+    } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
         QString suffix = "offline";
         foreach (const QXmppPresence &presence, rosterManager->getAllPresencesForBareJid(entry.getBareJid()))
         {
@@ -67,9 +79,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
             }
         }
         return QIcon(QString(":/contact-%1.png").arg(suffix));
-    } else if (role == BareJidRole) {
-        return bareJid;
-    } else if (role == IconRole) {
+    } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
         if (rosterIcons.contains(bareJid))
             return rosterIcons[bareJid];
     }
@@ -80,7 +90,7 @@ void RosterModel::presenceChanged(const QString& bareJid, const QString& resourc
 {
     const int rowIndex = rosterKeys.indexOf(bareJid);
     if (rowIndex >= 0)
-        emit dataChanged(index(rowIndex, Qt::DisplayRole), index(rowIndex, BareJidRole));
+        emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, ContactColumn));
 }
 
 void RosterModel::rosterChanged(const QString &jid)
@@ -95,7 +105,7 @@ void RosterModel::rosterChanged(const QString &jid)
             rosterKeys.removeAt(rowIndex);
             endRemoveRows();
         } else {
-            emit dataChanged(index(rowIndex, Qt::DisplayRole), index(rowIndex, BareJidRole));
+            emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, ContactColumn));
         }
     } else {
         beginInsertRows(QModelIndex(), rosterKeys.length(), rosterKeys.length());
@@ -128,7 +138,7 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
     {
         const QImage &image = vcard.getPhotoAsImage();
         rosterIcons[bareJid] = QIcon(QPixmap::fromImage(image));
-        emit dataChanged(index(rowIndex, IconRole), index(rowIndex, IconRole));
+        emit dataChanged(index(rowIndex, ImageColumn), index(rowIndex, ImageColumn));
     }
 }
 
@@ -166,13 +176,13 @@ void RosterView::removeContact()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
-        emit removeContact(index.data(RosterModel::BareJidRole).toString());
+        emit removeContact(index.data(Qt::UserRole).toString());
 }
 
 void RosterView::startChat()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
-        emit chatContact(index.data(RosterModel::BareJidRole).toString());
+        emit chatContact(index.data(Qt::UserRole).toString());
 }
 
