@@ -21,47 +21,17 @@
 #define __WDESKTOP_CHAT_H__
 
 #include <QDialog>
-#include <QListWidget>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
-class QContextMenuEvent;
+class ContactsList;
 class QLabel;
 class QLineEdit;
 class QSystemTrayIcon;
 class QTextEdit;
 class QXmppVCard;
 class QXmppVCardManager;
-
-class ContactsList : public QListWidget
-{
-    Q_OBJECT
-
-public:
-    ContactsList(QWidget *parent = NULL);
-    void addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCardManager &VCardManager);
-    void setShowOffline(bool show);
-
-protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-
-signals:
-    void chatContact(const QString &jid);
-    void removeContact(const QString &jid);
-
-public slots:
-    void presenceReceived(const QXmppPresence &presence);
-    void vCardReceived(const QXmppVCard&);
-
-protected slots:
-    void startChat();
-    void removeContact();
-
-private:
-    QMenu *contextMenu;
-    bool showOffline;
-};
 
 class ChatDialog : public QDialog
 {

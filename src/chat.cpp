@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QContextMenuEvent>
 #include <QDebug>
 #include <QDateTime>
 #include <QInputDialog>
@@ -41,135 +40,9 @@
 
 #include "qnetio/dns.h"
 #include "chat.h"
+#include "chat_contacts.h"
 
 using namespace QNetIO;
-
-ContactsList::ContactsList(QWidget *parent)
-    : QListWidget(parent), showOffline(true)
-{
-    QAction *action;
-    contextMenu = new QMenu(this);
-    action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
-    connect(action, SIGNAL(triggered()), this, SLOT(startChat()));
-    action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-    connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
-
-    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(startChat()));
-    setContextMenuPolicy(Qt::DefaultContextMenu);
-    setMinimumSize(QSize(140, 140));
-}
-
-void ContactsList::contextMenuEvent(QContextMenuEvent *event)
-{
-    QListWidgetItem *item = itemAt(event->pos());
-    if (!item)
-        return;
-
-    contextMenu->popup(event->globalPos());
-}
-
-void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry, QXmppVCardManager &vCardManager)
-{
-    QListWidgetItem *newItem = new QListWidgetItem;
-    newItem->setIcon(QIcon(":/contact-offline.png"));
-    QString jid = entry.getBareJid();
-    newItem->setData(Qt::UserRole, jid);
-    QString name = entry.getName();
-    if (name.isEmpty())
-        name = jid.split("@")[0];
-    newItem->setText(name);
-    addItem(newItem);
-    if (!showOffline)
-        setItemHidden(newItem, true);
-    vCardManager.requestVCard(jid);
-}
-
-void ContactsList::removeContact()
-{
-    QListWidgetItem *item = currentItem();
-    if (!item)
-        return;
-
-    const QString jid = item->data(Qt::UserRole).toString();
-    if (QMessageBox::question(this, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(jid),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-    {
-        emit removeContact(jid);
-    }
-}
-
-void ContactsList::presenceReceived(const QXmppPresence &presence)
-{
-    QString suffix;
-    bool offline;
-    switch (presence.getType())
-    {
-    case QXmppPresence::Available:
-        switch(presence.getStatus().getType())
-        {
-            case QXmppPresence::Status::Online:
-                suffix = "available";
-                break;
-            default:
-                suffix = "busy";
-                break;
-        }
-        offline = false;
-        break;
-    case QXmppPresence::Unavailable:
-        suffix = "offline";
-        offline = true;
-        break;
-    default:
-        return;
-    }
-    QString bareJid = presence.getFrom().split("/").first();
-    for (int i = 0; i < count(); i++)
-    {
-        QListWidgetItem *entry = item(i);
-        if (entry->data(Qt::UserRole).toString() == bareJid)
-        {
-            entry->setIcon(QIcon(QString(":/contact-%1.png").arg(suffix)));
-            bool hidden = !showOffline && offline;
-            setItemHidden(entry, hidden);
-            break;
-        }
-    }
-}
-
-void ContactsList::setShowOffline(bool show)
-{
-    // FIXME: refresh list
-    showOffline = show;
-}
-
-void ContactsList::startChat()
-{
-    QListWidgetItem *item = currentItem();
-    if (!item)
-        return;
-
-    const QString jid = item->data(Qt::UserRole).toString();
-    emit chatContact(jid);
-}
-
-void ContactsList::vCardReceived(const QXmppVCard& vcard)
-{
-    QImage image = vcard.getPhotoAsImage();
-    const QString bareJid = vcard.getFrom().split("/").first();
-    for (int i = 0; i < count(); i++)
-    {
-        QListWidgetItem *entry = item(i);
-        if (entry->data(Qt::UserRole).toString() == bareJid)
-        {
-            entry->setIcon(QIcon(QPixmap::fromImage(image)));
-            if(!vcard.getFullName().isEmpty())
-                entry->setText(vcard.getFullName());
-            break;
-        }
-    }
-}
 
 ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     : QDialog(parent), chatRemoteJid(jid), chatRemoteName(name)
