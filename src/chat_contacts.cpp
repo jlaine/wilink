@@ -36,16 +36,33 @@
 RosterModel::RosterModel(QXmppRoster *roster)
     : modelRoster(roster)
 {
+    connect(modelRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 }
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const
 {
+    if (!index.isValid() || index.row() >= rosterKeys.size())
+        return QVariant();
 
+    const QXmppRoster::QXmppRosterEntry &entry = modelRoster->getRosterEntry(rosterKeys.at(index.row()));
+    if (role == Qt::DisplayRole)
+    {
+        QString name = entry.getName();
+        if (name.isEmpty())
+            name = entry.getBareJid().split("@").first();
+        return name;
+    }
+    return QVariant();
+}
+
+void RosterModel::rosterReceived()
+{
+    rosterKeys = modelRoster->getRosterBareJids();
 }
 
 int RosterModel::rowCount(const QModelIndex &parent) const
 {
-    return modelRoster->getRosterBareJids().count();
+    return rosterKeys.size();
 }
 
 ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent)
