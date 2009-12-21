@@ -44,6 +44,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 protected slots:
+    void presenceChanged(const QString& bareJid, const QString& resource);
     void rosterChanged(const QString &jid);
     void rosterReceived();
     void vCardReceived(const QXmppVCard&);

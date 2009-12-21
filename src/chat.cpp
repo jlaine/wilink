@@ -282,18 +282,18 @@ bool Chat::open(const QString &jid, const QString &password)
 
 void Chat::removeContact(const QString &jid)
 {
-    qDebug() << "Sending unsubscribe to" << jid;
-    QXmppRosterIq::Item item;
-    item.setBareJid(jid);
-    item.setSubscriptionType(QXmppRosterIq::Item::Remove);
-    QXmppRosterIq packet(QXmppIq::Set);
-    packet.addItem(item);
-/*
-    QXmppPresence packet;
-    packet.setTo(jid);
-    packet.setType(QXmppPresence::Unsubscribe);
-*/
-    client->sendPacket(packet);
+    if (QMessageBox::question(this, tr("Remove contact"),
+        tr("Do you want to remove %1 from your contact list?").arg(jid),
+        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+    {
+        qDebug() << "Sending unsubscribe to" << jid;
+        QXmppRosterIq::Item item;
+        item.setBareJid(jid);
+        item.setSubscriptionType(QXmppRosterIq::Item::Remove);
+        QXmppRosterIq packet(QXmppIq::Set);
+        packet.addItem(item);
+        client->sendPacket(packet);
+    }
 }
 
 void Chat::vCardReceived(const QXmppVCard& vcard)

@@ -31,6 +31,14 @@
         <source>Add a contact</source>
         <translation>Ajouter un contact</translation>
     </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Do you want to remove %1 from your contact list?</source>
+        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
+    </message>
 </context>
 <context>
     <name>ChatDialog</name>
@@ -45,21 +53,6 @@
     <message>
         <source>Me</source>
         <translation>Moi</translation>
-    </message>
-</context>
-<context>
-    <name>ContactsList</name>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
-    </message>
-    <message>
-        <source>Do you want to remove %1 from your contact list?</source>
-        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
-    </message>
-    <message>
-        <source>Start chat</source>
-        <translation>Démarrer conversation</translation>
     </message>
 </context>
 <context>
@@ -110,6 +103,17 @@
     <message>
         <source>Go back</source>
         <translation>Retour</translation>
+    </message>
+</context>
+<context>
+    <name>RosterView</name>
+    <message>
+        <source>Start chat</source>
+        <translation>Démarrer conversation</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
     </message>
 </context>
 <context>

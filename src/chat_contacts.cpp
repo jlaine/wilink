@@ -36,6 +36,7 @@
 RosterModel::RosterModel(QXmppRoster *roster)
     : modelRoster(roster)
 {
+    connect(modelRoster, SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(modelRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(modelRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
     //connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
@@ -74,11 +75,18 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void RosterModel::presenceChanged(const QString& bareJid, const QString& resource)
+{
+    const int rowIndex = rosterKeys.indexOf(bareJid);
+    if (rowIndex >= 0)
+        emit dataChanged(index(rowIndex, Qt::DisplayRole), index(rowIndex, BareJidRole));
+}
+
 void RosterModel::rosterChanged(const QString &jid)
 {
     QXmppRoster::QXmppRosterEntry entry = modelRoster->getRosterEntry(jid);
     const int rowIndex = rosterKeys.indexOf(jid);
-    if (rosterKeys.contains(jid))
+    if (rowIndex >= 0)
     {
         if (entry.getSubscriptionType() == QXmppRosterIq::Item::Remove)
         {
@@ -86,8 +94,7 @@ void RosterModel::rosterChanged(const QString &jid)
             rosterKeys.removeAt(rowIndex);
             endRemoveRows();
         } else {
-            // FIXME : actually process updates
-            qDebug("roster item changed");
+            emit dataChanged(index(rowIndex, Qt::DisplayRole), index(rowIndex, BareJidRole));
         }
     } else {
         beginInsertRows(QModelIndex(), rosterKeys.length(), rosterKeys.length());
@@ -99,6 +106,7 @@ void RosterModel::rosterChanged(const QString &jid)
 void RosterModel::rosterReceived()
 {
     rosterKeys = modelRoster->getRosterBareJids();
+    reset();
 }
 
 int RosterModel::rowCount(const QModelIndex &parent) const
@@ -156,16 +164,8 @@ void RosterView::contextMenuEvent(QContextMenuEvent *event)
 void RosterView::removeContact()
 {
     const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    const QString &jid = index.data(RosterModel::BareJidRole).toString();
-    if (QMessageBox::question(this, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(jid),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
-    {
-        emit removeContact(jid);
-    }
+    if (index.isValid())
+        emit removeContact(index.data(RosterModel::BareJidRole).toString());
 }
 
 void RosterView::startChat()
