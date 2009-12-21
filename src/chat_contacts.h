@@ -21,7 +21,7 @@
 #define __WDESKTOP_CHAT_CONTACTS_H__
 
 #include <QAbstractListModel>
-#include <QListWidget>
+#include <QListView>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
@@ -40,6 +40,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 protected slots:
+    void rosterChanged(const QString &jid);
     void rosterReceived();
 
 private:
@@ -47,12 +48,7 @@ private:
     QStringList rosterKeys;
 };
 
-#define LEGACY_CONTACTS
-#ifdef LEGACY_CONTACTS
-class ContactsList : public QListWidget
-#else
 class ContactsList : public QListView
-#endif
 {
     Q_OBJECT
 
@@ -75,7 +71,6 @@ protected slots:
     void startChat();
     void removeContact();
     void rosterChanged(const QString &jid);
-    void rosterReceived();
     void vCardReceived(const QXmppVCard&);
 
 private:

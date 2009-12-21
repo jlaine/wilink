@@ -36,6 +36,7 @@
 RosterModel::RosterModel(QXmppRoster *roster)
     : modelRoster(roster)
 {
+    connect(modelRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(modelRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
 }
 
@@ -72,6 +73,19 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void RosterModel::rosterChanged(const QString &jid)
+{
+    if (rosterKeys.contains(jid))
+    {
+        // FIXME : process update
+        qDebug("roster item changed");
+    } else {
+        rosterKeys.append(jid);
+        // FIXME : send notification that a row was added
+        qDebug("roster item added");
+    }
+}
+
 void RosterModel::rosterReceived()
 {
     rosterKeys = modelRoster->getRosterBareJids();
@@ -83,15 +97,14 @@ int RosterModel::rowCount(const QModelIndex &parent) const
 }
 
 ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent)
-#ifdef LEGACY_CONTACTS
-    : QListWidget(parent),
-#else
     : QListView(parent),
-#endif
     showOffline(true),
     vcardManager(cardManager),
     xmppRoster(roster)
 {
+    setModel(new RosterModel(roster));
+
+    /* prepare context menu */
     QAction *action;
     contextMenu = new QMenu(this);
     action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
@@ -101,15 +114,9 @@ ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, 
 
     /* connect to XMPP events */
     connect(xmppRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(xmppRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
     connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 
-#ifdef LEGACY_CONTACTS
-    connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(startChat()));
-#else
-    setModel(new RosterModel(roster));
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
-#endif
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
@@ -135,13 +142,11 @@ void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
 
 void ContactsList::contextMenuEvent(QContextMenuEvent *event)
 {
-#ifdef LEGACY_CONTACTS
-    QListWidgetItem *item = itemAt(event->pos());
-    if (!item)
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
         return;
 
     contextMenu->popup(event->globalPos());
-#endif
 }
 
 void ContactsList::presenceReceived(const QXmppPresence &presence)
@@ -187,19 +192,17 @@ void ContactsList::presenceReceived(const QXmppPresence &presence)
 
 void ContactsList::removeContact()
 {
-#ifdef LEGACY_CONTACTS
-    QListWidgetItem *item = currentItem();
-    if (!item)
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
         return;
 
-    const QString jid = item->data(Qt::UserRole).toString();
+    const QString &jid = index.data(Qt::UserRole).toString();
     if (QMessageBox::question(this, tr("Remove contact"),
         tr("Do you want to remove %1 from your contact list?").arg(jid),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         emit removeContact(jid);
     }
-#endif
 }
 
 void ContactsList::rosterChanged(const QString &jid)
@@ -229,16 +232,6 @@ void ContactsList::rosterChanged(const QString &jid)
 #endif
 }
 
-void ContactsList::rosterReceived()
-{
-#ifdef LEGACY_CONTACTS
-    QMap<QString, QXmppRoster::QXmppRosterEntry> entries = xmppRoster->getRosterEntries();
-    clear();
-    foreach (const QString &key, entries.keys())
-        addEntry(entries[key]);
-#endif
-}
-
 void ContactsList::setShowOffline(bool show)
 {
     // FIXME: refresh list
@@ -247,18 +240,9 @@ void ContactsList::setShowOffline(bool show)
 
 void ContactsList::startChat()
 {
-#ifdef LEGACY_CONTACTS
-    QListWidgetItem *item = currentItem();
-    if (!item)
-        return;
-
-    const QString jid = item->data(Qt::UserRole).toString();
-    emit chatContact(jid);
-#else
     const QModelIndex &index = currentIndex();
     if (index.isValid())
         emit chatContact(index.data(Qt::UserRole).toString());
-#endif
 }
 
 void ContactsList::vCardReceived(const QXmppVCard& vcard)
