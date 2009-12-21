@@ -52,7 +52,20 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
             name = entry.getBareJid().split("@").first();
         return name;
     } else if (role == Qt::DecorationRole) {
-        return QIcon(":/contact-offline.png");
+        QString suffix = "offline";
+        foreach (const QXmppPresence &presence, modelRoster->getAllPresencesForBareJid(entry.getBareJid()))
+        {
+            if (presence.getType() != QXmppPresence::Available)
+                continue;
+            if (presence.getStatus().getType() == QXmppPresence::Status::Online)
+            {
+                suffix = "available";
+                break;
+            } else {
+                suffix = "busy";
+            }
+        }
+        return QIcon(QString(":/contact-%1.png").arg(suffix));
     } else if (role == Qt::UserRole) {
         return entry.getBareJid();
     }
