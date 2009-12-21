@@ -19,11 +19,8 @@
 
 #include <QContextMenuEvent>
 #include <QDebug>
-#include <QLineEdit>
 #include <QList>
 #include <QMenu>
-#include <QMessageBox>
-#include <QPushButton>
 #include <QStringList>
 
 #include "qxmpp/QXmppMessage.h"
@@ -31,7 +28,7 @@
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppVCardManager.h"
 
-#include "chat_contacts.h"
+#include "chat_roster.h"
 
 RosterModel::RosterModel(QXmppRoster *roster)
     : modelRoster(roster)

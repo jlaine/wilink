@@ -18,7 +18,7 @@ target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 set(wDesktop_SOURCES
     chat.cpp
-    chat_contacts.cpp
+    chat_roster.cpp
     diagnostics.cpp
     main.cpp
     photos.cpp
@@ -29,7 +29,7 @@ set(wDesktop_SOURCES
 
 set(wDesktop_MOC_HEADERS
     chat.h
-    chat_contacts.h
+    chat_roster.h
     diagnostics.h
     photos.h
     trayicon.h

@@ -40,7 +40,7 @@
 
 #include "qnetio/dns.h"
 #include "chat.h"
-#include "chat_contacts.h"
+#include "chat_roster.h"
 
 using namespace QNetIO;
 
