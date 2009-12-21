@@ -24,10 +24,10 @@
 #include <QListView>
 
 #include "qxmpp/QXmppRoster.h"
+#include "qxmpp/QXmppVCard.h"
 
 class QContextMenuEvent;
 class QXmppClient;
-class QXmppVCard;
 class QXmppVCardManager;
 
 class RosterModel : public QAbstractListModel
@@ -37,9 +37,10 @@ class RosterModel : public QAbstractListModel
 public:
     enum Roles {
         BareJidRole = Qt::UserRole,
+        IconRole,
     };
 
-    RosterModel(QXmppRoster *roster);
+    RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -50,8 +51,10 @@ protected slots:
     void vCardReceived(const QXmppVCard&);
 
 private:
-    QXmppRoster *modelRoster;
+    QXmppRoster *rosterManager;
+    QXmppVCardManager *vcardManager;
     QStringList rosterKeys;
+    QMap<QString, QIcon> rosterIcons;
 };
 
 class RosterView : public QListView

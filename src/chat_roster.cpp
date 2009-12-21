@@ -30,13 +30,13 @@
 
 #include "chat_roster.h"
 
-RosterModel::RosterModel(QXmppRoster *roster)
-    : modelRoster(roster)
+RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
+    : rosterManager(roster), vcardManager(vcard)
 {
-    connect(modelRoster, SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
-    connect(modelRoster, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(modelRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
-    //connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
+    connect(rosterManager, SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
+    connect(rosterManager, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
+    connect(rosterManager, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+    connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const
@@ -44,16 +44,17 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() >= rosterKeys.size())
         return QVariant();
 
-    const QXmppRoster::QXmppRosterEntry &entry = modelRoster->getRosterEntry(rosterKeys.at(index.row()));
+    const QXmppRoster::QXmppRosterEntry &entry = rosterManager->getRosterEntry(rosterKeys.at(index.row()));
+    const QString bareJid = entry.getBareJid();
     if (role == Qt::DisplayRole)
     {
         QString name = entry.getName();
         if (name.isEmpty())
-            name = entry.getBareJid().split("@").first();
+            name = bareJid.split("@").first();
         return name;
     } else if (role == Qt::DecorationRole) {
         QString suffix = "offline";
-        foreach (const QXmppPresence &presence, modelRoster->getAllPresencesForBareJid(entry.getBareJid()))
+        foreach (const QXmppPresence &presence, rosterManager->getAllPresencesForBareJid(entry.getBareJid()))
         {
             if (presence.getType() != QXmppPresence::Available)
                 continue;
@@ -67,7 +68,10 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         }
         return QIcon(QString(":/contact-%1.png").arg(suffix));
     } else if (role == BareJidRole) {
-        return entry.getBareJid();
+        return bareJid;
+    } else if (role == IconRole) {
+        if (rosterIcons.contains(bareJid))
+            return rosterIcons[bareJid];
     }
     return QVariant();
 }
@@ -81,7 +85,7 @@ void RosterModel::presenceChanged(const QString& bareJid, const QString& resourc
 
 void RosterModel::rosterChanged(const QString &jid)
 {
-    QXmppRoster::QXmppRosterEntry entry = modelRoster->getRosterEntry(jid);
+    QXmppRoster::QXmppRosterEntry entry = rosterManager->getRosterEntry(jid);
     const int rowIndex = rosterKeys.indexOf(jid);
     if (rowIndex >= 0)
     {
@@ -102,7 +106,12 @@ void RosterModel::rosterChanged(const QString &jid)
 
 void RosterModel::rosterReceived()
 {
-    rosterKeys = modelRoster->getRosterBareJids();
+    rosterKeys = rosterManager->getRosterBareJids();
+    foreach (const QString &jid, rosterKeys)
+    {
+        if (!rosterIcons.contains(jid))
+            vcardManager->requestVCard(jid);
+    }
     reset();
 }
 
@@ -113,27 +122,20 @@ int RosterModel::rowCount(const QModelIndex &parent) const
 
 void RosterModel::vCardReceived(const QXmppVCard& vcard)
 {
-#ifdef LEGACY_CONTACTS
-    QImage image = vcard.getPhotoAsImage();
-    const QString bareJid = vcard.getFrom().split("/").first();
-    for (int i = 0; i < count(); i++)
+    const QString bareJid = vcard.getFrom();
+    const int rowIndex = rosterKeys.indexOf(bareJid);
+    if (rowIndex >= 0)
     {
-        QListWidgetItem *entry = item(i);
-        if (entry->data(BareJidRole).toString() == bareJid)
-        {
-            entry->setIcon(QIcon(QPixmap::fromImage(image)));
-            if(!vcard.getFullName().isEmpty())
-                entry->setText(vcard.getFullName());
-            break;
-        }
+        const QImage &image = vcard.getPhotoAsImage();
+        rosterIcons[bareJid] = QIcon(QPixmap::fromImage(image));
+        emit dataChanged(index(rowIndex, IconRole), index(rowIndex, IconRole));
     }
-#endif
 }
 
 RosterView::RosterView(QXmppClient &client, QWidget *parent)
     : QListView(parent)
 {
-    setModel(new RosterModel(&client.getRoster()));
+    setModel(new RosterModel(&client.getRoster(), &client.getVCardManager()));
 
     /* prepare context menu */
     QAction *action;
