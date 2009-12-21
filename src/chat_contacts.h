@@ -47,7 +47,12 @@ private:
     QStringList rosterKeys;
 };
 
+#define LEGACY_CONTACTS
+#ifdef LEGACY_CONTACTS
 class ContactsList : public QListWidget
+#else
+class ContactsList : public QListView
+#endif
 {
     Q_OBJECT
 

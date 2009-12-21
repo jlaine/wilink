@@ -51,6 +51,10 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         if (name.isEmpty())
             name = entry.getBareJid().split("@").first();
         return name;
+    } else if (role == Qt::DecorationRole) {
+        return QIcon(":/contact-offline.png");
+    } else if (role == Qt::UserRole) {
+        return entry.getBareJid();
     }
     return QVariant();
 }
@@ -66,7 +70,11 @@ int RosterModel::rowCount(const QModelIndex &parent) const
 }
 
 ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent)
+#ifdef LEGACY_CONTACTS
     : QListWidget(parent),
+#else
+    : QListView(parent),
+#endif
     showOffline(true),
     vcardManager(cardManager),
     xmppRoster(roster)
@@ -83,13 +91,20 @@ ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, 
     connect(xmppRoster, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
     connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 
+#ifdef LEGACY_CONTACTS
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(startChat()));
+#else
+    setModel(new RosterModel(roster));
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
+#endif
+
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
 }
 
 void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
 {
+#ifdef LEGACY_CONTACTS
     QListWidgetItem *newItem = new QListWidgetItem;
     newItem->setIcon(QIcon(":/contact-offline.png"));
     QString jid = entry.getBareJid();
@@ -102,19 +117,23 @@ void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
     if (!showOffline)
         setItemHidden(newItem, true);
     vcardManager->requestVCard(jid);
+#endif
 }
 
 void ContactsList::contextMenuEvent(QContextMenuEvent *event)
 {
+#ifdef LEGACY_CONTACTS
     QListWidgetItem *item = itemAt(event->pos());
     if (!item)
         return;
 
     contextMenu->popup(event->globalPos());
+#endif
 }
 
 void ContactsList::presenceReceived(const QXmppPresence &presence)
 {
+#ifdef LEGACY_CONTACTS
     QString suffix;
     bool offline;
     switch (presence.getType())
@@ -150,10 +169,12 @@ void ContactsList::presenceReceived(const QXmppPresence &presence)
             break;
         }
     }
+#endif
 }
 
 void ContactsList::removeContact()
 {
+#ifdef LEGACY_CONTACTS
     QListWidgetItem *item = currentItem();
     if (!item)
         return;
@@ -165,10 +186,12 @@ void ContactsList::removeContact()
     {
         emit removeContact(jid);
     }
+#endif
 }
 
 void ContactsList::rosterChanged(const QString &jid)
 {
+#ifdef LEGACY_CONTACTS
     QXmppRoster::QXmppRosterEntry entry = xmppRoster->getRosterEntry(jid);
     int itemIndex = -1;
     for (int i = 0; i < count(); i++)
@@ -190,14 +213,17 @@ void ContactsList::rosterChanged(const QString &jid)
             if (itemIndex < 0)
                 addEntry(entry);
     }
+#endif
 }
 
 void ContactsList::rosterReceived()
 {
+#ifdef LEGACY_CONTACTS
     QMap<QString, QXmppRoster::QXmppRosterEntry> entries = xmppRoster->getRosterEntries();
     clear();
     foreach (const QString &key, entries.keys())
         addEntry(entries[key]);
+#endif
 }
 
 void ContactsList::setShowOffline(bool show)
@@ -208,16 +234,23 @@ void ContactsList::setShowOffline(bool show)
 
 void ContactsList::startChat()
 {
+#ifdef LEGACY_CONTACTS
     QListWidgetItem *item = currentItem();
     if (!item)
         return;
 
     const QString jid = item->data(Qt::UserRole).toString();
     emit chatContact(jid);
+#else
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+        emit chatContact(index.data(Qt::UserRole).toString());
+#endif
 }
 
 void ContactsList::vCardReceived(const QXmppVCard& vcard)
 {
+#ifdef LEGACY_CONTACTS
     QImage image = vcard.getPhotoAsImage();
     const QString bareJid = vcard.getFrom().split("/").first();
     for (int i = 0; i < count(); i++)
@@ -231,6 +264,7 @@ void ContactsList::vCardReceived(const QXmppVCard& vcard)
             break;
         }
     }
+#endif
 }
 
 
