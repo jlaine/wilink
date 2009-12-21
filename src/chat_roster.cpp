@@ -19,6 +19,7 @@
 
 #include <QContextMenuEvent>
 #include <QDebug>
+#include <QHeaderView>
 #include <QList>
 #include <QMenu>
 #include <QStringList>
@@ -143,7 +144,7 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
 }
 
 RosterView::RosterView(QXmppClient &client, QWidget *parent)
-    : QListView(parent)
+    : QTableView(parent)
 {
     setModel(new RosterModel(&client.getRoster(), &client.getVCardManager()));
 
@@ -158,8 +159,15 @@ RosterView::RosterView(QXmppClient &client, QWidget *parent)
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
 
     setAlternatingRowColors(true);
+    setColumnWidth(ImageColumn, 32);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setIconSize(QSize(32, 32));
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setShowGrid(false);
+    horizontalHeader()->setResizeMode(ContactColumn, QHeaderView::Stretch);
+    horizontalHeader()->setVisible(false);
+    verticalHeader()->setVisible(false);
+
     setMinimumSize(QSize(140, 140));
 }
 

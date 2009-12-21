@@ -20,8 +20,8 @@
 #ifndef __WDESKTOP_CHAT_CONTACTS_H__
 #define __WDESKTOP_CHAT_CONTACTS_H__
 
-#include <QAbstractListModel>
-#include <QListView>
+#include <QAbstractTableModel>
+#include <QTableView>
 
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppVCard.h"
@@ -30,7 +30,7 @@ class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
 
-class RosterModel : public QAbstractListModel
+class RosterModel : public QAbstractTableModel
 {
     Q_OBJECT
 
@@ -53,7 +53,7 @@ private:
     QMap<QString, QIcon> rosterIcons;
 };
 
-class RosterView : public QListView
+class RosterView : public QTableView
 {
     Q_OBJECT
 
