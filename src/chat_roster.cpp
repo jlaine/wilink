@@ -147,7 +147,9 @@ RosterView::RosterView(QXmppClient &client, QWidget *parent)
 
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
 
+    setAlternatingRowColors(true);
     setContextMenuPolicy(Qt::DefaultContextMenu);
+    setIconSize(QSize(32, 32));
     setMinimumSize(QSize(140, 140));
 }
 
