@@ -98,7 +98,6 @@ int RosterModel::rowCount(const QModelIndex &parent) const
 
 ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent)
     : QListView(parent),
-    showOffline(true),
     vcardManager(cardManager),
     xmppRoster(roster)
 {
@@ -120,24 +119,6 @@ ContactsList::ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, 
 
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setMinimumSize(QSize(140, 140));
-}
-
-void ContactsList::addEntry(const QXmppRoster::QXmppRosterEntry &entry)
-{
-#ifdef LEGACY_CONTACTS
-    QListWidgetItem *newItem = new QListWidgetItem;
-    newItem->setIcon(QIcon(":/contact-offline.png"));
-    QString jid = entry.getBareJid();
-    newItem->setData(Qt::UserRole, jid);
-    QString name = entry.getName();
-    if (name.isEmpty())
-        name = jid.split("@")[0];
-    newItem->setText(name);
-    addItem(newItem);
-    if (!showOffline)
-        setItemHidden(newItem, true);
-    vcardManager->requestVCard(jid);
-#endif
 }
 
 void ContactsList::contextMenuEvent(QContextMenuEvent *event)
@@ -230,12 +211,6 @@ void ContactsList::rosterChanged(const QString &jid)
                 addEntry(entry);
     }
 #endif
-}
-
-void ContactsList::setShowOffline(bool show)
-{
-    // FIXME: refresh list
-    showOffline = show;
 }
 
 void ContactsList::startChat()

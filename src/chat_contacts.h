@@ -54,10 +54,8 @@ class ContactsList : public QListView
 
 public:
     ContactsList(QXmppRoster *roster, QXmppVCardManager *cardManager, QWidget *parent = NULL);
-    void setShowOffline(bool show);
 
 protected:
-    void addEntry(const QXmppRoster::QXmppRosterEntry &entry);
     void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
@@ -75,7 +73,6 @@ protected slots:
 
 private:
     QMenu *contextMenu;
-    bool showOffline;
     QXmppVCardManager *vcardManager;
     QXmppRoster *xmppRoster;
 };
