@@ -77,17 +77,22 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
 void RosterModel::rosterChanged(const QString &jid)
 {
     QXmppRoster::QXmppRosterEntry entry = modelRoster->getRosterEntry(jid);
+    const int rowIndex = rosterKeys.indexOf(jid);
     if (rosterKeys.contains(jid))
     {
-        // FIXME : actually process updates
         if (entry.getSubscriptionType() == QXmppRosterIq::Item::Remove)
-            qDebug("roster item removed");
-        else
+        {
+            beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
+            rosterKeys.removeAt(rowIndex);
+            endRemoveRows();
+        } else {
+            // FIXME : actually process updates
             qDebug("roster item changed");
+        }
     } else {
+        beginInsertRows(QModelIndex(), rosterKeys.length(), rosterKeys.length());
         rosterKeys.append(jid);
-        // FIXME : send notification that a row was added
-        qDebug("roster item added");
+        endInsertRows();
     }
 }
 
