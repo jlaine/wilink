@@ -48,7 +48,6 @@ class Ping
 {
 public:
     Ping();
-    Ping(const QHostAddress &host, int maxPackets = 1);
 
     QHostAddress hostAddress;
 
