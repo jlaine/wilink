@@ -76,6 +76,7 @@ protected slots:
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &presence);
     void removeContact(const QString &jid);
+    void resizeContacts();
     void vCardReceived(const QXmppVCard&);
 
 private:

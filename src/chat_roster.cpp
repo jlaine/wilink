@@ -167,8 +167,6 @@ RosterView::RosterView(QXmppClient &client, QWidget *parent)
     horizontalHeader()->setResizeMode(ContactColumn, QHeaderView::Stretch);
     horizontalHeader()->setVisible(false);
     verticalHeader()->setVisible(false);
-
-    setMinimumSize(QSize(140, 140));
 }
 
 void RosterView::contextMenuEvent(QContextMenuEvent *event)
@@ -185,6 +183,18 @@ void RosterView::removeContact()
     const QModelIndex &index = currentIndex();
     if (index.isValid())
         emit removeContact(index.data(Qt::UserRole).toString());
+}
+
+QSize RosterView::sizeHint () const
+{
+    if (!model()->rowCount())
+        return QTableView::sizeHint();
+
+    QSize hint(64, 0);
+    hint.setHeight(model()->rowCount() * sizeHintForRow(0));
+    for (int i = 0; i < model()->columnCount(); i++)
+        hint.setWidth(hint.width() + sizeHintForColumn(i));
+    return hint;
 }
 
 void RosterView::startChat()

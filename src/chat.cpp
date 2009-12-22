@@ -131,6 +131,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     contacts = new RosterView(*client);
     connect(contacts, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
+    connect(contacts->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     layout->addWidget(contacts);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -294,6 +295,13 @@ void Chat::removeContact(const QString &jid)
         packet.addItem(item);
         client->sendPacket(packet);
     }
+}
+
+void Chat::resizeContacts()
+{
+    QSize hint = contacts->sizeHint();
+    hint.setHeight(hint.height() + 32);
+    resize(hint);
 }
 
 void Chat::vCardReceived(const QXmppVCard& vcard)

@@ -59,6 +59,7 @@ class RosterView : public QTableView
 
 public:
     RosterView(QXmppClient &client, QWidget *parent = NULL);
+    QSize sizeHint () const;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
