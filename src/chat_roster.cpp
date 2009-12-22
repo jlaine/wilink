@@ -100,7 +100,7 @@ void RosterModel::rosterChanged(const QString &jid)
     const int rowIndex = rosterKeys.indexOf(jid);
     if (rowIndex >= 0)
     {
-        if (entry.getSubscriptionType() == QXmppRosterIq::Item::Remove)
+        if (static_cast<int>(entry.getSubscriptionType()) == static_cast<int>(QXmppRosterIq::Item::Remove))
         {
             beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
             rosterKeys.removeAt(rowIndex);
@@ -159,7 +159,7 @@ RosterView::RosterView(QXmppClient &client, QWidget *parent)
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
 
     setAlternatingRowColors(true);
-    setColumnWidth(ImageColumn, 32);
+    setColumnWidth(ImageColumn, 40);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setIconSize(QSize(32, 32));
     setSelectionBehavior(QAbstractItemView::SelectRows);

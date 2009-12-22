@@ -80,7 +80,7 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
 
 void ChatDialog::addMessage(const QString &text, bool local)
 {
-    chatHistory->insertHtml(QString(
+    chatHistory->append(QString(
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr style=\"background-color: %1\">"
         "  <td>%2</td>"
@@ -94,7 +94,6 @@ void ChatDialog::addMessage(const QString &text, bool local)
         .arg(local ? chatLocalName : chatRemoteName)
         .arg(QDateTime::currentDateTime().toString("hh:mm"))
         .arg(text));
-    chatHistory->ensureCursorVisible();
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
@@ -109,6 +108,7 @@ void ChatDialog::send()
         return;
 
     addMessage(text, true);
+    chatHistory->ensureCursorVisible();
     chatInput->clear();
     emit sendMessage(chatRemoteJid, text);
 }
@@ -185,7 +185,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
 
         chatDialogs[jid] = new ChatDialog(this, jid, name);
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
-            client, SLOT(sendMessage(const QString&, const QString &)));
+            client, SLOT(sendMessage(const QString&, const QString&)));
    }
     chatDialogs[jid]->show();
     return chatDialogs[jid];
