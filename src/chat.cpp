@@ -183,7 +183,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
 
         chatDialogs[jid] = new ChatDialog(this, jid, name);
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
-            client, SLOT(sendMessage(const QString&, const QString&)));
+            this, SLOT(sendMessage(const QString&, const QString&)));
    }
     chatDialogs[jid]->show();
     return chatDialogs[jid];
@@ -299,6 +299,11 @@ void Chat::resizeContacts()
     QSize hint = contacts->sizeHint();
     hint.setHeight(hint.height() + 32);
     resize(hint);
+}
+
+void Chat::sendMessage(const QString &jid, const QString message)
+{
+    client->sendPacket(QXmppMessage("", jid, message));
 }
 
 void Chat::vCardReceived(const QXmppVCard& vcard)
