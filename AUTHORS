@@ -1,3 +1,7 @@
 Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
  * Principal developer of wDesktop
 
+Adrien Demarez <adrien.demarez@bolloretelecom.eu>
+ * Support for vCard images in chat application.
+ * Support for browsing images in photos application.
+
