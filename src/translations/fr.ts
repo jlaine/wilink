@@ -43,10 +43,6 @@
 <context>
     <name>ChatDialog</name>
     <message>
-        <source>Send</source>
-        <translation>Envoyer</translation>
-    </message>
-    <message>
         <source>Chat with %1</source>
         <translation>Conversation avec %1</translation>
     </message>

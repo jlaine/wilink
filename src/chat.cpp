@@ -66,11 +66,8 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     hbox->setMargin(10);
     hbox->setSpacing(10);
     chatInput = new QLineEdit;
+    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
     hbox->addWidget(chatInput);
-
-    QPushButton *sendButton = new QPushButton(tr("Send"));
-    connect(sendButton, SIGNAL(clicked()), this, SLOT(send()));
-    hbox->addWidget(sendButton);
     layout->addItem(hbox);
 
     setLayout(layout);
