@@ -69,7 +69,7 @@ void NetworkThread::run()
 
         foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
-            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol && !entry.netmask().isNull())
             {
                 gateways.append(QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1));
                 break;
