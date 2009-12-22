@@ -23,12 +23,12 @@
 #include <QPushButton>
 #include <QPrintDialog>
 #include <QPrinter>
-#include <QProcess>
 #include <QTextEdit>
 #include <QThread>
 
 #include "config.h"
 #include "diagnostics.h"
+#include "networkinfo.h"
 #include "systeminfo.h"
 #include "wireless.h"
 
@@ -42,173 +42,6 @@ static QString interfaceName(const QNetworkInterface &interface)
 #else
     return interface.name();
 #endif
-}
-
-class Ping
-{
-public:
-    Ping();
-
-    QHostAddress hostAddress;
-
-    // in milliseconds
-    float minimumTime;
-    float maximumTime;
-    float averageTime;
-
-    int sentPackets;
-    int receivedPackets;
-};
-
-Ping::Ping()
-    : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
-    sentPackets(0), receivedPackets(0)
-{
-}
-
-class NetworkInfo
-{
-public:
-    static Ping ping(const QHostAddress &host, int maxPackets = 1);
-    static QList<Ping> traceroute(const QHostAddress &host, int maxPackets = 1, int maxHops = 0);
-};
-
-Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
-{
-    Ping info;
-    info.hostAddress = host;
-
-    QString program;
-    if (host.protocol() == QAbstractSocket::IPv4Protocol)
-    {
-        program = "ping";
-    } else {
-        program = "ping6";
-    }
-
-    QStringList arguments;
-#ifdef Q_OS_WIN
-    arguments << "-n" << QString::number(maxPackets);
-#else
-    arguments << "-c" << QString::number(maxPackets);
-#endif
-    arguments << host.toString();
-
-    QProcess process;
-    process.start(program, arguments, QIODevice::ReadOnly);
-    process.waitForFinished(60000);
-
-    /* process stats */
-    QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
-
-#ifdef Q_OS_WIN
-    /* min max avg */
-    QRegExp timeRegex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
-    if (timeRegex.indexIn(result))
-    {
-        info.minimumTime = timeRegex.cap(1).toInt();
-        info.maximumTime = timeRegex.cap(2).toInt();
-        info.averageTime = timeRegex.cap(3).toInt();
-    }
-    QRegExp packetRegex(" = ([0-9]+), [^ ]+ = ([0-9]+),");
-#else
-    /* min/avg/max/stddev */
-    QRegExp timeRegex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
-    if (timeRegex.indexIn(result))
-    {
-        info.minimumTime = timeRegex.cap(1).toFloat();
-        info.averageTime = timeRegex.cap(2).toFloat();
-        info.maximumTime = timeRegex.cap(3).toFloat();
-    }
-    /* Linux  : 2 packets transmitted, 2 received, 0% packet loss, time 1001ms */
-    /* Mac OS : 2 packets transmitted, 1 packets received, 50.0% packet loss */
-    QRegExp packetRegex("([0-9]+) [^ ]+ [^ ]+, ([0-9]+) [^ ]+( [^ ]+)?, [0-9]+");
-#endif
-    if (packetRegex.indexIn(result))
-    {
-        info.sentPackets = packetRegex.cap(1).toInt();
-        info.receivedPackets = packetRegex.cap(2).toInt();
-    }
-    return info;
-}
-
-QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, int maxHops)
-{
-    QList<Ping> hops;
-    QString program;
-    QStringList arguments;
-
-    if (host.protocol() != QAbstractSocket::IPv4Protocol)
-    {
-        qWarning("IPv6 traceroute is not supported");
-        return hops;
-    } else {
-#ifdef Q_OS_WIN
-        program = "tracert";
-#else
-        program = "traceroute";
-#endif
-    }
-
-#ifdef Q_OS_WIN
-    if (maxPackets > 0)
-        arguments << "-h" << QString::number(maxHops);
-#else
-    arguments << "-n";
-    if (maxPackets > 0)
-        arguments << "-q" << QString::number(maxPackets);
-    if (maxHops > 0)
-        arguments << "-m" << QString::number(maxHops);
-#endif
-    arguments << host.toString();
-
-    QProcess process;
-    process.start(program, arguments, QIODevice::ReadOnly);
-    process.waitForFinished(60000);
-
-    /* process results */
-    QString result = QString::fromLocal8Bit(process.readAllStandardOutput());
-
-    /*
-     * Windows :  1  6.839 ms  19.866 ms  1.134 ms 192.168.99.1
-     * Windows :  2  <1 ms  <1 ms  <1 ms 192.168.99.1
-     * *nix    :  1  192.168.99.1  6.839 ms  19.866 ms  1.134 ms
-     *            2  192.168.99.1  6.839 ms * 1.134 ms
-     */
-    QRegExp hopRegex("\\s+[0-9]+\\s+(.+)");
-    QRegExp ipRegex("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+");
-    QRegExp timeRegex("([0-9.]+|<1)");
-    foreach (const QString &line, result.split("\n"))
-    {
-        if (hopRegex.exactMatch(line))
-        {
-            Ping hop;
-            float totalTime = 0.0;
-
-            foreach (const QString &bit, hopRegex.cap(1).split(QRegExp("\\s+")))
-            {
-                if (ipRegex.exactMatch(bit))
-                    hop.hostAddress = QHostAddress(bit);
-                else if (bit == "*")
-                    hop.sentPackets++;
-                else if (timeRegex.exactMatch(bit))
-                {
-                    float hopTime = (bit == "<1") ? 0 : bit.toFloat();
-                    hop.sentPackets += 1;
-                    hop.receivedPackets += 1;
-                    if (hopTime > hop.maximumTime)
-                        hop.maximumTime = hopTime;
-                    if (!hop.minimumTime || hopTime < hop.minimumTime)
-                        hop.minimumTime = hopTime;
-                    totalTime += hopTime;
-                }
-            }
-            if (hop.receivedPackets)
-                hop.averageTime = totalTime / static_cast<float>(hop.receivedPackets);
-            hops.append(hop);
-        }
-    }
-    return hops;
 }
 
 /* NETWORK */

@@ -120,7 +120,7 @@
     <name>TrayIcon</name>
     <message>
         <source>&amp;Diagnostics</source>
-        <translation>&amp;Diagnostiques</translation>
+        <translation>&amp;Diagnostics</translation>
     </message>
     <message>
         <source>&amp;Quit</source>

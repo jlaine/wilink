@@ -21,6 +21,7 @@ set(wDesktop_SOURCES
     chat_roster.cpp
     diagnostics.cpp
     main.cpp
+    networkinfo.cpp
     photos.cpp
     systeminfo.cpp
     trayicon.cpp
