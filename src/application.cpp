@@ -21,10 +21,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
-
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
+#include <QSettings>
 
 #include "application.h"
 
@@ -48,7 +45,7 @@ bool Application::isInstalled()
     return !dir.exists("CMakeFiles");
 }
 
-bool Application::setOpenAtLogin(bool run)
+void Application::setOpenAtLogin(bool run)
 {
     const QString appName = qApp->applicationName();
     const QString appPath = executablePath();
@@ -65,27 +62,13 @@ bool Application::setOpenAtLogin(bool run)
     process.write(script.toAscii());
     process.closeWriteChannel();
     process.waitForFinished();
-    return true;
 #endif
 #ifdef Q_OS_WIN
-    HKEY handle;
-    DWORD result = RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_READ | KEY_WRITE, &handle);
-    if (result != ERROR_SUCCESS)
-    {
-        qWarning("Could not open registry key");
-        return false;
-    }
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if (run)
-    {
-        QByteArray regValue = QByteArray((const char*)appPath.utf16(), (appPath.size() + 1) * 2);
-        result = RegSetValueExW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()), 0, REG_SZ,
-            reinterpret_cast<const unsigned char*>(regValue.constData()), regValue.size());
-    } else {
-        result = RegDeleteValueW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()));
-    }
-    RegCloseKey(handle);
-    return (result == ERROR_SUCCESS);
+        settings.setValue(appName, appPath);
+    else
+        settings.remove(appName);
 #endif
-    return false;
 }
 

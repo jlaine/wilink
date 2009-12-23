@@ -26,7 +26,7 @@ class Application
 {
 public:
     static bool isInstalled();
-    static bool setOpenAtLogin(bool run);
+    static void setOpenAtLogin(bool run);
 
 private:
     static QString executablePath();
