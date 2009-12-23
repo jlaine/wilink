@@ -29,7 +29,7 @@
 #include <QPushButton>
 #include <QStringList>
 #include <QSystemTrayIcon>
-#include <QTextEdit>
+#include <QTextBrowser>
 
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
@@ -58,8 +58,7 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     hbox->addWidget(imageLabel);
     layout->addItem(hbox);
 
-    chatHistory = new QTextEdit;
-    chatHistory->setReadOnly(true);
+    chatHistory = new QTextBrowser;
     layout->addWidget(chatHistory);
 
     hbox = new QHBoxLayout;

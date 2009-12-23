@@ -23,7 +23,7 @@
 #include <QPushButton>
 #include <QPrintDialog>
 #include <QPrinter>
-#include <QTextEdit>
+#include <QTextBrowser>
 #include <QThread>
 
 #include "config.h"
@@ -222,8 +222,7 @@ Diagnostics::Diagnostics(QWidget *parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
-    text = new QTextEdit;
-    text->setReadOnly(true);
+    text = new QTextBrowser;
     layout->addWidget(text);
 
     QHBoxLayout *hbox = new QHBoxLayout;

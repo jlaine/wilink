@@ -29,7 +29,7 @@ class RosterView;
 class QLabel;
 class QLineEdit;
 class QSystemTrayIcon;
-class QTextEdit;
+class QTextBrowser;
 class QXmppVCard;
 class QXmppVCardManager;
 
@@ -53,7 +53,7 @@ signals:
 private:
     void addMessage(const QString &text, bool local);
 
-    QTextEdit *chatHistory;
+    QTextBrowser *chatHistory;
     QLineEdit *chatInput;
     QString chatLocalName;
     QString chatRemoteJid;

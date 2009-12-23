@@ -23,7 +23,7 @@
 #include <QDialog>
 
 class QPushButton;
-class QTextEdit;
+class QTextBrowser;
 
 class NetworkThread;
 class WirelessThread;
@@ -46,7 +46,7 @@ protected slots:
 private:
     QPushButton *printButton;
     QPushButton *refreshButton;
-    QTextEdit *text;
+    QTextBrowser *text;
 
     NetworkThread *networkThread;
     WirelessThread *wirelessThread;
