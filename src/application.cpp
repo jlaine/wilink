@@ -36,6 +36,9 @@ QString Application::executablePath()
     if (appDir.endsWith(macDir))
         return appDir.left(appDir.size() - macDir.size());
 #endif
+#ifdef Q_OS_WIN
+    return qApp->applicationFilePath().replace("/", "\\");
+#endif
     return qApp->applicationFilePath();
 }
 
