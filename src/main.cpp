@@ -34,19 +34,23 @@ static void signal_handler(int sig)
     qApp->quit();
 }
 
-void runAtLogin()
+void runAtLogin(const QString &appName, bool run)
 {
 #ifdef Q_OS_MAC
-    QDir bundleDir("/Applications/wDesktop.app");
+    QDir bundleDir(QString("/Applications/%1.app").arg(appName));
     if (!bundleDir.exists())
         return;
 
+    QString script = run ?
+        QString("tell application \"System Events\"\n"
+            "\tmake login item at end with properties {path:\"%1\"}\n"
+            "end tell\n").arg(bundleDir.absolutePath()) :
+        QString("tell application \"System Events\"\n"
+            "\tdelete login item \"%1\"\n"
+            "end tell\n").arg(appName);
     QProcess process;
     process.start("osascript");
-    process.write(QString(
-        "tell application \"System Events\"\n"
-        "\tmake login item at end with properties {path:\"%1\"}\n"
-        "end tell\n").arg(bundleDir.absolutePath()).toLocal8Bit());
+    process.write(script.toLocal8Bit());
     process.closeWriteChannel();
     process.waitForFinished();
 #endif
@@ -63,7 +67,7 @@ int main(int argc, char *argv[])
 #endif
 
     /* Make sure application runs at login */
-    runAtLogin();
+    runAtLogin(app.applicationName(), true);
 
     /* Load translations */
     QTranslator translator;
