@@ -32,12 +32,14 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSettings>
 #include <QTimer>
 
 #include "qnetio/wallet.h"
 
 #include "chat.h"
 #include "config.h"
+#include "application.h"
 #include "diagnostics.h"
 #include "photos.h"
 #include "trayicon.h"
@@ -53,6 +55,11 @@ TrayIcon::TrayIcon()
     refreshInterval(0)
 {
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
+
+    /* initialise settings */
+    settings = new QSettings(this);
+    if (Application::isInstalled() && !settings->contains("OpenAtLogin"))
+        openAtLogin(true);
 
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
@@ -189,7 +196,8 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 
 void TrayIcon::openAtLogin(bool checked)
 {
-
+    Application::setOpenAtLogin(checked);
+    settings->setValue("OpenAtLogin", checked);
 }
 
 void TrayIcon::showDiagnostics()
@@ -248,13 +256,17 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
 
-    QMenu *optionsMenu = new QMenu;
-    action = optionsMenu->addAction(tr("Open at login"));
-    action->setCheckable(true);
-    connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
+    if (Application::isInstalled())
+    {
+        QMenu *optionsMenu = new QMenu;
+        action = optionsMenu->addAction(tr("Open at login"));
+        action->setCheckable(true);
+        action->setChecked(settings->value("OpenAtLogin").toBool());
+        connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
 
-    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
-    action->setMenu(optionsMenu);
+        action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
+        action->setMenu(optionsMenu);
+    }
 
     action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));

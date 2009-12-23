@@ -48,7 +48,7 @@ bool Application::isInstalled()
     return !dir.exists("CMakeFiles");
 }
 
-bool Application::setRunAtLogin(bool run)
+bool Application::setOpenAtLogin(bool run)
 {
     const QString appName = qApp->applicationName();
     const QString appPath = executablePath();

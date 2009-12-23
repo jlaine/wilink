@@ -37,6 +37,7 @@ class QLabel;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QProgressBar;
+class QSettings;
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
@@ -72,6 +73,7 @@ private:
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;
     QStringList seenMessages;
+    QSettings *settings;
     QByteArray userAgent;
 };
 

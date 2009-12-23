@@ -33,7 +33,6 @@
 
 #include "config.h"
 #include "qnetio/wallet.h"
-#include "application.h"
 #include "trayicon.h"
 
 static void signal_handler(int sig)
@@ -52,10 +51,6 @@ int main(int argc, char *argv[])
 #ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/wDesktop.png"));
 #endif
-
-    /* Make sure application runs at login */
-    if (Application::isInstalled())
-        Application::setRunAtLogin(true);
 
     /* Load translations */
     QTranslator translator;
