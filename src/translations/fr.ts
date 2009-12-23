@@ -130,6 +130,14 @@
         <source>Upload &amp;photos</source>
         <translation>Téléchargement &amp;photos</translation>
     </message>
+    <message>
+        <source>Open at login</source>
+        <translation>Ouvrir au démarrage</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Options</translation>
+    </message>
 </context>
 <context>
     <name>UpdatesDialog</name>
