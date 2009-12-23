@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QDomDocument>
@@ -53,7 +54,7 @@ void Updates::check()
     QList< QPair<QString, QString> > query = statusUrl.queryItems();
     query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
     query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
-    query.append(qMakePair(QString::fromLatin1("version"), currentVersion));
+    query.append(qMakePair(QString::fromLatin1("version"), qApp->applicationVersion()));
     statusUrl.setQueryItems(query);
 
     QNetworkRequest req(statusUrl);
@@ -137,17 +138,12 @@ void Updates::processStatus()
     if (!urlString.isEmpty())
         release.url = updatesUrl.resolved(QUrl(urlString));
 
-    if (compareVersions(release.version, currentVersion) > 0 && !release.url.isEmpty())
+    if (compareVersions(release.version, qApp->applicationVersion()) > 0 && !release.url.isEmpty())
         emit updateAvailable(release);
 }
 
 void Updates::setUrl(const QUrl &url)
 {
     updatesUrl = url;
-}
-
-void Updates::setVersion(const QString &version)
-{
-    currentVersion = version;
 }
 

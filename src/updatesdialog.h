@@ -35,7 +35,6 @@ class UpdatesDialog : public QDialog
 public:
     UpdatesDialog(QWidget *parent = NULL);
     void setUrl(const QUrl &url);
-    void setVersion(const QString &version);
 
 public slots:
     void check();

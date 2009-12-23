@@ -46,14 +46,14 @@
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
-static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
-static const QByteArray userAgent("wDesktop/" WDESKTOP_VERSION);
 
 TrayIcon::TrayIcon()
     : chat(NULL), diagnostics(NULL), photos(NULL),
     connected(false),
     refreshInterval(0)
 {
+    userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
+
     /* set icon */
     setIcon(QIcon(":/wDesktop.png"));
 
@@ -79,7 +79,6 @@ TrayIcon::TrayIcon()
     /* prepare modules */
     chat = new Chat(this);
     updates = new UpdatesDialog;
-    updates->setVersion(wdesktopVersion);
 
     /* fetch menu */
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));

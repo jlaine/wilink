@@ -64,11 +64,6 @@ void UpdatesDialog::setUrl(const QUrl &url)
     updates->setUrl(url);
 }
 
-void UpdatesDialog::setVersion(const QString &version)
-{
-    updates->setVersion(version);
-}
-
 void UpdatesDialog::updateAvailable(const Release &release)
 {
     const QString message = tr("Version %1 of %2 is available. Do you want to install it?")

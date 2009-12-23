@@ -30,6 +30,7 @@
 #include <windows.h>
 #endif
 
+#include "config.h"
 #include "qnetio/wallet.h"
 #include "trayicon.h"
 
@@ -101,6 +102,7 @@ int main(int argc, char *argv[])
     /* Create application */
     QApplication app(argc, argv);
     app.setApplicationName("wDesktop");
+    app.setApplicationVersion(WDESKTOP_VERSION);
     app.setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/wDesktop.png"));

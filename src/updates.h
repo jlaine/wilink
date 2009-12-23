@@ -47,7 +47,6 @@ public:
     void check();
     void download(const Release &release, const QString &dirPath);
     void setUrl(const QUrl &url);
-    void setVersion(const QString &url);
 
     static int compareVersions(const QString &v1, const QString v2);
 
@@ -63,7 +62,6 @@ signals:
 
 private:
     QNetworkAccessManager *network;
-    QString currentVersion;
     QFile downloadFile;
     QUrl updatesUrl;
 };

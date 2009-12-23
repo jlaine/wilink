@@ -71,6 +71,7 @@ private:
     QNetworkAccessManager *network;
     QList< QPair<QUrl, QAction *> > icons;
     QStringList seenMessages;
+    QByteArray userAgent;
 };
 
 #endif
