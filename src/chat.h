@@ -45,6 +45,7 @@ public slots:
     void vCardReceived(const QXmppVCard&);
 
 protected slots:
+    void anchorClicked(const QUrl &link);
     void send();
 
 signals:

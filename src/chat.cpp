@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -59,6 +60,8 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
     layout->addItem(hbox);
 
     chatHistory = new QTextBrowser;
+    chatHistory->setOpenLinks(false);
+    connect(chatHistory, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
     layout->addWidget(chatHistory);
 
     hbox = new QHBoxLayout;
@@ -76,6 +79,8 @@ ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
 
 void ChatDialog::addMessage(const QString &text, bool local)
 {
+    QString html = text;
+    html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
     chatHistory->append(QString(
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr style=\"background-color: %1\">"
@@ -89,7 +94,12 @@ void ChatDialog::addMessage(const QString &text, bool local)
         .arg(local ? "#dbdbdb" : "#b6d4ff")
         .arg(local ? chatLocalName : chatRemoteName)
         .arg(QDateTime::currentDateTime().toString("hh:mm"))
-        .arg(text));
+        .arg(html));
+}
+
+void ChatDialog::anchorClicked(const QUrl &link)
+{
+    QDesktopServices::openUrl(link);
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
