@@ -26,6 +26,10 @@
 #include <QProcess>
 #include <QTranslator>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 #include "qnetio/wallet.h"
 #include "trayicon.h"
 
@@ -34,12 +38,13 @@ static void signal_handler(int sig)
     qApp->quit();
 }
 
-void runAtLogin(const QString &appName, bool run)
+bool runAtLogin(bool run)
 {
+    const QString appName = qApp->applicationName();
 #ifdef Q_OS_MAC
     QDir bundleDir(QString("/Applications/%1.app").arg(appName));
     if (!bundleDir.exists())
-        return;
+        return false;
 
     QString script = run ?
         QString("tell application \"System Events\"\n"
@@ -50,10 +55,32 @@ void runAtLogin(const QString &appName, bool run)
             "end tell\n").arg(appName);
     QProcess process;
     process.start("osascript");
-    process.write(script.toLocal8Bit());
+    process.write(script.toAscii());
     process.closeWriteChannel();
     process.waitForFinished();
+    return true;
 #endif
+#ifdef Q_OS_WIN
+    HKEY handle;
+    DWORD result = RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_READ | KEY_WRITE, &handle);
+    if (result != ERROR_SUCCESS)
+    {
+        qWarning("Could not open registry key");
+        return false;
+    }
+    if (run)
+    {
+        const QString appPath = qApp->applicationFilePath();
+        QByteArray regValue = QByteArray((const char*)appPath.utf16(), (appPath.length() + 1) * 2);
+        result = RegSetValueExW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()), 0, REG_SZ,
+            reinterpret_cast<const unsigned char*>(regValue.constData()), regValue.size());
+    } else {
+        result = RegDeleteValueW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()));
+    }
+    RegCloseKey(handle);
+    return (result == ERROR_SUCCESS);
+#endif
+    return false;
 }
 
 int main(int argc, char *argv[])
@@ -67,7 +94,7 @@ int main(int argc, char *argv[])
 #endif
 
     /* Make sure application runs at login */
-    runAtLogin(app.applicationName(), true);
+    runAtLogin(true);
 
     /* Load translations */
     QTranslator translator;
