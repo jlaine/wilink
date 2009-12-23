@@ -21,7 +21,9 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDir>
 #include <QLocale>
+#include <QProcess>
 #include <QTranslator>
 
 #include "qnetio/wallet.h"
@@ -30,6 +32,24 @@
 static void signal_handler(int sig)
 {
     qApp->quit();
+}
+
+void runAtLogin()
+{
+#ifdef Q_OS_MAC
+    QDir bundleDir("/Applications/wDesktop.app");
+    if (!bundleDir.exists())
+        return;
+
+    QProcess process;
+    process.start("osascript");
+    process.write(QString(
+        "tell application \"System Events\"\n"
+        "\tmake login item at end with properties {path:\"%1\"}\n"
+        "end tell\n").arg(bundleDir.absolutePath()).toLocal8Bit());
+    process.closeWriteChannel();
+    process.waitForFinished();
+#endif
 }
 
 int main(int argc, char *argv[])
@@ -41,6 +61,9 @@ int main(int argc, char *argv[])
 #ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/wDesktop.png"));
 #endif
+
+    /* Make sure application runs at login */
+    runAtLogin();
 
     /* Load translations */
     QTranslator translator;
