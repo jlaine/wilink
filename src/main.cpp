@@ -70,15 +70,12 @@ bool Package::isInstalled()
 bool Package::setRunAtLogin(bool run)
 {
     const QString appName = qApp->applicationName();
+    const QString appPath = executablePath();
 #ifdef Q_OS_MAC
-    QDir bundleDir(QString("/Applications/%1.app").arg(appName));
-    if (!bundleDir.exists())
-        return false;
-
     QString script = run ?
         QString("tell application \"System Events\"\n"
             "\tmake login item at end with properties {path:\"%1\"}\n"
-            "end tell\n").arg(bundleDir.absolutePath()) :
+            "end tell\n").arg(appPath) :
         QString("tell application \"System Events\"\n"
             "\tdelete login item \"%1\"\n"
             "end tell\n").arg(appName);
@@ -99,7 +96,6 @@ bool Package::setRunAtLogin(bool run)
     }
     if (run)
     {
-        const QString appPath = qApp->applicationFilePath();
         QByteArray regValue = QByteArray((const char*)appPath.utf16(), (appPath.size() + 1) * 2);
         result = RegSetValueExW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()), 0, REG_SZ,
             reinterpret_cast<const unsigned char*>(regValue.constData()), regValue.size());
