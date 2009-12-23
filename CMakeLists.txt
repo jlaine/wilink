@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 include(CheckIncludeFiles)
-include(RelativePath)
 
 # Project and version
 project(wDesktop)
@@ -25,12 +24,6 @@ if(COREWLAN_LIBRARY)
     set(WLAN_LIBRARIES ${COREWLAN_LIBRARY})
 endif(COREWLAN_LIBRARY)
 
-# Destination directories
-set(WDESKTOP_PLUGINS_DIR lib/${PROJECT_NAME} CACHE STRING "wDesktop plugins directory.")
-
-# Path definitions
-relative_path(WDESKTOP_PLUGINS_PATH bin ${WDESKTOP_PLUGINS_DIR})
-
 # Extra runtime dependencies
 if(APPLE)
     set(WDESKTOP_EXTRA_PLUGINS
@@ -51,7 +44,7 @@ if(WIN32)
         ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
         ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
     install(FILES ${WDESKTOP_EXTRA_RUNTIME} DESTINATION bin)
-    install(FILES ${WDESKTOP_EXTRA_PLUGINS} DESTINATION ${WDESKTOP_PLUGINS_DIR}/imageformats)
+    install(FILES ${WDESKTOP_EXTRA_PLUGINS} DESTINATION bin/imageformats)
 endif(WIN32)
 
 # Packaging
