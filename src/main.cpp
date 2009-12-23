@@ -22,6 +22,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QDir>
+#include <QFileInfo>
 #include <QLocale>
 #include <QProcess>
 #include <QTranslator>
@@ -44,12 +45,26 @@ class Package
 public:
     static bool isInstalled();
     static bool setRunAtLogin(bool run);
+
+private:
+    static QString executablePath();
 };
+
+QString Package::executablePath()
+{
+#ifdef Q_OS_MAC
+    const QString macDir("/Contents/MacOS");
+    const QString appDir = qApp->applicationDirPath();
+    if (appDir.endsWith(macDir))
+        return appDir.left(appDir.size() - macDir.size());
+#endif
+    return qApp->applicationFilePath();
+}
 
 bool Package::isInstalled()
 {
-    const QString appPath = qApp->applicationFilePath();
-    return false;
+    QDir dir = QFileInfo(executablePath()).dir();
+    return !dir.exists("CMakeFiles");
 }
 
 bool Package::setRunAtLogin(bool run)
@@ -85,7 +100,7 @@ bool Package::setRunAtLogin(bool run)
     if (run)
     {
         const QString appPath = qApp->applicationFilePath();
-        QByteArray regValue = QByteArray((const char*)appPath.utf16(), (appPath.length() + 1) * 2);
+        QByteArray regValue = QByteArray((const char*)appPath.utf16(), (appPath.size() + 1) * 2);
         result = RegSetValueExW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()), 0, REG_SZ,
             reinterpret_cast<const unsigned char*>(regValue.constData()), regValue.size());
     } else {
