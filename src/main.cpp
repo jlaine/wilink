@@ -38,7 +38,20 @@ static void signal_handler(int sig)
     qApp->quit();
 }
 
-bool runAtLogin(bool run)
+class Package
+{
+public:
+    static bool isInstalled();
+    static bool setRunAtLogin(bool run);
+};
+
+bool Package::isInstalled()
+{
+    const QString appPath = qApp->applicationFilePath();
+    return false;
+}
+
+bool Package::setRunAtLogin(bool run)
 {
     const QString appName = qApp->applicationName();
 #ifdef Q_OS_MAC
@@ -94,7 +107,8 @@ int main(int argc, char *argv[])
 #endif
 
     /* Make sure application runs at login */
-    runAtLogin(true);
+    if (Package::isInstalled())
+        Package::setRunAtLogin(true);
 
     /* Load translations */
     QTranslator translator;
