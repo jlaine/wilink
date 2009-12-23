@@ -9,6 +9,7 @@ generate_png(png
     contact-busy.svg
     contact-offline.svg
     diagnostics.svg
+    options.svg
     photos.svg
     remove.svg
     updates.svg

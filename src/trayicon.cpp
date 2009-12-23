@@ -187,6 +187,11 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
+void TrayIcon::openAtLogin(bool checked)
+{
+
+}
+
 void TrayIcon::showDiagnostics()
 {
     if (!diagnostics)
@@ -242,6 +247,14 @@ void TrayIcon::showMenu()
 
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
+
+    QMenu *optionsMenu = new QMenu;
+    action = optionsMenu->addAction(tr("Open at login"));
+    action->setCheckable(true);
+    connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
+
+    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
+    action->setMenu(optionsMenu);
 
     action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));

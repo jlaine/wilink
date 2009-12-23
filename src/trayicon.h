@@ -50,6 +50,7 @@ public:
 protected slots:
     void fetchMenu();
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
+    void openAtLogin(bool checked);
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
     void showIcon();
