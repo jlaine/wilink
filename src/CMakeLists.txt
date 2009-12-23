@@ -17,6 +17,7 @@ target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 # wDesktop
 
 set(wDesktop_SOURCES
+    application.cpp
     chat.cpp
     chat_roster.cpp
     diagnostics.cpp

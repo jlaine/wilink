@@ -33,79 +33,12 @@
 
 #include "config.h"
 #include "qnetio/wallet.h"
+#include "application.h"
 #include "trayicon.h"
 
 static void signal_handler(int sig)
 {
     qApp->quit();
-}
-
-class Package
-{
-public:
-    static bool isInstalled();
-    static bool setRunAtLogin(bool run);
-
-private:
-    static QString executablePath();
-};
-
-QString Package::executablePath()
-{
-#ifdef Q_OS_MAC
-    const QString macDir("/Contents/MacOS");
-    const QString appDir = qApp->applicationDirPath();
-    if (appDir.endsWith(macDir))
-        return appDir.left(appDir.size() - macDir.size());
-#endif
-    return qApp->applicationFilePath();
-}
-
-bool Package::isInstalled()
-{
-    QDir dir = QFileInfo(executablePath()).dir();
-    return !dir.exists("CMakeFiles");
-}
-
-bool Package::setRunAtLogin(bool run)
-{
-    const QString appName = qApp->applicationName();
-    const QString appPath = executablePath();
-#ifdef Q_OS_MAC
-    QString script = run ?
-        QString("tell application \"System Events\"\n"
-            "\tmake login item at end with properties {path:\"%1\"}\n"
-            "end tell\n").arg(appPath) :
-        QString("tell application \"System Events\"\n"
-            "\tdelete login item \"%1\"\n"
-            "end tell\n").arg(appName);
-    QProcess process;
-    process.start("osascript");
-    process.write(script.toAscii());
-    process.closeWriteChannel();
-    process.waitForFinished();
-    return true;
-#endif
-#ifdef Q_OS_WIN
-    HKEY handle;
-    DWORD result = RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_READ | KEY_WRITE, &handle);
-    if (result != ERROR_SUCCESS)
-    {
-        qWarning("Could not open registry key");
-        return false;
-    }
-    if (run)
-    {
-        QByteArray regValue = QByteArray((const char*)appPath.utf16(), (appPath.size() + 1) * 2);
-        result = RegSetValueExW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()), 0, REG_SZ,
-            reinterpret_cast<const unsigned char*>(regValue.constData()), regValue.size());
-    } else {
-        result = RegDeleteValueW(handle, reinterpret_cast<const wchar_t *>(appName.utf16()));
-    }
-    RegCloseKey(handle);
-    return (result == ERROR_SUCCESS);
-#endif
-    return false;
 }
 
 int main(int argc, char *argv[])
@@ -120,8 +53,8 @@ int main(int argc, char *argv[])
 #endif
 
     /* Make sure application runs at login */
-    if (Package::isInstalled())
-        Package::setRunAtLogin(true);
+    if (Application::isInstalled())
+        Application::setRunAtLogin(true);
 
     /* Load translations */
     QTranslator translator;
