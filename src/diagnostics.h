@@ -40,12 +40,10 @@ public:
     NetworkThread(QObject *parent) : QThread(parent) {};
     void run();
 
-    QList<QHostInfo> lookups;
-    QList<Ping> pings;
-    QList<Ping> traceroute;
-
 signals:
     void dnsResults(const QList<QHostInfo> &results);
+    void pingResults(const QList<Ping> &results);
+    void tracerouteResults(const QList<Ping> &results);
 };
 
 class Diagnostics : public QDialog
@@ -62,6 +60,8 @@ protected slots:
     void refresh();
 
     void showDns(const QList<QHostInfo> &results);
+    void showPing(const QList<Ping> &results);
+    void showTraceroute(const QList<Ping> &results);
     void networkFinished();
     void wirelessFinished();
 

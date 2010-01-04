@@ -34,7 +34,10 @@ static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
 static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
+Q_DECLARE_METATYPE(QList<Ping>)
+
 int id = qRegisterMetaType< QList<QHostInfo> >();
+int id2 = qRegisterMetaType< QList<Ping> >();
 
 static QString interfaceName(const QNetworkInterface &interface)
 {
@@ -50,6 +53,7 @@ static QString interfaceName(const QNetworkInterface &interface)
 void NetworkThread::run()
 {
     QList<QHostAddress> gateways;
+    QList<QHostInfo> lookups;
 
     /* try to detemine gateways */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -94,11 +98,14 @@ void NetworkThread::run()
     emit dnsResults(lookups);
 
     /* run ping tests */
+    QList<Ping> pings;
     foreach (const QHostAddress &gateway, gateways)
         pings.append(NetworkInfo::ping(gateway, longPing.contains(gateway) ? 30 : 3));
+    emit pingResults(pings);
 
     /* run traceroute */
-    traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
+    QList<Ping> traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
+    emit tracerouteResults(traceroute);
 }
 
 /* WIRELESS */
@@ -293,17 +300,12 @@ void Diagnostics::refresh()
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
+    connect(networkThread, SIGNAL(pingResults(const QList<Ping> &)), this, SLOT(showPing(const QList<Ping> &)));
     networkThread->start();
 }
 
 void Diagnostics::networkFinished()
 {
-    /* ping tests */
-    addItem("Ping", dumpPings(networkThread->pings));
-
-    /* traceroute tests */
-    addItem("Traceroute", dumpPings(networkThread->traceroute));
-
     /* get wireless info */
     wirelessThread = new WirelessThread(this);
     connect(wirelessThread, SIGNAL(finished()), this, SLOT(wirelessFinished()));
@@ -316,7 +318,7 @@ void Diagnostics::showDns(const QList<QHostInfo> &results)
     TextRow titles(true);
     titles << "Host name" << "Host address";
     table << titles;
-    foreach (const QHostInfo &hostInfo, networkThread->lookups)
+    foreach (const QHostInfo &hostInfo, results)
     {
         QString hostAddress = "not found";
         foreach (const QHostAddress &address, hostInfo.addresses())
@@ -333,6 +335,16 @@ void Diagnostics::showDns(const QList<QHostInfo> &results)
         table << row;
     }
     addItem("DNS", table.render());
+}
+
+void Diagnostics::showPing(const QList<Ping> &results)
+{
+    addItem("Ping", dumpPings(results));
+}
+
+void Diagnostics::showTraceroute(const QList<Ping> &results)
+{
+    addItem("Traceroute", dumpPings(results));
 }
 
 void Diagnostics::wirelessFinished()
