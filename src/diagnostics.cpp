@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QHostInfo>
 #include <QLayout>
 #include <QNetworkInterface>
 #include <QPushButton>
@@ -28,12 +27,14 @@
 
 #include "config.h"
 #include "diagnostics.h"
-#include "networkinfo.h"
 #include "systeminfo.h"
 #include "wireless.h"
 
 static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
 static const QHostAddress serverAddress("213.91.4.201");
+
+Q_DECLARE_METATYPE(QList<QHostInfo>)
+int id = qRegisterMetaType< QList<QHostInfo> >();
 
 static QString interfaceName(const QNetworkInterface &interface)
 {
@@ -45,17 +46,6 @@ static QString interfaceName(const QNetworkInterface &interface)
 }
 
 /* NETWORK */
-
-class NetworkThread : public QThread
-{
-public:
-    NetworkThread(QObject *parent) : QThread(parent) {};
-    void run();
-
-    QList<QHostInfo> lookups;
-    QList<Ping> pings;
-    QList<Ping> traceroute;
-};
 
 void NetworkThread::run()
 {
@@ -101,6 +91,7 @@ void NetworkThread::run()
             }
         }
     }
+    emit dnsResults(lookups);
 
     /* run ping tests */
     foreach (const QHostAddress &gateway, gateways)
@@ -296,17 +287,31 @@ void Diagnostics::refresh()
             list.size() ? list.render() : "<p>No address</p>");
     }
 
+    addSection("Tests");
+
     /* run network tests */
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
+    connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
     networkThread->start();
 }
 
 void Diagnostics::networkFinished()
 {
-    addSection("Tests");
+    /* ping tests */
+    addItem("Ping", dumpPings(networkThread->pings));
 
-    /* DNS tests */
+    /* traceroute tests */
+    addItem("Traceroute", dumpPings(networkThread->traceroute));
+
+    /* get wireless info */
+    wirelessThread = new WirelessThread(this);
+    connect(wirelessThread, SIGNAL(finished()), this, SLOT(wirelessFinished()));
+    wirelessThread->start();
+}
+
+void Diagnostics::showDns(const QList<QHostInfo> &results)
+{
     TextTable table;
     TextRow titles(true);
     titles << "Host name" << "Host address";
@@ -328,17 +333,6 @@ void Diagnostics::networkFinished()
         table << row;
     }
     addItem("DNS", table.render());
-
-    /* ping tests */
-    addItem("Ping", dumpPings(networkThread->pings));
-
-    /* traceroute tests */
-    addItem("Traceroute", dumpPings(networkThread->traceroute));
-
-    /* get wireless info */
-    wirelessThread = new WirelessThread(this);
-    connect(wirelessThread, SIGNAL(finished()), this, SLOT(wirelessFinished()));
-    wirelessThread->start();
 }
 
 void Diagnostics::wirelessFinished()

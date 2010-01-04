@@ -21,12 +21,32 @@
 #define __WDESKTOP_DIAGNOSTICS_H__
 
 #include <QDialog>
+#include <QHostInfo>
+#include <QThread>
+
+#include "networkinfo.h"
 
 class QPushButton;
 class QTextBrowser;
 
 class NetworkThread;
 class WirelessThread;
+
+class NetworkThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    NetworkThread(QObject *parent) : QThread(parent) {};
+    void run();
+
+    QList<QHostInfo> lookups;
+    QList<Ping> pings;
+    QList<Ping> traceroute;
+
+signals:
+    void dnsResults(const QList<QHostInfo> &results);
+};
 
 class Diagnostics : public QDialog
 {
@@ -40,6 +60,8 @@ protected slots:
     void addSection(const QString &title);
     void print();
     void refresh();
+
+    void showDns(const QList<QHostInfo> &results);
     void networkFinished();
     void wirelessFinished();
 
