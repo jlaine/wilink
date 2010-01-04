@@ -34,9 +34,11 @@ static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
 Q_DECLARE_METATYPE(QList<Ping>)
+Q_DECLARE_METATYPE(WirelessResult)
 
-int id = qRegisterMetaType< QList<QHostInfo> >();
-int id2 = qRegisterMetaType< QList<Ping> >();
+static int id1 = qRegisterMetaType< QList<QHostInfo> >();
+static int id2 = qRegisterMetaType< QList<Ping> >();
+static int id3 = qRegisterMetaType< WirelessResult >();
 
 static QString interfaceName(const QNetworkInterface &interface)
 {
@@ -105,21 +107,8 @@ void NetworkThread::run()
     /* run traceroute */
     QList<Ping> traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
     emit tracerouteResults(traceroute);
-}
 
-/* WIRELESS */
-
-class WirelessThread : public QThread
-{
-public:
-    WirelessThread(QObject *parent) : QThread(parent) {};
-    void run();
-
-    QList<WirelessResult> results;
-};
-
-void WirelessThread::run()
-{
+    /* run wireless */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (interface.flags() & QNetworkInterface::IsLoopBack)
@@ -133,8 +122,9 @@ void WirelessThread::run()
         result.interface = interface;
         result.availableNetworks = wireless.availableNetworks();
         result.currentNetwork = wireless.currentNetwork();
-        results.append(result);
+        emit wirelessResult(result);
     }
+
 }
 
 /* GUI */
@@ -207,7 +197,7 @@ static QString dumpPings(const QList<Ping> &pings)
 }
 
 Diagnostics::Diagnostics(QWidget *parent)
-    : QDialog(parent), networkThread(NULL), wirelessThread(NULL)
+    : QDialog(parent), networkThread(NULL)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
@@ -292,15 +282,16 @@ void Diagnostics::refresh()
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
     connect(networkThread, SIGNAL(pingResults(const QList<Ping> &)), this, SLOT(showPing(const QList<Ping> &)));
+    connect(networkThread, SIGNAL(tracerouteResults(const QList<Ping> &)), this, SLOT(showTraceroute(const QList<Ping> &)));
+    connect(networkThread, SIGNAL(wirelessResult(const WirelessResult &)), this, SLOT(showWireless(const WirelessResult &)));
     networkThread->start();
 }
 
 void Diagnostics::networkFinished()
 {
-    /* get wireless info */
-    wirelessThread = new WirelessThread(this);
-    connect(wirelessThread, SIGNAL(finished()), this, SLOT(wirelessFinished()));
-    wirelessThread->start();
+    /* enable buttons */
+    refreshButton->setEnabled(true);
+    printButton->setEnabled(true);
 }
 
 void Diagnostics::showDns(const QList<QHostInfo> &results)
@@ -338,42 +329,35 @@ void Diagnostics::showTraceroute(const QList<Ping> &results)
     addItem("Traceroute", dumpPings(results));
 }
 
-void Diagnostics::wirelessFinished()
+void Diagnostics::showWireless(const WirelessResult &result)
 {
-    foreach (const WirelessResult &result, wirelessThread->results)
+    addSection("Wireless interface " + interfaceName(result.interface));
+
+    if (result.currentNetwork.isValid())
     {
-        addSection("Wireless interface " + interfaceName(result.interface));
-
-        if (result.currentNetwork.isValid())
-        {
-            TextList list;
-            list << "SSID: " + result.currentNetwork.ssid();
-            list << "RSSI: " + QString::number(result.currentNetwork.rssi());
-            if (result.currentNetwork.cinr())
-                list << "CINR: " + QString::number(result.currentNetwork.cinr());
-            addItem("Current network", list.render());
-        }
-
-        TextTable table;
-        TextRow titles(true);
-        titles << "SSID" << "RSSI" << "CINR";
-        table << titles;
-        foreach (const WirelessNetwork &network, result.availableNetworks)
-        {
-            if (network != result.currentNetwork)
-            {
-                TextRow row;
-                row << network.ssid();
-                row << QString::number(network.rssi());
-                row << (network.cinr() ? QString::number(network.cinr()) : QString());
-                table << row;
-            }
-        }
-        addItem("Available networks", table.render());
+        TextList list;
+        list << "SSID: " + result.currentNetwork.ssid();
+        list << "RSSI: " + QString::number(result.currentNetwork.rssi());
+        if (result.currentNetwork.cinr())
+            list << "CINR: " + QString::number(result.currentNetwork.cinr());
+        addItem("Current network", list.render());
     }
 
-    /* enable buttons */
-    refreshButton->setEnabled(true);
-    printButton->setEnabled(true);
+    TextTable table;
+    TextRow titles(true);
+    titles << "SSID" << "RSSI" << "CINR";
+    table << titles;
+    foreach (const WirelessNetwork &network, result.availableNetworks)
+    {
+        if (network != result.currentNetwork)
+        {
+            TextRow row;
+            row << network.ssid();
+            row << QString::number(network.rssi());
+            row << (network.cinr() ? QString::number(network.cinr()) : QString());
+            table << row;
+        }
+    }
+    addItem("Available networks", table.render());
 }
 

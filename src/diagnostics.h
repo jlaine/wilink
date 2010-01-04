@@ -31,7 +31,6 @@ class QPushButton;
 class QTextBrowser;
 
 class NetworkThread;
-class WirelessThread;
 
 class WirelessResult
 {
@@ -53,6 +52,7 @@ signals:
     void dnsResults(const QList<QHostInfo> &results);
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Ping> &results);
+    void wirelessResult(const WirelessResult &result);
 };
 
 class Diagnostics : public QDialog
@@ -71,8 +71,8 @@ protected slots:
     void showDns(const QList<QHostInfo> &results);
     void showPing(const QList<Ping> &results);
     void showTraceroute(const QList<Ping> &results);
+    void showWireless(const WirelessResult &result);
     void networkFinished();
-    void wirelessFinished();
 
 private:
     QPushButton *printButton;
@@ -80,7 +80,6 @@ private:
     QTextBrowser *text;
 
     NetworkThread *networkThread;
-    WirelessThread *wirelessThread;
 };
 
 #endif
