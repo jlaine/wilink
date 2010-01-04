@@ -28,7 +28,6 @@
 #include "config.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
-#include "wireless.h"
 
 static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
 static const QHostAddress serverAddress("213.91.4.201");
@@ -109,14 +108,6 @@ void NetworkThread::run()
 }
 
 /* WIRELESS */
-
-class WirelessResult
-{
-public:
-    QNetworkInterface interface;
-    QList<WirelessNetwork> availableNetworks;
-    WirelessNetwork currentNetwork;
-};
 
 class WirelessThread : public QThread
 {

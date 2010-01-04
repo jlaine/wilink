@@ -25,12 +25,21 @@
 #include <QThread>
 
 #include "networkinfo.h"
+#include "wireless.h"
 
 class QPushButton;
 class QTextBrowser;
 
 class NetworkThread;
 class WirelessThread;
+
+class WirelessResult
+{
+public:
+    QNetworkInterface interface;
+    QList<WirelessNetwork> availableNetworks;
+    WirelessNetwork currentNetwork;
+};
 
 class NetworkThread : public QThread
 {
