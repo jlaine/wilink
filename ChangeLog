@@ -1,7 +1,10 @@
+wDesktop 0.2.5
+ * Improve window behaviour on OS X.
+
 wDesktop 0.2.4
  * Make wDesktop start at login.
  * Make links clickable in chat window.
- * Fix plugins installation on Windows
+ * Fix plugins installation on Windows.
 
 wDesktop 0.2.3
  * Display chat window at startup.
