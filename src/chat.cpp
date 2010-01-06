@@ -46,7 +46,7 @@
 using namespace QNetIO;
 
 ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
-    : QDialog(parent), chatRemoteJid(jid), chatRemoteName(name)
+    : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name)
 {
     chatLocalName = tr("Me");
 

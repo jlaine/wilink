@@ -20,7 +20,7 @@
 #ifndef __WDESKTOP_CHAT_H__
 #define __WDESKTOP_CHAT_H__
 
-#include <QDialog>
+#include <QWidget>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
@@ -33,7 +33,7 @@ class QTextBrowser;
 class QXmppVCard;
 class QXmppVCardManager;
 
-class ChatDialog : public QDialog
+class ChatDialog : public QWidget
 {
     Q_OBJECT
 
@@ -61,7 +61,7 @@ private:
     QString chatRemoteName;
 };
 
-class Chat : public QDialog
+class Chat : public QWidget
 {
     Q_OBJECT
 
