@@ -20,11 +20,13 @@ macro(generate_icns OUTPUT)
 	set(${OUTPUT})
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_icns ${_this_svg} icns)
-		set(_this_png ${_this_icns}.tmp.png)
 		add_custom_command(OUTPUT ${_this_icns} DEPENDS ${_this_svg}
-			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=128 --export-height=128
-			COMMAND ${PNG2ICNS} ${_this_icns} ${_this_png}
-			COMMAND rm -f ${_this_png})
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_icns}.256 --export-width=256 --export-height=256
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_icns}.128 --export-width=128 --export-height=128
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_icns}.32 --export-width=32 --export-height=32
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_icns}.16 --export-width=16 --export-height=16
+			COMMAND ${PNG2ICNS} ${_this_icns} ${_this_icns}.256 ${_this_icns}.128 ${_this_icns}.32 ${_this_icns}.16
+			COMMAND rm -f ${_this_icns}.256 ${_this_icns}.128 ${_this_icns}.32 ${_this_icns}.16)
 		list(APPEND ${OUTPUT} ${_this_icns})
 	endforeach()
 endmacro(generate_icns)
