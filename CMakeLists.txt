@@ -62,8 +62,10 @@ if(APPLE)
 	set(CPACK_BUNDLE_IDENTIFIER net.wifirst.wDesktop)
 
     # image generation
-    set(BUNDLE_DMG ${PROJECT_NAME}-${WDESKTOP_VERSION}-mac.dmg)
-	set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wDesktop.app)
+    execute_process(COMMAND sw_vers -productVersion COMMAND cut -d. -f1,2
+        OUTPUT_VARIABLE OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(BUNDLE_DMG ${PROJECT_NAME}-${WDESKTOP_VERSION}-mac-${OSX_VERSION}.dmg)
+    set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wDesktop.app)
     set(_dmg_temp ${BUNDLE_DMG}.temp)
     add_custom_command(OUTPUT ${BUNDLE_DMG}
         COMMAND mkdir ${_dmg_temp}
