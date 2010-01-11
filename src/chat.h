@@ -46,6 +46,7 @@ protected slots:
     void connected();
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
+    void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);
     void removeContact(const QString &jid);
     void resizeContacts();

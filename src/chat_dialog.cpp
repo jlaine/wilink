@@ -52,6 +52,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     hbox->addWidget(statusLabel);
     QLabel *nameLabel = new QLabel(jid);
     hbox->addWidget(nameLabel);
+    hbox->addStretch();
     layout->addItem(hbox);
 
     /* chat history */

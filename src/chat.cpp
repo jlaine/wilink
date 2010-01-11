@@ -82,6 +82,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+
+    connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
 }
 
 void Chat::addContact()
@@ -138,6 +140,13 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
     ChatDialog *dialog = chatContact(jid.split("/")[0]);
     dialog->messageReceived(msg);
+}
+
+void Chat::presenceChanged(const QString& bareJid, const QString& resource)
+{
+    if (!chatDialogs.contains(bareJid))
+        return;
+    chatDialogs[bareJid]->statusChanged(contactStatus(&client->getRoster(), bareJid));
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)
