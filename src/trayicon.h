@@ -54,8 +54,9 @@ protected slots:
     void openAtLogin(bool checked);
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
-    void showIcon();
+    void showChat();
     void showDiagnostics();
+    void showIcon();
     void showMenu();
     void showPhotos();
 

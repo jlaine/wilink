@@ -200,11 +200,18 @@ void TrayIcon::openAtLogin(bool checked)
     settings->setValue("OpenAtLogin", checked);
 }
 
+void TrayIcon::showChat()
+{
+    chat->show();
+    chat->raise();
+}
+
 void TrayIcon::showDiagnostics()
 {
     if (!diagnostics)
         diagnostics = new Diagnostics;
     diagnostics->show();
+    diagnostics->raise();
 }
 
 void TrayIcon::showMenu()
@@ -248,7 +255,7 @@ void TrayIcon::showMenu()
     menu->addSeparator();
 
     action = menu->addAction(QIcon(":/chat.png"), tr("&Chat"));
-    connect(action, SIGNAL(triggered(bool)), chat, SLOT(show()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChat()));
 
     action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
