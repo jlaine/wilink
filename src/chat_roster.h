@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_CONTACTS_H__
-#define __WDESKTOP_CHAT_CONTACTS_H__
+#ifndef __WDESKTOP_CHAT_ROSTER_H__
+#define __WDESKTOP_CHAT_ROSTER_H__
 
 #include <QAbstractTableModel>
 #include <QTableView>
@@ -29,6 +29,8 @@
 class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
+
+QString contactStatus(QXmppRoster *rosterManager, const QString &bareJid);
 
 class RosterModel : public QAbstractTableModel
 {

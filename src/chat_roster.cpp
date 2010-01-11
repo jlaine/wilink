@@ -37,6 +37,24 @@ enum RosterColumns {
     MaxColumn,
 };
 
+QString contactStatus(QXmppRoster *roster, const QString &bareJid)
+{
+    QString suffix = "offline";
+    foreach (const QXmppPresence &presence, roster->getAllPresencesForBareJid(bareJid))
+    {
+        if (presence.getType() != QXmppPresence::Available)
+            continue;
+        if (presence.getStatus().getType() == QXmppPresence::Status::Online)
+        {
+            suffix = "available";
+            break;
+        } else {
+            suffix = "busy";
+        }
+    }
+    return suffix;
+}
+
 RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
     : rosterManager(roster), vcardManager(vcard)
 {
@@ -66,20 +84,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
             name = bareJid.split("@").first();
         return name;
     } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-        QString suffix = "offline";
-        foreach (const QXmppPresence &presence, rosterManager->getAllPresencesForBareJid(entry.getBareJid()))
-        {
-            if (presence.getType() != QXmppPresence::Available)
-                continue;
-            if (presence.getStatus().getType() == QXmppPresence::Status::Online)
-            {
-                suffix = "available";
-                break;
-            } else {
-                suffix = "busy";
-            }
-        }
-        return QIcon(QString(":/contact-%1.png").arg(suffix));
+        return QIcon(QString(":/contact-%1.png").arg(contactStatus(rosterManager, entry.getBareJid())));
     } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
         if (rosterIcons.contains(bareJid))
             return rosterIcons[bareJid];

@@ -18,14 +18,11 @@
  */
 
 #include <QDebug>
-#include <QDateTime>
-#include <QDesktopServices>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QList>
-#include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QStringList>
@@ -41,88 +38,10 @@
 
 #include "qnetio/dns.h"
 #include "chat.h"
+#include "chat_dialog.h"
 #include "chat_roster.h"
 
 using namespace QNetIO;
-
-ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
-    : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name)
-{
-    chatLocalName = tr("Me");
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *imageLabel = new QLabel;
-    hbox->addWidget(imageLabel);
-    layout->addItem(hbox);
-
-    chatHistory = new QTextBrowser;
-    chatHistory->setOpenLinks(false);
-    connect(chatHistory, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
-    layout->addWidget(chatHistory);
-
-    hbox = new QHBoxLayout;
-    hbox->setMargin(10);
-    hbox->setSpacing(10);
-    chatInput = new QLineEdit;
-    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
-    hbox->addWidget(chatInput);
-    layout->addItem(hbox);
-
-    setLayout(layout);
-    setWindowTitle(tr("Chat with %1").arg(jid));
-    chatInput->setFocus();
-}
-
-void ChatDialog::addMessage(const QString &text, bool local)
-{
-    QString html = text;
-    html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-    chatHistory->append(QString(
-        "<table cellspacing=\"0\" width=\"100%\">"
-        "<tr style=\"background-color: %1\">"
-        "  <td>%2</td>"
-        "  <td align=\"right\">%3</td>"
-        "</tr>"
-        "<tr>"
-        "  <td colspan=\"2\">%4</td>"
-        "</tr>"
-        "</table>")
-        .arg(local ? "#dbdbdb" : "#b6d4ff")
-        .arg(local ? chatLocalName : chatRemoteName)
-        .arg(QDateTime::currentDateTime().toString("hh:mm"))
-        .arg(html));
-}
-
-void ChatDialog::anchorClicked(const QUrl &link)
-{
-    QDesktopServices::openUrl(link);
-}
-
-void ChatDialog::messageReceived(const QXmppMessage &msg)
-{
-    addMessage(msg.getBody(), false);
-}
-
-void ChatDialog::send()
-{
-    QString text = chatInput->text();
-    if (text.isEmpty())
-        return;
-
-    addMessage(text, true);
-    chatHistory->ensureCursorVisible();
-    chatInput->clear();
-    emit sendMessage(chatRemoteJid, text);
-}
-
-void ChatDialog::vCardReceived(const QXmppVCard& vcard)
-{
-
-}
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : systemTrayIcon(trayIcon)
@@ -156,6 +75,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
+    setWindowTitle(tr("Chat"));
 
     /* set up client */
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));

@@ -17,48 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_H__
-#define __WDESKTOP_CHAT_H__
+#ifndef __WDESKTOP_CHAT_DIALOG_H__
+#define __WDESKTOP_CHAT_DIALOG_H__
 
 #include <QWidget>
 
 #include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppRoster.h"
 
-class ChatDialog;
-class RosterView;
 class QLabel;
-class QSystemTrayIcon;
+class QLineEdit;
+class QTextBrowser;
 class QXmppVCard;
-class QXmppVCardManager;
 
-class Chat : public QWidget
+class ChatDialog : public QWidget
 {
     Q_OBJECT
 
 public:
-    Chat(QSystemTrayIcon *trayIcon);
-    bool open(const QString &jid, const QString &password);
+    ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
 
-protected slots:
-    void addContact();
-    ChatDialog *chatContact(const QString &jid);
-    void connected();
-    void disconnected();
+public slots:
     void messageReceived(const QXmppMessage &msg);
-    void presenceReceived(const QXmppPresence &presence);
-    void removeContact(const QString &jid);
-    void resizeContacts();
-    void sendMessage(const QString &jid, const QString message);
     void vCardReceived(const QXmppVCard&);
 
-private:
-    QXmppClient *client;
-    RosterView *contacts;
-    QLabel *statusLabel;
-    QSystemTrayIcon *systemTrayIcon;
-    QHash<QString, ChatDialog*> chatDialogs;
-};
+protected slots:
+    void anchorClicked(const QUrl &link);
+    void send();
 
+signals:
+    void sendMessage(const QString &jid, const QString &message);
+
+private:
+    void addMessage(const QString &text, bool local);
+
+    QTextBrowser *chatHistory;
+    QLineEdit *chatInput;
+    QString chatLocalName;
+    QString chatRemoteJid;
+    QString chatRemoteName;
+};
 
 #endif
