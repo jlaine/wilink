@@ -45,7 +45,7 @@
 
 using namespace QNetIO;
 
-ChatDialog::ChatDialog(QWidget *parent, const QString &jid, const QString &name)
+ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name)
 {
     chatLocalName = tr("Me");
@@ -190,7 +190,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
         if (name.isEmpty())
             name = jid.split("@")[0];
 
-        chatDialogs[jid] = new ChatDialog(this, jid, name);
+        chatDialogs[jid] = new ChatDialog(jid, name);
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
    }

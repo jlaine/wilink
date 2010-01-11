@@ -38,7 +38,7 @@ class ChatDialog : public QWidget
     Q_OBJECT
 
 public:
-    ChatDialog(QWidget *parent, const QString &jid, const QString &name);
+    ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
 
 public slots:
     void messageReceived(const QXmppMessage &msg);
