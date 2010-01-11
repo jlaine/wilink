@@ -82,8 +82,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-
-    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 void Chat::addContact()
@@ -111,6 +109,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
             name = jid.split("@")[0];
 
         chatDialogs[jid] = new ChatDialog(jid, name);
+        chatDialogs[jid]->statusChanged(contactStatus(&client->getRoster(), jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
    }
@@ -233,12 +232,5 @@ void Chat::resizeContacts()
 void Chat::sendMessage(const QString &jid, const QString message)
 {
     client->sendPacket(QXmppMessage("", jid, message));
-}
-
-void Chat::vCardReceived(const QXmppVCard& vcard)
-{
-    const QString bareJid = vcard.getFrom().split("/").first();
-    if (!chatDialogs.contains(bareJid))
-        return;
 }
 

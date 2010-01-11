@@ -46,11 +46,15 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
+    /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *imageLabel = new QLabel;
-    hbox->addWidget(imageLabel);
+    statusLabel = new QLabel;
+    hbox->addWidget(statusLabel);
+    QLabel *nameLabel = new QLabel(jid);
+    hbox->addWidget(nameLabel);
     layout->addItem(hbox);
 
+    /* chat history */
     chatHistory = new QTextBrowser;
     chatHistory->setOpenLinks(false);
     connect(chatHistory, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
@@ -111,8 +115,8 @@ void ChatDialog::send()
     emit sendMessage(chatRemoteJid, text);
 }
 
-void ChatDialog::vCardReceived(const QXmppVCard& vcard)
+void ChatDialog::statusChanged(const QString &status)
 {
-
+    statusLabel->setPixmap(status);
 }
 

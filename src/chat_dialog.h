@@ -37,8 +37,8 @@ public:
     ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
 
 public slots:
+    void statusChanged(const QString &status);
     void messageReceived(const QXmppMessage &msg);
-    void vCardReceived(const QXmppVCard&);
 
 protected slots:
     void anchorClicked(const QUrl &link);
@@ -52,6 +52,8 @@ private:
 
     QTextBrowser *chatHistory;
     QLineEdit *chatInput;
+    QLabel *statusLabel;
+
     QString chatLocalName;
     QString chatRemoteJid;
     QString chatRemoteName;

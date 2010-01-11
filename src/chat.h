@@ -50,7 +50,6 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendMessage(const QString &jid, const QString message);
-    void vCardReceived(const QXmppVCard&);
 
 private:
     QXmppClient *client;

@@ -52,7 +52,7 @@ QString contactStatus(QXmppRoster *roster, const QString &bareJid)
             suffix = "busy";
         }
     }
-    return suffix;
+    return QString(":/contact-%1.png").arg(suffix);
 }
 
 RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
@@ -84,7 +84,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
             name = bareJid.split("@").first();
         return name;
     } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-        return QIcon(QString(":/contact-%1.png").arg(contactStatus(rosterManager, entry.getBareJid())));
+        return QIcon(contactStatus(rosterManager, entry.getBareJid()));
     } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
         if (rosterIcons.contains(bareJid))
             return rosterIcons[bareJid];
