@@ -219,6 +219,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     setLayout(layout);
     setMinimumSize(QSize(450, 400));
     setWindowIcon(QIcon(":/diagnostics.png"));
+    setWindowTitle(tr("Diagnostics"));
 
     refresh();
 }
