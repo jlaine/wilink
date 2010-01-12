@@ -23,6 +23,7 @@
 #include <QList>
 #include <QMenu>
 #include <QStringList>
+#include <QSortFilterProxyModel>
 
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
@@ -34,10 +35,11 @@
 enum RosterColumns {
     ContactColumn = 0,
     ImageColumn,
+    SortingColumn,
     MaxColumn,
 };
 
-QString contactStatus(QXmppRoster *roster, const QString &bareJid)
+static QString contactStatus(QXmppRoster *roster, const QString &bareJid)
 {
     QString suffix = "offline";
     foreach (const QXmppPresence &presence, roster->getAllPresencesForBareJid(bareJid))
@@ -52,7 +54,12 @@ QString contactStatus(QXmppRoster *roster, const QString &bareJid)
             suffix = "busy";
         }
     }
-    return QString(":/contact-%1.png").arg(suffix);
+    return suffix;
+}
+
+QString contactStatusIcon(QXmppRoster *roster, const QString &bareJid)
+{
+    return QString(":/contact-%1.png").arg(contactStatus(roster, bareJid));
 }
 
 RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
@@ -84,10 +91,12 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
             name = bareJid.split("@").first();
         return name;
     } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-        return QIcon(contactStatus(rosterManager, entry.getBareJid()));
+        return QIcon(contactStatusIcon(rosterManager, entry.getBareJid()));
     } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
         if (rosterIcons.contains(bareJid))
             return rosterIcons[bareJid];
+    } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+        return contactStatus(rosterManager, bareJid) + "_" + bareJid;
     }
     return QVariant();
 }
@@ -96,7 +105,7 @@ void RosterModel::presenceChanged(const QString& bareJid, const QString& resourc
 {
     const int rowIndex = rosterKeys.indexOf(bareJid);
     if (rowIndex >= 0)
-        emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, ContactColumn));
+        emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
 }
 
 void RosterModel::rosterChanged(const QString &jid)
@@ -111,7 +120,7 @@ void RosterModel::rosterChanged(const QString &jid)
             rosterKeys.removeAt(rowIndex);
             endRemoveRows();
         } else {
-            emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, ContactColumn));
+            emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
         }
     } else {
         beginInsertRows(QModelIndex(), rosterKeys.length(), rosterKeys.length());
@@ -151,7 +160,11 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
 RosterView::RosterView(QXmppClient &client, QWidget *parent)
     : QTableView(parent)
 {
-    setModel(new RosterModel(&client.getRoster(), &client.getVCardManager()));
+    RosterModel *model =  new RosterModel(&client.getRoster(), &client.getVCardManager());
+    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
+    sortedModel->setSourceModel(model);
+    sortedModel->setDynamicSortFilter(true);
+    setModel(sortedModel);
 
     /* prepare context menu */
     QAction *action;
@@ -164,11 +177,14 @@ RosterView::RosterView(QXmppClient &client, QWidget *parent)
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
 
     setAlternatingRowColors(true);
+    setColumnHidden(SortingColumn, true);
     setColumnWidth(ImageColumn, 40);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setIconSize(QSize(32, 32));
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setShowGrid(false);
+    setSortingEnabled(true);
+    sortByColumn(SortingColumn, Qt::AscendingOrder);
     horizontalHeader()->setResizeMode(ContactColumn, QHeaderView::Stretch);
     horizontalHeader()->setVisible(false);
     verticalHeader()->setVisible(false);
@@ -197,7 +213,7 @@ QSize RosterView::sizeHint () const
 
     QSize hint(64, 0);
     hint.setHeight(model()->rowCount() * sizeHintForRow(0));
-    for (int i = 0; i < model()->columnCount(); i++)
+    for (int i = 0; i < SortingColumn; i++)
         hint.setWidth(hint.width() + sizeHintForColumn(i));
     return hint;
 }

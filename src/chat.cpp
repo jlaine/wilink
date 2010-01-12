@@ -111,7 +111,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
             name = jid.split("@")[0];
 
         chatDialogs[jid] = new ChatDialog(jid, name);
-        chatDialogs[jid]->statusChanged(contactStatus(&client->getRoster(), jid));
+        chatDialogs[jid]->statusChanged(contactStatusIcon(&client->getRoster(), jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
    }
@@ -146,7 +146,7 @@ void Chat::presenceChanged(const QString& bareJid, const QString& resource)
 {
     if (!chatDialogs.contains(bareJid))
         return;
-    chatDialogs[bareJid]->statusChanged(contactStatus(&client->getRoster(), bareJid));
+    chatDialogs[bareJid]->statusChanged(contactStatusIcon(&client->getRoster(), bareJid));
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)
