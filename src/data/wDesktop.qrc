@@ -11,5 +11,6 @@
     <file>photos.png</file>
     <file>remove.png</file>
     <file>wDesktop.png</file>
+    <file>wDesktop-black.png</file>
 </qresource>
 </RCC>

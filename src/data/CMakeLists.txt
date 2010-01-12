@@ -13,6 +13,7 @@ generate_png(png
     photos.svg
     remove.svg
     updates.svg
-    wDesktop.svg)
+    wDesktop.svg
+    wDesktop-black.svg)
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png})
 

@@ -62,7 +62,11 @@ TrayIcon::TrayIcon()
         openAtLogin(true);
 
     /* set icon */
+#ifdef Q_WS_MAC
+    setIcon(QIcon(":/wDesktop-black.png"));
+#else
     setIcon(QIcon(":/wDesktop.png"));
+#endif
 
     /* set initial menu */
     QMenu *menu = new QMenu;
