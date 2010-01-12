@@ -1,6 +1,9 @@
 wDesktop 0.2.5
  * Improve window behaviour on OS X.
  * Show contact status in chat dialog.
+ * Improve contact icons.
+ * Sort contacts by status then by name.
+ * Add glow around wDesktop icon.
 
 wDesktop 0.2.4
  * Make wDesktop start at login.
