@@ -30,7 +30,7 @@ class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
 
-QString contactStatus(QXmppRoster *rosterManager, const QString &bareJid);
+QString contactStatusIcon(QXmppRoster *rosterManager, const QString &bareJid);
 
 class RosterModel : public QAbstractTableModel
 {
