@@ -39,6 +39,10 @@
         <source>Do you want to remove %1 from your contact list?</source>
         <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
+    <message>
+        <source>Chat</source>
+        <translation>Chat</translation>
+    </message>
 </context>
 <context>
     <name>ChatDialog</name>
@@ -60,6 +64,10 @@
     <message>
         <source>Print</source>
         <translation>Imprimer</translation>
+    </message>
+    <message>
+        <source>Diagnostics</source>
+        <translation>Diagnostics</translation>
     </message>
 </context>
 <context>
@@ -99,6 +107,10 @@
     <message>
         <source>Go back</source>
         <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Upload photos</source>
+        <translation>Téléchargement photos</translation>
     </message>
 </context>
 <context>
