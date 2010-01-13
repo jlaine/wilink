@@ -1,10 +1,12 @@
-wDesktop 0.2.7
+wDesktop 0.2.8 (UNRELEASED)
+
+wDesktop 0.2.7 (2010-01-13)
  * Only perform long ping if short ping gives errors to speed things up.
  * Add a progress bar to the diagnostics window.
  * Raise chat conversation window when it's activated.
  * When a chat conversation is activated, pass focus to the input line.
 
-wDesktop 0.2.6
+wDesktop 0.2.6 (2010-01-12)
  * Improve window behaviour on OS X.
  * Show contact status in chat dialog.
  * Improve contact icons.
