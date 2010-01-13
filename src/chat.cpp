@@ -193,7 +193,11 @@ bool Chat::open(const QString &jid, const QString &password)
         config.setHost(results[0].hostName());
         config.setPort(results[0].port());
     } else {
-        config.setHost(config.getDomain());
+        QString serverName = config.getDomain();
+        if (serverName == "wifirst.net")
+            serverName = "chat.wifirst.net";
+        config.setHost(serverName);
+        systemTrayIcon->showMessage("Could not discover chat server", QString("Connecting to server %1 instead.").arg(serverName));
     }
 
     /* connect to server */

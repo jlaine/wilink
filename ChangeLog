@@ -1,4 +1,5 @@
-wDesktop 0.2.8 (UNRELEASED)
+wDesktop 0.2.8 (2010-01-13)
+ * Make it possible to connect when DNS SRV lookup fails.
 
 wDesktop 0.2.7 (2010-01-13)
  * Only perform long ping if short ping gives errors to speed things up.
