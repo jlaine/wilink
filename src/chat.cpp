@@ -116,6 +116,7 @@ ChatDialog *Chat::chatContact(const QString &jid)
             this, SLOT(sendMessage(const QString&, const QString&)));
    }
     chatDialogs[jid]->show();
+    chatDialogs[jid]->raise();
     return chatDialogs[jid];
 }
 
