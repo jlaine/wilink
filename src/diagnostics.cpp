@@ -101,7 +101,12 @@ void NetworkThread::run()
     /* run ping tests */
     QList<Ping> pings;
     foreach (const QHostAddress &gateway, gateways)
-        pings.append(NetworkInfo::ping(gateway, longPing.contains(gateway) ? 30 : 3));
+    {
+        const Ping &ping = NetworkInfo::ping(gateway, 3);
+        pings.append(ping);
+        if (longPing.contains(gateway) && ping.sentPackets != ping.receivedPackets)
+            pings.append(NetworkInfo::ping(gateway, 30));
+    }
     emit pingResults(pings);
 
     /* run traceroute */
