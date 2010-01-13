@@ -22,6 +22,7 @@
 #include <QPushButton>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QProgressBar>
 #include <QTextBrowser>
 #include <QThread>
 
@@ -56,7 +57,9 @@ void NetworkThread::run()
     QList<QHostAddress> gateways;
     QList<QHostInfo> lookups;
     int done = 0;
-    int total = 4;
+    int total = 3;
+
+    emit progress(done, total);
 
     /* run wireless */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -73,8 +76,8 @@ void NetworkThread::run()
         result.availableNetworks = wireless.availableNetworks();
         result.currentNetwork = wireless.currentNetwork();
         emit wirelessResult(result);
+        emit progress(++done, ++total);
     }
-    emit progress(++done, total);
 
     /* try to detemine gateways */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -215,15 +218,17 @@ Diagnostics::Diagnostics(QWidget *parent)
     layout->addWidget(text);
 
     QHBoxLayout *hbox = new QHBoxLayout;
-    refreshButton = new QPushButton(tr("Refresh"));
-    connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
-    hbox->addWidget(refreshButton);
 
-    hbox->addStretch();
+    progressBar = new QProgressBar;
+    hbox->addWidget(progressBar);
 
     printButton = new QPushButton(tr("Print"));
     connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
     hbox->addWidget(printButton);
+
+    refreshButton = new QPushButton(tr("Refresh"));
+    connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
+    hbox->addWidget(refreshButton);
 
     layout->addItem(hbox);
     setLayout(layout);
@@ -338,7 +343,8 @@ void Diagnostics::showPing(const QList<Ping> &results)
 
 void Diagnostics::showProgress(int done, int total)
 {
-
+    progressBar->setMaximum(total);
+    progressBar->setValue(done);
 }
 
 void Diagnostics::showTraceroute(const QList<Ping> &results)

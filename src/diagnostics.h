@@ -28,6 +28,7 @@
 #include "wireless.h"
 
 class QPushButton;
+class QProgressBar;
 class QTextBrowser;
 
 class NetworkThread;
@@ -79,6 +80,7 @@ protected slots:
 
 private:
     QPushButton *printButton;
+    QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
 
