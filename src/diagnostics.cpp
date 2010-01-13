@@ -55,6 +55,26 @@ void NetworkThread::run()
 {
     QList<QHostAddress> gateways;
     QList<QHostInfo> lookups;
+    int done = 0;
+    int total = 4;
+
+    /* run wireless */
+    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if (interface.flags() & QNetworkInterface::IsLoopBack)
+            continue;
+
+        WirelessInterface wireless(interface);
+        if (!wireless.isValid())
+            continue;
+
+        WirelessResult result;
+        result.interface = interface;
+        result.availableNetworks = wireless.availableNetworks();
+        result.currentNetwork = wireless.currentNetwork();
+        emit wirelessResult(result);
+    }
+    emit progress(++done, total);
 
     /* try to detemine gateways */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -97,6 +117,7 @@ void NetworkThread::run()
         }
     }
     emit dnsResults(lookups);
+    emit progress(++done, total);
 
     /* run ping tests */
     QList<Ping> pings;
@@ -108,28 +129,12 @@ void NetworkThread::run()
             pings.append(NetworkInfo::ping(gateway, 30));
     }
     emit pingResults(pings);
+    emit progress(++done, total);
 
     /* run traceroute */
     QList<Ping> traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
     emit tracerouteResults(traceroute);
-
-    /* run wireless */
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if (interface.flags() & QNetworkInterface::IsLoopBack)
-            continue;
-
-        WirelessInterface wireless(interface);
-        if (!wireless.isValid())
-            continue;
-
-        WirelessResult result;
-        result.interface = interface;
-        result.availableNetworks = wireless.availableNetworks();
-        result.currentNetwork = wireless.currentNetwork();
-        emit wirelessResult(result);
-    }
-
+    emit progress(++done, total);
 }
 
 /* GUI */
@@ -288,6 +293,7 @@ void Diagnostics::refresh()
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
     connect(networkThread, SIGNAL(pingResults(const QList<Ping> &)), this, SLOT(showPing(const QList<Ping> &)));
+    connect(networkThread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
     connect(networkThread, SIGNAL(tracerouteResults(const QList<Ping> &)), this, SLOT(showTraceroute(const QList<Ping> &)));
     connect(networkThread, SIGNAL(wirelessResult(const WirelessResult &)), this, SLOT(showWireless(const WirelessResult &)));
     networkThread->start();
@@ -328,6 +334,11 @@ void Diagnostics::showDns(const QList<QHostInfo> &results)
 void Diagnostics::showPing(const QList<Ping> &results)
 {
     addItem("Ping", dumpPings(results));
+}
+
+void Diagnostics::showProgress(int done, int total)
+{
+
 }
 
 void Diagnostics::showTraceroute(const QList<Ping> &results)

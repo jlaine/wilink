@@ -49,6 +49,8 @@ public:
     void run();
 
 signals:
+    void progress(int done, int total);
+
     void dnsResults(const QList<QHostInfo> &results);
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Ping> &results);
@@ -70,6 +72,7 @@ protected slots:
 
     void showDns(const QList<QHostInfo> &results);
     void showPing(const QList<Ping> &results);
+    void showProgress(int done, int total);
     void showTraceroute(const QList<Ping> &results);
     void showWireless(const WirelessResult &result);
     void networkFinished();
