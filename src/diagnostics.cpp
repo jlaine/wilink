@@ -64,7 +64,7 @@ void NetworkThread::run()
 
         foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
         {
-            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol && !entry.netmask().isNull())
+            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol && !entry.netmask().isNull() && entry.netmask() != QHostAddress::Broadcast)
             {
                 gateways.append(QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1));
                 break;
@@ -332,6 +332,7 @@ void Diagnostics::showTraceroute(const QList<Ping> &results)
 
 void Diagnostics::showWireless(const WirelessResult &result)
 {
+    const bool showCinr = false;
     addSection("Wireless interface " + interfaceName(result.interface));
 
     if (result.currentNetwork.isValid())
@@ -339,14 +340,16 @@ void Diagnostics::showWireless(const WirelessResult &result)
         TextList list;
         list << "SSID: " + result.currentNetwork.ssid();
         list << "RSSI: " + QString::number(result.currentNetwork.rssi());
-        if (result.currentNetwork.cinr())
+        if (showCinr)
             list << "CINR: " + QString::number(result.currentNetwork.cinr());
         addItem("Current network", list.render());
     }
 
     TextTable table;
     TextRow titles(true);
-    titles << "SSID" << "RSSI" << "CINR";
+    titles << "SSID" << "RSSI";
+    if (showCinr)
+        titles << "CINR";
     table << titles;
     foreach (const WirelessNetwork &network, result.availableNetworks)
     {
@@ -355,7 +358,8 @@ void Diagnostics::showWireless(const WirelessResult &result)
             TextRow row;
             row << network.ssid();
             row << QString::number(network.rssi());
-            row << (network.cinr() ? QString::number(network.cinr()) : QString());
+            if (showCinr)
+                row << (network.cinr() ? QString::number(network.cinr()) : QString());
             table << row;
         }
     }
