@@ -244,7 +244,7 @@ ChatDialog *Chat::showConversation(const QString &jid)
         chatDialogs[jid]->statusChanged(contactStatusIcon(&client->getRoster(), jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
-   }
+    }
     chatDialogs[jid]->show();
     chatDialogs[jid]->raise();
     return chatDialogs[jid];
