@@ -42,7 +42,7 @@ public:
 
 protected slots:
     void addContact();
-    ChatDialog *chatContact(const QString &jid);
+    void chatContact(const QString &jid);
     void connected();
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
@@ -51,6 +51,9 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendMessage(const QString &jid, const QString message);
+
+protected:
+    ChatDialog *showConversation(const QString &jid);
 
 private:
     QXmppClient *client;

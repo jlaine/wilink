@@ -101,23 +101,10 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
-ChatDialog *Chat::chatContact(const QString &jid)
+void Chat::chatContact(const QString &jid)
 {
-    if (!chatDialogs.contains(jid))
-    {
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
-        QString name = entry.getName();
-        if (name.isEmpty())
-            name = jid.split("@")[0];
-
-        chatDialogs[jid] = new ChatDialog(jid, name);
-        chatDialogs[jid]->statusChanged(contactStatusIcon(&client->getRoster(), jid));
-        connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
-            this, SLOT(sendMessage(const QString&, const QString&)));
-   }
-    chatDialogs[jid]->show();
-    chatDialogs[jid]->raise();
-    return chatDialogs[jid];
+    ChatDialog *dialog = showConversation(jid);
+    dialog->activateWindow();
 }
 
 void Chat::connected()
@@ -139,7 +126,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
     if (body.isEmpty())
         return;
 
-    ChatDialog *dialog = chatContact(jid.split("/")[0]);
+    ChatDialog *dialog = showConversation(jid.split("/")[0]);
     dialog->messageReceived(msg);
 }
 
@@ -242,5 +229,24 @@ void Chat::resizeContacts()
 void Chat::sendMessage(const QString &jid, const QString message)
 {
     client->sendPacket(QXmppMessage("", jid, message));
+}
+
+ChatDialog *Chat::showConversation(const QString &jid)
+{
+    if (!chatDialogs.contains(jid))
+    {
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+        QString name = entry.getName();
+        if (name.isEmpty())
+            name = jid.split("@")[0];
+
+        chatDialogs[jid] = new ChatDialog(jid, name);
+        chatDialogs[jid]->statusChanged(contactStatusIcon(&client->getRoster(), jid));
+        connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
+            this, SLOT(sendMessage(const QString&, const QString&)));
+   }
+    chatDialogs[jid]->show();
+    chatDialogs[jid]->raise();
+    return chatDialogs[jid];
 }
 
