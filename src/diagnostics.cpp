@@ -291,8 +291,6 @@ void Diagnostics::refresh()
             list.size() ? list.render() : "<p>No address</p>");
     }
 
-    addSection("Tests");
-
     /* run network tests */
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
@@ -313,6 +311,8 @@ void Diagnostics::networkFinished()
 
 void Diagnostics::showDns(const QList<QHostInfo> &results)
 {
+    addSection("Tests");
+
     TextTable table;
     TextRow titles(true);
     titles << "Host name" << "Host address";
