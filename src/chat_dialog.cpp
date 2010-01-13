@@ -18,6 +18,7 @@
  */
 
 #include <QDebug>
+#include <QEvent>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QLabel>
@@ -71,7 +72,6 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     setLayout(layout);
     setWindowTitle(tr("Chat with %1").arg(jid));
-    chatInput->setFocus();
 }
 
 void ChatDialog::addMessage(const QString &text, bool local)
@@ -97,6 +97,15 @@ void ChatDialog::addMessage(const QString &text, bool local)
 void ChatDialog::anchorClicked(const QUrl &link)
 {
     QDesktopServices::openUrl(link);
+}
+
+/** When the window is activated, pass focus to the input line.
+ */
+void ChatDialog::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::ActivationChange && isActiveWindow())
+        chatInput->setFocus();
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)

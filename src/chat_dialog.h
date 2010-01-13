@@ -47,6 +47,9 @@ protected slots:
 signals:
     void sendMessage(const QString &jid, const QString &message);
 
+protected:
+    void changeEvent(QEvent *event);
+
 private:
     void addMessage(const QString &text, bool local);
 
