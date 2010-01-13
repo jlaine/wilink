@@ -194,7 +194,7 @@ static QString dumpPings(const QList<Ping> &pings)
     {
         TextRow row;
         row.setColor(report.receivedPackets == report.sentPackets ? "green" : "red");
-        row << report.hostAddress.toString();
+        row << (report.hostAddress.isNull() ? "-" : report.hostAddress.toString());
         row << QString("%1 / %2").arg(report.receivedPackets).arg(report.sentPackets);
         if (report.receivedPackets)
         {
