@@ -1,6 +1,7 @@
 wDesktop 0.2.7
  * Only perform long ping if short ping gives errors to speed things up.
  * Add a progress bar to the diagnostics window.
+ * Raise chat conversation window when it's activated.
 
 wDesktop 0.2.6
  * Improve window behaviour on OS X.
