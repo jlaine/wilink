@@ -26,6 +26,7 @@
 #include "qxmpp/QXmppRoster.h"
 
 class ChatDialog;
+class RosterModel;
 class RosterView;
 class QLabel;
 class QSystemTrayIcon;
@@ -57,7 +58,8 @@ protected:
 
 private:
     QXmppClient *client;
-    RosterView *contacts;
+    RosterModel *rosterModel;
+    RosterView *rosterView;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
     QHash<QString, ChatDialog*> chatDialogs;

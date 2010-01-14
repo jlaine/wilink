@@ -47,17 +47,18 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
+    rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    contacts = new RosterView(*client);
-    connect(contacts, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
-    connect(contacts, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
-    connect(contacts->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
-    layout->addWidget(contacts);
+    rosterView = new RosterView(rosterModel);
+    connect(rosterView, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
+    connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
+    connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
+    layout->addWidget(rosterView);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setMargin(10);
@@ -136,7 +137,7 @@ void Chat::presenceChanged(const QString& bareJid, const QString& resource)
 {
     if (!chatDialogs.contains(bareJid))
         return;
-    chatDialogs[bareJid]->statusChanged(contactStatusIcon(&client->getRoster(), bareJid));
+    chatDialogs[bareJid]->statusChanged(rosterModel->contactStatusIcon(bareJid));
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)
@@ -237,7 +238,7 @@ void Chat::removeContact(const QString &jid)
  */
 void Chat::resizeContacts()
 {
-    QSize hint = contacts->sizeHint();
+    QSize hint = rosterView->sizeHint();
     hint.setHeight(hint.height() + 32);
     resize(hint);
 }
@@ -266,7 +267,7 @@ ChatDialog *Chat::showConversation(const QString &jid)
             name = jid.split("@")[0];
 
         chatDialogs[jid] = new ChatDialog(jid, name);
-        chatDialogs[jid]->statusChanged(contactStatusIcon(&client->getRoster(), jid));
+        chatDialogs[jid]->statusChanged(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
     }

@@ -30,8 +30,6 @@ class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
 
-QString contactStatusIcon(QXmppRoster *rosterManager, const QString &bareJid);
-
 class RosterModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -42,6 +40,9 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
+    QString contactName(const QString &bareJid) const;
+    QString contactStatusIcon(const QString &bareJid) const;
+
 protected slots:
     void presenceChanged(const QString& bareJid, const QString& resource);
     void rosterChanged(const QString &jid);
@@ -49,10 +50,14 @@ protected slots:
     void vCardReceived(const QXmppVCard&);
 
 private:
+    QString contactStatus(const QString &bareJid) const;
+
+private:
     QXmppRoster *rosterManager;
     QXmppVCardManager *vcardManager;
     QStringList rosterKeys;
     QMap<QString, QIcon> rosterIcons;
+    QMap<QString, QString> rosterNames;
 };
 
 class RosterView : public QTableView
@@ -60,7 +65,7 @@ class RosterView : public QTableView
     Q_OBJECT
 
 public:
-    RosterView(QXmppClient &client, QWidget *parent = NULL);
+    RosterView(RosterModel *model, QWidget *parent = NULL);
     QSize sizeHint () const;
 
 protected:
