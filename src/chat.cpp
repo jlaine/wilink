@@ -86,6 +86,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
 }
 
+/** Prompt the user for a new contact then add it to the roster.
+ */
 void Chat::addContact()
 {
     bool ok = false;
@@ -169,6 +171,11 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     }
 }
 
+/** Open the connection to the chat server.
+ *
+ * @param jid
+ * @param password
+ */
 bool Chat::open(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
@@ -207,13 +214,16 @@ bool Chat::open(const QString &jid, const QString &password)
     return true;
 }
 
+/** Prompt the user for confirmation then remove a contact.
+ *
+ * @param jid
+ */
 void Chat::removeContact(const QString &jid)
 {
     if (QMessageBox::question(this, tr("Remove contact"),
         tr("Do you want to remove %1 from your contact list?").arg(jid),
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
-        qDebug() << "Sending unsubscribe to" << jid;
         QXmppRosterIq::Item item;
         item.setBareJid(jid);
         item.setSubscriptionType(QXmppRosterIq::Item::Remove);
@@ -223,6 +233,8 @@ void Chat::removeContact(const QString &jid)
     }
 }
 
+/** Try to resize the window to fit the contents of the contacts list.
+ */
 void Chat::resizeContacts()
 {
     QSize hint = contacts->sizeHint();
@@ -230,11 +242,20 @@ void Chat::resizeContacts()
     resize(hint);
 }
 
+/** Send a chat message to the specified recipient.
+ *
+ * @param jid
+ * @param message
+ */
 void Chat::sendMessage(const QString &jid, const QString message)
 {
     client->sendPacket(QXmppMessage("", jid, message));
 }
 
+/** Show are raise a conversation dialog for the specified recipient.
+ *
+ * @param jid
+ */
 ChatDialog *Chat::showConversation(const QString &jid)
 {
     if (!chatDialogs.contains(jid))
