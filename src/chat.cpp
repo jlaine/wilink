@@ -261,12 +261,7 @@ ChatDialog *Chat::showConversation(const QString &jid)
 {
     if (!chatDialogs.contains(jid))
     {
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
-        QString name = entry.getName();
-        if (name.isEmpty())
-            name = jid.split("@")[0];
-
-        chatDialogs[jid] = new ChatDialog(jid, name);
+        chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
         chatDialogs[jid]->statusChanged(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));

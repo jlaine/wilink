@@ -51,7 +51,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
     statusLabel = new QLabel;
     hbox->addWidget(statusLabel);
-    QLabel *nameLabel = new QLabel(jid);
+    QLabel *nameLabel = new QLabel(chatRemoteJid);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
     layout->addItem(hbox);
@@ -71,7 +71,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     layout->addItem(hbox);
 
     setLayout(layout);
-    setWindowTitle(tr("Chat with %1").arg(jid));
+    setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
 }
 
 void ChatDialog::addMessage(const QString &text, bool local)
