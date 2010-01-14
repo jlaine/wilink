@@ -221,6 +221,12 @@ Photos::Photos(const QString &url, QWidget *parent)
     fs->open(url);
 }
 
+/** When a command finishes, process its results.
+ *
+ * @param cmd
+ * @param error
+ * @param results
+ */
 void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 {
     if (error)
@@ -287,6 +293,8 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     }
 }
 
+/** Prompt the user for a new folder name and create it.
+ */
 void Photos::createFolder()
 {
      bool ok;
@@ -302,6 +310,11 @@ void Photos::createFolder()
     }
 }
 
+/** Upload the given files to a remote folder.
+ *
+ * @param files
+ * @param destination
+ */
 void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
 {
     QString base = destination.toString();
@@ -318,10 +331,12 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
     processUploadQueue();
 }
 
+/** Open the remote folder at the given URL.
+ *
+ * @param url
+ */
 void Photos::folderOpened(const QUrl &url)
 {
-    qDebug() << "folderOpened" << url;
-
     PhotosList *listView = new PhotosList(url);
     photosView->setCurrentIndex(photosView->addWidget(listView));
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
@@ -331,6 +346,8 @@ void Photos::folderOpened(const QUrl &url)
     fs->list(url.toString());
 }
 
+/** Go back to the previous folder.
+ */
 void Photos::goBack()
 {
     if (photosView->count() <= 1)
@@ -340,6 +357,8 @@ void Photos::goBack()
         backButton->setEnabled(false);
 }
 
+/** If the download queue is not empty, process the next item.
+ */
 void Photos::processDownloadQueue()
 {
     if (downloadQueue.empty())
@@ -349,6 +368,8 @@ void Photos::processDownloadQueue()
     fdPhoto = fs->get(downloadUrl);
 }
 
+/** If the upload queue is not empty, process the next item.
+ */
 void Photos::processUploadQueue()
 {
     if (busy)
@@ -378,6 +399,8 @@ void Photos::processUploadQueue()
     fs->put(file, item.second.toString());
 }
 
+/** Update the progress bar for the current upload.
+ */
 void Photos::putProgress(int done, int total)
 {
     if (!total)
@@ -385,6 +408,8 @@ void Photos::putProgress(int done, int total)
     progressBar->setValue(PROGRESS_STEPS * (int(progressBar->value() / PROGRESS_STEPS) + double(done) / double(total)));
 }
 
+/** Refresh the contents of the current folder.
+ */
 void Photos::refresh()
 {
     statusLabel->setText(tr("Loading your folders.."));
@@ -393,6 +418,10 @@ void Photos::refresh()
     fs->list(listView->url());
 }
 
+/** Set the system tray icon.
+ *
+ * @param trayIcon
+ */
 void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
 {
     systemTrayIcon = trayIcon;
