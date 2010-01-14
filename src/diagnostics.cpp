@@ -99,7 +99,7 @@ void NetworkThread::run()
     /* run DNS tests */
     QList<QHostAddress> longPing;
     QStringList hostNames;
-    hostNames << "wireless.wifirst.fr" << "www.wifirst.net" << "www.google.fr";
+    hostNames << "wireless.wifirst.fr" << "www.wifirst.net" << "chat.wifirst.net" << "www.google.fr";
     foreach (const QString &hostName, hostNames)
     {
         QHostInfo hostInfo = QHostInfo::fromName(hostName);
