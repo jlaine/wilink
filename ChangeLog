@@ -1,6 +1,7 @@
 wDesktop 0.2.9 (2010-01-15)
  * Display nicknames when available.
  * Improve contact status icons by adding a shadow.
+ * Disable DNS SRV lookups for chat.
 
 wDesktop 0.2.8 (2010-01-13)
  * Make it possible to connect when DNS SRV lookup fails.
