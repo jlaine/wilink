@@ -195,8 +195,6 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setDomain(bits[1]);
 
     /* get the server */
-    // FIXME : for now disable SRV lookups
-#ifdef USE_DNS_SRV
     QList<ServiceInfo> results;
     if (ServiceInfo::lookupService("_xmpp-client._tcp." + config.getDomain(), results))
     {
@@ -207,9 +205,6 @@ bool Chat::open(const QString &jid, const QString &password)
         config.setHost(serverName);
         systemTrayIcon->showMessage("Could not discover chat server", QString("Connecting to server %1 instead.").arg(serverName));
     }
-#else
-    config.setHost(config.getDomain());
-#endif
 
     /* connect to server */
     statusLabel->setText(tr("Connecting.."));
