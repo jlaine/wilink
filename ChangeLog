@@ -1,5 +1,6 @@
-wDesktop 0.2.9 (UNRELEASED)
- * Add chat.wifirst.net to the hosts which are pinged during diagnostics.
+wDesktop 0.2.9 (2010-01-15)
+ * Display nicknames when available.
+ * Improve contact status icons by adding a shadow.
 
 wDesktop 0.2.8 (2010-01-13)
  * Make it possible to connect when DNS SRV lookup fails.
