@@ -28,12 +28,14 @@
 #include <QStringList>
 #include <QSystemTrayIcon>
 #include <QTextBrowser>
+#include <QTimer>
 
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "qnetio/dns.h"
@@ -42,6 +44,24 @@
 #include "chat_roster.h"
 
 using namespace QNetIO;
+
+class QXmppPingIq : public QXmppIq
+{
+public:
+    QXmppPingIq();
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+};
+
+QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
+{
+}
+
+void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("ping");
+    helperToXmlAddAttribute(writer, "xmlns", "urn:xmpp:ping");
+    writer->writeEndElement();
+}
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : systemTrayIcon(trayIcon)
@@ -85,6 +105,11 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
+
+    /* set up timers */
+    pingTimer = new QTimer(this);
+    pingTimer->setInterval(60000);
+    connect(pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
 }
 
 /** Prompt the user for a new contact then add it to the roster.
@@ -92,9 +117,10 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 void Chat::addContact()
 {
     bool ok = false;
+    QString defaultJid = "@" + client->getConfiguration().getDomain();
     QString jid = QInputDialog::getText(this, tr("Add a contact"),
         tr("Enter the address of the contact you want to add."),
-        QLineEdit::Normal, "@wifirst.net", &ok);
+        QLineEdit::Normal, defaultJid, &ok);
     if (!ok || jid.isEmpty())
         return;
 
@@ -112,11 +138,13 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::connected()
 {
+    pingTimer->start();
     statusLabel->setText(tr("Connected"));
 }
 
 void Chat::disconnected()
 {
+    pingTimer->stop();
     statusLabel->setText(tr("Disconnected"));
 }
 
@@ -182,7 +210,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
 
     /* get user and domain */
     QStringList bits = jid.split("@");
@@ -253,6 +281,17 @@ void Chat::resizeContacts()
 void Chat::sendMessage(const QString &jid, const QString message)
 {
     client->sendPacket(QXmppMessage("", jid, message));
+}
+
+/** Send an XMPP Ping as described in XEP-0199:
+ *  http://xmpp.org/extensions/xep-0199.html
+ */
+void Chat::sendPing()
+{
+    QXmppPingIq ping;
+    ping.setFrom(client->getConfiguration().getJid());
+    ping.setTo(client->getConfiguration().getDomain());
+    client->sendPacket(ping);
 }
 
 /** Show are raise a conversation dialog for the specified recipient.

@@ -52,12 +52,14 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendMessage(const QString &jid, const QString message);
+    void sendPing();
 
 protected:
     ChatDialog *showConversation(const QString &jid);
 
 private:
     QXmppClient *client;
+    QTimer *pingTimer;
     RosterModel *rosterModel;
     RosterView *rosterView;
     QLabel *statusLabel;
