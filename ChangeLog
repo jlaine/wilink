@@ -1,4 +1,4 @@
-wdesktop 0.3.0 (UNRELEASED)
+wdesktop 0.3.0 (2010-01-18)
  * Implement server ping (XEP-0199) and reconnection.
  * Fix chat history scrolling when sending a message.
 
