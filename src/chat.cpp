@@ -99,6 +99,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowTitle(tr("Chat"));
 
     /* set up client */
+    connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
@@ -110,6 +111,10 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     pingTimer = new QTimer(this);
     pingTimer->setInterval(60000);
     connect(pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
+
+    timeoutTimer = new QTimer(this);
+    timeoutTimer->setInterval(10000);
+    connect(timeoutTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
 }
 
 /** Prompt the user for a new contact then add it to the roster.
@@ -146,6 +151,11 @@ void Chat::disconnected()
 {
     pingTimer->stop();
     statusLabel->setText(tr("Disconnected"));
+}
+
+void Chat::iqReceived(const QXmppIq&)
+{
+    timeoutTimer->stop();
 }
 
 void Chat::messageReceived(const QXmppMessage &msg)
@@ -219,6 +229,7 @@ bool Chat::open(const QString &jid, const QString &password)
         qWarning("Invalid JID");
         return false;
     }
+    config.setPasswd(password);
     config.setUser(bits[0]);
     config.setDomain(bits[1]);
 
@@ -240,7 +251,6 @@ bool Chat::open(const QString &jid, const QString &password)
 
     /* connect to server */
     statusLabel->setText(tr("Connecting.."));
-    config.setPasswd(password);
     client->connectToServer(config);
     return true;
 }
@@ -262,6 +272,14 @@ void Chat::removeContact(const QString &jid)
         packet.addItem(item);
         client->sendPacket(packet);
     }
+}
+
+void Chat::reconnect()
+{
+    qWarning("RECONNECT");
+    client->disconnect();
+    statusLabel->setText(tr("Connecting.."));
+    client->connectToServer(client->getConfiguration());
 }
 
 /** Try to resize the window to fit the contents of the contacts list.
@@ -292,6 +310,7 @@ void Chat::sendPing()
     ping.setFrom(client->getConfiguration().getJid());
     ping.setTo(client->getConfiguration().getDomain());
     client->sendPacket(ping);
+    timeoutTimer->start();
 }
 
 /** Show are raise a conversation dialog for the specified recipient.

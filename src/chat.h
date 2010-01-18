@@ -46,9 +46,11 @@ protected slots:
     void chatContact(const QString &jid);
     void connected();
     void disconnected();
+    void iqReceived(const QXmppIq&);
     void messageReceived(const QXmppMessage &msg);
     void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);
+    void reconnect();
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendMessage(const QString &jid, const QString message);
@@ -58,13 +60,14 @@ protected:
     ChatDialog *showConversation(const QString &jid);
 
 private:
+    QHash<QString, ChatDialog*> chatDialogs;
     QXmppClient *client;
     QTimer *pingTimer;
     RosterModel *rosterModel;
     RosterView *rosterView;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
-    QHash<QString, ChatDialog*> chatDialogs;
+    QTimer *timeoutTimer;
 };
 
 
