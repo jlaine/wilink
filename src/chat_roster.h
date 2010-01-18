@@ -43,6 +43,9 @@ public:
     QString contactName(const QString &bareJid) const;
     QString contactStatusIcon(const QString &bareJid) const;
 
+public slots:
+    void disconnected();
+
 protected slots:
     void presenceChanged(const QString& bareJid, const QString& resource);
     void rosterChanged(const QString &jid);

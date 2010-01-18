@@ -60,6 +60,7 @@ protected:
     ChatDialog *showConversation(const QString &jid);
 
 private:
+    bool reconnectOnDisconnect;
     QHash<QString, ChatDialog*> chatDialogs;
     QXmppClient *client;
     QTimer *pingTimer;

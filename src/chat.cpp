@@ -64,7 +64,7 @@ void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
-    : systemTrayIcon(trayIcon)
+    : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
     rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
@@ -143,14 +143,27 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::connected()
 {
+    qWarning("CONNECTED");
     pingTimer->start();
     statusLabel->setText(tr("Connected"));
 }
 
 void Chat::disconnected()
 {
+    qWarning("DISCONNECTED");
     pingTimer->stop();
-    statusLabel->setText(tr("Disconnected"));
+    timeoutTimer->stop();
+    rosterModel->disconnected();
+
+    if (reconnectOnDisconnect)
+    {
+        qWarning("RECONNECT");
+        reconnectOnDisconnect = false;
+        statusLabel->setText(tr("Connecting.."));
+        client->connectToServer(client->getConfiguration());
+    } else {
+        statusLabel->setText(tr("Disconnected"));
+    }
 }
 
 void Chat::iqReceived(const QXmppIq&)
@@ -220,7 +233,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
 
     /* get user and domain */
     QStringList bits = jid.split("@");
@@ -276,10 +289,8 @@ void Chat::removeContact(const QString &jid)
 
 void Chat::reconnect()
 {
-    qWarning("RECONNECT");
+    reconnectOnDisconnect = true;
     client->disconnect();
-    statusLabel->setText(tr("Connecting.."));
-    client->connectToServer(client->getConfiguration());
 }
 
 /** Try to resize the window to fit the contents of the contacts list.

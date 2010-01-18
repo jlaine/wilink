@@ -105,6 +105,12 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void RosterModel::disconnected()
+{
+    rosterKeys.clear();
+    reset();
+}
+
 void RosterModel::presenceChanged(const QString& bareJid, const QString& resource)
 {
     const int rowIndex = rosterKeys.indexOf(bareJid);
