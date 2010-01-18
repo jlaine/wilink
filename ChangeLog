@@ -1,3 +1,6 @@
+wdesktop 0.3.0 (UNRELEASED)
+ * Implement server ping (XEP-0199) and reconnection.
+
 wDesktop 0.2.9 (2010-01-15)
  * Display nicknames when available.
  * Improve contact status icons by adding a shadow.
