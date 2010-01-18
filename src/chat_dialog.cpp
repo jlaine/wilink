@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QStringList>
 #include <QTextBrowser>
 
@@ -120,7 +121,11 @@ void ChatDialog::send()
         return;
 
     addMessage(text, true);
-    chatHistory->ensureCursorVisible();
+
+    /* scroll to end, but don't touch cursor */
+    QScrollBar *scrollBar = chatHistory->verticalScrollBar();
+    scrollBar->setSliderPosition(scrollBar->maximum());
+
     chatInput->clear();
     emit sendMessage(chatRemoteJid, text);
 }
