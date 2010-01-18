@@ -28,7 +28,8 @@ set(wDesktop_SOURCES
     systeminfo.cpp
     trayicon.cpp
     updates.cpp
-    updatesdialog.cpp)
+    updatesdialog.cpp
+    growableTextEdit.cpp)
 
 set(wDesktop_MOC_HEADERS
     chat.h
@@ -38,7 +39,8 @@ set(wDesktop_MOC_HEADERS
     photos.h
     trayicon.h
     updates.h
-    updatesdialog.h)
+    updatesdialog.h
+    growableTextEdit.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)

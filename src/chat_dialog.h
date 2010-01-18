@@ -27,6 +27,7 @@
 class QLabel;
 class QLineEdit;
 class QTextBrowser;
+class growableTextEdit;
 class QXmppVCard;
 
 class ChatDialog : public QWidget
@@ -54,8 +55,9 @@ private:
     void addMessage(const QString &text, bool local);
 
     QTextBrowser *chatHistory;
-    QLineEdit *chatInput;
+    //QLineEdit *chatInput;
     QLabel *statusLabel;
+    growableTextEdit *chatInput;
 
     QString chatLocalName;
     QString chatRemoteJid;

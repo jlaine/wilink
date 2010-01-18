@@ -31,6 +31,7 @@
 #include <QScrollBar>
 #include <QStringList>
 #include <QTextBrowser>
+#include "growableTextEdit.h"
 
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
@@ -63,13 +64,10 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     connect(chatHistory, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
     layout->addWidget(chatHistory);
 
-    hbox = new QHBoxLayout;
-    hbox->setMargin(10);
-    hbox->setSpacing(10);
-    chatInput = new QLineEdit;
+    /* text edit */
+    chatInput = new growableTextEdit(80);
+    layout->addWidget(chatInput);
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
-    hbox->addWidget(chatInput);
-    layout->addItem(hbox);
 
     setLayout(layout);
     setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
@@ -116,7 +114,8 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
 void ChatDialog::send()
 {
-    QString text = chatInput->text();
+    //QString text = chatInput->text();
+    QString text = chatInput->document()->toPlainText();
     if (text.isEmpty())
         return;
 
@@ -126,7 +125,7 @@ void ChatDialog::send()
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
     scrollBar->setSliderPosition(scrollBar->maximum());
 
-    chatInput->clear();
+    chatInput->document()->clear();
     emit sendMessage(chatRemoteJid, text);
 }
 
