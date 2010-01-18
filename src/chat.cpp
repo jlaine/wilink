@@ -154,6 +154,8 @@ void Chat::disconnected()
     pingTimer->stop();
     timeoutTimer->stop();
     rosterModel->disconnected();
+    foreach (ChatDialog *dialog, chatDialogs)
+        dialog->statusChanged(":/contact-offline.png");
 
     if (reconnectOnDisconnect)
     {
