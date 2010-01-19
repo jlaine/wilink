@@ -56,7 +56,7 @@ set(wDesktop_RCCS
 if(WIN32)
     set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
 elseif(APPLE)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_mac.mm)
+    set(wDesktop_SOURCES ${wDesktop_SOURCES} chat_mac.mm wireless_mac.mm)
 elseif(UNIX)
     set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_nm.cpp)
 else(WIN32)
