@@ -53,6 +53,13 @@ int RosterModel::columnCount(const QModelIndex &parent) const
     return MaxColumn;
 }
 
+QPixmap RosterModel::contactAvatar(const QString &bareJid) const
+{
+    if (rosterAvatars.contains(bareJid))
+        return rosterAvatars[bareJid];
+    return QPixmap();
+}
+
 QString RosterModel::contactName(const QString &bareJid) const
 {
     if (rosterNames.contains(bareJid) && !rosterNames[bareJid].isEmpty())
@@ -97,8 +104,8 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
         return QIcon(contactStatusIcon(entry.getBareJid()));
     } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-        if (rosterIcons.contains(bareJid))
-            return rosterIcons[bareJid];
+        if (rosterAvatars.contains(bareJid))
+            return QIcon(rosterAvatars[bareJid]);
     } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
         return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower();
     }
@@ -144,7 +151,7 @@ void RosterModel::rosterReceived()
     rosterKeys = rosterManager->getRosterBareJids();
     foreach (const QString &jid, rosterKeys)
     {
-        if (!rosterIcons.contains(jid))
+        if (!rosterAvatars.contains(jid))
             vcardManager->requestVCard(jid);
     }
     reset();
@@ -162,7 +169,7 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
     if (rowIndex >= 0)
     {
         const QImage &image = vcard.getPhotoAsImage();
-        rosterIcons[bareJid] = QIcon(QPixmap::fromImage(image));
+        rosterAvatars[bareJid] = QPixmap::fromImage(image);
         const QString &nickname = vcard.getNickName();
         rosterNames[bareJid] = vcard.getNickName();
         emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));

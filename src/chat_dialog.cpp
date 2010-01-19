@@ -56,6 +56,8 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     QLabel *nameLabel = new QLabel(chatRemoteJid);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
+    avatarLabel = new QLabel;
+    hbox->addWidget(avatarLabel);
     layout->addItem(hbox);
 
     /* chat history */
@@ -130,6 +132,11 @@ void ChatDialog::send()
 
     chatInput->document()->clear();
     emit sendMessage(chatRemoteJid, text);
+}
+
+void ChatDialog::setAvatar(const QPixmap &avatar)
+{
+    avatarLabel->setPixmap(avatar);
 }
 
 void ChatDialog::statusChanged(const QString &status)

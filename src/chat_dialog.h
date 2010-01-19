@@ -36,6 +36,7 @@ class ChatDialog : public QWidget
 
 public:
     ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
+    void setAvatar(const QPixmap &pixmap);
 
 public slots:
     void statusChanged(const QString &status);
@@ -54,6 +55,7 @@ protected:
 private:
     void addMessage(const QString &text, bool local);
 
+    QLabel *avatarLabel;
     QTextBrowser *chatHistory;
     ChatEdit *chatInput;
     QLabel *statusLabel;

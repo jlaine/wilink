@@ -335,6 +335,7 @@ ChatDialog *Chat::showConversation(const QString &jid)
     if (!chatDialogs.contains(jid))
     {
         chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
+        chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
         chatDialogs[jid]->statusChanged(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));

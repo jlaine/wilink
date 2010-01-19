@@ -40,6 +40,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
+    QPixmap contactAvatar(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
     QString contactStatusIcon(const QString &bareJid) const;
 
@@ -59,7 +60,7 @@ private:
     QXmppRoster *rosterManager;
     QXmppVCardManager *vcardManager;
     QStringList rosterKeys;
-    QMap<QString, QIcon> rosterIcons;
+    QMap<QString, QPixmap> rosterAvatars;
     QMap<QString, QString> rosterNames;
 };
 
