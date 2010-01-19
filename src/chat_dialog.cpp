@@ -65,9 +65,13 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     layout->addWidget(chatHistory);
 
     /* text edit */
+    hbox = new QHBoxLayout;
+    hbox->setMargin(10);
+    hbox->setSpacing(10);
     chatInput = new ChatEdit(80);
-    layout->addWidget(chatInput);
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
+    hbox->addWidget(chatInput);
+    layout->addItem(hbox);
 
     setLayout(layout);
     setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
