@@ -20,6 +20,7 @@ set(wDesktop_SOURCES
     application.cpp
     chat.cpp
     chat_dialog.cpp
+    chat_edit.cpp
     chat_roster.cpp
     diagnostics.cpp
     main.cpp
@@ -28,19 +29,18 @@ set(wDesktop_SOURCES
     systeminfo.cpp
     trayicon.cpp
     updates.cpp
-    updatesdialog.cpp
-    growableTextEdit.cpp)
+    updatesdialog.cpp)
 
 set(wDesktop_MOC_HEADERS
     chat.h
     chat_dialog.h
+    chat_edit.h
     chat_roster.h
     diagnostics.h
     photos.h
     trayicon.h
     updates.h
-    updatesdialog.h
-    growableTextEdit.h)
+    updatesdialog.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)

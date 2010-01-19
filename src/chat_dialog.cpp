@@ -38,7 +38,7 @@
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "chat_dialog.h"
-#include "growableTextEdit.h"
+#include "chat_edit.h"
 
 ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name)
@@ -65,7 +65,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     layout->addWidget(chatHistory);
 
     /* text edit */
-    chatInput = new growableTextEdit(80);
+    chatInput = new ChatEdit(80);
     layout->addWidget(chatInput);
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
 
