@@ -193,6 +193,7 @@ RosterView::RosterView(RosterModel *model, QWidget *parent)
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setIconSize(QSize(32, 32));
     setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
     setShowGrid(false);
     setSortingEnabled(true);
     sortByColumn(SortingColumn, Qt::AscendingOrder);
