@@ -61,9 +61,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     layout->addItem(hbox);
 
     /* chat history */
-    chatHistory = new QTextBrowser;
-    chatHistory->setOpenLinks(false);
-    connect(chatHistory, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
+    chatHistory = new ChatHistory;
     layout->addWidget(chatHistory);
 
     /* text edit */
@@ -97,11 +95,6 @@ void ChatDialog::addMessage(const QString &text, bool local)
         .arg(local ? chatLocalName : chatRemoteName)
         .arg(QDateTime::currentDateTime().toString("hh:mm"))
         .arg(html));
-}
-
-void ChatDialog::anchorClicked(const QUrl &link)
-{
-    QDesktopServices::openUrl(link);
 }
 
 /** When the window is activated, pass focus to the input line.
@@ -142,5 +135,17 @@ void ChatDialog::setAvatar(const QPixmap &avatar)
 void ChatDialog::setStatus(const QString &status)
 {
     statusLabel->setPixmap(status);
+}
+
+ChatHistory::ChatHistory(QWidget *parent)
+    : QTextBrowser(parent)
+{
+    setOpenLinks(false);
+    connect(this, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(slotAnchorClicked(const QUrl&)));
+}
+
+void ChatHistory::slotAnchorClicked(const QUrl &link)
+{
+    QDesktopServices::openUrl(link);
 }
 

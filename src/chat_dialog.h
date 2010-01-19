@@ -21,14 +21,25 @@
 #define __WDESKTOP_CHAT_DIALOG_H__
 
 #include <QWidget>
+#include <QTextBrowser>
 
 #include "qxmpp/QXmppClient.h"
 
 class ChatEdit;
 class QLabel;
 class QLineEdit;
-class QTextBrowser;
 class QXmppVCard;
+
+class ChatHistory : public QTextBrowser
+{
+    Q_OBJECT
+
+public:
+    ChatHistory(QWidget *parent = NULL);
+
+protected slots:
+    void slotAnchorClicked(const QUrl &link);
+};
 
 class ChatDialog : public QWidget
 {
@@ -43,7 +54,6 @@ public slots:
     void messageReceived(const QXmppMessage &msg);
 
 protected slots:
-    void anchorClicked(const QUrl &link);
     void send();
 
 signals:
@@ -56,7 +66,7 @@ private:
     void addMessage(const QString &text, bool local);
 
     QLabel *avatarLabel;
-    QTextBrowser *chatHistory;
+    ChatHistory *chatHistory;
     ChatEdit *chatInput;
     QLabel *statusLabel;
 
