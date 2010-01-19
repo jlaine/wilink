@@ -155,7 +155,7 @@ void Chat::disconnected()
     timeoutTimer->stop();
     rosterModel->disconnected();
     foreach (ChatDialog *dialog, chatDialogs)
-        dialog->statusChanged(":/contact-offline.png");
+        dialog->setStatus(":/contact-offline.png");
 
     if (reconnectOnDisconnect)
     {
@@ -190,7 +190,7 @@ void Chat::presenceChanged(const QString& bareJid, const QString& resource)
 {
     if (!chatDialogs.contains(bareJid))
         return;
-    chatDialogs[bareJid]->statusChanged(rosterModel->contactStatusIcon(bareJid));
+    chatDialogs[bareJid]->setStatus(rosterModel->contactStatusIcon(bareJid));
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)
@@ -336,7 +336,7 @@ ChatDialog *Chat::showConversation(const QString &jid)
     {
         chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
         chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
-        chatDialogs[jid]->statusChanged(rosterModel->contactStatusIcon(jid));
+        chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
     }

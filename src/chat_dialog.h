@@ -36,10 +36,10 @@ class ChatDialog : public QWidget
 
 public:
     ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
-    void setAvatar(const QPixmap &pixmap);
+    void setAvatar(const QPixmap &avatar);
+    void setStatus(const QString &status);
 
 public slots:
-    void statusChanged(const QString &status);
     void messageReceived(const QXmppMessage &msg);
 
 protected slots:
