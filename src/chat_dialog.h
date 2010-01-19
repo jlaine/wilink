@@ -39,6 +39,9 @@ public:
 
 protected slots:
     void slotAnchorClicked(const QUrl &link);
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
 };
 
 class ChatDialog : public QWidget

@@ -1,6 +1,8 @@
 wDesktop 0.3.1 (UNRELEASED)
  * Make the chat input grow as needed for long messages.
  * Only allow one chat contact to be selected at a time.
+ * Display the contact's avatar in the chat dialog.
+ * Make it possible to clear the history of a conversation.
 
 wdesktop 0.3.0 (2010-01-18)
  * Implement server ping (XEP-0199) and reconnection.

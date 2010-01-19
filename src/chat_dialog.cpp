@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QContextMenuEvent>
 #include <QDebug>
 #include <QEvent>
 #include <QDateTime>
@@ -142,6 +143,15 @@ ChatHistory::ChatHistory(QWidget *parent)
 {
     setOpenLinks(false);
     connect(this, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(slotAnchorClicked(const QUrl&)));
+}
+
+void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu *menu = createStandardContextMenu();
+    QAction *action = menu->addAction(tr("Clear"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
+    menu->exec(event->globalPos());
+    delete menu;
 }
 
 void ChatHistory::slotAnchorClicked(const QUrl &link)
