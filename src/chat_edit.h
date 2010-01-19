@@ -20,8 +20,9 @@
 #ifndef __WDESKTOP_CHAT_EDIT_H__
 #define __WDESKTOP_CHAT_EDIT_H__
 
-#include <QKeyEvent>
 #include <QTextEdit>
+
+class QKeyEvent;
 
 class ChatEdit : public QTextEdit
 {

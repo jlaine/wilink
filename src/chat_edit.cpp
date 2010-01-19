@@ -18,10 +18,12 @@
  */
 
 #include <QDebug>
+#include <QKeyEvent>
 
 #include "chat_edit.h"
 
-ChatEdit::ChatEdit(int maxheight, QWidget* parent) : QTextEdit(parent), maxHeight(maxheight)
+ChatEdit::ChatEdit(int maxheight, QWidget* parent)
+    : QTextEdit(parent), maxHeight(maxheight)
 {
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sizePolicy.setVerticalPolicy(QSizePolicy::Fixed);
