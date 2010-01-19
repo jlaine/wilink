@@ -1,5 +1,30 @@
-#include "growableTextEdit.h"
 #include <QDebug>
+#include "growableTextEdit.h"
+
+growableTextEdit::growableTextEdit(int maxheight, QWidget* parent) : QTextEdit(parent), maxHeight(maxheight)
+{
+    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    sizePolicy.setVerticalPolicy(QSizePolicy::Fixed);
+    setSizePolicy(sizePolicy);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+}
+
+void growableTextEdit::keyPressEvent(QKeyEvent* e)
+{
+    if(e->key()==Qt::Key_Return)
+        emit returnPressed();
+    else
+        QTextEdit::keyPressEvent(e);
+}
+
+QSize growableTextEdit::minimumSizeHint() const
+{
+    QSize sizeHint = QTextEdit::minimumSizeHint();
+    int myHeight = document()->size().toSize().height() + (width() - viewport()->width());
+    sizeHint.setHeight(qMin(myHeight, maxHeight));
+    return sizeHint;
+}
 
 void growableTextEdit::onTextChanged()
 {
@@ -16,23 +41,6 @@ void growableTextEdit::resizeEvent(QResizeEvent *e)
     updateGeometry();
 }
 
-void growableTextEdit::keyPressEvent(QKeyEvent* e)
-{
-    if(e->key()==Qt::Key_Return)
-        emit returnPressed();
-    else
-        QTextEdit::keyPressEvent(e);
-}
-
-growableTextEdit::growableTextEdit(int maxheight, QWidget* parent) : QTextEdit(parent), maxHeight(maxheight)
-{
-    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sizePolicy.setVerticalPolicy(QSizePolicy::Fixed);
-    setSizePolicy(sizePolicy);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-}
-
 QSize growableTextEdit::sizeHint() const
 {
     QSize sizeHint = QTextEdit::sizeHint();
@@ -41,10 +49,4 @@ QSize growableTextEdit::sizeHint() const
     return sizeHint;
 }
 
-QSize growableTextEdit::minimumSizeHint() const
-{
-    QSize sizeHint = QTextEdit::minimumSizeHint();
-    int myHeight = document()->size().toSize().height() + (width() - viewport()->width());
-    sizeHint.setHeight(qMin(myHeight, maxHeight));
-    return sizeHint;
-}
+

@@ -31,7 +31,6 @@
 #include <QScrollBar>
 #include <QStringList>
 #include <QTextBrowser>
-#include "growableTextEdit.h"
 
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
@@ -39,6 +38,7 @@
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "chat_dialog.h"
+#include "growableTextEdit.h"
 
 ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name)
@@ -114,7 +114,6 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
 void ChatDialog::send()
 {
-    //QString text = chatInput->text();
     QString text = chatInput->document()->toPlainText();
     if (text.isEmpty())
         return;
