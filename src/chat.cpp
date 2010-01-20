@@ -355,9 +355,11 @@ void Chat::resizeContacts()
      */
     QDesktopWidget *desktop = QApplication::desktop();
     const QRect &available = desktop->availableGeometry(this);
-    if (hint.height() > available.height() - 50)
-        hint.setHeight(available.height() - 50);
-
+    if (hint.height() > available.height() - 100)
+    {
+        hint.setHeight(available.height() - 100);
+        hint.setWidth(hint.width() + 32);
+    }
     resize(hint);
 }
 
