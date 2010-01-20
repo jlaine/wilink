@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QDir>
 #include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
@@ -80,6 +81,12 @@ void UpdatesDialog::updateAvailable(const Release &release)
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+#ifdef Q_OS_MAC
+        QDir downloads(QDir::home().filePath("Downloads"));
+        if (downloads.exists())
+            downloadDir = downloads.absolutePath();
+#endif
+
         statusLabel->setText(tr("Downloading.."));
         show();
         updates->download(release, downloadDir);

@@ -5,6 +5,7 @@ wDesktop 0.3.1 (UNRELEASED)
  * Display the contact's avatar in the chat dialog.
  * Make it possible to clear the history of a conversation.
  * Notify the user that wDesktop will quit once a new version is downloaded.
+ * On Mac OS X, store updates in the Downloads folder if it exists.
 
 wdesktop 0.3.0 (2010-01-18)
  * Implement server ping (XEP-0199) and reconnection.
