@@ -1,6 +1,6 @@
 # Compile for i386
-set(CMAKE_CXX_FLAGS "-march i386")
-set(LINK_FLAGS "-march i386")
+set(CMAKE_CXX_FLAGS "-arch i386")
+set(LINK_FLAGS "-arch i386")
 
 # Use Qt from macports
 set(QT_QMAKE_EXECUTABLE "/opt/local/libexec/qt4-mac/bin/qmake")
