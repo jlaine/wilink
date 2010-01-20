@@ -118,21 +118,30 @@ WirelessNetwork WirelessInterface::currentNetwork()
 {
     WirelessNetwork network;
 #ifdef USE_COREWLAN
+    NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
+
     CWInterface *currentInterface = [CWInterface interfaceWithName:qstringToNSString(d->interfaceName)];
     network.setCinr(nsnumberToInt([currentInterface noise]));
     network.setRssi(nsnumberToInt([currentInterface rssi]));
     network.setSsid(nsstringToQString([currentInterface ssid]));
+
+    [autoreleasepool release];
 #endif
     return network;
 }
 
 bool WirelessInterface::isValid() const
 {
+    bool valid = false;
 #ifdef USE_COREWLAN
+    NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
+
     CWInterface *defaultInterface = [CWInterface interfaceWithName: qstringToNSString(d->interfaceName)];
     if([defaultInterface power])
-        return true;
+        valid = true;
+
+    [autoreleasepool release];
 #endif
-    return false;
+    return valid;
 }
 
