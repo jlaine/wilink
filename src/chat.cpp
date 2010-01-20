@@ -350,13 +350,13 @@ void Chat::resizeContacts()
     QSize hint = rosterView->sizeHint();
     hint.setHeight(hint.height() + 32);
 
-    /* Make sure we do not resize to a size exceeding
-     * the desktop size + some padding.
+    /* Make sure we do not resize to a size exceeding the desktop size
+     * + some padding for the window title.
      */
     QDesktopWidget *desktop = QApplication::desktop();
-    const QRect &screen = desktop->screenGeometry(this);
-    if (hint.height() > screen.height() - 100)
-        hint.setHeight(screen.height() - 100);
+    const QRect &available = desktop->availableGeometry(this);
+    if (hint.height() > available.height() - 50)
+        hint.setHeight(available.height() - 50);
 
     resize(hint);
 }
