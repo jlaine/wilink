@@ -66,16 +66,21 @@ void UpdatesDialog::setUrl(const QUrl &url)
 
 void UpdatesDialog::updateAvailable(const Release &release)
 {
-    const QString message = tr("Version %1 of %2 is available. Do you want to install it?")
-            .arg(release.version)
-            .arg(release.package);
+    const QString message = QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
+            .arg(tr("Version %1 of %2 is available. Do you want to download it?")
+                .arg(release.version)
+                .arg(release.package))
+            .arg(tr("Changes:"))
+            .arg(release.changes)
+            .arg(tr("Once the download is complete, %1 will exit to allow you to install the new version.")
+                .arg(release.package));
     if (QMessageBox::question(NULL,
         tr("Update available"),
-        QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre>").arg(message, tr("Changes:"), release.changes),
+        message,
         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
     {
         QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-        statusLabel->setText(tr("Downloading"));
+        statusLabel->setText(tr("Downloading.."));
         show();
         updates->download(release, downloadDir);
     }

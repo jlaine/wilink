@@ -56,6 +56,13 @@
     </message>
 </context>
 <context>
+    <name>ChatHistory</name>
+    <message>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
+</context>
+<context>
     <name>Diagnostics</name>
     <message>
         <source>Refresh</source>
@@ -158,16 +165,21 @@
         <translation>Mise à jour disponible</translation>
     </message>
     <message>
-        <source>Downloading</source>
-        <translation>Téléchargement</translation>
-    </message>
-    <message>
-        <source>Version %1 of %2 is available. Do you want to install it?</source>
-        <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
-    </message>
-    <message>
         <source>Changes:</source>
         <translation>Changements :</translation>
+    </message>
+    <message>
+        <source>Version %1 of %2 is available. Do you want to download it?</source>
+        <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
+    </message>
+    </message>
+    <message>
+        <source>Once the download is complete, %1 will exit to allow you to install the new version.</source>
+        <translation>Une fois le téléchargement terminé, %1 quittera afin de vous laisser installer la nouvelle version.</translation>
+    </message>
+    <message>
+        <source>Downloading..</source>
+        <translation>Téléchargement..</translation>
     </message>
 </context>
 </TS>
