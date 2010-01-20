@@ -50,7 +50,7 @@ $ cmake .. -DQT_QMAKE_EXECUTABLE=/opt/local/libexec/qt4-mac/bin/qmake
 
 If you want to build specifically for i386 on an x86_64 machine:
 
-$ cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/maci386.toolchain
+$ cmake .. -DQT_QMAKE_EXECUTABLE=/opt/local/libexec/qt4-mac/bin/qmake -DCMAKE_CXX_FLAGS="-arch i386" -DLINK_FLAGS="-arch i386"
 
 Cross compiling for win32
 -------------------------
