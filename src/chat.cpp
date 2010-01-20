@@ -142,7 +142,8 @@ void Chat::addContact()
 
 void Chat::chatContact(const QString &jid)
 {
-    ChatDialog *dialog = showConversation(jid);
+    ChatDialog *dialog = conversation(jid);
+    dialog->show();
     dialog->raise();
     dialog->activateWindow();
 }
@@ -152,6 +153,23 @@ void Chat::connected()
     qWarning("CONNECTED");
     pingTimer->start();
     statusLabel->setText(tr("Connected"));
+}
+
+/** Get or create a conversation dialog for the specified recipient.
+ *
+ * @param jid
+ */
+ChatDialog *Chat::conversation(const QString &jid)
+{
+    if (!chatDialogs.contains(jid))
+    {
+        chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
+        chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
+        chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
+        connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
+            this, SLOT(sendMessage(const QString&, const QString&)));
+    }
+    return chatDialogs[jid];
 }
 
 void Chat::disconnected()
@@ -188,8 +206,9 @@ void Chat::messageReceived(const QXmppMessage &msg)
     if (body.isEmpty())
         return;
 
-    ChatDialog *dialog = showConversation(jid.split("/")[0]);
+    ChatDialog *dialog = conversation(jid.split("/")[0]);
     dialog->messageReceived(msg);
+    dialog->show();
 
     /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
      * only causes the dock icon to bounce for one second, instead of
@@ -343,21 +362,4 @@ void Chat::sendPing()
     timeoutTimer->start();
 }
 
-/** Show a conversation dialog for the specified recipient.
- *
- * @param jid
- */
-ChatDialog *Chat::showConversation(const QString &jid)
-{
-    if (!chatDialogs.contains(jid))
-    {
-        chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
-        chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
-        chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
-        connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
-            this, SLOT(sendMessage(const QString&, const QString&)));
-    }
-    chatDialogs[jid]->show();
-    return chatDialogs[jid];
-}
 

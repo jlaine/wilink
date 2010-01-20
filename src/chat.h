@@ -57,7 +57,7 @@ protected slots:
     void sendPing();
 
 protected:
-    ChatDialog *showConversation(const QString &jid);
+    ChatDialog *conversation(const QString &jid);
 
 private:
     bool reconnectOnDisconnect;
