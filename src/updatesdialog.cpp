@@ -94,7 +94,10 @@ void UpdatesDialog::updateDownloaded(const QUrl &url)
 
 void UpdatesDialog::updateFailed()
 {
-
+    QMessageBox::warning(this,
+        tr("Download failed"),
+        tr("Could not download the new version, please try again later."));
+    hide();
 }
 
 void UpdatesDialog::updateProgress(qint64 done, qint64 total)

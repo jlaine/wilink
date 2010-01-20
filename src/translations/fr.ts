@@ -172,7 +172,6 @@
         <source>Version %1 of %2 is available. Do you want to download it?</source>
         <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
     </message>
-    </message>
     <message>
         <source>Once the download is complete, %1 will exit to allow you to install the new version.</source>
         <translation>Une fois le téléchargement terminé, %1 quittera afin de vous laisser installer la nouvelle version.</translation>
@@ -180,6 +179,14 @@
     <message>
         <source>Downloading..</source>
         <translation>Téléchargement..</translation>
+    </message>
+    <message>
+        <source>Download failed</source>
+        <translation>Echec du téléchargement</translation>
+    </message>
+    <message>
+        <source>Could not download the new version, please try again later.</source>
+        <translation>Le téléchargement de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
 </context>
 </TS>
