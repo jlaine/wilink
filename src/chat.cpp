@@ -208,7 +208,18 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
     ChatDialog *dialog = conversation(jid.split("/")[0]);
     dialog->messageReceived(msg);
-    dialog->show();
+
+    if (!dialog->isVisible())
+    {
+#ifdef Q_OS_MAC
+        dialog->show();
+#else
+        if (!isVisible())
+            dialog->showMinimized();
+        else
+            dialog->show();
+#endif
+    }
 
     /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
      * only causes the dock icon to bounce for one second, instead of
