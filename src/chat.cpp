@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
 #include <QDebug>
 #include <QInputDialog>
 #include <QLabel>
@@ -42,6 +43,10 @@
 #include "chat.h"
 #include "chat_dialog.h"
 #include "chat_roster.h"
+
+#ifdef QT_MAC_USE_COCOA
+void application_alert_mac();
+#endif
 
 using namespace QNetIO;
 
@@ -138,6 +143,7 @@ void Chat::addContact()
 void Chat::chatContact(const QString &jid)
 {
     ChatDialog *dialog = showConversation(jid);
+    dialog->raise();
     dialog->activateWindow();
 }
 
@@ -184,6 +190,17 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
     ChatDialog *dialog = showConversation(jid.split("/")[0]);
     dialog->messageReceived(msg);
+
+    /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
+     * only causes the dock icon to bounce for one second, instead of
+     * bouncing until the user focuses the window. To work around this
+     * we implement our own version.
+     */
+#ifdef QT_MAC_USE_COCOA
+    application_alert_mac();
+#else
+    QApplication::alert(dialog);
+#endif
 }
 
 void Chat::presenceChanged(const QString& bareJid, const QString& resource)
@@ -326,7 +343,7 @@ void Chat::sendPing()
     timeoutTimer->start();
 }
 
-/** Show are raise a conversation dialog for the specified recipient.
+/** Show a conversation dialog for the specified recipient.
  *
  * @param jid
  */
@@ -341,7 +358,6 @@ ChatDialog *Chat::showConversation(const QString &jid)
             this, SLOT(sendMessage(const QString&, const QString&)));
     }
     chatDialogs[jid]->show();
-    chatDialogs[jid]->raise();
     return chatDialogs[jid];
 }
 

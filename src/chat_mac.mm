@@ -1,5 +1,4 @@
 #include <AppKit/AppKit.h>
-//#include <CoreServices/CoreServices.h>
 #include <Foundation/NSAutoreleasePool.h>
 
 void application_alert_mac()
