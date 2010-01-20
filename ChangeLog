@@ -1,4 +1,5 @@
 wDesktop 0.3.1 (UNRELEASED)
+ * When a message is received, don't grab the focus, notify the user.
  * Make the chat input grow as needed for long messages.
  * Only allow one chat contact to be selected at a time.
  * Display the contact's avatar in the chat dialog.
