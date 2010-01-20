@@ -191,7 +191,7 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger)
     {
-        chat->setVisible(!chat->isVisible());
+        showChat();
 #if 0
         // FIXME: this implies that the system tray is at the bottom of the screen..
         QMenu *menu = contextMenu();
