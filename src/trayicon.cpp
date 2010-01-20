@@ -78,7 +78,7 @@ TrayIcon::TrayIcon()
     setContextMenu(menu);
 
 #ifndef Q_WS_MAC
-    /* convert left clicks to right clicks, except on OS X */
+    /* catch left clicks, except on OS X */
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 #endif
 
@@ -191,10 +191,13 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger)
     {
+        chat->setVisible(!chat->isVisible());
+#if 0
         // FIXME: this implies that the system tray is at the bottom of the screen..
         QMenu *menu = contextMenu();
         QPoint delta = QPoint(0, menu->sizeHint().height());
         menu->popup(geometry().topLeft() - delta);
+#endif
     }
 }
 
