@@ -26,8 +26,8 @@ On Debian
 
 $ sudo aptitude install cmake libgnome-keyring-dev libgphoto2-2-dev libqt4-dev
 
-On MacOS/X
-----------
+On Mac OS X
+-----------
 
 $ sudo port install cmake qt4-mac
 
@@ -39,7 +39,28 @@ $ cd build
 $ cmake ..
 $ make
 
-Note: if you are running MacOS/X and are using Qt from macports, invoke cmake as:
+See platform specific notes for applicable cmake options.
+
+On Mac OS X
+-----------
+
+If you are running MacOS/X and are using Qt from macports, invoke cmake as:
 
 $ cmake .. -DQT_QMAKE_EXECUTABLE=/opt/local/libexec/qt4-mac/bin/qmake
+
+If you want to build specifically for i386 on an x86_64 machine:
+
+$ cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/maci386.toolchain
+
+Cross compiling for win32
+-------------------------
+
+To cross compile for win32 on a Debian machine, install the libqt4-mingw32-dev
+package from:
+
+  http://dev.jerryweb.org/debian/pool/main/
+
+Then invoke cmake as:
+
+$ cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
 
