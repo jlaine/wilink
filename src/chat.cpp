@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -348,6 +349,15 @@ void Chat::resizeContacts()
 {
     QSize hint = rosterView->sizeHint();
     hint.setHeight(hint.height() + 32);
+
+    /* Make sure we do not resize to a size exceeding
+     * the desktop size + some padding.
+     */
+    QDesktopWidget *desktop = QApplication::desktop();
+    const QRect &screen = desktop->screenGeometry(this);
+    if (hint.height() > screen.height() - 100)
+        hint.setHeight(screen.height() - 100);
+
     resize(hint);
 }
 
