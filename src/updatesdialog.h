@@ -40,6 +40,7 @@ public slots:
     void check();
 
 protected slots:
+    void checkFailed(Updates::UpdatesError error);
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error);

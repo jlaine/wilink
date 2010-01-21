@@ -49,6 +49,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* check for updates */
     updates = new Updates(this);
+    connect(updates, SIGNAL(checkFailed(Updates::UpdatesError)), this, SLOT(checkFailed(Updates::UpdatesError)));
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateFailed(Updates::UpdatesError)), this, SLOT(updateFailed(Updates::UpdatesError)));
@@ -58,6 +59,11 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 void UpdatesDialog::check()
 {
     updates->check();
+}
+
+void UpdatesDialog::checkFailed(Updates::UpdatesError error)
+{
+    qWarning("Failed to check for updates");
 }
 
 void UpdatesDialog::setUrl(const QUrl &url)
