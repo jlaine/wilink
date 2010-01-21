@@ -21,6 +21,7 @@
 #define __UPDATES_H__
 
 #include <QFile>
+#include <QMap>
 #include <QUrl>
 
 class QNetworkAccessManager;
@@ -33,6 +34,7 @@ public:
     QString package;
     QUrl url;
     QString version;
+    QMap<QString, QByteArray> hashes;
 };
 
 /** The Updates class handling checking for software updates
@@ -43,6 +45,13 @@ class Updates : public QObject
     Q_OBJECT
 
 public:
+    typedef enum {
+        BadHash,
+        DownloadFailed,
+        InsecureLocation,
+        SaveFailed,
+    } UpdatesError;
+
     Updates(QObject *parent);
     void check();
     void download(const Release &release, const QString &dirPath);
@@ -55,14 +64,16 @@ protected slots:
     void processStatus();
 
 signals:
+    void checkFailed(UpdatesError error);
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
-    void updateFailed();
+    void updateFailed(UpdatesError error);
     void updateProgress(qint64 done, qint64 total);
 
 private:
     QNetworkAccessManager *network;
     QFile downloadFile;
+    Release downloadRelease;
     QUrl updatesUrl;
 };
 

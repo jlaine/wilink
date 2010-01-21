@@ -18,6 +18,7 @@
  */
 
 #include <QCoreApplication>
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
 #include <QDomDocument>
@@ -46,7 +47,7 @@ void Updates::check()
         return;
     if (updatesUrl.scheme() != "https")
     {
-        qWarning() << "Refusing to check for updates at insecure address" << updatesUrl;
+        emit checkFailed(InsecureLocation);
         return;
     }
 
@@ -83,6 +84,7 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 void Updates::download(const Release &release, const QString &dirPath)
 {
     downloadFile.setFileName(QDir(dirPath).filePath(QFileInfo(release.url.path()).fileName()));
+    downloadRelease = release;
 
     QNetworkRequest req(release.url);
     QNetworkReply *reply = network->get(req);
@@ -97,19 +99,33 @@ void Updates::saveUpdate()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        qWarning() << "Failed to download update" << reply->url();
-        emit updateFailed();
+        emit updateFailed(DownloadFailed);
         return;
+    }
+
+    /* check data */
+    const QByteArray &data = reply->readAll();
+    foreach (const QString &type, downloadRelease.hashes.keys())
+    {
+        if (type == "sha1")
+        {
+            QCryptographicHash hash(QCryptographicHash::Sha1);
+            hash.addData(data);
+            if (hash.result() != downloadRelease.hashes[type])
+            {
+                emit updateFailed(BadHash);
+                return;
+            } 
+        }
     }
 
     /* save file */
     if (!downloadFile.open(QIODevice::WriteOnly))
     {
-        qWarning() << "Could not write to" << downloadFile.fileName();
-        emit updateFailed();
+        emit updateFailed(SaveFailed);
         return;
     }
-    downloadFile.write(reply->readAll());
+    downloadFile.write(data);
     downloadFile.close();
 
     emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
@@ -122,7 +138,7 @@ void Updates::processStatus()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        qWarning("Failed to check for updates");
+        emit checkFailed(DownloadFailed);
         return;
     }
 
@@ -130,15 +146,27 @@ void Updates::processStatus()
     doc.setContent(reply);
     QDomElement item = doc.documentElement();
 
+    /* parse release information */
     Release release;
     release.changes = item.firstChildElement("changes").text();
     release.package = item.firstChildElement("package").text();
     release.version = item.firstChildElement("version").text();
+    QDomElement hash = item.firstChildElement("hash");
+    while (!hash.isNull())
+    {
+        const QString type = hash.attribute("type");
+        const QByteArray value = QByteArray::fromBase64(hash.text().toAscii());
+        if (!type.isEmpty() && !value.isEmpty())
+            release.hashes[type] = value;
+        hash = hash.nextSiblingElement("hash");
+    }
     const QString urlString = item.firstChildElement("url").text();
     if (!urlString.isEmpty())
         release.url = updatesUrl.resolved(QUrl(urlString));
 
-    if (compareVersions(release.version, qApp->applicationVersion()) > 0 && !release.url.isEmpty())
+    /* check whether this version is more recent than the installed one */
+    if (compareVersions(release.version, qApp->applicationVersion()) > 0 &&
+        !release.url.isEmpty() && release.hashes.contains("sha1"))
         emit updateAvailable(release);
 }
 

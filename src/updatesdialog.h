@@ -42,7 +42,7 @@ public slots:
 protected slots:
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
-    void updateFailed();
+    void updateFailed(Updates::UpdatesError error);
     void updateProgress(qint64 done, qint64 total);
 
 signals:

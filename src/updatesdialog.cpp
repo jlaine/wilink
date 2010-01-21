@@ -51,7 +51,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     updates = new Updates(this);
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
-    connect(updates, SIGNAL(updateFailed()), this, SLOT(updateFailed()));
+    connect(updates, SIGNAL(updateFailed(Updates::UpdatesError)), this, SLOT(updateFailed(Updates::UpdatesError)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
 }
 
@@ -99,7 +99,7 @@ void UpdatesDialog::updateDownloaded(const QUrl &url)
     qApp->quit();
 }
 
-void UpdatesDialog::updateFailed()
+void UpdatesDialog::updateFailed(Updates::UpdatesError error)
 {
     QMessageBox::warning(this,
         tr("Download failed"),
