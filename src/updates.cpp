@@ -155,7 +155,7 @@ void Updates::processStatus()
     while (!hash.isNull())
     {
         const QString type = hash.attribute("type");
-        const QByteArray value = QByteArray::fromBase64(hash.text().toAscii());
+        const QByteArray value = QByteArray::fromHex(hash.text().toAscii());
         if (!type.isEmpty() && !value.isEmpty())
             release.hashes[type] = value;
         hash = hash.nextSiblingElement("hash");
