@@ -43,8 +43,7 @@ Updates::Updates(QObject *parent)
 
 void Updates::check()
 {
-    if (!updatesUrl.isValid())
-        return;
+    /* only download files over HTTPS */
     if (updatesUrl.scheme() != "https")
     {
         emit checkFailed(InsecureLocation);
@@ -83,8 +82,8 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 
 void Updates::download(const Release &release, const QString &dirPath)
 {
-    /* refuse to download files without SHA1 hash */
-    if (!release.hashes.contains("sha1"))
+    /* only download files over HTTPS with an SHA1 hash */
+    if (release.url.scheme() != "https" || !release.hashes.contains("sha1"))
     {
         emit updateFailed(InsecureLocation);
         return;
@@ -173,7 +172,7 @@ void Updates::processStatus()
 
     /* check whether this version is more recent than the installed one */
     if (compareVersions(release.version, qApp->applicationVersion()) > 0 &&
-        !release.url.isEmpty() && release.hashes.contains("sha1"))
+        release.url.scheme() == "https" && release.hashes.contains("sha1"))
         emit updateAvailable(release);
 }
 
