@@ -83,6 +83,13 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 
 void Updates::download(const Release &release, const QString &dirPath)
 {
+    /* refuse to download files without SHA1 hash */
+    if (!release.hashes.contains("sha1"))
+    {
+        emit updateFailed(InsecureLocation);
+        return;
+    }
+
     downloadFile.setFileName(QDir(dirPath).filePath(QFileInfo(release.url.path()).fileName()));
     downloadRelease = release;
 
