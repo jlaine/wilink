@@ -32,7 +32,7 @@
 #include <QTextBrowser>
 #include <QTimer>
 
-#include "qxmpp/QXmppArchiveIq.h"
+#include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
@@ -152,6 +152,9 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
+
+        // get archives
+        client->getArchiveManager().getCollections(jid);
     }
     return chatDialogs[jid];
 }
