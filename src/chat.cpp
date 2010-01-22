@@ -299,9 +299,7 @@ bool Chat::open(const QString &jid, const QString &password)
         config.setHost(results[0].hostName());
         config.setPort(results[0].port());
     } else {
-        QString serverName = config.getDomain();
-        config.setHost(serverName);
-        systemTrayIcon->showMessage("Could not discover chat server", QString("Connecting to server %1 instead.").arg(serverName));
+        config.setHost(config.getDomain());
     }
 #else
     config.setHost(config.getDomain());
