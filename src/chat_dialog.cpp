@@ -64,6 +64,8 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     /* chat history */
     chatHistory = new ChatHistory;
+    archiveCursor = chatHistory->textCursor();
+    archiveCursor.movePosition(QTextCursor::Start);
     layout->addWidget(chatHistory);
 
     /* text edit */
@@ -79,11 +81,11 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
 }
 
-void ChatDialog::addMessage(const QString &text, bool local, const QDateTime &datetime)
+QString ChatDialog::formatMessage(const QString &text, bool local, const QDateTime &datetime) const
 {
     QString html = text;
     html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-    chatHistory->append(QString(
+    return QString(
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr style=\"background-color: %1\">"
         "  <td>%2</td>"
@@ -96,13 +98,14 @@ void ChatDialog::addMessage(const QString &text, bool local, const QDateTime &da
         .arg(local ? "#dbdbdb" : "#b6d4ff")
         .arg(local ? chatLocalName : chatRemoteName)
         .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
-        .arg(html));
+        .arg(html);
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     foreach (const QXmppArchiveMessage &msg, chat.messages)
-        addMessage(msg.body, msg.local, msg.datetime);
+        archiveCursor.insertHtml(
+            formatMessage(msg.body, msg.local, msg.datetime));
 }
 
 /** When the window is activated, pass focus to the input line.
@@ -116,7 +119,8 @@ void ChatDialog::changeEvent(QEvent *event)
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    addMessage(msg.getBody(), false, QDateTime::currentDateTime());
+    chatHistory->append(
+        formatMessage(msg.getBody(), false, QDateTime::currentDateTime()));
 }
 
 void ChatDialog::send()
@@ -125,7 +129,8 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    addMessage(text, true, QDateTime::currentDateTime());
+    chatHistory->append(
+        formatMessage(text, true, QDateTime::currentDateTime()));
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();

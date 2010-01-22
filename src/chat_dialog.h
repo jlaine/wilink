@@ -68,7 +68,9 @@ protected:
     void changeEvent(QEvent *event);
 
 private:
-    void addMessage(const QString &text, bool local, const QDateTime &datetime);
+    QString formatMessage(const QString &text, bool local, const QDateTime &datetime) const;
+
+    QTextCursor archiveCursor;
 
     QLabel *avatarLabel;
     ChatHistory *chatHistory;
