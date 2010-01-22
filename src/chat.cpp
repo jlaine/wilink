@@ -128,8 +128,9 @@ void Chat::addContact()
 
 void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
 {
-    if (chatDialogs.contains(chat.with))
-        chatDialogs[chat.with]->archiveChatReceived(chat);
+    const QString &bareJid = chat.with.split("/")[0];
+    if (chatDialogs.contains(bareJid))
+        chatDialogs[bareJid]->archiveChatReceived(chat);
 }
 
 void Chat::chatContact(const QString &jid)

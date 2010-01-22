@@ -95,7 +95,7 @@ void ChatDialog::addMessage(const QString &text, bool local, const QDateTime &da
         "</table>")
         .arg(local ? "#dbdbdb" : "#b6d4ff")
         .arg(local ? chatLocalName : chatRemoteName)
-        .arg(datetime.toString("hh:mm"))
+        .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
         .arg(html));
 }
 
