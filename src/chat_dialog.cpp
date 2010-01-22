@@ -43,7 +43,8 @@
 #include "chat_edit.h"
 
 ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
-    : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name)
+    : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name),
+    archiveReceived(false)
 {
     chatLocalName = tr("Me");
 
@@ -102,8 +103,11 @@ QString ChatDialog::formatMessage(const QString &text, bool local, const QDateTi
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
-    if (archiveCursor.atEnd())
+    if (!archiveReceived)
+    {
         archiveCursor.movePosition(QTextCursor::Start);
+        archiveReceived = true;
+    }
     foreach (const QXmppArchiveMessage &msg, chat.messages)
         archiveCursor.insertHtml(
             formatMessage(msg.body, msg.local, msg.datetime));

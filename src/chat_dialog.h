@@ -71,6 +71,7 @@ private:
     QString formatMessage(const QString &text, bool local, const QDateTime &datetime) const;
 
     QTextCursor archiveCursor;
+    bool archiveReceived;
 
     QLabel *avatarLabel;
     ChatHistory *chatHistory;
