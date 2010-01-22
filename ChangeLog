@@ -1,5 +1,6 @@
 wDesktop 0.3.6 (UNRELEASED)
  * Add mandatory check of SHA-1 hash for updates.
+ * Add support for loading chat history from server.
 
 wDesktop 0.3.5 (2010-01-20)
  * When a message is received, don't grab the focus, notify the user.
