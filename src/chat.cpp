@@ -32,6 +32,7 @@
 #include <QTextBrowser>
 #include <QTimer>
 
+#include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
@@ -95,6 +96,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
+    connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -122,6 +124,12 @@ void Chat::addContact()
     packet.setTo(jid);
     packet.setType(QXmppPresence::Subscribe);
     client->sendPacket(packet);
+}
+
+void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
+{
+    if (chatDialogs.contains(chat.with))
+        chatDialogs[chat.with]->archiveChatReceived(chat);
 }
 
 void Chat::chatContact(const QString &jid)

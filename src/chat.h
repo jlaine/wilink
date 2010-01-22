@@ -30,6 +30,7 @@ class RosterModel;
 class RosterView;
 class QLabel;
 class QSystemTrayIcon;
+class QXmppArchiveChat;
 class QXmppVCard;
 class QXmppVCardManager;
 
@@ -47,6 +48,7 @@ protected slots:
     void connected();
     void disconnected();
     void iqReceived(const QXmppIq&);
+    void archiveChatReceived(const QXmppArchiveChat &chat);
     void messageReceived(const QXmppMessage &msg);
     void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);

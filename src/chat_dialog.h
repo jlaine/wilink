@@ -28,6 +28,7 @@
 class ChatEdit;
 class QLabel;
 class QLineEdit;
+class QXmppArchiveChat;
 class QXmppVCard;
 
 class ChatHistory : public QTextBrowser
@@ -54,6 +55,7 @@ public:
     void setStatus(const QString &status);
 
 public slots:
+    void archiveChatReceived(const QXmppArchiveChat &chat);
     void messageReceived(const QXmppMessage &msg);
 
 protected slots:
@@ -66,7 +68,7 @@ protected:
     void changeEvent(QEvent *event);
 
 private:
-    void addMessage(const QString &text, bool local);
+    void addMessage(const QString &text, bool local, const QDateTime &datetime);
 
     QLabel *avatarLabel;
     ChatHistory *chatHistory;

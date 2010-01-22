@@ -36,6 +36,7 @@
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "chat_dialog.h"
@@ -78,7 +79,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
 }
 
-void ChatDialog::addMessage(const QString &text, bool local)
+void ChatDialog::addMessage(const QString &text, bool local, const QDateTime &datetime)
 {
     QString html = text;
     html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
@@ -98,6 +99,12 @@ void ChatDialog::addMessage(const QString &text, bool local)
         .arg(html));
 }
 
+void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
+{
+    foreach (const QXmppArchiveMessage &msg, chat.messages)
+        addMessage(msg.body, msg.local, msg.datetime);
+}
+
 /** When the window is activated, pass focus to the input line.
  */
 void ChatDialog::changeEvent(QEvent *event)
@@ -109,7 +116,7 @@ void ChatDialog::changeEvent(QEvent *event)
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    addMessage(msg.getBody(), false);
+    addMessage(msg.getBody(), false, QDateTime::currentDateTime());
 }
 
 void ChatDialog::send()
@@ -118,7 +125,7 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    addMessage(text, true);
+    addMessage(text, true, QDateTime::currentDateTime());
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
