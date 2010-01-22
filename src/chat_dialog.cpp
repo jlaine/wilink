@@ -65,7 +65,6 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     /* chat history */
     chatHistory = new ChatHistory;
     archiveCursor = chatHistory->textCursor();
-    archiveCursor.movePosition(QTextCursor::Start);
     layout->addWidget(chatHistory);
 
     /* text edit */
@@ -103,9 +102,15 @@ QString ChatDialog::formatMessage(const QString &text, bool local, const QDateTi
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
+    if (archiveCursor.atEnd())
+        archiveCursor.movePosition(QTextCursor::Start);
     foreach (const QXmppArchiveMessage &msg, chat.messages)
         archiveCursor.insertHtml(
             formatMessage(msg.body, msg.local, msg.datetime));
+
+    /* scroll to end, but don't touch cursor */
+    QScrollBar *scrollBar = chatHistory->verticalScrollBar();
+    scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
 /** When the window is activated, pass focus to the input line.
