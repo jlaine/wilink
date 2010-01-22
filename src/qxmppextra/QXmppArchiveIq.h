@@ -34,10 +34,8 @@ class QXmppArchiveListIq : public QXmppIq
 public:
     QXmppArchiveListIq();
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-/*
     void parse( QDomElement &element );
     static bool isArchiveListIq( QDomElement &element );
-*/
 
     QString getWith() const;
     void setWith( const QString &with );
@@ -49,10 +47,8 @@ private:
 class QXmppArchivePrefIq : public QXmppIq
 {
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-/*
     void parse( QDomElement &element );
     static bool isArchivePrefIq( QDomElement &element );
-*/
 };
 
 #endif // QXMPPARCHIVEIQ_H

@@ -44,6 +44,22 @@ void QXmppArchiveListIq::setWith( const QString &with )
     m_with = with;
 }
 
+bool QXmppArchiveListIq::isArchiveListIq( QDomElement &element )
+{
+    QString type = element.attribute("type");
+    QDomElement errorElement = element.firstChildElement("error");
+    QDomElement listElement = element.firstChildElement("list");
+    return (type == "error") &&
+            !errorElement.isNull() &&
+            listElement.namespaceURI() == ns_archive;
+}
+
+void QXmppArchiveListIq::parse( QDomElement &element )
+{
+    QDomElement listElement = element.firstChildElement("list");
+    m_with = element.attribute("with");
+}
+
 void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("list");
@@ -57,7 +73,23 @@ void QXmppArchiveListIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+bool QXmppArchivePrefIq::isArchivePrefIq( QDomElement &element )
+{
+    QString type = element.attribute("type");
+    QDomElement errorElement = element.firstChildElement("error");
+    QDomElement prefElement = element.firstChildElement("pref");
+    return (type == "error") &&
+            !errorElement.isNull() &&
+            prefElement.namespaceURI() == ns_archive;
+}
+
+void QXmppArchivePrefIq::parse( QDomElement &element )
+{
+    QDomElement queryElement = element.firstChildElement("pref");
+    //setId( element.attribute("id"));
+}
+
+void QXmppArchivePrefIq::toXmlElementFromChild( QXmlStreamWriter *writer ) const
 {
     writer->writeStartElement("pref");
     helperToXmlAddAttribute(writer, "xmlns", ns_archive);
