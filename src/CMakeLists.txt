@@ -1,7 +1,6 @@
 add_subdirectory(data)
 add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
-add_subdirectory(qxmppextra)
 
 set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTXML 1)
@@ -76,7 +75,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_RCC_SOURCES} ${WDESKTOP_RESOURCE})
-target_link_libraries(wDesktop qnetio qxmpp qxmppextra ${QT_LIBRARIES} ${WLAN_LIBRARIES})
+target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
     set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE TRUE)

@@ -32,14 +32,14 @@
 #include <QTextBrowser>
 #include <QTimer>
 
+#include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
+#include "qxmpp/QXmppPingIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppVCardManager.h"
-#include "qxmppextra/QXmppArchiveIq.h"
-#include "qxmppextra/QXmppPingIq.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
