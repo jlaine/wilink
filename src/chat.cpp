@@ -37,8 +37,9 @@
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
-#include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
+#include "qxmppextra/QXmppArchiveIq.h"
+#include "qxmppextra/QXmppPingIq.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
@@ -50,24 +51,6 @@ void application_alert_mac();
 #endif
 
 using namespace QNetIO;
-
-class QXmppPingIq : public QXmppIq
-{
-public:
-    QXmppPingIq();
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-};
-
-QXmppPingIq::QXmppPingIq() : QXmppIq(QXmppIq::Get)
-{
-}
-
-void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement("ping");
-    helperToXmlAddAttribute(writer, "xmlns", "urn:xmpp:ping");
-    writer->writeEndElement();
-}
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
