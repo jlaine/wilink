@@ -146,8 +146,8 @@ void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
 void Chat::chatContact(const QString &jid)
 {
     ChatDialog *dialog = conversation(jid);
-    rosterModel->removePendingMessage(jid);
 #ifdef CHAT_SINGLEWINDOW
+    rosterModel->removePendingMessage(jid);
     conversationWidgets->setCurrentWidget(dialog);
 #else
     dialog->show();
