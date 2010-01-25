@@ -44,6 +44,9 @@ public:
     QString contactName(const QString &bareJid) const;
     QString contactStatusIcon(const QString &bareJid) const;
 
+    void setPendingMessage(const QXmppMessage &msg);
+    void removePendingMessage(const QString &jid);
+
 public slots:
     void disconnected();
 
@@ -62,6 +65,7 @@ private:
     QStringList rosterKeys;
     QMap<QString, QPixmap> rosterAvatars;
     QMap<QString, QString> rosterNames;
+    QHash<QString, QString> pendingMessages;
 };
 
 class RosterView : public QTableView

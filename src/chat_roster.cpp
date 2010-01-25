@@ -69,24 +69,22 @@ QString RosterModel::contactName(const QString &bareJid) const
 
 QString RosterModel::contactStatus(const QString &bareJid) const
 {
-    QString suffix = "offline";
-    foreach (const QXmppPresence &presence, rosterManager->getAllPresencesForBareJid(bareJid))
-    {
-        if (presence.getType() != QXmppPresence::Available)
-            continue;
-        if (presence.getStatus().getType() == QXmppPresence::Status::Online)
-        {
-            suffix = "available";
-            break;
-        } else {
-            suffix = "busy";
-        }
-    }
-    return suffix;
+    QMap<QString, QXmppPresence> presences = rosterManager->getAllPresencesForBareJid(bareJid);
+    if(presences.isEmpty())
+        return "offline";
+    QXmppPresence presence = presences[contactName(bareJid)];
+    if (presence.getType() != QXmppPresence::Available)
+        return "offline";
+    if (presence.getStatus().getType() == QXmppPresence::Status::Online)
+        return "available";
+
+    return "busy";
 }
 
 QString RosterModel::contactStatusIcon(const QString &bareJid) const
 {
+    if(pendingMessages.contains(bareJid))
+        return QString(":/contact-aPendingMessage.png");
     return QString(":/contact-%1.png").arg(contactStatus(bareJid));
 }
 
@@ -176,6 +174,25 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
     }
 }
 
+void RosterModel::removePendingMessage(const QString &bareJid)
+{
+    pendingMessages.remove(bareJid);
+    qDebug() << "Messages removed from" << bareJid;
+    const int rowIndex = rosterKeys.indexOf(bareJid);
+    emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+}
+
+void RosterModel::setPendingMessage(const QXmppMessage &msg)
+{
+    const QString jid = msg.getFrom().split('/')[0];
+    const QString body = msg.getBody();
+    const QString from = jid.split("@")[0];
+    qDebug() << "message received from" << from << jid << body;
+    pendingMessages[jid] = body;
+    const int rowIndex = rosterKeys.indexOf(jid);
+    emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+}
+
 RosterView::RosterView(RosterModel *model, QWidget *parent)
     : QTableView(parent)
 {
@@ -192,7 +209,11 @@ RosterView::RosterView(RosterModel *model, QWidget *parent)
     action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
 
+#ifdef CHAT_SINGLEWINDOW
+    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(startChat()));
+#else
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
+#endif
 
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);

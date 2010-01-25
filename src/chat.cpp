@@ -27,6 +27,7 @@
 #include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QStackedWidget>
 #include <QStringList>
 #include <QSystemTrayIcon>
 #include <QTextBrowser>
@@ -84,7 +85,16 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     hbox->addWidget(statusLabel);
     layout->addItem(hbox);
 
+#ifdef CHAT_SINGLEWINDOW
+    QWidget *rosterLayoutWidget = new QWidget;
+    rosterLayoutWidget->setLayout(layout);
+    addWidget(rosterLayoutWidget);
+    conversationWidgets = new QStackedWidget;
+    addWidget(conversationWidgets);
+#else
     setLayout(layout);
+#endif
+
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Chat"));
 
@@ -136,9 +146,14 @@ void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
 void Chat::chatContact(const QString &jid)
 {
     ChatDialog *dialog = conversation(jid);
+    rosterModel->removePendingMessage(jid);
+#ifdef CHAT_SINGLEWINDOW
+    conversationWidgets->setCurrentWidget(dialog);
+#else
     dialog->show();
     dialog->raise();
     dialog->activateWindow();
+#endif
 }
 
 void Chat::connected()
@@ -161,6 +176,9 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
+#ifdef CHAT_SINGLEWINDOW
+        conversationWidgets->addWidget(chatDialogs[jid]);
+#endif
 
         // get archives
         client->getArchiveManager().getCollections(jid);
@@ -205,6 +223,12 @@ void Chat::messageReceived(const QXmppMessage &msg)
     ChatDialog *dialog = conversation(jid.split("/")[0]);
     dialog->messageReceived(msg);
 
+#ifdef CHAT_SINGLEWINDOW
+    if (!isVisible())
+        show();
+    if(conversationWidgets->currentWidget() != dialog)
+        rosterModel->setPendingMessage(msg);
+#else /* CHAT_SINGLEWINDOW */
     if (!dialog->isVisible())
     {
 #ifdef Q_OS_MAC
@@ -216,6 +240,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
             dialog->show();
 #endif
     }
+#endif /* CHAT_SINGLEWINDOW */
 
     /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
      * only causes the dock icon to bounce for one second, instead of
