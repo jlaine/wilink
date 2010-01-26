@@ -81,11 +81,11 @@ QString RosterModel::contactStatus(const QString &bareJid) const
     return "busy";
 }
 
-QString RosterModel::contactStatusIcon(const QString &bareJid) const
+QPixmap RosterModel::contactStatusIcon(const QString &bareJid) const
 {
-    if(pendingMessages.contains(bareJid))
-        return QString(":/contact-aPendingMessage.png");
-    return QString(":/contact-%1.png").arg(contactStatus(bareJid));
+    if (pendingMessages.contains(bareJid))
+        return QPixmap(":/contact-aPendingMessage.png");
+    return QPixmap(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
 }
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const

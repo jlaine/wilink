@@ -154,7 +154,7 @@ void ChatDialog::setAvatar(const QPixmap &avatar)
     avatarLabel->setPixmap(avatar);
 }
 
-void ChatDialog::setStatus(const QString &status)
+void ChatDialog::setStatus(const QPixmap &status)
 {
     statusLabel->setPixmap(status);
 }

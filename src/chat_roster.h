@@ -42,7 +42,7 @@ public:
 
     QPixmap contactAvatar(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
-    QString contactStatusIcon(const QString &bareJid) const;
+    QPixmap contactStatusIcon(const QString &bareJid) const;
 
     void setPendingMessage(const QString &bareJid);
     void removePendingMessage(const QString &bareJid);

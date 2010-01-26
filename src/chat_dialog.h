@@ -52,7 +52,7 @@ class ChatDialog : public QWidget
 public:
     ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
     void setAvatar(const QPixmap &avatar);
-    void setStatus(const QString &status);
+    void setStatus(const QPixmap &status);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);

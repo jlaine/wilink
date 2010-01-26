@@ -192,7 +192,7 @@ void Chat::disconnected()
     timeoutTimer->stop();
     rosterModel->disconnected();
     foreach (ChatDialog *dialog, chatDialogs)
-        dialog->setStatus(":/contact-offline.png");
+        dialog->setStatus(QPixmap(":/contact-offline.png"));
 
     if (reconnectOnDisconnect)
     {
