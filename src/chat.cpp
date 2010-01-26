@@ -239,20 +239,26 @@ void Chat::messageReceived(const QXmppMessage &msg)
     if (singleWindow)
     {
         if (!isVisible())
+        {
+#ifdef Q_OS_MAC
             show();
-        if(conversationPanel->currentWidget() != dialog)
+#else
+            showMinimized();
+#endif
+        }
+        if (conversationPanel->currentWidget() != dialog)
             rosterModel->addPendingMessage(bareJid);
     } else {
         if (!dialog->isVisible())
         {
-    #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
             dialog->show();
-    #else
+#else
             if (!isVisible())
                 dialog->showMinimized();
             else
                 dialog->show();
-    #endif
+#endif
         }
     }
 
