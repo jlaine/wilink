@@ -66,7 +66,10 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     layout->setSpacing(0);
 
     rosterView = new RosterView(rosterModel);
-    connect(rosterView, SIGNAL(chatContact(const QString&)), this, SLOT(chatContact(const QString&)));
+#ifdef CHAT_SINGLEWINDOW
+    connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(chatContact(const QString&)));
+#endif
+    connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     layout->addWidget(rosterView);

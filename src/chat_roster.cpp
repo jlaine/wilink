@@ -202,15 +202,12 @@ RosterView::RosterView(RosterModel *model, QWidget *parent)
     QAction *action;
     contextMenu = new QMenu(this);
     action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
-    connect(action, SIGNAL(triggered()), this, SLOT(startChat()));
+    connect(action, SIGNAL(triggered()), this, SLOT(slotDoubleClicked()));
     action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
 
-#ifdef CHAT_SINGLEWINDOW
-    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(startChat()));
-#else
-    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(startChat()));
-#endif
+    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotClicked()));
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotDoubleClicked()));
 
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);
@@ -255,10 +252,17 @@ QSize RosterView::sizeHint () const
     return hint;
 }
 
-void RosterView::startChat()
+void RosterView::slotClicked()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
-        emit chatContact(index.data(Qt::UserRole).toString());
+        emit clicked(index.data(Qt::UserRole).toString());
+}
+
+void RosterView::slotDoubleClicked()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+        emit doubleClicked(index.data(Qt::UserRole).toString());
 }
 

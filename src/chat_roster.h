@@ -80,12 +80,14 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
-    void chatContact(const QString &jid);
+    void clicked(const QString &jid);
+    void doubleClicked(const QString &jid);
     void removeContact(const QString &jid);
 
 protected slots:
-    void startChat();
     void removeContact();
+    void slotClicked();
+    void slotDoubleClicked();
 
 private:
     QMenu *contextMenu;
