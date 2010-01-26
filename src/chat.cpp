@@ -88,11 +88,17 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     QWidget *rosterPanel = new QWidget;
     rosterPanel->setLayout(layout);
+    rosterPanel->setMinimumWidth(200);
+    rosterPanel->setMaximumWidth(300);
+    QSizePolicy policy = rosterPanel->sizePolicy();
+    policy.setHorizontalPolicy(QSizePolicy::Preferred);
+    rosterPanel->setSizePolicy(policy);
     addWidget(rosterPanel);
     conversationPanel = new QStackedWidget;
     conversationPanel->hide();
     addWidget(conversationPanel);
 
+    setChildrenCollapsible(false);
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Chat"));
 
