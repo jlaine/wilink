@@ -42,7 +42,6 @@ public:
 
     QPixmap contactAvatar(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
-    QPixmap contactStatusIcon(const QString &bareJid) const;
 
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
@@ -58,6 +57,7 @@ protected slots:
 
 private:
     QString contactStatus(const QString &bareJid) const;
+    QPixmap contactStatusIcon(const QString &bareJid) const;
 
 private:
     QXmppRoster *rosterManager;
