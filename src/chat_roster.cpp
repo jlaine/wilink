@@ -231,6 +231,7 @@ RosterView::RosterView(RosterModel *model, QWidget *parent)
     setColumnWidth(ImageColumn, 40);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setIconSize(QSize(32, 32));
+    setMinimumWidth(200);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
     setShowGrid(false);

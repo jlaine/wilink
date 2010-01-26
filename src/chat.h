@@ -20,7 +20,7 @@
 #ifndef __WDESKTOP_CHAT_H__
 #define __WDESKTOP_CHAT_H__
 
-#include <QSplitter>
+#include <QWidget>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
@@ -29,13 +29,14 @@ class ChatDialog;
 class RosterModel;
 class RosterView;
 class QLabel;
+class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
 class QXmppVCard;
 class QXmppVCardManager;
 
-class Chat : public QSplitter
+class Chat : public QWidget
 {
     Q_OBJECT
 
@@ -73,6 +74,7 @@ private:
     QTimer *pingTimer;
     RosterModel *rosterModel;
     RosterView *rosterView;
+    QSplitter *splitter;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
     QTimer *timeoutTimer;

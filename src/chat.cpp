@@ -27,6 +27,7 @@
 #include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSplitter>
 #include <QStackedWidget>
 #include <QStringList>
 #include <QSystemTrayIcon>
@@ -60,18 +61,24 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     client = new QXmppClient(this);
     rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
 
-    /* assemble UI */
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
+    /* build splitter */
+    splitter = new QSplitter;
+    splitter->setChildrenCollapsible(false);
 
     rosterView = new RosterView(rosterModel);
     connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(focusContact(const QString&)));
     connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
-    layout->addWidget(rosterView);
+    splitter->addWidget(rosterView);
+    splitter->setStretchFactor(0, 0);
 
+    conversationPanel = new QStackedWidget;
+    conversationPanel->hide();
+    splitter->addWidget(conversationPanel);
+    splitter->setStretchFactor(1, 1);
+
+    /* build status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setMargin(10);
     hbox->setSpacing(10);
@@ -84,21 +91,15 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     statusLabel = new QLabel;
     hbox->addWidget(statusLabel);
-    layout->addItem(hbox);
 
-    QWidget *rosterPanel = new QWidget;
-    rosterPanel->setLayout(layout);
-    rosterPanel->setMinimumWidth(200);
-    rosterPanel->setMaximumWidth(300);
-    QSizePolicy policy = rosterPanel->sizePolicy();
-    policy.setHorizontalPolicy(QSizePolicy::Preferred);
-    rosterPanel->setSizePolicy(policy);
-    addWidget(rosterPanel);
-    conversationPanel = new QStackedWidget;
-    conversationPanel->hide();
-    addWidget(conversationPanel);
+    /* assemble UI */
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    layout->addWidget(splitter, 1);
+    layout->addLayout(hbox);
 
-    setChildrenCollapsible(false);
+    setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Chat"));
 
