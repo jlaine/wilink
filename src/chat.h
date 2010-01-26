@@ -61,6 +61,7 @@ protected slots:
     void sendPing();
 
 protected:
+    void changeEvent(QEvent *event);
     ChatDialog *conversation(const QString &jid);
 
 private:

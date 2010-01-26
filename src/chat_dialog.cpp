@@ -118,15 +118,6 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-/** When the window is activated, pass focus to the input line.
- */
-void ChatDialog::changeEvent(QEvent *event)
-{
-    QWidget::changeEvent(event);
-    if (event->type() == QEvent::ActivationChange && isActiveWindow())
-        chatInput->setFocus();
-}
-
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     chatHistory->append(

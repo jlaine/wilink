@@ -148,6 +148,19 @@ void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
         chatDialogs[bareJid]->archiveChatReceived(chat);
 }
 
+/** When the window is activated, pass focus to the active chat.
+ */
+void Chat::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::ActivationChange && isActiveWindow())
+    {
+        QWidget *widget = conversationPanel->currentWidget();
+        if (widget)
+            widget->setFocus();
+    }
+}
+
 void Chat::chatContact(const QString &jid)
 {
     ChatDialog *dialog = conversation(jid);

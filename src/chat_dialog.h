@@ -64,9 +64,6 @@ protected slots:
 signals:
     void sendMessage(const QString &jid, const QString &message);
 
-protected:
-    void changeEvent(QEvent *event);
-
 private:
     QString formatMessage(const QString &text, bool local, const QDateTime &datetime) const;
 
