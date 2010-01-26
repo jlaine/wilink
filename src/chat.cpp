@@ -410,4 +410,16 @@ void Chat::sendPing()
     timeoutTimer->start();
 }
 
+void Chat::setSingleWindow(bool single)
+{
+    if (single == singleWindow)
+        return;
+    QList<ChatDialog*> oldDialogs = chatDialogs.values();
+    chatDialogs.clear();
+    singleWindow = single;
+    conversationPanel->hide();
+
+    foreach (ChatDialog *dialog, oldDialogs)
+        delete dialog;
+}
 

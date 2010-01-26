@@ -42,6 +42,7 @@ class Chat : public QSplitter
 public:
     Chat(QSystemTrayIcon *trayIcon);
     bool open(const QString &jid, const QString &password);
+    void setSingleWindow(bool single);
 
 protected slots:
     void addContact();
