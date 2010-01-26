@@ -83,10 +83,8 @@ QString RosterModel::contactStatus(const QString &bareJid) const
 
 QString RosterModel::contactStatusIcon(const QString &bareJid) const
 {
-#ifdef CHAT_SINGLEWINDOW
     if(pendingMessages.contains(bareJid))
         return QString(":/contact-aPendingMessage.png");
-#endif
     return QString(":/contact-%1.png").arg(contactStatus(bareJid));
 }
 
@@ -176,26 +174,22 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
     }
 }
 
-#ifdef CHAT_SINGLEWINDOW
 void RosterModel::removePendingMessage(const QString &bareJid)
 {
     pendingMessages.remove(bareJid);
-    qDebug() << "Messages removed from" << bareJid;
     const int rowIndex = rosterKeys.indexOf(bareJid);
     emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
 }
 
-void RosterModel::setPendingMessage(const QXmppMessage &msg)
+void RosterModel::setPendingMessage(const QString &bareJid)
 {
-    const QString jid = msg.getFrom().split('/')[0];
-    const QString body = msg.getBody();
-    const QString from = jid.split("@")[0];
-    qDebug() << "message received from" << from << jid << body;
-    pendingMessages[jid] = body;
-    const int rowIndex = rosterKeys.indexOf(jid);
+    if (pendingMessages.contains(bareJid))
+        pendingMessages[bareJid]++;
+    else
+        pendingMessages[bareJid] = 1;
+    const int rowIndex = rosterKeys.indexOf(bareJid);
     emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
 }
-#endif
 
 RosterView::RosterView(RosterModel *model, QWidget *parent)
     : QTableView(parent)

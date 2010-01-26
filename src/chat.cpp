@@ -213,21 +213,20 @@ void Chat::iqReceived(const QXmppIq&)
 
 void Chat::messageReceived(const QXmppMessage &msg)
 {
-    const QString jid = msg.getFrom();
+    const QString bareJid = msg.getFrom().split("/")[0];
     const QString body = msg.getBody();
-    const QString from = jid.split("@")[0];
 
     if (body.isEmpty())
         return;
 
-    ChatDialog *dialog = conversation(jid.split("/")[0]);
+    ChatDialog *dialog = conversation(bareJid);
     dialog->messageReceived(msg);
 
 #ifdef CHAT_SINGLEWINDOW
     if (!isVisible())
         show();
     if(conversationWidgets->currentWidget() != dialog)
-        rosterModel->setPendingMessage(msg);
+        rosterModel->setPendingMessage(bareJid);
 #else /* CHAT_SINGLEWINDOW */
     if (!dialog->isVisible())
     {

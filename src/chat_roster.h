@@ -44,10 +44,8 @@ public:
     QString contactName(const QString &bareJid) const;
     QString contactStatusIcon(const QString &bareJid) const;
 
-#ifdef CHAT_SINGLEWINDOW
-    void setPendingMessage(const QXmppMessage &msg);
-    void removePendingMessage(const QString &jid);
-#endif
+    void setPendingMessage(const QString &bareJid);
+    void removePendingMessage(const QString &bareJid);
 
 public slots:
     void disconnected();
@@ -67,9 +65,7 @@ private:
     QStringList rosterKeys;
     QMap<QString, QPixmap> rosterAvatars;
     QMap<QString, QString> rosterNames;
-#ifdef CHAT_SINGLEWINDOW
-    QHash<QString, QString> pendingMessages;
-#endif
+    QMap<QString, int> pendingMessages;
 };
 
 class RosterView : public QTableView
