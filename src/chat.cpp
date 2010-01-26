@@ -56,7 +56,7 @@ void application_alert_mac();
 using namespace QNetIO;
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
-    : reconnectOnDisconnect(false), singleWindow(false), systemTrayIcon(trayIcon)
+    : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
     rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
@@ -66,7 +66,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     splitter->setChildrenCollapsible(false);
 
     rosterView = new RosterView(rosterModel);
-    connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(focusContact(const QString&)));
+    connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
@@ -153,15 +153,8 @@ void Chat::chatContact(const QString &jid)
     ChatDialog *dialog = conversation(jid);
     rosterModel->clearPendingMessages(jid);
 
-    if (singleWindow)
-    {
-        conversationPanel->setCurrentWidget(dialog);
-        dialog->setFocus();
-    } else {
-        dialog->show();
-        dialog->raise();
-        dialog->activateWindow();
-    }
+    conversationPanel->setCurrentWidget(dialog);
+    dialog->setFocus();
 }
 
 void Chat::connected()
@@ -184,11 +177,8 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
-        if (singleWindow)
-        {
-            conversationPanel->addWidget(chatDialogs[jid]);
-            conversationPanel->show();
-        }
+        conversationPanel->addWidget(chatDialogs[jid]);
+        conversationPanel->show();
 
         // get archives
         client->getArchiveManager().getCollections(jid);
@@ -216,12 +206,6 @@ void Chat::disconnected()
     }
 }
 
-void Chat::focusContact(const QString &jid)
-{
-    if (singleWindow)
-        chatContact(jid);
-}
-
 void Chat::iqReceived(const QXmppIq&)
 {
     timeoutTimer->stop();
@@ -238,31 +222,16 @@ void Chat::messageReceived(const QXmppMessage &msg)
     ChatDialog *dialog = conversation(bareJid);
     dialog->messageReceived(msg);
 
-    if (singleWindow)
+    if (!isVisible())
     {
-        if (!isVisible())
-        {
 #ifdef Q_OS_MAC
-            show();
+        show();
 #else
-            showMinimized();
+        showMinimized();
 #endif
-        }
-        if (conversationPanel->currentWidget() != dialog)
-            rosterModel->addPendingMessage(bareJid);
-    } else {
-        if (!dialog->isVisible())
-        {
-#ifdef Q_OS_MAC
-            dialog->show();
-#else
-            if (!isVisible())
-                dialog->showMinimized();
-            else
-                dialog->show();
-#endif
-        }
     }
+    if (conversationPanel->currentWidget() != dialog)
+        rosterModel->addPendingMessage(bareJid);
 
     /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
      * only causes the dock icon to bounce for one second, instead of
@@ -423,18 +392,5 @@ void Chat::sendPing()
     ping.setTo(client->getConfiguration().getDomain());
     client->sendPacket(ping);
     timeoutTimer->start();
-}
-
-void Chat::setSingleWindow(bool single)
-{
-    if (single == singleWindow)
-        return;
-    QList<ChatDialog*> oldDialogs = chatDialogs.values();
-    chatDialogs.clear();
-    singleWindow = single;
-    conversationPanel->hide();
-
-    foreach (ChatDialog *dialog, oldDialogs)
-        delete dialog;
 }
 

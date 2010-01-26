@@ -59,7 +59,6 @@ protected slots:
     void showIcon();
     void showMenu();
     void showPhotos();
-    void singleChatWindow(bool checked);
 
 private:
     void fetchIcon();

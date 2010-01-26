@@ -43,14 +43,12 @@ class Chat : public QWidget
 public:
     Chat(QSystemTrayIcon *trayIcon);
     bool open(const QString &jid, const QString &password);
-    void setSingleWindow(bool single);
 
 protected slots:
     void addContact();
     void chatContact(const QString &jid);
     void connected();
     void disconnected();
-    void focusContact(const QString &jid);
     void iqReceived(const QXmppIq&);
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void messageReceived(const QXmppMessage &msg);
@@ -67,7 +65,6 @@ protected:
 
 private:
     bool reconnectOnDisconnect;
-    bool singleWindow;
 
     QHash<QString, ChatDialog*> chatDialogs;
     QXmppClient *client;

@@ -89,7 +89,6 @@ TrayIcon::TrayIcon()
 
     /* prepare modules */
     chat = new Chat(this);
-    chat->setSingleWindow(settings->value("SingleChatWindow").toBool());
     updates = new UpdatesDialog;
 
     /* fetch menu */
@@ -271,21 +270,18 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
 
-    QMenu *optionsMenu = new QMenu;
     if (Application::isInstalled())
     {
+        QMenu *optionsMenu = new QMenu;
+
         action = optionsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(settings->value("OpenAtLogin").toBool());
         connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
-    }
-    action = optionsMenu->addAction(tr("Single chat window"));
-    action->setCheckable(true);
-    action->setChecked(settings->value("SingleChatWindow").toBool());
-    connect(action, SIGNAL(toggled(bool)), this, SLOT(singleChatWindow(bool)));
 
-    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
-    action->setMenu(optionsMenu);
+        action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
+        action->setMenu(optionsMenu);
+    }
 
     action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
@@ -353,11 +349,5 @@ void TrayIcon::showPhotos()
     }
     photos->show();
     photos->raise();
-}
-
-void TrayIcon::singleChatWindow(bool checked)
-{
-    chat->setSingleWindow(checked);
-    settings->setValue("SingleChatWindow", checked);
 }
 
