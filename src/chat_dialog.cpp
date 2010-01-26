@@ -54,8 +54,6 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
-    statusLabel = new QLabel;
-    hbox->addWidget(statusLabel);
     QLabel *nameLabel = new QLabel(chatRemoteJid);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
@@ -144,11 +142,6 @@ void ChatDialog::send()
 void ChatDialog::setAvatar(const QPixmap &avatar)
 {
     avatarLabel->setPixmap(avatar);
-}
-
-void ChatDialog::setStatus(const QPixmap &status)
-{
-    statusLabel->setPixmap(status);
 }
 
 ChatHistory::ChatHistory(QWidget *parent)

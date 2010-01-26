@@ -110,7 +110,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
-    connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
 
     /* set up timers */
@@ -187,7 +186,6 @@ ChatDialog *Chat::conversation(const QString &jid)
     {
         chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
         chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
-        chatDialogs[jid]->setStatus(rosterModel->contactStatusIcon(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
         conversationPanel->addWidget(chatDialogs[jid]);
@@ -205,8 +203,6 @@ void Chat::disconnected()
     pingTimer->stop();
     timeoutTimer->stop();
     rosterModel->disconnected();
-    foreach (ChatDialog *dialog, chatDialogs)
-        dialog->setStatus(QPixmap(":/contact-offline.png"));
 
     if (reconnectOnDisconnect)
     {
@@ -256,13 +252,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
 #else
     QApplication::alert(dialog);
 #endif
-}
-
-void Chat::presenceChanged(const QString& bareJid, const QString& resource)
-{
-    if (!chatDialogs.contains(bareJid))
-        return;
-    chatDialogs[bareJid]->setStatus(rosterModel->contactStatusIcon(bareJid));
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)
@@ -382,7 +371,8 @@ void Chat::resizeContacts()
         hint.setHeight(available.height() - 100);
         hint.setWidth(hint.width() + 32);
     }
-    resize(hint);
+
+    resize(hint.expandedTo(size()));
 }
 
 /** Send a chat message to the specified recipient.

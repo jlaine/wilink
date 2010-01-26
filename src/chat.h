@@ -52,7 +52,6 @@ protected slots:
     void iqReceived(const QXmppIq&);
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void messageReceived(const QXmppMessage &msg);
-    void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);
     void reconnect();
     void removeContact(const QString &jid);
