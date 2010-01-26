@@ -67,13 +67,10 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     layout->addWidget(chatHistory);
 
     /* text edit */
-    hbox = new QHBoxLayout;
-    hbox->setMargin(10);
-    hbox->setSpacing(10);
     chatInput = new ChatEdit(80);
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
-    hbox->addWidget(chatInput);
-    layout->addItem(hbox);
+    layout->addSpacing(10);
+    layout->addWidget(chatInput);
 
     setFocusProxy(chatInput);
     setLayout(layout);
