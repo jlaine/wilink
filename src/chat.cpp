@@ -155,6 +155,7 @@ void Chat::chatContact(const QString &jid)
     if (singleWindow)
     {
         conversationPanel->setCurrentWidget(dialog);
+        dialog->setFocus();
     } else {
         dialog->show();
         dialog->raise();
