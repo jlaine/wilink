@@ -20,11 +20,7 @@
 #ifndef __WDESKTOP_CHAT_H__
 #define __WDESKTOP_CHAT_H__
 
-#ifdef CHAT_SINGLEWINDOW
 #include <QSplitter>
-#else
-#include <QWidget>
-#endif
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
@@ -33,17 +29,13 @@ class ChatDialog;
 class RosterModel;
 class RosterView;
 class QLabel;
+class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
 class QXmppVCard;
 class QXmppVCardManager;
 
-#ifdef CHAT_SINGLEWINDOW
-class QStackedWidget;
 class Chat : public QSplitter
-#else
-class Chat : public QWidget
-#endif
 {
     Q_OBJECT
 
@@ -80,9 +72,7 @@ private:
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
     QTimer *timeoutTimer;
-#ifdef CHAT_SINGLEWINDOW
-    QStackedWidget *conversationWidgets;
-#endif
+    QStackedWidget *conversationPanel;
 };
 
 

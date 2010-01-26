@@ -85,15 +85,14 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     hbox->addWidget(statusLabel);
     layout->addItem(hbox);
 
-#ifdef CHAT_SINGLEWINDOW
-    QWidget *rosterLayoutWidget = new QWidget;
-    rosterLayoutWidget->setLayout(layout);
-    addWidget(rosterLayoutWidget);
-    conversationWidgets = new QStackedWidget;
-    addWidget(conversationWidgets);
-#else
-    setLayout(layout);
+    QWidget *rosterPanel = new QWidget;
+    rosterPanel->setLayout(layout);
+    addWidget(rosterPanel);
+    conversationPanel = new QStackedWidget;
+#ifndef CHAT_SINGLEWINDOW
+    conversationPanel->hide();
 #endif
+    addWidget(conversationPanel);
 
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Chat"));
@@ -148,7 +147,7 @@ void Chat::chatContact(const QString &jid)
     ChatDialog *dialog = conversation(jid);
 #ifdef CHAT_SINGLEWINDOW
     rosterModel->removePendingMessage(jid);
-    conversationWidgets->setCurrentWidget(dialog);
+    conversationPanel->setCurrentWidget(dialog);
 #else
     dialog->show();
     dialog->raise();
@@ -177,7 +176,7 @@ ChatDialog *Chat::conversation(const QString &jid)
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
 #ifdef CHAT_SINGLEWINDOW
-        conversationWidgets->addWidget(chatDialogs[jid]);
+        conversationPanel->addWidget(chatDialogs[jid]);
 #endif
 
         // get archives
@@ -225,7 +224,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
 #ifdef CHAT_SINGLEWINDOW
     if (!isVisible())
         show();
-    if(conversationWidgets->currentWidget() != dialog)
+    if(conversationPanel->currentWidget() != dialog)
         rosterModel->setPendingMessage(bareJid);
 #else /* CHAT_SINGLEWINDOW */
     if (!dialog->isVisible())
