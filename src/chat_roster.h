@@ -44,8 +44,8 @@ public:
     QString contactName(const QString &bareJid) const;
     QPixmap contactStatusIcon(const QString &bareJid) const;
 
-    void setPendingMessage(const QString &bareJid);
-    void removePendingMessage(const QString &bareJid);
+    void addPendingMessage(const QString &bareJid);
+    void clearPendingMessages(const QString &bareJid);
 
 public slots:
     void disconnected();

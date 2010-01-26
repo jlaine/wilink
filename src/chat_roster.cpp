@@ -22,6 +22,7 @@
 #include <QHeaderView>
 #include <QList>
 #include <QMenu>
+#include <QPainter>
 #include <QStringList>
 #include <QSortFilterProxyModel>
 
@@ -83,9 +84,25 @@ QString RosterModel::contactStatus(const QString &bareJid) const
 
 QPixmap RosterModel::contactStatusIcon(const QString &bareJid) const
 {
+    QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
+
     if (pendingMessages.contains(bareJid))
-        return QPixmap(":/contact-aPendingMessage.png");
-    return QPixmap(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
+    {
+        QString pending = QString::number(pendingMessages[bareJid]);
+        QPainter painter(&icon);
+        QRect rect = painter.fontMetrics().boundingRect(pending);
+        rect.setWidth(rect.width() + 2);
+        rect.moveTop(2);
+        rect.moveRight(icon.width() - 2);
+
+        painter.setBrush(Qt::red);
+        painter.setPen(Qt::NoPen);
+        painter.drawRoundedRect(rect, 6, 6);
+        painter.setPen(Qt::white);
+        painter.drawText(rect, pending);
+    }
+
+    return icon;
 }
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const
@@ -173,19 +190,19 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
     }
 }
 
-void RosterModel::removePendingMessage(const QString &bareJid)
-{
-    pendingMessages.remove(bareJid);
-    const int rowIndex = rosterKeys.indexOf(bareJid);
-    emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
-}
-
-void RosterModel::setPendingMessage(const QString &bareJid)
+void RosterModel::addPendingMessage(const QString &bareJid)
 {
     if (pendingMessages.contains(bareJid))
         pendingMessages[bareJid]++;
     else
         pendingMessages[bareJid] = 1;
+    const int rowIndex = rosterKeys.indexOf(bareJid);
+    emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+}
+
+void RosterModel::clearPendingMessages(const QString &bareJid)
+{
+    pendingMessages.remove(bareJid);
     const int rowIndex = rosterKeys.indexOf(bareJid);
     emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
 }
