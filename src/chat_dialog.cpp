@@ -74,6 +74,7 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     setFocusProxy(chatInput);
     setLayout(layout);
+    setMinimumWidth(300);
     setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
 }
 
