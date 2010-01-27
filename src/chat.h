@@ -49,6 +49,7 @@ protected slots:
     void chatContact(const QString &jid);
     void connected();
     void disconnected();
+    void error(QXmppClient::Error error);
     void iqReceived(const QXmppIq&);
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void messageReceived(const QXmppMessage &msg);

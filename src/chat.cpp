@@ -104,6 +104,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowTitle(tr("Chat"));
 
     /* set up client */
+    connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
@@ -212,6 +213,17 @@ void Chat::disconnected()
         client->connectToServer(client->getConfiguration());
     } else {
         statusLabel->setText(tr("Disconnected"));
+    }
+}
+
+void Chat::error(QXmppClient::Error error)
+{
+    if(error == QXmppClient::XmppStreamError &&
+       client->getXmppStreamError() == QXmppClient::ConflictStreamError)
+    {
+        // if we received a resource conflict, exit
+        qWarning("RESOURCE CONFLICT");
+        qApp->quit();
     }
 }
 
