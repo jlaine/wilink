@@ -107,7 +107,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     }
     foreach (const QXmppArchiveMessage &msg, chat.messages)
         archiveCursor.insertHtml(
-            formatMessage(msg.body, msg.local, msg.datetime));
+            formatMessage(msg.body, msg.local, msg.datetime.toLocalTime()));
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
