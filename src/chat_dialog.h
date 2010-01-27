@@ -24,11 +24,11 @@
 #include <QTextBrowser>
 
 #include "qxmpp/QXmppClient.h"
+#include "qxmpp/QXmppArchiveIq.h"
 
 class ChatEdit;
 class QLabel;
 class QLineEdit;
-class QXmppArchiveChat;
 class QXmppVCard;
 
 class ChatHistory : public QTextBrowser
@@ -37,7 +37,7 @@ class ChatHistory : public QTextBrowser
 
 public:
     ChatHistory(QWidget *parent = NULL);
-    QString formatMessage(const QString &text, bool local, const QDateTime &datetime) const;
+    void addMessage(const QXmppArchiveMessage &message);
     void setLocalName(const QString &localName);
     void setRemoteName(const QString &remoteName);
 
@@ -48,6 +48,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
 private:
+    QList<QXmppArchiveMessage> messages;
     QString chatLocalName;
     QString chatRemoteName;
 };
@@ -71,9 +72,6 @@ signals:
     void sendMessage(const QString &jid, const QString &message);
 
 private:
-    QTextCursor archiveCursor;
-    bool archiveReceived;
-
     QLabel *avatarLabel;
     ChatHistory *chatHistory;
     ChatEdit *chatInput;

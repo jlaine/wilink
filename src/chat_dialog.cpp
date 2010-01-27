@@ -44,7 +44,6 @@
 
 ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     : QWidget(parent),
-    archiveReceived(false),
     chatRemoteJid(jid)
 {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -64,7 +63,6 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     chatHistory = new ChatHistory;
     chatHistory->setLocalName(tr("Me"));
     chatHistory->setRemoteName(name);
-    archiveCursor = chatHistory->textCursor();
     layout->addWidget(chatHistory);
 
     /* text edit */
@@ -80,14 +78,8 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
-    if (!archiveReceived)
-    {
-        archiveCursor.movePosition(QTextCursor::Start);
-        archiveReceived = true;
-    }
     foreach (const QXmppArchiveMessage &msg, chat.messages)
-        archiveCursor.insertHtml(
-            chatHistory->formatMessage(msg.body, msg.local, msg.datetime.toLocalTime()));
+        chatHistory->addMessage(msg);
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
@@ -96,8 +88,11 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    chatHistory->append(
-        chatHistory->formatMessage(msg.getBody(), false, QDateTime::currentDateTime()));
+    QXmppArchiveMessage message;
+    message.body = msg.getBody();
+    message.local = false;
+    message.datetime = QDateTime::currentDateTime();
+    chatHistory->addMessage(message);
 }
 
 void ChatDialog::send()
@@ -106,8 +101,11 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    chatHistory->append(
-        chatHistory->formatMessage(text, true, QDateTime::currentDateTime()));
+    QXmppArchiveMessage message;
+    message.body = text;
+    message.local = true;
+    message.datetime = QDateTime::currentDateTime();
+    chatHistory->addMessage(message);
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
@@ -129,20 +127,21 @@ ChatHistory::ChatHistory(QWidget *parent)
     connect(this, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(slotAnchorClicked(const QUrl&)));
 }
 
-void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
+void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 {
-    QMenu *menu = createStandardContextMenu();
-    QAction *action = menu->addAction(tr("Clear"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
-    menu->exec(event->globalPos());
-    delete menu;
-}
+    QTextCursor cursor = textCursor();
+    cursor.movePosition(QTextCursor::End);
+    int i = messages.size() - 1;
+    while (i >= 0 && message.datetime > messages.at(i).datetime)
+    {
+        cursor.movePosition(QTextCursor::PreviousBlock);
+        i--;
+    }
 
-QString ChatHistory::formatMessage(const QString &text, bool local, const QDateTime &datetime) const
-{
-    QString html = text;
+    /* add message */
+    QString html = message.body;
     html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-    return QString(
+    html = QString(
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr style=\"background-color: %1\">"
         "  <td>%2</td>"
@@ -152,10 +151,20 @@ QString ChatHistory::formatMessage(const QString &text, bool local, const QDateT
         "  <td colspan=\"2\">%4</td>"
         "</tr>"
         "</table>")
-        .arg(local ? "#dbdbdb" : "#b6d4ff")
-        .arg(local ? chatLocalName : chatRemoteName)
-        .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
+        .arg(message.local ? "#dbdbdb" : "#b6d4ff")
+        .arg(message.local ? chatLocalName : chatRemoteName)
+        .arg(message.datetime.date() == QDate::currentDate() ? message.datetime.toString("hh:mm") : message.datetime.toString("dd MMM hh:mm"))
         .arg(html);
+    cursor.insertHtml(html);
+}
+
+void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu *menu = createStandardContextMenu();
+    QAction *action = menu->addAction(tr("Clear"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
+    menu->exec(event->globalPos());
+    delete menu;
 }
 
 void ChatHistory::setLocalName(const QString &localName)
