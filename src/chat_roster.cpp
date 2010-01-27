@@ -121,7 +121,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
         return QIcon(contactAvatar(bareJid));
     } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-        return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower();
+        return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
     }
     return QVariant();
 }
