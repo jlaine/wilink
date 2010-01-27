@@ -87,9 +87,13 @@ TrayIcon::TrayIcon()
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
-    /* prepare modules */
+    /* prepare chat */
     chat = new Chat(this);
+
+    /* prepare updates */
     updates = new UpdatesDialog;
+    updatesTimer = new QTimer(this);
+    connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
 
     /* fetch menu */
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
@@ -334,8 +338,9 @@ void TrayIcon::showMenu()
         chat->open(auth.user(), auth.password());
         showChat();
 
-        /* check for updates */
+        /* check for updates now then every week */
         updates->check();
+        updatesTimer->start(7 * 24 * 3600 * 1000);
     }
 }
 

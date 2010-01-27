@@ -58,6 +58,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
 void UpdatesDialog::check()
 {
+    qDebug("Checking for updates");
     updates->check();
 }
 

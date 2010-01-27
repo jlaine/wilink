@@ -75,6 +75,7 @@ private:
     QList< QPair<QUrl, QAction *> > icons;
     QStringList seenMessages;
     QSettings *settings;
+    QTimer *updatesTimer;
     QByteArray userAgent;
 };
 
