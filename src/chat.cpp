@@ -126,10 +126,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up keyboard shortcuts */
 #ifdef Q_OS_MAC
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::META + Qt::Key_W), this);
-#else
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this);
-#endif
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
+#endif
 }
 
 /** Prompt the user for a new contact then add it to the roster.

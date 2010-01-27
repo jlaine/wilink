@@ -1,5 +1,6 @@
 wDesktop 0.4.1 (UNRELEASED)
  * Fix timezone of chat history.
+ * Make it possible to close the chat window using META-W on Mac OS.
 
 wDesktop 0.4.0 (2010-01-27)
  * Group all chats in a single window.
