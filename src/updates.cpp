@@ -59,6 +59,7 @@ void Updates::check()
 
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(processStatus()));
 }
