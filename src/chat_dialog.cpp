@@ -43,11 +43,10 @@
 #include "chat_edit.h"
 
 ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
-    : QWidget(parent), chatRemoteJid(jid), chatRemoteName(name),
-    archiveReceived(false)
+    : QWidget(parent),
+    archiveReceived(false),
+    chatRemoteJid(jid)
 {
-    chatLocalName = tr("Me");
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
@@ -63,6 +62,8 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     /* chat history */
     chatHistory = new ChatHistory;
+    chatHistory->setLocalName(tr("Me"));
+    chatHistory->setRemoteName(name);
     archiveCursor = chatHistory->textCursor();
     layout->addWidget(chatHistory);
 
@@ -75,27 +76,6 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
     setFocusProxy(chatInput);
     setLayout(layout);
     setMinimumWidth(300);
-    setWindowTitle(tr("Chat with %1").arg(chatRemoteName));
-}
-
-QString ChatDialog::formatMessage(const QString &text, bool local, const QDateTime &datetime) const
-{
-    QString html = text;
-    html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-    return QString(
-        "<table cellspacing=\"0\" width=\"100%\">"
-        "<tr style=\"background-color: %1\">"
-        "  <td>%2</td>"
-        "  <td align=\"right\">%3</td>"
-        "</tr>"
-        "<tr>"
-        "  <td colspan=\"2\">%4</td>"
-        "</tr>"
-        "</table>")
-        .arg(local ? "#dbdbdb" : "#b6d4ff")
-        .arg(local ? chatLocalName : chatRemoteName)
-        .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
-        .arg(html);
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -107,7 +87,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     }
     foreach (const QXmppArchiveMessage &msg, chat.messages)
         archiveCursor.insertHtml(
-            formatMessage(msg.body, msg.local, msg.datetime.toLocalTime()));
+            chatHistory->formatMessage(msg.body, msg.local, msg.datetime.toLocalTime()));
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
@@ -117,7 +97,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     chatHistory->append(
-        formatMessage(msg.getBody(), false, QDateTime::currentDateTime()));
+        chatHistory->formatMessage(msg.getBody(), false, QDateTime::currentDateTime()));
 }
 
 void ChatDialog::send()
@@ -127,7 +107,7 @@ void ChatDialog::send()
         return;
 
     chatHistory->append(
-        formatMessage(text, true, QDateTime::currentDateTime()));
+        chatHistory->formatMessage(text, true, QDateTime::currentDateTime()));
 
     /* scroll to end, but don't touch cursor */
     QScrollBar *scrollBar = chatHistory->verticalScrollBar();
@@ -156,6 +136,36 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
     menu->exec(event->globalPos());
     delete menu;
+}
+
+QString ChatHistory::formatMessage(const QString &text, bool local, const QDateTime &datetime) const
+{
+    QString html = text;
+    html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
+    return QString(
+        "<table cellspacing=\"0\" width=\"100%\">"
+        "<tr style=\"background-color: %1\">"
+        "  <td>%2</td>"
+        "  <td align=\"right\">%3</td>"
+        "</tr>"
+        "<tr>"
+        "  <td colspan=\"2\">%4</td>"
+        "</tr>"
+        "</table>")
+        .arg(local ? "#dbdbdb" : "#b6d4ff")
+        .arg(local ? chatLocalName : chatRemoteName)
+        .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
+        .arg(html);
+}
+
+void ChatHistory::setLocalName(const QString &localName)
+{
+    chatLocalName = localName;
+}
+
+void ChatHistory::setRemoteName(const QString &remoteName)
+{
+    chatRemoteName = remoteName;
 }
 
 void ChatHistory::slotAnchorClicked(const QUrl &link)

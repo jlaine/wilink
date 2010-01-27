@@ -37,12 +37,19 @@ class ChatHistory : public QTextBrowser
 
 public:
     ChatHistory(QWidget *parent = NULL);
+    QString formatMessage(const QString &text, bool local, const QDateTime &datetime) const;
+    void setLocalName(const QString &localName);
+    void setRemoteName(const QString &remoteName);
 
 protected slots:
     void slotAnchorClicked(const QUrl &link);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+
+private:
+    QString chatLocalName;
+    QString chatRemoteName;
 };
 
 class ChatDialog : public QWidget
@@ -64,8 +71,6 @@ signals:
     void sendMessage(const QString &jid, const QString &message);
 
 private:
-    QString formatMessage(const QString &text, bool local, const QDateTime &datetime) const;
-
     QTextCursor archiveCursor;
     bool archiveReceived;
 
@@ -73,9 +78,7 @@ private:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
 
-    QString chatLocalName;
     QString chatRemoteJid;
-    QString chatRemoteName;
 };
 
 #endif
