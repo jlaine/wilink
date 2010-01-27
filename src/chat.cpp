@@ -27,6 +27,7 @@
 #include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStringList>
@@ -121,6 +122,14 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     timeoutTimer = new QTimer(this);
     timeoutTimer->setInterval(10000);
     connect(timeoutTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
+
+    /* set up keyboard shortcuts */
+#ifdef Q_OS_MAC
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::META + Qt::Key_W), this);
+#else
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this);
+#endif
+    connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 }
 
 /** Prompt the user for a new contact then add it to the roster.
