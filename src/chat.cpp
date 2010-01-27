@@ -172,7 +172,7 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::connected()
 {
-    qWarning("CONNECTED");
+    qWarning("Connected to chat server");
     pingTimer->start();
     statusLabel->setText(tr("Connected"));
 }
@@ -192,22 +192,23 @@ ChatDialog *Chat::conversation(const QString &jid)
         conversationPanel->addWidget(chatDialogs[jid]);
         conversationPanel->show();
 
-        // get archives
-        client->getArchiveManager().getCollections(jid);
+        // get archives for the past week
+        client->getArchiveManager().getCollections(jid,
+            QDateTime::currentDateTime().addDays(-7));
     }
     return chatDialogs[jid];
 }
 
 void Chat::disconnected()
 {
-    qWarning("DISCONNECTED");
+    qWarning("Disconnected from chat server");
     pingTimer->stop();
     timeoutTimer->stop();
     rosterModel->disconnected();
 
     if (reconnectOnDisconnect)
     {
-        qWarning("RECONNECT");
+        qWarning("Reconnecting to chat server");
         reconnectOnDisconnect = false;
         statusLabel->setText(tr("Connecting.."));
         client->connectToServer(client->getConfiguration());
@@ -222,7 +223,7 @@ void Chat::error(QXmppClient::Error error)
        client->getXmppStreamError() == QXmppClient::ConflictStreamError)
     {
         // if we received a resource conflict, exit
-        qWarning("RESOURCE CONFLICT");
+        qWarning("Received a resource conflict from chat server");
         qApp->quit();
     }
 }
@@ -314,7 +315,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QStringList bits = jid.split("@");
     if (bits.size() != 2)
     {
-        qWarning("Invalid JID");
+        qWarning("Cannot connect to chat server using invalid JID");
         return false;
     }
     config.setPasswd(password);
