@@ -343,6 +343,10 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setHost(config.getDomain());
 #endif
 
+    /* set security parameters */
+    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    config.setIgnoreSslErrors(false);
+
     /* connect to server */
     statusLabel->setText(tr("Connecting.."));
     client->connectToServer(config);
