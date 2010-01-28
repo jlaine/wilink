@@ -19,6 +19,8 @@
 
 #include <QLayout>
 #include <QNetworkInterface>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QPushButton>
 #include <QPrintDialog>
 #include <QPrinter>
@@ -222,6 +224,10 @@ Diagnostics::Diagnostics(QWidget *parent)
     progressBar = new QProgressBar;
     hbox->addWidget(progressBar);
 
+    sendButton = new QPushButton(tr("Send"));
+    connect(sendButton, SIGNAL(clicked()), this, SLOT(send()));
+    hbox->addWidget(sendButton);
+
     printButton = new QPushButton(tr("Print"));
     connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
     hbox->addWidget(printButton);
@@ -307,6 +313,25 @@ void Diagnostics::networkFinished()
     /* enable buttons */
     refreshButton->setEnabled(true);
     printButton->setEnabled(true);
+    if(!diagnosticsUrl.isEmpty())
+        sendButton->setEnabled(true);
+}
+
+void Diagnostics::send()
+{
+    qDebug() << "sending diagnostics to" << diagnosticsUrl.toString();
+    QUrl query;
+    query.addQueryItem("dump", text->toHtml());
+    QNetworkRequest req(diagnosticsUrl.toString());
+    req.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    network.post(req, query.encodedQuery());
+}
+
+void Diagnostics::setUrl(const QUrl &url)
+{
+    diagnosticsUrl = url;
+    if(refreshButton->isEnabled() && url.isValid())
+        sendButton->setEnabled(true);
 }
 
 void Diagnostics::showDns(const QList<QHostInfo> &results)

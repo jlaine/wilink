@@ -90,6 +90,9 @@ TrayIcon::TrayIcon()
     /* prepare chat */
     chat = new Chat(this);
 
+    /* prepare diagnostics */
+    diagnostics = new Diagnostics;
+
     /* prepare updates */
     updates = new UpdatesDialog;
     updatesTimer = new QTimer(this);
@@ -219,8 +222,6 @@ void TrayIcon::showChat()
 
 void TrayIcon::showDiagnostics()
 {
-    if (!diagnostics)
-        diagnostics = new Diagnostics;
     diagnostics->show();
     diagnostics->raise();
 }
@@ -319,11 +320,20 @@ void TrayIcon::showMenu()
     /* parse preferences */
     item = doc.documentElement().firstChildElement("preferences");
     refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
-    const QString urlString = item.firstChildElement("updates").text();
+    QString urlString = item.firstChildElement("updates").text();
     if (!urlString.isEmpty())
         updates->setUrl(baseUrl.resolved(QUrl(urlString)));
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
+
+    // FIXME : not yet tested !
+    urlString = item.firstChildElement("diagnostics").text();
+    if (!urlString.isEmpty()) {
+        qDebug() << urlString << "used to report diagnostics";
+        diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
+    } else {
+        diagnostics->setUrl(QUrl("http://127.0.0.1:8000")); // FIXME: only for testing. To be removed !
+    }
 
     /* fetch icons */
     fetchIcon();

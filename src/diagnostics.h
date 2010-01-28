@@ -22,7 +22,9 @@
 
 #include <QDialog>
 #include <QHostInfo>
+#include <QNetworkAccessManager>
 #include <QThread>
+#include <QUrl>
 
 #include "networkinfo.h"
 #include "wireless.h"
@@ -64,12 +66,14 @@ class Diagnostics : public QDialog
 
 public:
     Diagnostics(QWidget *parent=0);
+    void setUrl(const QUrl &url);
 
 protected slots:
     void addItem(const QString &title, const QString &value);
     void addSection(const QString &title);
     void print();
     void refresh();
+    void send();
 
     void showDns(const QList<QHostInfo> &results);
     void showPing(const QList<Ping> &results);
@@ -83,6 +87,9 @@ private:
     QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
+    QPushButton *sendButton;
+    QUrl diagnosticsUrl;
+    QNetworkAccessManager network;
 
     NetworkThread *networkThread;
 };
