@@ -227,6 +227,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     hbox->addWidget(progressBar);
 
     sendButton = new QPushButton(tr("Send"));
+    sendButton->hide();
     connect(sendButton, SIGNAL(clicked()), this, SLOT(send()));
     hbox->addWidget(sendButton);
 
@@ -267,8 +268,9 @@ void Diagnostics::print()
 
 void Diagnostics::refresh()
 {
-    refreshButton->setEnabled(false);
     printButton->setEnabled(false);
+    sendButton->setEnabled(false);
+    refreshButton->setEnabled(false);
 
     /* show system info */
     text->setText("<h2>System information</h2>");
@@ -315,13 +317,11 @@ void Diagnostics::networkFinished()
     /* enable buttons */
     refreshButton->setEnabled(true);
     printButton->setEnabled(true);
-    if(!diagnosticsUrl.isEmpty())
-        sendButton->setEnabled(true);
+    sendButton->setEnabled(true);
 }
 
 void Diagnostics::send()
 {
-    qDebug() << "sending diagnostics to" << diagnosticsUrl.toString();
     QNetIO::MimeForm form;
     form.addString("dump", text->toHtml());
 
@@ -333,8 +333,8 @@ void Diagnostics::send()
 void Diagnostics::setUrl(const QUrl &url)
 {
     diagnosticsUrl = url;
-    if(refreshButton->isEnabled() && url.isValid())
-        sendButton->setEnabled(true);
+    if(url.isValid())
+        sendButton->show();
 }
 
 void Diagnostics::showDns(const QList<QHostInfo> &results)

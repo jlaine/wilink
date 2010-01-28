@@ -326,14 +326,9 @@ void TrayIcon::showMenu()
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 
-    // FIXME : not yet tested !
     urlString = item.firstChildElement("diagnostics").text();
-    if (!urlString.isEmpty()) {
-        qDebug() << urlString << "used to report diagnostics";
+    if (!urlString.isEmpty())
         diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
-    } else {
-        diagnostics->setUrl(QUrl("http://127.0.0.1:8000")); // FIXME: only for testing. To be removed !
-    }
 
     /* fetch icons */
     fetchIcon();
