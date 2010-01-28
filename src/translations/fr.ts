@@ -47,10 +47,6 @@
 <context>
     <name>ChatDialog</name>
     <message>
-        <source>Chat with %1</source>
-        <translation>Conversation avec %1</translation>
-    </message>
-    <message>
         <source>Me</source>
         <translation>Moi</translation>
     </message>
@@ -92,16 +88,12 @@
         <translation>Créer un album</translation>
     </message>
     <message>
-        <source>Folder name:</source>
-        <translation>Nom du dossier :</translation>
-    </message>
-    <message>
         <source>Photos upload complete.</source>
         <translation>Envoi de photos terminé.</translation>
     </message>
     <message>
         <source>Uploading %1</source>
-        <translation>Envoi de %1</translation>
+        <translation>Transfert de %1</translation>
     </message>
     <message>
         <source>Loading your albums..</source>
@@ -117,7 +109,11 @@
     </message>
     <message>
         <source>Upload photos</source>
-        <translation>Téléchargement photos</translation>
+        <translation>Transfert de photos</translation>
+    </message>
+    <message>
+        <source>Album name:</source>
+        <translation>Nom de l'album :</translation>
     </message>
 </context>
 <context>
@@ -147,7 +143,7 @@
     </message>
     <message>
         <source>Upload &amp;photos</source>
-        <translation>Téléchargement &amp;photos</translation>
+        <translation>Transfert de &amp;photos</translation>
     </message>
     <message>
         <source>Open at login</source>

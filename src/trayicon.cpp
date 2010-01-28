@@ -263,13 +263,11 @@ void TrayIcon::showMenu()
     }
 
     /* add static entries */
-    menu->addSeparator();
+    if (!menu->isEmpty())
+        menu->addSeparator();
 
     action = menu->addAction(QIcon(":/chat.png"), tr("&Chat"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChat()));
-
-    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
@@ -286,6 +284,9 @@ void TrayIcon::showMenu()
         action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
         action->setMenu(optionsMenu);
     }
+
+    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
     action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
