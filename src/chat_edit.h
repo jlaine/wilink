@@ -26,24 +26,24 @@ class QKeyEvent;
 
 class ChatEdit : public QTextEdit
 {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  ChatEdit(int maxheight = 80, QWidget* parent = NULL);
-  virtual QSize minimumSizeHint() const;
-  virtual QSize sizeHint() const;
+    ChatEdit(int maxheight = 80, QWidget* parent = NULL);
+    virtual QSize minimumSizeHint() const;
+    virtual QSize sizeHint() const;
 
 signals:
-  void returnPressed();
+    void returnPressed();
 
 protected:
-  virtual void keyPressEvent(QKeyEvent* e);
-  virtual void resizeEvent(QResizeEvent *e);
+    virtual void keyPressEvent(QKeyEvent* e);
+    virtual void resizeEvent(QResizeEvent *e);
 
 public slots:
-  void onTextChanged();
+    void onTextChanged();
 
 private:
-  int maxHeight;
+    int maxHeight;
 };
 #endif
