@@ -172,6 +172,7 @@ Photos::Photos(const QString &url, QWidget *parent)
 {
     /* create UI */
     helpLabel = new QLabel(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
+    helpLabel->setWordWrap(true);
 
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
@@ -204,6 +205,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     layout->addWidget(photosView);
     layout->addWidget(progressBar);
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addStretch();
     hbox->addWidget(backButton);
     hbox->addWidget(createButton);
     layout->addItem(hbox);
