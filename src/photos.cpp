@@ -171,7 +171,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     systemTrayIcon(NULL)
 {
     /* create UI */
-    helpLabel = new QLabel(tr("To upload your photos, simply drag and drop them to a folder."));
+    helpLabel = new QLabel(tr("To upload your photos, simply drag and drop them to an album."));
 
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
@@ -194,7 +194,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     backButton->setEnabled(false);
     connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
 
-    QPushButton *createButton = new QPushButton(tr("Create a folder"));
+    QPushButton *createButton = new QPushButton(tr("Create an album"));
     createButton->setIcon(QIcon(":/add.png"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
 
@@ -298,8 +298,8 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 void Photos::createFolder()
 {
      bool ok;
-     QString text = QInputDialog::getText(this, tr("Create a folder"),
-                                          tr("Folder name:"), QLineEdit::Normal,
+     QString text = QInputDialog::getText(this, tr("Create an album"),
+                                          tr("Album name:"), QLineEdit::Normal,
                                           "", &ok);
     if (ok && !text.isEmpty())
     {
@@ -412,7 +412,7 @@ void Photos::putProgress(int done, int total)
  */
 void Photos::refresh()
 {
-    statusLabel->setText(tr("Loading your folders.."));
+    statusLabel->setText(tr("Loading your albums.."));
     PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
     Q_ASSERT(listView != NULL);
     fs->list(listView->url());

@@ -80,16 +80,16 @@
 <context>
     <name>Photos</name>
     <message>
-        <source>To upload your photos, simply drag and drop them to a folder.</source>
-        <translation>Pour télécharger vos photos, il vous suffit de les faire glisser sur un dossier.</translation>
+        <source>To upload your photos, simply drag and drop them to an album.</source>
+        <translation>Pour télécharger vos photos, il vous suffit de les faire glisser sur un album.</translation>
     </message>
     <message>
         <source>Connecting..</source>
         <translation>Connexion..</translation>
     </message>
     <message>
-        <source>Create a folder</source>
-        <translation>Créer un dossier</translation>
+        <source>Create an album</source>
+        <translation>Créer un album</translation>
     </message>
     <message>
         <source>Folder name:</source>
@@ -104,8 +104,8 @@
         <translation>Envoi de %1</translation>
     </message>
     <message>
-        <source>Loading your folders..</source>
-        <translation>Chargement de vos dossiers..</translation>
+        <source>Loading your albums..</source>
+        <translation>Chargement de vos albums..</translation>
     </message>
     <message>
         <source>Your photos have been uploaded.</source>
