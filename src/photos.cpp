@@ -171,7 +171,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     systemTrayIcon(NULL)
 {
     /* create UI */
-    helpLabel = new QLabel(tr("To upload your photos, simply drag and drop them to an album."));
+    helpLabel = new QLabel(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
 
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);

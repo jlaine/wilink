@@ -76,10 +76,6 @@
 <context>
     <name>Photos</name>
     <message>
-        <source>To upload your photos, simply drag and drop them to an album.</source>
-        <translation>Pour télécharger vos photos, il vous suffit de les faire glisser sur un album.</translation>
-    </message>
-    <message>
         <source>Connecting..</source>
         <translation>Connexion..</translation>
     </message>
@@ -113,7 +109,11 @@
     </message>
     <message>
         <source>Album name:</source>
-        <translation>Nom de l'album :</translation>
+        <translation>Nom de l&apos;album :</translation>
+    </message>
+    <message>
+        <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
+        <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
     </message>
 </context>
 <context>
