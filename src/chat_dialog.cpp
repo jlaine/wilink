@@ -31,7 +31,7 @@
 #include <QPushButton>
 #include <QScrollBar>
 #include <QStringList>
-#include <QTextBrowser>
+#include <QTextBlock>
 
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
@@ -129,14 +129,12 @@ ChatHistory::ChatHistory(QWidget *parent)
 
 void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 {
-    QTextCursor cursor = textCursor();
-    cursor.movePosition(QTextCursor::End);
-    int i = messages.size() - 1;
-    while (i >= 0 && message.datetime > messages.at(i).datetime)
-    {
-        cursor.movePosition(QTextCursor::PreviousBlock);
-        i--;
-    }
+    /* position cursor */
+    int i = 0;
+    while (i < messages.size() && message.datetime > messages.at(i).datetime)
+        i++;
+    messages.insert(i, message);
+    QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
     /* add message */
     QString html = message.body;
