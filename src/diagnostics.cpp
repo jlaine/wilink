@@ -28,6 +28,8 @@
 #include <QTextBrowser>
 #include <QThread>
 
+#include "qnetio/mime.h"
+
 #include "config.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
@@ -320,11 +322,12 @@ void Diagnostics::networkFinished()
 void Diagnostics::send()
 {
     qDebug() << "sending diagnostics to" << diagnosticsUrl.toString();
-    QUrl query;
-    query.addQueryItem("dump", text->toHtml());
+    QNetIO::MimeForm form;
+    form.addString("dump", text->toHtml());
+
     QNetworkRequest req(diagnosticsUrl.toString());
-    req.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-    network.post(req, query.encodedQuery());
+    req.setRawHeader("Content-Type", "multipart/form-data; boundary=" + form.boundary);
+    network.post(req, form.render());
 }
 
 void Diagnostics::setUrl(const QUrl &url)

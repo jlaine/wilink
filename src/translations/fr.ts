@@ -72,6 +72,10 @@
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
+    <message>
+        <source>Send</source>
+        <translation>Envoyer</translation>
+    </message>
 </context>
 <context>
     <name>Photos</name>
