@@ -1,6 +1,8 @@
 wDesktop 0.4.1 (UNRELEASED)
+ * Improve behaviour of chat history when it is resized.
  * Fix timezone of chat history.
  * Make it possible to close the chat window using Cmd-W on Mac OS.
+ * Enforce SSL certificate validation.
 
 wDesktop 0.4.0 (2010-01-27)
  * Group all chats in a single window.
