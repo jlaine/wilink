@@ -80,10 +80,6 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     foreach (const QXmppArchiveMessage &msg, chat.messages)
         chatHistory->addMessage(msg);
-
-    /* scroll to end, but don't touch cursor */
-    QScrollBar *scrollBar = chatHistory->verticalScrollBar();
-    scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
@@ -107,10 +103,6 @@ void ChatDialog::send()
     message.datetime = QDateTime::currentDateTime();
     chatHistory->addMessage(message);
 
-    /* scroll to end, but don't touch cursor */
-    QScrollBar *scrollBar = chatHistory->verticalScrollBar();
-    scrollBar->setSliderPosition(scrollBar->maximum());
-
     chatInput->document()->clear();
     emit sendMessage(chatRemoteJid, text);
 }
@@ -129,6 +121,9 @@ ChatHistory::ChatHistory(QWidget *parent)
 
 void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 {
+    QScrollBar *scrollBar = verticalScrollBar();
+    bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
+
     /* position cursor */
     int i = 0;
     while (i < messages.size() && message.datetime > messages.at(i).datetime)
@@ -154,6 +149,10 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         .arg(message.datetime.date() == QDate::currentDate() ? message.datetime.toString("hh:mm") : message.datetime.toString("dd MMM hh:mm"))
         .arg(html);
     cursor.insertHtml(html);
+
+    /* scroll to end, but don't touch cursor */
+    if (atEnd)
+        scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
