@@ -150,7 +150,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         .arg(html);
     cursor.insertHtml(html);
 
-    /* scroll to end, but don't touch cursor */
+    /* scroll to end if we were previous at end */
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
@@ -162,6 +162,18 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
     menu->exec(event->globalPos());
     delete menu;
+}
+
+void ChatHistory::resizeEvent(QResizeEvent *e)
+{
+    QScrollBar *scrollBar = verticalScrollBar();
+    bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
+
+    QTextBrowser::resizeEvent(e);
+
+    /* scroll to end if we were previous at end */
+    if (atEnd)
+        scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
 void ChatHistory::setLocalName(const QString &localName)
