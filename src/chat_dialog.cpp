@@ -151,7 +151,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr class=\"title\">"
         "  <td class=\"from %1\">%2</td>"
-        "  <td class=\"time %3\" align=\"right\" width=\"100\">%4</td>"
+        "  <td class=\"time %3\" align=\"center\" width=\"100\">%4</td>"
         "</tr>"
         "<tr>"
         "  <td class=\"body\" colspan=\"2\">%5</td>"
