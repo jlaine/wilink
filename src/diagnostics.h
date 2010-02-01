@@ -22,13 +22,13 @@
 
 #include <QDialog>
 #include <QHostInfo>
-#include <QNetworkAccessManager>
 #include <QThread>
 #include <QUrl>
 
 #include "networkinfo.h"
 #include "wireless.h"
 
+class QNetworkAccessManager;
 class QPushButton;
 class QProgressBar;
 class QTextBrowser;
@@ -89,7 +89,7 @@ private:
     QTextBrowser *text;
     QPushButton *sendButton;
     QUrl diagnosticsUrl;
-    QNetworkAccessManager network;
+    QNetworkAccessManager *network;
 
     NetworkThread *networkThread;
 };

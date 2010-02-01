@@ -18,6 +18,7 @@
  */
 
 #include <QLayout>
+#include <QNetworkAccessManager>
 #include <QNetworkInterface>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -29,6 +30,7 @@
 #include <QThread>
 
 #include "qnetio/mime.h"
+#include "qnetio/wallet.h"
 
 #include "config.h"
 #include "diagnostics.h"
@@ -216,6 +218,12 @@ static QString dumpPings(const QList<Ping> &pings)
 Diagnostics::Diagnostics(QWidget *parent)
     : QDialog(parent), networkThread(NULL)
 {
+    /* prepare network access manager */
+    network = new QNetworkAccessManager(this);
+    connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
+        QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+
+    /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
 
     text = new QTextBrowser;
@@ -327,7 +335,7 @@ void Diagnostics::send()
 
     QNetworkRequest req(diagnosticsUrl.toString());
     req.setRawHeader("Content-Type", "multipart/form-data; boundary=" + form.boundary);
-    network.post(req, form.render());
+    network->post(req, form.render());
 }
 
 void Diagnostics::setUrl(const QUrl &url)
