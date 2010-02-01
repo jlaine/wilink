@@ -134,9 +134,9 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     /* add message */
     bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QDateTime datetime = message.datetime.toLocalTime();
-    QString html = message.body;
+    QString html = Qt::escape(message.body);
     html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-    html = QString(
+    cursor.insertHtml(QString(
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr style=\"background-color: %1\">"
         "  <td>%2</td>"
@@ -149,8 +149,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         .arg(message.local ? "#dbdbdb" : "#b6d4ff")
         .arg(showSender ? (message.local ? chatLocalName : chatRemoteName) : "")
         .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
-        .arg(html);
-    cursor.insertHtml(html);
+        .arg(html));
 
     /* scroll to end if we were previous at end */
     if (atEnd)
