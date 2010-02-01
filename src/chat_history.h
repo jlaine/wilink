@@ -30,8 +30,6 @@ class QGraphicsLinearLayout;
 
 class ChatMessageWidget : public QGraphicsWidget
 {
-    Q_OBJECT
-
 public:
     ChatMessageWidget(const QXmppArchiveMessage &message, QGraphicsItem *parent);
     void setGeometry(const QRectF &rect);
@@ -61,11 +59,9 @@ public:
 protected slots:
     void slotAnchorClicked(const QUrl &link);
 
-#ifndef USE_GRAPHICSVIEW
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);
-#endif
 
 private:
     QList<QXmppArchiveMessage> messages;

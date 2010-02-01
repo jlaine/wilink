@@ -75,12 +75,6 @@ ChatHistory::ChatHistory(QWidget *parent)
     scene->addItem(obj);
 }
 
-void ChatHistory::addMessage(const QXmppArchiveMessage &message)
-{
-    ChatMessageWidget *msg = new ChatMessageWidget(message, obj) ;
-    layout->addItem(msg);
-}
-
 #else
 
 ChatHistory::ChatHistory(QWidget *parent)
@@ -97,6 +91,8 @@ ChatHistory::ChatHistory(QWidget *parent)
     connect(this, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(slotAnchorClicked(const QUrl&)));
 }
 
+#endif
+
 void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 {
     QScrollBar *scrollBar = verticalScrollBar();
@@ -107,6 +103,11 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     while (i < messages.size() && message.datetime > messages.at(i).datetime)
         i++;
     messages.insert(i, message);
+
+#ifdef USE_GRAPHICSVIEW
+    ChatMessageWidget *msg = new ChatMessageWidget(message, obj) ;
+    layout->addItem(msg);
+#else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
     /* add message */
@@ -132,6 +133,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         .arg(type)
         .arg(dateString)
         .arg(html));
+#endif
 
     /* scroll to end if we were previous at end */
     if (atEnd)
@@ -140,7 +142,11 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
+#ifdef USE_GRAPHICSVIEW
+    QMenu *menu = new QMenu;
+#else
     QMenu *menu = createStandardContextMenu();
+#endif
     QAction *action = menu->addAction(tr("Clear"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
     menu->exec(event->globalPos());
@@ -152,14 +158,16 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
 
+#ifdef USE_GRAPHICSVIEW
+    QGraphicsView::resizeEvent(e);
+#else
     QTextBrowser::resizeEvent(e);
+#endif
 
     /* scroll to end if we were previous at end */
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
-
-#endif
 
 void ChatHistory::setLocalName(const QString &localName)
 {
