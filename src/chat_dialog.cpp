@@ -160,7 +160,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         .arg(showSender ? type : "line")
         .arg(showSender ? (message.local ? chatLocalName : chatRemoteName) : "")
         .arg(type)
-        .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
+        .arg(dateString)
         .arg(html));
 
     /* scroll to end if we were previous at end */
