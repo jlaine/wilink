@@ -1,0 +1,17 @@
+tr.local {
+  background-color: #dbdbdb;
+}
+tr.remote {
+  background-color: #b6d4ff;
+}
+td.from {
+  padding-left: 10px;
+  font-size: small;
+}
+td.time {
+  padding-right: 10px;
+  font-size: small;
+}
+td.body {
+  padding: 5px;
+}

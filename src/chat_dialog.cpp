@@ -22,6 +22,7 @@
 #include <QEvent>
 #include <QDateTime>
 #include <QDesktopServices>
+#include <QFile>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -115,6 +116,13 @@ void ChatDialog::setAvatar(const QPixmap &avatar)
 ChatHistory::ChatHistory(QWidget *parent)
     : QTextBrowser(parent)
 {
+    QFile styleSheet(":/chat.css");
+    if (styleSheet.open(QIODevice::ReadOnly))
+    {
+        document()->setDefaultStyleSheet(styleSheet.readAll());
+        styleSheet.close();
+    }
+
     setOpenLinks(false);
     connect(this, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(slotAnchorClicked(const QUrl&)));
 }
@@ -138,15 +146,15 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
     cursor.insertHtml(QString(
         "<table cellspacing=\"0\" width=\"100%\">"
-        "<tr style=\"background-color: %1\">"
-        "  <td>%2</td>"
-        "  <td align=\"right\">%3</td>"
+        "<tr class=\"%1\">"
+        "  <td class=\"from\">%2</td>"
+        "  <td class=\"time\" align=\"right\">%3</td>"
         "</tr>"
         "<tr>"
-        "  <td colspan=\"2\">%4</td>"
+        "  <td class=\"body\" colspan=\"2\">%4</td>"
         "</tr>"
         "</table>")
-        .arg(message.local ? "#dbdbdb" : "#b6d4ff")
+        .arg(message.local ? "local": "remote")
         .arg(showSender ? (message.local ? chatLocalName : chatRemoteName) : "")
         .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
         .arg(html));

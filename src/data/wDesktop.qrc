@@ -1,5 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <file>chat.css</file>
+
     <file>add.png</file>
     <file>back.png</file>
     <file>chat.png</file>
