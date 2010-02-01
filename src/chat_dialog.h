@@ -27,32 +27,10 @@
 #include "qxmpp/QXmppArchiveIq.h"
 
 class ChatEdit;
+class ChatHistory;
 class QLabel;
 class QLineEdit;
 class QXmppVCard;
-
-class ChatHistory : public QTextBrowser
-{
-    Q_OBJECT
-
-public:
-    ChatHistory(QWidget *parent = NULL);
-    void addMessage(const QXmppArchiveMessage &message);
-    void setLocalName(const QString &localName);
-    void setRemoteName(const QString &remoteName);
-
-protected slots:
-    void slotAnchorClicked(const QUrl &link);
-
-protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void resizeEvent(QResizeEvent *e);
-
-private:
-    QList<QXmppArchiveMessage> messages;
-    QString chatLocalName;
-    QString chatRemoteName;
-};
 
 class ChatDialog : public QWidget
 {

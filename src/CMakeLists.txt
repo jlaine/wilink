@@ -22,6 +22,7 @@ set(wDesktop_SOURCES
     chat.cpp
     chat_dialog.cpp
     chat_edit.cpp
+    chat_history.cpp
     chat_roster.cpp
     diagnostics.cpp
     main.cpp
@@ -36,6 +37,7 @@ set(wDesktop_MOC_HEADERS
     chat.h
     chat_dialog.h
     chat_edit.h
+    chat_history.h
     chat_roster.h
     diagnostics.h
     photos.h

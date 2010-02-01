@@ -22,6 +22,7 @@
 
 #include <QGraphicsView>
 #include <QGraphicsWidget>
+#include <QTextBrowser>
 
 #include "qxmpp/QXmppArchiveIq.h"
 
@@ -29,6 +30,8 @@ class QGraphicsLinearLayout;
 
 class ChatMessageWidget : public QGraphicsWidget
 {
+    Q_OBJECT
+
 public:
     ChatMessageWidget(const QXmppArchiveMessage &message, QGraphicsItem *parent);
     void setGeometry(const QRectF &rect);
@@ -41,7 +44,11 @@ protected:
     QGraphicsTextItem *fromText;
 };
 
+#ifdef USE_GRAPHICSVIEW
 class ChatHistory : public QGraphicsView
+#else
+class ChatHistory : public QTextBrowser
+#endif
 {
     Q_OBJECT
 
@@ -51,13 +58,25 @@ public:
     void setLocalName(const QString &localName);
     void setRemoteName(const QString &remoteName);
 
+protected slots:
+    void slotAnchorClicked(const QUrl &link);
+
+#ifndef USE_GRAPHICSVIEW
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
+    void resizeEvent(QResizeEvent *e);
+#endif
+
 private:
     QList<QXmppArchiveMessage> messages;
     QString chatLocalName;
     QString chatRemoteName;
+
+#ifdef USE_GRAPHICSVIEW
     QGraphicsScene *scene;
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
+#endif
 };
 
 #endif
