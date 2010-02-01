@@ -23,8 +23,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPushButton>
-#include <QPrintDialog>
-#include <QPrinter>
 #include <QProgressBar>
 #include <QTextBrowser>
 #include <QThread>
@@ -239,10 +237,6 @@ Diagnostics::Diagnostics(QWidget *parent)
     connect(sendButton, SIGNAL(clicked()), this, SLOT(send()));
     hbox->addWidget(sendButton);
 
-    printButton = new QPushButton(tr("Print"));
-    connect(printButton, SIGNAL(clicked()), this, SLOT(print()));
-    hbox->addWidget(printButton);
-
     refreshButton = new QPushButton(tr("Refresh"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
     hbox->addWidget(refreshButton);
@@ -266,17 +260,8 @@ void Diagnostics::addSection(const QString &title)
     text->append(QString("<h2>%1</h2>").arg(title));
 }
 
-void Diagnostics::print()
-{
-    QPrinter printer;
-    QPrintDialog dialog(&printer);
-    if (dialog.exec() == QDialog::Accepted)
-        text->print(&printer);
-}
-
 void Diagnostics::refresh()
 {
-    printButton->setEnabled(false);
     sendButton->setEnabled(false);
     refreshButton->setEnabled(false);
 
@@ -324,7 +309,6 @@ void Diagnostics::networkFinished()
 {
     /* enable buttons */
     refreshButton->setEnabled(true);
-    printButton->setEnabled(true);
     sendButton->setEnabled(true);
 }
 

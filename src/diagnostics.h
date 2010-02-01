@@ -71,7 +71,6 @@ public:
 protected slots:
     void addItem(const QString &title, const QString &value);
     void addSection(const QString &title);
-    void print();
     void refresh();
     void send();
 
@@ -83,7 +82,6 @@ protected slots:
     void networkFinished();
 
 private:
-    QPushButton *printButton;
     QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
