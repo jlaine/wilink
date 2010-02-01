@@ -142,20 +142,24 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     /* add message */
     bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QDateTime datetime = message.datetime.toLocalTime();
+    QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+    const QString type(message.local ? "local": "remote");
+
     QString html = Qt::escape(message.body);
     html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
     cursor.insertHtml(QString(
         "<table cellspacing=\"0\" width=\"100%\">"
-        "<tr class=\"%1\">"
-        "  <td class=\"from\">%2</td>"
-        "  <td class=\"time\" align=\"right\">%3</td>"
+        "<tr class=\"title\">"
+        "  <td class=\"from %1\">%2</td>"
+        "  <td class=\"time %3\" align=\"right\" width=\"100\">%4</td>"
         "</tr>"
         "<tr>"
-        "  <td class=\"body\" colspan=\"2\">%4</td>"
+        "  <td class=\"body\" colspan=\"2\">%5</td>"
         "</tr>"
         "</table>")
-        .arg(message.local ? "local": "remote")
+        .arg(showSender ? type : "line")
         .arg(showSender ? (message.local ? chatLocalName : chatRemoteName) : "")
+        .arg(type)
         .arg(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"))
         .arg(html));
 

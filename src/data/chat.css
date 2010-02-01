@@ -1,17 +1,21 @@
-tr.local {
+.local {
   background-color: #dbdbdb;
 }
-tr.remote {
+.remote {
   background-color: #b6d4ff;
+}
+td.line {
+  font-size: small;
 }
 td.from {
   padding-left: 8px;
   font-size: small;
+  font-weight: bold;
 }
 td.time {
-  padding-right: 8px;
+  padding: 0px 8px;
   font-size: small;
 }
 td.body {
-  padding: 2px;
+  padding: 3px 5px 2px 5px;
 }
