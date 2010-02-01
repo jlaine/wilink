@@ -122,6 +122,17 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         return QIcon(contactAvatar(bareJid));
     } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
         return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
+    } else if(role == Qt::FontRole && index.column() == ContactColumn) {
+        if (pendingMessages.contains(bareJid))
+            return QFont("", -1, QFont::Bold, true);
+    } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
+        if (pendingMessages.contains(bareJid)) {
+            QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
+            grad.setColorAt(0, QColor(255, 32, 32, 128)); // FIXME: change potentially ugly colors ! :)
+            grad.setColorAt(1, Qt::transparent);
+            grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+            return QBrush(grad);
+        }
     }
     return QVariant();
 }
