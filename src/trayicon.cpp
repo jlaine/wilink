@@ -157,7 +157,7 @@ void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticato
         if (!dialog->exec())
             return;
     }
-    QString userName = user->text();
+    QString userName = user->text().toLower();
     if (realm == baseUrl.host() && !userName.endsWith(authSuffix))
         userName += authSuffix;
     authenticator->setUser(userName);
