@@ -90,16 +90,25 @@ QPixmap RosterModel::contactStatusIcon(const QString &bareJid) const
     {
         QString pending = QString::number(pendingMessages[bareJid]);
         QPainter painter(&icon);
+        QFont font = painter.font();
+        font.setWeight(QFont::Bold);
+        painter.setFont(font);
+
+        // text rectangle
         QRect rect = painter.fontMetrics().boundingRect(pending);
-        rect.setWidth(rect.width() + 2);
+        rect.setWidth(rect.width() + 4);
+        if (rect.width() < rect.height())
+            rect.setWidth(rect.height());
+        else
+            rect.setHeight(rect.width());
         rect.moveTop(2);
         rect.moveRight(icon.width() - 2);
 
+        painter.setRenderHint(QPainter::Antialiasing, true);
         painter.setBrush(Qt::red);
-        painter.setPen(Qt::NoPen);
-        painter.drawRoundedRect(rect, 6, 6);
         painter.setPen(Qt::white);
-        painter.drawText(rect, pending);
+        painter.drawEllipse(rect);
+        painter.drawText(rect, Qt::AlignCenter, pending);
     }
 
     return icon;
