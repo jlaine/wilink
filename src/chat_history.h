@@ -56,6 +56,9 @@ public:
     void setLocalName(const QString &localName);
     void setRemoteName(const QString &remoteName);
 
+public slots:
+    void clear();
+
 protected slots:
     void slotAnchorClicked(const QUrl &link);
 

@@ -158,6 +158,16 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
+void ChatHistory::clear()
+{
+    messages.clear();
+#ifdef USE_GRAPHICSVIEW
+    // TODO
+#else
+    QTextBrowser::clear();
+#endif
+}
+
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
 #ifdef USE_GRAPHICSVIEW
