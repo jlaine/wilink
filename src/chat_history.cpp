@@ -47,8 +47,8 @@ void ChatMessageWidget::setGeometry(const QRectF &rect)
 {
     fromText->setPos(rect.x(), rect.y());
 
-    dateText->setPos(rect.x() + rect.width() - 80, rect.y());
-    dateText->setTextWidth(80);
+    dateText->setPos(rect.x() + rect.width() - 105, rect.y());
+    dateText->setTextWidth(90);
 
     bodyText->setPos(rect.x(), rect.y() + 20);
     bodyText->setTextWidth(rect.width());
@@ -56,10 +56,26 @@ void ChatMessageWidget::setGeometry(const QRectF &rect)
 
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
 {
-    QSizeF size;
-    size.setWidth(200);
-    size.setHeight(50);
-    return size;
+    switch (which)
+    {
+        case Qt::MinimumSize:
+            return QSizeF(10, 10);
+        case Qt::PreferredSize:
+        {
+            QSizeF bodyHint(bodyText->document()->size());
+            QSizeF dateHint(dateText->document()->size());
+            QSizeF fromHint(fromText->document()->size());
+
+            QSizeF hint(dateHint);
+            hint.setWidth(hint.width() + fromHint.width());
+            hint.setHeight(hint.height() + dateHint.height());
+            if (bodyHint.width() > hint.width())
+                hint.setWidth(bodyHint.width());
+            return hint;
+        }
+        default:
+            return constraint;
+    }
 }
 
 #ifdef USE_GRAPHICSVIEW
@@ -68,9 +84,11 @@ ChatHistory::ChatHistory(QWidget *parent)
 {
     scene = new QGraphicsScene;
     setScene(scene);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     obj = new QGraphicsWidget;
     layout = new QGraphicsLinearLayout(Qt::Vertical);
+    //obj->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     obj->setLayout(layout);
     scene->addItem(obj);
 }
@@ -159,6 +177,9 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
 
 #ifdef USE_GRAPHICSVIEW
+    obj->setMaximumWidth(width());
+    obj->setPreferredWidth(width());
+    obj->adjustSize();
     QGraphicsView::resizeEvent(e);
 #else
     QTextBrowser::resizeEvent(e);
