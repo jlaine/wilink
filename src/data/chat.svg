@@ -13,7 +13,7 @@
    height="22"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="chat.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0">
@@ -162,15 +162,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="30.286151"
-     inkscape:cx="-0.91129576"
-     inkscape:cy="11.315861"
+     inkscape:cx="-7.8451581"
+     inkscape:cy="13.957332"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="986"
-     inkscape:window-x="-4"
-     inkscape:window-y="-3"
+     inkscape:window-width="1280"
+     inkscape:window-height="752"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -190,7 +190,7 @@
      id="layer1"
      transform="translate(0,2)">
     <path
-       style="fill:#24d6f0;fill-opacity:1;stroke:#000000;stroke-width:0.18878935;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3606)"
+       style="fill:#24d6f0;fill-opacity:1;stroke:#000000;stroke-width:0.21171211;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3606)"
        d="M 11.166629,3.0689914 C 7.734117,3.2985733 5.036863,5.2273029 5.036863,7.548528 c 0,1.5098295 1.1403778,2.832479 2.8772373,3.64484 -0.00429,0.0229 -0.027573,0.0317 -0.031274,0.05565 -0.363485,2.351815 -3.6278209,2.364974 -3.6278209,2.364974 4.3802392,0.425521 6.2520466,-0.938931 6.9116236,-1.613746 0.0073,-0.0075 0.02427,0.0073 0.03127,0 0.218743,0.01396 0.432454,0.02782 0.656761,0.02782 3.759447,0 6.817801,-2.003564 6.817801,-4.4795374 0,-2.4759734 -3.058354,-4.4795366 -6.817801,-4.4795366 -0.234966,0 -0.459201,-0.015305 -0.688035,0 z"
        id="path2829"
        transform="matrix(1.0683425,0,0,1.3052031,-1.4438275,-2.8873031)" />

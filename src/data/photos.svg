@@ -14,7 +14,7 @@
    height="22"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="photos.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0">
@@ -205,15 +205,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="30.286151"
-     inkscape:cx="5.5986557"
+     inkscape:cx="-0.50974678"
      inkscape:cy="11.315861"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="986"
-     inkscape:window-x="-4"
-     inkscape:window-y="-3"
+     inkscape:window-width="1280"
+     inkscape:window-height="752"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -233,7 +233,7 @@
      id="layer1"
      transform="translate(0,2)">
     <path
-       style="fill:#ff8e00;fill-opacity:1;stroke:#000000;stroke-width:0.10000000000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3673)"
+       style="fill:#ff8e00;fill-opacity:1;stroke:#000000;stroke-width:0.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3673)"
        d="m 5.09375,2.2936035 c -1.0060704,0 -1.8125,0.8064296 -1.8125,1.8125 l 0,1.46875 0,0.78125 0,7.1875005 c 0,1.00607 0.8064296,1.8125 1.8125,1.8125 l 11.65625,0 c 1.00607,0 1.8125,-0.80643 1.8125,-1.8125 l 0,-7.9687505 c 0,-1.0060704 -0.80643,-1.8125 -1.8125,-1.8125 l -5.59375,0 C 10.987467,2.9333371 10.255312,2.2936035 9.375,2.2936035 l -4.28125,0 z"
        id="rect3664" />
   </g>
