@@ -134,13 +134,18 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
  */
 void Chat::addContact()
 {
-    bool ok = false;
-    QString defaultJid = "@" + client->getConfiguration().getDomain();
-    QString jid = QInputDialog::getText(this, tr("Add a contact"),
-        tr("Enter the address of the contact you want to add."),
-        QLineEdit::Normal, defaultJid, &ok);
-    if (!ok || jid.isEmpty())
-        return;
+    bool ok = true;
+    QRegExp validator("[^@]+@[^@]+");
+    QString jid = "@" + client->getConfiguration().getDomain();
+    while (!validator.exactMatch(jid))
+    {
+        jid = QInputDialog::getText(this, tr("Add a contact"),
+            tr("Enter the address of the contact you want to add."),
+            QLineEdit::Normal, jid, &ok).toLower();
+        if (!ok)
+            return;
+        jid = jid.trimmed().toLower();
+    }
 
     QXmppPresence packet;
     packet.setTo(jid);
