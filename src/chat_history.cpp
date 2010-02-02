@@ -28,19 +28,32 @@
 
 #include <QTextBlock>
 
-ChatMessageWidget::ChatMessageWidget(const QXmppArchiveMessage &message, QGraphicsItem *parent)
-        : QGraphicsWidget(parent)
+ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
 {
-    bodyText = scene()->addText(message.body);
+    bodyText = scene()->addText("");
     bodyText->setParentItem(this);
 
-    QDateTime datetime = message.datetime.toLocalTime();
-    QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-    dateText = scene()->addText(dateString);
+    dateText = scene()->addText("");
     dateText->setParentItem(this);
 
-    fromText = scene()->addText("Foo");
+    fromText = scene()->addText("");
     fromText->setParentItem(this);
+}
+
+void ChatMessageWidget::setBody(const QString &body)
+{
+    bodyText->setPlainText(body);
+}
+
+void ChatMessageWidget::setDate(const QDateTime &datetime)
+{
+    dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+}
+
+void ChatMessageWidget::setFrom(const QString &from)
+{
+    fromText->setPlainText(from);
 }
 
 void ChatMessageWidget::setGeometry(const QRectF &rect)
@@ -123,7 +136,10 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     messages.insert(i, message);
 
 #ifdef USE_GRAPHICSVIEW
-    ChatMessageWidget *msg = new ChatMessageWidget(message, obj) ;
+    ChatMessageWidget *msg = new ChatMessageWidget(obj);
+    msg->setBody(message.body);
+    msg->setDate(message.datetime.toLocalTime());
+    msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     layout->addItem(msg);
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));

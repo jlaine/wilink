@@ -31,7 +31,10 @@ class QGraphicsLinearLayout;
 class ChatMessageWidget : public QGraphicsWidget
 {
 public:
-    ChatMessageWidget(const QXmppArchiveMessage &message, QGraphicsItem *parent);
+    ChatMessageWidget(QGraphicsItem *parent);
+    void setBody(const QString &body);
+    void setDate(const QDateTime &datetime);
+    void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
 
 protected:
