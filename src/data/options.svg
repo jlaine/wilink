@@ -202,9 +202,9 @@
      showgrid="true"
      inkscape:window-width="1280"
      inkscape:window-height="752"
-     inkscape:window-x="97"
+     inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1"
+     inkscape:window-maximized="0"
      inkscape:snap-global="true">
     <inkscape:grid
        type="xygrid"
@@ -228,7 +228,7 @@
      id="layer1"
      transform="translate(0,2)">
     <path
-       style="fill:#b5bfca;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4066)"
+       style="fill:#b5bfca;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.25;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4066)"
        d="M 9,2 C 7.6825273,0.68252719 5.6944393,0.49853839 4.1607383,1.4033786 l 2.010835,2.0108349 c 0.391737,0.3917372 0.391737,1.0224764 0,1.4142136 -0.391738,0.3917372 -1.022477,0.3917372 -1.414214,0 L 2.7465243,2.8175922 c -0.90484,1.533701 -0.720851,3.5217893 0.596621,4.839262 1.045959,1.0459584 2.511378,1.3712257 3.844894,1.016466 l 7.4688157,7.4688148 c 0.783473,0.783474 2.044952,0.783474 2.828426,0 0.783474,-0.783474 0.783474,-2.044953 0,-2.828427 L 10.016466,5.8448931 C 10.371226,4.5113772 10.045958,3.0459583 9,2 z m 7.778174,12.727922 c 0.195262,0.195261 0.195262,0.511844 0,0.707106 -0.195262,0.195262 -0.511845,0.195262 -0.707107,0 -0.195262,-0.195262 -0.195262,-0.511845 0,-0.707106 0.195262,-0.195263 0.511845,-0.195262 0.707107,0 z"
        id="rect2839" />
   </g>
