@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<!-- Generator: Adobe Illustrator 14.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 43363)  -->
 
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -7,234 +7,74 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
    width="22"
    height="22"
-   id="svg2"
-   sodipodi:version="0.32"
+   viewBox="0 0 22 22"
+   enable-background="new 0 0 64 64"
+   xml:space="preserve"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="photos.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   version="1.0">
-  <defs
-     id="defs4">
-    <linearGradient
-       id="linearGradient3620">
-      <stop
-         style="stop-color:#072232;stop-opacity:1;"
-         offset="0"
-         id="stop3622" />
-      <stop
-         style="stop-color:#35a3e2;stop-opacity:1;"
-         offset="1"
-         id="stop3624" />
-    </linearGradient>
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective10" />
-    <inkscape:perspective
-       id="perspective2464"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       sodipodi:type="inkscape:persp3d" />
-    <inkscape:perspective
-       id="perspective2517"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       sodipodi:type="inkscape:persp3d" />
-    <filter
-       id="filter4280"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur4282"
-         in="SourceAlpha"
-         stdDeviation="0.500000"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix4284"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
-      <feOffset
-         id="feOffset4286"
-         in="bluralpha"
-         dx="1.000000"
-         dy="1.000000"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge4288">
-        <feMergeNode
-           id="feMergeNode4290"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode4292"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <filter
-       id="filter3718"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur3720"
-         in="SourceAlpha"
-         stdDeviation="0.500000"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix3722"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
-      <feOffset
-         id="feOffset3724"
-         in="bluralpha"
-         dx="1.000000"
-         dy="1.000000"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge3726">
-        <feMergeNode
-           id="feMergeNode3728"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode3730"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <filter
-       id="filter3606"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur3608"
-         in="SourceAlpha"
-         stdDeviation="0.500000"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix3610"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
-      <feOffset
-         id="feOffset3612"
-         in="bluralpha"
-         dx="1.000000"
-         dy="1.000000"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge3614">
-        <feMergeNode
-           id="feMergeNode3616"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode3618"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3620"
-       id="linearGradient3626"
-       x1="7.4759302"
-       y1="3.267158"
-       x2="15.913794"
-       y2="13.159492"
-       gradientUnits="userSpaceOnUse" />
-    <filter
-       id="filter3673"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur3675"
-         in="SourceAlpha"
-         stdDeviation="0.500000"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix3677"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
-      <feOffset
-         id="feOffset3679"
-         in="bluralpha"
-         dx="1.000000"
-         dy="1.000000"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge3681">
-        <feMergeNode
-           id="feMergeNode3683"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode3685"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-  </defs>
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     gridtolerance="10000"
-     guidetolerance="10"
-     objecttolerance="10"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="30.286151"
-     inkscape:cx="-0.50974678"
-     inkscape:cy="11.315861"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="752"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1" />
-  <metadata
-     id="metadata7">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,2)">
-    <path
-       style="fill:#ff8e00;fill-opacity:1;stroke:#000000;stroke-width:0.25;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3673)"
-       d="m 5.09375,2.2936035 c -1.0060704,0 -1.8125,0.8064296 -1.8125,1.8125 l 0,1.46875 0,0.78125 0,7.1875005 c 0,1.00607 0.8064296,1.8125 1.8125,1.8125 l 11.65625,0 c 1.00607,0 1.8125,-0.80643 1.8125,-1.8125 l 0,-7.9687505 c 0,-1.0060704 -0.80643,-1.8125 -1.8125,-1.8125 l -5.59375,0 C 10.987467,2.9333371 10.255312,2.2936035 9.375,2.2936035 l -4.28125,0 z"
-       id="rect3664" />
-  </g>
+   sodipodi:docname="camera.svg"><metadata
+   id="metadata9"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title /></cc:Work></rdf:RDF></metadata><defs
+   id="defs7"><inkscape:perspective
+     sodipodi:type="inkscape:persp3d"
+     inkscape:vp_x="0 : 32 : 1"
+     inkscape:vp_y="0 : 1000 : 0"
+     inkscape:vp_z="64 : 32 : 1"
+     inkscape:persp3d-origin="32 : 21.333333 : 1"
+     id="perspective11" /><filter
+     id="filter3639"
+     inkscape:label="Drop shadow"
+     width="1.5"
+     height="1.5"
+     x="-.25"
+     y="-.25"><feGaussianBlur
+       id="feGaussianBlur3641"
+       in="SourceAlpha"
+       stdDeviation="0.500000"
+       result="blur" /><feColorMatrix
+       id="feColorMatrix3643"
+       result="bluralpha"
+       type="matrix"
+       values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " /><feOffset
+       id="feOffset3645"
+       in="bluralpha"
+       dx="1.000000"
+       dy="1.000000"
+       result="offsetBlur" /><feMerge
+       id="feMerge3647"><feMergeNode
+         id="feMergeNode3649"
+         in="offsetBlur" /><feMergeNode
+         id="feMergeNode3651"
+         in="SourceGraphic" /></feMerge></filter></defs><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1280"
+   inkscape:window-height="752"
+   id="namedview5"
+   showgrid="false"
+   inkscape:zoom="20.85965"
+   inkscape:cx="1.4362881"
+   inkscape:cy="8.0585027"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<path
+   d="m 16.739651,5.7898959 h -5.79449 C 10.881304,5.6480206 10.801226,5.5164447 10.710848,5.4258092 L 9.3791254,4.0940862 C 9.1790575,3.8940188 8.7832999,3.7299994 8.5000642,3.7299994 H 6.4401677 c -0.2832358,0 -0.6184839,0.2072771 -0.7454251,0.4606444 L 5.1254386,5.3292516 C 5.0584921,5.4631449 4.99927,5.6490505 4.9570422,5.8362436 3.7556075,6.0525327 2.8353488,7.1035949 2.8353488,8.3647665 v 7.2096385 c 0,1.416179 1.1586918,2.57487 2.5748706,2.57487 H 16.739651 c 1.416179,0 2.57487,-1.158691 2.57487,-2.57487 V 8.3647665 c 0,-1.4161788 -1.158691,-2.5748706 -2.57487,-2.5748706 z m -5.664716,9.5270211 c -1.8482423,0 -3.347332,-1.498575 -3.347332,-3.347333 0,-1.848756 1.4990897,-3.3473304 3.347332,-3.3473304 1.848242,0 3.347332,1.4985744 3.347332,3.3473304 0,1.848758 -1.49909,3.347333 -3.347332,3.347333 z"
+   id="path3"
+   style="fill:#f196c5;fill-opacity:1;stroke:#000000;stroke-width:0.25000000000000000;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter3639)" />
 </svg>
