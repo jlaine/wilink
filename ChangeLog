@@ -1,4 +1,7 @@
-wDesktop 0.4.6 (2002-02-02)
+wDesktop 0.4.7 (2010-02-02)
+ * Fix a display glitch introduced in version 0.4.6.
+
+wDesktop 0.4.6 (2010-02-02)
  * Improve highlighting of contacts with pending messages.
  * Refresh diagnostics when the window is closed / reopened.
  * Improve validation of credentials and contacts.
