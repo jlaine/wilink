@@ -137,7 +137,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
         if (pendingMessages.contains(bareJid)) {
             QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
-            grad.setColorAt(0, QColor(255, 32, 32, 128)); // FIXME: change potentially ugly colors ! :)
+            grad.setColorAt(0, QColor(255, 0, 0, 144));
             grad.setColorAt(1, Qt::transparent);
             grad.setCoordinateMode(QGradient::ObjectBoundingMode);
             return QBrush(grad);

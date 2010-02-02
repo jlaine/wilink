@@ -1,4 +1,5 @@
 wDesktop 0.4.6 (UNRELEASED)
+ * Improve highlighting of contacts with pending messages.
  * Force username to lowercase.
 
 wDesktop 0.4.5 (2010-02-01)
