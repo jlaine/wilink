@@ -68,6 +68,9 @@ public:
     Diagnostics(QWidget *parent=0);
     void setUrl(const QUrl &url);
 
+public slots:
+    void show();
+
 protected slots:
     void addItem(const QString &title, const QString &value);
     void addSection(const QString &title);

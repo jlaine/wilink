@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QShortcut>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
 #include <QUrl>
@@ -221,6 +222,12 @@ Photos::Photos(const QString &url, QWidget *parent)
             SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
     fs->open(url);
+
+    /* set up keyboard shortcuts */
+#ifdef Q_OS_MAC
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
+#endif
 }
 
 /** When a command finishes, process its results.

@@ -24,6 +24,7 @@
 #include <QNetworkRequest>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QShortcut>
 #include <QTextBrowser>
 #include <QThread>
 
@@ -247,7 +248,11 @@ Diagnostics::Diagnostics(QWidget *parent)
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
 
-    refresh();
+    /* set up keyboard shortcuts */
+#ifdef Q_OS_MAC
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
+#endif
 }
 
 void Diagnostics::addItem(const QString &title, const QString &value)
@@ -262,6 +267,9 @@ void Diagnostics::addSection(const QString &title)
 
 void Diagnostics::refresh()
 {
+    if (networkThread)
+        return;
+
     sendButton->setEnabled(false);
     refreshButton->setEnabled(false);
 
@@ -307,6 +315,9 @@ void Diagnostics::refresh()
 
 void Diagnostics::networkFinished()
 {
+    delete networkThread;
+    networkThread = NULL;
+
     /* enable buttons */
     refreshButton->setEnabled(true);
     sendButton->setEnabled(true);
@@ -327,6 +338,13 @@ void Diagnostics::setUrl(const QUrl &url)
     diagnosticsUrl = url;
     if(url.isValid())
         sendButton->show();
+}
+
+void Diagnostics::show()
+{
+    if (!isVisible())
+        refresh();
+    QWidget::show();
 }
 
 void Diagnostics::showDns(const QList<QHostInfo> &results)
