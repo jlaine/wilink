@@ -1,5 +1,7 @@
-wDesktop 0.4.6 (UNRELEASED)
- * Force username to lowercase.
+wDesktop 0.4.6 (2002-02-02)
+ * Improve highlighting of contacts with pending messages.
+ * Refresh diagnostics when the window is closed / reopened.
+ * Improve validation of credentials and contacts.
 
 wDesktop 0.4.5 (2010-02-01)
  * Improve behaviour of chat history when it is resized.

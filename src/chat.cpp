@@ -56,6 +56,8 @@ void application_alert_mac();
 
 using namespace QNetIO;
 
+static QRegExp jidValidator("[^@]+@[^@]+");
+
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
@@ -134,13 +136,17 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
  */
 void Chat::addContact()
 {
-    bool ok = false;
-    QString defaultJid = "@" + client->getConfiguration().getDomain();
-    QString jid = QInputDialog::getText(this, tr("Add a contact"),
-        tr("Enter the address of the contact you want to add."),
-        QLineEdit::Normal, defaultJid, &ok);
-    if (!ok || jid.isEmpty())
-        return;
+    bool ok = true;
+    QString jid = "@" + client->getConfiguration().getDomain();
+    while (!jidValidator.exactMatch(jid))
+    {
+        jid = QInputDialog::getText(this, tr("Add a contact"),
+            tr("Enter the address of the contact you want to add."),
+            QLineEdit::Normal, jid, &ok).toLower();
+        if (!ok)
+            return;
+        jid = jid.trimmed().toLower();
+    }
 
     QXmppPresence packet;
     packet.setTo(jid);
@@ -319,12 +325,12 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
 
     /* get user and domain */
-    QStringList bits = jid.split("@");
-    if (bits.size() != 2)
+    if (!jidValidator.exactMatch(jid))
     {
         qWarning("Cannot connect to chat server using invalid JID");
         return false;
     }
+    QStringList bits = jid.split("@");
     config.setPasswd(password);
     config.setUser(bits[0]);
     config.setDomain(bits[1]);

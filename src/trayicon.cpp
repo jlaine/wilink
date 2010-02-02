@@ -137,13 +137,13 @@ void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticato
     layout->addWidget(new QLabel(prompt), 0, 0, 1, 2);
 
     layout->addWidget(new QLabel("User:"), 1, 0);
-    QLineEdit *user = new QLineEdit();
-    layout->addWidget(user, 1, 1);
+    QLineEdit *usernameEdit = new QLineEdit();
+    layout->addWidget(usernameEdit, 1, 1);
 
     layout->addWidget(new QLabel("Password:"), 2, 0);
-    QLineEdit *password = new QLineEdit();
-    password->setEchoMode(QLineEdit::Password);
-    layout->addWidget(password, 2, 1);
+    QLineEdit *passwordEdit = new QLineEdit();
+    passwordEdit->setEchoMode(QLineEdit::Password);
+    layout->addWidget(passwordEdit, 2, 1);
 
     QPushButton *btn = new QPushButton("OK");
     dialog->connect(btn, SIGNAL(clicked()), dialog, SLOT(accept()));
@@ -152,19 +152,23 @@ void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticato
     dialog->setLayout(layout);
 
     /* prompt user */
-    while (user->text().isEmpty() || password->text().isEmpty())
+    QString username, password;
+    while (username.isEmpty() || password.isEmpty())
     {
+        usernameEdit->setText(username);
+        passwordEdit->setText(password);
         if (!dialog->exec())
             return;
+        username = usernameEdit->text().trimmed().toLower();
+        password = passwordEdit->text().trimmed();
     }
-    QString userName = user->text().toLower();
-    if (realm == baseUrl.host() && !userName.endsWith(authSuffix))
-        userName += authSuffix;
-    authenticator->setUser(userName);
-    authenticator->setPassword(password->text());
+    if (realm == baseUrl.host() && !username.endsWith(authSuffix))
+        username += authSuffix;
+    authenticator->setUser(username);
+    authenticator->setPassword(password);
 
     /* store credentials */
-    QNetIO::Wallet::instance()->setCredentials(realm, userName, password->text());
+    QNetIO::Wallet::instance()->setCredentials(realm, username, password);
 }
 
 void TrayIcon::openUrl()
