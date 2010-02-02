@@ -67,7 +67,7 @@ void ChatMessageWidget::setGeometry(const QRectF &rect)
     bodyText->setTextWidth(rect.width());
 }
 
-QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
+QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which)
     {
@@ -98,9 +98,12 @@ ChatHistory::ChatHistory(QWidget *parent)
     scene = new QGraphicsScene;
     setScene(scene);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     obj = new QGraphicsWidget;
     layout = new QGraphicsLinearLayout(Qt::Vertical);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
     //obj->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     obj->setLayout(layout);
     scene->addItem(obj);
@@ -203,8 +206,9 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
 
 #ifdef USE_GRAPHICSVIEW
-    obj->setMaximumWidth(width());
-    obj->setPreferredWidth(width());
+    qreal w = width() - scrollBar->sizeHint().width();
+    obj->setMaximumWidth(w);
+    obj->setPreferredWidth(w);
     obj->adjustSize();
     QGraphicsView::resizeEvent(e);
 #else
