@@ -125,7 +125,7 @@ void PhotosList::setEntries(const FileInfoList &entries)
     {
         QListWidgetItem *newItem = new QListWidgetItem;
         if (info.isDir()) {
-            newItem->setIcon(QIcon(":/photos.png"));
+            newItem->setIcon(QIcon(":/album.png"));
         } else {
             QPixmap blank(ICON_SIZE);
             blank.fill();
