@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDateTime>
 #include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkInterface>
@@ -278,7 +279,8 @@ void Diagnostics::refresh()
     TextList list;
     list << QString("Operating system: %1 %2").arg(SystemInfo::osName(), SystemInfo::osVersion());
     list << QString("wDesktop: %1").arg(wdesktopVersion);
-    addItem("Software version", list.render());
+    list << QString("Date: %1").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss"));
+    addItem("Environment", list.render());
 
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
