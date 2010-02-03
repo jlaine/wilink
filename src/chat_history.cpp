@@ -35,6 +35,7 @@ ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
     bodyText->setParentItem(this);
 
     dateText = scene()->addText("");
+    dateText->setTextWidth(90);
     dateText->setParentItem(this);
 
     fromText = scene()->addText("");
@@ -60,11 +61,15 @@ void ChatMessageWidget::setGeometry(const QRectF &rect)
 {
     fromText->setPos(rect.x(), rect.y());
 
-    dateText->setPos(rect.x() + rect.width() - 105, rect.y());
-    dateText->setTextWidth(90);
+    dateText->setPos(rect.x() + rect.width() - 110, rect.y());
 
-    bodyText->setPos(rect.x(), rect.y() + 20);
-    bodyText->setTextWidth(rect.width());
+    bodyText->setPos(rect.x(), rect.y() + 15);
+}
+
+void ChatMessageWidget::setMaximumSize(const QSizeF &size)
+{
+    bodyText->document()->setTextWidth(size.width());
+    QGraphicsWidget::setMaximumSize(size);
 }
 
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -79,9 +84,7 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
             QSizeF dateHint(dateText->document()->size());
             QSizeF fromHint(fromText->document()->size());
 
-            QSizeF hint(dateHint);
-            hint.setWidth(hint.width() + fromHint.width());
-            hint.setHeight(hint.height() + dateHint.height());
+            QSizeF hint(fromHint.width() + 110, 15 + bodyHint.height());
             if (bodyHint.width() > hint.width())
                 hint.setWidth(bodyHint.width());
             return hint;
@@ -104,7 +107,6 @@ ChatHistory::ChatHistory(QWidget *parent)
     layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    //obj->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     obj->setLayout(layout);
     scene->addItem(obj);
 }
@@ -143,7 +145,9 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     msg->setBody(message.body);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
+    msg->setMaximumSize(QSizeF(width() - scrollBar->sizeHint().width(), -1));
     layout->addItem(msg);
+    obj->adjustSize();
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
@@ -181,7 +185,8 @@ void ChatHistory::clear()
 {
     messages.clear();
 #ifdef USE_GRAPHICSVIEW
-    // TODO
+    for (int i = layout->count() - 1; i >= 0; i--)
+        delete layout->itemAt(i);
 #else
     QTextBrowser::clear();
 #endif
@@ -207,8 +212,11 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
 
 #ifdef USE_GRAPHICSVIEW
     qreal w = width() - scrollBar->sizeHint().width();
-    obj->setMaximumWidth(w);
-    obj->setPreferredWidth(w);
+    for (int i = 0; i < layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        child->setMaximumSize(QSizeF(w, -1));
+    }
     obj->adjustSize();
     QGraphicsView::resizeEvent(e);
 #else

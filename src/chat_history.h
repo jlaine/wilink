@@ -36,6 +36,7 @@ public:
     void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
+    void setMaximumSize(const QSizeF &size);
 
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
