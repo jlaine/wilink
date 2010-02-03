@@ -60,6 +60,7 @@ protected slots:
     void resizeContacts();
     void sendMessage(const QString &jid, const QString message);
     void sendPing();
+    void vCardReceived(const QXmppVCard&);
 
 protected:
     void changeEvent(QEvent *event);
@@ -79,6 +80,8 @@ private:
     QSystemTrayIcon *systemTrayIcon;
     QTimer *timeoutTimer;
     QStackedWidget *conversationPanel;
+
+    QString ownName;
 };
 
 

@@ -119,6 +119,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -201,6 +202,7 @@ void Chat::connected()
     statusLabel->setText(tr("Connected"));
 
     /* request own vCard */
+    ownName = client->getConfiguration().getUser();
     client->getVCardManager().requestVCard(
         client->getConfiguration().getJidBare());
 }
@@ -214,7 +216,7 @@ ChatDialog *Chat::conversation(const QString &jid)
     if (!chatDialogs.contains(jid))
     {
         chatDialogs[jid] = new ChatDialog(jid);
-        chatDialogs[jid]->setLocalName(tr("Me"));
+        chatDialogs[jid]->setLocalName(ownName);
         chatDialogs[jid]->setRemoteAvatar(rosterModel->contactAvatar(jid));
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
@@ -443,5 +445,15 @@ void Chat::sendPing()
     ping.setTo(client->getConfiguration().getDomain());
     client->sendPacket(ping);
     timeoutTimer->start();
+}
+
+void Chat::vCardReceived(const QXmppVCard& vcard)
+{
+    const QString bareJid = vcard.getFrom();
+    if (bareJid == client->getConfiguration().getJidBare())
+    {
+        if (!vcard.getNickName().isEmpty())
+            ownName = vcard.getNickName();
+    }
 }
 
