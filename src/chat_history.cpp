@@ -96,27 +96,25 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 
     if (show_sender)
     {
+        dateBubble->setPath(bubblePath(rect.width()));
         dateBubble->setPos(rect.x(), rect.y() + 0.5);
         fromText->setPos(rect.x() + 10, rect.y() - 4);
         bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
     } else {
         dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
+        dateLine->setLine(0, 0, rect.width() - DATE_WIDTH, 0);
         dateLine->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
         bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
     }
     dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 5, rect.y() - 4);
-
 }
 
 void ChatMessageWidget::setMaximumSize(const QSizeF &size)
 {
     maximumWidth = size.width();
     bodyText->document()->setTextWidth(maximumWidth - DATE_WIDTH);
-    if (show_sender)
-        dateBubble->setPath(bubblePath(maximumWidth));
-    else
-        dateLine->setLine(0, 0, maximumWidth - DATE_WIDTH, 0);
     QGraphicsWidget::setMaximumSize(size);
+    updateGeometry();
 }
 
 void ChatMessageWidget::showSender(bool show)
