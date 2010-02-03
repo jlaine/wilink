@@ -28,14 +28,14 @@
 
 #include <QTextBlock>
 
-#define DATE_WIDTH 110
-#define DATE_HEIGHT 14
+#define DATE_WIDTH 80
+#define DATE_HEIGHT 12
 
 static const QColor localColor(0xdb, 0xdb, 0xdb);
 static const QColor remoteColor(0xb6, 0xd4, 0xff);
 
-ChatMessageWidget::ChatMessageWidget(bool local, bool showSender, QGraphicsItem *parent)
-    : QGraphicsWidget(parent), show_sender(showSender)
+ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
+    : QGraphicsWidget(parent), show_sender(false), maximumWidth(2 * DATE_WIDTH)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
@@ -44,11 +44,19 @@ ChatMessageWidget::ChatMessageWidget(bool local, bool showSender, QGraphicsItem 
     dateBubble->setParentItem(this);
     dateBubble->setZValue(-1);
 
+    dateLine = scene()->addLine(0, 0, DATE_WIDTH, 0);
+    dateLine->setParentItem(this);
+
     dateText = scene()->addText("");
+    QFont font = dateText->font();
+    font.setPixelSize(10);
+    dateText->setFont(font);
     dateText->setParentItem(this);
     dateText->setTextWidth(90);
 
     fromText = scene()->addText("");
+    fromText->hide();
+    fromText->setFont(font);
     fromText->setParentItem(this);
 }
 
@@ -75,28 +83,51 @@ void ChatMessageWidget::setDate(const QDateTime &datetime)
 
 void ChatMessageWidget::setFrom(const QString &from)
 {
-    if (show_sender)
-        fromText->setPlainText(from);
+    fromText->setPlainText(from);
 }
 
-void ChatMessageWidget::setGeometry(const QRectF &rect)
+void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 {
-    fromText->setPos(rect.x() + 10, rect.y() - 3);
+    QRectF rect(baseRect);
+    if (!show_sender)
+        rect.moveTop(rect.y() - DATE_HEIGHT/2);
 
     if (show_sender)
+    {
         dateBubble->setPos(rect.x(), rect.y() + 0.5);
-    else
+        fromText->setPos(rect.x() + 10, rect.y() - 4);
+        bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
+    } else {
         dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
-    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 10, rect.y() - 3);
+        dateLine->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
+        bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2);
+    }
+    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 5, rect.y() - 4);
 
-    bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
 }
 
 void ChatMessageWidget::setMaximumSize(const QSizeF &size)
 {
-    bodyText->document()->setTextWidth(size.width());
-    dateBubble->setPath(bubblePath(show_sender ? size.width() : DATE_WIDTH));
+    maximumWidth = size.width();
+    bodyText->document()->setTextWidth(maximumWidth - DATE_WIDTH);
+    if (show_sender)
+        dateBubble->setPath(bubblePath(maximumWidth));
+    else
+        dateLine->setLine(0, 0, maximumWidth - DATE_WIDTH, 0);
     QGraphicsWidget::setMaximumSize(size);
+}
+
+void ChatMessageWidget::showSender(bool show)
+{
+    if (show)
+    {
+        dateLine->hide();
+        fromText->show();
+    } else {
+        dateLine->show();
+        fromText->hide();
+    }
+    show_sender = show;
 }
 
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -107,12 +138,11 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
             return QSizeF(DATE_WIDTH, DATE_HEIGHT);
         case Qt::PreferredSize:
         {
-            QSizeF bodyHint(bodyText->document()->size());
-            QSizeF fromHint(fromText->document()->size());
-
-            QSizeF hint(fromHint.width() + DATE_WIDTH, bodyHint.height() + DATE_HEIGHT);
-            if (bodyHint.width() > hint.width())
-                hint.setWidth(bodyHint.width());
+            QSizeF hint(bodyText->document()->size());
+            if (hint.width() < maximumWidth)
+                hint.setWidth(maximumWidth);
+            if (show_sender)
+                hint.setHeight(hint.height() + DATE_HEIGHT);
             return hint;
         }
         default:
@@ -168,20 +198,23 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     messages.insert(i, message);
 
     /* add message */
-    bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QString bodyHtml = Qt::escape(message.body);
+    bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
 #ifdef USE_GRAPHICSVIEW
-    ChatMessageWidget *msg = new ChatMessageWidget(message.local, showSender, obj);
+    ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
     msg->setBody(bodyHtml);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
+    msg->showSender(i == 0 || messages.at(i-1).local != message.local);
+
     msg->setMaximumSize(QSizeF(availableWidth(), -1));
     layout->addItem(msg);
     obj->adjustSize();
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
+    bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QDateTime datetime = message.datetime.toLocalTime();
     QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
     const QString type(message.local ? "local": "remote");

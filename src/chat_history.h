@@ -31,20 +31,23 @@ class QGraphicsLinearLayout;
 class ChatMessageWidget : public QGraphicsWidget
 {
 public:
-    ChatMessageWidget(bool local, bool showSender, QGraphicsItem *parent);
+    ChatMessageWidget(bool local, QGraphicsItem *parent);
     void setBody(const QString &body);
     void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumSize(const QSizeF &size);
+    void showSender(bool show);
 
 protected:
-    QPainterPath bubblePath(qreal maxWidth);
+    QPainterPath bubblePath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
+    int maximumWidth;
     bool show_sender;
     QGraphicsTextItem *bodyText;
     QGraphicsPathItem *dateBubble;
+    QGraphicsLineItem *dateLine;
     QGraphicsTextItem *dateText;
     QGraphicsTextItem *fromText;
 };
