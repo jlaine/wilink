@@ -65,7 +65,7 @@ QPainterPath ChatMessageWidget::bubblePath(qreal width)
 
 void ChatMessageWidget::setBody(const QString &body)
 {
-    bodyText->setPlainText(body);
+    bodyText->setHtml(body);
 }
 
 void ChatMessageWidget::setDate(const QDateTime &datetime)
@@ -169,9 +169,11 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 
     /* add message */
     bool showSender = (i == 0 || messages.at(i-1).local != message.local);
+    QString bodyHtml = Qt::escape(message.body);
+    bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
 #ifdef USE_GRAPHICSVIEW
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, showSender, obj);
-    msg->setBody(message.body);
+    msg->setBody(bodyHtml);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->setMaximumSize(QSizeF(availableWidth(), -1));
@@ -180,13 +182,10 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
-    bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QDateTime datetime = message.datetime.toLocalTime();
     QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
     const QString type(message.local ? "local": "remote");
 
-    QString html = Qt::escape(message.body);
-    html.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
     cursor.insertHtml(QString(
         "<table cellspacing=\"0\" width=\"100%\">"
         "<tr class=\"title\">"
@@ -201,7 +200,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         .arg(showSender ? (message.local ? chatLocalName : chatRemoteName) : "")
         .arg(type)
         .arg(dateString)
-        .arg(html));
+        .arg(bodyHtml));
 #endif
 
     /* scroll to end if we were previous at end */
