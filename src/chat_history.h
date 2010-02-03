@@ -48,6 +48,8 @@ protected:
     QGraphicsTextItem *fromText;
 };
 
+//#define USE_GRAPHICSVIEW
+
 #ifdef USE_GRAPHICSVIEW
 class ChatHistory : public QGraphicsView
 #else
