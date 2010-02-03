@@ -28,11 +28,18 @@
 
 #include <QTextBlock>
 
+#define DATE_WIDTH 110
+#define DATE_HEIGHT 15
+
 ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
+
+    dateRect = scene()->addRect(0, 0, DATE_WIDTH, DATE_HEIGHT, Qt::NoPen, Qt::lightGray);
+    dateRect->setZValue(-1);
+    dateRect->setParentItem(this);
 
     dateText = scene()->addText("");
     dateText->setTextWidth(90);
@@ -61,9 +68,10 @@ void ChatMessageWidget::setGeometry(const QRectF &rect)
 {
     fromText->setPos(rect.x(), rect.y());
 
-    dateText->setPos(rect.x() + rect.width() - 110, rect.y());
+    dateRect->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y());
+    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y());
 
-    bodyText->setPos(rect.x(), rect.y() + 15);
+    bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
 }
 
 void ChatMessageWidget::setMaximumSize(const QSizeF &size)
@@ -77,14 +85,13 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     switch (which)
     {
         case Qt::MinimumSize:
-            return QSizeF(10, 10);
+            return QSizeF(DATE_WIDTH, DATE_HEIGHT);
         case Qt::PreferredSize:
         {
             QSizeF bodyHint(bodyText->document()->size());
-            QSizeF dateHint(dateText->document()->size());
             QSizeF fromHint(fromText->document()->size());
 
-            QSizeF hint(fromHint.width() + 110, 15 + bodyHint.height());
+            QSizeF hint(fromHint.width() + DATE_WIDTH, bodyHint.height() + DATE_HEIGHT);
             if (bodyHint.width() > hint.width())
                 hint.setWidth(bodyHint.width());
             return hint;
@@ -145,7 +152,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     msg->setBody(message.body);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
-    msg->setMaximumSize(QSizeF(width() - scrollBar->sizeHint().width(), -1));
+    msg->setMaximumSize(QSizeF(availableWidth(), -1));
     layout->addItem(msg);
     obj->adjustSize();
 #else
@@ -181,6 +188,11 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
+qreal ChatHistory::availableWidth() const
+{
+    return width() - verticalScrollBar()->sizeHint().width() - 10;
+}
+
 void ChatHistory::clear()
 {
     messages.clear();
@@ -211,7 +223,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
 
 #ifdef USE_GRAPHICSVIEW
-    qreal w = width() - scrollBar->sizeHint().width();
+    const qreal w = availableWidth();
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));

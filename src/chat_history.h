@@ -42,6 +42,7 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
     QGraphicsTextItem *bodyText;
+    QGraphicsRectItem *dateRect;
     QGraphicsTextItem *dateText;
     QGraphicsTextItem *fromText;
 };
@@ -67,6 +68,7 @@ protected slots:
     void slotAnchorClicked(const QUrl &link);
 
 protected:
+    qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);
 
