@@ -36,7 +36,7 @@ public:
     void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
-    void setMaximumSize(const QSizeF &size);
+    void setPageWidth(qreal width);
     void showSender(bool show);
 
 protected:

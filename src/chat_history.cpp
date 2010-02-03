@@ -108,12 +108,11 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 5, rect.y() - 4);
 }
 
-void ChatMessageWidget::setMaximumSize(const QSizeF &size)
+void ChatMessageWidget::setPageWidth(qreal width)
 {
-    maximumWidth = size.width();
+    maximumWidth = width;
     bodyText->document()->setTextWidth(maximumWidth - DATE_WIDTH);
     updateGeometry();
-    //QGraphicsWidget::setMaximumSize(size);
 }
 
 void ChatMessageWidget::showSender(bool show)
@@ -206,10 +205,12 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->showSender(i == 0 || messages.at(i-1).local != message.local);
+    msg->setPageWidth(availableWidth());
 
-    msg->setMaximumSize(QSizeF(availableWidth(), -1));
     layout->addItem(msg);
     adjustSize();
+    // FIXME: for some reason, we need to call updateGeometry() on message
+    msg->setPageWidth(availableWidth());
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
