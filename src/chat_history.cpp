@@ -210,7 +210,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 
     msg->setMaximumSize(QSizeF(availableWidth(), -1));
     layout->addItem(msg);
-    obj->adjustSize();
+    adjustSize();
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
@@ -239,6 +239,16 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     /* scroll to end if we were previous at end */
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
+}
+
+void ChatHistory::adjustSize()
+{
+#ifdef USE_GRAPHICSVIEW
+    obj->adjustSize();
+    QRectF rect = obj->boundingRect();
+    rect.setHeight(rect.height() - 10);
+    setSceneRect(rect);
+#endif
 }
 
 qreal ChatHistory::availableWidth() const
@@ -282,7 +292,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
         child->setMaximumSize(QSizeF(w, -1));
     }
-    obj->adjustSize();
     QGraphicsView::resizeEvent(e);
 #else
     QTextBrowser::resizeEvent(e);

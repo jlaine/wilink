@@ -75,6 +75,7 @@ protected slots:
     void slotAnchorClicked(const QUrl &link);
 
 protected:
+    void adjustSize();
     qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);
