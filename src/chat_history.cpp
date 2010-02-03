@@ -213,7 +213,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     msg->showSender(i == 0 || messages.at(i-1).local != message.local);
 
     msg->setMaximumWidth(availableWidth());
-    layout->addItem(msg);
+    layout->insertItem(i, msg);
     adjustSize();
     // FIXME: for some reason, we need to call updateGeometry() on message
     msg->setMaximumWidth(availableWidth());
