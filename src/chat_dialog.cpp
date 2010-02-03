@@ -39,7 +39,7 @@
 #include "chat_edit.h"
 #include "chat_history.h"
 
-ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
+ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
     : QWidget(parent),
     chatRemoteJid(jid)
 {
@@ -49,7 +49,8 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *nameLabel = new QLabel(chatRemoteJid);
+    nameLabel = new QLabel(chatRemoteJid);
+    hbox->addSpacing(16);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
     avatarLabel = new QLabel;
@@ -58,8 +59,6 @@ ChatDialog::ChatDialog(const QString &jid, const QString &name, QWidget *parent)
 
     /* chat history */
     chatHistory = new ChatHistory;
-    chatHistory->setLocalName(tr("Me"));
-    chatHistory->setRemoteName(name);
     layout->addWidget(chatHistory);
 
     /* text edit */
@@ -107,5 +106,18 @@ void ChatDialog::send()
 void ChatDialog::setAvatar(const QPixmap &avatar)
 {
     avatarLabel->setPixmap(avatar);
+}
+
+void ChatDialog::setLocalName(const QString &name)
+{
+    chatHistory->setLocalName(name);
+}
+
+void ChatDialog::setRemoteName(const QString &name)
+{
+    nameLabel->setText(QString("<b>%1</b><br/>%2")
+        .arg(name)
+        .arg(chatRemoteJid));
+    chatHistory->setRemoteName(name);
 }
 

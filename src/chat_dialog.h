@@ -37,8 +37,10 @@ class ChatDialog : public QWidget
     Q_OBJECT
 
 public:
-    ChatDialog(const QString &jid, const QString &name, QWidget *parent = NULL);
+    ChatDialog(const QString &jid, QWidget *parent = NULL);
     void setAvatar(const QPixmap &avatar);
+    void setLocalName(const QString &name);
+    void setRemoteName(const QString &name);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
@@ -52,6 +54,7 @@ signals:
 
 private:
     QLabel *avatarLabel;
+    QLabel *nameLabel;
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
 

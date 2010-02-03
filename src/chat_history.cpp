@@ -223,10 +223,13 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     QString bodyHtml = Qt::escape(message.body);
     bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-    
+
     /* determine grouping */
-    bool showSender = (i == 0 || message.local != messages.at(i-1).local);
-    bool showDate = (showSender || message.datetime > messages.at(i-1).datetime.addSecs(60));
+    bool showSender = (i == 0 ||
+        message.local != messages.at(i-1).local ||
+        message.datetime > messages.at(i-1).datetime.addSecs(120 * 60));
+    bool showDate = (showSender ||
+        message.datetime > messages.at(i-1).datetime.addSecs(60));
 #ifdef USE_GRAPHICSVIEW
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
     msg->setBody(bodyHtml);

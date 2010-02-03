@@ -205,8 +205,10 @@ ChatDialog *Chat::conversation(const QString &jid)
 {
     if (!chatDialogs.contains(jid))
     {
-        chatDialogs[jid] = new ChatDialog(jid, rosterModel->contactName(jid));
+        chatDialogs[jid] = new ChatDialog(jid);
         chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
+        chatDialogs[jid]->setLocalName(tr("Me"));
+        chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
         conversationPanel->addWidget(chatDialogs[jid]);
