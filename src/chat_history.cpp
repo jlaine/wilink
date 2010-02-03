@@ -32,7 +32,7 @@
 #define DATE_HEIGHT 12
 
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
-    : QGraphicsWidget(parent), show_sender(false), maxWidth(2 * DATE_WIDTH)
+    : QGraphicsWidget(parent), show_date(true), show_sender(false), maxWidth(2 * DATE_WIDTH)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
@@ -105,8 +105,13 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         fromText->setPos(rect.x() + 10, rect.y() - 4);
         bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
     } else {
-        dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
-        dateLine->setLine(0, 0, rect.width() - DATE_WIDTH, 0);
+        if (show_date)
+        {
+            dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
+            dateLine->setLine(0, 0, rect.width() - DATE_WIDTH, 0);
+        } else {
+            dateLine->setLine(0, 0, rect.width(), 0);
+        }
         dateLine->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
         bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
     }
@@ -121,7 +126,20 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
     updateGeometry();
 }
 
-void ChatMessageWidget::showSender(bool show)
+void ChatMessageWidget::setShowDate(bool show)
+{
+    if (show)
+    {
+        dateBubble->show();
+        dateText->show();
+    } else {
+        dateBubble->hide();
+        dateText->hide();
+    }
+    show_date = show;
+}
+
+void ChatMessageWidget::setShowSender(bool show)
 {
     if (show)
     {
@@ -162,7 +180,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     setScene(scene);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setRenderHints(QPainter::Antialiasing);
+    //setRenderHints(QPainter::Antialiasing);
 
     obj = new QGraphicsWidget;
     layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -201,16 +219,21 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         i++;
     messages.insert(i, message);
 
-    /* add message */
+    /* prepare message body */
     QString bodyHtml = Qt::escape(message.body);
     bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
+    
+    /* determine grouping */
+    bool showSender = (i == 0 || message.local != messages.at(i-1).local);
+    bool showDate = (showSender || message.datetime > messages.at(i-1).datetime.addSecs(60));
 #ifdef USE_GRAPHICSVIEW
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
     msg->setBody(bodyHtml);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
-    msg->showSender(i == 0 || messages.at(i-1).local != message.local);
+    msg->setShowDate(showDate);
+    msg->setShowSender(showSender);
 
     msg->setMaximumWidth(availableWidth());
     layout->insertItem(i, msg);
@@ -220,7 +243,6 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
-    bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QDateTime datetime = message.datetime.toLocalTime();
     QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
     const QString type(message.local ? "local": "remote");

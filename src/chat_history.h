@@ -37,7 +37,8 @@ public:
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    void showSender(bool show);
+    void setShowDate(bool show);
+    void setShowSender(bool show);
 
 protected:
     QPainterPath bubblePath(qreal width);
@@ -45,6 +46,7 @@ protected:
 
 private:
     int maxWidth;
+    bool show_date;
     bool show_sender;
     QGraphicsTextItem *bodyText;
     QGraphicsPathItem *dateBubble;
@@ -53,7 +55,7 @@ private:
     QGraphicsTextItem *fromText;
 };
 
-//#define USE_GRAPHICSVIEW
+#define USE_GRAPHICSVIEW
 
 #ifdef USE_GRAPHICSVIEW
 class ChatHistory : public QGraphicsView
