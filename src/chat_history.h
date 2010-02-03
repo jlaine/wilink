@@ -31,7 +31,7 @@ class QGraphicsLinearLayout;
 class ChatMessageWidget : public QGraphicsWidget
 {
 public:
-    ChatMessageWidget(QGraphicsItem *parent);
+    ChatMessageWidget(bool local, QGraphicsItem *parent);
     void setBody(const QString &body);
     void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
@@ -41,8 +41,9 @@ public:
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
+    QColor bubbleColor;
     QGraphicsTextItem *bodyText;
-    QGraphicsRectItem *dateRect;
+    QGraphicsPathItem *dateBubble;
     QGraphicsTextItem *dateText;
     QGraphicsTextItem *fromText;
 };

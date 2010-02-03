@@ -29,21 +29,30 @@
 #include <QTextBlock>
 
 #define DATE_WIDTH 110
-#define DATE_HEIGHT 15
+#define DATE_HEIGHT 14
 
-ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
+static const QColor localColor(0xdb, 0xdb, 0xdb);
+static const QColor remoteColor(0xb6, 0xd4, 0xff);
+
+ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
 
-    dateRect = scene()->addRect(0, 0, DATE_WIDTH, DATE_HEIGHT, Qt::NoPen, Qt::lightGray);
-    dateRect->setZValue(-1);
-    dateRect->setParentItem(this);
+    QPainterPath path;
+    path.moveTo(DATE_HEIGHT/2, 0);
+    path.arcTo(0, 0, DATE_HEIGHT, DATE_HEIGHT, 90, 180);
+    path.lineTo(DATE_WIDTH - DATE_HEIGHT/2, DATE_HEIGHT);
+    path.arcTo(DATE_WIDTH - DATE_HEIGHT, 0, DATE_HEIGHT, DATE_HEIGHT, -90, 180);
+    path.closeSubpath();
+    dateBubble = scene()->addPath(path, QPen(Qt::black), local ? localColor : remoteColor);
+    dateBubble->setParentItem(this);
+    dateBubble->setZValue(-1);
 
     dateText = scene()->addText("");
-    dateText->setTextWidth(90);
     dateText->setParentItem(this);
+    dateText->setTextWidth(90);
 
     fromText = scene()->addText("");
     fromText->setParentItem(this);
@@ -66,10 +75,10 @@ void ChatMessageWidget::setFrom(const QString &from)
 
 void ChatMessageWidget::setGeometry(const QRectF &rect)
 {
-    fromText->setPos(rect.x(), rect.y());
+    fromText->setPos(rect.x(), rect.y() - 3);
 
-    dateRect->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y());
-    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y());
+    dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
+    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() - 3);
 
     bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
 }
@@ -109,6 +118,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     setScene(scene);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setRenderHints(QPainter::Antialiasing);
 
     obj = new QGraphicsWidget;
     layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -148,7 +158,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     messages.insert(i, message);
 
 #ifdef USE_GRAPHICSVIEW
-    ChatMessageWidget *msg = new ChatMessageWidget(obj);
+    ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
     msg->setBody(message.body);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
