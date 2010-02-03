@@ -93,7 +93,6 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     QRectF rect(baseRect);
     if (!show_sender)
         rect.moveTop(rect.y() - DATE_HEIGHT/2);
-
     if (show_sender)
     {
         dateBubble->setPath(bubblePath(rect.width()));
@@ -113,8 +112,8 @@ void ChatMessageWidget::setMaximumSize(const QSizeF &size)
 {
     maximumWidth = size.width();
     bodyText->document()->setTextWidth(maximumWidth - DATE_WIDTH);
-    QGraphicsWidget::setMaximumSize(size);
     updateGeometry();
+    //QGraphicsWidget::setMaximumSize(size);
 }
 
 void ChatMessageWidget::showSender(bool show)
@@ -292,7 +291,8 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
         child->setMaximumSize(QSizeF(w, -1));
     }
-    QGraphicsView::resizeEvent(e);
+    adjustSize();
+    //QGraphicsView::resizeEvent(e);
 #else
     QTextBrowser::resizeEvent(e);
 #endif
