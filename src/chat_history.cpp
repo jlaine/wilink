@@ -39,6 +39,8 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
+    bodyText->setOpenExternalLinks(true);
+    bodyText->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     dateBubble = scene()->addPath(bubblePath(DATE_WIDTH), QPen(Qt::black), local ? localColor : remoteColor);
     dateBubble->setParentItem(this);
@@ -100,7 +102,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     } else {
         dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
         dateLine->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
-        bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2);
+        bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
     }
     dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 5, rect.y() - 4);
 
