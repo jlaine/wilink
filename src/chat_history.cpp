@@ -31,9 +31,6 @@
 #define DATE_WIDTH 80
 #define DATE_HEIGHT 12
 
-static const QColor localColor(0xdb, 0xdb, 0xdb);
-static const QColor remoteColor(0xb6, 0xd4, 0xff);
-
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     : QGraphicsWidget(parent), show_sender(false), maxWidth(2 * DATE_WIDTH)
 {
@@ -42,11 +39,19 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     bodyText->setOpenExternalLinks(true);
     bodyText->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
-    dateBubble = scene()->addPath(bubblePath(DATE_WIDTH), QPen(Qt::black), local ? localColor : remoteColor);
+    QColor baseColor = local ? QColor(0xdb, 0xdb, 0xdb) : QColor(0xb6, 0xd4, 0xff);
+    QLinearGradient grad(QPointF(0, 0), QPointF(0, 0.5));
+    grad.setColorAt(0, baseColor);
+    baseColor.setAlpha(0x80);
+    grad.setColorAt(1, baseColor);
+    grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+    grad.setSpread(QGradient::ReflectSpread);
+
+    dateBubble = scene()->addPath(bubblePath(DATE_WIDTH), QPen(Qt::gray), QBrush(grad));
     dateBubble->setParentItem(this);
     dateBubble->setZValue(-1);
 
-    dateLine = scene()->addLine(0, 0, DATE_WIDTH, 0);
+    dateLine = scene()->addLine(0, 0, DATE_WIDTH, 0, QPen(Qt::gray));
     dateLine->setParentItem(this);
 
     dateText = scene()->addText("");
