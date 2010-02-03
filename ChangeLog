@@ -1,5 +1,8 @@
-wDesktop 0.4.8 (UNRELEASED)
+wDesktop 0.5.0 (UNRELEASED)
  * Improve icon for photos upload.
+ * Beautify and make conversation history more compact.
+ * Display remote party's nickname in conversation panel.
+ * Display own status in the form of an icon.
 
 wDesktop 0.4.7 (2010-02-02)
  * Fix a display glitch introduced in version 0.4.6.
