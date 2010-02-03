@@ -34,19 +34,13 @@
 static const QColor localColor(0xdb, 0xdb, 0xdb);
 static const QColor remoteColor(0xb6, 0xd4, 0xff);
 
-ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
+ChatMessageWidget::ChatMessageWidget(bool local, bool showSender, QGraphicsItem *parent)
+    : QGraphicsWidget(parent), show_sender(showSender)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
 
-    QPainterPath path;
-    path.moveTo(DATE_HEIGHT/2, 0);
-    path.arcTo(0, 0, DATE_HEIGHT, DATE_HEIGHT, 90, 180);
-    path.lineTo(DATE_WIDTH - DATE_HEIGHT/2, DATE_HEIGHT);
-    path.arcTo(DATE_WIDTH - DATE_HEIGHT, 0, DATE_HEIGHT, DATE_HEIGHT, -90, 180);
-    path.closeSubpath();
-    dateBubble = scene()->addPath(path, QPen(Qt::black), local ? localColor : remoteColor);
+    dateBubble = scene()->addPath(bubblePath(DATE_WIDTH), QPen(Qt::black), local ? localColor : remoteColor);
     dateBubble->setParentItem(this);
     dateBubble->setZValue(-1);
 
@@ -56,6 +50,17 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
 
     fromText = scene()->addText("");
     fromText->setParentItem(this);
+}
+
+QPainterPath ChatMessageWidget::bubblePath(qreal width)
+{
+    QPainterPath path;
+    path.moveTo(DATE_HEIGHT/2, 0);
+    path.arcTo(0, 0, DATE_HEIGHT, DATE_HEIGHT, 90, 180);
+    path.lineTo(width - DATE_HEIGHT/2, DATE_HEIGHT);
+    path.arcTo(width - DATE_HEIGHT, 0, DATE_HEIGHT, DATE_HEIGHT, -90, 180);
+    path.closeSubpath();
+    return path;
 }
 
 void ChatMessageWidget::setBody(const QString &body)
@@ -70,15 +75,19 @@ void ChatMessageWidget::setDate(const QDateTime &datetime)
 
 void ChatMessageWidget::setFrom(const QString &from)
 {
-    fromText->setPlainText(from);
+    if (show_sender)
+        fromText->setPlainText(from);
 }
 
 void ChatMessageWidget::setGeometry(const QRectF &rect)
 {
-    fromText->setPos(rect.x(), rect.y() - 3);
+    fromText->setPos(rect.x() + 10, rect.y() - 3);
 
-    dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
-    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() - 3);
+    if (show_sender)
+        dateBubble->setPos(rect.x(), rect.y() + 0.5);
+    else
+        dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
+    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 10, rect.y() - 3);
 
     bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
 }
@@ -86,6 +95,7 @@ void ChatMessageWidget::setGeometry(const QRectF &rect)
 void ChatMessageWidget::setMaximumSize(const QSizeF &size)
 {
     bodyText->document()->setTextWidth(size.width());
+    dateBubble->setPath(bubblePath(show_sender ? size.width() : DATE_WIDTH));
     QGraphicsWidget::setMaximumSize(size);
 }
 
@@ -157,8 +167,10 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
         i++;
     messages.insert(i, message);
 
+    /* add message */
+    bool showSender = (i == 0 || messages.at(i-1).local != message.local);
 #ifdef USE_GRAPHICSVIEW
-    ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
+    ChatMessageWidget *msg = new ChatMessageWidget(message.local, showSender, obj);
     msg->setBody(message.body);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
@@ -168,7 +180,6 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
-    /* add message */
     bool showSender = (i == 0 || messages.at(i-1).local != message.local);
     QDateTime datetime = message.datetime.toLocalTime();
     QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));

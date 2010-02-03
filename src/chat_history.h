@@ -31,7 +31,7 @@ class QGraphicsLinearLayout;
 class ChatMessageWidget : public QGraphicsWidget
 {
 public:
-    ChatMessageWidget(bool local, QGraphicsItem *parent);
+    ChatMessageWidget(bool local, bool showSender, QGraphicsItem *parent);
     void setBody(const QString &body);
     void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
@@ -39,9 +39,10 @@ public:
     void setMaximumSize(const QSizeF &size);
 
 protected:
+    QPainterPath bubblePath(qreal maxWidth);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
-    QColor bubbleColor;
+    bool show_sender;
     QGraphicsTextItem *bodyText;
     QGraphicsPathItem *dateBubble;
     QGraphicsTextItem *dateText;
