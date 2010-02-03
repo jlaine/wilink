@@ -51,6 +51,7 @@ protected slots:
     void disconnected();
     void error(QXmppClient::Error error);
     void iqReceived(const QXmppIq&);
+    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &presence);

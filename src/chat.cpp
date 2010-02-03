@@ -115,6 +115,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
+    connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -161,6 +162,12 @@ void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
         chatDialogs[bareJid]->archiveChatReceived(chat);
 }
 
+void Chat::archiveListReceived(const QList<QXmppArchiveChat> &chats)
+{
+    foreach (const QXmppArchiveChat &chat, chats)
+        client->getArchiveManager().retrieveCollection(chat.with, chat.start);
+}
+
 /** When the window is activated, pass focus to the active chat.
  */
 void Chat::changeEvent(QEvent *event)
@@ -205,8 +212,8 @@ ChatDialog *Chat::conversation(const QString &jid)
         conversationPanel->addWidget(chatDialogs[jid]);
         conversationPanel->show();
 
-        // get archives for the past week
-        client->getArchiveManager().getCollections(jid,
+        // list archives for the past week
+        client->getArchiveManager().listCollections(jid,
             QDateTime::currentDateTime().addDays(-7));
     }
     return chatDialogs[jid];
