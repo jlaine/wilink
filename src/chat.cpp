@@ -164,8 +164,8 @@ void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
 
 void Chat::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
-    foreach (const QXmppArchiveChat &chat, chats)
-        client->getArchiveManager().retrieveCollection(chat.with, chat.start);
+    for (int i = chats.size() - 1; i >= 0; i--)
+        client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
 }
 
 /** When the window is activated, pass focus to the active chat.
