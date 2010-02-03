@@ -74,6 +74,7 @@ private:
     RosterModel *rosterModel;
     RosterView *rosterView;
     QSplitter *splitter;
+    QLabel *statusIconLabel;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
     QTimer *timeoutTimer;

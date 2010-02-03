@@ -92,6 +92,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     hbox->addWidget(addButton);
     hbox->addStretch();
 
+    statusIconLabel = new QLabel;
+    statusIconLabel->setPixmap(QPixmap(":/contact-offline.png"));
+    hbox->addWidget(statusIconLabel);
     statusLabel = new QLabel;
     hbox->addWidget(statusLabel);
 
@@ -194,7 +197,12 @@ void Chat::connected()
 {
     qWarning("Connected to chat server");
     pingTimer->start();
+    statusIconLabel->setPixmap(QPixmap(":/contact-available.png"));
     statusLabel->setText(tr("Connected"));
+
+    /* request own vCard */
+    client->getVCardManager().requestVCard(
+        client->getConfiguration().getJidBare());
 }
 
 /** Get or create a conversation dialog for the specified recipient.
@@ -206,8 +214,8 @@ ChatDialog *Chat::conversation(const QString &jid)
     if (!chatDialogs.contains(jid))
     {
         chatDialogs[jid] = new ChatDialog(jid);
-        chatDialogs[jid]->setAvatar(rosterModel->contactAvatar(jid));
         chatDialogs[jid]->setLocalName(tr("Me"));
+        chatDialogs[jid]->setRemoteAvatar(rosterModel->contactAvatar(jid));
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
             this, SLOT(sendMessage(const QString&, const QString&)));
@@ -228,6 +236,7 @@ void Chat::disconnected()
     timeoutTimer->stop();
     rosterModel->disconnected();
 
+    statusIconLabel->setPixmap(QPixmap(":/contact-offline.png"));
     if (reconnectOnDisconnect)
     {
         qWarning("Reconnecting to chat server");

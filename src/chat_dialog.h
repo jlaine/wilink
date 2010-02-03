@@ -38,9 +38,9 @@ class ChatDialog : public QWidget
 
 public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
-    void setAvatar(const QPixmap &avatar);
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
+    void setRemoteAvatar(const QPixmap &avatar);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);

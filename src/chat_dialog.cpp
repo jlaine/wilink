@@ -103,14 +103,14 @@ void ChatDialog::send()
     emit sendMessage(chatRemoteJid, text);
 }
 
-void ChatDialog::setAvatar(const QPixmap &avatar)
-{
-    avatarLabel->setPixmap(avatar);
-}
-
 void ChatDialog::setLocalName(const QString &name)
 {
     chatHistory->setLocalName(name);
+}
+
+void ChatDialog::setRemoteAvatar(const QPixmap &avatar)
+{
+    avatarLabel->setPixmap(avatar);
 }
 
 void ChatDialog::setRemoteName(const QString &name)
