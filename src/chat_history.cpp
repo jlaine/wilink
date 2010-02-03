@@ -35,7 +35,7 @@ static const QColor localColor(0xdb, 0xdb, 0xdb);
 static const QColor remoteColor(0xb6, 0xd4, 0xff);
 
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
-    : QGraphicsWidget(parent), show_sender(false), maximumWidth(2 * DATE_WIDTH)
+    : QGraphicsWidget(parent), show_sender(false), maxWidth(2 * DATE_WIDTH)
 {
     bodyText = scene()->addText("");
     bodyText->setParentItem(this);
@@ -108,10 +108,11 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 5, rect.y() - 4);
 }
 
-void ChatMessageWidget::setPageWidth(qreal width)
+void ChatMessageWidget::setMaximumWidth(qreal width)
 {
-    maximumWidth = width;
-    bodyText->document()->setTextWidth(maximumWidth - DATE_WIDTH);
+    QGraphicsWidget::setMaximumWidth(width);
+    maxWidth = width;
+    bodyText->document()->setTextWidth(width - DATE_WIDTH);
     updateGeometry();
 }
 
@@ -137,8 +138,8 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
         case Qt::PreferredSize:
         {
             QSizeF hint(bodyText->document()->size());
-            if (hint.width() < maximumWidth)
-                hint.setWidth(maximumWidth);
+            if (hint.width() < maxWidth)
+                hint.setWidth(maxWidth);
             if (show_sender)
                 hint.setHeight(hint.height() + DATE_HEIGHT);
             return hint;
@@ -205,12 +206,12 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message)
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->showSender(i == 0 || messages.at(i-1).local != message.local);
-    msg->setPageWidth(availableWidth());
 
+    msg->setMaximumWidth(availableWidth());
     layout->addItem(msg);
     adjustSize();
     // FIXME: for some reason, we need to call updateGeometry() on message
-    msg->setPageWidth(availableWidth());
+    msg->setMaximumWidth(availableWidth());
 #else
     QTextCursor cursor(document()->findBlockByNumber(i * 4));
 
@@ -290,7 +291,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        child->setMaximumSize(QSizeF(w, -1));
+        child->setMaximumWidth(w);
     }
     adjustSize();
     //QGraphicsView::resizeEvent(e);

@@ -36,14 +36,15 @@ public:
     void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
-    void setPageWidth(qreal width);
+    void setMaximumWidth(qreal width);
     void showSender(bool show);
 
 protected:
     QPainterPath bubblePath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
-    int maximumWidth;
+private:
+    int maxWidth;
     bool show_sender;
     QGraphicsTextItem *bodyText;
     QGraphicsPathItem *dateBubble;
