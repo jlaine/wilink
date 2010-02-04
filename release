@@ -7,7 +7,7 @@ if [ -n "`git diff`" ]; then
     exit 1
 fi
 git pull
-git submodule update
+git submodule update --init
 
 if [ -n "`which sw_vers`" ]; then
     rm -rf release-mac
