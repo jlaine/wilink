@@ -1,0 +1,14 @@
+#!/bin/sh
+if [ -n "`which sw_vers`" ]; then
+    rm -rf release-mac
+    mkdir release-mac
+    cd release-mac
+    cmake .. -DQT_QMAKE_EXECUTABLE=/opt/local/libexec/qt4-mac/bin/qmake -DCMAKE_CXX_FLAGS="-arch i386" -DLINK_FLAGS="-arch i386"
+    make package
+else
+    rm -rf release-win32
+    mkdir release-win32
+    cd release-win32
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
+    make package
+fi
