@@ -46,7 +46,7 @@ void Updates::check()
     /* only download files over HTTPS */
     if (updatesUrl.scheme() != "https")
     {
-        emit checkFailed(InsecureLocation);
+        emit checkFailed(InsecureLocation, "Refusing to check for updates from non-HTTPS site");
         return;
     }
 
@@ -86,7 +86,7 @@ void Updates::download(const Release &release, const QString &dirPath)
     /* only download files over HTTPS with an SHA1 hash */
     if (release.url.scheme() != "https" || !release.hashes.contains("sha1"))
     {
-        emit updateFailed(InsecureLocation);
+        emit updateFailed(InsecureLocation, "Refusing to download update from non-HTTPS site or without checksum");
         return;
     }
 
@@ -106,7 +106,7 @@ void Updates::saveUpdate()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        emit updateFailed(DownloadFailed);
+        emit updateFailed(DownloadFailed, reply->errorString());
         return;
     }
 
@@ -120,7 +120,7 @@ void Updates::saveUpdate()
             hash.addData(data);
             if (hash.result() != downloadRelease.hashes[type])
             {
-                emit updateFailed(BadHash);
+                emit updateFailed(BadHash, "The checksum of the downloaded file is incorrect");
                 return;
             } 
         }
@@ -129,7 +129,7 @@ void Updates::saveUpdate()
     /* save file */
     if (!downloadFile.open(QIODevice::WriteOnly))
     {
-        emit updateFailed(SaveFailed);
+        emit updateFailed(SaveFailed, "Could not save downloaded file to disk");
         return;
     }
     downloadFile.write(data);
@@ -145,7 +145,7 @@ void Updates::processStatus()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        emit checkFailed(DownloadFailed);
+        emit checkFailed(DownloadFailed, reply->errorString());
         return;
     }
 

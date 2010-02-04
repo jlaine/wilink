@@ -40,10 +40,10 @@ public slots:
     void check();
 
 protected slots:
-    void checkFailed(Updates::UpdatesError error);
+    void checkFailed(Updates::UpdatesError error, const QString &errorString);
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
-    void updateFailed(Updates::UpdatesError error);
+    void updateFailed(Updates::UpdatesError error, const QString &errorString);
     void updateProgress(qint64 done, qint64 total);
 
 signals:

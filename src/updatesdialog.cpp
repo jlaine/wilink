@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QDesktopServices>
+#include <QDebug>
 #include <QDialog>
 #include <QDir>
 #include <QLabel>
@@ -49,10 +50,10 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* check for updates */
     updates = new Updates(this);
-    connect(updates, SIGNAL(checkFailed(Updates::UpdatesError)), this, SLOT(checkFailed(Updates::UpdatesError)));
+    connect(updates, SIGNAL(checkFailed(Updates::UpdatesError, const QString&)), this, SLOT(checkFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
-    connect(updates, SIGNAL(updateFailed(Updates::UpdatesError)), this, SLOT(updateFailed(Updates::UpdatesError)));
+    connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
 }
 
@@ -62,9 +63,9 @@ void UpdatesDialog::check()
     updates->check();
 }
 
-void UpdatesDialog::checkFailed(Updates::UpdatesError error)
+void UpdatesDialog::checkFailed(Updates::UpdatesError error, const QString &errorString)
 {
-    qWarning("Failed to check for updates");
+    qWarning() << "Failed to check for updates" << errorString;
 }
 
 void UpdatesDialog::setUrl(const QUrl &url)
@@ -106,8 +107,9 @@ void UpdatesDialog::updateDownloaded(const QUrl &url)
     qApp->quit();
 }
 
-void UpdatesDialog::updateFailed(Updates::UpdatesError error)
+void UpdatesDialog::updateFailed(Updates::UpdatesError error, const QString &errorString)
 {
+    qWarning() << "Failed to download update" << errorString;
     QMessageBox::warning(this,
         tr("Download failed"),
         tr("Could not download the new version, please try again later."));
