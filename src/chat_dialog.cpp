@@ -75,7 +75,7 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     foreach (const QXmppArchiveMessage &msg, chat.messages)
-        chatHistory->addMessage(msg);
+        chatHistory->addMessage(msg, true);
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)

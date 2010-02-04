@@ -67,7 +67,7 @@ class ChatHistory : public QTextBrowser
 
 public:
     ChatHistory(QWidget *parent = NULL);
-    void addMessage(const QXmppArchiveMessage &message);
+    void addMessage(const QXmppArchiveMessage &message, bool archived = false);
     void setLocalName(const QString &localName);
     void setRemoteName(const QString &remoteName);
 

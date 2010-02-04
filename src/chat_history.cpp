@@ -208,10 +208,22 @@ ChatHistory::ChatHistory(QWidget *parent)
 
 #endif
 
-void ChatHistory::addMessage(const QXmppArchiveMessage &message)
+void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
 {
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
+
+    /* check for archived message collisions */
+    if (archived)
+    {
+        foreach (const QXmppArchiveMessage &existing, messages)
+        {
+            if (message.datetime == existing.datetime &&
+                message.local == existing.local &&
+                message.body == existing.body)
+                return;
+        }
+    }
 
     /* position cursor */
     int i = 0;
