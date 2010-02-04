@@ -1,4 +1,14 @@
 #!/bin/sh
+
+set -e
+
+if [ -n "`git diff`" ]; then
+    echo "working copy is dirty!"
+    exit 1
+fi
+git pull
+git submodule update
+
 if [ -n "`which sw_vers`" ]; then
     rm -rf release-mac
     mkdir release-mac
