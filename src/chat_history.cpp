@@ -278,33 +278,24 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
 
     /* position cursor */
     ChatMessageWidget *previous = NULL;
-    int i = 0;
-    while (i < layout->count())
+    int pos = 0;
+    for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
         if (message.datetime > child->message().datetime)
         {
             previous = child;
-            i++;
-        }
-        else
-            break;
-    }
-
-#if 0
-    /* check for archived message collisions */
-    if (archived)
-    {
-        for (int i = 0; i < layout->count(); i++)
-        {
-            ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-            if (!child->archived() && (i > layout->count() - 5) &&
+            pos++;
+        } else if (archived) {
+            // check for collision
+            if (!child->archived() &&
                 message.local == child->message().local &&
                 message.body == child->message().body)
                 return;
+        } else {
+            break;
         }
     }
-#endif
 
     /* determine grouping */
     bool showSender = (!previous ||
@@ -323,7 +314,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
 
     connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
     msg->setMaximumWidth(availableWidth());
-    layout->insertItem(i, msg);
+    layout->insertItem(pos, msg);
     adjustSize();
 
     /* scroll to end if we were previous at end */
