@@ -20,6 +20,8 @@
 #include "chat_history.h"
 
 #include <QAbstractTextDocumentLayout>
+#include <QApplication>
+#include <QClipboard>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
@@ -27,6 +29,7 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QMenu>
 #include <QScrollBar>
+#include <QShortcut>
 #include <QTextDocument>
 #include <QUrl>
 
@@ -100,6 +103,11 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
+QString ChatMessageWidget::from() const
+{
+    return msgFrom;
+}
+
 QXmppArchiveMessage ChatMessageWidget::message() const
 {
     return msg;
@@ -108,6 +116,7 @@ QXmppArchiveMessage ChatMessageWidget::message() const
 void ChatMessageWidget::setFrom(const QString &from)
 {
     fromText->setPlainText(from);
+    msgFrom = from;
 }
 
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
@@ -247,6 +256,8 @@ ChatHistory::ChatHistory(QWidget *parent)
     scene->addItem(obj);
 
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(copy()));
 }
 
 void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
@@ -290,8 +301,6 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
     msg->setMaximumWidth(availableWidth());
     layout->insertItem(i, msg);
     adjustSize();
-    // FIXME: for some reason, we need to call updateGeometry() on message
-    msg->setMaximumWidth(availableWidth());
 
     /* scroll to end if we were previous at end */
     if (atEnd)
@@ -317,6 +326,29 @@ void ChatHistory::clear()
     for (int i = layout->count() - 1; i >= 0; i--)
         delete layout->itemAt(i);
     adjustSize();
+}
+
+void ChatHistory::copy()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(copyText(), QClipboard::Clipboard);
+}
+
+QString ChatHistory::copyText()
+{
+    QString copyText;
+    QList<QGraphicsItem*> selection = scene->selectedItems();
+    for (int i = 0; i < layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        if (selection.contains(child))
+        {
+            if (!copyText.isEmpty())
+                copyText += "\n";
+            copyText += child->from() + "> " + child->message().body;
+        }
+    }
+    return copyText;
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
@@ -375,6 +407,11 @@ void ChatHistory::slotSelectionChanged()
         } else if (lastSelection.contains(child)) {
             child->setSelected(false);
         }
+    }
+    if (!selection.isEmpty())
+    {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(copyText(), QClipboard::Selection);
     }
     lastSelection = selection;
 }

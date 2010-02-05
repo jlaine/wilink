@@ -48,7 +48,9 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+    QString from() const;
     QXmppArchiveMessage message() const;
+
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
@@ -67,6 +69,7 @@ protected:
 private:
     int maxWidth;
     QXmppArchiveMessage msg;
+    QString msgFrom;
     bool show_date;
     bool show_sender;
 
@@ -89,6 +92,7 @@ public:
 
 public slots:
     void clear();
+    void copy();
 
 protected slots:
     void slotLinkHoverChanged(const QString &link);
@@ -98,6 +102,7 @@ protected:
     void adjustSize();
     qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
+    QString copyText();
     void resizeEvent(QResizeEvent *e);
 
 private:
