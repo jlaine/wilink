@@ -48,9 +48,11 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+    bool archived() const;
     QString from() const;
     QXmppArchiveMessage message() const;
 
+    void setArchived(bool archived);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
@@ -69,6 +71,7 @@ protected:
 private:
     int maxWidth;
     QXmppArchiveMessage msg;
+    bool msgArchived;
     QString msgFrom;
     bool show_date;
     bool show_sender;

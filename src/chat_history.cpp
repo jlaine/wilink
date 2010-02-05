@@ -49,7 +49,8 @@ void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 }
 
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
-    : QGraphicsWidget(parent), show_date(true), show_sender(false), maxWidth(2 * DATE_WIDTH)
+    : QGraphicsWidget(parent), show_date(true), show_sender(false), maxWidth(2 * DATE_WIDTH),
+    msgArchived(false)
 {
     bodyText = new ChatTextItem;
     scene()->addItem(bodyText);
@@ -103,6 +104,11 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
+bool ChatMessageWidget::archived() const
+{
+    return msgArchived;
+}
+
 QString ChatMessageWidget::from() const
 {
     return msgFrom;
@@ -111,6 +117,11 @@ QString ChatMessageWidget::from() const
 QXmppArchiveMessage ChatMessageWidget::message() const
 {
     return msg;
+}
+
+void ChatMessageWidget::setArchived(bool archived)
+{
+    msgArchived = archived;
 }
 
 void ChatMessageWidget::setFrom(const QString &from)
