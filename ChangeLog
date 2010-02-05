@@ -1,5 +1,7 @@
-wDesktop 0.5.2 (UNRELEASED)
+wDesktop 0.5.2 (2010-02-05)
  * Fix duplicated messages when archives overlap with received messages.
+ * Improve text copy behaviour.
+ * Fix opening links in messages.
 
 wDesktop 0.5.1 (2010-02-05)
  * Center date label in chat history.
