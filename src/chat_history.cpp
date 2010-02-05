@@ -110,7 +110,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     } else {
         if (show_date)
         {
-            dateBubble->setPos(rect.x() + rect.width() - DATE_WIDTH, rect.y() + 0.5);
+            dateBubble->setPos(rect.right() - DATE_WIDTH, rect.y() + 0.5);
             dateLine->setLine(0, 0, rect.width() - DATE_WIDTH, 0);
         } else {
             dateLine->setLine(0, 0, rect.width(), 0);
@@ -118,7 +118,9 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         dateLine->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
         bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
     }
-    dateText->setPos(rect.x() + rect.width() - DATE_WIDTH + 5, rect.y() - 4);
+    dateText->setPos(
+        rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
+        rect.y() - 4);
 }
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
