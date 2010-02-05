@@ -344,7 +344,11 @@ QString ChatHistory::copyText()
         if (selection.contains(child))
         {
             if (!copyText.isEmpty())
+#ifdef Q_OS_WIN
+                copyText += "\r\n";
+#else
                 copyText += "\n";
+#endif
             copyText += child->from() + "> " + child->message().body;
         }
     }
