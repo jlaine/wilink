@@ -49,12 +49,11 @@ public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     QXmppArchiveMessage message() const;
-    void setBody(const QString &body);
-    void setDate(const QDateTime &datetime);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const QXmppArchiveMessage &message);
+    void setSelected(bool selected);
     void setShowDate(bool show);
     void setShowSender(bool show);
 
@@ -105,10 +104,11 @@ private:
     QList<QXmppArchiveMessage> messages;
     QString chatLocalName;
     QString chatRemoteName;
-
     QGraphicsScene *scene;
+
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
+    QList<QGraphicsItem*> lastSelection;
 };
 
 #endif

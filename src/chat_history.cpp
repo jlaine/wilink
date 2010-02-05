@@ -105,26 +105,6 @@ QXmppArchiveMessage ChatMessageWidget::message() const
     return msg;
 }
 
-void ChatMessageWidget::setBody(const QString &body)
-{
-    QString bodyHtml = Qt::escape(body);
-    bodyHtml.replace("\n", "<br/>");
-    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
-    if (bodyHtml.contains(linkRegex))
-    {
-        bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() | Qt::LinksAccessibleByMouse);
-    } else {
-        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() & ~Qt::LinksAccessibleByMouse);
-    }
-    bodyText->setHtml(bodyHtml);
-}
-
-void ChatMessageWidget::setDate(const QDateTime &datetime)
-{
-    dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-}
-
 void ChatMessageWidget::setFrom(const QString &from)
 {
     fromText->setPlainText(from);
@@ -174,6 +154,32 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 void ChatMessageWidget::setMessage(const QXmppArchiveMessage &message)
 {
     msg = message;
+
+    /* set date */
+    QDateTime datetime = message.datetime.toLocalTime();
+    dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+
+    /* set body */
+    QString bodyHtml = Qt::escape(message.body);
+    bodyHtml.replace("\n", "<br/>");
+    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
+    if (bodyHtml.contains(linkRegex))
+    {
+        bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() | Qt::LinksAccessibleByMouse);
+    } else {
+        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() & ~Qt::LinksAccessibleByMouse);
+    }
+    bodyText->setHtml(bodyHtml);
+}
+
+void ChatMessageWidget::setSelected(bool selected)
+{
+    QGraphicsWidget::setSelected(selected);
+    QTextCursor cursor(bodyText->document());
+    if (selected)
+        cursor.select(QTextCursor::Document);
+    bodyText->setTextCursor(cursor);
 }
 
 void ChatMessageWidget::setShowDate(bool show)
@@ -275,8 +281,6 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
 
     /* add message */
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
-    msg->setBody(message.body);
-    msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->setMessage(message);
     msg->setShowDate(showDate);
@@ -360,5 +364,17 @@ void ChatHistory::slotLinkHoverChanged(const QString &link)
 
 void ChatHistory::slotSelectionChanged()
 {
-    qDebug() << "selected" << scene->selectedItems().size() << "items";
+    QList<QGraphicsItem*> selection = scene->selectedItems();
+    for (int i = 0; i < layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        if (selection.contains(child))
+        {
+            if (!lastSelection.contains(child))
+                child->setSelected(true);
+        } else if (lastSelection.contains(child)) {
+            child->setSelected(false);
+        }
+    }
+    lastSelection = selection;
 }
