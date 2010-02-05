@@ -80,7 +80,10 @@ QPainterPath ChatMessageWidget::bubblePath(qreal width)
 
 void ChatMessageWidget::setBody(const QString &body)
 {
-    bodyText->setHtml(body);
+    QString bodyHtml = Qt::escape(body);
+    bodyHtml.replace("\n", "<br/>");
+    bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
+    bodyText->setHtml(bodyHtml);
 }
 
 void ChatMessageWidget::setDate(const QDateTime &datetime)
@@ -172,7 +175,6 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     }
 }
 
-#ifdef USE_GRAPHICSVIEW
 ChatHistory::ChatHistory(QWidget *parent)
     : QGraphicsView(parent)
 {
@@ -189,24 +191,6 @@ ChatHistory::ChatHistory(QWidget *parent)
     obj->setLayout(layout);
     scene->addItem(obj);
 }
-
-#else
-
-ChatHistory::ChatHistory(QWidget *parent)
-    : QTextBrowser(parent)
-{
-    QFile styleSheet(":/chat.css");
-    if (styleSheet.open(QIODevice::ReadOnly))
-    {
-        document()->setDefaultStyleSheet(styleSheet.readAll());
-        styleSheet.close();
-    }
-
-    setOpenLinks(false);
-    connect(this, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(slotAnchorClicked(const QUrl&)));
-}
-
-#endif
 
 void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
 {
@@ -231,20 +215,16 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
         i++;
     messages.insert(i, message);
 
-    /* prepare message body */
-    QString bodyHtml = Qt::escape(message.body);
-    bodyHtml.replace("\n", "<br/>");
-    bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
-
     /* determine grouping */
     bool showSender = (i == 0 ||
         message.local != messages.at(i-1).local ||
         message.datetime > messages.at(i-1).datetime.addSecs(120 * 60));
     bool showDate = (showSender ||
         message.datetime > messages.at(i-1).datetime.addSecs(60));
-#ifdef USE_GRAPHICSVIEW
+
+    /* add message */
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
-    msg->setBody(bodyHtml);
+    msg->setBody(message.body);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->setShowDate(showDate);
@@ -255,29 +235,6 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
     adjustSize();
     // FIXME: for some reason, we need to call updateGeometry() on message
     msg->setMaximumWidth(availableWidth());
-#else
-    QTextCursor cursor(document()->findBlockByNumber(i * 4));
-
-    QDateTime datetime = message.datetime.toLocalTime();
-    QString dateString(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-    const QString type(message.local ? "local": "remote");
-
-    cursor.insertHtml(QString(
-        "<table cellspacing=\"0\" width=\"100%\">"
-        "<tr class=\"title\">"
-        "  <td class=\"from %1\">%2</td>"
-        "  <td class=\"time %3\" align=\"center\" width=\"100\">%4</td>"
-        "</tr>"
-        "<tr>"
-        "  <td class=\"body\" colspan=\"2\">%5</td>"
-        "</tr>"
-        "</table>")
-        .arg(showSender ? type : "line")
-        .arg(showSender ? (message.local ? chatLocalName : chatRemoteName) : "")
-        .arg(type)
-        .arg(dateString)
-        .arg(bodyHtml));
-#endif
 
     /* scroll to end if we were previous at end */
     if (atEnd)
@@ -286,12 +243,10 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
 
 void ChatHistory::adjustSize()
 {
-#ifdef USE_GRAPHICSVIEW
     obj->adjustSize();
     QRectF rect = obj->boundingRect();
     rect.setHeight(rect.height() - 10);
     setSceneRect(rect);
-#endif
 }
 
 qreal ChatHistory::availableWidth() const
@@ -302,21 +257,13 @@ qreal ChatHistory::availableWidth() const
 void ChatHistory::clear()
 {
     messages.clear();
-#ifdef USE_GRAPHICSVIEW
     for (int i = layout->count() - 1; i >= 0; i--)
         delete layout->itemAt(i);
-#else
-    QTextBrowser::clear();
-#endif
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
-#ifdef USE_GRAPHICSVIEW
     QMenu *menu = new QMenu;
-#else
-    QMenu *menu = createStandardContextMenu();
-#endif
     QAction *action = menu->addAction(tr("Clear"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
     menu->exec(event->globalPos());
@@ -328,7 +275,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
 
-#ifdef USE_GRAPHICSVIEW
     const qreal w = availableWidth();
     for (int i = 0; i < layout->count(); i++)
     {
@@ -337,9 +283,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     }
     adjustSize();
     //QGraphicsView::resizeEvent(e);
-#else
-    QTextBrowser::resizeEvent(e);
-#endif
 
     /* scroll to end if we were previous at end */
     if (atEnd)

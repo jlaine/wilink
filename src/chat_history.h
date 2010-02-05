@@ -55,13 +55,7 @@ private:
     QGraphicsTextItem *fromText;
 };
 
-#define USE_GRAPHICSVIEW
-
-#ifdef USE_GRAPHICSVIEW
 class ChatHistory : public QGraphicsView
-#else
-class ChatHistory : public QTextBrowser
-#endif
 {
     Q_OBJECT
 
@@ -88,11 +82,9 @@ private:
     QString chatLocalName;
     QString chatRemoteName;
 
-#ifdef USE_GRAPHICSVIEW
     QGraphicsScene *scene;
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
-#endif
 };
 
 #endif
