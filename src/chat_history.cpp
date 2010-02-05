@@ -32,6 +32,7 @@
 
 #define DATE_WIDTH 80
 #define DATE_HEIGHT 12
+#define BODY_OFFSET 5
 
 void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -79,6 +80,7 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     fromText->setFont(font);
     fromText->setParentItem(this);
 
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
     connect(bodyText, SIGNAL(linkHoverChanged(QString)), this, SIGNAL(linkHoverChanged(QString)));
 }
 
@@ -91,6 +93,16 @@ QPainterPath ChatMessageWidget::bubblePath(qreal width)
     path.arcTo(width - DATE_HEIGHT, 0, DATE_HEIGHT, DATE_HEIGHT, -90, 180);
     path.closeSubpath();
     return path;
+}
+
+bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode) const
+{
+    return bodyText->collidesWithPath(path, mode);
+}
+
+QXmppArchiveMessage ChatMessageWidget::message() const
+{
+    return msg;
 }
 
 void ChatMessageWidget::setBody(const QString &body)
@@ -120,15 +132,21 @@ void ChatMessageWidget::setFrom(const QString &from)
 
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 {
+    QGraphicsWidget::setGeometry(baseRect);
+
     QRectF rect(baseRect);
+    rect.moveLeft(0);
+    rect.moveTop(0);
     if (!show_sender)
-        rect.moveTop(rect.y() - DATE_HEIGHT/2);
+        rect.moveTop(-DATE_HEIGHT/2);
+    else
+        rect.moveTop(0);
     if (show_sender)
     {
         dateBubble->setPath(bubblePath(rect.width()));
         dateBubble->setPos(rect.x(), rect.y() + 0.5);
         fromText->setPos(rect.x() + 10, rect.y() - 4);
-        bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT);
+        bodyText->setPos(rect.x() + BODY_OFFSET, rect.y() + DATE_HEIGHT);
     } else {
         if (show_date)
         {
@@ -138,7 +156,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
             dateLine->setLine(0, 0, rect.width(), 0);
         }
         dateLine->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
-        bodyText->setPos(rect.x(), rect.y() + DATE_HEIGHT/2 + 0.5);
+        bodyText->setPos(rect.x() + BODY_OFFSET, rect.y() + DATE_HEIGHT/2 + 0.5);
     }
     dateText->setPos(
         rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
@@ -149,8 +167,13 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 {
     QGraphicsWidget::setMaximumWidth(width);
     maxWidth = width;
-    bodyText->document()->setTextWidth(width - DATE_WIDTH);
+    bodyText->document()->setTextWidth(width - DATE_WIDTH - BODY_OFFSET);
     updateGeometry();
+}
+
+void ChatMessageWidget::setMessage(const QXmppArchiveMessage &message)
+{
+    msg = message;
 }
 
 void ChatMessageWidget::setShowDate(bool show)
@@ -205,6 +228,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     scene = new QGraphicsScene;
     setScene(scene);
     setDragMode(QGraphicsView::RubberBandDrag);
+    setRubberBandSelectionMode(Qt::IntersectsItemShape);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     //setRenderHints(QPainter::Antialiasing);
@@ -254,6 +278,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
     msg->setBody(message.body);
     msg->setDate(message.datetime.toLocalTime());
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
+    msg->setMessage(message);
     msg->setShowDate(showDate);
     msg->setShowSender(showSender);
 
