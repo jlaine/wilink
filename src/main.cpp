@@ -54,7 +54,9 @@ int main(int argc, char *argv[])
 
     /* Load translations */
     QTranslator translator;
-    translator.load(QString(":/%1.qm").arg(QLocale::system().name().split("_").first()));
+    QString localeName = QLocale::system().name().split("_").first();
+    translator.load(QString(":/qt_%1.qm").arg(localeName));
+    translator.load(QString(":/%1.qm").arg(localeName));
     app.installTranslator(&translator);
 
     /* Install signal handler */

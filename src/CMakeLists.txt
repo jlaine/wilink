@@ -51,6 +51,7 @@ if(RELOAD_TRANSLATIONS)
 else(RELOAD_TRANSLATIONS)
     qt4_add_translation(QM_FILES translations/fr.ts)
 endif(RELOAD_TRANSLATIONS)
+qt4_add_translation(QM_FILES translations/qt_fr.ts)
 
 set(wDesktop_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
