@@ -109,7 +109,6 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    QList<QXmppArchiveMessage> messages;
     QString chatLocalName;
     QString chatRemoteName;
     QGraphicsScene *scene;

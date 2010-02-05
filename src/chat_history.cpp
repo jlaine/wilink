@@ -276,33 +276,46 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
 
+    /* position cursor */
+    ChatMessageWidget *previous = NULL;
+    int i = 0;
+    while (i < layout->count())
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        if (message.datetime > child->message().datetime)
+        {
+            previous = child;
+            i++;
+        }
+        else
+            break;
+    }
+
+#if 0
     /* check for archived message collisions */
     if (archived)
     {
-        foreach (const QXmppArchiveMessage &existing, messages)
+        for (int i = 0; i < layout->count(); i++)
         {
-            if (message.datetime == existing.datetime &&
-                message.local == existing.local &&
-                message.body == existing.body)
+            ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+            if (!child->archived() && (i > layout->count() - 5) &&
+                message.local == child->message().local &&
+                message.body == child->message().body)
                 return;
         }
     }
-
-    /* position cursor */
-    int i = 0;
-    while (i < messages.size() && message.datetime > messages.at(i).datetime)
-        i++;
-    messages.insert(i, message);
+#endif
 
     /* determine grouping */
-    bool showSender = (i == 0 ||
-        message.local != messages.at(i-1).local ||
-        message.datetime > messages.at(i-1).datetime.addSecs(120 * 60));
+    bool showSender = (!previous ||
+        message.local != previous->message().local ||
+        message.datetime > previous->message().datetime.addSecs(120 * 60));
     bool showDate = (showSender ||
-        message.datetime > messages.at(i-1).datetime.addSecs(60));
+        message.datetime > previous->message().datetime.addSecs(60));
 
     /* add message */
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
+    msg->setArchived(archived);
     msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->setMessage(message);
     msg->setShowDate(showDate);
@@ -333,7 +346,6 @@ qreal ChatHistory::availableWidth() const
 
 void ChatHistory::clear()
 {
-    messages.clear();
     for (int i = layout->count() - 1; i >= 0; i--)
         delete layout->itemAt(i);
     adjustSize();
