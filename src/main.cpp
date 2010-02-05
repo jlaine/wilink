@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     app.installTranslator(&qtTranslator);
 
     QTranslator appTranslator;
-    translator.load(QString(":/%1.qm").arg(localeName));
-    app.installTranslator(&translator);
+    appTranslator.load(QString(":/%1.qm").arg(localeName));
+    app.installTranslator(&appTranslator);
 
     /* Install signal handler */
     signal(SIGINT, signal_handler);
