@@ -88,6 +88,7 @@ public slots:
 
 protected slots:
     void slotLinkHoverChanged(const QString &link);
+    void slotSelectionChanged();
 
 protected:
     void adjustSize();

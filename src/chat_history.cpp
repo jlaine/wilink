@@ -51,7 +51,6 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     scene()->addItem(bodyText);
     bodyText->setParentItem(this);
     bodyText->setOpenExternalLinks(true);
-    bodyText->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     QColor baseColor = local ? QColor(0xdb, 0xdb, 0xdb) : QColor(0xb6, 0xd4, 0xff);
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 0.5));
@@ -98,7 +97,14 @@ void ChatMessageWidget::setBody(const QString &body)
 {
     QString bodyHtml = Qt::escape(body);
     bodyHtml.replace("\n", "<br/>");
-    bodyHtml.replace(QRegExp("((ftp|http|https)://[^ ]+)"), "<a href=\"\\1\">\\1</a>");
+    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
+    if (bodyHtml.contains(linkRegex))
+    {
+        bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() | Qt::LinksAccessibleByMouse);
+    } else {
+        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() & ~Qt::LinksAccessibleByMouse);
+    }
     bodyText->setHtml(bodyHtml);
 }
 
@@ -198,6 +204,7 @@ ChatHistory::ChatHistory(QWidget *parent)
 {
     scene = new QGraphicsScene;
     setScene(scene);
+    setDragMode(QGraphicsView::RubberBandDrag);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     //setRenderHints(QPainter::Antialiasing);
@@ -208,6 +215,8 @@ ChatHistory::ChatHistory(QWidget *parent)
     layout->setSpacing(0);
     obj->setLayout(layout);
     scene->addItem(obj);
+
+    connect(scene, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
 }
 
 void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
@@ -322,4 +331,9 @@ void ChatHistory::setRemoteName(const QString &remoteName)
 void ChatHistory::slotLinkHoverChanged(const QString &link)
 {
     setCursor(link.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
+}
+
+void ChatHistory::slotSelectionChanged()
+{
+    qDebug() << "selected" << scene->selectedItems().size() << "items";
 }
