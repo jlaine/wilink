@@ -311,7 +311,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             if (QMessageBox::question(this,
                 tr("Invitation from %1").arg(presence.getFrom()),
                 tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
-                QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
             {
                 qDebug("Subscribe accepted");
                 packet.setType(QXmppPresence::Subscribed);
@@ -387,7 +387,7 @@ void Chat::removeContact(const QString &jid)
 {
     if (QMessageBox::question(this, tr("Remove contact"),
         tr("Do you want to remove %1 from your contact list?").arg(jid),
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
     {
         QXmppRosterIq::Item item;
         item.setBareJid(jid);

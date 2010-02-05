@@ -86,7 +86,7 @@ void UpdatesDialog::updateAvailable(const Release &release)
     if (QMessageBox::question(NULL,
         tr("Update available"),
         message,
-        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
         QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
 #ifdef Q_OS_MAC
