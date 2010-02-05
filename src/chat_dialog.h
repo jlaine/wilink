@@ -47,6 +47,7 @@ public slots:
     void messageReceived(const QXmppMessage &msg);
 
 protected slots:
+    void newLine();
     void send();
 
 signals:

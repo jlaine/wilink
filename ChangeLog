@@ -1,6 +1,8 @@
 wDesktop 0.5.1 (UNRELEASED)
  * Center date label in chat history.
  * Improve clearing of chat history.
+ * Implement copying text from the chat history.
+ * Add CTRL-RETURN / ALT-RETURN shortcuts to enter a new chat line.
 
 wDesktop 0.5.0 (2010-02-04)
  * Improve icon for photos upload.

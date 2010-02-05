@@ -27,6 +27,7 @@
 #include <QList>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QShortcut>
 #include <QStringList>
 
 #include "qxmpp/QXmppMessage.h"
@@ -70,6 +71,12 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
     setFocusProxy(chatInput);
     setLayout(layout);
     setMinimumWidth(300);
+
+    /* shortcuts for new line */
+    connect(new QShortcut(QKeySequence(Qt::AltModifier + Qt::Key_Return), this),
+        SIGNAL(activated()), this, SLOT(newLine()));
+    connect(new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Return), this),
+        SIGNAL(activated()), this, SLOT(newLine()));
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -85,6 +92,11 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.local = false;
     message.datetime = QDateTime::currentDateTime();
     chatHistory->addMessage(message);
+}
+
+void ChatDialog::newLine()
+{
+    chatInput->append("");
 }
 
 void ChatDialog::send()
