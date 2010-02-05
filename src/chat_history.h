@@ -22,14 +22,29 @@
 
 #include <QGraphicsView>
 #include <QGraphicsWidget>
-#include <QTextBrowser>
 
 #include "qxmpp/QXmppArchiveIq.h"
 
 class QGraphicsLinearLayout;
 
+class ChatTextItem : public QGraphicsTextItem
+{
+    Q_OBJECT
+
+signals:
+    void linkHoverChanged(const QString &link);
+
+protected:
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+
+private:
+    QString lastAnchor;
+};
+
 class ChatMessageWidget : public QGraphicsWidget
 {
+    Q_OBJECT
+
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     void setBody(const QString &body);
@@ -40,6 +55,9 @@ public:
     void setShowDate(bool show);
     void setShowSender(bool show);
 
+signals:
+    void linkHoverChanged(const QString &link);
+
 protected:
     QPainterPath bubblePath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
@@ -48,7 +66,7 @@ private:
     int maxWidth;
     bool show_date;
     bool show_sender;
-    QGraphicsTextItem *bodyText;
+    ChatTextItem *bodyText;
     QGraphicsPathItem *dateBubble;
     QGraphicsLineItem *dateLine;
     QGraphicsTextItem *dateText;
@@ -69,7 +87,7 @@ public slots:
     void clear();
 
 protected slots:
-    void slotAnchorClicked(const QUrl &link);
+    void slotLinkHoverChanged(const QString &link);
 
 protected:
     void adjustSize();

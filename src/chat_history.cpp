@@ -19,22 +19,36 @@
 
 #include "chat_history.h"
 
+#include <QAbstractTextDocumentLayout>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 #include <QGraphicsLinearLayout>
+#include <QGraphicsSceneHoverEvent>
 #include <QMenu>
 #include <QScrollBar>
-
-#include <QTextBlock>
+#include <QTextDocument>
+#include <QUrl>
 
 #define DATE_WIDTH 80
 #define DATE_HEIGHT 12
 
+void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QString anchor = document()->documentLayout()->anchorAt(event->pos());
+    if (anchor != lastAnchor)
+    {
+        emit linkHoverChanged(anchor);
+        lastAnchor = anchor;
+    }
+    QGraphicsTextItem::hoverMoveEvent(event);
+}
+
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     : QGraphicsWidget(parent), show_date(true), show_sender(false), maxWidth(2 * DATE_WIDTH)
 {
-    bodyText = scene()->addText("");
+    bodyText = new ChatTextItem;
+    scene()->addItem(bodyText);
     bodyText->setParentItem(this);
     bodyText->setOpenExternalLinks(true);
     bodyText->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -65,6 +79,8 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     fromText->hide();
     fromText->setFont(font);
     fromText->setParentItem(this);
+
+    connect(bodyText, SIGNAL(linkHoverChanged(QString)), this, SIGNAL(linkHoverChanged(QString)));
 }
 
 QPainterPath ChatMessageWidget::bubblePath(qreal width)
@@ -232,6 +248,7 @@ void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
     msg->setShowDate(showDate);
     msg->setShowSender(showSender);
 
+    connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
     msg->setMaximumWidth(availableWidth());
     layout->insertItem(i, msg);
     adjustSize();
@@ -302,8 +319,7 @@ void ChatHistory::setRemoteName(const QString &remoteName)
     chatRemoteName = remoteName;
 }
 
-void ChatHistory::slotAnchorClicked(const QUrl &link)
+void ChatHistory::slotLinkHoverChanged(const QString &link)
 {
-    QDesktopServices::openUrl(link);
+    setCursor(link.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
 }
-
