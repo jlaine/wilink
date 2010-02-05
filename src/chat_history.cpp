@@ -58,6 +58,13 @@ void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsTextItem::hoverMoveEvent(event);
 }
 
+void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
+{
+    if (!lastAnchor.isEmpty())
+        QDesktopServices::openUrl(lastAnchor);
+    QGraphicsTextItem::mousePressEvent(event);
+}
+
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     : QGraphicsWidget(parent), show_date(true), show_sender(false), maxWidth(2 * DATE_WIDTH),
     msgArchived(false)
@@ -65,7 +72,6 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     bodyText = new ChatTextItem;
     scene()->addItem(bodyText);
     bodyText->setParentItem(this);
-    bodyText->setOpenExternalLinks(true);
 
     QColor baseColor = local ? QColor(0xdb, 0xdb, 0xdb) : QColor(0xb6, 0xd4, 0xff);
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 0.5));
@@ -94,6 +100,7 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     fromText->setFont(font);
     fromText->setParentItem(this);
 
+    setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     connect(bodyText, SIGNAL(linkHoverChanged(QString)), this, SIGNAL(linkHoverChanged(QString)));
 }
@@ -193,13 +200,7 @@ void ChatMessageWidget::setMessage(const QXmppArchiveMessage &message)
     QString bodyHtml = Qt::escape(message.body);
     bodyHtml.replace("\n", "<br/>");
     QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
-    if (bodyHtml.contains(linkRegex))
-    {
-        bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() | Qt::LinksAccessibleByMouse);
-    } else {
-        bodyText->setTextInteractionFlags(bodyText->textInteractionFlags() & ~Qt::LinksAccessibleByMouse);
-    }
+    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
     bodyText->setHtml(bodyHtml);
 }
 

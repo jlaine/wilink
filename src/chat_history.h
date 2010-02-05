@@ -37,6 +37,7 @@ signals:
 protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent * event);
 
 private:
     QString lastAnchor;
