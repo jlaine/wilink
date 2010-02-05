@@ -35,6 +35,7 @@ signals:
     void linkHoverChanged(const QString &link);
 
 protected:
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 
 private:

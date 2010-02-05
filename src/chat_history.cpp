@@ -37,6 +37,16 @@
 #define DATE_HEIGHT 12
 #define BODY_OFFSET 5
 
+void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    if (!lastAnchor.isEmpty())
+    {
+        emit linkHoverChanged("");
+        lastAnchor = "";
+    }
+    QGraphicsTextItem::hoverMoveEvent(event);
+}
+
 void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     QString anchor = document()->documentLayout()->anchorAt(event->pos());
