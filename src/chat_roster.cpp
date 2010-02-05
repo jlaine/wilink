@@ -174,7 +174,7 @@ void RosterModel::rosterChanged(const QString &jid)
             emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
         }
     } else {
-        beginInsertRows(QModelIndex(), rosterKeys.length(), rosterKeys.length());
+        beginInsertRows(QModelIndex(), rosterKeys.size(), rosterKeys.size());
         rosterKeys.append(jid);
         endInsertRows();
     }

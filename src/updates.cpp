@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QFileInfo>
+#include <QLocale>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
