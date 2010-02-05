@@ -8,10 +8,6 @@
         <translation>&amp;Oui</translation>
     </message>
     <message>
-        <source>Yes</source>
-        <translation>Oui</translation>
-    </message>
-    <message>
         <source>&amp;No</source>
         <translation>&amp;Non</translation>
     </message>

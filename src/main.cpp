@@ -53,9 +53,13 @@ int main(int argc, char *argv[])
 #endif
 
     /* Load translations */
-    QTranslator translator;
     QString localeName = QLocale::system().name().split("_").first();
-    translator.load(QString(":/qt_%1.qm").arg(localeName));
+
+    QTranslator qtTranslator;
+    qtTranslator.load(QString(":/qt_%1.qm").arg(localeName));
+    app.installTranslator(&qtTranslator);
+
+    QTranslator appTranslator;
     translator.load(QString(":/%1.qm").arg(localeName));
     app.installTranslator(&translator);
 
