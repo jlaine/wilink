@@ -344,15 +344,16 @@ QString ChatHistory::copyText()
         if (selection.contains(child))
         {
             if (!copyText.isEmpty())
-#ifdef Q_OS_WIN
-                copyText += "\r\n";
-#else
                 copyText += "\n";
-#endif
-            copyText += child->from() + "> " + child->message().body;
+            copyText += child->from() + "> " + child->message().body.replace("\r\n", "\n");
         }
     }
+
+#ifdef Q_OS_WIN
+    return copyText.replace("\n", "\r\n");
+#else
     return copyText;
+#endif
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
