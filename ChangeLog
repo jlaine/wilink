@@ -1,5 +1,6 @@
 wDesktop 0.5.1 (UNRELEASED)
  * Center date label in chat history.
+ * Improve clearing of chat history.
 
 wDesktop 0.5.0 (2010-02-04)
  * Improve icon for photos upload.

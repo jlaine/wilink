@@ -261,12 +261,13 @@ void ChatHistory::clear()
     messages.clear();
     for (int i = layout->count() - 1; i >= 0; i--)
         delete layout->itemAt(i);
+    adjustSize();
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu;
-    QAction *action = menu->addAction(tr("Clear"));
+    QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
     menu->exec(event->globalPos());
     delete menu;
