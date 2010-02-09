@@ -26,6 +26,7 @@
 #include "qxmpp/QXmppRoster.h"
 
 class ChatDialog;
+class ChatRoom;
 class RosterModel;
 class RosterView;
 class QLabel;
@@ -47,6 +48,7 @@ public:
 protected slots:
     void addContact();
     void chatContact(const QString &jid);
+    void chatRoom(const QString &jid);
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
@@ -70,6 +72,7 @@ private:
     bool reconnectOnDisconnect;
 
     QHash<QString, ChatDialog*> chatDialogs;
+    QHash<QString, ChatRoom*> chatRooms;
     QXmppClient *client;
     QTimer *pingTimer;
     RosterModel *rosterModel;

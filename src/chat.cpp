@@ -48,6 +48,7 @@
 #include "qnetio/dns.h"
 #include "chat.h"
 #include "chat_dialog.h"
+#include "chat_room.h"
 #include "chat_roster.h"
 
 #ifdef QT_MAC_USE_COCOA
@@ -192,6 +193,16 @@ void Chat::chatContact(const QString &jid)
 
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
+}
+
+void Chat::chatRoom(const QString &jid)
+{
+    ChatRoom *room;
+    if (chatRooms.contains(jid))
+        room = chatRooms[jid];
+    else
+        room = chatRooms[jid] = new ChatRoom(jid, this);
+    room->show();
 }
 
 void Chat::connected()
