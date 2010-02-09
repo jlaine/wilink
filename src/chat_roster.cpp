@@ -178,6 +178,10 @@ void RosterModel::rosterChanged(const QString &jid)
         rosterKeys.append(jid);
         endInsertRows();
     }
+
+    // fetch vCard
+    if (!rosterAvatars.contains(jid))
+        vcardManager->requestVCard(jid);
 }
 
 void RosterModel::rosterReceived()
@@ -185,6 +189,7 @@ void RosterModel::rosterReceived()
     rosterKeys = rosterManager->getRosterBareJids();
     foreach (const QString &jid, rosterKeys)
     {
+        // fetch vCard
         if (!rosterAvatars.contains(jid))
             vcardManager->requestVCard(jid);
     }
