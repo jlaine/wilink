@@ -308,10 +308,20 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     {
     case QXmppPresence::Subscribe:
         {
-            if (QMessageBox::question(this,
-                tr("Invitation from %1").arg(presence.getFrom()),
-                tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+            QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.getFrom());
+            QXmppRosterIq::Item::SubscriptionType type = static_cast<QXmppRosterIq::Item::SubscriptionType>(entry.getSubscriptionType());
+
+            /* if the contact is in our roster accept subscribe, otherwise ask user */
+            bool accepted = false;
+            if (type == QXmppRosterIq::Item::To || type == QXmppRosterIq::Item::Both)
+                accepted = true;
+            else if (QMessageBox::question(this,
+                    tr("Invitation from %1").arg(presence.getFrom()),
+                    tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
+                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+                accepted = true;
+
+            if (accepted)
             {
                 qDebug("Subscribe accepted");
                 packet.setType(QXmppPresence::Subscribed);
@@ -370,6 +380,7 @@ bool Chat::open(const QString &jid, const QString &password)
 #endif
 
     /* set security parameters */
+    config.setAutoAcceptSubscriptions(false);
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(false);
 
