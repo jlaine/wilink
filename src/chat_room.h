@@ -24,6 +24,7 @@
 
 class ChatEdit;
 class ChatHistory;
+class QLabel;
 
 class ChatRoom : public QWidget
 {
@@ -35,6 +36,7 @@ public:
 private:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
+    QLabel *nameLabel;
 
     QString chatRemoteJid;
 };

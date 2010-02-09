@@ -17,11 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLabel>
+#include <QLayout>
+
+#include "chat_edit.h"
+#include "chat_history.h"
 #include "chat_room.h"
 
 ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     : QWidget(parent)
 {
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
 
+    /* status bar */
+    QHBoxLayout *hbox = new QHBoxLayout;
+    nameLabel = new QLabel(chatRemoteJid);
+    hbox->addSpacing(16);
+    hbox->addWidget(nameLabel);
+    hbox->addStretch();
+    layout->addItem(hbox);
+
+    /* chat history */
+    chatHistory = new ChatHistory;
+    layout->addWidget(chatHistory);
+
+    /* text edit */
+    chatInput = new ChatEdit(80);
+    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
+    layout->addSpacing(10);
+    layout->addWidget(chatInput);
+
+    setFocusProxy(chatInput);
 }
 
