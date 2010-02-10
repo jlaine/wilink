@@ -48,12 +48,14 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     /* chat history */
     QSplitter *splitter = new QSplitter;
     chatHistory = new ChatHistory;
+    chatHistory->setMinimumWidth(300);
     splitter->addWidget(chatHistory);
     splitter->setStretchFactor(0, 1);
     chatParticipants = new QListWidget;
     splitter->addWidget(chatParticipants);
     splitter->setStretchFactor(1, 0);
     layout->addWidget(splitter);
+    layout->setStretch(1, 1);
 
     /* text edit */
     chatInput = new ChatEdit(80);
