@@ -232,7 +232,9 @@ void Chat::changeEvent(QEvent *event)
 void Chat::chatContact(const QString &jid)
 {
     ChatDialog *dialog = conversation(jid);
+    roomsView->selectRoom("");
     rosterModel->clearPendingMessages(jid);
+    rosterView->selectContact(jid);
 
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
@@ -241,6 +243,9 @@ void Chat::chatContact(const QString &jid)
 void Chat::chatRoom(const QString &jid)
 {
     ChatRoom *dialog = room(jid);
+    roomsView->selectRoom(jid);
+    rosterView->selectContact("");
+
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
 }
@@ -348,6 +353,8 @@ void Chat::messageReceived(const QXmppMessage &msg)
     dialog->messageReceived(msg);
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
+    else
+        rosterView->selectContact(bareJid);
 
     if (!isVisible())
     {

@@ -74,6 +74,7 @@ class RosterView : public QTableView
 
 public:
     RosterView(RosterModel *model, QWidget *parent = NULL);
+    void selectContact(const QString &jid);
     QSize sizeHint() const;
 
 protected:

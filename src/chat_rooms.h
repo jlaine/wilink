@@ -60,6 +60,7 @@ class ChatRoomsView : public QTreeView
 
 public:
     ChatRoomsView(ChatRoomsModel *model, QWidget *parent = NULL);
+    void selectRoom(const QString &bareJid);
     QSize sizeHint() const;
 
 protected slots:

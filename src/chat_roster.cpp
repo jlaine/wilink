@@ -283,6 +283,20 @@ void RosterView::removeContact()
         emit removeContact(index.data(Qt::UserRole).toString());
 }
 
+void RosterView::selectContact(const QString &jid)
+{
+    for (int i = 0; i < model()->rowCount(); i++)
+    {
+        QModelIndex index = model()->index(i, 0);
+        if (index.data(Qt::UserRole).toString() == jid)
+        {
+            setCurrentIndex(index);
+            return;
+        }
+    }
+    setCurrentIndex(QModelIndex());
+}
+
 QSize RosterView::sizeHint () const
 {
     if (!model()->rowCount())
