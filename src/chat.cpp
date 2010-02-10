@@ -329,6 +329,13 @@ void Chat::iqReceived(const QXmppIq&)
 
 void Chat::leaveRoom(const QString &jid)
 {
+    // close view
+    ChatRoom *room = chatRooms.take(jid);
+    delete room;
+    if (!conversationPanel->count())
+        conversationPanel->hide();
+
+    // remove from list
     roomsModel->removeRoom(jid);
     if (!roomsModel->rowCount(QModelIndex()))
         roomsView->hide();
