@@ -112,7 +112,11 @@ void ChatDialog::send()
     chatHistory->addMessage(message);
 
     chatInput->document()->clear();
-    emit sendMessage(chatRemoteJid, text);
+
+    QXmppMessage msg;
+    msg.setBody(text);
+    msg.setTo(chatRemoteJid);
+    emit sendMessage(msg);
 }
 
 void ChatDialog::setLocalName(const QString &name)

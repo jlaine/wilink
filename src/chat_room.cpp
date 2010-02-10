@@ -20,12 +20,14 @@
 #include <QLabel>
 #include <QLayout>
 
+#include "qxmpp/QXmppMessage.h"
+
 #include "chat_edit.h"
 #include "chat_history.h"
 #include "chat_room.h"
 
 ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), chatRemoteJid(jid)
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -50,5 +52,28 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     layout->addWidget(chatInput);
 
     setFocusProxy(chatInput);
+    setLayout(layout);
+    setMinimumWidth(300);
+}
+
+void ChatRoom::send()
+{
+    QString text = chatInput->document()->toPlainText();
+    if (text.isEmpty())
+        return;
+
+    QXmppArchiveMessage message;
+    message.body = text;
+    message.local = true;
+    message.datetime = QDateTime::currentDateTime();
+    chatHistory->addMessage(message);
+
+    chatInput->document()->clear();
+
+    QXmppMessage msg;
+    msg.setBody(text);
+    msg.setTo(chatRemoteJid);
+    msg.setType(QXmppMessage::GroupChat);
+    emit sendMessage(msg);
 }
 

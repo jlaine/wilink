@@ -51,7 +51,7 @@ protected slots:
     void send();
 
 signals:
-    void sendMessage(const QString &jid, const QString &message);
+    void sendMessage(const QXmppMessage &message);
 
 private:
     QLabel *avatarLabel;

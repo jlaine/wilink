@@ -25,6 +25,7 @@
 class ChatEdit;
 class ChatHistory;
 class QLabel;
+class QXmppMessage;
 
 class ChatRoom : public QWidget
 {
@@ -32,6 +33,12 @@ class ChatRoom : public QWidget
 
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
+
+signals:
+    void sendMessage(const QXmppMessage &message);
+
+protected slots:
+    void send();
 
 private:
     ChatHistory *chatHistory;

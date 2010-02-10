@@ -197,12 +197,20 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::chatRoom(const QString &jid)
 {
-    ChatRoom *room;
-    if (chatRooms.contains(jid))
-        room = chatRooms[jid];
-    else
-        room = chatRooms[jid] = new ChatRoom(jid, this);
+    if (!chatRooms.contains(jid))
+    {
+        chatRooms[jid] = new ChatRoom(jid);
+        connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
+            this, SLOT(sendMessage(const QXmppMessage&)));
+
+        QXmppPresence packet;
+        packet.setTo(jid + "/Test");
+        packet.setType(QXmppPresence::Available);
+        client->sendPacket(packet);
+    }
+    ChatRoom *room = chatRooms[jid];
     room->show();
+    room->raise();
 }
 
 void Chat::connected()
@@ -230,8 +238,8 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setLocalName(ownName);
         chatDialogs[jid]->setRemoteAvatar(rosterModel->contactAvatar(jid));
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
-        connect(chatDialogs[jid], SIGNAL(sendMessage(const QString&, const QString&)),
-            this, SLOT(sendMessage(const QString&, const QString&)));
+        connect(chatDialogs[jid], SIGNAL(sendMessage(const QXmppMessage&)),
+            this, SLOT(sendMessage(const QXmppMessage&)));
         conversationPanel->addWidget(chatDialogs[jid]);
         conversationPanel->show();
 
@@ -449,12 +457,11 @@ void Chat::resizeContacts()
 
 /** Send a chat message to the specified recipient.
  *
- * @param jid
- * @param message
+ * @param msg
  */
-void Chat::sendMessage(const QString &jid, const QString message)
+void Chat::sendMessage(const QXmppMessage &msg)
 {
-    client->sendPacket(QXmppMessage("", jid, message));
+    client->sendPacket(msg);
 }
 
 /** Send an XMPP Ping as described in XEP-0199:
