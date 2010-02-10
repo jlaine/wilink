@@ -26,6 +26,7 @@
 
 class QXmppClient;
 class QXmppDiscoveryIq;
+class QXmppPresence;
 
 class ChatRoomsModel : public QAbstractItemModel
 {
@@ -45,6 +46,7 @@ public:
 
 protected slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void presenceReceived(const QXmppPresence &presence);
 
 private:
     QXmppClient *xmppClient;

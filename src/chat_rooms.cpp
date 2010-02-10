@@ -33,6 +33,7 @@ ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
     : xmppClient(client)
 {
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
 }
 
 void ChatRoomsModel::addRoom(const QString &bareJid)
@@ -44,11 +45,13 @@ void ChatRoomsModel::addRoom(const QString &bareJid)
     roomParticipants[bareJid] = QStringList();
     endInsertRows();
 
-    // discover room participants
+#if 0
+    // discover room info
     QXmppDiscoveryIq disco;
     disco.setTo(bareJid);
-    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
     xmppClient->sendPacket(disco);
+#endif
 }
 
 QString ChatRoomsModel::roomName(const QString &bareJid) const
@@ -107,7 +110,7 @@ void ChatRoomsModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         foreach (const QString &attr, item.attributes())
             qDebug() << "   -" << attr << ":" << item.attribute(attr);
     }
-
+#if 0
     if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery)
     {
         const QString bareJid = disco.getFrom().split("/")[0];
@@ -115,6 +118,7 @@ void ChatRoomsModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         foreach (const QXmppDiscoveryItem &item, disco.getItems())
             roomParticipants[bareJid].append(item.attribute("jid"));
     }
+#endif
 }
 
 QModelIndex ChatRoomsModel::index(int row, int column, const QModelIndex &parent) const
@@ -146,6 +150,36 @@ QModelIndex ChatRoomsModel::parent(const QModelIndex & index) const
     if (index.internalId() > 0 && index.internalId() <= roomKeys.size())
         return createIndex(index.internalId() - 1, index.column(), 0);
     return QModelIndex();
+}
+
+void ChatRoomsModel::presenceReceived(const QXmppPresence &presence)
+{
+    const QString jid = presence.getFrom();
+    const QString roomJid = jid.split("/")[0];
+    int roomIndex = roomKeys.indexOf(roomJid);
+    if (roomIndex < 0)
+        return;
+
+    if (presence.getType() == QXmppPresence::Available)
+    {
+        int index = roomParticipants[roomJid].indexOf(jid);
+        if (index < 0)
+        {
+            beginInsertRows(createIndex(roomIndex, 0, 0), roomParticipants[roomJid].size(), roomParticipants[roomJid].size());
+            roomParticipants[roomJid].append(jid);
+            endInsertRows();
+        }
+    }
+    else if (presence.getType() == QXmppPresence::Unavailable)
+    {
+        int index = roomParticipants[roomJid].indexOf(jid);
+        if (index >= 0)
+        {
+            beginRemoveRows(createIndex(roomIndex, 0, 0), index, index);
+            roomParticipants[roomJid].removeAt(index);
+            endRemoveRows();
+        }
+    }
 }
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const
@@ -192,9 +226,8 @@ void ChatRoomsView::slotClicked()
     const QModelIndex &index = currentIndex();
     if (index.isValid())
     {
-        const QString jid = index.data(Qt::UserRole).toString();
-        if (!jid.isEmpty() && !jid.contains("/"))
-            emit clicked(jid);
+        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
+        emit clicked(jid);
     }
 }
 
@@ -203,9 +236,8 @@ void ChatRoomsView::slotDoubleClicked()
     const QModelIndex &index = currentIndex();
     if (index.isValid())
     {
-        const QString jid = index.data(Qt::UserRole).toString();
-        if (!jid.isEmpty() && !jid.contains("/"))
-            emit doubleClicked(index.data(Qt::UserRole).toString());
+        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
+        emit doubleClicked(jid);
     }
 }
 
