@@ -72,25 +72,22 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
-    QWidget *leftPanel = new QWidget;
-    QVBoxLayout *leftLayout = new QVBoxLayout;
-    leftLayout->setMargin(0);
+    QSplitter *leftSplitter = new QSplitter(Qt::Vertical);
     rosterView = new RosterView(rosterModel);
     connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
-    leftLayout->insertWidget(0, rosterView, 1);
+    leftSplitter->addWidget(rosterView);
 
     roomsView = new ChatRoomsView(roomsModel);
     connect(roomsView, SIGNAL(clicked(const QString&)), this, SLOT(chatRoom(const QString&)));
     connect(roomsView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatRoom(const QString&)));
     connect(roomsView, SIGNAL(leaveRoom(const QString&)), this, SLOT(leaveRoom(const QString&)));
     roomsView->hide();
-    leftLayout->insertWidget(1, roomsView, 0);
-    leftPanel->setLayout(leftLayout);
+    leftSplitter->addWidget(roomsView);
 
-    splitter->addWidget(leftPanel);
+    splitter->addWidget(leftSplitter);
     splitter->setStretchFactor(0, 0);
 
     /* right panel */
