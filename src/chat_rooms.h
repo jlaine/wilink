@@ -28,6 +28,7 @@ class ChatRoomsModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
+    void addRoom(const QString &bareJid);
     QString roomName(const QString &bareJid) const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;

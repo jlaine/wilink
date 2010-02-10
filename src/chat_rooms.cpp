@@ -17,7 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QHeaderView>
+
 #include "chat_rooms.h"
+
+enum RoomsColumns {
+    RoomColumn = 0,
+    MaxColumn,
+};
+
+void ChatRoomsModel::addRoom(const QString &bareJid)
+{
+    if (roomKeys.contains(bareJid))
+        return;
+    beginInsertRows(QModelIndex(), roomKeys.size(), roomKeys.size());
+    roomKeys.append(bareJid);
+    endInsertRows();
+}
 
 QString ChatRoomsModel::roomName(const QString &bareJid) const
 {
@@ -26,12 +42,22 @@ QString ChatRoomsModel::roomName(const QString &bareJid) const
 
 int ChatRoomsModel::columnCount(const QModelIndex &parent) const
 {
-    return 1;
+    return MaxColumn;
 }
 
 QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
 {
+    if (!index.isValid() || index.row() >= roomKeys.size())
+        return QVariant();
 
+    const QString bareJid = roomKeys.at(index.row());
+    if (role == Qt::UserRole) {
+        return bareJid;
+    } else if (role == Qt::DisplayRole) {
+        return roomName(bareJid);
+    } else if (role == Qt::DecorationRole) {
+        return QIcon(":/chat.png");
+    }
 }
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const
@@ -43,5 +69,16 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
     : QTableView(parent)
 {
     setModel(model);
+
+    setAlternatingRowColors(true);
+    setIconSize(QSize(32, 32));
+    setMinimumWidth(200);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+    setShowGrid(false);
+
+    horizontalHeader()->setResizeMode(RoomColumn, QHeaderView::Stretch);
+    horizontalHeader()->setVisible(false);
+    verticalHeader()->setVisible(false);
 }
 

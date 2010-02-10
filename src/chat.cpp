@@ -240,7 +240,7 @@ void Chat::chatRoom(const QString &jid)
 {
     if (!chatRooms.contains(jid))
     {
-        //roomsView->addItem(jid.split('@')[0]);
+        roomsModel->addRoom(jid);
         roomsView->show();
 
         chatRooms[jid] = new ChatRoom(jid);
