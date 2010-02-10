@@ -41,6 +41,7 @@ void ChatRoomsModel::addRoom(const QString &bareJid)
         return;
     beginInsertRows(QModelIndex(), roomKeys.size(), roomKeys.size());
     roomKeys.append(bareJid);
+    roomParticipants[bareJid] = QStringList();
     endInsertRows();
 
     // discover room participants
@@ -62,16 +63,37 @@ int ChatRoomsModel::columnCount(const QModelIndex &parent) const
 
 QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() >= roomKeys.size())
+    if (!index.isValid())
         return QVariant();
 
-    const QString bareJid = roomKeys.at(index.row());
-    if (role == Qt::UserRole) {
-        return bareJid;
-    } else if (role == Qt::DisplayRole) {
-        return roomName(bareJid);
-    } else if (role == Qt::DecorationRole) {
-        return QIcon(":/chat.png");
+    if (index.internalId() > 0)
+    {
+        int id = index.internalId() - 1;
+        if (id >= roomKeys.size())
+            return QVariant();
+        const QString roomJid = roomKeys.at(id);
+
+        if (index.row() >= roomParticipants[roomJid].size())
+            return QVariant();
+        const QString jid = roomParticipants[roomJid].at(index.row());
+
+        if (role == Qt::UserRole) {
+            return jid;
+        } else if (role == Qt::DisplayRole) {
+            return jid.split("/")[1];
+        }
+    } else {
+        if (index.row() >= roomKeys.size())
+            return QVariant();
+
+        const QString bareJid = roomKeys.at(index.row());
+        if (role == Qt::UserRole) {
+            return bareJid;
+        } else if (role == Qt::DisplayRole) {
+            return roomName(bareJid);
+        } else if (role == Qt::DecorationRole) {
+            return QIcon(":/chat.png");
+        }
     }
     return QVariant();
 }
@@ -85,15 +107,66 @@ void ChatRoomsModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         foreach (const QString &attr, item.attributes())
             qDebug() << "   -" << attr << ":" << item.attribute(attr);
     }
+
+    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery)
+    {
+        const QString bareJid = disco.getFrom().split("/")[0];
+        roomParticipants[bareJid] = QStringList();
+        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+            roomParticipants[bareJid].append(item.attribute("jid"));
+    }
+}
+
+QModelIndex ChatRoomsModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    if (!parent.isValid())
+    {
+        if (row < roomKeys.size())
+            return createIndex(row, column, 0);
+        else
+            return QModelIndex();
+    } else if (!parent.internalId()) {
+        QString jid = roomKeys.at(parent.row());
+        if (row < roomParticipants[jid].size())
+            return createIndex(row, column, 1 + parent.row());
+        else
+            return QModelIndex();
+    }
+    return QModelIndex();
+}
+
+QModelIndex ChatRoomsModel::parent(const QModelIndex & index) const
+{
+    if (!index.isValid())
+        return QModelIndex();
+
+    if (index.internalId() > 0 && index.internalId() <= roomKeys.size())
+        return createIndex(index.internalId() - 1, index.column(), 0);
+    return QModelIndex();
 }
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const
 {
-    return roomKeys.size();
+    if (parent.column() > 0)
+        return 0;
+
+    if (!parent.isValid())
+    {
+        return roomKeys.size();
+    } else if (!parent.internalId()) {
+        const QString bareJid = roomKeys.at(parent.row());
+        Q_ASSERT(roomParticipants.contains(bareJid));
+        if (roomParticipants.contains(bareJid))
+            return roomParticipants[bareJid].size();
+    }
+    return 0;
 }
 
 ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
-    : QTableView(parent)
+    : QTreeView(parent)
 {
     setModel(model);
 
@@ -105,31 +178,41 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
     setMinimumWidth(200);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
+/*
     setShowGrid(false);
 
     horizontalHeader()->setResizeMode(RoomColumn, QHeaderView::Stretch);
     horizontalHeader()->setVisible(false);
     verticalHeader()->setVisible(false);
+*/
 }
 
 void ChatRoomsView::slotClicked()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
-        emit clicked(index.data(Qt::UserRole).toString());
+    {
+        const QString jid = index.data(Qt::UserRole).toString();
+        if (!jid.isEmpty() && !jid.contains("/"))
+            emit clicked(jid);
+    }
 }
 
 void ChatRoomsView::slotDoubleClicked()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
-        emit doubleClicked(index.data(Qt::UserRole).toString());
+    {
+        const QString jid = index.data(Qt::UserRole).toString();
+        if (!jid.isEmpty() && !jid.contains("/"))
+            emit doubleClicked(index.data(Qt::UserRole).toString());
+    }
 }
 
 QSize ChatRoomsView::sizeHint () const
 {
     if (!model()->rowCount())
-        return QTableView::sizeHint();
+        return QTreeView::sizeHint();
 
     QSize hint(64, 0);
     hint.setHeight(model()->rowCount() * sizeHintForRow(0));

@@ -20,13 +20,14 @@
 #ifndef __WDESKTOP_CHAT_ROOMS_H__
 #define __WDESKTOP_CHAT_ROOMS_H__
 
-#include <QAbstractTableModel>
+#include <QAbstractItemModel>
 #include <QTableView>
+#include <QTreeView>
 
 class QXmppClient;
 class QXmppDiscoveryIq;
 
-class ChatRoomsModel : public QAbstractTableModel
+class ChatRoomsModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -38,6 +39,8 @@ public:
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 protected slots:
@@ -46,9 +49,10 @@ protected slots:
 private:
     QXmppClient *xmppClient;
     QStringList roomKeys;
+    QMap<QString, QStringList> roomParticipants;
 };
 
-class ChatRoomsView : public QTableView
+class ChatRoomsView : public QTreeView
 {
     Q_OBJECT
 
