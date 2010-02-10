@@ -34,11 +34,14 @@ class ChatRoom : public QWidget
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
 
-signals:
-    void sendMessage(const QXmppMessage &message);
+public slots:
+    void messageReceived(const QXmppMessage &msg);
 
 protected slots:
     void send();
+
+signals:
+    void sendMessage(const QXmppMessage &message);
 
 private:
     ChatHistory *chatHistory;

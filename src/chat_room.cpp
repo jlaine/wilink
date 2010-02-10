@@ -56,6 +56,15 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     setMinimumWidth(300);
 }
 
+void ChatRoom::messageReceived(const QXmppMessage &msg)
+{
+    QXmppArchiveMessage message;
+    message.body = msg.getBody();
+    message.local = false;
+    message.datetime = QDateTime::currentDateTime();
+    chatHistory->addMessage(message);
+}
+
 void ChatRoom::send()
 {
     QString text = chatInput->document()->toPlainText();

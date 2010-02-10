@@ -205,7 +205,7 @@ void Chat::chatRoom(const QString &jid)
             this, SLOT(sendMessage(const QXmppMessage&)));
 
         QXmppPresence packet;
-        packet.setTo(jid + "/Test");
+        packet.setTo(jid + "/" + ownName);
         packet.setType(QXmppPresence::Available);
         client->sendPacket(packet);
     }
@@ -291,13 +291,30 @@ void Chat::iqReceived(const QXmppIq&)
 void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = msg.getFrom().split("/")[0];
-    const QString body = msg.getBody();
 
-    if (body.isEmpty())
+    if (msg.getBody().isEmpty())
         return;
+
+    switch (msg.getType())
+    {
+    case QXmppMessage::GroupChat:
+        if (chatRooms.contains(bareJid))
+            chatRooms[bareJid]->messageReceived(msg);
+        return;
+    case QXmppMessage::Error:
+        qWarning() << "Received an error message" << msg.getBody();
+        return;
+    case QXmppMessage::Headline:
+        // FIXME : what is this type ?
+        return;
+    default:
+        break;
+    }
 
     ChatDialog *dialog = conversation(bareJid);
     dialog->messageReceived(msg);
+    if (conversationPanel->currentWidget() != dialog)
+        rosterModel->addPendingMessage(bareJid);
 
     if (!isVisible())
     {
@@ -307,8 +324,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
         showMinimized();
 #endif
     }
-    if (conversationPanel->currentWidget() != dialog)
-        rosterModel->addPendingMessage(bareJid);
 
     /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
      * only causes the dock icon to bounce for one second, instead of
