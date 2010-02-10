@@ -66,7 +66,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 {
     client = new QXmppClient(this);
     rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
-    roomsModel =  new ChatRoomsModel();
+    roomsModel =  new ChatRoomsModel(client);
 
     /* build splitter */
     splitter = new QSplitter;

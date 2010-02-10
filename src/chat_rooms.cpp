@@ -19,12 +19,20 @@
 
 #include <QHeaderView>
 
+#include "qxmpp/QXmppClient.h"
+#include "qxmpp/QXmppDiscoveryIq.h"
+
 #include "chat_rooms.h"
 
 enum RoomsColumns {
     RoomColumn = 0,
     MaxColumn,
 };
+
+ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
+{
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+}
 
 void ChatRoomsModel::addRoom(const QString &bareJid)
 {
@@ -59,6 +67,17 @@ QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
         return QIcon(":/chat.png");
     }
     return QVariant();
+}
+
+void ChatRoomsModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    qDebug() << "discovery received";
+    foreach (const QXmppDiscoveryItem &item, disco.getItems())
+    {
+        qDebug() << " *" << item.type();
+        foreach (const QString &attr, item.attributes())
+            qDebug() << "   -" << attr << ":" << item.attribute(attr);
+    }
 }
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const

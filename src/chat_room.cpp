@@ -70,19 +70,11 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
 
 void ChatRoom::discoveryReceived(const QXmppDiscoveryIq &disco)
 {
-    qDebug() << "discovery received";
     if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery)
     {
         chatParticipants->clear();
         foreach (const QXmppDiscoveryItem &item, disco.getItems())
             chatParticipants->addItem(item.attribute("name"));
-    } else {
-        foreach (const QXmppDiscoveryItem &item, disco.getItems())
-        {
-            qDebug() << " *" << item.type();
-            foreach (const QString &attr, item.attributes())
-                qDebug() << "   -" << attr << ":" << item.attribute(attr);
-        }
     }
 }
 

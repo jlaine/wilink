@@ -23,17 +23,25 @@
 #include <QAbstractTableModel>
 #include <QTableView>
 
+class QXmppClient;
+class QXmppDiscoveryIq;
+
 class ChatRoomsModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
+    ChatRoomsModel(QXmppClient *client);
+
     void addRoom(const QString &bareJid);
     QString roomName(const QString &bareJid) const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+protected slots:
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
 
 private:
     QStringList roomKeys;
