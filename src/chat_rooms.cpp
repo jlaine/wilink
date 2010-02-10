@@ -58,6 +58,7 @@ QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
     } else if (role == Qt::DecorationRole) {
         return QIcon(":/chat.png");
     }
+    return QVariant();
 }
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const
@@ -97,5 +98,17 @@ void ChatRoomsView::slotDoubleClicked()
     const QModelIndex &index = currentIndex();
     if (index.isValid())
         emit doubleClicked(index.data(Qt::UserRole).toString());
+}
+
+QSize ChatRoomsView::sizeHint () const
+{
+    if (!model()->rowCount())
+        return QTableView::sizeHint();
+
+    QSize hint(64, 0);
+    hint.setHeight(model()->rowCount() * sizeHintForRow(0));
+    for (int i = 0; i < MaxColumn; i++)
+        hint.setWidth(hint.width() + sizeHintForColumn(i));
+    return hint;
 }
 

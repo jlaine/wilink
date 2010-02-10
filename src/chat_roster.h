@@ -74,7 +74,7 @@ class RosterView : public QTableView
 
 public:
     RosterView(RosterModel *model, QWidget *parent = NULL);
-    QSize sizeHint () const;
+    QSize sizeHint() const;
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);

@@ -45,6 +45,7 @@ class ChatRoomsView : public QTableView
 
 public:
     ChatRoomsView(ChatRoomsModel *model, QWidget *parent = NULL);
+    QSize sizeHint() const;
 
 protected slots:
     void slotClicked();
