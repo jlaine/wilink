@@ -21,7 +21,6 @@
 #define __WDESKTOP_CHAT_ROOM_H__
 
 #include <QWidget>
-#include <QListWidget>
 
 class ChatEdit;
 class ChatHistory;
