@@ -269,7 +269,7 @@ ChatHistory::ChatHistory(QWidget *parent)
 void ChatHistory::addMessage(const ChatHistoryMessage &message)
 {
     QScrollBar *scrollBar = verticalScrollBar();
-    bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
+    bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
 
     /* position cursor */
     ChatMessageWidget *previous = NULL;
@@ -377,7 +377,7 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 void ChatHistory::resizeEvent(QResizeEvent *e)
 {
     QScrollBar *scrollBar = verticalScrollBar();
-    bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
+    bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
 
     const qreal w = availableWidth();
     for (int i = 0; i < layout->count(); i++)
