@@ -27,6 +27,8 @@
 
 class ChatDialog;
 class ChatRoom;
+class ChatRoomsModel;
+class ChatRoomsView;
 class RosterModel;
 class RosterView;
 class QLabel;
@@ -80,8 +82,13 @@ private:
     QHash<QString, ChatRoom*> chatRooms;
     QXmppClient *client;
     QTimer *pingTimer;
+
     RosterModel *rosterModel;
     RosterView *rosterView;
+
+    ChatRoomsModel *roomsModel;
+    ChatRoomsView *roomsView;
+
     QSplitter *splitter;
     QLabel *statusIconLabel;
     QLabel *statusLabel;

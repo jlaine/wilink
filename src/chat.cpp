@@ -50,6 +50,7 @@
 #include "chat.h"
 #include "chat_dialog.h"
 #include "chat_room.h"
+#include "chat_rooms.h"
 #include "chat_roster.h"
 
 #ifdef QT_MAC_USE_COCOA
@@ -65,19 +66,30 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 {
     client = new QXmppClient(this);
     rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
+    roomsModel =  new ChatRoomsModel();
 
     /* build splitter */
     splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
 
+    /* left panel */
+    QWidget *leftPanel = new QWidget;
+    QVBoxLayout *leftLayout = new QVBoxLayout;
+    leftLayout->setMargin(0);
     rosterView = new RosterView(rosterModel);
     connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
-    splitter->addWidget(rosterView);
+    leftLayout->addWidget(rosterView);
+    roomsView = new ChatRoomsView(roomsModel);
+    roomsView->hide();
+    leftLayout->addWidget(roomsView);
+    leftPanel->setLayout(leftLayout);
+    splitter->addWidget(leftPanel);
     splitter->setStretchFactor(0, 0);
 
+    /* right panel */
     conversationPanel = new QStackedWidget;
     conversationPanel->hide();
     splitter->addWidget(conversationPanel);
@@ -228,6 +240,9 @@ void Chat::chatRoom(const QString &jid)
 {
     if (!chatRooms.contains(jid))
     {
+        //roomsView->addItem(jid.split('@')[0]);
+        roomsView->show();
+
         chatRooms[jid] = new ChatRoom(jid);
         chatRooms[jid]->setLocalName(ownName);
         connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),

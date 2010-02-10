@@ -24,6 +24,7 @@ set(wDesktop_SOURCES
     chat_edit.cpp
     chat_history.cpp
     chat_room.cpp
+    chat_rooms.cpp
     chat_roster.cpp
     diagnostics.cpp
     main.cpp
@@ -40,6 +41,7 @@ set(wDesktop_MOC_HEADERS
     chat_edit.h
     chat_history.h
     chat_room.h
+    chat_rooms.h
     chat_roster.h
     diagnostics.h
     photos.h

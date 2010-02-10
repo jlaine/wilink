@@ -17,45 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_ROOM_H__
-#define __WDESKTOP_CHAT_ROOM_H__
+#ifndef __WDESKTOP_CHAT_ROOMS_H__
+#define __WDESKTOP_CHAT_ROOMS_H__
 
-#include <QWidget>
-#include <QListWidget>
+#include <QAbstractTableModel>
+#include <QTableView>
 
-class ChatEdit;
-class ChatHistory;
-class QLabel;
-class QListWidget;
-class QXmppDiscoveryIq;
-class QXmppMessage;
-
-class ChatRoom : public QWidget
+class ChatRoomsModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    ChatRoom(const QString &jid, QWidget *parent = NULL);
-    void setLocalName(const QString &name);
+    QString roomName(const QString &bareJid) const;
 
-public slots:
-    void discoveryReceived(const QXmppDiscoveryIq &disco);
-    void messageReceived(const QXmppMessage &msg);
-
-protected slots:
-    void send();
-
-signals:
-    void sendMessage(const QXmppMessage &message);
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 private:
-    ChatHistory *chatHistory;
-    ChatEdit *chatInput;
-    QLabel *nameLabel;
-    QListWidget *chatParticipants;
-
-    QString chatLocalName;
-    QString chatRemoteJid;
+    QStringList roomKeys;
 };
+
+class ChatRoomsView : public QTableView
+{
+    Q_OBJECT
+
+public:
+    ChatRoomsView(ChatRoomsModel *model, QWidget *parent = NULL);
+};
+
 
 #endif
