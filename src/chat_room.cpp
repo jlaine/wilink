@@ -43,6 +43,9 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     hbox->addSpacing(16);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
+    QLabel *iconLabel = new QLabel();
+    iconLabel->setPixmap(QPixmap(":/chat.png"));
+    hbox->addWidget(iconLabel);
     layout->addItem(hbox);
 
     /* chat history */
@@ -96,4 +99,11 @@ void ChatRoom::send()
 void ChatRoom::setLocalName(const QString &name)
 {
     chatLocalName = name;
+}
+
+void ChatRoom::setRoomName(const QString &name)
+{
+    nameLabel->setText(QString("<b>%1</b><br/>%2")
+        .arg(name)
+        .arg(chatRemoteJid));
 }

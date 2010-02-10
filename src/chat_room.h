@@ -34,6 +34,7 @@ class ChatRoom : public QWidget
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
     void setLocalName(const QString &name);
+    void setRoomName(const QString &name);
 
 public slots:
     void messageReceived(const QXmppMessage &msg);

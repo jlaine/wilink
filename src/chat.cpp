@@ -510,8 +510,12 @@ ChatRoom *Chat::room(const QString &jid)
 {
     if (!chatRooms.contains(jid))
     {
+        roomsModel->addRoom(jid);
+        roomsView->show();
+
         chatRooms[jid] = new ChatRoom(jid);
         chatRooms[jid]->setLocalName(ownName);
+        chatRooms[jid]->setRoomName(roomsModel->roomName(jid));
         connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
             this, SLOT(sendMessage(const QXmppMessage&)));
         conversationPanel->addWidget(chatRooms[jid]);
@@ -521,9 +525,6 @@ ChatRoom *Chat::room(const QString &jid)
         packet.setTo(jid + "/" + ownName);
         packet.setType(QXmppPresence::Available);
         client->sendPacket(packet);
-
-        roomsModel->addRoom(jid);
-        roomsView->show();
     }
     return chatRooms[jid];
 }

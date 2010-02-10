@@ -208,17 +208,11 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotDoubleClicked()));
 
     setAlternatingRowColors(true);
+    setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setMinimumWidth(200);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
-/*
-    setShowGrid(false);
-
-    horizontalHeader()->setResizeMode(RoomColumn, QHeaderView::Stretch);
-    horizontalHeader()->setVisible(false);
-    verticalHeader()->setVisible(false);
-*/
 }
 
 void ChatRoomsView::slotClicked()
