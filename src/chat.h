@@ -48,11 +48,13 @@ public:
 
 protected slots:
     void addContact();
+    void addRoom();
     void chatContact(const QString &jid);
     void chatRoom(const QString &jid);
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
+    void discoveryIqReceived(const QXmppDiscoveryIq&);
     void iqReceived(const QXmppIq&);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void archiveChatReceived(const QXmppArchiveChat &chat);
@@ -73,6 +75,7 @@ private:
     bool reconnectOnDisconnect;
 
     QPushButton *addButton;
+    QPushButton *roomButton;
     QHash<QString, ChatDialog*> chatDialogs;
     QHash<QString, ChatRoom*> chatRooms;
     QXmppClient *client;

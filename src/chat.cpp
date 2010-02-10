@@ -38,6 +38,7 @@
 #include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
+#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppPingIq.h"
@@ -92,6 +93,13 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     addButton->setIcon(QIcon(":/add.png"));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
     hbox->addWidget(addButton);
+
+    roomButton = new QPushButton;
+    roomButton->setEnabled(false);
+    roomButton->setIcon(QIcon(":/chat.png"));
+    connect(roomButton, SIGNAL(clicked()), this, SLOT(addRoom()));
+    hbox->addWidget(roomButton);
+
     hbox->addStretch();
 
     statusIconLabel = new QLabel;
@@ -112,6 +120,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowTitle(tr("Chat"));
 
     /* set up client */
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
@@ -159,6 +168,25 @@ void Chat::addContact()
     packet.setTo(jid);
     packet.setType(QXmppPresence::Subscribe);
     client->sendPacket(packet);
+}
+
+/** Prompt the user for a new group chat then join it.
+ */
+void Chat::addRoom()
+{
+    bool ok = true;
+    QString jid = "@conference." + client->getConfiguration().getDomain();
+    while (!jidValidator.exactMatch(jid))
+    {
+        jid = QInputDialog::getText(this, tr("Join a group chat"),
+            tr("Enter the address of the room you want to join."),
+            QLineEdit::Normal, jid, &ok).toLower();
+        if (!ok)
+            return;
+        jid = jid.trimmed().toLower();
+    }
+
+    chatRoom(jid);
 }
 
 void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -209,6 +237,11 @@ void Chat::chatRoom(const QString &jid)
         packet.setTo(jid + "/" + ownName);
         packet.setType(QXmppPresence::Available);
         client->sendPacket(packet);
+
+        QXmppDiscoveryIq disco;
+        disco.setTo(jid);
+        disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+        client->sendPacket(disco);
     }
     ChatRoom *room = chatRooms[jid];
     room->show();
@@ -219,6 +252,7 @@ void Chat::connected()
 {
     qWarning("Connected to chat server");
     addButton->setEnabled(true);
+    roomButton->setEnabled(true);
     pingTimer->start();
     statusIconLabel->setPixmap(QPixmap(":/contact-available.png"));
     statusLabel->setText(tr("Connected"));
@@ -257,6 +291,7 @@ void Chat::disconnected()
 {
     qWarning("Disconnected from chat server");
     addButton->setEnabled(false);
+    roomButton->setEnabled(false);
     pingTimer->stop();
     timeoutTimer->stop();
     rosterModel->disconnected();
@@ -270,6 +305,17 @@ void Chat::disconnected()
         client->connectToServer(client->getConfiguration());
     } else {
         statusLabel->setText(tr("Disconnected"));
+    }
+}
+
+void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    qDebug() << "discovery received";
+    foreach (const QXmppDiscoveryItem &item, disco.getItems())
+    {
+        qDebug() << " *" << item.type();
+        foreach (const QString &attr, item.attributes())
+            qDebug() << "   -" << attr << ":" << item.attribute(attr);
     }
 }
 
