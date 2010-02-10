@@ -85,6 +85,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     roomsView = new ChatRoomsView(roomsModel);
     connect(roomsView, SIGNAL(clicked(const QString&)), this, SLOT(chatRoom(const QString&)));
     connect(roomsView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatRoom(const QString&)));
+    connect(roomsView, SIGNAL(leaveRoom(const QString&)), this, SLOT(leaveRoom(const QString&)));
     roomsView->hide();
     leftLayout->insertWidget(1, roomsView, 0);
     leftPanel->setLayout(leftLayout);
@@ -326,6 +327,19 @@ void Chat::iqReceived(const QXmppIq&)
     timeoutTimer->stop();
 }
 
+void Chat::leaveRoom(const QString &jid)
+{
+    roomsModel->removeRoom(jid);
+    if (!roomsModel->rowCount(QModelIndex()))
+        roomsView->hide();
+
+    // leave room
+    QXmppPresence packet;
+    packet.setTo(jid + "/" + ownName);
+    packet.setType(QXmppPresence::Unavailable);
+    client->sendPacket(packet);
+}
+
 void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = msg.getFrom().split("/")[0];
@@ -528,6 +542,7 @@ ChatRoom *Chat::room(const QString &jid)
         conversationPanel->addWidget(chatRooms[jid]);
         conversationPanel->show();
 
+        // join room
         QXmppPresence packet;
         packet.setTo(jid + "/" + ownName);
         packet.setType(QXmppPresence::Available);

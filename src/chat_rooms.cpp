@@ -55,11 +55,6 @@ void ChatRoomsModel::addRoom(const QString &bareJid)
 #endif
 }
 
-QString ChatRoomsModel::roomName(const QString &bareJid) const
-{
-    return bareJid.split('@')[0];
-}
-
 int ChatRoomsModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
@@ -181,6 +176,23 @@ void ChatRoomsModel::presenceReceived(const QXmppPresence &presence)
             endRemoveRows();
         }
     }
+}
+
+void ChatRoomsModel::removeRoom(const QString &bareJid)
+{
+    int index = roomKeys.indexOf(bareJid);
+    if (index >= 0)
+    {
+        beginRemoveRows(QModelIndex(), index, index);
+        roomKeys.removeAt(index);
+        roomParticipants.remove(bareJid);
+        endRemoveRows();
+    }
+}
+
+QString ChatRoomsModel::roomName(const QString &bareJid) const
+{
+    return bareJid.split('@')[0];
 }
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const

@@ -38,6 +38,7 @@ public:
     ChatRoomsModel(QXmppClient *client);
 
     void addRoom(const QString &bareJid);
+    void removeRoom(const QString &bareJid);
     QString roomName(const QString &bareJid) const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
