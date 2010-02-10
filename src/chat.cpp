@@ -107,12 +107,14 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     addButton = new QPushButton;
     addButton->setEnabled(false);
     addButton->setIcon(QIcon(":/add.png"));
+    addButton->setToolTip(tr("Add a contact"));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
     hbox->addWidget(addButton);
 
     roomButton = new QPushButton;
     roomButton->setEnabled(false);
     roomButton->setIcon(QIcon(":/chat.png"));
+    roomButton->setToolTip(tr("Join a chat room"));
     connect(roomButton, SIGNAL(clicked()), this, SLOT(addRoom()));
     hbox->addWidget(roomButton);
 
@@ -193,8 +195,8 @@ void Chat::addRoom()
     QString jid = "@conference." + client->getConfiguration().getDomain();
     while (!jidValidator.exactMatch(jid))
     {
-        jid = QInputDialog::getText(this, tr("Join a group chat"),
-            tr("Enter the address of the room you want to join."),
+        jid = QInputDialog::getText(this, tr("Join a chat room"),
+            tr("Enter the address of the chat room you want to join."),
             QLineEdit::Normal, jid, &ok).toLower();
         if (!ok)
             return;
