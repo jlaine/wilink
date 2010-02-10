@@ -25,8 +25,6 @@
 class ChatEdit;
 class ChatHistory;
 class QLabel;
-class QListWidget;
-class QXmppDiscoveryIq;
 class QXmppMessage;
 
 class ChatRoom : public QWidget
@@ -38,7 +36,6 @@ public:
     void setLocalName(const QString &name);
 
 public slots:
-    void discoveryReceived(const QXmppDiscoveryIq &disco);
     void messageReceived(const QXmppMessage &msg);
 
 protected slots:
@@ -51,7 +48,6 @@ private:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
     QLabel *nameLabel;
-    QListWidget *chatParticipants;
 
     QString chatLocalName;
     QString chatRemoteJid;

@@ -46,15 +46,9 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     layout->addItem(hbox);
 
     /* chat history */
-    QSplitter *splitter = new QSplitter;
     chatHistory = new ChatHistory;
     chatHistory->setMinimumWidth(300);
-    splitter->addWidget(chatHistory);
-    splitter->setStretchFactor(0, 1);
-    chatParticipants = new QListWidget;
-    splitter->addWidget(chatParticipants);
-    splitter->setStretchFactor(1, 0);
-    layout->addWidget(splitter);
+    layout->addWidget(chatHistory);
     layout->setStretch(1, 1);
 
     /* text edit */
@@ -66,16 +60,6 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     setFocusProxy(chatInput);
     setLayout(layout);
     setMinimumWidth(300);
-}
-
-void ChatRoom::discoveryReceived(const QXmppDiscoveryIq &disco)
-{
-    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery)
-    {
-        chatParticipants->clear();
-        foreach (const QXmppDiscoveryItem &item, disco.getItems())
-            chatParticipants->addItem(item.attribute("name"));
-    }
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)

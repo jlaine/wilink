@@ -38,7 +38,6 @@
 #include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppPingIq.h"
@@ -136,7 +135,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowTitle(tr("Chat"));
 
     /* set up client */
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
@@ -305,13 +303,6 @@ void Chat::disconnected()
     } else {
         statusLabel->setText(tr("Disconnected"));
     }
-}
-
-void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
-{
-    const QString jid = disco.getFrom();
-    if (chatRooms.contains(jid))
-        chatRooms[jid]->discoveryReceived(disco);
 }
 
 void Chat::error(QXmppClient::Error error)
