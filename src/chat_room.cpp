@@ -87,6 +87,7 @@ void ChatRoom::send()
 
     QXmppMessage msg;
     msg.setBody(text);
+    msg.setFrom(chatRemoteJid + "/" + chatLocalName);
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
     emit sendMessage(msg);
