@@ -17,9 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
 #include <QLabel>
 #include <QLayout>
 
+#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
 
 #include "chat_edit.h"
@@ -54,6 +56,17 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     setFocusProxy(chatInput);
     setLayout(layout);
     setMinimumWidth(300);
+}
+
+void ChatRoom::discoveryReceived(const QXmppDiscoveryIq &disco)
+{
+    qDebug() << "discovery received";
+    foreach (const QXmppDiscoveryItem &item, disco.getItems())
+    {
+        qDebug() << " *" << item.type();
+        foreach (const QString &attr, item.attributes())
+            qDebug() << "   -" << attr << ":" << item.attribute(attr);
+    }
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)

@@ -310,13 +310,9 @@ void Chat::disconnected()
 
 void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
-    qDebug() << "discovery received";
-    foreach (const QXmppDiscoveryItem &item, disco.getItems())
-    {
-        qDebug() << " *" << item.type();
-        foreach (const QString &attr, item.attributes())
-            qDebug() << "   -" << attr << ":" << item.attribute(attr);
-    }
+    const QString jid = disco.getFrom();
+    if (chatRooms.contains(jid))
+        chatRooms[jid]->discoveryReceived(disco);
 }
 
 void Chat::error(QXmppClient::Error error)
