@@ -20,6 +20,8 @@
 #include <QDebug>
 #include <QLabel>
 #include <QLayout>
+#include <QListWidget>
+#include <QSplitter>
 
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
@@ -44,8 +46,14 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     layout->addItem(hbox);
 
     /* chat history */
+    QSplitter *splitter = new QSplitter;
     chatHistory = new ChatHistory;
-    layout->addWidget(chatHistory);
+    splitter->addWidget(chatHistory);
+    splitter->setStretchFactor(0, 1);
+    chatParticipants = new QListWidget;
+    splitter->addWidget(chatParticipants);
+    splitter->setStretchFactor(1, 0);
+    layout->addWidget(splitter);
 
     /* text edit */
     chatInput = new ChatEdit(80);
@@ -61,11 +69,18 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
 void ChatRoom::discoveryReceived(const QXmppDiscoveryIq &disco)
 {
     qDebug() << "discovery received";
-    foreach (const QXmppDiscoveryItem &item, disco.getItems())
+    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery)
     {
-        qDebug() << " *" << item.type();
-        foreach (const QString &attr, item.attributes())
-            qDebug() << "   -" << attr << ":" << item.attribute(attr);
+        chatParticipants->clear();
+        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+            chatParticipants->addItem(item.attribute("name"));
+    } else {
+        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        {
+            qDebug() << " *" << item.type();
+            foreach (const QString &attr, item.attributes())
+                qDebug() << "   -" << attr << ":" << item.attribute(attr);
+        }
     }
 }
 

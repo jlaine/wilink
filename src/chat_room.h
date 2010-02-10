@@ -25,6 +25,7 @@
 class ChatEdit;
 class ChatHistory;
 class QLabel;
+class QListWidget;
 class QXmppDiscoveryIq;
 class QXmppMessage;
 
@@ -50,6 +51,7 @@ private:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
     QLabel *nameLabel;
+    QListWidget *chatParticipants;
 
     QString chatLocalName;
     QString chatRemoteJid;
