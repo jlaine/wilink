@@ -246,7 +246,7 @@ RosterView::RosterView(RosterModel *model, QWidget *parent)
     action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
     connect(action, SIGNAL(triggered()), this, SLOT(slotDoubleClicked()));
     action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-    connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
+    connect(action, SIGNAL(triggered()), this, SLOT(slotRemoveContact()));
 
     connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotClicked()));
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotDoubleClicked()));
@@ -274,13 +274,6 @@ void RosterView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     contextMenu->popup(event->globalPos());
-}
-
-void RosterView::removeContact()
-{
-    const QModelIndex &index = currentIndex();
-    if (index.isValid())
-        emit removeContact(index.data(Qt::UserRole).toString());
 }
 
 void RosterView::selectContact(const QString &jid)
@@ -321,5 +314,12 @@ void RosterView::slotDoubleClicked()
     const QModelIndex &index = currentIndex();
     if (index.isValid())
         emit doubleClicked(index.data(Qt::UserRole).toString());
+}
+
+void RosterView::slotRemoveContact()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+        emit removeContact(index.data(Qt::UserRole).toString());
 }
 

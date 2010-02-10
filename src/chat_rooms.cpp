@@ -17,7 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QHeaderView>
+#include <QContextMenuEvent>
+#include <QMenu>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
@@ -204,6 +205,12 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
 {
     setModel(model);
 
+    /* prepare context menu */
+    QAction *action;
+    contextMenu = new QMenu(this);
+    action = contextMenu->addAction(QIcon(":/remove.png"), tr("Leave room"));
+    connect(action, SIGNAL(triggered()), this, SLOT(slotLeaveRoom()));
+
     connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotClicked()));
     connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotDoubleClicked()));
 
@@ -215,24 +222,13 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
     setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
-void ChatRoomsView::slotClicked()
+void ChatRoomsView::contextMenuEvent(QContextMenuEvent *event)
 {
     const QModelIndex &index = currentIndex();
-    if (index.isValid())
-    {
-        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
-        emit clicked(jid);
-    }
-}
+    if (!index.isValid())
+        return;
 
-void ChatRoomsView::slotDoubleClicked()
-{
-    const QModelIndex &index = currentIndex();
-    if (index.isValid())
-    {
-        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
-        emit doubleClicked(jid);
-    }
+    contextMenu->popup(event->globalPos());
 }
 
 void ChatRoomsView::selectRoom(const QString &jid)
@@ -259,5 +255,35 @@ QSize ChatRoomsView::sizeHint () const
     for (int i = 0; i < MaxColumn; i++)
         hint.setWidth(hint.width() + sizeHintForColumn(i));
     return hint;
+}
+
+void ChatRoomsView::slotClicked()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+    {
+        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
+        emit clicked(jid);
+    }
+}
+
+void ChatRoomsView::slotDoubleClicked()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+    {
+        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
+        emit doubleClicked(jid);
+    }
+}
+
+void ChatRoomsView::slotLeaveRoom()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+    {
+        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
+        emit leaveRoom(jid);
+    }
 }
 

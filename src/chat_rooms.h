@@ -24,6 +24,8 @@
 #include <QTableView>
 #include <QTreeView>
 
+class QContextMenuEvent;
+class QMenu;
 class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;
@@ -66,10 +68,18 @@ public:
 protected slots:
     void slotClicked();
     void slotDoubleClicked();
+    void slotLeaveRoom();
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
     void clicked(const QString &jid);
     void doubleClicked(const QString &jid);
+    void leaveRoom(const QString &jid);
+
+private:
+    QMenu *contextMenu;
 };
 
 #endif

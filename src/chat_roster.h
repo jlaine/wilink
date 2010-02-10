@@ -86,9 +86,9 @@ signals:
     void removeContact(const QString &jid);
 
 protected slots:
-    void removeContact();
     void slotClicked();
     void slotDoubleClicked();
+    void slotRemoveContact();
 
 private:
     QMenu *contextMenu;
