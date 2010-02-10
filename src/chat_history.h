@@ -61,10 +61,8 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
-    bool archived() const;
     ChatHistoryMessage message() const;
 
-    void setArchived(bool archived);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
@@ -82,7 +80,6 @@ protected:
 private:
     int maxWidth;
     ChatHistoryMessage msg;
-    bool msgArchived;
     bool show_date;
     bool show_sender;
 
@@ -99,7 +96,7 @@ class ChatHistory : public QGraphicsView
 
 public:
     ChatHistory(QWidget *parent = NULL);
-    void addMessage(const ChatHistoryMessage &message, bool archived = false);
+    void addMessage(const ChatHistoryMessage &message);
 
 public slots:
     void clear();

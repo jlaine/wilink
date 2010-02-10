@@ -66,8 +66,10 @@ void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 }
 
 ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
-    : QGraphicsWidget(parent), show_date(true), show_sender(false), maxWidth(2 * DATE_WIDTH),
-    msgArchived(false)
+    : QGraphicsWidget(parent),
+    show_date(true),
+    show_sender(false),
+    maxWidth(2 * DATE_WIDTH)
 {
     bodyText = new ChatTextItem;
     scene()->addItem(bodyText);
@@ -121,19 +123,9 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
-bool ChatMessageWidget::archived() const
-{
-    return msgArchived;
-}
-
 ChatHistoryMessage ChatMessageWidget::message() const
 {
     return msg;
-}
-
-void ChatMessageWidget::setArchived(bool archived)
-{
-    msgArchived = archived;
 }
 
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
@@ -274,7 +266,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     connect(shortcut, SIGNAL(activated()), this, SLOT(copy()));
 }
 
-void ChatHistory::addMessage(const ChatHistoryMessage &message, bool archived)
+void ChatHistory::addMessage(const ChatHistoryMessage &message)
 {
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();
@@ -289,9 +281,9 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message, bool archived)
         {
             previous = child;
             pos++;
-        } else if (archived) {
+        } else if (message.archived) {
             // check for collision
-            if (!child->archived() &&
+            if (!child->message().archived &&
                 message.local == child->message().local &&
                 message.body == child->message().body)
                 return;
@@ -309,7 +301,6 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message, bool archived)
 
     /* add message */
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
-    msg->setArchived(archived);
     msg->setMessage(message);
     msg->setShowDate(showDate);
     msg->setShowSender(showSender);

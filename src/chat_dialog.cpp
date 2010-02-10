@@ -84,11 +84,12 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     foreach (const QXmppArchiveMessage &msg, chat.messages)
     {
         ChatHistoryMessage message;
+        message.archived = true;
         message.body = msg.body;
         message.datetime = msg.datetime;
         message.from = msg.local ? chatLocalName : chatRemoteName;
         message.local = msg.local;
-        chatHistory->addMessage(message, true);
+        chatHistory->addMessage(message);
     }
 }
 
