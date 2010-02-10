@@ -87,7 +87,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     hbox->setMargin(10);
     hbox->setSpacing(10);
 
-    QPushButton *addButton = new QPushButton;
+    addButton = new QPushButton;
+    addButton->setEnabled(false);
     addButton->setIcon(QIcon(":/add.png"));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
     hbox->addWidget(addButton);
@@ -216,6 +217,7 @@ void Chat::chatRoom(const QString &jid)
 void Chat::connected()
 {
     qWarning("Connected to chat server");
+    addButton->setEnabled(true);
     pingTimer->start();
     statusIconLabel->setPixmap(QPixmap(":/contact-available.png"));
     statusLabel->setText(tr("Connected"));
@@ -253,6 +255,7 @@ ChatDialog *Chat::conversation(const QString &jid)
 void Chat::disconnected()
 {
     qWarning("Disconnected from chat server");
+    addButton->setEnabled(false);
     pingTimer->stop();
     timeoutTimer->stop();
     rosterModel->disconnected();

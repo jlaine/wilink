@@ -30,6 +30,7 @@ class ChatRoom;
 class RosterModel;
 class RosterView;
 class QLabel;
+class QPushButton;
 class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
@@ -71,6 +72,7 @@ protected:
 private:
     bool reconnectOnDisconnect;
 
+    QPushButton *addButton;
     QHash<QString, ChatDialog*> chatDialogs;
     QHash<QString, ChatRoom*> chatRooms;
     QXmppClient *client;
