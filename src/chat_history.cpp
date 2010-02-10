@@ -284,7 +284,7 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
         } else if (message.archived) {
             // check for collision
             if (!child->message().archived &&
-                message.local == child->message().local &&
+                message.from == child->message().from &&
                 message.body == child->message().body)
                 return;
         } else {
@@ -294,7 +294,7 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
 
     /* determine grouping */
     bool showSender = (!previous ||
-        message.local != previous->message().local ||
+        message.from != previous->message().from ||
         message.datetime > previous->message().datetime.addSecs(120 * 60));
     bool showDate = (showSender ||
         message.datetime > previous->message().datetime.addSecs(60));

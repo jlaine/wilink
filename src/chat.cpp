@@ -201,6 +201,7 @@ void Chat::chatRoom(const QString &jid)
     if (!chatRooms.contains(jid))
     {
         chatRooms[jid] = new ChatRoom(jid);
+        chatRooms[jid]->setLocalName(ownName);
         connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
             this, SLOT(sendMessage(const QXmppMessage&)));
 
