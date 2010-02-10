@@ -86,6 +86,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         ChatHistoryMessage message;
         message.body = msg.body;
         message.datetime = msg.datetime;
+        message.from = msg.local ? chatLocalName : chatRemoteName;
         message.local = msg.local;
         chatHistory->addMessage(message, true);
     }
@@ -95,8 +96,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     ChatHistoryMessage message;
     message.body = msg.getBody();
-    message.local = false;
     message.datetime = QDateTime::currentDateTime();
+    message.from = chatRemoteName;
+    message.local = false;
     chatHistory->addMessage(message);
 }
 
@@ -113,8 +115,9 @@ void ChatDialog::send()
 
     ChatHistoryMessage message;
     message.body = text;
-    message.local = true;
     message.datetime = QDateTime::currentDateTime();
+    message.from = chatLocalName;
+    message.local = true;
     chatHistory->addMessage(message);
 
     chatInput->document()->clear();
@@ -127,6 +130,7 @@ void ChatDialog::send()
 
 void ChatDialog::setLocalName(const QString &name)
 {
+    chatLocalName = name;
     chatHistory->setLocalName(name);
 }
 
@@ -137,6 +141,7 @@ void ChatDialog::setRemoteAvatar(const QPixmap &avatar)
 
 void ChatDialog::setRemoteName(const QString &name)
 {
+    chatRemoteName = name;
     nameLabel->setText(QString("<b>%1</b><br/>%2")
         .arg(name)
         .arg(chatRemoteJid));

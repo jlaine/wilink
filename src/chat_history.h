@@ -31,6 +31,7 @@ class ChatHistoryMessage
 public:
     QString body;
     QDateTime datetime;
+    QString from;
     bool local;
 };
 

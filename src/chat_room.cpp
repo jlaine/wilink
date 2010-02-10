@@ -58,8 +58,12 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
+    const QStringList bits = msg.getFrom().split("/");
+    const QString from = bits.size() > 1 ? bits[1] : bits[0].split('@')[0];
+
     ChatHistoryMessage message;
     message.body = msg.getBody();
+    message.from = from;
     message.local = false;
     message.datetime = QDateTime::currentDateTime();
     chatHistory->addMessage(message);

@@ -59,7 +59,9 @@ private:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
 
+    QString chatLocalName;
     QString chatRemoteJid;
+    QString chatRemoteName;
 };
 
 #endif
