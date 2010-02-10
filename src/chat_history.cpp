@@ -126,11 +126,6 @@ bool ChatMessageWidget::archived() const
     return msgArchived;
 }
 
-QString ChatMessageWidget::from() const
-{
-    return msgFrom;
-}
-
 ChatHistoryMessage ChatMessageWidget::message() const
 {
     return msg;
@@ -139,12 +134,6 @@ ChatHistoryMessage ChatMessageWidget::message() const
 void ChatMessageWidget::setArchived(bool archived)
 {
     msgArchived = archived;
-}
-
-void ChatMessageWidget::setFrom(const QString &from)
-{
-    fromText->setPlainText(from);
-    msgFrom = from;
 }
 
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
@@ -191,6 +180,9 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 {
     msg = message;
+
+    /* set from */
+    fromText->setPlainText(message.from);
 
     /* set date */
     QDateTime datetime = message.datetime.toLocalTime();
@@ -318,7 +310,6 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message, bool archived)
     /* add message */
     ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
     msg->setArchived(archived);
-    msg->setFrom(message.local ? chatLocalName : chatRemoteName);
     msg->setMessage(message);
     msg->setShowDate(showDate);
     msg->setShowSender(showSender);
@@ -368,9 +359,11 @@ QString ChatHistory::copyText()
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
         if (selection.contains(child))
         {
+            ChatHistoryMessage message = child->message();
+
             if (!copyText.isEmpty())
                 copyText += "\n";
-            copyText += child->from() + "> " + child->message().body.replace("\r\n", "\n");
+            copyText += message.from + "> " + message.body.replace("\r\n", "\n");
         }
     }
 
@@ -409,16 +402,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-void ChatHistory::setLocalName(const QString &localName)
-{
-    chatLocalName = localName;
-}
-
-void ChatHistory::setRemoteName(const QString &remoteName)
-{
-    chatRemoteName = remoteName;
-}
-
 void ChatHistory::slotLinkHoverChanged(const QString &link)
 {
     setCursor(link.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
@@ -444,4 +427,9 @@ void ChatHistory::slotSelectionChanged()
         clipboard->setText(copyText(), QClipboard::Selection);
     }
     lastSelection = selection;
+}
+
+ChatHistoryMessage::ChatHistoryMessage()
+    : archived(false), local(false)
+{
 }

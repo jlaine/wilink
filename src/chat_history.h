@@ -29,6 +29,9 @@ class QGraphicsLinearLayout;
 class ChatHistoryMessage
 {
 public:
+    ChatHistoryMessage();
+
+    bool archived;
     QString body;
     QDateTime datetime;
     QString from;
@@ -59,11 +62,9 @@ public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     bool archived() const;
-    QString from() const;
     ChatHistoryMessage message() const;
 
     void setArchived(bool archived);
-    void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
@@ -82,7 +83,6 @@ private:
     int maxWidth;
     ChatHistoryMessage msg;
     bool msgArchived;
-    QString msgFrom;
     bool show_date;
     bool show_sender;
 
@@ -100,8 +100,6 @@ class ChatHistory : public QGraphicsView
 public:
     ChatHistory(QWidget *parent = NULL);
     void addMessage(const ChatHistoryMessage &message, bool archived = false);
-    void setLocalName(const QString &localName);
-    void setRemoteName(const QString &remoteName);
 
 public slots:
     void clear();
@@ -119,8 +117,6 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    QString chatLocalName;
-    QString chatRemoteName;
     QGraphicsScene *scene;
 
     QGraphicsWidget *obj;

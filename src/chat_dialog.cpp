@@ -131,7 +131,6 @@ void ChatDialog::send()
 void ChatDialog::setLocalName(const QString &name)
 {
     chatLocalName = name;
-    chatHistory->setLocalName(name);
 }
 
 void ChatDialog::setRemoteAvatar(const QPixmap &avatar)
@@ -143,8 +142,7 @@ void ChatDialog::setRemoteName(const QString &name)
 {
     chatRemoteName = name;
     nameLabel->setText(QString("<b>%1</b><br/>%2")
-        .arg(name)
+        .arg(chatRemoteName)
         .arg(chatRemoteJid));
-    chatHistory->setRemoteName(name);
 }
 
