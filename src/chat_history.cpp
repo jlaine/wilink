@@ -131,7 +131,7 @@ QString ChatMessageWidget::from() const
     return msgFrom;
 }
 
-QXmppArchiveMessage ChatMessageWidget::message() const
+ChatHistoryMessage ChatMessageWidget::message() const
 {
     return msg;
 }
@@ -188,7 +188,7 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
     updateGeometry();
 }
 
-void ChatMessageWidget::setMessage(const QXmppArchiveMessage &message)
+void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 {
     msg = message;
 
@@ -282,7 +282,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     connect(shortcut, SIGNAL(activated()), this, SLOT(copy()));
 }
 
-void ChatHistory::addMessage(const QXmppArchiveMessage &message, bool archived)
+void ChatHistory::addMessage(const ChatHistoryMessage &message, bool archived)
 {
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() == scrollBar->maximum();

@@ -20,12 +20,19 @@
 #ifndef __WDESKTOP_CHAT_HISTORY_H__
 #define __WDESKTOP_CHAT_HISTORY_H__
 
+#include <QDateTime>
 #include <QGraphicsView>
 #include <QGraphicsWidget>
 
-#include "qxmpp/QXmppArchiveIq.h"
-
 class QGraphicsLinearLayout;
+
+class ChatHistoryMessage
+{
+public:
+    QString body;
+    QDateTime datetime;
+    bool local;
+};
 
 class ChatTextItem : public QGraphicsTextItem
 {
@@ -52,13 +59,13 @@ public:
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     bool archived() const;
     QString from() const;
-    QXmppArchiveMessage message() const;
+    ChatHistoryMessage message() const;
 
     void setArchived(bool archived);
     void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    void setMessage(const QXmppArchiveMessage &message);
+    void setMessage(const ChatHistoryMessage &message);
     void setSelected(bool selected);
     void setShowDate(bool show);
     void setShowSender(bool show);
@@ -72,7 +79,7 @@ protected:
 
 private:
     int maxWidth;
-    QXmppArchiveMessage msg;
+    ChatHistoryMessage msg;
     bool msgArchived;
     QString msgFrom;
     bool show_date;
@@ -91,7 +98,7 @@ class ChatHistory : public QGraphicsView
 
 public:
     ChatHistory(QWidget *parent = NULL);
-    void addMessage(const QXmppArchiveMessage &message, bool archived = false);
+    void addMessage(const ChatHistoryMessage &message, bool archived = false);
     void setLocalName(const QString &localName);
     void setRemoteName(const QString &remoteName);
 

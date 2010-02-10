@@ -82,12 +82,18 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     foreach (const QXmppArchiveMessage &msg, chat.messages)
-        chatHistory->addMessage(msg, true);
+    {
+        ChatHistoryMessage message;
+        message.body = msg.body;
+        message.datetime = msg.datetime;
+        message.local = msg.local;
+        chatHistory->addMessage(message, true);
+    }
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    QXmppArchiveMessage message;
+    ChatHistoryMessage message;
     message.body = msg.getBody();
     message.local = false;
     message.datetime = QDateTime::currentDateTime();
@@ -105,7 +111,7 @@ void ChatDialog::send()
     if (text.isEmpty())
         return;
 
-    QXmppArchiveMessage message;
+    ChatHistoryMessage message;
     message.body = text;
     message.local = true;
     message.datetime = QDateTime::currentDateTime();

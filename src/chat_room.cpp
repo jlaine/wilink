@@ -58,7 +58,7 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
-    QXmppArchiveMessage message;
+    ChatHistoryMessage message;
     message.body = msg.getBody();
     message.local = false;
     message.datetime = QDateTime::currentDateTime();
@@ -70,12 +70,6 @@ void ChatRoom::send()
     QString text = chatInput->document()->toPlainText();
     if (text.isEmpty())
         return;
-
-    QXmppArchiveMessage message;
-    message.body = text;
-    message.local = true;
-    message.datetime = QDateTime::currentDateTime();
-    chatHistory->addMessage(message);
 
     chatInput->document()->clear();
 
