@@ -83,6 +83,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     leftLayout->addWidget(rosterView);
     roomsView = new ChatRoomsView(roomsModel);
+    connect(roomsView, SIGNAL(clicked(const QString&)), this, SLOT(chatRoom(const QString&)));
+    connect(roomsView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatRoom(const QString&)));
     roomsView->hide();
     leftLayout->addWidget(roomsView);
     leftPanel->setLayout(leftLayout);
@@ -238,29 +240,9 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::chatRoom(const QString &jid)
 {
-    if (!chatRooms.contains(jid))
-    {
-        roomsModel->addRoom(jid);
-        roomsView->show();
-
-        chatRooms[jid] = new ChatRoom(jid);
-        chatRooms[jid]->setLocalName(ownName);
-        connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
-            this, SLOT(sendMessage(const QXmppMessage&)));
-
-        QXmppPresence packet;
-        packet.setTo(jid + "/" + ownName);
-        packet.setType(QXmppPresence::Available);
-        client->sendPacket(packet);
-
-        QXmppDiscoveryIq disco;
-        disco.setTo(jid);
-        disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-        client->sendPacket(disco);
-    }
-    ChatRoom *room = chatRooms[jid];
-    room->show();
-    room->raise();
+    ChatRoom *dialog = room(jid);
+    conversationPanel->setCurrentWidget(dialog);
+    dialog->setFocus();
 }
 
 void Chat::connected()
@@ -529,6 +511,33 @@ void Chat::resizeContacts()
     }
 
     resize(hint.expandedTo(size()));
+}
+
+ChatRoom *Chat::room(const QString &jid)
+{
+    if (!chatRooms.contains(jid))
+    {
+        roomsModel->addRoom(jid);
+        roomsView->show();
+
+        chatRooms[jid] = new ChatRoom(jid);
+        chatRooms[jid]->setLocalName(ownName);
+        connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
+            this, SLOT(sendMessage(const QXmppMessage&)));
+        conversationPanel->addWidget(chatRooms[jid]);
+        conversationPanel->show();
+
+        QXmppPresence packet;
+        packet.setTo(jid + "/" + ownName);
+        packet.setType(QXmppPresence::Available);
+        client->sendPacket(packet);
+
+        QXmppDiscoveryIq disco;
+        disco.setTo(jid);
+        disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+        client->sendPacket(disco);
+    }
+    return chatRooms[jid];
 }
 
 /** Send a chat message to the specified recipient.

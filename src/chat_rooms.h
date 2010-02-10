@@ -45,7 +45,14 @@ class ChatRoomsView : public QTableView
 
 public:
     ChatRoomsView(ChatRoomsModel *model, QWidget *parent = NULL);
-};
 
+protected slots:
+    void slotClicked();
+    void slotDoubleClicked();
+
+signals:
+    void clicked(const QString &jid);
+    void doubleClicked(const QString &jid);
+};
 
 #endif

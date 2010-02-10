@@ -70,6 +70,9 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
 {
     setModel(model);
 
+    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotClicked()));
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotDoubleClicked()));
+
     setAlternatingRowColors(true);
     setIconSize(QSize(32, 32));
     setMinimumWidth(200);
@@ -80,5 +83,19 @@ ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
     horizontalHeader()->setResizeMode(RoomColumn, QHeaderView::Stretch);
     horizontalHeader()->setVisible(false);
     verticalHeader()->setVisible(false);
+}
+
+void ChatRoomsView::slotClicked()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+        emit clicked(index.data(Qt::UserRole).toString());
+}
+
+void ChatRoomsView::slotDoubleClicked()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+        emit doubleClicked(index.data(Qt::UserRole).toString());
 }
 
