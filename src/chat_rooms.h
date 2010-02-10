@@ -44,6 +44,7 @@ protected slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
 
 private:
+    QXmppClient *xmppClient;
     QStringList roomKeys;
 };
 

@@ -30,6 +30,7 @@ enum RoomsColumns {
 };
 
 ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
+    : xmppClient(client)
 {
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
 }
@@ -41,6 +42,12 @@ void ChatRoomsModel::addRoom(const QString &bareJid)
     beginInsertRows(QModelIndex(), roomKeys.size(), roomKeys.size());
     roomKeys.append(bareJid);
     endInsertRows();
+
+    // discover room participants
+    QXmppDiscoveryIq disco;
+    disco.setTo(bareJid);
+    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    xmppClient->sendPacket(disco);
 }
 
 QString ChatRoomsModel::roomName(const QString &bareJid) const

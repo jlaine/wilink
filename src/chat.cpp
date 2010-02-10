@@ -519,9 +519,6 @@ ChatRoom *Chat::room(const QString &jid)
 {
     if (!chatRooms.contains(jid))
     {
-        roomsModel->addRoom(jid);
-        roomsView->show();
-
         chatRooms[jid] = new ChatRoom(jid);
         chatRooms[jid]->setLocalName(ownName);
         connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
@@ -534,10 +531,8 @@ ChatRoom *Chat::room(const QString &jid)
         packet.setType(QXmppPresence::Available);
         client->sendPacket(packet);
 
-        QXmppDiscoveryIq disco;
-        disco.setTo(jid);
-        disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-        client->sendPacket(disco);
+        roomsModel->addRoom(jid);
+        roomsView->show();
     }
     return chatRooms[jid];
 }
