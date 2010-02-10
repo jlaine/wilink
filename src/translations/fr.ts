@@ -43,12 +43,13 @@
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
-</context>
-<context>
-    <name>ChatDialog</name>
     <message>
-        <source>Me</source>
-        <translation>Moi</translation>
+        <source>Join a chat room</source>
+        <translation>Rejoindre un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Enter the address of the chat room you want to join.</source>
+        <translation>Saisissez l&apos;addresse du salon de discussion que vous souhaitez rejoindre.</translation>
     </message>
 </context>
 <context>
@@ -59,14 +60,17 @@
     </message>
 </context>
 <context>
+    <name>ChatRoomsView</name>
+    <message>
+        <source>Leave room</source>
+        <translation>Quiter le salon</translation>
+    </message>
+</context>
+<context>
     <name>Diagnostics</name>
     <message>
         <source>Refresh</source>
         <translation>Rafraîchir</translation>
-    </message>
-    <message>
-        <source>Print</source>
-        <translation>Imprimer</translation>
     </message>
     <message>
         <source>Diagnostics</source>
