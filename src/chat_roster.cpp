@@ -163,6 +163,10 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(":/chat.png");
             }
+        } else if (item->type() == ChatRosterItem::RoomMember) {
+            if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+                return bareJid.split("/")[1];
+            }
         }
     }
     return QVariant();
@@ -370,15 +374,8 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setModel(sortedModel);
 
     /* prepare context menu */
-    QAction *action;
-    contextMenu = new QMenu(this);
-    action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
-    connect(action, SIGNAL(triggered()), this, SLOT(slotActivated()));
-    action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-    connect(action, SIGNAL(triggered()), this, SLOT(slotRemoveContact()));
-
-    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotActivated()));
-    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotActivated()));
+    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotActivated(const QModelIndex&)));
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotActivated(const QModelIndex&)));
 
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);
@@ -402,7 +399,19 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     if (!index.isValid())
         return;
 
-    contextMenu->popup(event->globalPos());
+    int type = index.data(TypeRole).toInt();
+    if (type == ChatRosterItem::Contact)
+    {
+        QMenu *menu = new QMenu(this);
+        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
+        connect(action, SIGNAL(triggered()), this, SLOT(slotRemoveContact()));
+        menu->popup(event->globalPos());
+    } else if (type == ChatRosterItem::Room) {
+        QMenu *menu = new QMenu(this);
+        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
+        connect(action, SIGNAL(triggered()), this, SLOT(slotLeaveRoom()));
+        menu->popup(event->globalPos());
+    }
 }
 
 void ChatRosterView::selectContact(const QString &jid)
@@ -431,9 +440,8 @@ QSize ChatRosterView::sizeHint () const
     return hint;
 }
 
-void ChatRosterView::slotActivated()
+void ChatRosterView::slotActivated(const QModelIndex &index)
 {
-    const QModelIndex &index = currentIndex();
     if (!index.isValid())
         return;
 
@@ -442,6 +450,16 @@ void ChatRosterView::slotActivated()
         emit contactActivated(index.data(IdRole).toString());
     else if (type == ChatRosterItem::Room)
         emit roomActivated(index.data(IdRole).toString());
+}
+
+void ChatRosterView::slotLeaveRoom()
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid())
+    {
+        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
+        emit leaveRoom(jid);
+    }
 }
 
 void ChatRosterView::slotRemoveContact()

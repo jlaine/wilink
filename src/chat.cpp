@@ -75,8 +75,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* left panel */
     rosterView = new ChatRosterView(rosterModel);
     connect(rosterView, SIGNAL(contactActivated(const QString&)), this, SLOT(chatContact(const QString&)));
-    connect(rosterView, SIGNAL(roomActivated(const QString&)), this, SLOT(chatRoom(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
+    connect(rosterView, SIGNAL(roomActivated(const QString&)), this, SLOT(chatRoom(const QString&)));
+    connect(rosterView, SIGNAL(leaveRoom(const QString&)), this, SLOT(leaveRoom(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);

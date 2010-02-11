@@ -91,14 +91,13 @@ protected:
 signals:
     void contactActivated(const QString &jid);
     void roomActivated(const QString &jid);
+    void leaveRoom(const QString &jid);
     void removeContact(const QString &jid);
 
 protected slots:
-    void slotActivated();
+    void slotActivated(const QModelIndex &index);
+    void slotLeaveRoom();
     void slotRemoveContact();
-
-private:
-    QMenu *contextMenu;
 };
 
 #endif
