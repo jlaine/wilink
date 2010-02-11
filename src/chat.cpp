@@ -303,6 +303,8 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setLocalName(ownName);
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
         chatDialogs[jid]->setRemotePixmap(rosterModel->contactAvatar(jid));
+        connect(chatDialogs[jid], SIGNAL(leave(const QString&)),
+            this, SLOT(leaveChat(const QString&)));
         connect(chatDialogs[jid], SIGNAL(sendPacket(const QXmppPacket&)),
             client, SLOT(sendPacket(const QXmppPacket&)));
         conversationPanel->addWidget(chatDialogs[jid]);
@@ -412,6 +414,15 @@ void Chat::error(QXmppClient::Error error)
 void Chat::iqReceived(const QXmppIq&)
 {
     timeoutTimer->stop();
+}
+
+void Chat::leaveChat(const QString &jid)
+{
+    // close view
+    ChatDialog *dialog = chatDialogs.take(jid);
+    if (conversationPanel->count() == 1)
+        conversationPanel->hide();
+    dialog->deleteLater();
 }
 
 void Chat::leaveRoom(const QString &jid)

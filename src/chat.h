@@ -51,6 +51,7 @@ protected slots:
     void addRoom();
     void chatContact(const QString &jid);
     void chatRoom(const QString &jid);
+    void leaveChat(const QString &jid);
     void leaveRoom(const QString &jid);
     void connected();
     void disconnected();
