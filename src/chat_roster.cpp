@@ -137,13 +137,13 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
+    } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+        return item->data(Qt::DisplayRole).toString();
     } else {
         if (item->type() == ChatRosterItem::Contact)
         {
             const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
-            if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-                return contactName(bareJid);
-            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+            if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(contactStatusIcon(entry.getBareJid()));
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(contactAvatar(bareJid));
@@ -162,17 +162,13 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 }
             }
         } else if (item->type() == ChatRosterItem::Room) {
-            if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-                return contactName(bareJid);
-            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+            if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(":/chat.png");
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatroom_") + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
-            if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-                return bareJid.split("/")[1];
-            } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+            if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatuser_") + bareJid.toLower();
             }
         }
