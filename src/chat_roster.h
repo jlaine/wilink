@@ -47,6 +47,7 @@ public:
     QString contactName(const QString &bareJid) const;
 
     void addPendingMessage(const QString &bareJid);
+    void addRoom(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
 
 public slots:
@@ -54,6 +55,7 @@ public slots:
 
 protected slots:
     void presenceChanged(const QString& bareJid, const QString& resource);
+    void presenceReceived(const QXmppPresence &presence);
     void rosterChanged(const QString &jid);
     void rosterReceived();
     void vCardReceived(const QXmppVCard&);

@@ -596,8 +596,8 @@ ChatRoom *Chat::room(const QString &jid)
 {
     if (!chatRooms.contains(jid))
     {
-        roomsModel->addRoom(jid);
-        roomsView->show();
+        rosterModel->addRoom(jid);
+        //roomsView->show();
 
         chatRooms[jid] = new ChatRoom(jid);
         chatRooms[jid]->setLocalName(ownName);

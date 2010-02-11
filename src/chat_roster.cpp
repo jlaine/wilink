@@ -45,6 +45,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
@@ -123,27 +124,38 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     QString bareJid = item->id();
-    const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
-    if (role == Qt::UserRole) {
-        return bareJid;
-    } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-        return contactName(bareJid);
-    } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-        return QIcon(contactStatusIcon(entry.getBareJid()));
-    } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-        return QIcon(contactAvatar(bareJid));
-    } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-        return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
-    } else if(role == Qt::FontRole && index.column() == ContactColumn) {
-        if (pendingMessages.contains(bareJid))
-            return QFont("", -1, QFont::Bold, true);
-    } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
-        if (pendingMessages.contains(bareJid)) {
-            QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
-            grad.setColorAt(0, QColor(255, 0, 0, 144));
-            grad.setColorAt(1, Qt::transparent);
-            grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-            return QBrush(grad);
+    if (item->type() == ChatRosterItem::Contact)
+    {
+        const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
+        if (role == Qt::UserRole) {
+            return bareJid;
+        } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+            return contactName(bareJid);
+        } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+            return QIcon(contactStatusIcon(entry.getBareJid()));
+        } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+            return QIcon(contactAvatar(bareJid));
+        } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+            return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
+        } else if(role == Qt::FontRole && index.column() == ContactColumn) {
+            if (pendingMessages.contains(bareJid))
+                return QFont("", -1, QFont::Bold, true);
+        } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
+            if (pendingMessages.contains(bareJid)) {
+                QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
+                grad.setColorAt(0, QColor(255, 0, 0, 144));
+                grad.setColorAt(1, Qt::transparent);
+                grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+                return QBrush(grad);
+            }
+        }
+    } else if (item->type() == ChatRosterItem::Room) {
+        if (role == Qt::UserRole) {
+            return bareJid;
+        } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+            return bareJid;
+        } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+            return QIcon(":/chat.png");
         }
     }
     return QVariant();
@@ -193,6 +205,29 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
     if (item)
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
+}
+
+void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
+{
+    const QString jid = presence.getFrom();
+    const QString roomJid = jid.split("/")[0];
+    ChatRosterItem *roomItem = rootItem->find(roomJid);
+    if (!roomItem || roomItem->type() != ChatRosterItem::Room)
+        return;
+
+    ChatRosterItem *memberItem = roomItem->find(jid);
+    if (presence.getType() == QXmppPresence::Available && !memberItem)
+    {
+        beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
+        roomItem->append(new ChatRosterItem(ChatRosterItem::RoomMember, jid));
+        endInsertRows();
+    }
+    else if (presence.getType() == QXmppPresence::Unavailable && memberItem)
+    {
+        beginRemoveRows(createIndex(roomItem->row(), 0, roomItem), memberItem->row(), memberItem->row());
+        roomItem->remove(memberItem);
+        endRemoveRows();
+    }
 }
 
 void ChatRosterModel::rosterChanged(const QString &jid)
@@ -273,6 +308,23 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
+}
+
+void ChatRosterModel::addRoom(const QString &bareJid)
+{
+    if (rootItem->contains(bareJid))
+        return;
+    beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+    rootItem->append(new ChatRosterItem(ChatRosterItem::Room, bareJid));
+    endInsertRows();
+
+#if 0
+    // discover room info
+    QXmppDiscoveryIq disco;
+    disco.setTo(bareJid);
+    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    xmppClient->sendPacket(disco);
+#endif
 }
 
 void ChatRosterModel::clearPendingMessages(const QString &bareJid)
