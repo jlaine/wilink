@@ -17,11 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QStringList>
+
 #include "chat_roster_item.h"
 
 ChatRosterItem::ChatRosterItem(enum ChatRosterItem::Type type, const QString &id)
     : itemId(id), itemType(type), parentItem(0)
 {
+    QString name;
+    if (type == RoomMember)
+        name = id.split('/').last();
+    else
+        name = id.split('@').first();
+    setData(Qt::DisplayRole, name);
 }
 
 ChatRosterItem::~ChatRosterItem()

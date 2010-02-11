@@ -70,8 +70,9 @@ QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
 
 QString ChatRosterModel::contactName(const QString &bareJid) const
 {
-    if (rosterNames.contains(bareJid) && !rosterNames[bareJid].isEmpty())
-        return rosterNames[bareJid];
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+        return item->data(Qt::DisplayRole).toString();
     return bareJid.split("@").first();
 }
 
@@ -302,7 +303,8 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
     {
         const QImage &image = vcard.getPhotoAsImage();
         rosterAvatars[bareJid] = QPixmap::fromImage(image);
-        rosterNames[bareJid] = vcard.getNickName();
+        if (!vcard.getNickName().isEmpty())
+            item->setData(Qt::DisplayRole, vcard.getNickName());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
