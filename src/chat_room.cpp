@@ -22,7 +22,6 @@
 #include <QLayout>
 #include <QListWidget>
 #include <QPushButton>
-#include <QSplitter>
 
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
@@ -32,43 +31,8 @@
 #include "chat_room.h"
 
 ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
-    : QWidget(parent), chatRemoteJid(jid)
+    : ChatDialog(jid, parent)
 {
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-
-    /* status bar */
-    QHBoxLayout *hbox = new QHBoxLayout;
-    nameLabel = new QLabel(chatRemoteJid);
-    hbox->addSpacing(16);
-    hbox->addWidget(nameLabel);
-    hbox->addStretch();
-    QLabel *iconLabel = new QLabel();
-    iconLabel->setPixmap(QPixmap(":/chat.png"));
-    hbox->addWidget(iconLabel);
-    QPushButton *button = new QPushButton;
-    button->setFlat(true);
-    button->setIcon(QIcon(":/remove.png"));
-    connect(button, SIGNAL(clicked()), this, SLOT(slotLeave()));
-    hbox->addWidget(button);
-    layout->addItem(hbox);
-
-    /* chat history */
-    chatHistory = new ChatHistory;
-    chatHistory->setMinimumWidth(300);
-    layout->addWidget(chatHistory);
-    layout->setStretch(1, 1);
-
-    /* text edit */
-    chatInput = new ChatEdit(80);
-    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
-    layout->addSpacing(10);
-    layout->addWidget(chatInput);
-
-    setFocusProxy(chatInput);
-    setLayout(layout);
-    setMinimumWidth(300);
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -102,11 +66,6 @@ void ChatRoom::send()
     emit sendMessage(msg);
 }
 
-void ChatRoom::setLocalName(const QString &name)
-{
-    chatLocalName = name;
-}
-
 void ChatRoom::setRoomName(const QString &name)
 {
     nameLabel->setText(QString("<b>%1</b><br/>%2")
@@ -114,7 +73,3 @@ void ChatRoom::setRoomName(const QString &name)
         .arg(chatRemoteJid));
 }
 
-void ChatRoom::slotLeave()
-{
-    emit leave(chatRemoteJid);
-}

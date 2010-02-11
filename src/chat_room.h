@@ -20,6 +20,7 @@
 #ifndef __WDESKTOP_CHAT_ROOM_H__
 #define __WDESKTOP_CHAT_ROOM_H__
 
+#include "chat_dialog.h"
 #include <QWidget>
 
 class ChatEdit;
@@ -27,13 +28,12 @@ class ChatHistory;
 class QLabel;
 class QXmppMessage;
 
-class ChatRoom : public QWidget
+class ChatRoom : public ChatDialog
 {
     Q_OBJECT
 
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
-    void setLocalName(const QString &name);
     void setRoomName(const QString &name);
 
 public slots:
@@ -41,19 +41,9 @@ public slots:
 
 protected slots:
     void send();
-    void slotLeave();
 
 signals:
-    void leave(const QString &jid);
     void sendMessage(const QXmppMessage &message);
-
-private:
-    ChatHistory *chatHistory;
-    ChatEdit *chatInput;
-    QLabel *nameLabel;
-
-    QString chatLocalName;
-    QString chatRemoteJid;
 };
 
 #endif

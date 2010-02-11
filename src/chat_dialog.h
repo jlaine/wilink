@@ -40,7 +40,7 @@ public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
-    void setRemoteAvatar(const QPixmap &avatar);
+    void setRemotePixmap(const QPixmap &avatar);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
@@ -49,15 +49,17 @@ public slots:
 protected slots:
     void newLine();
     void send();
+    void slotLeave();
 
 signals:
+    void leave(const QString &jid);
     void sendMessage(const QXmppMessage &message);
 
-private:
-    QLabel *avatarLabel;
-    QLabel *nameLabel;
+protected:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
+    QLabel *iconLabel;
+    QLabel *nameLabel;
 
     QString chatLocalName;
     QString chatRemoteJid;

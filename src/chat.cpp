@@ -251,6 +251,7 @@ void Chat::chatRoom(const QString &jid)
         dialog = chatRooms[jid] = new ChatRoom(jid);
         dialog->setLocalName(ownName);
         dialog->setRoomName(rosterModel->roomName(jid));
+        dialog->setRemotePixmap(QPixmap(":/chat.png"));
         connect(dialog, SIGNAL(leave(const QString&)),
             this, SLOT(leaveRoom(const QString&)));
         connect(dialog, SIGNAL(sendMessage(const QXmppMessage&)),
@@ -300,8 +301,8 @@ ChatDialog *Chat::conversation(const QString &jid)
     {
         chatDialogs[jid] = new ChatDialog(jid);
         chatDialogs[jid]->setLocalName(ownName);
-        chatDialogs[jid]->setRemoteAvatar(rosterModel->contactAvatar(jid));
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
+        chatDialogs[jid]->setRemotePixmap(rosterModel->contactAvatar(jid));
         connect(chatDialogs[jid], SIGNAL(sendMessage(const QXmppMessage&)),
             this, SLOT(sendMessage(const QXmppMessage&)));
         conversationPanel->addWidget(chatDialogs[jid]);

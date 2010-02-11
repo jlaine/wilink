@@ -54,8 +54,13 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
     hbox->addSpacing(16);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
-    avatarLabel = new QLabel;
-    hbox->addWidget(avatarLabel);
+    iconLabel = new QLabel;
+    hbox->addWidget(iconLabel);
+    QPushButton *button = new QPushButton;
+    button->setFlat(true);
+    button->setIcon(QIcon(":/remove.png"));
+    connect(button, SIGNAL(clicked()), this, SLOT(slotLeave()));
+    hbox->addWidget(button);
     layout->addItem(hbox);
 
     /* chat history */
@@ -134,9 +139,9 @@ void ChatDialog::setLocalName(const QString &name)
     chatLocalName = name;
 }
 
-void ChatDialog::setRemoteAvatar(const QPixmap &avatar)
+void ChatDialog::setRemotePixmap(const QPixmap &avatar)
 {
-    avatarLabel->setPixmap(avatar);
+    iconLabel->setPixmap(avatar);
 }
 
 void ChatDialog::setRemoteName(const QString &name)
@@ -147,3 +152,7 @@ void ChatDialog::setRemoteName(const QString &name)
         .arg(chatRemoteJid));
 }
 
+void ChatDialog::slotLeave()
+{
+    emit leave(chatRemoteJid);
+}
