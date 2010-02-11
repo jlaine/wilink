@@ -90,9 +90,8 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 signals:
-    void contactActivated(const QString &jid);
-    void roomActivated(const QString &jid);
-    void leaveConversation(const QString &jid);
+    void joinConversation(const QString &jid, bool isRoom);
+    void leaveConversation(const QString &jid, bool isRoom);
     void removeContact(const QString &jid);
 
 protected slots:

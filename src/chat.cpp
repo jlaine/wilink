@@ -73,10 +73,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* left panel */
     rosterView = new ChatRosterView(rosterModel);
-    connect(rosterView, SIGNAL(contactActivated(const QString&)), this, SLOT(chatContact(const QString&)));
+    connect(rosterView, SIGNAL(joinConversation(const QString&, bool)), this, SLOT(joinConversation(const QString&, bool)));
+    connect(rosterView, SIGNAL(leaveConversation(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
-    connect(rosterView, SIGNAL(roomActivated(const QString&)), this, SLOT(chatRoom(const QString&)));
-    connect(rosterView, SIGNAL(leaveConversation(const QString&)), this, SLOT(leaveConversation(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
@@ -202,7 +201,7 @@ void Chat::addRoom()
     if (!jid.contains("@"))
         jid = jid + "@" + chatRoomServer;
 
-    chatRoom(jid);
+    joinConversation(jid, true);
 }
 
 void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -229,29 +228,6 @@ void Chat::changeEvent(QEvent *event)
         if (widget)
             widget->setFocus();
     }
-}
-
-void Chat::chatContact(const QString &jid)
-{
-    if (!chatDialogs.contains(jid))
-        createConversation(jid, false);
-
-    ChatDialog *dialog = chatDialogs.value(jid);
-    rosterModel->clearPendingMessages(jid);
-    rosterView->selectContact(jid);
-    conversationPanel->setCurrentWidget(dialog);
-    dialog->setFocus();
-}
-
-void Chat::chatRoom(const QString &jid)
-{
-    if (!chatDialogs.contains(jid))
-        createConversation(jid, true);
-
-    ChatDialog *dialog = chatDialogs.value(jid);
-    rosterView->selectContact(jid);
-    conversationPanel->setCurrentWidget(dialog);
-    dialog->setFocus();
 }
 
 void Chat::connected()
@@ -282,7 +258,7 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
 {
     ChatDialog *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
     dialog->setLocalName(ownName);
-    connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
+    connect(dialog, SIGNAL(leave(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
     connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
     conversationPanel->addWidget(dialog);
     conversationPanel->show();
@@ -409,14 +385,25 @@ void Chat::iqReceived(const QXmppIq&)
     timeoutTimer->stop();
 }
 
-void Chat::leaveConversation(const QString &jid)
+void Chat::joinConversation(const QString &jid, bool isRoom)
+{
+    if (!chatDialogs.contains(jid))
+        createConversation(jid, isRoom);
+
+    ChatDialog *dialog = chatDialogs.value(jid);
+    rosterModel->clearPendingMessages(jid);
+    rosterView->selectContact(jid);
+    conversationPanel->setCurrentWidget(dialog);
+    dialog->setFocus();
+}
+
+void Chat::leaveConversation(const QString &jid, bool isRoom)
 {
     if (!chatDialogs.contains(jid))
         return;
-    ChatDialog *dialog = chatDialogs.take(jid);
 
     // leave room
-    if (dialog->isRoom())
+    if (isRoom)
     {
         rosterModel->removeRoom(jid);
 
@@ -427,6 +414,7 @@ void Chat::leaveConversation(const QString &jid)
     }
 
     // close view
+    ChatDialog *dialog = chatDialogs.take(jid);
     if (conversationPanel->count() == 1)
         conversationPanel->hide();
     dialog->deleteLater();
