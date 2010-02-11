@@ -40,9 +40,6 @@ public slots:
 
 protected slots:
     void send();
-
-signals:
-    void sendMessage(const QXmppMessage &message);
 };
 
 #endif
