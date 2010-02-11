@@ -22,6 +22,7 @@
 
 #include <QAbstractItemModel>
 #include <QTableView>
+#include <QTreeView>
 
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppVCard.h"
@@ -76,7 +77,7 @@ private:
     ChatRosterItem *rootItem;
 };
 
-class ChatRosterView : public QTableView
+class ChatRosterView : public QTreeView
 {
     Q_OBJECT
 
@@ -87,6 +88,7 @@ public:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+    void resizeEvent(QResizeEvent *e);
 
 signals:
     void contactActivated(const QString &jid);

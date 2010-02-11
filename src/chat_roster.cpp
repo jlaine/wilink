@@ -19,7 +19,6 @@
 
 #include <QContextMenuEvent>
 #include <QDebug>
-#include <QHeaderView>
 #include <QList>
 #include <QMenu>
 #include <QPainter>
@@ -370,7 +369,7 @@ QString ChatRosterModel::roomName(const QString &bareJid) const
 }
 
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
-    : QTableView(parent)
+    : QTreeView(parent)
 {
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(model);
@@ -385,16 +384,13 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setColumnHidden(SortingColumn, true);
     setColumnWidth(ImageColumn, 40);
     setContextMenuPolicy(Qt::DefaultContextMenu);
+    setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setMinimumWidth(200);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
-    setShowGrid(false);
     setSortingEnabled(true);
     sortByColumn(SortingColumn, Qt::AscendingOrder);
-    horizontalHeader()->setResizeMode(ContactColumn, QHeaderView::Stretch);
-    horizontalHeader()->setVisible(false);
-    verticalHeader()->setVisible(false);
 }
 
 void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
@@ -418,6 +414,12 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     }
 }
 
+void ChatRosterView::resizeEvent(QResizeEvent *e)
+{
+    QTreeView::resizeEvent(e);
+    setColumnWidth(ContactColumn, e->size().width() - 40);
+}
+
 void ChatRosterView::selectContact(const QString &jid)
 {
     for (int i = 0; i < model()->rowCount(); i++)
@@ -435,7 +437,7 @@ void ChatRosterView::selectContact(const QString &jid)
 QSize ChatRosterView::sizeHint () const
 {
     if (!model()->rowCount())
-        return QTableView::sizeHint();
+        return QTreeView::sizeHint();
 
     QSize hint(64, 0);
     hint.setHeight(model()->rowCount() * sizeHintForRow(0));
