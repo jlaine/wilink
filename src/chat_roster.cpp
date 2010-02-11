@@ -163,7 +163,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         } else if (item->type() == ChatRosterItem::Room) {
             if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-                return roomName(bareJid);
+                return contactName(bareJid);
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(":/chat.png");
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
@@ -367,11 +367,6 @@ void ChatRosterModel::removeRoom(const QString &bareJid)
         rootItem->remove(roomItem);
         endRemoveRows();
     }
-}
-
-QString ChatRosterModel::roomName(const QString &bareJid) const
-{
-    return bareJid.split('@').first();
 }
 
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)

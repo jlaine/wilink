@@ -258,6 +258,7 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
 {
     ChatDialog *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
     dialog->setLocalName(ownName);
+    dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
     connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
     conversationPanel->addWidget(dialog);
@@ -266,7 +267,6 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
 
     if (room)
     {
-        dialog->setRemoteName(rosterModel->roomName(jid));
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
 
         // join room
@@ -276,7 +276,6 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
         packet.setType(QXmppPresence::Available);
         client->sendPacket(packet);
     } else {
-        dialog->setRemoteName(rosterModel->contactName(jid));
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
 
         // list archives for the past week
