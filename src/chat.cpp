@@ -67,7 +67,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 {
     client = new QXmppClient(this);
     rosterModel =  new ChatRosterModel(client);
-    roomsModel =  new ChatRoomsModel(client);
 
     /* build splitter */
     splitter = new QSplitter;
@@ -382,7 +381,7 @@ void Chat::leaveRoom(const QString &jid)
         conversationPanel->hide();
 
     // remove from list
-    roomsModel->removeRoom(jid);
+    rosterModel->removeRoom(jid);
 
     // leave room
     QXmppPresence packet;
@@ -586,7 +585,7 @@ ChatRoom *Chat::room(const QString &jid)
 
         chatRooms[jid] = new ChatRoom(jid);
         chatRooms[jid]->setLocalName(ownName);
-        chatRooms[jid]->setRoomName(roomsModel->roomName(jid));
+        chatRooms[jid]->setRoomName(rosterModel->roomName(jid));
         connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
             this, SLOT(sendMessage(const QXmppMessage&)));
         conversationPanel->addWidget(chatRooms[jid]);

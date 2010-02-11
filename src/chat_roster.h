@@ -45,9 +45,12 @@ public:
 
     QPixmap contactAvatar(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
+    QString roomName(const QString &bareJid) const;
+
+    void addRoom(const QString &bareJid);
+    void removeRoom(const QString &bareJid);
 
     void addPendingMessage(const QString &bareJid);
-    void addRoom(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
 
 public slots:

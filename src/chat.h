@@ -27,8 +27,6 @@
 
 class ChatDialog;
 class ChatRoom;
-class ChatRoomsModel;
-class ChatRoomsView;
 class ChatRosterModel;
 class ChatRosterView;
 class QLabel;
@@ -87,9 +85,6 @@ private:
 
     ChatRosterModel *rosterModel;
     ChatRosterView *rosterView;
-
-    ChatRoomsModel *roomsModel;
-    ChatRoomsView *roomsView;
 
     QSplitter *splitter;
     QLabel *statusIconLabel;
