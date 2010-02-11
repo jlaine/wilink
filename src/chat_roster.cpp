@@ -389,6 +389,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setMinimumWidth(200);
+    setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSortingEnabled(true);
