@@ -41,7 +41,7 @@ enum RosterColumns {
     MaxColumn,
 };
 
-RosterModel::RosterModel(QXmppClient *xmppClient)
+ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
     rootItem = new ChatRosterItem("");
@@ -51,26 +51,26 @@ RosterModel::RosterModel(QXmppClient *xmppClient)
     connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
-int RosterModel::columnCount(const QModelIndex &parent) const
+int ChatRosterModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
 }
 
-QPixmap RosterModel::contactAvatar(const QString &bareJid) const
+QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
 {
     if (rosterAvatars.contains(bareJid))
         return rosterAvatars[bareJid];
     return QPixmap();
 }
 
-QString RosterModel::contactName(const QString &bareJid) const
+QString ChatRosterModel::contactName(const QString &bareJid) const
 {
     if (rosterNames.contains(bareJid) && !rosterNames[bareJid].isEmpty())
         return rosterNames[bareJid];
     return bareJid.split("@").first();
 }
 
-QString RosterModel::contactStatus(const QString &bareJid) const
+QString ChatRosterModel::contactStatus(const QString &bareJid) const
 {
     QMap<QString, QXmppPresence> presences = client->getRoster().getAllPresencesForBareJid(bareJid);
     if(presences.isEmpty())
@@ -84,7 +84,7 @@ QString RosterModel::contactStatus(const QString &bareJid) const
     return "busy";
 }
 
-QPixmap RosterModel::contactStatusIcon(const QString &bareJid) const
+QPixmap ChatRosterModel::contactStatusIcon(const QString &bareJid) const
 {
     QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
 
@@ -116,7 +116,7 @@ QPixmap RosterModel::contactStatusIcon(const QString &bareJid) const
     return icon;
 }
 
-QVariant RosterModel::data(const QModelIndex &index, int role) const
+QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 {
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -149,13 +149,13 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void RosterModel::disconnected()
+void ChatRosterModel::disconnected()
 {
     rootItem->clear();
     reset();
 }
 
-QModelIndex RosterModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex ChatRosterModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
@@ -173,7 +173,7 @@ QModelIndex RosterModel::index(int row, int column, const QModelIndex &parent) c
         return QModelIndex();
 }
 
-QModelIndex RosterModel::parent(const QModelIndex & index) const
+QModelIndex ChatRosterModel::parent(const QModelIndex & index) const
 {
     if (!index.isValid())
         return QModelIndex();
@@ -187,7 +187,7 @@ QModelIndex RosterModel::parent(const QModelIndex & index) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
-void RosterModel::presenceChanged(const QString& bareJid, const QString& resource)
+void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& resource)
 {
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
@@ -195,7 +195,7 @@ void RosterModel::presenceChanged(const QString& bareJid, const QString& resourc
                          createIndex(item->row(), SortingColumn, item));
 }
 
-void RosterModel::rosterChanged(const QString &jid)
+void ChatRosterModel::rosterChanged(const QString &jid)
 {
     ChatRosterItem *item = rootItem->find(jid);
     if (item)
@@ -221,7 +221,7 @@ void RosterModel::rosterChanged(const QString &jid)
         client->getVCardManager().requestVCard(jid);
 }
 
-void RosterModel::rosterReceived()
+void ChatRosterModel::rosterReceived()
 {
     rootItem->clear();
     foreach (const QString &jid, client->getRoster().getRosterBareJids())
@@ -235,7 +235,7 @@ void RosterModel::rosterReceived()
     reset();
 }
 
-int RosterModel::rowCount(const QModelIndex &parent) const
+int ChatRosterModel::rowCount(const QModelIndex &parent) const
 {
     ChatRosterItem *parentItem;
     if (!parent.isValid())
@@ -245,7 +245,7 @@ int RosterModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-void RosterModel::vCardReceived(const QXmppVCard& vcard)
+void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
 {
     const QString bareJid = vcard.getFrom();
     ChatRosterItem *item = rootItem->find(bareJid);
@@ -260,7 +260,7 @@ void RosterModel::vCardReceived(const QXmppVCard& vcard)
     }
 }
 
-void RosterModel::addPendingMessage(const QString &bareJid)
+void ChatRosterModel::addPendingMessage(const QString &bareJid)
 {
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
@@ -275,7 +275,7 @@ void RosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-void RosterModel::clearPendingMessages(const QString &bareJid)
+void ChatRosterModel::clearPendingMessages(const QString &bareJid)
 {
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
@@ -286,7 +286,7 @@ void RosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
-RosterView::RosterView(RosterModel *model, QWidget *parent)
+ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     : QTableView(parent)
 {
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
@@ -321,7 +321,7 @@ RosterView::RosterView(RosterModel *model, QWidget *parent)
     verticalHeader()->setVisible(false);
 }
 
-void RosterView::contextMenuEvent(QContextMenuEvent *event)
+void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
 {
     const QModelIndex &index = currentIndex();
     if (!index.isValid())
@@ -330,7 +330,7 @@ void RosterView::contextMenuEvent(QContextMenuEvent *event)
     contextMenu->popup(event->globalPos());
 }
 
-void RosterView::selectContact(const QString &jid)
+void ChatRosterView::selectContact(const QString &jid)
 {
     for (int i = 0; i < model()->rowCount(); i++)
     {
@@ -344,7 +344,7 @@ void RosterView::selectContact(const QString &jid)
     setCurrentIndex(QModelIndex());
 }
 
-QSize RosterView::sizeHint () const
+QSize ChatRosterView::sizeHint () const
 {
     if (!model()->rowCount())
         return QTableView::sizeHint();
@@ -356,21 +356,21 @@ QSize RosterView::sizeHint () const
     return hint;
 }
 
-void RosterView::slotClicked()
+void ChatRosterView::slotClicked()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
         emit clicked(index.data(Qt::UserRole).toString());
 }
 
-void RosterView::slotDoubleClicked()
+void ChatRosterView::slotDoubleClicked()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
         emit doubleClicked(index.data(Qt::UserRole).toString());
 }
 
-void RosterView::slotRemoveContact()
+void ChatRosterView::slotRemoveContact()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())

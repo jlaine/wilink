@@ -66,7 +66,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
-    rosterModel =  new RosterModel(client);
+    rosterModel =  new ChatRosterModel(client);
     roomsModel =  new ChatRoomsModel(client);
 
     /* build splitter */
@@ -75,7 +75,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* left panel */
     QSplitter *leftSplitter = new QSplitter(Qt::Vertical);
-    rosterView = new RosterView(rosterModel);
+    rosterView = new ChatRosterView(rosterModel);
     connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));

@@ -31,12 +31,12 @@ class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
 
-class RosterModel : public QAbstractItemModel
+class ChatRosterModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    RosterModel(QXmppClient *client);
+    ChatRosterModel(QXmppClient *client);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -71,12 +71,12 @@ private:
     ChatRosterItem *rootItem;
 };
 
-class RosterView : public QTableView
+class ChatRosterView : public QTableView
 {
     Q_OBJECT
 
 public:
-    RosterView(RosterModel *model, QWidget *parent = NULL);
+    ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
     void selectContact(const QString &jid);
     QSize sizeHint() const;
 

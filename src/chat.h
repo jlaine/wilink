@@ -29,8 +29,8 @@ class ChatDialog;
 class ChatRoom;
 class ChatRoomsModel;
 class ChatRoomsView;
-class RosterModel;
-class RosterView;
+class ChatRosterModel;
+class ChatRosterView;
 class QLabel;
 class QPushButton;
 class QSplitter;
@@ -85,8 +85,8 @@ private:
     QXmppClient *client;
     QTimer *pingTimer;
 
-    RosterModel *rosterModel;
-    RosterView *rosterView;
+    ChatRosterModel *rosterModel;
+    ChatRosterView *rosterView;
 
     ChatRoomsModel *roomsModel;
     ChatRoomsView *roomsView;
