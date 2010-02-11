@@ -32,6 +32,7 @@
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "chat_roster.h"
+#include "chat_roster_item.h"
 
 enum RosterColumns {
     ContactColumn = 0,
@@ -43,6 +44,7 @@ enum RosterColumns {
 RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
     : rosterManager(roster), vcardManager(vcard)
 {
+    rootItem = new ChatRosterItem("");
     connect(rosterManager, SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(rosterManager, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(rosterManager, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
@@ -116,11 +118,12 @@ QPixmap RosterModel::contactStatusIcon(const QString &bareJid) const
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() >= rosterKeys.size())
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
         return QVariant();
 
-    const QXmppRoster::QXmppRosterEntry &entry = rosterManager->getRosterEntry(rosterKeys.at(index.row()));
-    const QString bareJid = entry.getBareJid();
+    QString bareJid = item->id();
+    const QXmppRoster::QXmppRosterEntry &entry = rosterManager->getRosterEntry(bareJid);
     if (role == Qt::UserRole) {
         return bareJid;
     } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
@@ -148,34 +151,54 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
 
 void RosterModel::disconnected()
 {
-    rosterKeys.clear();
+    rootItem->clear();
     reset();
+}
+
+QModelIndex RosterModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    ChatRosterItem *parentItem;
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
+
+    ChatRosterItem *childItem = parentItem->child(row);
+    if (childItem)
+        return createIndex(row, column, childItem);
+    else
+        return QModelIndex();
 }
 
 void RosterModel::presenceChanged(const QString& bareJid, const QString& resource)
 {
-    const int rowIndex = rosterKeys.indexOf(bareJid);
-    if (rowIndex >= 0)
-        emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+        emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                         createIndex(item->row(), SortingColumn, item));
 }
 
 void RosterModel::rosterChanged(const QString &jid)
 {
     QXmppRoster::QXmppRosterEntry entry = rosterManager->getRosterEntry(jid);
-    const int rowIndex = rosterKeys.indexOf(jid);
-    if (rowIndex >= 0)
+    ChatRosterItem *item = rootItem->find(jid);
+    if (item)
     {
         if (static_cast<int>(entry.getSubscriptionType()) == static_cast<int>(QXmppRosterIq::Item::Remove))
         {
-            beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
-            rosterKeys.removeAt(rowIndex);
+            beginRemoveRows(QModelIndex(), item->row(), item->row());
+            rootItem->remove(item);
             endRemoveRows();
         } else {
-            emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+            emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                             createIndex(item->row(), SortingColumn, item));
         }
     } else {
-        beginInsertRows(QModelIndex(), rosterKeys.size(), rosterKeys.size());
-        rosterKeys.append(jid);
+        beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+        rootItem->append(new ChatRosterItem(jid));
         endInsertRows();
     }
 
@@ -186,9 +209,11 @@ void RosterModel::rosterChanged(const QString &jid)
 
 void RosterModel::rosterReceived()
 {
-    rosterKeys = rosterManager->getRosterBareJids();
-    foreach (const QString &jid, rosterKeys)
+    rootItem->clear();
+    foreach (const QString &jid, rosterManager->getRosterBareJids())
     {
+        rootItem->append(new ChatRosterItem(jid));
+
         // fetch vCard
         if (!rosterAvatars.contains(jid))
             vcardManager->requestVCard(jid);
@@ -198,38 +223,53 @@ void RosterModel::rosterReceived()
 
 int RosterModel::rowCount(const QModelIndex &parent) const
 {
-    return rosterKeys.size();
+    ChatRosterItem *parentItem;
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
+    return parentItem->size();
 }
 
 void RosterModel::vCardReceived(const QXmppVCard& vcard)
 {
     const QString bareJid = vcard.getFrom();
-    const int rowIndex = rosterKeys.indexOf(bareJid);
-    if (rowIndex >= 0)
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
     {
         const QImage &image = vcard.getPhotoAsImage();
         rosterAvatars[bareJid] = QPixmap::fromImage(image);
-        const QString &nickname = vcard.getNickName();
         rosterNames[bareJid] = vcard.getNickName();
-        emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+
+        emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                         createIndex(item->row(), SortingColumn, item));
     }
 }
 
 void RosterModel::addPendingMessage(const QString &bareJid)
 {
-    if (pendingMessages.contains(bareJid))
-        pendingMessages[bareJid]++;
-    else
-        pendingMessages[bareJid] = 1;
-    const int rowIndex = rosterKeys.indexOf(bareJid);
-    emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+    {
+        if (pendingMessages.contains(bareJid))
+            pendingMessages[bareJid]++;
+        else
+            pendingMessages[bareJid] = 1;
+
+        emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                         createIndex(item->row(), SortingColumn, item));
+    }
 }
 
 void RosterModel::clearPendingMessages(const QString &bareJid)
 {
-    pendingMessages.remove(bareJid);
-    const int rowIndex = rosterKeys.indexOf(bareJid);
-    emit dataChanged(index(rowIndex, ContactColumn), index(rowIndex, SortingColumn));
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+    {
+        pendingMessages.remove(bareJid);
+        emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                         createIndex(item->row(), SortingColumn, item));
+    }
 }
 
 RosterView::RosterView(RosterModel *model, QWidget *parent)

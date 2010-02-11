@@ -26,6 +26,7 @@
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppVCard.h"
 
+class ChatRosterItem;
 class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
@@ -38,6 +39,7 @@ public:
     RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     QPixmap contactAvatar(const QString &bareJid) const;
@@ -62,10 +64,11 @@ private:
 private:
     QXmppRoster *rosterManager;
     QXmppVCardManager *vcardManager;
-    QStringList rosterKeys;
     QMap<QString, QPixmap> rosterAvatars;
     QMap<QString, QString> rosterNames;
     QMap<QString, int> pendingMessages;
+
+    ChatRosterItem *rootItem;
 };
 
 class RosterView : public QTableView

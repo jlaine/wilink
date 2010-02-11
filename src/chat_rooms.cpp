@@ -34,7 +34,7 @@ enum RoomsColumns {
 ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
     : xmppClient(client)
 {
-    rootItem = new ChatRosterItem(NULL);
+    rootItem = new ChatRosterItem("");
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
 }
@@ -63,10 +63,10 @@ int ChatRoomsModel::columnCount(const QModelIndex &parent) const
 
 QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid())
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
         return QVariant();
 
-    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     QString jid = item->id();
     if (role == Qt::UserRole) {
         return jid;
@@ -168,15 +168,11 @@ QString ChatRoomsModel::roomName(const QString &bareJid) const
 
 int ChatRoomsModel::rowCount(const QModelIndex &parent) const
 {
-    if (parent.column() > 0)
-        return 0;
-
     ChatRosterItem *parentItem;
     if (!parent.isValid())
         parentItem = rootItem;
     else
         parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
-
     return parentItem->size();
 }
 

@@ -31,6 +31,7 @@ public:
 
     void append(ChatRosterItem *item);
     ChatRosterItem *child(int row);
+    void clear();
     bool contains(const QString &id) const;
     ChatRosterItem* find(const QString &id);
     QString id() const;

@@ -49,6 +49,13 @@ ChatRosterItem *ChatRosterItem::child(int row)
         return 0;
 }
 
+void ChatRosterItem::clear()
+{
+    foreach (ChatRosterItem *item, childItems)
+        delete item;
+    childItems.clear();
+}
+
 bool ChatRosterItem::contains(const QString &id) const
 {
     foreach (const ChatRosterItem *item, childItems)
