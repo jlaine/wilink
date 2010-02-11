@@ -180,6 +180,12 @@ void Chat::addContact()
  */
 void Chat::addRoom()
 {
+    // get rooms
+    QXmppDiscoveryIq disco;
+    disco.setTo(chatRoomServer);
+    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    client->sendPacket(disco);
+
     bool ok = true;
     QString jid;
     while (jid.isEmpty())
@@ -235,9 +241,29 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::chatRoom(const QString &jid)
 {
-    ChatRoom *dialog = room(jid);
-    rosterView->selectContact(jid);
+    ChatRoom *dialog;
+    if (chatRooms.contains(jid))
+        dialog = chatRooms.value(jid);
+    else
+    {
+        rosterModel->addRoom(jid);
 
+        dialog = chatRooms[jid] = new ChatRoom(jid);
+        dialog->setLocalName(ownName);
+        dialog->setRoomName(rosterModel->roomName(jid));
+        connect(dialog, SIGNAL(sendMessage(const QXmppMessage&)),
+            this, SLOT(sendMessage(const QXmppMessage&)));
+        conversationPanel->addWidget(dialog);
+        conversationPanel->show();
+
+        // join room
+        QXmppPresence packet;
+        packet.setTo(jid + "/" + ownName);
+        packet.setType(QXmppPresence::Available);
+        client->sendPacket(packet);
+    }
+
+    rosterView->selectContact(jid);
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
 }
@@ -354,6 +380,17 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
                 roomButton->setEnabled(true);
                 qDebug() << "Found chat room server" << chatRoomServer;
             }
+        }
+    }
+    else if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
+        disco.getFrom() == chatRoomServer)
+    {
+        // chat rooms list
+        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        {
+            qDebug() << " *" << item.type();
+            foreach (const QString &attr, item.attributes())
+                qDebug() << "   -" << attr << ":" << item.attribute(attr);
         }
     }
 }
@@ -577,29 +614,6 @@ void Chat::resizeContacts()
     }
 
     resize(hint.expandedTo(size()));
-}
-
-ChatRoom *Chat::room(const QString &jid)
-{
-    if (!chatRooms.contains(jid))
-    {
-        rosterModel->addRoom(jid);
-
-        chatRooms[jid] = new ChatRoom(jid);
-        chatRooms[jid]->setLocalName(ownName);
-        chatRooms[jid]->setRoomName(rosterModel->roomName(jid));
-        connect(chatRooms[jid], SIGNAL(sendMessage(const QXmppMessage&)),
-            this, SLOT(sendMessage(const QXmppMessage&)));
-        conversationPanel->addWidget(chatRooms[jid]);
-        conversationPanel->show();
-
-        // join room
-        QXmppPresence packet;
-        packet.setTo(jid + "/" + ownName);
-        packet.setType(QXmppPresence::Available);
-        client->sendPacket(packet);
-    }
-    return chatRooms[jid];
 }
 
 /** Send a chat message to the specified recipient.
