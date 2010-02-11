@@ -17,13 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QContextMenuEvent>
-#include <QDebug>
-#include <QEvent>
 #include <QDateTime>
 #include <QLabel>
 #include <QLayout>
-#include <QLineEdit>
 #include <QList>
 #include <QMessageBox>
 #include <QPushButton>
