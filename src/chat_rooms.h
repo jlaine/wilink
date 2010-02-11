@@ -30,6 +30,28 @@ class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;
 
+class ChatRoomsItem
+{
+public:
+    ChatRoomsItem(const QString &id);
+    ~ChatRoomsItem();
+
+    void append(ChatRoomsItem *item);
+    ChatRoomsItem *child(int row);
+    bool contains(const QString &id) const;
+    ChatRoomsItem* find(const QString &id);
+    QString id() const;
+    ChatRoomsItem* parent();
+    void remove(ChatRoomsItem *item);
+    int row() const;
+    int size() const;
+
+private:
+    QString itemId;
+    QList <ChatRoomsItem*> childItems;
+    ChatRoomsItem *parentItem;
+};
+
 class ChatRoomsModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -52,9 +74,8 @@ protected slots:
     void presenceReceived(const QXmppPresence &presence);
 
 private:
+    ChatRoomsItem *rootItem;
     QXmppClient *xmppClient;
-    QStringList roomKeys;
-    QMap<QString, QStringList> roomParticipants;
 };
 
 class ChatRoomsView : public QTreeView

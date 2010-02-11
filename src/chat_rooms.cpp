@@ -30,20 +30,100 @@ enum RoomsColumns {
     MaxColumn,
 };
 
+ChatRoomsItem::ChatRoomsItem(const QString &id)
+    : itemId(id), parentItem(0)
+{
+}
+
+ChatRoomsItem::~ChatRoomsItem()
+{
+    foreach (ChatRoomsItem *item, childItems)
+        delete item;
+}
+
+void ChatRoomsItem::append(ChatRoomsItem *item)
+{
+    if (item->parentItem)
+    {
+        qWarning("item already has a parent");
+        return;
+    }
+    item->parentItem = this;
+    childItems.append(item);
+}
+
+ChatRoomsItem *ChatRoomsItem::child(int row)
+{
+    if (row >= 0 && row < childItems.size())
+        return childItems.at(row);
+    else
+        return 0;
+}
+
+bool ChatRoomsItem::contains(const QString &id) const
+{
+    foreach (const ChatRoomsItem *item, childItems)
+    {
+        if (item->id() == id)
+            return true;
+    }
+    return false;
+}
+
+ChatRoomsItem *ChatRoomsItem::find(const QString &id)
+{
+    foreach (ChatRoomsItem *item, childItems)
+        if (item->itemId == id)
+            return item;
+    return 0;
+}
+
+QString ChatRoomsItem::id() const
+{
+    return itemId;
+}
+
+ChatRoomsItem* ChatRoomsItem::parent()
+{
+    return parentItem;
+}
+
+void ChatRoomsItem::remove(ChatRoomsItem *child)
+{
+    if (childItems.contains(child))
+    {
+        childItems.removeAll(child);
+        delete child;
+    }
+}
+
+int ChatRoomsItem::row() const
+{
+    if (parentItem)
+        return parentItem->childItems.indexOf(const_cast<ChatRoomsItem*>(this));
+
+    return 0;
+}
+
+int ChatRoomsItem::size() const
+{
+    return childItems.size();
+}
+
 ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
     : xmppClient(client)
 {
+    rootItem = new ChatRoomsItem(NULL);
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
 }
 
 void ChatRoomsModel::addRoom(const QString &bareJid)
 {
-    if (roomKeys.contains(bareJid))
+    if (rootItem->contains(bareJid))
         return;
-    beginInsertRows(QModelIndex(), roomKeys.size(), roomKeys.size());
-    roomKeys.append(bareJid);
-    roomParticipants[bareJid] = QStringList();
+    beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+    rootItem->append(new ChatRoomsItem(bareJid));
     endInsertRows();
 
 #if 0
@@ -65,34 +145,18 @@ QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (index.internalId() > 0)
-    {
-        int id = index.internalId() - 1;
-        if (id >= roomKeys.size())
-            return QVariant();
-        const QString roomJid = roomKeys.at(id);
-
-        if (index.row() >= roomParticipants[roomJid].size())
-            return QVariant();
-        const QString jid = roomParticipants[roomJid].at(index.row());
-
-        if (role == Qt::UserRole) {
-            return jid;
-        } else if (role == Qt::DisplayRole) {
+    ChatRoomsItem *item = static_cast<ChatRoomsItem*>(index.internalPointer());
+    QString jid = item->id();
+    if (role == Qt::UserRole) {
+        return jid;
+    } else if (role == Qt::DisplayRole) {
+        if (jid.contains("/"))
             return jid.split("/")[1];
-        }
-    } else {
-        if (index.row() >= roomKeys.size())
-            return QVariant();
-
-        const QString bareJid = roomKeys.at(index.row());
-        if (role == Qt::UserRole) {
-            return bareJid;
-        } else if (role == Qt::DisplayRole) {
-            return roomName(bareJid);
-        } else if (role == Qt::DecorationRole) {
+        else
+            return roomName(jid);
+    } else if (role == Qt::DecorationRole) {
+        if (!jid.contains("/"))
             return QIcon(":/chat.png");
-        }
     }
     return QVariant();
 }
@@ -115,20 +179,17 @@ QModelIndex ChatRoomsModel::index(int row, int column, const QModelIndex &parent
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
+    ChatRoomsItem *parentItem;
     if (!parent.isValid())
-    {
-        if (row < roomKeys.size())
-            return createIndex(row, column, 0);
-        else
-            return QModelIndex();
-    } else if (!parent.internalId()) {
-        QString jid = roomKeys.at(parent.row());
-        if (row < roomParticipants[jid].size())
-            return createIndex(row, column, 1 + parent.row());
-        else
-            return QModelIndex();
-    }
-    return QModelIndex();
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<ChatRoomsItem*>(parent.internalPointer());
+
+    ChatRoomsItem *childItem = parentItem->child(row);
+    if (childItem)
+        return createIndex(row, column, childItem);
+    else
+        return QModelIndex();
 }
 
 QModelIndex ChatRoomsModel::parent(const QModelIndex & index) const
@@ -136,49 +197,45 @@ QModelIndex ChatRoomsModel::parent(const QModelIndex & index) const
     if (!index.isValid())
         return QModelIndex();
 
-    if (index.internalId() > 0 && index.internalId() <= roomKeys.size())
-        return createIndex(index.internalId() - 1, index.column(), 0);
-    return QModelIndex();
+    ChatRoomsItem *childItem = static_cast<ChatRoomsItem*>(index.internalPointer());
+    ChatRoomsItem *parentItem = childItem->parent();
+
+    if (parentItem == rootItem)
+        return QModelIndex();
+
+    return createIndex(parentItem->row(), 0, parentItem);
 }
 
 void ChatRoomsModel::presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.getFrom();
     const QString roomJid = jid.split("/")[0];
-    int roomIndex = roomKeys.indexOf(roomJid);
-    if (roomIndex < 0)
+    ChatRoomsItem *roomItem = rootItem->find(roomJid);
+    if (!roomItem)
         return;
 
-    if (presence.getType() == QXmppPresence::Available)
+    ChatRoomsItem *memberItem = roomItem->find(jid);
+    if (presence.getType() == QXmppPresence::Available && !memberItem)
     {
-        int index = roomParticipants[roomJid].indexOf(jid);
-        if (index < 0)
-        {
-            beginInsertRows(createIndex(roomIndex, 0, 0), roomParticipants[roomJid].size(), roomParticipants[roomJid].size());
-            roomParticipants[roomJid].append(jid);
-            endInsertRows();
-        }
+        beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
+        roomItem->append(new ChatRoomsItem(jid));
+        endInsertRows();
     }
-    else if (presence.getType() == QXmppPresence::Unavailable)
+    else if (presence.getType() == QXmppPresence::Unavailable && memberItem)
     {
-        int index = roomParticipants[roomJid].indexOf(jid);
-        if (index >= 0)
-        {
-            beginRemoveRows(createIndex(roomIndex, 0, 0), index, index);
-            roomParticipants[roomJid].removeAt(index);
-            endRemoveRows();
-        }
+        beginRemoveRows(createIndex(roomItem->row(), 0, roomItem), memberItem->row(), memberItem->row());
+        roomItem->remove(memberItem);
+        endRemoveRows();
     }
 }
 
 void ChatRoomsModel::removeRoom(const QString &bareJid)
 {
-    int index = roomKeys.indexOf(bareJid);
-    if (index >= 0)
+    ChatRoomsItem *roomItem = rootItem->find(bareJid);
+    if (roomItem)
     {
-        beginRemoveRows(QModelIndex(), index, index);
-        roomKeys.removeAt(index);
-        roomParticipants.remove(bareJid);
+        beginRemoveRows(QModelIndex(), roomItem->row(), roomItem->row());
+        rootItem->remove(roomItem);
         endRemoveRows();
     }
 }
@@ -193,16 +250,13 @@ int ChatRoomsModel::rowCount(const QModelIndex &parent) const
     if (parent.column() > 0)
         return 0;
 
+    ChatRoomsItem *parentItem;
     if (!parent.isValid())
-    {
-        return roomKeys.size();
-    } else if (!parent.internalId()) {
-        const QString bareJid = roomKeys.at(parent.row());
-        Q_ASSERT(roomParticipants.contains(bareJid));
-        if (roomParticipants.contains(bareJid))
-            return roomParticipants[bareJid].size();
-    }
-    return 0;
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<ChatRoomsItem*>(parent.internalPointer());
+
+    return parentItem->size();
 }
 
 ChatRoomsView::ChatRoomsView(ChatRoomsModel *model, QWidget *parent)
