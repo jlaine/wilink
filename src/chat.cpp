@@ -51,7 +51,6 @@
 #include "chat.h"
 #include "chat_dialog.h"
 #include "chat_room.h"
-#include "chat_rooms.h"
 #include "chat_roster.h"
 
 #ifdef QT_MAC_USE_COCOA
