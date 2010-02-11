@@ -250,7 +250,7 @@ void Chat::chatRoom(const QString &jid)
 
         dialog = chatRooms[jid] = new ChatRoom(jid);
         dialog->setLocalName(ownName);
-        dialog->setRoomName(rosterModel->roomName(jid));
+        dialog->setRemoteName(rosterModel->roomName(jid));
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
         connect(dialog, SIGNAL(leave(const QString&)),
             this, SLOT(leaveRoom(const QString&)));

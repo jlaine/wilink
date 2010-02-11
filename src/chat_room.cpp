@@ -66,10 +66,3 @@ void ChatRoom::send()
     emit sendMessage(msg);
 }
 
-void ChatRoom::setRoomName(const QString &name)
-{
-    nameLabel->setText(QString("<b>%1</b><br/>%2")
-        .arg(name)
-        .arg(chatRemoteJid));
-}
-
