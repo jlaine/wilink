@@ -34,9 +34,7 @@ class ChatRoom : public ChatDialog
 
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
-
-public slots:
-    void messageReceived(const QXmppMessage &msg);
+    virtual void messageReceived(const QXmppMessage &msg);
 
 protected slots:
     void send();

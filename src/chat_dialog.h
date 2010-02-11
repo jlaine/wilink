@@ -38,13 +38,13 @@ class ChatDialog : public QWidget
 
 public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
+    virtual void messageReceived(const QXmppMessage &msg);
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
-    void messageReceived(const QXmppMessage &msg);
 
 protected slots:
     void newLine();
