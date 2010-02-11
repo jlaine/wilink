@@ -181,16 +181,18 @@ void Chat::addContact()
 void Chat::addRoom()
 {
     bool ok = true;
-    QString jid = "@" + chatRoomServer;
-    while (!jidValidator.exactMatch(jid))
+    QString jid;
+    while (jid.isEmpty())
     {
         jid = QInputDialog::getText(this, tr("Join a chat room"),
-            tr("Enter the address of the chat room you want to join."),
+            tr("Enter the name of the chat room you want to join."),
             QLineEdit::Normal, jid, &ok).toLower();
         if (!ok)
             return;
         jid = jid.trimmed().toLower();
     }
+    if (!jid.contains('@'))
+        jid = jid + chatRoomServer;
 
     chatRoom(jid);
 }

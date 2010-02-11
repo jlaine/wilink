@@ -48,8 +48,8 @@
         <translation>Rejoindre un salon de discussion</translation>
     </message>
     <message>
-        <source>Enter the address of the chat room you want to join.</source>
-        <translation>Saisissez l&apos;addresse du salon de discussion que vous souhaitez rejoindre.</translation>
+        <source>Enter the name of the chat room you want to join.</source>
+        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre.</translation>
     </message>
 </context>
 <context>
@@ -57,13 +57,6 @@
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>
-    </message>
-</context>
-<context>
-    <name>ChatRoomsView</name>
-    <message>
-        <source>Leave room</source>
-        <translation>Quiter le salon</translation>
     </message>
 </context>
 <context>
@@ -125,7 +118,7 @@
     </message>
 </context>
 <context>
-    <name>RosterView</name>
+    <name>ChatRosterView</name>
     <message>
         <source>Start chat</source>
         <translation>Démarrer conversation</translation>
@@ -133,6 +126,10 @@
     <message>
         <source>Remove contact</source>
         <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Leave room</source>
+        <translation>Quiter le salon</translation>
     </message>
 </context>
 <context>
