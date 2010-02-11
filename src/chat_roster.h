@@ -86,13 +86,12 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
-    void clicked(const QString &jid);
-    void doubleClicked(const QString &jid);
+    void contactActivated(const QString &jid);
+    void roomActivated(const QString &jid);
     void removeContact(const QString &jid);
 
 protected slots:
-    void slotClicked();
-    void slotDoubleClicked();
+    void slotActivated();
     void slotRemoveContact();
 
 private:

@@ -41,6 +41,11 @@ enum RosterColumns {
     MaxColumn,
 };
 
+enum RosterRoles {
+    IdRole = Qt::UserRole,
+    TypeRole,
+};
+
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
@@ -124,38 +129,40 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     QString bareJid = item->id();
-    if (item->type() == ChatRosterItem::Contact)
-    {
-        const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
-        if (role == Qt::UserRole) {
-            return bareJid;
-        } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-            return contactName(bareJid);
-        } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-            return QIcon(contactStatusIcon(entry.getBareJid()));
-        } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-            return QIcon(contactAvatar(bareJid));
-        } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-            return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
-        } else if(role == Qt::FontRole && index.column() == ContactColumn) {
-            if (pendingMessages.contains(bareJid))
-                return QFont("", -1, QFont::Bold, true);
-        } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
-            if (pendingMessages.contains(bareJid)) {
-                QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
-                grad.setColorAt(0, QColor(255, 0, 0, 144));
-                grad.setColorAt(1, Qt::transparent);
-                grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-                return QBrush(grad);
+    if (role == IdRole) {
+        return bareJid;
+    } else if (role == TypeRole) {
+        return item->type();
+    } else {
+        if (item->type() == ChatRosterItem::Contact)
+        {
+            const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
+            if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+                return contactName(bareJid);
+            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+                return QIcon(contactStatusIcon(entry.getBareJid()));
+            } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+                return QIcon(contactAvatar(bareJid));
+            } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+                return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
+            } else if(role == Qt::FontRole && index.column() == ContactColumn) {
+                if (pendingMessages.contains(bareJid))
+                    return QFont("", -1, QFont::Bold, true);
+            } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
+                if (pendingMessages.contains(bareJid)) {
+                    QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
+                    grad.setColorAt(0, QColor(255, 0, 0, 144));
+                    grad.setColorAt(1, Qt::transparent);
+                    grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+                    return QBrush(grad);
+                }
             }
-        }
-    } else if (item->type() == ChatRosterItem::Room) {
-        if (role == Qt::UserRole) {
-            return bareJid;
-        } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-            return bareJid;
-        } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-            return QIcon(":/chat.png");
+        } else if (item->type() == ChatRosterItem::Room) {
+            if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+                return bareJid.split("@")[0];
+            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+                return QIcon(":/chat.png");
+            }
         }
     }
     return QVariant();
@@ -350,12 +357,12 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     QAction *action;
     contextMenu = new QMenu(this);
     action = contextMenu->addAction(QIcon(":/chat.png"), tr("Start chat"));
-    connect(action, SIGNAL(triggered()), this, SLOT(slotDoubleClicked()));
+    connect(action, SIGNAL(triggered()), this, SLOT(slotActivated()));
     action = contextMenu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
     connect(action, SIGNAL(triggered()), this, SLOT(slotRemoveContact()));
 
-    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotClicked()));
-    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotDoubleClicked()));
+    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotActivated()));
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotActivated()));
 
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);
@@ -387,7 +394,7 @@ void ChatRosterView::selectContact(const QString &jid)
     for (int i = 0; i < model()->rowCount(); i++)
     {
         QModelIndex index = model()->index(i, 0);
-        if (index.data(Qt::UserRole).toString() == jid)
+        if (index.data(IdRole).toString() == jid)
         {
             setCurrentIndex(index);
             return;
@@ -408,24 +415,23 @@ QSize ChatRosterView::sizeHint () const
     return hint;
 }
 
-void ChatRosterView::slotClicked()
+void ChatRosterView::slotActivated()
 {
     const QModelIndex &index = currentIndex();
-    if (index.isValid())
-        emit clicked(index.data(Qt::UserRole).toString());
-}
+    if (!index.isValid())
+        return;
 
-void ChatRosterView::slotDoubleClicked()
-{
-    const QModelIndex &index = currentIndex();
-    if (index.isValid())
-        emit doubleClicked(index.data(Qt::UserRole).toString());
+    int type = index.data(TypeRole).toInt();
+    if (type == ChatRosterItem::Contact)
+        emit contactActivated(index.data(IdRole).toString());
+    else if (type == ChatRosterItem::Room)
+        emit roomActivated(index.data(IdRole).toString());
 }
 
 void ChatRosterView::slotRemoveContact()
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid())
-        emit removeContact(index.data(Qt::UserRole).toString());
+        emit removeContact(index.data(IdRole).toString());
 }
 

@@ -74,22 +74,12 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
-    QSplitter *leftSplitter = new QSplitter(Qt::Vertical);
     rosterView = new ChatRosterView(rosterModel);
-    connect(rosterView, SIGNAL(clicked(const QString&)), this, SLOT(chatContact(const QString&)));
-    connect(rosterView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatContact(const QString&)));
+    connect(rosterView, SIGNAL(contactActivated(const QString&)), this, SLOT(chatContact(const QString&)));
+    connect(rosterView, SIGNAL(roomActivated(const QString&)), this, SLOT(chatRoom(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
-    leftSplitter->addWidget(rosterView);
-
-    roomsView = new ChatRoomsView(roomsModel);
-    connect(roomsView, SIGNAL(clicked(const QString&)), this, SLOT(chatRoom(const QString&)));
-    connect(roomsView, SIGNAL(doubleClicked(const QString&)), this, SLOT(chatRoom(const QString&)));
-    connect(roomsView, SIGNAL(leaveRoom(const QString&)), this, SLOT(leaveRoom(const QString&)));
-    roomsView->hide();
-    leftSplitter->addWidget(roomsView);
-
-    splitter->addWidget(leftSplitter);
+    splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
 
     /* right panel */
@@ -235,7 +225,6 @@ void Chat::changeEvent(QEvent *event)
 void Chat::chatContact(const QString &jid)
 {
     ChatDialog *dialog = conversation(jid);
-    roomsView->selectRoom("");
     rosterModel->clearPendingMessages(jid);
     rosterView->selectContact(jid);
 
@@ -246,8 +235,7 @@ void Chat::chatContact(const QString &jid)
 void Chat::chatRoom(const QString &jid)
 {
     ChatRoom *dialog = room(jid);
-    roomsView->selectRoom(jid);
-    rosterView->selectContact("");
+    rosterView->selectContact(jid);
 
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
@@ -395,8 +383,6 @@ void Chat::leaveRoom(const QString &jid)
 
     // remove from list
     roomsModel->removeRoom(jid);
-    if (!roomsModel->rowCount(QModelIndex()))
-        roomsView->hide();
 
     // leave room
     QXmppPresence packet;
@@ -597,7 +583,6 @@ ChatRoom *Chat::room(const QString &jid)
     if (!chatRooms.contains(jid))
     {
         rosterModel->addRoom(jid);
-        //roomsView->show();
 
         chatRooms[jid] = new ChatRoom(jid);
         chatRooms[jid]->setLocalName(ownName);
