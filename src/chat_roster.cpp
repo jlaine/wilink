@@ -78,16 +78,20 @@ QString ChatRosterModel::contactName(const QString &bareJid) const
 
 QString ChatRosterModel::contactStatus(const QString &bareJid) const
 {
-    QMap<QString, QXmppPresence> presences = client->getRoster().getAllPresencesForBareJid(bareJid);
-    if(presences.isEmpty())
-        return "offline";
-    QXmppPresence presence = presences[contactName(bareJid)];
-    if (presence.getType() != QXmppPresence::Available)
-        return "offline";
-    if (presence.getStatus().getType() == QXmppPresence::Status::Online)
-        return "available";
-
-    return "busy";
+    QString suffix = "offline";
+    foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
+    {
+        if (presence.getType() != QXmppPresence::Available)
+            continue;
+        if (presence.getStatus().getType() == QXmppPresence::Status::Online)
+        {
+            suffix = "available";
+            break;
+        } else {
+            suffix = "busy";
+        }
+    }
+    return suffix;
 }
 
 QPixmap ChatRosterModel::contactStatusIcon(const QString &bareJid) const
