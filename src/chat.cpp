@@ -233,41 +233,22 @@ void Chat::changeEvent(QEvent *event)
 
 void Chat::chatContact(const QString &jid)
 {
-    ChatDialog *dialog = conversation(jid);
+    if (!chatDialogs.contains(jid))
+        createConversation(jid, false);
+
+    ChatDialog *dialog = chatDialogs.value(jid);
     rosterModel->clearPendingMessages(jid);
     rosterView->selectContact(jid);
-
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
 }
 
 void Chat::chatRoom(const QString &jid)
 {
-    ChatDialog *dialog;
-    if (chatDialogs.contains(jid))
-        dialog = chatDialogs.value(jid);
-    else
-    {
-        rosterModel->addRoom(jid);
+    if (!chatDialogs.contains(jid))
+        createConversation(jid, true);
 
-        dialog = chatDialogs[jid] = new ChatRoom(jid);
-        dialog->setLocalName(ownName);
-        dialog->setRemoteName(rosterModel->roomName(jid));
-        dialog->setRemotePixmap(QPixmap(":/chat.png"));
-        connect(dialog, SIGNAL(leave(const QString&)),
-            this, SLOT(leaveConversation(const QString&)));
-        connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)),
-            client, SLOT(sendPacket(const QXmppPacket&)));
-        conversationPanel->addWidget(dialog);
-        conversationPanel->show();
-
-        // join room
-        QXmppPresence packet;
-        packet.setTo(jid + "/" + ownName);
-        packet.setType(QXmppPresence::Available);
-        client->sendPacket(packet);
-    }
-
+    ChatDialog *dialog = chatDialogs.value(jid);
     rosterView->selectContact(jid);
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
@@ -293,30 +274,40 @@ void Chat::connected()
         client->getConfiguration().getJidBare());
 }
 
-/** Get or create a conversation dialog for the specified recipient.
+/** Create a conversation dialog for the specified recipient.
  *
  * @param jid
  */
-ChatDialog *Chat::conversation(const QString &jid)
+ChatDialog *Chat::createConversation(const QString &jid, bool room)
 {
-    if (!chatDialogs.contains(jid))
+    ChatDialog *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
+    dialog->setLocalName(ownName);
+    connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
+    connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
+    conversationPanel->addWidget(dialog);
+    conversationPanel->show();
+    chatDialogs[jid] = dialog;
+
+    if (room)
     {
-        chatDialogs[jid] = new ChatDialog(jid);
-        chatDialogs[jid]->setLocalName(ownName);
-        chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
-        chatDialogs[jid]->setRemotePixmap(rosterModel->contactAvatar(jid));
-        connect(chatDialogs[jid], SIGNAL(leave(const QString&)),
-            this, SLOT(leaveConversation(const QString&)));
-        connect(chatDialogs[jid], SIGNAL(sendPacket(const QXmppPacket&)),
-            client, SLOT(sendPacket(const QXmppPacket&)));
-        conversationPanel->addWidget(chatDialogs[jid]);
-        conversationPanel->show();
+        dialog->setRemoteName(rosterModel->roomName(jid));
+        dialog->setRemotePixmap(QPixmap(":/chat.png"));
+
+        // join room
+        rosterModel->addRoom(jid);
+        QXmppPresence packet;
+        packet.setTo(jid + "/" + ownName);
+        packet.setType(QXmppPresence::Available);
+        client->sendPacket(packet);
+    } else {
+        dialog->setRemoteName(rosterModel->contactName(jid));
+        dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
 
         // list archives for the past week
         client->getArchiveManager().listCollections(jid,
             QDateTime::currentDateTime().addDays(-7));
     }
-    return chatDialogs[jid];
+    return dialog;
 }
 
 void Chat::disconnected()
@@ -464,7 +455,9 @@ void Chat::messageReceived(const QXmppMessage &msg)
         break;
     }
 
-    ChatDialog *dialog = conversation(bareJid);
+    if (!chatDialogs.contains(bareJid))
+        createConversation(bareJid, false);
+    ChatDialog *dialog = chatDialogs.value(bareJid);
     dialog->messageReceived(msg);
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);

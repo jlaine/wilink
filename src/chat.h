@@ -69,7 +69,7 @@ protected slots:
 
 protected:
     void changeEvent(QEvent *event);
-    ChatDialog *conversation(const QString &jid);
+    ChatDialog *createConversation(const QString &jid, bool room);
 
 private:
     bool reconnectOnDisconnect;
