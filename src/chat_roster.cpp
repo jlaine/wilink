@@ -173,6 +173,20 @@ QModelIndex RosterModel::index(int row, int column, const QModelIndex &parent) c
         return QModelIndex();
 }
 
+QModelIndex RosterModel::parent(const QModelIndex & index) const
+{
+    if (!index.isValid())
+        return QModelIndex();
+
+    ChatRosterItem *childItem = static_cast<ChatRosterItem*>(index.internalPointer());
+    ChatRosterItem *parentItem = childItem->parent();
+
+    if (parentItem == rootItem)
+        return QModelIndex();
+
+    return createIndex(parentItem->row(), 0, parentItem);
+}
+
 void RosterModel::presenceChanged(const QString& bareJid, const QString& resource)
 {
     ChatRosterItem *item = rootItem->find(bareJid);

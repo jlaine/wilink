@@ -20,7 +20,7 @@
 #ifndef __WDESKTOP_CHAT_ROSTER_H__
 #define __WDESKTOP_CHAT_ROSTER_H__
 
-#include <QAbstractTableModel>
+#include <QAbstractItemModel>
 #include <QTableView>
 
 #include "qxmpp/QXmppRoster.h"
@@ -31,7 +31,7 @@ class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
 
-class RosterModel : public QAbstractTableModel
+class RosterModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -40,6 +40,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     QPixmap contactAvatar(const QString &bareJid) const;
