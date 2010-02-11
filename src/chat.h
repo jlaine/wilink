@@ -77,7 +77,6 @@ private:
     QPushButton *addButton;
     QPushButton *roomButton;
     QHash<QString, ChatDialog*> chatDialogs;
-    QHash<QString, ChatRoom*> chatRooms;
     QXmppClient *client;
     QTimer *pingTimer;
 

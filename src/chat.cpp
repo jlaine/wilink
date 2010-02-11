@@ -243,14 +243,14 @@ void Chat::chatContact(const QString &jid)
 
 void Chat::chatRoom(const QString &jid)
 {
-    ChatRoom *dialog;
-    if (chatRooms.contains(jid))
-        dialog = chatRooms.value(jid);
+    ChatDialog *dialog;
+    if (chatDialogs.contains(jid))
+        dialog = chatDialogs.value(jid);
     else
     {
         rosterModel->addRoom(jid);
 
-        dialog = chatRooms[jid] = new ChatRoom(jid);
+        dialog = chatDialogs[jid] = new ChatRoom(jid);
         dialog->setLocalName(ownName);
         dialog->setRemoteName(rosterModel->roomName(jid));
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
@@ -420,13 +420,9 @@ void Chat::iqReceived(const QXmppIq&)
 
 void Chat::leaveConversation(const QString &jid)
 {
-    ChatDialog *dialog;
-    if (chatDialogs.contains(jid))
-        dialog = chatDialogs.take(jid);
-    else if (chatRooms.contains(jid))
-        dialog = chatRooms.take(jid);
-    else
+    if (!chatDialogs.contains(jid))
         return;
+    ChatDialog *dialog = chatDialogs.take(jid);
 
     // leave room
     if (dialog->isRoom())
@@ -455,8 +451,8 @@ void Chat::messageReceived(const QXmppMessage &msg)
     switch (msg.getType())
     {
     case QXmppMessage::GroupChat:
-        if (chatRooms.contains(bareJid))
-            chatRooms[bareJid]->messageReceived(msg);
+        if (chatDialogs.contains(bareJid))
+            chatDialogs[bareJid]->messageReceived(msg);
         return;
     case QXmppMessage::Error:
         qWarning() << "Received an error message" << msg.getBody();
