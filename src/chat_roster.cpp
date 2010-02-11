@@ -44,7 +44,7 @@ enum RosterColumns {
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
-    rootItem = new ChatRosterItem("");
+    rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
@@ -212,7 +212,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         }
     } else {
         beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-        rootItem->append(new ChatRosterItem(jid));
+        rootItem->append(new ChatRosterItem(ChatRosterItem::Contact, jid));
         endInsertRows();
     }
 
@@ -226,7 +226,7 @@ void ChatRosterModel::rosterReceived()
     rootItem->clear();
     foreach (const QString &jid, client->getRoster().getRosterBareJids())
     {
-        rootItem->append(new ChatRosterItem(jid));
+        rootItem->append(new ChatRosterItem(ChatRosterItem::Contact, jid));
 
         // fetch vCard
         if (!rosterAvatars.contains(jid))

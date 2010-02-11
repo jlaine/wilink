@@ -26,7 +26,14 @@
 class ChatRosterItem
 {
 public:
-    ChatRosterItem(const QString &id);
+    enum Type {
+        Root,
+        Contact,
+        Room,
+        RoomMember,
+    };
+
+    ChatRosterItem(enum Type type, const QString &id = QString());
     ~ChatRosterItem();
 
     void append(ChatRosterItem *item);
@@ -39,9 +46,11 @@ public:
     void remove(ChatRosterItem *item);
     int row() const;
     int size() const;
+    enum Type type() const;
 
 private:
     QString itemId;
+    enum Type itemType;
     QList <ChatRosterItem*> childItems;
     ChatRosterItem *parentItem;
 };

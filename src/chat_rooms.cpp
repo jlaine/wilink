@@ -34,7 +34,7 @@ enum RoomsColumns {
 ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
     : xmppClient(client)
 {
-    rootItem = new ChatRosterItem("");
+    rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
 }
@@ -44,7 +44,7 @@ void ChatRoomsModel::addRoom(const QString &bareJid)
     if (rootItem->contains(bareJid))
         return;
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-    rootItem->append(new ChatRosterItem(bareJid));
+    rootItem->append(new ChatRosterItem(ChatRosterItem::Room, bareJid));
     endInsertRows();
 
 #if 0
@@ -71,12 +71,12 @@ QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::UserRole) {
         return jid;
     } else if (role == Qt::DisplayRole) {
-        if (jid.contains("/"))
-            return jid.split("/")[1];
-        else
+        if (item->type() == ChatRosterItem::Room)
             return roomName(jid);
+        else if (item->type() == ChatRosterItem::RoomMember)
+            return jid.split("/")[1];
     } else if (role == Qt::DecorationRole) {
-        if (!jid.contains("/"))
+        if (item->type() == ChatRosterItem::Room)
             return QIcon(":/chat.png");
     }
     return QVariant();
@@ -139,7 +139,7 @@ void ChatRoomsModel::presenceReceived(const QXmppPresence &presence)
     if (presence.getType() == QXmppPresence::Available && !memberItem)
     {
         beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
-        roomItem->append(new ChatRosterItem(jid));
+        roomItem->append(new ChatRosterItem(ChatRosterItem::RoomMember, jid));
         endInsertRows();
     }
     else if (presence.getType() == QXmppPresence::Unavailable && memberItem)

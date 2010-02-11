@@ -19,8 +19,8 @@
 
 #include "chat_roster_item.h"
 
-ChatRosterItem::ChatRosterItem(const QString &id)
-    : itemId(id), parentItem(0)
+ChatRosterItem::ChatRosterItem(enum ChatRosterItem::Type type, const QString &id)
+    : itemId(id), itemType(type), parentItem(0)
 {
 }
 
@@ -106,3 +106,7 @@ int ChatRosterItem::size() const
     return childItems.size();
 }
 
+enum ChatRosterItem::Type ChatRosterItem::type() const
+{
+    return itemType;
+}
