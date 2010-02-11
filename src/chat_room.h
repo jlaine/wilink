@@ -41,8 +41,10 @@ public slots:
 
 protected slots:
     void send();
+    void slotLeave();
 
 signals:
+    void leave(const QString &jid);
     void sendMessage(const QXmppMessage &message);
 
 private:

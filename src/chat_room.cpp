@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QListWidget>
+#include <QPushButton>
 #include <QSplitter>
 
 #include "qxmpp/QXmppDiscoveryIq.h"
@@ -46,6 +47,11 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     QLabel *iconLabel = new QLabel();
     iconLabel->setPixmap(QPixmap(":/chat.png"));
     hbox->addWidget(iconLabel);
+    QPushButton *button = new QPushButton;
+    button->setFlat(true);
+    button->setIcon(QIcon(":/remove.png"));
+    connect(button, SIGNAL(clicked()), this, SLOT(slotLeave()));
+    hbox->addWidget(button);
     layout->addItem(hbox);
 
     /* chat history */
@@ -106,4 +112,9 @@ void ChatRoom::setRoomName(const QString &name)
     nameLabel->setText(QString("<b>%1</b><br/>%2")
         .arg(name)
         .arg(chatRemoteJid));
+}
+
+void ChatRoom::slotLeave()
+{
+    emit leave(chatRemoteJid);
 }

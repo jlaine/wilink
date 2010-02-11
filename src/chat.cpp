@@ -251,6 +251,8 @@ void Chat::chatRoom(const QString &jid)
         dialog = chatRooms[jid] = new ChatRoom(jid);
         dialog->setLocalName(ownName);
         dialog->setRoomName(rosterModel->roomName(jid));
+        connect(dialog, SIGNAL(leave(const QString&)),
+            this, SLOT(leaveRoom(const QString&)));
         connect(dialog, SIGNAL(sendMessage(const QXmppMessage&)),
             this, SLOT(sendMessage(const QXmppMessage&)));
         conversationPanel->addWidget(dialog);
@@ -415,9 +417,9 @@ void Chat::leaveRoom(const QString &jid)
 {
     // close view
     ChatRoom *room = chatRooms.take(jid);
-    delete room;
-    if (!conversationPanel->count())
+    if (conversationPanel->count() == 1)
         conversationPanel->hide();
+    room->deleteLater();
 
     // remove from list
     rosterModel->removeRoom(jid);
