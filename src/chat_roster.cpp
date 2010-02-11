@@ -41,14 +41,14 @@ enum RosterColumns {
     MaxColumn,
 };
 
-RosterModel::RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard)
-    : rosterManager(roster), vcardManager(vcard)
+RosterModel::RosterModel(QXmppClient *xmppClient)
+    : client(xmppClient)
 {
     rootItem = new ChatRosterItem("");
-    connect(rosterManager, SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
-    connect(rosterManager, SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(rosterManager, SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
-    connect(vcardManager, SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
+    connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
+    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
+    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 int RosterModel::columnCount(const QModelIndex &parent) const
@@ -72,7 +72,7 @@ QString RosterModel::contactName(const QString &bareJid) const
 
 QString RosterModel::contactStatus(const QString &bareJid) const
 {
-    QMap<QString, QXmppPresence> presences = rosterManager->getAllPresencesForBareJid(bareJid);
+    QMap<QString, QXmppPresence> presences = client->getRoster().getAllPresencesForBareJid(bareJid);
     if(presences.isEmpty())
         return "offline";
     QXmppPresence presence = presences[contactName(bareJid)];
@@ -123,7 +123,7 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     QString bareJid = item->id();
-    const QXmppRoster::QXmppRosterEntry &entry = rosterManager->getRosterEntry(bareJid);
+    const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
     if (role == Qt::UserRole) {
         return bareJid;
     } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
@@ -197,10 +197,10 @@ void RosterModel::presenceChanged(const QString& bareJid, const QString& resourc
 
 void RosterModel::rosterChanged(const QString &jid)
 {
-    QXmppRoster::QXmppRosterEntry entry = rosterManager->getRosterEntry(jid);
     ChatRosterItem *item = rootItem->find(jid);
     if (item)
     {
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
         if (static_cast<int>(entry.getSubscriptionType()) == static_cast<int>(QXmppRosterIq::Item::Remove))
         {
             beginRemoveRows(QModelIndex(), item->row(), item->row());
@@ -218,19 +218,19 @@ void RosterModel::rosterChanged(const QString &jid)
 
     // fetch vCard
     if (!rosterAvatars.contains(jid))
-        vcardManager->requestVCard(jid);
+        client->getVCardManager().requestVCard(jid);
 }
 
 void RosterModel::rosterReceived()
 {
     rootItem->clear();
-    foreach (const QString &jid, rosterManager->getRosterBareJids())
+    foreach (const QString &jid, client->getRoster().getRosterBareJids())
     {
         rootItem->append(new ChatRosterItem(jid));
 
         // fetch vCard
         if (!rosterAvatars.contains(jid))
-            vcardManager->requestVCard(jid);
+            client->getVCardManager().requestVCard(jid);
     }
     reset();
 }

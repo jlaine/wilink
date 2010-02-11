@@ -36,7 +36,7 @@ class RosterModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    RosterModel(QXmppRoster *roster, QXmppVCardManager *vcard);
+    RosterModel(QXmppClient *client);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -63,8 +63,7 @@ private:
     QPixmap contactStatusIcon(const QString &bareJid) const;
 
 private:
-    QXmppRoster *rosterManager;
-    QXmppVCardManager *vcardManager;
+    QXmppClient *client;
     QMap<QString, QPixmap> rosterAvatars;
     QMap<QString, QString> rosterNames;
     QMap<QString, int> pendingMessages;

@@ -66,7 +66,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
-    rosterModel =  new RosterModel(&client->getRoster(), &client->getVCardManager());
+    rosterModel =  new RosterModel(client);
     roomsModel =  new ChatRoomsModel(client);
 
     /* build splitter */
