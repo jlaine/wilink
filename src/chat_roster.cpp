@@ -162,10 +162,14 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return roomName(bareJid);
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(":/chat.png");
+            } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+                return QString("chatroom_") + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
             if (role == Qt::DisplayRole && index.column() == ContactColumn) {
                 return bareJid.split("/")[1];
+            } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+                return QString("chatuser_") + bareJid.toLower();
             }
         }
     }
