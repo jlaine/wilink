@@ -26,6 +26,7 @@ set(wDesktop_SOURCES
     chat_room.cpp
     chat_rooms.cpp
     chat_roster.cpp
+    chat_roster_item.cpp
     diagnostics.cpp
     main.cpp
     networkinfo.cpp
