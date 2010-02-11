@@ -65,7 +65,7 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
 
     /* text edit */
     chatInput = new ChatEdit(80);
-    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(send()));
+    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(slotSend()));
     layout->addSpacing(10);
     layout->addWidget(chatInput);
 
@@ -75,9 +75,9 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
 
     /* shortcuts for new line */
     connect(new QShortcut(QKeySequence(Qt::AltModifier + Qt::Key_Return), this),
-        SIGNAL(activated()), this, SLOT(newLine()));
+        SIGNAL(activated()), this, SLOT(slotNewLine()));
     connect(new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Return), this),
-        SIGNAL(activated()), this, SLOT(newLine()));
+        SIGNAL(activated()), this, SLOT(slotNewLine()));
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -104,17 +104,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     chatHistory->addMessage(message);
 }
 
-void ChatDialog::newLine()
+void ChatDialog::sendMessage(const QString &text)
 {
-    chatInput->append("");
-}
-
-void ChatDialog::send()
-{
-    QString text = chatInput->document()->toPlainText();
-    if (text.isEmpty())
-        return;
-
+    // add message to history
     ChatHistoryMessage message;
     message.body = text;
     message.datetime = QDateTime::currentDateTime();
@@ -122,12 +114,11 @@ void ChatDialog::send()
     message.local = true;
     chatHistory->addMessage(message);
 
-    chatInput->document()->clear();
-
+    // send message
     QXmppMessage msg;
     msg.setBody(text);
     msg.setTo(chatRemoteJid);
-    emit sendMessage(msg);
+    emit sendPacket(msg);
 }
 
 void ChatDialog::setLocalName(const QString &name)
@@ -152,3 +143,19 @@ void ChatDialog::slotLeave()
 {
     emit leave(chatRemoteJid);
 }
+
+void ChatDialog::slotNewLine()
+{
+    chatInput->append("");
+}
+
+void ChatDialog::slotSend()
+{
+    QString text = chatInput->document()->toPlainText();
+    if (text.isEmpty())
+        return;
+
+    chatInput->document()->clear();
+    sendMessage(text);
+}
+

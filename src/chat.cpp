@@ -254,8 +254,8 @@ void Chat::chatRoom(const QString &jid)
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
         connect(dialog, SIGNAL(leave(const QString&)),
             this, SLOT(leaveRoom(const QString&)));
-        connect(dialog, SIGNAL(sendMessage(const QXmppMessage&)),
-            this, SLOT(sendMessage(const QXmppMessage&)));
+        connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)),
+            client, SLOT(sendPacket(const QXmppPacket&)));
         conversationPanel->addWidget(dialog);
         conversationPanel->show();
 
@@ -303,8 +303,8 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setLocalName(ownName);
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
         chatDialogs[jid]->setRemotePixmap(rosterModel->contactAvatar(jid));
-        connect(chatDialogs[jid], SIGNAL(sendMessage(const QXmppMessage&)),
-            this, SLOT(sendMessage(const QXmppMessage&)));
+        connect(chatDialogs[jid], SIGNAL(sendPacket(const QXmppPacket&)),
+            client, SLOT(sendPacket(const QXmppPacket&)));
         conversationPanel->addWidget(chatDialogs[jid]);
         conversationPanel->show();
 
@@ -617,15 +617,6 @@ void Chat::resizeContacts()
     }
 
     resize(hint.expandedTo(size()));
-}
-
-/** Send a chat message to the specified recipient.
- *
- * @param msg
- */
-void Chat::sendMessage(const QXmppMessage &msg)
-{
-    client->sendPacket(msg);
 }
 
 /** Send an XMPP Ping as described in XEP-0199:

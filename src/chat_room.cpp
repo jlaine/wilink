@@ -50,19 +50,13 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     chatHistory->addMessage(message);
 }
 
-void ChatRoom::send()
+void ChatRoom::sendMessage(const QString &text)
 {
-    QString text = chatInput->document()->toPlainText();
-    if (text.isEmpty())
-        return;
-
-    chatInput->document()->clear();
-
     QXmppMessage msg;
     msg.setBody(text);
     msg.setFrom(chatRemoteJid + "/" + chatLocalName);
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
-    emit sendMessage(msg);
+    emit sendPacket(msg);
 }
 

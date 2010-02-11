@@ -38,7 +38,9 @@ class ChatDialog : public QWidget
 
 public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
+
     virtual void messageReceived(const QXmppMessage &msg);
+
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
@@ -47,13 +49,16 @@ public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
 
 protected slots:
-    void newLine();
-    void send();
     void slotLeave();
+    void slotNewLine();
+    void slotSend();
 
 signals:
     void leave(const QString &jid);
-    void sendMessage(const QXmppMessage &message);
+    void sendPacket(const QXmppPacket &packet);
+
+protected:
+    virtual void sendMessage(const QString &body);
 
 protected:
     ChatHistory *chatHistory;

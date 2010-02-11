@@ -21,11 +21,7 @@
 #define __WDESKTOP_CHAT_ROOM_H__
 
 #include "chat_dialog.h"
-#include <QWidget>
 
-class ChatEdit;
-class ChatHistory;
-class QLabel;
 class QXmppMessage;
 
 class ChatRoom : public ChatDialog
@@ -35,9 +31,7 @@ class ChatRoom : public ChatDialog
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
     virtual void messageReceived(const QXmppMessage &msg);
-
-protected slots:
-    void send();
+    virtual void sendMessage(const QString &text);
 };
 
 #endif
