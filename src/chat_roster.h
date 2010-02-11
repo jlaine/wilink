@@ -92,7 +92,7 @@ protected:
 signals:
     void contactActivated(const QString &jid);
     void roomActivated(const QString &jid);
-    void leaveRoom(const QString &jid);
+    void leaveConversation(const QString &jid);
     void removeContact(const QString &jid);
 
 protected slots:

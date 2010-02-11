@@ -467,7 +467,7 @@ void ChatRosterView::slotLeaveRoom()
     if (index.isValid())
     {
         const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
-        emit leaveRoom(jid);
+        emit leaveConversation(jid);
     }
 }
 

@@ -35,6 +35,11 @@ ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
 {
 }
 
+bool ChatRoom::isRoom() const
+{
+    return true;
+}
+
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
     const QStringList bits = msg.getFrom().split("/");

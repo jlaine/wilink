@@ -30,6 +30,7 @@ class ChatRoom : public ChatDialog
 
 public:
     ChatRoom(const QString &jid, QWidget *parent = NULL);
+    virtual bool isRoom() const;
     virtual void messageReceived(const QXmppMessage &msg);
     virtual void sendMessage(const QString &text);
 };

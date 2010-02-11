@@ -94,6 +94,11 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     }
 }
 
+bool ChatDialog::isRoom() const
+{
+    return false;
+}
+
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     ChatHistoryMessage message;

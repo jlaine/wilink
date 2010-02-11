@@ -76,7 +76,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(rosterView, SIGNAL(contactActivated(const QString&)), this, SLOT(chatContact(const QString&)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
     connect(rosterView, SIGNAL(roomActivated(const QString&)), this, SLOT(chatRoom(const QString&)));
-    connect(rosterView, SIGNAL(leaveRoom(const QString&)), this, SLOT(leaveRoom(const QString&)));
+    connect(rosterView, SIGNAL(leaveConversation(const QString&)), this, SLOT(leaveConversation(const QString&)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
@@ -152,6 +152,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
+
+    move(QPoint(20, 20));
 }
 
 /** Prompt the user for a new contact then add it to the roster.
@@ -253,7 +255,7 @@ void Chat::chatRoom(const QString &jid)
         dialog->setRemoteName(rosterModel->roomName(jid));
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
         connect(dialog, SIGNAL(leave(const QString&)),
-            this, SLOT(leaveRoom(const QString&)));
+            this, SLOT(leaveConversation(const QString&)));
         connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)),
             client, SLOT(sendPacket(const QXmppPacket&)));
         conversationPanel->addWidget(dialog);
@@ -304,7 +306,7 @@ ChatDialog *Chat::conversation(const QString &jid)
         chatDialogs[jid]->setRemoteName(rosterModel->contactName(jid));
         chatDialogs[jid]->setRemotePixmap(rosterModel->contactAvatar(jid));
         connect(chatDialogs[jid], SIGNAL(leave(const QString&)),
-            this, SLOT(leaveChat(const QString&)));
+            this, SLOT(leaveConversation(const QString&)));
         connect(chatDialogs[jid], SIGNAL(sendPacket(const QXmppPacket&)),
             client, SLOT(sendPacket(const QXmppPacket&)));
         conversationPanel->addWidget(chatDialogs[jid]);
@@ -416,31 +418,31 @@ void Chat::iqReceived(const QXmppIq&)
     timeoutTimer->stop();
 }
 
-void Chat::leaveChat(const QString &jid)
+void Chat::leaveConversation(const QString &jid)
 {
+    ChatDialog *dialog;
+    if (chatDialogs.contains(jid))
+        dialog = chatDialogs.take(jid);
+    else if (chatRooms.contains(jid))
+        dialog = chatRooms.take(jid);
+    else
+        return;
+
+    // leave room
+    if (dialog->isRoom())
+    {
+        rosterModel->removeRoom(jid);
+
+        QXmppPresence packet;
+        packet.setTo(jid + "/" + ownName);
+        packet.setType(QXmppPresence::Unavailable);
+        client->sendPacket(packet);
+    }
+
     // close view
-    ChatDialog *dialog = chatDialogs.take(jid);
     if (conversationPanel->count() == 1)
         conversationPanel->hide();
     dialog->deleteLater();
-}
-
-void Chat::leaveRoom(const QString &jid)
-{
-    // close view
-    ChatRoom *room = chatRooms.take(jid);
-    if (conversationPanel->count() == 1)
-        conversationPanel->hide();
-    room->deleteLater();
-
-    // remove from list
-    rosterModel->removeRoom(jid);
-
-    // leave room
-    QXmppPresence packet;
-    packet.setTo(jid + "/" + ownName);
-    packet.setType(QXmppPresence::Unavailable);
-    client->sendPacket(packet);
 }
 
 void Chat::messageReceived(const QXmppMessage &msg)
