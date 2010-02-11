@@ -56,6 +56,7 @@ protected slots:
     void leaveRoom(const QString &jid);
     void connected();
     void disconnected();
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void error(QXmppClient::Error error);
     void iqReceived(const QXmppIq&);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
@@ -97,6 +98,8 @@ private:
     QTimer *timeoutTimer;
     QStackedWidget *conversationPanel;
 
+    QString chatRoomServer;
+    QStringList discoQueue;
     QString ownName;
 };
 

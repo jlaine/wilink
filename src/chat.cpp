@@ -38,6 +38,8 @@
 #include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
+#include "qxmpp/QXmppDiscoveryIq.h"
+#include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppPingIq.h"
@@ -135,6 +137,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowTitle(tr("Chat"));
 
     /* set up client */
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
@@ -189,7 +192,7 @@ void Chat::addContact()
 void Chat::addRoom()
 {
     bool ok = true;
-    QString jid = "@conference." + client->getConfiguration().getDomain();
+    QString jid = "@" + chatRoomServer;
     while (!jidValidator.exactMatch(jid))
     {
         jid = QInputDialog::getText(this, tr("Join a chat room"),
@@ -254,10 +257,15 @@ void Chat::connected()
 {
     qWarning("Connected to chat server");
     addButton->setEnabled(true);
-    roomButton->setEnabled(true);
     pingTimer->start();
     statusIconLabel->setPixmap(QPixmap(":/contact-available.png"));
     statusLabel->setText(tr("Connected"));
+
+    /* discover services */
+    QXmppDiscoveryIq disco;
+    disco.setTo(client->getConfiguration().getDomain());
+    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    client->sendPacket(disco);
 
     /* request own vCard */
     ownName = client->getConfiguration().getUser();
@@ -307,6 +315,57 @@ void Chat::disconnected()
         client->connectToServer(client->getConfiguration());
     } else {
         statusLabel->setText(tr("Disconnected"));
+    }
+}
+
+void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    // we only want results
+    if (disco.getType() != QXmppIq::Result)
+        return;
+
+#if 0
+    qDebug("Received discovery result");
+    foreach (const QXmppDiscoveryItem &item, disco.getItems())
+    {
+        qDebug() << " *" << item.type();
+        foreach (const QString &attr, item.attributes())
+            qDebug() << "   -" << attr << ":" << item.attribute(attr);
+    }
+#endif
+
+    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
+        disco.getFrom() == client->getConfiguration().getDomain())
+    {
+        // root items
+        discoQueue.clear();
+        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        {
+            if (item.type() == "item" && !item.attribute("jid").isEmpty() && item.attribute("node").isEmpty())
+            {
+                discoQueue.append(item.attribute("jid"));
+                // get info for item
+                QXmppDiscoveryIq info;
+                info.setQueryType(QXmppDiscoveryIq::InfoQuery);
+                info.setTo(item.attribute("jid"));
+                client->sendPacket(info);
+            }
+        }
+    }
+    else if (disco.getQueryType() == QXmppDiscoveryIq::InfoQuery &&
+             discoQueue.contains(disco.getFrom()))
+    {
+        discoQueue.removeAll(disco.getFrom());
+        // check if it's a conference server
+        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        {
+            if (item.type() == "identity" && item.attribute("category") == "conference" && item.attribute("type") == "text")
+            {
+                chatRoomServer = disco.getFrom();
+                roomButton->setEnabled(true);
+                qDebug() << "Found chat room server" << chatRoomServer;
+            }
+        }
     }
 }
 

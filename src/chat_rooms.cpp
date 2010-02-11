@@ -99,13 +99,6 @@ QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
 
 void ChatRoomsModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
-    qDebug() << "discovery received";
-    foreach (const QXmppDiscoveryItem &item, disco.getItems())
-    {
-        qDebug() << " *" << item.type();
-        foreach (const QString &attr, item.attributes())
-            qDebug() << "   -" << attr << ":" << item.attribute(attr);
-    }
 #if 0
     if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery)
     {
