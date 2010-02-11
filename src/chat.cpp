@@ -189,10 +189,10 @@ void Chat::addRoom()
             QLineEdit::Normal, jid, &ok).toLower();
         if (!ok)
             return;
-        jid = jid.trimmed().toLower();
+        jid = jid.trimmed().replace(" ", "_").toLower();
     }
-    if (!jid.contains('@'))
-        jid = jid + chatRoomServer;
+    if (!jid.contains("@"))
+        jid = jid + "@" + chatRoomServer;
 
     chatRoom(jid);
 }

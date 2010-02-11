@@ -60,6 +60,21 @@
     </message>
 </context>
 <context>
+    <name>ChatRosterView</name>
+    <message>
+        <source>Start chat</source>
+        <translation type="obsolete">Démarrer conversation</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Leave room</source>
+        <translation>Quiter le salon</translation>
+    </message>
+</context>
+<context>
     <name>Diagnostics</name>
     <message>
         <source>Refresh</source>
@@ -115,21 +130,6 @@
     <message>
         <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
         <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
-    </message>
-</context>
-<context>
-    <name>ChatRosterView</name>
-    <message>
-        <source>Start chat</source>
-        <translation>Démarrer conversation</translation>
-    </message>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
-    </message>
-    <message>
-        <source>Leave room</source>
-        <translation>Quiter le salon</translation>
     </message>
 </context>
 <context>
