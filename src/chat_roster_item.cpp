@@ -66,6 +66,11 @@ bool ChatRosterItem::contains(const QString &id) const
     return false;
 }
 
+QVariant ChatRosterItem::data(int role) const
+{
+    return itemData.value(role);
+}
+
 ChatRosterItem *ChatRosterItem::find(const QString &id)
 {
     foreach (ChatRosterItem *item, childItems)
@@ -99,6 +104,11 @@ int ChatRosterItem::row() const
         return parentItem->childItems.indexOf(const_cast<ChatRosterItem*>(this));
 
     return 0;
+}
+
+void ChatRosterItem::setData(int role, const QVariant &value)
+{
+    itemData.insert(role, value);
 }
 
 int ChatRosterItem::size() const

@@ -21,7 +21,9 @@
 #define __WDESKTOP_CHAT_ROSTER_ITEM_H__
 
 #include <QList>
+#include <QMap>
 #include <QString>
+#include <QVariant>
 
 class ChatRosterItem
 {
@@ -40,16 +42,19 @@ public:
     ChatRosterItem *child(int row);
     void clear();
     bool contains(const QString &id) const;
+    QVariant data(int role) const;
     ChatRosterItem* find(const QString &id);
     QString id() const;
     ChatRosterItem* parent();
     void remove(ChatRosterItem *item);
     int row() const;
+    void setData(int role, const QVariant &value);
     int size() const;
     enum Type type() const;
 
 private:
     QString itemId;
+    QMap<int, QVariant> itemData;
     enum Type itemType;
     QList <ChatRosterItem*> childItems;
     ChatRosterItem *parentItem;
