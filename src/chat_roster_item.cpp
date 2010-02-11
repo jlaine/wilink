@@ -19,18 +19,18 @@
 
 #include "chat_roster_item.h"
 
-ChatRoomsItem::ChatRoomsItem(const QString &id)
+ChatRosterItem::ChatRosterItem(const QString &id)
     : itemId(id), parentItem(0)
 {
 }
 
-ChatRoomsItem::~ChatRoomsItem()
+ChatRosterItem::~ChatRosterItem()
 {
-    foreach (ChatRoomsItem *item, childItems)
+    foreach (ChatRosterItem *item, childItems)
         delete item;
 }
 
-void ChatRoomsItem::append(ChatRoomsItem *item)
+void ChatRosterItem::append(ChatRosterItem *item)
 {
     if (item->parentItem)
     {
@@ -41,7 +41,7 @@ void ChatRoomsItem::append(ChatRoomsItem *item)
     childItems.append(item);
 }
 
-ChatRoomsItem *ChatRoomsItem::child(int row)
+ChatRosterItem *ChatRosterItem::child(int row)
 {
     if (row >= 0 && row < childItems.size())
         return childItems.at(row);
@@ -49,9 +49,9 @@ ChatRoomsItem *ChatRoomsItem::child(int row)
         return 0;
 }
 
-bool ChatRoomsItem::contains(const QString &id) const
+bool ChatRosterItem::contains(const QString &id) const
 {
-    foreach (const ChatRoomsItem *item, childItems)
+    foreach (const ChatRosterItem *item, childItems)
     {
         if (item->id() == id)
             return true;
@@ -59,25 +59,25 @@ bool ChatRoomsItem::contains(const QString &id) const
     return false;
 }
 
-ChatRoomsItem *ChatRoomsItem::find(const QString &id)
+ChatRosterItem *ChatRosterItem::find(const QString &id)
 {
-    foreach (ChatRoomsItem *item, childItems)
+    foreach (ChatRosterItem *item, childItems)
         if (item->itemId == id)
             return item;
     return 0;
 }
 
-QString ChatRoomsItem::id() const
+QString ChatRosterItem::id() const
 {
     return itemId;
 }
 
-ChatRoomsItem* ChatRoomsItem::parent()
+ChatRosterItem* ChatRosterItem::parent()
 {
     return parentItem;
 }
 
-void ChatRoomsItem::remove(ChatRoomsItem *child)
+void ChatRosterItem::remove(ChatRosterItem *child)
 {
     if (childItems.contains(child))
     {
@@ -86,15 +86,15 @@ void ChatRoomsItem::remove(ChatRoomsItem *child)
     }
 }
 
-int ChatRoomsItem::row() const
+int ChatRosterItem::row() const
 {
     if (parentItem)
-        return parentItem->childItems.indexOf(const_cast<ChatRoomsItem*>(this));
+        return parentItem->childItems.indexOf(const_cast<ChatRosterItem*>(this));
 
     return 0;
 }
 
-int ChatRoomsItem::size() const
+int ChatRosterItem::size() const
 {
     return childItems.size();
 }

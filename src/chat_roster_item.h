@@ -23,26 +23,26 @@
 #include <QList>
 #include <QString>
 
-class ChatRoomsItem
+class ChatRosterItem
 {
 public:
-    ChatRoomsItem(const QString &id);
-    ~ChatRoomsItem();
+    ChatRosterItem(const QString &id);
+    ~ChatRosterItem();
 
-    void append(ChatRoomsItem *item);
-    ChatRoomsItem *child(int row);
+    void append(ChatRosterItem *item);
+    ChatRosterItem *child(int row);
     bool contains(const QString &id) const;
-    ChatRoomsItem* find(const QString &id);
+    ChatRosterItem* find(const QString &id);
     QString id() const;
-    ChatRoomsItem* parent();
-    void remove(ChatRoomsItem *item);
+    ChatRosterItem* parent();
+    void remove(ChatRosterItem *item);
     int row() const;
     int size() const;
 
 private:
     QString itemId;
-    QList <ChatRoomsItem*> childItems;
-    ChatRoomsItem *parentItem;
+    QList <ChatRosterItem*> childItems;
+    ChatRosterItem *parentItem;
 };
 
 #endif

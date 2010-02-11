@@ -24,6 +24,7 @@
 #include "qxmpp/QXmppDiscoveryIq.h"
 
 #include "chat_rooms.h"
+#include "chat_roster_item.h"
 
 enum RoomsColumns {
     RoomColumn = 0,
@@ -33,7 +34,7 @@ enum RoomsColumns {
 ChatRoomsModel::ChatRoomsModel(QXmppClient *client)
     : xmppClient(client)
 {
-    rootItem = new ChatRoomsItem(NULL);
+    rootItem = new ChatRosterItem(NULL);
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
 }
@@ -43,7 +44,7 @@ void ChatRoomsModel::addRoom(const QString &bareJid)
     if (rootItem->contains(bareJid))
         return;
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-    rootItem->append(new ChatRoomsItem(bareJid));
+    rootItem->append(new ChatRosterItem(bareJid));
     endInsertRows();
 
 #if 0
@@ -65,7 +66,7 @@ QVariant ChatRoomsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    ChatRoomsItem *item = static_cast<ChatRoomsItem*>(index.internalPointer());
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     QString jid = item->id();
     if (role == Qt::UserRole) {
         return jid;
@@ -99,13 +100,13 @@ QModelIndex ChatRoomsModel::index(int row, int column, const QModelIndex &parent
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    ChatRoomsItem *parentItem;
+    ChatRosterItem *parentItem;
     if (!parent.isValid())
         parentItem = rootItem;
     else
-        parentItem = static_cast<ChatRoomsItem*>(parent.internalPointer());
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
 
-    ChatRoomsItem *childItem = parentItem->child(row);
+    ChatRosterItem *childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
     else
@@ -117,8 +118,8 @@ QModelIndex ChatRoomsModel::parent(const QModelIndex & index) const
     if (!index.isValid())
         return QModelIndex();
 
-    ChatRoomsItem *childItem = static_cast<ChatRoomsItem*>(index.internalPointer());
-    ChatRoomsItem *parentItem = childItem->parent();
+    ChatRosterItem *childItem = static_cast<ChatRosterItem*>(index.internalPointer());
+    ChatRosterItem *parentItem = childItem->parent();
 
     if (parentItem == rootItem)
         return QModelIndex();
@@ -130,15 +131,15 @@ void ChatRoomsModel::presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.getFrom();
     const QString roomJid = jid.split("/")[0];
-    ChatRoomsItem *roomItem = rootItem->find(roomJid);
+    ChatRosterItem *roomItem = rootItem->find(roomJid);
     if (!roomItem)
         return;
 
-    ChatRoomsItem *memberItem = roomItem->find(jid);
+    ChatRosterItem *memberItem = roomItem->find(jid);
     if (presence.getType() == QXmppPresence::Available && !memberItem)
     {
         beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
-        roomItem->append(new ChatRoomsItem(jid));
+        roomItem->append(new ChatRosterItem(jid));
         endInsertRows();
     }
     else if (presence.getType() == QXmppPresence::Unavailable && memberItem)
@@ -151,7 +152,7 @@ void ChatRoomsModel::presenceReceived(const QXmppPresence &presence)
 
 void ChatRoomsModel::removeRoom(const QString &bareJid)
 {
-    ChatRoomsItem *roomItem = rootItem->find(bareJid);
+    ChatRosterItem *roomItem = rootItem->find(bareJid);
     if (roomItem)
     {
         beginRemoveRows(QModelIndex(), roomItem->row(), roomItem->row());
@@ -170,11 +171,11 @@ int ChatRoomsModel::rowCount(const QModelIndex &parent) const
     if (parent.column() > 0)
         return 0;
 
-    ChatRoomsItem *parentItem;
+    ChatRosterItem *parentItem;
     if (!parent.isValid())
         parentItem = rootItem;
     else
-        parentItem = static_cast<ChatRoomsItem*>(parent.internalPointer());
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
 
     return parentItem->size();
 }

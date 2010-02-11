@@ -24,8 +24,7 @@
 #include <QTableView>
 #include <QTreeView>
 
-#include "chat_roster_item.h"
-
+class ChatRosterItem;
 class QContextMenuEvent;
 class QMenu;
 class QXmppClient;
@@ -54,7 +53,7 @@ protected slots:
     void presenceReceived(const QXmppPresence &presence);
 
 private:
-    ChatRoomsItem *rootItem;
+    ChatRosterItem *rootItem;
     QXmppClient *xmppClient;
 };
 
