@@ -60,6 +60,8 @@ void application_alert_mac();
 using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
+static const char *ns_muc = "http://jabber.org/protocol/muc";
+static const char *ns_muc_user = "http://jabber.org/protocol/muc#user";
 
 static void dumpElement(const QXmppElement &item, int level = 0)
 {
@@ -268,6 +270,10 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
         QXmppPresence packet;
         packet.setTo(jid + "/" + ownName);
         packet.setType(QXmppPresence::Available);
+        QXmppElement x;
+        x.setTagName("x");
+        x.setAttribute("xmlns", ns_muc);
+        packet.setExtension(x);
         client->sendPacket(packet);
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
@@ -516,6 +522,11 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         }
         break;
     default:
+        if (!presence.getExtension().isNull())
+        {
+            qDebug("Received a presence with an extension");
+            dumpElement(presence.getExtension());
+        }
         break;
     }
 }
