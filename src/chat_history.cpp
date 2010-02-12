@@ -268,6 +268,9 @@ ChatHistory::ChatHistory(QWidget *parent)
 
 void ChatHistory::addMessage(const ChatHistoryMessage &message)
 {
+    if (message.body.isEmpty())
+        return;
+
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
 
