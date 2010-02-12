@@ -64,16 +64,6 @@ void ChatRosterItem::clear()
     childItems.clear();
 }
 
-bool ChatRosterItem::contains(const QString &id) const
-{
-    foreach (const ChatRosterItem *item, childItems)
-    {
-        if (item->id() == id)
-            return true;
-    }
-    return false;
-}
-
 QVariant ChatRosterItem::data(int role) const
 {
     return itemData.value(role);

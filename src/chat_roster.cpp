@@ -328,7 +328,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
 
 void ChatRosterModel::addRoom(const QString &bareJid)
 {
-    if (rootItem->contains(bareJid))
+    if (rootItem->find(bareJid))
         return;
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
     rootItem->append(new ChatRosterItem(ChatRosterItem::Room, bareJid));

@@ -41,7 +41,6 @@ public:
     void append(ChatRosterItem *item);
     ChatRosterItem *child(int row);
     void clear();
-    bool contains(const QString &id) const;
     QVariant data(int role) const;
     ChatRosterItem* find(const QString &id);
     QString id() const;

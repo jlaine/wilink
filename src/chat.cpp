@@ -311,9 +311,9 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         // root items
         discoQueue.clear();
-        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        foreach (const QXmppElement &item, disco.getItems())
         {
-            if (item.type() == "item" && !item.attribute("jid").isEmpty() && item.attribute("node").isEmpty())
+            if (item.tagName() == "item" && !item.attribute("jid").isEmpty() && item.attribute("node").isEmpty())
             {
                 discoQueue.append(item.attribute("jid"));
                 // get info for item
@@ -329,9 +329,9 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         discoQueue.removeAll(disco.getFrom());
         // check if it's a conference server
-        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        foreach (const QXmppElement &item, disco.getItems())
         {
-            if (item.type() == "identity" && item.attribute("category") == "conference" && item.attribute("type") == "text")
+            if (item.tagName() == "identity" && item.attribute("category") == "conference" && item.attribute("type") == "text")
             {
                 chatRoomServer = disco.getFrom();
                 roomButton->setEnabled(true);
@@ -344,7 +344,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         // chat rooms list
         QStringList channels;
-        foreach (const QXmppDiscoveryItem &item, disco.getItems())
+        foreach (const QXmppElement &item, disco.getItems())
             channels << item.attribute("jid").split('@')[0];
         channels.sort();
         bool ok = true;
