@@ -91,11 +91,13 @@ protected:
 signals:
     void joinConversation(const QString &jid, bool isRoom);
     void leaveConversation(const QString &jid, bool isRoom);
+    void inviteContact(const QString &jid);
     void removeContact(const QString &jid);
 
 protected slots:
     void slotActivated(const QModelIndex &index);
     void slotLeaveRoom();
+    void slotInviteContact();
     void slotRemoveContact();
 };
 

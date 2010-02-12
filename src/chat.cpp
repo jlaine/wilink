@@ -60,6 +60,7 @@ void application_alert_mac();
 using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
+static const char *ns_conference = "jabber:x:conference";
 static const char *ns_muc = "http://jabber.org/protocol/muc";
 static const char *ns_muc_user = "http://jabber.org/protocol/muc#user";
 
@@ -85,6 +86,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* left panel */
     rosterView = new ChatRosterView(rosterModel);
+    connect(rosterView, SIGNAL(inviteContact(const QString&)), this, SLOT(inviteContact(const QString&)));
     connect(rosterView, SIGNAL(joinConversation(const QString&, bool)), this, SLOT(joinConversation(const QString&, bool)));
     connect(rosterView, SIGNAL(leaveConversation(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
     connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
@@ -361,6 +363,32 @@ void Chat::error(QXmppClient::Error error)
         qWarning("Received a resource conflict from chat server");
         qApp->quit();
     }
+}
+
+void Chat::inviteContact(const QString &jid)
+{
+    ChatRoomPrompt prompt(client, chatRoomServer, this);
+    if (!prompt.exec())
+        return;
+
+    // join chat room
+    const QString roomJid = prompt.textValue();
+    joinConversation(roomJid, true);
+
+    // invite contact
+    QList<QXmppElement> children;
+
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_conference);
+    x.setAttribute("jid", roomJid);
+    x.setAttribute("reason", "Let's talk");
+
+    QXmppMessage message;
+    message.setTo(jid);
+    message.setType(QXmppMessage::Normal);
+    message.setExtension(x);
+    client->sendPacket(message);
 }
 
 void Chat::iqReceived(const QXmppIq&)

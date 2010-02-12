@@ -401,7 +401,9 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     if (type == ChatRosterItem::Contact)
     {
         QMenu *menu = new QMenu(this);
-        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
+        QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
+        connect(action, SIGNAL(triggered()), this, SLOT(slotInviteContact()));
+        action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
         connect(action, SIGNAL(triggered()), this, SLOT(slotRemoveContact()));
         menu->popup(event->globalPos());
     } else if (type == ChatRosterItem::Room) {
@@ -447,8 +449,8 @@ void ChatRosterView::slotActivated(const QModelIndex &index)
     if (!index.isValid())
         return;
 
-    int type = index.data(TypeRole).toInt();
-    QString jid = index.data(IdRole).toString();
+    const int type = index.data(TypeRole).toInt();
+    const QString jid = index.data(IdRole).toString();
     if (type == ChatRosterItem::Contact)
         emit joinConversation(jid, false);
     else if (type == ChatRosterItem::Room)
@@ -458,17 +460,36 @@ void ChatRosterView::slotActivated(const QModelIndex &index)
 void ChatRosterView::slotLeaveRoom()
 {
     const QModelIndex &index = currentIndex();
-    if (index.isValid())
+    if (!index.isValid())
+        return;
+
+    const int type = index.data(TypeRole).toInt();
+    if (type == ChatRosterItem::Room)
     {
         const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
         emit leaveConversation(jid, true);
     }
 }
 
+void ChatRosterView::slotInviteContact()
+{
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
+        return;
+
+    const int type = index.data(TypeRole).toInt();
+    if (type == ChatRosterItem::Contact)
+        emit inviteContact(index.data(IdRole).toString());
+}
+
 void ChatRosterView::slotRemoveContact()
 {
     const QModelIndex &index = currentIndex();
-    if (index.isValid())
+    if (!index.isValid())
+        return;
+
+    const int type = index.data(TypeRole).toInt();
+    if (type == ChatRosterItem::Contact)
         emit removeContact(index.data(IdRole).toString());
 }
 

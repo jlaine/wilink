@@ -92,6 +92,10 @@
         <source>Leave room</source>
         <translation>Quiter le salon</translation>
     </message>
+    <message>
+        <source>Invite to a chat room</source>
+        <translation>Inviter à un salon de discussion</translation>
+    </message>
 </context>
 <context>
     <name>Diagnostics</name>

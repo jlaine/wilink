@@ -49,15 +49,16 @@ public:
 protected slots:
     void addContact();
     void addRoom();
-    void joinConversation(const QString &jid, bool isRoom);
-    void leaveConversation(const QString &jid, bool isRoom);
+    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
+    void archiveChatReceived(const QXmppArchiveChat &chat);
     void connected();
     void disconnected();
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void error(QXmppClient::Error error);
+    void inviteContact(const QString &jid);
     void iqReceived(const QXmppIq&);
-    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
-    void archiveChatReceived(const QXmppArchiveChat &chat);
+    void joinConversation(const QString &jid, bool isRoom);
+    void leaveConversation(const QString &jid, bool isRoom);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &presence);
     void reconnect();
