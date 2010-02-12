@@ -1,4 +1,4 @@
-wDesktop 0.5.4 (2010-02-12)
+wDesktop 0.6.0 (2010-02-12)
  * If we receive a subscribe request from someone in our list, accept it.
  * When a contact is added to our list, update it's vCard.
  * Add support for chat rooms.
