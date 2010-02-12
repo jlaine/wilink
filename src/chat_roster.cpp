@@ -46,6 +46,31 @@ enum RosterRoles {
     MessagesRole,
 };
 
+static void paintMessages(QPixmap &icon, int messages)
+{
+    QString pending = QString::number(messages);
+    QPainter painter(&icon);
+    QFont font = painter.font();
+    font.setWeight(QFont::Bold);
+    painter.setFont(font);
+
+    // text rectangle
+    QRect rect = painter.fontMetrics().boundingRect(pending);
+    rect.setWidth(rect.width() + 4);
+    if (rect.width() < rect.height())
+        rect.setWidth(rect.height());
+    else
+        rect.setHeight(rect.width());
+    rect.moveTop(2);
+    rect.moveRight(icon.width() - 2);
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setBrush(Qt::red);
+    painter.setPen(Qt::white);
+    painter.drawEllipse(rect);
+    painter.drawText(rect, Qt::AlignCenter, pending);
+}
+
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
@@ -95,43 +120,6 @@ QString ChatRosterModel::contactStatus(const QString &bareJid) const
     return suffix;
 }
 
-QPixmap ChatRosterModel::contactStatusIcon(const QString &bareJid) const
-{
-    QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
-
-    int messages = 0;
-    ChatRosterItem *item = rootItem->find(bareJid);
-    if (item)
-        messages = item->data(MessagesRole).toInt();
-
-    if (messages)
-    {
-        QString pending = QString::number(messages);
-        QPainter painter(&icon);
-        QFont font = painter.font();
-        font.setWeight(QFont::Bold);
-        painter.setFont(font);
-
-        // text rectangle
-        QRect rect = painter.fontMetrics().boundingRect(pending);
-        rect.setWidth(rect.width() + 4);
-        if (rect.width() < rect.height())
-            rect.setWidth(rect.height());
-        else
-            rect.setHeight(rect.width());
-        rect.moveTop(2);
-        rect.moveRight(icon.width() - 2);
-
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setBrush(Qt::red);
-        painter.setPen(Qt::white);
-        painter.drawEllipse(rect);
-        painter.drawText(rect, Qt::AlignCenter, pending);
-    }
-
-    return icon;
-}
-
 QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 {
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
@@ -164,7 +152,10 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         {
             const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                return QIcon(contactStatusIcon(entry.getBareJid()));
+                QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
+                if (messages)
+                    paintMessages(icon, messages);
+                return icon;
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(contactAvatar(bareJid));
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
@@ -172,7 +163,10 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         } else if (item->type() == ChatRosterItem::Room) {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                return QIcon(":/chat.png");
+                QPixmap icon(":/chat.png");
+                if (messages)
+                    paintMessages(icon, messages);
+                return icon;
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatroom_") + bareJid.toLower();
             }

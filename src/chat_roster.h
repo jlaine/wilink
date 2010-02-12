@@ -65,7 +65,6 @@ protected slots:
 
 private:
     QString contactStatus(const QString &bareJid) const;
-    QPixmap contactStatusIcon(const QString &bareJid) const;
 
 private:
     QXmppClient *client;
