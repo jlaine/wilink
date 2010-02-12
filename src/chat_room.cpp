@@ -74,10 +74,14 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join.")));
     lineEdit = new QLineEdit;
     layout->addWidget(lineEdit);
+
     listWidget = new QListWidget;
     listWidget->hide();
+    listWidget->setIconSize(QSize(32, 32));
     listWidget->setSortingEnabled(true);
+    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
     layout->addWidget(listWidget);
+
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     layout->addWidget(buttonBox);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
@@ -102,9 +106,20 @@ void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         // chat rooms list
         listWidget->clear();
         foreach (const QXmppElement &item, disco.getItems())
-            listWidget->addItem(item.attribute("jid").split("@").first());
+        {
+            QString jid = item.attribute("jid");
+            QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.attribute("name"));
+            wdgItem->setData(Qt::UserRole, jid);
+            listWidget->addItem(wdgItem);
+        }
         listWidget->show();
     }
+}
+
+void ChatRoomPrompt::itemClicked(QListWidgetItem *item)
+{
+    lineEdit->setText(item->data(Qt::UserRole).toString());
+    validate();
 }
 
 QString ChatRoomPrompt::textValue() const
@@ -114,11 +129,15 @@ QString ChatRoomPrompt::textValue() const
 
 void ChatRoomPrompt::validate()
 {
-    QString jid = lineEdit->text().trimmed().replace(" ", "_").toLower();
-    lineEdit->setText(jid);
-    if (jid.isEmpty())
+    QString jid = lineEdit->text();
+    if (jid.contains(" ") || jid.isEmpty())
+    {
+        lineEdit->setText(jid.trimmed().replace(" ", "_"));
         return;
+    }
     if (!jid.contains("@"))
-        lineEdit->setText(jid + "@" + chatRoomServer);
+        lineEdit->setText(jid.toLower() + "@" + chatRoomServer);
+    else
+        lineEdit->setText(jid.toLower());
     accept();
 }

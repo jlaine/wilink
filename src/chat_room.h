@@ -26,6 +26,7 @@
 
 class QLineEdit;
 class QListWidget;
+class QListWidgetItem;
 class QXmppClient;
 class QXmppMessage;
 
@@ -52,6 +53,7 @@ public:
 
 protected slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void itemClicked(QListWidgetItem * item);
     void validate();
 
 private:
