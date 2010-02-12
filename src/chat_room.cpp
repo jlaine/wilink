@@ -18,6 +18,7 @@
  */
 
 #include <QDebug>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QListWidget>
@@ -63,5 +64,34 @@ void ChatRoom::sendMessage(const QString &text)
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
     emit sendPacket(msg);
+}
+
+ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)
+    : QInputDialog(parent), chatRoomServer(roomServer)
+{
+    setComboBoxEditable(true);
+    setLabelText(tr("Enter the name of the chat room you want to join."));
+    setWindowTitle(tr("Join a chat room"));
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+
+    // get rooms
+    QXmppDiscoveryIq disco;
+    disco.setTo(chatRoomServer);
+    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    client->sendPacket(disco);
+}
+
+void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
+        disco.getFrom() == chatRoomServer)
+    {
+        // chat rooms list
+        QStringList channels;
+        foreach (const QXmppElement &item, disco.getItems())
+            channels << item.attribute("jid").split('@')[0];
+        channels.sort();
+        setComboBoxItems(channels);
+    }
 }
 

@@ -22,6 +22,9 @@
 
 #include "chat_dialog.h"
 
+#include <QInputDialog>
+
+class QXmppClient;
 class QXmppMessage;
 
 class ChatRoom : public ChatDialog
@@ -35,6 +38,20 @@ public:
 protected:
     virtual bool isRoom() const;
     virtual void sendMessage(const QString &text);
+};
+
+class ChatRoomPrompt : public QInputDialog
+{
+    Q_OBJECT
+
+public:
+    ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent);
+
+protected slots:
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+
+private:
+    QString chatRoomServer;
 };
 
 #endif

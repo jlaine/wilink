@@ -48,10 +48,6 @@
         <translation>Rejoindre un salon de discussion</translation>
     </message>
     <message>
-        <source>Enter the name of the chat room you want to join.</source>
-        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre.</translation>
-    </message>
-    <message>
         <source>Cannot join chat room</source>
         <translation>Impossible de rejoindre le salon de discussion</translation>
     </message>
@@ -69,6 +65,17 @@
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>
+    </message>
+</context>
+<context>
+    <name>ChatRoomPrompt</name>
+    <message>
+        <source>Join a chat room</source>
+        <translation>Rejoindre un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Enter the name of the chat room you want to join.</source>
+        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre.</translation>
     </message>
 </context>
 <context>

@@ -193,11 +193,19 @@ void Chat::addContact()
  */
 void Chat::addRoom()
 {
-    // get rooms
-    QXmppDiscoveryIq disco;
-    disco.setTo(chatRoomServer);
-    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    client->sendPacket(disco);
+    ChatRoomPrompt prompt(client, chatRoomServer, this);
+
+    QString jid;
+    while (jid.isEmpty())
+    {
+        if (!prompt.exec())
+            return;
+        jid = prompt.textValue().trimmed().replace(" ", "_").toLower();
+    }
+    if (!jid.contains("@"))
+        jid = jid + "@" + chatRoomServer;
+
+    joinConversation(jid, true);
 }
 
 void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -350,30 +358,6 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
                 qDebug() << "Found chat room server" << chatRoomServer;
             }
         }
-    }
-    else if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.getFrom() == chatRoomServer)
-    {
-        // chat rooms list
-        QStringList channels;
-        foreach (const QXmppElement &item, disco.getItems())
-            channels << item.attribute("jid").split('@')[0];
-        channels.sort();
-        bool ok = true;
-        QString jid;
-        while (jid.isEmpty())
-        {
-            jid = QInputDialog::getItem(this, tr("Join a chat room"),
-                                        tr("Enter the name of the chat room you want to join."),
-                                        channels, 0, true, &ok);
-            if (!ok)
-                return;
-            jid = jid.trimmed().replace(" ", "_").toLower();
-        }
-        if (!jid.contains("@"))
-            jid = jid + "@" + chatRoomServer;
-
-        joinConversation(jid, true);
     }
 }
 
