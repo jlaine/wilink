@@ -438,27 +438,37 @@ void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = msg.getFrom().split("/")[0];
 
-    if (msg.getBody().isEmpty())
-        return;
-
     switch (msg.getType())
     {
-    case QXmppMessage::GroupChat:
-        if (chatDialogs.contains(bareJid))
-            chatDialogs[bareJid]->messageReceived(msg);
+    case QXmppMessage::Normal:
+        if (msg.getExtension().attribute("xmlns") == ns_conference)
+        {
+            const QString contactName = rosterModel->contactName(bareJid);
+            const QString roomJid = msg.getExtension().attribute("jid");
+            if (!roomJid.isEmpty() && QMessageBox::question(this,
+                    tr("Invitation from %1").arg(contactName),
+                    tr("%1 has asked to add you to join the '%2' chat room. Do you accept?").arg(contactName, roomJid),
+                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+            {
+                joinConversation(roomJid, true);
+            }
+        }
         return;
+    case QXmppMessage::Chat:
+        if (!chatDialogs.contains(bareJid))
+            createConversation(bareJid, false);
+        break;
+    case QXmppMessage::GroupChat:
+        if (!chatDialogs.contains(bareJid))
+            return;
+        break;
     case QXmppMessage::Error:
         qWarning() << "Received an error message" << msg.getBody();
         return;
-    case QXmppMessage::Headline:
-        // FIXME : what is this type ?
-        return;
     default:
-        break;
+        return;
     }
 
-    if (!chatDialogs.contains(bareJid))
-        createConversation(bareJid, false);
     ChatDialog *dialog = chatDialogs.value(bareJid);
     dialog->messageReceived(msg);
     if (conversationPanel->currentWidget() != dialog)

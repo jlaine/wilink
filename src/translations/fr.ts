@@ -59,6 +59,10 @@
 
 %2</translation>
     </message>
+    <message>
+        <source>%1 has asked to add you to join the &apos;%2&apos; chat room. Do you accept?</source>
+        <translation>%1 vous invite au salon de discussion &apos;%2&apos;. Acceptez-vous?</translation>
+    </message>
 </context>
 <context>
     <name>ChatHistory</name>
