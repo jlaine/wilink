@@ -93,6 +93,7 @@ signals:
     void removeContact(const QString &jid);
 
 protected slots:
+    void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
     void slotActivated(const QModelIndex &index);
     void slotLeaveRoom();
     void slotInviteContact();

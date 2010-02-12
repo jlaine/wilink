@@ -436,6 +436,18 @@ void ChatRosterView::selectContact(const QString &jid)
     setCurrentIndex(QModelIndex());
 }
 
+void ChatRosterView::selectionChanged(const QItemSelection & selected, const QItemSelection &deselected)
+{
+    QModelIndexList toCollapse = deselected.indexes();
+    foreach (const QModelIndex &index, selected.indexes())
+    {
+        toCollapse.removeAll(index.parent());
+        expand(index);
+    }
+    foreach (const QModelIndex &index, toCollapse)
+        collapse(index);
+}
+
 QSize ChatRosterView::sizeHint () const
 {
     if (!model()->rowCount())
