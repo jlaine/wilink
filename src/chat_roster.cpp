@@ -171,6 +171,9 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QString("chatroom_") + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
+            if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+                return QIcon(":/contact-available.png");
+            }
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatuser_") + bareJid.toLower();
             }
