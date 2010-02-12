@@ -61,6 +61,16 @@ using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
 
+static void dumpElement(const QXmppElement &item, int level = 0)
+{
+    QString pad(level * 2, ' ');
+    qDebug() << (pad + "*").toAscii().constData() << item.tagName();
+    foreach (const QString &attr, item.attributeNames())
+        qDebug() << (pad + "  -").toAscii().constData() << attr << ":" << item.attribute(attr);
+    foreach (const QXmppElement &child, item.children())
+        dumpElement(child, level+1);
+}
+
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
@@ -298,12 +308,8 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 
 #if 0
     qDebug("Received discovery result");
-    foreach (const QXmppDiscoveryItem &item, disco.getItems())
-    {
-        qDebug() << " *" << item.type();
-        foreach (const QString &attr, item.attributes())
-            qDebug() << "   -" << attr << ":" << item.attribute(attr);
-    }
+    foreach (const QXmppElement &item, disco.getItems())
+        dumpElement(item);
 #endif
 
     if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
