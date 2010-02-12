@@ -437,6 +437,7 @@ void Chat::leaveConversation(const QString &jid, bool isRoom)
 void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = msg.getFrom().split("/")[0];
+    bool alert = false;
 
     switch (msg.getType())
     {
@@ -457,6 +458,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         }
         return;
     case QXmppMessage::Chat:
+        alert = true;
         if (!chatDialogs.contains(bareJid))
             createConversation(bareJid, false);
         break;
@@ -471,12 +473,17 @@ void Chat::messageReceived(const QXmppMessage &msg)
         return;
     }
 
+    // add message
     ChatDialog *dialog = chatDialogs.value(bareJid);
     dialog->messageReceived(msg);
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
     else
         rosterView->selectContact(bareJid);
+
+    // if requested, alert user
+    if (!alert)
+        return;
 
     if (!isVisible())
     {
