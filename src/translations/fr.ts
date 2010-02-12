@@ -51,6 +51,18 @@
         <source>Enter the name of the chat room you want to join.</source>
         <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre.</translation>
     </message>
+    <message>
+        <source>Cannot join chat room</source>
+        <translation>Impossible de rejoindre le salon de discussion</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot join chat room %1.
+
+%2</source>
+        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion %1.
+
+%2</translation>
+    </message>
 </context>
 <context>
     <name>ChatHistory</name>

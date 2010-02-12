@@ -490,6 +490,20 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     packet.setTo(presence.getFrom());
     switch (presence.getType())
     {
+    case QXmppPresence::Error:
+        if (presence.getExtension().attribute("xmlns") == ns_muc)
+        {
+            const QString bareJid = presence.getFrom().split('/').first();
+            QXmppStanza::Error error = presence.getError();
+            if (error.getType() == QXmppStanza::Error::Cancel && chatDialogs.contains(bareJid))
+            {
+                leaveConversation(bareJid, true);
+                QMessageBox::warning(this,
+                    tr("Cannot join chat room"),
+                    tr("Sorry, but you cannot join chat room %1.\n\n%2").arg(bareJid).arg(error.getText()));
+            }
+        }
+        break;
     case QXmppPresence::Subscribe:
         {
             QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.getFrom());
