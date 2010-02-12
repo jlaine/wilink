@@ -194,18 +194,9 @@ void Chat::addContact()
 void Chat::addRoom()
 {
     ChatRoomPrompt prompt(client, chatRoomServer, this);
-
-    QString jid;
-    while (jid.isEmpty())
-    {
-        if (!prompt.exec())
-            return;
-        jid = prompt.textValue().trimmed().replace(" ", "_").toLower();
-    }
-    if (!jid.contains("@"))
-        jid = jid + "@" + chatRoomServer;
-
-    joinConversation(jid, true);
+    if (!prompt.exec())
+        return;
+    joinConversation(prompt.textValue(), true);
 }
 
 void Chat::archiveChatReceived(const QXmppArchiveChat &chat)

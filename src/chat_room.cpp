@@ -18,9 +18,10 @@
  */
 
 #include <QDebug>
-#include <QInputDialog>
+#include <QDialogButtonBox>
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
 
@@ -67,10 +68,22 @@ void ChatRoom::sendMessage(const QString &text)
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)
-    : QInputDialog(parent), chatRoomServer(roomServer)
+    : QDialog(parent), chatRoomServer(roomServer)
 {
-    setComboBoxEditable(true);
-    setLabelText(tr("Enter the name of the chat room you want to join."));
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join.")));
+    lineEdit = new QLineEdit;
+    layout->addWidget(lineEdit);
+    listWidget = new QListWidget;
+    listWidget->hide();
+    listWidget->setSortingEnabled(true);
+    layout->addWidget(listWidget);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    layout->addWidget(buttonBox);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    setLayout(layout);
+
     setWindowTitle(tr("Join a chat room"));
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
 
@@ -87,11 +100,25 @@ void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         disco.getFrom() == chatRoomServer)
     {
         // chat rooms list
-        QStringList channels;
+        listWidget->clear();
         foreach (const QXmppElement &item, disco.getItems())
-            channels << item.attribute("jid").split('@')[0];
-        channels.sort();
-        setComboBoxItems(channels);
+            listWidget->addItem(item.attribute("jid").split("@").first());
+        listWidget->show();
     }
 }
 
+QString ChatRoomPrompt::textValue() const
+{
+    return lineEdit->text();
+}
+
+void ChatRoomPrompt::validate()
+{
+    QString jid = lineEdit->text().trimmed().replace(" ", "_").toLower();
+    lineEdit->setText(jid);
+    if (jid.isEmpty())
+        return;
+    if (!jid.contains("@"))
+        lineEdit->setText(jid + "@" + chatRoomServer);
+    accept();
+}
