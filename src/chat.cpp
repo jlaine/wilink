@@ -412,7 +412,10 @@ void Chat::leaveConversation(const QString &jid, bool isRoom)
     // close view
     ChatDialog *dialog = chatDialogs.take(jid);
     if (conversationPanel->count() == 1)
+    {
         conversationPanel->hide();
+        QTimer::singleShot(100, this, SLOT(resizeContacts()));
+    }
     dialog->deleteLater();
 }
 
@@ -590,6 +593,10 @@ void Chat::resizeContacts()
 {
     QSize hint = rosterView->sizeHint();
     hint.setHeight(hint.height() + 32);
+    if (conversationPanel->isVisible() && hint.width() < size().width())
+        hint.setWidth(size().width());
+    if (hint.height() < size().height())
+        hint.setHeight(size().height());
 
     /* Make sure we do not resize to a size exceeding the desktop size
      * + some padding for the window title.
@@ -602,7 +609,7 @@ void Chat::resizeContacts()
         hint.setWidth(hint.width() + 32);
     }
 
-    resize(hint.expandedTo(size()));
+    resize(hint);
 }
 
 /** Send an XMPP Ping as described in XEP-0199:

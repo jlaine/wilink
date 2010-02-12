@@ -437,10 +437,8 @@ QSize ChatRosterView::sizeHint () const
     if (!model()->rowCount())
         return QTreeView::sizeHint();
 
-    QSize hint(64, 0);
+    QSize hint(200, 0);
     hint.setHeight(model()->rowCount() * sizeHintForRow(0));
-    for (int i = 0; i < SortingColumn; i++)
-        hint.setWidth(hint.width() + sizeHintForColumn(i));
     return hint;
 }
 
