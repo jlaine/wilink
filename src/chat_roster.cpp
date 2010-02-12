@@ -385,6 +385,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
+    setItemsExpandable(false);
     setMinimumWidth(200);
     setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -429,7 +430,8 @@ void ChatRosterView::selectContact(const QString &jid)
         QModelIndex index = model()->index(i, 0);
         if (index.data(IdRole).toString() == jid)
         {
-            setCurrentIndex(index);
+            if (index != currentIndex())
+                setCurrentIndex(index);
             return;
         }
     }
@@ -438,9 +440,18 @@ void ChatRosterView::selectContact(const QString &jid)
 
 void ChatRosterView::selectionChanged(const QItemSelection & selected, const QItemSelection &deselected)
 {
-    QModelIndexList toCollapse = deselected.indexes();
+    if (selected.indexes().isEmpty())
+        return;
+    QModelIndexList toCollapse;
+    for (int i = 0; i < model()->rowCount(); i++)
+    {
+        QModelIndex index = model()->index(i, 0);
+        if (isExpanded(index))
+            toCollapse << index;
+    }
     foreach (const QModelIndex &index, selected.indexes())
     {
+        toCollapse.removeAll(index);
         toCollapse.removeAll(index.parent());
         expand(index);
     }
