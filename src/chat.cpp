@@ -549,11 +549,13 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         }
         break;
     default:
+#if 0
         if (!presence.getExtension().isNull())
         {
             qDebug("Received a presence with an extension");
             dumpElement(presence.getExtension());
         }
+#endif
         break;
     }
 }
