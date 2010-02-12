@@ -70,7 +70,6 @@ private:
 private:
     QXmppClient *client;
     QMap<QString, QPixmap> rosterAvatars;
-    QMap<QString, int> pendingMessages;
 
     ChatRosterItem *rootItem;
 };

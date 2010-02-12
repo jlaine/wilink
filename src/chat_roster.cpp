@@ -43,6 +43,7 @@ enum RosterColumns {
 enum RosterRoles {
     IdRole = Qt::UserRole,
     TypeRole,
+    MessagesRole,
 };
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
@@ -98,9 +99,14 @@ QPixmap ChatRosterModel::contactStatusIcon(const QString &bareJid) const
 {
     QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
 
-    if (pendingMessages.contains(bareJid))
+    int messages = 0;
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+        messages = item->data(MessagesRole).toInt();
+
+    if (messages)
     {
-        QString pending = QString::number(pendingMessages[bareJid]);
+        QString pending = QString::number(messages);
         QPainter painter(&icon);
         QFont font = painter.font();
         font.setWeight(QFont::Bold);
@@ -133,12 +139,26 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     QString bareJid = item->id();
+    int messages = item->data(MessagesRole).toInt();
+
     if (role == IdRole) {
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
     } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
         return item->data(Qt::DisplayRole).toString();
+    } else if(role == Qt::FontRole && index.column() == ContactColumn) {
+        if (messages)
+            return QFont("", -1, QFont::Bold, true);
+    } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
+        if (messages)
+        {
+            QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
+            grad.setColorAt(0, QColor(255, 0, 0, 144));
+            grad.setColorAt(1, Qt::transparent);
+            grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+            return QBrush(grad);
+        }
     } else {
         if (item->type() == ChatRosterItem::Contact)
         {
@@ -149,17 +169,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QIcon(contactAvatar(bareJid));
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
-            } else if(role == Qt::FontRole && index.column() == ContactColumn) {
-                if (pendingMessages.contains(bareJid))
-                    return QFont("", -1, QFont::Bold, true);
-            } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
-                if (pendingMessages.contains(bareJid)) {
-                    QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
-                    grad.setColorAt(0, QColor(255, 0, 0, 144));
-                    grad.setColorAt(1, Qt::transparent);
-                    grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-                    return QBrush(grad);
-                }
             }
         } else if (item->type() == ChatRosterItem::Room) {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
@@ -316,11 +325,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
-        if (pendingMessages.contains(bareJid))
-            pendingMessages[bareJid]++;
-        else
-            pendingMessages[bareJid] = 1;
-
+        item->setData(MessagesRole, item->data(MessagesRole).toInt() + 1);
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
@@ -348,7 +353,7 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
-        pendingMessages.remove(bareJid);
+        item->setData(MessagesRole, 0);
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
