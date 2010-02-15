@@ -4,20 +4,8 @@
 <context>
     <name>Chat</name>
     <message>
-        <source>Connected</source>
-        <translation>Connecté</translation>
-    </message>
-    <message>
-        <source>Disconnected</source>
-        <translation>Déconnecté</translation>
-    </message>
-    <message>
         <source>%1 has asked to add you to his or her contact list. Do you accept?</source>
         <translation>%1 a demandé à vous ajouter à sa liste de contacts. Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Connecting..</source>
-        <translation>Connexion..</translation>
     </message>
     <message>
         <source>Invitation from %1</source>
@@ -62,6 +50,18 @@
     <message>
         <source>%1 has asked to add you to join the &apos;%2&apos; chat room. Do you accept?</source>
         <translation>%1 vous invite au salon de discussion &apos;%2&apos;. Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Available</source>
+        <translation>Disponible</translation>
+    </message>
+    <message>
+        <source>Busy</source>
+        <translation>Occupé</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>Déconnecté</translation>
     </message>
 </context>
 <context>

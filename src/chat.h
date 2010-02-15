@@ -29,6 +29,7 @@ class ChatDialog;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
+class QComboBox;
 class QLabel;
 class QPushButton;
 class QSplitter;
@@ -66,6 +67,7 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendPing();
+    void statusChanged(int currentIndex);
     void vCardReceived(const QXmppVCard&);
 
 protected:
@@ -73,6 +75,8 @@ protected:
     ChatDialog *createConversation(const QString &jid, bool room);
 
 private:
+    bool isBusy;
+    bool isConnected;
     bool reconnectOnDisconnect;
 
     QPushButton *addButton;
@@ -85,8 +89,7 @@ private:
     ChatRosterView *rosterView;
 
     QSplitter *splitter;
-    QLabel *statusIconLabel;
-    QLabel *statusLabel;
+    QComboBox *statusCombo;
     QSystemTrayIcon *systemTrayIcon;
     QTimer *timeoutTimer;
     QStackedWidget *conversationPanel;

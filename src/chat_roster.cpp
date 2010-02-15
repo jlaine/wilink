@@ -76,6 +76,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
+    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));

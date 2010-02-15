@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QComboBox>
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QInputDialog>
@@ -64,6 +65,12 @@ static const char *ns_conference = "jabber:x:conference";
 static const char *ns_muc = "http://jabber.org/protocol/muc";
 static const char *ns_muc_user = "http://jabber.org/protocol/muc#user";
 
+enum StatusIndexes {
+    AvailableIndex = 0,
+    BusyIndex = 1,
+    OfflineIndex = 2,
+};
+
 static void dumpElement(const QXmppElement &item, int level = 0)
 {
     QString pad(level * 2, ' ');
@@ -75,7 +82,7 @@ static void dumpElement(const QXmppElement &item, int level = 0)
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
-    : reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
+    : isBusy(false), isConnected(false), reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
     rosterModel =  new ChatRosterModel(client);
@@ -121,11 +128,13 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     hbox->addStretch();
 
-    statusIconLabel = new QLabel;
-    statusIconLabel->setPixmap(QPixmap(":/contact-offline.png"));
-    hbox->addWidget(statusIconLabel);
-    statusLabel = new QLabel;
-    hbox->addWidget(statusLabel);
+    statusCombo = new QComboBox;
+    statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
+    statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
+    statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
+    statusCombo->setCurrentIndex(OfflineIndex);
+    connect(statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
+    hbox->addWidget(statusCombo);
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -236,10 +245,10 @@ void Chat::changeEvent(QEvent *event)
 void Chat::connected()
 {
     qWarning("Connected to chat server");
+    isConnected = true;
     addButton->setEnabled(true);
     pingTimer->start();
-    statusIconLabel->setPixmap(QPixmap(":/contact-available.png"));
-    statusLabel->setText(tr("Connected"));
+    statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 
     /* discover services */
     QXmppDiscoveryIq disco;
@@ -295,21 +304,18 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
 void Chat::disconnected()
 {
     qWarning("Disconnected from chat server");
+    isConnected = false;
     addButton->setEnabled(false);
     roomButton->setEnabled(false);
+    statusCombo->setCurrentIndex(OfflineIndex);
     pingTimer->stop();
     timeoutTimer->stop();
-    rosterModel->disconnected();
 
-    statusIconLabel->setPixmap(QPixmap(":/contact-offline.png"));
     if (reconnectOnDisconnect)
     {
         qWarning("Reconnecting to chat server");
         reconnectOnDisconnect = false;
-        statusLabel->setText(tr("Connecting.."));
         client->connectToServer(client->getConfiguration());
-    } else {
-        statusLabel->setText(tr("Disconnected"));
     }
 }
 
@@ -618,7 +624,6 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setIgnoreSslErrors(false);
 
     /* connect to server */
-    statusLabel->setText(tr("Connecting.."));
     client->connectToServer(config);
     return true;
 }
@@ -683,6 +688,36 @@ void Chat::sendPing()
     ping.setTo(client->getConfiguration().getDomain());
     client->sendPacket(ping);
     timeoutTimer->start();
+}
+
+void Chat::statusChanged(int currentIndex)
+{
+    if (currentIndex == AvailableIndex)
+    {
+        isBusy = false;
+        if (isConnected)
+        {
+            QXmppPresence presence;
+            presence.setType(QXmppPresence::Available);
+            client->sendPacket(presence);
+        }
+        else
+            client->connectToServer(client->getConfiguration());
+    } else if (currentIndex == BusyIndex) {
+        isBusy = true;
+        if (isConnected)
+        {
+            QXmppPresence presence;
+            presence.setType(QXmppPresence::Available);
+            presence.setStatus(QXmppPresence::Status::DND);
+            client->sendPacket(presence);
+        }
+        else
+            client->connectToServer(client->getConfiguration());
+    } else if (currentIndex == OfflineIndex) {
+        if (isConnected)
+            client->disconnect();
+    }
 }
 
 void Chat::vCardReceived(const QXmppVCard& vcard)
