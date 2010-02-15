@@ -39,6 +39,7 @@
 #include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
+#include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppLogger.h"
@@ -61,9 +62,6 @@ void application_alert_mac();
 using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
-static const char *ns_conference = "jabber:x:conference";
-static const char *ns_muc = "http://jabber.org/protocol/muc";
-static const char *ns_muc_user = "http://jabber.org/protocol/muc#user";
 
 enum StatusIndexes {
     AvailableIndex = 0,

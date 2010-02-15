@@ -23,8 +23,8 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QPushButton>
 
+#include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
 
@@ -53,7 +53,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     message.body = msg.getBody();
     message.from = from;
     message.local = (from == chatLocalName);
-    if (msg.getExtension().attribute("xmlns") == "jabber:x:delay")
+    if (msg.getExtension().attribute("xmlns") == ns_delay)
     {
         const QString str = msg.getExtension().attribute("stamp");
         message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");

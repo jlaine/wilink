@@ -20,17 +20,11 @@
 #include <QDateTime>
 #include <QLabel>
 #include <QLayout>
-#include <QList>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
-#include <QStringList>
 
+#include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppRoster.h"
-#include "qxmpp/QXmppRosterIq.h"
-#include "qxmpp/QXmppArchiveIq.h"
-#include "qxmpp/QXmppVCardManager.h"
 
 #include "chat_dialog.h"
 #include "chat_edit.h"
@@ -103,7 +97,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     ChatHistoryMessage message;
     message.body = msg.getBody();
-    if (msg.getExtension().attribute("xmlns") == "jabber:x:delay")
+    if (msg.getExtension().attribute("xmlns") == ns_delay)
     {
         const QString str = msg.getExtension().attribute("stamp");
         message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
