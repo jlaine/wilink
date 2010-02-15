@@ -50,7 +50,7 @@ static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
 TrayIcon::TrayIcon()
-    : chat(NULL), diagnostics(NULL), photos(NULL),
+    : chat(NULL), diagnostics(NULL), photos(NULL), updates(NULL),
     connected(false),
     refreshInterval(0)
 {
@@ -100,6 +100,15 @@ TrayIcon::TrayIcon()
 
     /* fetch menu */
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
+}
+
+TrayIcon::~TrayIcon()
+{
+    delete chat;
+    delete diagnostics;
+    delete updates;
+    if (photos)
+        delete photos;
 }
 
 void TrayIcon::fetchIcon()

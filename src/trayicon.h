@@ -47,6 +47,7 @@ class TrayIcon : public QSystemTrayIcon
 
 public:
     TrayIcon();
+    ~TrayIcon();
 
 protected slots:
     void fetchMenu();
