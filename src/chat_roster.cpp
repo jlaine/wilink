@@ -301,7 +301,18 @@ void ChatRosterModel::rosterChanged(const QString &jid)
 
 void ChatRosterModel::rosterReceived()
 {
-    rootItem->clear();
+    // remove existing contacts
+    QList <ChatRosterItem*> goners;
+    for (int i = 0; i < rootItem->size(); i++)
+    {
+        ChatRosterItem *child = rootItem->child(i);
+        if (child->type() == ChatRosterItem::Contact)
+            goners << child;
+    }
+    foreach (ChatRosterItem *child, goners)
+        rootItem->remove(child);
+
+    // add received contacts
     foreach (const QString &jid, client->getRoster().getRosterBareJids())
     {
         rootItem->append(new ChatRosterItem(ChatRosterItem::Contact, jid));
