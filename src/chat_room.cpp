@@ -83,7 +83,6 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     layout->addWidget(lineEdit);
 
     listWidget = new QListWidget;
-    listWidget->hide();
     listWidget->setIconSize(QSize(32, 32));
     listWidget->setSortingEnabled(true);
     connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
@@ -119,7 +118,6 @@ void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             wdgItem->setData(Qt::UserRole, jid);
             listWidget->addItem(wdgItem);
         }
-        listWidget->show();
     }
 }
 

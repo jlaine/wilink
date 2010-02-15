@@ -254,7 +254,7 @@ void Chat::connected()
     client->sendPacket(disco);
 
     /* re-join conversations */
-    rejoinConversations();
+    QTimer::singleShot(500, this, SLOT(rejoinConversations()));
 }
 
 /** Create a conversation dialog for the specified recipient.
