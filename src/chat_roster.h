@@ -47,6 +47,7 @@ public:
 
     QPixmap contactAvatar(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
+    QString ownName() const;
 
     void addRoom(const QString &bareJid);
     void removeRoom(const QString &bareJid);
@@ -55,6 +56,7 @@ public:
     void clearPendingMessages(const QString &bareJid);
 
 public slots:
+    void connected();
     void disconnected();
 
 protected slots:
@@ -70,6 +72,7 @@ private:
 private:
     QXmppClient *client;
     ChatRosterItem *rootItem;
+    QString nickName;
 };
 
 class ChatRosterView : public QTreeView

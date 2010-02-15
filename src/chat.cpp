@@ -156,7 +156,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
-    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -253,11 +252,6 @@ void Chat::connected()
     disco.setTo(client->getConfiguration().getDomain());
     disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     client->sendPacket(disco);
-
-    /* request own vCard */
-    ownName = client->getConfiguration().getUser();
-    client->getVCardManager().requestVCard(
-        client->getConfiguration().getJidBare());
 }
 
 /** Create a conversation dialog for the specified recipient.
@@ -267,7 +261,7 @@ void Chat::connected()
 ChatDialog *Chat::createConversation(const QString &jid, bool room)
 {
     ChatDialog *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
-    dialog->setLocalName(ownName);
+    dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
     connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
@@ -282,7 +276,7 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
         // join room
         rosterModel->addRoom(jid);
         QXmppPresence packet;
-        packet.setTo(jid + "/" + ownName);
+        packet.setTo(jid + "/" + rosterModel->ownName());
         packet.setType(QXmppPresence::Available);
         QXmppElement x;
         x.setTagName("x");
@@ -429,7 +423,7 @@ void Chat::leaveConversation(const QString &jid, bool isRoom)
         rosterModel->removeRoom(jid);
 
         QXmppPresence packet;
-        packet.setTo(jid + "/" + ownName);
+        packet.setTo(jid + "/" + rosterModel->ownName());
         packet.setType(QXmppPresence::Unavailable);
         client->sendPacket(packet);
     }
@@ -715,16 +709,6 @@ void Chat::statusChanged(int currentIndex)
     } else if (currentIndex == OfflineIndex) {
         if (isConnected)
             client->disconnect();
-    }
-}
-
-void Chat::vCardReceived(const QXmppVCard& vcard)
-{
-    const QString bareJid = vcard.getFrom();
-    if (bareJid == client->getConfiguration().getJidBare())
-    {
-        if (!vcard.getNickName().isEmpty())
-            ownName = vcard.getNickName();
     }
 }
 

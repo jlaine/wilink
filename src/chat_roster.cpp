@@ -76,6 +76,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     : client(xmppClient)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
+    connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
@@ -92,6 +93,14 @@ ChatRosterModel::~ChatRosterModel()
 int ChatRosterModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
+}
+
+void ChatRosterModel::connected()
+{
+    /* request own vCard */
+    nickName = client->getConfiguration().getUser();
+    client->getVCardManager().requestVCard(
+        client->getConfiguration().getJidBare());
 }
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
@@ -214,6 +223,11 @@ QModelIndex ChatRosterModel::index(int row, int column, const QModelIndex &paren
         return QModelIndex();
 }
 
+QString ChatRosterModel::ownName() const
+{
+    return nickName;
+}
+
 QModelIndex ChatRosterModel::parent(const QModelIndex & index) const
 {
     if (!index.isValid())
@@ -321,6 +335,11 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
+    }
+    if (bareJid == client->getConfiguration().getJidBare())
+    {
+        if (!vcard.getNickName().isEmpty())
+            nickName = vcard.getNickName();
     }
 }
 

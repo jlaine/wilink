@@ -68,7 +68,6 @@ protected slots:
     void resizeContacts();
     void sendPing();
     void statusChanged(int currentIndex);
-    void vCardReceived(const QXmppVCard&);
 
 protected:
     void changeEvent(QEvent *event);
@@ -96,7 +95,6 @@ private:
 
     QString chatRoomServer;
     QStringList discoQueue;
-    QString ownName;
 };
 
 
