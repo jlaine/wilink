@@ -53,7 +53,14 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     message.body = msg.getBody();
     message.from = from;
     message.local = (from == chatLocalName);
-    message.datetime = QDateTime::currentDateTime();
+    if (msg.getExtension().attribute("xmlns") == "jabber:x:delay")
+    {
+        const QString str = msg.getExtension().attribute("stamp");
+        message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+        message.datetime.setTimeSpec(Qt::UTC);
+    } else {
+        message.datetime = QDateTime::currentDateTime();
+    }
     chatHistory->addMessage(message);
 }
 
