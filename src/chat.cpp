@@ -92,7 +92,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* left panel */
     rosterView = new ChatRosterView(rosterModel);
-    connect(rosterView, SIGNAL(joinConversation(const QString&, bool)), this, SLOT(joinConversation(const QString&, bool)));
     connect(rosterView, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
@@ -688,10 +687,16 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     {
         if (action == ChatRosterView::InviteAction)
             inviteContact(jid);
+        else if (action == ChatRosterView::JoinAction)
+            joinConversation(jid, false);
+        else if (action == ChatRosterView::LeaveAction)
+            leaveConversation(jid, false);
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
     } else if (type == ChatRosterItem::Room) {
-        if (action == ChatRosterView::LeaveAction)
+        if (action == ChatRosterView::JoinAction)
+            joinConversation(jid, true);
+        else if (action == ChatRosterView::LeaveAction)
             leaveConversation(jid, true);
     }
 }

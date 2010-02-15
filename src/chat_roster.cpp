@@ -488,12 +488,9 @@ void ChatRosterView::slotActivated(const QModelIndex &index)
     if (!index.isValid())
         return;
 
-    const int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    if (type == ChatRosterItem::Contact)
-        emit joinConversation(jid, false);
-    else if (type == ChatRosterItem::Room)
-        emit joinConversation(jid, true);
+    emit itemAction(JoinAction,
+        index.data(ChatRosterModel::IdRole).toString(),
+        index.data(ChatRosterModel::TypeRole).toInt());
 }
 
 void ChatRosterView::slotLeaveRoom()

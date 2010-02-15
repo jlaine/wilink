@@ -92,6 +92,7 @@ public:
         NoAction,
         AddAction,
         InviteAction,
+        JoinAction,
         LeaveAction,
         RemoveAction,
     };
@@ -105,7 +106,6 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 signals:
-    void joinConversation(const QString &jid, bool isRoom);
     void itemAction(int action, const QString &jid, int type);
 
 protected slots:
