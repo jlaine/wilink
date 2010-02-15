@@ -191,19 +191,19 @@ void ChatRoomOptions::iqReceived(const QXmppIq &iq)
     {
         if (field.tagName() == "field" && !field.attribute("var").isEmpty())
         {
-            QWidget *widget = NULL;
             if (field.attribute("type") == "boolean")
             {
                 QCheckBox *checkbox = new QCheckBox(field.attribute("label"));
                 checkbox->setChecked(field.firstChild("value").value() == "1");
-                widget = checkbox;
+                checkbox->setObjectName(field.attribute("var"));
+                vbox->addWidget(checkbox);
             } else if (field.attribute("type") == "text-single") {
-                widget = new QLineEdit(field.firstChild("value").value());
-            }
-            if (widget)
-            {
+                QHBoxLayout *hbox = new QHBoxLayout;
+                hbox->addWidget(new QLabel(field.attribute("label")));
+                QWidget *widget = new QLineEdit(field.firstChild("value").value());
                 widget->setObjectName(field.attribute("var"));
-                vbox->addWidget(widget);
+                hbox->addWidget(widget);
+                vbox->addItem(hbox);
             }
         }
 
