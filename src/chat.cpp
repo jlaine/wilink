@@ -377,8 +377,6 @@ void Chat::inviteContact(const QString &jid)
     joinConversation(roomJid, true);
 
     // invite contact
-    QList<QXmppElement> children;
-
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_conference);
