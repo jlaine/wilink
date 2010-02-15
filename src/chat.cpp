@@ -54,6 +54,7 @@
 #include "chat_dialog.h"
 #include "chat_room.h"
 #include "chat_roster.h"
+#include "chat_roster_item.h"
 
 #ifdef QT_MAC_USE_COCOA
 void application_alert_mac();
@@ -91,10 +92,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* left panel */
     rosterView = new ChatRosterView(rosterModel);
-    connect(rosterView, SIGNAL(inviteContact(const QString&)), this, SLOT(inviteContact(const QString&)));
     connect(rosterView, SIGNAL(joinConversation(const QString&, bool)), this, SLOT(joinConversation(const QString&, bool)));
-    connect(rosterView, SIGNAL(leaveConversation(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
-    connect(rosterView, SIGNAL(removeContact(const QString&)), this, SLOT(removeContact(const QString&)));
+    connect(rosterView, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
@@ -680,6 +679,21 @@ void Chat::resizeContacts()
     }
 
     resize(hint);
+}
+
+void Chat::rosterAction(int action, const QString &jid, int type)
+{
+    qDebug() << "roster action" << action << "on" << jid;
+    if (type == ChatRosterItem::Contact)
+    {
+        if (action == ChatRosterView::InviteAction)
+            inviteContact(jid);
+        else if (action == ChatRosterView::RemoveAction)
+            removeContact(jid);
+    } else if (type == ChatRosterItem::Room) {
+        if (action == ChatRosterView::LeaveAction)
+            leaveConversation(jid, true);
+    }
 }
 
 /** Send a request to join a multi-user chat.

@@ -37,6 +37,13 @@ class ChatRosterModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    enum Role {
+        IdRole = Qt::UserRole,
+        TypeRole,
+        MessagesRole,
+        AvatarRole,
+    };
+
     ChatRosterModel(QXmppClient *client);
     ~ChatRosterModel();
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -80,6 +87,15 @@ class ChatRosterView : public QTreeView
     Q_OBJECT
 
 public:
+    enum Action
+    {
+        NoAction,
+        AddAction,
+        InviteAction,
+        LeaveAction,
+        RemoveAction,
+    };
+
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
     void selectContact(const QString &jid);
     QSize sizeHint() const;
@@ -90,9 +106,7 @@ protected:
 
 signals:
     void joinConversation(const QString &jid, bool isRoom);
-    void leaveConversation(const QString &jid, bool isRoom);
-    void inviteContact(const QString &jid);
-    void removeContact(const QString &jid);
+    void itemAction(int action, const QString &jid, int type);
 
 protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);

@@ -40,13 +40,6 @@ enum RosterColumns {
     MaxColumn,
 };
 
-enum RosterRoles {
-    IdRole = Qt::UserRole,
-    TypeRole,
-    MessagesRole,
-    AvatarRole,
-};
-
 static void paintMessages(QPixmap &icon, int messages)
 {
     QString pending = QString::number(messages);
@@ -436,7 +429,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     if (!index.isValid())
         return;
 
-    int type = index.data(TypeRole).toInt();
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
     if (type == ChatRosterItem::Contact)
     {
         QMenu *menu = new QMenu(this);
@@ -464,7 +457,7 @@ void ChatRosterView::selectContact(const QString &jid)
     for (int i = 0; i < model()->rowCount(); i++)
     {
         QModelIndex index = model()->index(i, 0);
-        if (index.data(IdRole).toString() == jid)
+        if (index.data(ChatRosterModel::IdRole).toString() == jid)
         {
             if (index != currentIndex())
                 setCurrentIndex(index);
@@ -495,8 +488,8 @@ void ChatRosterView::slotActivated(const QModelIndex &index)
     if (!index.isValid())
         return;
 
-    const int type = index.data(TypeRole).toInt();
-    const QString jid = index.data(IdRole).toString();
+    const int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
     if (type == ChatRosterItem::Contact)
         emit joinConversation(jid, false);
     else if (type == ChatRosterItem::Room)
@@ -509,12 +502,9 @@ void ChatRosterView::slotLeaveRoom()
     if (!index.isValid())
         return;
 
-    const int type = index.data(TypeRole).toInt();
-    if (type == ChatRosterItem::Room)
-    {
-        const QString jid = index.data(Qt::UserRole).toString().split("/")[0];
-        emit leaveConversation(jid, true);
-    }
+    emit itemAction(LeaveAction,
+        index.data(ChatRosterModel::IdRole).toString(),
+        index.data(ChatRosterModel::TypeRole).toInt());
 }
 
 void ChatRosterView::slotInviteContact()
@@ -523,9 +513,9 @@ void ChatRosterView::slotInviteContact()
     if (!index.isValid())
         return;
 
-    const int type = index.data(TypeRole).toInt();
-    if (type == ChatRosterItem::Contact)
-        emit inviteContact(index.data(IdRole).toString());
+    emit itemAction(InviteAction,
+        index.data(ChatRosterModel::IdRole).toString(),
+        index.data(ChatRosterModel::TypeRole).toInt());
 }
 
 void ChatRosterView::slotRemoveContact()
@@ -534,8 +524,8 @@ void ChatRosterView::slotRemoveContact()
     if (!index.isValid())
         return;
 
-    const int type = index.data(TypeRole).toInt();
-    if (type == ChatRosterItem::Contact)
-        emit removeContact(index.data(IdRole).toString());
+    emit itemAction(RemoveAction,
+        index.data(ChatRosterModel::IdRole).toString(),
+        index.data(ChatRosterModel::TypeRole).toInt());
 }
 

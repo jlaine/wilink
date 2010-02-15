@@ -65,6 +65,7 @@ protected slots:
     void presenceReceived(const QXmppPresence &presence);
     void reconnect();
     void rejoinConversations();
+    void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendJoin(const QString &jid);
