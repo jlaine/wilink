@@ -252,6 +252,9 @@ void Chat::connected()
     disco.setTo(client->getConfiguration().getDomain());
     disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     client->sendPacket(disco);
+
+    /* re-join conversations */
+    rejoinConversations();
 }
 
 /** Create a conversation dialog for the specified recipient.
@@ -275,14 +278,7 @@ ChatDialog *Chat::createConversation(const QString &jid, bool room)
 
         // join room
         rosterModel->addRoom(jid);
-        QXmppPresence packet;
-        packet.setTo(jid + "/" + rosterModel->ownName());
-        packet.setType(QXmppPresence::Available);
-        QXmppElement x;
-        x.setTagName("x");
-        x.setAttribute("xmlns", ns_muc);
-        packet.setExtension(x);
-        client->sendPacket(packet);
+        sendJoin(jid);
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
 
@@ -620,6 +616,22 @@ bool Chat::open(const QString &jid, const QString &password)
     return true;
 }
 
+/** Re-join open conversations after reconnection.
+ */
+void Chat::rejoinConversations()
+{
+    foreach (const QString &bareJid, chatDialogs.keys())
+    {
+        ChatDialog *dialog = chatDialogs.value(bareJid);
+        if (dialog->isRoom())
+        {
+            dialog->clear();
+            rosterModel->addRoom(bareJid);
+            sendJoin(bareJid);
+        }
+    }
+}
+
 /** Prompt the user for confirmation then remove a contact.
  *
  * @param jid
@@ -668,6 +680,20 @@ void Chat::resizeContacts()
     }
 
     resize(hint);
+}
+
+/** Send a request to join a multi-user chat.
+ */
+void Chat::sendJoin(const QString &jid)
+{
+    QXmppPresence packet;
+    packet.setTo(jid + "/" + rosterModel->ownName());
+    packet.setType(QXmppPresence::Available);
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_muc);
+    packet.setExtension(x);
+    client->sendPacket(packet);
 }
 
 /** Send an XMPP Ping as described in XEP-0199:

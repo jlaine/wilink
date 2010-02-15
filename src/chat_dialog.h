@@ -39,6 +39,7 @@ class ChatDialog : public QWidget
 public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
 
+    void clear();
     virtual bool isRoom() const;
     virtual void messageReceived(const QXmppMessage &msg);
 

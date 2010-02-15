@@ -88,6 +88,11 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     }
 }
 
+void ChatDialog::clear()
+{
+    chatHistory->clear();
+}
+
 bool ChatDialog::isRoom() const
 {
     return false;
