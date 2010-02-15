@@ -195,36 +195,38 @@ void ChatRoomOptions::iqReceived(const QXmppIq &iq)
     vbox->setMargin(0);
     foreach (const QXmppElement &field, form.children())
     {
-        if (field.tagName() == "field" && !field.attribute("var").isEmpty())
+        const QString key = field.attribute("var");
+        const QString label = field.attribute("label");
+        const QString value = field.firstChild("value").value();
+        if (field.tagName() == "field" && !key.isEmpty())
         {
             if (field.attribute("type") == "boolean")
             {
-                QCheckBox *checkbox = new QCheckBox(field.attribute("label"));
-                checkbox->setChecked(field.firstChild("value").value() == "1");
-                checkbox->setObjectName(field.attribute("var"));
+                QCheckBox *checkbox = new QCheckBox(label);
+                checkbox->setChecked(value == "1");
+                checkbox->setObjectName(key);
                 vbox->addWidget(checkbox);
             } else if (field.attribute("type") == "text-single") {
                 QHBoxLayout *hbox = new QHBoxLayout;
-                hbox->addWidget(new QLabel(field.attribute("label")));
-                QLineEdit *edit = new QLineEdit(field.firstChild("value").value());
-                edit->setObjectName(field.attribute("var"));
+                hbox->addWidget(new QLabel(label));
+                QLineEdit *edit = new QLineEdit(value);
+                edit->setObjectName(key);
                 hbox->addWidget(edit);
                 vbox->addItem(hbox);
             } else if (field.attribute("type") == "list-single") {
                 QHBoxLayout *hbox = new QHBoxLayout;
-                hbox->addWidget(new QLabel(field.attribute("label")));
+                hbox->addWidget(new QLabel(label));
                 QComboBox *combo = new QComboBox;
-                combo->setObjectName(field.attribute("var"));
+                combo->setObjectName(key);
                 int currentIndex = 0;
-                const QString currentValue = field.firstChild("value").value();
                 int index = 0;
                 foreach (const QXmppElement &option, field.children())
                 {
                     if (option.tagName() == "option")
                     {
-                        const QString value = option.firstChild("value").value();
-                        combo->addItem(option.attribute("label"), value);
-                        if (value == currentValue)
+                        const QString optionValue = option.firstChild("value").value();
+                        combo->addItem(option.attribute("label"), optionValue);
+                        if (optionValue == value)
                             currentIndex = index;
                         index++;
                     }
@@ -246,16 +248,29 @@ void ChatRoomOptions::submit()
     {
         if (field.tagName() == "field" && !field.attribute("var").isEmpty())
         {
+            const QString key = field.attribute("var");
             QXmppElement value = field.firstChild("value");
             if (field.attribute("type") == "boolean")
             {
-                QCheckBox *checkbox = frame->findChild<QCheckBox*>(field.attribute("var"));
+                QCheckBox *checkbox = frame->findChild<QCheckBox*>(key);
                 value.setValue(checkbox->checkState() == Qt::Checked ? "1" : "0");
                 field.setChildren(value);
             } else if (field.attribute("type") == "text-single") {
-                QLineEdit *edit = frame->findChild<QLineEdit*>(field.attribute("var"));
+                QLineEdit *edit = frame->findChild<QLineEdit*>(key);
                 value.setValue(edit->text());
                 field.setChildren(value);
+            } else if (field.attribute("type") == "list-single") {
+                QXmppElementList childElements;
+                foreach (QXmppElement option, field.children())
+                {
+                    if (option.tagName() == "value")
+                    {
+                        QComboBox *combo = frame->findChild<QComboBox*>(key);
+                        option.setValue(combo->itemData(combo->currentIndex()).toString());
+                    }
+                    childElements.append(option);
+                }
+                field.setChildren(childElements);
             }
         }
         formFields.append(field);
