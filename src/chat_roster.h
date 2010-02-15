@@ -38,6 +38,7 @@ class ChatRosterModel : public QAbstractItemModel
 
 public:
     ChatRosterModel(QXmppClient *client);
+    ~ChatRosterModel();
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -68,8 +69,6 @@ private:
 
 private:
     QXmppClient *client;
-    QMap<QString, QPixmap> rosterAvatars;
-
     ChatRosterItem *rootItem;
 };
 

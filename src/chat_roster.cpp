@@ -44,6 +44,7 @@ enum RosterRoles {
     IdRole = Qt::UserRole,
     TypeRole,
     MessagesRole,
+    AvatarRole,
 };
 
 static void paintMessages(QPixmap &icon, int messages)
@@ -82,6 +83,11 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
+ChatRosterModel::~ChatRosterModel()
+{
+    delete rootItem;
+}
+
 int ChatRosterModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
@@ -89,8 +95,9 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
 {
-    if (rosterAvatars.contains(bareJid))
-        return rosterAvatars[bareJid];
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+        return item->data(AvatarRole).value<QPixmap>();
     return QPixmap();
 }
 
@@ -262,6 +269,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
             beginRemoveRows(QModelIndex(), item->row(), item->row());
             rootItem->remove(item);
             endRemoveRows();
+            return;
         } else {
             emit dataChanged(createIndex(item->row(), ContactColumn, item),
                              createIndex(item->row(), SortingColumn, item));
@@ -273,8 +281,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     }
 
     // fetch vCard
-    if (!rosterAvatars.contains(jid))
-        client->getVCardManager().requestVCard(jid);
+    client->getVCardManager().requestVCard(jid);
 }
 
 void ChatRosterModel::rosterReceived()
@@ -285,8 +292,7 @@ void ChatRosterModel::rosterReceived()
         rootItem->append(new ChatRosterItem(ChatRosterItem::Contact, jid));
 
         // fetch vCard
-        if (!rosterAvatars.contains(jid))
-            client->getVCardManager().requestVCard(jid);
+        client->getVCardManager().requestVCard(jid);
     }
     reset();
 }
@@ -308,7 +314,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
     if (item)
     {
         const QImage &image = vcard.getPhotoAsImage();
-        rosterAvatars[bareJid] = QPixmap::fromImage(image);
+        item->setData(AvatarRole, QPixmap::fromImage(image));
         if (!vcard.getNickName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.getNickName());
 
