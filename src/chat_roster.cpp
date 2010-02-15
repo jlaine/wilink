@@ -446,7 +446,12 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     } else if (type == ChatRosterItem::Room) {
         QMenu *menu = new QMenu(this);
 
-        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
+        // FIXME : this should probably only be available for moderators
+        QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
+        action->setData(OptionsAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+
+        action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
         action->setData(LeaveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 

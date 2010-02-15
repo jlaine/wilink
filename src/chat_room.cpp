@@ -106,7 +106,8 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
 
 void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
+    if (disco.getType() == QXmppIq::Result &&
+        disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
         disco.getFrom() == chatRoomServer)
     {
         // chat rooms list
@@ -145,4 +146,35 @@ void ChatRoomPrompt::validate()
     else
         lineEdit->setText(jid.toLower());
     accept();
+}
+
+ChatRoomOptions::ChatRoomOptions(QXmppClient *client, const QString &roomJid, QWidget *parent)
+    : QDialog(parent), chatRoomJid(roomJid)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    layout->addWidget(buttonBox);
+    //connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    setLayout(layout);
+
+    setWindowTitle(tr("Chat room options"));
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+
+    // get room info
+    QXmppDiscoveryIq disco;
+    disco.setTo(chatRoomJid);
+    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    client->sendPacket(disco);
+}
+
+void ChatRoomOptions::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    if (disco.getType() == QXmppIq::Result &&
+        disco.getQueryType() == QXmppDiscoveryIq::InfoQuery &&
+        disco.getFrom() == chatRoomJid)
+    {
+        qDebug() << "Received options for chat room" << chatRoomJid;
+    }
 }

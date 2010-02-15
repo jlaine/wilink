@@ -94,6 +94,7 @@ public:
         InviteAction,
         JoinAction,
         LeaveAction,
+        OptionsAction,
         RemoveAction,
     };
 

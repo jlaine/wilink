@@ -72,6 +72,13 @@
     </message>
 </context>
 <context>
+    <name>ChatRoomOptions</name>
+    <message>
+        <source>Chat room options</source>
+        <translation>Options du salon de discussion</translation>
+    </message>
+</context>
+<context>
     <name>ChatRoomPrompt</name>
     <message>
         <source>Join a chat room</source>
@@ -99,6 +106,10 @@
     <message>
         <source>Invite to a chat room</source>
         <translation>Inviter à un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
     </message>
 </context>
 <context>

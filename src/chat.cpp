@@ -697,6 +697,11 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             joinConversation(jid, true);
         else if (action == ChatRosterView::LeaveAction)
             leaveConversation(jid, true);
+        else if (action == ChatRosterView::OptionsAction)
+        {
+            ChatRoomOptions dialog(client, jid, this);
+            dialog.exec();
+        }
     }
 }
 
