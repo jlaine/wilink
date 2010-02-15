@@ -18,6 +18,7 @@
  */
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QLabel>
@@ -205,9 +206,31 @@ void ChatRoomOptions::iqReceived(const QXmppIq &iq)
             } else if (field.attribute("type") == "text-single") {
                 QHBoxLayout *hbox = new QHBoxLayout;
                 hbox->addWidget(new QLabel(field.attribute("label")));
-                QWidget *widget = new QLineEdit(field.firstChild("value").value());
-                widget->setObjectName(field.attribute("var"));
-                hbox->addWidget(widget);
+                QLineEdit *edit = new QLineEdit(field.firstChild("value").value());
+                edit->setObjectName(field.attribute("var"));
+                hbox->addWidget(edit);
+                vbox->addItem(hbox);
+            } else if (field.attribute("type") == "list-single") {
+                QHBoxLayout *hbox = new QHBoxLayout;
+                hbox->addWidget(new QLabel(field.attribute("label")));
+                QComboBox *combo = new QComboBox;
+                combo->setObjectName(field.attribute("var"));
+                int currentIndex = 0;
+                const QString currentValue = field.firstChild("value").value();
+                int index = 0;
+                foreach (const QXmppElement &option, field.children())
+                {
+                    if (option.tagName() == "option")
+                    {
+                        const QString value = option.firstChild("value").value();
+                        combo->addItem(option.attribute("label"), value);
+                        if (value == currentValue)
+                            currentIndex = index;
+                        index++;
+                    }
+                }
+                combo->setCurrentIndex(currentIndex);
+                hbox->addWidget(combo);
                 vbox->addItem(hbox);
             }
         }
