@@ -1,8 +1,9 @@
-wDesktop 0.6.1 (UNRELEASED)
+wDesktop 0.6.1 (2010-02-15)
  * Improve auto-expanding of chat rooms.
  * Parse the timestamp of chat room messages.
  * Close connection to chat server on exit.
  * Make it possible to set available/busy/offline status.
+ * Re-join chat rooms after a disconnect / reconnect.
 
 wDesktop 0.6.0 (2010-02-12)
  * If we receive a subscribe request from someone in our list, accept it.
