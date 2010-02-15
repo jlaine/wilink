@@ -39,6 +39,7 @@ class ChatDialog : public QWidget
 public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
 
+    virtual bool isRoom() const;
     virtual void messageReceived(const QXmppMessage &msg);
 
     void setLocalName(const QString &name);
@@ -58,7 +59,6 @@ signals:
     void sendPacket(const QXmppPacket &packet);
 
 protected:
-    virtual bool isRoom() const;
     virtual void sendMessage(const QString &body);
 
 protected:
