@@ -316,7 +316,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 
 #if 0
     qDebug("Received discovery result");
-    foreach (const QXmppElement &item, disco.getItems())
+    foreach (const QXmppElement &item, disco.getQueryItems())
         dumpElement(item);
 #endif
 
@@ -325,7 +325,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         // root items
         discoQueue.clear();
-        foreach (const QXmppElement &item, disco.getItems())
+        foreach (const QXmppElement &item, disco.getQueryItems())
         {
             if (item.tagName() == "item" && !item.attribute("jid").isEmpty() && item.attribute("node").isEmpty())
             {
@@ -343,7 +343,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         discoQueue.removeAll(disco.getFrom());
         // check if it's a conference server
-        foreach (const QXmppElement &item, disco.getItems())
+        foreach (const QXmppElement &item, disco.getQueryItems())
         {
             if (item.tagName() == "identity" && item.attribute("category") == "conference" && item.attribute("type") == "text")
             {

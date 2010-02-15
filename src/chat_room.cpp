@@ -112,7 +112,7 @@ void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         // chat rooms list
         listWidget->clear();
-        foreach (const QXmppElement &item, disco.getItems())
+        foreach (const QXmppElement &item, disco.getQueryItems())
         {
             QString jid = item.attribute("jid");
             QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.attribute("name"));
