@@ -110,10 +110,8 @@ signals:
 
 protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
+    void slotAction();
     void slotActivated(const QModelIndex &index);
-    void slotLeaveRoom();
-    void slotInviteContact();
-    void slotRemoveContact();
 };
 
 #endif

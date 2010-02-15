@@ -433,15 +433,23 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     if (type == ChatRosterItem::Contact)
     {
         QMenu *menu = new QMenu(this);
+
         QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
-        connect(action, SIGNAL(triggered()), this, SLOT(slotInviteContact()));
+        action->setData(InviteAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-        connect(action, SIGNAL(triggered()), this, SLOT(slotRemoveContact()));
+        action->setData(RemoveAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+
         menu->popup(event->globalPos());
     } else if (type == ChatRosterItem::Room) {
         QMenu *menu = new QMenu(this);
+
         QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
-        connect(action, SIGNAL(triggered()), this, SLOT(slotLeaveRoom()));
+        action->setData(LeaveAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+
         menu->popup(event->globalPos());
     }
 }
@@ -483,45 +491,26 @@ QSize ChatRosterView::sizeHint () const
     return hint;
 }
 
+void ChatRosterView::slotAction()
+{
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
+        return;
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+
+    emit itemAction(action->data().toInt(),
+        index.data(ChatRosterModel::IdRole).toString(),
+        index.data(ChatRosterModel::TypeRole).toInt());
+}
+
 void ChatRosterView::slotActivated(const QModelIndex &index)
 {
     if (!index.isValid())
         return;
 
     emit itemAction(JoinAction,
-        index.data(ChatRosterModel::IdRole).toString(),
-        index.data(ChatRosterModel::TypeRole).toInt());
-}
-
-void ChatRosterView::slotLeaveRoom()
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    emit itemAction(LeaveAction,
-        index.data(ChatRosterModel::IdRole).toString(),
-        index.data(ChatRosterModel::TypeRole).toInt());
-}
-
-void ChatRosterView::slotInviteContact()
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    emit itemAction(InviteAction,
-        index.data(ChatRosterModel::IdRole).toString(),
-        index.data(ChatRosterModel::TypeRole).toInt());
-}
-
-void ChatRosterView::slotRemoveContact()
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    emit itemAction(RemoveAction,
         index.data(ChatRosterModel::IdRole).toString(),
         index.data(ChatRosterModel::TypeRole).toInt());
 }

@@ -682,7 +682,6 @@ void Chat::resizeContacts()
 
 void Chat::rosterAction(int action, const QString &jid, int type)
 {
-    qDebug() << "roster action" << action << "on" << jid;
     if (type == ChatRosterItem::Contact)
     {
         if (action == ChatRosterView::InviteAction)
