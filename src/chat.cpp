@@ -73,7 +73,10 @@ enum StatusIndexes {
 static void dumpElement(const QXmppElement &item, int level = 0)
 {
     QString pad(level * 2, ' ');
-    qDebug() << (pad + "*").toAscii().constData() << item.tagName();
+    if (item.value().isEmpty())
+        qDebug() << (pad + "*").toAscii().constData() << item.tagName();
+    else
+        qDebug() << (pad + "*").toAscii().constData() << item.tagName() << ":" << item.value();
     foreach (const QString &attr, item.attributeNames())
         qDebug() << (pad + "  -").toAscii().constData() << attr << ":" << item.attribute(attr);
     foreach (const QXmppElement &child, item.children())

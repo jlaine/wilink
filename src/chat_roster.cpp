@@ -371,7 +371,7 @@ void ChatRosterModel::addRoom(const QString &bareJid)
     QXmppDiscoveryIq disco;
     disco.setTo(bareJid);
     disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    xmppClient->sendPacket(disco);
+    client->sendPacket(disco);
 #endif
 }
 
