@@ -103,7 +103,14 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     ChatHistoryMessage message;
     message.body = msg.getBody();
-    message.datetime = QDateTime::currentDateTime();
+    if (msg.getExtension().attribute("xmlns") == "jabber:x:delay")
+    {
+        const QString str = msg.getExtension().attribute("stamp");
+        message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+        message.datetime.setTimeSpec(Qt::UTC);
+    } else {
+        message.datetime = QDateTime::currentDateTime();
+    }
     message.from = chatRemoteName;
     message.local = false;
     chatHistory->addMessage(message);
