@@ -51,10 +51,11 @@ public:
     ChatRoomOptions(QXmppClient *client, const QString &roomJid, QWidget *parent);
 
 protected slots:
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void iqReceived(const QXmppIq &iq);
 
 private:
     QString chatRoomJid;
+    QXmppElement form;
 };
 
 class ChatRoomPrompt : public QDialog

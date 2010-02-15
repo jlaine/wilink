@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCheckBox>
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QLabel>
@@ -155,26 +156,56 @@ ChatRoomOptions::ChatRoomOptions(QXmppClient *client, const QString &roomJid, QW
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     layout->addWidget(buttonBox);
+
     //connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     setLayout(layout);
 
     setWindowTitle(tr("Chat room options"));
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+    connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
 
     // get room info
-    QXmppDiscoveryIq disco;
-    disco.setTo(chatRoomJid);
-    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    client->sendPacket(disco);
+    QXmppIq iq;
+    QXmppElement query;
+    query.setTagName("query");
+    query.setAttribute("xmlns", ns_muc_owner);
+    iq.setItems(query);
+    iq.setTo(chatRoomJid);
+    client->sendPacket(iq);
 }
 
-void ChatRoomOptions::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+void ChatRoomOptions::iqReceived(const QXmppIq &iq)
 {
-    if (disco.getType() == QXmppIq::Result &&
-        disco.getQueryType() == QXmppDiscoveryIq::InfoQuery &&
-        disco.getFrom() == chatRoomJid)
+    if (iq.getType() != QXmppIq::Result ||
+        iq.getFrom() != chatRoomJid)
+        return;
+    const QXmppElement query = iq.getItems().first();
+    if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_owner)
+        return;
+    form = query.firstChild("x");
+    if (form.attribute("type") != "form" || form.attribute("xmlns") != "jabber:x:data")
+        return;
+
+    QVBoxLayout *vbox = qobject_cast<QVBoxLayout *> (layout());
+    foreach (const QXmppElement &field, form.children())
     {
-        qDebug() << "Received options for chat room" << chatRoomJid;
+        if (field.tagName() == "field" && !field.attribute("var").isEmpty())
+        {
+            QWidget *widget = NULL;
+            if (field.attribute("type") == "boolean")
+            {
+                QCheckBox *checkbox = new QCheckBox(field.attribute("label"));
+                checkbox->setChecked(field.firstChild("value").value() == "1");
+                widget = checkbox;
+            } else if (field.attribute("type") == "text-single") {
+                widget = new QLineEdit(field.firstChild("value").value());
+            }
+            if (widget)
+            {
+                widget->setObjectName(field.attribute("var"));
+                vbox->addWidget(widget);
+            }
+        }
+
     }
 }
