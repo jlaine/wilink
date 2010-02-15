@@ -29,6 +29,7 @@
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
 
+#include "chat.h"
 #include "chat_edit.h"
 #include "chat_history.h"
 #include "chat_room.h"
@@ -149,15 +150,18 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-ChatRoomOptions::ChatRoomOptions(QXmppClient *client, const QString &roomJid, QWidget *parent)
-    : QDialog(parent), chatRoomJid(roomJid)
+ChatRoomOptions::ChatRoomOptions(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
+    : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
 {
     QVBoxLayout *layout = new QVBoxLayout;
+
+    frame = new QFrame;
+    layout->addWidget(frame);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     layout->addWidget(buttonBox);
 
-    //connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     setLayout(layout);
 
@@ -186,7 +190,8 @@ void ChatRoomOptions::iqReceived(const QXmppIq &iq)
     if (form.attribute("type") != "form" || form.attribute("xmlns") != "jabber:x:data")
         return;
 
-    QVBoxLayout *vbox = qobject_cast<QVBoxLayout *> (layout());
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(0);
     foreach (const QXmppElement &field, form.children())
     {
         if (field.tagName() == "field" && !field.attribute("var").isEmpty())
@@ -206,6 +211,43 @@ void ChatRoomOptions::iqReceived(const QXmppIq &iq)
                 vbox->addItem(hbox);
             }
         }
-
     }
+    frame->setLayout(vbox);
+}
+
+void ChatRoomOptions::submit()
+{
+    form.setAttribute("type", "submit");
+    QXmppElementList formFields;
+    foreach (QXmppElement field, form.children())
+    {
+        if (field.tagName() == "field" && !field.attribute("var").isEmpty())
+        {
+            QXmppElement value = field.firstChild("value");
+            if (field.attribute("type") == "boolean")
+            {
+                QCheckBox *checkbox = frame->findChild<QCheckBox*>(field.attribute("var"));
+                value.setValue(checkbox->checkState() == Qt::Checked ? "1" : "0");
+                field.setChildren(value);
+            } else if (field.attribute("type") == "text-single") {
+                QLineEdit *edit = frame->findChild<QLineEdit*>(field.attribute("var"));
+                value.setValue(edit->text());
+                field.setChildren(value);
+            }
+        }
+        formFields.append(field);
+    }
+    form.setChildren(formFields);
+
+    QXmppElement query;
+    query.setTagName("query");
+    query.setAttribute("xmlns", ns_muc_owner);
+    query.setChildren(form);
+
+    QXmppIq iq(QXmppIq::Set);
+    iq.setItems(query);
+    iq.setTo(chatRoomJid);
+    client->sendPacket(iq);
+
+    accept();
 }

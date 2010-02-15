@@ -39,6 +39,8 @@ class QXmppArchiveChat;
 class QXmppVCard;
 class QXmppVCardManager;
 
+void dumpElement(const QXmppElement &item, int level = 0);
+
 class Chat : public QWidget
 {
     Q_OBJECT

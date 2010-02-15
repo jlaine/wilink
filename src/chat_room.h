@@ -52,10 +52,13 @@ public:
 
 protected slots:
     void iqReceived(const QXmppIq &iq);
+    void submit();
 
 private:
     QString chatRoomJid;
+    QXmppClient *client;
     QXmppElement form;
+    QFrame *frame;
 };
 
 class ChatRoomPrompt : public QDialog

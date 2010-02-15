@@ -70,7 +70,7 @@ enum StatusIndexes {
     OfflineIndex = 2,
 };
 
-static void dumpElement(const QXmppElement &item, int level = 0)
+void dumpElement(const QXmppElement &item, int level)
 {
     QString pad(level * 2, ' ');
     if (item.value().isEmpty())
