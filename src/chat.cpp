@@ -169,6 +169,12 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     move(QPoint(20, 20));
 }
 
+Chat::~Chat()
+{
+    // disconnect
+    client->disconnect();
+}
+
 /** Prompt the user for a new contact then add it to the roster.
  */
 void Chat::addContact()

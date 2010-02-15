@@ -44,6 +44,7 @@ class Chat : public QWidget
 
 public:
     Chat(QSystemTrayIcon *trayIcon);
+    ~Chat();
     bool open(const QString &jid, const QString &password);
 
 protected slots:
