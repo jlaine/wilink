@@ -1,5 +1,6 @@
 wDesktop 0.6.1 (UNRELEASED)
  * Improve auto-expanding of chat rooms.
+ * Parse the timestamp of chat room messages.
 
 wDesktop 0.6.0 (2010-02-12)
  * If we receive a subscribe request from someone in our list, accept it.
