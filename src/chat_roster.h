@@ -42,7 +42,11 @@ public:
         TypeRole,
         MessagesRole,
         AvatarRole,
-        AdminRole,
+        FlagsRole,
+    };
+
+    enum Flag {
+        OwnerFlag = 1,
     };
 
     ChatRosterModel(QXmppClient *client);

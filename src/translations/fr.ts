@@ -111,6 +111,10 @@
         <source>Options</source>
         <translation>Options</translation>
     </message>
+    <message>
+        <source>Kick user</source>
+        <translation>Sortir l'utilisateur</translation>
+    </message>
 </context>
 <context>
     <name>Diagnostics</name>

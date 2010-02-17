@@ -267,7 +267,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             if (item.attribute("jid") == client->getConfiguration().getJid() &&
                 item.attribute("affiliation") == "owner")
             {
-                roomItem->setData(AdminRole, true);
+                roomItem->setData(FlagsRole, OwnerFlag);
             }
         }
     }
@@ -459,7 +459,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     } else if (type == ChatRosterItem::Room) {
         QMenu *menu = new QMenu(this);
 
-        if (index.data(ChatRosterModel::AdminRole).toBool())
+        if (index.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::OwnerFlag)
         {
             QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
             action->setData(OptionsAction);
@@ -471,6 +471,17 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
         menu->popup(event->globalPos());
+    } else if (type == ChatRosterItem::RoomMember) {
+        QModelIndex room = index.parent();
+        if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::OwnerFlag)
+        {
+            QMenu *menu = new QMenu(this);
+
+            QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
+            action->setData(RemoveAction);
+
+            menu->popup(event->globalPos());
+        }
     }
 }
 
