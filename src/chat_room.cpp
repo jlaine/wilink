@@ -151,6 +151,74 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
+ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
+    : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    frame = new QFrame;
+    layout->addWidget(frame);
+
+    listWidget = new QListWidget(this);
+    layout->addWidget(listWidget);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    layout->addWidget(buttonBox);
+
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    setLayout(layout);
+
+    setWindowTitle(tr("Chat room options"));
+    connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
+
+    QXmppElementList elements;
+
+    QXmppElement item;
+    item.setTagName("item");
+    item.setAttribute("affiliation", "member");
+    elements.append(item);
+    item.setAttribute("affiliation", "outcast");
+    elements.append(item);
+    item.setAttribute("affiliation", "owner");
+    elements.append(item);
+    item.setAttribute("affiliation", "admin");
+    elements.append(item);
+    item.setAttribute("affiliation", "none");
+    elements.append(item);
+
+    QXmppElement query;
+    query.setTagName("query");
+    query.setAttribute("xmlns", ns_muc_admin);
+    query.setChildren(elements);
+
+    QXmppIq iq;
+    iq.setItems(query);
+    iq.setTo(chatRoomJid);
+    client->sendPacket(iq);
+}
+
+void ChatRoomMembers::iqReceived(const QXmppIq &iq)
+{
+    qDebug() << "iq received" << iq.getTypeStr() <<  iq.getFrom() << chatRoomJid;
+    if (iq.getType() != QXmppIq::Result ||
+        iq.getFrom() != chatRoomJid)
+        return;
+    const QXmppElement query = iq.getItems().first();
+    if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_admin)
+        return;
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+    foreach(QXmppElement element, query.children())
+    {
+        listWidget->addItem(element.attribute("jid"));
+        qDebug() <<element.attribute("jid");
+    }
+    frame->setLayout(vbox);
+    qDebug() << "iq received 3";
+}
+
 ChatRoomOptions::ChatRoomOptions(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
     : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
 {

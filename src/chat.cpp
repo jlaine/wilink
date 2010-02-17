@@ -703,6 +703,12 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             ChatRoomOptions dialog(client, jid, this);
             dialog.exec();
         }
+        else if (action == ChatRosterView::MembersAction)
+        {
+            qDebug() << "manage members";
+            ChatRoomMembers dialog(client, jid, this);
+            dialog.exec();
+        }
     } else if (type == ChatRosterItem::RoomMember) {
         if (action == ChatRosterView::RemoveAction)
         {

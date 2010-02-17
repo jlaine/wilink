@@ -61,6 +61,25 @@ private:
     QFrame *frame;
 };
 
+class ChatRoomMembers : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ChatRoomMembers(QXmppClient *client, const QString &roomJid, QWidget *parent);
+
+protected slots:
+    void iqReceived(const QXmppIq &iq);
+    //void submit();
+
+private:
+    QString chatRoomJid;
+    QXmppClient *client;
+    QXmppElement form;
+    QListWidget *listWidget;
+    QFrame *frame;
+};
+
 class ChatRoomPrompt : public QDialog
 {
     Q_OBJECT

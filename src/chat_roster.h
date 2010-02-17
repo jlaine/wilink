@@ -100,6 +100,7 @@ public:
         JoinAction,
         LeaveAction,
         OptionsAction,
+        MembersAction,
         RemoveAction,
     };
 
