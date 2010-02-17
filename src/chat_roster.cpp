@@ -146,6 +146,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return item->type();
     } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
         return item->data(Qt::DisplayRole).toString();
+    } else if (role == Qt::DisplayRole && index.column() == ImageColumn) {
+        return QVariant();
     } else if(role == Qt::FontRole && index.column() == ContactColumn) {
         if (messages)
             return QFont("", -1, QFont::Bold, true);
