@@ -200,7 +200,6 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
 
 void ChatRoomMembers::iqReceived(const QXmppIq &iq)
 {
-    qDebug() << "iq received" << iq.getTypeStr() <<  iq.getFrom() << chatRoomJid;
     if (iq.getType() != QXmppIq::Result ||
         iq.getFrom() != chatRoomJid)
         return;
@@ -212,11 +211,9 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
     vbox->setMargin(0);
     foreach(QXmppElement element, query.children())
     {
-        listWidget->addItem(element.attribute("jid"));
-        qDebug() <<element.attribute("jid");
+        listWidget->addItem(element.attribute("jid")); // FIXME: show a 2nd columns (one for the affiliation)
     }
     frame->setLayout(vbox);
-    qDebug() << "iq received 3";
 }
 
 ChatRoomOptions::ChatRoomOptions(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)

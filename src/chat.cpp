@@ -705,7 +705,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         }
         else if (action == ChatRosterView::MembersAction)
         {
-            qDebug() << "manage members";
             ChatRoomMembers dialog(client, jid, this);
             dialog.exec();
         }
