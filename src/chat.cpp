@@ -516,7 +516,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         {
             const QString bareJid = presence.getFrom().split('/').first();
             QXmppStanza::Error error = presence.getError();
-            if (error.getType() == QXmppStanza::Error::Cancel && chatDialogs.contains(bareJid))
+            if (chatDialogs.contains(bareJid))
             {
                 leaveConversation(bareJid, true);
                 QMessageBox::warning(this,
