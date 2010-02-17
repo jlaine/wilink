@@ -25,6 +25,7 @@
 #include <QStringList>
 #include <QSortFilterProxyModel>
 
+#include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
@@ -189,7 +190,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         }
     }
-    return QVariant();
+    return item->data(role);
 }
 
 void ChatRosterModel::disconnected()
@@ -257,6 +258,18 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
         roomItem->append(new ChatRosterItem(ChatRosterItem::RoomMember, jid));
         endInsertRows();
+
+        // check whether we own the room
+        QXmppElement x = presence.getExtension();
+        if (x.attribute("xmlns") == ns_muc_user)
+        {
+            QXmppElement item = x.firstChild("item");
+            if (item.attribute("jid") == client->getConfiguration().getJid() &&
+                item.attribute("affiliation") == "owner")
+            {
+                roomItem->setData(AdminRole, true);
+            }
+        }
     }
     else if (presence.getType() == QXmppPresence::Unavailable && memberItem)
     {
@@ -446,12 +459,14 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     } else if (type == ChatRosterItem::Room) {
         QMenu *menu = new QMenu(this);
 
-        // FIXME : this should probably only be available for moderators
-        QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
-        action->setData(OptionsAction);
-        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        if (index.data(ChatRosterModel::AdminRole).toBool())
+        {
+            QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
+            action->setData(OptionsAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
 
-        action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
+        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
         action->setData(LeaveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 

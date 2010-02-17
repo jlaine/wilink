@@ -42,6 +42,7 @@ public:
         TypeRole,
         MessagesRole,
         AvatarRole,
+        AdminRole,
     };
 
     ChatRosterModel(QXmppClient *client);
