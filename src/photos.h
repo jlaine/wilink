@@ -78,7 +78,6 @@ public:
 protected:
     void processDownloadQueue();
     void processUploadQueue();
-    void refresh();
 
 protected slots:
     void createFolder();
@@ -87,6 +86,7 @@ protected slots:
     void folderOpened(const QUrl &url);
     void goBack();
     void putProgress(int done, int total);
+    void refresh();
 
 private:
     bool busy;
