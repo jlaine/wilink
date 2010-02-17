@@ -479,6 +479,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
 
             QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
             action->setData(RemoveAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
             menu->popup(event->globalPos());
         }

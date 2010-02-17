@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Kick user</source>
-        <translation>Sortir l'utilisateur</translation>
+        <translation>Ejecter l&apos;utilisateur</translation>
     </message>
 </context>
 <context>

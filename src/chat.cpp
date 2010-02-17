@@ -703,6 +703,25 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             ChatRoomOptions dialog(client, jid, this);
             dialog.exec();
         }
+    } else if (type == ChatRosterItem::RoomMember) {
+        if (action == ChatRosterView::RemoveAction)
+        {
+            QXmppElement item;
+            item.setTagName("item");
+            item.setAttribute("nick", jid.split("/").last());
+            item.setAttribute("role", "none");
+
+            QXmppElement query;
+            query.setTagName("query");
+            query.setAttribute("xmlns", ns_muc_admin);
+            query.setChildren(item);
+
+            QXmppIq iq(QXmppIq::Set);
+            iq.setTo(jid.split("/").first());
+            iq.setItems(query);
+
+            client->sendPacket(iq);
+        }
     }
 }
 
