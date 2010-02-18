@@ -48,7 +48,7 @@ ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
     hbox->addWidget(iconLabel);
     QPushButton *button = new QPushButton;
     button->setFlat(true);
-    button->setIcon(QIcon(":/remove.png"));
+    button->setIcon(QIcon(":/close.png"));
     connect(button, SIGNAL(clicked()), this, SLOT(slotLeave()));
     hbox->addWidget(button);
     layout->addItem(hbox);
@@ -130,6 +130,11 @@ void ChatDialog::sendMessage(const QString &text)
     msg.setBody(text);
     msg.setTo(chatRemoteJid);
     emit sendPacket(msg);
+}
+
+QString ChatDialog::localName() const
+{
+    return chatLocalName;
 }
 
 void ChatDialog::setLocalName(const QString &name)

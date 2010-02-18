@@ -6,6 +6,7 @@ generate_png(png
     album.svg
     back.svg
     chat.svg
+    close.svg
     contact-available.svg
     contact-busy.svg
     contact-offline.svg

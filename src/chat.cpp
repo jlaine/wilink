@@ -540,13 +540,34 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         if (presence.getExtension().attribute("xmlns") == ns_muc)
         {
             const QString bareJid = presence.getFrom().split('/').first();
-            QXmppStanza::Error error = presence.getError();
             if (chatDialogs.contains(bareJid))
             {
                 leaveConversation(bareJid, true);
+
+                QXmppStanza::Error error = presence.getError();
                 QMessageBox::warning(this,
-                    tr("Cannot join chat room"),
-                    tr("Sorry, but you cannot join chat room %1.\n\n%2").arg(bareJid).arg(error.getText()));
+                    tr("Chat room error"),
+                    tr("Sorry, but you cannot join chat room %1.\n\n%2")
+                        .arg(bareJid)
+                        .arg(error.getText()));
+            }
+        }
+        break;
+    case QXmppPresence::Unavailable:
+        if (presence.getExtension().attribute("xmlns") == ns_muc_user)
+        {
+            const QString bareJid = presence.getFrom().split('/').first();
+            if (chatDialogs.contains(bareJid) &&
+                chatDialogs[bareJid]->localName() == presence.getFrom().split('/').last())
+            {
+                leaveConversation(bareJid, true);
+
+                QXmppElement reason = presence.getExtension().firstChild("item").firstChild("reason");
+                QMessageBox::warning(this,
+                    tr("Chat room error"),
+                    tr("Sorry, but you were kicked from chat room %1.\n\n%2")
+                        .arg(bareJid)
+                        .arg(reason.value()));
             }
         }
         break;
@@ -603,7 +624,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
 
     /* get user and domain */
     if (!jidValidator.exactMatch(jid))
