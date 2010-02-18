@@ -2,6 +2,7 @@ wDesktop 0.6.2 (UNRELEASED)
  * Notify the user when he cannot join a chat room or gets kicked out.
  * Make it possible to manage chat room properties.
  * Make it possible to kick users out of chat rooms.
+ * Make it possible to manage chat room members
 
 wDesktop 0.6.1 (2010-02-15)
  * Improve auto-expanding of chat rooms.
