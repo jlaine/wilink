@@ -227,9 +227,13 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
 
     foreach(QXmppElement element, query.children())
     {
-        // FIXME: check that initialMembers does not already have the current jid ?
-        addEntry(element.attribute("jid"), element.attribute("affiliation"), element.firstChild("reason").value());
-        initialMembers[element.attribute("jid")] = element.attribute("affiliation");
+        const QString jid = element.attribute("jid");
+        const QString affiliation = element.attribute("affiliation");
+        if (!initialMembers.contains(jid))
+        {
+            addEntry(jid, affiliation);
+            initialMembers[jid] = affiliation;
+        }
     }
     tableWidget->sortItems(JidColumn, Qt::AscendingOrder);;
 }
@@ -290,7 +294,7 @@ void ChatRoomMembers::addMember()
         addEntry(jid, "member");
 }
 
-void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation, const QString &comment)
+void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation)
 {
     QComboBox *combo = new QComboBox;
     foreach (const QString &text, affiliations)

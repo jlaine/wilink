@@ -58,7 +58,7 @@ protected slots:
     void submit();
 
 private:
-    void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation, const QString &comment="");
+    void addEntry(const QString &jid, const QString &affiliation);
     QString chatRoomJid;
     QXmppClient *client;
     QXmppElement form;
