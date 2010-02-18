@@ -132,6 +132,11 @@ void ChatDialog::sendMessage(const QString &text)
     emit sendPacket(msg);
 }
 
+QString ChatDialog::localName() const
+{
+    return chatLocalName;
+}
+
 void ChatDialog::setLocalName(const QString &name)
 {
     chatLocalName = name;

@@ -36,10 +36,6 @@
         <translation>Rejoindre un salon de discussion</translation>
     </message>
     <message>
-        <source>Cannot join chat room</source>
-        <translation>Impossible de rejoindre le salon de discussion</translation>
-    </message>
-    <message>
         <source>Sorry, but you cannot join chat room %1.
 
 %2</source>
@@ -62,6 +58,18 @@
     <message>
         <source>Offline</source>
         <translation>Déconnecté</translation>
+    </message>
+    <message>
+        <source>Chat room error</source>
+        <translation>Erreur de salon de discussion</translation>
+    </message>
+    <message>
+        <source>Sorry, but you were kicked from chat room %1.
+
+%2</source>
+        <translation>Désole, mais vous avez été éjecté(e) du salon de discussion %1.
+
+%2</translation>
     </message>
 </context>
 <context>

@@ -43,6 +43,7 @@ public:
     virtual bool isRoom() const;
     virtual void messageReceived(const QXmppMessage &msg);
 
+    QString localName() const;
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
