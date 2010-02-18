@@ -25,6 +25,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QPushButton>
 
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
@@ -163,13 +164,23 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     layout->addWidget(listWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    layout->addWidget(buttonBox);
-
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+    QPushButton *addButton = new QPushButton;
+    addButton->setIcon(QIcon(":/add.png"));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addMember()));
+    buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
+
+    QPushButton *removeButton = new QPushButton;
+    removeButton->setIcon(QIcon(":/remove.png"));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeMember()));
+    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+
+    layout->addWidget(buttonBox);
     setLayout(layout);
 
-    setWindowTitle(tr("Chat room options"));
+    setWindowTitle(tr("Chatroom members"));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
 
     QXmppElementList elements;
@@ -216,3 +227,17 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
     frame->setLayout(vbox);
 }
 
+void ChatRoomMembers::submit()
+{
+    qDebug() << "Submitting!";
+}
+
+void ChatRoomMembers::addMember()
+{
+    qDebug() << "Adding a member!";
+}
+
+void ChatRoomMembers::removeMember()
+{
+    qDebug() << "Removing a member!";
+}

@@ -51,8 +51,10 @@ public:
     ChatRoomMembers(QXmppClient *client, const QString &roomJid, QWidget *parent);
 
 protected slots:
+    void addMember();
+    void removeMember();
     void iqReceived(const QXmppIq &iq);
-    //void submit();
+    void submit();
 
 private:
     QString chatRoomJid;
