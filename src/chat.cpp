@@ -391,9 +391,33 @@ void Chat::inviteContact(const QString &jid)
     client->sendPacket(message);
 }
 
-void Chat::iqReceived(const QXmppIq&)
+void Chat::iqReceived(const QXmppIq &iq)
 {
     timeoutTimer->stop();
+    if (iq.getType() == QXmppIq::Result && !iq.getItems().isEmpty())
+    {
+        const QXmppElement query = iq.getItems().first();
+        const QXmppElement form = query.firstChild("x");
+        if (query.tagName() == "query" &&
+            query.attribute("xmlns") == ns_muc_owner &&
+            form.attribute("type") == "form" &&
+            form.attribute("xmlns") == "jabber:x:data")
+        {
+            ChatForm dialog(form, this);
+            if (dialog.exec())
+            {
+                QXmppElement query;
+                query.setTagName("query");
+                query.setAttribute("xmlns", ns_muc_owner);
+                query.setChildren(dialog.form());
+
+                QXmppIq iqPacket(QXmppIq::Set);
+                iqPacket.setItems(query);
+                iqPacket.setTo(iq.getFrom());
+                client->sendPacket(iqPacket);
+            }
+        }
+    }
 }
 
 void Chat::joinConversation(const QString &jid, bool isRoom)
@@ -701,8 +725,14 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             leaveConversation(jid, true);
         else if (action == ChatRosterView::OptionsAction)
         {
-            ChatRoomOptions dialog(client, jid, this);
-            dialog.exec();
+            // get room info
+            QXmppIq iq;
+            QXmppElement query;
+            query.setTagName("query");
+            query.setAttribute("xmlns", ns_muc_owner);
+            iq.setItems(query);
+            iq.setTo(jid);
+            client->sendPacket(iq);
         }
         else if (action == ChatRosterView::MembersAction)
         {

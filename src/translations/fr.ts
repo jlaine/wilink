@@ -72,7 +72,7 @@
     </message>
 </context>
 <context>
-    <name>ChatRoomOptions</name>
+    <name>ChatRoomMembers</name>
     <message>
         <source>Chat room options</source>
         <translation>Options du salon de discussion</translation>
@@ -114,6 +114,10 @@
     <message>
         <source>Kick user</source>
         <translation>Ejecter l&apos;utilisateur</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <translation>Membres</translation>
     </message>
 </context>
 <context>

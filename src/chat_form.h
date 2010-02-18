@@ -24,26 +24,19 @@
 
 #include "qxmpp/QXmppElement.h"
 
-class QFrame;
-class QXmppClient;
-class QXmppIq;
-
-class ChatRoomOptions : public QDialog
+class ChatForm : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatRoomOptions(QXmppClient *client, const QString &roomJid, QWidget *parent);
+    ChatForm(const QXmppElement &form, QWidget *parent);
+    QXmppElement form() const;
 
 protected slots:
-    void iqReceived(const QXmppIq &iq);
     void submit();
 
 private:
-    QString chatRoomJid;
-    QXmppClient *client;
-    QXmppElement form;
-    QFrame *frame;
+    QXmppElement chatForm;
 };
 
 #endif

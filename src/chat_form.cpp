@@ -19,63 +19,18 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDebug>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListWidget>
-
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
-#include "qxmpp/QXmppMessage.h"
 
 #include "chat_form.h"
 
-ChatRoomOptions::ChatRoomOptions(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
-    : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
+ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
+    : QDialog(parent), chatForm(form)
 {
-    QVBoxLayout *layout = new QVBoxLayout;
-
-    frame = new QFrame;
-    layout->addWidget(frame);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    layout->addWidget(buttonBox);
-
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    setLayout(layout);
-
-    setWindowTitle(tr("Chat room options"));
-    connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
-
-    // get room info
-    QXmppIq iq;
-    QXmppElement query;
-    query.setTagName("query");
-    query.setAttribute("xmlns", ns_muc_owner);
-    iq.setItems(query);
-    iq.setTo(chatRoomJid);
-    client->sendPacket(iq);
-}
-
-void ChatRoomOptions::iqReceived(const QXmppIq &iq)
-{
-    if (iq.getType() != QXmppIq::Result ||
-        iq.getFrom() != chatRoomJid)
-        return;
-    const QXmppElement query = iq.getItems().first();
-    if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_owner)
-        return;
-    form = query.firstChild("x");
-    if (form.attribute("type") != "form" || form.attribute("xmlns") != "jabber:x:data")
-        return;
-
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->setMargin(0);
-    foreach (const QXmppElement &field, form.children())
+    foreach (const QXmppElement &field, chatForm.children())
     {
         const QString key = field.attribute("var");
         const QString label = field.attribute("label");
@@ -119,14 +74,22 @@ void ChatRoomOptions::iqReceived(const QXmppIq &iq)
             }
         }
     }
-    frame->setLayout(vbox);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    vbox->addWidget(buttonBox);
+
+    setLayout(vbox);
+    setWindowTitle(chatForm.firstChild("title").value());
+
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
-void ChatRoomOptions::submit()
+void ChatForm::submit()
 {
-    form.setAttribute("type", "submit");
+    chatForm.setAttribute("type", "submit");
     QXmppElementList formFields;
-    foreach (QXmppElement field, form.children())
+    foreach (QXmppElement field, chatForm.children())
     {
         if (field.tagName() == "field" && !field.attribute("var").isEmpty())
         {
@@ -134,11 +97,11 @@ void ChatRoomOptions::submit()
             QXmppElement value = field.firstChild("value");
             if (field.attribute("type") == "boolean")
             {
-                QCheckBox *checkbox = frame->findChild<QCheckBox*>(key);
+                QCheckBox *checkbox = findChild<QCheckBox*>(key);
                 value.setValue(checkbox->checkState() == Qt::Checked ? "1" : "0");
                 field.setChildren(value);
             } else if (field.attribute("type") == "text-single") {
-                QLineEdit *edit = frame->findChild<QLineEdit*>(key);
+                QLineEdit *edit = findChild<QLineEdit*>(key);
                 value.setValue(edit->text());
                 field.setChildren(value);
             } else if (field.attribute("type") == "list-single") {
@@ -147,7 +110,7 @@ void ChatRoomOptions::submit()
                 {
                     if (option.tagName() == "value")
                     {
-                        QComboBox *combo = frame->findChild<QComboBox*>(key);
+                        QComboBox *combo = findChild<QComboBox*>(key);
                         option.setValue(combo->itemData(combo->currentIndex()).toString());
                     }
                     childElements.append(option);
@@ -157,17 +120,12 @@ void ChatRoomOptions::submit()
         }
         formFields.append(field);
     }
-    form.setChildren(formFields);
-
-    QXmppElement query;
-    query.setTagName("query");
-    query.setAttribute("xmlns", ns_muc_owner);
-    query.setChildren(form);
-
-    QXmppIq iq(QXmppIq::Set);
-    iq.setItems(query);
-    iq.setTo(chatRoomJid);
-    client->sendPacket(iq);
+    chatForm.setChildren(formFields);
 
     accept();
+}
+
+QXmppElement ChatForm::form() const
+{
+    return chatForm;
 }
