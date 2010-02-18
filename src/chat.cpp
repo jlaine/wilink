@@ -624,7 +624,7 @@ bool Chat::open(const QString &jid, const QString &password)
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
 
     /* get user and domain */
     if (!jidValidator.exactMatch(jid))

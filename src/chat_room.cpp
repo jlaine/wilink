@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QDialogButtonBox>
 #include <QHeaderView>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -168,8 +169,8 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
 
     tableWidget = new QTableWidget(this);
     tableWidget->setColumnCount(2);
-    tableWidget->setHorizontalHeaderItem(JidColumn, new QTableWidgetItem(tr("Jid")));
-    tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Affiliation")));
+    tableWidget->setHorizontalHeaderItem(JidColumn, new QTableWidgetItem(tr("User")));
+    tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Role")));
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     tableWidget->verticalHeader()->setVisible(false);
@@ -263,23 +264,30 @@ void ChatRoomMembers::submit()
         elements.append(item);
     }
 
-    QXmppElement query;
-    query.setTagName("query");
-    query.setAttribute("xmlns", ns_muc_admin);
-    query.setChildren(elements);
+    if (! elements.isEmpty()) {
+        QXmppElement query;
+        query.setTagName("query");
+        query.setAttribute("xmlns", ns_muc_admin);
+        query.setChildren(elements);
 
-    QXmppIq iq;
-    iq.setTo(chatRoomJid);
-    iq.setType(QXmppIq::Set);
-    iq.setItems(query);
-    client->sendPacket(iq);
-
+        QXmppIq iq;
+        iq.setTo(chatRoomJid);
+        iq.setType(QXmppIq::Set);
+        iq.setItems(query);
+        client->sendPacket(iq);
+    }
     accept();
 }
 
 void ChatRoomMembers::addMember()
 {
-    addEntry("@" + client->getConfiguration().getDomain(), "member");
+    bool ok = false;
+    QString jid = "@" + client->getConfiguration().getDomain();
+    jid = QInputDialog::getText(this, tr("Add a user"),
+                  tr("Enter the address of the user you want to add."),
+                  QLineEdit::Normal, jid, &ok).toLower();
+    if (ok)
+        addEntry(jid, "member");
 }
 
 void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation, const QString &comment)
@@ -290,7 +298,7 @@ void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation, c
     combo->setEditable(false);
     combo->setCurrentIndex(combo->findData(affiliation));
     QTableWidgetItem *jidItem = new QTableWidgetItem(jid);
-    jidItem->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+    jidItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     tableWidget->insertRow(0);
     tableWidget->setCellWidget(0, AffiliationColumn, combo);
     tableWidget->setItem(0, JidColumn, jidItem);

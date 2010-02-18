@@ -82,8 +82,24 @@
 <context>
     <name>ChatRoomMembers</name>
     <message>
-        <source>Chat room options</source>
-        <translation>Options du salon de discussion</translation>
+        <source>User</source>
+        <translation>Utilisateur</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation>Role</translation>
+    </message>
+    <message>
+        <source>Chat room members</source>
+        <translation>Membres du salon de discussion</translation>
+    </message>
+    <message>
+        <source>Add a user</source>
+        <translation>Ajouter un utilisateur</translation>
+    </message>
+    <message>
+        <source>Enter the address of the user you want to add.</source>
+        <translation>Saisissez l&apos;adresse de l&apos;utilisateur que vous souhaitez ajouter.</translation>
     </message>
 </context>
 <context>
@@ -99,10 +115,6 @@
 </context>
 <context>
     <name>ChatRosterView</name>
-    <message>
-        <source>Start chat</source>
-        <translation type="obsolete">Démarrer conversation</translation>
-    </message>
     <message>
         <source>Remove contact</source>
         <translation>Retirer contact</translation>
