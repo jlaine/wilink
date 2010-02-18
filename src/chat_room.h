@@ -43,24 +43,6 @@ protected:
     virtual void sendMessage(const QString &text);
 };
 
-class ChatRoomOptions : public QDialog
-{
-    Q_OBJECT
-
-public:
-    ChatRoomOptions(QXmppClient *client, const QString &roomJid, QWidget *parent);
-
-protected slots:
-    void iqReceived(const QXmppIq &iq);
-    void submit();
-
-private:
-    QString chatRoomJid;
-    QXmppClient *client;
-    QXmppElement form;
-    QFrame *frame;
-};
-
 class ChatRoomMembers : public QDialog
 {
     Q_OBJECT

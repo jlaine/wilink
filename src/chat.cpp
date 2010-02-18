@@ -52,6 +52,7 @@
 #include "qnetio/dns.h"
 #include "chat.h"
 #include "chat_dialog.h"
+#include "chat_form.h"
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
