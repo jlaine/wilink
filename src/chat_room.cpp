@@ -172,8 +172,6 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Affiliation")));
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    /*tableWidget->setSortingEnabled(true);
-    tableWidget->sortByColumn(JidColumn, Qt::AscendingOrder);*/
     tableWidget->verticalHeader()->setVisible(false);
     tableWidget->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
 
@@ -232,7 +230,6 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
         addEntry(element.attribute("jid"), element.attribute("affiliation"), element.firstChild("reason").value());
         initialMembers[element.attribute("jid")] = element.attribute("affiliation");
     }
-    //tableWidget->sortItems(AffiliationColumn, Qt::AscendingOrder);
     tableWidget->sortItems(JidColumn, Qt::AscendingOrder);;
 }
 
