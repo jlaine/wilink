@@ -101,6 +101,22 @@
         <source>Enter the address of the user you want to add.</source>
         <translation>Saisissez l&apos;adresse de l&apos;utilisateur que vous souhaitez ajouter.</translation>
     </message>
+    <message>
+        <source>member</source>
+        <translation>membre</translation>
+    </message>
+    <message>
+        <source>administrator</source>
+        <translation>administrateur</translation>
+    </message>
+    <message>
+        <source>owner</source>
+        <translation>propriétaire</translation>
+    </message>
+    <message>
+        <source>banned</source>
+        <translation>banni</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoomPrompt</name>

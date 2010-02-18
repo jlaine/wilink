@@ -160,8 +160,6 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-const QStringList ChatRoomMembers::affiliations = QStringList() << "member" << "admin" << "owner" << "outcast";
-
 ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
     : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
 {
@@ -198,7 +196,11 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     setWindowTitle(tr("Chat room members"));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
 
-    foreach (const QString &affiliation, ChatRoomMembers::affiliations)
+    affiliations["member"] = tr("member");
+    affiliations["admin"] = tr("administrator");
+    affiliations["owner"] = tr("owner");
+    affiliations["outcast"] = tr("banned");
+    foreach (const QString &affiliation, affiliations.keys())
     {
         QXmppElement item;
         item.setTagName("item");
@@ -297,8 +299,8 @@ void ChatRoomMembers::addMember()
 void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation)
 {
     QComboBox *combo = new QComboBox;
-    foreach (const QString &text, affiliations)
-        combo->addItem(text, text); // FIXME: manage translations
+    foreach (const QString &key, affiliations.keys())
+        combo->addItem(affiliations[key], key);
     combo->setEditable(false);
     combo->setCurrentIndex(combo->findData(affiliation));
     QTableWidgetItem *jidItem = new QTableWidgetItem(jid);

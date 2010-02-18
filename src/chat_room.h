@@ -65,7 +65,7 @@ private:
     QTableWidget *tableWidget;
     QFrame *frame;
     QMap<QString, QString> initialMembers;
-    const static QStringList affiliations;
+    QMap<QString, QString> affiliations;
 };
 
 class ChatRoomPrompt : public QDialog
