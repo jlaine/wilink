@@ -21,11 +21,13 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDialogButtonBox>
+#include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
+#include <QTableWidget>
 
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
@@ -35,6 +37,11 @@
 #include "chat_edit.h"
 #include "chat_history.h"
 #include "chat_room.h"
+
+enum MembersColumns {
+    JidColumn = 0,
+    AffiliationColumn,
+};
 
 ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
     : ChatDialog(jid, parent)
@@ -152,16 +159,25 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
+const QStringList ChatRoomMembers::affiliations = QStringList() << "member" << "admin" << "owner" << "outcast";
+
 ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
     : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
-    frame = new QFrame;
-    layout->addWidget(frame);
+    tableWidget = new QTableWidget(this);
+    tableWidget->setColumnCount(2);
+    tableWidget->setHorizontalHeaderItem(JidColumn, new QTableWidgetItem(tr("Jid")));
+    tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Affiliation")));
+    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    /*tableWidget->setSortingEnabled(true);
+    tableWidget->sortByColumn(JidColumn, Qt::AscendingOrder);*/
+    tableWidget->verticalHeader()->setVisible(false);
+    tableWidget->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
 
-    listWidget = new QListWidget(this);
-    layout->addWidget(listWidget);
+    layout->addWidget(tableWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
@@ -180,33 +196,25 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     layout->addWidget(buttonBox);
     setLayout(layout);
 
-    setWindowTitle(tr("Chatroom members"));
+    setWindowTitle(tr("Chat room members"));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
 
-    QXmppElementList elements;
+    foreach (const QString &affiliation, ChatRoomMembers::affiliations)
+    {
+        QXmppElement item;
+        item.setTagName("item");
+        item.setAttribute("affiliation", affiliation);
 
-    QXmppElement item;
-    item.setTagName("item");
-    item.setAttribute("affiliation", "member");
-    elements.append(item);
-    item.setAttribute("affiliation", "outcast");
-    elements.append(item);
-    item.setAttribute("affiliation", "owner");
-    elements.append(item);
-    item.setAttribute("affiliation", "admin");
-    elements.append(item);
-    item.setAttribute("affiliation", "none");
-    elements.append(item);
+        QXmppElement query;
+        query.setTagName("query");
+        query.setAttribute("xmlns", ns_muc_admin);
+        query.setChildren(item);
 
-    QXmppElement query;
-    query.setTagName("query");
-    query.setAttribute("xmlns", ns_muc_admin);
-    query.setChildren(elements);
-
-    QXmppIq iq;
-    iq.setItems(query);
-    iq.setTo(chatRoomJid);
-    client->sendPacket(iq);
+        QXmppIq iq;
+        iq.setTo(chatRoomJid);
+        iq.setItems(query);
+        client->sendPacket(iq);
+    }
 }
 
 void ChatRoomMembers::iqReceived(const QXmppIq &iq)
@@ -218,26 +226,80 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
     if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_admin)
         return;
 
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->setMargin(0);
     foreach(QXmppElement element, query.children())
     {
-        listWidget->addItem(element.attribute("jid")); // FIXME: show a 2nd columns (one for the affiliation)
+        // FIXME: check that initialMembers does not already have the current jid ?
+        addEntry(element.attribute("jid"), element.attribute("affiliation"), element.firstChild("reason").value());
+        initialMembers[element.attribute("jid")] = element.attribute("affiliation");
     }
-    frame->setLayout(vbox);
+    //tableWidget->sortItems(AffiliationColumn, Qt::AscendingOrder);
+    tableWidget->sortItems(JidColumn, Qt::AscendingOrder);;
 }
 
 void ChatRoomMembers::submit()
 {
-    qDebug() << "Submitting!";
+    QXmppElementList elements;
+    for (int i=0; i < tableWidget->rowCount(); i++)
+    {
+        const QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(i, AffiliationColumn));
+        Q_ASSERT(tableWidget->item(i, JidColumn) && combo);
+
+        const QString currentJid = tableWidget->item(i, JidColumn)->text();
+        const QString currentAffiliation = combo->itemData(combo->currentIndex()).toString();
+        if (initialMembers.value(currentJid) != currentAffiliation) {
+            QXmppElement item;
+            item.setTagName("item");
+            item.setAttribute("affiliation", currentAffiliation);
+            item.setAttribute("jid", currentJid);
+            elements.append(item);
+        }
+        initialMembers.remove(currentJid);
+    }
+
+    // Process deleted members (i.e. remaining entries in initialMember)
+    foreach(const QString &entry, initialMembers.keys())
+    {
+        QXmppElement item;
+        item.setTagName("item");
+        item.setAttribute("affiliation", "none");
+        item.setAttribute("jid", entry);
+        elements.append(item);
+    }
+
+    QXmppElement query;
+    query.setTagName("query");
+    query.setAttribute("xmlns", ns_muc_admin);
+    query.setChildren(elements);
+
+    QXmppIq iq;
+    iq.setTo(chatRoomJid);
+    iq.setType(QXmppIq::Set);
+    iq.setItems(query);
+    client->sendPacket(iq);
+
+    accept();
 }
 
 void ChatRoomMembers::addMember()
 {
-    qDebug() << "Adding a member!";
+    addEntry("@" + client->getConfiguration().getDomain(), "member");
+}
+
+void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation, const QString &comment)
+{
+    QComboBox *combo = new QComboBox;
+    foreach (const QString &text, affiliations)
+        combo->addItem(text, text); // FIXME: manage translations
+    combo->setEditable(false);
+    combo->setCurrentIndex(combo->findData(affiliation));
+    QTableWidgetItem *jidItem = new QTableWidgetItem(jid);
+    jidItem->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+    tableWidget->insertRow(0);
+    tableWidget->setCellWidget(0, AffiliationColumn, combo);
+    tableWidget->setItem(0, JidColumn, jidItem);
 }
 
 void ChatRoomMembers::removeMember()
 {
-    qDebug() << "Removing a member!";
+    tableWidget->removeRow(tableWidget->currentRow());
 }

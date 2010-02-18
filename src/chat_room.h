@@ -27,6 +27,7 @@
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
+class QTableWidget;
 class QXmppClient;
 class QXmppMessage;
 
@@ -57,11 +58,14 @@ protected slots:
     void submit();
 
 private:
+    void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation, const QString &comment="");
     QString chatRoomJid;
     QXmppClient *client;
     QXmppElement form;
-    QListWidget *listWidget;
+    QTableWidget *tableWidget;
     QFrame *frame;
+    QMap<QString, QString> initialMembers;
+    const static QStringList affiliations;
 };
 
 class ChatRoomPrompt : public QDialog
