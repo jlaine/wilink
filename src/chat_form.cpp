@@ -30,13 +30,14 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
     : QDialog(parent), chatForm(form)
 {
     QVBoxLayout *vbox = new QVBoxLayout;
-    foreach (const QXmppElement &field, chatForm.children())
+    QXmppElement field = chatForm.firstChildElement("field");
+    while (!field.isNull())
     {
         const QString key = field.attribute("var");
-        const QString label = field.attribute("label");
-        const QString value = field.firstChildElement("value").value();
-        if (field.tagName() == "field" && !key.isEmpty())
+        if (!key.isEmpty())
         {
+            const QString label = field.attribute("label");
+            const QString value = field.firstChildElement("value").value();
             if (field.attribute("type") == "boolean")
             {
                 QCheckBox *checkbox = new QCheckBox(label);
@@ -57,22 +58,22 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
                 combo->setObjectName(key);
                 int currentIndex = 0;
                 int index = 0;
-                foreach (const QXmppElement &option, field.children())
+                QXmppElement option = field.firstChildElement("option");
+                while (!option.isNull())
                 {
-                    if (option.tagName() == "option")
-                    {
-                        const QString optionValue = option.firstChildElement("value").value();
-                        combo->addItem(option.attribute("label"), optionValue);
-                        if (optionValue == value)
-                            currentIndex = index;
-                        index++;
-                    }
+                    const QString optionValue = option.firstChildElement("value").value();
+                    combo->addItem(option.attribute("label"), optionValue);
+                    if (optionValue == value)
+                        currentIndex = index;
+                    index++;
+                    option = option.nextSiblingElement("option");
                 }
                 combo->setCurrentIndex(currentIndex);
                 hbox->addWidget(combo);
                 vbox->addItem(hbox);
             }
         }
+        field = field.nextSiblingElement("field");
     }
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -88,12 +89,12 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
 void ChatForm::submit()
 {
     chatForm.setAttribute("type", "submit");
-    QXmppElementList formFields;
-    foreach (QXmppElement field, chatForm.children())
+    QXmppElement field = chatForm.firstChildElement("field");
+    while (!field.isNull())
     {
-        if (field.tagName() == "field" && !field.attribute("var").isEmpty())
+        const QString key = field.attribute("var");
+        if (!key.isEmpty())
         {
-            const QString key = field.attribute("var");
             QXmppElement value = field.firstChildElement("value");
             if (field.attribute("type") == "boolean")
             {
@@ -103,19 +104,11 @@ void ChatForm::submit()
                 QLineEdit *edit = findChild<QLineEdit*>(key);
                 value.setValue(edit->text());
             } else if (field.attribute("type") == "list-single") {
-                QXmppElementList childElements;
-                foreach (QXmppElement option, field.children())
-                {
-                    if (option.tagName() == "value")
-                    {
-                        QComboBox *combo = findChild<QComboBox*>(key);
-                        option.setValue(combo->itemData(combo->currentIndex()).toString());
-                    }
-                    childElements.append(option);
-                }
+                QComboBox *combo = findChild<QComboBox*>(key);
+                value.setValue(combo->itemData(combo->currentIndex()).toString());
             }
         }
-        formFields.append(field);
+        field = field.nextSiblingElement("field");
     }
 
     accept();
