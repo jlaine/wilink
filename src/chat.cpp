@@ -461,7 +461,10 @@ void Chat::messageReceived(const QXmppMessage &msg)
     case QXmppMessage::Chat:
         alert = true;
         if (!chatDialogs.contains(bareJid))
-            createConversation(bareJid, false);
+        {
+            ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
+            dialog->messageReceived(msg);
+        }
         break;
     case QXmppMessage::GroupChat:
         if (!chatDialogs.contains(bareJid))
@@ -476,7 +479,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
     // add message
     ChatConversation *dialog = chatDialogs.value(bareJid);
-    dialog->messageReceived(msg);
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
     else

@@ -37,9 +37,11 @@ public:
     virtual bool isRoom() const;
     virtual void join();
     virtual void leave();
-    virtual void messageReceived(const QXmppMessage &msg);
 
 public slots:
+    void messageReceived(const QXmppMessage &msg);
+
+protected slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
 

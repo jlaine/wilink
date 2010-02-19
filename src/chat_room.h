@@ -40,7 +40,9 @@ public:
     virtual bool isRoom() const;
     virtual void join();
     virtual void leave();
-    virtual void messageReceived(const QXmppMessage &msg);
+
+protected slots:
+    void messageReceived(const QXmppMessage &msg);
 
 protected:
     virtual void sendMessage(const QString &text);

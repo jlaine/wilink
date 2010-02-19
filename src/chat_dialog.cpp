@@ -34,13 +34,14 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
+    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
-    if (chat.with.split("/")[0] != chatRemoteJid)
+    if (chat.with.split("/").first() != chatRemoteJid)
         return;
 
     foreach (const QXmppArchiveMessage &msg, chat.messages)
@@ -58,7 +59,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
-        if (chats[i].with.split("/")[0] == chatRemoteJid)
+        if (chats[i].with.split("/").first() == chatRemoteJid)
             client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
 }
 
@@ -81,6 +82,9 @@ void ChatDialog::leave()
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
+    if (msg.getFrom().split("/").first() != chatRemoteJid)
+        return;
+
     ChatHistoryMessage message;
     message.body = msg.getBody();
     if (msg.getExtension().attribute("xmlns") == ns_delay)

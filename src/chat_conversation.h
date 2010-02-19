@@ -42,7 +42,6 @@ public:
     virtual bool isRoom() const = 0;
     virtual void join();
     virtual void leave();
-    virtual void messageReceived(const QXmppMessage &msg) = 0;
 
     QString localName() const;
     void setLocalName(const QString &name);

@@ -47,6 +47,7 @@ enum MembersColumns {
 ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
+    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
 }
 
 bool ChatRoom::isRoom() const
@@ -84,7 +85,7 @@ void ChatRoom::leave()
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
     const QStringList bits = msg.getFrom().split("/");
-    if (bits.size() != 2)
+    if (bits.size() != 2 || bits.first() != chatRemoteJid)
         return;
     const QString from = bits[1];
 
