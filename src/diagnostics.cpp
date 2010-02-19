@@ -401,7 +401,7 @@ void Diagnostics::showWireless(const WirelessResult &result)
     {
         TextList list;
         list << "SSID: " + result.currentNetwork.ssid();
-        list << "RSSI: " + QString::number(result.currentNetwork.rssi());
+        list << "RSSI: " + QString::number(result.currentNetwork.rssi()) + " dBm";
         if (showCinr)
             list << "CINR: " + QString::number(result.currentNetwork.cinr());
         addItem("Current network", list.render());
@@ -419,7 +419,7 @@ void Diagnostics::showWireless(const WirelessResult &result)
         {
             TextRow row;
             row << network.ssid();
-            row << QString::number(network.rssi());
+            row << QString::number(network.rssi()) + " dBm";
             if (showCinr)
                 row << (network.cinr() ? QString::number(network.cinr()) : QString());
             table << row;
