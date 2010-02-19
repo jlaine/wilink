@@ -80,8 +80,12 @@ void dumpElement(const QXmppElement &item, int level)
         qDebug() << (pad + "*").toAscii().constData() << item.tagName() << ":" << item.value();
     foreach (const QString &attr, item.attributeNames())
         qDebug() << (pad + "  -").toAscii().constData() << attr << ":" << item.attribute(attr);
-    foreach (const QXmppElement &child, item.children())
+    QXmppElement child = item.firstChildElement();
+    while (!child.isNull())
+    {
         dumpElement(child, level+1);
+        child = child.nextSiblingElement();
+    }
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)

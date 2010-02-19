@@ -255,7 +255,8 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
     if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_admin)
         return;
 
-    foreach(QXmppElement element, query.children())
+    QXmppElement element = query.firstChildElement();
+    while (!element.isNull())
     {
         const QString jid = element.attribute("jid");
         const QString affiliation = element.attribute("affiliation");
@@ -264,6 +265,7 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
             addEntry(jid, affiliation);
             initialMembers[jid] = affiliation;
         }
+        element = element.nextSiblingElement();
     }
     tableWidget->sortItems(JidColumn, Qt::AscendingOrder);;
 }
