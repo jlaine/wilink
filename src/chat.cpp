@@ -438,7 +438,6 @@ void Chat::leaveConversation(const QString &jid)
 void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = msg.getFrom().split("/")[0];
-    bool alert = false;
 
     switch (msg.getType())
     {
@@ -459,16 +458,11 @@ void Chat::messageReceived(const QXmppMessage &msg)
         }
         return;
     case QXmppMessage::Chat:
-        alert = true;
         if (!chatDialogs.contains(bareJid))
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
             dialog->messageReceived(msg);
         }
-        break;
-    case QXmppMessage::GroupChat:
-        if (!chatDialogs.contains(bareJid))
-            return;
         break;
     case QXmppMessage::Error:
         qWarning() << "Received an error message" << msg.getBody();
@@ -479,13 +473,15 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
     // add message
     ChatConversation *dialog = chatDialogs.value(bareJid);
+    if (!dialog)
+        return;
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
     else
         rosterView->selectContact(bareJid);
 
-    // if requested, alert user
-    if (!alert)
+    // don't alert the user for chat rooms
+    if (dialog->isRoom())
         return;
 
     if (!isVisible())
