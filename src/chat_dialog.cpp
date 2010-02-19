@@ -24,9 +24,11 @@
 #include <QShortcut>
 
 #include "qxmpp/QXmppArchiveManager.h"
+#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
 
+#include "chat.h"
 #include "chat_dialog.h"
 #include "chat_edit.h"
 #include "chat_history.h"
@@ -34,6 +36,7 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
@@ -63,15 +66,36 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
             client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
 }
 
+void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    // we only want results from remote party
+    if (disco.getFrom().split("/").first() != chatRemoteJid ||
+        disco.getType() != QXmppIq::Result )
+        return;
+
+    qDebug("Received discovery result from remote party");
+    foreach (const QXmppElement &element, disco.getQueryItems())
+        dumpElement(element);
+}
+
 bool ChatDialog::isRoom() const
 {
     return false;
 }
 
-/** List archives for the past week.
+/** Start a two party dialog.
  */
 void ChatDialog::join()
 {
+#if 0
+    // discover remote party features
+    QXmppDiscoveryIq disco;
+    disco.setTo(chatRemoteJid);
+    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    client->sendPacket(disco);
+#endif
+
+    // list archives for the past week.
     client->getArchiveManager().listCollections(chatRemoteJid,
         QDateTime::currentDateTime().addDays(-7));
 }

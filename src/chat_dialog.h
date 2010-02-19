@@ -22,10 +22,12 @@
 
 #include <QWidget>
 
-#include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppArchiveIq.h"
+#include "qxmpp/QXmppMessage.h"
 
 #include "chat_conversation.h"
+
+class QXmppClient;
 
 class ChatDialog : public ChatConversation
 {
@@ -44,6 +46,7 @@ public slots:
 protected slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
 
 protected:
     virtual void sendMessage(const QString &body);
