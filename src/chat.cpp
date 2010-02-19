@@ -218,8 +218,9 @@ void Chat::addRoom()
 void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     QString bareJid = chat.with.split("/")[0];
-    if (chatDialogs.contains(bareJid))
-        chatDialogs[bareJid]->archiveChatReceived(chat);
+    ChatDialog *dialog = qobject_cast<ChatDialog*>(chatDialogs.value(bareJid));
+    if (dialog)
+        dialog->archiveChatReceived(chat);
 }
 
 void Chat::archiveListReceived(const QList<QXmppArchiveChat> &chats)
@@ -263,9 +264,9 @@ void Chat::connected()
  *
  * @param jid
  */
-ChatDialog *Chat::createConversation(const QString &jid, bool room)
+ChatConversation *Chat::createConversation(const QString &jid, bool room)
 {
-    ChatDialog *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
+    ChatConversation *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
@@ -425,7 +426,7 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     if (!chatDialogs.contains(jid))
         createConversation(jid, isRoom);
 
-    ChatDialog *dialog = chatDialogs.value(jid);
+    ChatConversation *dialog = chatDialogs.value(jid);
     rosterModel->clearPendingMessages(jid);
     rosterView->selectContact(jid);
     conversationPanel->setCurrentWidget(dialog);
@@ -449,7 +450,7 @@ void Chat::leaveConversation(const QString &jid, bool isRoom)
     }
 
     // close view
-    ChatDialog *dialog = chatDialogs.take(jid);
+    ChatConversation *dialog = chatDialogs.take(jid);
     if (conversationPanel->count() == 1)
     {
         conversationPanel->hide();
@@ -498,7 +499,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
     }
 
     // add message
-    ChatDialog *dialog = chatDialogs.value(bareJid);
+    ChatConversation *dialog = chatDialogs.value(bareJid);
     dialog->messageReceived(msg);
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
@@ -667,7 +668,7 @@ void Chat::rejoinConversations()
 {
     foreach (const QString &bareJid, chatDialogs.keys())
     {
-        ChatDialog *dialog = chatDialogs.value(bareJid);
+        ChatConversation *dialog = chatDialogs.value(bareJid);
         if (dialog->isRoom())
         {
             dialog->clear();

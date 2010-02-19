@@ -25,7 +25,7 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
-class ChatDialog;
+class ChatConversation;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
@@ -76,7 +76,7 @@ protected slots:
 
 protected:
     void changeEvent(QEvent *event);
-    ChatDialog *createConversation(const QString &jid, bool room);
+    ChatConversation *createConversation(const QString &jid, bool room);
 
 private:
     bool isBusy;
@@ -85,7 +85,7 @@ private:
 
     QPushButton *addButton;
     QPushButton *roomButton;
-    QHash<QString, ChatDialog*> chatDialogs;
+    QHash<QString, ChatConversation*> chatDialogs;
     QXmppClient *client;
     QTimer *pingTimer;
 
