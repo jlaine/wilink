@@ -68,7 +68,7 @@ void ChatRoom::join()
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_muc);
-    packet.setExtension(x);
+    packet.setExtensions(x);
     client->sendPacket(packet);
 }
 
@@ -93,13 +93,15 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     message.body = msg.getBody();
     message.from = from;
     message.local = (from == chatLocalName);
-    if (msg.getExtension().attribute("xmlns") == ns_delay)
+    message.datetime = QDateTime::currentDateTime();
+    foreach (const QXmppElement &extension, msg.getExtensions())
     {
-        const QString str = msg.getExtension().attribute("stamp");
-        message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-        message.datetime.setTimeSpec(Qt::UTC);
-    } else {
-        message.datetime = QDateTime::currentDateTime();
+        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
+        {
+            const QString str = extension.attribute("stamp");
+            message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+            message.datetime.setTimeSpec(Qt::UTC);
+        }
     }
     chatHistory->addMessage(message);
 }

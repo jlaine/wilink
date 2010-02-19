@@ -121,13 +121,15 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     ChatHistoryMessage message;
     message.body = msg.getBody();
-    if (msg.getExtension().attribute("xmlns") == ns_delay)
+    message.datetime = QDateTime::currentDateTime();
+    foreach (const QXmppElement &extension, msg.getExtensions())
     {
-        const QString str = msg.getExtension().attribute("stamp");
-        message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-        message.datetime.setTimeSpec(Qt::UTC);
-    } else {
-        message.datetime = QDateTime::currentDateTime();
+        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
+        {
+            const QString str = extension.attribute("stamp");
+            message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+            message.datetime.setTimeSpec(Qt::UTC);
+        }
     }
     message.from = chatRemoteName;
     message.local = false;

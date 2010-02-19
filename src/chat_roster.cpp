@@ -262,14 +262,16 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         endInsertRows();
 
         // check whether we own the room
-        QXmppElement x = presence.getExtension();
-        if (x.attribute("xmlns") == ns_muc_user)
+        foreach (const QXmppElement &x, presence.getExtensions())
         {
-            QXmppElement item = x.firstChildElement("item");
-            if (item.attribute("jid") == client->getConfiguration().getJid() &&
-                item.attribute("affiliation") == "owner")
+            if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
             {
-                roomItem->setData(FlagsRole, OwnerFlag);
+                QXmppElement item = x.firstChildElement("item");
+                if (item.attribute("jid") == client->getConfiguration().getJid() &&
+                    item.attribute("affiliation") == "owner")
+                {
+                    roomItem->setData(FlagsRole, OwnerFlag);
+                }
             }
         }
     }

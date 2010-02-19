@@ -375,7 +375,7 @@ void Chat::inviteContact(const QString &jid)
     QXmppMessage message;
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
-    message.setExtension(x);
+    message.setExtensions(x);
     client->sendPacket(message);
 }
 
@@ -447,18 +447,22 @@ void Chat::messageReceived(const QXmppMessage &msg)
     switch (msg.getType())
     {
     case QXmppMessage::Normal:
-        if (msg.getExtension().attribute("xmlns") == ns_conference)
+        foreach (const QXmppElement &extension, msg.getExtensions())
         {
-            const QString contactName = rosterModel->contactName(bareJid);
-            const QString roomJid = msg.getExtension().attribute("jid");
-            if (!roomJid.isEmpty() &&
-                !chatDialogs.contains(roomJid) &&
-                QMessageBox::question(this,
-                    tr("Invitation from %1").arg(contactName),
-                    tr("%1 has asked to add you to join the '%2' chat room. Do you accept?").arg(contactName, roomJid),
-                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
             {
-                joinConversation(roomJid, true);
+                const QString contactName = rosterModel->contactName(bareJid);
+                const QString roomJid = extension.attribute("jid");
+                if (!roomJid.isEmpty() &&
+                    !chatDialogs.contains(roomJid) &&
+                    QMessageBox::question(this,
+                        tr("Invitation from %1").arg(contactName),
+                        tr("%1 has asked to add you to join the '%2' chat room. Do you accept?").arg(contactName, roomJid),
+                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+                {
+                    joinConversation(roomJid, true);
+                }
+                break;
             }
         }
         return;
@@ -514,13 +518,16 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 {
     QXmppPresence packet;
     packet.setTo(presence.getFrom());
+    const QString bareJid = jidToBareJid(presence.getFrom());
+    
     switch (presence.getType())
     {
     case QXmppPresence::Error:
-        if (presence.getExtension().attribute("xmlns") == ns_muc)
+        if (!chatDialogs.contains(bareJid))
+            return;
+        foreach (const QXmppElement &extension, presence.getExtensions())
         {
-            const QString bareJid = jidToBareJid(presence.getFrom());
-            if (chatDialogs.contains(bareJid))
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
             {
                 leaveConversation(bareJid);
 
@@ -530,24 +537,27 @@ void Chat::presenceReceived(const QXmppPresence &presence)
                     tr("Sorry, but you cannot join chat room %1.\n\n%2")
                         .arg(bareJid)
                         .arg(error.getText()));
+                break;
             }
         }
         break;
     case QXmppPresence::Unavailable:
-        if (presence.getExtension().attribute("xmlns") == ns_muc_user)
+        if (!chatDialogs.contains(bareJid) ||
+            chatDialogs[bareJid]->localName() != jidToResource(presence.getFrom()))
+            return;
+        foreach (const QXmppElement &extension, presence.getExtensions())
         {
-            const QString bareJid = jidToBareJid(presence.getFrom());
-            if (chatDialogs.contains(bareJid) &&
-                chatDialogs[bareJid]->localName() == jidToResource(presence.getFrom()))
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc_user)
             {
                 leaveConversation(bareJid);
 
-                QXmppElement reason = presence.getExtension().firstChildElement("item").firstChildElement("reason");
+                QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
                 QMessageBox::warning(this,
                     tr("Chat room error"),
                     tr("Sorry, but you were kicked from chat room %1.\n\n%2")
                         .arg(bareJid)
                         .arg(reason.value()));
+                break;
             }
         }
         break;
