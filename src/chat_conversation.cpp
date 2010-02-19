@@ -18,10 +18,12 @@
  */
 
 #include <QDateTime>
+#include <QDebug>
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
 #include "chat_conversation.h"
 #include "chat_edit.h"
@@ -29,7 +31,7 @@
 
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     : QWidget(parent),
-    chatRemoteJid(jid), state(QXmppMessage::None)
+    chatRemoteJid(jid), localState(QXmppMessage::None)
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -65,11 +67,25 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     setLayout(layout);
     setMinimumWidth(300);
 
+    /* timers */
+    pausedTimer = new QTimer(this);
+    pausedTimer->setInterval(30000);
+    pausedTimer->setSingleShot(true);
+    connect(pausedTimer, SIGNAL(timeout()), this, SLOT(slotPaused()));
+
+    inactiveTimer = new QTimer(this);
+    inactiveTimer->setInterval(120000);
+    inactiveTimer->setSingleShot(true);
+    connect(inactiveTimer, SIGNAL(timeout()), this, SLOT(slotInactive()));
+
     /* shortcuts for new line */
     connect(new QShortcut(QKeySequence(Qt::AltModifier + Qt::Key_Return), this),
         SIGNAL(activated()), this, SLOT(slotNewLine()));
     connect(new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Return), this),
         SIGNAL(activated()), this, SLOT(slotNewLine()));
+
+    /* start inactivity timer */
+    inactiveTimer->start();
 }
 
 void ChatConversation::join()
@@ -90,17 +106,49 @@ void ChatConversation::setLocalName(const QString &name)
     chatLocalName = name;
 }
 
+void ChatConversation::setRemoteName(const QString &name)
+{
+    chatRemoteName = name;
+    setRemoteState(QXmppMessage::None);
+}
+
 void ChatConversation::setRemotePixmap(const QPixmap &avatar)
 {
     iconLabel->setPixmap(avatar);
 }
 
-void ChatConversation::setRemoteName(const QString &name)
+void ChatConversation::setRemoteState(QXmppMessage::State state)
 {
-    chatRemoteName = name;
-    nameLabel->setText(QString("<b>%1</b><br/>%2")
+    QString stateName;
+    if (state == QXmppMessage::Active)
+        stateName = "active";
+    else if (state == QXmppMessage::Composing)
+        stateName = "composing";
+    else if (state == QXmppMessage::Gone)
+        stateName = "gone";
+    else if (state == QXmppMessage::Inactive)
+        stateName = "inactive";
+    else if (state == QXmppMessage::Paused)
+        stateName = "paused";
+    qDebug() << "remote state changed" << stateName;
+
+    if (!stateName.isEmpty())
+        stateName = QString(" (%1)").arg(stateName);
+
+    nameLabel->setText(QString("<b>%1</b>%2<br/>%3")
         .arg(chatRemoteName)
+        .arg(stateName)
         .arg(chatRemoteJid));
+}
+
+void ChatConversation::slotInactive()
+{
+    if (localState != QXmppMessage::Inactive)
+    {
+        qDebug("inactive");
+        localState = QXmppMessage::Inactive;
+        emit stateChanged(localState);
+    }
 }
 
 void ChatConversation::slotLeave()
@@ -113,13 +161,23 @@ void ChatConversation::slotNewLine()
     chatInput->append("");
 }
 
+void ChatConversation::slotPaused()
+{
+    if (localState == QXmppMessage::Composing)
+    {
+        qDebug("paused");
+        localState = QXmppMessage::Paused;
+        emit stateChanged(localState);
+    }
+}
+
 void ChatConversation::slotSend()
 {
     QString text = chatInput->document()->toPlainText();
     if (text.isEmpty())
         return;
 
-    state = QXmppMessage::Active;
+    localState = QXmppMessage::Active;
     chatInput->document()->clear();
     sendMessage(text);
 }
@@ -129,17 +187,22 @@ void ChatConversation::slotTextChanged()
     QString text = chatInput->document()->toPlainText();
     if (!text.isEmpty())
     {
-        if (state != QXmppMessage::Composing)
+        if (localState != QXmppMessage::Composing)
         {
-            state = QXmppMessage::Composing;
-            emit stateChanged(state);
+            localState = QXmppMessage::Composing;
+            emit stateChanged(localState);
         }
+        pausedTimer->start();
     } else {
-        if (state != QXmppMessage::Active)
+        if (localState != QXmppMessage::Active)
         {
-            state = QXmppMessage::Active;
-            emit stateChanged(state);
+            localState = QXmppMessage::Active;
+            emit stateChanged(localState);
         }
+        pausedTimer->stop();
     }
+    // reset inactivity timer
+    inactiveTimer->stop();
+    inactiveTimer->start();
 }
 

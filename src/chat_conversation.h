@@ -45,10 +45,13 @@ public:
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
+    void setRemoteState(QXmppMessage::State state);
 
 protected slots:
+    void slotInactive();
     void slotLeave();
     void slotNewLine();
+    void slotPaused();
     void slotSend();
     void slotTextChanged();
 
@@ -58,7 +61,6 @@ signals:
 
 protected:
     virtual void sendMessage(const QString &body) = 0;
-    void setState(QXmppMessage::State newState);
 
 protected:
     ChatHistory *chatHistory;
@@ -71,7 +73,9 @@ protected:
     QString chatRemoteName;
 
 private:
-    QXmppMessage::State state;
+    QXmppMessage::State localState;
+    QTimer *inactiveTimer;
+    QTimer *pausedTimer;
 };
 
 #endif

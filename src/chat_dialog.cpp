@@ -120,6 +120,8 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     if (msg.getFrom().split("/").first() != chatRemoteJid)
         return;
 
+    setRemoteState(msg.getState());
+
     ChatHistoryMessage message;
     message.body = msg.getBody();
     if (msg.getExtension().attribute("xmlns") == ns_delay)
