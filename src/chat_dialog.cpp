@@ -112,10 +112,6 @@ void ChatDialog::join()
         QDateTime::currentDateTime().addDays(-7));
 }
 
-void ChatDialog::leave()
-{
-}
-
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     if (jidToBareJid(msg.getFrom()) != chatRemoteJid)

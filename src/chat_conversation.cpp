@@ -93,6 +93,8 @@ void ChatConversation::join()
 
 void ChatConversation::leave()
 {
+    localState = QXmppMessage::Gone;
+    emit stateChanged(localState);
 }
 
 QString ChatConversation::localName() const
