@@ -21,8 +21,8 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
-#include <QShortcut>
 
+#include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppConstants.h"

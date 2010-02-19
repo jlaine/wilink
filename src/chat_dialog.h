@@ -22,12 +22,13 @@
 
 #include <QWidget>
 
-#include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppMessage.h"
 
 #include "chat_conversation.h"
 
+class QXmppArchiveChat;
 class QXmppClient;
+class QXmppDiscoveryIq;
 
 class ChatDialog : public ChatConversation
 {
