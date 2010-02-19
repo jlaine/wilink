@@ -74,11 +74,6 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
         SIGNAL(activated()), this, SLOT(slotNewLine()));
 }
 
-void ChatConversation::clear()
-{
-    chatHistory->clear();
-}
-
 void ChatConversation::join()
 {
 }

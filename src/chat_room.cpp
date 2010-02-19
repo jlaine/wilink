@@ -59,7 +59,7 @@ bool ChatRoom::isRoom() const
 void ChatRoom::join()
 {
     // clear history
-    clear();
+    chatHistory->clear();
 
     QXmppPresence packet;
     packet.setTo(chatRemoteJid + "/" + chatLocalName);

@@ -39,7 +39,6 @@ class ChatConversation : public QWidget
 public:
     ChatConversation(const QString &jid, QWidget *parent = NULL);
 
-    void clear();
     virtual bool isRoom() const = 0;
     virtual void messageReceived(const QXmppMessage &msg) = 0;
 
