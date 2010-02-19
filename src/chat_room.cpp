@@ -44,8 +44,8 @@ enum MembersColumns {
     AffiliationColumn,
 };
 
-ChatRoom::ChatRoom(const QString &jid, QWidget *parent)
-    : ChatDialog(jid, parent)
+ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
+    : ChatConversation(jid, parent), client(xmppClient)
 {
 }
 
@@ -68,7 +68,7 @@ void ChatRoom::join()
     x.setTagName("x");
     x.setAttribute("xmlns", ns_muc);
     packet.setExtension(x);
-    emit sendPacket(packet);
+    client->sendPacket(packet);
 }
 
 /** Send a request to leave a multi-user chat.
@@ -78,7 +78,7 @@ void ChatRoom::leave()
     QXmppPresence packet;
     packet.setTo(chatRemoteJid + "/" + chatLocalName);
     packet.setType(QXmppPresence::Unavailable);
-    emit sendPacket(packet);
+    client->sendPacket(packet);
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -110,7 +110,7 @@ void ChatRoom::sendMessage(const QString &text)
     msg.setFrom(chatRemoteJid + "/" + chatLocalName);
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
-    emit sendPacket(msg);
+    client->sendPacket(msg);
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)

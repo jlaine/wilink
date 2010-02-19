@@ -107,7 +107,7 @@ void ChatConversation::setRemoteName(const QString &name)
 
 void ChatConversation::slotLeave()
 {
-    emit leave(chatRemoteJid, isRoom());
+    emit leave(chatRemoteJid);
 }
 
 void ChatConversation::slotNewLine()

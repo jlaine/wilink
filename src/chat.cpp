@@ -266,10 +266,14 @@ void Chat::connected()
  */
 ChatConversation *Chat::createConversation(const QString &jid, bool room)
 {
-    ChatConversation *dialog = room ? new ChatRoom(jid) : new ChatDialog(jid);
+    ChatConversation *dialog;
+    if (room)
+        dialog  = new ChatRoom(client, jid);
+    else
+        dialog = new ChatDialog(client, jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(leave(const QString&, bool)), this, SLOT(leaveConversation(const QString&, bool)));
+    connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
     connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
     conversationPanel->addWidget(dialog);
     conversationPanel->show();
@@ -278,10 +282,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     if (room)
     {
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
-
-        // join room
         rosterModel->addRoom(jid);
-        dialog->join();
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
 
@@ -289,6 +290,9 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
         client->getArchiveManager().listCollections(jid,
             QDateTime::currentDateTime().addDays(-7));
     }
+
+    // join conversation
+    dialog->join();
     return dialog;
 }
 
@@ -433,18 +437,16 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     dialog->setFocus();
 }
 
-void Chat::leaveConversation(const QString &jid, bool isRoom)
+void Chat::leaveConversation(const QString &jid)
 {
     if (!chatDialogs.contains(jid))
         return;
     ChatConversation *dialog = chatDialogs.take(jid);
 
     // leave room
-    if (isRoom)
-    {
+    if (dialog->isRoom())
         rosterModel->removeRoom(jid);
-        dialog->leave();
-    }
+    dialog->leave();
 
     // close view
     if (conversationPanel->count() == 1)
@@ -539,7 +541,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             const QString bareJid = presence.getFrom().split('/').first();
             if (chatDialogs.contains(bareJid))
             {
-                leaveConversation(bareJid, true);
+                leaveConversation(bareJid);
 
                 QXmppStanza::Error error = presence.getError();
                 QMessageBox::warning(this,
@@ -557,7 +559,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             if (chatDialogs.contains(bareJid) &&
                 chatDialogs[bareJid]->localName() == presence.getFrom().split('/').last())
             {
-                leaveConversation(bareJid, true);
+                leaveConversation(bareJid);
 
                 QXmppElement reason = presence.getExtension().firstChild("item").firstChild("reason");
                 QMessageBox::warning(this,
@@ -732,14 +734,14 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         else if (action == ChatRosterView::JoinAction)
             joinConversation(jid, false);
         else if (action == ChatRosterView::LeaveAction)
-            leaveConversation(jid, false);
+            leaveConversation(jid);
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
             joinConversation(jid, true);
         else if (action == ChatRosterView::LeaveAction)
-            leaveConversation(jid, true);
+            leaveConversation(jid);
         else if (action == ChatRosterView::OptionsAction)
         {
             // get room info

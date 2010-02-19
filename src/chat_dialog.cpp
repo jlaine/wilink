@@ -30,8 +30,8 @@
 #include "chat_edit.h"
 #include "chat_history.h"
 
-ChatDialog::ChatDialog(const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent)
+ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
+    : ChatConversation(jid, parent), client(xmppClient)
 {
 }
 
@@ -85,6 +85,6 @@ void ChatDialog::sendMessage(const QString &text)
     QXmppMessage msg;
     msg.setBody(text);
     msg.setTo(chatRemoteJid);
-    emit sendPacket(msg);
+    client->sendPacket(msg);
 }
 

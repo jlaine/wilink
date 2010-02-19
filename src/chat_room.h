@@ -20,7 +20,7 @@
 #ifndef __WDESKTOP_CHAT_ROOM_H__
 #define __WDESKTOP_CHAT_ROOM_H__
 
-#include "chat_dialog.h"
+#include "chat_conversation.h"
 
 #include <QDialog>
 
@@ -31,12 +31,12 @@ class QTableWidget;
 class QXmppClient;
 class QXmppMessage;
 
-class ChatRoom : public ChatDialog
+class ChatRoom : public ChatConversation
 {
     Q_OBJECT
 
 public:
-    ChatRoom(const QString &jid, QWidget *parent = NULL);
+    ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
     virtual bool isRoom() const;
 
     virtual void join();
@@ -46,6 +46,9 @@ public:
 
 protected:
     virtual void sendMessage(const QString &text);
+
+private:
+    QXmppClient *client;
 };
 
 class ChatRoomMembers : public QDialog

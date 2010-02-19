@@ -32,7 +32,7 @@ class ChatDialog : public ChatConversation
     Q_OBJECT
 
 public:
-    ChatDialog(const QString &jid, QWidget *parent = NULL);
+    ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
 
     virtual bool isRoom() const;
     virtual void messageReceived(const QXmppMessage &msg);
@@ -42,6 +42,9 @@ public slots:
 
 protected:
     virtual void sendMessage(const QString &body);
+
+private:
+    QXmppClient *client;
 };
 
 #endif

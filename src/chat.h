@@ -62,7 +62,7 @@ protected slots:
     void inviteContact(const QString &jid);
     void iqReceived(const QXmppIq&);
     void joinConversation(const QString &jid, bool isRoom);
-    void leaveConversation(const QString &jid, bool isRoom);
+    void leaveConversation(const QString &jid);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &presence);
     void reconnect();

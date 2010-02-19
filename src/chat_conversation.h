@@ -56,8 +56,7 @@ protected slots:
     void slotSend();
 
 signals:
-    void leave(const QString &jid, bool isRoom);
-    void sendPacket(const QXmppPacket &packet);
+    void leave(const QString &jid);
 
 protected:
     virtual void sendMessage(const QString &body) = 0;
