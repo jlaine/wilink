@@ -237,7 +237,7 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
         QXmppElement query;
         query.setTagName("query");
         query.setAttribute("xmlns", ns_muc_admin);
-        query.setChildren(item);
+        query.appendChild(item);
 
         QXmppIq iq;
         iq.setTo(chatRoomJid);
@@ -302,7 +302,8 @@ void ChatRoomMembers::submit()
         QXmppElement query;
         query.setTagName("query");
         query.setAttribute("xmlns", ns_muc_admin);
-        query.setChildren(elements);
+        foreach (const QXmppElement &child, elements)
+            query.appendChild(child);
 
         QXmppIq iq;
         iq.setTo(chatRoomJid);

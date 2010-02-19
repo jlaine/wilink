@@ -99,11 +99,9 @@ void ChatForm::submit()
             {
                 QCheckBox *checkbox = findChild<QCheckBox*>(key);
                 value.setValue(checkbox->checkState() == Qt::Checked ? "1" : "0");
-                field.setChildren(value);
             } else if (field.attribute("type") == "text-single") {
                 QLineEdit *edit = findChild<QLineEdit*>(key);
                 value.setValue(edit->text());
-                field.setChildren(value);
             } else if (field.attribute("type") == "list-single") {
                 QXmppElementList childElements;
                 foreach (QXmppElement option, field.children())
@@ -115,12 +113,10 @@ void ChatForm::submit()
                     }
                     childElements.append(option);
                 }
-                field.setChildren(childElements);
             }
         }
         formFields.append(field);
     }
-    chatForm.setChildren(formFields);
 
     accept();
 }

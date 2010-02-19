@@ -392,7 +392,7 @@ void Chat::iqReceived(const QXmppIq &iq)
                 QXmppElement query;
                 query.setTagName("query");
                 query.setAttribute("xmlns", ns_muc_owner);
-                query.setChildren(dialog.form());
+                query.appendChild(dialog.form());
 
                 QXmppIq iqPacket(QXmppIq::Set);
                 iqPacket.setItems(query);
@@ -745,7 +745,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             QXmppElement query;
             query.setTagName("query");
             query.setAttribute("xmlns", ns_muc_admin);
-            query.setChildren(item);
+            query.appendChild(item);
 
             QXmppIq iq(QXmppIq::Set);
             iq.setTo(jid.split("/").first());
