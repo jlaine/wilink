@@ -458,7 +458,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         }
         return;
     case QXmppMessage::Chat:
-        if (!chatDialogs.contains(bareJid))
+        if (!chatDialogs.contains(bareJid) && !msg.getBody().isEmpty())
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
             dialog->messageReceived(msg);
@@ -481,7 +481,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         rosterView->selectContact(bareJid);
 
     // don't alert the user for chat rooms
-    if (dialog->isRoom())
+    if (msg.getBody().isEmpty() || dialog->isRoom())
         return;
 
     if (!isVisible())

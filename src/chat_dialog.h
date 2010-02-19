@@ -47,6 +47,7 @@ public slots:
 protected slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
+    void chatStateChanged(QXmppMessage::State state);
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
 
 protected:

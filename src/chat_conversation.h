@@ -21,10 +21,8 @@
 #define __WDESKTOP_CHAT_CONVERSATION_H__
 
 #include <QWidget>
-#include <QTextBrowser>
 
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppArchiveIq.h"
+#include "qxmpp/QXmppMessage.h"
 
 class ChatEdit;
 class ChatHistory;
@@ -52,12 +50,15 @@ protected slots:
     void slotLeave();
     void slotNewLine();
     void slotSend();
+    void slotTextChanged();
 
 signals:
     void leave(const QString &jid);
+    void stateChanged(QXmppMessage::State state);
 
 protected:
     virtual void sendMessage(const QString &body) = 0;
+    void setState(QXmppMessage::State newState);
 
 protected:
     ChatHistory *chatHistory;
@@ -68,6 +69,9 @@ protected:
     QString chatLocalName;
     QString chatRemoteJid;
     QString chatRemoteName;
+
+private:
+    QXmppMessage::State state;
 };
 
 #endif

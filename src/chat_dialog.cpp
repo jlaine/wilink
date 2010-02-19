@@ -36,6 +36,7 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
+    connect(this, SIGNAL(stateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
@@ -64,6 +65,16 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
     for (int i = chats.size() - 1; i >= 0; i--)
         if (chats[i].with.split("/").first() == chatRemoteJid)
             client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
+}
+
+/** When the chat state changes, notify the remote party.
+ */
+void ChatDialog::chatStateChanged(QXmppMessage::State state)
+{
+    QXmppMessage message;
+    message.setTo(chatRemoteJid);
+    message.setState(state);
+    client->sendPacket(message);
 }
 
 void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -138,6 +149,7 @@ void ChatDialog::sendMessage(const QString &text)
     QXmppMessage msg;
     msg.setBody(text);
     msg.setTo(chatRemoteJid);
+    msg.setState(QXmppMessage::Active);
     client->sendPacket(msg);
 }
 

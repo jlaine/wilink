@@ -23,16 +23,13 @@
 #include <QPushButton>
 #include <QShortcut>
 
-#include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppMessage.h"
-
 #include "chat_conversation.h"
 #include "chat_edit.h"
 #include "chat_history.h"
 
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     : QWidget(parent),
-    chatRemoteJid(jid)
+    chatRemoteJid(jid), state(QXmppMessage::None)
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -60,6 +57,7 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     /* text edit */
     chatInput = new ChatEdit(80);
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(slotSend()));
+    connect(chatInput, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
     layout->addSpacing(10);
     layout->addWidget(chatInput);
 
@@ -121,7 +119,27 @@ void ChatConversation::slotSend()
     if (text.isEmpty())
         return;
 
+    state = QXmppMessage::Active;
     chatInput->document()->clear();
     sendMessage(text);
+}
+
+void ChatConversation::slotTextChanged()
+{
+    QString text = chatInput->document()->toPlainText();
+    if (!text.isEmpty())
+    {
+        if (state != QXmppMessage::Composing)
+        {
+            state = QXmppMessage::Composing;
+            emit stateChanged(state);
+        }
+    } else {
+        if (state != QXmppMessage::Active)
+        {
+            state = QXmppMessage::Active;
+            emit stateChanged(state);
+        }
+    }
 }
 
