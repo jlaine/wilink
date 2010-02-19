@@ -29,6 +29,8 @@ class QListWidget;
 class QListWidgetItem;
 class QTableWidget;
 class QXmppClient;
+class QXmppDiscoveryIq;
+class QXmppIq;
 class QXmppMessage;
 
 class ChatRoom : public ChatConversation
@@ -70,7 +72,6 @@ private:
     QXmppClient *client;
     QXmppElement form;
     QTableWidget *tableWidget;
-    QFrame *frame;
     QMap<QString, QString> initialMembers;
     QMap<QString, QString> affiliations;
 };
