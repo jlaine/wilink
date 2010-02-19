@@ -71,9 +71,14 @@ void ChatRoom::join()
     emit sendPacket(packet);
 }
 
+/** Send a request to leave a multi-user chat.
+ */
 void ChatRoom::leave()
 {
-
+    QXmppPresence packet;
+    packet.setTo(chatRemoteJid + "/" + chatLocalName);
+    packet.setType(QXmppPresence::Unavailable);
+    emit sendPacket(packet);
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)

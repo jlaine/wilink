@@ -437,20 +437,16 @@ void Chat::leaveConversation(const QString &jid, bool isRoom)
 {
     if (!chatDialogs.contains(jid))
         return;
+    ChatConversation *dialog = chatDialogs.take(jid);
 
     // leave room
     if (isRoom)
     {
         rosterModel->removeRoom(jid);
-
-        QXmppPresence packet;
-        packet.setTo(jid + "/" + rosterModel->ownName());
-        packet.setType(QXmppPresence::Unavailable);
-        client->sendPacket(packet);
+        dialog->leave();
     }
 
     // close view
-    ChatConversation *dialog = chatDialogs.take(jid);
     if (conversationPanel->count() == 1)
     {
         conversationPanel->hide();
