@@ -156,9 +156,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
-    connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
-    connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
-
     /* set up timers */
     pingTimer = new QTimer(this);
     pingTimer->setInterval(60000);
@@ -215,20 +212,6 @@ void Chat::addRoom()
     joinConversation(prompt.textValue(), true);
 }
 
-void Chat::archiveChatReceived(const QXmppArchiveChat &chat)
-{
-    QString bareJid = chat.with.split("/")[0];
-    ChatDialog *dialog = qobject_cast<ChatDialog*>(chatDialogs.value(bareJid));
-    if (dialog)
-        dialog->archiveChatReceived(chat);
-}
-
-void Chat::archiveListReceived(const QList<QXmppArchiveChat> &chats)
-{
-    for (int i = chats.size() - 1; i >= 0; i--)
-        client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
-}
-
 /** When the window is activated, pass focus to the active chat.
  */
 void Chat::changeEvent(QEvent *event)
@@ -274,7 +257,6 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
-    connect(dialog, SIGNAL(sendPacket(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
     conversationPanel->addWidget(dialog);
     conversationPanel->show();
     chatDialogs[jid] = dialog;
@@ -285,10 +267,6 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
         rosterModel->addRoom(jid);
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
-
-        // list archives for the past week
-        client->getArchiveManager().listCollections(jid,
-            QDateTime::currentDateTime().addDays(-7));
     }
 
     // join conversation

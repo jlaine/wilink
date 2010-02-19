@@ -23,6 +23,7 @@
 #include <QPushButton>
 #include <QShortcut>
 
+#include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
 
@@ -33,10 +34,15 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
+    connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
+    connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
+    if (chat.with.split("/")[0] != chatRemoteJid)
+        return;
+
     foreach (const QXmppArchiveMessage &msg, chat.messages)
     {
         ChatHistoryMessage message;
@@ -49,9 +55,28 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     }
 }
 
+void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
+{
+    for (int i = chats.size() - 1; i >= 0; i--)
+        if (chats[i].with.split("/")[0] == chatRemoteJid)
+            client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
+}
+
 bool ChatDialog::isRoom() const
 {
     return false;
+}
+
+/** List archives for the past week.
+ */
+void ChatDialog::join()
+{
+    client->getArchiveManager().listCollections(chatRemoteJid,
+        QDateTime::currentDateTime().addDays(-7));
+}
+
+void ChatDialog::leave()
+{
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)

@@ -40,15 +40,14 @@ public:
     ChatConversation(const QString &jid, QWidget *parent = NULL);
 
     virtual bool isRoom() const = 0;
+    virtual void join();
+    virtual void leave();
     virtual void messageReceived(const QXmppMessage &msg) = 0;
 
     QString localName() const;
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
-
-    virtual void join();
-    virtual void leave();
 
 protected slots:
     void slotLeave();

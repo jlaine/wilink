@@ -35,10 +35,13 @@ public:
     ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
 
     virtual bool isRoom() const;
+    virtual void join();
+    virtual void leave();
     virtual void messageReceived(const QXmppMessage &msg);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
+    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
 
 protected:
     virtual void sendMessage(const QString &body);

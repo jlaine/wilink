@@ -53,8 +53,6 @@ public:
 protected slots:
     void addContact();
     void addRoom();
-    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
-    void archiveChatReceived(const QXmppArchiveChat &chat);
     void connected();
     void disconnected();
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
