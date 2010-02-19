@@ -27,6 +27,7 @@
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
+#include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_dialog.h"
@@ -45,7 +46,7 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *par
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
-    if (chat.with.split("/").first() != chatRemoteJid)
+    if (jidToBareJid(chat.with) != chatRemoteJid)
         return;
 
     foreach (const QXmppArchiveMessage &msg, chat.messages)
@@ -63,7 +64,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
-        if (chats[i].with.split("/").first() == chatRemoteJid)
+        if (jidToBareJid(chats[i].with) == chatRemoteJid)
             client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
 }
 
@@ -80,7 +81,7 @@ void ChatDialog::chatStateChanged(QXmppMessage::State state)
 void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results from remote party
-    if (disco.getFrom().split("/").first() != chatRemoteJid ||
+    if (jidToBareJid(disco.getFrom()) != chatRemoteJid ||
         disco.getType() != QXmppIq::Result )
         return;
 
@@ -117,7 +118,7 @@ void ChatDialog::leave()
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    if (msg.getFrom().split("/").first() != chatRemoteJid)
+    if (jidToBareJid(msg.getFrom()) != chatRemoteJid)
         return;
 
     setRemoteState(msg.getState());

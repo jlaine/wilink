@@ -47,6 +47,7 @@
 #include "qxmpp/QXmppPingIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "qnetio/dns.h"
@@ -441,7 +442,7 @@ void Chat::leaveConversation(const QString &jid)
 
 void Chat::messageReceived(const QXmppMessage &msg)
 {
-    const QString bareJid = msg.getFrom().split("/")[0];
+    const QString bareJid = jidToBareJid(msg.getFrom());
 
     switch (msg.getType())
     {
@@ -518,7 +519,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     case QXmppPresence::Error:
         if (presence.getExtension().attribute("xmlns") == ns_muc)
         {
-            const QString bareJid = presence.getFrom().split('/').first();
+            const QString bareJid = jidToBareJid(presence.getFrom());
             if (chatDialogs.contains(bareJid))
             {
                 leaveConversation(bareJid);
@@ -535,9 +536,9 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     case QXmppPresence::Unavailable:
         if (presence.getExtension().attribute("xmlns") == ns_muc_user)
         {
-            const QString bareJid = presence.getFrom().split('/').first();
+            const QString bareJid = jidToBareJid(presence.getFrom());
             if (chatDialogs.contains(bareJid) &&
-                chatDialogs[bareJid]->localName() == presence.getFrom().split('/').last())
+                chatDialogs[bareJid]->localName() == jidToResource(presence.getFrom()))
             {
                 leaveConversation(bareJid);
 
@@ -743,7 +744,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         {
             QXmppElement item;
             item.setTagName("item");
-            item.setAttribute("nick", jid.split("/").last());
+            item.setAttribute("nick", jidToResource(jid));
             item.setAttribute("role", "none");
 
             QXmppElement query;
@@ -752,7 +753,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             query.appendChild(item);
 
             QXmppIq iq(QXmppIq::Set);
-            iq.setTo(jid.split("/").first());
+            iq.setTo(jidToBareJid(jid));
             iq.setItems(query);
 
             client->sendPacket(iq);
