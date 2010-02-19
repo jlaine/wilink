@@ -21,57 +21,27 @@
 #define __WDESKTOP_CHAT_DIALOG_H__
 
 #include <QWidget>
-#include <QTextBrowser>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppArchiveIq.h"
 
-class ChatEdit;
-class ChatHistory;
-class QLabel;
-class QLineEdit;
-class QXmppVCard;
+#include "chat_conversation.h"
 
-class ChatDialog : public QWidget
+class ChatDialog : public ChatConversation
 {
     Q_OBJECT
 
 public:
     ChatDialog(const QString &jid, QWidget *parent = NULL);
 
-    void clear();
     virtual bool isRoom() const;
     virtual void messageReceived(const QXmppMessage &msg);
-
-    QString localName() const;
-    void setLocalName(const QString &name);
-    void setRemoteName(const QString &name);
-    void setRemotePixmap(const QPixmap &avatar);
 
 public slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
 
-protected slots:
-    void slotLeave();
-    void slotNewLine();
-    void slotSend();
-
-signals:
-    void leave(const QString &jid, bool isRoom);
-    void sendPacket(const QXmppPacket &packet);
-
 protected:
     virtual void sendMessage(const QString &body);
-
-protected:
-    ChatHistory *chatHistory;
-    ChatEdit *chatInput;
-    QLabel *iconLabel;
-    QLabel *nameLabel;
-
-    QString chatLocalName;
-    QString chatRemoteJid;
-    QString chatRemoteName;
 };
 
 #endif

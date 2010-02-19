@@ -20,6 +20,7 @@ target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 set(wDesktop_SOURCES
     application.cpp
     chat.cpp
+    chat_conversation.cpp
     chat_dialog.cpp
     chat_edit.cpp
     chat_form.cpp
@@ -38,6 +39,7 @@ set(wDesktop_SOURCES
 
 set(wDesktop_MOC_HEADERS
     chat.h
+    chat_conversation.h
     chat_dialog.h
     chat_edit.h
     chat_form.h
