@@ -374,7 +374,7 @@ void Photos::processDownloadQueue()
         return;
 
     downloadUrl = downloadQueue.takeFirst();
-    fdPhoto = fs->get(downloadUrl);
+    fdPhoto = fs->get(downloadUrl, FileSystem::Preview);
 }
 
 /** If the upload queue is not empty, process the next item.
