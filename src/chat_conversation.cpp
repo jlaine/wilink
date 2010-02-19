@@ -18,7 +18,6 @@
  */
 
 #include <QDateTime>
-#include <QDebug>
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
@@ -130,7 +129,6 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
         stateName = "inactive";
     else if (state == QXmppMessage::Paused)
         stateName = "paused";
-    qDebug() << "remote state changed" << stateName;
 
     if (!stateName.isEmpty())
         stateName = QString(" (%1)").arg(stateName);
@@ -145,7 +143,6 @@ void ChatConversation::slotInactive()
 {
     if (localState != QXmppMessage::Inactive)
     {
-        qDebug("inactive");
         localState = QXmppMessage::Inactive;
         emit stateChanged(localState);
     }
@@ -165,7 +162,6 @@ void ChatConversation::slotPaused()
 {
     if (localState == QXmppMessage::Composing)
     {
-        qDebug("paused");
         localState = QXmppMessage::Paused;
         emit stateChanged(localState);
     }
