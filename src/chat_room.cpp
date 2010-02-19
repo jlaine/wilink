@@ -54,6 +54,28 @@ bool ChatRoom::isRoom() const
     return true;
 }
 
+/** Send a request to join a multi-user chat.
+ */
+void ChatRoom::join()
+{
+    // clear history
+    clear();
+
+    QXmppPresence packet;
+    packet.setTo(chatRemoteJid + "/" + chatLocalName);
+    packet.setType(QXmppPresence::Available);
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_muc);
+    packet.setExtension(x);
+    emit sendPacket(packet);
+}
+
+void ChatRoom::leave()
+{
+
+}
+
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
     const QStringList bits = msg.getFrom().split("/");

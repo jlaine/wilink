@@ -70,7 +70,6 @@ protected slots:
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void resizeContacts();
-    void sendJoin(const QString &jid);
     void sendPing();
     void statusChanged(int currentIndex);
 

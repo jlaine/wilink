@@ -281,7 +281,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
 
         // join room
         rosterModel->addRoom(jid);
-        sendJoin(jid);
+        dialog->join();
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
 
@@ -671,9 +671,8 @@ void Chat::rejoinConversations()
         ChatConversation *dialog = chatDialogs.value(bareJid);
         if (dialog->isRoom())
         {
-            dialog->clear();
             rosterModel->addRoom(bareJid);
-            sendJoin(bareJid);
+            dialog->join();
         }
     }
 }
@@ -781,20 +780,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             client->sendPacket(iq);
         }
     }
-}
-
-/** Send a request to join a multi-user chat.
- */
-void Chat::sendJoin(const QString &jid)
-{
-    QXmppPresence packet;
-    packet.setTo(jid + "/" + rosterModel->ownName());
-    packet.setType(QXmppPresence::Available);
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_muc);
-    packet.setExtension(x);
-    client->sendPacket(packet);
 }
 
 /** Send an XMPP Ping as described in XEP-0199:

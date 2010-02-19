@@ -48,6 +48,9 @@ public:
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
 
+    virtual void join();
+    virtual void leave();
+
 protected slots:
     void slotLeave();
     void slotNewLine();

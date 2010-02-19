@@ -79,6 +79,14 @@ void ChatConversation::clear()
     chatHistory->clear();
 }
 
+void ChatConversation::join()
+{
+}
+
+void ChatConversation::leave()
+{
+}
+
 QString ChatConversation::localName() const
 {
     return chatLocalName;
