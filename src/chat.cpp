@@ -380,7 +380,7 @@ void Chat::iqReceived(const QXmppIq &iq)
     if (iq.getType() == QXmppIq::Result && !iq.getItems().isEmpty())
     {
         const QXmppElement query = iq.getItems().first();
-        const QXmppElement form = query.firstChild("x");
+        const QXmppElement form = query.firstChildElement("x");
         if (query.tagName() == "query" &&
             query.attribute("xmlns") == ns_muc_owner &&
             form.attribute("type") == "form" &&
@@ -537,7 +537,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             {
                 leaveConversation(bareJid);
 
-                QXmppElement reason = presence.getExtension().firstChild("item").firstChild("reason");
+                QXmppElement reason = presence.getExtension().firstChildElement("item").firstChildElement("reason");
                 QMessageBox::warning(this,
                     tr("Chat room error"),
                     tr("Sorry, but you were kicked from chat room %1.\n\n%2")

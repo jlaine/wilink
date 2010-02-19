@@ -265,7 +265,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         QXmppElement x = presence.getExtension();
         if (x.attribute("xmlns") == ns_muc_user)
         {
-            QXmppElement item = x.firstChild("item");
+            QXmppElement item = x.firstChildElement("item");
             if (item.attribute("jid") == client->getConfiguration().getJid() &&
                 item.attribute("affiliation") == "owner")
             {

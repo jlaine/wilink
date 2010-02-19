@@ -34,7 +34,7 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
     {
         const QString key = field.attribute("var");
         const QString label = field.attribute("label");
-        const QString value = field.firstChild("value").value();
+        const QString value = field.firstChildElement("value").value();
         if (field.tagName() == "field" && !key.isEmpty())
         {
             if (field.attribute("type") == "boolean")
@@ -61,7 +61,7 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
                 {
                     if (option.tagName() == "option")
                     {
-                        const QString optionValue = option.firstChild("value").value();
+                        const QString optionValue = option.firstChildElement("value").value();
                         combo->addItem(option.attribute("label"), optionValue);
                         if (optionValue == value)
                             currentIndex = index;
@@ -79,7 +79,7 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
     vbox->addWidget(buttonBox);
 
     setLayout(vbox);
-    setWindowTitle(chatForm.firstChild("title").value());
+    setWindowTitle(chatForm.firstChildElement("title").value());
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -94,7 +94,7 @@ void ChatForm::submit()
         if (field.tagName() == "field" && !field.attribute("var").isEmpty())
         {
             const QString key = field.attribute("var");
-            QXmppElement value = field.firstChild("value");
+            QXmppElement value = field.firstChildElement("value");
             if (field.attribute("type") == "boolean")
             {
                 QCheckBox *checkbox = findChild<QCheckBox*>(key);
