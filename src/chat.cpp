@@ -264,6 +264,8 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
     conversationPanel->addWidget(dialog);
     conversationPanel->show();
+    if (conversationPanel->count() == 1)
+        resizeContacts();
     chatDialogs[jid] = dialog;
 
     if (room)
@@ -697,6 +699,10 @@ void Chat::resizeContacts()
 {
     QSize hint = rosterView->sizeHint();
     hint.setHeight(hint.height() + 32);
+    if (conversationPanel->isVisible())
+        hint.setWidth(hint.width() + 500);
+
+    // respect current size
     if (conversationPanel->isVisible() && hint.width() < size().width())
         hint.setWidth(size().width());
     if (hint.height() < size().height())
