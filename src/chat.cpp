@@ -489,7 +489,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
     else
         rosterView->selectContact(bareJid);
 
-    // don't alert the user for chat rooms
+    // don't alert the user for empty messages or chat rooms
     if (msg.getBody().isEmpty() || dialog->isRoom())
         return;
 
