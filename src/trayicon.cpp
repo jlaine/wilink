@@ -38,6 +38,7 @@
 #include "qnetio/wallet.h"
 
 #include "chat.h"
+#include "chat_accounts.h"
 #include "config.h"
 #include "application.h"
 #include "diagnostics.h"
@@ -234,6 +235,12 @@ void TrayIcon::showChat()
     }
 }
 
+void TrayIcon::showChatAccounts()
+{
+    ChatAccounts dlg;
+    dlg.exec();
+}
+
 void TrayIcon::showDiagnostics()
 {
     diagnostics->show();
@@ -287,18 +294,20 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
 
+    QMenu *optionsMenu = new QMenu;
+    action = optionsMenu->addAction(tr("Chat accounts"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
+
     if (Application::isInstalled())
     {
-        QMenu *optionsMenu = new QMenu;
-
         action = optionsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(settings->value("OpenAtLogin").toBool());
         connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
-
-        action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
-        action->setMenu(optionsMenu);
     }
+
+    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
+    action->setMenu(optionsMenu);
 
     action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
