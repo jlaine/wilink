@@ -242,7 +242,7 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
 
         QXmppIq iq;
         iq.setTo(chatRoomJid);
-        iq.setItems(query);
+        iq.setExtensions(query);
         client->sendPacket(iq);
     }
 }
@@ -252,7 +252,7 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
     if (iq.getType() != QXmppIq::Result ||
         iq.getFrom() != chatRoomJid)
         return;
-    const QXmppElement query = iq.getItems().first();
+    const QXmppElement query = iq.getExtensions().first();
     if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_admin)
         return;
 
@@ -311,7 +311,7 @@ void ChatRoomMembers::submit()
         QXmppIq iq;
         iq.setTo(chatRoomJid);
         iq.setType(QXmppIq::Set);
-        iq.setItems(query);
+        iq.setExtensions(query);
         client->sendPacket(iq);
     }
     accept();

@@ -394,9 +394,9 @@ void Chat::inviteContact(const QString &jid)
 void Chat::iqReceived(const QXmppIq &iq)
 {
     timeoutTimer->stop();
-    if (iq.getType() == QXmppIq::Result && !iq.getItems().isEmpty())
+    if (iq.getType() == QXmppIq::Result && !iq.getExtensions().isEmpty())
     {
-        const QXmppElement query = iq.getItems().first();
+        const QXmppElement query = iq.getExtensions().first();
         const QXmppElement form = query.firstChildElement("x");
         if (query.tagName() == "query" &&
             query.attribute("xmlns") == ns_muc_owner &&
@@ -412,7 +412,7 @@ void Chat::iqReceived(const QXmppIq &iq)
                 query.appendChild(dialog.form());
 
                 QXmppIq iqPacket(QXmppIq::Set);
-                iqPacket.setItems(query);
+                iqPacket.setExtensions(query);
                 iqPacket.setTo(iq.getFrom());
                 client->sendPacket(iqPacket);
             }
@@ -756,7 +756,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             QXmppElement query;
             query.setTagName("query");
             query.setAttribute("xmlns", ns_muc_owner);
-            iq.setItems(query);
+            iq.setExtensions(query);
             iq.setTo(jid);
             client->sendPacket(iq);
         }
@@ -780,7 +780,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
 
             QXmppIq iq(QXmppIq::Set);
             iq.setTo(jidToBareJid(jid));
-            iq.setItems(query);
+            iq.setExtensions(query);
 
             client->sendPacket(iq);
         }
