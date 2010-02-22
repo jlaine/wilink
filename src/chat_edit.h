@@ -34,9 +34,11 @@ public:
     virtual QSize sizeHint() const;
 
 signals:
+    void focused();
     void returnPressed();
 
 protected:
+    virtual void focusInEvent(QFocusEvent* e);
     virtual void keyPressEvent(QKeyEvent* e);
     virtual void resizeEvent(QResizeEvent *e);
 

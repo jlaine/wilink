@@ -32,6 +32,12 @@ ChatEdit::ChatEdit(int maxheight, QWidget* parent)
     connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 }
 
+void ChatEdit::focusInEvent(QFocusEvent *e)
+{
+    QTextEdit::focusInEvent(e);
+    emit focused();
+}
+
 void ChatEdit::keyPressEvent(QKeyEvent* e)
 {
     if(e->key()==Qt::Key_Return)

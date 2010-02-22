@@ -377,6 +377,12 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
+void ChatHistory::focusInEvent(QFocusEvent *e)
+{
+    QGraphicsView::focusInEvent(e);
+    emit focused();
+}
+
 void ChatHistory::resizeEvent(QResizeEvent *e)
 {
     QScrollBar *scrollBar = verticalScrollBar();

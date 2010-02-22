@@ -102,6 +102,9 @@ public slots:
     void clear();
     void copy();
 
+signals:
+    void focused();
+
 protected slots:
     void slotLinkHoverChanged(const QString &link);
     void slotSelectionChanged();
@@ -111,6 +114,7 @@ protected:
     qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
     QString copyText();
+    void focusInEvent(QFocusEvent* e);
     void resizeEvent(QResizeEvent *e);
 
 private:
