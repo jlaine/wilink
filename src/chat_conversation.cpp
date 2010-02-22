@@ -150,7 +150,9 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
 
 void ChatConversation::slotFocused()
 {
-    if (chatLocalState != QXmppMessage::Active)
+    if (chatLocalState != QXmppMessage::Active &&
+        chatLocalState != QXmppMessage::Composing &&
+        chatLocalState != QXmppMessage::Paused)
     {
         chatLocalState = QXmppMessage::Active;
         emit localStateChanged(chatLocalState);
