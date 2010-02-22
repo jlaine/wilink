@@ -355,7 +355,7 @@ void TrayIcon::showMenu()
         /* connect to chat */
         QAuthenticator auth;
         Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
-        chat->open(auth.user(), auth.password());
+        chat->open(auth.user(), auth.password(), false);
         showChat();
 
         /* check for updates now then every week */

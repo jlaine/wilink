@@ -609,7 +609,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
  * @param jid
  * @param password
  */
-bool Chat::open(const QString &jid, const QString &password)
+bool Chat::open(const QString &jid, const QString &password, bool ignoreSslErrors)
 {
     QXmppConfiguration config;
     config.setResource("wDesktop");
@@ -644,7 +644,7 @@ bool Chat::open(const QString &jid, const QString &password)
     /* set security parameters */
     config.setAutoAcceptSubscriptions(false);
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
-    config.setIgnoreSslErrors(false);
+    config.setIgnoreSslErrors(ignoreSslErrors);
 
     /* connect to server */
     client->connectToServer(config);
