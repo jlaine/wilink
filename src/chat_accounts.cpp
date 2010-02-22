@@ -54,6 +54,14 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     setLayout(layout);
 }
 
+QStringList ChatAccounts::accounts() const
+{
+    QStringList accounts;
+    for (int i = 0; i < listWidget->count(); i++)
+        accounts << listWidget->item(i)->data(Qt::UserRole).toString();
+    return accounts;
+}
+
 void ChatAccounts::addAccount()
 {
     bool ok = false;
@@ -62,16 +70,26 @@ void ChatAccounts::addAccount()
                   tr("Enter the address of the account you want to add."),
                   QLineEdit::Normal, jid, &ok).toLower();
     if (ok)
-    {
-        QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), jid);
-        wdgItem->setData(Qt::UserRole, jid);
-        listWidget->addItem(wdgItem);
-    }
+        addEntry(jid);
+}
+
+void ChatAccounts::addEntry(const QString &jid)
+{
+    QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), jid);
+    wdgItem->setData(Qt::UserRole, jid);
+    listWidget->addItem(wdgItem);
 }
 
 void ChatAccounts::removeAccount()
 {
     listWidget->takeItem(listWidget->currentRow());
+}
+
+void ChatAccounts::setAccounts(const QStringList &accounts)
+{
+    listWidget->clear();
+    foreach (const QString &jid, accounts)
+        addEntry(jid);
 }
 
 void ChatAccounts::validate()

@@ -30,6 +30,8 @@ class ChatAccounts : public QDialog
 
 public:
     ChatAccounts(QWidget *parent = NULL);
+    QStringList accounts() const;
+    void setAccounts(const QStringList &accounts);
 
 private slots:
     void addAccount();
@@ -37,6 +39,8 @@ private slots:
     void validate();
 
 private:
+    void addEntry(const QString &jid);
+
     QListWidget *listWidget;
 };
 
