@@ -65,7 +65,7 @@ private:
     void fetchIcon();
 
 private:
-    Chat *chat;
+    QList<Chat*> chats;
     Diagnostics *diagnostics;
     Photos *photos;
     UpdatesDialog *updates;

@@ -50,7 +50,7 @@ static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
 TrayIcon::TrayIcon()
-    : chat(NULL), diagnostics(NULL), photos(NULL), updates(NULL),
+    : diagnostics(NULL), photos(NULL), updates(NULL),
     connected(false),
     refreshInterval(0)
 {
@@ -87,9 +87,6 @@ TrayIcon::TrayIcon()
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
-    /* prepare chat */
-    chat = new Chat(this);
-
     /* prepare diagnostics */
     diagnostics = new Diagnostics;
 
@@ -104,7 +101,8 @@ TrayIcon::TrayIcon()
 
 TrayIcon::~TrayIcon()
 {
-    delete chat;
+    foreach (Chat *chat, chats)
+        delete chat;
     delete diagnostics;
     delete updates;
     if (photos)
@@ -229,8 +227,11 @@ void TrayIcon::openAtLogin(bool checked)
 
 void TrayIcon::showChat()
 {
-    chat->show();
-    chat->raise();
+    foreach (Chat *chat, chats)
+    {
+        chat->show();
+        chat->raise();
+    }
 }
 
 void TrayIcon::showDiagnostics()
@@ -355,7 +356,11 @@ void TrayIcon::showMenu()
         /* connect to chat */
         QAuthenticator auth;
         Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+        Chat *chat = new Chat(this);
         chat->open(auth.user(), auth.password(), false);
+        chats << chat;
+
+        /* show chat */
         showChat();
 
         /* check for updates now then every week */
