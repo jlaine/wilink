@@ -90,7 +90,9 @@ void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 
     foreach (const QXmppElement &element, disco.getQueryItems())
     {
-        if (element.tagName() == "feature" && element.attribute("var") == ns_chat_states)
+        // iChat does not state it supports chat states
+        if ((element.tagName() == "feature" && element.attribute("var") == ns_chat_states) ||
+            (element.tagName() == "identity" && element.attribute("name") == "iChatAgent"))
         {
             if (!chatStatesJids.contains(disco.getFrom()))
             {
