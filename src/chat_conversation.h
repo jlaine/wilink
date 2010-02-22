@@ -42,12 +42,14 @@ public:
     virtual void leave();
 
     QString localName() const;
+    QXmppMessage::State localState() const;
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
     void setRemoteState(QXmppMessage::State state);
 
 protected slots:
+    void slotFocused();
     void slotInactive();
     void slotLeave();
     void slotNewLine();
@@ -57,7 +59,7 @@ protected slots:
 
 signals:
     void leave(const QString &jid);
-    void stateChanged(QXmppMessage::State state);
+    void localStateChanged(QXmppMessage::State state);
 
 protected:
     virtual void sendMessage(const QString &body) = 0;
@@ -73,7 +75,7 @@ protected:
     QString chatRemoteName;
 
 private:
-    QXmppMessage::State localState;
+    QXmppMessage::State chatLocalState;
     QTimer *inactiveTimer;
     QTimer *pausedTimer;
 };

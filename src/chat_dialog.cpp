@@ -37,7 +37,7 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
-    connect(this, SIGNAL(stateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
+    connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
@@ -93,8 +93,15 @@ void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         if (element.tagName() == "feature" && element.attribute("var") == ns_chat_states)
         {
             if (!chatStatesJids.contains(disco.getFrom()))
+            {
                 chatStatesJids.append(disco.getFrom());
-            qDebug() << "Remote party supports chat states" << disco.getFrom();
+
+                // send initial state
+                QXmppMessage message;
+                message.setTo(disco.getFrom());
+                message.setState(localState());
+                client->sendPacket(message);
+            }
         }
     }
 }

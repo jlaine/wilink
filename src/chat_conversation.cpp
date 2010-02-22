@@ -30,7 +30,7 @@
 
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     : QWidget(parent),
-    chatRemoteJid(jid), localState(QXmppMessage::None)
+    chatRemoteJid(jid), chatLocalState(QXmppMessage::None)
 {
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -53,10 +53,12 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
 
     /* chat history */
     chatHistory = new ChatHistory;
+    connect(chatHistory, SIGNAL(focused()), this, SLOT(slotFocused()));
     layout->addWidget(chatHistory);
 
     /* text edit */
     chatInput = new ChatEdit(80);
+    connect(chatInput, SIGNAL(focused()), this, SLOT(slotFocused()));
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(slotSend()));
     connect(chatInput, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
     layout->addSpacing(10);
@@ -93,13 +95,18 @@ void ChatConversation::join()
 
 void ChatConversation::leave()
 {
-    localState = QXmppMessage::Gone;
-    emit stateChanged(localState);
+    chatLocalState = QXmppMessage::Gone;
+    emit localStateChanged(chatLocalState);
 }
 
 QString ChatConversation::localName() const
 {
     return chatLocalName;
+}
+
+QXmppMessage::State ChatConversation::localState() const
+{
+    return chatLocalState;
 }
 
 void ChatConversation::setLocalName(const QString &name)
@@ -141,12 +148,24 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
         .arg(chatRemoteJid));
 }
 
+void ChatConversation::slotFocused()
+{
+    if (chatLocalState != QXmppMessage::Active)
+    {
+        chatLocalState = QXmppMessage::Active;
+        emit localStateChanged(chatLocalState);
+    }
+    // reset inactivity timer
+    inactiveTimer->stop();
+    inactiveTimer->start();
+}
+
 void ChatConversation::slotInactive()
 {
-    if (localState != QXmppMessage::Inactive)
+    if (chatLocalState != QXmppMessage::Inactive)
     {
-        localState = QXmppMessage::Inactive;
-        emit stateChanged(localState);
+        chatLocalState = QXmppMessage::Inactive;
+        emit localStateChanged(chatLocalState);
     }
 }
 
@@ -162,10 +181,10 @@ void ChatConversation::slotNewLine()
 
 void ChatConversation::slotPaused()
 {
-    if (localState == QXmppMessage::Composing)
+    if (chatLocalState == QXmppMessage::Composing)
     {
-        localState = QXmppMessage::Paused;
-        emit stateChanged(localState);
+        chatLocalState = QXmppMessage::Paused;
+        emit localStateChanged(chatLocalState);
     }
 }
 
@@ -175,7 +194,7 @@ void ChatConversation::slotSend()
     if (text.isEmpty())
         return;
 
-    localState = QXmppMessage::Active;
+    chatLocalState = QXmppMessage::Active;
     chatInput->document()->clear();
     sendMessage(text);
 }
@@ -185,17 +204,17 @@ void ChatConversation::slotTextChanged()
     QString text = chatInput->document()->toPlainText();
     if (!text.isEmpty())
     {
-        if (localState != QXmppMessage::Composing)
+        if (chatLocalState != QXmppMessage::Composing)
         {
-            localState = QXmppMessage::Composing;
-            emit stateChanged(localState);
+            chatLocalState = QXmppMessage::Composing;
+            emit localStateChanged(chatLocalState);
         }
         pausedTimer->start();
     } else {
-        if (localState != QXmppMessage::Active)
+        if (chatLocalState != QXmppMessage::Active)
         {
-            localState = QXmppMessage::Active;
-            emit stateChanged(localState);
+            chatLocalState = QXmppMessage::Active;
+            emit localStateChanged(chatLocalState);
         }
         pausedTimer->stop();
     }
