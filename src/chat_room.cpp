@@ -30,12 +30,12 @@
 #include <QPushButton>
 #include <QTableWidget>
 
+#include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
+#include "qxmpp/QXmppUtils.h"
 
-#include "chat.h"
-#include "chat_edit.h"
 #include "chat_history.h"
 #include "chat_room.h"
 
@@ -84,10 +84,9 @@ void ChatRoom::leave()
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
-    const QStringList bits = msg.getFrom().split("/");
-    if (bits.size() != 2 || bits.first() != chatRemoteJid)
+    const QString from = jidToResource(msg.getFrom());
+    if (jidToBareJid(msg.getFrom()) != chatRemoteJid || from.isEmpty())
         return;
-    const QString from = bits[1];
 
     ChatHistoryMessage message;
     message.body = msg.getBody();
