@@ -46,6 +46,7 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     hbox->addWidget(iconLabel);
     QPushButton *button = new QPushButton;
     button->setFlat(true);
+    button->setMaximumWidth(32);
     button->setIcon(QIcon(":/close.png"));
     connect(button, SIGNAL(clicked()), this, SLOT(slotLeave()));
     hbox->addWidget(button);
@@ -128,19 +129,13 @@ void ChatConversation::setRemotePixmap(const QPixmap &avatar)
 void ChatConversation::setRemoteState(QXmppMessage::State state)
 {
     QString stateName;
-    if (state == QXmppMessage::Active)
-        stateName = "active";
-    else if (state == QXmppMessage::Composing)
-        stateName = "composing";
+    if (state == QXmppMessage::Composing)
+        stateName = tr("is composing a message");
     else if (state == QXmppMessage::Gone)
-        stateName = "gone";
-    else if (state == QXmppMessage::Inactive)
-        stateName = "inactive";
-    else if (state == QXmppMessage::Paused)
-        stateName = "paused";
+        stateName = tr("has closed the conversation");
 
     if (!stateName.isEmpty())
-        stateName = QString(" (%1)").arg(stateName);
+        stateName = QString(" %1").arg(stateName);
 
     nameLabel->setText(QString("<b>%1</b>%2<br/>%3")
         .arg(chatRemoteName)
