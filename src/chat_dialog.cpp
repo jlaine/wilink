@@ -32,7 +32,6 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat_dialog.h"
-#include "chat_edit.h"
 #include "chat_history.h"
 
 ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
