@@ -289,7 +289,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     if (item)
     {
         QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
-        if (static_cast<int>(entry.getSubscriptionType()) == static_cast<int>(QXmppRosterIq::Item::Remove))
+        if (entry.getSubscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
         {
             beginRemoveRows(QModelIndex(), item->row(), item->row());
             rootItem->remove(item);

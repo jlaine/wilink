@@ -564,11 +564,11 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     case QXmppPresence::Subscribe:
         {
             QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.getFrom());
-            QXmppRosterIq::Item::SubscriptionType type = static_cast<QXmppRosterIq::Item::SubscriptionType>(entry.getSubscriptionType());
+            QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.getSubscriptionType();
 
             /* if the contact is in our roster accept subscribe, otherwise ask user */
             bool accepted = false;
-            if (type == QXmppRosterIq::Item::To || type == QXmppRosterIq::Item::Both)
+            if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
                 accepted = true;
             else if (QMessageBox::question(this,
                     tr("Invitation from %1").arg(presence.getFrom()),
