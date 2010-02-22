@@ -54,6 +54,7 @@ protected:
 
 private:
     QXmppClient *client;
+    QStringList chatStatesJids;
 };
 
 #endif

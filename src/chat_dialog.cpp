@@ -24,12 +24,13 @@
 
 #include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
+#include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
+#include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppUtils.h"
 
-#include "chat.h"
 #include "chat_dialog.h"
 #include "chat_edit.h"
 #include "chat_history.h"
@@ -72,10 +73,13 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
  */
 void ChatDialog::chatStateChanged(QXmppMessage::State state)
 {
-    QXmppMessage message;
-    message.setTo(chatRemoteJid);
-    message.setState(state);
-    client->sendPacket(message);
+    foreach (const QString &jid, chatStatesJids)
+    {
+        QXmppMessage message;
+        message.setTo(jid);
+        message.setState(state);
+        client->sendPacket(message);
+    }
 }
 
 void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -85,9 +89,15 @@ void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         disco.getType() != QXmppIq::Result )
         return;
 
-    qDebug("Received discovery result from remote party");
     foreach (const QXmppElement &element, disco.getQueryItems())
-        dumpElement(element);
+    {
+        if (element.tagName() == "feature" && element.attribute("var") == ns_chat_states)
+        {
+            if (!chatStatesJids.contains(disco.getFrom()))
+                chatStatesJids.append(disco.getFrom());
+            qDebug() << "Remote party supports chat states" << disco.getFrom();
+        }
+    }
 }
 
 bool ChatDialog::isRoom() const
@@ -99,13 +109,14 @@ bool ChatDialog::isRoom() const
  */
 void ChatDialog::join()
 {
-#if 0
     // discover remote party features
-    QXmppDiscoveryIq disco;
-    disco.setTo(chatRemoteJid);
-    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    client->sendPacket(disco);
-#endif
+    foreach (const QString& resource, client->getRoster().getResources(chatRemoteJid))
+    {
+        QXmppDiscoveryIq disco;
+        disco.setTo(chatRemoteJid + "/" + resource);
+        disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
+        client->sendPacket(disco);
+    }
 
     // list archives for the past week.
     client->getArchiveManager().listCollections(chatRemoteJid,
