@@ -22,12 +22,22 @@
 
 #include <QDialog>
 
+class QListWidget;
+
 class ChatAccounts : public QDialog
 {
     Q_OBJECT
 
 public:
     ChatAccounts(QWidget *parent = NULL);
+
+private slots:
+    void addAccount();
+    void removeAccount();
+    void validate();
+
+private:
+    QListWidget *listWidget;
 };
 
 #endif

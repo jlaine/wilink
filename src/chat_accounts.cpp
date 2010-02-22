@@ -17,10 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDialogButtonBox>
+#include <QInputDialog>
+#include <QLayout>
+#include <QListWidget>
+#include <QPushButton>
+
 #include "chat_accounts.h"
 
 ChatAccounts::ChatAccounts(QWidget *parent)
     : QDialog(parent)
 {
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    listWidget = new QListWidget;
+    listWidget->setIconSize(QSize(32, 32));
+    listWidget->setSortingEnabled(true);
+    layout->addWidget(listWidget);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+    QPushButton *addButton = new QPushButton;
+    addButton->setIcon(QIcon(":/add.png"));
+    connect(addButton, SIGNAL(clicked()), this, SLOT(addAccount()));
+    buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
+
+    QPushButton *removeButton = new QPushButton;
+    removeButton->setIcon(QIcon(":/remove.png"));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeAccount()));
+    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+
+    layout->addWidget(buttonBox);
+
+    setLayout(layout);
+}
+
+void ChatAccounts::addAccount()
+{
+    bool ok = false;
+    QString jid;
+    jid = QInputDialog::getText(this, tr("Add an account"),
+                  tr("Enter the address of the account you want to add."),
+                  QLineEdit::Normal, jid, &ok).toLower();
+    if (ok)
+    {
+        QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), jid);
+        wdgItem->setData(Qt::UserRole, jid);
+        listWidget->addItem(wdgItem);
+    }
+}
+
+void ChatAccounts::removeAccount()
+{
+    listWidget->takeItem(listWidget->currentRow());
+}
+
+void ChatAccounts::validate()
+{
+    accept();
 }
 
