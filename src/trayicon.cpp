@@ -161,6 +161,7 @@ void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticato
 
     /* prompt user */
     QString username, password;
+    username = authenticator->user();
     while (username.isEmpty() || password.isEmpty())
     {
         usernameEdit->setText(username);
@@ -238,7 +239,9 @@ void TrayIcon::showChat()
 void TrayIcon::showChatAccounts()
 {
     ChatAccounts dlg;
-    dlg.exec();
+    dlg.setAccounts(settings->value("ChatAccounts").toStringList());
+    if (dlg.exec())
+        settings->setValue("ChatAccounts", dlg.accounts());
 }
 
 void TrayIcon::showDiagnostics()
@@ -368,6 +371,17 @@ void TrayIcon::showMenu()
         Chat *chat = new Chat(this);
         chat->open(auth.user(), auth.password(), false);
         chats << chat;
+
+        /* connect to additional chats */
+        foreach (const QString &jid, settings->value("ChatAccounts").toStringList())
+        {
+            QAuthenticator auth;
+            auth.setUser(jid);
+            Wallet::instance()->onAuthenticationRequired(jid.split("@").last(), &auth);
+            Chat *chat = new Chat(this);
+            chat->open(auth.user(), auth.password(), true);
+            chats << chat;
+        }
 
         /* show chat */
         showChat();
