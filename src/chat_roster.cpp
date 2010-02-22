@@ -29,6 +29,7 @@
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
 
 #include "chat_roster.h"
@@ -249,7 +250,7 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
 void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.getFrom();
-    const QString roomJid = jid.split("/")[0];
+    const QString roomJid = jidToBareJid(jid);
     ChatRosterItem *roomItem = rootItem->find(roomJid);
     if (!roomItem || roomItem->type() != ChatRosterItem::Room)
         return;
