@@ -57,6 +57,7 @@ protected slots:
     void disconnected();
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void error(QXmppClient::Error error);
+    void ibbStreamRequestReceived(const QString &sid, const QString &jid);
     void inviteContact(const QString &jid);
     void iqReceived(const QXmppIq&);
     void joinConversation(const QString &jid, bool isRoom);

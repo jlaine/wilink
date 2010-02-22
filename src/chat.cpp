@@ -36,12 +36,10 @@
 #include <QTextBrowser>
 #include <QTimer>
 
-#include "qxmpp/QXmppArchiveIq.h"
-#include "qxmpp/QXmppArchiveManager.h"
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
-#include "qxmpp/QXmppArchiveManager.h"
+#include "qxmpp/QXmppIbbTransferManager.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppPingIq.h"
@@ -160,6 +158,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(client->getIbbTransferManager(), SIGNAL(byteStreamRequestReceived(const QString&, const QString&)),
+            this, SLOT(ibbStreamRequestReceived(const QString&, const QString&)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -355,6 +355,16 @@ void Chat::error(QXmppClient::Error error)
         qWarning("Received a resource conflict from chat server");
         qApp->quit();
     }
+}
+
+void Chat::ibbStreamRequestReceived(const QString &sid, const QString &remoteJid)
+{
+    qDebug() << "ibb request received";
+#if 0
+    QFile *file = new QFile("/tmp/foo.txt", this);
+    file->open(QIODevice::WriteOnly);
+    client->getIbbTransferManager()->acceptByteStreamRequest(sid, file);
+#endif
 }
 
 void Chat::inviteContact(const QString &jid)
