@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 
+#include "systeminfo.h"
 #include "updatesdialog.h"
 
 UpdatesDialog::UpdatesDialog(QWidget *parent)
@@ -88,16 +89,9 @@ void UpdatesDialog::updateAvailable(const Release &release)
         message,
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
-        QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-#ifdef Q_OS_MAC
-        QDir downloads(QDir::home().filePath("Downloads"));
-        if (downloads.exists())
-            downloadDir = downloads.absolutePath();
-#endif
-
         statusLabel->setText(tr("Downloading.."));
         show();
-        updates->download(release, downloadDir);
+        updates->download(release, SystemInfo::downloadsLocation());
     }
 }
 
