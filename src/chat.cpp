@@ -45,7 +45,7 @@
 #include "qxmpp/QXmppPingIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
-#include "qxmpp/QXmppStreamManager.h"
+#include "qxmpp/QXmppTransferManager.h"
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
 
@@ -161,8 +161,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client->getIbbTransferManager(), SIGNAL(byteStreamRequestReceived(const QString&, const QString&)),
             this, SLOT(ibbStreamRequestReceived(const QString&, const QString&)));
-    connect(&client->getStreamManager(), SIGNAL(offerReceived(QXmppStreamOffer&)),
-            this, SLOT(streamOfferReceived(QXmppStreamOffer&)));
+    connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+            this, SLOT(fileReceived(QXmppTransferJob*)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -363,11 +363,9 @@ void Chat::error(QXmppClient::Error error)
 void Chat::ibbStreamRequestReceived(const QString &sid, const QString &remoteJid)
 {
     qDebug() << "ibb request received";
-#if 0
     QFile *file = new QFile("/tmp/foo.txt", this);
     file->open(QIODevice::WriteOnly);
     client->getIbbTransferManager()->acceptByteStreamRequest(sid, file);
-#endif
 }
 
 void Chat::inviteContact(const QString &jid)
@@ -832,16 +830,14 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
-void Chat::streamOfferReceived(QXmppStreamOffer &offer)
+void Chat::fileReceived(QXmppTransferJob *job)
 {
-    const QString bareJid = jidToBareJid(offer.jid());
+    const QString bareJid = jidToBareJid(job->jid());
     const QString contactName = rosterModel->contactName(bareJid);
 
     if (QMessageBox::question(this,
         tr("File from %1").arg(contactName),
-        tr("%1 wants to send you a file called '%2'. Do you accept?").arg(contactName, offer.fileName()),
+        tr("%1 wants to send you a file called '%2'. Do you accept?").arg(contactName, job->fileName()),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
-        offer.accept();
-    else
-        offer.decline();
+        job->accept();
 }

@@ -36,7 +36,7 @@ class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
-class QXmppStreamOffer;
+class QXmppTransferJob;
 class QXmppVCard;
 class QXmppVCardManager;
 
@@ -73,7 +73,7 @@ protected slots:
     void statusChanged(int currentIndex);
 
     void ibbStreamRequestReceived(const QString &sid, const QString &jid);
-    void streamOfferReceived(QXmppStreamOffer &offer);
+    void fileReceived(QXmppTransferJob *job);
 
 protected:
     void changeEvent(QEvent *event);
