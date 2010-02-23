@@ -239,9 +239,20 @@ void TrayIcon::showChat()
 void TrayIcon::showChatAccounts()
 {
     ChatAccounts dlg;
-    dlg.setAccounts(settings->value("ChatAccounts").toStringList());
+
+    QAuthenticator auth;
+    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+    QString baseAccount = auth.user();
+
+    QStringList accounts = settings->value("ChatAccounts").toStringList();
+    accounts.prepend(baseAccount);
+    dlg.setAccounts(accounts);
     if (dlg.exec())
-        settings->setValue("ChatAccounts", dlg.accounts());
+    {
+        accounts = dlg.accounts();
+        accounts.removeAll(baseAccount);
+        settings->setValue("ChatAccounts", accounts);
+    }
 }
 
 void TrayIcon::showDiagnostics()

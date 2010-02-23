@@ -32,7 +32,7 @@ ChatAccounts::ChatAccounts(QWidget *parent)
 
     listWidget = new QListWidget;
     listWidget->setIconSize(QSize(32, 32));
-    listWidget->setSortingEnabled(true);
+    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
     layout->addWidget(listWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -44,7 +44,8 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     connect(addButton, SIGNAL(clicked()), this, SLOT(addAccount()));
     buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
 
-    QPushButton *removeButton = new QPushButton;
+    removeButton = new QPushButton;
+    removeButton->setEnabled(false);
     removeButton->setIcon(QIcon(":/remove.png"));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(removeAccount()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
@@ -58,7 +59,7 @@ QStringList ChatAccounts::accounts() const
 {
     QStringList accounts;
     for (int i = 0; i < listWidget->count(); i++)
-        accounts << listWidget->item(i)->data(Qt::UserRole).toString();
+        accounts << listWidget->item(i)->text();
     return accounts;
 }
 
@@ -76,13 +77,20 @@ void ChatAccounts::addAccount()
 void ChatAccounts::addEntry(const QString &jid)
 {
     QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), jid);
-    wdgItem->setData(Qt::UserRole, jid);
+    wdgItem->setData(Qt::UserRole, listWidget->count() > 0);
     listWidget->addItem(wdgItem);
+}
+
+void ChatAccounts::itemClicked(QListWidgetItem *item)
+{
+    removeButton->setEnabled(item->data(Qt::UserRole).toBool());
 }
 
 void ChatAccounts::removeAccount()
 {
-    listWidget->takeItem(listWidget->currentRow());
+    QListWidgetItem *item = listWidget->item(listWidget->currentRow());
+    if (item && item->data(Qt::UserRole).toBool())
+        listWidget->takeItem(listWidget->currentRow());
 }
 
 void ChatAccounts::setAccounts(const QStringList &accounts)

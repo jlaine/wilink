@@ -23,6 +23,7 @@
 #include <QDialog>
 
 class QListWidget;
+class QListWidgetItem;
 
 class ChatAccounts : public QDialog
 {
@@ -35,6 +36,7 @@ public:
 
 private slots:
     void addAccount();
+    void itemClicked(QListWidgetItem *item);
     void removeAccount();
     void validate();
 
@@ -42,6 +44,7 @@ private:
     void addEntry(const QString &jid);
 
     QListWidget *listWidget;
+    QPushButton *removeButton;
 };
 
 #endif
