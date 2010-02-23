@@ -45,6 +45,7 @@
 #include "qxmpp/QXmppPingIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppStreamManager.h"
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
 
@@ -160,6 +161,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client->getIbbTransferManager(), SIGNAL(byteStreamRequestReceived(const QString&, const QString&)),
             this, SLOT(ibbStreamRequestReceived(const QString&, const QString&)));
+    connect(&client->getStreamManager(), SIGNAL(offerReceived(QXmppStreamOffer&)),
+            this, SLOT(streamOfferReceived(QXmppStreamOffer&)));
 
     /* set up timers */
     pingTimer = new QTimer(this);
@@ -626,7 +629,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
 
     /* get user and domain */
     if (!jidValidator.exactMatch(jid))
@@ -829,3 +832,16 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
+void Chat::streamOfferReceived(QXmppStreamOffer &offer)
+{
+    const QString bareJid = jidToBareJid(offer.jid());
+    const QString contactName = rosterModel->contactName(bareJid);
+
+    if (QMessageBox::question(this,
+        tr("File from %1").arg(contactName),
+        tr("%1 wants to send you a file called '%2'. Do you accept?").arg(contactName, offer.fileName()),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+        offer.accept();
+    else
+        offer.decline();
+}

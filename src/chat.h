@@ -36,6 +36,7 @@ class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
+class QXmppStreamOffer;
 class QXmppVCard;
 class QXmppVCardManager;
 
@@ -57,7 +58,6 @@ protected slots:
     void disconnected();
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void error(QXmppClient::Error error);
-    void ibbStreamRequestReceived(const QString &sid, const QString &jid);
     void inviteContact(const QString &jid);
     void iqReceived(const QXmppIq&);
     void joinConversation(const QString &jid, bool isRoom);
@@ -71,6 +71,9 @@ protected slots:
     void resizeContacts();
     void sendPing();
     void statusChanged(int currentIndex);
+
+    void ibbStreamRequestReceived(const QString &sid, const QString &jid);
+    void streamOfferReceived(QXmppStreamOffer &offer);
 
 protected:
     void changeEvent(QEvent *event);
