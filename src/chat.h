@@ -72,7 +72,6 @@ protected slots:
     void sendPing();
     void statusChanged(int currentIndex);
 
-    void ibbStreamRequestReceived(const QString &sid, const QString &jid);
     void fileReceived(QXmppTransferJob *job);
 
 protected:

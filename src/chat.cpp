@@ -159,8 +159,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(client->getIbbTransferManager(), SIGNAL(byteStreamRequestReceived(const QString&, const QString&)),
-            this, SLOT(ibbStreamRequestReceived(const QString&, const QString&)));
     connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
             this, SLOT(fileReceived(QXmppTransferJob*)));
 
@@ -358,14 +356,6 @@ void Chat::error(QXmppClient::Error error)
         qWarning("Received a resource conflict from chat server");
         qApp->quit();
     }
-}
-
-void Chat::ibbStreamRequestReceived(const QString &sid, const QString &remoteJid)
-{
-    qDebug() << "ibb request received";
-    QFile *file = new QFile("/tmp/foo.txt", this);
-    file->open(QIODevice::WriteOnly);
-    client->getIbbTransferManager()->acceptByteStreamRequest(sid, file);
 }
 
 void Chat::inviteContact(const QString &jid)
@@ -839,5 +829,9 @@ void Chat::fileReceived(QXmppTransferJob *job)
         tr("File from %1").arg(contactName),
         tr("%1 wants to send you a file called '%2'. Do you accept?").arg(contactName, job->fileName()),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
-        job->accept();
+    {
+        QFile *file = new QFile("/tmp/foo.txt", this);
+        file->open(QIODevice::WriteOnly);
+        job->accept(file);
+    }
 }
