@@ -73,6 +73,17 @@
     </message>
 </context>
 <context>
+    <name>ChatAccounts</name>
+    <message>
+        <source>Add an account</source>
+        <translation>Ajouter un compte</translation>
+    </message>
+    <message>
+        <source>Enter the address of the account you want to add.</source>
+        <translation>Saisissez l&apos;adresse du compte que vous souhaitez ajouter.</translation>
+    </message>
+</context>
+<context>
     <name>ChatConversation</name>
     <message>
         <source>is composing a message</source>
@@ -250,6 +261,10 @@
     <message>
         <source>&amp;Options</source>
         <translation>&amp;Options</translation>
+    </message>
+    <message>
+        <source>Chat accounts</source>
+        <translation>Comptes de chat</translation>
     </message>
 </context>
 <context>
