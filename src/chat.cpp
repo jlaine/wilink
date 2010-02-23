@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopWidget>
+#include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -735,6 +736,22 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             leaveConversation(jid);
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
+        else if (action == ChatRosterView::SendAction)
+        {
+            // FIXME : we need to discover client support for file transfer!
+            QStringList resources = client->getRoster().getResources(jid);
+            if (!resources.size())
+                return;
+            QString fullJid = jid + "/" + resources.first();
+
+            QFileDialog dlg(this);
+            if (dlg.exec())
+            {
+                QStringList files = dlg.selectedFiles();
+                if (files.size() > 0)
+                    client->getTransferManager().sendFile(fullJid, files.first());
+            }
+        }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
             joinConversation(jid, true);

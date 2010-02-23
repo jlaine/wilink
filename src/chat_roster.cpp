@@ -456,6 +456,10 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         action->setData(InviteAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
+        action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
+        action->setData(SendAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
         action->setData(RemoveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
@@ -470,7 +474,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
             action->setData(OptionsAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
-            action = menu->addAction(QIcon(":/options.png"), tr("Members"));
+            action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
             action->setData(MembersAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }

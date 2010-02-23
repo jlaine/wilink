@@ -102,6 +102,7 @@ public:
         OptionsAction,
         MembersAction,
         RemoveAction,
+        SendAction,
     };
 
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
