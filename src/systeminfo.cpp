@@ -17,9 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDesktopServices>
+#include <QDir>
 #include <QProcess>
 
 #include "systeminfo.h"
+
+QString SystemInfo::downloadsLocation()
+{
+    QString downloadDir = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+#ifdef Q_OS_MAC
+    QDir downloads(QDir::home().filePath("Downloads"));
+    if (downloads.exists())
+        downloadDir = downloads.absolutePath();
+#endif
+    return downloadDir;
+}
 
 QString SystemInfo::osName()
 {

@@ -25,6 +25,8 @@
 class SystemInfo
 {
 public:
+    static QString downloadsLocation();
+
     static QString osName();
     static QString osType();
     static QString osVersion();
