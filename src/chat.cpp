@@ -57,6 +57,7 @@
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
+#include "systeminfo.h"
 
 #ifdef QT_MAC_USE_COCOA
 void application_alert_mac();
@@ -618,7 +619,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     QXmppConfiguration config;
     config.setResource("wDesktop");
 
-    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::STDOUT);
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::NONE);
 
     /* get user and domain */
     if (!jidValidator.exactMatch(jid))
@@ -748,8 +749,11 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             if (dlg.exec())
             {
                 QStringList files = dlg.selectedFiles();
-                if (files.size() > 0)
-                    client->getTransferManager().sendFile(fullJid, files.first());
+                if (!files.size())
+                    return;
+
+                QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, files.first());
+                connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(fileProgress(qint64, qint64)));
             }
         }
     } else if (type == ChatRosterItem::Room) {
@@ -837,6 +841,15 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
+void Chat::fileProgress(qint64 done, qint64 total)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+
+    qDebug() << "progress for" << job->fileName() << done << "/" << total;
+}
+
 void Chat::fileReceived(QXmppTransferJob *job)
 {
     const QString bareJid = jidToBareJid(job->jid());
@@ -847,7 +860,9 @@ void Chat::fileReceived(QXmppTransferJob *job)
         tr("%1 wants to send you a file called '%2'. Do you accept?").arg(contactName, job->fileName()),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
-        QFile *file = new QFile("/tmp/foo.txt", this);
+        QDir downloadsDir(SystemInfo::downloadsLocation());
+
+        QFile *file = new QFile(downloadsDir.absoluteFilePath(job->fileName()), this);
         file->open(QIODevice::WriteOnly);
         job->accept(file);
     }

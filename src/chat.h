@@ -72,6 +72,7 @@ protected slots:
     void sendPing();
     void statusChanged(int currentIndex);
 
+    void fileProgress(qint64, qint64);
     void fileReceived(QXmppTransferJob *job);
 
 protected:
