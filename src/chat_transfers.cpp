@@ -18,17 +18,19 @@
  */
 
 #include <QDebug>
+#include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QLayout>
 #include <QProgressBar>
+#include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 
 #include "chat_transfers.h"
 
 enum TransfersColumns {
-    NameColumn = 0,
-    ProgressColumn,
+    ProgressColumn = 0,
+    NameColumn,
     SizeColumn,
     MaxColumn,
 };
@@ -48,6 +50,15 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     tableWidget->verticalHeader()->setVisible(false);
     tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
     layout->addWidget(tableWidget);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+
+    QPushButton *removeButton = new QPushButton;
+    removeButton->setIcon(QIcon(":/remove.png"));
+    //connect(removeButton, SIGNAL(clicked()), this, SLOT(removeJob()));
+    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+
+    layout->addWidget(buttonBox);
 
     setLayout(layout);
 }
@@ -117,5 +128,5 @@ void ChatTransfers::progress(qint64 done, qint64 total)
 
 QSize ChatTransfers::sizeHint() const
 {
-    return QSize(350, 100);
+    return QSize(400, 200);
 }
