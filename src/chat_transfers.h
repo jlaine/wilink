@@ -33,14 +33,19 @@ class ChatTransfers : public QWidget
 public:
     ChatTransfers(QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
+    void removeJob(QXmppTransferJob *job);
 
 private slots:
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64, qint64);
 
+protected:
+    QSize sizeHint() const;
+
 private:
     QTableWidget *tableWidget;
+    QList<QXmppTransferJob*> jobs;
 };
 
 #endif

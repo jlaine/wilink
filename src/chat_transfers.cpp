@@ -54,8 +54,10 @@ ChatTransfers::ChatTransfers(QWidget *parent)
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
 {
+    jobs.insert(0, job);
     tableWidget->insertRow(0);
-    tableWidget->setItem(0, NameColumn, new QTableWidgetItem(job->fileName()));
+    QTableWidgetItem *nameItem = new QTableWidgetItem(job->fileName());
+    tableWidget->setItem(0, NameColumn, nameItem);
 
     QString fileSize;
     if (job->fileSize() < 1024)
@@ -73,6 +75,16 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(error(QXmppTransferJob::Error)));
     connect(job, SIGNAL(finished()), this, SLOT(finished()));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
+}
+
+void ChatTransfers::removeJob(QXmppTransferJob *job)
+{
+    int jobRow = jobs.indexOf(job);
+    if (jobRow < 0)
+        return;
+
+    jobs.removeAt(jobRow);
+    tableWidget->removeRow(jobRow);
 }
 
 void ChatTransfers::error(QXmppTransferJob::Error error)
@@ -94,8 +106,16 @@ void ChatTransfers::finished()
 void ChatTransfers::progress(qint64 done, qint64 total)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
+    int jobRow = jobs.indexOf(job);
+    if (!job || jobRow < 0)
         return;
-    qDebug() << "Job" << job->fileName() << "progress" << done << "/" << total;
+
+    QProgressBar *progress = qobject_cast<QProgressBar*>(tableWidget->cellWidget(jobRow, ProgressColumn));
+    if (progress)
+        progress->setValue(done);
 }
 
+QSize ChatTransfers::sizeHint() const
+{
+    return QSize(350, 100);
+}
