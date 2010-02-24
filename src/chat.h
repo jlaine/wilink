@@ -29,6 +29,7 @@ class ChatConversation;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
+class ChatTransfers;
 class QComboBox;
 class QLabel;
 class QPushButton;
@@ -72,7 +73,6 @@ protected slots:
     void sendPing();
     void statusChanged(int currentIndex);
 
-    void fileProgress(qint64, qint64);
     void fileReceived(QXmppTransferJob *job);
 
 protected:
@@ -87,6 +87,7 @@ private:
     QPushButton *addButton;
     QPushButton *roomButton;
     QHash<QString, ChatConversation*> chatDialogs;
+    ChatTransfers *chatTransfers;
     QXmppClient *client;
     QTimer *pingTimer;
 

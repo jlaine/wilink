@@ -17,10 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
+
 #include "chat_transfers.h"
 
 ChatTransfers::ChatTransfers(QWidget *parent)
     : QWidget(parent)
 {
+}
+
+void ChatTransfers::addJob(QXmppTransferJob *job)
+{
+    connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(error(QXmppTransferJob::Error)));
+    connect(job, SIGNAL(finished()), this, SLOT(finished()));
+    connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
+}
+
+void ChatTransfers::error(QXmppTransferJob::Error error)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    qDebug() << "Job" << job->fileName() << "failed";
+}
+
+void ChatTransfers::finished()
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    qDebug() << "Job" << job->fileName() << "finished";
+}
+
+void ChatTransfers::progress(qint64 done, qint64 total)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    qDebug() << "Job" << job->fileName() << "progress" << done << "/" << total;
 }
 

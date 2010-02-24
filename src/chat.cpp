@@ -57,6 +57,7 @@
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
+#include "chat_transfers.h"
 #include "systeminfo.h"
 
 #ifdef QT_MAC_USE_COCOA
@@ -152,6 +153,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Chat"));
+
+    /* set up transfers window */
+    chatTransfers = new ChatTransfers(this);
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -753,7 +757,8 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                     return;
 
                 QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, files.first());
-                connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(fileProgress(qint64, qint64)));
+                chatTransfers->addJob(job);
+                chatTransfers->show();
             }
         }
     } else if (type == ChatRosterItem::Room) {
@@ -841,15 +846,6 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
-void Chat::fileProgress(qint64 done, qint64 total)
-{
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
-        return;
-
-    qDebug() << "progress for" << job->fileName() << done << "/" << total;
-}
-
 void Chat::fileReceived(QXmppTransferJob *job)
 {
     const QString bareJid = jidToBareJid(job->jid());
@@ -864,6 +860,9 @@ void Chat::fileReceived(QXmppTransferJob *job)
 
         QFile *file = new QFile(downloadsDir.absoluteFilePath(job->fileName()), this);
         file->open(QIODevice::WriteOnly);
+
+        chatTransfers->addJob(job);
+        chatTransfers->show();
         job->accept(file);
     }
 }

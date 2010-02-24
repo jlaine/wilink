@@ -22,12 +22,20 @@
 
 #include <QWidget>
 
-class ChatTransfers : QWidget
+#include "qxmpp/QXmppTransferManager.h"
+
+class ChatTransfers : public QWidget
 {
     Q_OBJECT
 
 public:
     ChatTransfers(QWidget *parent);
+    void addJob(QXmppTransferJob *job);
+
+private slots:
+    void error(QXmppTransferJob::Error error);
+    void finished();
+    void progress(qint64, qint64);
 };
 
 #endif
