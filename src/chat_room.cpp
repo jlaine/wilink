@@ -201,7 +201,7 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     tableWidget->verticalHeader()->setVisible(false);
-    tableWidget->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
+    tableWidget->horizontalHeader()->setResizeMode(JidColumn, QHeaderView::Stretch);
 
     layout->addWidget(tableWidget);
 

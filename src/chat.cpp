@@ -155,7 +155,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowTitle(tr("Chat"));
 
     /* set up transfers window */
-    chatTransfers = new ChatTransfers(this);
+    chatTransfers = new ChatTransfers;
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -178,8 +178,10 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(timeoutTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
 
     /* set up keyboard shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
+    connect(shortcut, SIGNAL(activated()), chatTransfers, SLOT(show()));
 #ifdef Q_OS_MAC
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 
@@ -190,6 +192,8 @@ Chat::~Chat()
 {
     // disconnect
     client->disconnect();
+
+    delete chatTransfers;
 }
 
 /** Prompt the user for a new contact then add it to the roster.

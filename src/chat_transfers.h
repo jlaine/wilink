@@ -24,18 +24,23 @@
 
 #include "qxmpp/QXmppTransferManager.h"
 
+class QTableWidget;
+
 class ChatTransfers : public QWidget
 {
     Q_OBJECT
 
 public:
-    ChatTransfers(QWidget *parent);
+    ChatTransfers(QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
 
 private slots:
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64, qint64);
+
+private:
+    QTableWidget *tableWidget;
 };
 
 #endif

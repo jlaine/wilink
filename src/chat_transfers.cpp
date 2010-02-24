@@ -18,16 +18,58 @@
  */
 
 #include <QDebug>
+#include <QHeaderView>
+#include <QLayout>
+#include <QProgressBar>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 
 #include "chat_transfers.h"
+
+enum TransfersColumns {
+    NameColumn = 0,
+    ProgressColumn,
+    SizeColumn,
+    MaxColumn,
+};
 
 ChatTransfers::ChatTransfers(QWidget *parent)
     : QWidget(parent)
 {
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    tableWidget = new QTableWidget;
+    tableWidget->setColumnCount(MaxColumn);
+    tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("File name")));
+    tableWidget->setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
+    tableWidget->setHorizontalHeaderItem(ProgressColumn, new QTableWidgetItem(tr("Progress")));
+    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableWidget->verticalHeader()->setVisible(false);
+    tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
+    layout->addWidget(tableWidget);
+
+    setLayout(layout);
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
 {
+    tableWidget->insertRow(0);
+    tableWidget->setItem(0, NameColumn, new QTableWidgetItem(job->fileName()));
+
+    QString fileSize;
+    if (job->fileSize() < 1024)
+        fileSize = QString("%1 B").arg(job->fileSize());
+    else if (job->fileSize() < 1024 * 1024)
+        fileSize = QString("%1 KiB").arg(job->fileSize() / 1024);
+    else
+        fileSize = QString("%1 MiB").arg(job->fileSize() / (1024*1024));
+    tableWidget->setItem(0, SizeColumn, new QTableWidgetItem(fileSize));
+
+    QProgressBar *progress = new QProgressBar;
+    progress->setMaximum(job->fileSize());
+    tableWidget->setCellWidget(0, ProgressColumn, progress);
+
     connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(error(QXmppTransferJob::Error)));
     connect(job, SIGNAL(finished()), this, SLOT(finished()));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));

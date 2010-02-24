@@ -191,6 +191,21 @@
     </message>
 </context>
 <context>
+    <name>ChatTransfers</name>
+    <message>
+        <source>File name</source>
+        <translation>Nom du fichier</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Taille</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Progrès</translation>
+    </message>
+</context>
+<context>
     <name>Diagnostics</name>
     <message>
         <source>Refresh</source>
