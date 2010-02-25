@@ -39,6 +39,7 @@ private slots:
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64, qint64);
+    void stateChanged(QXmppTransferJob::State state);
 
 protected:
     QSize sizeHint() const;

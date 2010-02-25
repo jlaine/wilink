@@ -29,11 +29,23 @@
 #include "chat_transfers.h"
 
 enum TransfersColumns {
-    ProgressColumn = 0,
     NameColumn,
+    ProgressColumn,
     SizeColumn,
     MaxColumn,
 };
+
+static QIcon jobIcon(QXmppTransferJob *job)
+{
+    if (job->state() == QXmppTransferJob::Finished)
+    {
+        if (job->error() == QXmppTransferJob::NoError)
+            return QIcon(":/contact-available.png");
+        else
+            return QIcon(":/contact-busy.png");
+    }
+    return QIcon(":/contact-offline.png");
+}
 
 ChatTransfers::ChatTransfers(QWidget *parent)
     : QWidget(parent)
@@ -68,6 +80,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     jobs.insert(0, job);
     tableWidget->insertRow(0);
     QTableWidgetItem *nameItem = new QTableWidgetItem(job->fileName());
+    nameItem->setIcon(jobIcon(job));
     tableWidget->setItem(0, NameColumn, nameItem);
 
     QString fileSize;
@@ -86,6 +99,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(error(QXmppTransferJob::Error)));
     connect(job, SIGNAL(finished()), this, SLOT(finished()));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
+    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
 }
 
 void ChatTransfers::removeJob(QXmppTransferJob *job)
@@ -129,4 +143,14 @@ void ChatTransfers::progress(qint64 done, qint64 total)
 QSize ChatTransfers::sizeHint() const
 {
     return QSize(400, 200);
+}
+
+void ChatTransfers::stateChanged(QXmppTransferJob::State state)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    int jobRow = jobs.indexOf(job);
+    if (!job || jobRow < 0)
+        return;
+
+    tableWidget->item(jobRow, NameColumn)->setIcon(jobIcon(job));
 }
