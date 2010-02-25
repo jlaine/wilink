@@ -28,10 +28,6 @@
         <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
-    </message>
-    <message>
         <source>Join a chat room</source>
         <translation>Rejoindre un salon de discussion</translation>
     </message>
@@ -292,6 +288,10 @@
     <message>
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
+    </message>
+    <message>
+        <source>Chat</source>
+        <translation>Chat</translation>
     </message>
 </context>
 <context>
