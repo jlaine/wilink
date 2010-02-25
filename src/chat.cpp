@@ -491,13 +491,13 @@ void Chat::messageReceived(const QXmppMessage &msg)
     }
 
     // don't alert the user for empty messages or chat rooms
+    ChatConversation *dialog = chatDialogs.value(bareJid);
+    if (!dialog)
+        return;
     if (msg.getBody().isEmpty() || dialog->isRoom())
         return;
 
     // add pending message
-    ChatConversation *dialog = chatDialogs.value(bareJid);
-    if (!dialog)
-        return;
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
     else
