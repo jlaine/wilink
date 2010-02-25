@@ -163,7 +163,7 @@
     </message>
     <message>
         <source>Leave room</source>
-        <translation>Quiter le salon</translation>
+        <translation>Quitter le salon</translation>
     </message>
     <message>
         <source>Invite to a chat room</source>
