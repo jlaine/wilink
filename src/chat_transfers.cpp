@@ -37,7 +37,7 @@ enum TransfersColumns {
 
 static QIcon jobIcon(QXmppTransferJob *job)
 {
-    if (job->state() == QXmppTransferJob::Finished)
+    if (job->state() == QXmppTransferJob::FinishedState)
     {
         if (job->error() == QXmppTransferJob::NoError)
             return QIcon(":/contact-available.png");
@@ -121,7 +121,7 @@ void ChatTransfers::currentCellChanged(int currentRow, int currentColumn, int pr
         return;
     }
     QXmppTransferJob *job = jobs.at(currentRow);
-    removeButton->setEnabled(job->state() == QXmppTransferJob::Finished);
+    removeButton->setEnabled(job->state() == QXmppTransferJob::FinishedState);
 }
 
 void ChatTransfers::error(QXmppTransferJob::Error error)
@@ -159,7 +159,7 @@ void ChatTransfers::removeCurrentJob()
         return;
 
     QXmppTransferJob *job = jobs.at(jobRow);
-    if (job->state() == QXmppTransferJob::Finished)
+    if (job->state() == QXmppTransferJob::FinishedState)
     {
         jobs.removeAt(jobRow);
         tableWidget->removeRow(jobRow);
@@ -180,5 +180,5 @@ void ChatTransfers::stateChanged(QXmppTransferJob::State state)
 
     tableWidget->item(jobRow, NameColumn)->setIcon(jobIcon(job));
     if (jobRow == tableWidget->currentRow())
-        removeButton->setEnabled(job->state() == QXmppTransferJob::Finished);
+        removeButton->setEnabled(job->state() == QXmppTransferJob::FinishedState);
 }
