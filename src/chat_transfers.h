@@ -24,6 +24,7 @@
 
 #include "qxmpp/QXmppTransferManager.h"
 
+class QPushButton;
 class QTableWidget;
 
 class ChatTransfers : public QWidget
@@ -33,18 +34,21 @@ class ChatTransfers : public QWidget
 public:
     ChatTransfers(QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
-    void removeJob(QXmppTransferJob *job);
 
 private slots:
+    void cellDoubleClicked(int row, int column);
+    void currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64, qint64);
+    void removeCurrentJob();
     void stateChanged(QXmppTransferJob::State state);
 
 protected:
     QSize sizeHint() const;
 
 private:
+    QPushButton *removeButton;
     QTableWidget *tableWidget;
     QList<QXmppTransferJob*> jobs;
 };

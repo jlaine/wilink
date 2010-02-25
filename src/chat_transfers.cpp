@@ -59,15 +59,19 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     tableWidget->setHorizontalHeaderItem(ProgressColumn, new QTableWidgetItem(tr("Progress")));
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableWidget->setShowGrid(false);
     tableWidget->verticalHeader()->setVisible(false);
     tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
+    connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
+    connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(currentCellChanged(int,int,int,int)));
     layout->addWidget(tableWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
-    QPushButton *removeButton = new QPushButton;
+    removeButton = new QPushButton;
     removeButton->setIcon(QIcon(":/remove.png"));
-    //connect(removeButton, SIGNAL(clicked()), this, SLOT(removeJob()));
+    removeButton->setEnabled(false);
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeCurrentJob()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
 
     layout->addWidget(buttonBox);
@@ -102,14 +106,22 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
 }
 
-void ChatTransfers::removeJob(QXmppTransferJob *job)
+void ChatTransfers::cellDoubleClicked(int row, int column)
 {
-    int jobRow = jobs.indexOf(job);
-    if (jobRow < 0)
+    if (row < 0 || row >= jobs.size())
         return;
+    // TODO : open file
+}
 
-    jobs.removeAt(jobRow);
-    tableWidget->removeRow(jobRow);
+void ChatTransfers::currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+    if (currentRow < 0 || currentRow >= jobs.size())
+    {
+        removeButton->setEnabled(false);
+        return;
+    }
+    QXmppTransferJob *job = jobs.at(currentRow);
+    removeButton->setEnabled(job->state() == QXmppTransferJob::Finished);
 }
 
 void ChatTransfers::error(QXmppTransferJob::Error error)
@@ -140,6 +152,20 @@ void ChatTransfers::progress(qint64 done, qint64 total)
         progress->setValue(done);
 }
 
+void ChatTransfers::removeCurrentJob()
+{
+    int jobRow = tableWidget->currentRow();
+    if (jobRow < 0 || jobRow >= jobs.size())
+        return;
+
+    QXmppTransferJob *job = jobs.at(jobRow);
+    if (job->state() == QXmppTransferJob::Finished)
+    {
+        jobs.removeAt(jobRow);
+        tableWidget->removeRow(jobRow);
+    }
+}
+
 QSize ChatTransfers::sizeHint() const
 {
     return QSize(400, 200);
@@ -153,4 +179,6 @@ void ChatTransfers::stateChanged(QXmppTransferJob::State state)
         return;
 
     tableWidget->item(jobRow, NameColumn)->setIcon(jobIcon(job));
+    if (jobRow == tableWidget->currentRow())
+        removeButton->setEnabled(job->state() == QXmppTransferJob::Finished);
 }
