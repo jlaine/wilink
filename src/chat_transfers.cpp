@@ -18,6 +18,7 @@
  */
 
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QLayout>
@@ -25,6 +26,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QUrl>
 
 #include "chat_transfers.h"
 
@@ -84,6 +86,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     jobs.insert(0, job);
     tableWidget->insertRow(0);
     QTableWidgetItem *nameItem = new QTableWidgetItem(job->fileName());
+    nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     nameItem->setIcon(jobIcon(job));
     tableWidget->setItem(0, NameColumn, nameItem);
 
@@ -94,7 +97,9 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
         fileSize = QString("%1 KiB").arg(job->fileSize() / 1024);
     else
         fileSize = QString("%1 MiB").arg(job->fileSize() / (1024*1024));
-    tableWidget->setItem(0, SizeColumn, new QTableWidgetItem(fileSize));
+    QTableWidgetItem *sizeItem = new QTableWidgetItem(fileSize);
+    sizeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    tableWidget->setItem(0, SizeColumn, sizeItem);
 
     QProgressBar *progress = new QProgressBar;
     progress->setMaximum(job->fileSize());
@@ -110,7 +115,15 @@ void ChatTransfers::cellDoubleClicked(int row, int column)
 {
     if (row < 0 || row >= jobs.size())
         return;
-    // TODO : open file
+
+    QXmppTransferJob *job = jobs.at(row);
+    if (job->localFilePath().isEmpty())
+        return;
+    if (job->direction() == QXmppTransferJob::IncomingDirection &&
+        (job->state() != QXmppTransferJob::FinishedState || job->error() != QXmppTransferJob::NoError))
+        return;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(job->localFilePath()));
 }
 
 void ChatTransfers::currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn)

@@ -757,8 +757,10 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 QStringList files = dlg.selectedFiles();
                 if (!files.size())
                     return;
+                const QString filePath = files.first();
 
-                QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, files.first());
+                QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
+                job->setLocalFilePath(filePath);
                 chatTransfers->addJob(job);
                 chatTransfers->show();
             }
@@ -859,12 +861,15 @@ void Chat::fileReceived(QXmppTransferJob *job)
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
         QDir downloadsDir(SystemInfo::downloadsLocation());
+        const QString filePath = downloadsDir.absoluteFilePath(job->fileName());
 
-        QFile *file = new QFile(downloadsDir.absoluteFilePath(job->fileName()), this);
-        file->open(QIODevice::WriteOnly);
-
-        chatTransfers->addJob(job);
-        chatTransfers->show();
-        job->accept(file);
+        QFile *file = new QFile(filePath, job);
+        if (file->open(QIODevice::WriteOnly))
+        {
+            job->setLocalFilePath(filePath);
+            chatTransfers->addJob(job);
+            chatTransfers->show();
+            job->accept(file);
+        }
     }
 }
