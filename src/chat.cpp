@@ -184,8 +184,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
-
-    move(QPoint(20, 20));
 }
 
 Chat::~Chat()

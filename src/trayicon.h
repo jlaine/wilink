@@ -55,7 +55,7 @@ protected slots:
     void openAtLogin(bool checked);
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
-    void showChat();
+    void showChats();
     void showChatAccounts();
     void showDiagnostics();
     void showIcon();
@@ -64,6 +64,7 @@ protected slots:
 
 private:
     void fetchIcon();
+    void resetChats();
 
 private:
     QList<Chat*> chats;

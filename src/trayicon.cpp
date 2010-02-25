@@ -211,7 +211,7 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger)
     {
-        showChat();
+        showChats();
 #if 0
         // FIXME: this implies that the system tray is at the bottom of the screen..
         QMenu *menu = contextMenu();
@@ -227,7 +227,45 @@ void TrayIcon::openAtLogin(bool checked)
     settings->setValue("OpenAtLogin", checked);
 }
 
-void TrayIcon::showChat()
+void TrayIcon::resetChats()
+{
+    /* close any existing chats */
+    foreach (Chat *chat, chats)
+        delete chat;
+    chats.clear();
+
+    int xpos = 30;
+    int ypos = 20;
+
+    /* connect to chat */
+    QAuthenticator auth;
+    Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
+    Chat *chat = new Chat(this);
+    chat->move(QPoint(xpos, ypos));
+    chat->open(auth.user(), auth.password(), false);
+    chats << chat;
+    xpos += 300;
+
+    /* connect to additional chats */
+    foreach (const QString &jid, settings->value("ChatAccounts").toStringList())
+    {
+        QAuthenticator auth;
+        auth.setUser(jid);
+        Wallet::instance()->onAuthenticationRequired(jid.split("@").last(), &auth);
+        Chat *chat = new Chat(this);
+        chat->move(xpos, ypos);
+        chat->setWindowTitle(jid);
+        chat->show();
+        chat->open(auth.user(), auth.password(), true);
+        chats << chat;
+        xpos += 250;
+    }
+
+    /* show chats */
+    showChats();
+}
+
+void TrayIcon::showChats()
 {
     foreach (Chat *chat, chats)
     {
@@ -247,11 +285,15 @@ void TrayIcon::showChatAccounts()
     QStringList accounts = settings->value("ChatAccounts").toStringList();
     accounts.prepend(baseAccount);
     dlg.setAccounts(accounts);
-    if (dlg.exec())
+    if (dlg.exec() && dlg.accounts() != accounts)
     {
+        // store new settings
         accounts = dlg.accounts();
         accounts.removeAll(baseAccount);
         settings->setValue("ChatAccounts", accounts);
+
+        // reset chats
+        resetChats();
     }
 }
 
@@ -303,7 +345,7 @@ void TrayIcon::showMenu()
         menu->addSeparator();
 
     action = menu->addAction(QIcon(":/chat.png"), tr("&Chat"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChat()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChats()));
 
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
@@ -376,26 +418,8 @@ void TrayIcon::showMenu()
     {
         connected = true;
 
-        /* connect to chat */
-        QAuthenticator auth;
-        Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
-        Chat *chat = new Chat(this);
-        chat->open(auth.user(), auth.password(), false);
-        chats << chat;
-
-        /* connect to additional chats */
-        foreach (const QString &jid, settings->value("ChatAccounts").toStringList())
-        {
-            QAuthenticator auth;
-            auth.setUser(jid);
-            Wallet::instance()->onAuthenticationRequired(jid.split("@").last(), &auth);
-            Chat *chat = new Chat(this);
-            chat->open(auth.user(), auth.password(), true);
-            chats << chat;
-        }
-
-        /* show chat */
-        showChat();
+        /* create and show chat windows */
+        resetChats();
 
         /* check for updates now then every week */
         updates->check();
