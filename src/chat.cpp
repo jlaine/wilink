@@ -490,7 +490,11 @@ void Chat::messageReceived(const QXmppMessage &msg)
         return;
     }
 
-    // add message
+    // don't alert the user for empty messages or chat rooms
+    if (msg.getBody().isEmpty() || dialog->isRoom())
+        return;
+
+    // add pending message
     ChatConversation *dialog = chatDialogs.value(bareJid);
     if (!dialog)
         return;
@@ -499,10 +503,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
     else
         rosterView->selectContact(bareJid);
 
-    // don't alert the user for empty messages or chat rooms
-    if (msg.getBody().isEmpty() || dialog->isRoom())
-        return;
-
+    // show the chat window
     if (!isVisible())
     {
 #ifdef Q_OS_MAC
