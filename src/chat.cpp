@@ -152,7 +152,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
-    setWindowTitle(tr("Chat"));
 
     /* set up transfers window */
     chatTransfers = new ChatTransfers;

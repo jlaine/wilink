@@ -234,6 +234,7 @@ void TrayIcon::resetChats()
         delete chat;
     chats.clear();
 
+    QStringList extraJids = settings->value("ChatAccounts").toStringList();
     int xpos = 30;
     int ypos = 20;
 
@@ -242,19 +243,23 @@ void TrayIcon::resetChats()
     Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
     Chat *chat = new Chat(this);
     chat->move(QPoint(xpos, ypos));
+    if (extraJids.isEmpty())
+        chat->setWindowTitle(tr("Chat"));
+    else
+        chat->setWindowTitle(auth.user());
     chat->open(auth.user(), auth.password(), false);
     chats << chat;
     xpos += 300;
 
     /* connect to additional chats */
-    foreach (const QString &jid, settings->value("ChatAccounts").toStringList())
+    foreach (const QString &jid, extraJids)
     {
         QAuthenticator auth;
         auth.setUser(jid);
         Wallet::instance()->onAuthenticationRequired(jid.split("@").last(), &auth);
         Chat *chat = new Chat(this);
         chat->move(xpos, ypos);
-        chat->setWindowTitle(jid);
+        chat->setWindowTitle(auth.user());
         chat->show();
         chat->open(auth.user(), auth.password(), true);
         chats << chat;
