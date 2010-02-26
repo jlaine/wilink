@@ -75,6 +75,10 @@
         <source>%1 wants to send you a file called &apos;%2&apos;. Do you accept?</source>
         <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos;. Acceptez-vous?</translation>
     </message>
+    <message>
+        <source>Send a file</source>
+        <translation>Envoyer un fichier</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -163,7 +167,7 @@
     </message>
     <message>
         <source>Leave room</source>
-        <translation>Quiter le salon</translation>
+        <translation>Quitter le salon</translation>
     </message>
     <message>
         <source>Invite to a chat room</source>
