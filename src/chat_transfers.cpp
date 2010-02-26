@@ -173,13 +173,13 @@ QSize ChatTransfers::sizeHint() const
 QString ChatTransfers::sizeToString(qint64 size)
 {
     if (size < KIBIBYTE)
-        return QString("%1 B").arg(size);
+        return QString::fromUtf8("%1 B").arg(size);
     else if (size < MEBIBYTE)
-        return QString("%1 KiB").arg(double(size) / double(KIBIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 KiB").arg(double(size) / double(KIBIBYTE), 0, 'f', 1);
     else if (size < GIGIBYTE)
-        return QString("%1 MiB").arg(double(size) / double(MEBIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 MiB").arg(double(size) / double(MEBIBYTE), 0, 'f', 1);
     else
-        return QString("%1 GiB").arg(double(size) / double(GIGIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 GiB").arg(double(size) / double(GIGIBYTE), 0, 'f', 1);
 }
 
 void ChatTransfers::stateChanged(QXmppTransferJob::State state)
