@@ -154,6 +154,10 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowIcon(QIcon(":/chat.png"));
 
     /* set up transfers window */
+#if 0
+    client->getTransferManager().setSupportedMethods(
+        QXmppTransferJob::InBandMethod);
+#endif
     chatTransfers = new ChatTransfers;
 
     /* set up client */
@@ -751,14 +755,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 return;
             QString fullJid = jid + "/" + resources.first();
 
-            QFileDialog dlg(this);
-            if (dlg.exec())
+            QString filePath = QFileDialog::getOpenFileName(this, tr("Send a file"));
+            if (!filePath.isEmpty())
             {
-                QStringList files = dlg.selectedFiles();
-                if (!files.size())
-                    return;
-                const QString filePath = files.first();
-
                 QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
                 job->setLocalFilePath(filePath);
                 chatTransfers->addJob(job);
