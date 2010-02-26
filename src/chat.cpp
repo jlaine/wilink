@@ -856,19 +856,26 @@ void Chat::fileReceived(QXmppTransferJob *job)
 
     if (QMessageBox::question(this,
         tr("File from %1").arg(contactName),
-        tr("%1 wants to send you a file called '%2'. Do you accept?").arg(contactName, job->fileName()),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+        tr("%1 wants to send you a file called '%2'. Do you accept?")
+            .arg(contactName, job->fileName()),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
     {
-        QDir downloadsDir(SystemInfo::downloadsLocation());
-        const QString filePath = downloadsDir.absoluteFilePath(job->fileName());
+        // The user cancelled the job
+        return;
+    }
 
-        QFile *file = new QFile(filePath, job);
-        if (file->open(QIODevice::WriteOnly))
-        {
-            job->setLocalFilePath(filePath);
-            chatTransfers->addJob(job);
-            chatTransfers->show();
-            job->accept(file);
-        }
+    // determine file location
+    QDir downloadsDir(SystemInfo::downloadsLocation());
+    const QString filePath = QFileDialog::getSaveFileName(this, tr("Receive a file"), downloadsDir.absoluteFilePath(job->fileName()));
+    if (filePath.isEmpty())
+        return;
+
+    QFile *file = new QFile(filePath, job);
+    if (file->open(QIODevice::WriteOnly))
+    {
+        job->setLocalFilePath(filePath);
+        chatTransfers->addJob(job);
+        chatTransfers->show();
+        job->accept(file);
     }
 }
