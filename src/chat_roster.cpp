@@ -479,7 +479,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }
 
-        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Leave room"));
+        QAction *action = menu->addAction(QIcon(":/close.png"), tr("Leave room"));
         action->setData(LeaveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 

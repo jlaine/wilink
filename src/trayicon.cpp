@@ -74,7 +74,7 @@ TrayIcon::TrayIcon()
     QAction *action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
-    action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
+    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
 
@@ -373,7 +373,7 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
-    action = menu->addAction(QIcon(":/remove.png"), tr("&Quit"));
+    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
 
