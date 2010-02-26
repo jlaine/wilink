@@ -13,22 +13,22 @@
    height="22"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="remove.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0">
   <defs
      id="defs4">
     <linearGradient
-       id="linearGradient5475">
+       id="linearGradient4223">
       <stop
-         style="stop-color:#bb1b1b;stop-opacity:1;"
+         style="stop-color:#106a15;stop-opacity:1;"
          offset="0"
-         id="stop5477" />
+         id="stop4225" />
       <stop
-         style="stop-color:#f3aea7;stop-opacity:1;"
+         style="stop-color:#ccf1d2;stop-opacity:1;"
          offset="1"
-         id="stop5479" />
+         id="stop4227" />
     </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
@@ -51,76 +51,36 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 526.18109 : 1"
        sodipodi:type="inkscape:persp3d" />
-    <inkscape:perspective
-       id="perspective3306"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       sodipodi:type="inkscape:persp3d" />
     <filter
-       id="filter2819"
+       id="filter4864"
        inkscape:label="Drop shadow"
        width="1.5"
        height="1.5"
        x="-.25"
        y="-.25">
       <feGaussianBlur
-         id="feGaussianBlur2821"
+         id="feGaussianBlur4866"
          in="SourceAlpha"
          stdDeviation="0.500000"
          result="blur" />
       <feColorMatrix
-         id="feColorMatrix2823"
+         id="feColorMatrix4868"
          result="bluralpha"
          type="matrix"
          values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
       <feOffset
-         id="feOffset2825"
+         id="feOffset4870"
          in="bluralpha"
          dx="1.000000"
          dy="1.000000"
          result="offsetBlur" />
       <feMerge
-         id="feMerge2827">
+         id="feMerge4872">
         <feMergeNode
-           id="feMergeNode2829"
+           id="feMergeNode4874"
            in="offsetBlur" />
         <feMergeNode
-           id="feMergeNode2831"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <filter
-       id="filter4337"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur4339"
-         in="SourceAlpha"
-         stdDeviation="0.500000"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix4341"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
-      <feOffset
-         id="feOffset4343"
-         in="bluralpha"
-         dx="1.000000"
-         dy="1.000000"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge4345">
-        <feMergeNode
-           id="feMergeNode4347"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode4349"
+           id="feMergeNode4876"
            in="SourceGraphic" />
       </feMerge>
     </filter>
@@ -135,17 +95,22 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="39"
-     inkscape:cx="6.7709947"
-     inkscape:cy="7.6761718"
+     inkscape:zoom="30.286151"
+     inkscape:cx="6.1227413"
+     inkscape:cy="11.315861"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="false"
+     showgrid="true"
      inkscape:window-width="1680"
      inkscape:window-height="986"
      inkscape:window-x="-4"
      inkscape:window-y="-3"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:snap-global="false">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2841" />
+  </sodipodi:namedview>
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -163,10 +128,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,2)">
-    <path
-       style="fill:#fa2924;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.20000000000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4337)"
-       d="M 6.90625,6 C 6.6293208,6.0300763 6.3512343,6.1807373 6.125,6.40625 5.672837,6.8569705 5.6264314,7.5044443 6,7.90625 L 8.125,10 6.03125,12.09375 C 5.6558072,12.495326 5.6721522,13.173597 6.125,13.625 c 0.4615181,0.460046 1.1942317,0.491994 1.59375,0.09375 L 9.78125,11.65625 11.875,13.75 c 0.40286,0.374245 1.078402,0.357653 1.53125,-0.09375 0.461518,-0.460046 0.524519,-1.195506 0.125,-1.59375 L 11.4375,10 13.5625,7.90625 C 13.936903,7.5045465 13.858718,6.8260249 13.40625,6.375 13.180169,6.1496398 12.895332,6.0234092 12.625,6 12.354668,5.9765908 12.107796,6.0638115 11.90625,6.25 L 9.78125,8.34375 7.65625,6.25 C 7.4547567,6.0633941 7.1831792,5.9699237 6.90625,6 z"
-       transform="matrix(1.5,0,0,1.5,-3.6567739,-6.079068)"
-       id="rect3293" />
+    <rect
+       style="fill:#fa2924;fill-opacity:1;stroke:#000000;stroke-width:0.30000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter4864)"
+       id="rect2847"
+       width="12"
+       height="3"
+       x="5"
+       y="7.625"
+       transform="matrix(0.99829408,0,0,1.2191479,0.01876511,-2.1245419)" />
   </g>
 </svg>
