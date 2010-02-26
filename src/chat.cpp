@@ -471,7 +471,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
                     !chatDialogs.contains(roomJid) &&
                     QMessageBox::question(this,
                         tr("Invitation from %1").arg(contactName),
-                        tr("%1 has asked to add you to join the '%2' chat room. Do you accept?").arg(contactName, roomJid),
+                        tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
                         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
                 {
                     joinConversation(roomJid, true);
@@ -587,7 +587,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
                 accepted = true;
             else if (QMessageBox::question(this,
                     tr("Invitation from %1").arg(presence.getFrom()),
-                    tr("%1 has asked to add you to his or her contact list. Do you accept?").arg(presence.getFrom()),
+                    tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(presence.getFrom()),
                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
                 accepted = true;
 
@@ -856,8 +856,8 @@ void Chat::fileReceived(QXmppTransferJob *job)
 
     if (QMessageBox::question(this,
         tr("File from %1").arg(contactName),
-        tr("%1 wants to send you a file called '%2'. Do you accept?")
-            .arg(contactName, job->fileName()),
+        tr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?")
+            .arg(contactName, job->fileName(), ChatTransfers::sizeToString(job->fileSize())),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
     {
         // The user cancelled the job

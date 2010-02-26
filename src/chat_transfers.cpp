@@ -30,6 +30,10 @@
 
 #include "chat_transfers.h"
 
+#define KIBIBYTE (1024)
+#define MEBIBYTE (1024 * 1024)
+#define GIGIBYTE (1024 * 1024 * 1024)
+
 enum TransfersColumns {
     NameColumn,
     ProgressColumn,
@@ -89,14 +93,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     nameItem->setIcon(jobIcon(job));
     tableWidget->setItem(0, NameColumn, nameItem);
 
-    QString fileSize;
-    if (job->fileSize() < 1024)
-        fileSize = QString("%1 B").arg(job->fileSize());
-    else if (job->fileSize() < 1024 * 1024)
-        fileSize = QString("%1 KiB").arg(job->fileSize() / 1024);
-    else
-        fileSize = QString("%1 MiB").arg(job->fileSize() / (1024*1024));
-    QTableWidgetItem *sizeItem = new QTableWidgetItem(fileSize);
+    QTableWidgetItem *sizeItem = new QTableWidgetItem(sizeToString(job->fileSize()));
     sizeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     tableWidget->setItem(0, SizeColumn, sizeItem);
 
@@ -171,6 +168,18 @@ void ChatTransfers::removeCurrentJob()
 QSize ChatTransfers::sizeHint() const
 {
     return QSize(400, 200);
+}
+
+QString ChatTransfers::sizeToString(qint64 size)
+{
+    if (size < KIBIBYTE)
+        return QString("%1 B").arg(size);
+    else if (size < MEBIBYTE)
+        return QString("%1 KiB").arg(double(size) / double(KIBIBYTE), 0, 'f', 1);
+    else if (size < GIGIBYTE)
+        return QString("%1 MiB").arg(double(size) / double(MEBIBYTE), 0, 'f', 1);
+    else
+        return QString("%1 GiB").arg(double(size) / double(GIGIBYTE), 0, 'f', 1);
 }
 
 void ChatTransfers::stateChanged(QXmppTransferJob::State state)

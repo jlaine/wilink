@@ -34,6 +34,7 @@ class ChatTransfers : public QWidget
 public:
     ChatTransfers(QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
+    static QString sizeToString(qint64 size);
 
 private slots:
     void cellDoubleClicked(int row, int column);
