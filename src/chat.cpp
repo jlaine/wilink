@@ -40,7 +40,6 @@
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
-#include "qxmpp/QXmppIbbTransferManager.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppPingIq.h"
