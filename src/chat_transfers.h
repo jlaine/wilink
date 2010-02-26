@@ -37,12 +37,12 @@ public:
 
 private slots:
     void cellDoubleClicked(int row, int column);
-    void currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
     void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64, qint64);
     void removeCurrentJob();
     void stateChanged(QXmppTransferJob::State state);
+    void updateButtons();
 
 protected:
     QSize sizeHint() const;
