@@ -32,7 +32,7 @@ ChatAccounts::ChatAccounts(QWidget *parent)
 
     listWidget = new QListWidget;
     listWidget->setIconSize(QSize(32, 32));
-    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
+    connect(listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(updateButtons()));
     layout->addWidget(listWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -45,7 +45,6 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
 
     removeButton = new QPushButton;
-    removeButton->setEnabled(false);
     removeButton->setIcon(QIcon(":/remove.png"));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(removeAccount()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
@@ -53,6 +52,7 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     layout->addWidget(buttonBox);
 
     setLayout(layout);
+    updateButtons();
 }
 
 QStringList ChatAccounts::accounts() const
@@ -81,16 +81,14 @@ void ChatAccounts::addEntry(const QString &jid)
     listWidget->addItem(wdgItem);
 }
 
-void ChatAccounts::itemClicked(QListWidgetItem *item)
-{
-    removeButton->setEnabled(item->data(Qt::UserRole).toBool());
-}
-
 void ChatAccounts::removeAccount()
 {
     QListWidgetItem *item = listWidget->item(listWidget->currentRow());
     if (item && item->data(Qt::UserRole).toBool())
+    {
         listWidget->takeItem(listWidget->currentRow());
+        updateButtons();
+    }
 }
 
 void ChatAccounts::setAccounts(const QStringList &accounts)
@@ -98,6 +96,15 @@ void ChatAccounts::setAccounts(const QStringList &accounts)
     listWidget->clear();
     foreach (const QString &jid, accounts)
         addEntry(jid);
+}
+
+void ChatAccounts::updateButtons()
+{
+    QListWidgetItem *item = listWidget->currentItem();
+    if (item)
+        removeButton->setEnabled(item->data(Qt::UserRole).toBool());
+    else
+        removeButton->setEnabled(false);
 }
 
 void ChatAccounts::validate()
