@@ -651,7 +651,6 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setDomain(bits[1]);
 
     /* get the server */
-#ifdef USE_DNS_SRV
     QList<ServiceInfo> results;
     if (ServiceInfo::lookupService("_xmpp-client._tcp." + config.getDomain(), results))
     {
@@ -660,9 +659,6 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     } else {
         config.setHost(config.getDomain());
     }
-#else
-    config.setHost(config.getDomain());
-#endif
 
     /* set security parameters */
     config.setAutoAcceptSubscriptions(false);
