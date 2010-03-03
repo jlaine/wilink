@@ -359,8 +359,8 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             else if (item.attribute("category") == "proxy" &&
                      item.attribute("type") == "bytestreams")
             {
-                byteStreamProxy = disco.getFrom();
-                qDebug() << "Found bytestream proxy" << byteStreamProxy;
+                client->getTransferManager().setProxy(disco.getFrom());
+                qDebug() << "Found bytestream proxy" << disco.getFrom();
             }
         }
     }

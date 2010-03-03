@@ -101,7 +101,6 @@ private:
     QStackedWidget *conversationPanel;
 
     QString chatRoomServer;
-    QString byteStreamProxy;
     QStringList discoQueue;
 };
 
