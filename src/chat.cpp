@@ -347,11 +347,20 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         // check if it's a conference server
         foreach (const QXmppElement &item, disco.getQueryItems())
         {
-            if (item.tagName() == "identity" && item.attribute("category") == "conference" && item.attribute("type") == "text")
+            if (item.tagName() != "identity")
+                continue;
+            if (item.attribute("category") == "conference" &&
+                item.attribute("type") == "text")
             {
                 chatRoomServer = disco.getFrom();
                 roomButton->setEnabled(true);
                 qDebug() << "Found chat room server" << chatRoomServer;
+            }
+            else if (item.attribute("category") == "proxy" &&
+                     item.attribute("type") == "bytestreams")
+            {
+                byteStreamProxy = disco.getFrom();
+                qDebug() << "Found bytestream proxy" << byteStreamProxy;
             }
         }
     }
