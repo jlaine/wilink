@@ -162,6 +162,8 @@ void ChatTransfers::removeCurrentJob()
         jobs.removeAt(jobRow);
         tableWidget->removeRow(jobRow);
         updateButtons();
+    } else {
+        jobs.at(jobRow)->abort();
     }
 }
 
@@ -173,13 +175,13 @@ QSize ChatTransfers::sizeHint() const
 QString ChatTransfers::sizeToString(qint64 size)
 {
     if (size < KIBIBYTE)
-        return QString::fromUtf8("%1 B").arg(size);
+        return QString::fromUtf8("%1 B").arg(size);
     else if (size < MEBIBYTE)
-        return QString::fromUtf8("%1 KiB").arg(double(size) / double(KIBIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 KiB").arg(double(size) / double(KIBIBYTE), 0, 'f', 1);
     else if (size < GIGIBYTE)
-        return QString::fromUtf8("%1 MiB").arg(double(size) / double(MEBIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 MiB").arg(double(size) / double(MEBIBYTE), 0, 'f', 1);
     else
-        return QString::fromUtf8("%1 GiB").arg(double(size) / double(GIGIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 GiB").arg(double(size) / double(GIGIBYTE), 0, 'f', 1);
 }
 
 void ChatTransfers::stateChanged(QXmppTransferJob::State state)
@@ -205,12 +207,9 @@ void ChatTransfers::updateButtons()
 
     QXmppTransferJob *job = jobs.at(jobRow);
     if (job->state() == QXmppTransferJob::FinishedState)
-    {
-        removeButton->setEnabled(true);
         removeButton->setIcon(QIcon(":/remove.png"));
-    } else {
-        removeButton->setEnabled(false);
+    else
         removeButton->setIcon(QIcon(":/close.png"));
-    }
+    removeButton->setEnabled(true);
 }
 
