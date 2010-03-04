@@ -91,15 +91,15 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     ChatHistoryMessage message;
     message.body = msg.body();
     message.from = from;
-    message.local = (from == chatLocalName);
-    message.datetime = QDateTime::currentDateTime();
+    message.received = (from != chatLocalName);
+    message.date = QDateTime::currentDateTime();
     foreach (const QXmppElement &extension, msg.extensions())
     {
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
         {
             const QString str = extension.attribute("stamp");
-            message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-            message.datetime.setTimeSpec(Qt::UTC);
+            message.date = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+            message.date.setTimeSpec(Qt::UTC);
         }
     }
     chatHistory->addMessage(message);

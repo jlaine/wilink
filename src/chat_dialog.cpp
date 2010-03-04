@@ -46,17 +46,17 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *par
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 {
-    if (jidToBareJid(chat.with) != chatRemoteJid)
+    if (jidToBareJid(chat.with()) != chatRemoteJid)
         return;
 
-    foreach (const QXmppArchiveMessage &msg, chat.messages)
+    foreach (const QXmppArchiveMessage &msg, chat.messages())
     {
         ChatHistoryMessage message;
         message.archived = true;
-        message.body = msg.body;
-        message.datetime = msg.datetime;
-        message.from = msg.local ? chatLocalName : chatRemoteName;
-        message.local = msg.local;
+        message.body = msg.body();
+        message.date = msg.date();
+        message.from = msg.isReceived() ? chatRemoteName : chatLocalName;
+        message.received = msg.isReceived();
         chatHistory->addMessage(message);
     }
 }
@@ -64,8 +64,8 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
-        if (jidToBareJid(chats[i].with) == chatRemoteJid)
-            client->getArchiveManager().retrieveCollection(chats[i].with, chats[i].start);
+        if (jidToBareJid(chats[i].with()) == chatRemoteJid)
+            client->getArchiveManager().retrieveCollection(chats[i].with(), chats[i].start());
 }
 
 /** When the chat state changes, notify the remote party.
@@ -140,18 +140,18 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     ChatHistoryMessage message;
     message.body = msg.body();
-    message.datetime = QDateTime::currentDateTime();
+    message.date = QDateTime::currentDateTime();
     foreach (const QXmppElement &extension, msg.extensions())
     {
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
         {
             const QString str = extension.attribute("stamp");
-            message.datetime = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-            message.datetime.setTimeSpec(Qt::UTC);
+            message.date = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
+            message.date.setTimeSpec(Qt::UTC);
         }
     }
     message.from = chatRemoteName;
-    message.local = false;
+    message.received = true;
     chatHistory->addMessage(message);
 }
 
@@ -160,9 +160,9 @@ void ChatDialog::sendMessage(const QString &text)
     // add message to history
     ChatHistoryMessage message;
     message.body = text;
-    message.datetime = QDateTime::currentDateTime();
+    message.date = QDateTime::currentDateTime();
     message.from = chatLocalName;
-    message.local = true;
+    message.received = false;
     chatHistory->addMessage(message);
 
     // send message

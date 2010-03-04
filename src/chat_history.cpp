@@ -65,7 +65,7 @@ void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
     QGraphicsTextItem::mousePressEvent(event);
 }
 
-ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
+ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     show_date(true),
     show_sender(false),
@@ -75,7 +75,7 @@ ChatMessageWidget::ChatMessageWidget(bool local, QGraphicsItem *parent)
     scene()->addItem(bodyText);
     bodyText->setParentItem(this);
 
-    QColor baseColor = local ? QColor(0xdb, 0xdb, 0xdb) : QColor(0xb6, 0xd4, 0xff);
+    QColor baseColor = received ? QColor(0xb6, 0xd4, 0xff) : QColor(0xdb, 0xdb, 0xdb);
     QLinearGradient grad(QPointF(0, 0), QPointF(0, 0.5));
     grad.setColorAt(0, baseColor);
     baseColor.setAlpha(0x80);
@@ -177,7 +177,7 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
     fromText->setPlainText(message.from);
 
     /* set date */
-    QDateTime datetime = message.datetime.toLocalTime();
+    QDateTime datetime = message.date.toLocalTime();
     dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
 
     /* set body */
@@ -280,7 +280,7 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        if (message.datetime > child->message().datetime)
+        if (message.date > child->message().date)
         {
             previous = child;
             pos++;
@@ -298,12 +298,12 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     /* determine grouping */
     bool showSender = (!previous ||
         message.from != previous->message().from ||
-        message.datetime > previous->message().datetime.addSecs(120 * 60));
+        message.date > previous->message().date.addSecs(120 * 60));
     bool showDate = (showSender ||
-        message.datetime > previous->message().datetime.addSecs(60));
+        message.date > previous->message().date.addSecs(60));
 
     /* add message */
-    ChatMessageWidget *msg = new ChatMessageWidget(message.local, obj);
+    ChatMessageWidget *msg = new ChatMessageWidget(message.received, obj);
     msg->setMessage(message);
     msg->setShowDate(showDate);
     msg->setShowSender(showSender);
@@ -430,6 +430,6 @@ void ChatHistory::slotSelectionChanged()
 }
 
 ChatHistoryMessage::ChatHistoryMessage()
-    : archived(false), local(false)
+    : archived(false), received(true)
 {
 }

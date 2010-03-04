@@ -33,9 +33,9 @@ public:
 
     bool archived;
     QString body;
-    QDateTime datetime;
+    QDateTime date;
     QString from;
-    bool local;
+    bool received;
 };
 
 class ChatTextItem : public QGraphicsTextItem
