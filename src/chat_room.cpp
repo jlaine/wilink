@@ -84,8 +84,8 @@ void ChatRoom::leave()
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
-    const QString from = jidToResource(msg.getFrom());
-    if (jidToBareJid(msg.getFrom()) != chatRemoteJid || from.isEmpty())
+    const QString from = jidToResource(msg.from());
+    if (jidToBareJid(msg.from()) != chatRemoteJid || from.isEmpty())
         return;
 
     ChatHistoryMessage message;
@@ -93,7 +93,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     message.from = from;
     message.local = (from == chatLocalName);
     message.datetime = QDateTime::currentDateTime();
-    foreach (const QXmppElement &extension, msg.getExtensions())
+    foreach (const QXmppElement &extension, msg.extensions())
     {
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
         {
@@ -149,7 +149,7 @@ void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
     if (disco.getType() == QXmppIq::Result &&
         disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.getFrom() == chatRoomServer)
+        disco.from() == chatRoomServer)
     {
         // chat rooms list
         listWidget->clear();
@@ -250,9 +250,9 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
 void ChatRoomMembers::iqReceived(const QXmppIq &iq)
 {
     if (iq.getType() != QXmppIq::Result ||
-        iq.getFrom() != chatRoomJid)
+        iq.from() != chatRoomJid)
         return;
-    const QXmppElement query = iq.getExtensions().first();
+    const QXmppElement query = iq.extensions().first();
     if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_admin)
         return;
 

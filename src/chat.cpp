@@ -323,7 +323,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 #endif
 
     if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.getFrom() == client->getConfiguration().getDomain())
+        disco.from() == client->getConfiguration().getDomain())
     {
         // root items
         discoQueue.clear();
@@ -341,9 +341,9 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         }
     }
     else if (disco.getQueryType() == QXmppDiscoveryIq::InfoQuery &&
-             discoQueue.contains(disco.getFrom()))
+             discoQueue.contains(disco.from()))
     {
-        discoQueue.removeAll(disco.getFrom());
+        discoQueue.removeAll(disco.from());
         // check if it's a conference server
         foreach (const QXmppElement &item, disco.getQueryItems())
         {
@@ -352,15 +352,15 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             if (item.attribute("category") == "conference" &&
                 item.attribute("type") == "text")
             {
-                chatRoomServer = disco.getFrom();
+                chatRoomServer = disco.from();
                 roomButton->setEnabled(true);
                 qDebug() << "Found chat room server" << chatRoomServer;
             }
             else if (item.attribute("category") == "proxy" &&
                      item.attribute("type") == "bytestreams")
             {
-                client->getTransferManager().setProxy(disco.getFrom());
-                qDebug() << "Found bytestream proxy" << disco.getFrom();
+                client->getTransferManager().setProxy(disco.from());
+                qDebug() << "Found bytestream proxy" << disco.from();
             }
         }
     }
@@ -404,9 +404,9 @@ void Chat::inviteContact(const QString &jid)
 void Chat::iqReceived(const QXmppIq &iq)
 {
     timeoutTimer->stop();
-    if (iq.getType() == QXmppIq::Result && !iq.getExtensions().isEmpty())
+    if (iq.getType() == QXmppIq::Result && !iq.extensions().isEmpty())
     {
-        const QXmppElement query = iq.getExtensions().first();
+        const QXmppElement query = iq.extensions().first();
         const QXmppElement form = query.firstChildElement("x");
         if (query.tagName() == "query" &&
             query.attribute("xmlns") == ns_muc_owner &&
@@ -423,7 +423,7 @@ void Chat::iqReceived(const QXmppIq &iq)
 
                 QXmppIq iqPacket(QXmppIq::Set);
                 iqPacket.setExtensions(query);
-                iqPacket.setTo(iq.getFrom());
+                iqPacket.setTo(iq.from());
                 client->sendPacket(iqPacket);
             }
         }
@@ -464,12 +464,12 @@ void Chat::leaveConversation(const QString &jid)
 
 void Chat::messageReceived(const QXmppMessage &msg)
 {
-    const QString bareJid = jidToBareJid(msg.getFrom());
+    const QString bareJid = jidToBareJid(msg.from());
 
     switch (msg.getType())
     {
     case QXmppMessage::Normal:
-        foreach (const QXmppElement &extension, msg.getExtensions())
+        foreach (const QXmppElement &extension, msg.extensions())
         {
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
             {
@@ -540,21 +540,21 @@ void Chat::messageReceived(const QXmppMessage &msg)
 void Chat::presenceReceived(const QXmppPresence &presence)
 {
     QXmppPresence packet;
-    packet.setTo(presence.getFrom());
-    const QString bareJid = jidToBareJid(presence.getFrom());
+    packet.setTo(presence.from());
+    const QString bareJid = jidToBareJid(presence.from());
     
     switch (presence.getType())
     {
     case QXmppPresence::Error:
         if (!chatDialogs.contains(bareJid))
             return;
-        foreach (const QXmppElement &extension, presence.getExtensions())
+        foreach (const QXmppElement &extension, presence.extensions())
         {
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
             {
                 leaveConversation(bareJid);
 
-                QXmppStanza::Error error = presence.getError();
+                QXmppStanza::Error error = presence.error();
                 QMessageBox::warning(this,
                     tr("Chat room error"),
                     tr("Sorry, but you cannot join chat room %1.\n\n%2")
@@ -566,9 +566,9 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         break;
     case QXmppPresence::Unavailable:
         if (!chatDialogs.contains(bareJid) ||
-            chatDialogs[bareJid]->localName() != jidToResource(presence.getFrom()))
+            chatDialogs[bareJid]->localName() != jidToResource(presence.from()))
             return;
-        foreach (const QXmppElement &extension, presence.getExtensions())
+        foreach (const QXmppElement &extension, presence.extensions())
         {
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc_user)
             {
@@ -586,7 +586,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         break;
     case QXmppPresence::Subscribe:
         {
-            QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.getFrom());
+            QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
             QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.getSubscriptionType();
 
             /* if the contact is in our roster accept subscribe, otherwise ask user */
@@ -594,8 +594,8 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
                 accepted = true;
             else if (QMessageBox::question(this,
-                    tr("Invitation from %1").arg(presence.getFrom()),
-                    tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(presence.getFrom()),
+                    tr("Invitation from %1").arg(presence.from()),
+                    tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(presence.from()),
                     QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
                 accepted = true;
 

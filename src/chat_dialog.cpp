@@ -84,7 +84,7 @@ void ChatDialog::chatStateChanged(QXmppMessage::State state)
 void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results from remote party
-    if (jidToBareJid(disco.getFrom()) != chatRemoteJid ||
+    if (jidToBareJid(disco.from()) != chatRemoteJid ||
         disco.getType() != QXmppIq::Result )
         return;
 
@@ -94,13 +94,13 @@ void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         if ((element.tagName() == "feature" && element.attribute("var") == ns_chat_states) ||
             (element.tagName() == "identity" && element.attribute("name") == "iChatAgent"))
         {
-            if (!chatStatesJids.contains(disco.getFrom()))
+            if (!chatStatesJids.contains(disco.from()))
             {
-                chatStatesJids.append(disco.getFrom());
+                chatStatesJids.append(disco.from());
 
                 // send initial state
                 QXmppMessage message;
-                message.setTo(disco.getFrom());
+                message.setTo(disco.from());
                 message.setState(localState());
                 client->sendPacket(message);
             }
@@ -133,7 +133,7 @@ void ChatDialog::join()
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    if (jidToBareJid(msg.getFrom()) != chatRemoteJid)
+    if (jidToBareJid(msg.from()) != chatRemoteJid)
         return;
 
     setRemoteState(msg.getState());
@@ -141,7 +141,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     ChatHistoryMessage message;
     message.body = msg.getBody();
     message.datetime = QDateTime::currentDateTime();
-    foreach (const QXmppElement &extension, msg.getExtensions())
+    foreach (const QXmppElement &extension, msg.extensions())
     {
         if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
         {

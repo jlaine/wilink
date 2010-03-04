@@ -249,7 +249,7 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
 
 void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 {
-    const QString jid = presence.getFrom();
+    const QString jid = presence.from();
     const QString roomJid = jidToBareJid(jid);
     ChatRosterItem *roomItem = rootItem->find(roomJid);
     if (!roomItem || roomItem->type() != ChatRosterItem::Room)
@@ -263,7 +263,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         endInsertRows();
 
         // check whether we own the room
-        foreach (const QXmppElement &x, presence.getExtensions())
+        foreach (const QXmppElement &x, presence.extensions())
         {
             if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
             {
@@ -346,7 +346,7 @@ int ChatRosterModel::rowCount(const QModelIndex &parent) const
 
 void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
 {
-    const QString bareJid = vcard.getFrom();
+    const QString bareJid = vcard.from();
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
