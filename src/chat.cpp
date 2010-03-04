@@ -559,7 +559,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
                     tr("Chat room error"),
                     tr("Sorry, but you cannot join chat room %1.\n\n%2")
                         .arg(bareJid)
-                        .arg(error.getText()));
+                        .arg(error.text()));
                 break;
             }
         }
