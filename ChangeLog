@@ -7,6 +7,7 @@ wDesktop 0.6.92 (UNRELEASED)
  * Make it possible to manage chat room members.
  * Add unit for RSSI measurements.
  * Make it possible to add additional chat accounts.
+ * Report software version via chat.
 
 wDesktop 0.6.1 (2010-02-15)
  * Improve auto-expanding of chat rooms.
