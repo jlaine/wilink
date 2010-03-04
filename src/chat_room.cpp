@@ -320,7 +320,7 @@ void ChatRoomMembers::submit()
 void ChatRoomMembers::addMember()
 {
     bool ok = false;
-    QString jid = "@" + client->getConfiguration().getDomain();
+    QString jid = "@" + client->getConfiguration().domain();
     jid = QInputDialog::getText(this, tr("Add a user"),
                   tr("Enter the address of the user you want to add."),
                   QLineEdit::Normal, jid, &ok).toLower();

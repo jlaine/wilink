@@ -201,7 +201,7 @@ Chat::~Chat()
 void Chat::addContact()
 {
     bool ok = true;
-    QString jid = "@" + client->getConfiguration().getDomain();
+    QString jid = "@" + client->getConfiguration().domain();
     while (!jidValidator.exactMatch(jid))
     {
         jid = QInputDialog::getText(this, tr("Add a contact"),
@@ -251,7 +251,7 @@ void Chat::connected()
 
     /* discover services */
     QXmppDiscoveryIq disco;
-    disco.setTo(client->getConfiguration().getDomain());
+    disco.setTo(client->getConfiguration().domain());
     disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     client->sendPacket(disco);
 
@@ -323,7 +323,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 #endif
 
     if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == client->getConfiguration().getDomain())
+        disco.from() == client->getConfiguration().domain())
     {
         // root items
         discoQueue.clear();
@@ -645,12 +645,12 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 
     /* get the server */
     QList<ServiceInfo> results;
-    if (ServiceInfo::lookupService("_xmpp-client._tcp." + config.getDomain(), results))
+    if (ServiceInfo::lookupService("_xmpp-client._tcp." + config.domain(), results))
     {
         config.setHost(results[0].hostName());
         config.setPort(results[0].port());
     } else {
-        config.setHost(config.getDomain());
+        config.setHost(config.domain());
     }
 
     /* set security parameters */
@@ -810,8 +810,8 @@ void Chat::rosterAction(int action, const QString &jid, int type)
 void Chat::sendPing()
 {
     QXmppPingIq ping;
-    ping.setFrom(client->getConfiguration().getJid());
-    ping.setTo(client->getConfiguration().getDomain());
+    ping.setFrom(client->getConfiguration().jid());
+    ping.setTo(client->getConfiguration().domain());
     client->sendPacket(ping);
     timeoutTimer->start();
 }

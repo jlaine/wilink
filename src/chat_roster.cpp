@@ -93,9 +93,9 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 void ChatRosterModel::connected()
 {
     /* request own vCard */
-    nickName = client->getConfiguration().getUser();
+    nickName = client->getConfiguration().user();
     client->getVCardManager().requestVCard(
-        client->getConfiguration().getJidBare());
+        client->getConfiguration().jidBare());
 }
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
@@ -268,7 +268,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
             {
                 QXmppElement item = x.firstChildElement("item");
-                if (item.attribute("jid") == client->getConfiguration().getJid() &&
+                if (item.attribute("jid") == client->getConfiguration().jid() &&
                     item.attribute("affiliation") == "owner")
                 {
                     roomItem->setData(FlagsRole, OwnerFlag);
@@ -358,7 +358,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
-    if (bareJid == client->getConfiguration().getJidBare())
+    if (bareJid == client->getConfiguration().jidBare())
     {
         if (!vcard.getNickName().isEmpty())
             nickName = vcard.getNickName();
