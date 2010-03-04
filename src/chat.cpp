@@ -466,7 +466,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = jidToBareJid(msg.from());
 
-    switch (msg.getType())
+    switch (msg.type())
     {
     case QXmppMessage::Normal:
         foreach (const QXmppElement &extension, msg.extensions())
@@ -489,14 +489,14 @@ void Chat::messageReceived(const QXmppMessage &msg)
         }
         return;
     case QXmppMessage::Chat:
-        if (!chatDialogs.contains(bareJid) && !msg.getBody().isEmpty())
+        if (!chatDialogs.contains(bareJid) && !msg.body().isEmpty())
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
             dialog->messageReceived(msg);
         }
         break;
     case QXmppMessage::Error:
-        qWarning() << "Received an error message" << msg.getBody();
+        qWarning() << "Received an error message" << msg.body();
         return;
     default:
         return;
@@ -506,7 +506,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
     ChatConversation *dialog = chatDialogs.value(bareJid);
     if (!dialog)
         return;
-    if (msg.getBody().isEmpty() || dialog->isRoom())
+    if (msg.body().isEmpty() || dialog->isRoom())
         return;
 
     // add pending message

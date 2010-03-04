@@ -136,10 +136,10 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     if (jidToBareJid(msg.from()) != chatRemoteJid)
         return;
 
-    setRemoteState(msg.getState());
+    setRemoteState(msg.state());
 
     ChatHistoryMessage message;
-    message.body = msg.getBody();
+    message.body = msg.body();
     message.datetime = QDateTime::currentDateTime();
     foreach (const QXmppElement &extension, msg.extensions())
     {

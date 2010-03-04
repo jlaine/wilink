@@ -89,7 +89,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         return;
 
     ChatHistoryMessage message;
-    message.body = msg.getBody();
+    message.body = msg.body();
     message.from = from;
     message.local = (from == chatLocalName);
     message.datetime = QDateTime::currentDateTime();
