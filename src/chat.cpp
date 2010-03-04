@@ -587,7 +587,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     case QXmppPresence::Subscribe:
         {
             QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
-            QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.getSubscriptionType();
+            QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
 
             /* if the contact is in our roster accept subscribe, otherwise ask user */
             bool accepted = false;
