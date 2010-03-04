@@ -313,21 +313,21 @@ void Chat::disconnected()
 void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
-    if (disco.getType() != QXmppIq::Result)
+    if (disco.type() != QXmppIq::Result)
         return;
 
 #if 0
     qDebug("Received discovery result");
-    foreach (const QXmppElement &item, disco.getQueryItems())
+    foreach (const QXmppElement &item, disco.queryItems())
         dumpElement(item);
 #endif
 
-    if (disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
+    if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
         disco.from() == client->getConfiguration().getDomain())
     {
         // root items
         discoQueue.clear();
-        foreach (const QXmppElement &item, disco.getQueryItems())
+        foreach (const QXmppElement &item, disco.queryItems())
         {
             if (item.tagName() == "item" && !item.attribute("jid").isEmpty() && item.attribute("node").isEmpty())
             {
@@ -340,12 +340,12 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             }
         }
     }
-    else if (disco.getQueryType() == QXmppDiscoveryIq::InfoQuery &&
+    else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery &&
              discoQueue.contains(disco.from()))
     {
         discoQueue.removeAll(disco.from());
         // check if it's a conference server
-        foreach (const QXmppElement &item, disco.getQueryItems())
+        foreach (const QXmppElement &item, disco.queryItems())
         {
             if (item.tagName() != "identity")
                 continue;
@@ -404,7 +404,7 @@ void Chat::inviteContact(const QString &jid)
 void Chat::iqReceived(const QXmppIq &iq)
 {
     timeoutTimer->stop();
-    if (iq.getType() == QXmppIq::Result && !iq.extensions().isEmpty())
+    if (iq.type() == QXmppIq::Result && !iq.extensions().isEmpty())
     {
         const QXmppElement query = iq.extensions().first();
         const QXmppElement form = query.firstChildElement("x");

@@ -147,13 +147,13 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
 
 void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.getType() == QXmppIq::Result &&
-        disco.getQueryType() == QXmppDiscoveryIq::ItemsQuery &&
+    if (disco.type() == QXmppIq::Result &&
+        disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
         disco.from() == chatRoomServer)
     {
         // chat rooms list
         listWidget->clear();
-        foreach (const QXmppElement &item, disco.getQueryItems())
+        foreach (const QXmppElement &item, disco.queryItems())
         {
             QString jid = item.attribute("jid");
             QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.attribute("name"));
@@ -249,7 +249,7 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
 
 void ChatRoomMembers::iqReceived(const QXmppIq &iq)
 {
-    if (iq.getType() != QXmppIq::Result ||
+    if (iq.type() != QXmppIq::Result ||
         iq.from() != chatRoomJid)
         return;
     const QXmppElement query = iq.extensions().first();

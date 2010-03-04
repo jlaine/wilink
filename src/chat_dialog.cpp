@@ -85,10 +85,10 @@ void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results from remote party
     if (jidToBareJid(disco.from()) != chatRemoteJid ||
-        disco.getType() != QXmppIq::Result )
+        disco.type() != QXmppIq::Result)
         return;
 
-    foreach (const QXmppElement &element, disco.getQueryItems())
+    foreach (const QXmppElement &element, disco.queryItems())
     {
         // iChat does not state it supports chat states
         if ((element.tagName() == "feature" && element.attribute("var") == ns_chat_states) ||
