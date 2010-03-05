@@ -101,7 +101,6 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     progress->setMaximum(job->fileSize());
     tableWidget->setCellWidget(0, ProgressColumn, progress);
 
-    connect(job, SIGNAL(error(QXmppTransferJob::Error)), this, SLOT(error(QXmppTransferJob::Error)));
     connect(job, SIGNAL(finished()), this, SLOT(finished()));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
@@ -123,20 +122,17 @@ void ChatTransfers::cellDoubleClicked(int row, int column)
     QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
 }
 
-void ChatTransfers::error(QXmppTransferJob::Error error)
-{
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
-        return;
-    qDebug() << "Job" << job->fileName() << "failed";
-}
-
 void ChatTransfers::finished()
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
+    int jobRow = jobs.indexOf(job);
+    if (!job || jobRow < 0)
         return;
-    qDebug() << "Job" << job->fileName() << "finished";
+
+    // if the job failed, reset the progress bar
+    QProgressBar *progress = qobject_cast<QProgressBar*>(tableWidget->cellWidget(jobRow, ProgressColumn));
+    if (progress && job->error() != QXmppTransferJob::NoError)
+        progress->reset();
 }
 
 void ChatTransfers::progress(qint64 done, qint64 total)

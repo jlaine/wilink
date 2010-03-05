@@ -40,7 +40,6 @@ public:
 
 private slots:
     void cellDoubleClicked(int row, int column);
-    void error(QXmppTransferJob::Error error);
     void finished();
     void progress(qint64, qint64);
     void removeCurrentJob();
