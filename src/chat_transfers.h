@@ -21,6 +21,7 @@
 #define __WDESKTOP_CHAT_TRANSFERS_H__
 
 #include <QWidget>
+#include <QMessageBox>
 
 #include "qxmpp/QXmppTransferManager.h"
 
@@ -28,6 +29,20 @@ class QPushButton;
 class QTableWidget;
 
 const int LocalPathRole = Qt::UserRole;
+
+class ChatTransferPrompt : public QMessageBox
+{
+    Q_OBJECT
+
+public:
+    ChatTransferPrompt(QXmppTransferJob *job, const QString &contactName, QWidget *parent = 0);
+
+private slots:
+    void slotButtonClicked(QAbstractButton *button);
+
+private:
+    QXmppTransferJob *m_job; 
+};
 
 class ChatTransfers : public QWidget
 {

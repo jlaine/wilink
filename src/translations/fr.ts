@@ -75,26 +75,6 @@ Acceptez-vous?</translation>
 
 %2</translation>
     </message>
-    <message>
-        <source>File from %1</source>
-        <translation>Fichier de %1</translation>
-    </message>
-    <message>
-        <source>Send a file</source>
-        <translation>Envoyer un fichier</translation>
-    </message>
-    <message>
-        <source>Receive a file</source>
-        <translation>Recevoir un fichier</translation>
-    </message>
-    <message>
-        <source>%1 wants to send you a file called &apos;%2&apos; (%3).
-
-Do you accept?</source>
-        <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
-
-Acceptez-vous?</translation>
-    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -204,6 +184,25 @@ Acceptez-vous?</translation>
     <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
+    </message>
+</context>
+<context>
+    <name>ChatTransferPrompt</name>
+    <message>
+        <source>%1 wants to send you a file called &apos;%2&apos; (%3).
+
+Do you accept?</source>
+        <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>File from %1</source>
+        <translation>Fichier de %1</translation>
+    </message>
+    <message>
+        <source>Receive a file</source>
+        <translation>Recevoir un fichier</translation>
     </message>
 </context>
 <context>

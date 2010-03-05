@@ -856,28 +856,12 @@ void Chat::fileReceived(QXmppTransferJob *job)
     const QString bareJid = jidToBareJid(job->jid());
     const QString contactName = rosterModel->contactName(bareJid);
 
-    if (QMessageBox::question(this,
-        tr("File from %1").arg(contactName),
-        tr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?")
-            .arg(contactName, job->fileName(), ChatTransfers::sizeToString(job->fileSize())),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
-    {
-        // The user cancelled the job
-        return;
-    }
+    // add transfer
+    chatTransfers->addJob(job);
+    chatTransfers->show();
+    chatTransfers->raise();
 
-    // determine file location
-    QDir downloadsDir(SystemInfo::downloadsLocation());
-    const QString filePath = QFileDialog::getSaveFileName(this, tr("Receive a file"), downloadsDir.absoluteFilePath(job->fileName()));
-    if (filePath.isEmpty())
-        return;
-
-    QFile *file = new QFile(filePath, job);
-    if (file->open(QIODevice::WriteOnly))
-    {
-        job->setData(LocalPathRole, filePath);
-        chatTransfers->addJob(job);
-        chatTransfers->show();
-        job->accept(file);
-    }
+    // prompt user
+    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, contactName, this);
+    dlg->show();
 }

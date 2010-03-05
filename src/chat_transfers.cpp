@@ -20,6 +20,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QDir>
+#include <QFileDialog>
 #include <QHeaderView>
 #include <QLayout>
 #include <QProgressBar>
@@ -29,6 +31,7 @@
 #include <QUrl>
 
 #include "chat_transfers.h"
+#include "systeminfo.h"
 
 #define KIBIBYTE (1024)
 #define MEBIBYTE (1024 * 1024)
@@ -51,6 +54,45 @@ static QIcon jobIcon(QXmppTransferJob *job)
             return QIcon(":/contact-busy.png");
     }
     return QIcon(":/contact-offline.png");
+}
+
+ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &contactName, QWidget *parent)
+    : QMessageBox(parent), m_job(job)
+{
+    setIcon(QMessageBox::Question);
+    setText(tr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?")
+            .arg(contactName, job->fileName(), ChatTransfers::sizeToString(job->fileSize())));
+    setWindowTitle(tr("File from %1").arg(contactName));
+
+    setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    setEscapeButton(button(QMessageBox::No));
+
+    connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
+}
+
+void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
+{
+    if (standardButton(button) != QMessageBox::Yes)
+    {
+        // The user cancelled the job
+        m_job->abort();
+        return;
+    }
+
+    // determine file location
+    QDir downloadsDir(SystemInfo::downloadsLocation());
+    const QString filePath = QFileDialog::getSaveFileName(this, tr("Receive a file"), downloadsDir.absoluteFilePath(m_job->fileName()));
+    if (filePath.isEmpty())
+        return;
+
+    QFile *file = new QFile(filePath, m_job);
+    if (file->open(QIODevice::WriteOnly))
+    {
+        m_job->setData(LocalPathRole, filePath);
+        m_job->accept(file);
+    } else {
+        m_job->abort();
+    }
 }
 
 ChatTransfers::ChatTransfers(QWidget *parent)
