@@ -4,14 +4,6 @@
 <context>
     <name>Chat</name>
     <message>
-        <source>%1 has asked to add you to his or her contact list.
-
-Do you accept?</source>
-        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
     </message>
@@ -74,6 +66,10 @@ Acceptez-vous?</translation>
         <translation>Désole, mais vous avez été éjecté(e) du salon de discussion %1.
 
 %2</translation>
+    </message>
+    <message>
+        <source>Send a file</source>
+        <translation>Envoyer un fichier</translation>
     </message>
 </context>
 <context>
@@ -153,6 +149,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Enter the name of the chat room you want to join.</source>
         <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre.</translation>
+    </message>
+</context>
+<context>
+    <name>ChatRosterPrompt</name>
+    <message>
+        <source>%1 has asked to add you to his or her contact list.
+
+Do you accept?</source>
+        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
     </message>
 </context>
 <context>

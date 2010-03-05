@@ -176,7 +176,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
 
     timeoutTimer = new QTimer(this);
-    timeoutTimer->setInterval(10000);
+    timeoutTimer->setInterval(15000);
     connect(timeoutTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
 
     /* set up keyboard shortcuts */
@@ -589,17 +589,8 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
             QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
 
-            /* if the contact is in our roster accept subscribe, otherwise ask user */
-            bool accepted = false;
+            /* if the contact is in our roster accept subscribe */
             if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
-                accepted = true;
-            else if (QMessageBox::question(this,
-                    tr("Invitation from %1").arg(presence.from()),
-                    tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(presence.from()),
-                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
-                accepted = true;
-
-            if (accepted)
             {
                 qDebug("Subscribe accepted");
                 packet.setType(QXmppPresence::Subscribed);
@@ -607,12 +598,12 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 
                 packet.setType(QXmppPresence::Subscribe);
                 client->sendPacket(packet);
-            } else {
-                qDebug("Subscribe refused");
-                QXmppPresence packet;
-                packet.setType(QXmppPresence::Unsubscribed);
-                client->sendPacket(packet);
+                return;
             }
+
+            /* otherwise ask user */
+            ChatRosterPrompt *dlg = new ChatRosterPrompt(client, presence.from(), this);
+            dlg->show();
         }
         break;
     default:
