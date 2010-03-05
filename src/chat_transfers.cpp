@@ -82,9 +82,12 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 
     // determine file location
     QDir downloadsDir(SystemInfo::downloadsLocation());
-    const QString filePath = QFileDialog::getSaveFileName(this, tr("Receive a file"), downloadsDir.absoluteFilePath(m_job->fileName()));
+    const QString filePath = QFileDialog::getSaveFileName(0, tr("Receive a file"), downloadsDir.absoluteFilePath(m_job->fileName()));
     if (filePath.isEmpty())
+    {
+        m_job->abort();
         return;
+    }
 
     QFile *file = new QFile(filePath, m_job);
     if (file->open(QIODevice::WriteOnly))
