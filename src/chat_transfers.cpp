@@ -113,13 +113,14 @@ void ChatTransfers::cellDoubleClicked(int row, int column)
         return;
 
     QXmppTransferJob *job = jobs.at(row);
-    if (job->localFilePath().isEmpty())
+    const QString localFilePath = job->data(LocalPathRole).toString();
+    if (localFilePath.isEmpty())
         return;
     if (job->direction() == QXmppTransferJob::IncomingDirection &&
         (job->state() != QXmppTransferJob::FinishedState || job->error() != QXmppTransferJob::NoError))
         return;
 
-    QDesktopServices::openUrl(QUrl::fromLocalFile(job->localFilePath()));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
 }
 
 void ChatTransfers::error(QXmppTransferJob::Error error)

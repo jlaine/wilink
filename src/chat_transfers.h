@@ -27,6 +27,8 @@
 class QPushButton;
 class QTableWidget;
 
+const int LocalPathRole = Qt::UserRole;
+
 class ChatTransfers : public QWidget
 {
     Q_OBJECT

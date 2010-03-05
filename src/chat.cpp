@@ -756,7 +756,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             if (!filePath.isEmpty())
             {
                 QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
-                job->setLocalFilePath(filePath);
+                job->setData(LocalPathRole, filePath);
                 chatTransfers->addJob(job);
                 chatTransfers->show();
             }
@@ -870,7 +870,7 @@ void Chat::fileReceived(QXmppTransferJob *job)
     QFile *file = new QFile(filePath, job);
     if (file->open(QIODevice::WriteOnly))
     {
-        job->setLocalFilePath(filePath);
+        job->setData(LocalPathRole, filePath);
         chatTransfers->addJob(job);
         chatTransfers->show();
         job->accept(file);
