@@ -658,6 +658,11 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(ignoreSslErrors);
 
+#if 0
+    if (config.domain() == "wifirst.net")
+        client->getTransferManager().setProxy("bytestreams@wifirst.net/xmpp-socks-proxy");
+#endif
+
     /* connect to server */
     client->connectToServer(config);
     return true;
