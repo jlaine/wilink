@@ -475,14 +475,11 @@ void Chat::messageReceived(const QXmppMessage &msg)
             {
                 const QString contactName = rosterModel->contactName(bareJid);
                 const QString roomJid = extension.attribute("jid");
-                if (!roomJid.isEmpty() &&
-                    !chatDialogs.contains(roomJid) &&
-                    QMessageBox::question(this,
-                        tr("Invitation from %1").arg(contactName),
-                        tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
-                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+                if (!roomJid.isEmpty() && !chatDialogs.contains(roomJid))
                 {
-                    joinConversation(roomJid, true);
+                    ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, this);
+                    connect(dlg, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
+                    dlg->show();
                 }
                 break;
             }

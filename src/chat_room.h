@@ -23,6 +23,7 @@
 #include "chat_conversation.h"
 
 #include <QDialog>
+#include <QMessageBox>
 
 class QLineEdit;
 class QListWidget;
@@ -74,6 +75,23 @@ private:
     QTableWidget *tableWidget;
     QMap<QString, QString> initialMembers;
     QMap<QString, QString> affiliations;
+};
+
+class ChatRoomInvitePrompt : public QMessageBox
+{
+    Q_OBJECT
+
+public:
+    ChatRoomInvitePrompt(const QString &contactName, const QString &jid, QWidget *parent = 0);
+
+signals:
+    void itemAction(int action, const QString &jid, int type);
+
+private slots:
+    void slotButtonClicked(QAbstractButton *button);
+
+private:
+    QString m_jid;
 };
 
 class ChatRoomPrompt : public QDialog

@@ -38,6 +38,8 @@
 
 #include "chat_history.h"
 #include "chat_room.h"
+#include "chat_roster.h"
+#include "chat_roster_item.h"
 
 enum MembersColumns {
     JidColumn = 0,
@@ -187,6 +189,25 @@ void ChatRoomPrompt::validate()
     else
         lineEdit->setText(jid.toLower());
     accept();
+}
+
+ChatRoomInvitePrompt::ChatRoomInvitePrompt(const QString &contactName, const QString &roomJid, QWidget *parent)
+    : QMessageBox(parent), m_jid(roomJid)
+{
+    setText(tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid));
+    setWindowTitle(tr("Invitation from %1").arg(contactName));
+
+    setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    setDefaultButton(QMessageBox::Yes);
+    setEscapeButton(QMessageBox::No);
+
+    connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
+}
+
+void ChatRoomInvitePrompt::slotButtonClicked(QAbstractButton *button)
+{
+    if (standardButton(button) == QMessageBox::Yes)
+        emit itemAction(ChatRosterView::JoinAction, m_jid, ChatRosterItem::Room);
 }
 
 ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)

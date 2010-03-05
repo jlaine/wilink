@@ -4,10 +4,6 @@
 <context>
     <name>Chat</name>
     <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-    <message>
         <source>Enter the address of the contact you want to add.</source>
         <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
     </message>
@@ -34,14 +30,6 @@
         <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion %1.
 
 %2</translation>
-    </message>
-    <message>
-        <source>%1 has asked to add you to join the &apos;%2&apos; chat room.
-
-Do you accept?</source>
-        <translation>%1 vous invite au salon de discussion &apos;%2&apos;.
-
-Acceptez-vous?</translation>
     </message>
     <message>
         <source>Available</source>
@@ -99,6 +87,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>
+    </message>
+</context>
+<context>
+    <name>ChatRoomInvitePrompt</name>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
+    </message>
+    <message>
+        <source>%1 has asked to add you to join the &apos;%2&apos; chat room.
+
+Do you accept?</source>
+        <translation>%1 vous invite au salon de discussion &apos;%2&apos;.
+
+Acceptez-vous?</translation>
     </message>
 </context>
 <context>
