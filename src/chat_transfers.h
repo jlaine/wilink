@@ -37,6 +37,10 @@ class ChatTransferPrompt : public QMessageBox
 public:
     ChatTransferPrompt(QXmppTransferJob *job, const QString &contactName, QWidget *parent = 0);
 
+signals:
+    void fileAccepted(QXmppTransferJob *job);
+    void fileDeclined(QXmppTransferJob *job);
+
 private slots:
     void slotButtonClicked(QAbstractButton *button);
 
@@ -54,6 +58,9 @@ public:
     static QString sizeToString(qint64 size);
 
 private slots:
+    void fileAccepted(QXmppTransferJob *job);
+    void fileDeclined(QXmppTransferJob *job);
+    void fileReceived(QXmppTransferJob *job);
     void cellDoubleClicked(int row, int column);
     void finished();
     void progress(qint64, qint64);

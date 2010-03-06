@@ -168,7 +168,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
-            this, SLOT(fileReceived(QXmppTransferJob*)));
+            chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
 
     /* set up timers */
     pingTimer = new QTimer(this);

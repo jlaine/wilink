@@ -30,6 +30,8 @@
 #include <QTableWidgetItem>
 #include <QUrl>
 
+#include "qxmpp/QXmppUtils.h"
+
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
@@ -73,30 +75,10 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
 
 void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 {
-    if (standardButton(button) != QMessageBox::Yes)
-    {
-        // The user cancelled the job
-        m_job->abort();
-        return;
-    }
-
-    // determine file location
-    QDir downloadsDir(SystemInfo::downloadsLocation());
-    const QString filePath = QFileDialog::getSaveFileName(0, tr("Receive a file"), downloadsDir.absoluteFilePath(m_job->fileName()));
-    if (filePath.isEmpty())
-    {
-        m_job->abort();
-        return;
-    }
-
-    QFile *file = new QFile(filePath, m_job);
-    if (file->open(QIODevice::WriteOnly))
-    {
-        m_job->setData(LocalPathRole, filePath);
-        m_job->accept(file);
-    } else {
-        m_job->abort();
-    }
+    if (standardButton(button) == QMessageBox::Yes)
+        emit fileAccepted(m_job);
+    else
+        emit fileDeclined(m_job);
 }
 
 ChatTransfers::ChatTransfers(QWidget *parent)
@@ -179,6 +161,52 @@ void ChatTransfers::finished()
     QProgressBar *progress = qobject_cast<QProgressBar*>(tableWidget->cellWidget(jobRow, ProgressColumn));
     if (progress && job->error() != QXmppTransferJob::NoError)
         progress->reset();
+}
+
+void ChatTransfers::fileAccepted(QXmppTransferJob *job)
+{
+    // determine file location
+    QDir downloadsDir(SystemInfo::downloadsLocation());
+    const QString filePath = QFileDialog::getSaveFileName(this, tr("Receive a file"),
+        downloadsDir.absoluteFilePath(job->fileName()));
+    if (filePath.isEmpty())
+    {
+        job->abort();
+        return;
+    }
+
+    QFile *file = new QFile(filePath, job);
+    if (file->open(QIODevice::WriteOnly))
+    {
+        job->setData(LocalPathRole, filePath);
+
+        // show transfer window
+        addJob(job);
+        show();
+        raise();
+
+        // start transfer
+        job->accept(file);
+    } else {
+        job->abort();
+    }
+}
+
+void ChatTransfers::fileDeclined(QXmppTransferJob *job)
+{
+    job->abort();
+}
+
+void ChatTransfers::fileReceived(QXmppTransferJob *job)
+{
+    const QString bareJid = jidToBareJid(job->jid());
+//    const QString contactName = rosterModel->contactName(bareJid);
+
+    // prompt user
+    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, this);
+    connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(fileAccepted(QXmppTransferJob*)));
+    connect(dlg, SIGNAL(fileDeclined(QXmppTransferJob*)), this, SLOT(fileDeclined(QXmppTransferJob*)));
+    dlg->show();
 }
 
 void ChatTransfers::progress(qint64 done, qint64 total)
