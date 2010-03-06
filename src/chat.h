@@ -73,8 +73,6 @@ protected slots:
     void sendPing();
     void statusChanged(int currentIndex);
 
-    void fileReceived(QXmppTransferJob *job);
-
 protected:
     void changeEvent(QEvent *event);
     ChatConversation *createConversation(const QString &jid, bool room);

@@ -181,7 +181,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), chatTransfers, SLOT(show()));
+    connect(shortcut, SIGNAL(activated()), chatTransfers, SLOT(toggle()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -751,7 +751,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
                 job->setData(LocalPathRole, filePath);
                 chatTransfers->addJob(job);
-                chatTransfers->show();
             }
         }
     } else if (type == ChatRosterItem::Room) {
@@ -839,17 +838,3 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
-void Chat::fileReceived(QXmppTransferJob *job)
-{
-    const QString bareJid = jidToBareJid(job->jid());
-    const QString contactName = rosterModel->contactName(bareJid);
-
-    // add transfer
-    chatTransfers->addJob(job);
-    chatTransfers->show();
-    chatTransfers->raise();
-
-    // prompt user
-    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, contactName, this);
-    dlg->show();
-}

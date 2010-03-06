@@ -57,6 +57,9 @@ public:
     void addJob(QXmppTransferJob *job);
     static QString sizeToString(qint64 size);
 
+public slots:
+    void toggle();
+
 private slots:
     void fileAccepted(QXmppTransferJob *job);
     void fileDeclined(QXmppTransferJob *job);

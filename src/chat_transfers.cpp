@@ -114,6 +114,9 @@ ChatTransfers::ChatTransfers(QWidget *parent)
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
 {
+    if (jobs.contains(job))
+        return;
+
     jobs.insert(0, job);
     tableWidget->insertRow(0);
     QTableWidgetItem *nameItem = new QTableWidgetItem(job->fileName());
@@ -132,6 +135,8 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(finished()), this, SLOT(finished()));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
+
+    show();
 }
 
 void ChatTransfers::cellDoubleClicked(int row, int column)
@@ -182,8 +187,6 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 
         // show transfer window
         addJob(job);
-        show();
-        raise();
 
         // start transfer
         job->accept(file);
@@ -266,6 +269,13 @@ void ChatTransfers::stateChanged(QXmppTransferJob::State state)
     updateButtons();
 }
 
+void ChatTransfers::toggle()
+{
+    if (isVisible())
+        hide();
+    else
+        show();
+}
 void ChatTransfers::updateButtons()
 {
     int jobRow = tableWidget->currentRow();
