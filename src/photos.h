@@ -47,6 +47,7 @@ public:
     QUrl url();
 
 signals:
+    void fileOpened(const QUrl &url);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
     void folderOpened(const QUrl &url);
 
@@ -83,6 +84,7 @@ protected:
 protected slots:
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void fileOpened(const QUrl &url);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
     void folderOpened(const QUrl &url);
     void goBack();
@@ -92,11 +94,11 @@ protected slots:
 private:
     bool busy;
     FileSystem *fs;
-    QList<QUrl> downloadQueue;
+    QList< QPair<QUrl, int> > downloadQueue;
     QList< QPair<QUrl, QUrl> > uploadQueue;
 
     QPushButton *backButton;
-    QUrl downloadUrl;
+    QPair<QUrl, int> downloadPair;
     QLabel *helpLabel;
     QStackedWidget *photosView;
     QProgressBar *progressBar;
