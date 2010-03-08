@@ -68,7 +68,7 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
     setWindowTitle(tr("File from %1").arg(contactName));
 
     setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    setDefaultButton(0);
+    setDefaultButton(QMessageBox::NoButton);
 
     connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
 }
