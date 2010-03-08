@@ -33,6 +33,7 @@ public:
         Contact,
         Room,
         RoomMember,
+        Other,
     };
 
     ChatRosterItem(enum Type type, const QString &id = QString());

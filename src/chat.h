@@ -73,8 +73,8 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendPing();
+    void showTransfers();
     void statusChanged(int currentIndex);
-    void toggleTransfers();
 
 protected:
     void changeEvent(QEvent *event);

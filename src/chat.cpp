@@ -181,7 +181,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(toggleTransfers()));
+    connect(shortcut, SIGNAL(activated()), this, SLOT(showTransfers()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -302,7 +302,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     if (room)
     {
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
-        rosterModel->addRoom(jid);
+        rosterModel->addItem(ChatRosterItem::Room, jid);
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
     }
@@ -470,7 +470,7 @@ void Chat::leaveConversation(const QString &jid)
 
     // leave room
     if (qobject_cast<ChatRoom*>(dialog))
-        rosterModel->removeRoom(jid);
+        rosterModel->removeItem(jid);
     dialog->leave();
 
     // close view
@@ -675,7 +675,7 @@ void Chat::rejoinConversations()
         ChatConversation *dialog = qobject_cast<ChatRoom*>(conversationPanel->widget(i));
         if (dialog)
         {
-            rosterModel->addRoom(dialog->remoteJid());
+            rosterModel->addItem(ChatRosterItem::Room, dialog->remoteJid());
             dialog->join();
         }
     }
@@ -848,11 +848,10 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
-void Chat::toggleTransfers()
+void Chat::showTransfers()
 {
     if (conversationPanel->indexOf(chatTransfers) < 0)
         addPanel(chatTransfers);
-    else
-        removePanel(chatTransfers);
+    rosterModel->addItem(ChatRosterItem::Other, tr("File transfers"));
 }
 

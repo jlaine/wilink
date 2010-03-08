@@ -59,6 +59,10 @@
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
+    <message>
+        <source>File transfers</source>
+        <translation>Transferts de fichiers</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>

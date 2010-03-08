@@ -409,21 +409,13 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::addRoom(const QString &bareJid)
+void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &bareJid)
 {
     if (rootItem->find(bareJid))
         return;
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-    rootItem->append(new ChatRosterItem(ChatRosterItem::Room, bareJid));
+    rootItem->append(new ChatRosterItem(type, bareJid));
     endInsertRows();
-
-#if 0
-    // discover room info
-    QXmppDiscoveryIq disco;
-    disco.setTo(bareJid);
-    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    client->sendPacket(disco);
-#endif
 }
 
 void ChatRosterModel::clearPendingMessages(const QString &bareJid)
@@ -437,13 +429,13 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::removeRoom(const QString &bareJid)
+void ChatRosterModel::removeItem(const QString &bareJid)
 {
-    ChatRosterItem *roomItem = rootItem->find(bareJid);
-    if (roomItem)
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
     {
-        beginRemoveRows(QModelIndex(), roomItem->row(), roomItem->row());
-        rootItem->remove(roomItem);
+        beginRemoveRows(QModelIndex(), item->row(), item->row());
+        rootItem->remove(item);
         endRemoveRows();
     }
 }

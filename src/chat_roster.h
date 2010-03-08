@@ -28,7 +28,8 @@
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppVCard.h"
 
-class ChatRosterItem;
+#include "chat_roster_item.h"
+
 class QContextMenuEvent;
 class QXmppClient;
 class QXmppVCardManager;
@@ -77,8 +78,8 @@ public:
     QString contactName(const QString &bareJid) const;
     QString ownName() const;
 
-    void addRoom(const QString &bareJid);
-    void removeRoom(const QString &bareJid);
+    void addItem(ChatRosterItem::Type type, const QString &bareJid);
+    void removeItem(const QString &bareJid);
 
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
