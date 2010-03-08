@@ -99,6 +99,7 @@ private:
     QList< QPair<QUrl, QUrl> > uploadQueue;
 
     QPushButton *backButton;
+    QPushButton *createButton;
     QPair<QUrl, int> downloadPair;
     QLabel *helpLabel;
     QStackedWidget *photosView;

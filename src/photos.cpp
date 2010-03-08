@@ -213,7 +213,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     backButton->setEnabled(false);
     connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
 
-    QPushButton *createButton = new QPushButton(tr("Create an album"));
+    createButton = new QPushButton(tr("Create an album"));
     createButton->setIcon(QIcon(":/add.png"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
 
@@ -358,6 +358,10 @@ void Photos::fileOpened(const QUrl &url)
     if (!url.toString().endsWith(".jpg"))
         return;
 
+    // disable controls
+    createButton->setEnabled(false);
+    helpLabel->hide();
+
     // create white label
     QLabel *label = new QLabel;
     QPalette pal = label->palette();
@@ -415,10 +419,14 @@ void Photos::goBack()
 {
     if (photosView->count() < 2)
         return;
+
     photosView->removeWidget(photosView->currentWidget());
     photosView->currentWidget()->setFocus();
+    /* enable controls */
     if (photosView->count() == 1)
         backButton->setEnabled(false);
+    createButton->setEnabled(true);
+    helpLabel->show();
 }
 
 /** If the download queue is not empty, process the next item.
