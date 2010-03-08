@@ -110,6 +110,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* right panel */
     conversationPanel = new QStackedWidget;
     conversationPanel->hide();
+    connect(conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
     splitter->addWidget(conversationPanel);
     splitter->setStretchFactor(1, 1);
 
@@ -158,6 +159,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
         QXmppTransferJob::InBandMethod);
 #endif
     chatTransfers = new ChatTransfers;
+    connect(chatTransfers, SIGNAL(newJob()), this, SLOT(showTransfers()));
+    chatTransfers->setObjectName("transfers");
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -241,6 +244,14 @@ void Chat::removePanel(QWidget *panel)
     conversationPanel->removeWidget(panel);
 }
 
+void Chat::panelChanged(int index)
+{
+    QWidget *widget = conversationPanel->widget(index);
+    if (!widget)
+        return;
+    rosterView->selectContact(widget->objectName());
+}
+
 /** Prompt the user for a new group chat then join it.
  */
 void Chat::addRoom()
@@ -297,8 +308,6 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
-    addPanel(dialog);
-
     if (room)
     {
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
@@ -306,6 +315,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     } else {
         dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
     }
+    addPanel(dialog);
 
     // join conversation
     dialog->join();
@@ -457,7 +467,6 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
         dialog = createConversation(jid, isRoom);
 
     rosterModel->clearPendingMessages(jid);
-    rosterView->selectContact(jid);
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
 }
@@ -523,8 +532,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
     // add pending message
     if (conversationPanel->currentWidget() != dialog)
         rosterModel->addPendingMessage(bareJid);
-    else
-        rosterView->selectContact(bareJid);
 
     // show the chat window
     if (!isVisible())
@@ -803,6 +810,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
 
             client->sendPacket(iq);
         }
+    } else if (type == ChatRosterItem::Other) {
+        if (action == ChatRosterView::JoinAction)
+            showTransfers();
     }
 }
 
@@ -850,8 +860,11 @@ void Chat::statusChanged(int currentIndex)
 
 void Chat::showTransfers()
 {
+    rosterModel->addItem(ChatRosterItem::Other, chatTransfers->objectName(),
+        tr("File transfers"), QIcon(":/album.png"));
     if (conversationPanel->indexOf(chatTransfers) < 0)
         addPanel(chatTransfers);
-    rosterModel->addItem(ChatRosterItem::Other, "transfers", tr("File transfers"), QIcon(":/album.png"));
+    else
+        conversationPanel->setCurrentWidget(chatTransfers);
 }
 

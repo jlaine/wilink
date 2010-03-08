@@ -58,7 +58,7 @@ public:
     static QString sizeToString(qint64 size);
 
 signals:
-    void wantFocus();
+    void newJob();
 
 private slots:
     void fileAccepted(QXmppTransferJob *job);
