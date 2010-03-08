@@ -382,18 +382,18 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
-        const QImage &image = vcard.getPhotoAsImage();
+        const QImage &image = vcard.photoAsImage();
         item->setData(AvatarRole, QPixmap::fromImage(image));
-        if (!vcard.getNickName().isEmpty())
-            item->setData(Qt::DisplayRole, vcard.getNickName());
+        if (!vcard.nickName().isEmpty())
+            item->setData(Qt::DisplayRole, vcard.nickName());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
     if (bareJid == client->getConfiguration().jidBare())
     {
-        if (!vcard.getNickName().isEmpty())
-            nickName = vcard.getNickName();
+        if (!vcard.nickName().isEmpty())
+            nickName = vcard.nickName();
     }
 }
 
