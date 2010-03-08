@@ -852,6 +852,6 @@ void Chat::showTransfers()
 {
     if (conversationPanel->indexOf(chatTransfers) < 0)
         addPanel(chatTransfers);
-    rosterModel->addItem(ChatRosterItem::Other, tr("File transfers"));
+    rosterModel->addItem(ChatRosterItem::Other, "transfers", tr("File transfers"), QIcon(":/album.png"));
 }
 

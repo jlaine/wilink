@@ -224,6 +224,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatuser_") + bareJid.toLower();
             }
+        } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+            return QVariant();
         }
     }
     return item->data(role);
@@ -409,12 +411,21 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &bareJid)
+void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon)
 {
-    if (rootItem->find(bareJid))
+    if (rootItem->find(id))
         return;
+
+    // prepare item
+    ChatRosterItem *item = new ChatRosterItem(type, id);
+    if (!name.isEmpty())
+        item->setData(Qt::DisplayRole, name);
+    if (!icon.isNull())
+        item->setData(Qt::DecorationRole, icon);
+
+    // add item
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-    rootItem->append(new ChatRosterItem(type, bareJid));
+    rootItem->append(item);
     endInsertRows();
 }
 

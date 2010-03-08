@@ -78,7 +78,7 @@ public:
     QString contactName(const QString &bareJid) const;
     QString ownName() const;
 
-    void addItem(ChatRosterItem::Type type, const QString &bareJid);
+    void addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon());
     void removeItem(const QString &bareJid);
 
     void addPendingMessage(const QString &bareJid);
