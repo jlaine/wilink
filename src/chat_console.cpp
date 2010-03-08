@@ -33,10 +33,20 @@ ChatConsole::ChatConsole(QWidget *parent)
     setLayout(layout);
 }
 
-void ChatConsole::message(QtMsgType type, const QString &msg)
+void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 {
-    if (msg.startsWith("CLIENT:"))
-        browser->append(QString("<font color=\"green\">%1</font>").arg(Qt::escape(msg)));
-    if (msg.startsWith("SERVER:"))
-        browser->append(QString("<font color=\"blue\">%1</font>").arg(Qt::escape(msg)));
+    if (type == QXmppLogger::DebugMessage)
+        return;
+
+    QString color;
+    if (type == QXmppLogger::SentMessage)
+        color = "green";
+    else if (type == QXmppLogger::ReceivedMessage)
+        color = "blue";
+    else if (type == QXmppLogger::WarningMessage)
+        color = "red";
+    else
+        color = "black";
+    
+    browser->append(QString("<font color=\"%1\">%2</font>").arg(color, Qt::escape(msg)));
 }

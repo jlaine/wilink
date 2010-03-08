@@ -157,7 +157,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     chatConsole = new ChatConsole;
     chatConsole->setObjectName("console");
-    connect(client->logger(), SIGNAL(message(QtMsgType,QString)), chatConsole, SLOT(message(QtMsgType,QString)));
+    connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
 
     /* set up transfers window */
 #if 0

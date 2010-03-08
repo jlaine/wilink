@@ -22,6 +22,8 @@
 
 #include <QWidget>
 
+#include "qxmpp/QXmppLogger.h"
+
 class QTextBrowser;
 
 class ChatConsole : public QWidget
@@ -32,7 +34,7 @@ public:
     ChatConsole(QWidget *parent = 0);
 
 private slots:
-    void message(QtMsgType type, const QString &msg);
+    void message(QXmppLogger::MessageType type, const QString &msg);
 
 private:
     QTextBrowser *browser;
