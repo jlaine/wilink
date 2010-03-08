@@ -274,18 +274,21 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             img.load(fdPhoto, NULL);
             fdPhoto->close();
 
+            if (photosView->indexOf(downloadJob.widget) < 0)
+                return;
+
             /* display image */
-            if (downloadPair.second == FileSystem::Preview)
+            if (downloadJob.type == FileSystem::Preview)
             {
-                PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+                PhotosList *listView = qobject_cast<PhotosList *>(downloadJob.widget);
                 Q_ASSERT(listView != NULL);
-                listView->setImage(downloadPair.first, img);
-            } else if (downloadPair.second == FileSystem::Normal) {
-                QLabel *label = qobject_cast<QLabel *>(photosView->currentWidget());
+                listView->setImage(downloadJob.remoteUrl, img);
+            } else if (downloadJob.type == FileSystem::Normal) {
+                QLabel *label = qobject_cast<QLabel *>(downloadJob.widget);
                 Q_ASSERT(label != NULL);
                 label->setPixmap(QPixmap::fromImage(img));
             }
-            downloadPair.first.clear();
+            downloadJob.clear();
         }
         /* fetch next thumbnail */
         processDownloadQueue();
@@ -313,7 +316,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         foreach (const FileInfo& info, results)
         {
             if (!info.isDir() && info.name().endsWith(".jpg"))
-                downloadQueue.append(QPair<QUrl, int>(info.url(), FileSystem::Preview));
+                downloadQueue.append(Job(listView, info.url(), FileSystem::Preview));
         }
         processDownloadQueue();
         break;
@@ -367,10 +370,10 @@ void Photos::fileOpened(const QUrl &url)
     QPalette pal = label->palette();
     pal.setColor(QPalette::Background, Qt::white);
     label->setPalette(pal);
-    photosView->setCurrentIndex(photosView->addWidget(label));
+    pushView(label);
 
     // download image
-    downloadQueue.append(QPair<QUrl, int>(url, FileSystem::Normal));
+    downloadQueue.append(Job(label, url, FileSystem::Normal));
     processDownloadQueue();
 }
 
@@ -402,7 +405,7 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
 void Photos::folderOpened(const QUrl &url)
 {
     PhotosList *listView = new PhotosList(url);
-    photosView->setCurrentIndex(photosView->addWidget(listView));
+    pushView(listView);
     listView->setFocus();
     connect(listView, SIGNAL(fileOpened(const QUrl&)),
             this, SLOT(fileOpened(const QUrl&)));
@@ -433,11 +436,11 @@ void Photos::goBack()
  */
 void Photos::processDownloadQueue()
 {
-    if (downloadQueue.empty() || !downloadPair.first.isEmpty())
+    if (downloadQueue.empty() || !downloadJob.isEmpty())
         return;
 
-    downloadPair = downloadQueue.takeFirst();
-    fdPhoto = fs->get(downloadPair.first, downloadPair.second);
+    downloadJob = downloadQueue.takeFirst();
+    fdPhoto = fs->get(downloadJob.remoteUrl, downloadJob.type);
 }
 
 /** If the upload queue is not empty, process the next item.
@@ -469,6 +472,13 @@ void Photos::processUploadQueue()
     showMessage(tr("Uploading %1").arg(QFileInfo(file->fileName()).fileName()));
     busy = true;
     fs->put(file, item.second.toString());
+}
+
+void Photos::pushView(QWidget *widget)
+{
+    static int counter = 0;
+    widget->setObjectName(QString::number(counter++));
+    photosView->setCurrentIndex(photosView->addWidget(widget));
 }
 
 /** Update the progress bar for the current upload.

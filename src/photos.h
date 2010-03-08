@@ -73,6 +73,19 @@ class Photos : public QWidget
 {
     Q_OBJECT
 
+    class Job {
+    public:
+        Job() : type(-1), widget(0) {};
+        Job(QWidget *downloadWidget, const QUrl &downloadUrl, int downloadType)
+            : remoteUrl(downloadUrl), type(downloadType), widget(downloadWidget) {};
+        void clear() { remoteUrl.clear(); type = -1; widget = 0; };
+        bool isEmpty() { return remoteUrl.isEmpty() || type < 0; };
+
+        QUrl remoteUrl;
+        int type;
+        QWidget *widget;
+    };
+
 public:
     Photos(const QString &url, QWidget *parent = NULL);
     void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
@@ -89,18 +102,19 @@ protected slots:
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
     void folderOpened(const QUrl &url);
     void goBack();
+    void pushView(QWidget *widget);
     void putProgress(int done, int total);
     void refresh();
 
 private:
     bool busy;
     FileSystem *fs;
-    QList< QPair<QUrl, int> > downloadQueue;
+    QList<Job> downloadQueue;
     QList< QPair<QUrl, QUrl> > uploadQueue;
 
     QPushButton *backButton;
     QPushButton *createButton;
-    QPair<QUrl, int> downloadPair;
+    Job downloadJob;
     QLabel *helpLabel;
     QStackedWidget *photosView;
     QProgressBar *progressBar;
