@@ -71,6 +71,7 @@ ChatRosterPrompt::ChatRosterPrompt(QXmppClient *client, const QString &jid, QWid
     : QMessageBox(parent), m_client(client), m_jid(jid)
 {
     setText(tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(jid));
+    setWindowModality(Qt::NonModal);
     setWindowTitle(tr("Invitation from %1").arg(jid));
 
     setStandardButtons(QMessageBox::Yes | QMessageBox::No);

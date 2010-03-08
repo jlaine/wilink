@@ -195,6 +195,7 @@ ChatRoomInvitePrompt::ChatRoomInvitePrompt(const QString &contactName, const QSt
     : QMessageBox(parent), m_jid(roomJid)
 {
     setText(tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid));
+    setWindowModality(Qt::NonModal);
     setWindowTitle(tr("Invitation from %1").arg(contactName));
 
     setStandardButtons(QMessageBox::Yes | QMessageBox::No);
