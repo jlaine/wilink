@@ -19,7 +19,6 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QFile>
 #include <QFileIconProvider>
@@ -278,22 +277,12 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             fdPhoto->close();
 
             /* display image */
-            if (downloadJob.type == FileSystem::Preview)
-            {
-                PhotosList *listView = qobject_cast<PhotosList *>(downloadJob.widget);
-                Q_ASSERT(listView != NULL);
+            PhotosList *listView = qobject_cast<PhotosList *>(downloadJob.widget);
+            QLabel *label = qobject_cast<QLabel *>(downloadJob.widget);
+            if (listView)
                 listView->setImage(downloadJob.remoteUrl, img);
-            } else if (downloadJob.type == FileSystem::Normal) {
-                QLabel *label = qobject_cast<QLabel *>(downloadJob.widget);
-                Q_ASSERT(label != NULL);
-
-                QDesktopWidget *desktop = QApplication::desktop();
-                const QRect &available = desktop->availableGeometry(this);
-                QSize maxSize(available.width() - 40, available.height() - 80);
-                if (img.width() > maxSize.width() || img.height() > img.height())
-                    img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            else if (label)
                 label->setPixmap(QPixmap::fromImage(img));
-            }
         }
 
         /* fetch next thumbnail */
@@ -323,7 +312,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         foreach (const FileInfo& info, results)
         {
             if (!info.isDir() && info.name().endsWith(".jpg"))
-                downloadQueue.append(Job(listView, info.url(), FileSystem::Preview));
+                downloadQueue.append(Job(listView, info.url(), FileSystem::SmallSize));
         }
         processDownloadQueue();
         break;
@@ -382,7 +371,7 @@ void Photos::fileOpened(const QUrl &url)
     pushView(label);
 
     // download image
-    downloadQueue.append(Job(label, url, FileSystem::Normal));
+    downloadQueue.append(Job(label, url, FileSystem::LargeSize));
     processDownloadQueue();
 }
 
