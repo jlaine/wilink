@@ -418,7 +418,7 @@ void Photos::folderOpened(const QUrl &url)
  */
 void Photos::goBack()
 {
-    if (photosView->count() < 2)
+    if (photosView->count() < 2 || !backButton->isEnabled())
         return;
 
     // remove obsolete items from download queue
@@ -429,6 +429,7 @@ void Photos::goBack()
 
     photosView->removeWidget(goner);
     photosView->currentWidget()->setFocus();
+
     /* enable controls */
     if (photosView->count() == 1)
         backButton->setEnabled(false);
@@ -498,10 +499,13 @@ void Photos::putProgress(int done, int total)
  */
 void Photos::refresh()
 {
-    showMessage(tr("Loading your albums.."));
     PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
-    if (listView)
-        fs->list(listView->url());
+    if (!listView)
+        return;
+
+    showMessage(tr("Loading your albums.."));
+    listView->setAcceptDrops(false);
+    fs->list(listView->url());
 }
 
 /** Set the system tray icon.
