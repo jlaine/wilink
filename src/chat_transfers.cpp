@@ -62,12 +62,13 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
     : QMessageBox(parent), m_job(job)
 {
     setIcon(QMessageBox::Question);
-    setModal(false);
     setText(tr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?")
             .arg(contactName, job->fileName(), ChatTransfers::sizeToString(job->fileSize())));
+    setWindowModality(Qt::NonModal);
     setWindowTitle(tr("File from %1").arg(contactName));
 
     setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    setDefaultButton(0);
 
     connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
 }
