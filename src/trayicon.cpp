@@ -193,6 +193,8 @@ void TrayIcon::showIcon()
     Q_ASSERT(reply != NULL);
 
     /* display current icon */
+    if (icons.isEmpty())
+        return;
     QPair<QUrl, QAction*> entry = icons.takeFirst();
     QPixmap pixmap;
     QByteArray data = reply->readAll();

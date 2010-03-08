@@ -9,6 +9,7 @@ wDesktop 0.6.96 (UNRELEASED)
  * Make it possible to add additional chat accounts.
  * Report software version via chat.
  * Use operating system's native icon for folders.
+ * Make it possible to view fullsize version of photos.
 
 wDesktop 0.6.1 (2010-02-15)
  * Improve auto-expanding of chat rooms.
