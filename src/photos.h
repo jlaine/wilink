@@ -90,9 +90,6 @@ public:
     Photos(const QString &url, QWidget *parent = NULL);
     void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
-public slots:
-    void show();
-
 protected:
     void processDownloadQueue();
     void processUploadQueue();
@@ -111,7 +108,6 @@ protected slots:
 
 private:
     bool busy;
-    bool ready;
     FileSystem *fs;
     QList<Job> downloadQueue;
     QList< QPair<QUrl, QUrl> > uploadQueue;

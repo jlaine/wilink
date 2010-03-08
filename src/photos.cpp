@@ -184,7 +184,7 @@ QUrl PhotosList::url()
 }
 
 Photos::Photos(const QString &url, QWidget *parent)
-    : QWidget(parent), busy(false), ready(false),
+    : QWidget(parent), busy(false),
     systemTrayIcon(NULL)
 {
     /* create UI */
@@ -291,10 +291,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         break;
     case FileSystem::Open:
         if (!error)
-        {
-            ready = true;
             refresh();
-        }
         break;
     case FileSystem::List: {
         if (error)
@@ -514,13 +511,6 @@ void Photos::refresh()
 void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
 {
     systemTrayIcon = trayIcon;
-}
-
-void Photos::show()
-{
-    if (ready && !isVisible())
-        refresh();
-    QWidget::show();
 }
 
 void Photos::showMessage(const QString &message)
