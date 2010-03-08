@@ -35,9 +35,9 @@
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
-#define KIBIBYTE (1024)
-#define MEBIBYTE (1024 * 1024)
-#define GIGIBYTE (1024 * 1024 * 1024)
+#define KILOBYTE 1000
+#define MEGABYTE 1000000
+#define GIGABYTE 1000000000
 
 enum TransfersColumns {
     NameColumn,
@@ -62,13 +62,12 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
     : QMessageBox(parent), m_job(job)
 {
     setIcon(QMessageBox::Question);
+    setModal(false);
     setText(tr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?")
             .arg(contactName, job->fileName(), ChatTransfers::sizeToString(job->fileSize())));
     setWindowTitle(tr("File from %1").arg(contactName));
 
     setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    setDefaultButton(QMessageBox::Yes);
-    setEscapeButton(QMessageBox::No);
 
     connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
 }
@@ -248,14 +247,14 @@ QSize ChatTransfers::sizeHint() const
 
 QString ChatTransfers::sizeToString(qint64 size)
 {
-    if (size < KIBIBYTE)
-        return QString::fromUtf8("%1 B").arg(size);
-    else if (size < MEBIBYTE)
-        return QString::fromUtf8("%1 KiB").arg(double(size) / double(KIBIBYTE), 0, 'f', 1);
-    else if (size < GIGIBYTE)
-        return QString::fromUtf8("%1 MiB").arg(double(size) / double(MEBIBYTE), 0, 'f', 1);
+    if (size < KILOBYTE)
+        return QString::fromUtf8("%1 B").arg(size);
+    else if (size < MEGABYTE)
+        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
+    else if (size < GIGABYTE)
+        return QString::fromUtf8("%1 MB").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
     else
-        return QString::fromUtf8("%1 GiB").arg(double(size) / double(GIGIBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
 }
 
 void ChatTransfers::stateChanged(QXmppTransferJob::State state)
