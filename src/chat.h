@@ -25,6 +25,7 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
+class ChatConsole;
 class ChatConversation;
 class ChatRoom;
 class ChatRosterModel;
@@ -76,6 +77,8 @@ protected slots:
     void sendPing();
     void statusChanged(int currentIndex);
 
+    void showConsole();
+
     void showTransfers();
     void hideTransfers();
 
@@ -90,6 +93,7 @@ private:
 
     QPushButton *addButton;
     QPushButton *roomButton;
+    ChatConsole *chatConsole;
     ChatTransfers *chatTransfers;
     QXmppClient *client;
     QTimer *pingTimer;

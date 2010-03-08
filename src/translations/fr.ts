@@ -63,6 +63,10 @@
         <source>File transfers</source>
         <translation>Transferts de fichiers</translation>
     </message>
+    <message>
+        <source>Debugging console</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>

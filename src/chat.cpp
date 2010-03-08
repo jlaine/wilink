@@ -51,6 +51,7 @@
 
 #include "qnetio/dns.h"
 #include "chat.h"
+#include "chat_console.h"
 #include "chat_dialog.h"
 #include "chat_form.h"
 #include "chat_room.h"
@@ -154,15 +155,19 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
 
+    chatConsole = new ChatConsole;
+    chatConsole->setObjectName("console");
+    connect(client->logger(), SIGNAL(message(QtMsgType,QString)), chatConsole, SLOT(message(QtMsgType,QString)));
+
     /* set up transfers window */
 #if 0
     client->getTransferManager().setSupportedMethods(
         QXmppTransferJob::InBandMethod);
 #endif
     chatTransfers = new ChatTransfers;
+    chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
-    chatTransfers->setObjectName("transfers");
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -187,6 +192,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_J), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(showTransfers()));
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(showConsole()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -856,6 +863,16 @@ void Chat::statusChanged(int currentIndex)
         if (isConnected)
             client->disconnect();
     }
+}
+
+void Chat::showConsole()
+{
+    rosterModel->addItem(ChatRosterItem::Other, chatTransfers->objectName(),
+        tr("Debugging console"), QIcon(":/options.png"));
+    if (conversationPanel->indexOf(chatConsole) < 0)
+        addPanel(chatConsole);
+    else
+        conversationPanel->setCurrentWidget(chatConsole);
 }
 
 void Chat::showTransfers()
