@@ -184,7 +184,7 @@ QUrl PhotosList::url()
 }
 
 Photos::Photos(const QString &url, QWidget *parent)
-    : QWidget(parent), busy(false),
+    : QWidget(parent), busy(false), ready(false),
     systemTrayIcon(NULL)
 {
     /* create UI */
@@ -291,7 +291,10 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         break;
     case FileSystem::Open:
         if (!error)
+        {
+            ready = true;
             refresh();
+        }
         break;
     case FileSystem::List: {
         if (error)
@@ -500,8 +503,8 @@ void Photos::refresh()
 {
     showMessage(tr("Loading your albums.."));
     PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
-    Q_ASSERT(listView != NULL);
-    fs->list(listView->url());
+    if (listView)
+        fs->list(listView->url());
 }
 
 /** Set the system tray icon.
@@ -511,6 +514,13 @@ void Photos::refresh()
 void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
 {
     systemTrayIcon = trayIcon;
+}
+
+void Photos::show()
+{
+    if (ready && !isVisible())
+        refresh();
+    QWidget::show();
 }
 
 void Photos::showMessage(const QString &message)
