@@ -37,13 +37,13 @@ class ChatConversation : public QWidget
 public:
     ChatConversation(const QString &jid, QWidget *parent = NULL);
 
-    virtual bool isRoom() const = 0;
     virtual void join();
     virtual void leave();
 
     QString localName() const;
     QXmppMessage::State localState() const;
     void setLocalName(const QString &name);
+    QString remoteJid() const;
     void setRemoteName(const QString &name);
     void setRemotePixmap(const QPixmap &avatar);
     void setRemoteState(QXmppMessage::State state);

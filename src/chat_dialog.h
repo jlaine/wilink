@@ -37,7 +37,6 @@ class ChatDialog : public ChatConversation
 public:
     ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
 
-    virtual bool isRoom() const;
     virtual void join();
 
 public slots:

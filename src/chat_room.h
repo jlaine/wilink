@@ -40,7 +40,6 @@ class ChatRoom : public ChatConversation
 
 public:
     ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
-    virtual bool isRoom() const;
     virtual void join();
     virtual void leave();
 

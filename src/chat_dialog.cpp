@@ -108,11 +108,6 @@ void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-bool ChatDialog::isRoom() const
-{
-    return false;
-}
-
 /** Start a two party dialog.
  */
 void ChatDialog::join()

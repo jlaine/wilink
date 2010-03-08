@@ -115,6 +115,11 @@ void ChatConversation::setLocalName(const QString &name)
     chatLocalName = name;
 }
 
+QString ChatConversation::remoteJid() const
+{
+    return chatRemoteJid;
+}
+
 void ChatConversation::setRemoteName(const QString &name)
 {
     chatRemoteName = name;

@@ -52,11 +52,6 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
 }
 
-bool ChatRoom::isRoom() const
-{
-    return true;
-}
-
 /** Send a request to join a multi-user chat.
  */
 void ChatRoom::join()

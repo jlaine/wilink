@@ -270,6 +270,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
         dialog  = new ChatRoom(client, jid);
     else
         dialog = new ChatDialog(client, jid);
+    dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
@@ -277,7 +278,6 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     conversationPanel->show();
     if (conversationPanel->count() == 1)
         resizeContacts();
-    chatDialogs[jid] = dialog;
 
     if (room)
     {
@@ -432,10 +432,10 @@ void Chat::iqReceived(const QXmppIq &iq)
 
 void Chat::joinConversation(const QString &jid, bool isRoom)
 {
-    if (!chatDialogs.contains(jid))
-        createConversation(jid, isRoom);
+    ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
+    if (!dialog)
+        dialog = createConversation(jid, isRoom);
 
-    ChatConversation *dialog = chatDialogs.value(jid);
     rosterModel->clearPendingMessages(jid);
     rosterView->selectContact(jid);
     conversationPanel->setCurrentWidget(dialog);
@@ -444,12 +444,12 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
 
 void Chat::leaveConversation(const QString &jid)
 {
-    if (!chatDialogs.contains(jid))
+    ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
+    if (!dialog)
         return;
-    ChatConversation *dialog = chatDialogs.take(jid);
 
     // leave room
-    if (dialog->isRoom())
+    if (qobject_cast<ChatRoom*>(dialog))
         rosterModel->removeRoom(jid);
     dialog->leave();
 
@@ -475,7 +475,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
             {
                 const QString contactName = rosterModel->contactName(bareJid);
                 const QString roomJid = extension.attribute("jid");
-                if (!roomJid.isEmpty() && !chatDialogs.contains(roomJid))
+                if (!roomJid.isEmpty() && !conversationPanel->findChild<ChatRoom*>(roomJid))
                 {
                     ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, this);
                     connect(dlg, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
@@ -486,7 +486,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         }
         return;
     case QXmppMessage::Chat:
-        if (!chatDialogs.contains(bareJid) && !msg.body().isEmpty())
+        if (!conversationPanel->findChild<ChatDialog*>(bareJid) && !msg.body().isEmpty())
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
             dialog->messageReceived(msg);
@@ -500,10 +500,8 @@ void Chat::messageReceived(const QXmppMessage &msg)
     }
 
     // don't alert the user for empty messages or chat rooms
-    ChatConversation *dialog = chatDialogs.value(bareJid);
-    if (!dialog)
-        return;
-    if (msg.body().isEmpty() || dialog->isRoom())
+    ChatDialog *dialog = conversationPanel->findChild<ChatDialog*>(bareJid);
+    if (msg.body().isEmpty() || !dialog)
         return;
 
     // add pending message
@@ -539,11 +537,12 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     QXmppPresence packet;
     packet.setTo(presence.from());
     const QString bareJid = jidToBareJid(presence.from());
-    
+    ChatRoom *chatRoom = conversationPanel->findChild<ChatRoom*>(bareJid);
+
     switch (presence.getType())
     {
     case QXmppPresence::Error:
-        if (!chatDialogs.contains(bareJid))
+        if (!chatRoom)
             return;
         foreach (const QXmppElement &extension, presence.extensions())
         {
@@ -562,8 +561,8 @@ void Chat::presenceReceived(const QXmppPresence &presence)
         }
         break;
     case QXmppPresence::Unavailable:
-        if (!chatDialogs.contains(bareJid) ||
-            chatDialogs[bareJid]->localName() != jidToResource(presence.from()))
+        if (!chatRoom ||
+            chatRoom->localName() != jidToResource(presence.from()))
             return;
         foreach (const QXmppElement &extension, presence.extensions())
         {
@@ -655,12 +654,12 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
  */
 void Chat::rejoinConversations()
 {
-    foreach (const QString &bareJid, chatDialogs.keys())
+    for (int i = 0; i < conversationPanel->count(); i++)
     {
-        ChatConversation *dialog = chatDialogs.value(bareJid);
-        if (dialog->isRoom())
+        ChatConversation *dialog = qobject_cast<ChatRoom*>(conversationPanel->widget(i));
+        if (dialog)
         {
-            rosterModel->addRoom(bareJid);
+            rosterModel->addRoom(dialog->remoteJid());
             dialog->join();
         }
     }

@@ -26,6 +26,7 @@
 #include <QLayout>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QShortcut>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QUrl>
@@ -110,6 +111,10 @@ ChatTransfers::ChatTransfers(QWidget *parent)
 
     setLayout(layout);
     updateButtons();
+
+    /* set up keyboard shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(toggle()));
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
