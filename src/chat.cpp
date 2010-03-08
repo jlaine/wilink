@@ -159,7 +159,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
         QXmppTransferJob::InBandMethod);
 #endif
     chatTransfers = new ChatTransfers;
-    connect(chatTransfers, SIGNAL(newJob()), this, SLOT(showTransfers()));
+    connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
+    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
     chatTransfers->setObjectName("transfers");
 
     /* set up client */
@@ -183,7 +184,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(timeoutTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_J), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(showTransfers()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
@@ -868,3 +869,7 @@ void Chat::showTransfers()
         conversationPanel->setCurrentWidget(chatTransfers);
 }
 
+void Chat::hideTransfers()
+{
+    removePanel(chatTransfers);
+}

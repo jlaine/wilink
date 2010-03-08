@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QHeaderView>
+#include <QLabel>
 #include <QLayout>
 #include <QProgressBar>
 #include <QPushButton>
@@ -86,6 +87,25 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     : QWidget(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
+    /* status bar */
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(tr("File transfers")));
+    hbox->addSpacing(16);
+    hbox->addWidget(nameLabel);
+    hbox->addStretch();
+    QLabel *iconLabel = new QLabel;
+    iconLabel->setPixmap(QPixmap(":/album.png"));
+    hbox->addWidget(iconLabel);
+    QPushButton *button = new QPushButton;
+    button->setFlat(true);
+    button->setMaximumWidth(32);
+    button->setIcon(QIcon(":/close.png"));
+    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
+    hbox->addWidget(button);
+    layout->addItem(hbox);
 
     tableWidget = new QTableWidget;
     tableWidget->setColumnCount(MaxColumn);
@@ -137,7 +157,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
 
-    emit newJob();
+    emit openTab();
 }
 
 void ChatTransfers::cellDoubleClicked(int row, int column)

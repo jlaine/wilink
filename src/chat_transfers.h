@@ -58,7 +58,8 @@ public:
     static QString sizeToString(qint64 size);
 
 signals:
-    void newJob();
+    void openTab();
+    void closeTab();
 
 private slots:
     void fileAccepted(QXmppTransferJob *job);

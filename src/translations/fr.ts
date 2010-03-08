@@ -241,6 +241,10 @@ Acceptez-vous?</translation>
         <source>Receive a file</source>
         <translation>Recevoir un fichier</translation>
     </message>
+    <message>
+        <source>File transfers</source>
+        <translation>Transferts de fichiers</translation>
+    </message>
 </context>
 <context>
     <name>Diagnostics</name>
