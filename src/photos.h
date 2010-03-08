@@ -59,6 +59,7 @@ protected:
 
 protected slots:
     void slotItemDoubleClicked(QListWidgetItem *item);
+    void slotReturnPressed();
 
 private:
     bool baseDrop;

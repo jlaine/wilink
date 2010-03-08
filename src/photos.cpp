@@ -53,6 +53,10 @@ PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     setWrapping(true);
     connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
             this, SLOT(slotItemDoubleClicked(QListWidgetItem *)));
+
+    /* set up keyboard shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(slotReturnPressed()));
 }
 
 void PhotosList::dragEnterEvent(QDragEnterEvent *event)
@@ -135,6 +139,8 @@ void PhotosList::setEntries(const FileInfoList &entries)
         newItem->setText(info.name());
         addItem(newItem);
     }
+    if (count())
+        setCurrentRow(0);
 }
 
 void PhotosList::setImage(const QUrl &url, const QImage &img)
@@ -162,6 +168,13 @@ void PhotosList::slotItemDoubleClicked(QListWidgetItem *item)
         emit folderOpened(info.url());
     else
         emit fileOpened(info.url());
+}
+
+void PhotosList::slotReturnPressed()
+{
+    QListWidgetItem *item = currentItem();
+    if (item)
+        slotItemDoubleClicked(item);
 }
 
 QUrl PhotosList::url()
@@ -229,8 +242,10 @@ Photos::Photos(const QString &url, QWidget *parent)
     fs->open(url);
 
     /* set up keyboard shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Backspace), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(goBack()));
 #ifdef Q_OS_MAC
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 
@@ -270,6 +285,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
                 Q_ASSERT(label != NULL);
                 label->setPixmap(QPixmap::fromImage(img));
             }
+            downloadPair.first.clear();
         }
         /* fetch next thumbnail */
         processDownloadQueue();
@@ -383,6 +399,7 @@ void Photos::folderOpened(const QUrl &url)
 {
     PhotosList *listView = new PhotosList(url);
     photosView->setCurrentIndex(photosView->addWidget(listView));
+    listView->setFocus();
     connect(listView, SIGNAL(fileOpened(const QUrl&)),
             this, SLOT(fileOpened(const QUrl&)));
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
@@ -396,10 +413,11 @@ void Photos::folderOpened(const QUrl &url)
  */
 void Photos::goBack()
 {
-    if (photosView->count() <= 1)
+    if (photosView->count() < 2)
         return;
     photosView->removeWidget(photosView->currentWidget());
-    if (photosView->count() <= 1)
+    photosView->currentWidget()->setFocus();
+    if (photosView->count() == 1)
         backButton->setEnabled(false);
 }
 
@@ -407,7 +425,7 @@ void Photos::goBack()
  */
 void Photos::processDownloadQueue()
 {
-    if (downloadQueue.empty())
+    if (downloadQueue.empty() || !downloadPair.first.isEmpty())
         return;
 
     downloadPair = downloadQueue.takeFirst();
