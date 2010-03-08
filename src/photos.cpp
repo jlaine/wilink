@@ -366,6 +366,7 @@ void Photos::fileOpened(const QUrl &url)
     // create white label
     QLabel *label = new QLabel(tr("Loading image.."));
     label->setAlignment(Qt::AlignCenter);
+    label->setAutoFillBackground(true);
     QPalette pal = label->palette();
     pal.setColor(QPalette::Background, Qt::white);
     label->setPalette(pal);
