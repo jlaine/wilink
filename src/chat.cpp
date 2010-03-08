@@ -668,7 +668,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setIgnoreSslErrors(ignoreSslErrors);
 
     /* connect to server */
-    client->logger().setLoggingType(QXmppLogger::STDOUT);
+    client->logger().setLoggingType(QXmppLogger::NONE);
     client->connectToServer(config);
     return true;
 }
