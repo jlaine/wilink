@@ -94,6 +94,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : isBusy(false), isConnected(false), reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
+    client->setLogger(new QXmppLogger(this));
     rosterModel =  new ChatRosterModel(client);
 
     /* build splitter */
@@ -668,7 +669,6 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setIgnoreSslErrors(ignoreSslErrors);
 
     /* connect to server */
-    client->logger().setLoggingType(QXmppLogger::NONE);
     client->connectToServer(config);
     return true;
 }
