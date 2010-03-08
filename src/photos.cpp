@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
 #include <QDebug>
+#include <QDesktopWidget>
 #include <QDragEnterEvent>
 #include <QFile>
 #include <QFileIconProvider>
@@ -219,6 +221,7 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(10);
     layout->addWidget(helpLabel);
     layout->addWidget(photosView);
     layout->addWidget(progressBar);
@@ -283,6 +286,12 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             } else if (downloadJob.type == FileSystem::Normal) {
                 QLabel *label = qobject_cast<QLabel *>(downloadJob.widget);
                 Q_ASSERT(label != NULL);
+
+                QDesktopWidget *desktop = QApplication::desktop();
+                const QRect &available = desktop->availableGeometry(this);
+                QSize maxSize(available.width() - 40, available.height() - 80);
+                if (img.width() > maxSize.width() || img.height() > img.height())
+                    img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 label->setPixmap(QPixmap::fromImage(img));
             }
         }

@@ -440,6 +440,7 @@ void TrayIcon::showPhotos()
     {
         QAction *action = qobject_cast<QAction *>(sender());
         photos = new Photos("wifirst://www.wifirst.net/w");
+        photos->move(10, 10);
         photos->setSystemTrayIcon(this);
     }
     photos->show();
