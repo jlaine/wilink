@@ -129,9 +129,7 @@ void PhotosList::setEntries(const FileInfoList &entries)
         if (info.isDir()) {
             newItem->setIcon(iconProvider.icon(QFileIconProvider::Folder));
         } else {
-            QPixmap blank(ICON_SIZE);
-            blank.fill();
-            newItem->setIcon(blank);
+            newItem->setIcon(iconProvider.icon(QFileIconProvider::File));
         }
         newItem->setData(Qt::UserRole, QUrl(info.url()));
         newItem->setText(info.name());
