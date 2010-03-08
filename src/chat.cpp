@@ -181,7 +181,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), chatTransfers, SLOT(toggle()));
+    connect(shortcut, SIGNAL(activated()), this, SLOT(toggleTransfers()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -216,6 +216,29 @@ void Chat::addContact()
     packet.setTo(jid);
     packet.setType(QXmppPresence::Subscribe);
     client->sendPacket(packet);
+}
+
+void Chat::addPanel(QWidget *panel)
+{
+    conversationPanel->addWidget(panel);
+    conversationPanel->setCurrentWidget(panel);
+    conversationPanel->show();
+    if (conversationPanel->count() == 1)
+        resizeContacts();
+}
+
+void Chat::removePanel(QWidget *panel)
+{
+    if (conversationPanel->indexOf(panel) < 0)
+        return;
+
+    // close view
+    if (conversationPanel->count() == 1)
+    {
+        conversationPanel->hide();
+        QTimer::singleShot(100, this, SLOT(resizeContacts()));
+    }
+    conversationPanel->removeWidget(panel);
 }
 
 /** Prompt the user for a new group chat then join it.
@@ -274,10 +297,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
-    conversationPanel->addWidget(dialog);
-    conversationPanel->show();
-    if (conversationPanel->count() == 1)
-        resizeContacts();
+    addPanel(dialog);
 
     if (room)
     {
@@ -454,11 +474,7 @@ void Chat::leaveConversation(const QString &jid)
     dialog->leave();
 
     // close view
-    if (conversationPanel->count() == 1)
-    {
-        conversationPanel->hide();
-        QTimer::singleShot(100, this, SLOT(resizeContacts()));
-    }
+    removePanel(dialog);
     dialog->deleteLater();
 }
 
@@ -830,5 +846,13 @@ void Chat::statusChanged(int currentIndex)
         if (isConnected)
             client->disconnect();
     }
+}
+
+void Chat::toggleTransfers()
+{
+    if (conversationPanel->indexOf(chatTransfers) < 0)
+        addPanel(chatTransfers);
+    else
+        removePanel(chatTransfers);
 }
 

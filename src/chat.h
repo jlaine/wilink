@@ -54,6 +54,7 @@ public:
 
 protected slots:
     void addContact();
+    void addPanel(QWidget *panel);
     void addRoom();
     void connected();
     void disconnected();
@@ -67,11 +68,13 @@ protected slots:
     void presenceReceived(const QXmppPresence &presence);
     void reconnect();
     void rejoinConversations();
+    void removePanel(QWidget *panel);
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void resizeContacts();
     void sendPing();
     void statusChanged(int currentIndex);
+    void toggleTransfers();
 
 protected:
     void changeEvent(QEvent *event);
