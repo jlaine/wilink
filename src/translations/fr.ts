@@ -70,6 +70,10 @@
         <source>Enter the address of the account you want to add.</source>
         <translation>Saisissez l&apos;adresse du compte que vous souhaitez ajouter.</translation>
     </message>
+    <message>
+        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
+        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
+    </message>
 </context>
 <context>
     <name>ChatConversation</name>
@@ -214,10 +218,6 @@ Acceptez-vous?</translation>
         <source>File from %1</source>
         <translation>Fichier de %1</translation>
     </message>
-    <message>
-        <source>Receive a file</source>
-        <translation>Recevoir un fichier</translation>
-    </message>
 </context>
 <context>
     <name>ChatTransfers</name>
@@ -232,6 +232,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Progress</source>
         <translation>Progrès</translation>
+    </message>
+    <message>
+        <source>Receive a file</source>
+        <translation>Recevoir un fichier</translation>
     </message>
 </context>
 <context>

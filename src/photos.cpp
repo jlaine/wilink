@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QDragEnterEvent>
 #include <QFile>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QLabel>
@@ -119,13 +120,14 @@ void PhotosList::setBaseDrop(bool accept)
 
 void PhotosList::setEntries(const FileInfoList &entries)
 {
+    QFileIconProvider iconProvider;
     fileList = entries;
     clear();
     foreach (const FileInfo& info, fileList)
     {
         QListWidgetItem *newItem = new QListWidgetItem;
         if (info.isDir()) {
-            newItem->setIcon(QIcon(":/album.png"));
+            newItem->setIcon(iconProvider.icon(QFileIconProvider::Folder));
         } else {
             QPixmap blank(ICON_SIZE);
             blank.fill();
@@ -178,6 +180,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
     listView->setBaseDrop(false);
+    listView->setIconSize(QSize(32, 32));
     photosView->addWidget(listView);
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));

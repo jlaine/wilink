@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
 #include <QDialogButtonBox>
 #include <QInputDialog>
+#include <QLabel>
 #include <QLayout>
 #include <QListWidget>
 #include <QPushButton>
@@ -29,6 +31,13 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     : QDialog(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
+
+    QLabel *helpLabel = new QLabel(
+        tr("In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.")
+            .arg(qApp->organizationName())
+            .arg(qApp->applicationName()));
+    helpLabel->setWordWrap(true);
+    layout->addWidget(helpLabel);
 
     listWidget = new QListWidget;
     listWidget->setIconSize(QSize(32, 32));
