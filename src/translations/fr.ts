@@ -299,6 +299,10 @@ Acceptez-vous?</translation>
         <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
         <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
     </message>
+    <message>
+        <source>Loading image..</source>
+        <translation>Chargement de l&apos;image..</translation>
+    </message>
 </context>
 <context>
     <name>TrayIcon</name>

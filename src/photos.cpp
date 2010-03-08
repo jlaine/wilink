@@ -266,16 +266,13 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     switch (cmd)
     {
     case FileSystem::Get:
-        if (!error)
+        if (!error && photosView->indexOf(downloadJob.widget) >= 0)
         {
             /* load image */
             fdPhoto->reset();
             QImage img;
             img.load(fdPhoto, NULL);
             fdPhoto->close();
-
-            if (photosView->indexOf(downloadJob.widget) < 0)
-                return;
 
             /* display image */
             if (downloadJob.type == FileSystem::Preview)
@@ -288,9 +285,10 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
                 Q_ASSERT(label != NULL);
                 label->setPixmap(QPixmap::fromImage(img));
             }
-            downloadJob.clear();
         }
+
         /* fetch next thumbnail */
+        downloadJob.clear();
         processDownloadQueue();
         break;
     case FileSystem::Open:
@@ -366,7 +364,8 @@ void Photos::fileOpened(const QUrl &url)
     helpLabel->hide();
 
     // create white label
-    QLabel *label = new QLabel;
+    QLabel *label = new QLabel(tr("Loading image.."));
+    label->setAlignment(Qt::AlignCenter);
     QPalette pal = label->palette();
     pal.setColor(QPalette::Background, Qt::white);
     label->setPalette(pal);
@@ -423,7 +422,13 @@ void Photos::goBack()
     if (photosView->count() < 2)
         return;
 
-    photosView->removeWidget(photosView->currentWidget());
+    // remove obsolete items from download queue
+    QWidget *goner = photosView->currentWidget();
+    for (int i = downloadQueue.size() - 1; i >= 0; i--)
+        if (downloadQueue.at(i).widget == goner)
+            downloadQueue.removeAt(i);
+
+    photosView->removeWidget(goner);
     photosView->currentWidget()->setFocus();
     /* enable controls */
     if (photosView->count() == 1)
