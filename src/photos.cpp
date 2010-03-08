@@ -178,7 +178,6 @@ Photos::Photos(const QString &url, QWidget *parent)
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
     listView->setBaseDrop(false);
-    listView->setIconSize(QSize(32, 32));
     photosView->addWidget(listView);
     connect(listView, SIGNAL(filesDropped(const QList<QUrl>&, const QUrl&)),
             this, SLOT(filesDropped(const QList<QUrl>&, const QUrl&)));
@@ -190,7 +189,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     progressBar->setValue(0);
     progressBar->hide();
 
-    statusLabel = new QLabel(tr("Connecting.."));
+    statusLabel = new QLabel;
 
     backButton = new QPushButton(tr("Go back"));
     backButton->setIcon(QIcon(":/back.png"));
@@ -222,6 +221,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this,
             SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
+    showMessage(tr("Connecting.."));
     fs->open(url);
 
     /* set up keyboard shortcuts */
@@ -229,6 +229,8 @@ Photos::Photos(const QString &url, QWidget *parent)
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
+
+    resize(QSize(600, 400).expandedTo(minimumSizeHint()));
 }
 
 /** When a command finishes, process its results.
@@ -275,7 +277,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         listView->setEntries(results);
 
         /* drag and drop is now allowed */
-        statusLabel->setText("");
+        showMessage();
         listView->setAcceptDrops(true);
         if (photosView->count() > 1)
             backButton->setEnabled(true);
@@ -388,7 +390,7 @@ void Photos::processUploadQueue()
     /* if the queue is empty, hide progress bar and reset it */
     if (uploadQueue.empty())
     {
-        statusLabel->setText(tr("Photos upload complete."));
+        showMessage(tr("Photos upload complete."));
         if (systemTrayIcon)
             systemTrayIcon->showMessage(tr("Photos upload complete."),
                 tr("Your photos have been uploaded."));
@@ -404,7 +406,7 @@ void Photos::processUploadQueue()
     /* process the next file to upload */
     QPair<QUrl, QUrl> item = uploadQueue.takeFirst();
     QFile *file = new QFile(item.first.toLocalFile(), this);
-    statusLabel->setText(tr("Uploading %1").arg(QFileInfo(file->fileName()).fileName()));
+    showMessage(tr("Uploading %1").arg(QFileInfo(file->fileName()).fileName()));
     busy = true;
     fs->put(file, item.second.toString());
 }
@@ -422,7 +424,7 @@ void Photos::putProgress(int done, int total)
  */
 void Photos::refresh()
 {
-    statusLabel->setText(tr("Loading your albums.."));
+    showMessage(tr("Loading your albums.."));
     PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
     Q_ASSERT(listView != NULL);
     fs->list(listView->url());
@@ -435,5 +437,15 @@ void Photos::refresh()
 void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
 {
     systemTrayIcon = trayIcon;
+}
+
+void Photos::showMessage(const QString &message)
+{
+    if (message.isEmpty())
+        statusLabel->hide();
+    else {
+        statusLabel->setText(message);
+        statusLabel->show();
+    }
 }
 

@@ -78,6 +78,7 @@ public:
 protected:
     void processDownloadQueue();
     void processUploadQueue();
+    void showMessage(const QString &message = QString());
 
 protected slots:
     void createFolder();
