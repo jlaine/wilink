@@ -78,6 +78,7 @@ protected slots:
     void statusChanged(int currentIndex);
 
     void showConsole();
+    void hideConsole();
 
     void showTransfers();
     void hideTransfers();

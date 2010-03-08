@@ -875,6 +875,11 @@ void Chat::showConsole()
         conversationPanel->setCurrentWidget(chatConsole);
 }
 
+void Chat::hideConsole()
+{
+    removePanel(chatConsole);
+}
+
 void Chat::showTransfers()
 {
     rosterModel->addItem(ChatRosterItem::Other, chatTransfers->objectName(),

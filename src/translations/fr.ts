@@ -65,7 +65,7 @@
     </message>
     <message>
         <source>Debugging console</source>
-        <translation type="unfinished"></translation>
+        <translation>Console de déboggage</translation>
     </message>
 </context>
 <context>
