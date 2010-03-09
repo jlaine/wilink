@@ -150,9 +150,11 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     if (jobs.contains(job))
         return;
 
+    const QString fileName = QFileInfo(job->data(LocalPathRole).toString()).fileName();
+
     jobs.insert(0, job);
     tableWidget->insertRow(0);
-    QTableWidgetItem *nameItem = new QTableWidgetItem(job->fileName());
+    QTableWidgetItem *nameItem = new QTableWidgetItem(fileName);
     nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     nameItem->setIcon(jobIcon(job));
     tableWidget->setItem(0, NameColumn, nameItem);
@@ -206,19 +208,19 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
     // determine file location
     QDir downloadsDir(SystemInfo::downloadsLocation());
 
-    const QString fileBase = QFileInfo(job->fileName()).completeBaseName();
-    const QString fileSuffix = QFileInfo(job->fileName()).suffix();
-    QString fileName = fileBase;
-    if (!fileSuffix.isEmpty())
-        fileName += "." + fileSuffix;
-    int i = 2;
-    while (downloadsDir.exists(fileName))
+    QString fileName = job->fileName();
+    if (downloadsDir.exists(fileName))
     {
-        fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
-        if (!fileSuffix.isEmpty())
-            fileName += "." + fileSuffix;
+        const QString fileBase = QFileInfo(fileName).completeBaseName();
+        const QString fileSuffix = QFileInfo(fileName).suffix();
+        int i = 2;
+        while (downloadsDir.exists(fileName))
+        {
+            fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
+            if (!fileSuffix.isEmpty())
+                fileName += "." + fileSuffix;
+        }
     }
-    qDebug() << "file name" << fileName;
 
     const QString filePath = downloadsDir.absoluteFilePath(fileName);
     QFile *file = new QFile(filePath, job);
