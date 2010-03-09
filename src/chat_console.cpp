@@ -25,11 +25,11 @@
 ChatConsole::ChatConsole(QWidget *parent)
     : QWidget(parent)
 {
-    QVBoxLayout *layout = new QVBoxLayout;
+    setWindowTitle(tr("Debugging console"));
 
+    QVBoxLayout *layout = new QVBoxLayout;
     browser = new QTextBrowser;
     layout->addWidget(browser);
-
     setLayout(layout);
 }
 

@@ -59,14 +59,6 @@
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
-    <message>
-        <source>File transfers</source>
-        <translation>Transferts de fichiers</translation>
-    </message>
-    <message>
-        <source>Debugging console</source>
-        <translation>Console de déboggage</translation>
-    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -81,6 +73,13 @@
     <message>
         <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
         <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
+    </message>
+</context>
+<context>
+    <name>ChatConsole</name>
+    <message>
+        <source>Debugging console</source>
+        <translation>Console de déboggage</translation>
     </message>
 </context>
 <context>

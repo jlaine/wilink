@@ -872,7 +872,7 @@ void Chat::statusChanged(int currentIndex)
 void Chat::showConsole()
 {
     rosterModel->addItem(ChatRosterItem::Other, chatConsole->objectName(),
-        tr("Debugging console"), QIcon(":/options.png"));
+        chatConsole->windowTitle(), QIcon(":/options.png"));
     if (conversationPanel->indexOf(chatConsole) < 0)
         addPanel(chatConsole);
     else
@@ -882,7 +882,7 @@ void Chat::showConsole()
 void Chat::showTransfers()
 {
     rosterModel->addItem(ChatRosterItem::Other, chatTransfers->objectName(),
-        tr("File transfers"), QIcon(":/album.png"));
+        chatTransfers->windowTitle(), QIcon(":/album.png"));
     if (conversationPanel->indexOf(chatTransfers) < 0)
         addPanel(chatTransfers);
     else

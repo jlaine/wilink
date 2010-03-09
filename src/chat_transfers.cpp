@@ -86,13 +86,15 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 ChatTransfers::ChatTransfers(QWidget *parent)
     : QWidget(parent)
 {
+    setWindowTitle(tr("File transfers"));
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
 
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(tr("File transfers")));
+    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(windowTitle()));
     hbox->addSpacing(16);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
