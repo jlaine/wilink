@@ -51,7 +51,7 @@
         <source>Sorry, but you were kicked from chat room %1.
 
 %2</source>
-        <translation>Désole, mais vous avez été éjecté(e) du salon de discussion %1.
+        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion %1.
 
 %2</translation>
     </message>
