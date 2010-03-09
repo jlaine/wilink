@@ -17,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLabel>
 #include <QLayout>
+#include <QPushButton>
 #include <QTextBrowser>
 
 #include "chat_console.h"
@@ -28,8 +30,29 @@ ChatConsole::ChatConsole(QWidget *parent)
     setWindowTitle(tr("Debugging console"));
 
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
+    /* status bar */
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(windowTitle()));
+    hbox->addSpacing(16);
+    hbox->addWidget(nameLabel);
+    hbox->addStretch();
+    QLabel *iconLabel = new QLabel;
+    iconLabel->setPixmap(QPixmap(":/options.png"));
+    hbox->addWidget(iconLabel);
+    QPushButton *button = new QPushButton;
+    button->setFlat(true);
+    button->setMaximumWidth(32);
+    button->setIcon(QIcon(":/close.png"));
+    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
+    hbox->addWidget(button);
+    layout->addItem(hbox);
+
     browser = new QTextBrowser;
     layout->addWidget(browser);
+
     setLayout(layout);
 }
 
