@@ -248,6 +248,8 @@ void Chat::addPanel(QWidget *panel)
         resizeContacts();
 }
 
+/** Remove a panel.
+ */
 void Chat::removePanel(QWidget *panel)
 {
     if (conversationPanel->indexOf(panel) < 0)
@@ -267,6 +269,7 @@ void Chat::panelChanged(int index)
     QWidget *widget = conversationPanel->widget(index);
     if (!widget)
         return;
+    rosterModel->clearPendingMessages(widget->objectName());
     rosterView->selectContact(widget->objectName());
 }
 
@@ -484,7 +487,6 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     if (!dialog)
         dialog = createConversation(jid, isRoom);
 
-    rosterModel->clearPendingMessages(jid);
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
 }
