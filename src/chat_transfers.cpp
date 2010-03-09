@@ -90,7 +90,6 @@ ChatTransfers::ChatTransfers(QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
-    layout->setSpacing(0);
 
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -109,6 +108,16 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     hbox->addWidget(button);
     layout->addItem(hbox);
 
+    /* help label */
+    QLabel *helpLabel = new QLabel(tr("The file transfer feature is experimental and the transfer speed is purposefuly limited so as not to disturb your internet connection."));
+    helpLabel->setWordWrap(true);
+    layout->addWidget(helpLabel);
+
+    /* download location label */
+    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in the '%1' folder.").arg(SystemInfo::downloadsLocation()));
+    layout->addWidget(downloadsLabel);
+
+    /* transfers list */
     tableWidget = new QTableWidget;
     tableWidget->setColumnCount(MaxColumn);
     tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("File name")));
@@ -123,6 +132,7 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
     layout->addWidget(tableWidget);
 
+    /* buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
     removeButton = new QPushButton;
