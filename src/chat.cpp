@@ -92,7 +92,11 @@ void dumpElement(const QXmppElement &item, int level)
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
-    : isBusy(false), isConnected(false), reconnectOnDisconnect(false), systemTrayIcon(trayIcon)
+    : chatConsole(0),
+    isBusy(false),
+    isConnected(false),
+    reconnectOnDisconnect(false),
+    systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
     client->setLogger(new QXmppLogger(this));
@@ -154,11 +158,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
-
-    chatConsole = new ChatConsole;
-    chatConsole->setObjectName("console");
-    connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
-    connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closeTab()));
 
     /* set up transfers window */
 #if 0
@@ -881,6 +880,13 @@ void Chat::statusChanged(int currentIndex)
 
 void Chat::showConsole()
 {
+    if (!chatConsole)
+    {
+        chatConsole = new ChatConsole;
+        chatConsole->setObjectName("console");
+        connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
+        connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closeTab()));
+    }
     rosterModel->addItem(ChatRosterItem::Other,
         chatConsole->objectName(),
         chatConsole->windowTitle(),
