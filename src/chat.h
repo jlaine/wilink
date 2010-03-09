@@ -77,9 +77,11 @@ protected slots:
     void sendPing();
     void statusChanged(int currentIndex);
 
+    void hideConsole();
     void showConsole();
+
+    void hideTransfers();
     void showTransfers();
-    void closeTab();
 
 protected:
     void changeEvent(QEvent *event);

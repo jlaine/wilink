@@ -167,7 +167,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatTransfers = new ChatTransfers;
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
-    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closeTab()));
+    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -878,6 +878,17 @@ void Chat::statusChanged(int currentIndex)
     }
 }
 
+void Chat::hideConsole()
+{
+    if (chatConsole)
+    {
+        rosterModel->removeItem(chatConsole->objectName());
+        removePanel(chatConsole);
+        chatConsole->deleteLater();
+        chatConsole = 0;
+    }
+}
+
 void Chat::showConsole()
 {
     if (!chatConsole)
@@ -885,13 +896,18 @@ void Chat::showConsole()
         chatConsole = new ChatConsole;
         chatConsole->setObjectName("console");
         connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
-        connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closeTab()));
+        connect(chatConsole, SIGNAL(closeTab()), this, SLOT(hideConsole()));
     }
     rosterModel->addItem(ChatRosterItem::Other,
         chatConsole->objectName(),
         chatConsole->windowTitle(),
         QIcon(":/options.png"));
     addPanel(chatConsole);
+}
+
+void Chat::hideTransfers()
+{
+    removePanel(chatTransfers);
 }
 
 void Chat::showTransfers()
@@ -903,9 +919,3 @@ void Chat::showTransfers()
     addPanel(chatTransfers);
 }
 
-void Chat::closeTab()
-{
-    QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (panel)
-        removePanel(panel);
-}
