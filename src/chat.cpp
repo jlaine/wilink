@@ -158,6 +158,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatConsole = new ChatConsole;
     chatConsole->setObjectName("console");
     connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
+    connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closeTab()));
 
     /* set up transfers window */
 #if 0
@@ -167,7 +168,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatTransfers = new ChatTransfers;
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
-    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
+    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closeTab()));
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -819,7 +820,10 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         }
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
-            showTransfers();
+        {
+            QWidget *widget = conversationPanel->findChild<QWidget*>(jid);
+            conversationPanel->setCurrentWidget(widget);
+        }
     }
 }
 
@@ -867,17 +871,12 @@ void Chat::statusChanged(int currentIndex)
 
 void Chat::showConsole()
 {
-    rosterModel->addItem(ChatRosterItem::Other, chatTransfers->objectName(),
+    rosterModel->addItem(ChatRosterItem::Other, chatConsole->objectName(),
         tr("Debugging console"), QIcon(":/options.png"));
     if (conversationPanel->indexOf(chatConsole) < 0)
         addPanel(chatConsole);
     else
         conversationPanel->setCurrentWidget(chatConsole);
-}
-
-void Chat::hideConsole()
-{
-    removePanel(chatConsole);
 }
 
 void Chat::showTransfers()
@@ -890,7 +889,9 @@ void Chat::showTransfers()
         conversationPanel->setCurrentWidget(chatTransfers);
 }
 
-void Chat::hideTransfers()
+void Chat::closeTab()
 {
-    removePanel(chatTransfers);
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (panel)
+        removePanel(panel);
 }

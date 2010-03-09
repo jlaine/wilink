@@ -33,6 +33,9 @@ class ChatConsole : public QWidget
 public:
     ChatConsole(QWidget *parent = 0);
 
+signals:
+    void closeTab();
+
 private slots:
     void message(QXmppLogger::MessageType type, const QString &msg);
 
