@@ -26,16 +26,16 @@
 
 #include "chat_conversation.h"
 
+class ChatRosterModel;
 class QXmppArchiveChat;
 class QXmppClient;
-class QXmppDiscoveryIq;
 
 class ChatDialog : public ChatConversation
 {
     Q_OBJECT
 
 public:
-    ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
+    ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
 
     virtual void join();
 
@@ -46,13 +46,13 @@ protected slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void chatStateChanged(QXmppMessage::State state);
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
 
 protected:
     virtual void sendMessage(const QString &body);
 
 private:
     QXmppClient *client;
+    ChatRosterModel *rosterModel;
     QStringList chatStatesJids;
 };
 

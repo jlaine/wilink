@@ -323,7 +323,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     if (room)
         dialog  = new ChatRoom(client, jid);
     else
-        dialog = new ChatDialog(client, jid);
+        dialog = new ChatDialog(client, rosterModel, jid);
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
@@ -773,11 +773,11 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             removeContact(jid);
         else if (action == ChatRosterView::SendAction)
         {
-            // FIXME : we need to discover client support for file transfer!
-            QStringList resources = client->getRoster().getResources(jid);
-            if (!resources.size())
+            // find first resource supporting file transfer
+            QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+            if (!fullJids.size())
                 return;
-            QString fullJid = jid + "/" + resources.first();
+            QString fullJid = fullJids.first();
 
             QString filePath = QFileDialog::getOpenFileName(this, tr("Send a file"));
             if (!filePath.isEmpty())

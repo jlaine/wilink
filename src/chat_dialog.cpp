@@ -33,12 +33,12 @@
 
 #include "chat_dialog.h"
 #include "chat_history.h"
+#include "chat_roster.h"
 
-ChatDialog::ChatDialog(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent), client(xmppClient)
+ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
+    : ChatConversation(jid, parent), client(xmppClient), rosterModel(chatRosterModel)
 {
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
@@ -81,44 +81,18 @@ void ChatDialog::chatStateChanged(QXmppMessage::State state)
     }
 }
 
-void ChatDialog::discoveryIqReceived(const QXmppDiscoveryIq &disco)
-{
-    // we only want results from remote party
-    if (jidToBareJid(disco.from()) != chatRemoteJid ||
-        disco.type() != QXmppIq::Result)
-        return;
-
-    foreach (const QXmppElement &element, disco.queryItems())
-    {
-        // iChat does not state it supports chat states
-        if ((element.tagName() == "feature" && element.attribute("var") == ns_chat_states) ||
-            (element.tagName() == "identity" && element.attribute("name") == "iChatAgent"))
-        {
-            if (!chatStatesJids.contains(disco.from()))
-            {
-                chatStatesJids.append(disco.from());
-
-                // send initial state
-                QXmppMessage message;
-                message.setTo(disco.from());
-                message.setState(localState());
-                client->sendPacket(message);
-            }
-        }
-    }
-}
-
 /** Start a two party dialog.
  */
 void ChatDialog::join()
 {
-    // discover remote party features
-    foreach (const QString& resource, client->getRoster().getResources(chatRemoteJid))
+    // send initial state
+    chatStatesJids = rosterModel->contactFeaturing(chatRemoteJid, ChatRosterModel::ChatStatesFeature);
+    foreach (const QString &fullJid, chatStatesJids)
     {
-        QXmppDiscoveryIq disco;
-        disco.setTo(chatRemoteJid + "/" + resource);
-        disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-        client->sendPacket(disco);
+        QXmppMessage message;
+        message.setTo(fullJid);
+        message.setState(localState());
+        client->sendPacket(message);
     }
 
     // list archives for the past week.

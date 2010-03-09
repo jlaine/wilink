@@ -26,6 +26,7 @@
 #include <QSortFilterProxyModel>
 
 #include "qxmpp/QXmppConstants.h"
+#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
@@ -106,6 +107,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
@@ -137,6 +139,16 @@ QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
     if (item)
         return item->data(AvatarRole).value<QPixmap>();
     return QPixmap();
+}
+
+QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRosterModel::Feature feature) const
+{
+    QStringList jids;
+    const QString sought = bareJid + "/";
+    foreach (const QString &key, clientFeatures.keys())
+        if (key.startsWith(sought) && (clientFeatures.value(key) & feature))
+            jids << key;
+    return jids;
 }
 
 QString ChatRosterModel::contactName(const QString &bareJid) const
@@ -233,8 +245,31 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 
 void ChatRosterModel::disconnected()
 {
+    clientFeatures.clear();
     rootItem->clear();
     reset();
+}
+
+void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    if (!clientFeatures.contains(disco.from()) ||
+        disco.type() != QXmppIq::Result ||
+        disco.queryType() != QXmppDiscoveryIq::InfoQuery)
+        return;
+
+    int features = 0;
+    foreach (const QXmppElement &element, disco.queryItems())
+    {
+        // iChat does not state it supports chat states
+        if ((element.tagName() == "feature" && element.attribute("var") == ns_chat_states) ||
+            (element.tagName() == "identity" && element.attribute("name") == "iChatAgent"))
+        {
+            features |= ChatStatesFeature;
+        } else if (element.tagName() == "feature" && element.attribute("var") == ns_stream_initiation_file_transfer) {
+            features |= FileTransferFeature;
+        }
+    }
+    clientFeatures.insert(disco.from(), features);
 }
 
 QModelIndex ChatRosterModel::index(int row, int column, const QModelIndex &parent) const
@@ -285,8 +320,28 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
 void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.from();
-    const QString roomJid = jidToBareJid(jid);
-    ChatRosterItem *roomItem = rootItem->find(roomJid);
+    const QString bareJid = jidToBareJid(jid);
+    const QString resource = jidToResource(jid);
+
+    // handle features discovery
+    if (!resource.isEmpty())
+    {
+        if (presence.getType() == QXmppPresence::Unavailable)
+            clientFeatures.remove(jid);
+        else if (presence.getType() == QXmppPresence::Available && !clientFeatures.contains(jid))
+        {
+            clientFeatures.insert(jid, 0);
+
+            // discover remote party features
+            QXmppDiscoveryIq disco;
+            disco.setTo(jid);
+            disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
+            client->sendPacket(disco);
+        }
+    }
+
+    // handle chat rooms
+    ChatRosterItem *roomItem = rootItem->find(bareJid);
     if (!roomItem || roomItem->type() != ChatRosterItem::Room)
         return;
 
@@ -452,7 +507,7 @@ void ChatRosterModel::removeItem(const QString &bareJid)
 }
 
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
-    : QTreeView(parent)
+    : QTreeView(parent), rosterModel(model)
 {
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(model);
@@ -484,6 +539,8 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString &bareJid = index.data(ChatRosterModel::IdRole).toString();
+    
     if (type == ChatRosterItem::Contact)
     {
         QMenu *menu = new QMenu(this);
@@ -492,9 +549,12 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         action->setData(InviteAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
-        action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
-        action->setData(SendAction);
-        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        if (!rosterModel->contactFeaturing(bareJid, ChatRosterModel::FileTransferFeature).isEmpty())
+        {
+            action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
+            action->setData(SendAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
 
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
         action->setData(RemoveAction);

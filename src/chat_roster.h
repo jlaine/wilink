@@ -62,6 +62,11 @@ public:
         FlagsRole,
     };
 
+    enum Feature {
+        ChatStatesFeature = 1,
+        FileTransferFeature = 2,
+    };
+
     enum Flag {
         OwnerFlag = 1,
     };
@@ -75,6 +80,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     QPixmap contactAvatar(const QString &bareJid) const;
+    QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
     QString contactName(const QString &bareJid) const;
     QString ownName() const;
 
@@ -89,6 +95,7 @@ public slots:
     void disconnected();
 
 protected slots:
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);
     void rosterChanged(const QString &jid);
@@ -102,6 +109,7 @@ private:
     QXmppClient *client;
     ChatRosterItem *rootItem;
     QString nickName;
+    QMap<QString, int> clientFeatures;
 };
 
 class ChatRosterView : public QTreeView
@@ -137,6 +145,9 @@ protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
     void slotAction();
     void slotActivated(const QModelIndex &index);
+
+private:
+    ChatRosterModel *rosterModel;
 };
 
 #endif
