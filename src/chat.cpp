@@ -68,6 +68,8 @@ using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
 
+static qint64 fileSizeLimit = 10000000; // 10 MB
+
 enum StatusIndexes {
     AvailableIndex = 0,
     BusyIndex = 1,
@@ -779,13 +781,25 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 return;
             QString fullJid = fullJids.first();
 
+            // get file name
             QString filePath = QFileDialog::getOpenFileName(this, tr("Send a file"));
-            if (!filePath.isEmpty())
+            if (filePath.isEmpty())
+                return;
+
+            // check file size
+            if (QFileInfo(filePath).size() > fileSizeLimit)
             {
-                QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
-                job->setData(LocalPathRole, filePath);
-                chatTransfers->addJob(job);
+                QMessageBox::warning(this,
+                    tr("Send a file"),
+                    tr("Sorry, but you cannot send files bigger than %1.")
+                        .arg(ChatTransfers::sizeToString(fileSizeLimit)));
+                return;
             }
+
+            // send file
+            QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
+            job->setData(LocalPathRole, filePath);
+            chatTransfers->addJob(job);
         }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)

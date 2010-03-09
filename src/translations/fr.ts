@@ -59,6 +59,10 @@
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
+    <message>
+        <source>Sorry, but you cannot send files bigger than %1.</source>
+        <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
