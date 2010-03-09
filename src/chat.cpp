@@ -235,13 +235,9 @@ void Chat::addContact()
 void Chat::addPanel(QWidget *panel)
 {
     if (conversationPanel->indexOf(panel) >= 0)
-    {
-        conversationPanel->setCurrentWidget(panel);
         return;
-    }
 
     conversationPanel->addWidget(panel);
-    conversationPanel->setCurrentWidget(panel);
     conversationPanel->show();
     if (conversationPanel->count() == 1)
         resizeContacts();
@@ -842,8 +838,8 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
         {
-            QWidget *widget = conversationPanel->findChild<QWidget*>(jid);
-            conversationPanel->setCurrentWidget(widget);
+            if (jid == chatTransfers->objectName())
+                showTransfers();
         }
     }
 }
@@ -915,6 +911,7 @@ void Chat::showConsole()
         chatConsole->windowTitle(),
         QIcon(":/options.png"));
     addPanel(chatConsole);
+    conversationPanel->setCurrentWidget(chatConsole);
 }
 
 void Chat::hideTransfers()
@@ -929,5 +926,6 @@ void Chat::showTransfers()
         chatTransfers->windowTitle(),
         QIcon(":/album.png"));
     addPanel(chatTransfers);
+    conversationPanel->setCurrentWidget(chatTransfers);
 }
 
