@@ -205,14 +205,22 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
     // determine file location
     QDir downloadsDir(SystemInfo::downloadsLocation());
-    const QString filePath = QFileDialog::getSaveFileName(this, tr("Receive a file"),
-        downloadsDir.absoluteFilePath(job->fileName()));
-    if (filePath.isEmpty())
-    {
-        job->abort();
-        return;
-    }
 
+    const QString fileBase = QFileInfo(job->fileName()).completeBaseName();
+    const QString fileSuffix = QFileInfo(job->fileName()).suffix();
+    QString fileName = fileBase;
+    if (!fileSuffix.isEmpty())
+        fileName += "." + fileSuffix;
+    int i = 2;
+    while (downloadsDir.exists(fileName))
+    {
+        fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
+        if (!fileSuffix.isEmpty())
+            fileName += "." + fileSuffix;
+    }
+    qDebug() << "file name" << fileName;
+
+    const QString filePath = downloadsDir.absoluteFilePath(fileName);
     QFile *file = new QFile(filePath, job);
     if (file->open(QIODevice::WriteOnly))
     {
