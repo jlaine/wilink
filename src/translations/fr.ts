@@ -249,12 +249,12 @@ Acceptez-vous?</translation>
         <translation>Transferts de fichiers</translation>
     </message>
     <message>
-        <source>The file transfer feature is experimental and the transfer speed is purposefuly limited so as not to disturb your internet connection.</source>
-        <translation>La fonctionalité transfert de fichiers est expérimentale et la vitesse de transfert est volontairement limitée pour ne pas perturber votre connexion internet.</translation>
-    </message>
-    <message>
         <source>Received files are stored in the &apos;%1&apos; folder.</source>
         <translation>Les fichiers reçus sont stockés dans le dossier &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection.</source>
+        <translation>La fonctionalité transfert de fichiers est expérimentale et la vitesse de transfert est limitée pour ne pas perturber votre connexion internet.</translation>
     </message>
 </context>
 <context>

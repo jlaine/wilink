@@ -109,12 +109,13 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     layout->addItem(hbox);
 
     /* help label */
-    QLabel *helpLabel = new QLabel(tr("The file transfer feature is experimental and the transfer speed is purposefuly limited so as not to disturb your internet connection."));
+    QLabel *helpLabel = new QLabel(tr("The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection."));
     helpLabel->setWordWrap(true);
     layout->addWidget(helpLabel);
 
     /* download location label */
-    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in the '%1' folder.").arg(SystemInfo::downloadsLocation()));
+    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in the '%1' folder.")
+        .arg(QFileInfo(SystemInfo::downloadsLocation()).fileName()));
     layout->addWidget(downloadsLabel);
 
     /* transfers list */
