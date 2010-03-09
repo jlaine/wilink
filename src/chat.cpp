@@ -162,10 +162,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowIcon(QIcon(":/chat.png"));
 
     /* set up transfers window */
-#if 0
     client->getTransferManager().setSupportedMethods(
-        QXmppTransferJob::InBandMethod);
-#endif
+        QXmppTransferJob::SocksMethod);
     chatTransfers = new ChatTransfers;
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
