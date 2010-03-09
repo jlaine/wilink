@@ -231,8 +231,16 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
+/** Add a panel or show it.
+ */
 void Chat::addPanel(QWidget *panel)
 {
+    if (conversationPanel->indexOf(panel) >= 0)
+    {
+        conversationPanel->setCurrentWidget(panel);
+        return;
+    }
+
     conversationPanel->addWidget(panel);
     conversationPanel->setCurrentWidget(panel);
     conversationPanel->show();
@@ -871,22 +879,20 @@ void Chat::statusChanged(int currentIndex)
 
 void Chat::showConsole()
 {
-    rosterModel->addItem(ChatRosterItem::Other, chatConsole->objectName(),
-        chatConsole->windowTitle(), QIcon(":/options.png"));
-    if (conversationPanel->indexOf(chatConsole) < 0)
-        addPanel(chatConsole);
-    else
-        conversationPanel->setCurrentWidget(chatConsole);
+    rosterModel->addItem(ChatRosterItem::Other,
+        chatConsole->objectName(),
+        chatConsole->windowTitle(),
+        QIcon(":/options.png"));
+    addPanel(chatConsole);
 }
 
 void Chat::showTransfers()
 {
-    rosterModel->addItem(ChatRosterItem::Other, chatTransfers->objectName(),
-        chatTransfers->windowTitle(), QIcon(":/album.png"));
-    if (conversationPanel->indexOf(chatTransfers) < 0)
-        addPanel(chatTransfers);
-    else
-        conversationPanel->setCurrentWidget(chatTransfers);
+    rosterModel->addItem(ChatRosterItem::Other,
+        chatTransfers->objectName(),
+        chatTransfers->windowTitle(),
+        QIcon(":/album.png"));
+    addPanel(chatTransfers);
 }
 
 void Chat::closeTab()
