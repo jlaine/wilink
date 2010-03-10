@@ -840,6 +840,8 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         {
             if (jid == chatTransfers->objectName())
                 showTransfers();
+            else if (jid == chatConsole->objectName())
+                showConsole();
         }
     }
 }
