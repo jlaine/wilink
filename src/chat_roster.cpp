@@ -444,6 +444,8 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         item->setData(AvatarRole, QPixmap::fromImage(image));
         if (!vcard.nickName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.nickName());
+        else if (!vcard.fullName().isEmpty())
+            item->setData(Qt::DisplayRole, vcard.fullName());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
