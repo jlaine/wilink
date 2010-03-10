@@ -47,6 +47,7 @@
 #include "qxmpp/QXmppTransferManager.h"
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
+#include "qxmpp/QXmppVersionIq.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
@@ -704,6 +705,17 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             inviteContact(jid);
         else if (action == ChatRosterView::JoinAction)
             joinConversation(jid, false);
+        else if (action == ChatRosterView::OptionsAction)
+        {
+            QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::VersionFeature);
+            if (!fullJids.size())
+                return;
+
+            QXmppVersionIq iq;
+            iq.setType(QXmppIq::Get);
+            iq.setTo(fullJids.first());
+            client->sendPacket(iq);
+        }
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
         else if (action == ChatRosterView::SendAction)

@@ -260,13 +260,20 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     int features = 0;
     foreach (const QXmppElement &element, disco.queryItems())
     {
+        if (element.tagName() == "feature")
+        {
+            const QString var = element.attribute("var");
+            if (var == ns_chat_states)
+                features |= ChatStatesFeature;
+            else if (var == ns_stream_initiation_file_transfer)
+                features |= FileTransferFeature;
+            else if (var == ns_version)
+                features |= VersionFeature;
+        }
         // iChat does not state it supports chat states
-        if ((element.tagName() == "feature" && element.attribute("var") == ns_chat_states) ||
-            (element.tagName() == "identity" && element.attribute("name") == "iChatAgent"))
+        else if (element.tagName() == "identity" && element.attribute("name") == "iChatAgent")
         {
             features |= ChatStatesFeature;
-        } else if (element.tagName() == "feature" && element.attribute("var") == ns_stream_initiation_file_transfer) {
-            features |= FileTransferFeature;
         }
     }
     clientFeatures.insert(disco.from(), features);
@@ -565,6 +572,15 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
             action->setData(SendAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }
+
+#if 0
+        if (!rosterModel->contactFeaturing(bareJid, ChatRosterModel::VersionFeature).isEmpty())
+        {
+            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Information"));
+            action->setData(OptionsAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
+#endif
 
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
         action->setData(RemoveAction);

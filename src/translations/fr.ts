@@ -213,6 +213,10 @@ Acceptez-vous?</translation>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
+    <message>
+        <source>Information</source>
+        <translation>Informations</translation>
+    </message>
 </context>
 <context>
     <name>ChatTransferPrompt</name>

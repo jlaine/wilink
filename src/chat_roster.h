@@ -65,6 +65,7 @@ public:
     enum Feature {
         ChatStatesFeature = 1,
         FileTransferFeature = 2,
+        VersionFeature = 4,
     };
 
     enum Flag {
