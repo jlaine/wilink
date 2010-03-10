@@ -48,7 +48,7 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     button->setFlat(true);
     button->setMaximumWidth(32);
     button->setIcon(QIcon(":/close.png"));
-    connect(button, SIGNAL(clicked()), this, SLOT(slotLeave()));
+    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
     hbox->addWidget(button);
     layout->addItem(hbox);
 
@@ -169,11 +169,6 @@ void ChatConversation::slotInactive()
         chatLocalState = QXmppMessage::Inactive;
         emit localStateChanged(chatLocalState);
     }
-}
-
-void ChatConversation::slotLeave()
-{
-    emit closeTab(chatRemoteJid);
 }
 
 void ChatConversation::slotNewLine()

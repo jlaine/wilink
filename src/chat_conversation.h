@@ -51,14 +51,13 @@ public:
 protected slots:
     void slotFocused();
     void slotInactive();
-    void slotLeave();
     void slotNewLine();
     void slotPaused();
     void slotSend();
     void slotTextChanged();
 
 signals:
-    void closeTab(const QString &jid);
+    void closeTab();
     void localStateChanged(QXmppMessage::State state);
 
 protected:

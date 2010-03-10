@@ -327,7 +327,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(closeTab(const QString&)), this, SLOT(leaveConversation(const QString&)));
+    connect(dialog, SIGNAL(closeTab()), this, SLOT(leaveConversation()));
     if (room)
     {
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
@@ -490,15 +490,15 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     dialog->setFocus();
 }
 
-void Chat::leaveConversation(const QString &jid)
+void Chat::leaveConversation()
 {
-    ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
-    if (!dialog)
+    ChatConversation *dialog = qobject_cast<ChatConversation*>(sender());
+    if (!dialog || conversationPanel->indexOf(dialog) < 0)
         return;
 
     // leave room
     if (qobject_cast<ChatRoom*>(dialog))
-        rosterModel->removeItem(jid);
+        rosterModel->removeItem(dialog->objectName());
     dialog->leave();
 
     // close view

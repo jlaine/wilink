@@ -116,7 +116,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
             {
                 // leave room
-                emit closeTab(chatRemoteJid);
+                emit closeTab();
 
                 QXmppStanza::Error error = presence.error();
                 QMessageBox::warning(window(),
@@ -133,7 +133,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
             return;
 
         // leave room
-        emit closeTab(chatRemoteJid);
+        emit closeTab();
 
         foreach (const QXmppElement &extension, presence.extensions())
         {
