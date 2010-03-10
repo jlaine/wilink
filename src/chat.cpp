@@ -101,8 +101,12 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
-    client->setLogger(new QXmppLogger(this));
     rosterModel =  new ChatRosterModel(client);
+
+    /* set up logger */
+    QXmppLogger *logger = new QXmppLogger(this);
+    logger->setLoggingType(QXmppLogger::SIGNAL);
+    client->setLogger(logger);
 
     /* build splitter */
     splitter = new QSplitter;
