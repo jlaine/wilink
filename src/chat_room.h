@@ -33,6 +33,7 @@ class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppIq;
 class QXmppMessage;
+class QXmppPresence;
 
 class ChatRoom : public ChatConversation
 {
@@ -45,6 +46,7 @@ public:
 
 protected slots:
     void messageReceived(const QXmppMessage &msg);
+    void presenceReceived(const QXmppPresence &msg);
 
 protected:
     virtual void sendMessage(const QString &text);

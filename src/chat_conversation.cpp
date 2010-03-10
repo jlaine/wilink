@@ -173,7 +173,7 @@ void ChatConversation::slotInactive()
 
 void ChatConversation::slotLeave()
 {
-    emit leave(chatRemoteJid);
+    emit closeTab(chatRemoteJid);
 }
 
 void ChatConversation::slotNewLine()

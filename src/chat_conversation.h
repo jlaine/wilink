@@ -58,7 +58,7 @@ protected slots:
     void slotTextChanged();
 
 signals:
-    void leave(const QString &jid);
+    void closeTab(const QString &jid);
     void localStateChanged(QXmppMessage::State state);
 
 protected:

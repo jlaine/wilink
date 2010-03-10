@@ -50,6 +50,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient)
 {
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
 }
 
 /** Send a request to join a multi-user chat.
@@ -100,6 +101,59 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         }
     }
     chatHistory->addMessage(message);
+}
+
+void ChatRoom::presenceReceived(const QXmppPresence &presence)
+{
+    if (jidToBareJid(presence.from()) != chatRemoteJid)
+        return;
+
+    switch (presence.getType())
+    {
+    case QXmppPresence::Error:
+        foreach (const QXmppElement &extension, presence.extensions())
+        {
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
+            {
+                // leave room
+                emit closeTab(chatRemoteJid);
+
+                QXmppStanza::Error error = presence.error();
+                QMessageBox::warning(window(),
+                    tr("Chat room error"),
+                    tr("Sorry, but you cannot join chat room %1.\n\n%2")
+                        .arg(chatRemoteJid)
+                        .arg(error.text()));
+                break;
+            }
+        }
+        break;
+    case QXmppPresence::Unavailable:
+        if (chatLocalName != jidToResource(presence.from()))
+            return;
+
+        // leave room
+        emit closeTab(chatRemoteJid);
+
+        foreach (const QXmppElement &extension, presence.extensions())
+        {
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc_user)
+            {
+                int statusCode = extension.firstChildElement("status").attribute("code").toInt();
+                if (statusCode == 307)
+                {
+                    QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
+                    QMessageBox::warning(window(),
+                        tr("Chat room error"),
+                        tr("Sorry, but you were kicked from chat room %1.\n\n%2")
+                            .arg(chatRemoteJid)
+                            .arg(reason.value()));
+                }
+                break;
+            }
+        }
+        break;
+    }
 }
 
 void ChatRoom::sendMessage(const QString &text)

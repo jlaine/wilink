@@ -24,14 +24,6 @@
         <translation>Rejoindre un salon de discussion</translation>
     </message>
     <message>
-        <source>Sorry, but you cannot join chat room %1.
-
-%2</source>
-        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion %1.
-
-%2</translation>
-    </message>
-    <message>
         <source>Available</source>
         <translation>Disponible</translation>
     </message>
@@ -42,18 +34,6 @@
     <message>
         <source>Offline</source>
         <translation>Déconnecté</translation>
-    </message>
-    <message>
-        <source>Chat room error</source>
-        <translation>Erreur de salon de discussion</translation>
-    </message>
-    <message>
-        <source>Sorry, but you were kicked from chat room %1.
-
-%2</source>
-        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion %1.
-
-%2</translation>
     </message>
     <message>
         <source>Send a file</source>
@@ -102,6 +82,29 @@
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>
+    </message>
+</context>
+<context>
+    <name>ChatRoom</name>
+    <message>
+        <source>Chat room error</source>
+        <translation>Erreur de salon de discussion</translation>
+    </message>
+    <message>
+        <source>Sorry, but you were kicked from chat room %1.
+
+%2</source>
+        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion %1.
+
+%2</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot join chat room %1.
+
+%2</source>
+        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion %1.
+
+%2</translation>
     </message>
 </context>
 <context>
@@ -189,10 +192,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Remove contact</source>
         <translation>Retirer contact</translation>
-    </message>
-    <message>
-        <source>Leave room</source>
-        <translation>Quitter le salon</translation>
     </message>
     <message>
         <source>Invite to a chat room</source>

@@ -327,7 +327,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(leave(const QString&)), this, SLOT(leaveConversation(const QString&)));
+    connect(dialog, SIGNAL(closeTab(const QString&)), this, SLOT(leaveConversation(const QString&)));
     if (room)
     {
         dialog->setRemotePixmap(QPixmap(":/chat.png"));
@@ -579,53 +579,9 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     QXmppPresence packet;
     packet.setTo(presence.from());
     const QString bareJid = jidToBareJid(presence.from());
-    ChatRoom *chatRoom = conversationPanel->findChild<ChatRoom*>(bareJid);
 
     switch (presence.getType())
     {
-    case QXmppPresence::Error:
-        if (!chatRoom)
-            return;
-        foreach (const QXmppElement &extension, presence.extensions())
-        {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
-            {
-                leaveConversation(bareJid);
-
-                QXmppStanza::Error error = presence.error();
-                QMessageBox::warning(this,
-                    tr("Chat room error"),
-                    tr("Sorry, but you cannot join chat room %1.\n\n%2")
-                        .arg(bareJid)
-                        .arg(error.text()));
-                break;
-            }
-        }
-        break;
-    case QXmppPresence::Unavailable:
-        if (!chatRoom ||
-            chatRoom->localName() != jidToResource(presence.from()))
-            return;
-        foreach (const QXmppElement &extension, presence.extensions())
-        {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc_user)
-            {
-                leaveConversation(bareJid);
-
-                int statusCode = extension.firstChildElement("status").attribute("code").toInt();
-                if (statusCode == 307)
-                {
-                    QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
-                    QMessageBox::warning(this,
-                        tr("Chat room error"),
-                        tr("Sorry, but you were kicked from chat room %1.\n\n%2")
-                            .arg(bareJid)
-                            .arg(reason.value()));
-                }
-                break;
-            }
-        }
-        break;
     case QXmppPresence::Subscribe:
         {
             QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
