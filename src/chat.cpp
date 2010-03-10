@@ -42,7 +42,6 @@
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppPingIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppTransferManager.h"
@@ -97,7 +96,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : chatConsole(0),
     isBusy(false),
     isConnected(false),
-    reconnectOnDisconnect(false),
     systemTrayIcon(trayIcon)
 {
     client = new QXmppClient(this);
@@ -183,15 +181,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
             chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
-
-    /* set up timers */
-    pingTimer = new QTimer(this);
-    pingTimer->setInterval(60000);
-    connect(pingTimer, SIGNAL(timeout()), this, SLOT(sendPing()));
-
-    timeoutTimer = new QTimer(this);
-    timeoutTimer->setInterval(15000);
-    connect(timeoutTimer, SIGNAL(timeout()), this, SLOT(reconnect()));
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_J), this);
@@ -300,7 +289,7 @@ void Chat::connected()
     qWarning("Connected to chat server");
     isConnected = true;
     addButton->setEnabled(true);
-    pingTimer->start();
+    //pingTimer->start();
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 
     /* discover services */
@@ -349,15 +338,6 @@ void Chat::disconnected()
     addButton->setEnabled(false);
     roomButton->setEnabled(false);
     statusCombo->setCurrentIndex(OfflineIndex);
-    pingTimer->stop();
-    timeoutTimer->stop();
-
-    if (reconnectOnDisconnect)
-    {
-        qWarning("Reconnecting to chat server");
-        reconnectOnDisconnect = false;
-        client->connectToServer(client->getConfiguration());
-    }
 }
 
 void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -453,7 +433,6 @@ void Chat::inviteContact(const QString &jid)
 
 void Chat::iqReceived(const QXmppIq &iq)
 {
-    timeoutTimer->stop();
     if (iq.type() == QXmppIq::Result && !iq.extensions().isEmpty())
     {
         const QXmppElement query = iq.extensions().first();
@@ -645,6 +624,10 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(ignoreSslErrors);
 
+    /* set keep alive */
+    config.setKeepAliveInterval(60);
+    config.setKeepAliveTimeout(15);
+
     /* connect to server */
     client->connectToServer(config);
     return true;
@@ -682,12 +665,6 @@ void Chat::removeContact(const QString &jid)
         packet.addItem(item);
         client->sendPacket(packet);
     }
-}
-
-void Chat::reconnect()
-{
-    reconnectOnDisconnect = true;
-    client->disconnect();
 }
 
 /** Try to resize the window to fit the contents of the contacts list.
@@ -804,18 +781,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 showConsole();
         }
     }
-}
-
-/** Send an XMPP Ping as described in XEP-0199:
- *  http://xmpp.org/extensions/xep-0199.html
- */
-void Chat::sendPing()
-{
-    QXmppPingIq ping;
-    ping.setFrom(client->getConfiguration().jid());
-    ping.setTo(client->getConfiguration().domain());
-    client->sendPacket(ping);
-    timeoutTimer->start();
 }
 
 void Chat::statusChanged(int currentIndex)

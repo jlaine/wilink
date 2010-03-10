@@ -68,13 +68,11 @@ protected slots:
     void messageReceived(const QXmppMessage &msg);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
-    void reconnect();
     void rejoinConversations();
     void removePanel(QWidget *panel);
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void resizeContacts();
-    void sendPing();
     void statusChanged(int currentIndex);
 
     void hideConsole();
@@ -90,14 +88,12 @@ protected:
 private:
     bool isBusy;
     bool isConnected;
-    bool reconnectOnDisconnect;
 
     QPushButton *addButton;
     QPushButton *roomButton;
     ChatConsole *chatConsole;
     ChatTransfers *chatTransfers;
     QXmppClient *client;
-    QTimer *pingTimer;
 
     ChatRosterModel *rosterModel;
     ChatRosterView *rosterView;
@@ -105,7 +101,6 @@ private:
     QSplitter *splitter;
     QComboBox *statusCombo;
     QSystemTrayIcon *systemTrayIcon;
-    QTimer *timeoutTimer;
     QStackedWidget *conversationPanel;
 
     QString chatRoomServer;
