@@ -612,12 +612,16 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             {
                 leaveConversation(bareJid);
 
-                QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
-                QMessageBox::warning(this,
-                    tr("Chat room error"),
-                    tr("Sorry, but you were kicked from chat room %1.\n\n%2")
-                        .arg(bareJid)
-                        .arg(reason.value()));
+                int statusCode = extension.firstChildElement("status").attribute("code").toInt();
+                if (statusCode == 307)
+                {
+                    QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
+                    QMessageBox::warning(this,
+                        tr("Chat room error"),
+                        tr("Sorry, but you were kicked from chat room %1.\n\n%2")
+                            .arg(bareJid)
+                            .arg(reason.value()));
+                }
                 break;
             }
         }
