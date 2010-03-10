@@ -1,4 +1,4 @@
-wDesktop 0.6.99 (UNRELEASED)
+wDesktop 0.7.0 (2010-03-10)
  * Add support for chat state notifications.
  * Add support for file transfers.
  * Notify the user when he cannot join a chat room or gets kicked out.
