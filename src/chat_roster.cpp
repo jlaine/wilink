@@ -572,27 +572,27 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
 
         menu->popup(event->globalPos());
     } else if (type == ChatRosterItem::Room) {
-        QMenu *menu = new QMenu(this);
-
-        if (index.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::OptionsFlag)
+        int flags = index.data(ChatRosterModel::FlagsRole).toInt();
+        if (flags & ChatRosterModel::OptionsFlag || flags & ChatRosterModel::MembersFlag)
         {
-            QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
-            action->setData(OptionsAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+            QMenu *menu = new QMenu(this);
+
+            if (flags & ChatRosterModel::OptionsFlag)
+            {
+                QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
+                action->setData(OptionsAction);
+                connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+            }
+
+            if (flags & ChatRosterModel::MembersFlag)
+            {
+                QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
+                action->setData(MembersAction);
+                connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+            }
+
+            menu->popup(event->globalPos());
         }
-
-        if (index.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::MembersFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
-            action->setData(MembersAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
-
-        QAction *action = menu->addAction(QIcon(":/close.png"), tr("Leave room"));
-        action->setData(LeaveAction);
-        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-
-        menu->popup(event->globalPos());
     } else if (type == ChatRosterItem::RoomMember) {
         QModelIndex room = index.parent();
         if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)

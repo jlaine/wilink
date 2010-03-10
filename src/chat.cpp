@@ -771,8 +771,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             inviteContact(jid);
         else if (action == ChatRosterView::JoinAction)
             joinConversation(jid, false);
-        else if (action == ChatRosterView::LeaveAction)
-            leaveConversation(jid);
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
         else if (action == ChatRosterView::SendAction)
@@ -806,8 +804,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
             joinConversation(jid, true);
-        else if (action == ChatRosterView::LeaveAction)
-            leaveConversation(jid);
         else if (action == ChatRosterView::OptionsAction)
         {
             // get room info

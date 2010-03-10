@@ -125,7 +125,6 @@ public:
         AddAction,
         InviteAction,
         JoinAction,
-        LeaveAction,
         OptionsAction,
         MembersAction,
         RemoveAction,
