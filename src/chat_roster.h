@@ -68,7 +68,9 @@ public:
     };
 
     enum Flag {
-        OwnerFlag = 1,
+        OptionsFlag = 1,
+        MembersFlag = 2,
+        KickFlag = 4,
     };
 
     ChatRosterModel(QXmppClient *client);

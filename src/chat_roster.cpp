@@ -358,10 +358,18 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
             {
                 QXmppElement item = x.firstChildElement("item");
-                if (item.attribute("jid") == client->getConfiguration().jid() &&
-                    item.attribute("affiliation") == "owner")
+                if (item.attribute("jid") == client->getConfiguration().jid())
                 {
-                    roomItem->setData(FlagsRole, OwnerFlag);
+                    int flags = 0;
+                    // role
+                    if (item.attribute("role") == "moderator")
+                        flags |= KickFlag;
+                    // affiliation
+                    if (item.attribute("affiliation") == "owner")
+                        flags |= (OptionsFlag | MembersFlag);
+                    else if (item.attribute("affiliation") == "admin")
+                        flags |= MembersFlag;
+                    roomItem->setData(FlagsRole, flags);
                 }
             }
         }
@@ -566,13 +574,16 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     } else if (type == ChatRosterItem::Room) {
         QMenu *menu = new QMenu(this);
 
-        if (index.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::OwnerFlag)
+        if (index.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::OptionsFlag)
         {
             QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
             action->setData(OptionsAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
 
-            action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
+        if (index.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::MembersFlag)
+        {
+            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
             action->setData(MembersAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }
@@ -584,7 +595,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         menu->popup(event->globalPos());
     } else if (type == ChatRosterItem::RoomMember) {
         QModelIndex room = index.parent();
-        if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::OwnerFlag)
+        if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
         {
             QMenu *menu = new QMenu(this);
 
