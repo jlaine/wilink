@@ -659,7 +659,7 @@ void Chat::rejoinConversations()
         ChatConversation *dialog = qobject_cast<ChatRoom*>(conversationPanel->widget(i));
         if (dialog)
         {
-            rosterModel->addItem(ChatRosterItem::Room, dialog->remoteJid());
+            rosterModel->addItem(ChatRosterItem::Room, dialog->objectName());
             dialog->join();
         }
     }

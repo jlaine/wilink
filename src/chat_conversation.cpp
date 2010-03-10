@@ -100,11 +100,6 @@ void ChatConversation::leave()
     emit localStateChanged(chatLocalState);
 }
 
-QString ChatConversation::localName() const
-{
-    return chatLocalName;
-}
-
 QXmppMessage::State ChatConversation::localState() const
 {
     return chatLocalState;
@@ -113,11 +108,6 @@ QXmppMessage::State ChatConversation::localState() const
 void ChatConversation::setLocalName(const QString &name)
 {
     chatLocalName = name;
-}
-
-QString ChatConversation::remoteJid() const
-{
-    return chatRemoteJid;
 }
 
 void ChatConversation::setRemoteName(const QString &name)
