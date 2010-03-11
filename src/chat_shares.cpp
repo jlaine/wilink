@@ -31,6 +31,14 @@ ChatShares::ChatShares(QXmppClient *xmppClient, QObject *parent)
     : QObject(parent), client(xmppClient)
 {
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+
+    // FIXME : find shared files in a thread
+    findFiles();
+}
+
+ChatShares::~ChatShares()
+{
+//    unregisterFromServer();
 }
 
 void ChatShares::discoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -51,7 +59,6 @@ void ChatShares::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         const QString ownJid = client->getConfiguration().jid();
         foreach (const QString &key, sharedFiles.keys())
         {
-            qDebug() << "hash" << key;
             QXmppElement item;
             item.setTagName("item");
             item.setAttribute("jid", ownJid);
@@ -91,13 +98,8 @@ void ChatShares::findFiles()
     }
 }
 
-void ChatShares::setShareServer(const QString &server)
+void ChatShares::registerWithServer()
 {
-    shareServer = server;
-
-    // find shared files
-    findFiles();
-
     // register with server
     QList<QXmppElement> extensions;
     QXmppElement x;
@@ -109,5 +111,26 @@ void ChatShares::setShareServer(const QString &server)
     presence.setTo(shareServer);
     presence.setExtensions(extensions);
     client->sendPacket(presence);
+}
+
+void ChatShares::unregisterFromServer()
+{
+    // unregister from server
+    QList<QXmppElement> extensions;
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_shares);
+    extensions.append(x);
+
+    QXmppPresence presence(QXmppPresence::Unavailable);
+    presence.setTo(shareServer);
+    presence.setExtensions(extensions);
+    client->sendPacket(presence);
+}
+
+void ChatShares::setShareServer(const QString &server)
+{
+    shareServer = server;
+    registerWithServer();
 }
 

@@ -34,11 +34,16 @@ class ChatShares : public QObject
 
 public:
     ChatShares(QXmppClient *client, QObject *parent);
+    ~ChatShares();
     void setShareServer(const QString &server);
 
 private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void findFiles();
+
+private:
+    void registerWithServer();
+    void unregisterFromServer();
 
 private:
     QXmppClient *client;
