@@ -33,7 +33,7 @@ ChatShares::ChatShares(QXmppClient *xmppClient, QObject *parent)
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
 
     // FIXME : find shared files in a thread
-    findFiles();
+    findLocalFiles();
 }
 
 ChatShares::~ChatShares()
@@ -72,7 +72,7 @@ void ChatShares::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-void ChatShares::findFiles()
+void ChatShares::findLocalFiles()
 {
     QDir shares(QDir::home().filePath("Public"));
     QByteArray buffer;
@@ -98,18 +98,35 @@ void ChatShares::findFiles()
     }
 }
 
-void ChatShares::registerWithServer()
+void ChatShares::findRemoteFiles(const QString &query)
 {
-    // register with server
-    QList<QXmppElement> extensions;
+    QXmppDiscoveryIq iq;
+    iq.setTo(shareServer);
+    iq.setType(QXmppIq::Get);
+    iq.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    iq.setQueryNode(ns_shares);
+
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_shares);
-    extensions.append(x);
+    QXmppElement search;
+    search.setTagName("search");
+    search.setValue(query);
+    x.appendChild(search);
+
+    iq.setExtensions(x);
+}
+
+void ChatShares::registerWithServer()
+{
+    // register with server
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_shares);
 
     QXmppPresence presence;
     presence.setTo(shareServer);
-    presence.setExtensions(extensions);
+    presence.setExtensions(x);
     client->sendPacket(presence);
 }
 

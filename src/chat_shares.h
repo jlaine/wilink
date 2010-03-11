@@ -39,7 +39,8 @@ public:
 
 private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
-    void findFiles();
+    void findLocalFiles();
+    void findRemoteFiles(const QString &query);
 
 private:
     void registerWithServer();
