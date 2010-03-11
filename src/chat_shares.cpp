@@ -27,8 +27,8 @@
 
 const char* ns_shares = "http://wifirst.net/protocol/shares";
 
-ChatShares::ChatShares(QXmppClient *xmppClient, QObject *parent)
-    : QObject(parent), client(xmppClient)
+ChatShares::ChatShares(QXmppClient *xmppClient, QWidget *parent)
+    : QWidget(parent), client(xmppClient)
 {
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
 

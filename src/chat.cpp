@@ -108,6 +108,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     logger->setLoggingType(QXmppLogger::SIGNAL);
     client->setLogger(logger);
 
+    /* set up shares */
+    chatShares = new ChatShares(client);
+
     /* build splitter */
     splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
@@ -145,6 +148,12 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(roomButton, SIGNAL(clicked()), this, SLOT(addRoom()));
     hbox->addWidget(roomButton);
 
+    sharesButton = new QPushButton;
+    sharesButton->setVisible(false);
+    sharesButton->setIcon(QIcon(":/album.png"));
+    connect(sharesButton, SIGNAL(clicked()), chatShares, SLOT(show()));
+    hbox->addWidget(sharesButton);
+
     hbox->addStretch();
 
     statusCombo = new QComboBox;
@@ -172,9 +181,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
-
-    /* set up shares */
-    chatShares = new ChatShares(client, this);
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -401,6 +407,7 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
                      item.attribute("type") == "file")
             {
                 chatShares->setShareServer(disco.from());
+                sharesButton->setVisible(true);
                 qDebug() << "Found share server" << disco.from();
             }
         }

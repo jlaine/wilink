@@ -21,19 +21,19 @@
 #define __WDESKTOP_CHAT_SHARES_H__
 
 #include <QMap>
-#include <QObject>
+#include <QWidget>
 
 class QXmppClient;
 class QXmppDiscoveryIq;
 
 extern const char* ns_shares;
 
-class ChatShares : public QObject
+class ChatShares : public QWidget
 {
     Q_OBJECT
 
 public:
-    ChatShares(QXmppClient *client, QObject *parent);
+    ChatShares(QXmppClient *client, QWidget *parent = 0);
     ~ChatShares();
     void setShareServer(const QString &server);
 
