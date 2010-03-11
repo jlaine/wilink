@@ -30,6 +30,7 @@ class ChatConversation;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
+class ChatShares;
 class ChatTransfers;
 class QComboBox;
 class QLabel;
@@ -92,6 +93,7 @@ private:
     QPushButton *addButton;
     QPushButton *roomButton;
     ChatConsole *chatConsole;
+    ChatShares *chatShares;
     ChatTransfers *chatTransfers;
     QXmppClient *client;
 

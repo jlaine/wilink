@@ -57,6 +57,7 @@
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
+#include "chat_shares.h"
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
@@ -171,6 +172,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
+
+    /* set up shares */
+    chatShares = new ChatShares(client, this);
 
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -392,6 +396,12 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             {
                 client->getTransferManager().setProxy(disco.from());
                 qDebug() << "Found bytestream proxy" << disco.from();
+            }
+            else if (item.attribute("category") == "store" &&
+                     item.attribute("type") == "file")
+            {
+                chatShares->setShareServer(disco.from());
+                qDebug() << "Found share server" << disco.from();
             }
         }
     }
