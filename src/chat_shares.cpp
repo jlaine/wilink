@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCryptographicHash>
+#include <QDir>
+
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 
@@ -32,11 +35,11 @@ ChatShares::ChatShares(QXmppClient *xmppClient, QObject *parent)
 
 void ChatShares::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.type() == QXmppIq::Get &&
-        disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == shareServer)
+    if (disco.from() == shareServer &&
+        disco.type() == QXmppIq::Get &&
+        disco.queryNode() == ns_shares &&
+        disco.queryType() == QXmppDiscoveryIq::ItemsQuery)
     {
-        qDebug() << "GOT A QUERY";
         QXmppDiscoveryIq iq;
         iq.setId(disco.id());
         iq.setTo(disco.from());
@@ -44,21 +47,56 @@ void ChatShares::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         iq.setQueryType(disco.queryType());
 
         QList<QXmppElement> items;
-        QXmppElement item;
-        item.setTagName("item");
-        item.setAttribute("jid", client->getConfiguration().jid());
-        item.setAttribute("node", "azerty");
-        item.setAttribute("name", "test_file.txt");
-        items.append(item);
+
+        const QString ownJid = client->getConfiguration().jid();
+        foreach (const QString &key, sharedFiles.keys())
+        {
+            qDebug() << "hash" << key;
+            QXmppElement item;
+            item.setTagName("item");
+            item.setAttribute("jid", ownJid);
+            item.setAttribute("node", key);
+            item.setAttribute("name", QFileInfo(sharedFiles[key]).fileName());
+            items.append(item);
+        }
 
         iq.setQueryItems(items);
         client->sendPacket(iq);
     }
 }
 
+void ChatShares::findFiles()
+{
+    QDir shares(QDir::home().filePath("Public"));
+    QByteArray buffer;
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    foreach (const QFileInfo &info, shares.entryInfoList())
+    {
+        if (info.isDir())
+            continue;
+
+        const QString path = info.absoluteFilePath();
+        QFile file(path);
+        if (file.open(QIODevice::ReadOnly))
+        {
+            while (file.bytesAvailable())
+            {
+                buffer = file.read(16384);
+                hash.addData(buffer);
+            }
+            const QString key = hash.result().toHex();
+            sharedFiles.insert(key, path);
+            hash.reset();
+        }
+    }
+}
+
 void ChatShares::setShareServer(const QString &server)
 {
     shareServer = server;
+
+    // find shared files
+    findFiles();
 
     // register with server
     QList<QXmppElement> extensions;

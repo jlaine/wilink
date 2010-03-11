@@ -20,6 +20,7 @@
 #ifndef __WDESKTOP_CHAT_SHARES_H__
 #define __WDESKTOP_CHAT_SHARES_H__
 
+#include <QMap>
 #include <QObject>
 
 class QXmppClient;
@@ -37,10 +38,12 @@ public:
 
 private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void findFiles();
 
 private:
     QXmppClient *client;
     QString shareServer;
+    QMap<QString, QString> sharedFiles;
 };
 
 #endif
