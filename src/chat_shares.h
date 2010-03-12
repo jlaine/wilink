@@ -24,6 +24,8 @@
 #include <QWidget>
 
 class ChatClient;
+class QLineEdit;
+class QListWidget;
 class QXmppShareIq;
 
 class ChatShares : public QWidget
@@ -36,9 +38,9 @@ public:
     void setShareServer(const QString &server);
 
 private slots:
-    void shareIqReceived(const QXmppShareIq &share);
     void findLocalFiles();
-    void findRemoteFiles(const QString &query);
+    void findRemoteFiles();
+    void shareIqReceived(const QXmppShareIq &share);
 
 private:
     void registerWithServer();
@@ -56,6 +58,9 @@ private:
     ChatClient *client;
     QString shareServer;
     QMap<QByteArray, File> sharedFiles;
+
+    QLineEdit *lineEdit;
+    QListWidget *listWidget;
 };
 
 #endif

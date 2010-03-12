@@ -19,6 +19,10 @@
 
 #include <QCryptographicHash>
 #include <QDir>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QListWidget>
 
 #include "qxmpp/QXmppShareIq.h"
 
@@ -28,10 +32,25 @@
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient)
 {
-    connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join.")));
+    lineEdit = new QLineEdit;
+    connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
+    layout->addWidget(lineEdit);
+
+    listWidget = new QListWidget;
+    listWidget->setIconSize(QSize(32, 32));
+    listWidget->setSortingEnabled(true);
+    //connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
+    layout->addWidget(listWidget);
+
+    setLayout(layout);
 
     // FIXME : find shared files in a thread
     findLocalFiles();
+
+    /* connect signals */
+    connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
 }
 
 ChatShares::~ChatShares()
@@ -41,11 +60,12 @@ ChatShares::~ChatShares()
 
 void ChatShares::shareIqReceived(const QXmppShareIq &share)
 {
-    if (share.from() == shareServer && share.type() == QXmppIq::Get)
+    if (share.from() != shareServer)
+        return;
+
+    if (share.type() == QXmppIq::Get)
     {
-        QXmppShareIq response;
-        response.setId(share.id());
-        response.setTo(share.from());
+        // perform search
         QList<QXmppShareIq::File> files;
         foreach (const QByteArray &key, sharedFiles.keys())
         {
@@ -55,8 +75,22 @@ void ChatShares::shareIqReceived(const QXmppShareIq &share)
             file.setHash(key);
             files.append(file);
         }
+
+        // send response
+        QXmppShareIq response;
+        response.setId(share.id());
+        response.setTo(share.from());
+        response.setType(QXmppIq::Result);
         response.setFiles(files);
         client->sendPacket(response);
+    }
+    else if (share.type() == QXmppIq::Result)
+    {
+        lineEdit->setEnabled(true);
+        foreach (const QXmppShareIq::File &file, share.files())
+        {
+            listWidget->insertItem(0, file.name());
+        }
     }
 }
 
@@ -89,12 +123,19 @@ void ChatShares::findLocalFiles()
     }
 }
 
-void ChatShares::findRemoteFiles(const QString &query)
+void ChatShares::findRemoteFiles()
 {
+    const QString search = lineEdit->text();
+    if (search.isEmpty())
+        return;
+
+    lineEdit->setEnabled(false);
+    listWidget->clear();
+
     QXmppShareIq iq;
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
-    iq.setSearch(query);
+    iq.setSearch(search);
     client->sendPacket(iq);
 }
 
