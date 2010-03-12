@@ -20,10 +20,12 @@
 #ifndef __WDESKTOP_CHAT_SHARES_H__
 #define __WDESKTOP_CHAT_SHARES_H__
 
-#include <QMap>
+#include <QDir>
 #include <QWidget>
+#include <QSqlDatabase>
 
 class ChatClient;
+class QDir;
 class QLineEdit;
 class QListWidget;
 class QXmppShareIq;
@@ -38,8 +40,8 @@ public:
     void setShareServer(const QString &server);
 
 private slots:
-    void findLocalFiles();
     void findRemoteFiles();
+    void scanFiles(const QDir &dir);
     void shareIqReceived(const QXmppShareIq &share);
 
 private:
@@ -47,17 +49,10 @@ private:
     void unregisterFromServer();
 
 private:
-    class File
-    {
-    public:
-        QString name;
-        QString path;
-        qint64 size;
-    };
-
     ChatClient *client;
     QString shareServer;
-    QMap<QByteArray, File> sharedFiles;
+    QDir sharesDir;
+    QSqlDatabase sharesDb;
 
     QLineEdit *lineEdit;
     QListWidget *listWidget;

@@ -23,6 +23,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QSqlQuery>
 
 #include "qxmpp/QXmppShareIq.h"
 
@@ -32,6 +33,8 @@
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient)
 {
+    sharesDir = QDir(QDir::home().filePath("Public"));
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join.")));
     lineEdit = new QLineEdit;
@@ -46,9 +49,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     setLayout(layout);
 
-    // FIXME : find shared files in a thread
-    findLocalFiles();
-
     /* connect signals */
     connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
 }
@@ -58,52 +58,74 @@ ChatShares::~ChatShares()
 //    unregisterFromServer();
 }
 
-void ChatShares::shareIqReceived(const QXmppShareIq &share)
+void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 {
-    if (share.from() != shareServer)
+    if (shareIq.from() != shareServer)
         return;
 
-    if (share.type() == QXmppIq::Get)
+    if (shareIq.type() == QXmppIq::Get)
     {
         // perform search
+        QSqlQuery query;
+        if (shareIq.search().isEmpty())
+        {
+            query = QSqlQuery("SELECT path, size, hash FROM files", sharesDb);
+        } else {
+            query = QSqlQuery("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
+            query.bindValue(":search", "%" + shareIq.search() + "%");
+        }
+        query.exec();
+
         QList<QXmppShareIq::File> files;
-        foreach (const QByteArray &key, sharedFiles.keys())
+        while (query.next())
         {
             QXmppShareIq::File file;
-            file.setName(sharedFiles[key].name);
-            file.setSize(sharedFiles[key].size);
-            file.setHash(key);
+            file.setName(QFileInfo(query.value(0).toString()).fileName());
+            file.setSize(query.value(1).toInt());
+            file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
             files.append(file);
         }
 
         // send response
         QXmppShareIq response;
-        response.setId(share.id());
-        response.setTo(share.from());
+        response.setId(shareIq.id());
+        response.setTo(shareIq.from());
         response.setType(QXmppIq::Result);
         response.setFiles(files);
         client->sendPacket(response);
     }
-    else if (share.type() == QXmppIq::Result)
+    else if (shareIq.type() == QXmppIq::Result)
     {
         lineEdit->setEnabled(true);
-        foreach (const QXmppShareIq::File &file, share.files())
+        foreach (const QXmppShareIq::File &file, shareIq.files())
         {
             listWidget->insertItem(0, file.name());
         }
     }
 }
 
-void ChatShares::findLocalFiles()
+void ChatShares::scanFiles(const QDir &dir)
 {
-    QDir shares(QDir::home().filePath("Public"));
-    QByteArray buffer;
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    foreach (const QFileInfo &info, shares.entryInfoList())
+    QSqlQuery query("INSERT INTO files (path, size) "
+                    "VALUES(:path, :size)", sharesDb);
+
+    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable))
     {
         if (info.isDir())
-            continue;
+        {
+            qDebug() << "recursing into" << info.filePath();
+            scanFiles(QDir(info.filePath()));
+        } else {
+            qDebug() << "inserting" << info.filePath();
+            query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
+            query.bindValue(":size", info.size());
+            query.exec();
+        }
 
+/*
+
+        QByteArray buffer;
+        QCryptographicHash hash(QCryptographicHash::Md5);
         File f;
         f.name = info.fileName();
         f.path = info.absoluteFilePath();
@@ -120,6 +142,7 @@ void ChatShares::findLocalFiles()
             sharedFiles.insert(key, f);
             hash.reset();
         }
+*/
     }
 }
 
@@ -170,6 +193,15 @@ void ChatShares::unregisterFromServer()
 void ChatShares::setShareServer(const QString &server)
 {
     shareServer = server;
+
+    // prepare database
+    sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+    sharesDb.setDatabaseName("/tmp/shares.db");
+    Q_ASSERT(sharesDb.open());
+    sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
+
+    scanFiles(sharesDir);
+
     registerWithServer();
 }
 
