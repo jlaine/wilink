@@ -28,7 +28,8 @@ endif(COREWLAN_LIBRARY)
 if(APPLE)
     set(WDESKTOP_EXTRA_PLUGINS
         ${QT_PLUGINS_DIR}/imageformats/libqgif.*
-        ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*)
+        ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
+        ${QT_PLUGINS_DIR}/sqldrivers/libqsqlite.*)
 endif(APPLE)
 if(WIN32)
     set(WDESKTOP_EXTRA_RUNTIME
@@ -40,11 +41,14 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll)
-    set(WDESKTOP_EXTRA_PLUGINS
+    set(WDESKTOP_IMAGE_PLUGINS
         ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
         ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
+    set(WDESKTOP_SQL_PLUGINS
+        ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
     install(FILES ${WDESKTOP_EXTRA_RUNTIME} DESTINATION bin)
-    install(FILES ${WDESKTOP_EXTRA_PLUGINS} DESTINATION bin/imageformats)
+    install(FILES ${WDESKTOP_IMAGE_PLUGINS} DESTINATION bin/imageformats)
+    install(FILES ${WDESKTOP_SQL_PLUGINS} DESTINATION bin/sqldrivers)
 endif(WIN32)
 
 # Packaging
