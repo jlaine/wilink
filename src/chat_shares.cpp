@@ -173,6 +173,8 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
     }
 
     QCryptographicHash hasher(QCryptographicHash::Md5);
+    QTime t;
+    t.start();
 
     // perform search
     QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
@@ -232,23 +234,23 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
     }
 
     // send response
+    qDebug() << "Found" << files.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     responseIq.setType(QXmppIq::Result);
     responseIq.setFiles(files);
     emit searchFinished(responseIq);
 }
 
 ChatSharesDatabase::IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
-    : QThread(parent), sharesDb(database), sharesDir(dir)
+    : QThread(parent), scanCount(0), sharesDb(database), sharesDir(dir)
 {
 };
 
 void ChatSharesDatabase::IndexThread::run()
 {
-    scanCount = 0;
     QTime t;
     t.start();
     scanDir(sharesDir);
-    qDebug() << "Found" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Scanned" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
 }
 
 void ChatSharesDatabase::IndexThread::scanDir(const QDir &dir)
