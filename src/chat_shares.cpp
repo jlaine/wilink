@@ -50,7 +50,8 @@ void ChatShares::shareIqReceived(const QXmppShareIq &share)
         foreach (const QByteArray &key, sharedFiles.keys())
         {
             QXmppShareIq::File file;
-            file.setName(QFileInfo(sharedFiles[key]).fileName());
+            file.setName(sharedFiles[key].name);
+            file.setSize(sharedFiles[key].size);
             file.setHash(key);
             files.append(file);
         }
@@ -69,8 +70,11 @@ void ChatShares::findLocalFiles()
         if (info.isDir())
             continue;
 
-        const QString path = info.absoluteFilePath();
-        QFile file(path);
+        File f;
+        f.name = info.fileName();
+        f.path = info.absoluteFilePath();
+        f.size = info.size();
+        QFile file(f.path);
         if (file.open(QIODevice::ReadOnly))
         {
             while (file.bytesAvailable())
@@ -79,7 +83,7 @@ void ChatShares::findLocalFiles()
                 hash.addData(buffer);
             }
             const QByteArray key = hash.result();
-            sharedFiles.insert(key, path);
+            sharedFiles.insert(key, f);
             hash.reset();
         }
     }

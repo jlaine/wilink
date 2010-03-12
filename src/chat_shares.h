@@ -45,9 +45,17 @@ private:
     void unregisterFromServer();
 
 private:
+    class File
+    {
+    public:
+        QString name;
+        QString path;
+        qint64 size;
+    };
+
     ChatClient *client;
     QString shareServer;
-    QMap<QByteArray, QString> sharedFiles;
+    QMap<QByteArray, File> sharedFiles;
 };
 
 #endif
