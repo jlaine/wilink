@@ -68,7 +68,7 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
             response.setId(shareIq.id());
             response.setTo(shareIq.from());
             response.setType(QXmppIq::Error);
-            response.setSid(shareIq.sid());
+            response.setTag(shareIq.tag());
             client->sendPacket(response);
             return;
         }
@@ -125,7 +125,7 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
         response.setId(shareIq.id());
         response.setTo(shareIq.from());
         response.setType(QXmppIq::Result);
-        response.setSid(shareIq.sid());
+        response.setTag(shareIq.tag());
         response.setFiles(files);
         client->sendPacket(response);
     }
