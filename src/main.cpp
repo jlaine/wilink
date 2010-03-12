@@ -35,9 +35,14 @@
 #include "qnetio/wallet.h"
 #include "trayicon.h"
 
+static int aborted = 0;
 static void signal_handler(int sig)
 {
+    if (aborted)
+        exit(1);
+
     qApp->quit();
+    aborted = 1;
 }
 
 int main(int argc, char *argv[])

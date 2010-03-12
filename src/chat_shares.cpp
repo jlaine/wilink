@@ -160,7 +160,7 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
 
     // prepare update queries
     QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
-    QSqlQuery updateQuery("UPDATE files SET hash = :hash WHERE path = :path", sharesDb);
+    QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
 
     QList<QXmppShareIq::File> files;
     while (query.next())
@@ -168,14 +168,25 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
         const QString path = query.value(0).toString();
         const qint64 size = query.value(1).toInt();
         QByteArray hash = QByteArray::fromHex(query.value(2).toByteArray());
+        QFileInfo info(sharesDir.filePath(path));
 
-        if (hash.isEmpty())
+        // check file is still readable
+        if (!info.isReadable())
         {
-            QFile file(sharesDir.filePath(path));
+            deleteQuery.bindValue(":path", path);
+            deleteQuery.exec();
+            continue;
+        }
+
+        // check whether we need to calculate checksum
+        if (hash.isEmpty() || info.size() != size)
+        {
+            QFile file(info.filePath());
+
             // if we cannot open the file, remove it from database
             if (!file.open(QIODevice::ReadOnly))
             {
-                qWarning() << "Removing file" << path;
+                qWarning() << "Failed to open file" << path;
                 deleteQuery.bindValue(":path", path);
                 deleteQuery.exec();
             }
@@ -185,14 +196,15 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
             hash = hasher.result();
             hasher.reset();
 
-            // add hash to database
+            // update database entry
             updateQuery.bindValue(":hash", hash.toHex());
+            updateQuery.bindValue(":size", info.size());
             updateQuery.bindValue(":path", path);
             updateQuery.exec();
         }
 
         QXmppShareIq::File file;
-        file.setName(QFileInfo(path).fileName());
+        file.setName(info.fileName());
         file.setSize(size);
         file.setHash(hash);
         files.append(file);
