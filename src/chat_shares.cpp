@@ -23,6 +23,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QListWidget>
+#include <QSqlError>
 #include <QSqlQuery>
 
 #include "qxmpp/QXmppShareIq.h"
@@ -76,8 +77,9 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
         query.bindValue(":search", "%" + shareIq.search() + "%");
         query.exec();
 
-        // prepare update query
-        QSqlQuery update("UPDATE files SET hash=:hash WHERE path=:path", sharesDb);
+        // prepare update queries
+        QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
+        QSqlQuery updateQuery("UPDATE files SET hash = :hash WHERE path = :path", sharesDb);
 
         QCryptographicHash hasher(QCryptographicHash::Md5);
 
@@ -90,13 +92,24 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 
             if (hash.isEmpty())
             {
-                QFile file(path);
+                QFile file(sharesDir.filePath(path));
+                // if we cannot open the file, remove it from database
                 if (!file.open(QIODevice::ReadOnly))
-                    continue;
+                {
+                    qWarning() << "Removing file" << path;
+                    deleteQuery.bindValue(":path", path);
+                    deleteQuery.exec();
+                }
+
                 while (file.bytesAvailable())
                     hasher.addData(file.read(16384));
                 hash = hasher.result();
                 hasher.reset();
+
+                // add hash to database
+                updateQuery.bindValue(":hash", hash.toHex());
+                updateQuery.bindValue(":path", path);
+                updateQuery.exec();
             }
 
             QXmppShareIq::File file;
@@ -180,6 +193,7 @@ void ChatShares::setShareServer(const QString &server)
     sharesDb.setDatabaseName("/tmp/shares.db");
     Q_ASSERT(sharesDb.open());
     sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
+    sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
     scanFiles(sharesDir);
 
