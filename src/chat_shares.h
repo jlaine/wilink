@@ -23,6 +23,7 @@
 #include <QDir>
 #include <QWidget>
 #include <QSqlDatabase>
+#include <QThread>
 
 class ChatClient;
 class QDir;
@@ -30,6 +31,21 @@ class QLineEdit;
 class QListWidget;
 class QTimer;
 class QXmppShareIq;
+
+class ChatSharesIndexer : public QThread
+{
+public:
+    ChatSharesIndexer(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
+    void run();
+
+protected:
+    void scanDir(const QDir &dir);
+
+private:
+    QSqlDatabase sharesDb;
+    QDir sharesDir;
+    qint64 scanCount;
+};
 
 class ChatShares : public QWidget
 {
@@ -42,7 +58,6 @@ public:
 private slots:
     void findRemoteFiles();
     void registerWithServer();
-    void scanFiles(const QDir &dir);
     void shareIqReceived(const QXmppShareIq &share);
 
 private:
@@ -51,6 +66,7 @@ private:
     QSqlDatabase sharesDb;
 
     ChatClient *client;
+    ChatSharesIndexer *indexer;
     QLineEdit *lineEdit;
     QListWidget *listWidget;
     QTimer *registerTimer;

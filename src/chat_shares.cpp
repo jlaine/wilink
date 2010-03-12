@@ -25,6 +25,7 @@
 #include <QListWidget>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QTime>
 #include <QTimer>
 
 #include "qxmpp/QXmppShareIq.h"
@@ -33,7 +34,7 @@
 #include "chat_shares.h"
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : QWidget(parent), client(xmppClient)
+    : QWidget(parent), client(xmppClient), indexer(0)
 {
     sharesDir = QDir(QDir::home().filePath("Public"));
 
@@ -143,24 +144,6 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     }
 }
 
-void ChatShares::scanFiles(const QDir &dir)
-{
-    QSqlQuery query("INSERT INTO files (path, size) "
-                    "VALUES(:path, :size)", sharesDb);
-
-    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable))
-    {
-        if (info.isDir())
-        {
-            scanFiles(QDir(info.filePath()));
-        } else {
-            query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
-            query.bindValue(":size", info.size());
-            query.exec();
-        }
-    }
-}
-
 void ChatShares::findRemoteFiles()
 {
     const QString search = lineEdit->text();
@@ -194,17 +177,55 @@ void ChatShares::setShareServer(const QString &server)
 {
     shareServer = server;
 
-    // prepare database
-    sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-    sharesDb.setDatabaseName("/tmp/shares.db");
-    Q_ASSERT(sharesDb.open());
-    sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
-    sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
+    if (!indexer)
+    {
+        // prepare database
+        sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+        sharesDb.setDatabaseName("/tmp/shares.db");
+        Q_ASSERT(sharesDb.open());
+        sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
+        sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
-    scanFiles(sharesDir);
+        // run indexer
+        indexer = new ChatSharesIndexer(sharesDb, sharesDir, this);
+        indexer->start();
+    }
 
     // register with server
     registerWithServer();
     registerTimer->start();
+}
+
+ChatSharesIndexer::ChatSharesIndexer(const QSqlDatabase &database, const QDir &dir, QObject *parent)
+    : QThread(parent), sharesDb(database), sharesDir(dir)
+{
+};
+
+void ChatSharesIndexer::run()
+{
+    scanCount = 0;
+    QTime t;
+    t.start();
+    scanDir(sharesDir);
+    qDebug() << "Found" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
+}
+
+void ChatSharesIndexer::scanDir(const QDir &dir)
+{
+    QSqlQuery query("INSERT INTO files (path, size) "
+                    "VALUES(:path, :size)", sharesDb);
+
+    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable))
+    {
+        if (info.isDir())
+        {
+            scanDir(QDir(info.filePath()));
+        } else {
+            query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
+            query.bindValue(":size", info.size());
+            query.exec();
+            scanCount++;
+        }
+    }
 }
 
