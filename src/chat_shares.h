@@ -30,21 +30,36 @@ class QDir;
 class QLineEdit;
 class QListWidget;
 class QTimer;
+class QXmppPacket;
 class QXmppShareIq;
 
-class ChatSharesIndexer : public QThread
+class ChatSharesDatabase : public QObject
 {
-public:
-    ChatSharesIndexer(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
-    void run();
+    Q_OBJECT
 
-protected:
-    void scanDir(const QDir &dir);
+public:
+    ChatSharesDatabase(const QString &path, QObject *parent = 0);
+    void search(const QXmppShareIq &requestIq);
+
+signals:
+    void searchFinished(const QXmppPacket &packet);
 
 private:
+    class IndexThread : public QThread
+    {
+    public:
+        IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
+        void run();
+
+    private:
+        void scanDir(const QDir &dir);
+        QSqlDatabase sharesDb;
+        QDir sharesDir;
+        qint64 scanCount;
+    };
+
     QSqlDatabase sharesDb;
     QDir sharesDir;
-    qint64 scanCount;
 };
 
 class ChatShares : public QWidget
@@ -63,10 +78,9 @@ private slots:
 private:
     QString shareServer;
     QDir sharesDir;
-    QSqlDatabase sharesDb;
 
     ChatClient *client;
-    ChatSharesIndexer *indexer;
+    ChatSharesDatabase *db;
     QLineEdit *lineEdit;
     QListWidget *listWidget;
     QTimer *registerTimer;

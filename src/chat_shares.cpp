@@ -34,7 +34,7 @@
 #include "chat_shares.h"
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : QWidget(parent), client(xmppClient), indexer(0)
+    : QWidget(parent), client(xmppClient), db(0)
 {
     sharesDir = QDir(QDir::home().filePath("Public"));
 
@@ -66,73 +66,7 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Get)
     {
-        // refuse to perform search without criteria
-        if (shareIq.search().isEmpty())
-        {
-            QXmppShareIq response;
-            response.setId(shareIq.id());
-            response.setTo(shareIq.from());
-            response.setType(QXmppIq::Error);
-            response.setTag(shareIq.tag());
-            client->sendPacket(response);
-            return;
-        }
-
-        // perform search
-        QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
-        query.bindValue(":search", "%" + shareIq.search() + "%");
-        query.exec();
-
-        // prepare update queries
-        QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
-        QSqlQuery updateQuery("UPDATE files SET hash = :hash WHERE path = :path", sharesDb);
-
-        QCryptographicHash hasher(QCryptographicHash::Md5);
-
-        QList<QXmppShareIq::File> files;
-        while (query.next())
-        {
-            const QString path = query.value(0).toString();
-            const qint64 size = query.value(1).toInt();
-            QByteArray hash = QByteArray::fromHex(query.value(2).toByteArray());
-
-            if (hash.isEmpty())
-            {
-                QFile file(sharesDir.filePath(path));
-                // if we cannot open the file, remove it from database
-                if (!file.open(QIODevice::ReadOnly))
-                {
-                    qWarning() << "Removing file" << path;
-                    deleteQuery.bindValue(":path", path);
-                    deleteQuery.exec();
-                }
-
-                while (file.bytesAvailable())
-                    hasher.addData(file.read(16384));
-                hash = hasher.result();
-                hasher.reset();
-
-                // add hash to database
-                updateQuery.bindValue(":hash", hash.toHex());
-                updateQuery.bindValue(":path", path);
-                updateQuery.exec();
-            }
-
-            QXmppShareIq::File file;
-            file.setName(QFileInfo(path).fileName());
-            file.setSize(size);
-            file.setHash(hash);
-            files.append(file);
-        }
-
-        // send response
-        QXmppShareIq response;
-        response.setId(shareIq.id());
-        response.setTo(shareIq.from());
-        response.setType(QXmppIq::Result);
-        response.setTag(shareIq.tag());
-        response.setFiles(files);
-        client->sendPacket(response);
+        db->search(shareIq);
     }
     else if (shareIq.type() == QXmppIq::Result)
     {
@@ -177,18 +111,10 @@ void ChatShares::setShareServer(const QString &server)
 {
     shareServer = server;
 
-    if (!indexer)
+    if (!db)
     {
-        // prepare database
-        sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-        sharesDb.setDatabaseName("/tmp/shares.db");
-        Q_ASSERT(sharesDb.open());
-        sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
-        sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
-
-        // run indexer
-        indexer = new ChatSharesIndexer(sharesDb, sharesDir, this);
-        indexer->start();
+        db = new ChatSharesDatabase(sharesDir.path(), this);
+        connect(db, SIGNAL(searchFinished(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
     }
 
     // register with server
@@ -196,12 +122,94 @@ void ChatShares::setShareServer(const QString &server)
     registerTimer->start();
 }
 
-ChatSharesIndexer::ChatSharesIndexer(const QSqlDatabase &database, const QDir &dir, QObject *parent)
+ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
+    : QObject(parent), sharesDir(path)
+{
+    // prepare database
+    sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+    sharesDb.setDatabaseName("/tmp/shares.db");
+    Q_ASSERT(sharesDb.open());
+    sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
+    sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
+
+    IndexThread *indexer = new IndexThread(sharesDb, sharesDir, this);
+    indexer->start();
+}
+
+void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
+{
+    QXmppShareIq responseIq;
+    responseIq.setId(requestIq.id());
+    responseIq.setTo(requestIq.from());
+    responseIq.setTag(requestIq.tag());
+
+    // refuse to perform search without criteria
+    if (requestIq.search().isEmpty())
+    {
+        responseIq.setType(QXmppIq::Error);
+        emit searchFinished(responseIq);
+        return;
+    }
+
+    QCryptographicHash hasher(QCryptographicHash::Md5);
+
+    // perform search
+    QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
+    query.bindValue(":search", "%" + requestIq.search() + "%");
+    query.exec();
+
+    // prepare update queries
+    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
+    QSqlQuery updateQuery("UPDATE files SET hash = :hash WHERE path = :path", sharesDb);
+
+    QList<QXmppShareIq::File> files;
+    while (query.next())
+    {
+        const QString path = query.value(0).toString();
+        const qint64 size = query.value(1).toInt();
+        QByteArray hash = QByteArray::fromHex(query.value(2).toByteArray());
+
+        if (hash.isEmpty())
+        {
+            QFile file(sharesDir.filePath(path));
+            // if we cannot open the file, remove it from database
+            if (!file.open(QIODevice::ReadOnly))
+            {
+                qWarning() << "Removing file" << path;
+                deleteQuery.bindValue(":path", path);
+                deleteQuery.exec();
+            }
+
+            while (file.bytesAvailable())
+                hasher.addData(file.read(16384));
+            hash = hasher.result();
+            hasher.reset();
+
+            // add hash to database
+            updateQuery.bindValue(":hash", hash.toHex());
+            updateQuery.bindValue(":path", path);
+            updateQuery.exec();
+        }
+
+        QXmppShareIq::File file;
+        file.setName(QFileInfo(path).fileName());
+        file.setSize(size);
+        file.setHash(hash);
+        files.append(file);
+    }
+
+    // send response
+    responseIq.setType(QXmppIq::Result);
+    responseIq.setFiles(files);
+    emit searchFinished(responseIq);
+}
+
+ChatSharesDatabase::IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
     : QThread(parent), sharesDb(database), sharesDir(dir)
 {
 };
 
-void ChatSharesIndexer::run()
+void ChatSharesDatabase::IndexThread::run()
 {
     scanCount = 0;
     QTime t;
@@ -210,7 +218,7 @@ void ChatSharesIndexer::run()
     qDebug() << "Found" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
 }
 
-void ChatSharesIndexer::scanDir(const QDir &dir)
+void ChatSharesDatabase::IndexThread::scanDir(const QDir &dir)
 {
     QSqlQuery query("INSERT INTO files (path, size) "
                     "VALUES(:path, :size)", sharesDb);
