@@ -28,6 +28,7 @@ class ChatClient;
 class QDir;
 class QLineEdit;
 class QListWidget;
+class QTimer;
 class QXmppShareIq;
 
 class ChatShares : public QWidget
@@ -40,11 +41,9 @@ public:
 
 private slots:
     void findRemoteFiles();
+    void registerWithServer();
     void scanFiles(const QDir &dir);
     void shareIqReceived(const QXmppShareIq &share);
-
-private:
-    void registerWithServer();
 
 private:
     QString shareServer;
@@ -54,6 +53,7 @@ private:
     ChatClient *client;
     QLineEdit *lineEdit;
     QListWidget *listWidget;
+    QTimer *registerTimer;
 };
 
 #endif

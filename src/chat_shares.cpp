@@ -25,6 +25,7 @@
 #include <QListWidget>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QTimer>
 
 #include "qxmpp/QXmppShareIq.h"
 
@@ -51,6 +52,9 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
+    registerTimer = new QTimer(this);
+    registerTimer->setInterval(60000);
+    connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
 }
 
@@ -199,6 +203,8 @@ void ChatShares::setShareServer(const QString &server)
 
     scanFiles(sharesDir);
 
+    // register with server
     registerWithServer();
+    registerTimer->start();
 }
 
