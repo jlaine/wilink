@@ -224,10 +224,11 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
 Chat::~Chat()
 {
+    delete chatShares;
+    delete chatTransfers;
+
     // disconnect
     client->disconnect();
-
-    delete chatTransfers;
 }
 
 /** Prompt the user for a new contact then add it to the roster.

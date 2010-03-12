@@ -53,11 +53,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
 }
 
-ChatShares::~ChatShares()
-{
-//    unregisterFromServer();
-}
-
 void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 {
     if (shareIq.from() != shareServer)
@@ -65,24 +60,49 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Get)
     {
-        // perform search
-        QSqlQuery query;
+        // refuse to perform search without criteria
         if (shareIq.search().isEmpty())
         {
-            query = QSqlQuery("SELECT path, size, hash FROM files", sharesDb);
-        } else {
-            query = QSqlQuery("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
-            query.bindValue(":search", "%" + shareIq.search() + "%");
+            QXmppShareIq response;
+            response.setId(shareIq.id());
+            response.setTo(shareIq.from());
+            response.setType(QXmppIq::Error);
+            client->sendPacket(response);
+            return;
         }
+
+        // perform search
+        QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
+        query.bindValue(":search", "%" + shareIq.search() + "%");
         query.exec();
+
+        // prepare update query
+        QSqlQuery update("UPDATE files SET hash=:hash WHERE path=:path", sharesDb);
+
+        QCryptographicHash hasher(QCryptographicHash::Md5);
 
         QList<QXmppShareIq::File> files;
         while (query.next())
         {
+            const QString path = query.value(0).toString();
+            const qint64 size = query.value(1).toInt();
+            QByteArray hash = QByteArray::fromHex(query.value(2).toByteArray());
+
+            if (hash.isEmpty())
+            {
+                QFile file(path);
+                if (!file.open(QIODevice::ReadOnly))
+                    continue;
+                while (file.bytesAvailable())
+                    hasher.addData(file.read(16384));
+                hash = hasher.result();
+                hasher.reset();
+            }
+
             QXmppShareIq::File file;
-            file.setName(QFileInfo(query.value(0).toString()).fileName());
-            file.setSize(query.value(1).toInt());
-            file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
+            file.setName(QFileInfo(path).fileName());
+            file.setSize(size);
+            file.setHash(hash);
             files.append(file);
         }
 
@@ -113,36 +133,12 @@ void ChatShares::scanFiles(const QDir &dir)
     {
         if (info.isDir())
         {
-            qDebug() << "recursing into" << info.filePath();
             scanFiles(QDir(info.filePath()));
         } else {
-            qDebug() << "inserting" << info.filePath();
             query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
             query.bindValue(":size", info.size());
             query.exec();
         }
-
-/*
-
-        QByteArray buffer;
-        QCryptographicHash hash(QCryptographicHash::Md5);
-        File f;
-        f.name = info.fileName();
-        f.path = info.absoluteFilePath();
-        f.size = info.size();
-        QFile file(f.path);
-        if (file.open(QIODevice::ReadOnly))
-        {
-            while (file.bytesAvailable())
-            {
-                buffer = file.read(16384);
-                hash.addData(buffer);
-            }
-            const QByteArray key = hash.result();
-            sharedFiles.insert(key, f);
-            hash.reset();
-        }
-*/
     }
 }
 
@@ -172,21 +168,6 @@ void ChatShares::registerWithServer()
     QXmppPresence presence;
     presence.setTo(shareServer);
     presence.setExtensions(x);
-    client->sendPacket(presence);
-}
-
-void ChatShares::unregisterFromServer()
-{
-    // unregister from server
-    QList<QXmppElement> extensions;
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_shares);
-    extensions.append(x);
-
-    QXmppPresence presence(QXmppPresence::Unavailable);
-    presence.setTo(shareServer);
-    presence.setExtensions(extensions);
     client->sendPacket(presence);
 }
 

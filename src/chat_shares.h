@@ -36,7 +36,6 @@ class ChatShares : public QWidget
 
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
-    ~ChatShares();
     void setShareServer(const QString &server);
 
 private slots:
@@ -46,14 +45,13 @@ private slots:
 
 private:
     void registerWithServer();
-    void unregisterFromServer();
 
 private:
-    ChatClient *client;
     QString shareServer;
     QDir sharesDir;
     QSqlDatabase sharesDb;
 
+    ChatClient *client;
     QLineEdit *lineEdit;
     QListWidget *listWidget;
 };
