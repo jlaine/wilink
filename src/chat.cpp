@@ -44,6 +44,7 @@
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppTransferManager.h"
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
@@ -94,13 +95,30 @@ void dumpElement(const QXmppElement &item, int level)
     }
 }
 
+ChatClient::ChatClient(QObject *parent)
+    : QXmppClient(parent)
+{
+}
+
+bool ChatClient::handleStreamElement(const QDomElement &element)
+{
+    if (QXmppShareIq::isShareIq(element))
+    {
+        QXmppShareIq shareIq;
+        shareIq.parse(element);
+        emit shareIqReceived(shareIq);
+        return true;
+    }
+    return false;
+}
+
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : chatConsole(0),
     isBusy(false),
     isConnected(false),
     systemTrayIcon(trayIcon)
 {
-    client = new QXmppClient(this);
+    client = new ChatClient(this);
     rosterModel =  new ChatRosterModel(client);
 
     /* set up logger */

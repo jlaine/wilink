@@ -20,14 +20,12 @@
 #include <QCryptographicHash>
 #include <QDir>
 
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
+#include "qxmpp/QXmppShareIq.h"
 
+#include "chat_client.h"
 #include "chat_shares.h"
 
-const char* ns_shares = "http://wifirst.net/protocol/shares";
-
-ChatShares::ChatShares(QXmppClient *xmppClient, QWidget *parent)
+ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient)
 {
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
@@ -41,34 +39,23 @@ ChatShares::~ChatShares()
 //    unregisterFromServer();
 }
 
-void ChatShares::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+void ChatShares::shareIqReceived(const QXmppShareIq &share)
 {
-    if (disco.from() == shareServer &&
-        disco.type() == QXmppIq::Get &&
-        disco.queryNode() == ns_shares &&
-        disco.queryType() == QXmppDiscoveryIq::ItemsQuery)
+    if (share.from() == shareServer && share.type() == QXmppIq::Get)
     {
-        QXmppDiscoveryIq iq;
-        iq.setId(disco.id());
-        iq.setTo(disco.from());
-        iq.setType(QXmppIq::Result);
-        iq.setQueryType(disco.queryType());
-
-        QList<QXmppElement> items;
-
-        const QString ownJid = client->getConfiguration().jid();
-        foreach (const QString &key, sharedFiles.keys())
+        QXmppShareIq response;
+        response.setId(share.id());
+        response.setTo(share.from());
+        QList<QXmppShareIq::File> files;
+        foreach (const QByteArray &key, sharedFiles.keys())
         {
-            QXmppElement item;
-            item.setTagName("item");
-            item.setAttribute("jid", ownJid);
-            item.setAttribute("node", key);
-            item.setAttribute("name", QFileInfo(sharedFiles[key]).fileName());
-            items.append(item);
+            QXmppShareIq::File file;
+            file.setName(QFileInfo(sharedFiles[key]).fileName());
+            file.setHash(key);
+            files.append(file);
         }
-
-        iq.setQueryItems(items);
-        client->sendPacket(iq);
+        response.setFiles(files);
+        client->sendPacket(response);
     }
 }
 
@@ -91,7 +78,7 @@ void ChatShares::findLocalFiles()
                 buffer = file.read(16384);
                 hash.addData(buffer);
             }
-            const QString key = hash.result().toHex();
+            const QByteArray key = hash.result();
             sharedFiles.insert(key, path);
             hash.reset();
         }
@@ -100,21 +87,11 @@ void ChatShares::findLocalFiles()
 
 void ChatShares::findRemoteFiles(const QString &query)
 {
-    QXmppDiscoveryIq iq;
+    QXmppShareIq iq;
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    iq.setQueryNode(ns_shares);
-
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_shares);
-    QXmppElement search;
-    search.setTagName("search");
-    search.setValue(query);
-    x.appendChild(search);
-
-    iq.setExtensions(x);
+    iq.setSearch(query);
+    client->sendPacket(iq);
 }
 
 void ChatShares::registerWithServer()

@@ -23,22 +23,20 @@
 #include <QMap>
 #include <QWidget>
 
-class QXmppClient;
-class QXmppDiscoveryIq;
-
-extern const char* ns_shares;
+class ChatClient;
+class QXmppShareIq;
 
 class ChatShares : public QWidget
 {
     Q_OBJECT
 
 public:
-    ChatShares(QXmppClient *client, QWidget *parent = 0);
+    ChatShares(ChatClient *client, QWidget *parent = 0);
     ~ChatShares();
     void setShareServer(const QString &server);
 
 private slots:
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void shareIqReceived(const QXmppShareIq &share);
     void findLocalFiles();
     void findRemoteFiles(const QString &query);
 
@@ -47,9 +45,9 @@ private:
     void unregisterFromServer();
 
 private:
-    QXmppClient *client;
+    ChatClient *client;
     QString shareServer;
-    QMap<QString, QString> sharedFiles;
+    QMap<QByteArray, QString> sharedFiles;
 };
 
 #endif

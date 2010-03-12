@@ -39,11 +39,24 @@ class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
+class QXmppShareIq;
 class QXmppTransferJob;
 class QXmppVCard;
 class QXmppVCardManager;
 
 void dumpElement(const QXmppElement &item, int level = 0);
+
+class ChatClient : public QXmppClient
+{
+    Q_OBJECT
+
+public:
+    ChatClient(QObject *parent);
+    virtual bool handleStreamElement(const QDomElement &element);
+
+signals:
+    void shareIqReceived(const QXmppShareIq &iq);
+};
 
 class Chat : public QWidget
 {
@@ -96,7 +109,7 @@ private:
     ChatConsole *chatConsole;
     ChatShares *chatShares;
     ChatTransfers *chatTransfers;
-    QXmppClient *client;
+    ChatClient *client;
 
     ChatRosterModel *rosterModel;
     ChatRosterView *rosterView;
