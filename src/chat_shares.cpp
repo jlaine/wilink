@@ -26,7 +26,7 @@
 
 #include "qxmpp/QXmppShareIq.h"
 
-#include "chat_client.h"
+#include "chat.h"
 #include "chat_shares.h"
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
