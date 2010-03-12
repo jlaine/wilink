@@ -28,7 +28,7 @@
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient)
 {
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+    connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
 
     // FIXME : find shared files in a thread
     findLocalFiles();
