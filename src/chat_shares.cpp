@@ -19,12 +19,14 @@
 
 #include <QCryptographicHash>
 #include <QDir>
+#include <QFileIconProvider>
+#include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListWidget>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QTableWidget>
 #include <QTime>
 #include <QTimer>
 
@@ -32,6 +34,13 @@
 
 #include "chat.h"
 #include "chat_shares.h"
+#include "chat_transfers.h"
+
+enum Columns
+{
+    NameColumn,
+    SizeColumn,
+};
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient), db(0)
@@ -44,11 +53,17 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     layout->addWidget(lineEdit);
 
-    listWidget = new QListWidget;
-    listWidget->setIconSize(QSize(32, 32));
-    listWidget->setSortingEnabled(true);
+    tableWidget = new QTableWidget;
+    tableWidget->setColumnCount(2);
+    tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("Name")));
+    tableWidget->setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
+    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    tableWidget->verticalHeader()->setVisible(false);
+    tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
+    tableWidget->setSortingEnabled(true);
     //connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
-    layout->addWidget(listWidget);
+    layout->addWidget(tableWidget);
 
     setLayout(layout);
 
@@ -70,10 +85,16 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     }
     else if (shareIq.type() == QXmppIq::Result)
     {
+        QFileIconProvider iconProvider;
         lineEdit->setEnabled(true);
         foreach (const QXmppShareIq::File &file, shareIq.files())
         {
-            listWidget->insertItem(0, file.name());
+            QTableWidgetItem *nameItem = new QTableWidgetItem(file.name());
+            nameItem->setIcon(iconProvider.icon(QFileIconProvider::File));
+            QTableWidgetItem *sizeItem = new QTableWidgetItem(ChatTransfers::sizeToString(file.size()));
+            tableWidget->insertRow(0);
+            tableWidget->setItem(0, NameColumn, nameItem);
+            tableWidget->setItem(0, SizeColumn, sizeItem);
         }
     }
 }
@@ -85,7 +106,7 @@ void ChatShares::findRemoteFiles()
         return;
 
     lineEdit->setEnabled(false);
-    listWidget->clear();
+    tableWidget->clearContents();
 
     QXmppShareIq iq;
     iq.setTo(shareServer);

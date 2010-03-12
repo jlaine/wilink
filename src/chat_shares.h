@@ -29,6 +29,7 @@ class ChatClient;
 class QDir;
 class QLineEdit;
 class QListWidget;
+class QTableWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppShareIq;
@@ -82,7 +83,7 @@ private:
     ChatClient *client;
     ChatSharesDatabase *db;
     QLineEdit *lineEdit;
-    QListWidget *listWidget;
+    QTableWidget *tableWidget;
     QTimer *registerTimer;
 };
 
