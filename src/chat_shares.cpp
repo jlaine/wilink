@@ -26,9 +26,10 @@
 #include <QLineEdit>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QTableWidget>
+#include <QStringList>
 #include <QTime>
 #include <QTimer>
+#include <QTreeWidget>
 
 #include "qxmpp/QXmppShareIq.h"
 
@@ -57,18 +58,14 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     layout->addWidget(lineEdit);
 
-    tableWidget = new QTableWidget;
-    tableWidget->setColumnCount(2);
-    tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("Name")));
-    tableWidget->setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
-    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    tableWidget->verticalHeader()->setVisible(false);
-    tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
-    tableWidget->setSortingEnabled(true);
+    treeWidget = new QTreeWidget;
+    treeWidget->setColumnCount(2);
+    treeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    //treeWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
     //connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
     clearView();
-    layout->addWidget(tableWidget);
+    layout->addWidget(treeWidget);
 
     setLayout(layout);
 
@@ -81,9 +78,11 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
 void ChatShares::clearView()
 {
-    tableWidget->clear();
-    tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("Name")));
-    tableWidget->setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
+    treeWidget->clear();
+    QTreeWidgetItem *headerItem = new QTreeWidgetItem;
+    headerItem->setText(NameColumn, tr("Name"));
+    headerItem->setText(SizeColumn, tr("Size"));
+    treeWidget->setHeaderItem(headerItem);
 }
 
 void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
@@ -97,20 +96,42 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     }
     else if (shareIq.type() == QXmppIq::Result)
     {
-        QFileIconProvider iconProvider;
         lineEdit->setEnabled(true);
+        QFileIconProvider iconProvider;
         foreach (const QXmppShareIq::Collection &collection, shareIq.collections())
         {
-            foreach (const QXmppShareIq::File &file, collection)
+            if (collection.name().isEmpty())
             {
-                QTableWidgetItem *nameItem = new QTableWidgetItem(file.name());
-                nameItem->setIcon(iconProvider.icon(QFileIconProvider::File));
-                QTableWidgetItem *sizeItem = new QTableWidgetItem(ChatTransfers::sizeToString(file.size()));
-                tableWidget->insertRow(0);
-                tableWidget->setItem(0, NameColumn, nameItem);
-                tableWidget->setItem(0, SizeColumn, sizeItem);
+                foreach (const QXmppShareIq::File &file, collection)
+                {
+                    QTreeWidgetItem *fileItem = new QTreeWidgetItem(treeWidget);
+                    fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
+                    fileItem->setText(NameColumn, file.name());
+                    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
+                }
+            } else {
+                qint64 collectionSize = 0;
+                QTreeWidgetItem *collectionItem = new QTreeWidgetItem(treeWidget);
+                collectionItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::Folder));
+                collectionItem->setText(NameColumn, collection.name());
+
+                foreach (const QXmppShareIq::File &file, collection)
+                {
+                    QTreeWidgetItem *fileItem = new QTreeWidgetItem(collectionItem);
+                    fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
+                    fileItem->setText(NameColumn, file.name());
+                    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
+                    collectionSize += file.size();
+                }
+                collectionItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
             }
         }
+        treeWidget->setColumnWidth(NameColumn, treeWidget->width() - 60);
+        treeWidget->setColumnWidth(SizeColumn, 50);
+    }
+    else if (shareIq.type() == QXmppIq::Error)
+    {
+        lineEdit->setEnabled(true);
     }
 }
 
@@ -306,7 +327,6 @@ void SearchThread::run()
     QXmppShareIq::Collection baseCollection;
     QXmppShareIq::Collection currentCollection;
     int searchCount = 0;
-    int lastDepth = -1;
     QString lastString;
     while (query.next())
     {
@@ -316,29 +336,30 @@ void SearchThread::run()
         file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
 
         // find the depth at which we matched
-        int matchDepth;
+        const QString path = file.name();
         QString matchString;
-        for (matchDepth = 2; matchDepth >= 0; matchDepth--)
-        {
-            QString reString(".*([^/]+)");
-            for (int i = 0; i < matchDepth; ++i) reString += "/[^/]+";
-            QRegExp re(reString);
-            if (re.exactMatch(file.name()) && re.cap(1).contains(queryString, Qt::CaseInsensitive))
-            {
-                //qDebug() << "Matched at depth" << matchDepth << file.name() << re.cap(1);
-                matchString = re.cap(1); 
-                break;
-            }
-        }
-        if (matchDepth < 0 || !updateFile(file))
+        QRegExp subdirRe(".*(([^/]+)/[^/]+)/[^/]+");
+        QRegExp dirRe(".*([^/]+)/[^/]+");
+        QRegExp fileRe(".*([^/]+)");
+        if (subdirRe.exactMatch(path) && subdirRe.cap(2).contains(queryString, Qt::CaseInsensitive))
+            matchString = subdirRe.cap(1);
+        else if (dirRe.exactMatch(path) && dirRe.cap(1).contains(queryString, Qt::CaseInsensitive))
+            matchString = subdirRe.cap(1); 
+        else if (fileRe.exactMatch(path) && fileRe.cap(1).contains(queryString, Qt::CaseInsensitive))
+            matchString = "";
+        else
             continue;
+
+        // update file info
+        if (!updateFile(file))
+            continue;
+        file.setName(QFileInfo(file.name()).fileName());
 
         // add file to the appropriate collection
         searchCount++;
-        file.setName(QFileInfo(file.name()).fileName());
-        if (!matchDepth)
+        if (matchString.isEmpty())
             baseCollection.append(file);
-        else if (matchDepth == lastDepth && matchString == lastString)
+        else if (matchString == lastString)
         {
             currentCollection.append(file);
         }
@@ -347,21 +368,17 @@ void SearchThread::run()
             if (!currentCollection.isEmpty())
             {
                 collections.append(currentCollection);
-                // qDebug() << "Finished collection" << currentCollection.name();
                 currentCollection.clear();
             }
             currentCollection.setName(matchString);
-            // qDebug() << "Starting collection" << currentCollection.name();
+            currentCollection.append(file);
         }
-        lastDepth = matchDepth;
         lastString = matchString;
     }
     if (!currentCollection.isEmpty())
-    {
         collections.append(currentCollection);
-        // qDebug() << "Finished collection" << currentCollection.name();
-    }
-    collections.append(baseCollection);
+    if (!baseCollection.isEmpty())
+        collections.append(baseCollection);
 
     // send response
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
