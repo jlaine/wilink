@@ -384,7 +384,7 @@ void SearchThread::run()
         lastString = matchString;
     }
     if (!currentCollection.isEmpty())
-        rootCollection.append(currentCollection);
+        rootCollection.collections().append(currentCollection);
 
     // send response
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
