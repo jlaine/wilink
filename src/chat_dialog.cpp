@@ -106,6 +106,8 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
         return;
 
     setRemoteState(msg.state());
+    if (msg.body().isEmpty())
+        return;
 
     ChatHistoryMessage message;
     message.body = msg.body();
@@ -122,6 +124,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.from = chatRemoteName;
     message.received = true;
     chatHistory->addMessage(message);
+
+    // notify
+    emit notifyTab();
 }
 
 void ChatDialog::sendMessage(const QString &text)

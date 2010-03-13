@@ -160,7 +160,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
 
-    emit openTab();
+    emit showTab();
 }
 
 void ChatTransfers::cellDoubleClicked(int row, int column)

@@ -39,8 +39,9 @@ protected:
     QLayout *statusBar();
 
 signals:
-    void openTab();
     void closeTab();
+    void notifyTab();
+    void showTab();
 
 private:
     QPushButton *closeButton;

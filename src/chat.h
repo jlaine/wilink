@@ -69,7 +69,6 @@ public:
 
 protected slots:
     void addContact();
-    void addPanel(QWidget *panel);
     void addRoom();
     void connected();
     void disconnected();
@@ -82,24 +81,22 @@ protected slots:
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
     void rejoinConversations();
-    void removePanel(QWidget *panel);
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void resizeContacts();
     void statusChanged(int currentIndex);
 
+    void closePanel();
+    void notifyPanel();
+    void showPanel();
+
     void hideConversation();
 
-    void hideConsole();
-    void showConsole();
-
-    void hideShares();
-    void showShares();
-
-    void hideTransfers();
-    void showTransfers();
-
 protected:
+    void addPanel(QWidget *panel);
+    void removePanel(QWidget *panel);
+    void showPanel(QWidget *widget);
+
     void changeEvent(QEvent *event);
     ChatConversation *createConversation(const QString &jid, bool room);
 

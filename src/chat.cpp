@@ -126,6 +126,27 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     logger->setLoggingType(QXmppLogger::SIGNAL);
     client->setLogger(logger);
 
+    /* set up debugging console */
+    chatConsole = new ChatConsole;
+    chatConsole->setObjectName("console");
+    connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
+    connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closePanel()));
+    connect(chatConsole, SIGNAL(showTab()), this, SLOT(showPanel()));
+
+    /* set up shares */
+    chatShares = new ChatShares(client);
+    chatShares->setObjectName("shares");
+    connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
+    connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
+
+    /* set up transfers window */
+    client->getTransferManager().setSupportedMethods(
+        QXmppTransferJob::SocksMethod);
+    chatTransfers = new ChatTransfers;
+    chatTransfers->setObjectName("transfers");
+    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
+    connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
+
     /* build splitter */
     splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
@@ -166,7 +187,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     sharesButton = new QPushButton;
     sharesButton->setVisible(false);
     sharesButton->setIcon(QIcon(":/album.png"));
-    connect(sharesButton, SIGNAL(clicked()), this, SLOT(showShares()));
+    connect(sharesButton, SIGNAL(clicked()), chatShares, SIGNAL(showTab()));
     hbox->addWidget(sharesButton);
 
     hbox->addStretch();
@@ -189,19 +210,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
 
-    /* set up shares */
-    chatShares = new ChatShares(client);
-    chatShares->setObjectName("shares");
-    connect(chatShares, SIGNAL(closeTab()), this, SLOT(hideShares()));
-
-    /* set up transfers window */
-    client->getTransferManager().setSupportedMethods(
-        QXmppTransferJob::SocksMethod);
-    chatTransfers = new ChatTransfers;
-    chatTransfers->setObjectName("transfers");
-    connect(chatTransfers, SIGNAL(openTab()), this, SLOT(showTransfers()));
-    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(hideTransfers()));
-
     /* set up client */
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
@@ -215,11 +223,11 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(showShares()));
+    connect(shortcut, SIGNAL(activated()), chatShares, SIGNAL(showTab()));
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(showTransfers()));
+    connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showTab()));
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(showConsole()));
+    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showTab()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -270,6 +278,48 @@ void Chat::addPanel(QWidget *panel)
         resizeContacts();
 }
 
+void Chat::closePanel()
+{
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (conversationPanel->indexOf(panel) < 0)
+        return;
+    removePanel(panel);
+}
+
+/** Notify the user of activity on a panel.
+ */
+void Chat::notifyPanel()
+{
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (conversationPanel->indexOf(panel) < 0)
+        return;
+
+    // add pending message
+    if (conversationPanel->currentWidget() != panel)
+        rosterModel->addPendingMessage(panel->objectName());
+
+    // show the chat window
+    if (!isVisible())
+    {
+#ifdef Q_OS_MAC
+        show();
+#else
+        showMinimized();
+#endif
+    }
+
+    /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
+     * only causes the dock icon to bounce for one second, instead of
+     * bouncing until the user focuses the window. To work around this
+     * we implement our own version.
+     */
+#ifdef QT_MAC_USE_COCOA
+    application_alert_mac();
+#else
+    QApplication::alert(panel);
+#endif
+}
+
 /** Remove a panel.
  */
 void Chat::removePanel(QWidget *panel)
@@ -284,6 +334,25 @@ void Chat::removePanel(QWidget *panel)
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
     conversationPanel->removeWidget(panel);
+}
+
+/** Show a panel.
+ */
+void Chat::showPanel(QWidget *panel)
+{
+    rosterModel->addItem(ChatRosterItem::Other,
+        panel->objectName(),
+        panel->windowTitle(),
+        panel->windowIcon());
+    addPanel(panel);
+    conversationPanel->setCurrentWidget(panel);
+}
+
+void Chat::showPanel()
+{
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (panel)
+        showPanel(panel);
 }
 
 void Chat::panelChanged(int index)
@@ -355,6 +424,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(closeTab()), this, SLOT(hideConversation()));
+    connect(dialog, SIGNAL(notifyTab()), this, SLOT(notifyPanel()));
     addPanel(dialog);
 
     // join conversation
@@ -545,7 +615,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
                 break;
             }
         }
-        return;
+        break;
     case QXmppMessage::Chat:
         if (!conversationPanel->findChild<ChatDialog*>(bareJid) && !msg.body().isEmpty())
         {
@@ -553,42 +623,9 @@ void Chat::messageReceived(const QXmppMessage &msg)
             dialog->messageReceived(msg);
         }
         break;
-    case QXmppMessage::Error:
-        qWarning() << "Received an error message" << msg.body();
-        return;
     default:
-        return;
+        break;
     }
-
-    // don't alert the user for empty messages or chat rooms
-    ChatDialog *dialog = conversationPanel->findChild<ChatDialog*>(bareJid);
-    if (msg.body().isEmpty() || !dialog)
-        return;
-
-    // add pending message
-    if (conversationPanel->currentWidget() != dialog)
-        rosterModel->addPendingMessage(bareJid);
-
-    // show the chat window
-    if (!isVisible())
-    {
-#ifdef Q_OS_MAC
-        show();
-#else
-        showMinimized();
-#endif
-    }
-
-    /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
-     * only causes the dock icon to bounce for one second, instead of
-     * bouncing until the user focuses the window. To work around this
-     * we implement our own version.
-     */
-#ifdef QT_MAC_USE_COCOA
-    application_alert_mac();
-#else
-    QApplication::alert(dialog);
-#endif
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)
@@ -825,11 +862,11 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         if (action == ChatRosterView::JoinAction)
         {
             if (jid == chatShares->objectName())
-                showShares();
+                showPanel(chatShares);
             else if (jid == chatTransfers->objectName())
-                showTransfers();
+                showPanel(chatTransfers);
             else if (jid == chatConsole->objectName())
-                showConsole();
+                showPanel(chatConsole);
         }
     }
 }
@@ -862,63 +899,5 @@ void Chat::statusChanged(int currentIndex)
         if (isConnected)
             client->disconnect();
     }
-}
-
-void Chat::hideConsole()
-{
-    if (chatConsole)
-    {
-        rosterModel->removeItem(chatConsole->objectName());
-        removePanel(chatConsole);
-        chatConsole->deleteLater();
-        chatConsole = 0;
-    }
-}
-
-void Chat::showConsole()
-{
-    if (!chatConsole)
-    {
-        chatConsole = new ChatConsole;
-        chatConsole->setObjectName("console");
-        connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
-        connect(chatConsole, SIGNAL(closeTab()), this, SLOT(hideConsole()));
-    }
-    rosterModel->addItem(ChatRosterItem::Other,
-        chatConsole->objectName(),
-        chatConsole->windowTitle(),
-        chatConsole->windowIcon());
-    addPanel(chatConsole);
-    conversationPanel->setCurrentWidget(chatConsole);
-}
-
-void Chat::hideShares()
-{
-    removePanel(chatShares);
-}
-
-void Chat::showShares()
-{
-    rosterModel->addItem(ChatRosterItem::Other,
-        chatShares->objectName(),
-        chatShares->windowTitle(),
-        chatShares->windowIcon());
-    addPanel(chatShares);
-    conversationPanel->setCurrentWidget(chatShares);
-}
-
-void Chat::hideTransfers()
-{
-    removePanel(chatTransfers);
-}
-
-void Chat::showTransfers()
-{
-    rosterModel->addItem(ChatRosterItem::Other,
-        chatTransfers->objectName(),
-        chatTransfers->windowTitle(),
-        chatTransfers->windowIcon());
-    addPanel(chatTransfers);
-    conversationPanel->setCurrentWidget(chatTransfers);
 }
 
