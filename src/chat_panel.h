@@ -32,7 +32,7 @@ public:
     ChatPanel(QWidget *parent);
 
 protected:
-    QLayout *statusBar();
+    QLayout *statusBar(const QString &iconName);
 
 signals:
     void openTab();

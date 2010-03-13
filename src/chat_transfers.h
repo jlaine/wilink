@@ -20,10 +20,11 @@
 #ifndef __WDESKTOP_CHAT_TRANSFERS_H__
 #define __WDESKTOP_CHAT_TRANSFERS_H__
 
-#include <QWidget>
 #include <QMessageBox>
 
 #include "qxmpp/QXmppTransferManager.h"
+
+#include "chat_panel.h"
 
 class QPushButton;
 class QTableWidget;
@@ -48,7 +49,7 @@ private:
     QXmppTransferJob *m_job; 
 };
 
-class ChatTransfers : public QWidget
+class ChatTransfers : public ChatPanel
 {
     Q_OBJECT
 
@@ -56,10 +57,6 @@ public:
     ChatTransfers(QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
     static QString sizeToString(qint64 size);
-
-signals:
-    void openTab();
-    void closeTab();
 
 private slots:
     void fileAccepted(QXmppTransferJob *job);

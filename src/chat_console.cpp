@@ -33,7 +33,7 @@ ChatConsole::ChatConsole(QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    QLayout *hbox = statusBar();
+    QLayout *hbox = statusBar(":/options.png");
     layout->addItem(hbox);
     browser = new QTextBrowser;
     layout->addWidget(browser);

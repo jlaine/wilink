@@ -28,7 +28,7 @@ ChatPanel::ChatPanel(QWidget* parent)
 {
 }
 
-QLayout* ChatPanel::statusBar()
+QLayout* ChatPanel::statusBar(const QString &iconName)
 {
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -37,7 +37,7 @@ QLayout* ChatPanel::statusBar()
     hbox->addWidget(nameLabel);
     hbox->addStretch();
     QLabel *iconLabel = new QLabel;
-    iconLabel->setPixmap(QPixmap(":/options.png"));
+    iconLabel->setPixmap(QPixmap(iconName));
     hbox->addWidget(iconLabel);
     QPushButton *button = new QPushButton;
     button->setFlat(true);

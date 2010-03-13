@@ -84,7 +84,7 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 }
 
 ChatTransfers::ChatTransfers(QWidget *parent)
-    : QWidget(parent)
+    : ChatPanel(parent)
 {
     setWindowTitle(tr("File transfers"));
 
@@ -92,20 +92,7 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     layout->setMargin(0);
 
     /* status bar */
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(windowTitle()));
-    hbox->addSpacing(16);
-    hbox->addWidget(nameLabel);
-    hbox->addStretch();
-    QLabel *iconLabel = new QLabel;
-    iconLabel->setPixmap(QPixmap(":/album.png"));
-    hbox->addWidget(iconLabel);
-    QPushButton *button = new QPushButton;
-    button->setFlat(true);
-    button->setMaximumWidth(32);
-    button->setIcon(QIcon(":/close.png"));
-    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
-    hbox->addWidget(button);
+    QLayout *hbox = statusBar(":/album.png");
     layout->addItem(hbox);
 
     /* help label */
