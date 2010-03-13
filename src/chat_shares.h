@@ -46,19 +46,6 @@ signals:
     void searchFinished(const QXmppPacket &packet);
 
 private:
-    class IndexThread : public QThread
-    {
-    public:
-        IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
-        void run();
-
-    private:
-        void scanDir(const QDir &dir);
-        qint64 scanCount;
-        QSqlDatabase sharesDb;
-        QDir sharesDir;
-    };
-
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };

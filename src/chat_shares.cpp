@@ -42,6 +42,31 @@ enum Columns
     SizeColumn,
 };
 
+class IndexThread : public QThread
+{
+public:
+    IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
+    void run();
+
+private:
+    void scanDir(const QDir &dir);
+    qint64 scanCount;
+    QSqlDatabase sharesDb;
+    QDir sharesDir;
+};
+
+class SearchThread : public QThread
+{
+public:
+    SearchThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
+    void run();
+
+private:
+    QSqlDatabase sharesDb;
+    QDir sharesDir;
+};
+
+
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient), db(0)
 {
@@ -87,14 +112,17 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     {
         QFileIconProvider iconProvider;
         lineEdit->setEnabled(true);
-        foreach (const QXmppShareIq::File &file, shareIq.files())
+        foreach (const QXmppShareIq::Collection &collection, shareIq.collections())
         {
-            QTableWidgetItem *nameItem = new QTableWidgetItem(file.name());
-            nameItem->setIcon(iconProvider.icon(QFileIconProvider::File));
-            QTableWidgetItem *sizeItem = new QTableWidgetItem(ChatTransfers::sizeToString(file.size()));
-            tableWidget->insertRow(0);
-            tableWidget->setItem(0, NameColumn, nameItem);
-            tableWidget->setItem(0, SizeColumn, sizeItem);
+            foreach (const QXmppShareIq::File &file, collection)
+            {
+                QTableWidgetItem *nameItem = new QTableWidgetItem(file.name());
+                nameItem->setIcon(iconProvider.icon(QFileIconProvider::File));
+                QTableWidgetItem *sizeItem = new QTableWidgetItem(ChatTransfers::sizeToString(file.size()));
+                tableWidget->insertRow(0);
+                tableWidget->setItem(0, NameColumn, nameItem);
+                tableWidget->setItem(0, SizeColumn, sizeItem);
+            }
         }
     }
 }
@@ -185,7 +213,7 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
     QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
 
-    QList<QXmppShareIq::File> files;
+    QXmppShareIq::Collection collection;
     while (query.next())
     {
         const QString path = query.value(0).toString();
@@ -230,22 +258,24 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
         file.setName(info.fileName());
         file.setSize(size);
         file.setHash(hash);
-        files.append(file);
+        collection.append(file);
     }
+    QList<QXmppShareIq::Collection> collections;
+    collections.append(collection);
 
     // send response
-    qDebug() << "Found" << files.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Found" << collection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     responseIq.setType(QXmppIq::Result);
-    responseIq.setFiles(files);
+    responseIq.setCollections(collections);
     emit searchFinished(responseIq);
 }
 
-ChatSharesDatabase::IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
+IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
     : QThread(parent), scanCount(0), sharesDb(database), sharesDir(dir)
 {
 };
 
-void ChatSharesDatabase::IndexThread::run()
+void IndexThread::run()
 {
     QTime t;
     t.start();
@@ -253,7 +283,7 @@ void ChatSharesDatabase::IndexThread::run()
     qDebug() << "Scanned" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
 }
 
-void ChatSharesDatabase::IndexThread::scanDir(const QDir &dir)
+void IndexThread::scanDir(const QDir &dir)
 {
     QSqlQuery query("INSERT INTO files (path, size) "
                     "VALUES(:path, :size)", sharesDb);
