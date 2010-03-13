@@ -86,13 +86,14 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 ChatTransfers::ChatTransfers(QWidget *parent)
     : ChatPanel(parent)
 {
+    setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
 
     /* status bar */
-    QLayout *hbox = statusBar(":/album.png");
+    QLayout *hbox = statusBar();
     layout->addItem(hbox);
 
     /* help label */

@@ -29,28 +29,17 @@
 #include "chat_history.h"
 
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
-    : QWidget(parent),
+    : ChatPanel(parent),
     chatRemoteJid(jid), chatLocalState(QXmppMessage::None)
 {
+    setWindowTitle(chatRemoteJid);
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
 
     /* status bar */
-    QHBoxLayout *hbox = new QHBoxLayout;
-    nameLabel = new QLabel(chatRemoteJid);
-    hbox->addSpacing(16);
-    hbox->addWidget(nameLabel);
-    hbox->addStretch();
-    iconLabel = new QLabel;
-    hbox->addWidget(iconLabel);
-    QPushButton *button = new QPushButton;
-    button->setFlat(true);
-    button->setMaximumWidth(32);
-    button->setIcon(QIcon(":/close.png"));
-    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
-    hbox->addWidget(button);
-    layout->addItem(hbox);
+    layout->addItem(statusBar());
 
     /* chat history */
     chatHistory = new ChatHistory;
@@ -113,12 +102,7 @@ void ChatConversation::setLocalName(const QString &name)
 void ChatConversation::setRemoteName(const QString &name)
 {
     chatRemoteName = name;
-    setRemoteState(QXmppMessage::None);
-}
-
-void ChatConversation::setRemotePixmap(const QPixmap &avatar)
-{
-    iconLabel->setPixmap(avatar);
+    setWindowTitle(name);
 }
 
 void ChatConversation::setRemoteState(QXmppMessage::State state)
@@ -132,8 +116,7 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
     if (!stateName.isEmpty())
         stateName = QString(" %1").arg(stateName);
 
-    nameLabel->setText(QString("<b>%1</b>%2<br/>%3")
-        .arg(chatRemoteName)
+    setWindowExtra(QString("%1<br/>%2")
         .arg(stateName)
         .arg(chatRemoteJid));
 }

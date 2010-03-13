@@ -214,7 +214,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
             chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_J), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(showShares()));
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(showTransfers()));
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(showConsole()));
@@ -342,20 +344,17 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
 {
     ChatConversation *dialog;
     if (room)
+    {
+        rosterModel->addItem(ChatRosterItem::Room, jid);
         dialog  = new ChatRoom(client, jid);
-    else
+    } else {
         dialog = new ChatDialog(client, rosterModel, jid);
+        dialog->setWindowIcon(rosterModel->contactAvatar(jid));
+    }
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(closeTab()), this, SLOT(leaveConversation()));
-    if (room)
-    {
-        dialog->setRemotePixmap(QPixmap(":/chat.png"));
-        rosterModel->addItem(ChatRosterItem::Room, jid);
-    } else {
-        dialog->setRemotePixmap(rosterModel->contactAvatar(jid));
-    }
+    connect(dialog, SIGNAL(closeTab()), this, SLOT(hideConversation()));
     addPanel(dialog);
 
     // join conversation
@@ -508,7 +507,7 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     dialog->setFocus();
 }
 
-void Chat::leaveConversation()
+void Chat::hideConversation()
 {
     ChatConversation *dialog = qobject_cast<ChatConversation*>(sender());
     if (!dialog || conversationPanel->indexOf(dialog) < 0)
@@ -888,7 +887,7 @@ void Chat::showConsole()
     rosterModel->addItem(ChatRosterItem::Other,
         chatConsole->objectName(),
         chatConsole->windowTitle(),
-        QIcon(":/options.png"));
+        chatConsole->windowIcon());
     addPanel(chatConsole);
     conversationPanel->setCurrentWidget(chatConsole);
 }
@@ -903,7 +902,7 @@ void Chat::showShares()
     rosterModel->addItem(ChatRosterItem::Other,
         chatShares->objectName(),
         chatShares->windowTitle(),
-        QIcon(":/album.png"));
+        chatShares->windowIcon());
     addPanel(chatShares);
     conversationPanel->setCurrentWidget(chatShares);
 }
@@ -918,7 +917,7 @@ void Chat::showTransfers()
     rosterModel->addItem(ChatRosterItem::Other,
         chatTransfers->objectName(),
         chatTransfers->windowTitle(),
-        QIcon(":/album.png"));
+        chatTransfers->windowIcon());
     addPanel(chatTransfers);
     conversationPanel->setCurrentWidget(chatTransfers);
 }

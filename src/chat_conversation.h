@@ -20,9 +20,9 @@
 #ifndef __WDESKTOP_CHAT_CONVERSATION_H__
 #define __WDESKTOP_CHAT_CONVERSATION_H__
 
-#include <QWidget>
-
 #include "qxmpp/QXmppMessage.h"
+
+#include "chat_panel.h"
 
 class ChatEdit;
 class ChatHistory;
@@ -43,7 +43,6 @@ public:
     QXmppMessage::State localState() const;
     void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
-    void setRemotePixmap(const QPixmap &avatar);
     void setRemoteState(QXmppMessage::State state);
 
 protected slots:
@@ -55,7 +54,6 @@ protected slots:
     void slotTextChanged();
 
 signals:
-    void closeTab();
     void localStateChanged(QXmppMessage::State state);
 
 protected:
@@ -64,8 +62,6 @@ protected:
 protected:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
-    QLabel *iconLabel;
-    QLabel *nameLabel;
 
     QString chatLocalName;
     QString chatRemoteJid;

@@ -22,6 +22,7 @@
 
 #include <QWidget>
 
+class QLabel;
 class QPushButton;
 
 class ChatPanel : public QWidget
@@ -30,13 +31,22 @@ class ChatPanel : public QWidget
 
 public:
     ChatPanel(QWidget *parent);
+    void setWindowIcon(const QIcon &icon);
+    void setWindowExtra(const QString &extra);
+    void setWindowTitle(const QString &title);
 
 protected:
-    QLayout *statusBar(const QString &iconName);
+    QLayout *statusBar();
 
 signals:
     void openTab();
     void closeTab();
+
+private:
+    QPushButton *closeButton;
+    QLabel *iconLabel;
+    QLabel *nameLabel;
+    QString windowExtra;
 };
 
 #endif

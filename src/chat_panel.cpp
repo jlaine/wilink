@@ -26,25 +26,46 @@
 ChatPanel::ChatPanel(QWidget* parent)
     : QWidget(parent)
 {
+    closeButton = new QPushButton;
+    closeButton->setFlat(true);
+    closeButton->setMaximumWidth(32);
+    closeButton->setIcon(QIcon(":/close.png"));
+    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeTab()));
+
+    iconLabel = new QLabel;
+    nameLabel = new QLabel;
 }
 
-QLayout* ChatPanel::statusBar(const QString &iconName)
+void ChatPanel::setWindowExtra(const QString &extra)
+{
+    windowExtra = extra;
+    nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
+}
+
+void ChatPanel::setWindowIcon(const QIcon &icon)
+{
+    QWidget::setWindowIcon(icon);
+    QList<QSize> available = icon.availableSizes();
+    if (available.isEmpty())
+        return;
+    iconLabel->setPixmap(icon.pixmap(available.first()));
+}
+
+void ChatPanel::setWindowTitle(const QString &title)
+{
+    QWidget::setWindowTitle(title);
+    nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
+}
+
+QLayout* ChatPanel::statusBar()
 {
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(windowTitle()));
     hbox->addSpacing(16);
     hbox->addWidget(nameLabel);
     hbox->addStretch();
-    QLabel *iconLabel = new QLabel;
-    iconLabel->setPixmap(QPixmap(iconName));
     hbox->addWidget(iconLabel);
-    QPushButton *button = new QPushButton;
-    button->setFlat(true);
-    button->setMaximumWidth(32);
-    button->setIcon(QIcon(":/close.png"));
-    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
-    hbox->addWidget(button);
+    hbox->addWidget(closeButton);
     return hbox;
 }
 

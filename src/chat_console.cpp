@@ -27,14 +27,14 @@
 ChatConsole::ChatConsole(QWidget *parent)
     : ChatPanel(parent)
 {
+    setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Debugging console"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    QLayout *hbox = statusBar(":/options.png");
-    layout->addItem(hbox);
+    layout->addItem(statusBar());
     browser = new QTextBrowser;
     layout->addWidget(browser);
 

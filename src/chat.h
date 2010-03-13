@@ -78,7 +78,6 @@ protected slots:
     void inviteContact(const QString &jid);
     void iqReceived(const QXmppIq&);
     void joinConversation(const QString &jid, bool isRoom);
-    void leaveConversation();
     void messageReceived(const QXmppMessage &msg);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
@@ -88,6 +87,8 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void statusChanged(int currentIndex);
+
+    void hideConversation();
 
     void hideConsole();
     void showConsole();
