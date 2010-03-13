@@ -53,7 +53,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     sharesDir = QDir(QDir::home().filePath("Public"));
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join.")));
+    layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     lineEdit = new QLineEdit;
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     layout->addWidget(lineEdit);

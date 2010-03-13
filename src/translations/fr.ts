@@ -219,6 +219,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatShares</name>
+    <message>
+        <source>Enter the name of the file you are looking for.</source>
+        <translation>Saisissez le nom du fichier que vous cherchez.</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Taille</translation>
+    </message>
+</context>
+<context>
     <name>ChatTransferPrompt</name>
     <message>
         <source>%1 wants to send you a file called &apos;%2&apos; (%3).
