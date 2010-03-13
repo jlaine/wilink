@@ -47,6 +47,7 @@ public:
 
 private:
     void scanDir(const QDir &dir);
+
     qint64 scanCount;
     QSqlDatabase sharesDb;
     QDir sharesDir;
@@ -64,6 +65,8 @@ signals:
     void searchFinished(const QXmppShareIq &packet);
 
 private:
+    bool updateFile(QXmppShareIq::File &shareFile);
+
     QXmppShareIq requestIq;
     QSqlDatabase sharesDb;
     QDir sharesDir;

@@ -197,7 +197,7 @@ void IndexThread::scanDir(const QDir &dir)
     QSqlQuery query("INSERT INTO files (path, size) "
                     "VALUES(:path, :size)", sharesDb);
 
-    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable))
+    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable))
     {
         if (info.isDir())
         {
@@ -216,6 +216,51 @@ SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const 
 {
 };
 
+bool SearchThread::updateFile(QXmppShareIq::File &file)
+{
+    QCryptographicHash hasher(QCryptographicHash::Md5);
+    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
+    QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
+
+    // check file is still readable
+    QFileInfo info(sharesDir.filePath(file.name()));
+    if (!info.isReadable())
+    {
+        deleteQuery.bindValue(":path", file.name());
+        deleteQuery.exec();
+        return false;
+    }
+
+    // check whether we need to calculate checksum
+    if (file.hash().isEmpty() || info.size() != file.size())
+    {
+        QFile fp(info.filePath());
+
+        // if we cannot open the file, remove it from database
+        if (!fp.open(QIODevice::ReadOnly))
+        {
+            qWarning() << "Failed to open file" << file.name();
+            deleteQuery.bindValue(":path", file.name());
+            deleteQuery.exec();
+            return false;
+        }
+
+        // update file object
+        while (fp.bytesAvailable())
+            hasher.addData(fp.read(16384));
+        fp.close();
+        file.setHash(hasher.result());
+        file.setSize(info.size());
+
+        // update database entry
+        updateQuery.bindValue(":hash", file.hash().toHex());
+        updateQuery.bindValue(":size", file.size());
+        updateQuery.bindValue(":path", file.name());
+        updateQuery.exec();
+    }
+    return true;
+}
+
 void SearchThread::run()
 {
     QXmppShareIq responseIq;
@@ -223,9 +268,13 @@ void SearchThread::run()
     responseIq.setTo(requestIq.from());
     responseIq.setTag(requestIq.tag());
 
-    // refuse to perform search without criteria
-    if (requestIq.search().isEmpty())
+    // validate search
+    const QString queryString = requestIq.search();
+    if (queryString.isEmpty() || queryString.trimmed().isEmpty() ||
+        queryString.contains("/") ||
+        queryString.contains("\\"))
     {
+        qWarning() << "Received an invalid search" << queryString;
         responseIq.setType(QXmppIq::Error);
         emit searchFinished(responseIq);
         return;
@@ -236,66 +285,45 @@ void SearchThread::run()
     t.start();
 
     // perform search
-    QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search", sharesDb);
-    query.bindValue(":search", "%" + requestIq.search() + "%");
+    QString like = queryString;
+    like.replace("%", "\\%");
+    like.replace("_", "\\_");
+    like = "%" + like + "%";
+    QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search ESCAPE :escape ORDER BY path", sharesDb);
+    query.bindValue(":search", like);
+    query.bindValue(":escape", "\\");
     query.exec();
 
-    // prepare update queries
-    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
-    QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
-
-    QXmppShareIq::Collection collection;
+    QXmppShareIq::Collection baseCollection;
     while (query.next())
     {
-        const QString path = query.value(0).toString();
-        const qint64 size = query.value(1).toInt();
-        QByteArray hash = QByteArray::fromHex(query.value(2).toByteArray());
-        QFileInfo info(sharesDir.filePath(path));
-
-        // check file is still readable
-        if (!info.isReadable())
-        {
-            deleteQuery.bindValue(":path", path);
-            deleteQuery.exec();
-            continue;
-        }
-
-        // check whether we need to calculate checksum
-        if (hash.isEmpty() || info.size() != size)
-        {
-            QFile file(info.filePath());
-
-            // if we cannot open the file, remove it from database
-            if (!file.open(QIODevice::ReadOnly))
-            {
-                qWarning() << "Failed to open file" << path;
-                deleteQuery.bindValue(":path", path);
-                deleteQuery.exec();
-            }
-
-            while (file.bytesAvailable())
-                hasher.addData(file.read(16384));
-            hash = hasher.result();
-            hasher.reset();
-
-            // update database entry
-            updateQuery.bindValue(":hash", hash.toHex());
-            updateQuery.bindValue(":size", info.size());
-            updateQuery.bindValue(":path", path);
-            updateQuery.exec();
-        }
-
         QXmppShareIq::File file;
-        file.setName(info.fileName());
-        file.setSize(size);
-        file.setHash(hash);
-        collection.append(file);
+        file.setName(query.value(0).toString());
+        file.setSize(query.value(1).toInt());
+        file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
+
+        if (updateFile(file))
+            baseCollection.append(file);
     }
+
     QList<QXmppShareIq::Collection> collections;
-    collections.append(collection);
+#if 0
+    // perform grouping
+    QString lastMatch;
+    for (int depth = 1; depth > 0; depth--)
+    {
+        qDebug() << "searching for" << queryString << "at depth" << depth;
+    }
+#endif
+    for (int i = 0; i < baseCollection.size(); i++)
+    {
+        const QString path = baseCollection[i].name();
+        baseCollection[i].setName(QFileInfo(path).fileName());
+    }
+    collections.append(baseCollection);
 
     // send response
-    qDebug() << "Found" << collection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Found" << baseCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     responseIq.setType(QXmppIq::Result);
     responseIq.setCollections(collections);
     emit searchFinished(responseIq);
