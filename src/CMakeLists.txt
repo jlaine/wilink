@@ -54,6 +54,7 @@ set(wDesktop_MOC_HEADERS
     chat_room.h
     chat_roster.h
     chat_shares.h
+    chat_shares_p.h
     chat_transfers.h
     diagnostics.h
     photos.h

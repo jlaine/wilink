@@ -34,6 +34,7 @@
 
 #include "chat.h"
 #include "chat_shares.h"
+#include "chat_shares_p.h"
 #include "chat_transfers.h"
 
 enum Columns
@@ -42,34 +43,12 @@ enum Columns
     SizeColumn,
 };
 
-class IndexThread : public QThread
-{
-public:
-    IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
-    void run();
-
-private:
-    void scanDir(const QDir &dir);
-    qint64 scanCount;
-    QSqlDatabase sharesDb;
-    QDir sharesDir;
-};
-
-class SearchThread : public QThread
-{
-public:
-    SearchThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
-    void run();
-
-private:
-    QSqlDatabase sharesDb;
-    QDir sharesDir;
-};
-
+Q_DECLARE_METATYPE(QXmppShareIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : QWidget(parent), client(xmppClient), db(0)
 {
+    qRegisterMetaType<QXmppShareIq>("QXmppShareIq");
     sharesDir = QDir(QDir::home().filePath("Public"));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -127,6 +106,11 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     }
 }
 
+void ChatShares::searchFinished(const QXmppShareIq &iq)
+{
+    client->sendPacket(iq);
+}
+
 void ChatShares::findRemoteFiles()
 {
     const QString search = lineEdit->text();
@@ -163,7 +147,7 @@ void ChatShares::setShareServer(const QString &server)
     if (!db)
     {
         db = new ChatSharesDatabase(sharesDir.path(), this);
-        connect(db, SIGNAL(searchFinished(const QXmppPacket&)), client, SLOT(sendPacket(const QXmppPacket&)));
+        connect(db, SIGNAL(searchFinished(const QXmppShareIq&)), this, SLOT(searchFinished(const QXmppShareIq&)));
     }
 
     // register with server
@@ -181,11 +165,58 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
-    IndexThread *indexer = new IndexThread(sharesDb, sharesDir, this);
-    indexer->start();
+    // start indexing
+    QThread *worker = new IndexThread(sharesDb, sharesDir, this);
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    worker->start();
 }
 
 void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
+{
+    QThread *worker = new SearchThread(sharesDb, sharesDir, requestIq, this);
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(worker, SIGNAL(searchFinished(const QXmppShareIq&)), this, SIGNAL(searchFinished(const QXmppShareIq&)));
+    worker->start();
+}
+
+IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
+    : QThread(parent), scanCount(0), sharesDb(database), sharesDir(dir)
+{
+};
+
+void IndexThread::run()
+{
+    QTime t;
+    t.start();
+    scanDir(sharesDir);
+    qDebug() << "Scanned" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
+}
+
+void IndexThread::scanDir(const QDir &dir)
+{
+    QSqlQuery query("INSERT INTO files (path, size) "
+                    "VALUES(:path, :size)", sharesDb);
+
+    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable))
+    {
+        if (info.isDir())
+        {
+            scanDir(QDir(info.filePath()));
+        } else {
+            query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
+            query.bindValue(":size", info.size());
+            query.exec();
+            scanCount++;
+        }
+    }
+}
+
+SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const QXmppShareIq &request, QObject *parent)
+    : QThread(parent), requestIq(request), sharesDb(database), sharesDir(dir)
+{
+};
+
+void SearchThread::run()
 {
     QXmppShareIq responseIq;
     responseIq.setId(requestIq.id());
@@ -269,36 +300,3 @@ void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
     responseIq.setCollections(collections);
     emit searchFinished(responseIq);
 }
-
-IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
-    : QThread(parent), scanCount(0), sharesDb(database), sharesDir(dir)
-{
-};
-
-void IndexThread::run()
-{
-    QTime t;
-    t.start();
-    scanDir(sharesDir);
-    qDebug() << "Scanned" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
-}
-
-void IndexThread::scanDir(const QDir &dir)
-{
-    QSqlQuery query("INSERT INTO files (path, size) "
-                    "VALUES(:path, :size)", sharesDb);
-
-    foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot | QDir::Readable))
-    {
-        if (info.isDir())
-        {
-            scanDir(QDir(info.filePath()));
-        } else {
-            query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
-            query.bindValue(":size", info.size());
-            query.exec();
-            scanCount++;
-        }
-    }
-}
-

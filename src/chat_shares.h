@@ -22,33 +22,15 @@
 
 #include <QDir>
 #include <QWidget>
-#include <QSqlDatabase>
-#include <QThread>
 
 class ChatClient;
-class QDir;
+class ChatSharesDatabase;
 class QLineEdit;
 class QListWidget;
 class QTableWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppShareIq;
-
-class ChatSharesDatabase : public QObject
-{
-    Q_OBJECT
-
-public:
-    ChatSharesDatabase(const QString &path, QObject *parent = 0);
-    void search(const QXmppShareIq &requestIq);
-
-signals:
-    void searchFinished(const QXmppPacket &packet);
-
-private:
-    QSqlDatabase sharesDb;
-    QDir sharesDir;
-};
 
 class ChatShares : public QWidget
 {
@@ -62,6 +44,7 @@ private slots:
     void findRemoteFiles();
     void registerWithServer();
     void shareIqReceived(const QXmppShareIq &share);
+    void searchFinished(const QXmppShareIq &share);
 
 private:
     QString shareServer;
