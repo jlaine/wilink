@@ -126,9 +126,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     logger->setLoggingType(QXmppLogger::SIGNAL);
     client->setLogger(logger);
 
-    /* set up shares */
-    chatShares = new ChatShares(client);
-
     /* build splitter */
     splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
@@ -169,7 +166,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     sharesButton = new QPushButton;
     sharesButton->setVisible(false);
     sharesButton->setIcon(QIcon(":/album.png"));
-    connect(sharesButton, SIGNAL(clicked()), chatShares, SLOT(show()));
+    connect(sharesButton, SIGNAL(clicked()), this, SLOT(showShares()));
     hbox->addWidget(sharesButton);
 
     hbox->addStretch();
@@ -191,6 +188,11 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     setLayout(layout);
     setWindowIcon(QIcon(":/chat.png"));
+
+    /* set up shares */
+    chatShares = new ChatShares(client);
+    chatShares->setObjectName("shares");
+    connect(chatShares, SIGNAL(closeTab()), this, SLOT(hideShares()));
 
     /* set up transfers window */
     client->getTransferManager().setSupportedMethods(
@@ -823,7 +825,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
         {
-            if (jid == chatTransfers->objectName())
+            if (jid == chatShares->objectName())
+                showShares();
+            else if (jid == chatTransfers->objectName())
                 showTransfers();
             else if (jid == chatConsole->objectName())
                 showConsole();
@@ -887,6 +891,21 @@ void Chat::showConsole()
         QIcon(":/options.png"));
     addPanel(chatConsole);
     conversationPanel->setCurrentWidget(chatConsole);
+}
+
+void Chat::hideShares()
+{
+    removePanel(chatShares);
+}
+
+void Chat::showShares()
+{
+    rosterModel->addItem(ChatRosterItem::Other,
+        chatShares->objectName(),
+        chatShares->windowTitle(),
+        QIcon(":/album.png"));
+    addPanel(chatShares);
+    conversationPanel->setCurrentWidget(chatShares);
 }
 
 void Chat::hideTransfers()

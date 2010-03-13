@@ -92,6 +92,9 @@ protected slots:
     void hideConsole();
     void showConsole();
 
+    void hideShares();
+    void showShares();
+
     void hideTransfers();
     void showTransfers();
 

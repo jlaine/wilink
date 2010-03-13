@@ -17,27 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_CONSOLE_H__
-#define __WDESKTOP_CHAT_CONSOLE_H__
-
-#include "qxmpp/QXmppLogger.h"
+#include <QLabel>
+#include <QLayout>
+#include <QPushButton>
 
 #include "chat_panel.h"
 
-class QTextBrowser;
-
-class ChatConsole : public ChatPanel
+ChatPanel::ChatPanel(QWidget* parent)
+    : QWidget(parent)
 {
-    Q_OBJECT
+}
 
-public:
-    ChatConsole(QWidget *parent = 0);
+QLayout* ChatPanel::statusBar()
+{
+    /* status bar */
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(windowTitle()));
+    hbox->addSpacing(16);
+    hbox->addWidget(nameLabel);
+    hbox->addStretch();
+    QLabel *iconLabel = new QLabel;
+    iconLabel->setPixmap(QPixmap(":/options.png"));
+    hbox->addWidget(iconLabel);
+    QPushButton *button = new QPushButton;
+    button->setFlat(true);
+    button->setMaximumWidth(32);
+    button->setIcon(QIcon(":/close.png"));
+    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
+    hbox->addWidget(button);
+    return hbox;
+}
 
-private slots:
-    void message(QXmppLogger::MessageType type, const QString &msg);
-
-private:
-    QTextBrowser *browser;
-};
-
-#endif

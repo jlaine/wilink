@@ -47,12 +47,15 @@ enum Columns
 Q_DECLARE_METATYPE(QXmppShareIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : QWidget(parent), client(xmppClient), db(0)
+    : ChatPanel(parent), client(xmppClient), db(0)
 {
     qRegisterMetaType<QXmppShareIq>("QXmppShareIq");
     sharesDir = QDir(QDir::home().filePath("Public"));
 
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     lineEdit = new QLineEdit;
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
@@ -100,32 +103,29 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
         QFileIconProvider iconProvider;
         foreach (const QXmppShareIq::Collection &collection, shareIq.collections())
         {
-            if (collection.name().isEmpty())
-            {
-                foreach (const QXmppShareIq::File &file, collection)
-                {
-                    QTreeWidgetItem *fileItem = new QTreeWidgetItem(treeWidget);
-                    fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
-                    fileItem->setText(NameColumn, file.name());
-                    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
-                }
-            } else {
-                qint64 collectionSize = 0;
-                QTreeWidgetItem *collectionItem = new QTreeWidgetItem(treeWidget);
-                collectionItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::Folder));
-                collectionItem->setText(NameColumn, collection.name());
+            qint64 collectionSize = 0;
+            QTreeWidgetItem *collectionItem = new QTreeWidgetItem(treeWidget);
+            collectionItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::Folder));
+            collectionItem->setText(NameColumn, collection.name());
 
-                foreach (const QXmppShareIq::File &file, collection)
-                {
-                    QTreeWidgetItem *fileItem = new QTreeWidgetItem(collectionItem);
-                    fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
-                    fileItem->setText(NameColumn, file.name());
-                    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
-                    collectionSize += file.size();
-                }
-                collectionItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
+            foreach (const QXmppShareIq::File &file, collection)
+            {
+                QTreeWidgetItem *fileItem = new QTreeWidgetItem(collectionItem);
+                fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
+                fileItem->setText(NameColumn, file.name());
+                fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
+                collectionSize += file.size();
             }
+            collectionItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
         }
+        foreach (const QXmppShareIq::File &file, shareIq.files())
+        {
+            QTreeWidgetItem *fileItem = new QTreeWidgetItem(treeWidget);
+            fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
+            fileItem->setText(NameColumn, file.name());
+            fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
+        }
+
         treeWidget->setColumnWidth(NameColumn, treeWidget->width() - 60);
         treeWidget->setColumnWidth(SizeColumn, 50);
     }
@@ -324,8 +324,8 @@ void SearchThread::run()
     query.exec();
 
     QList<QXmppShareIq::Collection> collections;
-    QXmppShareIq::Collection baseCollection;
     QXmppShareIq::Collection currentCollection;
+    QList<QXmppShareIq::File> files;
     int searchCount = 0;
     QString lastString;
     while (query.next())
@@ -358,7 +358,7 @@ void SearchThread::run()
         // add file to the appropriate collection
         searchCount++;
         if (matchString.isEmpty())
-            baseCollection.append(file);
+            files.append(file);
         else if (matchString == lastString)
         {
             currentCollection.append(file);
@@ -382,12 +382,11 @@ void SearchThread::run()
     }
     if (!currentCollection.isEmpty())
         collections.append(currentCollection);
-    if (!baseCollection.isEmpty())
-        collections.append(baseCollection);
 
     // send response
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
     responseIq.setType(QXmppIq::Result);
     responseIq.setCollections(collections);
+    responseIq.setFiles(files);
     emit searchFinished(responseIq);
 }

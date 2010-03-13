@@ -25,7 +25,7 @@
 #include "chat_console.h"
 
 ChatConsole::ChatConsole(QWidget *parent)
-    : QWidget(parent)
+    : ChatPanel(parent)
 {
     setWindowTitle(tr("Debugging console"));
 
@@ -33,23 +33,8 @@ ChatConsole::ChatConsole(QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    /* status bar */
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *nameLabel = new QLabel(QString("<b>%1</b>").arg(windowTitle()));
-    hbox->addSpacing(16);
-    hbox->addWidget(nameLabel);
-    hbox->addStretch();
-    QLabel *iconLabel = new QLabel;
-    iconLabel->setPixmap(QPixmap(":/options.png"));
-    hbox->addWidget(iconLabel);
-    QPushButton *button = new QPushButton;
-    button->setFlat(true);
-    button->setMaximumWidth(32);
-    button->setIcon(QIcon(":/close.png"));
-    connect(button, SIGNAL(clicked()), this, SIGNAL(closeTab()));
-    hbox->addWidget(button);
+    QLayout *hbox = statusBar();
     layout->addItem(hbox);
-
     browser = new QTextBrowser;
     layout->addWidget(browser);
 
