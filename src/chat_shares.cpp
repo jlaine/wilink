@@ -373,6 +373,11 @@ void SearchThread::run()
             currentCollection.setName(matchString);
             currentCollection.append(file);
         }
+
+        // limit maximum search time to 15s
+        if (t.elapsed() > 15000 || searchCount > 120)
+            break;
+
         lastString = matchString;
     }
     if (!currentCollection.isEmpty())
