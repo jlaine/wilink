@@ -47,6 +47,9 @@ private slots:
     void searchFinished(const QXmppShareIq &share);
 
 private:
+    void clearView();
+
+private:
     QString shareServer;
     QDir sharesDir;
 

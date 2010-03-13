@@ -67,6 +67,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
     tableWidget->setSortingEnabled(true);
     //connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
+    clearView();
     layout->addWidget(tableWidget);
 
     setLayout(layout);
@@ -76,6 +77,13 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
+}
+
+void ChatShares::clearView()
+{
+    tableWidget->clear();
+    tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("Name")));
+    tableWidget->setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
 }
 
 void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
@@ -118,7 +126,7 @@ void ChatShares::findRemoteFiles()
         return;
 
     lineEdit->setEnabled(false);
-    tableWidget->clearContents();
+    clearView();
 
     QXmppShareIq iq;
     iq.setTo(shareServer);
@@ -294,7 +302,12 @@ void SearchThread::run()
     query.bindValue(":escape", "\\");
     query.exec();
 
+    QList<QXmppShareIq::Collection> collections;
     QXmppShareIq::Collection baseCollection;
+    QXmppShareIq::Collection currentCollection;
+    int searchCount = 0;
+    int lastDepth = -1;
+    QString lastString;
     while (query.next())
     {
         QXmppShareIq::File file;
@@ -302,28 +315,56 @@ void SearchThread::run()
         file.setSize(query.value(1).toInt());
         file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
 
-        if (updateFile(file))
-            baseCollection.append(file);
-    }
+        // find the depth at which we matched
+        int matchDepth;
+        QString matchString;
+        for (matchDepth = 2; matchDepth >= 0; matchDepth--)
+        {
+            QString reString(".*([^/]+)");
+            for (int i = 0; i < matchDepth; ++i) reString += "/[^/]+";
+            QRegExp re(reString);
+            if (re.exactMatch(file.name()) && re.cap(1).contains(queryString, Qt::CaseInsensitive))
+            {
+                //qDebug() << "Matched at depth" << matchDepth << file.name() << re.cap(1);
+                matchString = re.cap(1); 
+                break;
+            }
+        }
+        if (matchDepth < 0 || !updateFile(file))
+            continue;
 
-    QList<QXmppShareIq::Collection> collections;
-#if 0
-    // perform grouping
-    QString lastMatch;
-    for (int depth = 1; depth > 0; depth--)
-    {
-        qDebug() << "searching for" << queryString << "at depth" << depth;
+        // add file to the appropriate collection
+        searchCount++;
+        file.setName(QFileInfo(file.name()).fileName());
+        if (!matchDepth)
+            baseCollection.append(file);
+        else if (matchDepth == lastDepth && matchString == lastString)
+        {
+            currentCollection.append(file);
+        }
+        else
+        {
+            if (!currentCollection.isEmpty())
+            {
+                collections.append(currentCollection);
+                // qDebug() << "Finished collection" << currentCollection.name();
+                currentCollection.clear();
+            }
+            currentCollection.setName(matchString);
+            // qDebug() << "Starting collection" << currentCollection.name();
+        }
+        lastDepth = matchDepth;
+        lastString = matchString;
     }
-#endif
-    for (int i = 0; i < baseCollection.size(); i++)
+    if (!currentCollection.isEmpty())
     {
-        const QString path = baseCollection[i].name();
-        baseCollection[i].setName(QFileInfo(path).fileName());
+        collections.append(currentCollection);
+        // qDebug() << "Finished collection" << currentCollection.name();
     }
     collections.append(baseCollection);
 
     // send response
-    qDebug() << "Found" << baseCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
     responseIq.setType(QXmppIq::Result);
     responseIq.setCollections(collections);
     emit searchFinished(responseIq);
