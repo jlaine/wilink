@@ -76,11 +76,40 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     setLayout(layout);
 
+    /* load icons */
+    QFileIconProvider iconProvider;
+    collectionIcon = iconProvider.icon(QFileIconProvider::Folder);
+    fileIcon = iconProvider.icon(QFileIconProvider::File);
+
     /* connect signals */
     registerTimer = new QTimer(this);
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
+}
+
+qint64 ChatShares::addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem *collectionItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(treeWidget);
+    collectionItem->setIcon(NameColumn, collectionIcon);
+    collectionItem->setText(NameColumn, collection.name());
+
+    qint64 collectionSize = 0;
+    foreach (const QXmppShareIq::Collection &child, collection.collections())
+        collectionSize += addCollection(child, collectionItem);
+    foreach (const QXmppShareIq::File &file, collection)
+        collectionSize += addFile(file, collectionItem);
+    collectionItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
+    return collectionSize;
+}
+
+qint64 ChatShares::addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent)
+{
+    QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(treeWidget);
+    fileItem->setIcon(NameColumn, fileIcon);
+    fileItem->setText(NameColumn, file.name());
+    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
+    return file.size();
 }
 
 void ChatShares::clearView()
@@ -106,29 +135,9 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
         lineEdit->setEnabled(true);
         QFileIconProvider iconProvider;
         foreach (const QXmppShareIq::Collection &collection, shareIq.collection().collections())
-        {
-            qint64 collectionSize = 0;
-            QTreeWidgetItem *collectionItem = new QTreeWidgetItem(treeWidget);
-            collectionItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::Folder));
-            collectionItem->setText(NameColumn, collection.name());
-
-            foreach (const QXmppShareIq::File &file, collection)
-            {
-                QTreeWidgetItem *fileItem = new QTreeWidgetItem(collectionItem);
-                fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
-                fileItem->setText(NameColumn, file.name());
-                fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
-                collectionSize += file.size();
-            }
-            collectionItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
-        }
+            addCollection(collection, 0);
         foreach (const QXmppShareIq::File &file, shareIq.collection())
-        {
-            QTreeWidgetItem *fileItem = new QTreeWidgetItem(treeWidget);
-            fileItem->setIcon(NameColumn, iconProvider.icon(QFileIconProvider::File));
-            fileItem->setText(NameColumn, file.name());
-            fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
-        }
+            addFile(file, 0);
 
         treeWidget->setColumnWidth(NameColumn, treeWidget->width() - 60);
         treeWidget->setColumnWidth(SizeColumn, 50);

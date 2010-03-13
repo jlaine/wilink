@@ -21,6 +21,9 @@
 #define __WDESKTOP_CHAT_SHARES_H__
 
 #include <QDir>
+#include <QIcon>
+
+#include "qxmpp/QXmppShareIq.h"
 
 #include "chat_panel.h"
 
@@ -29,9 +32,9 @@ class ChatSharesDatabase;
 class QLineEdit;
 class QListWidget;
 class QTreeWidget;
+class QTreeWidgetItem;
 class QTimer;
 class QXmppPacket;
-class QXmppShareIq;
 
 class ChatShares : public ChatPanel
 {
@@ -48,11 +51,15 @@ private slots:
     void searchFinished(const QXmppShareIq &share);
 
 private:
+    qint64 addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent);
+    qint64 addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent);
     void clearView();
 
 private:
     QString shareServer;
     QDir sharesDir;
+    QIcon collectionIcon;
+    QIcon fileIcon;
 
     ChatClient *client;
     ChatSharesDatabase *db;
