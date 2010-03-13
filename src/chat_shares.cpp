@@ -375,7 +375,7 @@ void SearchThread::run()
         }
 
         // limit maximum search time to 15s
-        if (t.elapsed() > 15000 || searchCount > 120)
+        if (t.elapsed() > 15000 || searchCount > 250)
             break;
 
         lastString = matchString;
