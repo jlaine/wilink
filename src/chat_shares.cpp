@@ -49,12 +49,18 @@ Q_DECLARE_METATYPE(QXmppShareIq)
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient), db(0)
 {
+    setWindowTitle(tr("Shares"));
+
     qRegisterMetaType<QXmppShareIq>("QXmppShareIq");
     sharesDir = QDir(QDir::home().filePath("Public"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
+
+    /* status bar */
+    QLayout *hbox = statusBar(":/album.png");
+    layout->addItem(hbox);
 
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     lineEdit = new QLineEdit;

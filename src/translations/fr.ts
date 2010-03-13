@@ -232,6 +232,10 @@ Acceptez-vous?</translation>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
 </context>
 <context>
     <name>ChatTransferPrompt</name>

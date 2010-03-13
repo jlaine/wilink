@@ -30,7 +30,7 @@ class QLabel;
 class QLineEdit;
 class QXmppVCard;
 
-class ChatConversation : public QWidget
+class ChatConversation : public ChatPanel
 {
     Q_OBJECT
 
