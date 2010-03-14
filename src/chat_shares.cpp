@@ -44,6 +44,12 @@ enum Columns
     SizeColumn,
 };
 
+enum Roles
+{
+    HashRole = Qt::UserRole,
+    SizeRole,
+};
+
 Q_DECLARE_METATYPE(QXmppShareIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
@@ -70,7 +76,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     treeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     //treeWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
-    //connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
+    connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem*)));
     clearView();
     layout->addWidget(treeWidget);
 
@@ -106,6 +112,8 @@ qint64 ChatShares::addCollection(const QXmppShareIq::Collection &collection, QTr
 qint64 ChatShares::addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(treeWidget);
+    fileItem->setData(NameColumn, HashRole, file.hash());
+    fileItem->setData(NameColumn, SizeRole, file.size());
     fileItem->setIcon(NameColumn, fileIcon);
     fileItem->setText(NameColumn, file.name());
     fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
@@ -126,25 +134,58 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     if (shareIq.from() != shareServer)
         return;
 
-    if (shareIq.type() == QXmppIq::Get)
+    if (shareIq.queryType() == QXmppShareIq::SearchQuery)
     {
-        db->search(shareIq);
-    }
-    else if (shareIq.type() == QXmppIq::Result)
-    {
-        lineEdit->setEnabled(true);
-        QFileIconProvider iconProvider;
-        foreach (const QXmppShareIq::Collection &collection, shareIq.collection().collections())
-            addCollection(collection, 0);
-        foreach (const QXmppShareIq::File &file, shareIq.collection())
-            addFile(file, 0);
+        if (shareIq.type() == QXmppIq::Get)
+        {
+            db->search(shareIq);
+        }
+        else if (shareIq.type() == QXmppIq::Result)
+        {
+            lineEdit->setEnabled(true);
+            QFileIconProvider iconProvider;
+            foreach (const QXmppShareIq::Collection &collection, shareIq.collection().collections())
+                addCollection(collection, 0);
+            foreach (const QXmppShareIq::File &file, shareIq.collection())
+                addFile(file, 0);
 
-        treeWidget->setColumnWidth(NameColumn, treeWidget->width() - 60);
-        treeWidget->setColumnWidth(SizeColumn, 50);
+            treeWidget->setColumnWidth(NameColumn, treeWidget->width() - 60);
+            treeWidget->setColumnWidth(SizeColumn, 50);
+        }
+        else if (shareIq.type() == QXmppIq::Error)
+        {
+            lineEdit->setEnabled(true);
+        }
     }
-    else if (shareIq.type() == QXmppIq::Error)
+    else if (shareIq.queryType() == QXmppShareIq::GetQuery)
     {
-        lineEdit->setEnabled(true);
+        if (shareIq.type() == QXmppIq::Get)
+        {
+            QXmppShareIq responseIq;
+            responseIq.setId(shareIq.id());
+            responseIq.setTo(shareIq.from());
+            responseIq.setQueryType(shareIq.queryType());
+            responseIq.setTag(shareIq.tag());
+            responseIq.setType(QXmppIq::Result);
+
+            // check paths are OK
+            QStringList filePaths;
+            foreach (const QXmppShareIq::File &file, shareIq.collection())
+            {
+                QString path = db->locate(file);
+                if (path.isEmpty())
+                {
+                    qWarning() << "Could not find file" << file.name();
+                    responseIq.setType(QXmppIq::Error);
+                    client->sendPacket(responseIq);
+                    return;
+                } 
+                filePaths << path;
+            }
+            client->sendPacket(responseIq);
+
+            // send files
+        }
     }
 }
 
@@ -166,6 +207,24 @@ void ChatShares::findRemoteFiles()
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
     iq.setSearch(search);
+    client->sendPacket(iq);
+}
+
+void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
+{
+    qDebug() << "double click" << item->text(NameColumn);
+    QXmppShareIq iq;
+    iq.setTo(shareServer);
+    iq.setType(QXmppIq::Get);
+    iq.setQueryType(QXmppShareIq::GetQuery);
+
+    QXmppShareIq::File file;
+    file.setName(item->text(NameColumn));
+    file.setHash(item->data(NameColumn, HashRole).toByteArray());
+    file.setSize(item->data(NameColumn, SizeRole).toInt());
+
+    iq.collection().append(file);
+    
     client->sendPacket(iq);
 }
 
@@ -211,6 +270,17 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     QThread *worker = new IndexThread(sharesDb, sharesDir, this);
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     worker->start();
+}
+
+QString ChatSharesDatabase::locate(const QXmppShareIq::File &file)
+{
+    QSqlQuery query("SELECT path FROM files WHERE hash = :hash AND size = :size", sharesDb);
+    query.bindValue(":hash", file.hash().toHex());
+    query.bindValue(":size", file.size());
+    query.exec();
+    if (!query.next())
+        return QString();
+    return sharesDir.filePath(query.value(0).toString());
 }
 
 void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
@@ -309,6 +379,7 @@ void SearchThread::run()
     responseIq.setId(requestIq.id());
     responseIq.setTo(requestIq.from());
     responseIq.setTag(requestIq.tag());
+    responseIq.setQueryType(QXmppShareIq::SearchQuery);
 
     // validate search
     const QString queryString = requestIq.search();
