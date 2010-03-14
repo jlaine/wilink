@@ -279,6 +279,7 @@ void ChatTransfers::removeCurrentJob()
         jobs.removeAt(jobRow);
         tableWidget->removeRow(jobRow);
         updateButtons();
+        job->deleteLater();
     } else {
         jobs.at(jobRow)->abort();
     }
