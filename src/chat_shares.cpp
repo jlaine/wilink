@@ -186,10 +186,7 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 
             // send files
             foreach (const QString &filePath, filePaths)
-            {
-                QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath);
-                connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
-            }
+                client->getTransferManager().sendFile(shareIq.from(), filePath);
         }
     }
 }
