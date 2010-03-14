@@ -218,18 +218,20 @@ void ChatShares::findRemoteFiles()
 void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
 {
     qDebug() << "double click" << item->text(NameColumn);
-    QXmppShareIq iq;
-    iq.setTo(shareServer);
-    iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppShareIq::GetQuery);
 
+    // expect file
     QXmppShareIq::File file;
     file.setName(item->text(NameColumn));
     file.setHash(item->data(NameColumn, HashRole).toByteArray());
     file.setSize(item->data(NameColumn, SizeRole).toInt());
+    emit fileExpected(file);
 
+    // request file
+    QXmppShareIq iq;
+    iq.setTo(shareServer);
+    iq.setType(QXmppIq::Get);
+    iq.setQueryType(QXmppShareIq::GetQuery);
     iq.collection().append(file);
-    
     client->sendPacket(iq);
 }
 

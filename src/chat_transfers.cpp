@@ -232,8 +232,19 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
     job->abort();
 }
 
+void ChatTransfers::fileExpected(const QXmppTransferFile &file)
+{
+    expected.append(file);
+}
+
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
+    if (expected.contains(job->file()))
+    {
+        fileAccepted(job);
+        expected.removeAll(job->file());
+        return;
+    }
     const QString bareJid = jidToBareJid(job->jid());
 //    const QString contactName = rosterModel->contactName(bareJid);
 

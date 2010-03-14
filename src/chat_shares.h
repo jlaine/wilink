@@ -35,6 +35,7 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QTimer;
 class QXmppPacket;
+class QXmppTransferFile;
 
 class ChatShares : public ChatPanel
 {
@@ -43,6 +44,9 @@ class ChatShares : public ChatPanel
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     void setShareServer(const QString &server);
+
+signals:
+    void fileExpected(const QXmppTransferFile &file);
 
 private slots:
     void findRemoteFiles();

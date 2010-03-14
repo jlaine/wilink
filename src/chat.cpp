@@ -133,12 +133,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatConsole, SIGNAL(showTab()), this, SLOT(showPanel()));
 
-    /* set up shares */
-    chatShares = new ChatShares(client);
-    chatShares->setObjectName("shares");
-    connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
-
     /* set up transfers window */
     client->getTransferManager().setSupportedMethods(
         QXmppTransferJob::SocksMethod);
@@ -146,6 +140,13 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
+
+    /* set up shares */
+    chatShares = new ChatShares(client);
+    chatShares->setObjectName("shares");
+    connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
+    connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
+    connect(chatShares, SIGNAL(fileExpected(const QXmppTransferFile&)), chatTransfers, SLOT(fileExpected(const QXmppTransferFile&)));
 
     /* build splitter */
     splitter = new QSplitter;
