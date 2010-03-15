@@ -217,8 +217,6 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
 {
-    qDebug() << "double click" << item->text(NameColumn);
-
     // expect file
     QXmppShareIq::File file;
     file.setName(item->text(NameColumn));
@@ -415,9 +413,7 @@ void SearchThread::run()
     query.exec();
 
     QXmppShareIq::Collection rootCollection;
-    QXmppShareIq::Collection currentCollection;
     int searchCount = 0;
-    QString lastString;
     while (query.next())
     {
         QXmppShareIq::File file;
@@ -446,32 +442,13 @@ void SearchThread::run()
         file.setName(QFileInfo(file.name()).fileName());
 
         // add file to the appropriate collection
-        searchCount++;
-        if (matchString.isEmpty())
-            rootCollection.append(file);
-        else if (matchString == lastString)
-        {
-            currentCollection.append(file);
-        }
-        else
-        {
-            if (!currentCollection.isEmpty())
-            {
-                rootCollection.collections().append(currentCollection);
-                currentCollection.clear();
-            }
-            currentCollection.setName(matchString);
-            currentCollection.append(file);
-        }
+        rootCollection.mkpath(matchString).append(file);
 
         // limit maximum search time to 15s
+        searchCount++;
         if (t.elapsed() > 15000 || searchCount > 250)
             break;
-
-        lastString = matchString;
     }
-    if (!currentCollection.isEmpty())
-        rootCollection.collections().append(currentCollection);
 
     // send response
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
