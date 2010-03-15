@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QResizeEvent>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
@@ -71,11 +72,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     layout->addWidget(lineEdit);
 
-    treeWidget = new QTreeWidget;
-    treeWidget->setColumnCount(2);
-    treeWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    treeWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    //treeWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
+    treeWidget = new ChatSharesView;
     connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem*)));
     clearView();
     layout->addWidget(treeWidget);
@@ -148,9 +145,6 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
                 addCollection(collection, 0);
             foreach (const QXmppShareIq::File &file, shareIq.collection())
                 addFile(file, 0);
-
-            treeWidget->setColumnWidth(NameColumn, treeWidget->width() - 60);
-            treeWidget->setColumnWidth(SizeColumn, 50);
         }
         else if (shareIq.type() == QXmppIq::Error)
         {
@@ -456,3 +450,19 @@ void SearchThread::run()
     responseIq.setCollection(rootCollection);
     emit searchFinished(responseIq);
 }
+
+ChatSharesView::ChatSharesView(QWidget *parent)
+    : QTreeWidget(parent)
+{
+    setColumnCount(2);
+    setColumnWidth(SizeColumn, 80);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+}
+
+void ChatSharesView::resizeEvent(QResizeEvent *e)
+{
+    QTreeWidget::resizeEvent(e);
+    setColumnWidth(NameColumn, e->size().width() - 80);
+}
+

@@ -22,6 +22,7 @@
 
 #include <QDir>
 #include <QIcon>
+#include <QTreeWidget>
 
 #include "qxmpp/QXmppShareIq.h"
 
@@ -36,6 +37,15 @@ class QTreeWidgetItem;
 class QTimer;
 class QXmppPacket;
 class QXmppTransferFile;
+
+class ChatSharesView : public QTreeWidget
+{
+public:
+    ChatSharesView(QWidget *parent = 0);
+
+protected:
+    void resizeEvent(QResizeEvent *e);
+};
 
 class ChatShares : public ChatPanel
 {
