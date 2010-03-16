@@ -43,6 +43,7 @@ class QXmppShareIq;
 class QXmppTransferJob;
 class QXmppVCard;
 class QXmppVCardManager;
+class QXmppMucOwnerIq;
 
 void dumpElement(const QXmppElement &item, int level = 0);
 
@@ -55,6 +56,7 @@ public:
     virtual bool handleStreamElement(const QDomElement &element);
 
 signals:
+    void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void shareIqReceived(const QXmppShareIq &iq);
 };
 
@@ -78,6 +80,7 @@ protected slots:
     void iqReceived(const QXmppIq&);
     void joinConversation(const QString &jid, bool isRoom);
     void messageReceived(const QXmppMessage &msg);
+    void mucOwnerIqReceived(const QXmppMucOwnerIq&);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
     void rejoinConversations();

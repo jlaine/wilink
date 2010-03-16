@@ -19,6 +19,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLayout>
@@ -26,61 +27,57 @@
 
 #include "chat_form.h"
 
-ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
+ChatForm::ChatForm(const QXmppDataForm &form, QWidget *parent)
     : QDialog(parent), chatForm(form)
 {
     QVBoxLayout *vbox = new QVBoxLayout;
-    QXmppElement field = chatForm.firstChildElement("field");
-    while (!field.isNull())
+    foreach (const QXmppDataForm::Field &field, chatForm.fields())
     {
-        const QString key = field.attribute("var");
-        if (!key.isEmpty())
+        const QString key = field.id();
+        if (key.isEmpty())
+            continue;
+
+        if (field.type() == QXmppDataForm::Field::BooleanField)
         {
-            const QString label = field.attribute("label");
-            const QString value = field.firstChildElement("value").value();
-            if (field.attribute("type") == "boolean")
-            {
-                QCheckBox *checkbox = new QCheckBox(label);
-                checkbox->setChecked(value == "1");
-                checkbox->setObjectName(key);
-                vbox->addWidget(checkbox);
-            } else if (field.attribute("type") == "text-single") {
-                QHBoxLayout *hbox = new QHBoxLayout;
-                hbox->addWidget(new QLabel(label));
-                QLineEdit *edit = new QLineEdit(value);
-                edit->setObjectName(key);
-                hbox->addWidget(edit);
-                vbox->addItem(hbox);
-            } else if (field.attribute("type") == "list-single") {
-                QHBoxLayout *hbox = new QHBoxLayout;
-                hbox->addWidget(new QLabel(label));
-                QComboBox *combo = new QComboBox;
-                combo->setObjectName(key);
-                int currentIndex = 0;
-                int index = 0;
-                QXmppElement option = field.firstChildElement("option");
-                while (!option.isNull())
-                {
-                    const QString optionValue = option.firstChildElement("value").value();
-                    combo->addItem(option.attribute("label"), optionValue);
-                    if (optionValue == value)
-                        currentIndex = index;
-                    index++;
-                    option = option.nextSiblingElement("option");
-                }
-                combo->setCurrentIndex(currentIndex);
-                hbox->addWidget(combo);
-                vbox->addItem(hbox);
-            }
+            QCheckBox *checkbox = new QCheckBox(field.label());
+            checkbox->setChecked(field.value().toBool());
+            checkbox->setObjectName(key);
+            vbox->addWidget(checkbox);
         }
-        field = field.nextSiblingElement("field");
+        else if (field.type() == QXmppDataForm::Field::TextSingleField)
+        {
+            QHBoxLayout *hbox = new QHBoxLayout;
+            hbox->addWidget(new QLabel(field.label()));
+            QLineEdit *edit = new QLineEdit(field.value().toString());
+            edit->setObjectName(key);
+            hbox->addWidget(edit);
+            vbox->addItem(hbox);
+        }
+        else if (field.type() == QXmppDataForm::Field::ListSingleField)
+        {
+            QHBoxLayout *hbox = new QHBoxLayout;
+            hbox->addWidget(new QLabel(field.label()));
+            QComboBox *combo = new QComboBox;
+            combo->setObjectName(key);
+            int currentIndex = 0;
+            QList<QPair<QString,QString> > options = field.options();
+            for (int i = 0; i < options.size(); i++)
+            {
+                combo->addItem(options[i].first, options[i].second);
+                if (options[i].first == field.value().toString())
+                    currentIndex = i;
+            }
+            combo->setCurrentIndex(currentIndex);
+            hbox->addWidget(combo);
+            vbox->addItem(hbox);
+        }
     }
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     vbox->addWidget(buttonBox);
 
     setLayout(vbox);
-    setWindowTitle(chatForm.firstChildElement("title").value());
+    setWindowTitle(chatForm.title());
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -88,33 +85,34 @@ ChatForm::ChatForm(const QXmppElement &form, QWidget *parent)
 
 void ChatForm::submit()
 {
-    chatForm.setAttribute("type", "submit");
-    QXmppElement field = chatForm.firstChildElement("field");
-    while (!field.isNull())
+    chatForm.setType(QXmppDataForm::Submit);
+    for (int i = 0; i < chatForm.fields().size(); i++)
     {
-        const QString key = field.attribute("var");
-        if (!key.isEmpty())
-        {
-            QXmppElement value = field.firstChildElement("value");
-            if (field.attribute("type") == "boolean")
-            {
-                QCheckBox *checkbox = findChild<QCheckBox*>(key);
-                value.setValue(checkbox->checkState() == Qt::Checked ? "1" : "0");
-            } else if (field.attribute("type") == "text-single") {
-                QLineEdit *edit = findChild<QLineEdit*>(key);
-                value.setValue(edit->text());
-            } else if (field.attribute("type") == "list-single") {
-                QComboBox *combo = findChild<QComboBox*>(key);
-                value.setValue(combo->itemData(combo->currentIndex()).toString());
-            }
-        }
-        field = field.nextSiblingElement("field");
-    }
+        QXmppDataForm::Field &field = chatForm.fields()[i];
+        const QString key = field.id();
+        if (key.isEmpty())
+            continue;
 
+        if (field.type() == QXmppDataForm::Field::BooleanField)
+        {
+            QCheckBox *checkbox = findChild<QCheckBox*>(key);
+            field.setValue(checkbox->checkState() == Qt::Checked);
+        }
+        else if (field.type() == QXmppDataForm::Field::TextSingleField)
+        {
+            QLineEdit *edit = findChild<QLineEdit*>(key);
+            field.setValue(edit->text());
+        }
+        else if (field.type() == QXmppDataForm::Field::ListSingleField)
+        {
+            QComboBox *combo = findChild<QComboBox*>(key);
+            field.setValue(combo->itemData(combo->currentIndex()).toString());
+        }
+    }
     accept();
 }
 
-QXmppElement ChatForm::form() const
+QXmppDataForm ChatForm::form() const
 {
     return chatForm;
 }

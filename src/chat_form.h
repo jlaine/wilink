@@ -22,21 +22,21 @@
 
 #include <QDialog>
 
-#include "qxmpp/QXmppElement.h"
+#include "qxmpp/QXmppDataForm.h"
 
 class ChatForm : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatForm(const QXmppElement &form, QWidget *parent);
-    QXmppElement form() const;
+    ChatForm(const QXmppDataForm &form, QWidget *parent);
+    QXmppDataForm form() const;
 
 protected slots:
     void submit();
 
 private:
-    QXmppElement chatForm;
+    QXmppDataForm chatForm;
 };
 
 #endif

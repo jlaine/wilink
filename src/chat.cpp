@@ -42,6 +42,7 @@
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
+#include "qxmpp/QXmppMucIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppShareIq.h"
@@ -102,12 +103,22 @@ ChatClient::ChatClient(QObject *parent)
 
 bool ChatClient::handleStreamElement(const QDomElement &element)
 {
-    if (QXmppShareIq::isShareIq(element))
+    if (element.tagName() == "iq")
     {
-        QXmppShareIq shareIq;
-        shareIq.parse(element);
-        emit shareIqReceived(shareIq);
-        return true;
+        if (QXmppShareIq::isShareIq(element))
+        {
+            QXmppShareIq shareIq;
+            shareIq.parse(element);
+            emit shareIqReceived(shareIq);
+            return true;
+        }
+        else if (QXmppMucOwnerIq::isMucOwnerIq(element))
+        {
+            QXmppMucOwnerIq mucIq;
+            mucIq.parse(element);
+            emit mucOwnerIqReceived(mucIq);
+            return true;
+        }
     }
     return false;
 }
@@ -216,6 +227,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
+    connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)), this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -542,30 +554,6 @@ void Chat::inviteContact(const QString &jid)
 
 void Chat::iqReceived(const QXmppIq &iq)
 {
-    if (iq.type() == QXmppIq::Result && !iq.extensions().isEmpty())
-    {
-        const QXmppElement query = iq.extensions().first();
-        const QXmppElement form = query.firstChildElement("x");
-        if (query.tagName() == "query" &&
-            query.attribute("xmlns") == ns_muc_owner &&
-            form.attribute("type") == "form" &&
-            form.attribute("xmlns") == "jabber:x:data")
-        {
-            ChatForm dialog(form, this);
-            if (dialog.exec())
-            {
-                QXmppElement query;
-                query.setTagName("query");
-                query.setAttribute("xmlns", ns_muc_owner);
-                query.appendChild(dialog.form());
-
-                QXmppIq iqPacket(QXmppIq::Set);
-                iqPacket.setExtensions(query);
-                iqPacket.setTo(iq.from());
-                client->sendPacket(iqPacket);
-            }
-        }
-    }
 }
 
 void Chat::joinConversation(const QString &jid, bool isRoom)
@@ -626,6 +614,22 @@ void Chat::messageReceived(const QXmppMessage &msg)
         break;
     default:
         break;
+    }
+}
+
+void Chat::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
+{
+    if (iq.type() != QXmppIq::Result)
+        return;
+
+    ChatForm dialog(iq.form(), this);
+    if (dialog.exec())
+    {
+        QXmppMucOwnerIq iqPacket;
+        iqPacket.setType(QXmppIq::Set);
+        iqPacket.setTo(iq.from());
+        iqPacket.setForm(dialog.form());
+        client->sendPacket(iqPacket);
     }
 }
 
