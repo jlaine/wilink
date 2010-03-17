@@ -258,23 +258,19 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
         return;
 
     int features = 0;
-    foreach (const QXmppElement &element, disco.queryItems())
+    foreach (const QString &var, disco.features())
     {
-        if (element.tagName() == "feature")
-        {
-            const QString var = element.attribute("var");
-            if (var == ns_chat_states)
-                features |= ChatStatesFeature;
-            else if (var == ns_stream_initiation_file_transfer)
-                features |= FileTransferFeature;
-            else if (var == ns_version)
-                features |= VersionFeature;
-        }
-        // iChat does not state it supports chat states
-        else if (element.tagName() == "identity" && element.attribute("name") == "iChatAgent")
-        {
+        if (var == ns_chat_states)
             features |= ChatStatesFeature;
-        }
+        else if (var == ns_stream_initiation_file_transfer)
+            features |= FileTransferFeature;
+        else if (var == ns_version)
+            features |= VersionFeature;
+    }
+    foreach (const QXmppDiscoveryIq::Identity& id, disco.identities())
+    {
+        if (id.name() == "iChatAgent")
+            features |= ChatStatesFeature;
     }
     clientFeatures.insert(disco.from(), features);
 }
