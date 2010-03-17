@@ -158,9 +158,9 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
         // send files, using server as proxy
         const QString oldProxy = client->getTransferManager().proxy();
-        client->getTransferManager().setProxy(shareServer);
+        //client->getTransferManager().setProxy(shareServer);
         QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, responseIq.sid());
-        client->getTransferManager().setProxy(oldProxy);
+        //client->getTransferManager().setProxy(oldProxy);
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     }
     else if (shareIq.type() == QXmppIq::Result)
@@ -233,6 +233,7 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
     file.setSize(item->data(NameColumn, SizeRole).toInt());
 
     // request file
+    qDebug() << "Requesting" << file.name() << "from" << mirrors.first();
     QXmppShareGetIq iq;
     iq.setTo(mirrors.first());
     iq.setType(QXmppIq::Get);
