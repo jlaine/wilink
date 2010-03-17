@@ -105,7 +105,14 @@ bool ChatClient::handleStreamElement(const QDomElement &element)
 {
     if (element.tagName() == "iq")
     {
-        if (QXmppShareIq::isShareIq(element))
+        if (QXmppShareGetIq::isShareGetIq(element))
+        {
+            QXmppShareGetIq shareIq;
+            shareIq.parse(element);
+            emit shareGetIqReceived(shareIq);
+            return true;
+        }
+        else if (QXmppShareIq::isShareIq(element))
         {
             QXmppShareIq shareIq;
             shareIq.parse(element);

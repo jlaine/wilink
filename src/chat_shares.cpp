@@ -89,6 +89,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer = new QTimer(this);
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
+    connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
 }
 
@@ -127,65 +128,57 @@ void ChatShares::clearView()
     treeWidget->setHeaderItem(headerItem);
 }
 
+void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
+{
+    if (shareIq.from() != shareServer)
+        return;
+
+    if (shareIq.type() == QXmppIq::Get)
+    {
+        QXmppShareGetIq responseIq;
+        responseIq.setId(shareIq.id());
+        responseIq.setTo(shareIq.from());
+        responseIq.setType(QXmppIq::Result);
+
+        // check path is OK
+        QString filePath = db->locate(shareIq.file());
+        if (filePath.isEmpty())
+        {
+            qWarning() << "Could not find file" << shareIq.file().name();
+            responseIq.setType(QXmppIq::Error);
+            client->sendPacket(responseIq);
+            return;
+        }
+        responseIq.setSid(generateStanzaHash());
+        client->sendPacket(responseIq);
+
+        // send files
+        QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, responseIq.sid());
+        connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
+    }
+}
+
 void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
 {
     if (shareIq.from() != shareServer)
         return;
 
-    if (shareIq.queryType() == QXmppShareIq::SearchQuery)
+    if (shareIq.type() == QXmppIq::Get)
     {
-        if (shareIq.type() == QXmppIq::Get)
-        {
-            db->search(shareIq);
-        }
-        else if (shareIq.type() == QXmppIq::Result)
-        {
-            lineEdit->setEnabled(true);
-            QFileIconProvider iconProvider;
-            foreach (const QXmppShareIq::Collection &collection, shareIq.collection().collections())
-                addCollection(collection, 0);
-            foreach (const QXmppShareIq::File &file, shareIq.collection())
-                addFile(file, 0);
-        }
-        else if (shareIq.type() == QXmppIq::Error)
-        {
-            lineEdit->setEnabled(true);
-        }
+        db->search(shareIq);
     }
-    else if (shareIq.queryType() == QXmppShareIq::GetQuery)
+    else if (shareIq.type() == QXmppIq::Result)
     {
-        if (shareIq.type() == QXmppIq::Get)
-        {
-            QXmppShareIq responseIq;
-            responseIq.setId(shareIq.id());
-            responseIq.setTo(shareIq.from());
-            responseIq.setQueryType(shareIq.queryType());
-            responseIq.setTag(shareIq.tag());
-            responseIq.setType(QXmppIq::Result);
-
-            // check paths are OK
-            QMap<QString, QString> fileMap;
-            foreach (const QXmppShareIq::File &file, shareIq.collection())
-            {
-                QString path = db->locate(file);
-                if (path.isEmpty())
-                {
-                    qWarning() << "Could not find file" << file.name();
-                    responseIq.setType(QXmppIq::Error);
-                    client->sendPacket(responseIq);
-                    return;
-                } 
-                fileMap.insert(path, generateStanzaHash());
-            }
-            client->sendPacket(responseIq);
-
-            // send files
-            foreach (const QString &filePath, fileMap.keys())
-            {
-                QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, fileMap[filePath]);
-                connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
-            }
-        }
+        lineEdit->setEnabled(true);
+        QFileIconProvider iconProvider;
+        foreach (const QXmppShareIq::Collection &collection, shareIq.collection().collections())
+            addCollection(collection, 0);
+        foreach (const QXmppShareIq::File &file, shareIq.collection())
+            addFile(file, 0);
+    }
+    else if (shareIq.type() == QXmppIq::Error)
+    {
+        lineEdit->setEnabled(true);
     }
 }
 
@@ -225,11 +218,10 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
     file.setHash(item->data(NameColumn, HashRole).toByteArray());
     file.setSize(item->data(NameColumn, SizeRole).toInt());
 
-    QXmppShareIq iq;
+    QXmppShareGetIq iq;
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppShareIq::GetQuery);
-    iq.collection().append(file);
+    iq.setFile(file);
     client->sendPacket(iq);
 }
 
@@ -384,7 +376,6 @@ void SearchThread::run()
     responseIq.setId(requestIq.id());
     responseIq.setTo(requestIq.from());
     responseIq.setTag(requestIq.tag());
-    responseIq.setQueryType(QXmppShareIq::SearchQuery);
 
     // validate search
     const QString queryString = requestIq.search();

@@ -62,6 +62,7 @@ private slots:
     void findRemoteFiles();
     void itemDoubleClicked(QTreeWidgetItem *item);
     void registerWithServer();
+    void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareIqReceived(const QXmppShareIq &share);
     void searchFinished(const QXmppShareIq &share);
 
