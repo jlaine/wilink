@@ -231,6 +231,7 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
     file.setSize(item->data(NameColumn, SizeRole).toInt());
 
     // request file
+    qDebug() << "Requesting" << file.name() << "from" << mirrors.first();
     QXmppShareGetIq iq;
     iq.setTo(mirrors.first());
     iq.setType(QXmppIq::Get);
