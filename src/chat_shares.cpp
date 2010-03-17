@@ -156,6 +156,12 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, responseIq.sid());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     }
+    else if (shareIq.type() == QXmppIq::Result)
+    {
+        // expect file
+        qDebug() << "Expecting file transfer" << shareIq.sid();
+        emit fileExpected(shareIq.sid());
+    }
 }
 
 void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
@@ -205,13 +211,6 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
 {
-    // expect file
-    QXmppTransferFileInfo fileInfo;
-    fileInfo.setName(item->text(NameColumn));
-    fileInfo.setHash(item->data(NameColumn, HashRole).toByteArray());
-    fileInfo.setSize(item->data(NameColumn, SizeRole).toInt());
-    emit fileExpected(fileInfo);
-
     // request file
     QXmppShareIq::File file;
     file.setName(item->text(NameColumn));

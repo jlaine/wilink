@@ -56,7 +56,7 @@ public:
     void setShareServer(const QString &server);
 
 signals:
-    void fileExpected(const QXmppTransferFileInfo &fileInfo);
+    void fileExpected(const QString &sid);
 
 private slots:
     void findRemoteFiles();
