@@ -132,8 +132,10 @@ void ChatShares::clearView()
 
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
+#if 0
     if (shareIq.from() != shareServer)
         return;
+#endif
 
     if (shareIq.type() == QXmppIq::Get)
     {
@@ -171,8 +173,10 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
 void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
+#if 0
     if (shareIq.from() != shareServer)
         return;
+#endif
 
     if (shareIq.type() == QXmppIq::Get)
     {
