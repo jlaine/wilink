@@ -147,7 +147,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up debugging console */
     chatConsole = new ChatConsole;
     chatConsole->setObjectName("console");
-    connect(client->logger(), SIGNAL(message(QXmppLogger::MessageType,QString)), chatConsole, SLOT(message(QXmppLogger::MessageType,QString)));
     connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatConsole, SIGNAL(showTab()), this, SLOT(showPanel()));
 
@@ -303,6 +302,8 @@ void Chat::closePanel()
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (conversationPanel->indexOf(panel) < 0)
         return;
+    if (panel == chatConsole)
+        chatConsole->setLogger(0);
     removePanel(panel);
 }
 
@@ -360,6 +361,8 @@ void Chat::removePanel(QWidget *panel)
  */
 void Chat::showPanel(QWidget *panel)
 {
+    if (panel == chatConsole)
+        chatConsole->setLogger(client->logger());
     rosterModel->addItem(ChatRosterItem::Other,
         panel->objectName(),
         panel->windowTitle(),

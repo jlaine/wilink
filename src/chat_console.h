@@ -32,12 +32,14 @@ class ChatConsole : public ChatPanel
 
 public:
     ChatConsole(QWidget *parent = 0);
+    void setLogger(QXmppLogger *logger);
 
 private slots:
     void message(QXmppLogger::MessageType type, const QString &msg);
 
 private:
     QTextBrowser *browser;
+    QXmppLogger *currentLogger;
 };
 
 #endif
