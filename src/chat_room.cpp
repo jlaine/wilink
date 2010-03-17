@@ -205,11 +205,10 @@ void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         // chat rooms list
         listWidget->clear();
-        foreach (const QXmppElement &item, disco.queryItems())
+        foreach (const QXmppDiscoveryIq::Item &item, disco.items())
         {
-            QString jid = item.attribute("jid");
-            QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.attribute("name"));
-            wdgItem->setData(Qt::UserRole, jid);
+            QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.name());
+            wdgItem->setData(Qt::UserRole, item.jid());
             listWidget->addItem(wdgItem);
         }
     }

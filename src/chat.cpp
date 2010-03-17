@@ -460,26 +460,20 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
-#if 0
-    qDebug("Received discovery result");
-    foreach (const QXmppElement &item, disco.queryItems())
-        dumpElement(item);
-#endif
-
     if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
         disco.from() == client->getConfiguration().domain())
     {
         // root items
         discoQueue.clear();
-        foreach (const QXmppElement &item, disco.queryItems())
+        foreach (const QXmppDiscoveryIq::Item &item, disco.items())
         {
-            if (item.tagName() == "item" && !item.attribute("jid").isEmpty() && item.attribute("node").isEmpty())
+            if (!item.jid().isEmpty() && item.node().isEmpty())
             {
-                discoQueue.append(item.attribute("jid"));
+                discoQueue.append(item.jid());
                 // get info for item
                 QXmppDiscoveryIq info;
                 info.setQueryType(QXmppDiscoveryIq::InfoQuery);
-                info.setTo(item.attribute("jid"));
+                info.setTo(item.jid());
                 client->sendPacket(info);
             }
         }
@@ -489,25 +483,23 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         discoQueue.removeAll(disco.from());
         // check if it's a conference server
-        foreach (const QXmppElement &item, disco.queryItems())
+        foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
         {
-            if (item.tagName() != "identity")
-                continue;
-            if (item.attribute("category") == "conference" &&
-                item.attribute("type") == "text")
+            if (id.category() == "conference" &&
+                id.type() == "text")
             {
                 chatRoomServer = disco.from();
                 roomButton->setEnabled(true);
                 qDebug() << "Found chat room server" << chatRoomServer;
             }
-            else if (item.attribute("category") == "proxy" &&
-                     item.attribute("type") == "bytestreams")
+            else if (id.category() == "proxy" &&
+                     id.type() == "bytestreams")
             {
                 client->getTransferManager().setProxy(disco.from());
                 qDebug() << "Found bytestream proxy" << disco.from();
             }
-            else if (item.attribute("category") == "store" &&
-                     item.attribute("type") == "file")
+            else if (id.category() == "store" &&
+                     id.type() == "file")
             {
                 chatShares->setShareServer(disco.from());
                 sharesButton->setVisible(true);
