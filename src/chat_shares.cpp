@@ -33,6 +33,7 @@
 #include <QTreeWidget>
 
 #include "qxmpp/QXmppShareIq.h"
+#include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_shares.h"
@@ -163,7 +164,7 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
             responseIq.setType(QXmppIq::Result);
 
             // check paths are OK
-            QStringList filePaths;
+            QMap<QString, QString> fileMap;
             foreach (const QXmppShareIq::File &file, shareIq.collection())
             {
                 QString path = db->locate(file);
@@ -174,14 +175,14 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
                     client->sendPacket(responseIq);
                     return;
                 } 
-                filePaths << path;
+                fileMap.insert(path, generateStanzaHash());
             }
             client->sendPacket(responseIq);
 
             // send files
-            foreach (const QString &filePath, filePaths)
+            foreach (const QString &filePath, fileMap.keys())
             {
-                QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath);
+                QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, fileMap[filePath]);
                 connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
             }
         }
