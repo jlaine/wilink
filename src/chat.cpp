@@ -611,7 +611,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
 void Chat::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
 {
-    if (iq.type() != QXmppIq::Result)
+    if (iq.type() != QXmppIq::Result || iq.form().isNull())
         return;
 
     ChatForm dialog(iq.form(), this);

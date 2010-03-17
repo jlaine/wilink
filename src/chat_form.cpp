@@ -33,7 +33,7 @@ ChatForm::ChatForm(const QXmppDataForm &form, QWidget *parent)
     QVBoxLayout *vbox = new QVBoxLayout;
     foreach (const QXmppDataForm::Field &field, chatForm.fields())
     {
-        const QString key = field.id();
+        const QString key = field.key();
         if (key.isEmpty())
             continue;
 
@@ -89,7 +89,7 @@ void ChatForm::submit()
     for (int i = 0; i < chatForm.fields().size(); i++)
     {
         QXmppDataForm::Field &field = chatForm.fields()[i];
-        const QString key = field.id();
+        const QString key = field.key();
         if (key.isEmpty())
             continue;
 
