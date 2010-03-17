@@ -50,6 +50,7 @@ enum Roles
 {
     HashRole = Qt::UserRole,
     SizeRole,
+    MirrorsRole,
 };
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
@@ -113,6 +114,7 @@ qint64 ChatShares::addFile(const QXmppShareIq::File &file, QTreeWidgetItem *pare
     QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(treeWidget);
     fileItem->setData(NameColumn, HashRole, file.hash());
     fileItem->setData(NameColumn, SizeRole, file.size());
+    fileItem->setData(NameColumn, MirrorsRole, file.mirrors());
     fileItem->setIcon(NameColumn, fileIcon);
     fileItem->setText(NameColumn, file.name());
     fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
@@ -152,8 +154,11 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         responseIq.setSid(generateStanzaHash());
         client->sendPacket(responseIq);
 
-        // send files
+        // send files, using server as proxy
+        const QString oldProxy = client->getTransferManager().proxy();
+        client->getTransferManager().setProxy(shareServer);
         QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, responseIq.sid());
+        client->getTransferManager().setProxy(oldProxy);
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     }
     else if (shareIq.type() == QXmppIq::Result)
@@ -211,14 +216,21 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
 {
-    // request file
+    const QStringList mirrors = item->data(NameColumn, MirrorsRole).toStringList();
+    if (mirrors.isEmpty())
+    {
+        qWarning() << "No mirror for file" << item->text(NameColumn);
+        return; 
+    }
+
     QXmppShareIq::File file;
     file.setName(item->text(NameColumn));
     file.setHash(item->data(NameColumn, HashRole).toByteArray());
     file.setSize(item->data(NameColumn, SizeRole).toInt());
 
+    // request file
     QXmppShareGetIq iq;
-    iq.setTo(shareServer);
+    iq.setTo(mirrors.first());
     iq.setType(QXmppIq::Get);
     iq.setFile(file);
     client->sendPacket(iq);
@@ -410,6 +422,7 @@ void SearchThread::run()
         file.setName(query.value(0).toString());
         file.setSize(query.value(1).toInt());
         file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
+        file.setMirrors(QStringList() << requestIq.to());
 
         // find the depth at which we matched
         const QString path = file.name();
