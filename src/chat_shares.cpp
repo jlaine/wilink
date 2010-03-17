@@ -156,11 +156,9 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         responseIq.setSid(generateStanzaHash());
         client->sendPacket(responseIq);
 
-        // send files, using server as proxy
-        const QString oldProxy = client->getTransferManager().proxy();
-        client->getTransferManager().setProxy(shareServer);
+        // send files
+        qDebug() << "Sending" << shareIq.file().name() << "to" << shareIq.from();
         QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, responseIq.sid());
-        client->getTransferManager().setProxy(oldProxy);
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     }
     else if (shareIq.type() == QXmppIq::Result)
