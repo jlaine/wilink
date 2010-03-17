@@ -112,11 +112,11 @@ bool ChatClient::handleStreamElement(const QDomElement &element)
             emit shareGetIqReceived(shareIq);
             return true;
         }
-        else if (QXmppShareIq::isShareIq(element))
+        else if (QXmppShareSearchIq::isShareSearchIq(element))
         {
-            QXmppShareIq shareIq;
+            QXmppShareSearchIq shareIq;
             shareIq.parse(element);
-            emit shareIqReceived(shareIq);
+            emit shareSearchIqReceived(shareIq);
             return true;
         }
         else if (QXmppMucOwnerIq::isMucOwnerIq(element))

@@ -52,7 +52,7 @@ enum Roles
     SizeRole,
 };
 
-Q_DECLARE_METATYPE(QXmppShareIq)
+Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient), db(0)
@@ -60,7 +60,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
-    qRegisterMetaType<QXmppShareIq>("QXmppShareIq");
+    qRegisterMetaType<QXmppShareSearchIq>("QXmppShareSearchIq");
     sharesDir = QDir(QDir::home().filePath("Public"));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -90,7 +90,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
-    connect(client, SIGNAL(shareIqReceived(const QXmppShareIq&)), this, SLOT(shareIqReceived(const QXmppShareIq&)));
+    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
 }
 
 qint64 ChatShares::addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent)
@@ -164,7 +164,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
     }
 }
 
-void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
+void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.from() != shareServer)
         return;
@@ -188,7 +188,7 @@ void ChatShares::shareIqReceived(const QXmppShareIq &shareIq)
     }
 }
 
-void ChatShares::searchFinished(const QXmppShareIq &iq)
+void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
 {
     client->sendPacket(iq);
 }
@@ -202,7 +202,7 @@ void ChatShares::findRemoteFiles()
     lineEdit->setEnabled(false);
     clearView();
 
-    QXmppShareIq iq;
+    QXmppShareSearchIq iq;
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
     iq.setSearch(search);
@@ -244,7 +244,7 @@ void ChatShares::setShareServer(const QString &server)
     if (!db)
     {
         db = new ChatSharesDatabase(sharesDir.path(), this);
-        connect(db, SIGNAL(searchFinished(const QXmppShareIq&)), this, SLOT(searchFinished(const QXmppShareIq&)));
+        connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SLOT(searchFinished(const QXmppShareSearchIq&)));
     }
 
     // register with server
@@ -279,11 +279,11 @@ QString ChatSharesDatabase::locate(const QXmppShareIq::File &file)
     return sharesDir.filePath(query.value(0).toString());
 }
 
-void ChatSharesDatabase::search(const QXmppShareIq &requestIq)
+void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
 {
     QThread *worker = new SearchThread(sharesDb, sharesDir, requestIq, this);
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(searchFinished(const QXmppShareIq&)), this, SIGNAL(searchFinished(const QXmppShareIq&)));
+    connect(worker, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SIGNAL(searchFinished(const QXmppShareSearchIq&)));
     worker->start();
 }
 
@@ -319,7 +319,7 @@ void IndexThread::scanDir(const QDir &dir)
     }
 }
 
-SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const QXmppShareIq &request, QObject *parent)
+SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const QXmppShareSearchIq &request, QObject *parent)
     : QThread(parent), requestIq(request), sharesDb(database), sharesDir(dir)
 {
 };
@@ -371,7 +371,7 @@ bool SearchThread::updateFile(QXmppShareIq::File &file)
 
 void SearchThread::run()
 {
-    QXmppShareIq responseIq;
+    QXmppShareSearchIq responseIq;
     responseIq.setId(requestIq.id());
     responseIq.setTo(requestIq.from());
     responseIq.setTag(requestIq.tag());

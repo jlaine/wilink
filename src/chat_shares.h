@@ -63,8 +63,8 @@ private slots:
     void itemDoubleClicked(QTreeWidgetItem *item);
     void registerWithServer();
     void shareGetIqReceived(const QXmppShareGetIq &getIq);
-    void shareIqReceived(const QXmppShareIq &share);
-    void searchFinished(const QXmppShareIq &share);
+    void shareSearchIqReceived(const QXmppShareSearchIq &share);
+    void searchFinished(const QXmppShareSearchIq &share);
 
 private:
     qint64 addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent);
