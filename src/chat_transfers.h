@@ -56,11 +56,10 @@ class ChatTransfers : public ChatPanel
 public:
     ChatTransfers(QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
-    void expectFile(const QXmppTransferFileInfo &file);
     static QString sizeToString(qint64 size);
 
 public slots:
-    void fileExpected(const QXmppTransferFileInfo &file);
+    void fileExpected(const QString &sid);
 
 private slots:
     void fileAccepted(QXmppTransferJob *job);
@@ -79,7 +78,7 @@ protected:
 private:
     QPushButton *removeButton;
     QTableWidget *tableWidget;
-    QList<QXmppTransferFileInfo> expected;
+    QList<QString> expected;
     QList<QXmppTransferJob*> jobs;
 };
 

@@ -232,17 +232,17 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
     job->abort();
 }
 
-void ChatTransfers::fileExpected(const QXmppTransferFileInfo &file)
+void ChatTransfers::fileExpected(const QString &sid)
 {
-    expected.append(file);
+    expected.append(sid);
 }
 
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
-    if (expected.contains(job->fileInfo()))
+    if (expected.contains(job->sid()))
     {
+        expected.removeAll(job->sid());
         fileAccepted(job);
-        expected.removeAll(job->fileInfo());
         return;
     }
     const QString bareJid = jidToBareJid(job->jid());
