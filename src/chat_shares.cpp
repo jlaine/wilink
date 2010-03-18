@@ -204,7 +204,7 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
             return;
         }
 
-        QXmppShareIq::File file;
+        QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
         file.setName(item->text(NameColumn));
         file.setFileHash(item->data(NameColumn, HashRole).toByteArray());
         file.setFileSize(item->data(NameColumn, SizeRole).toInt());
@@ -273,7 +273,7 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     worker->start();
 }
 
-QString ChatSharesDatabase::locate(const QXmppShareIq::File &file)
+QString ChatSharesDatabase::locate(const QXmppShareIq::Item &file)
 {
     QSqlQuery query("SELECT path FROM files WHERE hash = :hash AND size = :size", sharesDb);
     query.bindValue(":hash", file.fileHash().toHex());
@@ -329,7 +329,7 @@ SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const 
 {
 };
 
-bool SearchThread::updateFile(QXmppShareIq::File &file, const QSqlQuery &selectQuery)
+bool SearchThread::updateFile(QXmppShareIq::Item &file, const QSqlQuery &selectQuery)
 {
     const QString path = selectQuery.value(0).toString();
     qint64 cachedSize = selectQuery.value(1).toInt();
@@ -396,7 +396,7 @@ void SearchThread::run()
     responseIq.setTag(requestIq.tag());
 
     // determine query type
-    QXmppShareIq::Collection rootCollection;
+    QXmppShareIq::Item rootCollection(QXmppShareIq::Item::CollectionItem);
     QXmppShareIq::Mirror mirror;
     mirror.setJid(requestIq.to());
     rootCollection.setMirrors(mirror);
@@ -427,7 +427,7 @@ void SearchThread::run()
     emit searchFinished(responseIq);
 }
 
-bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QString &base)
+bool SearchThread::browse(QXmppShareIq::Item &rootCollection, const QString &base)
 {
     QTime t;
     t.start();
@@ -460,7 +460,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
         const QString relativePath = path.mid(prefix.size());
         if (relativePath.count("/") == 0)
         {
-            QXmppShareIq::File file;
+            QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
             if (updateFile(file, query))
             {
                 qDebug() << "Adding file" << file.name();
@@ -486,7 +486,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
     return true;
 }
 
-bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QString &queryString)
+bool SearchThread::search(QXmppShareIq::Item &rootCollection, const QString &queryString)
 {
     if (queryString.contains("/") ||
         queryString.contains("\\"))
@@ -529,7 +529,7 @@ bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QStrin
             continue;
 
         // update file info
-        QXmppShareIq::File file;
+        QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
         if (updateFile(file, query))
         {
             // add file to the appropriate collection
