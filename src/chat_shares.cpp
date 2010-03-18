@@ -144,20 +144,15 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
 void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
-#if 0
-    if (shareIq.from() != shareServer)
-        return;
-#endif
-
     if (shareIq.type() == QXmppIq::Get)
     {
         db->search(shareIq);
+        return;
     }
-    else if (shareIq.type() == QXmppIq::Result)
-    {
-        lineEdit->setEnabled(true);
-        QFileIconProvider iconProvider;
 
+    lineEdit->setEnabled(true);
+    if (shareIq.type() == QXmppIq::Result)
+    {
         QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
         if (!parent)
             treeWidget->clear();
@@ -165,10 +160,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
             treeWidget->addItem(item, parent);
         if (parent)
             parent->setExpanded(true);
-    }
-    else if (shareIq.type() == QXmppIq::Error)
-    {
-        lineEdit->setEnabled(true);
     }
 }
 
@@ -182,7 +173,6 @@ void ChatShares::findRemoteFiles()
     const QString search = lineEdit->text();
 
     lineEdit->setEnabled(false);
-    treeWidget->clear();
 
     QXmppShareSearchIq iq;
     iq.setTo(shareServer);
@@ -225,6 +215,9 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
     }
     else if (type == CollectionType && !item->childCount())
     {
+        lineEdit->setEnabled(false);
+
+        // browse files
         QXmppShareSearchIq iq;
         iq.setTo(jid);
         iq.setType(QXmppIq::Get);
