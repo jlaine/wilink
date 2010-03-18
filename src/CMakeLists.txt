@@ -9,13 +9,6 @@ include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
 
-# tests
-
-set(tests_MOC_HEADERS tests.h updates.h)
-qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests systeminfo.cpp tests.cpp updates.cpp ${tests_MOC_SOURCES})
-target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
-
 # wDesktop
 
 set(wDesktop_SOURCES
@@ -119,3 +112,12 @@ if(WIN32)
 endif(WIN32)
 
 install(TARGETS wDesktop DESTINATION bin)
+
+# tests
+add_executable(hasher hasher.cpp)
+target_link_libraries(hasher ${QT_LIBRARIES})
+
+set(tests_MOC_HEADERS tests.h updates.h)
+qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
+add_executable(tests systeminfo.cpp tests.cpp updates.cpp ${tests_MOC_SOURCES})
+target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
