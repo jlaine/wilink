@@ -50,7 +50,15 @@ enum Roles
 {
     HashRole = Qt::UserRole,
     SizeRole,
-    MirrorsRole,
+    TypeRole,
+    MirrorRole,
+    PathRole,
+};
+
+enum Types
+{
+    CollectionType = 0,
+    FileType = 1,
 };
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
@@ -99,6 +107,15 @@ qint64 ChatShares::addCollection(const QXmppShareIq::Collection &collection, QTr
     QTreeWidgetItem *collectionItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(treeWidget);
     collectionItem->setIcon(NameColumn, collectionIcon);
     collectionItem->setText(NameColumn, collection.name());
+    collectionItem->setData(NameColumn, TypeRole, CollectionType);
+
+    /* FIXME : we are only using the first mirror */
+    if (!collection.mirrors().isEmpty())
+    {
+        QXmppShareIq::Mirror mirror = collection.mirrors().first();
+        collectionItem->setData(NameColumn, MirrorRole, mirror.jid());
+        collectionItem->setData(NameColumn, PathRole, mirror.path());
+    }
 
     qint64 collectionSize = 0;
     foreach (const QXmppShareIq::Collection &child, collection.collections())
@@ -114,7 +131,16 @@ qint64 ChatShares::addFile(const QXmppShareIq::File &file, QTreeWidgetItem *pare
     QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(treeWidget);
     fileItem->setData(NameColumn, HashRole, file.hash());
     fileItem->setData(NameColumn, SizeRole, file.size());
-    fileItem->setData(NameColumn, MirrorsRole, file.mirrors());
+    fileItem->setData(NameColumn, TypeRole, FileType);
+
+    /* FIXME : we are only using the first mirror */
+    if (!file.mirrors().isEmpty())
+    {
+        QXmppShareIq::Mirror mirror = file.mirrors().first();
+        fileItem->setData(NameColumn, MirrorRole, mirror.jid());
+        fileItem->setData(NameColumn, PathRole, mirror.path());
+    }
+
     fileItem->setIcon(NameColumn, fileIcon);
     fileItem->setText(NameColumn, file.name());
     fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.size()));
@@ -218,25 +244,40 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
 {
-    const QStringList mirrors = item->data(NameColumn, MirrorsRole).toStringList();
-    if (mirrors.isEmpty())
+    const QString jid = item->data(NameColumn, MirrorRole).toString();
+    const QString path = item->data(NameColumn, PathRole).toString();
+    if (jid.isEmpty() || path.isEmpty())
     {
         qWarning() << "No mirror for file" << item->text(NameColumn);
         return; 
     }
 
-    QXmppShareIq::File file;
-    file.setName(item->text(NameColumn));
-    file.setHash(item->data(NameColumn, HashRole).toByteArray());
-    file.setSize(item->data(NameColumn, SizeRole).toInt());
+    int type = item->data(NameColumn, TypeRole).toInt();
+    if (type == FileType)
+    {
+        QXmppShareIq::File file;
+        file.setName(item->text(NameColumn));
+        file.setHash(item->data(NameColumn, HashRole).toByteArray());
+        file.setSize(item->data(NameColumn, SizeRole).toInt());
 
-    // request file
-    qDebug() << "Requesting" << file.name() << "from" << mirrors.first();
-    QXmppShareGetIq iq;
-    iq.setTo(mirrors.first());
-    iq.setType(QXmppIq::Get);
-    iq.setFile(file);
-    client->sendPacket(iq);
+        // request file
+        qDebug() << "Requesting" << file.name() << "from" << jid;
+        QXmppShareGetIq iq;
+        iq.setTo(jid);
+        iq.setType(QXmppIq::Get);
+        iq.setFile(file);
+        client->sendPacket(iq);
+    }
+    else if (type == CollectionType)
+    {
+        clearView();
+
+        QXmppShareSearchIq iq;
+        iq.setTo(jid);
+        iq.setType(QXmppIq::Get);
+        iq.setBase(path);
+        client->sendPacket(iq);
+    }
 }
 
 void ChatShares::registerWithServer()
@@ -393,7 +434,9 @@ void SearchThread::run()
 
     // determine query type
     QXmppShareIq::Collection rootCollection;
-    rootCollection.setMirrors(QStringList() << requestIq.to());
+    QXmppShareIq::Mirror mirror;
+    mirror.setJid(requestIq.to());
+    rootCollection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
     const QString queryString = requestIq.search().trimmed();
     if (queryString.isEmpty())
     {
@@ -459,7 +502,11 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
             file.setName(path);
             file.setSize(query.value(1).toInt());
             file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
-            file.setMirrors(QStringList() << requestIq.to());
+
+            QXmppShareIq::Mirror mirror;
+            mirror.setJid(requestIq.to());
+            mirror.setPath(path);
+            rootCollection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
             if (!updateFile(file))
                 continue;
 
@@ -501,14 +548,19 @@ bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QStrin
     int searchCount = 0;
     while (query.next())
     {
+        const QString path = query.value(0).toString();
+
         QXmppShareIq::File file;
-        file.setName(query.value(0).toString());
+        file.setName(path);
         file.setSize(query.value(1).toInt());
         file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
-        file.setMirrors(QStringList() << requestIq.to());
+
+        QXmppShareIq::Mirror mirror;
+        mirror.setJid(requestIq.to());
+        mirror.setPath(path);
+        file.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
 
         // find the depth at which we matched
-        const QString path = file.name();
         QString matchString;
         QRegExp subdirRe(".*(([^/]+)/[^/]+)/[^/]+");
         QRegExp dirRe(".*([^/]+)/[^/]+");
