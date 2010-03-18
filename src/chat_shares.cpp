@@ -246,15 +246,21 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
 {
     const QString jid = item->data(NameColumn, MirrorRole).toString();
     const QString path = item->data(NameColumn, PathRole).toString();
-    if (jid.isEmpty() || path.isEmpty())
+    if (jid.isEmpty())
     {
-        qWarning() << "No mirror for file" << item->text(NameColumn);
+        qWarning() << "No mirror for item" << item->text(NameColumn);
         return; 
     }
 
     int type = item->data(NameColumn, TypeRole).toInt();
     if (type == FileType)
     {
+        if (path.isEmpty())
+        {
+            qWarning() << "No path for file" << item->text(NameColumn);
+            return;
+        }
+
         QXmppShareIq::File file;
         file.setName(item->text(NameColumn));
         file.setHash(item->data(NameColumn, HashRole).toByteArray());
