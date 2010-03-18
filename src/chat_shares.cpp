@@ -63,6 +63,8 @@ enum Types
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
+#define SEARCH_MAX_TIME 15000
+
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient), db(0)
 {
@@ -380,31 +382,35 @@ SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const 
 {
 };
 
-bool SearchThread::updateFile(QXmppShareIq::File &file)
+bool SearchThread::updateFile(QXmppShareIq::File &file, const QSqlQuery &selectQuery)
 {
+    const QString path = selectQuery.value(0).toString();
+    qint64 cachedSize = selectQuery.value(1).toInt();
+    QByteArray cachedHash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
+
     QCryptographicHash hasher(QCryptographicHash::Md5);
     QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
 
     // check file is still readable
-    QFileInfo info(sharesDir.filePath(file.name()));
+    QFileInfo info(sharesDir.filePath(path));
     if (!info.isReadable())
     {
-        deleteQuery.bindValue(":path", file.name());
+        deleteQuery.bindValue(":path", path);
         deleteQuery.exec();
         return false;
     }
 
     // check whether we need to calculate checksum
-    if (file.hash().isEmpty() || info.size() != file.size())
+    if (cachedHash.isEmpty() || cachedSize == info.size())
     {
         QFile fp(info.filePath());
 
         // if we cannot open the file, remove it from database
         if (!fp.open(QIODevice::ReadOnly))
         {
-            qWarning() << "Failed to open file" << file.name();
-            deleteQuery.bindValue(":path", file.name());
+            qWarning() << "Failed to open file" << path;
+            deleteQuery.bindValue(":path", path);
             deleteQuery.exec();
             return false;
         }
@@ -413,15 +419,26 @@ bool SearchThread::updateFile(QXmppShareIq::File &file)
         while (fp.bytesAvailable())
             hasher.addData(fp.read(16384));
         fp.close();
-        file.setHash(hasher.result());
-        file.setSize(info.size());
+        cachedHash = hasher.result();
+        cachedSize = info.size();
 
         // update database entry
-        updateQuery.bindValue(":hash", file.hash().toHex());
-        updateQuery.bindValue(":size", file.size());
-        updateQuery.bindValue(":path", file.name());
+        updateQuery.bindValue(":hash", cachedHash);
+        updateQuery.bindValue(":size", cachedSize);
+        updateQuery.bindValue(":path", path);
         updateQuery.exec();
     }
+
+    // fill meta-data
+    file.setName(info.fileName());
+    file.setHash(cachedHash);
+    file.setSize(cachedSize);
+
+    QXmppShareIq::Mirror mirror;
+    mirror.setJid(requestIq.to());
+    mirror.setPath(path);
+    file.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
+
     return true;
 }
 
@@ -498,20 +515,11 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
         if (relativePath.count("/") == 0)
         {
             QXmppShareIq::File file;
-            file.setName(path);
-            file.setSize(query.value(1).toInt());
-            file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
-
-            QXmppShareIq::Mirror mirror;
-            mirror.setJid(requestIq.to());
-            mirror.setPath(path);
-            file.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
-            if (!updateFile(file))
-                continue;
-
-            file.setName(QFileInfo(file.name()).fileName());
-            qDebug() << "Adding file" << file.name();
-            rootCollection.append(file);
+            if (updateFile(file, query))
+            {
+                qDebug() << "Adding file" << file.name();
+                rootCollection.append(file);
+            }
         }
         else
         {
@@ -526,6 +534,8 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
             mirror.setPath(prefix + dirName + "/");
             collection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
         }
+        if (t.elapsed() > SEARCH_MAX_TIME)
+            break;
     }
     qDebug() << "Browsed" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
@@ -559,16 +569,6 @@ bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QStrin
     {
         const QString path = query.value(0).toString();
 
-        QXmppShareIq::File file;
-        file.setName(path);
-        file.setSize(query.value(1).toInt());
-        file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
-
-        QXmppShareIq::Mirror mirror;
-        mirror.setJid(requestIq.to());
-        mirror.setPath(path);
-        file.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
-
         // find the depth at which we matched
         QString matchString;
         QRegExp subdirRe(".*(([^/]+)/[^/]+)/[^/]+");
@@ -584,16 +584,16 @@ bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QStrin
             continue;
 
         // update file info
-        if (!updateFile(file))
-            continue;
-        file.setName(QFileInfo(file.name()).fileName());
-
-        // add file to the appropriate collection
-        rootCollection.mkpath(matchString).append(file);
+        QXmppShareIq::File file;
+        if (updateFile(file, query))
+        {
+            // add file to the appropriate collection
+            rootCollection.mkpath(matchString).append(file);
+            searchCount++;
+        }
 
         // limit maximum search time to 15s
-        searchCount++;
-        if (t.elapsed() > 15000 || searchCount > 250)
+        if (t.elapsed() > SEARCH_MAX_TIME || searchCount > 250)
             break;
     }
 
