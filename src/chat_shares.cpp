@@ -231,8 +231,6 @@ void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
 void ChatShares::findRemoteFiles()
 {
     const QString search = lineEdit->text();
-    if (search.isEmpty())
-        return;
 
     lineEdit->setEnabled(false);
     clearView();
