@@ -76,6 +76,7 @@ private:
     QDir sharesDir;
     QIcon collectionIcon;
     QIcon fileIcon;
+    QIcon peerIcon;
 
     ChatClient *client;
     ChatSharesDatabase *db;

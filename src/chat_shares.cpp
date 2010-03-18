@@ -95,6 +95,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     QFileIconProvider iconProvider;
     collectionIcon = iconProvider.icon(QFileIconProvider::Folder);
     fileIcon = iconProvider.icon(QFileIconProvider::File);
+    peerIcon = iconProvider.icon(QFileIconProvider::Network);
 
     /* connect signals */
     registerTimer = new QTimer(this);
@@ -117,6 +118,8 @@ qint64 ChatShares::addCollection(const QXmppShareIq::Collection &collection, QTr
         QXmppShareIq::Mirror mirror = collection.mirrors().first();
         collectionItem->setData(NameColumn, MirrorRole, mirror.jid());
         collectionItem->setData(NameColumn, PathRole, mirror.path());
+        if (mirror.path().isEmpty())
+            collectionItem->setIcon(NameColumn, peerIcon);
     }
 
     qint64 collectionSize = 0;
