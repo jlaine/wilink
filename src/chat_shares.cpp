@@ -490,8 +490,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
     }
     query.exec();
 
-    int searchCount = 0;
-    QRegExp dirRe("([^/]+)/.+");
+    QStringList subDirs;
     while (query.next())
     {
         const QString path = query.value(0).toString();
@@ -513,17 +512,21 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
             file.setName(QFileInfo(file.name()).fileName());
             rootCollection.append(file);
         }
-        else if (dirRe.exactMatch(relativePath))
+        else
         {
-            QXmppShareIq::Collection &collection = rootCollection.mkpath(dirRe.cap(1));
+            const QString dirName = relativePath.split("/").first();
+            if (subDirs.contains(dirName))
+                continue;
+            subDirs.append(dirName);
 
+            QXmppShareIq::Collection &collection = rootCollection.mkpath(dirName);
             QXmppShareIq::Mirror mirror;
             mirror.setJid(requestIq.to());
-            mirror.setPath(path);
+            mirror.setPath(prefix + dirName + "/");
             collection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
         }
     }
-    qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Found" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
 
