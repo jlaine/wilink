@@ -566,21 +566,21 @@ qint64 ChatSharesView::addItem(const QXmppShareIq::Item &file, QTreeWidgetItem *
     fileItem->setData(NameColumn, SizeRole, file.fileSize());
 
     /* FIXME : we are only using the first mirror */
+    bool isPeer = false;
     if (!file.mirrors().isEmpty())
     {
         QXmppShareIq::Mirror mirror = file.mirrors().first();
         fileItem->setData(NameColumn, MirrorRole, mirror.jid());
         fileItem->setData(NameColumn, PathRole, mirror.path());
+        if (mirror.path().isEmpty())
+            isPeer = true;
     }
 
     fileItem->setText(NameColumn, file.name());
     if (file.type() == QXmppShareIq::Item::CollectionItem)
     {
         fileItem->setData(NameColumn, TypeRole, CollectionType);
-        if (file.mirrors().first().path().isEmpty())
-            fileItem->setIcon(NameColumn, peerIcon);
-        else
-            fileItem->setIcon(NameColumn, collectionIcon);
+        fileItem->setIcon(NameColumn, isPeer ? peerIcon : collectionIcon);
     } else {
         fileItem->setData(NameColumn, TypeRole, FileType);
         fileItem->setIcon(NameColumn, fileIcon);
