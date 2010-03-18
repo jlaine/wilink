@@ -32,19 +32,29 @@ class ChatClient;
 class ChatSharesDatabase;
 class QLineEdit;
 class QListWidget;
+class QStackedWidget;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QTimer;
 class QXmppPacket;
-class QXmppTransferFile;
 
 class ChatSharesView : public QTreeWidget
 {
+    Q_OBJECT
+
 public:
     ChatSharesView(QWidget *parent = 0);
+    qint64 addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent);
+    qint64 addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent);
+    void clear();
 
 protected:
     void resizeEvent(QResizeEvent *e);
+
+private:
+    QIcon collectionIcon;
+    QIcon fileIcon;
+    QIcon peerIcon;
 };
 
 class ChatShares : public ChatPanel
@@ -59,6 +69,7 @@ signals:
     void fileExpected(const QString &sid);
 
 private slots:
+    void goBack();
     void findRemoteFiles();
     void itemDoubleClicked(QTreeWidgetItem *item);
     void registerWithServer();
@@ -67,21 +78,13 @@ private slots:
     void searchFinished(const QXmppShareSearchIq &share);
 
 private:
-    qint64 addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent);
-    qint64 addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent);
-    void clearView();
-
-private:
     QString shareServer;
     QDir sharesDir;
-    QIcon collectionIcon;
-    QIcon fileIcon;
-    QIcon peerIcon;
 
     ChatClient *client;
     ChatSharesDatabase *db;
     QLineEdit *lineEdit;
-    QTreeWidget *treeWidget;
+    ChatSharesView *treeWidget;
     QTimer *registerTimer;
 };
 
