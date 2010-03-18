@@ -158,24 +158,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         lineEdit->setEnabled(true);
         QFileIconProvider iconProvider;
 
-        /* FIXME : we are only using the first mirror */
-        QTreeWidgetItem *parent = 0;
-        const QXmppShareIq::Item &collection = shareIq.collection();
-        if (!collection.mirrors().isEmpty())
-        {
-            QXmppShareIq::Mirror mirror = collection.mirrors().first();
-            qDebug() << "looking for" << mirror.jid() << mirror.path();
-            for (int i = 0; i < treeWidget->topLevelItemCount(); i++)
-            {
-                QTreeWidgetItem *item = treeWidget->topLevelItem(i);
-                if (mirror.jid() == item->data(NameColumn, MirrorRole) &&
-                    mirror.path() == item->data(NameColumn, PathRole))
-                {
-                    parent = item;
-                    break;
-                }
-            }
-        }
+        QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
         if (!parent)
             treeWidget->clear();
         foreach (const QXmppShareIq::Item &item, shareIq.collection().children())
@@ -625,6 +608,30 @@ void ChatSharesView::clear()
     headerItem->setText(NameColumn, tr("Name"));
     headerItem->setText(SizeColumn, tr("Size"));
     setHeaderItem(headerItem);
+}
+
+QTreeWidgetItem *ChatSharesView::findItem(const QXmppShareIq::Item &collection, QTreeWidgetItem *parent)
+{
+    if (collection.mirrors().isEmpty())
+        return 0;
+
+    /* FIXME : we are only using the first mirror */
+    QXmppShareIq::Mirror mirror = collection.mirrors().first();
+    QTreeWidgetItem *found = 0;
+    if (parent)
+    {
+        if (mirror.jid() == parent->data(NameColumn, MirrorRole) &&
+            mirror.path() == parent->data(NameColumn, PathRole))
+            return parent;
+        for (int i = 0; i < parent->childCount(); i++)
+            if ((found = findItem(collection, parent->child(i))) != 0)
+                return found;
+    } else {
+        for (int i = 0; i < topLevelItemCount(); i++)
+            if ((found = findItem(collection, topLevelItem(i))) != 0)
+                return found;
+    }
+    return 0;
 }
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)
