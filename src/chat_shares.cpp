@@ -252,6 +252,12 @@ void ChatShares::setShareServer(const QString &server)
     // register with server
     registerWithServer();
     registerTimer->start();
+
+    // browse peers
+    QXmppShareSearchIq iq;
+    iq.setTo(shareServer);
+    iq.setType(QXmppIq::Get);
+    client->sendPacket(iq);
 }
 
 ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
