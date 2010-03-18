@@ -157,8 +157,31 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     {
         lineEdit->setEnabled(true);
         QFileIconProvider iconProvider;
+
+        /* FIXME : we are only using the first mirror */
+        QTreeWidgetItem *parent = 0;
+        const QXmppShareIq::Item &collection = shareIq.collection();
+        if (!collection.mirrors().isEmpty())
+        {
+            QXmppShareIq::Mirror mirror = collection.mirrors().first();
+            qDebug() << "looking for" << mirror.jid() << mirror.path();
+            for (int i = 0; i < treeWidget->topLevelItemCount(); i++)
+            {
+                QTreeWidgetItem *item = treeWidget->topLevelItem(i);
+                if (mirror.jid() == item->data(NameColumn, MirrorRole) &&
+                    mirror.path() == item->data(NameColumn, PathRole))
+                {
+                    parent = item;
+                    break;
+                }
+            }
+        }
+        if (!parent)
+            treeWidget->clear();
         foreach (const QXmppShareIq::Item &item, shareIq.collection().children())
-            treeWidget->addItem(item, 0);
+            treeWidget->addItem(item, parent);
+        if (parent)
+            parent->setExpanded(true);
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
@@ -217,10 +240,8 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
         iq.setFile(file);
         client->sendPacket(iq);
     }
-    else if (type == CollectionType)
+    else if (type == CollectionType && !item->childCount())
     {
-        treeWidget->clear();
-
         QXmppShareSearchIq iq;
         iq.setTo(jid);
         iq.setType(QXmppIq::Get);
