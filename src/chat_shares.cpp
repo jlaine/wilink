@@ -391,30 +391,56 @@ void SearchThread::run()
     responseIq.setTo(requestIq.from());
     responseIq.setTag(requestIq.tag());
 
-    // validate search
-    const QString queryString = requestIq.search();
-    if (queryString.isEmpty() || queryString.trimmed().isEmpty())
-    {
-        qWarning() << "Received an invalid search" << queryString;
-        responseIq.setType(QXmppIq::Error);
-        emit searchFinished(responseIq);
-        return;
-    }
-
-    // perform search
+    // determine query type
     QXmppShareIq::Collection rootCollection;
-    if (!search(rootCollection, queryString))
+    const QString queryString = requestIq.search().trimmed();
+    if (queryString.isEmpty())
     {
-        qWarning() << "Search" << queryString << "failed";
-        responseIq.setType(QXmppIq::Error);
-        emit searchFinished(responseIq);
-        return;
+        if (!browse(rootCollection))
+        {
+            qWarning() << "Browse failed";
+            responseIq.setType(QXmppIq::Error);
+            emit searchFinished(responseIq);
+            return;
+        }
+    } else {
+        // perform search
+        if (!search(rootCollection, queryString))
+        {
+            qWarning() << "Search" << queryString << "failed";
+            responseIq.setType(QXmppIq::Error);
+            emit searchFinished(responseIq);
+            return;
+        }
     }
 
     // send response
     responseIq.setType(QXmppIq::Result);
     responseIq.setCollection(rootCollection);
     emit searchFinished(responseIq);
+}
+
+bool SearchThread::browse(QXmppShareIq::Collection &rootCollection)
+{
+    QSqlQuery query("SELECT path, size, hash FROM files ORDER BY path", sharesDb);
+    while (query.next())
+    {
+        const QString path = query.value(0).toString();
+        if (path.count("/") == 0)
+        {
+            QXmppShareIq::File file;
+            file.setName(query.value(0).toString());
+            file.setSize(query.value(1).toInt());
+            file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
+            file.setMirrors(QStringList() << requestIq.to());
+            rootCollection.append(file);
+        }
+        else if (path.count("/") == 1)
+        {
+            rootCollection.mkpath(QFileInfo(path).fileName());
+        }
+    }
+    return true;
 }
 
 bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QString &queryString)
