@@ -506,7 +506,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
             QXmppShareIq::Mirror mirror;
             mirror.setJid(requestIq.to());
             mirror.setPath(path);
-            rootCollection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
+            file.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
             if (!updateFile(file))
                 continue;
 
@@ -515,7 +515,12 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
         }
         else if (dirRe.exactMatch(relativePath))
         {
-            rootCollection.mkpath(dirRe.cap(1));
+            QXmppShareIq::Collection &collection = rootCollection.mkpath(dirRe.cap(1));
+
+            QXmppShareIq::Mirror mirror;
+            mirror.setJid(requestIq.to());
+            mirror.setPath(path);
+            collection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
         }
     }
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
