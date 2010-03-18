@@ -475,7 +475,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
 
     QString sql("SELECT path, size, hash FROM files");
     if (!prefix.isEmpty())
-        sql += " WHERE path LIKE :search";
+        sql += " WHERE path LIKE :search ESCAPE :escape";
     sql += " ORDER BY path";
     QSqlQuery query(sql, sharesDb);
 
@@ -510,6 +510,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
                 continue;
 
             file.setName(QFileInfo(file.name()).fileName());
+            qDebug() << "Adding file" << file.name();
             rootCollection.append(file);
         }
         else
@@ -526,7 +527,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
             collection.setMirrors(QList<QXmppShareIq::Mirror>() << mirror);
         }
     }
-    qDebug() << "Found" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Browsed" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
 
