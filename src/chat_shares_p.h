@@ -66,6 +66,7 @@ signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
 private:
+    bool search(QXmppShareIq::Collection &rootCollection, const QString &queryString);
     bool updateFile(QXmppShareIq::File &shareFile);
 
     QXmppShareSearchIq requestIq;

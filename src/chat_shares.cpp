@@ -393,14 +393,37 @@ void SearchThread::run()
 
     // validate search
     const QString queryString = requestIq.search();
-    if (queryString.isEmpty() || queryString.trimmed().isEmpty() ||
-        queryString.contains("/") ||
-        queryString.contains("\\"))
+    if (queryString.isEmpty() || queryString.trimmed().isEmpty())
     {
         qWarning() << "Received an invalid search" << queryString;
         responseIq.setType(QXmppIq::Error);
         emit searchFinished(responseIq);
         return;
+    }
+
+    // perform search
+    QXmppShareIq::Collection rootCollection;
+    if (!search(rootCollection, queryString))
+    {
+        qWarning() << "Search" << queryString << "failed";
+        responseIq.setType(QXmppIq::Error);
+        emit searchFinished(responseIq);
+        return;
+    }
+
+    // send response
+    responseIq.setType(QXmppIq::Result);
+    responseIq.setCollection(rootCollection);
+    emit searchFinished(responseIq);
+}
+
+bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QString &queryString)
+{
+    if (queryString.contains("/") ||
+        queryString.contains("\\"))
+    {
+        qWarning() << "Received an invalid search" << queryString;
+        return false;
     }
 
     QCryptographicHash hasher(QCryptographicHash::Md5);
@@ -417,7 +440,6 @@ void SearchThread::run()
     query.bindValue(":escape", "\\");
     query.exec();
 
-    QXmppShareIq::Collection rootCollection;
     int searchCount = 0;
     while (query.next())
     {
@@ -456,11 +478,8 @@ void SearchThread::run()
             break;
     }
 
-    // send response
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
-    responseIq.setType(QXmppIq::Result);
-    responseIq.setCollection(rootCollection);
-    emit searchFinished(responseIq);
+    return true;
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)
