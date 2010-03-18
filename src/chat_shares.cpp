@@ -420,6 +420,7 @@ void SearchThread::run()
     QXmppShareIq::Item rootCollection(QXmppShareIq::Item::CollectionItem);
     QXmppShareIq::Mirror mirror;
     mirror.setJid(requestIq.to());
+    mirror.setPath(requestIq.base());
     rootCollection.setMirrors(mirror);
     const QString queryString = requestIq.search().trimmed();
     if (queryString.isEmpty())
