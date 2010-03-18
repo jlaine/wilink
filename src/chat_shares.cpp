@@ -121,7 +121,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         QString filePath = db->locate(shareIq.file());
         if (filePath.isEmpty())
         {
-            qWarning() << "Could not find file" << shareIq.file().name();
+            qWarning() << "Could not find file" << shareIq.file().name() << shareIq.file().fileSize();
             responseIq.setType(QXmppIq::Error);
             client->sendPacket(responseIq);
             return;
@@ -373,7 +373,7 @@ bool SearchThread::updateFile(QXmppShareIq::Item &file, const QSqlQuery &selectQ
         cachedSize = info.size();
 
         // update database entry
-        updateQuery.bindValue(":hash", cachedHash);
+        updateQuery.bindValue(":hash", cachedHash.toHex());
         updateQuery.bindValue(":size", cachedSize);
         updateQuery.bindValue(":path", path);
         updateQuery.exec();
