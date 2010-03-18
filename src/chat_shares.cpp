@@ -393,10 +393,11 @@ void SearchThread::run()
 
     // determine query type
     QXmppShareIq::Collection rootCollection;
+    rootCollection.setMirrors(QStringList() << requestIq.to());
     const QString queryString = requestIq.search().trimmed();
     if (queryString.isEmpty())
     {
-        if (!browse(rootCollection))
+        if (!browse(rootCollection, requestIq.base()))
         {
             qWarning() << "Browse failed";
             responseIq.setType(QXmppIq::Error);
@@ -420,26 +421,57 @@ void SearchThread::run()
     emit searchFinished(responseIq);
 }
 
-bool SearchThread::browse(QXmppShareIq::Collection &rootCollection)
+bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QString &base)
 {
-    QSqlQuery query("SELECT path, size, hash FROM files ORDER BY path", sharesDb);
+    QTime t;
+    t.start();
+
+    QString prefix = base;
+    if (!prefix.isEmpty() && !prefix.endsWith("/"))
+        prefix += "/";
+
+    QString sql("SELECT path, size, hash FROM files");
+    if (!prefix.isEmpty())
+        sql += " WHERE path LIKE :search";
+    sql += " ORDER BY path";
+    QSqlQuery query(sql, sharesDb);
+
+    if (!prefix.isEmpty())
+    {
+        QString like = prefix;
+        like.replace("%", "\\%");
+        like.replace("_", "\\_");
+        like += "%";
+        query.bindValue(":search", like);
+        query.bindValue(":escape", "\\");
+    }
+    query.exec();
+
+    int searchCount = 0;
+    QRegExp dirRe("([^/]+)/.+");
     while (query.next())
     {
         const QString path = query.value(0).toString();
-        if (path.count("/") == 0)
+        const QString relativePath = path.mid(prefix.size());
+        if (relativePath.count("/") == 0)
         {
             QXmppShareIq::File file;
-            file.setName(query.value(0).toString());
+            file.setName(path);
             file.setSize(query.value(1).toInt());
             file.setHash(QByteArray::fromHex(query.value(2).toByteArray()));
             file.setMirrors(QStringList() << requestIq.to());
+            if (!updateFile(file))
+                continue;
+
+            file.setName(QFileInfo(file.name()).fileName());
             rootCollection.append(file);
         }
-        else if (path.count("/") == 1)
+        else if (dirRe.exactMatch(relativePath))
         {
-            rootCollection.mkpath(QFileInfo(path).fileName());
+            rootCollection.mkpath(dirRe.cap(1));
         }
     }
+    qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
 
