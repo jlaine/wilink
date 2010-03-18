@@ -462,10 +462,7 @@ bool SearchThread::browse(QXmppShareIq::Item &rootCollection, const QString &bas
         {
             QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
             if (updateFile(file, query))
-            {
-                qDebug() << "Adding file" << file.name();
                 rootCollection.appendChild(file);
-            }
         }
         else
         {
