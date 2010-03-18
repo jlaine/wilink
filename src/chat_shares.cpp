@@ -157,10 +157,8 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     {
         lineEdit->setEnabled(true);
         QFileIconProvider iconProvider;
-        foreach (const QXmppShareIq::Collection &collection, shareIq.collection().collections())
-            treeWidget->addCollection(collection, 0);
-        foreach (const QXmppShareIq::File &file, shareIq.collection())
-            treeWidget->addFile(file, 0);
+        foreach (const QXmppShareIq::Item &item, shareIq.collection().children())
+            treeWidget->addItem(item, 0);
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
@@ -466,7 +464,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
             if (updateFile(file, query))
             {
                 qDebug() << "Adding file" << file.name();
-                rootCollection.append(file);
+                rootCollection.appendChild(file);
             }
         }
         else
@@ -476,7 +474,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
                 continue;
             subDirs.append(dirName);
 
-            QXmppShareIq::Collection &collection = rootCollection.mkpath(dirName);
+            QXmppShareIq::Item &collection = rootCollection.mkpath(dirName);
             QXmppShareIq::Mirror mirror(requestIq.to());
             mirror.setPath(prefix + dirName + "/");
             collection.setMirrors(mirror);
@@ -484,7 +482,7 @@ bool SearchThread::browse(QXmppShareIq::Collection &rootCollection, const QStrin
         if (t.elapsed() > SEARCH_MAX_TIME)
             break;
     }
-    qDebug() << "Browsed" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Browsed" << rootCollection.children().size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
 
@@ -535,7 +533,7 @@ bool SearchThread::search(QXmppShareIq::Collection &rootCollection, const QStrin
         if (updateFile(file, query))
         {
             // add file to the appropriate collection
-            rootCollection.mkpath(matchString).append(file);
+            rootCollection.mkpath(matchString).appendChild(file);
             searchCount++;
         }
 
@@ -566,38 +564,11 @@ ChatSharesView::ChatSharesView(QWidget *parent)
     clear();
 }
 
-qint64 ChatSharesView::addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent)
-{
-    QTreeWidgetItem *collectionItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(this);
-    collectionItem->setIcon(NameColumn, collectionIcon);
-    collectionItem->setText(NameColumn, collection.name());
-    collectionItem->setData(NameColumn, TypeRole, CollectionType);
-
-    /* FIXME : we are only using the first mirror */
-    if (!collection.mirrors().isEmpty())
-    {
-        QXmppShareIq::Mirror mirror = collection.mirrors().first();
-        collectionItem->setData(NameColumn, MirrorRole, mirror.jid());
-        collectionItem->setData(NameColumn, PathRole, mirror.path());
-        if (mirror.path().isEmpty())
-            collectionItem->setIcon(NameColumn, peerIcon);
-    }
-
-    qint64 collectionSize = 0;
-    foreach (const QXmppShareIq::Collection &child, collection.collections())
-        collectionSize += addCollection(child, collectionItem);
-    foreach (const QXmppShareIq::File &file, collection)
-        collectionSize += addFile(file, collectionItem);
-    collectionItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
-    return collectionSize;
-}
-
-qint64 ChatSharesView::addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent)
+qint64 ChatSharesView::addItem(const QXmppShareIq::Item &file, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(this);
     fileItem->setData(NameColumn, HashRole, file.fileHash());
     fileItem->setData(NameColumn, SizeRole, file.fileSize());
-    fileItem->setData(NameColumn, TypeRole, FileType);
 
     /* FIXME : we are only using the first mirror */
     if (!file.mirrors().isEmpty())
@@ -607,10 +578,25 @@ qint64 ChatSharesView::addFile(const QXmppShareIq::File &file, QTreeWidgetItem *
         fileItem->setData(NameColumn, PathRole, mirror.path());
     }
 
-    fileItem->setIcon(NameColumn, fileIcon);
     fileItem->setText(NameColumn, file.name());
-    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(file.fileSize()));
-    return file.fileSize();
+    if (file.type() == QXmppShareIq::Item::CollectionItem)
+    {
+        fileItem->setData(NameColumn, TypeRole, CollectionType);
+        if (file.mirrors().first().path().isEmpty())
+            fileItem->setIcon(NameColumn, peerIcon);
+        else
+            fileItem->setIcon(NameColumn, collectionIcon);
+    } else {
+        fileItem->setData(NameColumn, TypeRole, FileType);
+        fileItem->setIcon(NameColumn, fileIcon);
+    }
+
+    /* calculate size */
+    qint64 collectionSize = file.fileSize();
+    foreach (const QXmppShareIq::Item &child, file.children())
+        collectionSize += addItem(child, fileItem);
+    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
+    return collectionSize;
 }
 
 void ChatSharesView::clear()

@@ -44,8 +44,7 @@ class ChatSharesView : public QTreeWidget
 
 public:
     ChatSharesView(QWidget *parent = 0);
-    qint64 addCollection(const QXmppShareIq::Collection &collection, QTreeWidgetItem *parent);
-    qint64 addFile(const QXmppShareIq::File &file, QTreeWidgetItem *parent);
+    qint64 addItem(const QXmppShareIq::Item &item, QTreeWidgetItem *parent);
     void clear();
 
 protected:
