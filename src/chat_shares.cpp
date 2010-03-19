@@ -60,8 +60,6 @@ enum Types
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
-#define SEARCH_MAX_TIME 15000
-
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient), db(0)
 {
