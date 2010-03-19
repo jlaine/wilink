@@ -227,10 +227,7 @@ void ChatShares::setShareServer(const QString &server)
     registerTimer->start();
 
     // browse peers
-    QXmppShareSearchIq iq;
-    iq.setTo(shareServer);
-    iq.setType(QXmppIq::Get);
-    client->sendPacket(iq);
+    findRemoteFiles();
 }
 
 ChatSharesModel::ChatSharesModel(QObject *parent)
