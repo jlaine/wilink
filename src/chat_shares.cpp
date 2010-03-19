@@ -44,15 +44,6 @@ enum Columns
     MaxColumn,
 };
 
-enum Roles
-{
-    HashRole = Qt::UserRole,
-    SizeRole,
-    TypeRole,
-    MirrorRole,
-    PathRole,
-};
-
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
@@ -350,19 +341,15 @@ ChatSharesView::ChatSharesView(QWidget *parent)
     peerIcon = iconProvider.icon(QFileIconProvider::Network);
 
     /* set header names */
-    //clear();
-}
-
 #if 0
-void ChatSharesView::clear()
-{
-    QTreeWidget::clear();
     QTreeWidgetItem *headerItem = new QTreeWidgetItem;
     headerItem->setText(NameColumn, tr("Name"));
     headerItem->setText(SizeColumn, tr("Size"));
     setHeaderItem(headerItem);
+#endif
 }
 
+#if 0
 QTreeWidgetItem *ChatSharesView::findItem(const QXmppShareIq::Item &collection, QTreeWidgetItem *parent)
 {
     if (collection.mirrors().isEmpty())

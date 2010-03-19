@@ -65,11 +65,6 @@ class ChatSharesView : public QTreeView
 
 public:
     ChatSharesView(QWidget *parent = 0);
-#if 0
-    qint64 addItem(const QXmppShareIq::Item &item, QTreeWidgetItem *parent);
-    void clear();
-    QTreeWidgetItem *findItem(const QXmppShareIq::Item &item, QTreeWidgetItem *parent);
-#endif
 
 protected:
     void resizeEvent(QResizeEvent *e);
