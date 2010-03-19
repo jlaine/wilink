@@ -48,6 +48,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    void setShareServer(const QString &server);
 
 signals:
     void itemReceived(const QModelIndex &index);
@@ -57,6 +58,7 @@ private slots:
 
 private:
     QXmppShareItem *rootItem;
+    QString shareServer;
 
     QIcon collectionIcon;
     QIcon fileIcon;
@@ -101,6 +103,8 @@ private:
 
     ChatClient *client;
     ChatSharesDatabase *db;
+    ChatSharesModel *model;
+
     QLineEdit *lineEdit;
     ChatSharesView *treeWidget;
     QTimer *registerTimer;

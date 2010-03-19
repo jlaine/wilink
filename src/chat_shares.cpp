@@ -67,7 +67,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->addWidget(lineEdit);
 
     /* create model / view */
-    ChatSharesModel *model = new ChatSharesModel;
+    model = new ChatSharesModel;
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), model, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(model, SIGNAL(itemReceived(const QModelIndex&)), this, SLOT(itemReceived(const QModelIndex&)));
     treeWidget = new ChatSharesView;
@@ -222,6 +222,7 @@ void ChatShares::setShareServer(const QString &server)
         db = new ChatSharesDatabase(sharesDir.path(), this);
         connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SLOT(searchFinished(const QXmppShareSearchIq&)));
     }
+    model->setShareServer(server);
 
     // register with server
     registerWithServer();
@@ -327,18 +328,18 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
+void ChatSharesModel::setShareServer(const QString &server)
+{
+    shareServer = server;
+}
+
 void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
     {
         QXmppShareItem *parentItem = rootItem->findChild(shareIq.collection().mirrors());
-        if (!parentItem)
+        if (parentItem)
         {
-            rootItem->clearChildren();
-            foreach (const QXmppShareItem &child, shareIq.collection().children())
-                rootItem->appendChild(child);
-            emit reset();
-        } else {
             if (parentItem->size())
             {
                 beginRemoveRows(createIndex(parentItem->row(), 0, parentItem), 0, parentItem->size());
@@ -353,6 +354,11 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
                 endInsertRows();
             }
             emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
+        } else if (shareIq.from() == shareServer) {
+            rootItem->clearChildren();
+            foreach (const QXmppShareItem &child, shareIq.collection().children())
+                rootItem->appendChild(child);
+            emit reset();
         }
     }
 }
