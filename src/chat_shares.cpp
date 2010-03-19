@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCryptographicHash>
 #include <QDir>
 #include <QFileIconProvider>
 #include <QHeaderView>
@@ -25,11 +24,8 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QResizeEvent>
-#include <QSqlError>
-#include <QSqlQuery>
 #include <QStackedWidget>
 #include <QStringList>
-#include <QTime>
 #include <QTimer>
 #include <QTreeWidget>
 
@@ -38,7 +34,7 @@
 
 #include "chat.h"
 #include "chat_shares.h"
-#include "chat_shares_p.h"
+#include "chat_shares_database.h"
 #include "chat_transfers.h"
 
 enum Columns

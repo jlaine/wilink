@@ -19,26 +19,16 @@
 
 #include <QCryptographicHash>
 #include <QDir>
-#include <QFileIconProvider>
-#include <QHeaderView>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QResizeEvent>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QStackedWidget>
 #include <QStringList>
 #include <QTime>
 #include <QTimer>
-#include <QTreeWidget>
 
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppUtils.h"
 
-#include "chat.h"
-#include "chat_shares.h"
-#include "chat_shares_p.h"
+#include "chat_shares_database.h"
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
@@ -330,5 +320,4 @@ bool SearchThread::search(QXmppShareIq::Item &rootCollection, const QString &que
     qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
-
 
