@@ -33,6 +33,7 @@
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 15000
+#define HASH_MAX_SIZE 1024 * 1024
 
 ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     : QObject(parent), sharesDir(path)
@@ -112,7 +113,6 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     qint64 cachedSize = selectQuery.value(1).toInt();
     QByteArray cachedHash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
 
-    QCryptographicHash hasher(QCryptographicHash::Md5);
     QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
 
@@ -140,8 +140,20 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
         }
 
         // update file object
-        while (fp.bytesAvailable())
-            hasher.addData(fp.read(16384));
+        QCryptographicHash hasher(QCryptographicHash::Md5);
+        char buffer[16384];
+        int hashed = 0;
+        while (fp.bytesAvailable() && hashed < HASH_MAX_SIZE)
+        {
+            int len = fp.read(buffer, sizeof(buffer));
+            if (len < 0)
+            {
+                qWarning() << "Error reading from file" << path;
+                return false;
+            }
+            hasher.addData(buffer, len);
+            hashed += len;
+        }
         fp.close();
         cachedHash = hasher.result();
         cachedSize = info.size();
@@ -270,7 +282,6 @@ bool SearchThread::search(QXmppShareItem &rootCollection, const QString &querySt
         return false;
     }
 
-    QCryptographicHash hasher(QCryptographicHash::Md5);
     QTime t;
     t.start();
 
