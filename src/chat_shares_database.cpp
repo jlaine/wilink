@@ -173,26 +173,27 @@ void SearchThread::run()
     responseIq.setTag(requestIq.tag());
 
     // determine query type
-    QXmppShareIq::Item rootCollection(QXmppShareIq::Item::CollectionItem);
     QXmppShareIq::Mirror mirror;
     mirror.setJid(requestIq.to());
     mirror.setPath(requestIq.base());
-    rootCollection.setMirrors(mirror);
+    responseIq.collection().setMirrors(mirror);
     const QString queryString = requestIq.search().trimmed();
     if (queryString.isEmpty())
     {
-        if (!browse(rootCollection, requestIq.base()))
+        if (!browse(responseIq.collection(), requestIq.base()))
         {
             qWarning() << "Browse failed";
+            responseIq.collection().clear();
             responseIq.setType(QXmppIq::Error);
             emit searchFinished(responseIq);
             return;
         }
     } else {
         // perform search
-        if (!search(rootCollection, queryString))
+        if (!search(responseIq.collection(), queryString))
         {
             qWarning() << "Search" << queryString << "failed";
+            responseIq.collection().clear();
             responseIq.setType(QXmppIq::Error);
             emit searchFinished(responseIq);
             return;
@@ -201,7 +202,6 @@ void SearchThread::run()
 
     // send response
     responseIq.setType(QXmppIq::Result);
-    responseIq.setCollection(rootCollection);
     emit searchFinished(responseIq);
 }
 
