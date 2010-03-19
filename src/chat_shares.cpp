@@ -261,7 +261,12 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
         if (item->type() == QXmppShareIq::Item::CollectionItem)
-            return collectionIcon;
+        {
+            if (item->mirrors().size() == 1 && item->mirrors().first().path().isEmpty())
+                return peerIcon;
+            else
+                return collectionIcon;
+        }
         else
             return fileIcon;
     }
@@ -316,10 +321,8 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     {
         QXmppShareIq::Item *parentItem = rootItem->findChild(shareIq.collection().mirrors());
         if (!parentItem)
-        {
             parentItem = rootItem;
-            parentItem->clearChildren();
-        }
+        parentItem->clearChildren();
         foreach (const QXmppShareIq::Item &child, shareIq.collection().children())
             parentItem->appendChild(child);
         reset();
