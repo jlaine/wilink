@@ -250,12 +250,14 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
         const QString relativePath = path.mid(prefix.size());
         if (relativePath.count("/") == 0)
         {
+            // update file info
             QXmppShareItem file(QXmppShareItem::FileItem);
             if (updateFile(file, query))
                 rootCollection.appendChild(file);
         }
         else
         {
+            // add first level directory
             const QString dirName = relativePath.split("/").first();
             if (subDirs.contains(dirName))
                 continue;
@@ -269,7 +271,7 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
         if (t.elapsed() > SEARCH_MAX_TIME)
             break;
     }
-    qDebug() << "Browsed" << rootCollection.children().size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Browsed" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
 
@@ -295,7 +297,7 @@ bool SearchThread::search(QXmppShareItem &rootCollection, const QString &querySt
     query.bindValue(":escape", "\\");
     query.exec();
 
-    int searchCount = 0;
+    QStringList subDirs;
     while (query.next())
     {
         const QString path = query.value(0).toString();
@@ -311,27 +313,30 @@ bool SearchThread::search(QXmppShareItem &rootCollection, const QString &querySt
         const QString prefix = (slashIndex >= 0) ? path.left(slashIndex + 1) : "";
 
         // find the depth at which we matched
-        QString dirName;
-        if (relativePath.contains("/"))
-            dirName = relativePath.left(relativePath.lastIndexOf("/"));
-        else
-            dirName = "";
-
-        // update file info
-        QXmppShareItem file(QXmppShareItem::FileItem);
-        if (updateFile(file, query))
+        if (relativePath.count("/") == 0)
         {
-            // add file to the appropriate collection
-            rootCollection.mkpath(dirName).appendChild(file);
-            searchCount++;
+            // update file info
+            QXmppShareItem file(QXmppShareItem::FileItem);
+            if (updateFile(file, query))
+                rootCollection.appendChild(file);
+        } else {
+            const QString dirName = relativePath.split("/").first();
+            if (subDirs.contains(dirName))
+                continue;
+            subDirs.append(dirName);
+
+            QXmppShareItem &collection = rootCollection.mkpath(dirName);
+            QXmppShareMirror mirror(requestIq.to());
+            mirror.setPath(prefix + dirName + "/");
+            collection.setMirrors(mirror);
         }
 
         // limit maximum search time to 15s
-        if (t.elapsed() > SEARCH_MAX_TIME || searchCount > 250)
+        if (t.elapsed() > SEARCH_MAX_TIME)
             break;
     }
 
-    qDebug() << "Found" << searchCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
+    qDebug() << "Found" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
     return true;
 }
 
