@@ -273,13 +273,11 @@ QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &paren
     else
         parentItem = static_cast<QXmppShareIq::Item*>(parent.internalPointer());
 
-    /*
     QXmppShareIq::Item *childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
     else
         return QModelIndex();
-        */
 }
 
 QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
@@ -293,7 +291,7 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
     if (parentItem == rootItem)
         return QModelIndex();
 
-    //return createIndex(parentItem->row(), 0, parentItem);
+    return createIndex(parentItem->row(), 0, parentItem);
 }
 
 int ChatSharesModel::rowCount(const QModelIndex &parent) const
@@ -303,7 +301,7 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
         parentItem = rootItem;
     else
         parentItem = static_cast<QXmppShareIq::Item*>(parent.internalPointer());
-    return parentItem->children().size();
+    return parentItem->size();
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)
