@@ -180,7 +180,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         QXmppShareGetIq iq;
         iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
-        iq.file() = *item;
+        iq.setFile(item);
         qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
         client->sendPacket(iq);
     }
