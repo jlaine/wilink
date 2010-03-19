@@ -314,13 +314,16 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
     {
+        QXmppShareIq::Item *parentItem = rootItem->findChild(shareIq.collection().mirrors());
+        if (!parentItem)
+        {
+            parentItem = rootItem;
+            parentItem->clearChildren();
+        }
         foreach (const QXmppShareIq::Item &child, shareIq.collection().children())
-            rootItem->appendChild(child);
+            parentItem->appendChild(child);
         reset();
 /*
-        QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
-        if (!parent)
-            rootItem->clear();
         if (parent)
             parent->setExpanded(true);
 */
@@ -348,32 +351,6 @@ ChatSharesView::ChatSharesView(QWidget *parent)
     setHeaderItem(headerItem);
 #endif
 }
-
-#if 0
-QTreeWidgetItem *ChatSharesView::findItem(const QXmppShareIq::Item &collection, QTreeWidgetItem *parent)
-{
-    if (collection.mirrors().isEmpty())
-        return 0;
-
-    /* FIXME : we are only using the first mirror */
-    QXmppShareIq::Mirror mirror = collection.mirrors().first();
-    QTreeWidgetItem *found = 0;
-    if (parent)
-    {
-        if (mirror.jid() == parent->data(NameColumn, MirrorRole) &&
-            mirror.path() == parent->data(NameColumn, PathRole))
-            return parent;
-        for (int i = 0; i < parent->childCount(); i++)
-            if ((found = findItem(collection, parent->child(i))) != 0)
-                return found;
-    } else {
-        for (int i = 0; i < topLevelItemCount(); i++)
-            if ((found = findItem(collection, topLevelItem(i))) != 0)
-                return found;
-    }
-    return 0;
-}
-#endif
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)
 {
