@@ -63,6 +63,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     lineEdit = new QLineEdit;
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
+    connect(lineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(queryStringChanged()));
     layout->addWidget(lineEdit);
 
     /* create model / view */
@@ -130,8 +131,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         db->search(shareIq);
         return;
     }
-
-    lineEdit->setEnabled(true);
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
@@ -142,8 +141,6 @@ void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
 void ChatShares::findRemoteFiles()
 {
     const QString search = lineEdit->text();
-
-    lineEdit->setEnabled(false);
 
     QXmppShareSearchIq iq;
     iq.setTo(shareServer);
@@ -183,8 +180,6 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     }
     else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
     {
-        lineEdit->setEnabled(false);
-
         // browse files
         QXmppShareSearchIq iq;
         iq.setTo(mirror.jid());
@@ -197,6 +192,12 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
 void ChatShares::itemReceived(const QModelIndex &index)
 {
     treeWidget->setExpanded(index, true);
+}
+
+void ChatShares::queryStringChanged()
+{
+    if (lineEdit->text().isEmpty())
+        findRemoteFiles();
 }
 
 void ChatShares::registerWithServer()
