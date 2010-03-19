@@ -339,12 +339,27 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     {
         QXmppShareItem *parentItem = rootItem->findChild(shareIq.collection().mirrors());
         if (!parentItem)
-            parentItem = rootItem;
-        parentItem->clearChildren();
-        foreach (const QXmppShareItem &child, shareIq.collection().children())
-            parentItem->appendChild(child);
-        reset();
-        emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
+        {
+            rootItem->clearChildren();
+            foreach (const QXmppShareItem &child, shareIq.collection().children())
+                rootItem->appendChild(child);
+            emit reset();
+        } else {
+            if (parentItem->size())
+            {
+                beginRemoveRows(createIndex(parentItem->row(), 0, parentItem), 0, parentItem->size());
+                parentItem->clearChildren();
+                endRemoveRows();
+            }
+            if (shareIq.collection().size())
+            {
+                beginInsertRows(createIndex(parentItem->row(), 0, parentItem), 0, shareIq.collection().size());
+                foreach (const QXmppShareItem &child, shareIq.collection().children())
+                    parentItem->appendChild(child);
+                endInsertRows();
+            }
+            emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
+        }
     }
 }
 
