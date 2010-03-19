@@ -157,7 +157,7 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemDoubleClicked(const QModelIndex &index)
 {
-    QXmppShareIq::Item *item = static_cast<QXmppShareIq::Item*>(index.internalPointer());
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return;
 
@@ -168,7 +168,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     }
     const QXmppShareIq::Mirror mirror = item->mirrors().first();
 
-    if (item->type() == QXmppShareIq::Item::FileItem)
+    if (item->type() == QXmppShareItem::FileItem)
     {
         if (mirror.path().isEmpty())
         {
@@ -180,11 +180,11 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         QXmppShareGetIq iq;
         iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
-        iq.setFile(item);
+        iq.setFile(*item);
         qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
         client->sendPacket(iq);
     }
-    else if (item->type() == QXmppShareIq::Item::CollectionItem && !item->size())
+    else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
     {
         lineEdit->setEnabled(false);
 
@@ -234,7 +234,7 @@ void ChatShares::setShareServer(const QString &server)
 ChatSharesModel::ChatSharesModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    rootItem = new QXmppShareIq::Item(QXmppShareIq::Item::CollectionItem);
+    rootItem = new QXmppShareItem(QXmppShareItem::CollectionItem);
 
     /* load icons */
     QFileIconProvider iconProvider;
@@ -250,7 +250,7 @@ int ChatSharesModel::columnCount(const QModelIndex &parent) const
 
 QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
 {
-    QXmppShareIq::Item *item = static_cast<QXmppShareIq::Item*>(index.internalPointer());
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
 
@@ -260,7 +260,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         return ChatTransfers::sizeToString(item->fileSize());
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
-        if (item->type() == QXmppShareIq::Item::CollectionItem)
+        if (item->type() == QXmppShareItem::CollectionItem)
         {
             if (item->mirrors().size() == 1 && item->mirrors().first().path().isEmpty())
                 return peerIcon;
@@ -290,13 +290,13 @@ QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &paren
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    QXmppShareIq::Item *parentItem;
+    QXmppShareItem *parentItem;
     if (!parent.isValid())
         parentItem = rootItem;
     else
-        parentItem = static_cast<QXmppShareIq::Item*>(parent.internalPointer());
+        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
 
-    QXmppShareIq::Item *childItem = parentItem->child(row);
+    QXmppShareItem *childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
     else
@@ -308,8 +308,8 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
     if (!index.isValid())
         return QModelIndex();
 
-    QXmppShareIq::Item *childItem = static_cast<QXmppShareIq::Item*>(index.internalPointer());
-    QXmppShareIq::Item *parentItem = childItem->parent();
+    QXmppShareItem *childItem = static_cast<QXmppShareItem*>(index.internalPointer());
+    QXmppShareItem *parentItem = childItem->parent();
 
     if (parentItem == rootItem)
         return QModelIndex();
@@ -319,11 +319,11 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
 
 int ChatSharesModel::rowCount(const QModelIndex &parent) const
 {
-    QXmppShareIq::Item *parentItem;
+    QXmppShareItem *parentItem;
     if (!parent.isValid())
         parentItem = rootItem;
     else
-        parentItem = static_cast<QXmppShareIq::Item*>(parent.internalPointer());
+        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
     return parentItem->size();
 }
 
@@ -331,11 +331,11 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
     {
-        QXmppShareIq::Item *parentItem = rootItem->findChild(shareIq.collection().mirrors());
+        QXmppShareItem *parentItem = rootItem->findChild(shareIq.collection().mirrors());
         if (!parentItem)
             parentItem = rootItem;
         parentItem->clearChildren();
-        foreach (const QXmppShareIq::Item &child, shareIq.collection().children())
+        foreach (const QXmppShareItem &child, shareIq.collection().children())
             parentItem->appendChild(child);
         reset();
 /*

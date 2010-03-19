@@ -50,7 +50,7 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     worker->start();
 }
 
-QString ChatSharesDatabase::locate(const QXmppShareIq::Item &file)
+QString ChatSharesDatabase::locate(const QXmppShareItem &file)
 {
     QSqlQuery query("SELECT path FROM files WHERE hash = :hash AND size = :size", sharesDb);
     query.bindValue(":hash", file.fileHash().toHex());
@@ -106,7 +106,7 @@ SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const 
 {
 };
 
-bool SearchThread::updateFile(QXmppShareIq::Item &file, const QSqlQuery &selectQuery)
+bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery)
 {
     const QString path = selectQuery.value(0).toString();
     qint64 cachedSize = selectQuery.value(1).toInt();
@@ -205,7 +205,7 @@ void SearchThread::run()
     emit searchFinished(responseIq);
 }
 
-bool SearchThread::browse(QXmppShareIq::Item &rootCollection, const QString &base)
+bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
 {
     QTime t;
     t.start();
@@ -238,7 +238,7 @@ bool SearchThread::browse(QXmppShareIq::Item &rootCollection, const QString &bas
         const QString relativePath = path.mid(prefix.size());
         if (relativePath.count("/") == 0)
         {
-            QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
+            QXmppShareItem file(QXmppShareItem::FileItem);
             if (updateFile(file, query))
                 rootCollection.appendChild(file);
         }
@@ -249,7 +249,7 @@ bool SearchThread::browse(QXmppShareIq::Item &rootCollection, const QString &bas
                 continue;
             subDirs.append(dirName);
 
-            QXmppShareIq::Item &collection = rootCollection.mkpath(dirName);
+            QXmppShareItem &collection = rootCollection.mkpath(dirName);
             QXmppShareIq::Mirror mirror(requestIq.to());
             mirror.setPath(prefix + dirName + "/");
             collection.setMirrors(mirror);
@@ -261,7 +261,7 @@ bool SearchThread::browse(QXmppShareIq::Item &rootCollection, const QString &bas
     return true;
 }
 
-bool SearchThread::search(QXmppShareIq::Item &rootCollection, const QString &queryString)
+bool SearchThread::search(QXmppShareItem &rootCollection, const QString &queryString)
 {
     if (queryString.contains("/") ||
         queryString.contains("\\"))
@@ -304,7 +304,7 @@ bool SearchThread::search(QXmppShareIq::Item &rootCollection, const QString &que
             continue;
 
         // update file info
-        QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
+        QXmppShareItem file(QXmppShareItem::FileItem);
         if (updateFile(file, query))
         {
             // add file to the appropriate collection

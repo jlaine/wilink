@@ -53,7 +53,7 @@ private slots:
     void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);
 
 private:
-    QXmppShareIq::Item *rootItem;
+    QXmppShareItem *rootItem;
 
     QIcon collectionIcon;
     QIcon fileIcon;

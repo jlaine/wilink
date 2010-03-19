@@ -29,7 +29,7 @@ class ChatSharesDatabase : public QObject
 
 public:
     ChatSharesDatabase(const QString &path, QObject *parent = 0);
-    QString locate(const QXmppShareIq::Item &file);
+    QString locate(const QXmppShareItem &file);
     void search(const QXmppShareSearchIq &requestIq);
 
 signals:
@@ -66,9 +66,9 @@ signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
 private:
-    bool browse(QXmppShareIq::Item &rootCollection, const QString &base);
-    bool search(QXmppShareIq::Item &rootCollection, const QString &queryString);
-    bool updateFile(QXmppShareIq::Item &shareFile, const QSqlQuery &selectQuery);
+    bool browse(QXmppShareItem &rootCollection, const QString &base);
+    bool search(QXmppShareItem &rootCollection, const QString &queryString);
+    bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery);
 
     QXmppShareSearchIq requestIq;
     QSqlDatabase sharesDb;
