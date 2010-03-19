@@ -222,19 +222,19 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
     QTime t;
     t.start();
 
-    QString prefix = base;
-    if (!prefix.isEmpty() && !prefix.endsWith("/"))
-        prefix += "/";
+    QString basePrefix = base;
+    if (!basePrefix.isEmpty() && !basePrefix.endsWith("/"))
+        basePrefix += "/";
 
     QString sql("SELECT path, size, hash FROM files");
-    if (!prefix.isEmpty())
+    if (!basePrefix.isEmpty())
         sql += " WHERE path LIKE :search ESCAPE :escape";
     sql += " ORDER BY path";
     QSqlQuery query(sql, sharesDb);
 
-    if (!prefix.isEmpty())
+    if (!basePrefix.isEmpty())
     {
-        QString like = prefix;
+        QString like = basePrefix;
         like.replace("%", "\\%");
         like.replace("_", "\\_");
         like += "%";
@@ -247,6 +247,7 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
     while (query.next())
     {
         const QString path = query.value(0).toString();
+        const QString prefix = basePrefix;
 
         // find the depth at which we matched
         const QString relativePath = path.mid(prefix.size());
