@@ -68,6 +68,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     /* create model / view */
     ChatSharesModel *model = new ChatSharesModel;
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), model, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+    connect(model, SIGNAL(itemReceived(const QModelIndex&)), this, SLOT(itemReceived(const QModelIndex&)));
     treeWidget = new ChatSharesView;
     treeWidget->setModel(model);
     connect(treeWidget, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
@@ -195,6 +196,11 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         iq.setBase(mirror.path());
         client->sendPacket(iq);
     }
+}
+
+void ChatShares::itemReceived(const QModelIndex &index)
+{
+    treeWidget->setExpanded(index, true);
 }
 
 void ChatShares::registerWithServer()
@@ -338,10 +344,7 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         foreach (const QXmppShareItem &child, shareIq.collection().children())
             parentItem->appendChild(child);
         reset();
-/*
-        if (parent)
-            parent->setExpanded(true);
-*/
+        emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
     }
 }
 

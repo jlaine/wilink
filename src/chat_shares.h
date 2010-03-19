@@ -49,6 +49,9 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
+signals:
+    void itemReceived(const QModelIndex &index);
+
 private slots:
     void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);
 
@@ -86,6 +89,7 @@ private slots:
     void goBack();
     void findRemoteFiles();
     void itemDoubleClicked(const QModelIndex &index);
+    void itemReceived(const QModelIndex &index);
     void registerWithServer();
     void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &share);
