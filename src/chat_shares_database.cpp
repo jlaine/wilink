@@ -285,10 +285,12 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
                 continue;
             subDirs.append(dirName);
 
-            QXmppShareItem &collection = rootCollection.mkpath(dirName);
+            QXmppShareItem collection(QXmppShareItem::CollectionItem);
+            collection.setName(dirName);
             QXmppShareMirror mirror(requestIq.to());
             mirror.setPath(prefix + dirName + "/");
             collection.setMirrors(mirror);
+            rootCollection.appendChild(collection);
         }
         if (t.elapsed() > SEARCH_MAX_TIME)
             break;
