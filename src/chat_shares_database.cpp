@@ -247,6 +247,8 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
     while (query.next())
     {
         const QString path = query.value(0).toString();
+
+        // find the depth at which we matched
         const QString relativePath = path.mid(prefix.size());
         if (relativePath.count("/") == 0)
         {
@@ -277,15 +279,15 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
 
 bool SearchThread::search(QXmppShareItem &rootCollection, const QString &queryString)
 {
+    QTime t;
+    t.start();
+
     if (queryString.contains("/") ||
         queryString.contains("\\"))
     {
         qWarning() << "Received an invalid search" << queryString;
         return false;
     }
-
-    QTime t;
-    t.start();
 
     // perform search
     QString like = queryString;
@@ -309,10 +311,10 @@ bool SearchThread::search(QXmppShareItem &rootCollection, const QString &querySt
             continue;
         }
         int slashIndex = path.lastIndexOf("/", matchIndex);
-        const QString relativePath = path.mid(slashIndex + 1);
         const QString prefix = (slashIndex >= 0) ? path.left(slashIndex + 1) : "";
 
         // find the depth at which we matched
+        const QString relativePath = path.mid(prefix.size());
         if (relativePath.count("/") == 0)
         {
             // update file info
