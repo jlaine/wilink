@@ -38,6 +38,18 @@ class QTreeWidgetItem;
 class QTimer;
 class QXmppPacket;
 
+class ChatSharesModel : public QAbstractItemModel
+{
+    Q_OBJECT
+
+public:
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex parent(const QModelIndex & index) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+};
+
 class ChatSharesView : public QTreeWidget
 {
     Q_OBJECT

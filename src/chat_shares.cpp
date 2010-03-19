@@ -254,9 +254,36 @@ void ChatShares::setShareServer(const QString &server)
     client->sendPacket(iq);
 }
 
+int ChatSharesModel::columnCount(const QModelIndex &parent) const
+{
+
+}
+
+QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
+{
+
+}
+
+QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &parent) const
+{
+
+}
+
+QModelIndex ChatSharesModel::parent(const QModelIndex & index) const
+{
+
+}
+
+int ChatSharesModel::rowCount(const QModelIndex &parent) const
+{
+
+}
+
 ChatSharesView::ChatSharesView(QWidget *parent)
     : QTreeWidget(parent)
 {
+    ChatSharesModel *model = new ChatSharesModel;
+
     setColumnCount(2);
     setColumnWidth(SizeColumn, 80);
     setSelectionBehavior(QAbstractItemView::SelectRows);
