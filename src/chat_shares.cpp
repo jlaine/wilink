@@ -275,9 +275,11 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == Qt::DisplayRole)
+    if (role == Qt::DisplayRole && index.column() == NameColumn)
         return item->name();
-    else if (role == Qt::DecorationRole)
+    else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
+        return ChatTransfers::sizeToString(item->fileSize());
+    else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
         if (item->type() == QXmppShareIq::Item::CollectionItem)
             return collectionIcon;
