@@ -252,6 +252,18 @@ void ChatShares::setShareServer(const QString &server)
     client->sendPacket(iq);
 }
 
+ChatSharesModel::ChatSharesModel(QObject *parent)
+    : QAbstractItemModel(parent)
+{
+    rootItem = new QXmppShareIq::Item(QXmppShareIq::Item::CollectionItem);
+
+    /* load icons */
+    QFileIconProvider iconProvider;
+    collectionIcon = iconProvider.icon(QFileIconProvider::Folder);
+    fileIcon = iconProvider.icon(QFileIconProvider::File);
+    peerIcon = iconProvider.icon(QFileIconProvider::Network);
+}
+
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
@@ -259,7 +271,20 @@ int ChatSharesModel::columnCount(const QModelIndex &parent) const
 
 QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
 {
+    QXmppShareIq::Item *item = static_cast<QXmppShareIq::Item*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
 
+    if (role == Qt::DisplayRole)
+        return item->name();
+    else if (role == Qt::DecorationRole)
+    {
+        if (item->type() == QXmppShareIq::Item::CollectionItem)
+            return collectionIcon;
+        else
+            return fileIcon;
+    }
+    return QVariant();
 }
 
 QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &parent) const
@@ -302,6 +327,22 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     else
         parentItem = static_cast<QXmppShareIq::Item*>(parent.internalPointer());
     return parentItem->size();
+}
+
+void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
+{
+    if (shareIq.type() == QXmppIq::Result)
+    {
+/*
+        QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
+        if (!parent)
+            rootItem->clear();
+        foreach (const QXmppShareIq::Item &item, shareIq.collection().children())
+            treeWidget->addItem(item, parent);
+        if (parent)
+            parent->setExpanded(true);
+*/
+    }
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)

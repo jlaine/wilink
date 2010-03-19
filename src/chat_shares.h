@@ -43,14 +43,22 @@ class ChatSharesModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    ChatSharesModel(QObject *parent = 0);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
+private slots:
+    void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);
+
 private:
     QXmppShareIq::Item *rootItem;
+
+    QIcon collectionIcon;
+    QIcon fileIcon;
+    QIcon peerIcon;
 };
 
 class ChatSharesView : public QTreeWidget
