@@ -183,7 +183,7 @@ void SearchThread::run()
         if (!browse(responseIq.collection(), requestIq.base()))
         {
             qWarning() << "Browse failed";
-            responseIq.collection().clear();
+            responseIq.collection().clearChildren();
             responseIq.setType(QXmppIq::Error);
             emit searchFinished(responseIq);
             return;
@@ -193,7 +193,7 @@ void SearchThread::run()
         if (!search(responseIq.collection(), queryString))
         {
             qWarning() << "Search" << queryString << "failed";
-            responseIq.collection().clear();
+            responseIq.collection().clearChildren();
             responseIq.setType(QXmppIq::Error);
             emit searchFinished(responseIq);
             return;
