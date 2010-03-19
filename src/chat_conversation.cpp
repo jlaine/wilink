@@ -77,6 +77,7 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
 
     /* start inactivity timer */
     inactiveTimer->start();
+    setRemoteState(QXmppMessage::None);
 }
 
 void ChatConversation::join()
