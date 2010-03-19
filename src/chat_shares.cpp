@@ -273,6 +273,18 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role == Qt::DisplayRole)
+    {
+        if (section == NameColumn)
+            return tr("Name");
+        else if (section == SizeColumn)
+            return tr("Size");
+    }
+    return QVariant();
+}
+
 QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
@@ -339,20 +351,6 @@ ChatSharesView::ChatSharesView(QWidget *parent)
     setColumnWidth(SizeColumn, 80);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
-
-    /* load icons */
-    QFileIconProvider iconProvider;
-    collectionIcon = iconProvider.icon(QFileIconProvider::Folder);
-    fileIcon = iconProvider.icon(QFileIconProvider::File);
-    peerIcon = iconProvider.icon(QFileIconProvider::Network);
-
-    /* set header names */
-#if 0
-    QTreeWidgetItem *headerItem = new QTreeWidgetItem;
-    headerItem->setText(NameColumn, tr("Name"));
-    headerItem->setText(SizeColumn, tr("Size"));
-    setHeaderItem(headerItem);
-#endif
 }
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)
