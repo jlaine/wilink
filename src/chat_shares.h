@@ -48,6 +48,9 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+private:
+    QXmppShareIq::Item *rootItem;
 };
 
 class ChatSharesView : public QTreeWidget
