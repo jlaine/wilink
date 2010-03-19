@@ -166,7 +166,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         qWarning() << "No mirror for item" << item->name();
         return; 
     }
-    const QXmppShareIq::Mirror mirror = item->mirrors().first();
+    const QXmppShareMirror mirror = item->mirrors().first();
 
     if (item->type() == QXmppShareItem::FileItem)
     {

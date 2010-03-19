@@ -158,7 +158,7 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     file.setFileHash(cachedHash);
     file.setFileSize(cachedSize);
 
-    QXmppShareIq::Mirror mirror(requestIq.to());
+    QXmppShareMirror mirror(requestIq.to());
     mirror.setPath(path);
     file.setMirrors(mirror);
 
@@ -173,7 +173,7 @@ void SearchThread::run()
     responseIq.setTag(requestIq.tag());
 
     // determine query type
-    QXmppShareIq::Mirror mirror;
+    QXmppShareMirror mirror;
     mirror.setJid(requestIq.to());
     mirror.setPath(requestIq.base());
     responseIq.collection().setMirrors(mirror);
@@ -250,7 +250,7 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
             subDirs.append(dirName);
 
             QXmppShareItem &collection = rootCollection.mkpath(dirName);
-            QXmppShareIq::Mirror mirror(requestIq.to());
+            QXmppShareMirror mirror(requestIq.to());
             mirror.setPath(prefix + dirName + "/");
             collection.setMirrors(mirror);
         }
