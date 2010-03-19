@@ -189,74 +189,84 @@ void SearchThread::run()
     mirror.setJid(requestIq.to());
     mirror.setPath(requestIq.base());
     responseIq.collection().setMirrors(mirror);
+
+    // clean input
+    QString basePrefix = requestIq.base();
+    if (!basePrefix.isEmpty() && !basePrefix.endsWith("/"))
+        basePrefix += "/";
     const QString queryString = requestIq.search().trimmed();
-    if (queryString.isEmpty())
+    if (queryString.contains("\\"))
     {
-        if (!browse(responseIq.collection(), requestIq.base()))
-        {
-            qWarning() << "Browse failed";
-            responseIq.collection().clearChildren();
-            responseIq.setType(QXmppIq::Error);
-            emit searchFinished(responseIq);
-            return;
-        }
-    } else {
-        // perform search
-        if (!search(responseIq.collection(), queryString))
-        {
-            qWarning() << "Search" << queryString << "failed";
-            responseIq.collection().clearChildren();
-            responseIq.setType(QXmppIq::Error);
-            emit searchFinished(responseIq);
-            return;
-        }
+        qWarning() << "Received an invalid search" << queryString;
+        responseIq.collection().clearChildren();
+        responseIq.setType(QXmppIq::Error);
+        emit searchFinished(responseIq);
+        return;
     }
+
+    // perform query
+    search(responseIq.collection(), basePrefix, queryString);
 
     // send response
     responseIq.setType(QXmppIq::Result);
     emit searchFinished(responseIq);
 }
 
-bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
+void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString)
 {
     QTime t;
     t.start();
 
-    QString basePrefix = base;
-    if (!basePrefix.isEmpty() && !basePrefix.endsWith("/"))
-        basePrefix += "/";
-
-    QString sql("SELECT path, size, hash FROM files");
-    if (!basePrefix.isEmpty())
-        sql += " WHERE path LIKE :search ESCAPE :escape";
-    sql += " ORDER BY path";
-    QSqlQuery query(sql, sharesDb);
-
-    if (!basePrefix.isEmpty())
+    // prepare SQL query
+    QString like;
+    if (!queryString.isEmpty())
     {
-        QString like = basePrefix;
+        like = queryString;
+        like.replace("%", "\\%");
+        like.replace("_", "\\_");
+        like = "%" + like + "%";
+    }
+    else if (!basePrefix.isEmpty())
+    {
+        like = basePrefix;
         like.replace("%", "\\%");
         like.replace("_", "\\_");
         like += "%";
+    }
+
+    QString sql("SELECT path, size, hash FROM files");
+    if (!like.isEmpty())
+        sql += " WHERE path LIKE :search ESCAPE :escape";
+    sql += " ORDER BY path";
+    QSqlQuery query(sql, sharesDb);
+    if (!like.isEmpty())
+    {
         query.bindValue(":search", like);
         query.bindValue(":escape", "\\");
     }
+
+    // store results
     query.exec();
-
-    storeResults(rootCollection, query, basePrefix);
-    return true;
-}
-
-void SearchThread::storeResults(QXmppShareItem &rootCollection, QSqlQuery &query, const QString basePrefix)
-{
-    QTime t;
-    t.start();
-
     QStringList subDirs;
     while (query.next())
     {
         const QString path = query.value(0).toString();
-        const QString prefix = basePrefix;
+
+        QString prefix;
+        if (!queryString.isEmpty())
+        {
+            int matchIndex = path.indexOf(queryString, 0, Qt::CaseInsensitive);
+            if (matchIndex < 0)
+            {
+                qDebug() << "Could not find" << queryString << "in" << path;
+                continue;
+            }
+            int slashIndex = path.lastIndexOf("/", matchIndex);
+            if (slashIndex >= 0)
+                prefix = path.left(slashIndex + 1);
+        } else {
+            prefix = basePrefix;
+        }
 
         // find the depth at which we matched
         const QString relativePath = path.mid(prefix.size());
@@ -283,71 +293,6 @@ void SearchThread::storeResults(QXmppShareItem &rootCollection, QSqlQuery &query
         if (t.elapsed() > SEARCH_MAX_TIME)
             break;
     }
-    qDebug() << "Browsed" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
-}
-
-bool SearchThread::search(QXmppShareItem &rootCollection, const QString &queryString)
-{
-    QTime t;
-    t.start();
-
-    if (queryString.contains("/") ||
-        queryString.contains("\\"))
-    {
-        qWarning() << "Received an invalid search" << queryString;
-        return false;
-    }
-
-    // perform search
-    QString like = queryString;
-    like.replace("%", "\\%");
-    like.replace("_", "\\_");
-    like = "%" + like + "%";
-    QSqlQuery query("SELECT path, size, hash FROM files WHERE path LIKE :search ESCAPE :escape ORDER BY path", sharesDb);
-    query.bindValue(":search", like);
-    query.bindValue(":escape", "\\");
-    query.exec();
-
-    QStringList subDirs;
-    while (query.next())
-    {
-        const QString path = query.value(0).toString();
-
-        int matchIndex = path.indexOf(queryString, 0, Qt::CaseInsensitive);
-        if (matchIndex < 0)
-        {
-            qDebug() << "Could not find" << queryString << "in" << path;
-            continue;
-        }
-        int slashIndex = path.lastIndexOf("/", matchIndex);
-        const QString prefix = (slashIndex >= 0) ? path.left(slashIndex + 1) : "";
-
-        // find the depth at which we matched
-        const QString relativePath = path.mid(prefix.size());
-        if (relativePath.count("/") == 0)
-        {
-            // update file info
-            QXmppShareItem file(QXmppShareItem::FileItem);
-            if (updateFile(file, query))
-                rootCollection.appendChild(file);
-        } else {
-            const QString dirName = relativePath.split("/").first();
-            if (subDirs.contains(dirName))
-                continue;
-            subDirs.append(dirName);
-
-            QXmppShareItem &collection = rootCollection.mkpath(dirName);
-            QXmppShareMirror mirror(requestIq.to());
-            mirror.setPath(prefix + dirName + "/");
-            collection.setMirrors(mirror);
-        }
-
-        // limit maximum search time to 15s
-        if (t.elapsed() > SEARCH_MAX_TIME)
-            break;
-    }
-
     qDebug() << "Found" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
-    return true;
 }
 

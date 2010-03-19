@@ -66,9 +66,7 @@ signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
 private:
-    bool browse(QXmppShareItem &rootCollection, const QString &base);
-    bool search(QXmppShareItem &rootCollection, const QString &queryString);
-    void storeResults(QXmppShareItem &rootCollection, QSqlQuery &query, const QString basePrefix);
+    void search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString);
     bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery);
 
     QXmppShareSearchIq requestIq;
