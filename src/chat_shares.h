@@ -22,7 +22,7 @@
 
 #include <QDir>
 #include <QIcon>
-#include <QTreeWidget>
+#include <QTreeView>
 
 #include "qxmpp/QXmppShareIq.h"
 
@@ -33,8 +33,6 @@ class ChatSharesDatabase;
 class QLineEdit;
 class QListWidget;
 class QStackedWidget;
-class QTreeWidget;
-class QTreeWidgetItem;
 class QTimer;
 class QXmppPacket;
 
@@ -61,15 +59,17 @@ private:
     QIcon peerIcon;
 };
 
-class ChatSharesView : public QTreeWidget
+class ChatSharesView : public QTreeView
 {
     Q_OBJECT
 
 public:
     ChatSharesView(QWidget *parent = 0);
+#if 0
     qint64 addItem(const QXmppShareIq::Item &item, QTreeWidgetItem *parent);
     void clear();
     QTreeWidgetItem *findItem(const QXmppShareIq::Item &item, QTreeWidgetItem *parent);
+#endif
 
 protected:
     void resizeEvent(QResizeEvent *e);
@@ -94,7 +94,7 @@ signals:
 private slots:
     void goBack();
     void findRemoteFiles();
-    void itemDoubleClicked(QTreeWidgetItem *item);
+    void itemDoubleClicked(const QModelIndex &index);
     void registerWithServer();
     void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &share);

@@ -53,12 +53,6 @@ enum Roles
     PathRole,
 };
 
-enum Types
-{
-    CollectionType = 0,
-    FileType = 1,
-};
-
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
@@ -80,8 +74,12 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     layout->addWidget(lineEdit);
 
+    /* create model / view */
+    ChatSharesModel *model = new ChatSharesModel;
+    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), model, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     treeWidget = new ChatSharesView;
-    connect(treeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(itemDoubleClicked(QTreeWidgetItem*)));
+    treeWidget->setModel(model);
+    connect(treeWidget, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
     layout->addWidget(treeWidget);
 
     setLayout(layout);
@@ -146,6 +144,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     }
 
     lineEdit->setEnabled(true);
+#if 0
     if (shareIq.type() == QXmppIq::Result)
     {
         QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
@@ -156,6 +155,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         if (parent)
             parent->setExpanded(true);
     }
+#endif
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
@@ -176,44 +176,44 @@ void ChatShares::findRemoteFiles()
     client->sendPacket(iq);
 }
 
-void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
+void ChatShares::itemDoubleClicked(const QModelIndex &index)
 {
-    const QString jid = item->data(NameColumn, MirrorRole).toString();
-    const QString path = item->data(NameColumn, PathRole).toString();
-    if (jid.isEmpty())
+    QXmppShareIq::Item *item = static_cast<QXmppShareIq::Item*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return;
+
+    if (item->mirrors().isEmpty())
     {
-        qWarning() << "No mirror for item" << item->text(NameColumn);
+        qWarning() << "No mirror for item" << item->name();
         return; 
     }
+    const QXmppShareIq::Mirror mirror = item->mirrors().first();
 
-    int type = item->data(NameColumn, TypeRole).toInt();
-    if (type == FileType)
+    if (item->type() == QXmppShareIq::Item::FileItem)
     {
-        if (path.isEmpty())
+        if (mirror.path().isEmpty())
         {
-            qWarning() << "No path for file" << item->text(NameColumn);
+            qWarning() << "No path for file" << item->name();
             return;
         }
 
         // request file
         QXmppShareGetIq iq;
-        iq.setTo(jid);
+        iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
-        iq.file().setName(item->text(NameColumn));
-        iq.file().setFileHash(item->data(NameColumn, HashRole).toByteArray());
-        iq.file().setFileSize(item->data(NameColumn, SizeRole).toInt());
+        iq.file() = *item;
         qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
         client->sendPacket(iq);
     }
-    else if (type == CollectionType && !item->childCount())
+    else if (item->type() == QXmppShareIq::Item::CollectionItem && !item->size())
     {
         lineEdit->setEnabled(false);
 
         // browse files
         QXmppShareSearchIq iq;
-        iq.setTo(jid);
+        iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
-        iq.setBase(path);
+        iq.setBase(mirror.path());
         client->sendPacket(iq);
     }
 }
@@ -333,6 +333,9 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
     {
+        foreach (const QXmppShareIq::Item &child, shareIq.collection().children())
+            rootItem->appendChild(child);
+        reset();
 /*
         QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
         if (!parent)
@@ -346,11 +349,8 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)
-    : QTreeWidget(parent)
+    : QTreeView(parent)
 {
-    ChatSharesModel *model = new ChatSharesModel;
-
-    setColumnCount(MaxColumn);
     setColumnWidth(SizeColumn, 80);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
@@ -362,9 +362,10 @@ ChatSharesView::ChatSharesView(QWidget *parent)
     peerIcon = iconProvider.icon(QFileIconProvider::Network);
 
     /* set header names */
-    clear();
+    //clear();
 }
 
+#if 0
 qint64 ChatSharesView::addItem(const QXmppShareIq::Item &file, QTreeWidgetItem *parent)
 {
     QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(this);
@@ -432,10 +433,11 @@ QTreeWidgetItem *ChatSharesView::findItem(const QXmppShareIq::Item &collection, 
     }
     return 0;
 }
+#endif
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)
 {
-    QTreeWidget::resizeEvent(e);
+    QTreeView::resizeEvent(e);
     setColumnWidth(NameColumn, e->size().width() - 80);
 }
 
