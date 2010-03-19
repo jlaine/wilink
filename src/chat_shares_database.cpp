@@ -32,7 +32,7 @@
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
-#define SEARCH_MAX_TIME 15000
+#define SEARCH_MAX_TIME 5000
 #define HASH_MAX_SIZE 1024 * 1024
 
 ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
