@@ -144,18 +144,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     }
 
     lineEdit->setEnabled(true);
-#if 0
-    if (shareIq.type() == QXmppIq::Result)
-    {
-        QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
-        if (!parent)
-            treeWidget->clear();
-        foreach (const QXmppShareIq::Item &item, shareIq.collection().children())
-            treeWidget->addItem(item, parent);
-        if (parent)
-            parent->setExpanded(true);
-    }
-#endif
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
@@ -342,8 +330,6 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         QTreeWidgetItem *parent = treeWidget->findItem(shareIq.collection(), 0);
         if (!parent)
             rootItem->clear();
-        foreach (const QXmppShareIq::Item &item, shareIq.collection().children())
-            treeWidget->addItem(item, parent);
         if (parent)
             parent->setExpanded(true);
 */
@@ -368,41 +354,6 @@ ChatSharesView::ChatSharesView(QWidget *parent)
 }
 
 #if 0
-qint64 ChatSharesView::addItem(const QXmppShareIq::Item &file, QTreeWidgetItem *parent)
-{
-    QTreeWidgetItem *fileItem = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem(this);
-    fileItem->setData(NameColumn, HashRole, file.fileHash());
-    fileItem->setData(NameColumn, SizeRole, file.fileSize());
-
-    /* FIXME : we are only using the first mirror */
-    bool isPeer = false;
-    if (!file.mirrors().isEmpty())
-    {
-        QXmppShareIq::Mirror mirror = file.mirrors().first();
-        fileItem->setData(NameColumn, MirrorRole, mirror.jid());
-        fileItem->setData(NameColumn, PathRole, mirror.path());
-        if (mirror.path().isEmpty())
-            isPeer = true;
-    }
-
-    fileItem->setText(NameColumn, file.name());
-    if (file.type() == QXmppShareIq::Item::CollectionItem)
-    {
-        fileItem->setData(NameColumn, TypeRole, CollectionType);
-        fileItem->setIcon(NameColumn, isPeer ? peerIcon : collectionIcon);
-    } else {
-        fileItem->setData(NameColumn, TypeRole, FileType);
-        fileItem->setIcon(NameColumn, fileIcon);
-    }
-
-    /* calculate size */
-    qint64 collectionSize = file.fileSize();
-    foreach (const QXmppShareIq::Item &child, file.children())
-        collectionSize += addItem(child, fileItem);
-    fileItem->setText(SizeColumn, ChatTransfers::sizeToString(collectionSize));
-    return collectionSize;
-}
-
 void ChatSharesView::clear()
 {
     QTreeWidget::clear();
