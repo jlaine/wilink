@@ -84,10 +84,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
 }
 
-void ChatShares::goBack()
-{
-}
-
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
 #if 0

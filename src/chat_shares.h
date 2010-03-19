@@ -86,7 +86,6 @@ signals:
     void fileExpected(const QString &sid);
 
 private slots:
-    void goBack();
     void findRemoteFiles();
     void itemDoubleClicked(const QModelIndex &index);
     void itemReceived(const QModelIndex &index);
