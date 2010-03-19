@@ -195,17 +195,14 @@ void ChatShares::itemDoubleClicked(QTreeWidgetItem *item)
             return;
         }
 
-        QXmppShareIq::Item file(QXmppShareIq::Item::FileItem);
-        file.setName(item->text(NameColumn));
-        file.setFileHash(item->data(NameColumn, HashRole).toByteArray());
-        file.setFileSize(item->data(NameColumn, SizeRole).toInt());
-
         // request file
-        qDebug() << "Requesting" << file.name() << "from" << jid;
         QXmppShareGetIq iq;
         iq.setTo(jid);
         iq.setType(QXmppIq::Get);
-        iq.setFile(file);
+        iq.file().setName(item->text(NameColumn));
+        iq.file().setFileHash(item->data(NameColumn, HashRole).toByteArray());
+        iq.file().setFileSize(item->data(NameColumn, SizeRole).toInt());
+        qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
         client->sendPacket(iq);
     }
     else if (type == CollectionType && !item->childCount())
