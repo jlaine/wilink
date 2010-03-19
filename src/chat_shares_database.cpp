@@ -243,6 +243,15 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
     }
     query.exec();
 
+    storeResults(rootCollection, query, basePrefix);
+    return true;
+}
+
+void SearchThread::storeResults(QXmppShareItem &rootCollection, QSqlQuery &query, const QString basePrefix)
+{
+    QTime t;
+    t.start();
+
     QStringList subDirs;
     while (query.next())
     {
@@ -275,7 +284,6 @@ bool SearchThread::browse(QXmppShareItem &rootCollection, const QString &base)
             break;
     }
     qDebug() << "Browsed" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
-    return true;
 }
 
 bool SearchThread::search(QXmppShareItem &rootCollection, const QString &queryString)
