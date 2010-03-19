@@ -300,26 +300,29 @@ bool SearchThread::search(QXmppShareItem &rootCollection, const QString &querySt
     {
         const QString path = query.value(0).toString();
 
-        // find the depth at which we matched
-        QString matchString;
-        QRegExp subdirRe(".*(([^/]+)/[^/]+)/[^/]+");
-        QRegExp dirRe(".*([^/]+)/[^/]+");
-        QRegExp fileRe(".*([^/]+)");
-        if (subdirRe.exactMatch(path) && subdirRe.cap(2).contains(queryString, Qt::CaseInsensitive))
-            matchString = subdirRe.cap(1);
-        else if (dirRe.exactMatch(path) && dirRe.cap(1).contains(queryString, Qt::CaseInsensitive))
-            matchString = subdirRe.cap(1); 
-        else if (fileRe.exactMatch(path) && fileRe.cap(1).contains(queryString, Qt::CaseInsensitive))
-            matchString = "";
-        else
+        int matchIndex = path.indexOf(queryString, 0, Qt::CaseInsensitive);
+        if (matchIndex < 0)
+        {
+            qDebug() << "Could not find" << queryString << "in" << path;
             continue;
+        }
+        int slashIndex = path.lastIndexOf("/", matchIndex);
+        const QString relativePath = path.mid(slashIndex + 1);
+        const QString prefix = (slashIndex >= 0) ? path.left(slashIndex + 1) : "";
+
+        // find the depth at which we matched
+        QString dirName;
+        if (relativePath.contains("/"))
+            dirName = relativePath.left(relativePath.lastIndexOf("/"));
+        else
+            dirName = "";
 
         // update file info
         QXmppShareItem file(QXmppShareItem::FileItem);
         if (updateFile(file, query))
         {
             // add file to the appropriate collection
-            rootCollection.mkpath(matchString).appendChild(file);
+            rootCollection.mkpath(dirName).appendChild(file);
             searchCount++;
         }
 
