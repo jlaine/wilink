@@ -225,16 +225,19 @@ Acceptez-vous?</translation>
         <translation>Saisissez le nom du fichier que vous cherchez.</translation>
     </message>
     <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+</context>
+<context>
+    <name>ChatSharesModel</name>
+    <message>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
         <source>Size</source>
         <translation>Taille</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
     </message>
 </context>
 <context>
@@ -339,6 +342,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Loading image..</source>
         <translation>Chargement de l&apos;image..</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>Downloads</source>
+        <translation>Téléchargements</translation>
+    </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
     </message>
 </context>
 <context>
