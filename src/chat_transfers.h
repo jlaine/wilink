@@ -29,6 +29,8 @@
 class QPushButton;
 class QTableWidget;
 class QXmppClient;
+class QXmppShareItem;
+class QXmppShareGetIq;
 
 const int LocalPathRole = Qt::UserRole;
 
@@ -56,11 +58,9 @@ class ChatTransfers : public ChatPanel
 
 public:
     ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
+    void getFile(const QXmppShareItem &file);
     void sendFile(const QString &fullJid);
     static QString sizeToString(qint64 size);
-
-public slots:
-    void fileExpected(const QString &sid);
 
 protected:
     QSize sizeHint() const;
@@ -76,6 +76,7 @@ private slots:
     void finished();
     void progress(qint64, qint64);
     void removeCurrentJob();
+    void shareGetIqReceived(const QXmppShareGetIq &shareIq);
     void stateChanged(QXmppTransferJob::State state);
     void updateButtons();
 

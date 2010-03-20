@@ -97,6 +97,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         responseIq.setId(shareIq.id());
         responseIq.setTo(shareIq.from());
         responseIq.setType(QXmppIq::Result);
+        responseIq.setFile(shareIq.file());
 
         // check path is OK
         QString filePath = db->locate(shareIq.file());
@@ -110,16 +111,10 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         responseIq.setSid(generateStanzaHash());
         client->sendPacket(responseIq);
 
-        // send files
-        qDebug() << "Sending" << shareIq.file().name() << "to" << shareIq.from();
-        QXmppTransferJob *job = client->getTransferManager().sendFile(shareIq.from(), filePath, responseIq.sid());
+        // send file
+        qDebug() << "Sending" << responseIq.file().name() << "to" << responseIq.to();
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
-    }
-    else if (shareIq.type() == QXmppIq::Result)
-    {
-        // expect file
-        qDebug() << "Expecting file transfer" << shareIq.sid();
-        emit fileExpected(shareIq.sid());
     }
 }
 

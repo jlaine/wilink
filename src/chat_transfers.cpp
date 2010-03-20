@@ -34,6 +34,7 @@
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppUtils.h"
+#include "qxmpp/QXmppShareIq.h"
 
 #include "chat_transfers.h"
 #include "systeminfo.h"
@@ -246,11 +247,6 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
     job->abort();
 }
 
-void ChatTransfers::fileExpected(const QString &sid)
-{
-    expected.append(sid);
-}
-
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
     if (expected.contains(job->sid()))
@@ -267,6 +263,24 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(fileAccepted(QXmppTransferJob*)));
     connect(dlg, SIGNAL(fileDeclined(QXmppTransferJob*)), this, SLOT(fileDeclined(QXmppTransferJob*)));
     dlg->show();
+}
+
+void ChatTransfers::getFile(const QXmppShareItem &file)
+{
+    if (file.mirrors().isEmpty())
+    {
+        qWarning() << "No mirror for file" << file.name();
+        return; 
+    }
+    const QXmppShareMirror mirror = file.mirrors().first();
+
+    // request file
+    QXmppShareGetIq iq;
+    iq.setTo(mirror.jid());
+    iq.setType(QXmppIq::Get);
+    iq.setFile(file);
+    qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
+    client->sendPacket(iq);
 }
 
 void ChatTransfers::progress(qint64 done, qint64 total)
@@ -320,6 +334,20 @@ void ChatTransfers::sendFile(const QString &fullJid)
     QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
     job->setData(LocalPathRole, filePath);
     addJob(job);
+}
+
+void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
+{
+    if (shareIq.type() == QXmppIq::Result)
+    {
+        // expect file
+        qDebug() << "Expecting file transfer" << shareIq.sid();
+        expected.append(shareIq.sid());
+    }
+    else if (shareIq.type() == QXmppIq::Error)
+    {
+        qWarning() << "Error requesting file" << shareIq.file().name();
+    }
 }
 
 QSize ChatTransfers::sizeHint() const
