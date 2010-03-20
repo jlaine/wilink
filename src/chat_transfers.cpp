@@ -92,6 +92,8 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient)
 {
+    downloadQueue = new QXmppShareItem(QXmppShareItem::CollectionItem);
+
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
 
@@ -148,6 +150,11 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
+}
+
+ChatTransfers::~ChatTransfers()
+{
+    delete downloadQueue;
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)

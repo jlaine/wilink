@@ -22,7 +22,7 @@
 
 #include <QMessageBox>
 
-#include "qxmpp/QXmppTransferManager.h"
+#include "qxmpp/QXmppShareIq.h"
 
 #include "chat_panel.h"
 
@@ -58,6 +58,7 @@ class ChatTransfers : public ChatPanel
 
 public:
     ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
+    ~ChatTransfers();
     void sendFile(const QString &fullJid);
     static QString sizeToString(qint64 size);
 
@@ -83,6 +84,7 @@ private slots:
     void updateButtons();
 
 private:
+    QXmppShareItem *downloadQueue;
     QPushButton *removeButton;
     QTableWidget *tableWidget;
     QList<QString> expected;
