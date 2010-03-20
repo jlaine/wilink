@@ -71,8 +71,6 @@ using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
 
-static qint64 fileSizeLimit = 10000000; // 10 MB
-
 enum StatusIndexes {
     AvailableIndex = 0,
     BusyIndex = 1,
@@ -153,7 +151,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up transfers window */
     client->getTransferManager().setSupportedMethods(
         QXmppTransferJob::SocksMethod);
-    chatTransfers = new ChatTransfers;
+    chatTransfers = new ChatTransfers(&client->getTransferManager());
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
@@ -237,8 +235,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
-            chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), this);
@@ -803,30 +799,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         {
             // find first resource supporting file transfer
             QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-            if (!fullJids.size())
-                return;
-            QString fullJid = fullJids.first();
-
-            // get file name
-            QString filePath = QFileDialog::getOpenFileName(this, tr("Send a file"));
-            if (filePath.isEmpty())
-                return;
-
-            // check file size
-            if (QFileInfo(filePath).size() > fileSizeLimit)
-            {
-                QMessageBox::warning(this,
-                    tr("Send a file"),
-                    tr("Sorry, but you cannot send files bigger than %1.")
-                        .arg(ChatTransfers::sizeToString(fileSizeLimit)));
-                return;
-            }
-
-            // send file
-            QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
-            job->setData(LocalPathRole, filePath);
-            chatTransfers->addJob(job);
-        }
+            if (fullJids.size())
+                chatTransfers->sendFile(fullJids.first());
+       }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
             joinConversation(jid, true);

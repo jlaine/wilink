@@ -35,14 +35,6 @@
         <source>Offline</source>
         <translation>Déconnecté</translation>
     </message>
-    <message>
-        <source>Send a file</source>
-        <translation>Envoyer un fichier</translation>
-    </message>
-    <message>
-        <source>Sorry, but you cannot send files bigger than %1.</source>
-        <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
-    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -280,6 +272,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>Send a file</source>
+        <translation>Envoyer un fichier</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot send files bigger than %1.</source>
+        <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
     </message>
 </context>
 <context>

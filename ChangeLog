@@ -1,6 +1,7 @@
-wDesktop 0.7.901 (UNRELEASED)
+wDesktop 0.7.902 (UNRELEASED)
  * Improve file transfer support.
  * Add file sharing application.
+ * Change the default download directory to "Downloads" on Windows.
 
 wDesktop 0.7.0 (2010-03-10)
  * Add support for chat state notifications.

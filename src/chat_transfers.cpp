@@ -41,6 +41,8 @@
 #define MEGABYTE 1000000
 #define GIGABYTE 1000000000
 
+static qint64 fileSizeLimit = 10000000; // 10 MB
+
 enum TransfersColumns {
     NameColumn,
     ProgressColumn,
@@ -72,7 +74,9 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
     setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     setDefaultButton(QMessageBox::NoButton);
 
-    connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
+    /* connect signals */
+    connect(this, SIGNAL(buttonClicked(QAbstractButton*)),
+        this, SLOT(slotButtonClicked(QAbstractButton*)));
 }
 
 void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
@@ -83,8 +87,8 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
         emit fileDeclined(m_job);
 }
 
-ChatTransfers::ChatTransfers(QWidget *parent)
-    : ChatPanel(parent)
+ChatTransfers::ChatTransfers(QXmppTransferManager *manager, QWidget *parent)
+    : ChatPanel(parent), transferManager(manager)
 {
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
@@ -137,6 +141,10 @@ ChatTransfers::ChatTransfers(QWidget *parent)
 
     setLayout(layout);
     updateButtons();
+
+    /* connect signals */
+    connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
+        this, SLOT(fileReceived(QXmppTransferJob*)));
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
@@ -288,6 +296,29 @@ void ChatTransfers::removeCurrentJob()
     } else {
         jobs.at(jobRow)->abort();
     }
+}
+
+void ChatTransfers::sendFile(const QString &fullJid)
+{
+    // get file name
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Send a file"));
+    if (filePath.isEmpty())
+        return;
+
+    // check file size
+    if (QFileInfo(filePath).size() > fileSizeLimit)
+    {
+        QMessageBox::warning(this,
+            tr("Send a file"),
+            tr("Sorry, but you cannot send files bigger than %1.")
+                .arg(ChatTransfers::sizeToString(fileSizeLimit)));
+        return;
+    }
+
+    // send file
+    QXmppTransferJob *job = transferManager->sendFile(fullJid, filePath);
+    job->setData(LocalPathRole, filePath);
+    addJob(job);
 }
 
 QSize ChatTransfers::sizeHint() const

@@ -54,8 +54,9 @@ class ChatTransfers : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatTransfers(QWidget *parent = 0);
+    ChatTransfers(QXmppTransferManager *manager, QWidget *parent = 0);
     void addJob(QXmppTransferJob *job);
+    void sendFile(const QString &fullJid);
     static QString sizeToString(qint64 size);
 
 public slots:
@@ -80,6 +81,7 @@ private:
     QTableWidget *tableWidget;
     QList<QString> expected;
     QList<QXmppTransferJob*> jobs;
+    QXmppTransferManager *transferManager;
 };
 
 #endif
