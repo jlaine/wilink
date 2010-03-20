@@ -102,8 +102,12 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     layout->addWidget(helpLabel);
 
     /* download location label */
-    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in the '%1' folder.")
-        .arg(SystemInfo::displayName(SystemInfo::DownloadsLocation)));
+    const QString downloadsLink = QString("<a href=\"file://%1\">%2</a>").arg(
+        SystemInfo::storageLocation(SystemInfo::DownloadsLocation),
+        SystemInfo::displayName(SystemInfo::DownloadsLocation));
+    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder.")
+        .arg(downloadsLink));
+    downloadsLabel->setOpenExternalLinks(true);
     layout->addWidget(downloadsLabel);
 
     /* transfers list */
