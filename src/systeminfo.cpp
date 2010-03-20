@@ -23,15 +23,30 @@
 
 #include "systeminfo.h"
 
-QString SystemInfo::downloadsLocation()
+QString SystemInfo::displayName(SystemInfo::StorageLocation type)
 {
-    QDir downloads(QDir::home().filePath("Downloads"));
-    if (downloads.exists())
-        return downloads.absolutePath();
-#ifdef Q_OS_WIN
-    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-#endif
-    return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    if (type == SystemInfo::DownloadsLocation)
+        return QObject::tr("Downloads");
+    else if (type == SystemInfo::SharesLocation)
+        return QObject::tr("Shares");
+}
+
+QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
+{
+    if (type == SystemInfo::DownloadsLocation)
+    {
+        QDir downloads(QDir::home().filePath("Downloads"));
+        if (downloads.exists())
+            return downloads.absolutePath();
+    #ifdef Q_OS_WIN
+        return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+    #endif
+        return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    }
+    else if (type == SystemInfo::SharesLocation)
+    {
+        return QDir::home().filePath("Public");
+    }
 }
 
 QString SystemInfo::osName()

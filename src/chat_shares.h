@@ -20,7 +20,6 @@
 #ifndef __WDESKTOP_CHAT_SHARES_H__
 #define __WDESKTOP_CHAT_SHARES_H__
 
-#include <QDir>
 #include <QIcon>
 #include <QTreeView>
 
@@ -99,7 +98,6 @@ private slots:
 
 private:
     QString shareServer;
-    QDir sharesDir;
 
     ChatClient *client;
     ChatSharesDatabase *db;

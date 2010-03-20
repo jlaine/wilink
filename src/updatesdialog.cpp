@@ -91,7 +91,7 @@ void UpdatesDialog::updateAvailable(const Release &release)
     {
         statusLabel->setText(tr("Downloading.."));
         show();
-        updates->download(release, SystemInfo::downloadsLocation());
+        updates->download(release, SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
     }
 }
 

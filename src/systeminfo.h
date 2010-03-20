@@ -25,7 +25,14 @@
 class SystemInfo
 {
 public:
-    static QString downloadsLocation();
+    enum StorageLocation
+    {
+        DownloadsLocation,
+        SharesLocation,
+    };
+
+    static QString displayName(SystemInfo::StorageLocation);
+    static QString storageLocation(SystemInfo::StorageLocation);
 
     static QString osName();
     static QString osType();

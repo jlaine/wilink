@@ -103,7 +103,7 @@ ChatTransfers::ChatTransfers(QWidget *parent)
 
     /* download location label */
     QLabel *downloadsLabel = new QLabel(tr("Received files are stored in the '%1' folder.")
-        .arg(QFileInfo(SystemInfo::downloadsLocation()).fileName()));
+        .arg(SystemInfo::displayName(SystemInfo::DownloadsLocation)));
     layout->addWidget(downloadsLabel);
 
     /* transfers list */
@@ -195,7 +195,7 @@ void ChatTransfers::finished()
 void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
     // determine file location
-    QDir downloadsDir(SystemInfo::downloadsLocation());
+    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
 
     QString fileName = job->fileName();
     if (downloadsDir.exists(fileName))

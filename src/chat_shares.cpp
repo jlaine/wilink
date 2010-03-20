@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDir>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
@@ -36,6 +35,7 @@
 #include "chat_shares.h"
 #include "chat_shares_database.h"
 #include "chat_transfers.h"
+#include "systeminfo.h"
 
 enum Columns
 {
@@ -53,7 +53,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setWindowTitle(tr("Shares"));
 
     qRegisterMetaType<QXmppShareSearchIq>("QXmppShareSearchIq");
-    sharesDir = QDir(QDir::home().filePath("Public"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -219,7 +218,7 @@ void ChatShares::setShareServer(const QString &server)
 
     if (!db)
     {
-        db = new ChatSharesDatabase(sharesDir.path(), this);
+        db = new ChatSharesDatabase(SystemInfo::storageLocation(SystemInfo::SharesLocation), this);
         connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SLOT(searchFinished(const QXmppShareSearchIq&)));
     }
     model->setShareServer(server);
