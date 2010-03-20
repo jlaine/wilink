@@ -40,7 +40,7 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
 {
     // prepare database
     sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-    sharesDb.setDatabaseName("/tmp/shares.db");
+    sharesDb.setDatabaseName(":memory:");
     Q_ASSERT(sharesDb.open());
     sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
