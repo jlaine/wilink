@@ -36,6 +36,7 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtSql4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
