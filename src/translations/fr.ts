@@ -278,8 +278,8 @@ Acceptez-vous?</translation>
         <translation>La fonctionalité transfert de fichiers est expérimentale et la vitesse de transfert est limitée pour ne pas perturber votre connexion internet.</translation>
     </message>
     <message>
-        <source>Received files are stored in your %1 folder.</source>
-        <translation>Les fichiers reçus sont stockés dans votre dossier %1.</translation>
+        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Lorsqu'un fichier est reçu, double cliquez le pour l'ouvrir.</translation>
     </message>
 </context>
 <context>

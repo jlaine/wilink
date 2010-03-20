@@ -105,7 +105,7 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     const QString downloadsLink = QString("<a href=\"file://%1\">%2</a>").arg(
         SystemInfo::storageLocation(SystemInfo::DownloadsLocation),
         SystemInfo::displayName(SystemInfo::DownloadsLocation));
-    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder.")
+    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.")
         .arg(downloadsLink));
     downloadsLabel->setOpenExternalLinks(true);
     layout->addWidget(downloadsLabel);
