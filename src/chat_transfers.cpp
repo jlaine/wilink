@@ -108,6 +108,7 @@ ChatTransfers::ChatTransfers(QWidget *parent)
     QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.")
         .arg(downloadsLink));
     downloadsLabel->setOpenExternalLinks(true);
+    downloadsLabel->setWordWrap(true);
     layout->addWidget(downloadsLabel);
 
     /* transfers list */
