@@ -161,6 +161,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatShares->setObjectName("shares");
     connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
+    connect(chatShares, SIGNAL(fileRequested(const QXmppShareItem&)), chatTransfers, SLOT(getFile(const QXmppShareItem&)));
 
     /* build splitter */
     splitter = new QSplitter;

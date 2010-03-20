@@ -267,12 +267,22 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
 void ChatTransfers::getFile(const QXmppShareItem &file)
 {
-    if (file.mirrors().isEmpty())
+    // pick mirror
+    QXmppShareMirror mirror;
+    bool mirrorFound = false;
+    foreach (mirror, file.mirrors())
     {
-        qWarning() << "No mirror for file" << file.name();
-        return; 
+        if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
+        {
+            mirrorFound = true;
+            break;
+        }
     }
-    const QXmppShareMirror mirror = file.mirrors().first();
+    if (!mirrorFound)
+    {
+        qWarning() << "No mirror found for file" << file.name();
+        return;
+    }
 
     // request file
     QXmppShareGetIq iq;

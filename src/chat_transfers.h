@@ -58,9 +58,11 @@ class ChatTransfers : public ChatPanel
 
 public:
     ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
-    void getFile(const QXmppShareItem &file);
     void sendFile(const QString &fullJid);
     static QString sizeToString(qint64 size);
+
+public slots:
+    void getFile(const QXmppShareItem &file);
 
 protected:
     QSize sizeHint() const;

@@ -83,6 +83,9 @@ public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     void setShareServer(const QString &server);
 
+signals:
+    void fileRequested(const QXmppShareItem &file);
+
 private slots:
     void findRemoteFiles();
     void itemDoubleClicked(const QModelIndex &index);

@@ -158,19 +158,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
 
     if (item->type() == QXmppShareItem::FileItem)
     {
-        if (mirror.path().isEmpty())
-        {
-            qWarning() << "No path for file" << item->name();
-            return;
-        }
-
-        // request file
-        QXmppShareGetIq iq;
-        iq.setTo(mirror.jid());
-        iq.setType(QXmppIq::Get);
-        iq.setFile(*item);
-        qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
-        client->sendPacket(iq);
+        emit fileRequested(*item);
     }
     else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
     {
