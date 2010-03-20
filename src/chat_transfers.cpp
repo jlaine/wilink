@@ -145,6 +145,7 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     updateButtons();
 
     /* connect signals */
+    connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
 }
@@ -289,7 +290,7 @@ void ChatTransfers::getFile(const QXmppShareItem &file)
     iq.setTo(mirror.jid());
     iq.setType(QXmppIq::Get);
     iq.setFile(file);
-    qDebug() << "Requesting" << iq.file().name() << "from" << iq.to();
+    qDebug() << "Requesting file" << iq.file().name() << "from" << iq.to();
     client->sendPacket(iq);
 }
 
@@ -351,12 +352,12 @@ void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
     if (shareIq.type() == QXmppIq::Result)
     {
         // expect file
-        qDebug() << "Expecting file transfer" << shareIq.sid();
+        qDebug() << "Expecting file" << shareIq.file().name() << "from" << shareIq.from();
         expected.append(shareIq.sid());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
-        qWarning() << "Error requesting file" << shareIq.file().name();
+        qWarning() << "Error requesting file" << shareIq.file().name() << "from" << shareIq.from();
     }
 }
 
