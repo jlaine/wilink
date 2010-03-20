@@ -226,6 +226,11 @@ ChatSharesModel::ChatSharesModel(QObject *parent)
     peerIcon = iconProvider.icon(QFileIconProvider::Network);
 }
 
+ChatSharesModel::~ChatSharesModel()
+{
+    delete rootItem;
+}
+
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
