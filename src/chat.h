@@ -111,7 +111,6 @@ private:
 
     QPushButton *addButton;
     QPushButton *roomButton;
-    QPushButton *sharesButton;
     ChatConsole *chatConsole;
     ChatShares *chatShares;
     ChatTransfers *chatTransfers;

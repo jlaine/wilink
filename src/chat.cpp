@@ -200,12 +200,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(roomButton, SIGNAL(clicked()), this, SLOT(addRoom()));
     hbox->addWidget(roomButton);
 
-    sharesButton = new QPushButton;
-    sharesButton->setVisible(false);
-    sharesButton->setIcon(QIcon(":/album.png"));
-    connect(sharesButton, SIGNAL(clicked()), chatShares, SIGNAL(showTab()));
-    hbox->addWidget(sharesButton);
-
     hbox->addStretch();
 
     statusCombo = new QComboBox;
@@ -237,9 +231,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), this);
-    connect(shortcut, SIGNAL(activated()), chatShares, SIGNAL(showTab()));
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
     connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showTab()));
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), this);
     connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showTab()));
@@ -508,7 +500,10 @@ void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
                      id.type() == "file")
             {
                 chatShares->setShareServer(disco.from());
-                sharesButton->setVisible(true);
+                rosterModel->addItem(ChatRosterItem::Other,
+                    chatShares->objectName(),
+                    chatShares->windowTitle(),
+                    chatShares->windowIcon());
                 qDebug() << "Found share server" << disco.from();
             }
         }
