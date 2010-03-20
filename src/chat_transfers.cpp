@@ -32,6 +32,7 @@
 #include <QTableWidgetItem>
 #include <QUrl>
 
+#include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat_transfers.h"
@@ -87,8 +88,8 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
         emit fileDeclined(m_job);
 }
 
-ChatTransfers::ChatTransfers(QXmppTransferManager *manager, QWidget *parent)
-    : ChatPanel(parent), transferManager(manager)
+ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
+    : ChatPanel(parent), client(xmppClient)
 {
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
@@ -143,7 +144,7 @@ ChatTransfers::ChatTransfers(QXmppTransferManager *manager, QWidget *parent)
     updateButtons();
 
     /* connect signals */
-    connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
+    connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
 }
 
@@ -316,7 +317,7 @@ void ChatTransfers::sendFile(const QString &fullJid)
     }
 
     // send file
-    QXmppTransferJob *job = transferManager->sendFile(fullJid, filePath);
+    QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
     job->setData(LocalPathRole, filePath);
     addJob(job);
 }

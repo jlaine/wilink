@@ -28,6 +28,7 @@
 
 class QPushButton;
 class QTableWidget;
+class QXmppClient;
 
 const int LocalPathRole = Qt::UserRole;
 
@@ -54,7 +55,7 @@ class ChatTransfers : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatTransfers(QXmppTransferManager *manager, QWidget *parent = 0);
+    ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
     void sendFile(const QString &fullJid);
     static QString sizeToString(qint64 size);
 
@@ -83,7 +84,7 @@ private:
     QTableWidget *tableWidget;
     QList<QString> expected;
     QList<QXmppTransferJob*> jobs;
-    QXmppTransferManager *transferManager;
+    QXmppClient *client;
 };
 
 #endif

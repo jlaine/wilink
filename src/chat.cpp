@@ -151,7 +151,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up transfers window */
     client->getTransferManager().setSupportedMethods(
         QXmppTransferJob::SocksMethod);
-    chatTransfers = new ChatTransfers(&client->getTransferManager());
+    chatTransfers = new ChatTransfers(client);
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
