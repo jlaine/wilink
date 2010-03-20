@@ -25,11 +25,9 @@
 
 QString SystemInfo::downloadsLocation()
 {
-#ifdef Q_OS_MAC
     QDir downloads(QDir::home().filePath("Downloads"));
     if (downloads.exists())
         return downloads.absolutePath();
-#endif
 #ifdef Q_OS_WIN
     return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
 #endif
