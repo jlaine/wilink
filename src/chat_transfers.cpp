@@ -295,6 +295,8 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
 void ChatTransfers::getFile(const QXmppShareItem &file)
 {
+    if (file.type() == QXmppShareItem::CollectionItem && !file.size())
+        return;
     queueModel->addItem(file);
     processDownloadQueue();
 }
