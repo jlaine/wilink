@@ -233,7 +233,7 @@ void ChatTransfers::finished()
 void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
     // remove item from queue
-    QXmppShareItem *queueItem = queueModel->findItemByData(StreamId, job->sid());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
     if (queueItem)
         queueModel->removeItem(queueItem);
 
@@ -277,7 +277,7 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
 
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
-    QXmppShareItem *queueItem = queueModel->findItemByData(StreamId, job->sid());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
     if (queueItem)
     {
         fileAccepted(job);
@@ -314,7 +314,7 @@ void ChatTransfers::processDownloadQueue()
     }
 
     // find next item
-    QXmppShareItem *file = queueModel->findItemByData(PacketId, QVariant());
+    QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
     if (!file)
         return;
 
@@ -400,7 +400,7 @@ void ChatTransfers::sendFile(const QString &fullJid)
 
 void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
-    QXmppShareItem *queueItem = queueModel->findItemByData(PacketId, shareIq.id());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, shareIq.id());
     if (!queueItem)
         return;
 

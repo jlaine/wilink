@@ -50,12 +50,15 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     void addItem(const QXmppShareItem &item);
-    QXmppShareItem *findItemByData(int role, const QVariant &value);
+    QXmppShareItem *findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
     void setShareServer(const QString &server);
 
 signals:
     void itemReceived(const QModelIndex &index);
+
+private:
+    QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent);
 
 private slots:
     void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);

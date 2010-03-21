@@ -264,7 +264,7 @@ ChatSharesModel::~ChatSharesModel()
 
 void ChatSharesModel::addItem(const QXmppShareItem &item)
 {
-    if (rootItem->findChild(item.mirrors()))
+    if (findItemByMirrors(item.mirrors(), rootItem))
         return;
 
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
@@ -302,9 +302,50 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-QXmppShareItem *ChatSharesModel::findItemByData(int role, const QVariant &value)
+QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent)
 {
-    return rootItem->findChildByData(role, value);
+    if (!parent)
+        parent = rootItem;
+
+    // recurse
+    QXmppShareItem *child;
+    for (int i = 0; i < parent->size(); i++)
+        if ((child = findItemByData(type, role, data, parent->child(i))) != 0)
+            return child;
+
+    // look at immediate children
+    for (int i = 0; i < parent->size(); i++)
+    {
+        child = parent->child(i);
+        if (child->type() == type && child->data(role) == data)
+            return child;
+    }
+    return 0;
+}
+
+QXmppShareItem *ChatSharesModel::findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent)
+{
+    if (mirrors.isEmpty())
+        return 0;
+
+    // look at immediate children
+    QXmppShareItem *child;
+    foreach (const QXmppShareMirror &mirror, mirrors)
+    {
+        for (int i = 0; i < parent->size(); i++)
+        {
+            child = parent->child(i);
+            if (child->mirrors().contains(mirror))
+                return child;
+        }
+    }
+
+    // recurse
+    for (int i = 0; i < parent->size(); i++)
+        if ((child = findItemByMirrors(mirrors, parent->child(i))) != 0)
+            return child;
+
+    return 0;
 }
 
 QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -381,7 +422,7 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
     {
-        QXmppShareItem *parentItem = rootItem->findChild(shareIq.collection().mirrors());
+        QXmppShareItem *parentItem = findItemByMirrors(shareIq.collection().mirrors(), rootItem);
         if (parentItem)
         {
             if (parentItem->size())
