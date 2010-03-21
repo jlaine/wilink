@@ -236,10 +236,9 @@ void ChatSharesModel::addItem(const QXmppShareItem &item)
     if (rootItem->findChild(item.mirrors()))
         return;
 
-    //beginInsertRows(createIndex(0, 0, rootItem), rootItem->size(), rootItem->size());
+    beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
     rootItem->appendChild(item);
-    //endInsertRows();
-    reset();
+    endInsertRows();
 }
 
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
