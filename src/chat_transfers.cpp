@@ -240,7 +240,7 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
     {
         job->setData(LocalPathRole, filePath);
 
-        // show transfer window
+        // add transfer to list
         addJob(job);
 
         // start transfer

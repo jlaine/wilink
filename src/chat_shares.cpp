@@ -336,15 +336,15 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
             if (shareIq.collection().size())
             {
                 beginInsertRows(createIndex(parentItem->row(), 0, parentItem), 0, shareIq.collection().size());
-                foreach (const QXmppShareItem &child, shareIq.collection().children())
-                    parentItem->appendChild(child);
+                for (int i = 0; i < shareIq.collection().size(); i++)
+                    parentItem->appendChild(*shareIq.collection().child(i));
                 endInsertRows();
             }
             emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
         } else if (shareIq.from() == shareServer) {
             rootItem->clearChildren();
-            foreach (const QXmppShareItem &child, shareIq.collection().children())
-                rootItem->appendChild(child);
+            for (int i = 0; i < shareIq.collection().size(); i++)
+                rootItem->appendChild(*shareIq.collection().child(i));
             emit reset();
         }
     }
