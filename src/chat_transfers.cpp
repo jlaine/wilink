@@ -52,6 +52,11 @@ enum TransfersColumns {
     MaxColumn,
 };
 
+enum DataRoles {
+    PacketId,
+    StreamId,
+};
+
 static QIcon jobIcon(QXmppTransferJob *job)
 {
     if (job->state() == QXmppTransferJob::FinishedState)
@@ -257,9 +262,9 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
 
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
-    if (expected.contains(job->sid()))
+    QXmppShareItem *queueItem = downloadQueue->findChildByData(StreamId, job->sid());
+    if (queueItem)
     {
-        expected.removeAll(job->sid());
         fileAccepted(job);
         return;
     }
@@ -275,10 +280,25 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
 void ChatTransfers::getFile(const QXmppShareItem &file)
 {
+    if (downloadQueue->findChild(file.mirrors()))
+        return;
+
+    downloadQueue->appendChild(file);
+    processDownloadQueue();
+}
+
+void ChatTransfers::processDownloadQueue()
+{
+    if (!downloadQueue->size())
+        return;
+
+    // find next item
+    QXmppShareItem *file = downloadQueue->findChildByData(PacketId, QVariant());
+
     // pick mirror
     QXmppShareMirror mirror;
     bool mirrorFound = false;
-    foreach (mirror, file.mirrors())
+    foreach (mirror, file->mirrors())
     {
         if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
         {
@@ -288,7 +308,7 @@ void ChatTransfers::getFile(const QXmppShareItem &file)
     }
     if (!mirrorFound)
     {
-        qWarning() << "No mirror found for file" << file.name();
+        qWarning() << "No mirror found for file" << file->name();
         return;
     }
 
@@ -296,14 +316,10 @@ void ChatTransfers::getFile(const QXmppShareItem &file)
     QXmppShareGetIq iq;
     iq.setTo(mirror.jid());
     iq.setType(QXmppIq::Get);
-    iq.setFile(file);
+    iq.setFile(*file);
     qDebug() << "Requesting file" << iq.file().name() << "from" << iq.to();
+    file->setData(PacketId, iq.id());
     client->sendPacket(iq);
-}
-
-void ChatTransfers::processDownloadQueue()
-{
-
 }
 
 void ChatTransfers::progress(qint64 done, qint64 total)
@@ -361,11 +377,15 @@ void ChatTransfers::sendFile(const QString &fullJid)
 
 void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
+    QXmppShareItem *queueItem = downloadQueue->findChildByData(PacketId, shareIq.id());
+    if (!queueItem)
+        return;
+
     if (shareIq.type() == QXmppIq::Result)
     {
         // expect file
         qDebug() << "Expecting file" << shareIq.file().name() << "from" << shareIq.from();
-        expected.append(shareIq.sid());
+        queueItem->setData(StreamId, shareIq.sid());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {

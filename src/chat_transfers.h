@@ -88,7 +88,6 @@ private:
     QXmppShareItem *downloadQueue;
     QPushButton *removeButton;
     QTableWidget *tableWidget;
-    QList<QString> expected;
     QList<QXmppTransferJob*> jobs;
     QXmppClient *client;
 };
