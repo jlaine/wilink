@@ -36,6 +36,7 @@
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppShareIq.h"
 
+#include "chat_shares.h"
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
@@ -44,6 +45,7 @@
 #define GIGABYTE 1000000000
 
 static qint64 fileSizeLimit = 10000000; // 10 MB
+static int parallelDownloadLimit = 1;
 
 enum TransfersColumns {
     NameColumn,
@@ -97,8 +99,6 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient)
 {
-    downloadQueue = new QXmppShareItem(QXmppShareItem::CollectionItem);
-
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
 
@@ -139,6 +139,14 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
     layout->addWidget(tableWidget);
 
+    /* download queue */
+    queueModel = new ChatSharesModel(this);
+    queueView = new ChatSharesView;
+    queueView->setModel(queueModel);
+    //queueView->hide();
+    layout->addWidget(queueView);
+
+
     /* buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
@@ -159,7 +167,6 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
 
 ChatTransfers::~ChatTransfers()
 {
-    delete downloadQueue;
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
@@ -209,6 +216,9 @@ void ChatTransfers::cellDoubleClicked(int row, int column)
 
 void ChatTransfers::finished()
 {
+    processDownloadQueue();
+
+    // find the job that completed
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     int jobRow = jobs.indexOf(job);
     if (!job || jobRow < 0)
@@ -262,7 +272,7 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
 
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
-    QXmppShareItem *queueItem = downloadQueue->findChildByData(StreamId, job->sid());
+    QXmppShareItem *queueItem = queueModel->findItemByData(StreamId, job->sid());
     if (queueItem)
     {
         fileAccepted(job);
@@ -280,20 +290,28 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
 void ChatTransfers::getFile(const QXmppShareItem &file)
 {
-    if (downloadQueue->findChild(file.mirrors()))
-        return;
-
-    downloadQueue->appendChild(file);
+    queueModel->addItem(file);
     processDownloadQueue();
 }
 
 void ChatTransfers::processDownloadQueue()
 {
-    if (!downloadQueue->size())
+    // check how many downloads are active
+    int activeDownloads = 0;
+    for (int i = 0; i < jobs.size(); i++)
+        if (jobs[i]->direction() == QXmppTransferJob::IncomingDirection &&
+            jobs[i]->state() != QXmppTransferJob::FinishedState)
+            activeDownloads++;
+    if (activeDownloads >= parallelDownloadLimit)
+    {
+        qDebug() << "Too many active downloads, deferring job";
         return;
+    }
 
     // find next item
-    QXmppShareItem *file = downloadQueue->findChildByData(PacketId, QVariant());
+    QXmppShareItem *file = queueModel->findItemByData(PacketId, QVariant());
+    if (!file)
+        return;
 
     // pick mirror
     QXmppShareMirror mirror;
@@ -377,7 +395,7 @@ void ChatTransfers::sendFile(const QString &fullJid)
 
 void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
-    QXmppShareItem *queueItem = downloadQueue->findChildByData(PacketId, shareIq.id());
+    QXmppShareItem *queueItem = queueModel->findItemByData(PacketId, shareIq.id());
     if (!queueItem)
         return;
 

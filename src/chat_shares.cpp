@@ -231,6 +231,17 @@ ChatSharesModel::~ChatSharesModel()
     delete rootItem;
 }
 
+void ChatSharesModel::addItem(const QXmppShareItem &item)
+{
+    if (rootItem->findChild(item.mirrors()))
+        return;
+
+    //beginInsertRows(createIndex(0, 0, rootItem), rootItem->size(), rootItem->size());
+    rootItem->appendChild(item);
+    //endInsertRows();
+    reset();
+}
+
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
@@ -259,6 +270,11 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
             return fileIcon;
     }
     return QVariant();
+}
+
+QXmppShareItem *ChatSharesModel::findItemByData(int role, const QVariant &value)
+{
+    return rootItem->findChildByData(role, value);
 }
 
 QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, int role) const

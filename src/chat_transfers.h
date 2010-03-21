@@ -26,6 +26,8 @@
 
 #include "chat_panel.h"
 
+class ChatSharesModel;
+class ChatSharesView;
 class QPushButton;
 class QTableWidget;
 class QXmppClient;
@@ -85,7 +87,8 @@ private slots:
     void updateButtons();
 
 private:
-    QXmppShareItem *downloadQueue;
+    ChatSharesModel *queueModel;
+    ChatSharesView *queueView;
     QPushButton *removeButton;
     QTableWidget *tableWidget;
     QList<QXmppTransferJob*> jobs;
