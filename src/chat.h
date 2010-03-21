@@ -93,6 +93,7 @@ protected slots:
 
     void closePanel();
     void notifyPanel();
+    void registerPanel();
     void showPanel();
 
     void hideConversation();

@@ -41,6 +41,7 @@ protected:
 signals:
     void closeTab();
     void notifyTab();
+    void registerTab();
     void showTab();
 
 private:

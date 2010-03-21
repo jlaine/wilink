@@ -183,7 +183,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
 
-    emit showTab();
+    emit registerTab();
 }
 
 void ChatTransfers::cellDoubleClicked(int row, int column)
@@ -301,6 +301,11 @@ void ChatTransfers::getFile(const QXmppShareItem &file)
     client->sendPacket(iq);
 }
 
+void ChatTransfers::processDownloadQueue()
+{
+
+}
+
 void ChatTransfers::progress(qint64 done, qint64 total)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
@@ -376,9 +381,9 @@ QSize ChatTransfers::sizeHint() const
 QString ChatTransfers::sizeToString(qint64 size)
 {
     if (size < KILOBYTE)
-        return QString::fromUtf8("%1 B").arg(size);
+        return QString::fromUtf8("%1 B").arg(size);
     else if (size < MEGABYTE)
-        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
     else if (size < GIGABYTE)
         return QString::fromUtf8("%1 MB").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
     else

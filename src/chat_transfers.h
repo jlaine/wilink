@@ -77,6 +77,7 @@ private slots:
     void fileReceived(QXmppTransferJob *job);
     void cellDoubleClicked(int row, int column);
     void finished();
+    void processDownloadQueue();
     void progress(qint64, qint64);
     void removeCurrentJob();
     void shareGetIqReceived(const QXmppShareGetIq &shareIq);

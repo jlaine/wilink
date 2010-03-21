@@ -154,6 +154,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     chatTransfers = new ChatTransfers(client);
     chatTransfers->setObjectName("transfers");
     connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
+    connect(chatTransfers, SIGNAL(registerTab()), this, SLOT(registerPanel()));
     connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
 
     /* set up shares */
@@ -343,6 +344,19 @@ void Chat::removePanel(QWidget *panel)
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
     conversationPanel->removeWidget(panel);
+}
+
+/** Register a panel in the roster list.
+  */
+void Chat::registerPanel()
+{
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (!panel)
+        return;
+    rosterModel->addItem(ChatRosterItem::Other,
+        panel->objectName(),
+        panel->windowTitle(),
+        panel->windowIcon());
 }
 
 /** Show a panel.
