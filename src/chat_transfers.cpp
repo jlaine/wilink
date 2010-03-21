@@ -330,42 +330,42 @@ void ChatTransfers::processDownloadQueue()
         if (jobs[i]->direction() == QXmppTransferJob::IncomingDirection &&
             jobs[i]->state() != QXmppTransferJob::FinishedState)
             activeDownloads++;
-    if (activeDownloads >= parallelDownloadLimit)
-    {
-        qDebug() << "Too many active downloads, deferring job";
-        return;
-    }
 
-    // find next item
-    QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
-    if (!file)
-        return;
-
-    // pick mirror
-    QXmppShareMirror mirror;
-    bool mirrorFound = false;
-    foreach (mirror, file->mirrors())
+    while (activeDownloads < parallelDownloadLimit)
     {
-        if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
+        // find next item
+        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
+        if (!file)
+            return;
+
+        // pick mirror
+        QXmppShareMirror mirror;
+        bool mirrorFound = false;
+        foreach (mirror, file->mirrors())
         {
-            mirrorFound = true;
-            break;
+            if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
+            {
+                mirrorFound = true;
+                break;
+            }
         }
-    }
-    if (!mirrorFound)
-    {
-        qWarning() << "No mirror found for file" << file->name();
-        return;
-    }
+        if (!mirrorFound)
+        {
+            qWarning() << "No mirror found for file" << file->name();
+            return;
+        }
 
-    // request file
-    QXmppShareGetIq iq;
-    iq.setTo(mirror.jid());
-    iq.setType(QXmppIq::Get);
-    iq.setFile(*file);
-    qDebug() << "Requesting file" << iq.file().name() << "from" << iq.to();
-    file->setData(PacketId, iq.id());
-    client->sendPacket(iq);
+        // request file
+        QXmppShareGetIq iq;
+        iq.setTo(mirror.jid());
+        iq.setType(QXmppIq::Get);
+        iq.setFile(*file);
+        qDebug() << "Requesting file" << iq.file().name() << "from" << iq.to();
+        file->setData(PacketId, iq.id());
+        client->sendPacket(iq);
+
+        activeDownloads++;
+    }
 }
 
 void ChatTransfers::progress(qint64 done, qint64 total)
