@@ -35,9 +35,13 @@ QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
 {
     if (type == SystemInfo::DownloadsLocation)
     {
-        QDir downloads(QDir::home().filePath("Downloads"));
-        if (downloads.exists())
-            return downloads.absolutePath();
+        QStringList dirNames = QStringList() << "Downloads" << "Download";
+        foreach (const QString &dirName, dirNames)
+        {
+            QDir downloads(QDir::home().filePath(dirName));
+            if (downloads.exists())
+                return downloads.absolutePath();
+        }
     #ifdef Q_OS_WIN
         return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
     #endif

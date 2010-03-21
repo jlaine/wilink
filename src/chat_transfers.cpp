@@ -232,23 +232,42 @@ void ChatTransfers::finished()
 
 void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
-    // remove item from queue
+    QStringList pathBits;
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
     if (queueItem)
     {
+        // find full path
+        QXmppShareItem *parentItem = queueItem->parent();
+        while (parentItem && parentItem->parent())
+        {
+            // sanitize path
+            QString dirName = parentItem->name();
+            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
+                pathBits.append(dirName);
+            parentItem = parentItem->parent();
+        }
+
+        // find uppermost item to remove
         while (1)
         {
-            QXmppShareItem *parent = queueItem->parent();
-            if (!parent || !parent->parent() || parent->size() > 1)
+            parentItem = queueItem->parent();
+            if (!parentItem || !parentItem->parent() || parentItem->size() > 1)
+            {
+                queueModel->removeItem(queueItem);
                 break;
-            qDebug() << "going up to" << parent->name();
-            queueItem = parent;
+            }
+            queueItem = parentItem;
         }
-        queueModel->removeItem(queueItem);
     }
 
     // determine file location
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
+    if (pathBits.size() > 0)
+    {
+        QString subdir = pathBits.join("/");
+        if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
+            downloadsDir.setPath(downloadsDir.filePath(subdir));
+    }
 
     QString fileName = job->fileName();
     if (downloadsDir.exists(fileName))
@@ -276,6 +295,7 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
         // start transfer
         job->accept(file);
     } else {
+        qWarning() << "Could not write to" << filePath;
         job->abort();
     }
 }
