@@ -45,7 +45,7 @@
 #define GIGABYTE 1000000000
 
 static qint64 fileSizeLimit = 10000000; // 10 MB
-static int parallelDownloadLimit = 1;
+static int parallelDownloadLimit = 2;
 
 enum TransfersColumns {
     NameColumn,
