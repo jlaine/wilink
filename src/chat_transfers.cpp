@@ -243,7 +243,7 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
             // sanitize path
             QString dirName = parentItem->name();
             if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
-                pathBits.append(dirName);
+                pathBits.prepend(dirName);
             parentItem = parentItem->parent();
         }
 
