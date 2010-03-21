@@ -320,6 +320,17 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
+void ChatSharesModel::removeItem(QXmppShareItem *item)
+{
+    QXmppShareItem *parentItem = item->parent();
+    if (parentItem == rootItem)
+    {
+        beginRemoveRows(QModelIndex(), item->row(), item->row());
+        rootItem->removeChild(item);
+        endRemoveRows();
+    }
+}
+
 int ChatSharesModel::rowCount(const QModelIndex &parent) const
 {
     QXmppShareItem *parentItem;

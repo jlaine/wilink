@@ -51,6 +51,7 @@ public:
 
     void addItem(const QXmppShareItem &item);
     QXmppShareItem *findItemByData(int role, const QVariant &value);
+    void removeItem(QXmppShareItem *item);
     void setShareServer(const QString &server);
 
 signals:

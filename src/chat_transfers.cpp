@@ -232,6 +232,11 @@ void ChatTransfers::finished()
 
 void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
+    // remove item from queue
+    QXmppShareItem *queueItem = queueModel->findItemByData(StreamId, job->sid());
+    if (queueItem)
+        queueModel->removeItem(queueItem);
+
     // determine file location
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
 
