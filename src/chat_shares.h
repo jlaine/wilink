@@ -76,7 +76,11 @@ class ChatSharesView : public QTreeView
 public:
     ChatSharesView(QWidget *parent = 0);
 
+signals:
+    void contextMenu(const QModelIndex &index, const QPoint &globalPos);
+
 protected:
+    void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);
 };
 
@@ -93,6 +97,8 @@ signals:
 
 private slots:
     void findRemoteFiles();
+    void itemAction();
+    void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
     void itemReceived(const QModelIndex &index);
     void registerWithServer();

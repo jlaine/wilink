@@ -220,6 +220,10 @@ Acceptez-vous?</translation>
         <source>Shares</source>
         <translation>Partages</translation>
     </message>
+    <message>
+        <source>Download</source>
+        <translation>Télécharger</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>

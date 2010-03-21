@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QMenu>
 #include <QResizeEvent>
 #include <QStackedWidget>
 #include <QStringList>
@@ -36,6 +37,11 @@
 #include "chat_shares_database.h"
 #include "chat_transfers.h"
 #include "systeminfo.h"
+
+enum Actions
+{
+    DownloadAction,
+};
 
 enum Columns
 {
@@ -71,6 +77,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(model, SIGNAL(itemReceived(const QModelIndex&)), this, SLOT(itemReceived(const QModelIndex&)));
     treeWidget = new ChatSharesView;
     treeWidget->setModel(model);
+    connect(treeWidget, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(treeWidget, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
     layout->addWidget(treeWidget);
 
@@ -141,6 +148,30 @@ void ChatShares::findRemoteFiles()
     iq.setType(QXmppIq::Get);
     iq.setSearch(search);
     client->sendPacket(iq);
+}
+
+void ChatShares::itemAction()
+{
+    QAction *action = static_cast<QAction*>(sender());
+    QModelIndex index = treeWidget->currentIndex();
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+    if (!action || !index.isValid() || !item)
+        return;
+
+    if (action->data() == DownloadAction)
+    {
+        emit fileRequested(*item);
+    }
+}
+void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalPos)
+{
+    QMenu *menu = new QMenu(this);
+
+    QAction *action = menu->addAction(tr("Download"));
+    action->setData(DownloadAction);
+    connect(action, SIGNAL(triggered()), this, SLOT(itemAction()));
+
+    menu->popup(globalPos);
 }
 
 void ChatShares::itemDoubleClicked(const QModelIndex &index)
@@ -382,6 +413,15 @@ ChatSharesView::ChatSharesView(QWidget *parent)
     setColumnWidth(SizeColumn, 80);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
+}
+
+void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
+{
+    const QModelIndex &index = currentIndex();
+    if (!index.isValid())
+        return;
+
+    emit contextMenu(index, event->globalPos());
 }
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)
