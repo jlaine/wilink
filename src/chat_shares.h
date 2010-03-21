@@ -51,6 +51,7 @@ public:
 
     void addItem(const QXmppShareItem &item);
     QXmppShareItem *findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent = 0);
+    void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
     void setShareServer(const QString &server);
 

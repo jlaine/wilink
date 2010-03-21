@@ -247,17 +247,9 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
             parentItem = parentItem->parent();
         }
 
-        // find uppermost item to remove
-        while (1)
-        {
-            parentItem = queueItem->parent();
-            if (!parentItem || !parentItem->parent() || parentItem->size() > 1)
-            {
-                queueModel->removeItem(queueItem);
-                break;
-            }
-            queueItem = parentItem;
-        }
+        // remove from queue
+        queueModel->removeItem(queueItem);
+        queueModel->pruneEmptyChildren();
     }
 
     // determine file location
@@ -325,9 +317,8 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
 void ChatTransfers::getFile(const QXmppShareItem &file)
 {
-    if (file.type() == QXmppShareItem::CollectionItem && !file.size())
-        return;
     queueModel->addItem(file);
+    queueModel->pruneEmptyChildren();
     processDownloadQueue();
 }
 

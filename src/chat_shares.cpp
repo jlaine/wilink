@@ -392,6 +392,24 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
+void ChatSharesModel::pruneEmptyChildren(QXmppShareItem *parent)
+{
+    if (!parent)
+        parent = rootItem;
+
+    // recurse
+    for (int i = 0; i < parent->size(); i++)
+        pruneEmptyChildren(parent->child(i));
+
+    // look at immediate children
+    for (int i = parent->size() - 1; i >= 0; i--)
+    {
+        QXmppShareItem *child = parent->child(i);
+        if (child->type() == QXmppShareItem::CollectionItem && !child->size())
+            removeItem(child);
+    }
+}
+
 void ChatSharesModel::removeItem(QXmppShareItem *item)
 {
     if (!item || item == rootItem)
