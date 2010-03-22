@@ -247,7 +247,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
 
     // store results
     query.exec();
-    QStringList subDirs;
+    QMap<QString, QXmppShareItem*> subDirs;
     while (query.next())
     {
         const QString path = query.value(0).toString();
@@ -269,29 +269,44 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         }
 
         // find the depth at which we matched
-        const QString relativePath = path.mid(prefix.size());
-        if (relativePath.count("/") == 0)
+        QStringList relativeBits = path.mid(prefix.size()).split("/");
+        if (!relativeBits.size())
+        {
+            qWarning("Query returned an empty path");
+            continue;
+        }
+        relativeBits.removeLast();
+
+        const int maxDepth = 1;
+        QXmppShareItem *parentCollection = &rootCollection;
+        QString dirPath;
+        for (int i = 0; i < qMin(maxDepth, relativeBits.size()); i++)
+        {
+            const QString dirName = relativeBits[i];
+            if (!dirPath.isEmpty())
+                dirPath += "/";
+            dirPath += dirName;
+
+            if (!subDirs.contains(dirPath))
+            {
+                QXmppShareItem collection(QXmppShareItem::CollectionItem);
+                collection.setName(dirName);
+                QXmppShareMirror mirror(requestIq.to());
+                mirror.setPath(prefix + dirPath + "/");
+                collection.setMirrors(mirror);
+                subDirs[dirPath] = parentCollection->appendChild(collection);
+            }
+            parentCollection = subDirs[dirPath];
+        }
+
+        if (relativeBits.size() < maxDepth)
         {
             // update file info
             QXmppShareItem file(QXmppShareItem::FileItem);
             if (updateFile(file, query))
-                rootCollection.appendChild(file);
+                parentCollection->appendChild(file);
         }
-        else
-        {
-            // add first level directory
-            const QString dirName = relativePath.split("/").first();
-            if (subDirs.contains(dirName))
-                continue;
-            subDirs.append(dirName);
 
-            QXmppShareItem collection(QXmppShareItem::CollectionItem);
-            collection.setName(dirName);
-            QXmppShareMirror mirror(requestIq.to());
-            mirror.setPath(prefix + dirName + "/");
-            collection.setMirrors(mirror);
-            rootCollection.appendChild(collection);
-        }
         if (t.elapsed() > SEARCH_MAX_TIME)
             break;
     }
