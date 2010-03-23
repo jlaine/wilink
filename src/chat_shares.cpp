@@ -343,6 +343,7 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
         // send file
         QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
+        job->setData(LocalPathRole, filePath);
         chatTransfers->addJob(job);
         return;
     }
