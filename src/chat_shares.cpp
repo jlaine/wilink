@@ -209,6 +209,13 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 
     if (presence.getType() == QXmppPresence::Available)
     {
+        const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
+        if (forceProxy == "1")
+        {
+            logMessage(QXmppLogger::InformationMessage, "Forcing SOCKS5 proxy");
+            client->getTransferManager().setProxyOnly(true);
+        }
+
         // browse peers
         findRemoteFiles();
         emit registerTab();
@@ -233,7 +240,6 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         ChatClient *newClient = new ChatClient(this);
         connect(&newClient->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
             chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
-        newClient->getTransferManager().setProxyOnly(true);
         newClient->setLogger(baseClient->logger());
 
         /* replace client */
