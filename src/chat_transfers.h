@@ -34,7 +34,11 @@ class QXmppClient;
 class QXmppShareItem;
 class QXmppSiPubIq;
 
-const int LocalPathRole = Qt::UserRole;
+enum JobDataRoles
+{
+    LocalPathRole = Qt::UserRole,
+    RemotePathRole,
+};
 
 class ChatTransferPrompt : public QMessageBox
 {

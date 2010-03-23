@@ -233,34 +233,17 @@ void ChatTransfers::finished()
 void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
     QStringList pathBits;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
-    if (queueItem)
-    {
-        // find full path
-        QXmppShareItem *parentItem = queueItem->parent();
-        while (parentItem && parentItem->parent())
-        {
-            // sanitize path
-            QString dirName = parentItem->name();
-            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
-                pathBits.prepend(dirName);
-            parentItem = parentItem->parent();
-        }
-
-        // remove from queue
-        queueModel->removeItem(queueItem);
-        queueModel->pruneEmptyChildren();
-    }
 
     // determine file location
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
-    if (pathBits.size() > 0)
+    const QString subdir = job->data(RemotePathRole).toString();
+    if (!subdir.isEmpty())
     {
-        QString subdir = pathBits.join("/");
         if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
             downloadsDir.setPath(downloadsDir.filePath(subdir));
     }
 
+    // determine file name
     QString fileName = job->fileName();
     if (downloadsDir.exists(fileName))
     {
@@ -302,6 +285,22 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
     if (queueItem)
     {
+        // store full path
+        QStringList pathBits;
+        QXmppShareItem *parentItem = queueItem->parent();
+        while (parentItem && parentItem->parent())
+        {
+            // sanitize path
+            QString dirName = parentItem->name();
+            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
+                pathBits.prepend(dirName);
+            parentItem = parentItem->parent();
+        }
+        job->setData(RemotePathRole, pathBits.join("/"));
+
+        // remove from queue
+        queueModel->removeItem(queueItem);
+
         fileAccepted(job);
         return;
     }
