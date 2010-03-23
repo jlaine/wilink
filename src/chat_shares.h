@@ -23,6 +23,7 @@
 #include <QIcon>
 #include <QTreeView>
 
+#include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppShareIq.h"
 
 #include "chat_panel.h"
@@ -62,7 +63,7 @@ signals:
 private:
     QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent);
 
-private slots:
+public slots:
     void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);
 
 private:
@@ -96,12 +97,11 @@ class ChatShares : public ChatPanel
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     ChatSharesModel *downloadQueue();
-
-public slots:
-    void setShareServer(const QString &server);
+    void setClient(ChatClient *client);
 
 signals:
     void fileExpected(const QString &sid, const QString path);
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
     void findRemoteFiles();
@@ -115,12 +115,14 @@ private slots:
     void queryStringChanged();
     void siPubIqReceived(const QXmppSiPubIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &share);
+    void shareServerFound(const QString &server);
     void searchFinished(const QXmppShareSearchIq &share);
 
 private:
     QString shareServer;
 
     ChatClient *client;
+    ChatClient *baseClient;
     ChatSharesDatabase *db;
     ChatSharesModel *model;
     ChatSharesModel *queueModel;

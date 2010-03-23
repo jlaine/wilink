@@ -300,7 +300,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)), this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
     connect(client, SIGNAL(mucServerFound(const QString&)), this, SLOT(mucServerFound(const QString&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(shareServerFound(const QString&)), chatShares, SLOT(setShareServer(const QString&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 

@@ -60,7 +60,7 @@ enum DataRoles {
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent), client(xmppClient), db(0)
+    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0)
 {
     queueModel = new ChatSharesModel(this);
     setWindowIcon(QIcon(":/album.png"));
@@ -94,11 +94,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer = new QTimer(this);
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
-    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
-    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), model, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
-    connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
+    setClient(baseClient);
 }
 
 ChatSharesModel *ChatShares::downloadQueue()
@@ -128,7 +124,6 @@ void ChatShares::itemAction()
     if (action->data() == DownloadAction)
     {
         // queue file download
-        qDebug() << "Adding" << item->name() << "to queue";
         queueModel->addItem(*item);
         queueModel->pruneEmptyChildren();
         processDownloadQueue();
@@ -200,7 +195,6 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
     if (shareExtension.attribute("xmlns") != ns_shares)
         return;
 
-    qDebug() << "PRESENCE FROM SERVER";
     if (presence.getType() == QXmppPresence::Available)
     {
         emit registerTab();
@@ -211,14 +205,21 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
     {
         const QString domain = shareExtension.firstChildElement("domain").value();
         const QString server = shareExtension.firstChildElement("server").value();
-        qDebug() << "GOT REDIRECT" << domain << server;
-        QXmppConfiguration config = client->getConfiguration();
+
+        logMessage(QXmppLogger::InformationMessage, "Redirecting to " + domain + "," + server);
+
+        // reconnect to another server
+        registerTimer->stop();
+
+        QXmppConfiguration config = baseClient->getConfiguration();
         config.setDomain(domain);
         config.setHost(server);
+        config.setIgnoreSslErrors(true);
 
         ChatClient *newClient = new ChatClient(this);
+        newClient->setLogger(baseClient->logger());
+        setClient(newClient);
         newClient->connectToServer(config);
-        return;
     }
 }
 
@@ -280,6 +281,19 @@ void ChatShares::registerWithServer()
     presence.setTo(shareServer);
     presence.setExtensions(x);
     client->sendPacket(presence);
+}
+
+void ChatShares::setClient(ChatClient *newClient)
+{
+    if (client && client != baseClient)
+        client->deleteLater();
+    client = newClient;
+
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
+    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+    connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
+    connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
 }
 
 void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
@@ -352,6 +366,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         db->search(shareIq);
         return;
     }
+    model->shareSearchIqReceived(shareIq);
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
@@ -359,7 +374,7 @@ void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
     client->sendPacket(iq);
 }
 
-void ChatShares::setShareServer(const QString &server)
+void ChatShares::shareServerFound(const QString &server)
 {
     shareServer = server;
 
