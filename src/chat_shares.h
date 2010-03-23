@@ -106,6 +106,7 @@ signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
+    void disconnected();
     void findRemoteFiles();
     void itemAction();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);

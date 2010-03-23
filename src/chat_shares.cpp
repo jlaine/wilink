@@ -94,12 +94,24 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer = new QTimer(this);
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
+    connect(baseClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
     setClient(baseClient);
 }
 
 ChatSharesModel *ChatShares::downloadQueue()
 {
     return queueModel;
+}
+
+void ChatShares::disconnected()
+{
+    if (client && client != baseClient)
+    {
+        shareServer = "";
+        client->disconnect();
+        client->deleteLater();
+        client = baseClient;
+    }
 }
 
 void ChatShares::findRemoteFiles()
@@ -223,6 +235,10 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
         newClient->getTransferManager().setProxyOnly(true);
         newClient->setLogger(baseClient->logger());
+
+        /* replace client */
+        if (client && client != baseClient)
+            client->deleteLater();
         setClient(newClient);
         newClient->connectToServer(config);
     }
@@ -289,8 +305,6 @@ void ChatShares::registerWithServer()
 
 void ChatShares::setClient(ChatClient *newClient)
 {
-    if (client && client != baseClient)
-        client->deleteLater();
     client = newClient;
 
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
@@ -307,11 +321,6 @@ void ChatShares::setTransfers(ChatTransfers *transfers)
 
 void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
 {
-#if 0
-    if (shareIq.from() != shareServer)
-        return;
-#endif
-
     if (shareIq.type() == QXmppIq::Get)
     {
         QXmppSiPubIq responseIq;
