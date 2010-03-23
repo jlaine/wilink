@@ -429,11 +429,12 @@ void ChatTransfers::siPubIqReceived(const QXmppSiPubIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Result)
     {
-        queueItem->setData(StreamId, shareIq.sessionId());
+        queueItem->setData(StreamId, shareIq.streamId());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
         qWarning() << "Error requesting file from" << shareIq.from();
+        queueModel->removeItem(queueItem);
     }
 }
 

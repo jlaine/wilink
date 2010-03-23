@@ -114,12 +114,12 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
             client->sendPacket(responseIq);
             return;
         }
-        responseIq.setSessionId(generateStanzaHash());
+        responseIq.setStreamId(generateStanzaHash());
         client->sendPacket(responseIq);
 
         // send file
         qDebug() << "Sending" << QFileInfo(filePath).fileName() << "to" << responseIq.to();
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sessionId());
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     }
 }

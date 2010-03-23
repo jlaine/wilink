@@ -139,7 +139,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
-    logger->setLoggingType(QXmppLogger::SIGNAL);
+    logger->setLoggingType(QXmppLogger::SignalLogging);
     client->setLogger(logger);
 
     /* set up debugging console */
