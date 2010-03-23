@@ -98,11 +98,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setClient(baseClient);
 }
 
-ChatSharesModel *ChatShares::downloadQueue()
-{
-    return queueModel;
-}
-
 void ChatShares::disconnected()
 {
     if (client && client != baseClient)
@@ -323,6 +318,7 @@ void ChatShares::setClient(ChatClient *newClient)
 void ChatShares::setTransfers(ChatTransfers *transfers)
 {
     chatTransfers = transfers;
+    chatTransfers->setQueueModel(queueModel);
 }
 
 void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)

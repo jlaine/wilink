@@ -97,7 +97,6 @@ class ChatShares : public ChatPanel
 
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
-    ChatSharesModel *downloadQueue();
     void setClient(ChatClient *client);
     void setTransfers(ChatTransfers *transfers);
 
