@@ -261,7 +261,6 @@ void ChatShares::processDownloadQueue()
         iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
         iq.setPublishId(mirror.path());
-        qDebug() << "Requesting file" << file->name() << "from" << iq.to();
         file->setData(PacketId, iq.id());
         client->sendPacket(iq);
 
@@ -333,9 +332,9 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
         client->sendPacket(responseIq);
 
         // send file
-        qDebug() << "Sending" << QFileInfo(filePath).fileName() << "to" << responseIq.to();
         QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
+        chatTransfers->addJob(job);
         return;
     }
 

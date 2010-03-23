@@ -66,6 +66,7 @@ public:
     ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
     ~ChatTransfers();
 
+    void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid);
     void setQueueModel(ChatSharesModel *model);
 
@@ -73,9 +74,6 @@ public:
 
 protected:
     QSize sizeHint() const;
-
-private:
-    void addJob(QXmppTransferJob *job);
 
 private slots:
     void fileAccepted(QXmppTransferJob *job, const QString &subdir = QString());

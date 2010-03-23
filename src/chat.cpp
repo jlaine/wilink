@@ -173,26 +173,20 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
             if (id.category() == "conference" &&
                 id.type() == "text")
             {
-                qDebug() << "Found chat room server" << disco.from();
+                logger()->log(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
                 emit mucServerFound(disco.from());
             }
             else if (id.category() == "proxy" &&
                      id.type() == "bytestreams")
             {
-                qDebug() << "Found bytestream proxy" << disco.from();
+                logger()->log(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
                 getTransferManager().setProxy(disco.from());
             }
             else if (id.category() == "store" &&
                      id.type() == "file")
             {
-                qDebug() << "Found share server" << disco.from();
+                logger()->log(QXmppLogger::InformationMessage, "Found share server " + disco.from());
                 emit shareServerFound(disco.from());
-/*
-                rosterModel->addItem(ChatRosterItem::Other,
-                    chatShares->objectName(),
-                    chatShares->windowTitle(),
-                    chatShares->windowIcon());
-*/
             }
         }
     }
