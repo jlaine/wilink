@@ -197,8 +197,8 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
             parentItem = parentItem->parent();
         }
 
-        // remove from queue
-        //queueModel->removeItem(queueItem);
+        // FIXME : is this the right place to remove from queue?
+        queueModel->removeItem(queueItem);
 
         emit fileExpected(shareIq.streamId(), pathBits.join("/"));
     }
