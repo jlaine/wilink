@@ -38,6 +38,8 @@
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
+static int parallelDownloadLimit = 2;
+
 enum Actions
 {
     DownloadAction,
@@ -50,11 +52,17 @@ enum Columns
     MaxColumn,
 };
 
+enum DataRoles {
+    PacketId,
+    StreamId,
+};
+
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient), db(0)
 {
+    queueModel = new ChatSharesModel(this);
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
@@ -91,6 +99,59 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
 }
 
+ChatSharesModel *ChatShares::downloadQueue()
+{
+    return queueModel;
+}
+
+void ChatShares::processDownloadQueue()
+{
+    // check how many downloads are active
+    int activeDownloads = 0;
+#if 0
+    for (int i = 0; i < jobs.size(); i++)
+        if (jobs[i]->direction() == QXmppTransferJob::IncomingDirection &&
+            jobs[i]->state() != QXmppTransferJob::FinishedState)
+            activeDownloads++;
+#endif
+
+    while (activeDownloads < parallelDownloadLimit)
+    {
+        // find next item
+        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
+        if (!file)
+            return;
+
+        // pick mirror
+        QXmppShareMirror mirror;
+        bool mirrorFound = false;
+        foreach (mirror, file->mirrors())
+        {
+            if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
+            {
+                mirrorFound = true;
+                break;
+            }
+        }
+        if (!mirrorFound)
+        {
+            qWarning() << "No mirror found for file" << file->name();
+            return;
+        }
+
+        // request file
+        QXmppSiPubIq iq;
+        iq.setTo(mirror.jid());
+        iq.setType(QXmppIq::Get);
+        iq.setPublishId(mirror.path());
+        qDebug() << "Requesting file" << file->name() << "from" << iq.to();
+        file->setData(PacketId, iq.id());
+        client->sendPacket(iq);
+
+        activeDownloads++;
+    }
+}
+
 void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
 {
 #if 0
@@ -121,6 +182,36 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
         qDebug() << "Sending" << QFileInfo(filePath).fileName() << "to" << responseIq.to();
         QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
+        return;
+    }
+
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, shareIq.id());
+    if (!queueItem)
+        return;
+
+    if (shareIq.type() == QXmppIq::Result)
+    {
+        // store full path
+        QStringList pathBits;
+        QXmppShareItem *parentItem = queueItem->parent();
+        while (parentItem && parentItem->parent())
+        {
+            // sanitize path
+            QString dirName = parentItem->name();
+            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
+                pathBits.prepend(dirName);
+            parentItem = parentItem->parent();
+        }
+
+        // remove from queue
+        //queueModel->removeItem(queueItem);
+
+        emit fileExpected(shareIq.streamId(), pathBits.join("/"));
+    }
+    else if (shareIq.type() == QXmppIq::Error)
+    {
+        qWarning() << "Error requesting file from" << shareIq.from();
+        queueModel->removeItem(queueItem);
     }
 }
 
@@ -159,9 +250,14 @@ void ChatShares::itemAction()
 
     if (action->data() == DownloadAction)
     {
-        emit fileRequested(*item);
+        // queue file download
+        qDebug() << "Adding" << item->name() << "to queue";
+        queueModel->addItem(*item);
+        queueModel->pruneEmptyChildren();
+        processDownloadQueue();
     }
 }
+
 void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalPos)
 {
     QMenu *menu = new QMenu(this);
@@ -188,7 +284,10 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
 
     if (item->type() == QXmppShareItem::FileItem)
     {
-        emit fileRequested(*item);
+        // queue file download
+        queueModel->addItem(*item);
+        queueModel->pruneEmptyChildren();
+        processDownloadQueue();
     }
     else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
     {

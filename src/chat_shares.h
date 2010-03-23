@@ -94,10 +94,11 @@ class ChatShares : public ChatPanel
 
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
+    ChatSharesModel *downloadQueue();
     void setShareServer(const QString &server);
 
 signals:
-    void fileRequested(const QXmppShareItem &file);
+    void fileExpected(const QString &sid, const QString path);
 
 private slots:
     void findRemoteFiles();
@@ -105,6 +106,7 @@ private slots:
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
     void itemReceived(const QModelIndex &index);
+    void processDownloadQueue();
     void registerWithServer();
     void queryStringChanged();
     void siPubIqReceived(const QXmppSiPubIq &getIq);
@@ -117,6 +119,7 @@ private:
     ChatClient *client;
     ChatSharesDatabase *db;
     ChatSharesModel *model;
+    ChatSharesModel *queueModel;
 
     QLineEdit *lineEdit;
     ChatSharesView *treeWidget;

@@ -65,11 +65,11 @@ class ChatTransfers : public ChatPanel
 public:
     ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
     ~ChatTransfers();
-    void sendFile(const QString &fullJid);
-    static QString sizeToString(qint64 size);
 
-public slots:
-    void getFile(const QXmppShareItem &file);
+    void sendFile(const QString &fullJid);
+    void setQueueModel(ChatSharesModel *model);
+
+    static QString sizeToString(qint64 size);
 
 protected:
     QSize sizeHint() const;
@@ -78,25 +78,24 @@ private:
     void addJob(QXmppTransferJob *job);
 
 private slots:
-    void fileAccepted(QXmppTransferJob *job);
+    void fileAccepted(QXmppTransferJob *job, const QString &subdir = QString());
     void fileDeclined(QXmppTransferJob *job);
+    void fileExpected(const QString &sid, const QString &path);
     void fileReceived(QXmppTransferJob *job);
     void cellDoubleClicked(int row, int column);
     void finished();
-    void processDownloadQueue();
     void progress(qint64, qint64);
     void removeCurrentJob();
-    void siPubIqReceived(const QXmppSiPubIq &shareIq);
     void stateChanged(QXmppTransferJob::State state);
     void updateButtons();
 
 private:
-    ChatSharesModel *queueModel;
     ChatSharesView *queueView;
     QPushButton *removeButton;
     QTableWidget *tableWidget;
     QList<QXmppTransferJob*> jobs;
     QXmppClient *client;
+    QHash<QString, QString> expectedStreams;
 };
 
 #endif
