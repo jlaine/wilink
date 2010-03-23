@@ -201,13 +201,24 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         return;
 
     qDebug() << "PRESENCE FROM SERVER";
-    if (presence.getType() == QXmppPresence::Error &&
+    if (presence.getType() == QXmppPresence::Available)
+    {
+        emit registerTab();
+    }
+    else if (presence.getType() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
         presence.error().condition() == QXmppStanza::Error::Redirect)
     {
         const QString domain = shareExtension.firstChildElement("domain").value();
         const QString server = shareExtension.firstChildElement("server").value();
-        qDebug() << "got redirect" << domain << server;
+        qDebug() << "GOT REDIRECT" << domain << server;
+        QXmppConfiguration config = client->getConfiguration();
+        config.setDomain(domain);
+        config.setHost(server);
+
+        ChatClient *newClient = new ChatClient(this);
+        newClient->connectToServer(config);
+        return;
     }
 }
 

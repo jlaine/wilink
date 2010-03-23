@@ -60,6 +60,13 @@ signals:
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void siPubIqReceived(const QXmppSiPubIq &iq);
     void shareSearchIqReceived(const QXmppShareSearchIq &iq);
+
+private slots:
+    void slotConnected();
+    void slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco);
+
+private:
+    QStringList discoQueue;
 };
 
 class Chat : public QWidget
