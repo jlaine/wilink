@@ -22,7 +22,7 @@
 
 #include <QMessageBox>
 
-#include "qxmpp/QXmppShareIq.h"
+#include "qxmpp/QXmppTransferManager.h"
 
 #include "chat_panel.h"
 

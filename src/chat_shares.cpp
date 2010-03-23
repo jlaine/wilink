@@ -60,7 +60,7 @@ enum DataRoles {
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0)
+    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), chatTransfers(0)
 {
     queueModel = new ChatSharesModel(this);
     setWindowIcon(QIcon(":/album.png"));
@@ -197,6 +197,8 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 
     if (presence.getType() == QXmppPresence::Available)
     {
+        // browse peers
+        findRemoteFiles();
         emit registerTab();
     }
     else if (presence.getType() == QXmppPresence::Error &&
@@ -217,6 +219,9 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         config.setIgnoreSslErrors(true);
 
         ChatClient *newClient = new ChatClient(this);
+        connect(&newClient->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+            chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
+        newClient->getTransferManager().setProxyOnly(true);
         newClient->setLogger(baseClient->logger());
         setClient(newClient);
         newClient->connectToServer(config);
@@ -294,6 +299,11 @@ void ChatShares::setClient(ChatClient *newClient)
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
     connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
+}
+
+void ChatShares::setTransfers(ChatTransfers *transfers)
+{
+    chatTransfers = transfers;
 }
 
 void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
@@ -388,9 +398,6 @@ void ChatShares::shareServerFound(const QString &server)
     // register with server
     registerWithServer();
     registerTimer->start();
-
-    // browse peers
-    findRemoteFiles();
 }
 
 ChatSharesModel::ChatSharesModel(QObject *parent)

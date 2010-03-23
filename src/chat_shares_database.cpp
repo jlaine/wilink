@@ -18,6 +18,7 @@
  */
 
 #include <QCryptographicHash>
+#include <QDebug>
 #include <QDir>
 #include <QSqlError>
 #include <QSqlQuery>

@@ -30,6 +30,7 @@
 
 class ChatClient;
 class ChatSharesDatabase;
+class ChatTransfers;
 class QLineEdit;
 class QListWidget;
 class QStackedWidget;
@@ -98,6 +99,7 @@ public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     ChatSharesModel *downloadQueue();
     void setClient(ChatClient *client);
+    void setTransfers(ChatTransfers *transfers);
 
 signals:
     void fileExpected(const QString &sid, const QString path);
@@ -126,6 +128,7 @@ private:
     ChatSharesDatabase *db;
     ChatSharesModel *model;
     ChatSharesModel *queueModel;
+    ChatTransfers *chatTransfers;
 
     QLineEdit *lineEdit;
     ChatSharesView *treeWidget;
