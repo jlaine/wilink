@@ -97,6 +97,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+    connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
 }
 
 ChatSharesModel *ChatShares::downloadQueue()
@@ -107,14 +108,7 @@ ChatSharesModel *ChatShares::downloadQueue()
 void ChatShares::processDownloadQueue()
 {
     // check how many downloads are active
-    int activeDownloads = 0;
-#if 0
-    for (int i = 0; i < jobs.size(); i++)
-        if (jobs[i]->direction() == QXmppTransferJob::IncomingDirection &&
-            jobs[i]->state() != QXmppTransferJob::FinishedState)
-            activeDownloads++;
-#endif
-
+    int activeDownloads = client->getTransferManager().activeJobs(QXmppTransferJob::IncomingDirection);
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
