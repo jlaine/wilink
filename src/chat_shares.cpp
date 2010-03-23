@@ -81,7 +81,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     /* create model / view */
     model = new ChatSharesModel;
-    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), model, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(model, SIGNAL(itemReceived(const QModelIndex&)), this, SLOT(itemReceived(const QModelIndex&)));
     treeWidget = new ChatSharesView;
     treeWidget->setModel(model);
@@ -95,132 +94,16 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer = new QTimer(this);
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), model, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
 }
 
 ChatSharesModel *ChatShares::downloadQueue()
 {
     return queueModel;
-}
-
-void ChatShares::processDownloadQueue()
-{
-    // check how many downloads are active
-    int activeDownloads = client->getTransferManager().activeJobs(QXmppTransferJob::IncomingDirection);
-    while (activeDownloads < parallelDownloadLimit)
-    {
-        // find next item
-        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
-        if (!file)
-            return;
-
-        // pick mirror
-        QXmppShareMirror mirror;
-        bool mirrorFound = false;
-        foreach (mirror, file->mirrors())
-        {
-            if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
-            {
-                mirrorFound = true;
-                break;
-            }
-        }
-        if (!mirrorFound)
-        {
-            qWarning() << "No mirror found for file" << file->name();
-            return;
-        }
-
-        // request file
-        QXmppSiPubIq iq;
-        iq.setTo(mirror.jid());
-        iq.setType(QXmppIq::Get);
-        iq.setPublishId(mirror.path());
-        qDebug() << "Requesting file" << file->name() << "from" << iq.to();
-        file->setData(PacketId, iq.id());
-        client->sendPacket(iq);
-
-        activeDownloads++;
-    }
-}
-
-void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
-{
-#if 0
-    if (shareIq.from() != shareServer)
-        return;
-#endif
-
-    if (shareIq.type() == QXmppIq::Get)
-    {
-        QXmppSiPubIq responseIq;
-        responseIq.setId(shareIq.id());
-        responseIq.setTo(shareIq.from());
-        responseIq.setType(QXmppIq::Result);
-
-        // check path is OK
-        QString filePath = db->locate(shareIq.publishId());
-        if (filePath.isEmpty())
-        {
-            qWarning() << "Could not find file" << shareIq.publishId();
-            responseIq.setType(QXmppIq::Error);
-            client->sendPacket(responseIq);
-            return;
-        }
-        responseIq.setStreamId(generateStanzaHash());
-        client->sendPacket(responseIq);
-
-        // send file
-        qDebug() << "Sending" << QFileInfo(filePath).fileName() << "to" << responseIq.to();
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
-        connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
-        return;
-    }
-
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, shareIq.id());
-    if (!queueItem)
-        return;
-
-    if (shareIq.type() == QXmppIq::Result)
-    {
-        // store full path
-        QStringList pathBits;
-        QXmppShareItem *parentItem = queueItem->parent();
-        while (parentItem && parentItem->parent())
-        {
-            // sanitize path
-            QString dirName = parentItem->name();
-            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
-                pathBits.prepend(dirName);
-            parentItem = parentItem->parent();
-        }
-
-        // FIXME : is this the right place to remove from queue?
-        queueModel->removeItem(queueItem);
-
-        emit fileExpected(shareIq.streamId(), pathBits.join("/"));
-    }
-    else if (shareIq.type() == QXmppIq::Error)
-    {
-        qWarning() << "Error requesting file from" << shareIq.from();
-        queueModel->removeItem(queueItem);
-    }
-}
-
-void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
-{
-    if (shareIq.type() == QXmppIq::Get)
-    {
-        db->search(shareIq);
-        return;
-    }
-}
-
-void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
-{
-    client->sendPacket(iq);
 }
 
 void ChatShares::findRemoteFiles()
@@ -299,6 +182,76 @@ void ChatShares::itemReceived(const QModelIndex &index)
     treeWidget->setExpanded(index, true);
 }
 
+void ChatShares::presenceReceived(const QXmppPresence &presence)
+{
+    if (presence.from() != shareServer)
+        return;
+
+    // find shares extension
+    QXmppElement shareExtension;
+    foreach (const QXmppElement &extension, presence.extensions())
+    {
+        if (extension.attribute("xmlns") == ns_shares)
+        {
+            shareExtension = extension;
+            break;
+        }
+    }
+    if (shareExtension.attribute("xmlns") != ns_shares)
+        return;
+
+    qDebug() << "PRESENCE FROM SERVER";
+    if (presence.getType() == QXmppPresence::Error &&
+        presence.error().type() == QXmppStanza::Error::Modify &&
+        presence.error().condition() == QXmppStanza::Error::Redirect)
+    {
+        const QString domain = shareExtension.firstChildElement("domain").value();
+        const QString server = shareExtension.firstChildElement("server").value();
+        qDebug() << "got redirect" << domain << server;
+    }
+}
+
+void ChatShares::processDownloadQueue()
+{
+    // check how many downloads are active
+    int activeDownloads = client->getTransferManager().activeJobs(QXmppTransferJob::IncomingDirection);
+    while (activeDownloads < parallelDownloadLimit)
+    {
+        // find next item
+        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
+        if (!file)
+            return;
+
+        // pick mirror
+        QXmppShareMirror mirror;
+        bool mirrorFound = false;
+        foreach (mirror, file->mirrors())
+        {
+            if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
+            {
+                mirrorFound = true;
+                break;
+            }
+        }
+        if (!mirrorFound)
+        {
+            qWarning() << "No mirror found for file" << file->name();
+            return;
+        }
+
+        // request file
+        QXmppSiPubIq iq;
+        iq.setTo(mirror.jid());
+        iq.setType(QXmppIq::Get);
+        iq.setPublishId(mirror.path());
+        qDebug() << "Requesting file" << file->name() << "from" << iq.to();
+        file->setData(PacketId, iq.id());
+        client->sendPacket(iq);
+
+        activeDownloads++;
+    }
+}
+
 void ChatShares::queryStringChanged()
 {
     if (lineEdit->text().isEmpty())
@@ -316,6 +269,83 @@ void ChatShares::registerWithServer()
     presence.setTo(shareServer);
     presence.setExtensions(x);
     client->sendPacket(presence);
+}
+
+void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
+{
+#if 0
+    if (shareIq.from() != shareServer)
+        return;
+#endif
+
+    if (shareIq.type() == QXmppIq::Get)
+    {
+        QXmppSiPubIq responseIq;
+        responseIq.setId(shareIq.id());
+        responseIq.setTo(shareIq.from());
+        responseIq.setType(QXmppIq::Result);
+
+        // check path is OK
+        QString filePath = db->locate(shareIq.publishId());
+        if (filePath.isEmpty())
+        {
+            qWarning() << "Could not find file" << shareIq.publishId();
+            responseIq.setType(QXmppIq::Error);
+            client->sendPacket(responseIq);
+            return;
+        }
+        responseIq.setStreamId(generateStanzaHash());
+        client->sendPacket(responseIq);
+
+        // send file
+        qDebug() << "Sending" << QFileInfo(filePath).fileName() << "to" << responseIq.to();
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
+        connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
+        return;
+    }
+
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, shareIq.id());
+    if (!queueItem)
+        return;
+
+    if (shareIq.type() == QXmppIq::Result)
+    {
+        // store full path
+        QStringList pathBits;
+        QXmppShareItem *parentItem = queueItem->parent();
+        while (parentItem && parentItem->parent())
+        {
+            // sanitize path
+            QString dirName = parentItem->name();
+            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
+                pathBits.prepend(dirName);
+            parentItem = parentItem->parent();
+        }
+
+        // FIXME : is this the right place to remove from queue?
+        queueModel->removeItem(queueItem);
+
+        emit fileExpected(shareIq.streamId(), pathBits.join("/"));
+    }
+    else if (shareIq.type() == QXmppIq::Error)
+    {
+        qWarning() << "Error requesting file from" << shareIq.from();
+        queueModel->removeItem(queueItem);
+    }
+}
+
+void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
+{
+    if (shareIq.type() == QXmppIq::Get)
+    {
+        db->search(shareIq);
+        return;
+    }
+}
+
+void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
+{
+    client->sendPacket(iq);
 }
 
 void ChatShares::setShareServer(const QString &server)

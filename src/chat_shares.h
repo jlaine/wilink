@@ -34,6 +34,7 @@ class QListWidget;
 class QStackedWidget;
 class QTimer;
 class QXmppPacket;
+class QXmppPresence;
 
 class ChatSharesModel : public QAbstractItemModel
 {
@@ -106,6 +107,7 @@ private slots:
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
     void itemReceived(const QModelIndex &index);
+    void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void registerWithServer();
     void queryStringChanged();
