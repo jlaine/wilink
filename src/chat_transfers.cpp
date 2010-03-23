@@ -160,7 +160,7 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     updateButtons();
 
     /* connect signals */
-    connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
+    connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
     connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
 }
@@ -356,11 +356,11 @@ void ChatTransfers::processDownloadQueue()
         }
 
         // request file
-        QXmppShareGetIq iq;
+        QXmppSiPubIq iq;
         iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
-        iq.setFile(*file);
-        qDebug() << "Requesting file" << iq.file().name() << "from" << iq.to();
+        iq.setPublishId(mirror.path());
+        qDebug() << "Requesting file" << file->name() << "from" << iq.to();
         file->setData(PacketId, iq.id());
         client->sendPacket(iq);
 
@@ -421,7 +421,7 @@ void ChatTransfers::sendFile(const QString &fullJid)
     addJob(job);
 }
 
-void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
+void ChatTransfers::siPubIqReceived(const QXmppSiPubIq &shareIq)
 {
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, shareIq.id());
     if (!queueItem)
@@ -429,13 +429,11 @@ void ChatTransfers::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Result)
     {
-        // expect file
-        qDebug() << "Expecting file" << shareIq.file().name() << "from" << shareIq.from();
-        queueItem->setData(StreamId, shareIq.sid());
+        queueItem->setData(StreamId, shareIq.sessionId());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
-        qWarning() << "Error requesting file" << shareIq.file().name() << "from" << shareIq.from();
+        qWarning() << "Error requesting file from" << shareIq.from();
     }
 }
 

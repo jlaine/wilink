@@ -107,7 +107,7 @@ private slots:
     void itemReceived(const QModelIndex &index);
     void registerWithServer();
     void queryStringChanged();
-    void shareGetIqReceived(const QXmppShareGetIq &getIq);
+    void siPubIqReceived(const QXmppSiPubIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &share);
     void searchFinished(const QXmppShareSearchIq &share);
 

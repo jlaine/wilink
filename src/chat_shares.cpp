@@ -87,11 +87,11 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer = new QTimer(this);
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
-    connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
+    connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
 }
 
-void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
+void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
 {
 #if 0
     if (shareIq.from() != shareServer)
@@ -100,27 +100,26 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Get)
     {
-        QXmppShareGetIq responseIq;
+        QXmppSiPubIq responseIq;
         responseIq.setId(shareIq.id());
         responseIq.setTo(shareIq.from());
         responseIq.setType(QXmppIq::Result);
-        responseIq.setFile(shareIq.file());
 
         // check path is OK
-        QString filePath = db->locate(shareIq.file());
+        QString filePath = db->locate(shareIq.publishId());
         if (filePath.isEmpty())
         {
-            qWarning() << "Could not find file" << shareIq.file().name() << shareIq.file().fileSize();
+            qWarning() << "Could not find file" << shareIq.publishId();
             responseIq.setType(QXmppIq::Error);
             client->sendPacket(responseIq);
             return;
         }
-        responseIq.setSid(generateStanzaHash());
+        responseIq.setSessionId(generateStanzaHash());
         client->sendPacket(responseIq);
 
         // send file
-        qDebug() << "Sending" << responseIq.file().name() << "to" << responseIq.to();
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
+        qDebug() << "Sending" << QFileInfo(filePath).fileName() << "to" << responseIq.to();
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sessionId());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
     }
 }

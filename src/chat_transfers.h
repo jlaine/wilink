@@ -32,7 +32,7 @@ class QPushButton;
 class QTableWidget;
 class QXmppClient;
 class QXmppShareItem;
-class QXmppShareGetIq;
+class QXmppSiPubIq;
 
 const int LocalPathRole = Qt::UserRole;
 
@@ -82,7 +82,7 @@ private slots:
     void processDownloadQueue();
     void progress(qint64, qint64);
     void removeCurrentJob();
-    void shareGetIqReceived(const QXmppShareGetIq &shareIq);
+    void siPubIqReceived(const QXmppSiPubIq &shareIq);
     void stateChanged(QXmppTransferJob::State state);
     void updateButtons();
 

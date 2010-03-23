@@ -51,11 +51,10 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     worker->start();
 }
 
-QString ChatSharesDatabase::locate(const QXmppShareItem &file)
+QString ChatSharesDatabase::locate(const QString &publishId)
 {
-    QSqlQuery query("SELECT path FROM files WHERE hash = :hash AND size = :size", sharesDb);
-    query.bindValue(":hash", file.fileHash().toHex());
-    query.bindValue(":size", file.fileSize());
+    QSqlQuery query("SELECT path FROM files WHERE path = :path", sharesDb);
+    query.bindValue(":path", publishId);
     query.exec();
     if (!query.next())
         return QString();

@@ -29,7 +29,7 @@ class ChatSharesDatabase : public QObject
 
 public:
     ChatSharesDatabase(const QString &path, QObject *parent = 0);
-    QString locate(const QXmppShareItem &file);
+    QString locate(const QString &publishId);
     void search(const QXmppShareSearchIq &requestIq);
 
 signals:
