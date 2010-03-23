@@ -174,8 +174,7 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
                 id.type() == "text")
             {
                 qDebug() << "Found chat room server" << disco.from();
-                //QString chatRoomServer = disco.from();
-                //roomButton->setEnabled(true);
+                emit mucServerFound(disco.from());
             }
             else if (id.category() == "proxy" &&
                      id.type() == "bytestreams")
@@ -187,8 +186,8 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
                      id.type() == "file")
             {
                 qDebug() << "Found share server" << disco.from();
+                emit shareServerFound(disco.from());
 /*
-                chatShares->setShareServer(disco.from());
                 rosterModel->addItem(ChatRosterItem::Other,
                     chatShares->objectName(),
                     chatShares->windowTitle(),
@@ -295,12 +294,13 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     setWindowIcon(QIcon(":/chat.png"));
 
     /* set up client */
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)), this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
+    connect(client, SIGNAL(mucServerFound(const QString&)), this, SLOT(mucServerFound(const QString&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(client, SIGNAL(shareServerFound(const QString&)), chatShares, SLOT(setShareServer(const QString&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
@@ -533,54 +533,6 @@ void Chat::disconnected()
     statusCombo->setCurrentIndex(OfflineIndex);
 }
 
-void Chat::discoveryIqReceived(const QXmppDiscoveryIq &disco)
-{
-    // we only want results
-    if (disco.type() != QXmppIq::Result)
-        return;
-
-    if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == client->getConfiguration().domain())
-    {
-        // root items
-        discoQueue.clear();
-        foreach (const QXmppDiscoveryIq::Item &item, disco.items())
-        {
-            if (!item.jid().isEmpty() && item.node().isEmpty())
-            {
-                discoQueue.append(item.jid());
-                // get info for item
-                QXmppDiscoveryIq info;
-                info.setQueryType(QXmppDiscoveryIq::InfoQuery);
-                info.setTo(item.jid());
-                client->sendPacket(info);
-            }
-        }
-    }
-    else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery &&
-             discoQueue.contains(disco.from()))
-    {
-        discoQueue.removeAll(disco.from());
-        // check if it's a conference server
-        foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
-        {
-            if (id.category() == "conference" &&
-                id.type() == "text")
-            {
-                chatRoomServer = disco.from();
-                roomButton->setEnabled(true);
-                qDebug() << "Found chat room server" << chatRoomServer;
-            }
-            else if (id.category() == "store" &&
-                     id.type() == "file")
-            {
-                chatShares->setShareServer(disco.from());
-                qDebug() << "Found share server" << disco.from();
-            }
-        }
-    }
-}
-
 void Chat::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError &&
@@ -695,6 +647,12 @@ void Chat::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
         iqPacket.setForm(dialog.form());
         client->sendPacket(iqPacket);
     }
+}
+
+void Chat::mucServerFound(const QString &mucServer)
+{
+    chatRoomServer = mucServer;
+    roomButton->setEnabled(true);
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)

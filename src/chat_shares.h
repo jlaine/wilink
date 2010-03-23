@@ -96,6 +96,8 @@ class ChatShares : public ChatPanel
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     ChatSharesModel *downloadQueue();
+
+public slots:
     void setShareServer(const QString &server);
 
 signals:

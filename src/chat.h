@@ -58,8 +58,10 @@ public:
 
 signals:
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
+    void mucServerFound(const QString &mucServer);
     void siPubIqReceived(const QXmppSiPubIq &iq);
     void shareSearchIqReceived(const QXmppShareSearchIq &iq);
+    void shareServerFound(const QString &shareServer);
 
 private slots:
     void slotConnected();
@@ -83,7 +85,6 @@ protected slots:
     void addRoom();
     void connected();
     void disconnected();
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void error(QXmppClient::Error error);
     void inviteContact(const QString &jid);
     void iqReceived(const QXmppIq&);
@@ -97,6 +98,8 @@ protected slots:
     void removeContact(const QString &jid);
     void resizeContacts();
     void statusChanged(int currentIndex);
+
+    void mucServerFound(const QString &roomServer);
 
     void closePanel();
     void notifyPanel();
