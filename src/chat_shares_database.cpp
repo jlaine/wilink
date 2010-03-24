@@ -205,14 +205,14 @@ void SearchThread::run()
     }
 
     // perform query
-    search(responseIq.collection(), basePrefix, queryString);
+    search(responseIq.collection(), basePrefix, queryString, 1);
 
     // send response
     responseIq.setType(QXmppIq::Result);
     emit searchFinished(responseIq);
 }
 
-void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString)
+void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString, int maxDepth)
 {
     QTime t;
     t.start();
@@ -278,7 +278,6 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         }
         relativeBits.removeLast();
 
-        const int maxDepth = 1;
         QXmppShareItem *parentCollection = &rootCollection;
         QString dirPath;
         const int maxBits = maxDepth ? qMin(maxDepth, relativeBits.size()) : relativeBits.size();
