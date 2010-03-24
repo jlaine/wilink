@@ -224,6 +224,10 @@ Acceptez-vous?</translation>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Recherche</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
