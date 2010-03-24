@@ -281,7 +281,8 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         const int maxDepth = 1;
         QXmppShareItem *parentCollection = &rootCollection;
         QString dirPath;
-        for (int i = 0; i < qMin(maxDepth, relativeBits.size()); i++)
+        const int maxBits = maxDepth ? qMin(maxDepth, relativeBits.size()) : relativeBits.size();
+        for (int i = 0; i < maxBits; i++)
         {
             const QString dirName = relativeBits[i];
             if (!dirPath.isEmpty())
@@ -300,7 +301,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
             parentCollection = subDirs[dirPath];
         }
 
-        if (relativeBits.size() < maxDepth)
+        if (!maxDepth || relativeBits.size() < maxDepth)
         {
             // update file info
             QXmppShareItem file(QXmppShareItem::FileItem);
