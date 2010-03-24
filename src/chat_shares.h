@@ -121,6 +121,7 @@ private:
     ChatSharesDatabase *db;
     ChatSharesModel *queueModel;
     ChatTransfers *chatTransfers;
+    QMap<QString, QWidget*> searches;
 
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;

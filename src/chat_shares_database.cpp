@@ -182,7 +182,6 @@ void SearchThread::run()
     QXmppShareSearchIq responseIq;
     responseIq.setId(requestIq.id());
     responseIq.setTo(requestIq.from());
-    responseIq.setSearch(requestIq.search());
     responseIq.setTag(requestIq.tag());
 
     // determine query type

@@ -133,6 +133,7 @@ void ChatShares::findRemoteFiles()
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
     iq.setSearch(search);
+    searches.insert(iq.tag(), search.isEmpty() ? sharesView : searchView);
     client->sendPacket(iq);
 }
 
@@ -190,6 +191,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
         iq.setBase(mirror.path());
+        searches.insert(iq.tag(), tabWidget->currentWidget());
         client->sendPacket(iq);
     }
 }
@@ -406,7 +408,10 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         return;
     }
 
-    ChatSharesView *view = shareIq.search().isEmpty() ? sharesView : searchView;
+    // process search result
+    if (!searches.contains(shareIq.tag()))
+        return;
+    ChatSharesView *view = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
     ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
     Q_ASSERT(model);
 
