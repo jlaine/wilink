@@ -129,9 +129,11 @@ void ChatShares::findRemoteFiles()
 {
     const QString search = lineEdit->text();
 
+    // search for files
     QXmppShareSearchIq iq;
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
+    iq.setDepth(2);
     iq.setSearch(search);
     searches.insert(iq.tag(), search.isEmpty() ? sharesView : searchView);
     client->sendPacket(iq);
@@ -191,6 +193,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         iq.setTo(mirror.jid());
         iq.setType(QXmppIq::Get);
         iq.setBase(mirror.path());
+        iq.setDepth(1);
         searches.insert(iq.tag(), tabWidget->currentWidget());
         client->sendPacket(iq);
     }
