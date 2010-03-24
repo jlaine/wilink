@@ -198,6 +198,7 @@ void SearchThread::run()
     QString basePrefix = requestIq.base();
     if (!basePrefix.isEmpty() && !basePrefix.endsWith("/"))
         basePrefix += "/";
+    int queryDepth = requestIq.depth();
     const QString queryString = requestIq.search().trimmed();
     if (queryString.contains("\\"))
     {
@@ -209,7 +210,7 @@ void SearchThread::run()
     }
 
     // perform query
-    search(responseIq.collection(), basePrefix, queryString, 1);
+    search(responseIq.collection(), basePrefix, queryString, queryDepth);
 
     // send response
     responseIq.setType(QXmppIq::Result);
