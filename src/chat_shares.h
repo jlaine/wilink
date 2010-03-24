@@ -112,7 +112,6 @@ private slots:
     void itemAction();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
-    void itemDownload(const QModelIndex &index);
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void registerWithServer();

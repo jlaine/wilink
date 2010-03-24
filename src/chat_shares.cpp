@@ -140,13 +140,19 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemAction()
 {
+    QAction *action = static_cast<QAction*>(sender());
     ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
-    if (!treeWidget)
+    if (!action || !treeWidget)
+        return;
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(treeWidget->currentIndex().internalPointer());
+    if (!item)
         return;
 
-    QAction *action = static_cast<QAction*>(sender());
     if (action && action->data() == DownloadAction)
-        itemDownload(treeWidget->currentIndex());
+    {
+        queueModel->addItem(*item);
+        processDownloadQueue();
+    }
 }
 
 void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalPos)
@@ -169,7 +175,8 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     if (item->type() == QXmppShareItem::FileItem)
     {
         // download item
-        itemDownload(index);
+        queueModel->addItem(*item);
+        processDownloadQueue();
     }
     else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
     {
@@ -187,18 +194,6 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         iq.setBase(mirror.path());
         client->sendPacket(iq);
     }
-}
-
-void ChatShares::itemDownload(const QModelIndex &index)
-{
-    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
-    if (!index.isValid() || !item)
-        return;
-
-    // queue file download
-    queueModel->addItem(*item);
-    queueModel->pruneEmptyChildren();
-    processDownloadQueue();
 }
 
 void ChatShares::presenceReceived(const QXmppPresence &presence)
@@ -290,7 +285,7 @@ void ChatShares::processDownloadQueue()
         {
             qWarning() << "No mirror found for file" << file->name();
             queueModel->removeItem(file);
-            return;
+            continue;
         }
 
         // request file
@@ -303,6 +298,7 @@ void ChatShares::processDownloadQueue()
 
         activeDownloads++;
     }
+    queueModel->pruneEmptyChildren();
 }
 
 void ChatShares::queryStringChanged()
