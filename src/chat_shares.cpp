@@ -175,7 +175,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     {
         if (item->mirrors().isEmpty())
         {
-            qWarning() << "No mirror for item" << item->name();
+            qWarning() << "No mirror for collection" << item->name();
             return; 
         }
         const QXmppShareMirror mirror = item->mirrors().first();
@@ -194,13 +194,6 @@ void ChatShares::itemDownload(const QModelIndex &index)
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return;
-
-    if (item->mirrors().isEmpty())
-    {
-        qWarning() << "No mirror for item" << item->name();
-        return; 
-    }
-    const QXmppShareMirror mirror = item->mirrors().first();
 
     // queue file download
     queueModel->addItem(*item);
@@ -285,7 +278,9 @@ void ChatShares::processDownloadQueue()
         bool mirrorFound = false;
         foreach (mirror, file->mirrors())
         {
-            if (!mirror.jid().isEmpty() && !mirror.path().isEmpty())
+            if (!mirror.jid().isEmpty() &&
+                mirror.jid() != client->getConfiguration().jid() &&
+                !mirror.path().isEmpty())
             {
                 mirrorFound = true;
                 break;
@@ -294,6 +289,7 @@ void ChatShares::processDownloadQueue()
         if (!mirrorFound)
         {
             qWarning() << "No mirror found for file" << file->name();
+            queueModel->removeItem(file);
             return;
         }
 
