@@ -34,9 +34,7 @@
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppUtils.h"
-#include "qxmpp/QXmppShareIq.h"
 
-#include "chat_shares.h"
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
@@ -137,11 +135,6 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
     connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
     layout->addWidget(tableWidget);
-
-    /* download queue */
-    queueView = new ChatSharesView;
-    //queueView->hide();
-    layout->addWidget(queueView);
 
     /* buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -348,11 +341,6 @@ void ChatTransfers::sendFile(const QString &fullJid)
     QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
     job->setData(LocalPathRole, filePath);
     addJob(job);
-}
-
-void ChatTransfers::setQueueModel(ChatSharesModel *model)
-{
-    queueView->setModel(model);
 }
 
 QSize ChatTransfers::sizeHint() const
