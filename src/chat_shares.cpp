@@ -133,7 +133,7 @@ void ChatShares::findRemoteFiles()
     QXmppShareSearchIq iq;
     iq.setTo(shareServer);
     iq.setType(QXmppIq::Get);
-    iq.setDepth(2);
+    iq.setDepth(3);
     iq.setSearch(search);
     searches.insert(iq.tag(), search.isEmpty() ? sharesView : searchView);
     client->sendPacket(iq);
