@@ -36,6 +36,29 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 #define SEARCH_MAX_TIME 5000
 #define HASH_MAX_SIZE 1024 * 1024
 
+/** Fingerprint a file.
+ */
+static QByteArray hashFile(const QString &path)
+{
+    QFile fp(path);
+
+    if (!fp.open(QIODevice::ReadOnly))
+        return QByteArray();
+
+    QCryptographicHash hasher(QCryptographicHash::Md5);
+    char buffer[16384];
+    int hashed = 0;
+    while (fp.bytesAvailable() && hashed < HASH_MAX_SIZE)
+    {
+        int len = fp.read(buffer, sizeof(buffer));
+        if (len < 0)
+            return QByteArray();
+        hasher.addData(buffer, len);
+        hashed += len;
+    }
+    return hasher.result();
+}
+
 ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     : QObject(parent), sharesDir(path)
 {
@@ -128,34 +151,15 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     // check whether we need to calculate checksum
     if (cachedHash.isEmpty() || cachedSize == info.size())
     {
-        QFile fp(info.filePath());
-
         // if we cannot open the file, remove it from database
-        if (!fp.open(QIODevice::ReadOnly))
+        cachedHash = hashFile(info.filePath());
+        if (cachedHash.isEmpty())
         {
-            qWarning() << "Failed to open file" << path;
+            qWarning() << "Error hashing file" << path;
             deleteQuery.bindValue(":path", path);
             deleteQuery.exec();
             return false;
         }
-
-        // update file object
-        QCryptographicHash hasher(QCryptographicHash::Md5);
-        char buffer[16384];
-        int hashed = 0;
-        while (fp.bytesAvailable() && hashed < HASH_MAX_SIZE)
-        {
-            int len = fp.read(buffer, sizeof(buffer));
-            if (len < 0)
-            {
-                qWarning() << "Error reading from file" << path;
-                return false;
-            }
-            hasher.addData(buffer, len);
-            hashed += len;
-        }
-        fp.close();
-        cachedHash = hasher.result();
         cachedSize = info.size();
 
         // update database entry
