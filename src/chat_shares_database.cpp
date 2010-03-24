@@ -246,6 +246,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
     }
 
     // store results
+    int fileCount = 0;
     query.exec();
     QMap<QString, QXmppShareItem*> subDirs;
     while (query.next())
@@ -258,7 +259,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
             int matchIndex = path.indexOf(queryString, 0, Qt::CaseInsensitive);
             if (matchIndex < 0)
             {
-                qDebug() << "Could not find" << queryString << "in" << path;
+                qWarning() << "Could not find" << queryString << "in" << path;
                 continue;
             }
             int slashIndex = path.lastIndexOf("/", matchIndex);
@@ -304,12 +305,17 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
             // update file info
             QXmppShareItem file(QXmppShareItem::FileItem);
             if (updateFile(file, query))
+            {
+                fileCount++;
                 parentCollection->appendChild(file);
+            }
         }
 
         if (t.elapsed() > SEARCH_MAX_TIME)
+        {
+            qWarning() << "Search truncated at" << fileCount << "results after" << double(t.elapsed()) / 1000.0 << "s";
             break;
+        }
     }
-    qDebug() << "Found" << rootCollection.size() << "files in" << double(t.elapsed()) / 1000.0 << "s";
 }
 
