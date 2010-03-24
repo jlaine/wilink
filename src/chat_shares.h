@@ -62,7 +62,8 @@ signals:
     void itemReceived(const QModelIndex &index);
 
 private:
-    QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent);
+    QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent, bool recurse = true);
+    void updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
 public slots:
     void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);

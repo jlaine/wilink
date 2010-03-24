@@ -489,7 +489,7 @@ QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, int r
     return 0;
 }
 
-QXmppShareItem *ChatSharesModel::findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent)
+QXmppShareItem *ChatSharesModel::findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent, bool recurse)
 {
     if (mirrors.isEmpty())
         return 0;
@@ -507,9 +507,12 @@ QXmppShareItem *ChatSharesModel::findItemByMirrors(const QXmppShareMirrorList &m
     }
 
     // recurse
-    for (int i = 0; i < parent->size(); i++)
-        if ((child = findItemByMirrors(mirrors, parent->child(i))) != 0)
-            return child;
+    if (recurse)
+    {
+        for (int i = 0; i < parent->size(); i++)
+            if ((child = findItemByMirrors(mirrors, parent->child(i))) != 0)
+                return child;
+    }
 
     return 0;
 }
@@ -613,29 +616,59 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
     {
-        QXmppShareItem *parentItem = findItemByMirrors(shareIq.collection().mirrors(), rootItem);
+        // FIXME : we are casting away constness
+        QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
+        QXmppShareItem *parentItem = findItemByMirrors(newItem->mirrors(), rootItem);
         if (parentItem)
         {
-            if (parentItem->size())
-            {
-                beginRemoveRows(createIndex(parentItem->row(), 0, parentItem), 0, parentItem->size());
-                parentItem->clearChildren();
-                endRemoveRows();
-            }
-            if (shareIq.collection().size())
-            {
-                beginInsertRows(createIndex(parentItem->row(), 0, parentItem), 0, shareIq.collection().size());
-                for (int i = 0; i < shareIq.collection().size(); i++)
-                    parentItem->appendChild(*shareIq.collection().child(i));
-                endInsertRows();
-            }
+            updateItem(parentItem, newItem);
             emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
         } else if (shareIq.from() == shareServer) {
             rootItem->clearChildren();
-            for (int i = 0; i < shareIq.collection().size(); i++)
-                rootItem->appendChild(*shareIq.collection().child(i));
+            foreach (QXmppShareItem *newChild, newItem->children())
+                rootItem->appendChild(*newChild);
             emit reset();
         }
+    }
+}
+
+void ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
+{
+    oldItem->setFileHash(newItem->fileHash());
+    oldItem->setFileSize(newItem->fileSize());
+    oldItem->setMirrors(newItem->mirrors());
+    //oldItem->setName(newItem->name());
+    oldItem->setType(newItem->type());
+
+    QList<QXmppShareItem*> removed = oldItem->children();
+    QList<QXmppShareItem*> added;
+    foreach (QXmppShareItem *newChild, newItem->children())
+    {
+        QXmppShareItem *oldChild = findItemByMirrors(newChild->mirrors(), oldItem, false);
+        if (oldChild)
+        {
+            updateItem(oldChild, newChild);
+            removed.removeAll(oldChild);
+        } else {
+            added << newChild;
+        }
+    }
+
+    // remove old children
+    foreach (QXmppShareItem *oldChild, removed)
+    {
+        beginRemoveRows(createIndex(oldItem->row(), 0, oldItem), oldChild->row(), oldChild->row());
+        oldItem->removeChild(oldChild);
+        endRemoveRows();
+    }
+
+    // add new children
+    if (added.size())
+    {
+        beginInsertRows(createIndex(oldItem->row(), 0, oldItem), oldItem->size(), oldItem->size() + added.size());
+        foreach (QXmppShareItem *newChild, added)
+            oldItem->appendChild(*newChild);
+        endInsertRows();
     }
 }
 
