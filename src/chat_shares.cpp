@@ -634,6 +634,10 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 
 void ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
 {
+    QModelIndex oldIndex;
+    if (oldItem != rootItem)
+        oldIndex = createIndex(oldItem->row(), 0, oldItem);
+
     oldItem->setFileHash(newItem->fileHash());
     oldItem->setFileSize(newItem->fileSize());
     oldItem->setMirrors(newItem->mirrors());
@@ -654,18 +658,21 @@ void ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newIte
         }
     }
 
-    // remove old children
-    foreach (QXmppShareItem *oldChild, removed)
+    // remove old children if we received a file or a non-empty collection
+    if (newItem->type() == QXmppShareItem::FileItem || newItem->size())
     {
-        beginRemoveRows(createIndex(oldItem->row(), 0, oldItem), oldChild->row(), oldChild->row());
-        oldItem->removeChild(oldChild);
-        endRemoveRows();
+        foreach (QXmppShareItem *oldChild, removed)
+        {
+            beginRemoveRows(oldIndex, oldChild->row(), oldChild->row());
+            oldItem->removeChild(oldChild);
+            endRemoveRows();
+        }
     }
 
     // add new children
     if (added.size())
     {
-        beginInsertRows(createIndex(oldItem->row(), 0, oldItem), oldItem->size(), oldItem->size() + added.size());
+        beginInsertRows(oldIndex, oldItem->size(), oldItem->size() + added.size());
         foreach (QXmppShareItem *newChild, added)
             oldItem->appendChild(*newChild);
         endInsertRows();
