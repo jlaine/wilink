@@ -60,7 +60,7 @@ public:
 
 private:
     QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent, bool recurse = true);
-    void updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
+    QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
 private:
     QXmppShareItem *rootItem;

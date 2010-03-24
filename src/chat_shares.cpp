@@ -641,20 +641,12 @@ QModelIndex ChatSharesModel::mergeItem(const QXmppShareItem &item)
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&item;
     QXmppShareItem *parentItem = findItemByMirrors(newItem->mirrors(), rootItem);
-    if (parentItem)
-    {
-        updateItem(parentItem, newItem);
-        return createIndex(parentItem->row(), 0, parentItem);
-    } else {
-        rootItem->clearChildren();
-        foreach (QXmppShareItem *newChild, newItem->children())
-            rootItem->appendChild(*newChild);
-        emit reset();
-        return QModelIndex();
-    }
+    if (!parentItem)
+        parentItem = rootItem;
+    return updateItem(parentItem, newItem);
 }
 
-void ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
+QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
 {
     QModelIndex oldIndex;
     if (oldItem != rootItem)
@@ -699,6 +691,8 @@ void ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newIte
             oldItem->appendChild(*newChild);
         endInsertRows();
     }
+
+    return oldIndex;
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)
