@@ -67,7 +67,7 @@ signals:
 
 private:
     void search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString, int maxDepth);
-    bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery);
+    bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
     QXmppShareSearchIq requestIq;
     QSqlDatabase sharesDb;

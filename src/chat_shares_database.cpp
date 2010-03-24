@@ -130,7 +130,7 @@ SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const 
 {
 };
 
-bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery)
+bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery, bool updateHash)
 {
     const QString path = selectQuery.value(0).toString();
     qint64 cachedSize = selectQuery.value(1).toInt();
@@ -149,9 +149,10 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     }
 
     // check whether we need to calculate checksum
-    if (cachedHash.isEmpty() || cachedSize == info.size())
+    if (cachedSize != info.size())
+        cachedHash = QByteArray();
+    if (updateHash && cachedHash.isEmpty())
     {
-        // if we cannot open the file, remove it from database
         cachedHash = hashFile(info.filePath());
         if (cachedHash.isEmpty())
         {
@@ -160,9 +161,12 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
             deleteQuery.exec();
             return false;
         }
-        cachedSize = info.size();
+    }
 
-        // update database entry
+    // update database entry
+    if (cachedSize != info.size())
+    {
+        cachedSize = info.size();
         updateQuery.bindValue(":hash", cachedHash.toHex());
         updateQuery.bindValue(":size", cachedSize);
         updateQuery.bindValue(":path", path);
@@ -171,7 +175,8 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
 
     // fill meta-data
     file.setName(info.fileName());
-    file.setFileHash(cachedHash);
+    if (!cachedHash.isEmpty())
+        file.setFileHash(cachedHash);
     file.setFileSize(cachedSize);
 
     QXmppShareLocation location(requestIq.to());
@@ -309,7 +314,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         {
             // update file info
             QXmppShareItem file(QXmppShareItem::FileItem);
-            if (updateFile(file, query))
+            if (updateFile(file, query, requestIq.hash()))
             {
                 fileCount++;
                 parentCollection->appendChild(file);
