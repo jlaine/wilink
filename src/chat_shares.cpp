@@ -300,7 +300,7 @@ void ChatShares::processDownloadQueue()
 void ChatShares::queryStringChanged()
 {
     if (lineEdit->text().isEmpty())
-        findRemoteFiles();
+        tabWidget->setCurrentWidget(sharesView);
 }
 
 void ChatShares::registerWithServer()
