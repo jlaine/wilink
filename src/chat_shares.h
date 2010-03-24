@@ -33,7 +33,7 @@ class ChatSharesDatabase;
 class ChatTransfers;
 class QLineEdit;
 class QListWidget;
-class QStackedWidget;
+class QTabWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppPresence;
@@ -132,6 +132,7 @@ private:
     ChatTransfers *chatTransfers;
 
     QLineEdit *lineEdit;
+    QTabWidget *tabWidget;
     ChatSharesView *treeWidget;
     QTimer *registerTimer;
 };

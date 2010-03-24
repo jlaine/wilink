@@ -26,6 +26,7 @@
 #include <QResizeEvent>
 #include <QStackedWidget>
 #include <QStringList>
+#include <QTabWidget>
 #include <QTimer>
 #include <QTreeWidget>
 
@@ -79,14 +80,17 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(lineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(queryStringChanged()));
     layout->addWidget(lineEdit);
 
-    /* create model / view */
+    tabWidget = new QTabWidget;
+    layout->addWidget(tabWidget);
+
+    /* create main tab */
     model = new ChatSharesModel;
     connect(model, SIGNAL(itemReceived(const QModelIndex&)), this, SLOT(itemReceived(const QModelIndex&)));
     treeWidget = new ChatSharesView;
     treeWidget->setModel(model);
     connect(treeWidget, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(treeWidget, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    layout->addWidget(treeWidget);
+    tabWidget->addTab(treeWidget, tr("Shares"));
 
     setLayout(layout);
 
