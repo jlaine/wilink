@@ -84,13 +84,22 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->addWidget(tabWidget);
 
     /* create main tab */
-    model = new ChatSharesModel;
-    connect(model, SIGNAL(itemReceived(const QModelIndex&)), this, SLOT(itemReceived(const QModelIndex&)));
-    treeWidget = new ChatSharesView;
-    treeWidget->setModel(model);
-    connect(treeWidget, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
-    connect(treeWidget, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    tabWidget->addTab(treeWidget, tr("Shares"));
+    ChatSharesModel *sharesModel = new ChatSharesModel;
+    sharesView = new ChatSharesView;
+    sharesView->setModel(sharesModel);
+    connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
+    connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
+    connect(sharesModel, SIGNAL(itemReceived(const QModelIndex&)), sharesView, SLOT(itemReceived(const QModelIndex&)));
+    tabWidget->addTab(sharesView, tr("Shares"));
+
+    /* create search tab */
+    ChatSharesModel *searchModel = new ChatSharesModel;
+    searchView = new ChatSharesView;
+    searchView->setModel(searchModel);
+    connect(searchView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
+    connect(searchView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
+    connect(searchModel, SIGNAL(itemReceived(const QModelIndex&)), searchView, SLOT(itemReceived(const QModelIndex&)));
+    tabWidget->addTab(searchView, tr("Search"));
 
     setLayout(layout);
 
@@ -126,6 +135,10 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::itemAction()
 {
+    ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
+    if (!treeWidget)
+        return;
+
     QAction *action = static_cast<QAction*>(sender());
     QModelIndex index = treeWidget->currentIndex();
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
@@ -181,11 +194,6 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         iq.setBase(mirror.path());
         client->sendPacket(iq);
     }
-}
-
-void ChatShares::itemReceived(const QModelIndex &index)
-{
-    treeWidget->setExpanded(index, true);
 }
 
 void ChatShares::presenceReceived(const QXmppPresence &presence)
@@ -391,6 +399,15 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         db->search(shareIq);
         return;
     }
+    else if (shareIq.type() == QXmppIq::Error)
+    {
+        qWarning() << "Search failed" << shareIq.search();
+        return;
+    }
+
+    ChatSharesView *view = shareIq.search().isEmpty() ? sharesView : searchView;
+    ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
+    Q_ASSERT(model);
     model->shareSearchIqReceived(shareIq);
 }
 
@@ -408,7 +425,6 @@ void ChatShares::shareServerFound(const QString &server)
         db = new ChatSharesDatabase(SystemInfo::storageLocation(SystemInfo::SharesLocation), this);
         connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SLOT(searchFinished(const QXmppShareSearchIq&)));
     }
-    model->setShareServer(server);
 
     // register with server
     registerWithServer();
@@ -611,11 +627,6 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-void ChatSharesModel::setShareServer(const QString &server)
-{
-    shareServer = server;
-}
-
 void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Result)
@@ -627,7 +638,7 @@ void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         {
             updateItem(parentItem, newItem);
             emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
-        } else if (shareIq.from() == shareServer) {
+        } else {
             rootItem->clearChildren();
             foreach (QXmppShareItem *newChild, newItem->children())
                 rootItem->appendChild(*newChild);
@@ -698,6 +709,11 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     emit contextMenu(index, event->globalPos());
+}
+
+void ChatSharesView::itemReceived(const QModelIndex &index)
+{
+    setExpanded(index, true);
 }
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)

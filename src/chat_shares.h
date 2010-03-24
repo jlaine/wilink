@@ -56,7 +56,6 @@ public:
     QXmppShareItem *findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
-    void setShareServer(const QString &server);
 
 signals:
     void itemReceived(const QModelIndex &index);
@@ -70,7 +69,6 @@ public slots:
 
 private:
     QXmppShareItem *rootItem;
-    QString shareServer;
 
     QIcon collectionIcon;
     QIcon fileIcon;
@@ -83,6 +81,9 @@ class ChatSharesView : public QTreeView
 
 public:
     ChatSharesView(QWidget *parent = 0);
+
+public slots:
+    void itemReceived(const QModelIndex &index);
 
 signals:
     void contextMenu(const QModelIndex &index, const QPoint &globalPos);
@@ -111,7 +112,6 @@ private slots:
     void itemAction();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
-    void itemReceived(const QModelIndex &index);
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void registerWithServer();
@@ -127,13 +127,13 @@ private:
     ChatClient *client;
     ChatClient *baseClient;
     ChatSharesDatabase *db;
-    ChatSharesModel *model;
     ChatSharesModel *queueModel;
     ChatTransfers *chatTransfers;
 
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;
-    ChatSharesView *treeWidget;
+    ChatSharesView *sharesView;
+    ChatSharesView *searchView;
     QTimer *registerTimer;
 };
 
