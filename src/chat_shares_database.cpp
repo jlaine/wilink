@@ -191,11 +191,11 @@ void SearchThread::run()
     // determine query type
     QXmppShareLocation location;
     location.setJid(requestIq.to());
-    location.setNode(requestIq.base());
+    location.setNode(requestIq.node());
     responseIq.collection().setLocations(location);
 
     // clean input
-    QString basePrefix = requestIq.base();
+    QString basePrefix = requestIq.node();
     if (!basePrefix.isEmpty() && !basePrefix.endsWith("/"))
         basePrefix += "/";
     int queryDepth = requestIq.depth();

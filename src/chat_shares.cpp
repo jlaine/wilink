@@ -192,8 +192,8 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         QXmppShareSearchIq iq;
         iq.setTo(location.jid());
         iq.setType(QXmppIq::Get);
-        iq.setBase(location.node());
         iq.setDepth(1);
+        iq.setNode(location.node());
         searches.insert(iq.tag(), tabWidget->currentWidget());
         client->sendPacket(iq);
     }
