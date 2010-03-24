@@ -228,6 +228,10 @@ Acceptez-vous?</translation>
         <source>Search</source>
         <translation>Recherche</translation>
     </message>
+    <message>
+        <source>Downloads</source>
+        <translation>Téléchargements</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
