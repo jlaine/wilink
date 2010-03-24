@@ -1,4 +1,4 @@
-wDesktop 0.7.902 (UNRELEASED)
+wDesktop 0.8.0 (UNRELEASED)
  * Improve file transfer support.
  * Add file sharing application.
  * Change the default download directory to "Downloads" on Windows.
