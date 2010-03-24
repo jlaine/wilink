@@ -88,7 +88,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     sharesView->setModel(sharesModel);
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    connect(sharesModel, SIGNAL(itemReceived(const QModelIndex&)), sharesView, SLOT(itemReceived(const QModelIndex&)));
     tabWidget->addTab(sharesView, tr("Shares"));
 
     /* create search tab */
@@ -97,7 +96,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     searchView->setModel(searchModel);
     connect(searchView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(searchView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    connect(searchModel, SIGNAL(itemReceived(const QModelIndex&)), searchView, SLOT(itemReceived(const QModelIndex&)));
     tabWidget->addTab(searchView, tr("Search"));
 
     /* create queue tab */
@@ -411,7 +409,9 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     ChatSharesView *view = shareIq.search().isEmpty() ? sharesView : searchView;
     ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
     Q_ASSERT(model);
-    model->shareSearchIqReceived(shareIq);
+
+    QModelIndex index = model->mergeItem(shareIq.collection());
+    view->setExpanded(index, true);
     tabWidget->setCurrentWidget(view);
 }
 
@@ -631,23 +631,21 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-void ChatSharesModel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
+QModelIndex ChatSharesModel::mergeItem(const QXmppShareItem &item)
 {
-    if (shareIq.type() == QXmppIq::Result)
+    // FIXME : we are casting away constness
+    QXmppShareItem *newItem = (QXmppShareItem*)&item;
+    QXmppShareItem *parentItem = findItemByMirrors(newItem->mirrors(), rootItem);
+    if (parentItem)
     {
-        // FIXME : we are casting away constness
-        QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
-        QXmppShareItem *parentItem = findItemByMirrors(newItem->mirrors(), rootItem);
-        if (parentItem)
-        {
-            updateItem(parentItem, newItem);
-            emit itemReceived(createIndex(parentItem->row(), 0, parentItem));
-        } else {
-            rootItem->clearChildren();
-            foreach (QXmppShareItem *newChild, newItem->children())
-                rootItem->appendChild(*newChild);
-            emit reset();
-        }
+        updateItem(parentItem, newItem);
+        return createIndex(parentItem->row(), 0, parentItem);
+    } else {
+        rootItem->clearChildren();
+        foreach (QXmppShareItem *newChild, newItem->children())
+            rootItem->appendChild(*newChild);
+        emit reset();
+        return QModelIndex();
     }
 }
 
@@ -713,11 +711,6 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     emit contextMenu(index, event->globalPos());
-}
-
-void ChatSharesView::itemReceived(const QModelIndex &index)
-{
-    setExpanded(index, true);
 }
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)
