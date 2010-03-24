@@ -409,6 +409,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
     Q_ASSERT(model);
     model->shareSearchIqReceived(shareIq);
+    tabWidget->setCurrentWidget(view);
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
