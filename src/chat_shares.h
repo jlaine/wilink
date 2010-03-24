@@ -53,19 +53,14 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     void addItem(const QXmppShareItem &item);
+    QModelIndex mergeItem(const QXmppShareItem &item);
     QXmppShareItem *findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
 
-signals:
-    void itemReceived(const QModelIndex &index);
-
 private:
     QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent, bool recurse = true);
     void updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
-
-public slots:
-    void shareSearchIqReceived(const QXmppShareSearchIq &shareIq);
 
 private:
     QXmppShareItem *rootItem;
@@ -81,9 +76,6 @@ class ChatSharesView : public QTreeView
 
 public:
     ChatSharesView(QWidget *parent = 0);
-
-public slots:
-    void itemReceived(const QModelIndex &index);
 
 signals:
     void contextMenu(const QModelIndex &index, const QPoint &globalPos);
@@ -129,11 +121,13 @@ private:
     ChatSharesDatabase *db;
     ChatSharesModel *queueModel;
     ChatTransfers *chatTransfers;
+    QMap<QString, QWidget*> searches;
 
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;
     ChatSharesView *sharesView;
     ChatSharesView *searchView;
+    ChatSharesView *queueView;
     QTimer *registerTimer;
 };
 

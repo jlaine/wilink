@@ -26,12 +26,9 @@
 
 #include "chat_panel.h"
 
-class ChatSharesModel;
-class ChatSharesView;
 class QPushButton;
 class QTableWidget;
 class QXmppClient;
-class QXmppShareItem;
 class QXmppSiPubIq;
 
 enum JobDataRoles
@@ -68,7 +65,6 @@ public:
 
     void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid);
-    void setQueueModel(ChatSharesModel *model);
 
     static QString sizeToString(qint64 size);
 
@@ -88,7 +84,6 @@ private slots:
     void updateButtons();
 
 private:
-    ChatSharesView *queueView;
     QPushButton *removeButton;
     QTableWidget *tableWidget;
     QList<QXmppTransferJob*> jobs;
