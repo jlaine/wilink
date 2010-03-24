@@ -59,7 +59,7 @@ public:
     void removeItem(QXmppShareItem *item);
 
 private:
-    QXmppShareItem *findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent, bool recurse = true);
+    QXmppShareItem *findItemByLocations(const QXmppShareLocationList &mirrors, QXmppShareItem *parent, bool recurse = true);
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
 private:

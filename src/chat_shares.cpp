@@ -181,18 +181,18 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     }
     else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
     {
-        if (item->mirrors().isEmpty())
+        if (item->locations().isEmpty())
         {
-            qWarning() << "No mirror for collection" << item->name();
+            qWarning() << "No location for collection" << item->name();
             return; 
         }
-        const QXmppShareMirror mirror = item->mirrors().first();
+        const QXmppShareLocation location = item->locations().first();
 
         // browse files
         QXmppShareSearchIq iq;
-        iq.setTo(mirror.jid());
+        iq.setTo(location.jid());
         iq.setType(QXmppIq::Get);
-        iq.setBase(mirror.path());
+        iq.setBase(location.node());
         iq.setDepth(1);
         searches.insert(iq.tag(), tabWidget->currentWidget());
         client->sendPacket(iq);
@@ -271,31 +271,31 @@ void ChatShares::processDownloadQueue()
         if (!file)
             return;
 
-        // pick mirror
-        QXmppShareMirror mirror;
-        bool mirrorFound = false;
-        foreach (mirror, file->mirrors())
+        // pick location
+        QXmppShareLocation location;
+        bool locationFound = false;
+        foreach (location, file->locations())
         {
-            if (!mirror.jid().isEmpty() &&
-                mirror.jid() != client->getConfiguration().jid() &&
-                !mirror.path().isEmpty())
+            if (!location.jid().isEmpty() &&
+                location.jid() != client->getConfiguration().jid() &&
+                !location.node().isEmpty())
             {
-                mirrorFound = true;
+                locationFound = true;
                 break;
             }
         }
-        if (!mirrorFound)
+        if (!locationFound)
         {
-            qWarning() << "No mirror found for file" << file->name();
+            qWarning() << "No location found for file" << file->name();
             queueModel->removeItem(file);
             continue;
         }
 
         // request file
         QXmppSiPubIq iq;
-        iq.setTo(mirror.jid());
+        iq.setTo(location.jid());
         iq.setType(QXmppIq::Get);
-        iq.setPublishId(mirror.path());
+        iq.setPublishId(location.node());
         file->setData(PacketId, iq.id());
         client->sendPacket(iq);
 
@@ -462,7 +462,7 @@ ChatSharesModel::~ChatSharesModel()
 
 void ChatSharesModel::addItem(const QXmppShareItem &item)
 {
-    if (findItemByMirrors(item.mirrors(), rootItem))
+    if (findItemByLocations(item.locations(), rootItem))
         return;
 
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
@@ -489,7 +489,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     {
         if (item->type() == QXmppShareItem::CollectionItem)
         {
-            if (item->mirrors().size() == 1 && item->mirrors().first().path().isEmpty())
+            if (item->locations().size() == 1 && item->locations().first().node().isEmpty())
                 return peerIcon;
             else
                 return collectionIcon;
@@ -521,19 +521,19 @@ QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, int r
     return 0;
 }
 
-QXmppShareItem *ChatSharesModel::findItemByMirrors(const QXmppShareMirrorList &mirrors, QXmppShareItem *parent, bool recurse)
+QXmppShareItem *ChatSharesModel::findItemByLocations(const QXmppShareLocationList &locations, QXmppShareItem *parent, bool recurse)
 {
-    if (mirrors.isEmpty())
+    if (locations.isEmpty())
         return 0;
 
     // look at immediate children
     QXmppShareItem *child;
-    foreach (const QXmppShareMirror &mirror, mirrors)
+    foreach (const QXmppShareLocation &location, locations)
     {
         for (int i = 0; i < parent->size(); i++)
         {
             child = parent->child(i);
-            if (child->mirrors().contains(mirror))
+            if (child->locations().contains(location))
                 return child;
         }
     }
@@ -542,7 +542,7 @@ QXmppShareItem *ChatSharesModel::findItemByMirrors(const QXmppShareMirrorList &m
     if (recurse)
     {
         for (int i = 0; i < parent->size(); i++)
-            if ((child = findItemByMirrors(mirrors, parent->child(i))) != 0)
+            if ((child = findItemByLocations(locations, parent->child(i))) != 0)
                 return child;
     }
 
@@ -643,7 +643,7 @@ QModelIndex ChatSharesModel::mergeItem(const QXmppShareItem &item)
 {
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&item;
-    QXmppShareItem *parentItem = findItemByMirrors(newItem->mirrors(), rootItem);
+    QXmppShareItem *parentItem = findItemByLocations(newItem->locations(), rootItem);
     if (!parentItem)
         parentItem = rootItem;
     return updateItem(parentItem, newItem);
@@ -657,7 +657,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
 
     oldItem->setFileHash(newItem->fileHash());
     oldItem->setFileSize(newItem->fileSize());
-    oldItem->setMirrors(newItem->mirrors());
+    oldItem->setLocations(newItem->locations());
     //oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
 
@@ -665,7 +665,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     QList<QXmppShareItem*> added;
     foreach (QXmppShareItem *newChild, newItem->children())
     {
-        QXmppShareItem *oldChild = findItemByMirrors(newChild->mirrors(), oldItem, false);
+        QXmppShareItem *oldChild = findItemByLocations(newChild->locations(), oldItem, false);
         if (oldChild)
         {
             updateItem(oldChild, newChild);

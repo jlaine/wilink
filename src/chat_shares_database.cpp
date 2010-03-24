@@ -174,9 +174,9 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     file.setFileHash(cachedHash);
     file.setFileSize(cachedSize);
 
-    QXmppShareMirror mirror(requestIq.to());
-    mirror.setPath(path);
-    file.setMirrors(mirror);
+    QXmppShareLocation location(requestIq.to());
+    location.setNode(path);
+    file.setLocations(location);
 
     return true;
 }
@@ -189,10 +189,10 @@ void SearchThread::run()
     responseIq.setTag(requestIq.tag());
 
     // determine query type
-    QXmppShareMirror mirror;
-    mirror.setJid(requestIq.to());
-    mirror.setPath(requestIq.base());
-    responseIq.collection().setMirrors(mirror);
+    QXmppShareLocation location;
+    location.setJid(requestIq.to());
+    location.setNode(requestIq.base());
+    responseIq.collection().setLocations(location);
 
     // clean input
     QString basePrefix = requestIq.base();
@@ -297,9 +297,9 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
             {
                 QXmppShareItem collection(QXmppShareItem::CollectionItem);
                 collection.setName(dirName);
-                QXmppShareMirror mirror(requestIq.to());
-                mirror.setPath(prefix + dirPath + "/");
-                collection.setMirrors(mirror);
+                QXmppShareLocation location(requestIq.to());
+                location.setNode(prefix + dirPath + "/");
+                collection.setLocations(location);
                 subDirs[dirPath] = parentCollection->appendChild(collection);
             }
             parentCollection = subDirs[dirPath];
