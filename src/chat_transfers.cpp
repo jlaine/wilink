@@ -270,8 +270,8 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     const QString downloadsLink = QString("<a href=\"file://%1\">%2</a>").arg(
         SystemInfo::storageLocation(SystemInfo::DownloadsLocation),
         SystemInfo::displayName(SystemInfo::DownloadsLocation));
-    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.")
-        .arg(downloadsLink));
+    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder.").arg(downloadsLink)
+         + " " + tr("Once a file is received, you can double click to open it."));
     downloadsLabel->setOpenExternalLinks(true);
     downloadsLabel->setWordWrap(true);
     layout->addWidget(downloadsLabel);
