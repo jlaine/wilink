@@ -34,7 +34,7 @@ class QXmppSiPubIq;
 enum JobDataRoles
 {
     LocalPathRole = Qt::UserRole,
-    RemotePathRole,
+    StartTimeRole,
 };
 
 class ChatTransferPrompt : public QMessageBox
@@ -63,6 +63,7 @@ public:
     ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
     ~ChatTransfers();
 
+    int activeJobs(QXmppTransferJob::Direction direction) const;
     void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid);
 

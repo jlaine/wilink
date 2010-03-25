@@ -29,6 +29,7 @@
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QTime>
 #include <QUrl>
 
 #include "qxmpp/QXmppClient.h"
@@ -48,11 +49,6 @@ enum TransfersColumns {
     ProgressColumn,
     SizeColumn,
     MaxColumn,
-};
-
-enum DataRoles {
-    PacketId,
-    StreamId,
 };
 
 static QIcon jobIcon(QXmppTransferJob *job)
@@ -154,6 +150,16 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
 
 ChatTransfers::~ChatTransfers()
 {
+}
+
+int ChatTransfers::activeJobs(QXmppTransferJob::Direction direction) const
+{
+    int active = 0;
+    foreach (QXmppTransferJob *job, jobs)
+        if (job->direction() == direction &&
+            job->state() != QXmppTransferJob::FinishedState)
+            active++;
+    return active;
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
@@ -308,7 +314,15 @@ void ChatTransfers::progress(qint64 done, qint64 total)
 
     QProgressBar *progress = qobject_cast<QProgressBar*>(tableWidget->cellWidget(jobRow, ProgressColumn));
     if (progress)
+    {
+        int elapsed = job->data(StartTimeRole).toTime().elapsed();
+        if (elapsed)
+        {
+            int speed = (done * 1000.0) / elapsed;
+        }
+
         progress->setValue(done);
+    }
 }
 
 void ChatTransfers::removeCurrentJob()
@@ -371,6 +385,12 @@ void ChatTransfers::stateChanged(QXmppTransferJob::State state)
     if (!job || jobRow < 0)
         return;
 
+    if (state == QXmppTransferJob::TransferState)
+    {
+        QTime t;
+        t.start();
+        job->setData(StartTimeRole, t);
+    }
     tableWidget->item(jobRow, NameColumn)->setIcon(jobIcon(job));
     updateButtons();
 }
