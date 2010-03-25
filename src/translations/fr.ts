@@ -230,11 +230,11 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Downloads</source>
-        <translation>Téléchargements</translation>
+        <translation>Fichiers reçus</translation>
     </message>
     <message>
         <source>Uploads</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers envoyés</translation>
     </message>
 </context>
 <context>
