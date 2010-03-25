@@ -183,7 +183,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     {
         if (item->locations().isEmpty())
         {
-            qWarning() << "No location for collection" << item->name();
+            logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
             return; 
         }
         const QXmppShareLocation location = item->locations().first();
@@ -286,7 +286,7 @@ void ChatShares::processDownloadQueue()
         }
         if (!locationFound)
         {
-            qWarning() << "No location found for file" << file->name();
+            logMessage(QXmppLogger::WarningMessage, "No location found for file " + file->name());
             queueModel->removeItem(file);
             continue;
         }
@@ -352,7 +352,7 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
         QString filePath = db->locate(shareIq.publishId());
         if (filePath.isEmpty())
         {
-            qWarning() << "Could not find file" << shareIq.publishId();
+            logMessage(QXmppLogger::WarningMessage, "Could not find local file " + shareIq.publishId());
             responseIq.setType(QXmppIq::Error);
             client->sendPacket(responseIq);
             return;
@@ -393,7 +393,7 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
-        qWarning() << "Error requesting file from" << shareIq.from();
+        logMessage(QXmppLogger::WarningMessage, "Error requesting file from " + shareIq.from());
         queueModel->removeItem(queueItem);
     }
 }
@@ -407,7 +407,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
-        qWarning() << "Search failed" << shareIq.search();
+        logMessage(QXmppLogger::WarningMessage, "Search failed " + shareIq.search());
         return;
     }
 
