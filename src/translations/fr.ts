@@ -240,6 +240,10 @@ Acceptez-vous?</translation>
         <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
     </message>
+    <message>
+        <source>To share files with other users, simply place them in your %1 folder.</source>
+        <translation>Pour partager des fichiers avec les autres utilisateurs, placez les dans votre dossier %1.</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>

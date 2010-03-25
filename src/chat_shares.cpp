@@ -116,7 +116,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     QWidget *downloadsWidget = new QWidget;
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->setMargin(0);
-    vbox->setSpacing(0);
     downloadsWidget->setLayout(vbox);
 
     /* download location label */
@@ -144,8 +143,24 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     tabWidget->addTab(downloadsWidget, tr("Downloads"));
 
     /* create uploads tab */
+    QWidget *uploadsWidget = new QWidget;
+    vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+    uploadsWidget->setLayout(vbox);
+
+    /* download location label */
+    const QString sharesLink = QString("<a href=\"file://%1\">%2</a>").arg(
+        SystemInfo::storageLocation(SystemInfo::SharesLocation),
+        SystemInfo::displayName(SystemInfo::SharesLocation));
+    QLabel *uploadsLabel = new QLabel(tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink));
+    uploadsLabel->setOpenExternalLinks(true);
+    uploadsLabel->setWordWrap(true);
+    vbox->addWidget(uploadsLabel);
+
     uploadsView = new ChatTransfersView;
-    tabWidget->addTab(uploadsView, tr("Uploads"));
+    vbox->addWidget(uploadsView);
+
+    tabWidget->addTab(uploadsWidget, tr("Uploads"));
 
     setLayout(layout);
 
