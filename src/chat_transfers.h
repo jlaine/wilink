@@ -93,6 +93,7 @@ public:
     void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid);
 
+    static QString availableFilePath(const QString &dirPath, const QString &fileName);
     static QString sizeToString(qint64 size);
 
 protected:

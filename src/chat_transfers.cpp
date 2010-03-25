@@ -306,6 +306,25 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     emit registerTab();
 }
 
+QString ChatTransfers::availableFilePath(const QString &dirPath, const QString &name)
+{
+    QString fileName = name;
+    QDir downloadsDir(dirPath);
+    if (downloadsDir.exists(fileName))
+    {
+        const QString fileBase = QFileInfo(fileName).completeBaseName();
+        const QString fileSuffix = QFileInfo(fileName).suffix();
+        int i = 2;
+        while (downloadsDir.exists(fileName))
+        {
+            fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
+            if (!fileSuffix.isEmpty())
+                fileName += "." + fileSuffix;
+        }
+    }
+    return downloadsDir.absoluteFilePath(fileName);
+}
+
 void ChatTransfers::fileAccepted(QXmppTransferJob *job, const QString &subdir)
 {
     QStringList pathBits;
@@ -319,21 +338,7 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job, const QString &subdir)
     }
 
     // determine file name
-    QString fileName = job->fileName();
-    if (downloadsDir.exists(fileName))
-    {
-        const QString fileBase = QFileInfo(fileName).completeBaseName();
-        const QString fileSuffix = QFileInfo(fileName).suffix();
-        int i = 2;
-        while (downloadsDir.exists(fileName))
-        {
-            fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
-            if (!fileSuffix.isEmpty())
-                fileName += "." + fileSuffix;
-        }
-    }
-
-    const QString filePath = downloadsDir.absoluteFilePath(fileName);
+    const QString filePath = availableFilePath(downloadsDir.path(), job->fileName());
     QFile *file = new QFile(filePath, job);
     if (file->open(QIODevice::WriteOnly))
     {
