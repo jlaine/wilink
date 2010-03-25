@@ -76,6 +76,7 @@ private slots:
     void fileDeclined(QXmppTransferJob *job);
     void fileExpected(const QString &sid, const QString &path);
     void fileReceived(QXmppTransferJob *job);
+    void jobDestroyed(QObject *object);
     void cellDoubleClicked(int row, int column);
     void finished();
     void progress(qint64, qint64);

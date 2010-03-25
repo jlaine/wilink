@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -179,6 +178,7 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     progress->setMaximum(job->fileSize());
     tableWidget->setCellWidget(0, ProgressColumn, progress);
 
+    connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(jobDestroyed(QObject*)));
     connect(job, SIGNAL(finished()), this, SLOT(finished()));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
@@ -204,8 +204,6 @@ void ChatTransfers::cellDoubleClicked(int row, int column)
 
 void ChatTransfers::finished()
 {
-    //processDownloadQueue();
-
     // find the job that completed
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     int jobRow = jobs.indexOf(job);
@@ -290,6 +288,17 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
+void ChatTransfers::jobDestroyed(QObject *obj)
+{
+    int jobRow = jobs.indexOf(static_cast<QXmppTransferJob*>(obj));
+    if (jobRow < 0)
+        return;
+
+    jobs.removeAt(jobRow);
+    tableWidget->removeRow(jobRow);
+    updateButtons();
+}
+
 void ChatTransfers::progress(qint64 done, qint64 total)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
@@ -310,14 +319,9 @@ void ChatTransfers::removeCurrentJob()
 
     QXmppTransferJob *job = jobs.at(jobRow);
     if (job->state() == QXmppTransferJob::FinishedState)
-    {
-        jobs.removeAt(jobRow);
-        tableWidget->removeRow(jobRow);
-        updateButtons();
         job->deleteLater();
-    } else {
-        jobs.at(jobRow)->abort();
-    }
+    else
+        job->abort();
 }
 
 void ChatTransfers::sendFile(const QString &fullJid)
