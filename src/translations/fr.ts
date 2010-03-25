@@ -236,6 +236,10 @@ Acceptez-vous?</translation>
         <source>Uploads</source>
         <translation>Fichiers envoyés</translation>
     </message>
+    <message>
+        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
@@ -286,12 +290,8 @@ Acceptez-vous?</translation>
         <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
     </message>
     <message>
-        <source>Received files are stored in your %1 folder.</source>
-        <translation>Les fichiers reçus sont stockés dans votre dossier %1.</translation>
-    </message>
-    <message>
-        <source>Once a file is received, you can double click to open it.</source>
-        <translation>Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
     </message>
 </context>
 <context>

@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QFileIconProvider>
 #include <QHeaderView>
@@ -32,6 +33,7 @@
 #include <QTabWidget>
 #include <QTimer>
 #include <QTreeWidget>
+#include <QUrl>
 
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppUtils.h"
@@ -58,7 +60,7 @@ enum Columns
 };
 
 enum DataRoles {
-    PacketId = Qt::UserRole,
+    PacketId = Qt::UserRole + 10,
     StreamId,
     TransferStart,
     TransferDone,
@@ -117,9 +119,19 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     vbox->setSpacing(0);
     downloadsWidget->setLayout(vbox);
 
+    /* download location label */
+    const QString downloadsLink = QString("<a href=\"file://%1\">%2</a>").arg(
+        SystemInfo::storageLocation(SystemInfo::DownloadsLocation),
+        SystemInfo::displayName(SystemInfo::DownloadsLocation));
+    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
+    downloadsLabel->setOpenExternalLinks(true);
+    downloadsLabel->setWordWrap(true);
+    vbox->addWidget(downloadsLabel);
+
     queueModel = new ChatSharesModel(this);
     downloadsView = new ChatSharesView;
     downloadsView->setModel(queueModel);
+    connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(transferDoubleClicked(const QModelIndex&)));
     vbox->addWidget(downloadsView);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -177,6 +189,17 @@ void ChatShares::transferDestroyed(QObject *obj)
 {
     downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
     processDownloadQueue();
+}
+
+void ChatShares::transferDoubleClicked(const QModelIndex &index)
+{
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return;
+
+    QString localPath = item->data(LocalPathRole).toString();
+    if (item->type() == QXmppShareItem::FileItem && !localPath.isEmpty())
+        QDesktopServices::openUrl(QUrl::fromLocalFile(localPath));
 }
 
 void ChatShares::transferProgress(qint64 done, qint64 total)
@@ -271,8 +294,11 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(TransferStart, QVariant());
 
         // if the transfer failed, delete the local file
-        if (job->error() != QXmppTransferJob::NoError)
-            QFile(job->data(LocalPathRole).toString()).remove();
+        QString localPath = job->data(LocalPathRole).toString();
+        if (job->error() == QXmppTransferJob::NoError)
+            queueItem->setData(LocalPathRole, localPath);
+        else
+            QFile(localPath).remove();
         job->deleteLater();
     }
 }
