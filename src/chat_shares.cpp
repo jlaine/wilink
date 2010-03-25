@@ -497,8 +497,8 @@ ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
 
 void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (index.column() == ProgressColumn) {
-        int done = index.data(TransferDone).toInt();
+    int done = index.data(TransferDone).toInt();
+    if (index.column() == ProgressColumn && done) {
         int total = index.data(TransferTotal).toInt();
         int elapsed = index.data(TransferStart).toTime().elapsed();
 
