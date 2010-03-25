@@ -142,13 +142,19 @@ void ChatTransfersView::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(slotStateChanged(QXmppTransferJob::State)));
 }
 
-void ChatTransfersView::removeCurrentJob()
+QXmppTransferJob *ChatTransfersView::currentJob()
 {
     int jobRow = currentRow();
     if (jobRow < 0 || jobRow >= jobs.size())
-        return;
+        return 0;
+    return jobs.at(jobRow);
+}
 
-    QXmppTransferJob *job = jobs.at(jobRow);
+void ChatTransfersView::removeCurrentJob()
+{
+    QXmppTransferJob *job = currentJob();
+    if (!job)
+        return;
     if (job->state() == QXmppTransferJob::FinishedState)
         job->deleteLater();
     else
@@ -413,21 +419,21 @@ QString ChatTransfers::sizeToString(qint64 size)
 
 void ChatTransfers::updateButtons()
 {
-/*
-    int jobRow = tableWidget->currentRow();
-    if (jobRow < 0 || jobRow >= jobs.size())
+    QXmppTransferJob *job = tableWidget->currentJob();
+    if (!job)
     {
         removeButton->setEnabled(false);
         removeButton->setIcon(QIcon(":/remove.png"));
-        return;
     }
-
-    QXmppTransferJob *job = jobs.at(jobRow);
-    if (job->state() == QXmppTransferJob::FinishedState)
+    else if (job->state() == QXmppTransferJob::FinishedState)
+    {
         removeButton->setIcon(QIcon(":/remove.png"));
+        removeButton->setEnabled(true);
+    }
     else
+    {
         removeButton->setIcon(QIcon(":/close.png"));
-    removeButton->setEnabled(true);
-*/
+        removeButton->setEnabled(true);
+    }
 }
 

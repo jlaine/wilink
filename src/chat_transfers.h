@@ -62,6 +62,7 @@ public:
     ChatTransfersView(QWidget *parent = 0);
     int activeJobs(QXmppTransferJob::Direction direction) const;
     void addJob(QXmppTransferJob *job);
+    QXmppTransferJob *currentJob();
 
 public slots:
     void removeCurrentJob();
