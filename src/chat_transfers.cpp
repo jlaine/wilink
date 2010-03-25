@@ -197,9 +197,17 @@ void ChatTransfersView::slotFinished()
         return;
 
     // if the job failed, reset the progress bar
+    const QString localFilePath = job->data(LocalPathRole).toString();
     QProgressBar *progress = qobject_cast<QProgressBar*>(cellWidget(jobRow, ProgressColumn));
     if (progress && job->error() != QXmppTransferJob::NoError)
+    {
         progress->reset();
+
+        // delete failed downloads
+        if (job->direction() == QXmppTransferJob::IncomingDirection &&
+            !localFilePath.isEmpty())
+            QFile(localFilePath).remove();
+    }
 }
 
 void ChatTransfersView::slotProgress(qint64 done, qint64 total)

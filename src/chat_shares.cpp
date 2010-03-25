@@ -213,7 +213,13 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(TransferStart, t);
         }
         else if (state == QXmppTransferJob::FinishedState)
-            queueItem->setData(TransferStart, QVariant());
+        {
+            // if the transfer failed, delete the local file
+            if (job->error() != QXmppTransferJob::NoError)
+                QFile(job->data(LocalPathRole).toString()).remove();
+            queueModel->removeItem(queueItem);
+            job->deleteLater();
+        }
     }
 }
 
