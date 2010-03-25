@@ -101,7 +101,6 @@ protected:
 private slots:
     void fileAccepted(QXmppTransferJob *job, const QString &subdir = QString());
     void fileDeclined(QXmppTransferJob *job);
-    void fileExpected(const QString &sid, const QString &path);
     void fileReceived(QXmppTransferJob *job);
     void updateButtons();
 
@@ -109,7 +108,8 @@ private:
     QPushButton *removeButton;
     ChatTransfersView *tableWidget;
     QXmppClient *client;
-    QHash<QString, QString> expectedStreams;
+
+    friend class ChatShares;
 };
 
 #endif

@@ -21,10 +21,12 @@
 #define __WDESKTOP_CHAT_SHARES_H__
 
 #include <QIcon>
+#include <QStyledItemDelegate>
 #include <QTreeView>
 
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppShareIq.h"
+#include "qxmpp/QXmppTransferManager.h"
 
 #include "chat_panel.h"
 
@@ -37,7 +39,13 @@ class QTabWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppPresence;
-class QXmppTransferJob;
+
+class ChatSharesDelegate : public QStyledItemDelegate
+{
+public:
+    ChatSharesDelegate(QObject *parent);
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
 
 class ChatSharesModel : public QAbstractItemModel
 {
@@ -58,6 +66,8 @@ public:
     QXmppShareItem *findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
+
+    void setProgress(QXmppShareItem *item, qint64 done, qint64 total);
 
 private:
     QXmppShareItem *findItemByLocations(const QXmppShareLocationList &mirrors, QXmppShareItem *parent, bool recurse = true);
@@ -97,12 +107,13 @@ public:
     void setTransfers(ChatTransfers *transfers);
 
 signals:
-    void fileExpected(const QString &sid, const QString path);
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
     void disconnected();
-    void fileReceived(QXmppTransferJob *job);
+    void transferReceived(QXmppTransferJob *job);
+    void transferProgress(qint64, qint64);
+    void transferStateChanged(QXmppTransferJob::State state);
     void findRemoteFiles();
     void itemAction();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);

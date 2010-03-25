@@ -227,7 +227,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatShares, SIGNAL(registerTab()), this, SLOT(registerPanel()));
     connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
-    connect(chatShares, SIGNAL(fileExpected(const QString&, const QString&)), chatTransfers, SLOT(fileExpected(const QString&, const QString&)));
     chatShares->setTransfers(chatTransfers);
 
     /* build splitter */

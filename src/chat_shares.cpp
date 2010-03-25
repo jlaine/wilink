@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
@@ -49,14 +50,17 @@ enum Actions
 enum Columns
 {
     NameColumn,
-    SizeColumn,
     ProgressColumn,
+    SizeColumn,
     MaxColumn,
 };
 
 enum DataRoles {
     PacketId,
     StreamId,
+    TransferStart,
+    TransferDone,
+    TransferTotal,
 };
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
@@ -99,6 +103,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     ChatSharesModel *searchModel = new ChatSharesModel;
     searchView = new ChatSharesView;
     searchView->setModel(searchModel);
+    searchView->hideColumn(ProgressColumn);
     connect(searchView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(searchView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
     tabWidget->addTab(searchView, tr("Search"));
@@ -132,9 +137,54 @@ void ChatShares::disconnected()
     }
 }
 
-void ChatShares::fileReceived(QXmppTransferJob *job)
+void ChatShares::transferReceived(QXmppTransferJob *job)
 {
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    if (!queueItem)
+        job->abort();
 
+    // determine full path
+    QStringList pathBits;
+    QXmppShareItem *parentItem = queueItem->parent();
+    while (parentItem && parentItem->parent())
+    {
+        // sanitize path
+        QString dirName = parentItem->name();
+        if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
+            pathBits.prepend(dirName);
+        parentItem = parentItem->parent();
+    }
+
+    chatTransfers->fileAccepted(job, pathBits.join("/"));
+    connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
+    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
+}
+
+void ChatShares::transferProgress(qint64 done, qint64 total)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    if (queueItem)
+        queueModel->setProgress(queueItem, done, total);
+}
+
+void ChatShares::transferStateChanged(QXmppTransferJob::State state)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    if (queueItem)
+    {
+        if (state == QXmppTransferJob::TransferState)
+        { 
+            QTime t;
+            t.start();
+            job->setData(TransferStart, t);
+        }
+    }
 }
 
 void ChatShares::findRemoteFiles()
@@ -261,7 +311,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 
         ChatClient *newClient = new ChatClient(this);
         connect(&newClient->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
-            chatTransfers, SLOT(fileReceived(QXmppTransferJob*)));
+            this, SLOT(transferReceived(QXmppTransferJob*)));
         newClient->setLogger(baseClient->logger());
 
         /* replace client */
@@ -386,22 +436,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Result)
     {
-        // store full path
-        QStringList pathBits;
-        QXmppShareItem *parentItem = queueItem->parent();
-        while (parentItem && parentItem->parent())
-        {
-            // sanitize path
-            QString dirName = parentItem->name();
-            if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
-                pathBits.prepend(dirName);
-            parentItem = parentItem->parent();
-        }
-
-        // FIXME : is this the right place to remove from queue?
-        queueModel->removeItem(queueItem);
-
-        emit fileExpected(shareIq.sid(), pathBits.join("/"));
+        queueItem->setData(StreamId, shareIq.sid());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
@@ -455,6 +490,40 @@ void ChatShares::shareServerFound(const QString &server)
     registerTimer->start();
 }
 
+ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
+    : QStyledItemDelegate(parent)
+{
+}
+
+void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if (index.column() == ProgressColumn) {
+        int done = index.data(TransferDone).toInt();
+        int total = index.data(TransferTotal).toInt();
+        int elapsed = index.data(TransferStart).toTime().elapsed();
+
+        QStyleOptionProgressBar progressBarOption;
+        progressBarOption.rect = option.rect;
+        progressBarOption.minimum = 0;
+        progressBarOption.maximum = total; 
+        progressBarOption.progress = done;
+        progressBarOption.state = QStyle::State_Active | QStyle::State_Enabled | QStyle::State_HasFocus | QStyle::State_Selected;
+        QString text = QString::number(done/total) + "%";
+        if (elapsed)
+        {
+            int speed = (1000 * done) / elapsed;
+            text += " " + ChatTransfers::sizeToString(speed) + "/s";
+        }
+        progressBarOption.text = text;
+        progressBarOption.textVisible = true;
+
+        QApplication::style()->drawControl(QStyle::CE_ProgressBar,
+                                           &progressBarOption, painter);
+    } else {
+        QStyledItemDelegate::paint(painter, option, index);
+    }
+}
+
 ChatSharesModel::ChatSharesModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
@@ -497,6 +566,8 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         return item->name();
     else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
         return ChatTransfers::sizeToString(item->fileSize());
+    else if (index.column() == ProgressColumn)
+        return item->data(role);
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
         if (item->type() == QXmppShareItem::CollectionItem)
@@ -653,6 +724,13 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
+void ChatSharesModel::setProgress(QXmppShareItem *item, qint64 done, qint64 total)
+{
+    item->setData(TransferDone, done);
+    item->setData(TransferTotal, total);
+    emit dataChanged(createIndex(item->row(), ProgressColumn, item), createIndex(item->row(), ProgressColumn, item));
+}
+
 QModelIndex ChatSharesModel::mergeItem(const QXmppShareItem &item)
 {
     // FIXME : we are casting away constness
@@ -715,8 +793,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
 ChatSharesView::ChatSharesView(QWidget *parent)
     : QTreeView(parent)
 {
-    bool hidden = isColumnHidden(ProgressColumn);
-    qDebug() << "hidden" << hidden;
+    setItemDelegate(new ChatSharesDelegate(this));
     setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
