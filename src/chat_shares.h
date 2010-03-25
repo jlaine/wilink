@@ -115,6 +115,7 @@ signals:
 
 private slots:
     void disconnected();
+    void transferDestroyed(QObject *obj);
     void transferReceived(QXmppTransferJob *job);
     void transferProgress(qint64, qint64);
     void transferStateChanged(QXmppTransferJob::State state);
@@ -147,6 +148,7 @@ private:
     ChatSharesView *searchView;
     ChatSharesView *downloadsView;
     ChatTransfersView *uploadsView;
+    QList<QXmppTransferJob*> downloadJobs;
     QTimer *registerTimer;
 };
 

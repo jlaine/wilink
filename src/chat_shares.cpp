@@ -158,6 +158,12 @@ void ChatShares::disconnected()
     }
 }
 
+void ChatShares::transferDestroyed(QObject *obj)
+{
+    qDebug() << "Transfer destroyed";
+    downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
+}
+
 void ChatShares::transferReceived(QXmppTransferJob *job)
 {
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
@@ -198,8 +204,10 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
 
     // add transfer to list
     job->setData(LocalPathRole, filePath);
+    connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(transferDestroyed(QObject*)));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
+    downloadJobs.append(job);
 
     // start transfer
     job->accept(file);
@@ -380,7 +388,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 void ChatShares::processDownloadQueue()
 {
     // check how many downloads are active
-    int activeDownloads = chatTransfers->activeJobs(QXmppTransferJob::IncomingDirection);
+    int activeDownloads = downloadJobs.size();
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
@@ -555,7 +563,7 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 {
     int done = index.data(TransferDone).toInt();
     int total = index.data(TransferTotal).toInt();
-    if (index.column() == ProgressColumn && done >= 0 && total >= 0)
+    if (index.column() == ProgressColumn && done > 0 && total > 0)
     {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = option.rect;
