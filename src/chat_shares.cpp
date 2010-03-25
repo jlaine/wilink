@@ -18,12 +18,14 @@
  */
 
 #include <QApplication>
+#include <QDialogButtonBox>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QPushButton>
 #include <QResizeEvent>
 #include <QStackedWidget>
 #include <QStringList>
@@ -109,10 +111,25 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     tabWidget->addTab(searchView, tr("Search"));
 
     /* create queue tab */
+    QWidget *downloadsWidget = new QWidget;
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+    vbox->setSpacing(0);
+    downloadsWidget->setLayout(vbox);
+
     queueModel = new ChatSharesModel(this);
     downloadsView = new ChatSharesView;
     downloadsView->setModel(queueModel);
-    tabWidget->addTab(downloadsView, tr("Downloads"));
+    vbox->addWidget(downloadsView);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    QPushButton *removeButton = new QPushButton;
+    removeButton->setIcon(QIcon(":/remove.png"));
+    connect(removeButton, SIGNAL(clicked()), downloadsView, SLOT(removeCurrentItem()));
+    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+    vbox->addWidget(buttonBox);
+
+    tabWidget->addTab(downloadsWidget, tr("Downloads"));
 
     /* create uploads tab */
     uploadsView = new ChatTransfersView;
@@ -214,10 +231,12 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
         }
         else if (state == QXmppTransferJob::FinishedState)
         {
+            queueItem->setData(TransferStart, QVariant());
+
             // if the transfer failed, delete the local file
             if (job->error() != QXmppTransferJob::NoError)
                 QFile(job->data(LocalPathRole).toString()).remove();
-            queueModel->removeItem(queueItem);
+            //queueModel->removeItem(queueItem);
             job->deleteLater();
         }
     }
@@ -847,6 +866,17 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     emit contextMenu(index, event->globalPos());
+}
+
+void ChatSharesView::removeCurrentItem()
+{
+    const QModelIndex &index = currentIndex();
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return;
+
+    ChatSharesModel *sharesModel = qobject_cast<ChatSharesModel*>(model());
+    sharesModel->removeItem(item);
 }
 
 void ChatSharesView::resizeEvent(QResizeEvent *e)

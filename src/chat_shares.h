@@ -93,6 +93,9 @@ public:
 signals:
     void contextMenu(const QModelIndex &index, const QPoint &globalPos);
 
+private slots:
+    void removeCurrentItem();
+
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);

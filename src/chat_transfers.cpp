@@ -284,7 +284,6 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
 
     /* buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
-
     removeButton = new QPushButton;
     connect(removeButton, SIGNAL(clicked()), tableWidget, SLOT(removeCurrentJob()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
