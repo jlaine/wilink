@@ -243,6 +243,10 @@ Acceptez-vous?</translation>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
+    <message>
+        <source>Progress</source>
+        <translation>Progrès</translation>
+    </message>
 </context>
 <context>
     <name>ChatTransferPrompt</name>
@@ -262,18 +266,6 @@ Acceptez-vous?</translation>
 <context>
     <name>ChatTransfers</name>
     <message>
-        <source>File name</source>
-        <translation>Nom du fichier</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Taille</translation>
-    </message>
-    <message>
-        <source>Progress</source>
-        <translation>Progrès</translation>
-    </message>
-    <message>
         <source>File transfers</source>
         <translation>Transferts de fichiers</translation>
     </message>
@@ -292,6 +284,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Sorry, but you cannot send files bigger than %1.</source>
         <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
+    </message>
+</context>
+<context>
+    <name>ChatTransfersView</name>
+    <message>
+        <source>File name</source>
+        <translation>Nom du fichier</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Taille</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Progrès</translation>
     </message>
 </context>
 <context>
