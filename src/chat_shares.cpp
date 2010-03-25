@@ -111,6 +111,8 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     registerTimer->setInterval(60000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(baseClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
     setClient(baseClient);
 }
 
