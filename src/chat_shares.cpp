@@ -18,12 +18,14 @@
  */
 
 #include <QApplication>
+#include <QDialogButtonBox>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QPushButton>
 #include <QResizeEvent>
 #include <QStackedWidget>
 #include <QStringList>
@@ -109,10 +111,25 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     tabWidget->addTab(searchView, tr("Search"));
 
     /* create queue tab */
+    QWidget *downloadsWidget = new QWidget;
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+    vbox->setSpacing(0);
+    downloadsWidget->setLayout(vbox);
+
     queueModel = new ChatSharesModel(this);
     downloadsView = new ChatSharesView;
     downloadsView->setModel(queueModel);
-    tabWidget->addTab(downloadsView, tr("Downloads"));
+    vbox->addWidget(downloadsView);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    QPushButton *removeButton = new QPushButton;
+    removeButton->setIcon(QIcon(":/remove.png"));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
+    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+    vbox->addWidget(buttonBox);
+
+    tabWidget->addTab(downloadsWidget, tr("Downloads"));
 
     /* create uploads tab */
     uploadsView = new ChatTransfersView;
@@ -141,11 +158,45 @@ void ChatShares::disconnected()
     }
 }
 
+void ChatShares::transferAbort(QXmppShareItem *item)
+{
+    QString sid = item->data(StreamId).toString();
+    foreach (QXmppTransferJob *job, downloadJobs)
+    {
+        if (job->sid() == sid)
+        {
+            job->abort();
+            break;
+        }
+    }
+    foreach (QXmppShareItem *child, item->children())
+        transferAbort(child);
+}
+
+void ChatShares::transferDestroyed(QObject *obj)
+{
+    downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
+    processDownloadQueue();
+}
+
+void ChatShares::transferProgress(qint64 done, qint64 total)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    if (queueItem)
+        queueModel->setProgress(queueItem, done, total);
+}
+
 void ChatShares::transferReceived(QXmppTransferJob *job)
 {
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
     if (!queueItem)
+    {
         job->abort();
+        return;
+    }
 
     // determine full path
     QStringList pathBits;
@@ -181,21 +232,24 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
 
     // add transfer to list
     job->setData(LocalPathRole, filePath);
+    connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(transferDestroyed(QObject*)));
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
+    downloadJobs.append(job);
 
     // start transfer
     job->accept(file);
 }
 
-void ChatShares::transferProgress(qint64 done, qint64 total)
+void ChatShares::transferRemoved()
 {
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
+    const QModelIndex &index = downloadsView->currentIndex();
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
         return;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
-    if (queueItem)
-        queueModel->setProgress(queueItem, done, total);
+
+    transferAbort(item);
+    queueModel->removeItem(item);
 }
 
 void ChatShares::transferStateChanged(QXmppTransferJob::State state)
@@ -204,16 +258,22 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     if (!job)
         return;
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
-    if (queueItem)
+
+    if (state == QXmppTransferJob::TransferState && queueItem)
     {
-        if (state == QXmppTransferJob::TransferState)
-        { 
-            QTime t;
-            t.start();
-            queueItem->setData(TransferStart, t);
-        }
-        else if (state == QXmppTransferJob::FinishedState)
+        QTime t;
+        t.start();
+        queueItem->setData(TransferStart, t);
+    }
+    else if (state == QXmppTransferJob::FinishedState)
+    {
+        if (queueItem)
             queueItem->setData(TransferStart, QVariant());
+
+        // if the transfer failed, delete the local file
+        if (job->error() != QXmppTransferJob::NoError)
+            QFile(job->data(LocalPathRole).toString()).remove();
+        job->deleteLater();
     }
 }
 
@@ -355,7 +415,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 void ChatShares::processDownloadQueue()
 {
     // check how many downloads are active
-    int activeDownloads = chatTransfers->activeJobs(QXmppTransferJob::IncomingDirection);
+    int activeDownloads = downloadJobs.size();
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
@@ -425,7 +485,6 @@ void ChatShares::setClient(ChatClient *newClient)
     connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
-    connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
 }
 
 void ChatShares::setTransfers(ChatTransfers *transfers)
@@ -530,7 +589,7 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 {
     int done = index.data(TransferDone).toInt();
     int total = index.data(TransferTotal).toInt();
-    if (index.column() == ProgressColumn && done >= 0 && total >= 0)
+    if (index.column() == ProgressColumn && done > 0 && total > 0)
     {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = option.rect;
@@ -860,4 +919,3 @@ void ChatSharesView::setModel(QAbstractItemModel *model)
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
     setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
 }
-

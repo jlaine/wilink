@@ -112,8 +112,11 @@ signals:
 
 private slots:
     void disconnected();
-    void transferReceived(QXmppTransferJob *job);
+    void transferAbort(QXmppShareItem *item);
+    void transferDestroyed(QObject *obj);
     void transferProgress(qint64, qint64);
+    void transferReceived(QXmppTransferJob *job);
+    void transferRemoved();
     void transferStateChanged(QXmppTransferJob::State state);
     void findRemoteFiles();
     void itemAction();
@@ -144,6 +147,7 @@ private:
     ChatSharesView *searchView;
     ChatSharesView *downloadsView;
     ChatTransfersView *uploadsView;
+    QList<QXmppTransferJob*> downloadJobs;
     QTimer *registerTimer;
 };
 

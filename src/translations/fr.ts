@@ -230,7 +230,11 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Downloads</source>
-        <translation>Téléchargements</translation>
+        <translation>Fichiers reçus</translation>
+    </message>
+    <message>
+        <source>Uploads</source>
+        <translation>Fichiers envoyés</translation>
     </message>
 </context>
 <context>
@@ -274,16 +278,20 @@ Acceptez-vous?</translation>
         <translation>La fonctionalité transfert de fichiers est expérimentale et la vitesse de transfert est limitée pour ne pas perturber votre connexion internet.</translation>
     </message>
     <message>
-        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
     <message>
         <source>Sorry, but you cannot send files bigger than %1.</source>
         <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
+    </message>
+    <message>
+        <source>Received files are stored in your %1 folder.</source>
+        <translation>Les fichiers reçus sont stockés dans votre dossier %1.</translation>
+    </message>
+    <message>
+        <source>Once a file is received, you can double click to open it.</source>
+        <translation>Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
     </message>
 </context>
 <context>
