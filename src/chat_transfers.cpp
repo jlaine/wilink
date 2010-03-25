@@ -325,34 +325,27 @@ QString ChatTransfers::availableFilePath(const QString &dirPath, const QString &
     return downloadsDir.absoluteFilePath(fileName);
 }
 
-void ChatTransfers::fileAccepted(QXmppTransferJob *job, const QString &subdir)
+void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
-    QStringList pathBits;
-
     // determine file location
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
-    if (!subdir.isEmpty())
-    {
-        if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
-            downloadsDir.setPath(downloadsDir.filePath(subdir));
-    }
-
-    // determine file name
     const QString filePath = availableFilePath(downloadsDir.path(), job->fileName());
+
+    // open file
     QFile *file = new QFile(filePath, job);
-    if (file->open(QIODevice::WriteOnly))
+    if (!file->open(QIODevice::WriteOnly))
     {
-        job->setData(LocalPathRole, filePath);
-
-        // add transfer to list
-        addJob(job);
-
-        // start transfer
-        job->accept(file);
-    } else {
         qWarning() << "Could not write to" << filePath;
         job->abort();
+        return;
     }
+
+    // add transfer to list
+    job->setData(LocalPathRole, filePath);
+    addJob(job);
+
+    // start transfer
+    job->accept(file);
 }
 
 void ChatTransfers::fileDeclined(QXmppTransferJob *job)

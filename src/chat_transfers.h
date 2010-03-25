@@ -100,7 +100,7 @@ protected:
     QSize sizeHint() const;
 
 private slots:
-    void fileAccepted(QXmppTransferJob *job, const QString &subdir = QString());
+    void fileAccepted(QXmppTransferJob *job);
     void fileDeclined(QXmppTransferJob *job);
     void fileReceived(QXmppTransferJob *job);
     void updateButtons();
@@ -109,8 +109,6 @@ private:
     QPushButton *removeButton;
     ChatTransfersView *tableWidget;
     QXmppClient *client;
-
-    friend class ChatShares;
 };
 
 #endif

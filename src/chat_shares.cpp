@@ -158,10 +158,34 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
             pathBits.prepend(dirName);
         parentItem = parentItem->parent();
     }
+    const QString subdir = pathBits.join("/");
 
-    chatTransfers->fileAccepted(job, pathBits.join("/"));
+    // create directory
+    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
+    if (!subdir.isEmpty())
+    {
+        if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
+            downloadsDir.setPath(downloadsDir.filePath(subdir));
+    }
+
+    // determine file name
+    const QString filePath = ChatTransfers::availableFilePath(downloadsDir.path(), job->fileName());
+    QFile *file = new QFile(filePath, job);
+    if (!file->open(QIODevice::WriteOnly))
+    {
+        qWarning() << "Could not write to" << filePath;
+        job->abort();
+        delete file;
+        return;
+    }
+
+    // add transfer to list
+    job->setData(LocalPathRole, filePath);
     connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
+
+    // start transfer
+    job->accept(file);
 }
 
 void ChatShares::transferProgress(qint64 done, qint64 total)
