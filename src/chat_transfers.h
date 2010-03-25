@@ -21,13 +21,13 @@
 #define __WDESKTOP_CHAT_TRANSFERS_H__
 
 #include <QMessageBox>
+#include <QTableWidget>
 
 #include "qxmpp/QXmppTransferManager.h"
 
 #include "chat_panel.h"
 
 class QPushButton;
-class QTableWidget;
 class QXmppClient;
 
 enum JobDataRoles
@@ -54,6 +54,32 @@ private:
     QXmppTransferJob *m_job; 
 };
 
+class ChatTransfersView : public QTableWidget
+{
+    Q_OBJECT
+
+public:
+    ChatTransfersView(QWidget *parent = 0);
+    int activeJobs(QXmppTransferJob::Direction direction) const;
+    void addJob(QXmppTransferJob *job);
+
+public slots:
+    void removeCurrentJob();
+
+signals:
+    void updateButtons();
+
+private slots:
+    void slotDestroyed(QObject *object);
+    void slotDoubleClicked(int row, int column);
+    void slotFinished();
+    void slotProgress(qint64, qint64);
+    void slotStateChanged(QXmppTransferJob::State state);
+
+private:
+    QList<QXmppTransferJob*> jobs;
+};
+
 class ChatTransfers : public ChatPanel
 {
     Q_OBJECT
@@ -76,18 +102,11 @@ private slots:
     void fileDeclined(QXmppTransferJob *job);
     void fileExpected(const QString &sid, const QString &path);
     void fileReceived(QXmppTransferJob *job);
-    void jobDestroyed(QObject *object);
-    void cellDoubleClicked(int row, int column);
-    void finished();
-    void progress(qint64, qint64);
-    void removeCurrentJob();
-    void stateChanged(QXmppTransferJob::State state);
     void updateButtons();
 
 private:
     QPushButton *removeButton;
-    QTableWidget *tableWidget;
-    QList<QXmppTransferJob*> jobs;
+    ChatTransfersView *tableWidget;
     QXmppClient *client;
     QHash<QString, QString> expectedStreams;
 };

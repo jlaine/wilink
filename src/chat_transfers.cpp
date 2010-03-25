@@ -88,6 +88,151 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
         emit fileDeclined(m_job);
 }
 
+ChatTransfersView::ChatTransfersView(QWidget *parent)
+    : QTableWidget(parent)
+{
+    setColumnCount(MaxColumn);
+    setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("File name")));
+    setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
+    setHorizontalHeaderItem(ProgressColumn, new QTableWidgetItem(tr("Progress")));
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+    setShowGrid(false);
+    verticalHeader()->setVisible(false);
+    horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
+    
+    connect(this, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(slotDoubleClicked(int,int)));
+}
+
+int ChatTransfersView::activeJobs(QXmppTransferJob::Direction direction) const
+{
+    int active = 0;
+    foreach (QXmppTransferJob *job, jobs)
+        if (job->direction() == direction &&
+            job->state() != QXmppTransferJob::FinishedState)
+            active++;
+    return active;
+}
+
+void ChatTransfersView::addJob(QXmppTransferJob *job)
+{
+    if (jobs.contains(job))
+        return;
+
+    const QString fileName = QFileInfo(job->data(LocalPathRole).toString()).fileName();
+
+    jobs.insert(0, job);
+    insertRow(0);
+    QTableWidgetItem *nameItem = new QTableWidgetItem(fileName);
+    nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    nameItem->setIcon(jobIcon(job));
+    setItem(0, NameColumn, nameItem);
+
+    QTableWidgetItem *sizeItem = new QTableWidgetItem(ChatTransfers::sizeToString(job->fileSize()));
+    sizeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    setItem(0, SizeColumn, sizeItem);
+
+    QProgressBar *progress = new QProgressBar;
+    progress->setMaximum(job->fileSize());
+    setCellWidget(0, ProgressColumn, progress);
+
+    connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(slotDestroyed(QObject*)));
+    connect(job, SIGNAL(finished()), this, SLOT(slotFinished()));
+    connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(slotProgress(qint64, qint64)));
+    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(slotStateChanged(QXmppTransferJob::State)));
+}
+
+void ChatTransfersView::removeCurrentJob()
+{
+    int jobRow = currentRow();
+    if (jobRow < 0 || jobRow >= jobs.size())
+        return;
+
+    QXmppTransferJob *job = jobs.at(jobRow);
+    if (job->state() == QXmppTransferJob::FinishedState)
+        job->deleteLater();
+    else
+        job->abort();
+}
+
+void ChatTransfersView::slotDestroyed(QObject *obj)
+{
+    int jobRow = jobs.indexOf(static_cast<QXmppTransferJob*>(obj));
+    if (jobRow < 0)
+        return;
+
+    jobs.removeAt(jobRow);
+    removeRow(jobRow);
+    emit updateButtons();
+}
+
+void ChatTransfersView::slotDoubleClicked(int row, int column)
+{
+    if (row < 0 || row >= jobs.size())
+        return;
+
+    QXmppTransferJob *job = jobs.at(row);
+    const QString localFilePath = job->data(LocalPathRole).toString();
+    if (localFilePath.isEmpty())
+        return;
+    if (job->direction() == QXmppTransferJob::IncomingDirection &&
+        (job->state() != QXmppTransferJob::FinishedState || job->error() != QXmppTransferJob::NoError))
+        return;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
+}
+
+void ChatTransfersView::slotFinished()
+{
+    // find the job that completed
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    int jobRow = jobs.indexOf(job);
+    if (!job || jobRow < 0)
+        return;
+
+    // if the job failed, reset the progress bar
+    QProgressBar *progress = qobject_cast<QProgressBar*>(cellWidget(jobRow, ProgressColumn));
+    if (progress && job->error() != QXmppTransferJob::NoError)
+        progress->reset();
+}
+
+void ChatTransfersView::slotProgress(qint64 done, qint64 total)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    int jobRow = jobs.indexOf(job);
+    if (!job || jobRow < 0)
+        return;
+
+    QProgressBar *progress = qobject_cast<QProgressBar*>(cellWidget(jobRow, ProgressColumn));
+    if (progress)
+    {
+        int elapsed = job->data(StartTimeRole).toTime().elapsed();
+        if (elapsed)
+        {
+            int speed = (done * 1000.0) / elapsed;
+        }
+
+        progress->setValue(done);
+    }
+}
+
+void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    int jobRow = jobs.indexOf(job);
+    if (!job || jobRow < 0)
+        return;
+
+    if (state == QXmppTransferJob::TransferState)
+    {
+        QTime t;
+        t.start();
+        job->setData(StartTimeRole, t);
+    }
+    item(jobRow, NameColumn)->setIcon(jobIcon(job));
+    emit updateButtons();
+}
+
 ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient)
 {
@@ -117,17 +262,8 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     layout->addWidget(downloadsLabel);
 
     /* transfers list */
-    tableWidget = new QTableWidget;
-    tableWidget->setColumnCount(MaxColumn);
-    tableWidget->setHorizontalHeaderItem(NameColumn, new QTableWidgetItem(tr("File name")));
-    tableWidget->setHorizontalHeaderItem(SizeColumn, new QTableWidgetItem(tr("Size")));
-    tableWidget->setHorizontalHeaderItem(ProgressColumn, new QTableWidgetItem(tr("Progress")));
-    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    tableWidget->setShowGrid(false);
-    tableWidget->verticalHeader()->setVisible(false);
-    tableWidget->horizontalHeader()->setResizeMode(NameColumn, QHeaderView::Stretch);
-    connect(tableWidget, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(cellDoubleClicked(int,int)));
+    tableWidget = new ChatTransfersView;
+    connect(tableWidget, SIGNAL(updateButtons()), this, SLOT(updateButtons()));
     connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
     layout->addWidget(tableWidget);
 
@@ -135,7 +271,7 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
     removeButton = new QPushButton;
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeCurrentJob()));
+    connect(removeButton, SIGNAL(clicked()), tableWidget, SLOT(removeCurrentJob()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
 
     layout->addWidget(buttonBox);
@@ -154,72 +290,13 @@ ChatTransfers::~ChatTransfers()
 
 int ChatTransfers::activeJobs(QXmppTransferJob::Direction direction) const
 {
-    int active = 0;
-    foreach (QXmppTransferJob *job, jobs)
-        if (job->direction() == direction &&
-            job->state() != QXmppTransferJob::FinishedState)
-            active++;
-    return active;
+    return tableWidget->activeJobs(direction);
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
 {
-    if (jobs.contains(job))
-        return;
-
-    const QString fileName = QFileInfo(job->data(LocalPathRole).toString()).fileName();
-
-    jobs.insert(0, job);
-    tableWidget->insertRow(0);
-    QTableWidgetItem *nameItem = new QTableWidgetItem(fileName);
-    nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    nameItem->setIcon(jobIcon(job));
-    tableWidget->setItem(0, NameColumn, nameItem);
-
-    QTableWidgetItem *sizeItem = new QTableWidgetItem(sizeToString(job->fileSize()));
-    sizeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    tableWidget->setItem(0, SizeColumn, sizeItem);
-
-    QProgressBar *progress = new QProgressBar;
-    progress->setMaximum(job->fileSize());
-    tableWidget->setCellWidget(0, ProgressColumn, progress);
-
-    connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(jobDestroyed(QObject*)));
-    connect(job, SIGNAL(finished()), this, SLOT(finished()));
-    connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(progress(qint64, qint64)));
-    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(stateChanged(QXmppTransferJob::State)));
-
+    tableWidget->addJob(job);
     emit registerTab();
-}
-
-void ChatTransfers::cellDoubleClicked(int row, int column)
-{
-    if (row < 0 || row >= jobs.size())
-        return;
-
-    QXmppTransferJob *job = jobs.at(row);
-    const QString localFilePath = job->data(LocalPathRole).toString();
-    if (localFilePath.isEmpty())
-        return;
-    if (job->direction() == QXmppTransferJob::IncomingDirection &&
-        (job->state() != QXmppTransferJob::FinishedState || job->error() != QXmppTransferJob::NoError))
-        return;
-
-    QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
-}
-
-void ChatTransfers::finished()
-{
-    // find the job that completed
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    int jobRow = jobs.indexOf(job);
-    if (!job || jobRow < 0)
-        return;
-
-    // if the job failed, reset the progress bar
-    QProgressBar *progress = qobject_cast<QProgressBar*>(tableWidget->cellWidget(jobRow, ProgressColumn));
-    if (progress && job->error() != QXmppTransferJob::NoError)
-        progress->reset();
 }
 
 void ChatTransfers::fileAccepted(QXmppTransferJob *job, const QString &subdir)
@@ -294,50 +371,6 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
-void ChatTransfers::jobDestroyed(QObject *obj)
-{
-    int jobRow = jobs.indexOf(static_cast<QXmppTransferJob*>(obj));
-    if (jobRow < 0)
-        return;
-
-    jobs.removeAt(jobRow);
-    tableWidget->removeRow(jobRow);
-    updateButtons();
-}
-
-void ChatTransfers::progress(qint64 done, qint64 total)
-{
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    int jobRow = jobs.indexOf(job);
-    if (!job || jobRow < 0)
-        return;
-
-    QProgressBar *progress = qobject_cast<QProgressBar*>(tableWidget->cellWidget(jobRow, ProgressColumn));
-    if (progress)
-    {
-        int elapsed = job->data(StartTimeRole).toTime().elapsed();
-        if (elapsed)
-        {
-            int speed = (done * 1000.0) / elapsed;
-        }
-
-        progress->setValue(done);
-    }
-}
-
-void ChatTransfers::removeCurrentJob()
-{
-    int jobRow = tableWidget->currentRow();
-    if (jobRow < 0 || jobRow >= jobs.size())
-        return;
-
-    QXmppTransferJob *job = jobs.at(jobRow);
-    if (job->state() == QXmppTransferJob::FinishedState)
-        job->deleteLater();
-    else
-        job->abort();
-}
-
 void ChatTransfers::sendFile(const QString &fullJid)
 {
     // get file name
@@ -378,25 +411,9 @@ QString ChatTransfers::sizeToString(qint64 size)
         return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
 }
 
-void ChatTransfers::stateChanged(QXmppTransferJob::State state)
-{
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    int jobRow = jobs.indexOf(job);
-    if (!job || jobRow < 0)
-        return;
-
-    if (state == QXmppTransferJob::TransferState)
-    {
-        QTime t;
-        t.start();
-        job->setData(StartTimeRole, t);
-    }
-    tableWidget->item(jobRow, NameColumn)->setIcon(jobIcon(job));
-    updateButtons();
-}
-
 void ChatTransfers::updateButtons()
 {
+/*
     int jobRow = tableWidget->currentRow();
     if (jobRow < 0 || jobRow >= jobs.size())
     {
@@ -411,5 +428,6 @@ void ChatTransfers::updateButtons()
     else
         removeButton->setIcon(QIcon(":/close.png"));
     removeButton->setEnabled(true);
+*/
 }
 
