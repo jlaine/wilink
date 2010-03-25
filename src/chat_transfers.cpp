@@ -216,9 +216,8 @@ void ChatTransfersView::slotProgress(qint64 done, qint64 total)
         if (elapsed)
         {
             int speed = (done * 1000.0) / elapsed;
-            progress->setFormat("%p% (" + ChatTransfers::sizeToString(speed) + "/s)");
+            progress->setFormat(ChatTransfers::sizeToString(speed) + "/s");
         }
-
         progress->setValue(done);
     }
 }
