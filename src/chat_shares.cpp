@@ -184,6 +184,8 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             t.start();
             queueItem->setData(TransferStart, t);
         }
+        else if (state == QXmppTransferJob::FinishedState)
+            queueItem->setData(TransferStart, QVariant());
     }
 }
 
@@ -565,18 +567,11 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
         {
             int done = item->data(TransferDone).toInt();
-            int total = item->data(TransferTotal).toInt();
-            if (done <= 0 || total <=0)
-                return QVariant();
-            QString text = QString::number((100*done)/total) + "%";
-
             int elapsed = index.data(TransferStart).toTime().elapsed();
-            if (elapsed)
-            {
-                int speed = (done * 1000.0) / elapsed;
-                text += "  " + ChatTransfers::sizeToString(speed) + "/s";
-            }
-            return text;
+            if (done <= 0 || !elapsed)
+                return QVariant();
+            int speed = (done * 1000.0) / elapsed;
+            return ChatTransfers::sizeToString(speed) + "/s";
         }
         return item->data(role);
     }
