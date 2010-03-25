@@ -158,6 +158,22 @@ void ChatShares::disconnected()
     }
 }
 
+void ChatShares::transferAbort(QXmppShareItem *item)
+{
+    QString sid = item->data(StreamId).toString();
+    foreach (QXmppTransferJob *job, downloadJobs)
+    {
+        if (job->sid() == sid)
+        {
+            qDebug() << "aborting job" << sid;
+            job->abort();
+            break;
+        }
+    }
+    foreach (QXmppShareItem *child, item->children())
+        transferAbort(child);
+}
+
 void ChatShares::transferDestroyed(QObject *obj)
 {
     downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
@@ -177,7 +193,10 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
 {
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
     if (!queueItem)
+    {
         job->abort();
+        return;
+    }
 
     // determine full path
     QStringList pathBits;
@@ -229,16 +248,7 @@ void ChatShares::transferRemoved()
     if (!index.isValid() || !item)
         return;
 
-    QString sid = item->data(StreamId).toString();
-    foreach (QXmppTransferJob *job, downloadJobs)
-    {
-        if (job->sid() == sid)
-        {
-            qDebug() << "aborting job" << sid;
-            job->abort();
-            break;
-        }
-    }
+    transferAbort(item);
     queueModel->removeItem(item);
 }
 

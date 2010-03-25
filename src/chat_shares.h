@@ -112,6 +112,7 @@ signals:
 
 private slots:
     void disconnected();
+    void transferAbort(QXmppShareItem *item);
     void transferDestroyed(QObject *obj);
     void transferProgress(qint64, qint64);
     void transferReceived(QXmppTransferJob *job);
