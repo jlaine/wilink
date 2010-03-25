@@ -110,9 +110,9 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     /* create queue tab */
     queueModel = new ChatSharesModel(this);
-    queueView = new ChatSharesView;
-    queueView->setModel(queueModel);
-    tabWidget->addTab(queueView, tr("Downloads"));
+    downloadsView = new ChatSharesView;
+    downloadsView->setModel(queueModel);
+    tabWidget->addTab(downloadsView, tr("Downloads"));
 
     /* create uploads tab */
     uploadsView = new ChatTransfersView;

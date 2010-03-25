@@ -142,7 +142,7 @@ private:
     QTabWidget *tabWidget;
     ChatSharesView *sharesView;
     ChatSharesView *searchView;
-    ChatSharesView *queueView;
+    ChatSharesView *downloadsView;
     ChatTransfersView *uploadsView;
     QTimer *registerTimer;
 };
