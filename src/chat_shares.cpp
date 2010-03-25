@@ -56,7 +56,7 @@ enum Columns
 };
 
 enum DataRoles {
-    PacketId,
+    PacketId = Qt::UserRole,
     StreamId,
     TransferStart,
     TransferDone,
@@ -498,23 +498,16 @@ ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
 void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     int done = index.data(TransferDone).toInt();
-    if (index.column() == ProgressColumn && done) {
-        int total = index.data(TransferTotal).toInt();
-        int elapsed = index.data(TransferStart).toTime().elapsed();
-
+    int total = index.data(TransferTotal).toInt();
+    if (index.column() == ProgressColumn && done >= 0 && total >= 0)
+    {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = option.rect;
         progressBarOption.minimum = 0;
         progressBarOption.maximum = total; 
         progressBarOption.progress = done;
         progressBarOption.state = QStyle::State_Active | QStyle::State_Enabled | QStyle::State_HasFocus | QStyle::State_Selected;
-        QString text = QString::number(done/total) + "%";
-        if (elapsed)
-        {
-            int speed = (1000 * done) / elapsed;
-            text += " " + ChatTransfers::sizeToString(speed) + "/s";
-        }
-        progressBarOption.text = text;
+        progressBarOption.text = index.data(Qt::DisplayRole).toString();
         progressBarOption.textVisible = true;
 
         QApplication::style()->drawControl(QStyle::CE_ProgressBar,
@@ -567,7 +560,25 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
         return ChatTransfers::sizeToString(item->fileSize());
     else if (index.column() == ProgressColumn)
+    {
+        if (role == Qt::DisplayRole)
+        {
+            int done = item->data(TransferDone).toInt();
+            int total = item->data(TransferTotal).toInt();
+            if (done <= 0 || total <=0)
+                return QVariant();
+            QString text = QString::number(done/total) + "%";
+
+            int elapsed = index.data(TransferStart).toTime().elapsed();
+            if (elapsed)
+            {
+                int speed = (1000 * done) / elapsed;
+                text += "  " + ChatTransfers::sizeToString(speed) + "/s";
+            }
+            return text;
+        }
         return item->data(role);
+    }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
         if (item->type() == QXmppShareItem::CollectionItem)
