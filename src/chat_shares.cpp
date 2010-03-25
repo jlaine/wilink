@@ -50,6 +50,7 @@ enum Columns
 {
     NameColumn,
     SizeColumn,
+    ProgressColumn,
     MaxColumn,
 };
 
@@ -59,6 +60,9 @@ enum DataRoles {
 };
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
+
+#define SIZE_COLUMN_WIDTH 80
+#define PROGRESS_COLUMN_WIDTH 80
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), chatTransfers(0)
@@ -86,6 +90,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     ChatSharesModel *sharesModel = new ChatSharesModel;
     sharesView = new ChatSharesView;
     sharesView->setModel(sharesModel);
+    sharesView->hideColumn(ProgressColumn);
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
     tabWidget->addTab(sharesView, tr("Shares"));
@@ -125,6 +130,11 @@ void ChatShares::disconnected()
         client->deleteLater();
         client = baseClient;
     }
+}
+
+void ChatShares::fileReceived(QXmppTransferJob *job)
+{
+
 }
 
 void ChatShares::findRemoteFiles()
@@ -557,6 +567,8 @@ QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, i
     {
         if (section == NameColumn)
             return tr("Name");
+        else if (section == ProgressColumn)
+            return tr("Progress");
         else if (section == SizeColumn)
             return tr("Size");
     }
@@ -703,7 +715,9 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
 ChatSharesView::ChatSharesView(QWidget *parent)
     : QTreeView(parent)
 {
-    setColumnWidth(SizeColumn, 80);
+    bool hidden = isColumnHidden(ProgressColumn);
+    qDebug() << "hidden" << hidden;
+    setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
 }
@@ -720,6 +734,18 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
 void ChatSharesView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
-    setColumnWidth(NameColumn, e->size().width() - 80);
+    int nameWidth =  e->size().width();
+    if (!isColumnHidden(SizeColumn))
+        nameWidth -= SIZE_COLUMN_WIDTH;
+    if (!isColumnHidden(ProgressColumn))
+        nameWidth -= PROGRESS_COLUMN_WIDTH;
+    setColumnWidth(NameColumn, nameWidth);
+}
+
+void ChatSharesView::setModel(QAbstractItemModel *model)
+{
+    QTreeView::setModel(model);
+    setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
+    setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
 }
 

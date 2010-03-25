@@ -37,6 +37,7 @@ class QTabWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppPresence;
+class QXmppTransferJob;
 
 class ChatSharesModel : public QAbstractItemModel
 {
@@ -76,6 +77,7 @@ class ChatSharesView : public QTreeView
 
 public:
     ChatSharesView(QWidget *parent = 0);
+    void setModel(QAbstractItemModel *model);
 
 signals:
     void contextMenu(const QModelIndex &index, const QPoint &globalPos);
@@ -100,6 +102,7 @@ signals:
 
 private slots:
     void disconnected();
+    void fileReceived(QXmppTransferJob *job);
     void findRemoteFiles();
     void itemAction();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
