@@ -182,7 +182,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
         { 
             QTime t;
             t.start();
-            job->setData(TransferStart, t);
+            queueItem->setData(TransferStart, t);
         }
     }
 }
@@ -370,6 +370,8 @@ void ChatShares::queryStringChanged()
 {
     if (lineEdit->text().isEmpty())
         tabWidget->setCurrentWidget(sharesView);
+    else
+        tabWidget->setCurrentWidget(searchView);
 }
 
 void ChatShares::registerWithServer()
@@ -467,7 +469,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 
     QModelIndex index = model->mergeItem(shareIq.collection());
     view->setExpanded(index, true);
-    tabWidget->setCurrentWidget(view);
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
@@ -567,7 +568,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
             int total = item->data(TransferTotal).toInt();
             if (done <= 0 || total <=0)
                 return QVariant();
-            QString text = QString::number(done/total) + "%";
+            QString text = QString::number((100*done)/total) + "%";
 
             int elapsed = index.data(TransferStart).toTime().elapsed();
             if (elapsed)
