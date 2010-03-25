@@ -330,7 +330,7 @@ void ChatShares::setClient(ChatClient *newClient)
     client = newClient;
 
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(siPubIqReceived(const QXmppShareGetIq&)), this, SLOT(siPubIqReceived(const QXmppShareGetIq&)));
+    connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
     connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
@@ -341,7 +341,7 @@ void ChatShares::setTransfers(ChatTransfers *transfers)
     chatTransfers = transfers;
 }
 
-void ChatShares::siPubIqReceived(const QXmppShareGetIq &shareIq)
+void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
     {

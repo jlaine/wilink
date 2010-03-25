@@ -59,7 +59,7 @@ public:
 signals:
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &mucServer);
-    void siPubIqReceived(const QXmppShareGetIq &iq);
+    void shareGetIqReceived(const QXmppShareGetIq &iq);
     void shareSearchIqReceived(const QXmppShareSearchIq &iq);
     void shareServerFound(const QString &shareServer);
 

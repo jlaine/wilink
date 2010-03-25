@@ -105,18 +105,18 @@ bool ChatClient::handleStreamElement(const QDomElement &element)
 {
     if (element.tagName() == "iq")
     {
-        if (QXmppShareGetIq::isSiPubIq(element))
+        if (QXmppShareGetIq::isShareGetIq(element))
         {
-            QXmppShareGetIq sipubIq;
-            sipubIq.parse(element);
-            emit siPubIqReceived(sipubIq);
+            QXmppShareGetIq getIq;
+            getIq.parse(element);
+            emit shareGetIqReceived(getIq);
             return true;
         }
         else if (QXmppShareSearchIq::isShareSearchIq(element))
         {
-            QXmppShareSearchIq shareIq;
-            shareIq.parse(element);
-            emit shareSearchIqReceived(shareIq);
+            QXmppShareSearchIq searchIq;
+            searchIq.parse(element);
+            emit shareSearchIqReceived(searchIq);
             return true;
         }
         else if (QXmppMucOwnerIq::isMucOwnerIq(element))
