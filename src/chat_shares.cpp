@@ -110,9 +110,13 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     /* create queue tab */
     queueModel = new ChatSharesModel(this);
-    ChatSharesView *queueView = new ChatSharesView;
+    queueView = new ChatSharesView;
     queueView->setModel(queueModel);
     tabWidget->addTab(queueView, tr("Downloads"));
+
+    /* create uploads tab */
+    uploadsView = new ChatTransfersView;
+    tabWidget->addTab(uploadsView, tr("Uploads"));
 
     setLayout(layout);
 
@@ -430,7 +434,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
         job->setData(LocalPathRole, filePath);
-        chatTransfers->addJob(job);
+        uploadsView->addJob(job);
         return;
     }
 

@@ -33,6 +33,7 @@
 class ChatClient;
 class ChatSharesDatabase;
 class ChatTransfers;
+class ChatTransfersView;
 class QLineEdit;
 class QListWidget;
 class QTabWidget;
@@ -142,6 +143,7 @@ private:
     ChatSharesView *sharesView;
     ChatSharesView *searchView;
     ChatSharesView *queueView;
+    ChatTransfersView *uploadsView;
     QTimer *registerTimer;
 };
 
