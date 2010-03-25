@@ -573,7 +573,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
             int elapsed = index.data(TransferStart).toTime().elapsed();
             if (elapsed)
             {
-                int speed = (1000 * done) / elapsed;
+                int speed = (done * 1000.0) / elapsed;
                 text += "  " + ChatTransfers::sizeToString(speed) + "/s";
             }
             return text;
