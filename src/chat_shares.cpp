@@ -595,10 +595,10 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
         {
             int done = item->data(TransferDone).toInt();
-            int elapsed = index.data(TransferStart).toTime().elapsed();
-            if (done <= 0 || !elapsed)
+            QTime t = index.data(TransferStart).toTime();
+            if (done <= 0 || !t.isValid() || !t.elapsed())
                 return QVariant();
-            int speed = (done * 1000.0) / elapsed;
+            int speed = (done * 1000.0) / t.elapsed();
             return ChatTransfers::sizeToString(speed) + "/s";
         }
         return item->data(role);
