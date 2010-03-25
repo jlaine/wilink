@@ -294,10 +294,10 @@ void ChatShares::processDownloadQueue()
         }
 
         // request file
-        QXmppSiPubIq iq;
+        QXmppShareGetIq iq;
         iq.setTo(location.jid());
         iq.setType(QXmppIq::Get);
-        iq.setPublishId(location.node());
+        iq.setNode(location.node());
         file->setData(PacketId, iq.id());
         client->sendPacket(iq);
 
@@ -330,7 +330,7 @@ void ChatShares::setClient(ChatClient *newClient)
     client = newClient;
 
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(siPubIqReceived(const QXmppSiPubIq&)), this, SLOT(siPubIqReceived(const QXmppSiPubIq&)));
+    connect(client, SIGNAL(siPubIqReceived(const QXmppShareGetIq&)), this, SLOT(siPubIqReceived(const QXmppShareGetIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
     connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
@@ -341,29 +341,29 @@ void ChatShares::setTransfers(ChatTransfers *transfers)
     chatTransfers = transfers;
 }
 
-void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
+void ChatShares::siPubIqReceived(const QXmppShareGetIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
     {
-        QXmppSiPubIq responseIq;
+        QXmppShareGetIq responseIq;
         responseIq.setId(shareIq.id());
         responseIq.setTo(shareIq.from());
         responseIq.setType(QXmppIq::Result);
 
         // check path is OK
-        QString filePath = db->locate(shareIq.publishId());
+        QString filePath = db->locate(shareIq.node());
         if (filePath.isEmpty())
         {
-            logMessage(QXmppLogger::WarningMessage, "Could not find local file " + shareIq.publishId());
+            logMessage(QXmppLogger::WarningMessage, "Could not find local file " + shareIq.node());
             responseIq.setType(QXmppIq::Error);
             client->sendPacket(responseIq);
             return;
         }
-        responseIq.setStreamId(generateStanzaHash());
+        responseIq.setSid(generateStanzaHash());
         client->sendPacket(responseIq);
 
         // send file
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.streamId());
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
         job->setData(LocalPathRole, filePath);
         chatTransfers->addJob(job);
@@ -391,7 +391,7 @@ void ChatShares::siPubIqReceived(const QXmppSiPubIq &shareIq)
         // FIXME : is this the right place to remove from queue?
         queueModel->removeItem(queueItem);
 
-        emit fileExpected(shareIq.streamId(), pathBits.join("/"));
+        emit fileExpected(shareIq.sid(), pathBits.join("/"));
     }
     else if (shareIq.type() == QXmppIq::Error)
     {

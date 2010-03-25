@@ -39,7 +39,7 @@ class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
-class QXmppSiPubIq;
+class QXmppShareGetIq;
 class QXmppShareSearchIq;
 class QXmppTransferJob;
 class QXmppVCard;
@@ -59,7 +59,7 @@ public:
 signals:
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &mucServer);
-    void siPubIqReceived(const QXmppSiPubIq &iq);
+    void siPubIqReceived(const QXmppShareGetIq &iq);
     void shareSearchIqReceived(const QXmppShareSearchIq &iq);
     void shareServerFound(const QString &shareServer);
 

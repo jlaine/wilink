@@ -105,9 +105,9 @@ bool ChatClient::handleStreamElement(const QDomElement &element)
 {
     if (element.tagName() == "iq")
     {
-        if (QXmppSiPubIq::isSiPubIq(element))
+        if (QXmppShareGetIq::isSiPubIq(element))
         {
-            QXmppSiPubIq sipubIq;
+            QXmppShareGetIq sipubIq;
             sipubIq.parse(element);
             emit siPubIqReceived(sipubIq);
             return true;

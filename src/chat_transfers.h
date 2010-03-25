@@ -29,7 +29,6 @@
 class QPushButton;
 class QTableWidget;
 class QXmppClient;
-class QXmppSiPubIq;
 
 enum JobDataRoles
 {

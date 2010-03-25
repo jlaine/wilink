@@ -108,7 +108,7 @@ private slots:
     void processDownloadQueue();
     void registerWithServer();
     void queryStringChanged();
-    void siPubIqReceived(const QXmppSiPubIq &getIq);
+    void siPubIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &share);
     void shareServerFound(const QString &server);
     void searchFinished(const QXmppShareSearchIq &share);
