@@ -93,9 +93,6 @@ public:
 signals:
     void contextMenu(const QModelIndex &index, const QPoint &globalPos);
 
-private slots:
-    void removeCurrentItem();
-
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);
@@ -116,8 +113,9 @@ signals:
 private slots:
     void disconnected();
     void transferDestroyed(QObject *obj);
-    void transferReceived(QXmppTransferJob *job);
     void transferProgress(qint64, qint64);
+    void transferReceived(QXmppTransferJob *job);
+    void transferRemoved();
     void transferStateChanged(QXmppTransferJob::State state);
     void findRemoteFiles();
     void itemAction();

@@ -125,7 +125,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     QPushButton *removeButton = new QPushButton;
     removeButton->setIcon(QIcon(":/remove.png"));
-    connect(removeButton, SIGNAL(clicked()), downloadsView, SLOT(removeCurrentItem()));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
     vbox->addWidget(buttonBox);
 
@@ -160,8 +160,17 @@ void ChatShares::disconnected()
 
 void ChatShares::transferDestroyed(QObject *obj)
 {
-    qDebug() << "Transfer destroyed";
     downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
+}
+
+void ChatShares::transferProgress(qint64 done, qint64 total)
+{
+    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
+    if (!job)
+        return;
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    if (queueItem)
+        queueModel->setProgress(queueItem, done, total);
 }
 
 void ChatShares::transferReceived(QXmppTransferJob *job)
@@ -213,14 +222,24 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     job->accept(file);
 }
 
-void ChatShares::transferProgress(qint64 done, qint64 total)
+void ChatShares::transferRemoved()
 {
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
+    const QModelIndex &index = downloadsView->currentIndex();
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
         return;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
-    if (queueItem)
-        queueModel->setProgress(queueItem, done, total);
+
+    QString sid = item->data(StreamId).toString();
+    foreach (QXmppTransferJob *job, downloadJobs)
+    {
+        if (job->sid() == sid)
+        {
+            qDebug() << "aborting job" << sid;
+            job->abort();
+            break;
+        }
+    }
+    queueModel->removeItem(item);
 }
 
 void ChatShares::transferStateChanged(QXmppTransferJob::State state)
@@ -229,24 +248,22 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     if (!job)
         return;
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
-    if (queueItem)
+
+    if (state == QXmppTransferJob::TransferState && queueItem)
     {
-        if (state == QXmppTransferJob::TransferState)
-        { 
-            QTime t;
-            t.start();
-            queueItem->setData(TransferStart, t);
-        }
-        else if (state == QXmppTransferJob::FinishedState)
-        {
+        QTime t;
+        t.start();
+        queueItem->setData(TransferStart, t);
+    }
+    else if (state == QXmppTransferJob::FinishedState)
+    {
+        if (queueItem)
             queueItem->setData(TransferStart, QVariant());
 
-            // if the transfer failed, delete the local file
-            if (job->error() != QXmppTransferJob::NoError)
-                QFile(job->data(LocalPathRole).toString()).remove();
-            //queueModel->removeItem(queueItem);
-            job->deleteLater();
-        }
+        // if the transfer failed, delete the local file
+        if (job->error() != QXmppTransferJob::NoError)
+            QFile(job->data(LocalPathRole).toString()).remove();
+        job->deleteLater();
     }
 }
 
@@ -876,17 +893,6 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
     emit contextMenu(index, event->globalPos());
 }
 
-void ChatSharesView::removeCurrentItem()
-{
-    const QModelIndex &index = currentIndex();
-    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
-    if (!index.isValid() || !item)
-        return;
-
-    ChatSharesModel *sharesModel = qobject_cast<ChatSharesModel*>(model());
-    sharesModel->removeItem(item);
-}
-
 void ChatSharesView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
@@ -904,4 +910,3 @@ void ChatSharesView::setModel(QAbstractItemModel *model)
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
     setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
 }
-
