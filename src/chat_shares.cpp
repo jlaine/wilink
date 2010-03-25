@@ -263,7 +263,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 void ChatShares::processDownloadQueue()
 {
     // check how many downloads are active
-    int activeDownloads = client->getTransferManager().activeJobs(QXmppTransferJob::IncomingDirection);
+    int activeDownloads = chatTransfers->activeJobs(QXmppTransferJob::IncomingDirection);
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
