@@ -165,7 +165,6 @@ void ChatShares::transferAbort(QXmppShareItem *item)
     {
         if (job->sid() == sid)
         {
-            qDebug() << "aborting job" << sid;
             job->abort();
             break;
         }
@@ -177,6 +176,7 @@ void ChatShares::transferAbort(QXmppShareItem *item)
 void ChatShares::transferDestroyed(QObject *obj)
 {
     downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
+    processDownloadQueue();
 }
 
 void ChatShares::transferProgress(qint64 done, qint64 total)
@@ -485,7 +485,6 @@ void ChatShares::setClient(ChatClient *newClient)
     connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
-    connect(&client->getTransferManager(), SIGNAL(finished(QXmppTransferJob*)), this, SLOT(processDownloadQueue()));
 }
 
 void ChatShares::setTransfers(ChatTransfers *transfers)
