@@ -121,8 +121,6 @@ public:
     void refreshItem(QXmppShareItem *item);
     void removeItem(QXmppShareItem *item);
 
-    void setProgress(QXmppShareItem *item, qint64 done, qint64 total);
-
 private:
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
