@@ -24,6 +24,7 @@
 
 #include "chat_panel.h"
 
+class QCheckBox;
 class QTextBrowser;
 
 class ChatConsole : public ChatPanel
@@ -40,6 +41,7 @@ private slots:
 private:
     QTextBrowser *browser;
     QXmppLogger *currentLogger;
+    QCheckBox *showPackets;
 };
 
 #endif

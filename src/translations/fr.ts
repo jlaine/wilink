@@ -57,6 +57,14 @@
         <source>Debugging console</source>
         <translation>Console de déboggage</translation>
     </message>
+    <message>
+        <source>Show packets</source>
+        <translation>Afficher les paquets</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
 </context>
 <context>
     <name>ChatConversation</name>

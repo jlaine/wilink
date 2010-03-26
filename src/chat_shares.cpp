@@ -379,7 +379,33 @@ void ChatShares::itemAction()
 
     if (action && action->data() == DownloadAction)
     {
-        queueModel->addItem(*item);
+        QXmppShareItem *queueItem = queueModel->addItem(*item);
+        QXmppShareItem *emptyChild = queueModel->get(
+                Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::CollectionItem) &&
+                Q(QXmppShareItem::SizeRole, Q::Equals, 0),
+                ChatSharesModel::QueryOptions(), queueItem);
+
+        // if we have at least one empty child, we need to retrieve the children
+        // of the item we just queued
+        if (queueItem->type() == QXmppShareItem::CollectionItem && (!queueItem->size() || emptyChild))
+        {
+            if (queueItem->locations().isEmpty())
+            {
+                logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
+                return;
+            }
+            const QXmppShareLocation location = queueItem->locations().first();
+
+            // retrieve full tree
+            QXmppShareSearchIq iq;
+            iq.setTo(location.jid());
+            iq.setType(QXmppIq::Get);
+            iq.setDepth(0);
+            iq.setNode(location.node());
+            searches.insert(iq.tag(), downloadsView);
+            client->sendPacket(iq);
+        }
+
         processDownloadQueue();
     }
 }
@@ -534,7 +560,6 @@ void ChatShares::processDownloadQueue()
 
         activeDownloads++;
     }
-    queueModel->pruneEmptyChildren();
 }
 
 /** When the user changes the query string, switch to the appropriate tab.
@@ -637,22 +662,36 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     // process search result
     if (!searches.contains(shareIq.tag()))
         return;
-    ChatSharesView *view = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
-    ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
-    Q_ASSERT(model);
+
+    ChatSharesView *mainView = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
+    QList<ChatSharesView*> views;
+    views << mainView;
+    if (mainView == downloadsView)
+        views << sharesView;
 
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
-    QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
-                                         ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
-    if (!oldItem && shareIq.from() != shareServer)
+
+    // update all concerned views
+    foreach (ChatSharesView *view, views)
     {
-        logMessage(QXmppLogger::WarningMessage, "Ignoring unwanted search result");
-        return;
+        ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
+        QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
+                                             ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+        if (!oldItem && shareIq.from() != shareServer)
+        {
+            logMessage(QXmppLogger::WarningMessage, "Ignoring unwanted search result");
+            return;
+        }
+
+        QModelIndex index = model->updateItem(oldItem, newItem);
+        if (view == mainView)
+            view->setExpanded(index, true);
     }
 
-    QModelIndex index = model->updateItem(oldItem, newItem);
-    view->setExpanded(index, true);
+    // if we retrieved the contents of a download queue item, process queue
+    if (mainView == downloadsView)
+        processDownloadQueue();
 }
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
@@ -720,14 +759,16 @@ ChatSharesModel::~ChatSharesModel()
     delete rootItem;
 }
 
-void ChatSharesModel::addItem(const QXmppShareItem &item)
+QXmppShareItem *ChatSharesModel::addItem(const QXmppShareItem &item)
 {
-    if (get(Q_FIND_LOCATIONS(item.locations()), QueryOptions(PostRecurse), rootItem))
-        return;
-
-    beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-    rootItem->appendChild(item);
-    endInsertRows();
+    QXmppShareItem *child = get(Q_FIND_LOCATIONS(item.locations()), QueryOptions(PostRecurse), rootItem);
+    if (!child)
+    {
+       beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+       child = rootItem->appendChild(item);
+       endInsertRows();
+   }
+    return child;
 }
 
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
@@ -876,24 +917,6 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
         return QModelIndex();
 
     return createIndex(parentItem->row(), 0, parentItem);
-}
-
-void ChatSharesModel::pruneEmptyChildren(QXmppShareItem *parent)
-{
-    if (!parent)
-        parent = rootItem;
-
-    // recurse
-    for (int i = 0; i < parent->size(); i++)
-        pruneEmptyChildren(parent->child(i));
-
-    // look at immediate children
-    for (int i = parent->size() - 1; i >= 0; i--)
-    {
-        QXmppShareItem *child = parent->child(i);
-        if (child->type() == QXmppShareItem::CollectionItem && !child->size())
-            removeItem(child);
-    }
 }
 
 void ChatSharesModel::refreshItem(QXmppShareItem *item)

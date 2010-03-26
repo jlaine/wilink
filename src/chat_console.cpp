@@ -19,6 +19,7 @@
 
 #include <QLabel>
 #include <QLayout>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QTextBrowser>
 
@@ -35,8 +36,22 @@ ChatConsole::ChatConsole(QWidget *parent)
     layout->setSpacing(0);
 
     layout->addItem(statusBar());
+
     browser = new QTextBrowser;
     layout->addWidget(browser);
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    showPackets = new QCheckBox(tr("Show packets"));
+    showPackets->setCheckState(Qt::Checked);
+    hbox->addWidget(showPackets);
+
+    hbox->addStretch();
+
+    QPushButton *clearButton = new QPushButton(QIcon(":/close.png"), tr("Clear"));
+    connect(clearButton, SIGNAL(clicked()), browser, SLOT(clear()));
+    hbox->addWidget(clearButton);
+
+    layout->addItem(hbox);
 
     setLayout(layout);
 }
@@ -50,12 +65,15 @@ void ChatConsole::setLogger(QXmppLogger *newLogger)
     if (newLogger)
         connect(newLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
     currentLogger = newLogger;
-    browser->clear();
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 {
     if (type == QXmppLogger::DebugMessage)
+        return;
+
+    if (showPackets->checkState() != Qt::Checked &&
+        (type == QXmppLogger::ReceivedMessage || QXmppLogger::SentMessage))
         return;
 
     QString color;
