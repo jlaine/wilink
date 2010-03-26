@@ -60,12 +60,15 @@ enum Columns
 };
 
 enum DataRoles {
-    PacketId = Qt::UserRole + 10,
+    ItemType = Qt::UserRole + 10,
+    PacketId,
     StreamId,
     TransferStart,
     TransferDone,
     TransferTotal,
 };
+
+#define Q ChatSharesModelQuery
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
@@ -235,7 +238,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
         return;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(StreamId, Q::Equals, job->sid()));
     if (queueItem)
         queueModel->setProgress(queueItem, done, total);
 }
@@ -244,7 +247,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
  */
 void ChatShares::transferReceived(QXmppTransferJob *job)
 {
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(StreamId, Q::Equals, job->sid()));
     if (!queueItem)
     {
         job->abort();
@@ -313,7 +316,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
         return;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(StreamId, Q::Equals, job->sid()));
 
     if (state == QXmppTransferJob::TransferState && queueItem)
     {
@@ -478,7 +481,7 @@ void ChatShares::processDownloadQueue()
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
-        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, QVariant());
+        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, Q(PacketId, Q::Equals, QVariant()));
         if (!file)
             return;
 
@@ -582,7 +585,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         return;
     }
 
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, PacketId, shareIq.id());
+    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(PacketId, Q::Equals, shareIq.id()));
     if (!queueItem)
         return;
 
@@ -706,22 +709,27 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
+    // display roles
     if (role == Qt::DisplayRole && index.column() == NameColumn)
         return item->name();
     else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
         return ChatTransfers::sizeToString(item->fileSize());
-    else if (index.column() == ProgressColumn)
+    else if (role == Qt::DisplayRole && index.column() == ProgressColumn)
     {
-        if (role == Qt::DisplayRole)
+        const QString localPath = item->data(LocalPathRole).toString();
+        int done = item->data(TransferDone).toInt();
+        QTime t = index.data(TransferStart).toTime();
+        if (!localPath.isEmpty())
         {
-            int done = item->data(TransferDone).toInt();
-            QTime t = index.data(TransferStart).toTime();
-            if (done <= 0 || !t.isValid() || !t.elapsed())
-                return QVariant();
+            return tr("Downloaded");
+        }
+        else if (done > 0 && t.isValid() && t.elapsed())
+        {
             int speed = (done * 1000.0) / t.elapsed();
             return ChatTransfers::sizeToString(speed) + "/s";
+        } else {
+            return tr("Queued");
         }
-        return item->data(role);
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
@@ -735,10 +743,14 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         else
             return fileIcon;
     }
-    return QVariant();
+
+    // data roles
+    else if (role == ItemType)
+        return item->type();
+    return item->data(role);
 }
 
-QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent)
+QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, const ChatSharesModelQuery &query, QXmppShareItem *parent)
 {
     if (!parent)
         parent = rootItem;
@@ -746,14 +758,14 @@ QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, int r
     // recurse
     QXmppShareItem *child;
     for (int i = 0; i < parent->size(); i++)
-        if ((child = findItemByData(type, role, data, parent->child(i))) != 0)
+        if ((child = findItemByData(type, query, parent->child(i))) != 0)
             return child;
 
     // look at immediate children
     for (int i = 0; i < parent->size(); i++)
     {
         child = parent->child(i);
-        if (child->type() == type && child->data(role) == data)
+        if (child->type() == type && query.match(child))
             return child;
     }
     return 0;
@@ -948,6 +960,17 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     }
 
     return oldIndex;
+}
+
+ChatSharesModelQuery::ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data)
+    :  m_role(role), m_operation(operation), m_data(data)
+{
+}
+
+bool ChatSharesModelQuery::match(QXmppShareItem *item) const
+{
+    Q_ASSERT(item);
+    return (item->data(m_role) == m_data);
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)

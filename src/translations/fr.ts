@@ -259,6 +259,14 @@ Acceptez-vous?</translation>
         <source>Progress</source>
         <translation>Progrès</translation>
     </message>
+    <message>
+        <source>Downloaded</source>
+        <translation>Téléchargé</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>En attente</translation>
+    </message>
 </context>
 <context>
     <name>ChatTransferPrompt</name>

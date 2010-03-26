@@ -48,6 +48,24 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
+class ChatSharesModelQuery
+{
+public:
+    enum Operation
+    {
+        Equals,
+        Contains,
+    };
+
+    ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data);
+    bool match(QXmppShareItem *item) const;
+
+private:
+    int m_role;
+    ChatSharesModelQuery::Operation m_operation;
+    QVariant m_data;
+};
+
 /** Model representing a tree of share items (collections and files).
  */
 class ChatSharesModel : public QAbstractItemModel
@@ -66,7 +84,7 @@ public:
 
     void addItem(const QXmppShareItem &item);
     QModelIndex mergeItem(const QXmppShareItem &item);
-    QXmppShareItem *findItemByData(QXmppShareItem::Type type, int role, const QVariant &data, QXmppShareItem *parent = 0);
+    QXmppShareItem *findItemByData(QXmppShareItem::Type type, const ChatSharesModelQuery &query, QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
 
