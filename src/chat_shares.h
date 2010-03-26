@@ -55,6 +55,7 @@ public:
     {
         None,
         Equals,
+        NotEquals,
         // Contains,
     };
 
@@ -89,6 +90,20 @@ class ChatSharesModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    enum Recurse
+    {
+        DontRecurse,
+        PreRecurse,
+        PostRecurse,
+    };
+
+    class QueryOptions
+    {
+    public:
+        QueryOptions(Recurse recurse = PreRecurse);
+        Recurse recurse;
+    };
+
     ChatSharesModel(QObject *parent = 0);
     ~ChatSharesModel();
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -100,7 +115,8 @@ public:
 
     void addItem(const QXmppShareItem &item);
     QModelIndex mergeItem(const QXmppShareItem &item);
-    QXmppShareItem *findItemByData(QXmppShareItem::Type type, const ChatSharesModelQuery &query, QXmppShareItem *parent = 0);
+    QList<QXmppShareItem*> filter(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
+    QXmppShareItem *get(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void removeItem(QXmppShareItem *item);
 

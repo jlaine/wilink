@@ -67,12 +67,16 @@ enum DataRoles {
     TransferTotal,
 };
 
-#define Q ChatSharesModelQuery
-
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 80
+
+// common queries
+#define Q ChatSharesModelQuery
+#define Q_FIND_TRANSFER(sid) \
+    (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
+     Q(StreamId, Q::Equals, sid))
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), chatTransfers(0)
@@ -237,7 +241,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
         return;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(StreamId, Q::Equals, job->sid()));
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
     if (queueItem)
         queueModel->setProgress(queueItem, done, total);
 }
@@ -246,7 +250,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
  */
 void ChatShares::transferReceived(QXmppTransferJob *job)
 {
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(StreamId, Q::Equals, job->sid()));
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
     if (!queueItem)
     {
         job->abort();
@@ -315,7 +319,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
         return;
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(StreamId, Q::Equals, job->sid()));
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
 
     if (state == QXmppTransferJob::TransferState && queueItem)
     {
@@ -326,7 +330,10 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     else if (state == QXmppTransferJob::FinishedState)
     {
         if (queueItem)
+        {
+            queueItem->setData(StreamId, QVariant());
             queueItem->setData(TransferStart, QVariant());
+        }
 
         // if the transfer failed, delete the local file
         QString localPath = job->data(LocalPathRole).toString();
@@ -480,7 +487,9 @@ void ChatShares::processDownloadQueue()
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
-        QXmppShareItem *file = queueModel->findItemByData(QXmppShareItem::FileItem, Q(PacketId, Q::Equals, QVariant()));
+        QXmppShareItem *file = queueModel->get(
+                Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
+                Q(PacketId, Q::Equals, QVariant()));
         if (!file)
             return;
 
@@ -584,7 +593,9 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         return;
     }
 
-    QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, Q(PacketId, Q::Equals, shareIq.id()));
+    QXmppShareItem *queueItem = queueModel->get(
+            Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
+            Q(PacketId, Q::Equals, shareIq.id()));
     if (!queueItem)
         return;
 
@@ -744,24 +755,55 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     return item->data(role);
 }
 
-QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, const ChatSharesModelQuery &query, QXmppShareItem *parent)
+QList<QXmppShareItem *> ChatSharesModel::filter(const ChatSharesModelQuery &query, const ChatSharesModel::QueryOptions &options, QXmppShareItem *parent, int limit)
 {
     if (!parent)
         parent = rootItem;
 
-    // recurse
+    QList<QXmppShareItem*> matches;
     QXmppShareItem *child;
-    for (int i = 0; i < parent->size(); i++)
-        if ((child = findItemByData(type, query, parent->child(i))) != 0)
-            return child;
+
+    // pre-recurse
+    if (options.recurse == PreRecurse)
+    {
+        for (int i = 0; i < parent->size(); i++)
+        {
+            int childLimit = limit ? limit - matches.size() : 0;
+            matches.append(filter(query, options, parent->child(i), childLimit));
+            if (limit && matches.size() == limit)
+                return matches;
+        }
+    }
 
     // look at immediate children
     for (int i = 0; i < parent->size(); i++)
     {
         child = parent->child(i);
-        if (child->type() == type && query.match(child))
-            return child;
+        if (query.match(child))
+            matches.append(child);
+        if (limit && matches.size() == limit)
+            return matches;
     }
+
+    // post-recurse
+    if (options.recurse == PostRecurse)
+    {
+        for (int i = 0; i < parent->size(); i++)
+        {
+            int childLimit = limit ? limit - matches.size() : 0;
+            matches.append(filter(query, options, parent->child(i), childLimit));
+            if (limit && matches.size() == limit)
+                return matches;
+        }
+    }
+    return matches;
+}
+
+QXmppShareItem *ChatSharesModel::get(const ChatSharesModelQuery &query, const ChatSharesModel::QueryOptions &options, QXmppShareItem *parent)
+{
+    QList<QXmppShareItem*> match = filter(query, options, parent, 1);
+    if (match.size())
+        return match.first();
     return 0;
 }
 
@@ -773,27 +815,13 @@ QXmppShareItem *ChatSharesModel::findItemByLocations(const QXmppShareLocationLis
     if (locations.isEmpty())
         return 0;
 
-    // look at immediate children
-    QXmppShareItem *child;
-    foreach (const QXmppShareLocation &location, locations)
-    {
-        for (int i = 0; i < parent->size(); i++)
-        {
-            child = parent->child(i);
-            if (child->locations().contains(location))
-                return child;
-        }
-    }
+    foreach (const QXmppShareLocation &l, locations)
+        qDebug() << "looking for" << l.jid() << l.node();
 
-    // recurse
-    if (recurse)
-    {
-        for (int i = 0; i < parent->size(); i++)
-            if ((child = findItemByLocations(locations, parent->child(i))) != 0)
-                return child;
-    }
-
-    return 0;
+    // FIXME : we are not actually checking it *contains* a location,
+    // we are checking that the locations are equal!
+    ChatSharesModelQuery query = Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations));
+    return get(query, QueryOptions(recurse ? PostRecurse : DontRecurse), rootItem);
 }
 
 /** Return the title for the given column.
@@ -969,7 +997,17 @@ ChatSharesModelQuery::ChatSharesModelQuery(int role, ChatSharesModelQuery::Opera
 bool ChatSharesModelQuery::match(QXmppShareItem *item) const
 {
     if (m_operation == Equals)
-        return (item->data(m_role) == m_data);
+    {
+        const QVariant &data = item->data(m_role);
+        if (m_data.canConvert<QXmppShareLocationList>());
+            return data.value<QXmppShareLocationList>() == m_data.value<QXmppShareLocationList>();
+        return (data == m_data);
+    } else if (m_operation == NotEquals) {
+        const QVariant &data = item->data(m_role);
+        if (m_data.canConvert<QXmppShareLocationList>());
+            return !(data.value<QXmppShareLocationList>() == m_data.value<QXmppShareLocationList>());
+        return (item->data(m_role) != m_data);
+    }
     else if (m_combine == AndCombine)
     {
         foreach (const ChatSharesModelQuery &child, m_children)
@@ -1002,6 +1040,11 @@ ChatSharesModelQuery ChatSharesModelQuery::operator||(const ChatSharesModelQuery
     result.m_combine = OrCombine;
     result.m_children << *this << other;
     return result;
+}
+
+ChatSharesModel::QueryOptions::QueryOptions(Recurse recurse_)
+    : recurse(recurse_)
+{
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)
