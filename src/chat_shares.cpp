@@ -70,7 +70,7 @@ enum DataRoles {
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SIZE_COLUMN_WIDTH 80
-#define PROGRESS_COLUMN_WIDTH 80
+#define PROGRESS_COLUMN_WIDTH 100
 
 // common queries
 #define Q ChatSharesModelQuery
@@ -244,7 +244,12 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
         return;
     QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
     if (queueItem)
-        queueModel->setProgress(queueItem, done, total);
+    {
+        // update progress
+        queueItem->setData(TransferDone, done);
+        queueItem->setData(TransferTotal, total);
+        queueModel->refreshItem(queueItem);
+    }
 }
 
 /** When we receive a file, check it is in the download queue and accept it.
@@ -343,6 +348,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(LocalPathRole, localPath);
         else
             QFile(localPath).remove();
+        queueModel->refreshItem(queueItem);
         job->deleteLater();
     }
 }
@@ -668,7 +674,8 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 {
     int done = index.data(TransferDone).toInt();
     int total = index.data(TransferTotal).toInt();
-    if (index.column() == ProgressColumn && done > 0 && total > 0)
+    QString localPath = index.data(LocalPathRole).toString();
+    if (index.column() == ProgressColumn && done > 0 && total > 0 && localPath.isEmpty())
     {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = option.rect;
@@ -705,7 +712,7 @@ ChatSharesModel::~ChatSharesModel()
 
 void ChatSharesModel::addItem(const QXmppShareItem &item)
 {
-    if (findItemByLocations(item.locations(), rootItem))
+    if (get(Q_FIND_LOCATIONS(item.locations()), QueryOptions(PostRecurse), rootItem))
         return;
 
     beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
@@ -812,16 +819,6 @@ QXmppShareItem *ChatSharesModel::get(const ChatSharesModelQuery &query, const Ch
     return 0;
 }
 
-/** Find a tree item which is associated with any of the
- *  given locations.
- */
-QXmppShareItem *ChatSharesModel::findItemByLocations(const QXmppShareLocationList &locations, QXmppShareItem *parent, bool recurse)
-{
-    if (locations.isEmpty())
-        return 0;
-    return get(Q_FIND_LOCATIONS(locations), QueryOptions(recurse ? PostRecurse : DontRecurse), rootItem);
-}
-
 /** Return the title for the given column.
  */
 QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -888,6 +885,11 @@ void ChatSharesModel::pruneEmptyChildren(QXmppShareItem *parent)
     }
 }
 
+void ChatSharesModel::refreshItem(QXmppShareItem *item)
+{
+    emit dataChanged(createIndex(item->row(), ProgressColumn, item), createIndex(item->row(), ProgressColumn, item));
+}
+
 void ChatSharesModel::removeItem(QXmppShareItem *item)
 {
     if (!item || item == rootItem)
@@ -916,18 +918,11 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-void ChatSharesModel::setProgress(QXmppShareItem *item, qint64 done, qint64 total)
-{
-    item->setData(TransferDone, done);
-    item->setData(TransferTotal, total);
-    emit dataChanged(createIndex(item->row(), ProgressColumn, item), createIndex(item->row(), ProgressColumn, item));
-}
-
 QModelIndex ChatSharesModel::mergeItem(const QXmppShareItem &item)
 {
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&item;
-    QXmppShareItem *parentItem = findItemByLocations(newItem->locations(), rootItem);
+    QXmppShareItem *parentItem = get(Q_FIND_LOCATIONS(newItem->locations()), QueryOptions(PostRecurse), rootItem);
     if (!parentItem)
         parentItem = rootItem;
     return updateItem(parentItem, newItem);
@@ -949,7 +944,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     QList<QXmppShareItem*> added;
     foreach (QXmppShareItem *newChild, newItem->children())
     {
-        QXmppShareItem *oldChild = findItemByLocations(newChild->locations(), oldItem, false);
+        QXmppShareItem *oldChild = get(Q_FIND_LOCATIONS(newChild->locations()), QueryOptions(DontRecurse), oldItem);
         if (oldChild)
         {
             updateItem(oldChild, newChild);

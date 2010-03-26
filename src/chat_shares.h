@@ -118,12 +118,12 @@ public:
     QList<QXmppShareItem*> filter(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
     QXmppShareItem *get(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
+    void refreshItem(QXmppShareItem *item);
     void removeItem(QXmppShareItem *item);
 
     void setProgress(QXmppShareItem *item, qint64 done, qint64 total);
 
 private:
-    QXmppShareItem *findItemByLocations(const QXmppShareLocationList &mirrors, QXmppShareItem *parent, bool recurse = true);
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
 private:
