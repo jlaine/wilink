@@ -956,15 +956,35 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     return oldIndex;
 }
 
+ChatSharesModelQuery::ChatSharesModelQuery()
+    :  m_role(0), m_operation(None), m_combine(NoCombine)
+{
+}
+
 ChatSharesModelQuery::ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data)
-    :  m_role(role), m_operation(operation), m_data(data), m_combine(AndCombine)
+    :  m_role(role), m_operation(operation), m_data(data), m_combine(NoCombine)
 {
 }
 
 bool ChatSharesModelQuery::match(QXmppShareItem *item) const
 {
-    Q_ASSERT(item);
-    return (item->data(m_role) == m_data);
+    if (m_operation == Equals)
+        return (item->data(m_role) == m_data);
+    else if (m_combine == AndCombine)
+    {
+        foreach (const ChatSharesModelQuery &child, m_children)
+            if (!child.match(item))
+                return false;
+    }
+    return true;
+}
+
+ChatSharesModelQuery ChatSharesModelQuery::operator&&(const ChatSharesModelQuery &other) const
+{
+    ChatSharesModelQuery result;
+    result.m_combine = AndCombine;
+    result.m_children << *this << other;
+    return result;
 }
 
 ChatSharesView::ChatSharesView(QWidget *parent)

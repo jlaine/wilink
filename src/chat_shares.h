@@ -53,18 +53,24 @@ class ChatSharesModelQuery
 public:
     enum Operation
     {
+        None,
         Equals,
-        Contains,
+        // Contains,
     };
 
+    ChatSharesModelQuery();
     ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data);
+
     bool match(QXmppShareItem *item) const;
+
+    ChatSharesModelQuery operator&&(const ChatSharesModelQuery &other) const;
 
 private:
     enum Combine
     {
+        NoCombine,
         AndCombine,
-        OrCombine,
+        // OrCombine,
     };
 
     int m_role;
