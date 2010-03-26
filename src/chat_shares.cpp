@@ -645,6 +645,12 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
     QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
                                          ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+    if (!oldItem && shareIq.from() != shareServer)
+    {
+        logMessage(QXmppLogger::WarningMessage, "Ignoring unwanted search result");
+        return;
+    }
+
     QModelIndex index = model->updateItem(oldItem, newItem);
     view->setExpanded(index, true);
 }
