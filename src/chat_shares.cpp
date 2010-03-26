@@ -74,6 +74,7 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 // common queries
 #define Q ChatSharesModelQuery
+#define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
 #define Q_FIND_TRANSFER(sid) \
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
      Q(StreamId, Q::Equals, sid))
@@ -814,14 +815,7 @@ QXmppShareItem *ChatSharesModel::findItemByLocations(const QXmppShareLocationLis
 {
     if (locations.isEmpty())
         return 0;
-
-    foreach (const QXmppShareLocation &l, locations)
-        qDebug() << "looking for" << l.jid() << l.node();
-
-    // FIXME : we are not actually checking it *contains* a location,
-    // we are checking that the locations are equal!
-    ChatSharesModelQuery query = Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations));
-    return get(query, QueryOptions(recurse ? PostRecurse : DontRecurse), rootItem);
+    return get(Q_FIND_LOCATIONS(locations), QueryOptions(recurse ? PostRecurse : DontRecurse), rootItem);
 }
 
 /** Return the title for the given column.
