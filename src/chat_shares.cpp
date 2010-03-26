@@ -332,6 +332,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     {
         if (queueItem)
         {
+            queueItem->setData(PacketId, QVariant());
             queueItem->setData(StreamId, QVariant());
             queueItem->setData(TransferStart, QVariant());
         }
@@ -484,13 +485,16 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 void ChatShares::processDownloadQueue()
 {
     // check how many downloads are active
-    int activeDownloads = downloadJobs.size();
+    int activeDownloads = queueModel->filter(
+            Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
+            Q(PacketId, Q::NotEquals, QVariant())).size();
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
         QXmppShareItem *file = queueModel->get(
                 Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
-                Q(PacketId, Q::Equals, QVariant()));
+                Q(PacketId, Q::Equals, QVariant()) &&
+                Q(LocalPathRole, Q::Equals, QVariant()));
         if (!file)
             return;
 
@@ -992,14 +996,14 @@ bool ChatSharesModelQuery::match(QXmppShareItem *item) const
 {
     if (m_operation == Equals)
     {
-        const QVariant &data = item->data(m_role);
-        if (m_data.canConvert<QXmppShareLocationList>());
-            return data.value<QXmppShareLocationList>() == m_data.value<QXmppShareLocationList>();
-        return (data == m_data);
-    } else if (m_operation == NotEquals) {
-        const QVariant &data = item->data(m_role);
-        if (m_data.canConvert<QXmppShareLocationList>());
-            return !(data.value<QXmppShareLocationList>() == m_data.value<QXmppShareLocationList>());
+        if (m_role == QXmppShareItem::LocationsRole)
+            return item->locations() == m_data.value<QXmppShareLocationList>();
+        return item->data(m_role) == m_data;
+    }
+    else if (m_operation == NotEquals)
+    {
+        if (m_role == QXmppShareItem::LocationsRole)
+            return !(item->locations() == m_data.value<QXmppShareLocationList>());
         return (item->data(m_role) != m_data);
     }
     else if (m_combine == AndCombine)
