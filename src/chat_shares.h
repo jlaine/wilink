@@ -61,9 +61,18 @@ public:
     bool match(QXmppShareItem *item) const;
 
 private:
+    enum Combine
+    {
+        AndCombine,
+        OrCombine,
+    };
+
     int m_role;
     ChatSharesModelQuery::Operation m_operation;
     QVariant m_data;
+
+    QList<ChatSharesModelQuery> m_children;
+    ChatSharesModelQuery::Combine m_combine;
 };
 
 /** Model representing a tree of share items (collections and files).

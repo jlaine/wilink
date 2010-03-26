@@ -60,8 +60,7 @@ enum Columns
 };
 
 enum DataRoles {
-    ItemType = Qt::UserRole + 10,
-    PacketId,
+    PacketId = QXmppShareItem::MaxRole,
     StreamId,
     TransferStart,
     TransferDone,
@@ -709,7 +708,6 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    // display roles
     if (role == Qt::DisplayRole && index.column() == NameColumn)
         return item->name();
     else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
@@ -743,10 +741,6 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         else
             return fileIcon;
     }
-
-    // data roles
-    else if (role == ItemType)
-        return item->type();
     return item->data(role);
 }
 
@@ -963,7 +957,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
 }
 
 ChatSharesModelQuery::ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data)
-    :  m_role(role), m_operation(operation), m_data(data)
+    :  m_role(role), m_operation(operation), m_data(data), m_combine(AndCombine)
 {
 }
 
