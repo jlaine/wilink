@@ -735,7 +735,8 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         return item->name();
     else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
         return ChatTransfers::sizeToString(item->fileSize());
-    else if (role == Qt::DisplayRole && index.column() == ProgressColumn)
+    else if (role == Qt::DisplayRole && index.column() == ProgressColumn &&
+             item->type() == QXmppShareItem::FileItem)
     {
         const QString localPath = item->data(LocalPathRole).toString();
         int done = item->data(TransferDone).toInt();
