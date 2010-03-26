@@ -641,7 +641,11 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
     Q_ASSERT(model);
 
-    QModelIndex index = model->mergeItem(shareIq.collection());
+    // FIXME : we are casting away constness
+    QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
+    QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
+                                         ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+    QModelIndex index = model->updateItem(oldItem, newItem);
     view->setExpanded(index, true);
 }
 
@@ -919,19 +923,11 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-QModelIndex ChatSharesModel::mergeItem(const QXmppShareItem &item)
-{
-    // FIXME : we are casting away constness
-    QXmppShareItem *newItem = (QXmppShareItem*)&item;
-    QXmppShareItem *parentItem = get(Q_FIND_LOCATIONS(newItem->locations()), QueryOptions(PostRecurse), rootItem);
-    if (!parentItem)
-        parentItem = rootItem;
-    return updateItem(parentItem, newItem);
-}
-
 QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
 {
     QModelIndex oldIndex;
+    if (!oldItem)
+        oldItem = rootItem;
     if (oldItem != rootItem)
         oldIndex = createIndex(oldItem->row(), 0, oldItem);
 

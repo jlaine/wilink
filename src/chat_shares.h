@@ -114,14 +114,11 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     void addItem(const QXmppShareItem &item);
-    QModelIndex mergeItem(const QXmppShareItem &item);
     QList<QXmppShareItem*> filter(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
     QXmppShareItem *get(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
     void pruneEmptyChildren(QXmppShareItem *parent = 0);
     void refreshItem(QXmppShareItem *item);
     void removeItem(QXmppShareItem *item);
-
-private:
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
 private:
