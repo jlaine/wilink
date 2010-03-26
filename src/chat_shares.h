@@ -64,13 +64,14 @@ public:
     bool match(QXmppShareItem *item) const;
 
     ChatSharesModelQuery operator&&(const ChatSharesModelQuery &other) const;
+    ChatSharesModelQuery operator||(const ChatSharesModelQuery &other) const;
 
 private:
     enum Combine
     {
         NoCombine,
         AndCombine,
-        // OrCombine,
+        OrCombine,
     };
 
     int m_role;

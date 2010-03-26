@@ -975,7 +975,16 @@ bool ChatSharesModelQuery::match(QXmppShareItem *item) const
         foreach (const ChatSharesModelQuery &child, m_children)
             if (!child.match(item))
                 return false;
+        return true;
     }
+    else if (m_combine == OrCombine)
+    {
+        foreach (const ChatSharesModelQuery &child, m_children)
+            if (child.match(item))
+                return true;
+        return false;
+    }
+    // empty query matches all
     return true;
 }
 
@@ -983,6 +992,14 @@ ChatSharesModelQuery ChatSharesModelQuery::operator&&(const ChatSharesModelQuery
 {
     ChatSharesModelQuery result;
     result.m_combine = AndCombine;
+    result.m_children << *this << other;
+    return result;
+}
+
+ChatSharesModelQuery ChatSharesModelQuery::operator||(const ChatSharesModelQuery &other) const
+{
+    ChatSharesModelQuery result;
+    result.m_combine = OrCombine;
     result.m_children << *this << other;
     return result;
 }
