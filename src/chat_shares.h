@@ -48,6 +48,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
+/** Model representing a tree of share items (collections and files).
+ */
 class ChatSharesModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -77,11 +79,14 @@ private:
 private:
     QXmppShareItem *rootItem;
 
+    // cached icons, to avoid reloading them whenever an item is added
     QIcon collectionIcon;
     QIcon fileIcon;
     QIcon peerIcon;
 };
 
+/** View for displaying a tree of share items.
+ */
 class ChatSharesView : public QTreeView
 {
     Q_OBJECT
@@ -98,6 +103,8 @@ protected:
     void resizeEvent(QResizeEvent *e);
 };
 
+/** The shares panel.
+ */
 class ChatShares : public ChatPanel
 {
     Q_OBJECT

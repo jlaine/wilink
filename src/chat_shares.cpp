@@ -174,6 +174,9 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setClient(baseClient);
 }
 
+/** When the main XMPP stream is disconnected, disconnect the shares-specific
+ *  stream too.
+ */
 void ChatShares::disconnected()
 {
     if (client && client != baseClient)
@@ -185,6 +188,8 @@ void ChatShares::disconnected()
     }
 }
 
+/** Recursively cancel any transfer jobs associated with a download queue item.
+ */
 void ChatShares::transferAbort(QXmppShareItem *item)
 {
     QString sid = item->data(StreamId).toString();
@@ -200,12 +205,18 @@ void ChatShares::transferAbort(QXmppShareItem *item)
         transferAbort(child);
 }
 
+/** When a transfer job is destroyed, remove it from our list
+ *  an process the download queue.
+ */
 void ChatShares::transferDestroyed(QObject *obj)
 {
     downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
     processDownloadQueue();
 }
 
+/** When the user double clicks an item in the download queue,
+ *  open it if it is fully retrieved.
+ */
 void ChatShares::transferDoubleClicked(const QModelIndex &index)
 {
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
@@ -217,6 +228,8 @@ void ChatShares::transferDoubleClicked(const QModelIndex &index)
         QDesktopServices::openUrl(QUrl::fromLocalFile(localPath));
 }
 
+/** Update the progress bar for a transfer job.
+ */
 void ChatShares::transferProgress(qint64 done, qint64 total)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
@@ -227,6 +240,8 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
         queueModel->setProgress(queueItem, done, total);
 }
 
+/** When we receive a file, check it is in the download queue and accept it.
+ */
 void ChatShares::transferReceived(QXmppTransferJob *job)
 {
     QXmppShareItem *queueItem = queueModel->findItemByData(QXmppShareItem::FileItem, StreamId, job->sid());
@@ -279,6 +294,9 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     job->accept(file);
 }
 
+/** When the user removes an item from the download queue, cancel any jobs
+ *  associated with it.
+ */
 void ChatShares::transferRemoved()
 {
     const QModelIndex &index = downloadsView->currentIndex();
@@ -497,6 +515,8 @@ void ChatShares::processDownloadQueue()
     queueModel->pruneEmptyChildren();
 }
 
+/** When the user changes the query string, switch to the appropriate tab.
+ */
 void ChatShares::queryStringChanged()
 {
     if (lineEdit->text().isEmpty())
@@ -739,6 +759,9 @@ QXmppShareItem *ChatSharesModel::findItemByData(QXmppShareItem::Type type, int r
     return 0;
 }
 
+/** Find a tree item which is associated with any of the
+ *  given locations.
+ */
 QXmppShareItem *ChatSharesModel::findItemByLocations(const QXmppShareLocationList &locations, QXmppShareItem *parent, bool recurse)
 {
     if (locations.isEmpty())
@@ -767,6 +790,8 @@ QXmppShareItem *ChatSharesModel::findItemByLocations(const QXmppShareLocationLis
     return 0;
 }
 
+/** Return the title for the given column.
+ */
 QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole)
@@ -943,6 +968,9 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
     emit contextMenu(index, event->globalPos());
 }
 
+/** When the view is resized, adjust the width of the
+ *  "name" column to take all the available space.
+ */
 void ChatSharesView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
