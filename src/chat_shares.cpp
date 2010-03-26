@@ -800,9 +800,11 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         {
             int speed = (done * 1000.0) / t.elapsed();
             return ChatTransfers::sizeToString(speed) + "/s";
-        } else {
-            return tr("Queued");
         }
+        else if (!item->data(PacketId).toString().isEmpty())
+            return tr("Requested");
+        else
+            return tr("Queued");
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {

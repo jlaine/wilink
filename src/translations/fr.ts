@@ -275,6 +275,10 @@ Acceptez-vous?</translation>
         <source>Queued</source>
         <translation>En attente</translation>
     </message>
+    <message>
+        <source>Requested</source>
+        <translation>Demandé</translation>
+    </message>
 </context>
 <context>
     <name>ChatTransferPrompt</name>
