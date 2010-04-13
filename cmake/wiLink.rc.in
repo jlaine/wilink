@@ -13,10 +13,10 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "FileDescription",  "wDesktop ${WILINK_VERSION}\0"
+            VALUE "FileDescription",  "wiLink ${WILINK_VERSION}\0"
             VALUE "FileVersion",      "${WILINK_VERSION_WIN32}\0"
-            VALUE "LegalCopyright",   "Copyright 2008-2009 Bollore telecom\0"
-            VALUE "ProductName",      "wDesktop\0"
+            VALUE "LegalCopyright",   "Copyright 2009-2010 Bollore telecom\0"
+            VALUE "ProductName",      "wiLink\0"
             VALUE "ProductVersion",   "${WILINK_VERSION_WIN32}\0"
         END
     END

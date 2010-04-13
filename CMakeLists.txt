@@ -3,7 +3,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 include(CheckIncludeFiles)
 
 # Project and version
-project(wDesktop)
+project(wiLink)
 set(WILINK_VERSION_MAJOR 0)
 set(WILINK_VERSION_MINOR 7)
 set(WILINK_VERSION_PATCH 906)
@@ -53,10 +53,10 @@ if(WIN32)
 endif(WIN32)
 
 # Packaging
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "wDesktop")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "wiLink")
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/COPYING)
-set(CPACK_PACKAGE_EXECUTABLES "wDesktop" "wDesktop")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "wDesktop")
+set(CPACK_PACKAGE_EXECUTABLES "wiLink" "wiLink")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "wiLink")
 set(CPACK_PACKAGE_VERSION_MAJOR ${WILINK_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${WILINK_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${WILINK_VERSION_PATCH})
@@ -70,7 +70,7 @@ if(APPLE)
     execute_process(COMMAND sw_vers -productVersion COMMAND cut -d. -f1,2
         OUTPUT_VARIABLE OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(BUNDLE_DMG ${PROJECT_NAME}-${WILINK_VERSION}-mac-${OSX_VERSION}.dmg)
-    set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wDesktop.app)
+    set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wiLink.app)
     set(_dmg_temp ${BUNDLE_DMG}.temp)
     add_custom_command(OUTPUT ${BUNDLE_DMG}
         COMMAND mkdir ${_dmg_temp}
@@ -78,11 +78,11 @@ if(APPLE)
         COMMAND ln -s /Applications ${_dmg_temp}/Applications
         COMMAND hdiutil create ${BUNDLE_DMG} -srcdir ${_dmg_temp} -fs HFS+ -volname "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${WILINK_VERSION}"
         COMMAND rm -rf ${_dmg_temp}
-        DEPENDS wDesktop)
+        DEPENDS wiLink)
     add_custom_target(package DEPENDS ${BUNDLE_DMG})
 else(APPLE)
     if(WIN32)
-        set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wDesktop.exe\\\";")
+        set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\";")
     endif(WIN32)
     # Source package
     set(CPACK_SOURCE_GENERATOR "TBZ2")

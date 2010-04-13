@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QLocale>
 #include <QProcess>
+#include <QSettings>
 #include <QTranslator>
 
 #ifdef Q_OS_WIN
@@ -49,12 +50,19 @@ int main(int argc, char *argv[])
 {
     /* Create application */
     QApplication app(argc, argv);
-    app.setApplicationName("wDesktop");
+    app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
     app.setOrganizationName("Wifirst");
     app.setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/wiLink.png"));
+#endif
+
+    /* Migrate old settings */
+#ifdef Q_OS_WIN
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    settings.remove("wDesktop");
+    QDir::home().rename("wDesktop.encrypted", qApp->applicationName() + ".encrypted");
 #endif
 
     /* Load translations */

@@ -9,7 +9,7 @@ include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
 
-# wDesktop
+# wiLink
 
 set(wiLink_SOURCES
     application.cpp
@@ -90,29 +90,29 @@ if(WIN32)
     set(WILINK_RESOURCE wiLink.rc)
 endif(WIN32)
 
-add_executable(wDesktop ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
+add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
+target_link_libraries(wiLink qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE TRUE)
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_ICON_FILE ${BUNDLE_ICON_NAME})
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME ${CPACK_BUNDLE_NAME})
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION ${WILINK_VERSION})
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${WILINK_VERSION})
-    set_target_properties(wDesktop PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${WILINK_VERSION})
-    add_custom_command(TARGET wDesktop POST_BUILD
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE TRUE)
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_ICON_FILE ${BUNDLE_ICON_NAME})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME ${CPACK_BUNDLE_NAME})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION ${WILINK_VERSION})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${WILINK_VERSION})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${WILINK_VERSION})
+    add_custom_command(TARGET wiLink POST_BUILD
         COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION} -no-plugins
         COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${WILINK_EXTRA_PLUGINS}
-        DEPENDS wDesktop)
+        DEPENDS wiLink)
 endif(APPLE)
 if(WIN32)
-    set_target_properties(wDesktop PROPERTIES LINK_FLAGS "-mwindows")
+    set_target_properties(wiLink PROPERTIES LINK_FLAGS "-mwindows")
 endif(WIN32)
 
-install(TARGETS wDesktop DESTINATION bin)
+install(TARGETS wiLink DESTINATION bin)
 
 # tests
 add_executable(hasher hasher.cpp)
