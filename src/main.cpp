@@ -59,6 +59,13 @@ int main(int argc, char *argv[])
 #endif
 
     /* Migrate old settings */
+#ifdef Q_OS_MAC
+    QProcess process;
+    process.start("osascript");
+    process.write("tell application \"System Events\"\n\tdelete login item \"wDesktop\"\nend tell\n");
+    process.closeWriteChannel();
+    process.waitForFinished();
+#endif
 #ifdef Q_OS_WIN
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     settings.remove("wDesktop");
