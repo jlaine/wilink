@@ -81,7 +81,7 @@ wiLink 0.3.5 (2010-01-20)
  * Do not resize contact list to a size too big for the screen.
  * On Windows and Linux, make a left click on the tray icon show the chat screen.
 
-wdesktop 0.3.0 (2010-01-18)
+wiLink 0.3.0 (2010-01-18)
  * Implement server ping (XEP-0199) and reconnection.
  * Fix chat history scrolling when sending a message.
 

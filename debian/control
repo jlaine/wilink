@@ -1,11 +1,11 @@
-Source: wdesktop
+Source: wilink
 Section: net
 Priority: optional
 Maintainer: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
 Standards-Version: 3.8.1
 Build-Depends: cdbs, debhelper (>= 5), cmake, libgnome-keyring-dev, libgphoto2-2-dev, libqt4-dev
 
-Package: wdesktop
+Package: wilink
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: Utilities for Wifirst services
