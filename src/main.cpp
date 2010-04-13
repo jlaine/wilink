@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 #endif
 #ifdef Q_OS_WIN
     QSettings oldSettings("HKEY_CURRENT_USER\\Software\\Wifirst", QSettings::NativeFormat);
-    if (oldSettings.contains("wDesktop"))
+    if (oldSettings.childGroups().contains("wDesktop"))
     {
         QSettings newSettings;
         oldSettings.beginGroup("wDesktop");
