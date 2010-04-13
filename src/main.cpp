@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
+    app.setOrganizationDomain("wifirst.net");
     app.setOrganizationName("Wifirst");
     app.setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
