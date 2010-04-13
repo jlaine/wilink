@@ -63,8 +63,8 @@ set(CPACK_PACKAGE_VERSION_PATCH ${WDESKTOP_VERSION_PATCH})
 # Binary package
 if(APPLE)
 	set(CPACK_BUNDLE_NAME ${PROJECT_NAME})
-	set(CPACK_BUNDLE_ICON ${CMAKE_SOURCE_DIR}/src/data/wDesktop.icns)
-	set(CPACK_BUNDLE_IDENTIFIER net.wifirst.wDesktop)
+	set(CPACK_BUNDLE_ICON ${CMAKE_SOURCE_DIR}/src/data/wiLink.icns)
+	set(CPACK_BUNDLE_IDENTIFIER net.wifirst.wiLink)
 
     # image generation
     execute_process(COMMAND sw_vers -productVersion COMMAND cut -d. -f1,2
