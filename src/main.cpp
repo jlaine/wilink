@@ -60,13 +60,18 @@ int main(int argc, char *argv[])
 #endif
 
     /* Migrate old settings */
+#ifdef Q_OS_LINUX
+    QDir(QDir::home().filePath(".config/Wifirst")).rename("wDesktop.conf",
+        QString("%1.conf").arg(qApp->applicationName());
+#endif
 #ifdef Q_OS_MAC
     QProcess process;
     process.start("osascript");
     process.write("tell application \"System Events\"\n\tdelete login item \"wDesktop\"\nend tell\n");
     process.closeWriteChannel();
     process.waitForFinished();
-    QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist", "net.wifirst.wiLink.plist");
+    QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist",
+        QString("net.wifirst.%1.plist").arg(qApp->applicationName()));
 #endif
 #ifdef Q_OS_WIN
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
