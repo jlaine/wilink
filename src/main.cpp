@@ -82,7 +82,16 @@ int main(int argc, char *argv[])
         QString("net.wifirst.%1.plist").arg(qApp->applicationName()));
 #endif
 #ifdef Q_OS_WIN
-    // TODO
+    QSettings oldSettings("HKEY_CURRENT_USER\\Software\\Wifirst", QSettings::NativeFormat);
+    if (oldSettings.contains("wDesktop"))
+    {
+        QSettings newSettings;
+        oldSettings.beginGroup("wDesktop");
+        foreach (const QString &key, oldSettings.childKeys())
+            newSettings.setValue(key, oldSettings.value(key));
+        oldSettings.endGroup();
+        oldSettings.remove("wDesktop");
+    }
 #endif
 
     /* Migrate old passwords */
