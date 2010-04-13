@@ -11,7 +11,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
 
 # wDesktop
 
-set(wDesktop_SOURCES
+set(wiLink_SOURCES
     application.cpp
     chat.cpp
     chat_accounts.cpp
@@ -37,7 +37,7 @@ set(wDesktop_SOURCES
     updates.cpp
     updatesdialog.cpp)
 
-set(wDesktop_MOC_HEADERS
+set(wiLink_MOC_HEADERS
     chat.h
     chat_accounts.h
     chat_console.h
@@ -60,28 +60,28 @@ set(wDesktop_MOC_HEADERS
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
-    qt4_create_translation(QM_FILES ${wDesktop_SOURCES} translations/fr.ts)
+    qt4_create_translation(QM_FILES ${wiLink_SOURCES} translations/fr.ts)
 else(RELOAD_TRANSLATIONS)
     qt4_add_translation(QM_FILES translations/fr.ts)
 endif(RELOAD_TRANSLATIONS)
 qt4_add_translation(QM_FILES translations/qt_fr.ts)
 
-set(wDesktop_RCCS
+set(wiLink_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/data/wiLink.qrc)
 
 if(WIN32)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
+    set(wiLink_SOURCES ${wiLink_SOURCES} wireless_win.cpp)
 elseif(APPLE)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} chat_mac.mm wireless_mac.mm)
+    set(wiLink_SOURCES ${wiLink_SOURCES} chat_mac.mm wireless_mac.mm)
 elseif(UNIX)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_nm.cpp)
+    set(wiLink_SOURCES ${wiLink_SOURCES} wireless_nm.cpp)
 else(WIN32)
-    set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_stub.cpp)
+    set(wiLink_SOURCES ${wiLink_SOURCES} wireless_stub.cpp)
 endif(WIN32)
 
-qt4_add_resources(wDesktop_RCC_SOURCES ${wDesktop_RCCS})
-qt4_wrap_cpp(wDesktop_MOC_SOURCES ${wDesktop_MOC_HEADERS})
+qt4_add_resources(wiLink_RCC_SOURCES ${wiLink_RCCS})
+qt4_wrap_cpp(wiLink_MOC_SOURCES ${wiLink_MOC_HEADERS})
 
 if(WIN32)
     enable_language(RC)
@@ -90,7 +90,7 @@ if(WIN32)
     set(WDESKTOP_RESOURCE wiLink.rc)
 endif(WIN32)
 
-add_executable(wDesktop ${wDesktop_SOURCES} ${wDesktop_MOC_SOURCES} ${wDesktop_RCC_SOURCES} ${WDESKTOP_RESOURCE})
+add_executable(wDesktop ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WDESKTOP_RESOURCE})
 target_link_libraries(wDesktop qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
