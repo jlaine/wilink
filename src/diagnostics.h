@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_DIAGNOSTICS_H__
-#define __WDESKTOP_DIAGNOSTICS_H__
+#ifndef __WILINK_DIAGNOSTICS_H__
+#define __WILINK_DIAGNOSTICS_H__
 
 #include <QDialog>
 #include <QHostInfo>

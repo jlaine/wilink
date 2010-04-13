@@ -1,6 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#cmakedefine WDESKTOP_VERSION "@WDESKTOP_VERSION@"
+#cmakedefine WILINK_VERSION "@WILINK_VERSION@"
 
 #endif

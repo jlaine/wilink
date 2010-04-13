@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_DIALOG_H__
-#define __WDESKTOP_CHAT_DIALOG_H__
+#ifndef __WILINK_CHAT_DIALOG_H__
+#define __WILINK_CHAT_DIALOG_H__
 
 #include <QWidget>
 

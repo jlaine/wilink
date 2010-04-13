@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     /* Create application */
     QApplication app(argc, argv);
     app.setApplicationName("wDesktop");
-    app.setApplicationVersion(WDESKTOP_VERSION);
+    app.setApplicationVersion(WILINK_VERSION);
     app.setOrganizationName("Wifirst");
     app.setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC

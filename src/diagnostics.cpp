@@ -36,7 +36,7 @@
 #include "diagnostics.h"
 #include "systeminfo.h"
 
-static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
+static const QString wdesktopVersion = QString::fromLatin1(WILINK_VERSION);
 static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)

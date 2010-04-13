@@ -1,8 +1,8 @@
 #include <winver.h>
 
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION     ${WDESKTOP_VERSION_WIN32}
-    PRODUCTVERSION  ${WDESKTOP_VERSION_WIN32}
+    FILEVERSION     ${WILINK_VERSION_WIN32}
+    PRODUCTVERSION  ${WILINK_VERSION_WIN32}
     FILEFLAGSMASK   0x3fL
     FILEFLAGS       0x0L
     FILEOS          0x4L
@@ -13,11 +13,11 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "FileDescription",  "wDesktop ${WDESKTOP_VERSION}\0"
-            VALUE "FileVersion",      "${WDESKTOP_VERSION_WIN32}\0"
+            VALUE "FileDescription",  "wDesktop ${WILINK_VERSION}\0"
+            VALUE "FileVersion",      "${WILINK_VERSION_WIN32}\0"
             VALUE "LegalCopyright",   "Copyright 2008-2009 Bollore telecom\0"
             VALUE "ProductName",      "wDesktop\0"
-            VALUE "ProductVersion",   "${WDESKTOP_VERSION_WIN32}\0"
+            VALUE "ProductVersion",   "${WILINK_VERSION_WIN32}\0"
         END
     END
 END

@@ -4,10 +4,10 @@ include(CheckIncludeFiles)
 
 # Project and version
 project(wDesktop)
-set(WDESKTOP_VERSION_MAJOR 0)
-set(WDESKTOP_VERSION_MINOR 7)
-set(WDESKTOP_VERSION_PATCH 906)
-set(WDESKTOP_VERSION ${WDESKTOP_VERSION_MAJOR}.${WDESKTOP_VERSION_MINOR}.${WDESKTOP_VERSION_PATCH})
+set(WILINK_VERSION_MAJOR 0)
+set(WILINK_VERSION_MINOR 7)
+set(WILINK_VERSION_PATCH 906)
+set(WILINK_VERSION ${WILINK_VERSION_MAJOR}.${WILINK_VERSION_MINOR}.${WILINK_VERSION_PATCH})
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_BINARY_DIR}/src/config.h)
 
 # Required
@@ -26,13 +26,13 @@ endif(COREWLAN_LIBRARY)
 
 # Extra runtime dependencies
 if(APPLE)
-    set(WDESKTOP_EXTRA_PLUGINS
+    set(WILINK_EXTRA_PLUGINS
         ${QT_PLUGINS_DIR}/imageformats/libqgif.*
         ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
         ${QT_PLUGINS_DIR}/sqldrivers/libqsqlite.*)
 endif(APPLE)
 if(WIN32)
-    set(WDESKTOP_EXTRA_RUNTIME
+    set(WILINK_EXTRA_RUNTIME
         ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
@@ -42,14 +42,14 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll)
-    set(WDESKTOP_IMAGE_PLUGINS
+    set(WILINK_IMAGE_PLUGINS
         ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
         ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
-    set(WDESKTOP_SQL_PLUGINS
+    set(WILINK_SQL_PLUGINS
         ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
-    install(FILES ${WDESKTOP_EXTRA_RUNTIME} DESTINATION bin)
-    install(FILES ${WDESKTOP_IMAGE_PLUGINS} DESTINATION bin/imageformats)
-    install(FILES ${WDESKTOP_SQL_PLUGINS} DESTINATION bin/sqldrivers)
+    install(FILES ${WILINK_EXTRA_RUNTIME} DESTINATION bin)
+    install(FILES ${WILINK_IMAGE_PLUGINS} DESTINATION bin/imageformats)
+    install(FILES ${WILINK_SQL_PLUGINS} DESTINATION bin/sqldrivers)
 endif(WIN32)
 
 # Packaging
@@ -57,9 +57,9 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "wDesktop")
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/COPYING)
 set(CPACK_PACKAGE_EXECUTABLES "wDesktop" "wDesktop")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "wDesktop")
-set(CPACK_PACKAGE_VERSION_MAJOR ${WDESKTOP_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${WDESKTOP_VERSION_MINOR})
-set(CPACK_PACKAGE_VERSION_PATCH ${WDESKTOP_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION_MAJOR ${WILINK_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${WILINK_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${WILINK_VERSION_PATCH})
 # Binary package
 if(APPLE)
 	set(CPACK_BUNDLE_NAME ${PROJECT_NAME})
@@ -69,14 +69,14 @@ if(APPLE)
     # image generation
     execute_process(COMMAND sw_vers -productVersion COMMAND cut -d. -f1,2
         OUTPUT_VARIABLE OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-    set(BUNDLE_DMG ${PROJECT_NAME}-${WDESKTOP_VERSION}-mac-${OSX_VERSION}.dmg)
+    set(BUNDLE_DMG ${PROJECT_NAME}-${WILINK_VERSION}-mac-${OSX_VERSION}.dmg)
     set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wDesktop.app)
     set(_dmg_temp ${BUNDLE_DMG}.temp)
     add_custom_command(OUTPUT ${BUNDLE_DMG}
         COMMAND mkdir ${_dmg_temp}
         COMMAND cp -r ${BUNDLE_LOCATION} ${_dmg_temp}
         COMMAND ln -s /Applications ${_dmg_temp}/Applications
-        COMMAND hdiutil create ${BUNDLE_DMG} -srcdir ${_dmg_temp} -fs HFS+ -volname "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${WDESKTOP_VERSION}"
+        COMMAND hdiutil create ${BUNDLE_DMG} -srcdir ${_dmg_temp} -fs HFS+ -volname "${CPACK_PACKAGE_DESCRIPTION_SUMMARY} ${WILINK_VERSION}"
         COMMAND rm -rf ${_dmg_temp}
         DEPENDS wDesktop)
     add_custom_target(package DEPENDS ${BUNDLE_DMG})
@@ -86,7 +86,7 @@ else(APPLE)
     endif(WIN32)
     # Source package
     set(CPACK_SOURCE_GENERATOR "TBZ2")
-    set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${WDESKTOP_VERSION}")
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${WILINK_VERSION}")
     list(APPEND CPACK_SOURCE_IGNORE_FILES "/.git/")
     list(APPEND CPACK_SOURCE_IGNORE_FILES "/.gitmodules")
     list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_CURRENT_BINARY_DIR}")

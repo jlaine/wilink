@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_SYSTEMINFO_H__
-#define __WDESKTOP_SYSTEMINFO_H__
+#ifndef __WILINK_SYSTEMINFO_H__
+#define __WILINK_SYSTEMINFO_H__
 
 #include <QString>
 
