@@ -59,23 +59,37 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
-    /* Migrate old settings */
-#ifdef Q_OS_LINUX
-    QDir(QDir::home().filePath(".config/Wifirst")).rename("wDesktop.conf",
-        QString("%1.conf").arg(qApp->applicationName());
-#endif
+    /* Disable auto-launch of wDesktop */
 #ifdef Q_OS_MAC
     QProcess process;
     process.start("osascript");
     process.write("tell application \"System Events\"\n\tdelete login item \"wDesktop\"\nend tell\n");
     process.closeWriteChannel();
     process.waitForFinished();
-    QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist",
-        QString("net.wifirst.%1.plist").arg(qApp->applicationName()));
 #endif
 #ifdef Q_OS_WIN
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     settings.remove("wDesktop");
+#endif
+
+    /* Migrate old settings */
+#ifdef Q_OS_LINUX
+    QDir(QDir::home().filePath(".config/Wifirst")).rename("wDesktop.conf",
+        QString("%1.conf").arg(qApp->applicationName());
+#endif
+#ifdef Q_OS_MAC
+    QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist",
+        QString("net.wifirst.%1.plist").arg(qApp->applicationName()));
+#endif
+#ifdef Q_OS_WIN
+    // TODO
+#endif
+
+    /* Migrate old passwords */
+#ifdef Q_OS_LINUX
+    QDir::home().rename("wDesktop", qApp->applicationName());
+#endif
+#ifdef Q_OS_WIN
     QDir::home().rename("wDesktop.encrypted", qApp->applicationName() + ".encrypted");
 #endif
 
