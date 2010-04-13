@@ -68,7 +68,7 @@ qt4_add_translation(QM_FILES translations/qt_fr.ts)
 
 set(wDesktop_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/wDesktop.qrc)
+    ${CMAKE_CURRENT_SOURCE_DIR}/data/wiLink.qrc)
 
 if(WIN32)
     set(wDesktop_SOURCES ${wDesktop_SOURCES} wireless_win.cpp)
