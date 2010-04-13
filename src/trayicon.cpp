@@ -64,9 +64,9 @@ TrayIcon::TrayIcon()
 
     /* set icon */
 #ifdef Q_WS_MAC
-    setIcon(QIcon(":/wDesktop-black.png"));
+    setIcon(QIcon(":/wiLink-black.png"));
 #else
-    setIcon(QIcon(":/wDesktop.png"));
+    setIcon(QIcon(":/wiLink.png"));
 #endif
 
     /* set initial menu */

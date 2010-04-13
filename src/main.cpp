@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Wifirst");
     app.setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
-    app.setWindowIcon(QIcon(":/wDesktop.png"));
+    app.setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
     /* Load translations */
