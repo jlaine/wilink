@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     /* Migrate old settings */
 #ifdef Q_OS_LINUX
     QDir(QDir::home().filePath(".config/Wifirst")).rename("wDesktop.conf",
-        QString("%1.conf").arg(qApp->applicationName());
+        QString("%1.conf").arg(qApp->applicationName()));
 #endif
 #ifdef Q_OS_MAC
     QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist",
