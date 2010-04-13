@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
     process.write("tell application \"System Events\"\n\tdelete login item \"wDesktop\"\nend tell\n");
     process.closeWriteChannel();
     process.waitForFinished();
+    QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist", "net.wifirst.wiLink.plist");
 #endif
 #ifdef Q_OS_WIN
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
