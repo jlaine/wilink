@@ -690,7 +690,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 bool Chat::open(const QString &jid, const QString &password, bool ignoreSslErrors)
 {
     QXmppConfiguration config;
-    config.setResource("wDesktop");
+    config.setResource(qApp->applicationName());
 
     /* get user and domain */
     if (!jidValidator.exactMatch(jid))
