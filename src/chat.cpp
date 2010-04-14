@@ -370,7 +370,7 @@ void Chat::notifyPanel()
         return;
 
     // add pending message
-    if (conversationPanel->currentWidget() != panel)
+    if (!isActiveWindow() || conversationPanel->currentWidget() != panel)
         rosterModel->addPendingMessage(panel->objectName());
 
     // show the chat window
@@ -473,7 +473,10 @@ void Chat::changeEvent(QEvent *event)
     {
         QWidget *widget = conversationPanel->currentWidget();
         if (widget)
+        {
+            rosterModel->clearPendingMessages(widget->objectName());
             widget->setFocus();
+        }
     }
 }
 
