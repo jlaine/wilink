@@ -227,7 +227,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatShares, SIGNAL(registerTab()), this, SLOT(registerPanel()));
     connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
-    chatShares->setTransfers(chatTransfers);
+    chatShares->setRoster(rosterModel);
 
     /* build splitter */
     splitter = new QSplitter;

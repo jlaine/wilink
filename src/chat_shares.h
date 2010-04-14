@@ -31,6 +31,7 @@
 #include "chat_panel.h"
 
 class ChatClient;
+class ChatRosterModel;
 class ChatSharesDatabase;
 class ChatTransfers;
 class ChatTransfersView;
@@ -156,6 +157,7 @@ class ChatShares : public ChatPanel
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     void setClient(ChatClient *client);
+    void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);
 
 signals:
@@ -188,9 +190,9 @@ private:
 
     ChatClient *client;
     ChatClient *baseClient;
+    ChatRosterModel *rosterModel;
     ChatSharesDatabase *db;
     ChatSharesModel *queueModel;
-    ChatTransfers *chatTransfers;
     QMap<QString, QWidget*> searches;
 
     QLineEdit *lineEdit;

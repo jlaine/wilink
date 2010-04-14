@@ -80,7 +80,7 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
      Q(StreamId, Q::Equals, sid))
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), chatTransfers(0)
+    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), rosterModel(0)
 {
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
@@ -595,9 +595,9 @@ void ChatShares::setClient(ChatClient *newClient)
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
 }
 
-void ChatShares::setTransfers(ChatTransfers *transfers)
+void ChatShares::setRoster(ChatRosterModel *roster)
 {
-    chatTransfers = transfers;
+    rosterModel = roster;
 }
 
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
