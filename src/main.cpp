@@ -21,6 +21,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
 #include <QLocale>
@@ -59,6 +60,11 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
+    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    qDebug() << "Using data directory" << dataDir;
+    QDir().mkpath(dataDir);
+    QNetIO::Wallet::setDataPath(dataDir + "/wallet");
+
     /* Disable auto-launch of wDesktop */
 #ifdef Q_OS_MAC
     QProcess process;
@@ -96,10 +102,14 @@ int main(int argc, char *argv[])
 
     /* Migrate old passwords */
 #ifdef Q_OS_LINUX
-    QDir::home().rename("wDesktop", qApp->applicationName());
+    QFile oldWallet(QDir::home().filePath("wDesktop"));
+    if (oldWallet.exists() && oldWallet.copy(dataDir + "/wallet.dummy"))
+        oldWallet.remove();
 #endif
 #ifdef Q_OS_WIN
-    QDir::home().rename("wDesktop.encrypted", qApp->applicationName() + ".encrypted");
+    QFile oldWallet(QDir::home().filePath("wDesktop.encrypted"));
+    if (oldWallet.exists() && oldWallet.copy(dataDir + "/wallet.windows"))
+        oldWallet.remove();
 #endif
 
     /* Load translations */
