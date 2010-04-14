@@ -570,7 +570,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
 
         if (!index.data(ChatRosterModel::UrlRole).toString().isEmpty())
         {
-            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show web page"));
+            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
             action->setData(OptionsAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }

@@ -217,6 +217,10 @@ Acceptez-vous?</translation>
         <source>Information</source>
         <translation>Informations</translation>
     </message>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
 </context>
 <context>
     <name>ChatShares</name>
