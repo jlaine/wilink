@@ -23,6 +23,8 @@
 
 #include "qxmpp/QXmppShareIq.h"
 
+class QTimer;
+
 class ChatSharesDatabase : public QObject
 {
     Q_OBJECT
@@ -35,7 +37,11 @@ public:
 signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
+private slots:
+    void index();
+
 private:
+    QTimer *indexTimer;
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };

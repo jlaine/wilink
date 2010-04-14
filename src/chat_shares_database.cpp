@@ -70,8 +70,21 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
     // start indexing
+    indexTimer = new QTimer(this);
+    indexTimer->setInterval(60 * 60 * 1000); // 1 hour
+    indexTimer->setSingleShot(true);
+    connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
+    index();
+}
+
+/** Update database of available files.
+ */
+void ChatSharesDatabase::index()
+{
+    // start indexing
     QThread *worker = new IndexThread(sharesDb, sharesDir, this);
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(worker, SIGNAL(finished()), indexTimer, SLOT(start()));
     worker->start();
 }
 
@@ -85,6 +98,8 @@ QString ChatSharesDatabase::locate(const QString &publishId)
     return sharesDir.filePath(query.value(0).toString());
 }
 
+/** Handle a search request.
+ */
 void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
 {
     QThread *worker = new SearchThread(sharesDb, sharesDir, requestIq, this);
@@ -100,6 +115,7 @@ IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject 
 
 void IndexThread::run()
 {
+    qDebug() << "Scanning" << sharesDir.path();
     QTime t;
     t.start();
     scanDir(sharesDir);
