@@ -39,6 +39,7 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_roster.h"
 #include "chat_shares.h"
 #include "chat_shares_database.h"
 #include "chat_transfers.h"
@@ -578,6 +579,11 @@ void ChatShares::registerWithServer()
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_shares);
+
+    QXmppElement nickName;
+    nickName.setTagName("nickName");
+    nickName.setValue(rosterModel->ownName());
+    x.appendChild(nickName);
 
     QXmppPresence presence;
     presence.setTo(shareServer);
