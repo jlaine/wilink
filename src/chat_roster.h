@@ -60,6 +60,7 @@ public:
         MessagesRole,
         AvatarRole,
         FlagsRole,
+        UrlRole,
     };
 
     enum Feature {

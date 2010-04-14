@@ -457,6 +457,9 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
             item->setData(Qt::DisplayRole, vcard.nickName());
         else if (!vcard.fullName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.fullName());
+        const QString url = vcard.url();
+        if (!url.isEmpty())
+            item->setData(UrlRole, vcard.url());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
@@ -558,7 +561,16 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     {
         QMenu *menu = new QMenu(this);
 
-        QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
+        QAction *action;
+
+        if (!index.data(ChatRosterModel::UrlRole).toString().isEmpty())
+        {
+            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show web page"));
+            action->setData(OptionsAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
+
+        action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
         action->setData(InviteAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
