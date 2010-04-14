@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -803,6 +804,12 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             joinConversation(jid, false);
         else if (action == ChatRosterView::OptionsAction)
         {
+            ChatRosterItem *item = rosterModel->contactItem(jid);
+            QString url = item ? item->data(ChatRosterModel::UrlRole).toString() : QString();
+            if (!url.isEmpty())
+                QDesktopServices::openUrl(url);
+
+#if 0
             QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::VersionFeature);
             if (!fullJids.size())
                 return;
@@ -811,6 +818,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             iq.setType(QXmppIq::Get);
             iq.setTo(fullJids.first());
             client->sendPacket(iq);
+#endif
         }
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);

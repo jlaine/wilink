@@ -85,6 +85,7 @@ public:
 
     QPixmap contactAvatar(const QString &bareJid) const;
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
+    ChatRosterItem *contactItem(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
     QString ownName() const;
 

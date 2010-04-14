@@ -151,6 +151,11 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     return jids;
 }
 
+ChatRosterItem *ChatRosterModel::contactItem(const QString &bareJid) const
+{
+    return rootItem->find(bareJid);
+}
+
 QString ChatRosterModel::contactName(const QString &bareJid) const
 {
     ChatRosterItem *item = rootItem->find(bareJid);
