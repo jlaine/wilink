@@ -2,6 +2,7 @@ wiLink 0.8.0 (UNRELEASED)
  * Improve file transfer support.
  * Add file sharing application.
  * Change the default download directory to "Downloads" on Windows.
+ * Move wallet to application data directory.
 
 wiLink 0.7.0 (2010-03-10)
  * Add support for chat state notifications.
