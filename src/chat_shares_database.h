@@ -55,7 +55,9 @@ public:
 private:
     void scanDir(const QDir &dir);
 
-    qint64 scanCount;
+    QHash<QString, int> scanOld;
+    qint64 scanAdded;
+    qint64 scanUpdated;
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };

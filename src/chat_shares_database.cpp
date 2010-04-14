@@ -109,23 +109,40 @@ void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
 }
 
 IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
-    : QThread(parent), scanCount(0), sharesDb(database), sharesDir(dir)
+    : QThread(parent), scanAdded(0), scanUpdated(0), sharesDb(database), sharesDir(dir)
 {
 };
 
 void IndexThread::run()
 {
-    qDebug() << "Scanning" << sharesDir.path();
+    qDebug() << "Scan started for" << sharesDir.path();
+
+    // store existing entries
+    QSqlQuery query("SELECT path FROM files", sharesDb);
+    query.exec();
+    while (query.next())
+        scanOld.insert(query.value(0).toString(), 1);
+
+    // perform scan
     QTime t;
     t.start();
     scanDir(sharesDir);
-    qDebug() << "Scanned" << scanCount << "files in" << double(t.elapsed()) / 1000.0 << "s";
+
+    // remove obsolete entries
+    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
+    foreach (const QString &path, scanOld.keys())
+    {
+        deleteQuery.bindValue(":path", path);
+        deleteQuery.exec();
+    }
+    qDebug() << "Scan completed in" << double(t.elapsed()) / 1000.0 << "s (" << scanAdded << "added," << scanUpdated << "updated," << scanOld.size() << "removed )";
 }
 
 void IndexThread::scanDir(const QDir &dir)
 {
-    QSqlQuery query("INSERT INTO files (path, size) "
-                    "VALUES(:path, :size)", sharesDb);
+    QSqlQuery addQuery("INSERT INTO files (path, size) "
+                       "VALUES(:path, :size)", sharesDb);
+    QSqlQuery updateQuery("UPDATE files SET size = :size WHERE path = :path", sharesDb);
 
     foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable))
     {
@@ -133,10 +150,19 @@ void IndexThread::scanDir(const QDir &dir)
         {
             scanDir(QDir(info.filePath()));
         } else {
-            query.bindValue(":path", sharesDir.relativeFilePath(info.filePath()));
-            query.bindValue(":size", info.size());
-            query.exec();
-            scanCount++;
+            const QString relativePath = sharesDir.relativeFilePath(info.filePath());
+            if (scanOld.remove(relativePath))
+            {
+                updateQuery.bindValue(":path", relativePath);
+                updateQuery.bindValue(":size", info.size());
+                updateQuery.exec();
+                scanUpdated++;
+            } else {
+                addQuery.bindValue(":path", relativePath);
+                addQuery.bindValue(":size", info.size());
+                addQuery.exec();
+                scanAdded++;
+            }
         }
     }
 }
