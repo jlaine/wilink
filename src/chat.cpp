@@ -755,7 +755,8 @@ void Chat::removeContact(const QString &jid)
         QXmppRosterIq::Item item;
         item.setBareJid(jid);
         item.setSubscriptionType(QXmppRosterIq::Item::Remove);
-        QXmppRosterIq packet(QXmppIq::Set);
+        QXmppRosterIq packet;
+        packet.setType(QXmppIq::Set);
         packet.addItem(item);
         client->sendPacket(packet);
     }
