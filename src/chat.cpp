@@ -765,6 +765,22 @@ void Chat::removeContact(const QString &jid)
     }
 }
 
+/** Prompt the user to rename a contact.
+ *
+ * @param jid
+ */
+void Chat::renameContact(const QString &jid)
+{
+    bool ok = true;
+    QString name;
+    name = QInputDialog::getText(this, tr("Rename contact"),
+        tr("Enter the name for this contact."),
+        QLineEdit::Normal, name, &ok).toLower();
+    if (!ok)
+        return;
+    qDebug() << "name" << name;
+}
+
 /** Try to resize the window to fit the contents of the contacts list.
  */
 void Chat::resizeContacts()
@@ -822,6 +838,8 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         }
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
+        else if (action == ChatRosterView::RenameAction)
+            renameContact(jid);
         else if (action == ChatRosterView::SendAction)
         {
             // find first resource supporting file transfer

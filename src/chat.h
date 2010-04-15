@@ -96,6 +96,7 @@ protected slots:
     void rejoinConversations();
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
+    void renameContact(const QString &jid);
     void resizeContacts();
     void statusChanged(int currentIndex);
 

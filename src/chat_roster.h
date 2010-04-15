@@ -131,6 +131,7 @@ public:
         OptionsAction,
         MembersAction,
         RemoveAction,
+        RenameAction,
         SendAction,
     };
 

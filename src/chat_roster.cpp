@@ -595,6 +595,10 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         }
 #endif
 
+        action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
+        action->setData(RenameAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
         action->setData(RemoveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
