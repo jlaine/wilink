@@ -35,6 +35,14 @@
         <source>Offline</source>
         <translation>Déconnecté</translation>
     </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
+    <message>
+        <source>Enter the name for this contact.</source>
+        <translation>Saisissez le nom pour ce contact.</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -217,6 +225,14 @@ Acceptez-vous?</translation>
         <source>Information</source>
         <translation>Informations</translation>
     </message>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
 </context>
 <context>
     <name>ChatShares</name>
@@ -274,6 +290,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Queued</source>
         <translation>En attente</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Demandé</translation>
     </message>
 </context>
 <context>

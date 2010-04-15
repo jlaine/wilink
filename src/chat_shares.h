@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_SHARES_H__
-#define __WDESKTOP_CHAT_SHARES_H__
+#ifndef __WILINK_CHAT_SHARES_H__
+#define __WILINK_CHAT_SHARES_H__
 
 #include <QIcon>
 #include <QStyledItemDelegate>
@@ -31,6 +31,7 @@
 #include "chat_panel.h"
 
 class ChatClient;
+class ChatRosterModel;
 class ChatSharesDatabase;
 class ChatTransfers;
 class ChatTransfersView;
@@ -156,6 +157,7 @@ class ChatShares : public ChatPanel
 public:
     ChatShares(ChatClient *client, QWidget *parent = 0);
     void setClient(ChatClient *client);
+    void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);
 
 signals:
@@ -188,9 +190,9 @@ private:
 
     ChatClient *client;
     ChatClient *baseClient;
+    ChatRosterModel *rosterModel;
     ChatSharesDatabase *db;
     ChatSharesModel *queueModel;
-    ChatTransfers *chatTransfers;
     QMap<QString, QWidget*> searches;
 
     QLineEdit *lineEdit;

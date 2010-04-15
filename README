@@ -1,4 +1,4 @@
-wDesktop
+wiLink
 Copyright (C) 2009-2010 Bolloré telecom
 See AUTHORS file for a full list of contributors.
 
@@ -31,8 +31,8 @@ On Mac OS X
 
 $ sudo port install cmake qt4-mac
 
-Building wDesktop
-=================
+Building wiLink
+===============
 
 $ mkdir build
 $ cd build

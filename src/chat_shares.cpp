@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -39,6 +39,7 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_roster.h"
 #include "chat_shares.h"
 #include "chat_shares_database.h"
 #include "chat_transfers.h"
@@ -80,7 +81,7 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
      Q(StreamId, Q::Equals, sid))
 
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), chatTransfers(0)
+    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), rosterModel(0)
 {
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
@@ -579,6 +580,11 @@ void ChatShares::registerWithServer()
     x.setTagName("x");
     x.setAttribute("xmlns", ns_shares);
 
+    QXmppElement nickName;
+    nickName.setTagName("nickName");
+    nickName.setValue(rosterModel->ownName());
+    x.appendChild(nickName);
+
     QXmppPresence presence;
     presence.setTo(shareServer);
     presence.setExtensions(x);
@@ -595,9 +601,9 @@ void ChatShares::setClient(ChatClient *newClient)
     connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
 }
 
-void ChatShares::setTransfers(ChatTransfers *transfers)
+void ChatShares::setRoster(ChatRosterModel *roster)
 {
-    chatTransfers = transfers;
+    rosterModel = roster;
 }
 
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
@@ -800,9 +806,11 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         {
             int speed = (done * 1000.0) / t.elapsed();
             return ChatTransfers::sizeToString(speed) + "/s";
-        } else {
-            return tr("Queued");
         }
+        else if (!item->data(PacketId).toString().isEmpty())
+            return tr("Requested");
+        else
+            return tr("Queued");
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {

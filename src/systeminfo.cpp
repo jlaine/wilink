@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 

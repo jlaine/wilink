@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -38,7 +38,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     /* status */
     QHBoxLayout *hbox = new QHBoxLayout;
     QLabel *statusIcon = new QLabel;
-    statusIcon->setPixmap(QPixmap(":/wDesktop.png"));
+    statusIcon->setPixmap(QPixmap(":/wiLink.png"));
     hbox->addWidget(statusIcon);
     statusLabel = new QLabel;
     hbox->addWidget(statusLabel);

@@ -1,6 +1,6 @@
 include(IconUtilities)
-generate_icns(icns wDesktop.svg)
-generate_ico(ico wDesktop.svg)
+generate_icns(icns wiLink.svg)
+generate_ico(ico wiLink.svg)
 generate_png(png
     add.svg
     album.svg
@@ -15,7 +15,7 @@ generate_png(png
     photos.svg
     remove.svg
     updates.svg
-    wDesktop.svg
-    wDesktop-black.svg)
+    wiLink.svg
+    wiLink-black.svg)
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png})
 

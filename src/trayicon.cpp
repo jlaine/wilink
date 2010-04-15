@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -64,9 +64,9 @@ TrayIcon::TrayIcon()
 
     /* set icon */
 #ifdef Q_WS_MAC
-    setIcon(QIcon(":/wDesktop-black.png"));
+    setIcon(QIcon(":/wiLink-black.png"));
 #else
-    setIcon(QIcon(":/wDesktop.png"));
+    setIcon(QIcon(":/wiLink.png"));
 #endif
 
     /* set initial menu */

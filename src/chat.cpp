@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -227,7 +228,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(chatShares, SIGNAL(registerTab()), this, SLOT(registerPanel()));
     connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
-    chatShares->setTransfers(chatTransfers);
+    chatShares->setRoster(rosterModel);
 
     /* build splitter */
     splitter = new QSplitter;
@@ -370,7 +371,7 @@ void Chat::notifyPanel()
         return;
 
     // add pending message
-    if (conversationPanel->currentWidget() != panel)
+    if (!isActiveWindow() || conversationPanel->currentWidget() != panel)
         rosterModel->addPendingMessage(panel->objectName());
 
     // show the chat window
@@ -473,7 +474,10 @@ void Chat::changeEvent(QEvent *event)
     {
         QWidget *widget = conversationPanel->currentWidget();
         if (widget)
+        {
+            rosterModel->clearPendingMessages(widget->objectName());
             widget->setFocus();
+        }
     }
 }
 
@@ -690,7 +694,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 bool Chat::open(const QString &jid, const QString &password, bool ignoreSslErrors)
 {
     QXmppConfiguration config;
-    config.setResource("wDesktop");
+    config.setResource(qApp->applicationName());
 
     /* get user and domain */
     if (!jidValidator.exactMatch(jid))
@@ -762,6 +766,22 @@ void Chat::removeContact(const QString &jid)
     }
 }
 
+/** Prompt the user to rename a contact.
+ *
+ * @param jid
+ */
+void Chat::renameContact(const QString &jid)
+{
+    bool ok = true;
+    QString name;
+    name = QInputDialog::getText(this, tr("Rename contact"),
+        tr("Enter the name for this contact."),
+        QLineEdit::Normal, name, &ok).toLower();
+    if (!ok)
+        return;
+    qDebug() << "name" << name;
+}
+
 /** Try to resize the window to fit the contents of the contacts list.
  */
 void Chat::resizeContacts()
@@ -801,6 +821,12 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             joinConversation(jid, false);
         else if (action == ChatRosterView::OptionsAction)
         {
+            ChatRosterItem *item = rosterModel->contactItem(jid);
+            QString url = item ? item->data(ChatRosterModel::UrlRole).toString() : QString();
+            if (!url.isEmpty())
+                QDesktopServices::openUrl(url);
+
+#if 0
             QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::VersionFeature);
             if (!fullJids.size())
                 return;
@@ -809,9 +835,12 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             iq.setType(QXmppIq::Get);
             iq.setTo(fullJids.first());
             client->sendPacket(iq);
+#endif
         }
         else if (action == ChatRosterView::RemoveAction)
             removeContact(jid);
+        else if (action == ChatRosterView::RenameAction)
+            renameContact(jid);
         else if (action == ChatRosterView::SendAction)
         {
             // find first resource supporting file transfer

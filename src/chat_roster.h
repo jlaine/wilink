@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_ROSTER_H__
-#define __WDESKTOP_CHAT_ROSTER_H__
+#ifndef __WILINK_CHAT_ROSTER_H__
+#define __WILINK_CHAT_ROSTER_H__
 
 #include <QAbstractItemModel>
 #include <QMessageBox>
@@ -60,6 +60,7 @@ public:
         MessagesRole,
         AvatarRole,
         FlagsRole,
+        UrlRole,
     };
 
     enum Feature {
@@ -84,6 +85,7 @@ public:
 
     QPixmap contactAvatar(const QString &bareJid) const;
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
+    ChatRosterItem *contactItem(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
     QString ownName() const;
 
@@ -129,6 +131,7 @@ public:
         OptionsAction,
         MembersAction,
         RemoveAction,
+        RenameAction,
         SendAction,
     };
 

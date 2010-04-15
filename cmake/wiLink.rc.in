@@ -1,0 +1,25 @@
+#include <winver.h>
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION     ${WILINK_VERSION_WIN32}
+    PRODUCTVERSION  ${WILINK_VERSION_WIN32}
+    FILEFLAGSMASK   0x3fL
+    FILEFLAGS       0x0L
+    FILEOS          0x4L
+    FILETYPE        0x1L
+    FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription",  "wiLink ${WILINK_VERSION}\0"
+            VALUE "FileVersion",      "${WILINK_VERSION_WIN32}\0"
+            VALUE "LegalCopyright",   "Copyright 2009-2010 Bollore telecom\0"
+            VALUE "ProductName",      "wiLink\0"
+            VALUE "ProductVersion",   "${WILINK_VERSION_WIN32}\0"
+        END
+    END
+END
+
+IDR_MAINFRAME ICON "${CMAKE_SOURCE_DIR}/src/data/wiLink.ico"

@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WDESKTOP_CHAT_ACCOUNTS_H__
-#define __WDESKTOP_CHAT_ACCOUNTS_H__
+#ifndef __WILINK_CHAT_ACCOUNTS_H__
+#define __WILINK_CHAT_ACCOUNTS_H__
 
 #include <QDialog>
 

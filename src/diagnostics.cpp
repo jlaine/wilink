@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QLayout>
 #include <QNetworkAccessManager>
@@ -32,11 +33,9 @@
 #include "qnetio/mime.h"
 #include "qnetio/wallet.h"
 
-#include "config.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
 
-static const QString wdesktopVersion = QString::fromLatin1(WDESKTOP_VERSION);
 static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
@@ -278,7 +277,7 @@ void Diagnostics::refresh()
     text->setText("<h2>System information</h2>");
     TextList list;
     list << QString("Operating system: %1 %2").arg(SystemInfo::osName(), SystemInfo::osVersion());
-    list << QString("wDesktop: %1").arg(wdesktopVersion);
+    list << QString("%1: %2").arg(qApp->applicationName(), qApp->applicationVersion());
     list << QString("Date: %1").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss"));
     addItem("Environment", list.render());
 

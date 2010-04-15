@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -149,6 +149,11 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
         if (key.startsWith(sought) && (clientFeatures.value(key) & feature))
             jids << key;
     return jids;
+}
+
+ChatRosterItem *ChatRosterModel::contactItem(const QString &bareJid) const
+{
+    return rootItem->find(bareJid);
 }
 
 QString ChatRosterModel::contactName(const QString &bareJid) const
@@ -457,6 +462,9 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
             item->setData(Qt::DisplayRole, vcard.nickName());
         else if (!vcard.fullName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.fullName());
+        const QString url = vcard.url();
+        if (!url.isEmpty())
+            item->setData(UrlRole, vcard.url());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
@@ -558,7 +566,16 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     {
         QMenu *menu = new QMenu(this);
 
-        QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
+        QAction *action;
+
+        if (!index.data(ChatRosterModel::UrlRole).toString().isEmpty())
+        {
+            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
+            action->setData(OptionsAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
+
+        action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
         action->setData(InviteAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
@@ -577,6 +594,10 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }
 #endif
+
+        action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
+        action->setData(RenameAction);
+        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
         action->setData(RemoveAction);

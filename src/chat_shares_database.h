@@ -1,5 +1,5 @@
 /*
- * wDesktop
+ * wiLink
  * Copyright (C) 2009-2010 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
  * 
@@ -23,6 +23,8 @@
 
 #include "qxmpp/QXmppShareIq.h"
 
+class QTimer;
+
 class ChatSharesDatabase : public QObject
 {
     Q_OBJECT
@@ -35,7 +37,11 @@ public:
 signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
+private slots:
+    void index();
+
 private:
+    QTimer *indexTimer;
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };
@@ -49,7 +55,9 @@ public:
 private:
     void scanDir(const QDir &dir);
 
-    qint64 scanCount;
+    QHash<QString, int> scanOld;
+    qint64 scanAdded;
+    qint64 scanUpdated;
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };
