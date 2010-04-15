@@ -458,7 +458,11 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
     {
         const QImage &image = vcard.photoAsImage();
         item->setData(AvatarRole, QPixmap::fromImage(image));
-        if (!vcard.nickName().isEmpty())
+
+        const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
+        if (!entry.name().isEmpty())
+            item->setData(Qt::DisplayRole, entry.name());
+        else if (!vcard.nickName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.nickName());
         else if (!vcard.fullName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.fullName());

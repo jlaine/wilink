@@ -4,6 +4,7 @@ wiLink 0.8.0 (UNRELEASED)
  * Change the default download directory to "Downloads" on Windows.
  * Move wallet to application data directory.
  * Add a link from roster to a user's web page.
+ * Make it possible to rename chat contacts.
 
 wiLink 0.7.0 (2010-03-10)
  * Add support for chat state notifications.

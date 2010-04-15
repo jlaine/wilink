@@ -773,13 +773,18 @@ void Chat::removeContact(const QString &jid)
 void Chat::renameContact(const QString &jid)
 {
     bool ok = true;
-    QString name;
-    name = QInputDialog::getText(this, tr("Rename contact"),
+    QXmppRosterIq::Item item = client->getRoster().getRosterEntry(jid);
+    QString name = QInputDialog::getText(this, tr("Rename contact"),
         tr("Enter the name for this contact."),
-        QLineEdit::Normal, name, &ok).toLower();
-    if (!ok)
-        return;
-    qDebug() << "name" << name;
+        QLineEdit::Normal, item.name(), &ok);
+    if (ok)
+    {
+        item.setName(name);
+        QXmppRosterIq packet;
+        packet.setType(QXmppIq::Set);
+        packet.addItem(item);
+        client->sendPacket(packet);
+    }
 }
 
 /** Try to resize the window to fit the contents of the contacts list.
