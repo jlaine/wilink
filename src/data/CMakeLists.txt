@@ -17,5 +17,6 @@ generate_png(png
     updates.svg
     wiLink.svg
     wiLink-black.svg)
-add_custom_target(icons DEPENDS ${icns} ${ico} ${png})
+generate_xpm(xpm wiLink.svg)
+add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 
