@@ -45,10 +45,8 @@ void ChatPanel::setWindowExtra(const QString &extra)
 void ChatPanel::setWindowIcon(const QIcon &icon)
 {
     QWidget::setWindowIcon(icon);
-    QList<QSize> available = icon.availableSizes();
-    if (available.isEmpty())
-        return;
-    iconLabel->setPixmap(icon.pixmap(available.first()));
+    const QSize actualSize = icon.actualSize(QSize(80, 80));
+    iconLabel->setPixmap(icon.pixmap(actualSize));
 }
 
 void ChatPanel::setWindowTitle(const QString &title)
