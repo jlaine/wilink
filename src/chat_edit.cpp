@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
+#include <QApplication>
 #include <QKeyEvent>
 
 #include "chat_edit.h"
@@ -40,8 +40,13 @@ void ChatEdit::focusInEvent(QFocusEvent *e)
 
 void ChatEdit::keyPressEvent(QKeyEvent* e)
 {
-    if(e->key()==Qt::Key_Return)
-        emit returnPressed();
+    if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
+    {
+        if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier))
+            append("");
+        else
+            emit returnPressed();
+    }
     else
         QTextEdit::keyPressEvent(e);
 }

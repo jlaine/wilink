@@ -21,7 +21,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
-#include <QShortcut>
 #include <QTimer>
 
 #include "chat_conversation.h"
@@ -68,12 +67,6 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     inactiveTimer->setInterval(120000);
     inactiveTimer->setSingleShot(true);
     connect(inactiveTimer, SIGNAL(timeout()), this, SLOT(slotInactive()));
-
-    /* shortcuts for new line */
-    connect(new QShortcut(QKeySequence(Qt::AltModifier + Qt::Key_Return), this),
-        SIGNAL(activated()), this, SLOT(slotNewLine()));
-    connect(new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Return), this),
-        SIGNAL(activated()), this, SLOT(slotNewLine()));
 
     /* start inactivity timer */
     inactiveTimer->start();
