@@ -841,7 +841,7 @@ QList<QXmppShareItem *> ChatSharesModel::filter(const ChatSharesModelQuery &quer
         for (int i = 0; i < parent->size(); i++)
         {
             int childLimit = limit ? limit - matches.size() : 0;
-            matches.append(filter(query, options, parent->child(i), childLimit));
+            matches += filter(query, options, parent->child(i), childLimit);
             if (limit && matches.size() == limit)
                 return matches;
         }
@@ -863,7 +863,7 @@ QList<QXmppShareItem *> ChatSharesModel::filter(const ChatSharesModelQuery &quer
         for (int i = 0; i < parent->size(); i++)
         {
             int childLimit = limit ? limit - matches.size() : 0;
-            matches.append(filter(query, options, parent->child(i), childLimit));
+            matches += filter(query, options, parent->child(i), childLimit);
             if (limit && matches.size() == limit)
                 return matches;
         }
