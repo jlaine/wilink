@@ -66,12 +66,15 @@ enum DataRoles {
     TransferStart,
     TransferDone,
     TransferTotal,
+    UpdateTime,
 };
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 100
+#define REFRESH_INTERVAL 60
+#define REGISTER_INTERVAL 60
 
 // common queries
 #define Q ChatSharesModelQuery
@@ -174,7 +177,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     /* connect signals */
     registerTimer = new QTimer(this);
-    registerTimer->setInterval(60000);
+    registerTimer->setInterval(REGISTER_INTERVAL * 1000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
     connect(baseClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
@@ -428,13 +431,15 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     if (!index.isValid() || !item)
         return;
 
+    QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
+    QDateTime updateTime = item->data(UpdateTime).toDateTime();
     if (item->type() == QXmppShareItem::FileItem)
     {
         // download item
         queueModel->addItem(*item);
         processDownloadQueue();
     }
-    else if (item->type() == QXmppShareItem::CollectionItem && !item->size())
+    else if (item->type() == QXmppShareItem::CollectionItem && (!updateTime.isValid() || updateTime < cutoffTime))
     {
         if (item->locations().isEmpty())
         {
@@ -500,7 +505,6 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         QXmppConfiguration config = baseClient->getConfiguration();
         config.setDomain(domain);
         config.setHost(server);
-        config.setIgnoreSslErrors(true);
 
         ChatClient *newClient = new ChatClient(this);
         connect(&newClient->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
@@ -973,6 +977,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     oldItem->setLocations(newItem->locations());
     //oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
+    oldItem->setData(UpdateTime, QDateTime::currentDateTime());
 
     QList<QXmppShareItem*> removed = oldItem->children();
     QList<QXmppShareItem*> added;
