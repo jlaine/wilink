@@ -197,8 +197,6 @@ private:
 
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;
-    QWidget *sharesTab;
-    QWidget *searchTab;
     ChatSharesView *sharesView;
     ChatSharesView *searchView;
     ChatSharesView *downloadsView;

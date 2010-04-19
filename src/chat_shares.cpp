@@ -106,44 +106,22 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->addWidget(tabWidget);
 
     /* create main tab */
-    sharesTab = new QWidget;
-    QVBoxLayout *sharesVbox = new QVBoxLayout;
-    sharesVbox->setMargin(0);
-    sharesTab->setLayout(sharesVbox);
-
     ChatSharesModel *sharesModel = new ChatSharesModel;
     sharesView = new ChatSharesView;
     sharesView->setModel(sharesModel);
     sharesView->hideColumn(ProgressColumn);
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    sharesVbox->addWidget(sharesView);
-
-    QDialogButtonBox *mainButtons = new QDialogButtonBox;
-    QPushButton *downloadButton = new QPushButton(tr("Download"));;
-    // FIXME
-    //removeButton->setIcon(QIcon(":/remove.png"));
-    //connect(downloadButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
-    mainButtons->addButton(downloadButton, QDialogButtonBox::ActionRole);
-    sharesVbox->addWidget(mainButtons);
-
-    tabWidget->addTab(sharesTab, tr("Shares"));
+    tabWidget->addTab(sharesView, tr("Shares"));
 
     /* create search tab */
-    searchTab = new QWidget;
-    QVBoxLayout *searchVbox = new QVBoxLayout;
-    searchVbox->setMargin(0);
-    searchTab->setLayout(searchVbox);
-
     ChatSharesModel *searchModel = new ChatSharesModel;
     searchView = new ChatSharesView;
     searchView->setModel(searchModel);
     searchView->hideColumn(ProgressColumn);
     connect(searchView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(searchView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    searchVbox->addWidget(searchView);
-
-    tabWidget->addTab(searchTab, tr("Search"));
+    tabWidget->addTab(searchView, tr("Search"));
 
     /* create queue tab */
     QWidget *downloadsWidget = new QWidget;
@@ -396,17 +374,9 @@ void ChatShares::findRemoteFiles()
 void ChatShares::itemAction()
 {
     QAction *action = static_cast<QAction*>(sender());
-    if (!action)
+    ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
+    if (!action || !treeWidget)
         return;
-
-    ChatSharesView *treeWidget;
-    if (tabWidget->currentWidget() == sharesTab)
-        treeWidget = sharesView;
-    else if (tabWidget->currentWidget() == sharesTab)
-        treeWidget = searchView;
-    else
-        return;
-
     QXmppShareItem *item = static_cast<QXmppShareItem*>(treeWidget->currentIndex().internalPointer());
     if (!item)
         return;
@@ -603,9 +573,9 @@ void ChatShares::processDownloadQueue()
 void ChatShares::queryStringChanged()
 {
     if (lineEdit->text().isEmpty())
-        tabWidget->setCurrentWidget(sharesTab);
+        tabWidget->setCurrentWidget(sharesView);
     else
-        tabWidget->setCurrentWidget(searchTab);
+        tabWidget->setCurrentWidget(searchView);
 }
 
 void ChatShares::registerWithServer()
