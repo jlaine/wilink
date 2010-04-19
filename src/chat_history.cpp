@@ -401,6 +401,12 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
     emit focused();
 }
 
+void ChatHistory::mousePressEvent(QMouseEvent *e)
+{
+    if (e->button() != Qt::RightButton)
+        QGraphicsView::mousePressEvent(e);
+}
+
 void ChatHistory::resizeEvent(QResizeEvent *e)
 {
     QScrollBar *scrollBar = verticalScrollBar();

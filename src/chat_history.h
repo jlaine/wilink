@@ -114,7 +114,8 @@ protected:
     qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
     QString copyText();
-    void focusInEvent(QFocusEvent* e);
+    void focusInEvent(QFocusEvent *e);
+    void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
 
 private:
