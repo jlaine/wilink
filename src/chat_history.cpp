@@ -346,7 +346,7 @@ void ChatHistory::clear()
 void ChatHistory::copy()
 {
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(lastText, QClipboard::Clipboard);
+    clipboard->setText(copyText(), QClipboard::Clipboard);
 }
 
 QString ChatHistory::copyText()
@@ -446,13 +446,6 @@ void ChatHistory::selectAll()
             child->setSelected(true);
         selection.append(child);
     }
-    if (!selection.isEmpty())
-    {
-        // store text as context menu breaks selection
-        lastText = copyText();
-        QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(lastText, QClipboard::Selection);
-    }
     lastSelection = selection;
 }
 
@@ -477,10 +470,8 @@ void ChatHistory::slotSelectionChanged()
     }
     if (!selection.isEmpty())
     {
-        // store text as context menu breaks selection
-        lastText = copyText();
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(lastText, QClipboard::Selection);
+        clipboard->setText(copyText(), QClipboard::Selection);
     }
     lastSelection = selection;
 }
