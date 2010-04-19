@@ -348,6 +348,17 @@ QString ChatHistory::copyText()
 {
     QString copyText;
     QList<QGraphicsItem*> selection = scene->selectedItems();
+
+    // gather the message senders
+    QSet<QString> senders;
+    for (int i = 0; i < layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        if (selection.contains(child))
+            senders.insert(child->message().from);
+    }
+
+    // copy selected messages
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
@@ -357,7 +368,9 @@ QString ChatHistory::copyText()
 
             if (!copyText.isEmpty())
                 copyText += "\n";
-            copyText += message.from + "> " + message.body.replace("\r\n", "\n");
+            if (senders.size() > 1)
+                copyText += message.from + "> ";
+            copyText += message.body.replace("\r\n", "\n");
         }
     }
 
