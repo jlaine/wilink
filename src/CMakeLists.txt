@@ -1,4 +1,5 @@
 add_subdirectory(data)
+add_subdirectory(idle)
 add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
 

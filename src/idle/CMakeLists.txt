@@ -1,0 +1,21 @@
+SET(idle_SOURCES idle.cpp)
+
+include(${QT_USE_FILE})
+
+if(APPLE)
+    set(idle_SOURCES ${idle_SOURCES} idle_mac.cpp)
+elseif(WIN32)
+    set(idle_SOURCES ${idle_SOURCES} idle_win.cpp)
+else(APPLE)
+    set(idle_SOURCES ${idle_SOURCES} idle_x11.cpp)
+    find_library(XSS_LIBRARY NAMES Xss)
+    check_include_files(X11/extensions/scrnsaver.h HAVE_SCRNSAVER_H)
+    if(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
+        message(STATUS "Found X11 Screen saver library: ${XSS_LIBRARY}")
+        add_definitions(-DHAVE_XSS)
+        set(IDLE_LIBRARIES ${XSS_LIBRARY})
+    endif(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
+endif(APPLE)
+
+qt4_wrap_cpp(idle_MOC_SOURCES idle.h)
+add_library(idle STATIC ${idle_SOURCES} ${idle_MOC_SOURCES})
