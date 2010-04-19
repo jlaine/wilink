@@ -86,7 +86,8 @@ void ChatAccounts::addAccount()
 void ChatAccounts::addEntry(const QString &jid)
 {
     QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), jid);
-    wdgItem->setData(Qt::UserRole, listWidget->count() > 0);
+    // FIXME : do accounts need to be locked ?
+    wdgItem->setData(Qt::UserRole, true); //listWidget->count() > 0);
     listWidget->addItem(wdgItem);
 }
 
