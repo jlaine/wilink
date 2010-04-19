@@ -341,7 +341,7 @@ void ChatHistory::clear()
 void ChatHistory::copy()
 {
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(copyText(), QClipboard::Clipboard);
+    clipboard->setText(lastText, QClipboard::Clipboard);
 }
 
 QString ChatHistory::copyText()
@@ -371,8 +371,13 @@ QString ChatHistory::copyText()
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu;
-    QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
+
+    QAction *action = menu->addAction(tr("Copy"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(copy()));
+
+    action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
+
     menu->exec(event->globalPos());
     delete menu;
 }
@@ -423,8 +428,10 @@ void ChatHistory::slotSelectionChanged()
     }
     if (!selection.isEmpty())
     {
+        // store text as context menu breaks selection
+        lastText = copyText();
         QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(copyText(), QClipboard::Selection);
+        clipboard->setText(lastText, QClipboard::Selection);
     }
     lastSelection = selection;
 }

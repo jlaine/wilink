@@ -95,6 +95,10 @@
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copier</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoom</name>

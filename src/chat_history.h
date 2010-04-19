@@ -123,6 +123,7 @@ private:
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
     QList<QGraphicsItem*> lastSelection;
+    QString lastText;
 };
 
 #endif
