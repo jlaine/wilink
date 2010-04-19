@@ -96,8 +96,12 @@
         <translation>Effacer</translation>
     </message>
     <message>
-        <source>Copy</source>
-        <translation>Copier</translation>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copier</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Tout sélectionner</translation>
     </message>
 </context>
 <context>

@@ -101,6 +101,7 @@ public:
 public slots:
     void clear();
     void copy();
+    void selectAll();
 
 signals:
     void focused();

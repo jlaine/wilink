@@ -9,6 +9,7 @@ wiLink 0.8.0 (UNRELEASED)
  * Make it possible to change users by removing main chat account.
  * Make "copy" available using right-click in chat history.
  * Don't copy message sender when copying text from a single person.
+ * Make it possible to select entire chat history.
  * Mark users as away after 5 minutes of inactivity.
 
 wiLink 0.7.0 (2010-03-10)

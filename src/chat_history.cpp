@@ -262,8 +262,13 @@ ChatHistory::ChatHistory(QWidget *parent)
     scene->addItem(obj);
 
     connect(scene, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
+
+    /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(copy()));
+
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(selectAll()));
 }
 
 void ChatHistory::addMessage(const ChatHistoryMessage &message)
@@ -385,8 +390,13 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu;
 
-    QAction *action = menu->addAction(tr("Copy"));
+    QAction *action = menu->addAction(tr("&Copy"));
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(copy()));
+
+    action = menu->addAction(tr("Select &All"));
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(selectAll()));
 
     action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
@@ -424,6 +434,26 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     /* scroll to end if we were previous at end */
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
+}
+
+void ChatHistory::selectAll()
+{
+    QList<QGraphicsItem*> selection;
+    for (int i = 0; i < layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        if (!lastSelection.contains(child))
+            child->setSelected(true);
+        selection.append(child);
+    }
+    if (!selection.isEmpty())
+    {
+        // store text as context menu breaks selection
+        lastText = copyText();
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(lastText, QClipboard::Selection);
+    }
+    lastSelection = selection;
 }
 
 void ChatHistory::slotLinkHoverChanged(const QString &link)
