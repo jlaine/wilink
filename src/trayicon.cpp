@@ -81,11 +81,7 @@ TrayIcon::TrayIcon()
 
     /* set initial menu */
     QMenu *menu = new QMenu;
-    QAction *action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
-
-    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
-    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    addBaseMenu(menu);
     setContextMenu(menu);
 
 #ifndef Q_WS_MAC
@@ -118,6 +114,31 @@ TrayIcon::~TrayIcon()
     delete updates;
     if (photos)
         delete photos;
+}
+
+void TrayIcon::addBaseMenu(QMenu *menu)
+{
+    QMenu *optionsMenu = new QMenu;
+    QAction *action = optionsMenu->addAction(tr("Chat accounts"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
+
+    if (Application::isInstalled())
+    {
+        action = optionsMenu->addAction(tr("Open at login"));
+        action->setCheckable(true);
+        action->setChecked(settings->value("OpenAtLogin").toBool());
+        connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
+    }
+
+    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
+    action->setMenu(optionsMenu);
+
+    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
+
+    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    setContextMenu(menu);
 }
 
 void TrayIcon::fetchIcon()
@@ -379,26 +400,7 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
 
-    QMenu *optionsMenu = new QMenu;
-    action = optionsMenu->addAction(tr("Chat accounts"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
-
-    if (Application::isInstalled())
-    {
-        action = optionsMenu->addAction(tr("Open at login"));
-        action->setCheckable(true);
-        action->setChecked(settings->value("OpenAtLogin").toBool());
-        connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
-    }
-
-    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
-    action->setMenu(optionsMenu);
-
-    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
-
-    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
-    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    addBaseMenu(menu);
     setContextMenu(menu);
 
     /* parse messages */

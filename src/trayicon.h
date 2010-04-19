@@ -63,6 +63,7 @@ protected slots:
     void showPhotos();
 
 private:
+    void addBaseMenu(QMenu *menu);
     void fetchIcon();
     void resetChats();
 
