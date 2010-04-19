@@ -124,7 +124,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     tabWidget->addTab(searchView, tr("Search"));
 
     /* create queue tab */
-    QWidget *downloadsWidget = new QWidget;
+    downloadsWidget = new QWidget;
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->setMargin(0);
     downloadsWidget->setLayout(vbox);
@@ -143,13 +143,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     downloadsView->setModel(queueModel);
     connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(transferDoubleClicked(const QModelIndex&)));
     vbox->addWidget(downloadsView);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
-    QPushButton *removeButton = new QPushButton;
-    removeButton->setIcon(QIcon(":/remove.png"));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
-    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
-    vbox->addWidget(buttonBox);
 
     tabWidget->addTab(downloadsWidget, tr("Downloads"));
 
@@ -173,6 +166,18 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     tabWidget->addTab(uploadsWidget, tr("Uploads"));
 
+    /* button box */
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    downloadButton = new QPushButton(tr("Download"));
+    buttonBox->addButton(downloadButton, QDialogButtonBox::ActionRole);
+
+    removeButton = new QPushButton;
+    removeButton->setIcon(QIcon(":/remove.png"));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
+    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+    removeButton->hide();
+
+    layout->addWidget(buttonBox);
     setLayout(layout);
 
     /* connect signals */
@@ -182,6 +187,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(baseClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     setClient(baseClient);
 }
 
@@ -723,6 +729,20 @@ void ChatShares::shareServerFound(const QString &server)
     // register with server
     registerWithServer();
     registerTimer->start();
+}
+
+void ChatShares::tabChanged(int index)
+{
+    QWidget *tab = tabWidget->widget(index);
+    if (tab == sharesView || tab == searchView)
+        downloadButton->show();
+    else
+        downloadButton->hide();
+
+    if (tab == downloadsWidget)
+        removeButton->show();
+    else
+        removeButton->hide();
 }
 
 ChatSharesDelegate::ChatSharesDelegate(QObject *parent)

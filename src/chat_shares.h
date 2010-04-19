@@ -35,6 +35,7 @@ class ChatRosterModel;
 class ChatSharesDatabase;
 class ChatTransfers;
 class ChatTransfersView;
+class QDialogButtonBox;
 class QLineEdit;
 class QListWidget;
 class QTabWidget;
@@ -184,6 +185,7 @@ private slots:
     void shareSearchIqReceived(const QXmppShareSearchIq &share);
     void shareServerFound(const QString &server);
     void searchFinished(const QXmppShareSearchIq &share);
+    void tabChanged(int index);
 
 private:
     QString shareServer;
@@ -200,8 +202,12 @@ private:
     ChatSharesView *sharesView;
     ChatSharesView *searchView;
     ChatSharesView *downloadsView;
+    QWidget *downloadsWidget;
     ChatTransfersView *uploadsView;
     QList<QXmppTransferJob*> downloadJobs;
+
+    QPushButton *downloadButton;
+    QPushButton *removeButton;
     QTimer *registerTimer;
 };
 
