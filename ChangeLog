@@ -6,6 +6,9 @@ wiLink 0.8.0 (UNRELEASED)
  * Add a link from roster to a user's web page.
  * Make it possible to rename chat contacts.
  * Treat Enter and Return keys the same way in chat input.
+ * Make it possible to change users by removing main chat account.
+ * Make "copy" available using right-click in chat history.
+ * Mark users as away after 5 minutes of inactivity.
 
 wiLink 0.7.0 (2010-03-10)
  * Add support for chat state notifications.
