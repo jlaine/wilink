@@ -47,11 +47,6 @@
 
 static int parallelDownloadLimit = 2;
 
-enum Actions
-{
-    DownloadAction,
-};
-
 enum Columns
 {
     NameColumn,
@@ -169,6 +164,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     /* button box */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     downloadButton = new QPushButton(tr("Download"));
+    connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
     buttonBox->addButton(downloadButton, QDialogButtonBox::ActionRole);
 
     removeButton = new QPushButton;
@@ -377,47 +373,44 @@ void ChatShares::findRemoteFiles()
     client->sendPacket(iq);
 }
 
-void ChatShares::itemAction()
+void ChatShares::downloadItem()
 {
-    QAction *action = static_cast<QAction*>(sender());
     ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
-    if (!action || !treeWidget)
+    if (!treeWidget)
         return;
+
     QXmppShareItem *item = static_cast<QXmppShareItem*>(treeWidget->currentIndex().internalPointer());
     if (!item)
         return;
 
-    if (action && action->data() == DownloadAction)
+    QXmppShareItem *queueItem = queueModel->addItem(*item);
+    QXmppShareItem *emptyChild = queueModel->get(
+            Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::CollectionItem) &&
+            Q(QXmppShareItem::SizeRole, Q::Equals, 0),
+            ChatSharesModel::QueryOptions(), queueItem);
+
+    // if we have at least one empty child, we need to retrieve the children
+    // of the item we just queued
+    if (queueItem->type() == QXmppShareItem::CollectionItem && (!queueItem->size() || emptyChild))
     {
-        QXmppShareItem *queueItem = queueModel->addItem(*item);
-        QXmppShareItem *emptyChild = queueModel->get(
-                Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::CollectionItem) &&
-                Q(QXmppShareItem::SizeRole, Q::Equals, 0),
-                ChatSharesModel::QueryOptions(), queueItem);
-
-        // if we have at least one empty child, we need to retrieve the children
-        // of the item we just queued
-        if (queueItem->type() == QXmppShareItem::CollectionItem && (!queueItem->size() || emptyChild))
+        if (queueItem->locations().isEmpty())
         {
-            if (queueItem->locations().isEmpty())
-            {
-                logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
-                return;
-            }
-            const QXmppShareLocation location = queueItem->locations().first();
-
-            // retrieve full tree
-            QXmppShareSearchIq iq;
-            iq.setTo(location.jid());
-            iq.setType(QXmppIq::Get);
-            iq.setDepth(0);
-            iq.setNode(location.node());
-            searches.insert(iq.tag(), downloadsView);
-            client->sendPacket(iq);
+            logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
+            return;
         }
+        const QXmppShareLocation location = queueItem->locations().first();
 
-        processDownloadQueue();
+        // retrieve full tree
+        QXmppShareSearchIq iq;
+        iq.setTo(location.jid());
+        iq.setType(QXmppIq::Get);
+        iq.setDepth(0);
+        iq.setNode(location.node());
+        searches.insert(iq.tag(), downloadsView);
+        client->sendPacket(iq);
     }
+
+    processDownloadQueue();
 }
 
 void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalPos)
@@ -425,8 +418,7 @@ void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalP
     QMenu *menu = new QMenu(this);
 
     QAction *action = menu->addAction(tr("Download"));
-    action->setData(DownloadAction);
-    connect(action, SIGNAL(triggered()), this, SLOT(itemAction()));
+    connect(action, SIGNAL(triggered()), this, SLOT(downloadItem()));
 
     menu->popup(globalPos);
 }
