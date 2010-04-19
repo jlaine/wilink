@@ -19,6 +19,7 @@
 
 #include <QDesktopServices>
 #include <QDir>
+#include <QLibrary>
 #include <QProcess>
 
 #include "systeminfo.h"
@@ -28,6 +29,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/scrnsaver.h>
+#endif
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+
+typedef BOOL (WINAPI *GetLastInputInfoProto) (PLASTINPUTINFO inputInfo);
 #endif
 
 QString SystemInfo::displayName(SystemInfo::StorageLocation type)
@@ -53,6 +60,21 @@ int SystemInfo::idleTime()
         }
         XFree(ss_info);
     }
+#endif
+#ifdef Q_OS_WIN
+    GetLastInputInfoProto func;
+    QLibrary *lib = new QLibrary("user32");
+    if (lib->load() && (func = (GetLastInputInfoProto)lib->resolve("GetLastInputInfo")))
+    {
+        LASTINPUTINFO li;
+        li.cbSize = sizeof(LASTINPUTINFO);
+        bool ok = func(&li);
+        if (ok)
+        {
+            idle_time = (GetTickCount() - li.dwTime) / 1000;
+        }
+    }
+    delete lib;
 #endif
     return idle_time;
 }
