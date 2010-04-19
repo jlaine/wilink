@@ -99,6 +99,7 @@ protected slots:
     void removeContact(const QString &jid);
     void renameContact(const QString &jid);
     void resizeContacts();
+    void secondsIdle(int);
     void statusChanged(int currentIndex);
 
     void mucServerFound(const QString &roomServer);
@@ -119,6 +120,7 @@ protected:
     ChatConversation *createConversation(const QString &jid, bool room);
 
 private:
+    bool autoAway;
     bool isBusy;
     bool isConnected;
 

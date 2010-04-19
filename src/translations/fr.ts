@@ -43,6 +43,10 @@
         <source>Enter the name for this contact.</source>
         <translation>Saisissez le nom pour ce contact.</translation>
     </message>
+    <message>
+        <source>Away</source>
+        <translation>Absent</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>

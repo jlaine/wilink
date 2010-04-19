@@ -70,6 +70,8 @@
 void application_alert_mac();
 #endif
 
+#define AWAY_TIME 300 // set away after 50s
+
 using namespace QNetIO;
 
 static QRegExp jidValidator("[^@]+@[^@]+");
@@ -77,7 +79,8 @@ static QRegExp jidValidator("[^@]+@[^@]+");
 enum StatusIndexes {
     AvailableIndex = 0,
     BusyIndex = 1,
-    OfflineIndex = 2,
+    AwayIndex = 2,
+    OfflineIndex = 3,
 };
 
 void dumpElement(const QXmppElement &item, int level)
@@ -196,14 +199,19 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
 }
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
-    : chatConsole(0),
+    : autoAway(false),
     isBusy(false),
     isConnected(false),
+    chatConsole(0),
     systemTrayIcon(trayIcon)
 {
-    idle = new Idle;
     client = new ChatClient(this);
     rosterModel =  new ChatRosterModel(client);
+
+    /* set up idle monitor */
+    idle = new Idle;
+    connect(idle, SIGNAL(secondsIdle(int)), this, SLOT(secondsIdle(int)));
+    idle->start();
 
     /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
@@ -275,6 +283,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     statusCombo = new QComboBox;
     statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
     statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
+    statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Away"));
     statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
     statusCombo->setCurrentIndex(OfflineIndex);
     connect(statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
@@ -908,8 +917,24 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     }
 }
 
+void Chat::secondsIdle(int secs)
+{
+    if (secs >= AWAY_TIME)
+    {
+        if (statusCombo->currentIndex() == AvailableIndex)
+        {
+            statusCombo->setCurrentIndex(AwayIndex);
+            autoAway = true;
+        }
+    } else if (autoAway) {
+        const int oldIndex = isBusy ? BusyIndex : AvailableIndex;
+        statusCombo->setCurrentIndex(oldIndex);
+    }
+}
+
 void Chat::statusChanged(int currentIndex)
 {
+    autoAway = false;
     if (currentIndex == AvailableIndex)
     {
         isBusy = false;
@@ -921,6 +946,14 @@ void Chat::statusChanged(int currentIndex)
         }
         else
             client->connectToServer(client->getConfiguration());
+    } else if (currentIndex == AwayIndex) {
+        if (isConnected)
+        {
+            QXmppPresence presence;
+            presence.setType(QXmppPresence::Available);
+            presence.setStatus(QXmppPresence::Status::Away);
+            client->sendPacket(presence);
+        }
     } else if (currentIndex == BusyIndex) {
         isBusy = true;
         if (isConnected)
