@@ -32,7 +32,6 @@ public:
     };
 
     static QString displayName(SystemInfo::StorageLocation);
-    static int idleTime();
     static QString storageLocation(SystemInfo::StorageLocation);
 
     static QString osName();

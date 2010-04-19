@@ -38,6 +38,8 @@
 #include <QTextBrowser>
 #include <QTimer>
 
+#include "idle/idle.h"
+
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
@@ -199,6 +201,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     isConnected(false),
     systemTrayIcon(trayIcon)
 {
+    idle = new Idle;
     client = new ChatClient(this);
     rosterModel =  new ChatRosterModel(client);
 
@@ -310,6 +313,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
 Chat::~Chat()
 {
+    delete idle;
     delete chatShares;
     delete chatTransfers;
 

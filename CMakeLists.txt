@@ -24,15 +24,6 @@ if(COREWLAN_LIBRARY)
     set(WLAN_LIBRARIES ${COREWLAN_LIBRARY})
 endif(COREWLAN_LIBRARY)
 
-# Idle timeout
-find_library(XSS_LIBRARY NAMES Xss)
-check_include_files(X11/extensions/scrnsaver.h HAVE_SCRNSAVER_H)
-if(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
-    message(STATUS "Found X11 Screen saver library: ${XSS_LIBRARY}")
-    add_definitions(-DUSE_XSS)
-    set(IDLE_LIBRARIES ${XSS_LIBRARY})
-endif(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
-
 # Extra runtime dependencies
 if(APPLE)
     set(WILINK_EXTRA_PLUGINS

@@ -32,6 +32,7 @@ class ChatRosterModel;
 class ChatRosterView;
 class ChatShares;
 class ChatTransfers;
+class Idle;
 class QComboBox;
 class QLabel;
 class QPushButton;
@@ -120,6 +121,8 @@ protected:
 private:
     bool isBusy;
     bool isConnected;
+
+    Idle *idle;
 
     QPushButton *addButton;
     QPushButton *roomButton;

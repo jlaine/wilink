@@ -19,3 +19,4 @@ endif(APPLE)
 
 qt4_wrap_cpp(idle_MOC_SOURCES idle.h)
 add_library(idle STATIC ${idle_SOURCES} ${idle_MOC_SOURCES})
+target_link_libraries(idle ${QT_LIBRARIES} ${IDLE_LIBRARIES})
