@@ -50,6 +50,16 @@ static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
+/** Returns the authentication realm for the given JID.
+ */
+static QString authRealm(const QString &jid)
+{
+    QString domain = jid.split("@").last();
+    if ("www." + domain == baseUrl.host())
+        return baseUrl.host();
+    return domain;
+}
+
 TrayIcon::TrayIcon()
     : diagnostics(NULL), photos(NULL), updates(NULL),
     connected(false),
@@ -236,36 +246,35 @@ void TrayIcon::resetChats()
         delete chat;
     chats.clear();
 
-    QStringList extraJids = settings->value("ChatAccounts").toStringList();
-    int xpos = 30;
-    int ypos = 20;
-
-    /* connect to chat */
+    /* get chat accounts */
+    QString baseJid;
     QAuthenticator auth;
     Wallet::instance()->onAuthenticationRequired(baseUrl.host(), &auth);
-    Chat *chat = new Chat(this);
-    chat->move(QPoint(xpos, ypos));
-    if (extraJids.isEmpty())
-        chat->setWindowTitle(tr("Chat"));
-    else
-        chat->setWindowTitle(auth.user());
-    chat->open(auth.user(), auth.password(), false);
-    chats << chat;
-    xpos += 300;
+    baseJid = auth.user();
 
-    /* connect to additional chats */
-    foreach (const QString &jid, extraJids)
+    QStringList chatJids;
+    chatJids.append(baseJid);
+    chatJids += settings->value("ChatAccounts").toStringList();
+
+    /* connect to chat accounts */
+    int xpos = 30;
+    int ypos = 20;
+    foreach (const QString &jid, chatJids)
     {
         QAuthenticator auth;
         auth.setUser(jid);
-        Wallet::instance()->onAuthenticationRequired(jid.split("@").last(), &auth);
+        Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
+
         Chat *chat = new Chat(this);
         chat->move(xpos, ypos);
-        chat->setWindowTitle(auth.user());
+        if (chatJids.size() == 1)
+            chat->setWindowTitle(tr("Chat"));
+        else
+            chat->setWindowTitle(auth.user());
         chat->show();
         chat->open(auth.user(), auth.password(), true);
         chats << chat;
-        xpos += 250;
+        xpos += 300;
     }
 
     /* show chats */
@@ -294,6 +303,19 @@ void TrayIcon::showChatAccounts()
     dlg.setAccounts(accounts);
     if (dlg.exec() && dlg.accounts() != accounts)
     {
+        QStringList newAccounts = dlg.accounts();
+
+        // clean credentials
+        foreach (const QString &account, accounts)
+        {
+            if (!newAccounts.contains(account))
+            {
+                const QString realm = authRealm(account);
+                qDebug() << "Removing credentials for" << realm;
+                Wallet::instance()->deleteCredentials(realm);
+            }
+        }
+
         // store new settings
         accounts = dlg.accounts();
         accounts.removeAll(baseAccount);
