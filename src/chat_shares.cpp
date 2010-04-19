@@ -990,7 +990,6 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     oldItem->setLocations(newItem->locations());
     //oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
-    oldItem->setData(UpdateTime, QDateTime::currentDateTime());
 
     QList<QXmppShareItem*> removed = oldItem->children();
     QList<QXmppShareItem*> added;
@@ -1025,6 +1024,10 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
             oldItem->appendChild(*newChild);
         endInsertRows();
     }
+
+    // store stamp
+    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
+        oldItem->setData(UpdateTime, QDateTime::currentDateTime());
 
     return oldIndex;
 }
