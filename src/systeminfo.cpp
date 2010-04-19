@@ -23,12 +23,38 @@
 
 #include "systeminfo.h"
 
+#ifdef USE_XSS
+#include <QX11Info>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/scrnsaver.h>
+#endif
+
 QString SystemInfo::displayName(SystemInfo::StorageLocation type)
 {
     if (type == SystemInfo::DownloadsLocation)
         return QObject::tr("Downloads");
     else if (type == SystemInfo::SharesLocation)
         return QObject::tr("Shares");
+}
+
+int SystemInfo::idleTime()
+{
+    int idle_time = -1;
+#ifdef USE_XSS
+    int event_base, error_base;
+    if(XScreenSaverQueryExtension(QX11Info::display(), &event_base, &error_base))
+    {
+        XScreenSaverInfo *ss_info = XScreenSaverAllocInfo();
+        if(XScreenSaverQueryInfo(QX11Info::display(),
+            QX11Info::appRootWindow(), ss_info))
+        {
+            idle_time = ss_info->idle / 1000;
+        }
+        XFree(ss_info);
+    }
+#endif
+    return idle_time;
 }
 
 QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
