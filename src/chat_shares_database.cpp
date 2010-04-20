@@ -251,9 +251,7 @@ void SearchThread::run()
     {
         qWarning() << "Received an invalid search" << queryString;
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::BadRequest);
-        responseIq.collection().clearChildren();
         responseIq.setError(error);
-        responseIq.setNode(requestIq.node());
         responseIq.setType(QXmppIq::Error);
         emit searchFinished(responseIq);
         return;
@@ -276,9 +274,7 @@ void SearchThread::run()
         query.exec();
 
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
-        responseIq.collection().clearChildren();
         responseIq.setError(error);
-        responseIq.setNode(requestIq.node());
         responseIq.setType(QXmppIq::Error);
         emit searchFinished(responseIq);
         return;

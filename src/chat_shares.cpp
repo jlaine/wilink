@@ -673,17 +673,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     if (mainView == downloadsView)
         views << sharesView;
 
-    // handle failure
-    if (shareIq.type() == QXmppIq::Error)
-    {
-        logMessage(QXmppLogger::WarningMessage, "Search failed " + shareIq.search());
-        if (shareIq.error().condition() == QXmppStanza::Error::ItemNotFound)
-        {
-            qDebug() << "item not found" << shareIq.node();
-        }
-        return;
-    }
-
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
 
@@ -693,15 +682,22 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
         QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
                                              ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+
         if (!oldItem && shareIq.from() != shareServer)
         {
             logMessage(QXmppLogger::WarningMessage, "Ignoring unwanted search result");
-            return;
+            continue;
         }
 
-        QModelIndex index = model->updateItem(oldItem, newItem);
-        if (view == mainView)
-            view->setExpanded(index, true);
+        if (shareIq.type() == QXmppIq::Error)
+        {
+            if ((shareIq.error().condition() == QXmppStanza::Error::ItemNotFound) && oldItem)
+                model->removeItem(oldItem);
+        } else {
+            QModelIndex index = model->updateItem(oldItem, newItem);
+            if (view == mainView)
+                view->setExpanded(index, true);
+        }
     }
 
     // if we retrieved the contents of a download queue item, process queue
