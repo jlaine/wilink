@@ -164,6 +164,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     /* button box */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     downloadButton = new QPushButton(tr("Download"));
+    downloadButton->setIcon(QIcon(":/download.png"));
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
     buttonBox->addButton(downloadButton, QDialogButtonBox::ActionRole);
 
