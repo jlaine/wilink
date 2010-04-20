@@ -678,6 +678,8 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
         if (filePath.isEmpty())
         {
             logMessage(QXmppLogger::WarningMessage, "Could not find local file " + shareIq.node());
+            QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
+            responseIq.setError(error);
             responseIq.setType(QXmppIq::Error);
             client->sendPacket(responseIq);
             return;
@@ -706,7 +708,9 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
     else if (shareIq.type() == QXmppIq::Error)
     {
         logMessage(QXmppLogger::WarningMessage, "Error requesting file from " + shareIq.from());
-        queueModel->removeItem(queueItem);
+        queueItem->setData(PacketId, QVariant());
+        queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
+        queueModel->refreshItem(queueItem);
     }
 }
 
