@@ -684,6 +684,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
             client->sendPacket(responseIq);
             return;
         }
+        logMessage(QXmppLogger::DebugMessage, "Sending file " + filePath);
         responseIq.setSid(generateStanzaHash());
         client->sendPacket(responseIq);
 
