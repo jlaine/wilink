@@ -112,7 +112,7 @@ QString ChatSharesDatabase::locate(const QString &publishId)
  */
 void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
 {
-    QThread *worker = new SearchThread(sharesDb, sharesDir, requestIq, this);
+    QThread *worker = new SearchThread(this, requestIq);
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(worker, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SIGNAL(searchFinished(const QXmppShareSearchIq&)));
     worker->start();
@@ -183,17 +183,20 @@ void IndexThread::scanDir(const QDir &dir)
     }
 }
 
-SearchThread::SearchThread(const QSqlDatabase &database, const QDir &dir, const QXmppShareSearchIq &request, QObject *parent)
-    : QThread(parent), requestIq(request), sharesDb(database), sharesDir(dir)
+SearchThread::SearchThread(ChatSharesDatabase *database, const QXmppShareSearchIq &request)
+    : QThread(database), requestIq(request), sharesDatabase(database)
 {
 };
 
 bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery, bool updateHash)
 {
+    QDir sharesDir = sharesDatabase->directory();
+
     const QString path = selectQuery.value(0).toString();
     qint64 cachedSize = selectQuery.value(1).toInt();
     QByteArray cachedHash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
 
+    QSqlDatabase sharesDb = sharesDatabase->database();
     QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
 
@@ -274,6 +277,7 @@ void SearchThread::run()
     }
 
     // check the base path exists
+    QDir sharesDir = sharesDatabase->directory();
     QFileInfo info(sharesDir.filePath(basePrefix));
     if (!basePrefix.isEmpty() && !info.exists())
     {
@@ -284,6 +288,7 @@ void SearchThread::run()
         like.replace("%", "\\%");
         like.replace("_", "\\_");
         like += "%";
+        QSqlDatabase sharesDb = sharesDatabase->database();
         QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDb);
         query.bindValue(":search", like);
         query.bindValue(":escape", "\\");
@@ -330,6 +335,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
     if (!like.isEmpty())
         sql += " WHERE path LIKE :search ESCAPE :escape";
     sql += " ORDER BY path";
+    QSqlDatabase sharesDb = sharesDatabase->database();
     QSqlQuery query(sql, sharesDb);
     if (!like.isEmpty())
     {

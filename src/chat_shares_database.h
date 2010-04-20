@@ -70,7 +70,7 @@ class SearchThread : public QThread
     Q_OBJECT
 
 public:
-    SearchThread(const QSqlDatabase &database, const QDir &dir, const QXmppShareSearchIq &request, QObject *parent = 0);
+    SearchThread(ChatSharesDatabase *database, const QXmppShareSearchIq &request);
     void run();
 
 signals:
@@ -81,8 +81,7 @@ private:
     bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
     QXmppShareSearchIq requestIq;
-    QSqlDatabase sharesDb;
-    QDir sharesDir;
+    ChatSharesDatabase *sharesDatabase;
 };
 
 
