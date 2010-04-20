@@ -8,6 +8,7 @@ generate_png(png
     chat.svg
     close.svg
     contact-available.svg
+    contact-away.svg
     contact-busy.svg
     contact-offline.svg
     diagnostics.svg
