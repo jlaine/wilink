@@ -78,6 +78,18 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
      Q(StreamId, Q::Equals, sid))
 
+/** Update collection timestamps.
+ */
+static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
+{
+    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
+    {
+        oldItem->setData(UpdateTime, QDateTime::currentDateTime());
+        for (int i = 0; i < oldItem->size(); i++)
+            updateTime(oldItem->child(i), stamp);
+    }
+}
+
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), rosterModel(0)
 {
@@ -432,16 +444,20 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     if (!view || !index.isValid() || !item)
         return;
 
-    QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
-    QDateTime updateTime = item->data(UpdateTime).toDateTime();
     if (item->type() == QXmppShareItem::FileItem)
     {
         // download item
         queueModel->addItem(*item);
         processDownloadQueue();
     }
-    else if (item->type() == QXmppShareItem::CollectionItem && (!updateTime.isValid() || updateTime < cutoffTime))
+    else if (item->type() == QXmppShareItem::CollectionItem)
     {
+        // determine whether we need a refresh
+        QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
+        QDateTime updateTime = item->data(UpdateTime).toDateTime();
+        if (updateTime.isValid() && (view == searchView || updateTime >= cutoffTime))
+            return;
+
         if (item->locations().isEmpty())
         {
             logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
@@ -982,6 +998,8 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
 
 QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
 {
+    QDateTime stamp = QDateTime::currentDateTime();
+
     QModelIndex oldIndex;
     if (!oldItem)
         oldItem = rootItem;
@@ -993,6 +1011,8 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     oldItem->setLocations(newItem->locations());
     //oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
+    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
+        oldItem->setData(UpdateTime, stamp);
 
     QList<QXmppShareItem*> removed = oldItem->children();
     QList<QXmppShareItem*> added;
@@ -1024,13 +1044,12 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     {
         beginInsertRows(oldIndex, oldItem->size(), oldItem->size() + added.size());
         foreach (QXmppShareItem *newChild, added)
-            oldItem->appendChild(*newChild);
+        {
+            QXmppShareItem *item = oldItem->appendChild(*newChild);
+            updateTime(item, stamp);
+        }
         endInsertRows();
     }
-
-    // store stamp
-    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
-        oldItem->setData(UpdateTime, QDateTime::currentDateTime());
 
     return oldIndex;
 }
