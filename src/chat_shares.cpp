@@ -115,6 +115,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     /* create main tab */
     ChatSharesModel *sharesModel = new ChatSharesModel;
     sharesView = new ChatSharesView;
+    sharesView->setExpandsOnDoubleClick(false);
     sharesView->setModel(sharesModel);
     sharesView->hideColumn(ProgressColumn);
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
@@ -125,6 +126,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     /* create search tab */
     ChatSharesModel *searchModel = new ChatSharesModel;
     searchView = new ChatSharesView;
+    searchView->setExpandsOnDoubleClick(false);
     searchView->setModel(searchModel);
     searchView->hideColumn(ProgressColumn);
     connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)), this, SLOT(itemContextMenu(QModelIndex, QPoint)));
@@ -455,7 +457,10 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     }
     else if (item->type() == QXmppShareItem::CollectionItem)
     {
-        itemExpandRequested(index);
+        if (view->isExpanded(index))
+            view->collapse(index);
+        else
+            itemExpandRequested(index);
     }
 }
 
