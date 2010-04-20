@@ -160,7 +160,12 @@ QString ChatRosterModel::contactName(const QString &bareJid) const
 {
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
+    {
+        const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
+        if (!entry.name().isEmpty())
+            return entry.name();
         return item->data(Qt::DisplayRole).toString();
+    }
     return bareJid.split("@").first();
 }
 
@@ -200,8 +205,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
-    } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-        return item->data(Qt::DisplayRole).toString();
     } else if (role == Qt::DisplayRole && index.column() == ImageColumn) {
         return QVariant();
     } else if(role == Qt::FontRole && index.column() == ContactColumn) {
@@ -227,6 +230,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return icon;
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(contactAvatar(bareJid));
+            } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
+                return contactName(bareJid);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
             }
@@ -464,10 +469,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         const QImage &image = vcard.photoAsImage();
         item->setData(AvatarRole, QPixmap::fromImage(image));
 
-        const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
-        if (!entry.name().isEmpty())
-            item->setData(Qt::DisplayRole, entry.name());
-        else if (!vcard.nickName().isEmpty())
+        if (!vcard.nickName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.nickName());
         else if (!vcard.fullName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.fullName());
