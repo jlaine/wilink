@@ -16,6 +16,7 @@ generate_png(png
     photos.svg
     refresh.svg
     remove.svg
+    search.svg
     upload.svg
     wiLink.svg
     wiLink-black.svg)
