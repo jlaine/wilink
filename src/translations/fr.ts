@@ -280,6 +280,10 @@ Acceptez-vous?</translation>
         <source>To share files with other users, simply place them in your %1 folder.</source>
         <translation>Pour partager des fichiers avec les autres utilisateurs, placez les dans votre dossier %1.</translation>
     </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>

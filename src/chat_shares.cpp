@@ -107,7 +107,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     sharesView->hideColumn(ProgressColumn);
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    tabWidget->addTab(sharesView, tr("Shares"));
+    tabWidget->addTab(sharesView, QIcon(":/album.png"), tr("Shares"));
 
     /* create search tab */
     ChatSharesModel *searchModel = new ChatSharesModel;
@@ -116,7 +116,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     searchView->hideColumn(ProgressColumn);
     connect(searchView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(searchView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    tabWidget->addTab(searchView, tr("Search"));
+    tabWidget->addTab(searchView, QIcon(":/search.png"), tr("Search"));
 
     /* create queue tab */
     downloadsWidget = new QWidget;
@@ -139,7 +139,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(transferDoubleClicked(const QModelIndex&)));
     vbox->addWidget(downloadsView);
 
-    tabWidget->addTab(downloadsWidget, tr("Downloads"));
+    tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
 
     /* create uploads tab */
     QWidget *uploadsWidget = new QWidget;
@@ -159,7 +159,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     uploadsView = new ChatTransfersView;
     vbox->addWidget(uploadsView);
 
-    tabWidget->addTab(uploadsWidget, tr("Uploads"));
+    tabWidget->addTab(uploadsWidget, QIcon(":/upload.png"), tr("Uploads"));
 
     /* button box */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -168,7 +168,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
     buttonBox->addButton(downloadButton, QDialogButtonBox::ActionRole);
 
-    removeButton = new QPushButton;
+    removeButton = new QPushButton(tr("Remove"));
     removeButton->setIcon(QIcon(":/remove.png"));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
@@ -419,6 +419,7 @@ void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalP
     QMenu *menu = new QMenu(this);
 
     QAction *action = menu->addAction(tr("Download"));
+    action->setIcon(QIcon(":/download.png"));
     connect(action, SIGNAL(triggered()), this, SLOT(downloadItem()));
 
     menu->popup(globalPos);
