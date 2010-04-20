@@ -143,9 +143,11 @@ public:
 
 signals:
     void contextMenu(const QModelIndex &index, const QPoint &globalPos);
+    void expandRequested(const QModelIndex &index);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+    void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *e);
 };
 
@@ -177,6 +179,7 @@ private slots:
     void downloadItem();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
+    void itemExpandRequested(const QModelIndex &index);
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void registerWithServer();

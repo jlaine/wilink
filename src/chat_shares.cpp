@@ -119,6 +119,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     sharesView->hideColumn(ProgressColumn);
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
+    connect(sharesView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
     tabWidget->addTab(sharesView, QIcon(":/album.png"), tr("Shares"));
 
     /* create search tab */
@@ -126,8 +127,9 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     searchView = new ChatSharesView;
     searchView->setModel(searchModel);
     searchView->hideColumn(ProgressColumn);
-    connect(searchView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
-    connect(searchView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
+    connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)), this, SLOT(itemContextMenu(QModelIndex, QPoint)));
+    connect(searchView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(itemDoubleClicked(QModelIndex)));
+    connect(searchView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
     tabWidget->addTab(searchView, QIcon(":/search.png"), tr("Search"));
 
     /* create queue tab */
@@ -149,6 +151,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     downloadsView = new ChatSharesView;
     downloadsView->setModel(queueModel);
     connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(transferDoubleClicked(const QModelIndex&)));
+    connect(downloadsView, SIGNAL(expandRequested(QModelIndex)), downloadsView, SLOT(expand(QModelIndex)));
     vbox->addWidget(downloadsView);
 
     tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
@@ -452,28 +455,45 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     }
     else if (item->type() == QXmppShareItem::CollectionItem)
     {
-        // determine whether we need a refresh
-        QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
-        QDateTime updateTime = item->data(UpdateTime).toDateTime();
-        if (updateTime.isValid() && (view == searchView || updateTime >= cutoffTime))
-            return;
-
-        if (item->locations().isEmpty())
-        {
-            logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
-            return; 
-        }
-        const QXmppShareLocation location = item->locations().first();
-
-        // browse files
-        QXmppShareSearchIq iq;
-        iq.setTo(location.jid());
-        iq.setType(QXmppIq::Get);
-        iq.setDepth(1);
-        iq.setNode(location.node());
-        searches.insert(iq.tag(), view);
-        client->sendPacket(iq);
+        itemExpandRequested(index);
     }
+}
+
+/** When the user asks to expand a node, check whether we need to refresh
+ *  its contents.
+ */
+void ChatShares::itemExpandRequested(const QModelIndex &index)
+{
+    ChatSharesView *view = qobject_cast<ChatSharesView*>(sender());
+    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+    if (!view || !index.isValid() || !item || !item->type() == QXmppShareItem::CollectionItem)
+        return;
+
+    // determine whether we need a refresh
+    QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
+    QDateTime updateTime = item->data(UpdateTime).toDateTime();
+    if (updateTime.isValid() && (view == searchView || updateTime >= cutoffTime))
+    {
+        view->expand(index);
+        return;
+    }
+
+    if (item->locations().isEmpty())
+    {
+        logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
+        return;
+    }
+
+    const QXmppShareLocation location = item->locations().first();
+
+    // browse files
+    QXmppShareSearchIq iq;
+    iq.setTo(location.jid());
+    iq.setType(QXmppIq::Get);
+    iq.setDepth(1);
+    iq.setNode(location.node());
+    searches.insert(iq.tag(), view);
+    client->sendPacket(iq);
 }
 
 void ChatShares::presenceReceived(const QXmppPresence &presence)
@@ -1133,6 +1153,26 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     emit contextMenu(index, event->globalPos());
+}
+
+void ChatSharesView::keyPressEvent(QKeyEvent *event)
+{
+    QModelIndex current = currentIndex();
+    if (current.isValid())
+    {
+        switch (event->key())
+        {
+        case Qt::Key_Plus:
+        case Qt::Key_Right:
+            emit expandRequested(current);
+            return;
+        case Qt::Key_Minus:
+        case Qt::Key_Left:
+            collapse(current);
+            return;
+        }
+    }
+    QTreeView::keyPressEvent(event);
 }
 
 /** When the view is resized, adjust the width of the
