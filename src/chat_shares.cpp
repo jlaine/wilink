@@ -533,14 +533,12 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
     if (presence.getType() == QXmppPresence::Available)
     {
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
-        if (forceProxy == "1")
+        if (forceProxy == "1" && !client->getTransferManager().proxyOnly())
         {
             logMessage(QXmppLogger::InformationMessage, "Forcing SOCKS5 proxy");
             client->getTransferManager().setProxyOnly(true);
         }
 
-        // browse peers
-        findRemoteFiles();
         emit registerTab();
     }
     else if (presence.getType() == QXmppPresence::Error &&
@@ -748,9 +746,14 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     }
 
     // find target view(s)
-    if (!searches.contains(shareIq.tag()))
+    ChatSharesView *mainView = 0;
+    if (searches.contains(shareIq.tag()))
+        mainView = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
+    else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer)
+        mainView = sharesView;
+    else
         return;
-    ChatSharesView *mainView = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
+
     QList<ChatSharesView*> views;
     views << mainView;
     if (mainView == downloadsView)
