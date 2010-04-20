@@ -105,6 +105,15 @@ QString ChatSharesDatabase::locate(const QString &publishId)
     query.exec();
     if (!query.next())
         return QString();
+
+    // check file is still readable
+    const QString path = query.value(0).toString();
+    QFileInfo info(sharesDir.filePath(path));
+    if (!info.isReadable())
+    {
+        deleteFile(path);
+        return QString();
+    }
     return sharesDir.filePath(query.value(0).toString());
 }
 
@@ -197,15 +206,13 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     QByteArray cachedHash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
 
     QSqlDatabase sharesDb = sharesDatabase->database();
-    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
 
     // check file is still readable
     QFileInfo info(sharesDir.filePath(path));
     if (!info.isReadable())
     {
-        deleteQuery.bindValue(":path", path);
-        deleteQuery.exec();
+        sharesDatabase->deleteFile(path);
         return false;
     }
 
@@ -218,8 +225,7 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
         if (cachedHash.isEmpty())
         {
             qWarning() << "Error hashing file" << path;
-            deleteQuery.bindValue(":path", path);
-            deleteQuery.exec();
+            sharesDatabase->deleteFile(path);
             return false;
         }
     }
