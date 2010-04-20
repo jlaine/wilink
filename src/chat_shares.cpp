@@ -57,6 +57,7 @@ enum Columns
 
 enum DataRoles {
     PacketId = QXmppShareItem::MaxRole,
+    PacketStart,
     StreamId,
     TransferStart,
     TransferDone,
@@ -72,6 +73,7 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 #define PROGRESS_COLUMN_WIDTH 100
 #define REFRESH_INTERVAL 60
 #define REGISTER_INTERVAL 60
+#define REQUEST_TIMEOUT 60
 
 // common queries
 #define Q ChatSharesModelQuery
@@ -573,9 +575,26 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 void ChatShares::processDownloadQueue()
 {
     // check how many downloads are active
-    int activeDownloads = queueModel->filter(
+    QList<QXmppShareItem *> active = queueModel->filter(
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
-            Q(PacketId, Q::NotEquals, QVariant())).size();
+            Q(PacketId, Q::NotEquals, QVariant()));
+
+    QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REQUEST_TIMEOUT);
+    foreach (QXmppShareItem *queueItem, active)
+    {
+        QDateTime startTime = queueItem->data(PacketStart).toDateTime();
+        if (startTime.isValid() && startTime <= cutoffTime)
+        {
+            logMessage(QXmppLogger::WarningMessage, "Request timed out for file " + queueItem->name());
+            queueItem->setData(PacketId, QVariant());
+            queueItem->setData(PacketStart, QVariant());
+            queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
+            queueModel->refreshItem(queueItem);
+            active.removeAll(queueItem);
+        }
+    }
+
+    int activeDownloads = active.size();
     while (activeDownloads < parallelDownloadLimit)
     {
         // find next item
@@ -615,6 +634,9 @@ void ChatShares::processDownloadQueue()
         client->sendPacket(iq);
 
         file->setData(PacketId, iq.id());
+        file->setData(PacketStart, QDateTime::currentDateTime());
+        QTimer::singleShot(REQUEST_TIMEOUT * 1000, this, SLOT(processDownloadQueue()));
+
         queueModel->refreshItem(file);
 
         activeDownloads++;
@@ -684,7 +706,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
             client->sendPacket(responseIq);
             return;
         }
-        logMessage(QXmppLogger::DebugMessage, "Sending file " + filePath);
+        logMessage(QXmppLogger::InformationMessage, "Sending file " + filePath);
         responseIq.setSid(generateStanzaHash());
         client->sendPacket(responseIq);
 
@@ -704,12 +726,14 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Result)
     {
+        queueItem->setData(PacketStart, QVariant());
         queueItem->setData(StreamId, shareIq.sid());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
-        logMessage(QXmppLogger::WarningMessage, "Error requesting file from " + shareIq.from());
+        logMessage(QXmppLogger::WarningMessage, "Error requesting file " + queueItem->name() + " from " + shareIq.from());
         queueItem->setData(PacketId, QVariant());
+        queueItem->setData(PacketStart, QVariant());
         queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
         queueModel->refreshItem(queueItem);
     }
