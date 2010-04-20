@@ -61,6 +61,7 @@ enum DataRoles {
     TransferStart,
     TransferDone,
     TransferTotal,
+    TransferError,
     UpdateTime,
 };
 
@@ -365,8 +366,11 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(PacketId, QVariant());
             queueItem->setData(StreamId, QVariant());
             queueItem->setData(TransferStart, QVariant());
+            queueItem->setData(TransferError, job->error());
             if (job->error() == QXmppTransferJob::NoError)
                 queueItem->setData(LocalPathRole, localPath);
+            else
+                queueItem->setData(LocalPathRole, QVariant());
             queueModel->refreshItem(queueItem);
         }
 
