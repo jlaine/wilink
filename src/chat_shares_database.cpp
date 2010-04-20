@@ -77,12 +77,22 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     index();
 }
 
+QSqlDatabase ChatSharesDatabase::database() const
+{
+    return sharesDb;
+}
+
+QDir ChatSharesDatabase::directory() const
+{
+    return sharesDir;
+}
+
 /** Update database of available files.
  */
 void ChatSharesDatabase::index()
 {
     // start indexing
-    QThread *worker = new IndexThread(sharesDb, sharesDir, this);
+    QThread *worker = new IndexThread(this);
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(worker, SIGNAL(finished()), indexTimer, SLOT(start()));
     worker->start();
@@ -108,17 +118,25 @@ void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
     worker->start();
 }
 
-IndexThread::IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent)
-    : QThread(parent), scanAdded(0), scanUpdated(0), sharesDb(database), sharesDir(dir)
+void ChatSharesDatabase::deleteFile(const QString &path)
+{
+    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
+    deleteQuery.bindValue(":path", path);
+    deleteQuery.exec();
+}
+
+IndexThread::IndexThread(ChatSharesDatabase *database)
+    : QThread(database), scanAdded(0), scanUpdated(0), sharesDatabase(database)
 {
 };
 
 void IndexThread::run()
 {
+    QDir sharesDir = sharesDatabase->directory();
     qDebug() << "Scan started for" << sharesDir.path();
 
     // store existing entries
-    QSqlQuery query("SELECT path FROM files", sharesDb);
+    QSqlQuery query("SELECT path FROM files", sharesDatabase->database());
     query.exec();
     while (query.next())
         scanOld.insert(query.value(0).toString(), 1);
@@ -129,17 +147,15 @@ void IndexThread::run()
     scanDir(sharesDir);
 
     // remove obsolete entries
-    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     foreach (const QString &path, scanOld.keys())
-    {
-        deleteQuery.bindValue(":path", path);
-        deleteQuery.exec();
-    }
+        sharesDatabase->deleteFile(path);
     qDebug() << "Scan completed in" << double(t.elapsed()) / 1000.0 << "s (" << scanAdded << "added," << scanUpdated << "updated," << scanOld.size() << "removed )";
 }
 
 void IndexThread::scanDir(const QDir &dir)
 {
+    QSqlDatabase sharesDb = sharesDatabase->database();
+    QDir sharesDir = sharesDatabase->directory();
     QSqlQuery addQuery("INSERT INTO files (path, size) "
                        "VALUES(:path, :size)", sharesDb);
     QSqlQuery updateQuery("UPDATE files SET size = :size WHERE path = :path", sharesDb);

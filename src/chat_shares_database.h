@@ -31,8 +31,12 @@ class ChatSharesDatabase : public QObject
 
 public:
     ChatSharesDatabase(const QString &path, QObject *parent = 0);
+    QSqlDatabase database() const;
+    QDir directory() const;
+
     QString locate(const QString &publishId);
     void search(const QXmppShareSearchIq &requestIq);
+    void deleteFile(const QString &path);
 
 signals:
     void searchFinished(const QXmppShareSearchIq &packet);
@@ -49,7 +53,7 @@ private:
 class IndexThread : public QThread
 {
 public:
-    IndexThread(const QSqlDatabase &database, const QDir &dir, QObject *parent = 0);
+    IndexThread(ChatSharesDatabase *database);
     void run();
 
 private:
@@ -58,8 +62,7 @@ private:
     QHash<QString, int> scanOld;
     qint64 scanAdded;
     qint64 scanUpdated;
-    QSqlDatabase sharesDb;
-    QDir sharesDir;
+    ChatSharesDatabase *sharesDatabase;
 };
 
 class SearchThread : public QThread
