@@ -171,10 +171,15 @@ QString ChatRosterModel::contactStatus(const QString &bareJid) const
     {
         if (presence.getType() != QXmppPresence::Available)
             continue;
-        if (presence.getStatus().getType() == QXmppPresence::Status::Online)
+        QXmppPresence::Status::Type type = presence.getStatus().getType();
+        if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
         {
             suffix = "available";
             break;
+        }
+        else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
+        {
+            suffix = "away";
         } else {
             suffix = "busy";
         }

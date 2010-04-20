@@ -283,7 +283,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     statusCombo = new QComboBox;
     statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
     statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
-    statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Away"));
+    statusCombo->addItem(QIcon(":/contact-away.png"), tr("Away"));
     statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
     statusCombo->setCurrentIndex(OfflineIndex);
     connect(statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
