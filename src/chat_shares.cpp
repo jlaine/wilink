@@ -359,20 +359,21 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     }
     else if (state == QXmppTransferJob::FinishedState)
     {
+        const QString localPath = job->data(LocalPathRole).toString();
         if (queueItem)
         {
             queueItem->setData(PacketId, QVariant());
             queueItem->setData(StreamId, QVariant());
             queueItem->setData(TransferStart, QVariant());
+            if (job->error() == QXmppTransferJob::NoError)
+                queueItem->setData(LocalPathRole, localPath);
+            queueModel->refreshItem(queueItem);
         }
 
         // if the transfer failed, delete the local file
-        QString localPath = job->data(LocalPathRole).toString();
-        if (job->error() == QXmppTransferJob::NoError)
-            queueItem->setData(LocalPathRole, localPath);
-        else
+        if (job->error() != QXmppTransferJob::NoError)
             QFile(localPath).remove();
-        queueModel->refreshItem(queueItem);
+
         job->deleteLater();
     }
 }
