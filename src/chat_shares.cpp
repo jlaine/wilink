@@ -663,21 +663,26 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         db->search(shareIq);
         return;
     }
-    else if (shareIq.type() == QXmppIq::Error)
-    {
-        logMessage(QXmppLogger::WarningMessage, "Search failed " + shareIq.search());
-        return;
-    }
 
-    // process search result
+    // find target view(s)
     if (!searches.contains(shareIq.tag()))
         return;
-
     ChatSharesView *mainView = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
     QList<ChatSharesView*> views;
     views << mainView;
     if (mainView == downloadsView)
         views << sharesView;
+
+    // handle failure
+    if (shareIq.type() == QXmppIq::Error)
+    {
+        logMessage(QXmppLogger::WarningMessage, "Search failed " + shareIq.search());
+        if (shareIq.error().condition() == QXmppStanza::Error::ItemNotFound)
+        {
+            qDebug() << "item not found" << shareIq.node();
+        }
+        return;
+    }
 
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();

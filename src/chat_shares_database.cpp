@@ -250,7 +250,35 @@ void SearchThread::run()
     if (queryString.contains("\\"))
     {
         qWarning() << "Received an invalid search" << queryString;
+        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::BadRequest);
         responseIq.collection().clearChildren();
+        responseIq.setError(error);
+        responseIq.setNode(requestIq.node());
+        responseIq.setType(QXmppIq::Error);
+        emit searchFinished(responseIq);
+        return;
+    }
+
+    // check the base path exists
+    QFileInfo info(sharesDir.filePath(basePrefix));
+    if (!basePrefix.isEmpty() && !info.exists())
+    {
+        qWarning() << "Base path no longer exists" << basePrefix;
+
+        // remove obsolete DB entries
+        QString like = basePrefix;
+        like.replace("%", "\\%");
+        like.replace("_", "\\_");
+        like += "%";
+        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDb);
+        query.bindValue(":search", like);
+        query.bindValue(":escape", "\\");
+        query.exec();
+
+        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
+        responseIq.collection().clearChildren();
+        responseIq.setError(error);
+        responseIq.setNode(requestIq.node());
         responseIq.setType(QXmppIq::Error);
         emit searchFinished(responseIq);
         return;
