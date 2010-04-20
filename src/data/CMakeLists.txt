@@ -11,10 +11,12 @@ generate_png(png
     contact-busy.svg
     contact-offline.svg
     diagnostics.svg
+    download.svg
     options.svg
     photos.svg
+    refresh.svg
     remove.svg
-    updates.svg
+    upload.svg
     wiLink.svg
     wiLink-black.svg)
 generate_xpm(xpm wiLink.svg)
