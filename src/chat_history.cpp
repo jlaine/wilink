@@ -349,6 +349,8 @@ void ChatHistory::copy()
     clipboard->setText(copyText(), QClipboard::Clipboard);
 }
 
+/** Retrieve the text for the highlighted messages.
+  */
 QString ChatHistory::copyText()
 {
     QString copyText;
@@ -373,8 +375,11 @@ QString ChatHistory::copyText()
 
             if (!copyText.isEmpty())
                 copyText += "\n";
+
+            // if this is a conversation, prefix the message with its sender
             if (senders.size() > 1)
                 copyText += message.from + "> ";
+
             copyText += message.body.replace("\r\n", "\n");
         }
     }
@@ -456,6 +461,7 @@ void ChatHistory::slotLinkHoverChanged(const QString &link)
 
 void ChatHistory::slotSelectionChanged()
 {
+    // highlight the selected items
     QList<QGraphicsItem*> selection = scene->selectedItems();
     for (int i = 0; i < layout->count(); i++)
     {
@@ -468,11 +474,14 @@ void ChatHistory::slotSelectionChanged()
             child->setSelected(false);
         }
     }
+
+    // for X11, copy the selected text to the selection buffer
     if (!selection.isEmpty())
     {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->setText(copyText(), QClipboard::Selection);
     }
+
     lastSelection = selection;
 }
 
