@@ -311,6 +311,10 @@ Acceptez-vous?</translation>
         <source>Requested</source>
         <translation>Demandé</translation>
     </message>
+    <message>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
 </context>
 <context>
     <name>ChatTransferPrompt</name>

@@ -366,11 +366,14 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(PacketId, QVariant());
             queueItem->setData(StreamId, QVariant());
             queueItem->setData(TransferStart, QVariant());
-            queueItem->setData(TransferError, job->error());
             if (job->error() == QXmppTransferJob::NoError)
+            {
                 queueItem->setData(LocalPathRole, localPath);
-            else
+                queueItem->setData(TransferError, QVariant());
+            } else {
                 queueItem->setData(LocalPathRole, QVariant());
+                queueItem->setData(TransferError, job->error());
+            }
             queueModel->refreshItem(queueItem);
         }
 
@@ -578,7 +581,8 @@ void ChatShares::processDownloadQueue()
         QXmppShareItem *file = queueModel->get(
                 Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
                 Q(PacketId, Q::Equals, QVariant()) &&
-                Q(LocalPathRole, Q::Equals, QVariant()));
+                Q(LocalPathRole, Q::Equals, QVariant()) &&
+                Q(TransferError, Q::Equals, QVariant()));
         if (!file)
             return;
 
@@ -607,8 +611,10 @@ void ChatShares::processDownloadQueue()
         iq.setTo(location.jid());
         iq.setType(QXmppIq::Get);
         iq.setNode(location.node());
-        file->setData(PacketId, iq.id());
         client->sendPacket(iq);
+
+        file->setData(PacketId, iq.id());
+        queueModel->refreshItem(file);
 
         activeDownloads++;
     }
@@ -793,10 +799,11 @@ ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
 
 void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    int error = index.data(TransferError).toInt();
     int done = index.data(TransferDone).toInt();
     int total = index.data(TransferTotal).toInt();
     QString localPath = index.data(LocalPathRole).toString();
-    if (index.column() == ProgressColumn && done > 0 && total > 0 && localPath.isEmpty())
+    if (index.column() == ProgressColumn && done > 0 && total > 0 && !error && localPath.isEmpty())
     {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = option.rect;
@@ -875,6 +882,8 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         }
         else if (!item->data(PacketId).toString().isEmpty())
             return tr("Requested");
+        else if (item->data(TransferError).toInt())
+            return tr("Failed");
         else
             return tr("Queued");
     }
