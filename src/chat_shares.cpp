@@ -60,6 +60,7 @@ enum DataRoles {
     StreamId,
     TransferStart,
     TransferDone,
+    TransferPath,
     TransferTotal,
     TransferError,
     UpdateTime,
@@ -255,7 +256,7 @@ void ChatShares::transferDoubleClicked(const QModelIndex &index)
     if (!index.isValid() || !item)
         return;
 
-    QString localPath = item->data(LocalPathRole).toString();
+    QString localPath = item->data(TransferPath).toString();
     if (item->type() == QXmppShareItem::FileItem && !localPath.isEmpty())
         QDesktopServices::openUrl(QUrl::fromLocalFile(localPath));
 }
@@ -368,10 +369,10 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(TransferStart, QVariant());
             if (job->error() == QXmppTransferJob::NoError)
             {
-                queueItem->setData(LocalPathRole, localPath);
+                queueItem->setData(TransferPath, localPath);
                 queueItem->setData(TransferError, QVariant());
             } else {
-                queueItem->setData(LocalPathRole, QVariant());
+                queueItem->setData(TransferPath, QVariant());
                 queueItem->setData(TransferError, job->error());
             }
             queueModel->refreshItem(queueItem);
@@ -581,7 +582,7 @@ void ChatShares::processDownloadQueue()
         QXmppShareItem *file = queueModel->get(
                 Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
                 Q(PacketId, Q::Equals, QVariant()) &&
-                Q(LocalPathRole, Q::Equals, QVariant()) &&
+                Q(TransferPath, Q::Equals, QVariant()) &&
                 Q(TransferError, Q::Equals, QVariant()));
         if (!file)
             return;
@@ -802,7 +803,7 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     int error = index.data(TransferError).toInt();
     int done = index.data(TransferDone).toInt();
     int total = index.data(TransferTotal).toInt();
-    QString localPath = index.data(LocalPathRole).toString();
+    QString localPath = index.data(TransferPath).toString();
     if (index.column() == ProgressColumn && done > 0 && total > 0 && !error && localPath.isEmpty())
     {
         QStyleOptionProgressBar progressBarOption;
@@ -868,7 +869,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::DisplayRole && index.column() == ProgressColumn &&
              item->type() == QXmppShareItem::FileItem)
     {
-        const QString localPath = item->data(LocalPathRole).toString();
+        const QString localPath = item->data(TransferPath).toString();
         int done = item->data(TransferDone).toInt();
         QTime t = index.data(TransferStart).toTime();
         if (!localPath.isEmpty())
