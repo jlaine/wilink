@@ -94,7 +94,9 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     if (!message.isEmpty())
     {
         browser->setTextBackgroundColor(color);
-        browser->insertPlainText(message + "\n");
+        QTextCursor cursor = browser->textCursor();
+        cursor.movePosition(QTextCursor::End);
+        cursor.insertText(message + "\n");
     }
 }
 
