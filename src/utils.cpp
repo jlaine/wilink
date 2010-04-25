@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
 #include <QRegExp>
 
 #include "utils.h"
@@ -37,17 +38,25 @@ QString indentXml(const QString &xml)
         if (output.endsWith("\n"))
             output += QString(level * 4, ' ');
 
-        if (!tagContents.startsWith("/") && !tagContents.endsWith("/"))
+        if (!tagContents.startsWith("?") &&
+            !tagContents.endsWith("?") &&
+            !tagContents.startsWith("/") &&
+            !tagContents.endsWith("/"))
             level++;
 
         output += expression.cap(0);
-        if (index + length < xml.size() && xml.at(index + length) == '<')
-            output += "\n";
 
+        // look for next match
         int cursor = index + length;
         index = expression.indexIn(xml, cursor);
-        if (index > cursor)
-            output += xml.mid(cursor, index - cursor).trimmed(); 
+        if (index >= cursor)
+        {
+            QString data = xml.mid(cursor, index - cursor).trimmed();
+            if (data.isEmpty())
+                output += "\n";
+            else
+                output += data;
+        }
     }
     return output;
 }

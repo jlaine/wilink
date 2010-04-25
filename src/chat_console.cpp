@@ -78,26 +78,24 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
         (type == QXmppLogger::ReceivedMessage || QXmppLogger::SentMessage))
         return;
 
+    QColor color;
     QString message;
     if (type == QXmppLogger::SentMessage || type == QXmppLogger::ReceivedMessage)
     {
-        QString color = (type == QXmppLogger::SentMessage) ? "#9595ff" : "#95ff95";
+        color = (type == QXmppLogger::SentMessage) ? QColor(0xcc, 0xcc, 0xff) : QColor(0xcc, 0xff, 0xcc);
         message = indentXml(msg);
-        message = Qt::escape(message);
-        message = QString("<pre style=\"background-color: %1\">%2</pre>").arg(color, message);
     }
     else
     {
-        QString color;
-        if (type == QXmppLogger::WarningMessage)
-            color = "#ff9595";
-        else
-            color = "white";
-        message = QString("<p style=\"background-color: %1\">%2</p>").arg(color, Qt::escape(msg));
+        color = (type == QXmppLogger::WarningMessage) ? QColor(0xff, 0x95, 0x95) : Qt::white;
+        message = msg;
     }
   
     if (!message.isEmpty())
-        browser->append(message);
+    {
+        browser->setTextBackgroundColor(color);
+        browser->insertPlainText(message + "\n");
+    }
 }
 
 Highlighter::Highlighter(QTextDocument *parent)
