@@ -36,7 +36,8 @@ set(wiLink_SOURCES
     systeminfo.cpp
     trayicon.cpp
     updates.cpp
-    updatesdialog.cpp)
+    updatesdialog.cpp
+    utils.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
@@ -121,5 +122,5 @@ target_link_libraries(hasher ${QT_LIBRARIES})
 
 set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests systeminfo.cpp tests.cpp updates.cpp ${tests_MOC_SOURCES})
+add_executable(tests systeminfo.cpp tests.cpp updates.cpp utils.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})

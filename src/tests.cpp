@@ -21,7 +21,21 @@
 #include <QtTest/QtTest>
 
 #include "updates.h"
+#include "utils.h"
 #include "tests.h"
+
+void TestIndent::indentCollapsed()
+{
+    QCOMPARE(indentXml("<sometag/>"), QString::fromLatin1("<sometag/>"));
+    QCOMPARE(indentXml("<sometag>value</sometag>"), QString::fromLatin1("<sometag>value</sometag>"));
+    QCOMPARE(indentXml("<sometag><nested/></sometag>"), QString::fromLatin1("<sometag>\n    <nested/>\n</sometag>"));
+    QCOMPARE(indentXml("<sometag><nested/><nested2/></sometag>"), QString::fromLatin1("<sometag>\n    <nested/>\n    <nested2/>\n</sometag>"));
+    QCOMPARE(indentXml("<sometag><nested>value</nested></sometag>"), QString::fromLatin1("<sometag>\n    <nested>value</nested>\n</sometag>"));
+}
+
+void TestIndent::indentElement()
+{
+}
 
 void TestUpdates::compareVersions()
 {
@@ -40,6 +54,9 @@ void TestUpdates::compareVersions()
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
+
+    TestIndent testIndent;
+    QTest::qExec(&testIndent);
 
     TestUpdates testUpdates;
     QTest::qExec(&testUpdates);
