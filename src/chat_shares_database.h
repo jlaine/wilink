@@ -36,10 +36,15 @@ public:
     QSqlDatabase database() const;
     QDir directory() const;
 
+    QString jid() const;
+    void setJid(const QString &jid);
+
     QString locate(const QString &publishId);
     void get(const QXmppShareGetIq &requestIq);
     void search(const QXmppShareSearchIq &requestIq);
+
     void deleteFile(const QString &path);
+    bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
@@ -51,6 +56,7 @@ private slots:
 
 private:
     QTimer *indexTimer;
+    QString sharesJid;
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };
@@ -111,7 +117,6 @@ signals:
 
 private:
     void search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString, int maxDepth);
-    bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
     QXmppShareSearchIq requestIq;
 };
