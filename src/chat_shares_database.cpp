@@ -206,9 +206,10 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     const QString path = selectQuery.value(0).toString();
     qint64 cachedSize = selectQuery.value(1).toInt();
     QByteArray cachedHash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
+    QDateTime cachedDate = selectQuery.value(3).toDateTime();
 
     QSqlDatabase sharesDb = sharesDatabase->database();
-    QSqlQuery updateQuery("UPDATE files SET hash = :hash, size = :size WHERE path = :path", sharesDb);
+    QSqlQuery updateQuery("UPDATE files SET date = :date, hash = :hash, size = :size WHERE path = :path", sharesDb);
 
     // check file is still readable
     QFileInfo info(sharesDir.filePath(path));
@@ -219,7 +220,7 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     }
 
     // check whether we need to calculate checksum
-    if (cachedSize != info.size())
+    if (cachedDate != info.lastModified() || cachedSize != info.size())
         cachedHash = QByteArray();
     if (updateHash && cachedHash.isEmpty())
     {
@@ -233,9 +234,11 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
     }
 
     // update database entry
-    if (cachedSize != info.size())
+    if (cachedDate != info.lastModified() || cachedSize != info.size())
     {
+        cachedDate = info.lastModified();
         cachedSize = info.size();
+        updateQuery.bindValue(":date", cachedDate);
         updateQuery.bindValue(":hash", cachedHash.toHex());
         updateQuery.bindValue(":size", cachedSize);
         updateQuery.bindValue(":path", path);
@@ -339,7 +342,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         like += "%";
     }
 
-    QString sql("SELECT path, size, hash FROM files");
+    QString sql("SELECT path, size, hash, date FROM files");
     if (!like.isEmpty())
         sql += " WHERE path LIKE :search ESCAPE :escape";
     sql += " ORDER BY path";
