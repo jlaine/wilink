@@ -17,22 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QObject>
+#ifndef __UTILS_H__
+#define __UTILS_H__
 
-class TestIndent : public QObject
-{
-    Q_OBJECT
+#include <QString>
 
-private slots:
-    void indentCollapsed();
-    void indentElement();
-};
+QString indentXml(const QString &xml);
 
-class TestUpdates : public QObject
-{
-    Q_OBJECT
-
-private slots:
-    void compareVersions();
-};
-
+#endif

@@ -20,11 +20,16 @@
 #ifndef __WILINK_CHAT_CONSOLE_H__
 #define __WILINK_CHAT_CONSOLE_H__
 
+#include <QSyntaxHighlighter>
+#include <QTextCharFormat>
+#include <QVector>
+
 #include "qxmpp/QXmppLogger.h"
 
 #include "chat_panel.h"
 
 class QCheckBox;
+class QTextDocument;
 class QTextBrowser;
 
 class ChatConsole : public ChatPanel
@@ -42,6 +47,28 @@ private:
     QTextBrowser *browser;
     QXmppLogger *currentLogger;
     QCheckBox *showPackets;
+};
+
+class Highlighter : public QSyntaxHighlighter
+{
+    Q_OBJECT
+
+public:
+    Highlighter(QTextDocument *parent = 0);
+
+protected:
+    void highlightBlock(const QString &text);
+
+private:
+    struct HighlightingRule
+    {
+        QRegExp pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> highlightingRules;
+
+    QTextCharFormat tagFormat;
+    QTextCharFormat quotationFormat;
 };
 
 #endif

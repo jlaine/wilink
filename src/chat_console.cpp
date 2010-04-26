@@ -24,6 +24,7 @@
 #include <QTextBrowser>
 
 #include "chat_console.h"
+#include "utils.h"
 
 ChatConsole::ChatConsole(QWidget *parent)
     : ChatPanel(parent), currentLogger(0)
@@ -39,6 +40,7 @@ ChatConsole::ChatConsole(QWidget *parent)
 
     browser = new QTextBrowser;
     layout->addWidget(browser);
+    Highlighter *highlighter = new Highlighter(browser->document());
 
     QHBoxLayout *hbox = new QHBoxLayout;
     showPackets = new QCheckBox(tr("Show packets"));
@@ -76,15 +78,68 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
         (type == QXmppLogger::ReceivedMessage || QXmppLogger::SentMessage))
         return;
 
-    QString color;
-    if (type == QXmppLogger::SentMessage)
-        color = "green";
-    else if (type == QXmppLogger::ReceivedMessage)
-        color = "blue";
-    else if (type == QXmppLogger::WarningMessage)
-        color = "red";
+    QColor color;
+    QString message;
+    if (type == QXmppLogger::SentMessage || type == QXmppLogger::ReceivedMessage)
+    {
+        color = (type == QXmppLogger::SentMessage) ? QColor(0xcc, 0xcc, 0xff) : QColor(0xcc, 0xff, 0xcc);
+        message = indentXml(msg);
+    }
     else
-        color = "black";
-    
-    browser->append(QString("<font color=\"%1\">%2</font>").arg(color, Qt::escape(msg)));
+    {
+        color = (type == QXmppLogger::WarningMessage) ? QColor(0xff, 0x95, 0x95) : Qt::white;
+        message = msg;
+    }
+  
+    if (!message.isEmpty())
+    {
+        const QTextCursor savedCursor = browser->textCursor();
+
+        QTextCursor cursor = browser->textCursor();
+        cursor.movePosition(QTextCursor::End);
+        browser->setTextCursor(cursor);
+        browser->setTextBackgroundColor(color);
+        browser->insertPlainText(message + "\n");
+
+        browser->setTextCursor(savedCursor);
+    }
 }
+
+Highlighter::Highlighter(QTextDocument *parent)
+    : QSyntaxHighlighter(parent)
+{
+    HighlightingRule rule;
+
+    tagFormat.setForeground(Qt::darkBlue);
+    tagFormat.setFontWeight(QFont::Bold);
+
+    rule.pattern = QRegExp("</?([a-z:]+)[^>]*>");
+    rule.format = tagFormat;
+    highlightingRules.append(rule);
+
+    quotationFormat.setForeground(Qt::darkGreen);
+    rule.pattern = QRegExp("\"[^\"]*\"");
+    rule.format = quotationFormat;
+    highlightingRules.append(rule);
+
+    rule.pattern = QRegExp("'[^']*'");
+    rule.format = quotationFormat;
+    highlightingRules.append(rule);
+}
+
+void Highlighter::highlightBlock(const QString &text)
+{
+    foreach (const HighlightingRule &rule, highlightingRules) {
+        QRegExp expression(rule.pattern);
+        int index = expression.indexIn(text);
+        while (index >= 0) {
+            int length = expression.matchedLength();
+            if (expression.captureCount() > 0)
+                setFormat(expression.pos(1), expression.cap(1).size(), rule.format);
+            else
+                setFormat(index, length, rule.format);
+            index = expression.indexIn(text, index + length);
+        }
+    }
+}
+
