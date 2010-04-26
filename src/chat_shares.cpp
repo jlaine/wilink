@@ -318,7 +318,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     QFile *file = new QFile(filePath, job);
     if (!file->open(QIODevice::WriteOnly))
     {
-        qWarning() << "Could not write to" << filePath;
+        logMessage(QXmppLogger::WarningMessage, "Could not open file for writing: " + filePath);
         job->abort();
         delete file;
         return;
@@ -422,7 +422,7 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
         fileInfo.setHash(shareItem.fileHash());
         fileInfo.setSize(shareItem.fileSize());
 
-        logMessage(QXmppLogger::InformationMessage, QString("Sending file: %1").arg(filePath));
+        logMessage(QXmppLogger::InformationMessage, "Sending file: " + filePath);
 
         QFile *file = new QFile(filePath);
         file->open(QIODevice::ReadOnly);
@@ -456,7 +456,7 @@ void ChatShares::downloadItem()
     {
         if (queueItem->locations().isEmpty())
         {
-            logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
+            logMessage(QXmppLogger::WarningMessage, "No location for collection: " + item->name());
             return;
         }
         const QXmppShareLocation location = queueItem->locations().first();
@@ -528,7 +528,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
 
     if (item->locations().isEmpty())
     {
-        logMessage(QXmppLogger::WarningMessage, "No location for collection " + item->name());
+        logMessage(QXmppLogger::WarningMessage, "No location for collection: " + item->name());
         return;
     }
 
@@ -615,7 +615,7 @@ void ChatShares::processDownloadQueue()
         QDateTime startTime = queueItem->data(PacketStart).toDateTime();
         if (startTime.isValid() && startTime <= cutoffTime)
         {
-            logMessage(QXmppLogger::WarningMessage, "Request timed out for file " + queueItem->name());
+            logMessage(QXmppLogger::WarningMessage, "Request timed out for file: " + queueItem->name());
             queueItem->setData(PacketId, QVariant());
             queueItem->setData(PacketStart, QVariant());
             queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
@@ -651,7 +651,7 @@ void ChatShares::processDownloadQueue()
         }
         if (!locationFound)
         {
-            logMessage(QXmppLogger::WarningMessage, "No location found for file " + file->name());
+            logMessage(QXmppLogger::WarningMessage, "No location found for file: " + file->name());
             queueModel->removeItem(file);
             continue;
         }
@@ -810,7 +810,13 @@ void ChatShares::shareServerFound(const QString &server)
 
     if (!db)
     {
-        db = new ChatSharesDatabase(SystemInfo::storageLocation(SystemInfo::SharesLocation), this);
+        // create shares directory
+        QString sharesPath = SystemInfo::storageLocation(SystemInfo::SharesLocation);
+        QFileInfo info(sharesPath);
+        if (!info.exists() && !info.dir().mkdir(info.fileName()))
+            logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + sharesPath);
+
+        db = new ChatSharesDatabase(sharesPath, this);
         connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
             baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
         connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
