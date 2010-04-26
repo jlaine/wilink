@@ -23,7 +23,6 @@
 
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppShareIq.h"
-#include "qxmpp/QXmppTransferManager.h"
 
 class QTimer;
 
@@ -47,7 +46,7 @@ public:
 
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
-    void getFinished(const QXmppShareGetIq &packet, const QXmppTransferFileInfo &fileInfo);
+    void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
     void searchFinished(const QXmppShareSearchIq &packet);
 
 private slots:
@@ -83,7 +82,7 @@ public:
     void run();
 
 signals:
-    void getFinished(const QXmppShareGetIq &packet, const QXmppTransferFileInfo &fileInfo);
+    void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
 
 private:
     QXmppShareGetIq requestIq;

@@ -96,8 +96,8 @@ void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
             this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     connect(worker, SIGNAL(finished()),
             worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(getFinished(QXmppShareGetIq, QXmppTransferFileInfo)),
-            this, SIGNAL(getFinished(QXmppShareGetIq, QXmppTransferFileInfo)));
+    connect(worker, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
+            this, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)));
     worker->start();
  }
 
@@ -218,7 +218,6 @@ void GetThread::run()
 
     // look for file in database
     QXmppShareItem shareFile(QXmppShareItem::FileItem);
-    QXmppTransferFileInfo fileInfo;
     QSqlQuery query("SELECT path, size, hash, date FROM files WHERE path = :path", sharesDatabase->database());
     query.bindValue(":path", requestIq.node());
     query.exec();
@@ -228,14 +227,12 @@ void GetThread::run()
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
         responseIq.setError(error);
         responseIq.setType(QXmppIq::Error);
-        emit getFinished(responseIq, fileInfo);
+        emit getFinished(responseIq, shareFile);
         return;
     }
 
-    QString filePath = sharesDatabase->directory().filePath(query.value(0).toString());
-    fileInfo.setName(filePath);
     responseIq.setSid(generateStanzaHash());
-    emit getFinished(responseIq, fileInfo);
+    emit getFinished(responseIq, shareFile);
 };
 
 IndexThread::IndexThread(ChatSharesDatabase *database)
