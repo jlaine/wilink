@@ -423,7 +423,11 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
         fileInfo.setSize(shareItem.fileSize());
 
         logMessage(QXmppLogger::InformationMessage, QString("Sending file: %1").arg(filePath));
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
+
+        QFile *file = new QFile(filePath);
+        file->open(QIODevice::ReadOnly);
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), file, fileInfo, responseIq.sid());
+        file->setParent(job);
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
         job->setData(LocalPathRole, filePath);
         uploadsView->addJob(job);
