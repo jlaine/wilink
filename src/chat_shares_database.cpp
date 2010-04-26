@@ -124,25 +124,6 @@ void ChatSharesDatabase::setJid(const QString &jid)
     sharesJid = jid;
 }
 
-QString ChatSharesDatabase::locate(const QString &publishId)
-{
-    QSqlQuery query("SELECT path FROM files WHERE path = :path", sharesDb);
-    query.bindValue(":path", publishId);
-    query.exec();
-    if (!query.next())
-        return QString();
-
-    // check file is still readable
-    const QString path = query.value(0).toString();
-    QFileInfo info(sharesDir.filePath(path));
-    if (!info.isReadable())
-    {
-        deleteFile(path);
-        return QString();
-    }
-    return sharesDir.filePath(path);
-}
-
 /** Handle a search request.
  */
 void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
@@ -235,9 +216,13 @@ void GetThread::run()
     responseIq.setTo(requestIq.from());
     responseIq.setType(QXmppIq::Result);
 
+    // look for file in database
+    QXmppShareItem shareFile(QXmppShareItem::FileItem);
     QXmppTransferFileInfo fileInfo;
-    QString filePath = sharesDatabase->locate(requestIq.node());
-    if (filePath.isEmpty())
+    QSqlQuery query("SELECT path, size, hash, date FROM files WHERE path = :path", sharesDatabase->database());
+    query.bindValue(":path", requestIq.node());
+    query.exec();
+    if (!query.next() || !sharesDatabase->updateFile(shareFile, query, true))
     {
         logMessage(QXmppLogger::WarningMessage, "Could not find local file " + requestIq.node());
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
@@ -247,7 +232,7 @@ void GetThread::run()
         return;
     }
 
-    logMessage(QXmppLogger::InformationMessage, "Sending file " + filePath);
+    QString filePath = sharesDatabase->directory().filePath(query.value(0).toString());
     fileInfo.setName(filePath);
     responseIq.setSid(generateStanzaHash());
     emit getFinished(responseIq, fileInfo);

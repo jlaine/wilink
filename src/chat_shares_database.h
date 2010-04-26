@@ -39,7 +39,6 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
 
-    QString locate(const QString &publishId);
     void get(const QXmppShareGetIq &requestIq);
     void search(const QXmppShareSearchIq &requestIq);
 
