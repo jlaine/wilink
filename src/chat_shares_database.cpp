@@ -34,7 +34,6 @@
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
-#define HASH_MAX_SIZE 1024 * 1024
 
 /** Fingerprint a file.
  */
@@ -48,7 +47,7 @@ static QByteArray hashFile(const QString &path)
     QCryptographicHash hasher(QCryptographicHash::Md5);
     char buffer[16384];
     int hashed = 0;
-    while (fp.bytesAvailable() && hashed < HASH_MAX_SIZE)
+    while (fp.bytesAvailable())
     {
         int len = fp.read(buffer, sizeof(buffer));
         if (len < 0)
@@ -202,12 +201,12 @@ bool ChatSharesDatabase::updateFile(QXmppShareItem &file, const QSqlQuery &selec
 ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
-};
+}
 
 GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &request)
     : ChatSharesThread(database), requestIq(request)
 {
-};
+}
 
 void GetThread::run()
 {
@@ -231,14 +230,15 @@ void GetThread::run()
         return;
     }
 
-    responseIq.setSid(generateStanzaHash());
+    // FIXME : for some reason, random number generation fails
+    //responseIq.setSid(generateStanzaHash());
     emit getFinished(responseIq, shareFile);
-};
+}
 
 IndexThread::IndexThread(ChatSharesDatabase *database)
     : ChatSharesThread(database), scanAdded(0), scanUpdated(0)
 {
-};
+}
 
 void IndexThread::run()
 {

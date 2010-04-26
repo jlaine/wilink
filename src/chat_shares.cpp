@@ -403,8 +403,13 @@ void ChatShares::findRemoteFiles()
     client->sendPacket(iq);
 }
 
-void ChatShares::getFinished(const QXmppShareGetIq &responseIq, const QXmppShareItem &shareItem)
+void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &shareItem)
 {
+    QXmppShareGetIq responseIq(iq);
+
+    // FIXME: for some reason, random number generation in thread is broken
+    if (responseIq.type() != QXmppIq::Error)
+        responseIq.setSid(generateStanzaHash());
     client->sendPacket(responseIq);
 
     // send file
