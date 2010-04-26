@@ -67,8 +67,6 @@ enum DataRoles {
     UpdateTime,
 };
 
-Q_DECLARE_METATYPE(QXmppShareSearchIq)
-
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 100
 #define REFRESH_INTERVAL 60
@@ -100,8 +98,10 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
+    qRegisterMetaType<QXmppShareGetIq>("QXmppShareGetIq");
     qRegisterMetaType<QXmppShareSearchIq>("QXmppShareSearchIq");
     qRegisterMetaType<QXmppLogger::MessageType>("QXmppLogger::MessageType");
+    qRegisterMetaType<QXmppTransferFileInfo>("QXmppTransferFileInfo");
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -403,6 +403,25 @@ void ChatShares::findRemoteFiles()
     client->sendPacket(iq);
 }
 
+void ChatShares::getFinished(const QXmppShareGetIq &responseIq, const QXmppTransferFileInfo &fileInfo)
+{
+    client->sendPacket(responseIq);
+
+    // send file
+    if (responseIq.type() != QXmppIq::Error)
+    {
+        QXmppTransferFileInfo info(fileInfo);
+        QString filePath = info.name();
+        info.setName(QFileInfo(filePath).fileName());
+
+        logMessage(QXmppLogger::InformationMessage, QString("Sending file: %1").arg(filePath));
+        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
+        connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
+        job->setData(LocalPathRole, filePath);
+        uploadsView->addJob(job);
+    }
+}
+
 void ChatShares::downloadItem()
 {
     ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
@@ -689,31 +708,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
     {
-        QXmppShareGetIq responseIq;
-        responseIq.setId(shareIq.id());
-        responseIq.setTo(shareIq.from());
-        responseIq.setType(QXmppIq::Result);
-
-        // check path is OK
-        QString filePath = db->locate(shareIq.node());
-        if (filePath.isEmpty())
-        {
-            logMessage(QXmppLogger::WarningMessage, "Could not find local file " + shareIq.node());
-            QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
-            responseIq.setError(error);
-            responseIq.setType(QXmppIq::Error);
-            client->sendPacket(responseIq);
-            return;
-        }
-        logMessage(QXmppLogger::InformationMessage, "Sending file " + filePath);
-        responseIq.setSid(generateStanzaHash());
-        client->sendPacket(responseIq);
-
-        // send file
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), filePath, responseIq.sid());
-        connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
-        job->setData(LocalPathRole, filePath);
-        uploadsView->addJob(job);
+        db->get(shareIq);
         return;
     }
 
@@ -792,9 +787,9 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         processDownloadQueue();
 }
 
-void ChatShares::searchFinished(const QXmppShareSearchIq &iq)
+void ChatShares::searchFinished(const QXmppShareSearchIq &responseIq)
 {
-    client->sendPacket(iq);
+    client->sendPacket(responseIq);
 }
 
 void ChatShares::shareServerFound(const QString &server)
@@ -804,10 +799,12 @@ void ChatShares::shareServerFound(const QString &server)
     if (!db)
     {
         db = new ChatSharesDatabase(SystemInfo::storageLocation(SystemInfo::SharesLocation), this);
-        connect(db, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
-        connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)),
-            this, SLOT(searchFinished(const QXmppShareSearchIq&)));
+        connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+            baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
+        connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppTransferFileInfo)),
+            this, SLOT(getFinished(QXmppShareGetIq, QXmppTransferFileInfo)));
+        connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
+            this, SLOT(searchFinished(QXmppShareSearchIq)));
     }
 
     // register with server

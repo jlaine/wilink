@@ -93,9 +93,11 @@ void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
 {
     QThread *worker = new GetThread(this, requestIq);
     connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-        this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(getFinished(const QXmppShareGetIq&)), this, SIGNAL(getFinished(const QXmppShareGetIq&)));
+            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    connect(worker, SIGNAL(finished()),
+            worker, SLOT(deleteLater()));
+    connect(worker, SIGNAL(getFinished(QXmppShareGetIq, QXmppTransferFileInfo)),
+            this, SIGNAL(getFinished(QXmppShareGetIq, QXmppTransferFileInfo)));
     worker->start();
  }
 
@@ -167,6 +169,7 @@ void GetThread::run()
     responseIq.setTo(requestIq.from());
     responseIq.setType(QXmppIq::Result);
 
+    QXmppTransferFileInfo fileInfo;
     QString filePath = sharesDatabase->locate(requestIq.node());
     if (filePath.isEmpty())
     {
@@ -174,9 +177,14 @@ void GetThread::run()
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
         responseIq.setError(error);
         responseIq.setType(QXmppIq::Error);
-        emit getFinished(responseIq);
+        emit getFinished(responseIq, fileInfo);
         return;
     }
+
+    logMessage(QXmppLogger::InformationMessage, "Sending file " + filePath);
+    fileInfo.setName(filePath);
+    responseIq.setSid(generateStanzaHash());
+    emit getFinished(responseIq, fileInfo);
 };
 
 IndexThread::IndexThread(ChatSharesDatabase *database)
