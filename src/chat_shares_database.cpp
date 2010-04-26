@@ -41,7 +41,7 @@ static QByteArray hashFile(const QString &path)
 {
     QFile fp(path);
 
-    if (!fp.open(QIODevice::ReadOnly))
+    if (!fp.open(QIODevice::ReadOnly) || fp.isSequential())
         return QByteArray();
 
     QCryptographicHash hasher(QCryptographicHash::Md5);

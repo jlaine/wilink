@@ -67,7 +67,7 @@
     <name>ChatConsole</name>
     <message>
         <source>Debugging console</source>
-        <translation>Console de déboggage</translation>
+        <translation>Console de débogage</translation>
     </message>
     <message>
         <source>Show packets</source>
@@ -76,6 +76,10 @@
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>
+    </message>
+    <message>
+        <source>Show debug</source>
+        <translation>Afficher débogage</translation>
     </message>
 </context>
 <context>
