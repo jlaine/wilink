@@ -46,6 +46,7 @@ private slots:
 private:
     QTextBrowser *browser;
     QXmppLogger *currentLogger;
+    QCheckBox *showDebug;
     QCheckBox *showPackets;
 };
 

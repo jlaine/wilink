@@ -101,6 +101,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     setWindowTitle(tr("Shares"));
 
     qRegisterMetaType<QXmppShareSearchIq>("QXmppShareSearchIq");
+    qRegisterMetaType<QXmppLogger::MessageType>("QXmppLogger::MessageType");
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -803,7 +804,10 @@ void ChatShares::shareServerFound(const QString &server)
     if (!db)
     {
         db = new ChatSharesDatabase(SystemInfo::storageLocation(SystemInfo::SharesLocation), this);
-        connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SLOT(searchFinished(const QXmppShareSearchIq&)));
+        connect(db, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
+        connect(db, SIGNAL(searchFinished(const QXmppShareSearchIq&)),
+            this, SLOT(searchFinished(const QXmppShareSearchIq&)));
     }
 
     // register with server

@@ -47,6 +47,10 @@ ChatConsole::ChatConsole(QWidget *parent)
     showPackets->setCheckState(Qt::Checked);
     hbox->addWidget(showPackets);
 
+    showDebug = new QCheckBox(tr("Show debug"));
+    showDebug->setCheckState(Qt::Checked);
+    hbox->addWidget(showDebug);
+
     hbox->addStretch();
 
     QPushButton *clearButton = new QPushButton(QIcon(":/close.png"), tr("Clear"));
@@ -71,7 +75,8 @@ void ChatConsole::setLogger(QXmppLogger *newLogger)
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 {
-    if (type == QXmppLogger::DebugMessage)
+    if (showDebug->checkState() != Qt::Checked &&
+        type == QXmppLogger::DebugMessage)
         return;
 
     if (showPackets->checkState() != Qt::Checked &&

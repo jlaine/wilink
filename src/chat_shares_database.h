@@ -21,6 +21,7 @@
 #include <QSqlDatabase>
 #include <QThread>
 
+#include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppShareIq.h"
 
 class QTimer;
@@ -35,10 +36,13 @@ public:
     QDir directory() const;
 
     QString locate(const QString &publishId);
+    void get(const QXmppShareGetIq &requestIq);
     void search(const QXmppShareSearchIq &requestIq);
     void deleteFile(const QString &path);
 
 signals:
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+    void getFinished(const QXmppShareGetIq &packet);
     void searchFinished(const QXmppShareSearchIq &packet);
 
 private slots:
@@ -50,7 +54,36 @@ private:
     QDir sharesDir;
 };
 
-class IndexThread : public QThread
+class ChatSharesThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    ChatSharesThread(ChatSharesDatabase *database);
+
+signals:
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+
+protected:
+    ChatSharesDatabase *sharesDatabase;
+};
+
+class GetThread : public ChatSharesThread
+{
+    Q_OBJECT
+
+public:
+    GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &request);
+    void run();
+
+signals:
+    void getFinished(const QXmppShareGetIq &packet);
+
+private:
+    QXmppShareGetIq requestIq;
+};
+
+class IndexThread : public ChatSharesThread
 {
 public:
     IndexThread(ChatSharesDatabase *database);
@@ -62,10 +95,9 @@ private:
     QHash<QString, int> scanOld;
     qint64 scanAdded;
     qint64 scanUpdated;
-    ChatSharesDatabase *sharesDatabase;
 };
 
-class SearchThread : public QThread
+class SearchThread : public ChatSharesThread
 {
     Q_OBJECT
 
@@ -81,7 +113,4 @@ private:
     bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
     QXmppShareSearchIq requestIq;
-    ChatSharesDatabase *sharesDatabase;
 };
-
-

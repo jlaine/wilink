@@ -87,12 +87,26 @@ QDir ChatSharesDatabase::directory() const
     return sharesDir;
 }
 
+/** Handle a get request.
+  */
+void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
+{
+    QThread *worker = new GetThread(this, requestIq);
+    connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
+    connect(worker, SIGNAL(getFinished(const QXmppShareGetIq&)), this, SIGNAL(getFinished(const QXmppShareGetIq&)));
+    worker->start();
+ }
+
 /** Update database of available files.
  */
 void ChatSharesDatabase::index()
 {
     // start indexing
     QThread *worker = new IndexThread(this);
+    connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(worker, SIGNAL(finished()), indexTimer, SLOT(start()));
     worker->start();
@@ -122,6 +136,8 @@ QString ChatSharesDatabase::locate(const QString &publishId)
 void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
 {
     QThread *worker = new SearchThread(this, requestIq);
+    connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
     connect(worker, SIGNAL(searchFinished(const QXmppShareSearchIq&)), this, SIGNAL(searchFinished(const QXmppShareSearchIq&)));
     worker->start();
@@ -134,15 +150,44 @@ void ChatSharesDatabase::deleteFile(const QString &path)
     deleteQuery.exec();
 }
 
+ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
+    : QThread(database), sharesDatabase(database)
+{
+};
+
+GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &request)
+    : ChatSharesThread(database), requestIq(request)
+{
+};
+
+void GetThread::run()
+{
+    QXmppShareGetIq responseIq;
+    responseIq.setId(requestIq.id());
+    responseIq.setTo(requestIq.from());
+    responseIq.setType(QXmppIq::Result);
+
+    QString filePath = sharesDatabase->locate(requestIq.node());
+    if (filePath.isEmpty())
+    {
+        logMessage(QXmppLogger::WarningMessage, "Could not find local file " + requestIq.node());
+        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
+        responseIq.setError(error);
+        responseIq.setType(QXmppIq::Error);
+        emit getFinished(responseIq);
+        return;
+    }
+};
+
 IndexThread::IndexThread(ChatSharesDatabase *database)
-    : QThread(database), scanAdded(0), scanUpdated(0), sharesDatabase(database)
+    : ChatSharesThread(database), scanAdded(0), scanUpdated(0)
 {
 };
 
 void IndexThread::run()
 {
     QDir sharesDir = sharesDatabase->directory();
-    qDebug() << "Scan started for" << sharesDir.path();
+    logMessage(QXmppLogger::DebugMessage, "Scan started for " + sharesDir.path());
 
     // store existing entries
     QSqlQuery query("SELECT path FROM files", sharesDatabase->database());
@@ -158,7 +203,11 @@ void IndexThread::run()
     // remove obsolete entries
     foreach (const QString &path, scanOld.keys())
         sharesDatabase->deleteFile(path);
-    qDebug() << "Scan completed in" << double(t.elapsed()) / 1000.0 << "s (" << scanAdded << "added," << scanUpdated << "updated," << scanOld.size() << "removed )";
+    logMessage(QXmppLogger::DebugMessage, QString("Scan completed in %1 s ( %2 added, %3 updated, %4 removed )")
+               .arg(QString::number(double(t.elapsed()) / 1000.0))
+               .arg(scanAdded)
+               .arg(scanUpdated)
+               .arg(scanOld.size()));
 }
 
 void IndexThread::scanDir(const QDir &dir)
@@ -195,7 +244,7 @@ void IndexThread::scanDir(const QDir &dir)
 }
 
 SearchThread::SearchThread(ChatSharesDatabase *database, const QXmppShareSearchIq &request)
-    : QThread(database), requestIq(request), sharesDatabase(database)
+    : ChatSharesThread(database), requestIq(request)
 {
 };
 
@@ -227,7 +276,7 @@ bool SearchThread::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery
         cachedHash = hashFile(info.filePath());
         if (cachedHash.isEmpty())
         {
-            qWarning() << "Error hashing file" << path;
+            logMessage(QXmppLogger::WarningMessage, "Error hashing file " + path);
             sharesDatabase->deleteFile(path);
             return false;
         }
@@ -279,7 +328,7 @@ void SearchThread::run()
     const QString queryString = requestIq.search().trimmed();
     if (queryString.contains("\\"))
     {
-        qWarning() << "Received an invalid search" << queryString;
+        logMessage(QXmppLogger::WarningMessage, "Received an invalid search: " + queryString);
         QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::BadRequest);
         responseIq.setError(error);
         responseIq.setType(QXmppIq::Error);
@@ -292,7 +341,7 @@ void SearchThread::run()
     QFileInfo info(sharesDir.filePath(basePrefix));
     if (!basePrefix.isEmpty() && !info.exists())
     {
-        qWarning() << "Base path no longer exists" << basePrefix;
+        logMessage(QXmppLogger::WarningMessage, "Base path no longer exists: " + basePrefix);
 
         // remove obsolete DB entries
         QString like = basePrefix;
@@ -368,7 +417,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
             int matchIndex = path.indexOf(queryString, 0, Qt::CaseInsensitive);
             if (matchIndex < 0)
             {
-                qWarning() << "Could not find" << queryString << "in" << path;
+                logMessage(QXmppLogger::WarningMessage, QString("Could not find %1 in %2").arg(queryString, path));
                 continue;
             }
             int slashIndex = path.lastIndexOf("/", matchIndex);
@@ -382,7 +431,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         QStringList relativeBits = path.mid(prefix.size()).split("/");
         if (!relativeBits.size())
         {
-            qWarning("Query returned an empty path");
+            logMessage(QXmppLogger::WarningMessage, "Query returned an empty path");
             continue;
         }
         relativeBits.removeLast();
@@ -422,7 +471,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
 
         if (t.elapsed() > SEARCH_MAX_TIME)
         {
-            qWarning() << "Search truncated at" << fileCount << "results after" << double(t.elapsed()) / 1000.0 << "s";
+            logMessage(QXmppLogger::WarningMessage, QString("Search truncated at %1 results after %2 s").arg(fileCount).arg(double(t.elapsed()) / 1000.0));
             break;
         }
     }
