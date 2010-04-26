@@ -66,7 +66,7 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     sharesDb = QSqlDatabase::addDatabase("QSQLITE");
     sharesDb.setDatabaseName(":memory:");
     Q_ASSERT(sharesDb.open());
-    sharesDb.exec("CREATE TABLE files (path text, size int, hash varchar(32))");
+    sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
     // start indexing
@@ -114,7 +114,7 @@ QString ChatSharesDatabase::locate(const QString &publishId)
         deleteFile(path);
         return QString();
     }
-    return sharesDir.filePath(query.value(0).toString());
+    return sharesDir.filePath(path);
 }
 
 /** Handle a search request.
@@ -165,9 +165,9 @@ void IndexThread::scanDir(const QDir &dir)
 {
     QSqlDatabase sharesDb = sharesDatabase->database();
     QDir sharesDir = sharesDatabase->directory();
-    QSqlQuery addQuery("INSERT INTO files (path, size) "
-                       "VALUES(:path, :size)", sharesDb);
-    QSqlQuery updateQuery("UPDATE files SET size = :size WHERE path = :path", sharesDb);
+    QSqlQuery addQuery("INSERT INTO files (path, date, size) "
+                       "VALUES(:path, :date, :size)", sharesDb);
+    QSqlQuery updateQuery("UPDATE files SET date = :date, size = :size WHERE path = :path", sharesDb);
 
     foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable))
     {
@@ -179,11 +179,13 @@ void IndexThread::scanDir(const QDir &dir)
             if (scanOld.remove(relativePath))
             {
                 updateQuery.bindValue(":path", relativePath);
+                updateQuery.bindValue(":date", info.lastModified());
                 updateQuery.bindValue(":size", info.size());
                 updateQuery.exec();
                 scanUpdated++;
             } else {
                 addQuery.bindValue(":path", relativePath);
+                addQuery.bindValue(":date", info.lastModified());
                 addQuery.bindValue(":size", info.size());
                 addQuery.exec();
                 scanAdded++;
