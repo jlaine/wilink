@@ -266,8 +266,8 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     layout->addWidget(helpLabel);
 
     /* download location label */
-    const QString downloadsLink = QString("<a href=\"file://%1\">%2</a>").arg(
-        SystemInfo::storageLocation(SystemInfo::DownloadsLocation),
+    const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
+        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::DownloadsLocation)).toString(),
         SystemInfo::displayName(SystemInfo::DownloadsLocation));
     QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
     downloadsLabel->setOpenExternalLinks(true);

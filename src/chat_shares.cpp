@@ -146,8 +146,8 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     downloadsWidget->setLayout(vbox);
 
     /* download location label */
-    const QString downloadsLink = QString("<a href=\"file://%1\">%2</a>").arg(
-        SystemInfo::storageLocation(SystemInfo::DownloadsLocation),
+    const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
+        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::DownloadsLocation)).toString(),
         SystemInfo::displayName(SystemInfo::DownloadsLocation));
     QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
     downloadsLabel->setOpenExternalLinks(true);
@@ -170,8 +170,8 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     uploadsWidget->setLayout(vbox);
 
     /* download location label */
-    const QString sharesLink = QString("<a href=\"file://%1\">%2</a>").arg(
-        SystemInfo::storageLocation(SystemInfo::SharesLocation),
+    const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
+        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString(),
         SystemInfo::displayName(SystemInfo::SharesLocation));
     QLabel *uploadsLabel = new QLabel(tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink));
     uploadsLabel->setOpenExternalLinks(true);
