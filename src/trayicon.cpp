@@ -39,7 +39,6 @@
 
 #include "chat.h"
 #include "chat_accounts.h"
-#include "config.h"
 #include "application.h"
 #include "diagnostics.h"
 #include "photos.h"
