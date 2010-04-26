@@ -17,6 +17,10 @@ def red_to_orange(r, g, b):
 def red_to_green(r, g, b):
     return g, r, b
 
+def red_to_gray(r, g, b):
+    lum = int(0.3 * r + 0.59 * g + 0.11 * b)
+    return lum, lum, lum
+
 for line in fileinput.input():
     for col in color_re.findall(line):
         r, g, b = map(ord, binascii.unhexlify(col))
