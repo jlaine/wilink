@@ -968,22 +968,34 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     {
         const QString localPath = item->data(TransferPath).toString();
         int done = item->data(TransferDone).toInt();
-        QTime t = index.data(TransferStart).toTime();
         if (!localPath.isEmpty())
-        {
             return tr("Downloaded");
+        else if (item->data(TransferError).toInt())
+            return tr("Failed");
+        else if (done > 0)
+        {
+            int total = index.data(TransferTotal).toInt();
+            int progress = total ? (qreal(done) * 100.0 / total) : 0;
+            return QString::number(progress) + "%";
         }
-        else if (done > 0 && t.isValid() && t.elapsed())
+        else if (!item->data(PacketId).toString().isEmpty())
+            return tr("Requested");
+        else
+            return tr("Queued");
+    }
+    else if (role == Qt::ToolTipRole && index.column() == ProgressColumn &&
+             item->type() == QXmppShareItem::FileItem)
+    {
+        const QString localPath = item->data(TransferPath).toString();
+        QTime t = index.data(TransferStart).toTime();
+        int done = item->data(TransferDone).toInt();
+        if (!item->data(TransferError).toInt() &&
+            localPath.isEmpty() &&
+            done > 0 && t.isValid() && t.elapsed())
         {
             int speed = (done * 1000.0) / t.elapsed();
             return ChatTransfers::sizeToString(speed) + "/s";
         }
-        else if (!item->data(PacketId).toString().isEmpty())
-            return tr("Requested");
-        else if (item->data(TransferError).toInt())
-            return tr("Failed");
-        else
-            return tr("Queued");
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)
     {
