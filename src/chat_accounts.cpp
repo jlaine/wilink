@@ -74,13 +74,38 @@ QStringList ChatAccounts::accounts() const
 
 void ChatAccounts::addAccount()
 {
-    bool ok = false;
-    QString jid;
-    jid = QInputDialog::getText(this, tr("Add an account"),
-                  tr("Enter the address of the account you want to add."),
-                  QLineEdit::Normal, jid, &ok).toLower();
-    if (ok)
-        addEntry(jid);
+    bool valid = false;
+    QString jid, error;
+    while (!valid)
+    {
+        bool ok = false;
+        QString prompt = tr("Enter the address of the account you want to add.");
+        jid = QInputDialog::getText(this, tr("Add an account"),
+                      tr("Enter the address of the account you want to add.") + (error.isEmpty() ? QString() : "\n\n" + error),
+                      QLineEdit::Normal, jid, &ok).toLower();
+        if (!ok)
+            return;
+
+        if (jid.count("@") != 1)
+        {
+            error = tr("The address you entered is invalid.");
+            continue;
+        }
+
+        valid = true;
+        const QString domain = jid.split("@").last();
+        for (int i = 0; i < listWidget->count(); i++)
+        {
+            if (listWidget->item(i)->text().split("@").last() == domain)
+            {
+                error = tr("You already have an account for '%1'.").arg(domain);
+                valid = false;
+                break;
+            }
+        }
+    }
+
+    addEntry(jid);
 }
 
 void ChatAccounts::addEntry(const QString &jid)
