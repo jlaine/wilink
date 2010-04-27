@@ -374,7 +374,6 @@ void Chat::closePanel()
     removePanel(panel);
 
     // cleanup
-    bool shouldDelete = false;
     ChatConversation *conversation = qobject_cast<ChatConversation*>(panel);
     if (conversation)
     {
@@ -510,10 +509,9 @@ void Chat::changeEvent(QEvent *event)
 
 void Chat::connected()
 {
-    qWarning("Connected to chat server");
+    qWarning() << "Connected to chat server" << client->getConfiguration().host();
     isConnected = true;
     addButton->setEnabled(true);
-    //pingTimer->start();
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 
     /* re-join conversations */
