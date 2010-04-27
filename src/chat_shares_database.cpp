@@ -160,10 +160,10 @@ bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
 {
     QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
                            "VALUES(:path, :date, :size, :hash)", sharesDb);
-    replaceQuery.bindValue(":date", entry.date);
-    replaceQuery.bindValue(":hash", entry.hash.toHex());
-    replaceQuery.bindValue(":size", entry.size);
     replaceQuery.bindValue(":path", entry.path);
+    replaceQuery.bindValue(":date", entry.date);
+    replaceQuery.bindValue(":size", entry.size);
+    replaceQuery.bindValue(":hash", entry.hash.toHex());
     return replaceQuery.exec();
 }
 
