@@ -47,7 +47,6 @@ public:
     void setJid(const QString &jid);
 
     // threaded operations
-    void index();
     void get(const QXmppShareGetIq &requestIq);
     void search(const QXmppShareSearchIq &requestIq);
 
@@ -61,6 +60,9 @@ signals:
     void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
     void indexFinished(double elapsed, int added, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &packet);
+
+private slots:
+    void index();
 
 private:
     QTimer *indexTimer;
