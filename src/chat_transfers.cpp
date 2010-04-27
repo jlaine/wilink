@@ -257,7 +257,7 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     layout->setMargin(0);
 
     /* status bar */
-    QLayout *hbox = statusBar();
+    QLayout *hbox = headerLayout();
     layout->addItem(hbox);
 
     /* help label */

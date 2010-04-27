@@ -55,7 +55,7 @@ void ChatPanel::setWindowTitle(const QString &title)
     nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
 }
 
-QLayout* ChatPanel::statusBar()
+QLayout* ChatPanel::headerLayout()
 {
     /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;

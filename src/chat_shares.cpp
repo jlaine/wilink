@@ -29,6 +29,7 @@
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QStackedWidget>
+#include <QStatusBar>
 #include <QStringList>
 #include <QTabWidget>
 #include <QTimer>
@@ -107,12 +108,16 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    layout->addItem(statusBar());
+    // HEADER
+
+    layout->addItem(headerLayout());
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     lineEdit = new QLineEdit;
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     connect(lineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(queryStringChanged()));
     layout->addWidget(lineEdit);
+
+    // MAIN
 
     tabWidget = new QTabWidget;
     layout->addWidget(tabWidget);
@@ -183,20 +188,28 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     tabWidget->addTab(uploadsWidget, QIcon(":/upload.png"), tr("Uploads"));
 
-    /* button box */
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    // FOOTER
+
+    QHBoxLayout *footerLayout = new QHBoxLayout;
+    layout->addItem(footerLayout);
+
+    /* status bar */
+    statusBar = new QStatusBar;
+    statusBar->setSizeGripEnabled(false);
+    footerLayout->addWidget(statusBar, 1);
+
+    /* buttons */
     downloadButton = new QPushButton(tr("Download"));
     downloadButton->setIcon(QIcon(":/download.png"));
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
-    buttonBox->addButton(downloadButton, QDialogButtonBox::ActionRole);
+    footerLayout->addWidget(downloadButton);
 
     removeButton = new QPushButton(tr("Remove"));
     removeButton->setIcon(QIcon(":/remove.png"));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
-    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+    footerLayout->addWidget(removeButton);
     removeButton->hide();
 
-    layout->addWidget(buttonBox);
     setLayout(layout);
 
     /* connect signals */

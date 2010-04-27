@@ -36,7 +36,7 @@ public:
     void setWindowTitle(const QString &title);
 
 protected:
-    QLayout *statusBar();
+    QLayout *headerLayout();
 
 signals:
     void closeTab();

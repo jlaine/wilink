@@ -36,7 +36,7 @@ ChatConsole::ChatConsole(QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    layout->addItem(statusBar());
+    layout->addItem(headerLayout());
 
     browser = new QTextBrowser;
     layout->addWidget(browser);

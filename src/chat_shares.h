@@ -38,6 +38,7 @@ class ChatTransfersView;
 class QDialogButtonBox;
 class QLineEdit;
 class QListWidget;
+class QStatusBar;
 class QTabWidget;
 class QTimer;
 class QXmppPacket;
@@ -212,6 +213,7 @@ private:
 
     QPushButton *downloadButton;
     QPushButton *removeButton;
+    QStatusBar *statusBar;
     QTimer *registerTimer;
 };
 

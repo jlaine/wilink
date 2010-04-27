@@ -38,7 +38,7 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     layout->setSpacing(0);
 
     /* status bar */
-    layout->addItem(statusBar());
+    layout->addItem(headerLayout());
 
     /* chat history */
     chatHistory = new ChatHistory;
