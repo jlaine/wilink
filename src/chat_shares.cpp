@@ -345,6 +345,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     downloadJobs.append(job);
 
     // start transfer
+    statusBar->showMessage(tr("Downloading %1").arg(queueItem->name()));
     job->accept(file);
 }
 

@@ -304,6 +304,10 @@ Acceptez-vous?</translation>
         <source>Failed to download %1</source>
         <translation>Erreur du téléchargement de %1</translation>
     </message>
+    <message>
+        <source>Downloading %1</source>
+        <translation>Téléchargement de %1</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
