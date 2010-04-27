@@ -337,8 +337,10 @@ void TrayIcon::showChatAccounts()
         }
 
         // store new settings
-        accounts = dlg.accounts();
-        accounts.removeAll(baseAccount);
+        accounts.clear();
+        foreach (const QString &account, newAccounts)
+            if (!account.endsWith(authSuffix))
+                accounts << account;
         settings->setValue("ChatAccounts", accounts);
 
         // reset chats
