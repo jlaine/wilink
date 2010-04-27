@@ -38,9 +38,12 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
 
+    // threaded operations
+    void index();
     void get(const QXmppShareGetIq &requestIq);
     void search(const QXmppShareSearchIq &requestIq);
 
+    // atomic operations
     void deleteFile(const QString &path);
     bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
@@ -49,9 +52,6 @@ signals:
     void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
     void indexFinished(double elapsed, int added, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &packet);
-
-private slots:
-    void index();
 
 private:
     QTimer *indexTimer;
