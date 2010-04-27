@@ -70,6 +70,9 @@ enum DataRoles {
 
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 100
+// display message in statusbar for 10 seconds
+#define STATUS_TIMEOUT 10000
+// keep directory listings for 60 seconds
 #define REFRESH_INTERVAL 60
 #define REGISTER_INTERVAL 60
 #define REQUEST_TIMEOUT 60
@@ -382,9 +385,11 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(TransferStart, QVariant());
             if (job->error() == QXmppTransferJob::NoError)
             {
+                statusBar->showMessage(tr("Downloaded %1 successfully").arg(queueItem->name()), STATUS_TIMEOUT);
                 queueItem->setData(TransferPath, localPath);
                 queueItem->setData(TransferError, QVariant());
             } else {
+                statusBar->showMessage(tr("Failed to download %1").arg(queueItem->name()), STATUS_TIMEOUT);
                 queueItem->setData(TransferPath, QVariant());
                 queueItem->setData(TransferError, job->error());
             }

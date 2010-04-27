@@ -296,6 +296,14 @@ Acceptez-vous?</translation>
         <source>Remove</source>
         <translation>Retirer</translation>
     </message>
+    <message>
+        <source>Downloaded %1 successfully</source>
+        <translation>Téléchargement de %1 terminé</translation>
+    </message>
+    <message>
+        <source>Failed to download %1</source>
+        <translation>Erreur du téléchargement de %1</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
