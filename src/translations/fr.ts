@@ -64,7 +64,7 @@
     </message>
     <message>
         <source>The address you entered is invalid.</source>
-        <translation>L'adresse que vous avez saisie n'est pas valide.</translation>
+        <translation>L&apos;adresse que vous avez saisie n&apos;est pas valide.</translation>
     </message>
     <message>
         <source>You already have an account for &apos;%1&apos;.</source>
