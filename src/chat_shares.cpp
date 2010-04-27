@@ -815,7 +815,15 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         } else {
             QModelIndex index = model->updateItem(oldItem, newItem);
             if (view == mainView)
-                view->setExpanded(index, true);
+            {
+                // when the search view receives results and there are less than 10 results
+                // expand one level of folders
+                if (view == searchView && newItem->size() < 10)
+                    view->expandToDepth(1);
+                // otherwise just expand the added item
+                else
+                    view->setExpanded(index, true);
+            }
         }
     }
 
