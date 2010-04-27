@@ -35,6 +35,16 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
 
+static ChatSharesDatabase::Entry getFile(const QSqlQuery &selectQuery)
+{
+    ChatSharesDatabase::Entry cached;
+    cached.path = selectQuery.value(0).toString();
+    cached.size = selectQuery.value(1).toInt();
+    cached.hash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
+    cached.date = selectQuery.value(3).toDateTime();
+    return cached;
+}
+
 /** Fingerprint a file.
  */
 static QByteArray hashFile(const QString &path)
@@ -159,11 +169,7 @@ bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
 
 bool ChatSharesDatabase::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery, bool updateHash)
 {
-    ChatSharesDatabase::Entry cached;
-    cached.path = selectQuery.value(0).toString();
-    cached.size = selectQuery.value(1).toInt();
-    cached.hash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
-    cached.date = selectQuery.value(3).toDateTime();
+    ChatSharesDatabase::Entry cached = getFile(selectQuery);
 
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
@@ -260,11 +266,7 @@ void IndexThread::run()
     query.exec();
     while (query.next())
     {
-        ChatSharesDatabase::Entry item;
-        item.path = query.value(0).toString(),
-        item.size = query.value(1).toInt();
-        item.hash = QByteArray::fromHex(query.value(2).toByteArray());
-        item.date = query.value(3).toDateTime();
+        ChatSharesDatabase::Entry item = getFile(query);
         scanOld.insert(item.path, item);
     }
 
