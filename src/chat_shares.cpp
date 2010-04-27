@@ -392,6 +392,15 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
                 statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
                 queueItem->setData(TransferPath, localPath);
                 queueItem->setData(TransferError, QVariant());
+
+                // store to shares database
+                ChatSharesDatabase::Entry cached;
+                cached.path = db->directory().relativeFilePath(localPath);
+                cached.size = job->fileSize();
+                cached.hash = job->fileHash();
+                cached.date = QFileInfo(localPath).lastModified();
+                db->saveFile(cached);
+
             } else {
                 statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
                 queueItem->setData(TransferPath, QVariant());
