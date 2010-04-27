@@ -172,7 +172,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
 
     /* create uploads tab */
-    QWidget *uploadsWidget = new QWidget;
+    uploadsWidget = new QWidget;
     vbox = new QVBoxLayout;
     vbox->setMargin(0);
     uploadsWidget->setLayout(vbox);
@@ -212,6 +212,12 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
     footerLayout->addWidget(removeButton);
     removeButton->hide();
+
+    /* rescan button */
+    indexButton = new QPushButton(tr("Refresh my shares"));
+    indexButton->setIcon(QIcon(":/refresh.png"));
+    footerLayout->addWidget(indexButton);
+    indexButton->hide();
 
     setLayout(layout);
 
@@ -348,7 +354,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     downloadJobs.append(job);
 
     // start transfer
-    statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()));
+    statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
     job->accept(file);
 }
 
@@ -465,6 +471,13 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
 void ChatShares::indexFinished(double elapsed, int added, int updated, int removed)
 {
     statusBar->showMessage(tr("Indexed %1 files in %2s").arg(added + updated).arg(elapsed), STATUS_TIMEOUT);
+    indexButton->setEnabled(true);
+}
+
+void ChatShares::indexStarted()
+{
+    statusBar->showMessage(tr("Indexing files"), STATUS_TIMEOUT);
+    indexButton->setEnabled(false);
 }
 
 void ChatShares::downloadItem()
@@ -864,6 +877,7 @@ void ChatShares::shareServerFound(const QString &server)
             logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + sharesPath);
 
         db = new ChatSharesDatabase(sharesPath, this);
+        connect(indexButton, SIGNAL(clicked()), db, SLOT(index()));
         connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
             baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
         connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
@@ -892,6 +906,11 @@ void ChatShares::tabChanged(int index)
         removeButton->show();
     else
         removeButton->hide();
+
+    if (tab == uploadsWidget)
+        indexButton->show();
+    else
+        indexButton->hide();
 }
 
 ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
@@ -994,7 +1013,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
             done > 0 && t.isValid() && t.elapsed())
         {
             int speed = (done * 1000.0) / t.elapsed();
-            return ChatTransfers::sizeToString(speed) + "/s";
+            return tr("Downloading at %1").arg(ChatTransfers::sizeToString(speed) + "/s");
         }
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)

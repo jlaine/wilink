@@ -316,6 +316,14 @@ Acceptez-vous?</translation>
         <source>Indexed %1 files in %2s</source>
         <translation>%1 fichiers indexés en %2s</translation>
     </message>
+    <message>
+        <source>Refresh my shares</source>
+        <translation>Rafraîchir mes partages</translation>
+    </message>
+    <message>
+        <source>Indexing files</source>
+        <translation>Indexation des fichiers</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
@@ -346,6 +354,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Failed</source>
         <translation>Echoué</translation>
+    </message>
+    <message>
+        <source>Downloading at %1</source>
+        <translation>Téléchargement à %1</translation>
     </message>
 </context>
 <context>

@@ -58,6 +58,7 @@ public:
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
     void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
+    void indexStarted();
     void indexFinished(double elapsed, int added, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &packet);
 

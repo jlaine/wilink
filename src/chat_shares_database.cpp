@@ -124,6 +124,7 @@ void ChatSharesDatabase::index()
             indexTimer, SLOT(start()));
     connect(worker, SIGNAL(indexFinished(double, int, int, int)),
             this, SIGNAL(indexFinished(double, int, int, int)));
+    emit indexStarted();
     worker->start();
 }
 
@@ -304,7 +305,10 @@ void IndexThread::scanDir(const QDir &dir)
             if (cached.path == relativePath &&
                 cached.date == info.lastModified() &&
                 cached.size == info.size())
+            {
+                scanUpdated++;
                 continue;
+            }
 
             if (cached.path.isEmpty())
                 scanAdded++;
