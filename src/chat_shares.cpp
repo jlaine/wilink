@@ -193,21 +193,24 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     // FOOTER
 
+    QHBoxLayout *footerLayout = new QHBoxLayout;
+    layout->addItem(footerLayout);
+
     statusBar = new QStatusBar;
     statusBar->setSizeGripEnabled(false);
-    layout->addWidget(statusBar);
+    footerLayout->addWidget(statusBar);
 
     /* download button */
     downloadButton = new QPushButton(tr("Download"));
     downloadButton->setIcon(QIcon(":/download.png"));
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
-    statusBar->addPermanentWidget(downloadButton);
+    footerLayout->addWidget(downloadButton);
 
     /* remove button */
     removeButton = new QPushButton(tr("Remove"));
     removeButton->setIcon(QIcon(":/remove.png"));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
-    statusBar->addPermanentWidget(removeButton);
+    footerLayout->addWidget(removeButton);
     removeButton->hide();
 
     setLayout(layout);
