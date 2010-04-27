@@ -301,7 +301,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up client */
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
-    connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)), this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
     connect(client, SIGNAL(mucServerFound(const QString&)), this, SLOT(mucServerFound(const QString&)));
@@ -370,9 +369,24 @@ void Chat::closePanel()
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (conversationPanel->indexOf(panel) < 0)
         return;
-    if (panel == chatConsole)
-        chatConsole->setLogger(0);
+
+    // close view
     removePanel(panel);
+
+    // cleanup
+    bool shouldDelete = false;
+    ChatConversation *conversation = qobject_cast<ChatConversation*>(panel);
+    if (conversation)
+    {
+        if (qobject_cast<ChatRoom*>(conversation))
+            rosterModel->removeItem(conversation->objectName());
+        conversation->leave();
+        conversation->deleteLater();
+    }
+    else if (panel == chatConsole)
+    {
+        chatConsole->setLogger(0);
+    }
 }
 
 /** Notify the user of activity on a panel.
@@ -524,7 +538,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(closeTab()), this, SLOT(hideConversation()));
+    connect(dialog, SIGNAL(closeTab()), this, SLOT(closePanel()));
     connect(dialog, SIGNAL(notifyTab()), this, SLOT(notifyPanel()));
     addPanel(dialog);
 
@@ -577,10 +591,6 @@ void Chat::inviteContact(const QString &jid)
     client->sendPacket(message);
 }
 
-void Chat::iqReceived(const QXmppIq &iq)
-{
-}
-
 void Chat::joinConversation(const QString &jid, bool isRoom)
 {
     ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
@@ -589,22 +599,6 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
 
     conversationPanel->setCurrentWidget(dialog);
     dialog->setFocus();
-}
-
-void Chat::hideConversation()
-{
-    ChatConversation *dialog = qobject_cast<ChatConversation*>(sender());
-    if (!dialog || conversationPanel->indexOf(dialog) < 0)
-        return;
-
-    // leave room
-    if (qobject_cast<ChatRoom*>(dialog))
-        rosterModel->removeItem(dialog->objectName());
-    dialog->leave();
-
-    // close view
-    removePanel(dialog);
-    dialog->deleteLater();
 }
 
 void Chat::messageReceived(const QXmppMessage &msg)

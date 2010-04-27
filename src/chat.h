@@ -88,7 +88,6 @@ protected slots:
     void disconnected();
     void error(QXmppClient::Error error);
     void inviteContact(const QString &jid);
-    void iqReceived(const QXmppIq&);
     void joinConversation(const QString &jid, bool isRoom);
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
@@ -108,8 +107,6 @@ protected slots:
     void notifyPanel();
     void registerPanel();
     void showPanel();
-
-    void hideConversation();
 
 protected:
     void addPanel(QWidget *panel);
