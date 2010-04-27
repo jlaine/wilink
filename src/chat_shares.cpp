@@ -155,8 +155,8 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 
     /* download location label */
     const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
-        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::DownloadsLocation)).toString(),
-        SystemInfo::displayName(SystemInfo::DownloadsLocation));
+        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString(),
+        SystemInfo::displayName(SystemInfo::SharesLocation));
     QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
     downloadsLabel->setOpenExternalLinks(true);
     downloadsLabel->setWordWrap(true);
@@ -177,7 +177,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     vbox->setMargin(0);
     uploadsWidget->setLayout(vbox);
 
-    /* download location label */
+    /* shares location label */
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString(),
         SystemInfo::displayName(SystemInfo::SharesLocation));
@@ -322,7 +322,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     const QString subdir = pathBits.join("/");
 
     // create directory
-    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
+    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::SharesLocation));
     if (!subdir.isEmpty())
     {
         if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
