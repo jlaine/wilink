@@ -297,16 +297,20 @@ Acceptez-vous?</translation>
         <translation>Retirer</translation>
     </message>
     <message>
-        <source>Downloaded %1 successfully</source>
-        <translation>Téléchargement de %1 terminé</translation>
+        <source>Transfer</source>
+        <translation>Transfert</translation>
     </message>
     <message>
-        <source>Failed to download %1</source>
-        <translation>Erreur du téléchargement de %1</translation>
+        <source>Downloaded</source>
+        <translation>Téléchargé</translation>
     </message>
     <message>
-        <source>Downloading %1</source>
-        <translation>Téléchargement de %1</translation>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>En attente</translation>
     </message>
 </context>
 <context>

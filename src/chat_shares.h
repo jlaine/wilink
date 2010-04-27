@@ -193,6 +193,9 @@ private slots:
     void tabChanged(int index);
 
 private:
+    void queueItem(QXmppShareItem *item);
+
+private:
     QString shareServer;
 
     ChatClient *client;

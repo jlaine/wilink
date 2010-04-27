@@ -345,7 +345,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     downloadJobs.append(job);
 
     // start transfer
-    statusBar->showMessage(tr("Downloading %1").arg(queueItem->name()));
+    statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()));
     job->accept(file);
 }
 
@@ -386,11 +386,11 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             queueItem->setData(TransferStart, QVariant());
             if (job->error() == QXmppTransferJob::NoError)
             {
-                statusBar->showMessage(tr("Downloaded %1 successfully").arg(queueItem->name()), STATUS_TIMEOUT);
+                statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
                 queueItem->setData(TransferPath, localPath);
                 queueItem->setData(TransferError, QVariant());
             } else {
-                statusBar->showMessage(tr("Failed to download %1").arg(queueItem->name()), STATUS_TIMEOUT);
+                statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
                 queueItem->setData(TransferPath, QVariant());
                 queueItem->setData(TransferError, job->error());
             }
@@ -457,17 +457,25 @@ void ChatShares::downloadItem()
         return;
 
     QXmppShareItem *item = static_cast<QXmppShareItem*>(treeWidget->currentIndex().internalPointer());
-    if (!item)
+    if (item)
+        queueItem(item);
+}
+
+void ChatShares::queueItem(QXmppShareItem *item)
+{
+    // check item is not already in the queue
+    if (queueModel->get(Q_FIND_LOCATIONS(item->locations())))
         return;
 
     QXmppShareItem *queueItem = queueModel->addItem(*item);
+    statusBar->showMessage(QString("%1 - %2").arg(tr("Queued"), queueItem->name()), STATUS_TIMEOUT);
+
+    // if we have at least one empty child, we need to retrieve the children
+    // of the item we just queued
     QXmppShareItem *emptyChild = queueModel->get(
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::CollectionItem) &&
             Q(QXmppShareItem::SizeRole, Q::Equals, 0),
             ChatSharesModel::QueryOptions(), queueItem);
-
-    // if we have at least one empty child, we need to retrieve the children
-    // of the item we just queued
     if (queueItem->type() == QXmppShareItem::CollectionItem && (!queueItem->size() || emptyChild))
     {
         if (queueItem->locations().isEmpty())
@@ -510,9 +518,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
 
     if (item->type() == QXmppShareItem::FileItem)
     {
-        // download item
-        queueModel->addItem(*item);
-        processDownloadQueue();
+        queueItem(item);
     }
     else if (item->type() == QXmppShareItem::CollectionItem)
     {
@@ -909,14 +915,10 @@ ChatSharesModel::~ChatSharesModel()
 
 QXmppShareItem *ChatSharesModel::addItem(const QXmppShareItem &item)
 {
-    QXmppShareItem *child = get(Q_FIND_LOCATIONS(item.locations()), QueryOptions(PostRecurse), rootItem);
-    if (!child)
-    {
-       beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-       child = rootItem->appendChild(item);
-       endInsertRows();
-   }
-    return child;
+   beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+   QXmppShareItem *child = rootItem->appendChild(item);
+   endInsertRows();
+   return child;
 }
 
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
