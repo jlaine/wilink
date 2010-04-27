@@ -453,6 +453,11 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
     }
 }
 
+void ChatShares::indexFinished(double elapsed, int added, int updated, int removed)
+{
+    statusBar->showMessage(tr("Indexed %1 files in %2s").arg(added + updated).arg(elapsed), STATUS_TIMEOUT);
+}
+
 void ChatShares::downloadItem()
 {
     ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
@@ -854,6 +859,8 @@ void ChatShares::shareServerFound(const QString &server)
             baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
         connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
             this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
+        connect(db, SIGNAL(indexFinished(double, int, int, int)),
+            this, SLOT(indexFinished(double, int, int, int)));
         connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
             this, SLOT(searchFinished(QXmppShareSearchIq)));
     }

@@ -312,6 +312,10 @@ Acceptez-vous?</translation>
         <source>Queued</source>
         <translation>En attente</translation>
     </message>
+    <message>
+        <source>Indexed %1 files in %2s</source>
+        <translation>%1 fichiers indexés en %2s</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>

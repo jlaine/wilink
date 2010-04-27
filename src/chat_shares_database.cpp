@@ -108,8 +108,12 @@ void ChatSharesDatabase::index()
     QThread *worker = new IndexThread(this);
     connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-    connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(finished()), indexTimer, SLOT(start()));
+    connect(worker, SIGNAL(finished()),
+            worker, SLOT(deleteLater()));
+    connect(worker, SIGNAL(finished()),
+            indexTimer, SLOT(start()));
+    connect(worker, SIGNAL(indexFinished(double, int, int, int)),
+            this, SIGNAL(indexFinished(double, int, int, int)));
     worker->start();
 }
 
@@ -259,11 +263,14 @@ void IndexThread::run()
     // remove obsolete entries
     foreach (const QString &path, scanOld.keys())
         sharesDatabase->deleteFile(path);
+
+    const double elapsed = double(t.elapsed()) / 1000.0;
     logMessage(QXmppLogger::DebugMessage, QString("Scan completed in %1 s ( %2 added, %3 updated, %4 removed )")
-               .arg(QString::number(double(t.elapsed()) / 1000.0))
+               .arg(QString::number(elapsed))
                .arg(scanAdded)
                .arg(scanUpdated)
                .arg(scanOld.size()));
+    emit indexFinished(elapsed, scanAdded, scanUpdated, scanOld.size());
 }
 
 void IndexThread::scanDir(const QDir &dir)

@@ -47,6 +47,7 @@ public:
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
     void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
+    void indexFinished(double elapsed, int added, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &packet);
 
 private slots:
@@ -90,9 +91,14 @@ private:
 
 class IndexThread : public ChatSharesThread
 {
+    Q_OBJECT
+
 public:
     IndexThread(ChatSharesDatabase *database);
     void run();
+
+signals:
+    void indexFinished(double elapsed, int added, int updated, int removed);
 
 private:
     void scanDir(const QDir &dir);
