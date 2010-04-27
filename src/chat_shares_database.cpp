@@ -139,64 +139,76 @@ void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
     worker->start();
 }
 
-void ChatSharesDatabase::deleteFile(const QString &path)
+bool ChatSharesDatabase::deleteFile(const QString &path)
 {
     QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
     deleteQuery.bindValue(":path", path);
-    deleteQuery.exec();
+    return deleteQuery.exec();
+}
+
+bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
+{
+    QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
+                           "VALUES(:path, :date, :size, :hash)", sharesDb);
+    replaceQuery.bindValue(":date", entry.date);
+    replaceQuery.bindValue(":hash", entry.hash.toHex());
+    replaceQuery.bindValue(":size", entry.size);
+    replaceQuery.bindValue(":path", entry.path);
+    return replaceQuery.exec();
 }
 
 bool ChatSharesDatabase::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery, bool updateHash)
 {
-    const QString path = selectQuery.value(0).toString();
-    qint64 cachedSize = selectQuery.value(1).toInt();
-    QByteArray cachedHash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
-    QDateTime cachedDate = selectQuery.value(3).toDateTime();
+    ChatSharesDatabase::Entry cached;
+    cached.path = selectQuery.value(0).toString();
+    cached.size = selectQuery.value(1).toInt();
+    cached.hash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
+    cached.date = selectQuery.value(3).toDateTime();
 
     QSqlQuery updateQuery("UPDATE files SET date = :date, hash = :hash, size = :size WHERE path = :path", sharesDb);
 
     // check file is still readable
-    QFileInfo info(sharesDir.filePath(path));
+    QFileInfo info(sharesDir.filePath(cached.path));
     if (!info.isReadable())
     {
-        deleteFile(path);
+        deleteFile(cached.path);
         return false;
     }
 
     // check whether we need to calculate checksum
-    if (cachedDate != info.lastModified() || cachedSize != info.size())
-        cachedHash = QByteArray();
-    if (updateHash && cachedHash.isEmpty())
+    if (cached.date != info.lastModified() || cached.size != info.size())
+        cached.hash = QByteArray();
+    if (updateHash && cached.hash.isEmpty())
     {
-        cachedHash = hashFile(info.filePath());
-        if (cachedHash.isEmpty())
+        cached.hash = hashFile(info.filePath());
+        if (cached.hash.isEmpty())
         {
-            logMessage(QXmppLogger::WarningMessage, "Error hashing file " + path);
-            deleteFile(path);
+            logMessage(QXmppLogger::WarningMessage, "Error hashing file " + cached.path);
+            deleteFile(cached.path);
             return false;
         }
     }
 
     // update database entry
-    if (cachedDate != info.lastModified() || cachedSize != info.size())
+    if (cached.date != info.lastModified() || cached.size != info.size())
     {
-        cachedDate = info.lastModified();
-        cachedSize = info.size();
-        updateQuery.bindValue(":date", cachedDate);
-        updateQuery.bindValue(":hash", cachedHash.toHex());
-        updateQuery.bindValue(":size", cachedSize);
-        updateQuery.bindValue(":path", path);
+        cached.date = info.lastModified();
+        cached.size = info.size();
+        updateQuery.bindValue(":date", cached.date);
+        updateQuery.bindValue(":hash", cached.hash.toHex());
+        updateQuery.bindValue(":size", cached.size);
+        updateQuery.bindValue(":path", cached.path);
         updateQuery.exec();
     }
 
     // fill meta-data
     file.setName(info.fileName());
-    file.setFileDate(cachedDate);
-    file.setFileHash(cachedHash);
-    file.setFileSize(cachedSize);
+    file.setFileDate(cached.date);
+    file.setFileHash(cached.hash);
+    file.setFileSize(cached.size);
 
     QXmppShareLocation location(sharesJid);
-    location.setNode(path);
+    location.setNode(cached.path);
     file.setLocations(location);
 
     return true;

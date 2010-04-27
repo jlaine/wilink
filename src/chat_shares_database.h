@@ -52,7 +52,8 @@ public:
     void search(const QXmppShareSearchIq &requestIq);
 
     // atomic operations
-    void deleteFile(const QString &path);
+    bool deleteFile(const QString &path);
+    bool saveFile(const ChatSharesDatabase::Entry &path);
     bool updateFile(QXmppShareItem &shareFile, const QSqlQuery &selectQuery, bool updateHash);
 
 signals:
