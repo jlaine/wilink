@@ -165,8 +165,6 @@ bool ChatSharesDatabase::updateFile(QXmppShareItem &file, const QSqlQuery &selec
     cached.hash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
     cached.date = selectQuery.value(3).toDateTime();
 
-    QSqlQuery updateQuery("UPDATE files SET date = :date, hash = :hash, size = :size WHERE path = :path", sharesDb);
-
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
     if (!info.isReadable())
@@ -298,19 +296,25 @@ void IndexThread::scanDir(const QDir &dir)
             scanDir(QDir(info.filePath()));
         } else {
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
+            ChatSharesDatabase::Entry cached = scanOld.take(relativePath);
 
-            ChatSharesDatabase::Entry oldEntry = scanOld.take(relativePath);
-            if (oldEntry.path.isEmpty())
-            {
-                oldEntry.path = relativePath;
+            // database entry is up to date, do nothing
+            if (cached.path == relativePath &&
+                cached.date == info.lastModified() &&
+                cached.size == info.size())
+                continue;
+
+            if (cached.path.isEmpty())
                 scanAdded++;
-            } else {
+            else
                 scanUpdated++;
-            }
-            oldEntry.size = info.size();
-            oldEntry.date = info.lastModified();
-            oldEntry.hash = QByteArray();
-            sharesDatabase->saveFile(oldEntry);
+
+            // update database entry
+            cached.path = relativePath;
+            cached.size = info.size();
+            cached.date = info.lastModified();
+            cached.hash = QByteArray();
+            sharesDatabase->saveFile(cached);
         }
     }
 }
