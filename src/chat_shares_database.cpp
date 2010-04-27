@@ -194,11 +194,7 @@ bool ChatSharesDatabase::updateFile(QXmppShareItem &file, const QSqlQuery &selec
     {
         cached.date = info.lastModified();
         cached.size = info.size();
-        updateQuery.bindValue(":date", cached.date);
-        updateQuery.bindValue(":hash", cached.hash.toHex());
-        updateQuery.bindValue(":size", cached.size);
-        updateQuery.bindValue(":path", cached.path);
-        updateQuery.exec();
+        saveFile(cached);
     }
 
     // fill meta-data
@@ -294,12 +290,7 @@ void IndexThread::run()
 
 void IndexThread::scanDir(const QDir &dir)
 {
-    QSqlDatabase sharesDb = sharesDatabase->database();
     QDir sharesDir = sharesDatabase->directory();
-    QSqlQuery addQuery("INSERT INTO files (path, date, size) "
-                       "VALUES(:path, :date, :size)", sharesDb);
-    QSqlQuery updateQuery("UPDATE files SET date = :date, size = :size WHERE path = :path", sharesDb);
-
     foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable))
     {
         if (info.isDir())
@@ -307,21 +298,19 @@ void IndexThread::scanDir(const QDir &dir)
             scanDir(QDir(info.filePath()));
         } else {
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
+
             ChatSharesDatabase::Entry oldEntry = scanOld.take(relativePath);
-            if (!oldEntry.path.isEmpty())
+            if (oldEntry.path.isEmpty())
             {
-                updateQuery.bindValue(":path", relativePath);
-                updateQuery.bindValue(":date", info.lastModified());
-                updateQuery.bindValue(":size", info.size());
-                updateQuery.exec();
-                scanUpdated++;
-            } else {
-                addQuery.bindValue(":path", relativePath);
-                addQuery.bindValue(":date", info.lastModified());
-                addQuery.bindValue(":size", info.size());
-                addQuery.exec();
+                oldEntry.path = relativePath;
                 scanAdded++;
+            } else {
+                scanUpdated++;
             }
+            oldEntry.size = info.size();
+            oldEntry.date = info.lastModified();
+            oldEntry.hash = QByteArray();
+            sharesDatabase->saveFile(oldEntry);
         }
     }
 }
