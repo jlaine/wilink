@@ -250,10 +250,17 @@ void IndexThread::run()
     logMessage(QXmppLogger::DebugMessage, "Scan started for " + sharesDir.path());
 
     // store existing entries
-    QSqlQuery query("SELECT path FROM files", sharesDatabase->database());
+    QSqlQuery query("SELECT path, size, hash, date FROM files", sharesDatabase->database());
     query.exec();
     while (query.next())
-        scanOld.insert(query.value(0).toString(), 1);
+    {
+        ChatSharesDatabase::Entry item;
+        item.path = query.value(0).toString(),
+        item.size = query.value(1).toInt();
+        item.hash = QByteArray::fromHex(query.value(2).toByteArray());
+        item.date = query.value(3).toDateTime();
+        scanOld.insert(item.path, item);
+    }
 
     // perform scan
     QTime t;
@@ -288,7 +295,8 @@ void IndexThread::scanDir(const QDir &dir)
             scanDir(QDir(info.filePath()));
         } else {
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
-            if (scanOld.remove(relativePath))
+            ChatSharesDatabase::Entry oldEntry = scanOld.take(relativePath);
+            if (!oldEntry.path.isEmpty())
             {
                 updateQuery.bindValue(":path", relativePath);
                 updateQuery.bindValue(":date", info.lastModified());

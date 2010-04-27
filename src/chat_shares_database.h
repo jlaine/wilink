@@ -31,6 +31,14 @@ class ChatSharesDatabase : public QObject
     Q_OBJECT
 
 public:
+    struct Entry
+    {
+        QString path;
+        QDateTime date;
+        qint64 size;
+        QByteArray hash;
+    };
+
     ChatSharesDatabase(const QString &path, QObject *parent = 0);
     QSqlDatabase database() const;
     QDir directory() const;
@@ -103,7 +111,7 @@ signals:
 private:
     void scanDir(const QDir &dir);
 
-    QHash<QString, int> scanOld;
+    QHash<QString, ChatSharesDatabase::Entry> scanOld;
     qint64 scanAdded;
     qint64 scanUpdated;
 };
