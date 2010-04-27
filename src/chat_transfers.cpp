@@ -219,15 +219,7 @@ void ChatTransfersView::slotProgress(qint64 done, qint64 total)
 
     QProgressBar *progress = qobject_cast<QProgressBar*>(cellWidget(jobRow, ProgressColumn));
     if (progress)
-    {
-        int elapsed = job->data(StartTimeRole).toTime().elapsed();
-        if (elapsed)
-        {
-            int speed = (done * 1000.0) / elapsed;
-            progress->setFormat(ChatTransfers::sizeToString(speed) + "/s");
-        }
         progress->setValue(done);
-    }
 }
 
 void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
@@ -237,12 +229,6 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
     if (!job || jobRow < 0)
         return;
 
-    if (state == QXmppTransferJob::TransferState)
-    {
-        QTime t;
-        t.start();
-        job->setData(StartTimeRole, t);
-    }
     item(jobRow, NameColumn)->setIcon(jobIcon(job));
     emit updateButtons();
 }

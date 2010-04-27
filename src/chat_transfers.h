@@ -33,7 +33,6 @@ class QXmppClient;
 enum JobDataRoles
 {
     LocalPathRole = Qt::UserRole,
-    StartTimeRole,
 };
 
 class ChatTransferPrompt : public QMessageBox
