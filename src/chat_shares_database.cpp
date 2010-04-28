@@ -226,10 +226,11 @@ void GetThread::run()
     if (query.exec() && query.next())
     {
         ChatSharesDatabase::Entry cached = getFile(query);
+        QFileInfo info(sharesDatabase->directory().filePath(cached.path));
         if (sharesDatabase->updateFile(cached, true))
         {
             // fill meta-data
-            shareFile.setName(QFileInfo(cached.path).fileName());
+            shareFile.setName(info.fileName());
             shareFile.setFileDate(cached.date);
             shareFile.setFileHash(cached.hash);
             shareFile.setFileSize(cached.size);
@@ -299,6 +300,7 @@ void IndexThread::scanDir(const QDir &dir)
         } else {
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
             ChatSharesDatabase::Entry cached = scanOld.take(relativePath);
+            cached.path = relativePath;
             if (sharesDatabase->updateFile(cached, false))
                 scanUpdated++;
         }
@@ -407,13 +409,13 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
     }
 
     // store results
-    int fileCount = 0;
-    query.exec();
-    QMap<QString, QXmppShareItem*> subDirs;
     QList<ChatSharesDatabase::Entry> dbHits;
+    query.exec();
     while (query.next())
         dbHits << getFile(query);
 
+    int fileCount = 0;
+    QMap<QString, QXmppShareItem*> subDirs;
     for (int hit = 0; hit < dbHits.size(); hit++)
     {
         ChatSharesDatabase::Entry &cached = dbHits[hit];
@@ -470,10 +472,11 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         if (!maxDepth || relativeBits.size() < maxDepth)
         {
             // update file info
+            QFileInfo info(sharesDatabase->directory().filePath(cached.path));
             if (sharesDatabase->updateFile(cached, requestIq.hash()))
             {
                 QXmppShareItem shareFile(QXmppShareItem::FileItem);
-                shareFile.setName(QFileInfo(cached.path).fileName());
+                shareFile.setName(info.fileName());
                 shareFile.setFileDate(cached.date);
                 shareFile.setFileHash(cached.hash);
                 shareFile.setFileSize(cached.size);
