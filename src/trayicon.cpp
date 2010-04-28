@@ -289,9 +289,9 @@ void TrayIcon::resetChats()
         Chat *chat = new Chat(this);
         chat->move(xpos, ypos);
         if (chatJids.size() == 1)
-            chat->setWindowTitle(tr("Chat"));
+            chat->setWindowTitle(qApp->applicationName());
         else
-            chat->setWindowTitle(auth.user());
+            chat->setWindowTitle(QString("%1 - %2").arg(auth.user(), qApp->applicationName()));
         chat->show();
         chat->open(auth.user(), auth.password(), true);
         chats << chat;

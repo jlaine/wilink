@@ -513,10 +513,6 @@ Acceptez-vous?</translation>
         <translation>Comptes de chat</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
-    </message>
-    <message>
         <source>&amp;Chat and shares</source>
         <translation>&amp;Chat et partages</translation>
     </message>
