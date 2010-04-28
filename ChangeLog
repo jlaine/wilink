@@ -1,4 +1,5 @@
 wiLink 0.8.0 (UNRELEASED)
+ * Rename wDesktop to wiLink.
  * Improve file transfer support.
  * Add file sharing application.
  * Change the default download directory to "Downloads" on Windows.
@@ -11,10 +12,10 @@ wiLink 0.8.0 (UNRELEASED)
  * Don't copy message sender when copying text from a single person.
  * Make it possible to select entire chat history.
  * Mark users as away after 5 minutes of inactivity.
- * Resize photos to a maximum of 2048x2048 before upload.
+ * Resize photos to a maximum of 2048 x 2048 before upload.
  * Fix photo upload progress bar, really reaches 100% upon completion.
 
-wiLink 0.7.0 (2010-03-10)
+wDesktop 0.7.0 (2010-03-10)
  * Add support for chat state notifications.
  * Add support for file transfers.
  * Notify the user when he cannot join a chat room or gets kicked out.
@@ -28,45 +29,45 @@ wiLink 0.7.0 (2010-03-10)
  * Make it possible to view fullsize version of photos.
  * Add keyboard shortcuts for navigating photos.
 
-wiLink 0.6.1 (2010-02-15)
+wDesktop 0.6.1 (2010-02-15)
  * Improve auto-expanding of chat rooms.
  * Parse the timestamp of chat room messages.
  * Close connection to chat server on exit.
  * Make it possible to set available/busy/offline status.
  * Re-join chat rooms after a disconnect / reconnect.
 
-wiLink 0.6.0 (2010-02-12)
+wDesktop 0.6.0 (2010-02-12)
  * If we receive a subscribe request from someone in our list, accept it.
  * When a contact is added to our list, update it's vCard.
  * Add support for chat rooms.
  * Make it possible to close conversations.
 
-wiLink 0.5.2 (2010-02-05)
+wDesktop 0.5.2 (2010-02-05)
  * Fix duplicated messages when archives overlap with received messages.
  * Improve text copy behaviour.
  * Fix opening links in messages.
 
-wiLink 0.5.1 (2010-02-05)
+wDesktop 0.5.1 (2010-02-05)
  * Center date label in chat history.
  * Improve clearing of chat history.
  * Implement copying text from the chat history.
  * Add CTRL-RETURN / ALT-RETURN shortcuts to enter a new chat line.
 
-wiLink 0.5.0 (2010-02-04)
+wDesktop 0.5.0 (2010-02-04)
  * Improve icon for photos upload.
  * Beautify and make conversation history more compact.
  * Display remote party's nickname in conversation panel.
  * Display own status in the form of an icon.
 
-wiLink 0.4.7 (2010-02-02)
+wDesktop 0.4.7 (2010-02-02)
  * Fix a display glitch introduced in version 0.4.6.
 
-wiLink 0.4.6 (2010-02-02)
+wDesktop 0.4.6 (2010-02-02)
  * Improve highlighting of contacts with pending messages.
  * Refresh diagnostics when the window is closed / reopened.
  * Improve validation of credentials and contacts.
 
-wiLink 0.4.5 (2010-02-01)
+wDesktop 0.4.5 (2010-02-01)
  * Improve behaviour of chat history when it is resized.
  * Fix timezone of chat history.
  * Make it possible to close the chat window using Cmd-W on Mac OS.
@@ -74,67 +75,67 @@ wiLink 0.4.5 (2010-02-01)
  * Make it possible to send diagnostic reports.
  * Escape HTML in chat messages.
 
-wiLink 0.4.0 (2010-01-27)
+wDesktop 0.4.0 (2010-01-27)
  * Group all chats in a single window.
  * Add support for loading chat history from server.
  * Add mandatory check of SHA-1 hash for updates.
- * Exit if another instance of wiLink connects to the chat server.
+ * Exit if another instance of wDesktop connects to the chat server.
  * Add a weekly check for updates.
 
-wiLink 0.3.5 (2010-01-20)
+wDesktop 0.3.5 (2010-01-20)
  * When a message is received, don't grab the focus, notify the user.
  * Make the chat input grow as needed for long messages.
  * Only allow one chat contact to be selected at a time.
  * Display the contact's avatar in the chat dialog.
  * Make it possible to clear the history of a conversation.
- * Notify the user that wiLink will quit once a new version is downloaded.
+ * Notify the user that wDesktop will quit once a new version is downloaded.
  * On Mac OS X, store updates in the Downloads folder if it exists.
  * Do not resize contact list to a size too big for the screen.
  * On Windows and Linux, make a left click on the tray icon show the chat screen.
 
-wiLink 0.3.0 (2010-01-18)
+wDesktop 0.3.0 (2010-01-18)
  * Implement server ping (XEP-0199) and reconnection.
  * Fix chat history scrolling when sending a message.
 
-wiLink 0.2.9 (2010-01-15)
+wDesktop 0.2.9 (2010-01-15)
  * Display nicknames when available.
  * Improve contact status icons by adding a shadow.
  * Disable DNS SRV lookups for chat.
 
-wiLink 0.2.8 (2010-01-13)
+wDesktop 0.2.8 (2010-01-13)
  * Make it possible to connect when DNS SRV lookup fails.
 
-wiLink 0.2.7 (2010-01-13)
+wDesktop 0.2.7 (2010-01-13)
  * Only perform long ping if short ping gives errors to speed things up.
  * Add a progress bar to the diagnostics window.
  * Raise chat conversation window when it's activated.
  * When a chat conversation is activated, pass focus to the input line.
 
-wiLink 0.2.6 (2010-01-12)
+wDesktop 0.2.6 (2010-01-12)
  * Improve window behaviour on OS X.
  * Show contact status in chat dialog.
  * Improve contact icons.
  * Sort contacts by status then by name.
- * Add glow around wiLink icon.
+ * Add glow around wDesktop icon.
 
-wiLink 0.2.4
- * Make wiLink start at login.
+wDesktop 0.2.4
+ * Make wDesktop start at login.
  * Make links clickable in chat window.
  * Fix plugins installation on Windows.
 
-wiLink 0.2.3
+wDesktop 0.2.3
  * Display chat window at startup.
  * Display vCard image for chat contacts.
  * Add a User-Agent for request to portal.
 
-wiLink 0.2.2
+wDesktop 0.2.2
  * Add a button in photos to go back to the previous folder.
  * Improve display of photo thumbnails.
  * Refresh photos list after photos have been uploaded.
- * Make it possible to run wiLink at the end of Windows installer.
+ * Make it possible to run wDesktop at the end of Windows installer.
  * Display release changes in update prompt.
 
-wiLink 0.2.1
+wDesktop 0.2.1
  * Fix French translation for "Refresh".
- * Make it possible to keep wiLink in the dock on OS X.
+ * Make it possible to keep wDesktop in the dock on OS X.
 
