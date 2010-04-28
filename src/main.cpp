@@ -113,14 +113,15 @@ int main(int argc, char *argv[])
 #endif
 
     /* Uninstall wDesktop */
-    QDir appsDir(QDesktopServices::storageLocation(QDesktopServices::ApplicationsLocation));
 #ifdef Q_OS_MAC
+    QDir appsDir("/Applications");
     if (appsDir.exists("wDesktop.app"))
         QProcess::execute("rm", QStringList() << "-rf" << appsDir.filePath("wDesktop.app"));
 #endif
 #ifdef Q_OS_WIN
-    if (appsDir.exists("wDesktop/Uninstall.exe"))
-        QProcess::execute(appsDir.filePath("wDesktop/Uninstall.exe"), QStringList() << "/S");
+    QString uninstaller("C:\\Program Files\\wDesktop\\Uninstall.exe");
+    if (QFileInfo(uninstaller).isExecutable())
+        QProcess::execute(uninstaller, QStringList() << "/S");
 #endif
 
     /* Load translations */
