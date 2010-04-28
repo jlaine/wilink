@@ -324,6 +324,14 @@ Acceptez-vous?</translation>
         <source>Indexing files</source>
         <translation>Indexation des fichiers</translation>
     </message>
+    <message>
+        <source>No files found</source>
+        <translation>Aucun fichier trouvé</translation>
+    </message>
+    <message>
+        <source>My shares folder</source>
+        <translation>Mon dossier partages</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>

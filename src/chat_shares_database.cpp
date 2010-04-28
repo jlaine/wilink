@@ -20,6 +20,7 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QSettings>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
@@ -30,10 +31,13 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat_shares_database.h"
+#include "systeminfo.h"
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
+
+ChatSharesDatabase *ChatSharesDatabase::globalInstance = 0;
 
 static ChatSharesDatabase::Entry getFile(const QSqlQuery &selectQuery)
 {
@@ -68,9 +72,11 @@ static QByteArray hashFile(const QString &path)
     return hasher.result();
 }
 
-ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
-    : QObject(parent), sharesDir(path)
+ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
+    : QObject(parent), indexThread(0)
 {
+    QSettings settings;
+
     // prepare database
     sharesDb = QSqlDatabase::addDatabase("QSQLITE");
     sharesDb.setDatabaseName(":memory:");
@@ -80,9 +86,19 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
 
     // start indexing
     indexTimer = new QTimer(this);
-    indexTimer->setInterval(60 * 60 * 1000); // 1 hour
+    indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
+
+    // set directory
+    setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
+}
+
+ChatSharesDatabase *ChatSharesDatabase::instance()
+{
+    if (!globalInstance)
+        globalInstance = new ChatSharesDatabase();
+    return globalInstance;
 }
 
 QSqlDatabase ChatSharesDatabase::database() const
@@ -90,9 +106,41 @@ QSqlDatabase ChatSharesDatabase::database() const
     return sharesDb;
 }
 
-QDir ChatSharesDatabase::directory() const
+QString ChatSharesDatabase::directory() const
 {
-    return sharesDir;
+    return sharesDir.path();
+}
+
+void ChatSharesDatabase::setDirectory(const QString &path)
+{
+    if (path == sharesDir.path())
+        return;
+
+    // create directory if needed
+    QFileInfo info(path);
+    if (!info.exists() && !info.dir().mkdir(info.fileName()))
+       logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + path);
+
+    // remember directory
+    QSettings settings;
+    settings.setValue("SharesLocation", path);
+    sharesDir.setPath(path);
+
+    // schedule index
+    indexTimer->setInterval(0);
+    indexTimer->start();
+
+    emit directoryChanged(sharesDir.path());
+}
+
+QString ChatSharesDatabase::filePath(const QString &node) const
+{
+   return sharesDir.filePath(node);
+}
+
+QString ChatSharesDatabase::fileNode(const QString &path) const
+{
+    return sharesDir.relativeFilePath(path);
 }
 
 /** Handle a get request.
@@ -113,28 +161,26 @@ void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
  */
 void ChatSharesDatabase::index()
 {
+    if (indexThread)
+        return;
+
     // start indexing
-    QThread *worker = new IndexThread(this);
-    connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+    indexThread = new IndexThread(this);
+    connect(indexThread, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-    connect(worker, SIGNAL(finished()),
-            worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(finished()),
-            indexTimer, SLOT(start()));
-    connect(worker, SIGNAL(indexFinished(double, int, int)),
-            this, SIGNAL(indexFinished(double, int, int)));
+    connect(indexThread, SIGNAL(indexFinished(double, int, int)),
+            this, SLOT(slotIndexFinished(double, int, int)));
+    indexThread->start();
     emit indexStarted();
-    worker->start();
 }
 
-QString ChatSharesDatabase::jid() const
+void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int removed)
 {
-    return sharesJid;
-}
-
-void ChatSharesDatabase::setJid(const QString &jid)
-{
-    sharesJid = jid;
+    indexThread->deleteLater();
+    indexThread = 0;
+    indexTimer->setInterval(30 * 60 * 1000); // 30mn
+    indexTimer->start();
+    emit indexFinished(elapsed, updated, removed);
 }
 
 /** Handle a search request.
@@ -171,7 +217,7 @@ bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool upda
 {
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
-    if (!info.isReadable())
+    if (!info.isReadable() || !info.size())
     {
         deleteFile(cached.path);
         return false;
@@ -226,7 +272,7 @@ void GetThread::run()
     if (query.exec() && query.next())
     {
         ChatSharesDatabase::Entry cached = getFile(query);
-        QFileInfo info(sharesDatabase->directory().filePath(cached.path));
+        QFileInfo info(sharesDatabase->filePath(cached.path));
         if (sharesDatabase->updateFile(cached, true))
         {
             // fill meta-data
@@ -321,7 +367,7 @@ void SearchThread::run()
 
     // determine query type
     QXmppShareLocation location;
-    location.setJid(sharesDatabase->jid());
+    location.setJid(requestIq.to());
     location.setNode(requestIq.node());
     responseIq.collection().setLocations(location);
 
@@ -353,8 +399,7 @@ void SearchThread::run()
         like.replace("%", "\\%");
         like.replace("_", "\\_");
         like += "%";
-        QSqlDatabase sharesDb = sharesDatabase->database();
-        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDb);
+        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDatabase->database());
         query.bindValue(":search", like);
         query.bindValue(":escape", "\\");
         query.exec();
@@ -396,12 +441,11 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         like += "%";
     }
 
-    QString sql("SELECT path, size, hash, date FROM files");
+    QString extraSql;
     if (!like.isEmpty())
-        sql += " WHERE path LIKE :search ESCAPE :escape";
-    sql += " ORDER BY path";
-    QSqlDatabase sharesDb = sharesDatabase->database();
-    QSqlQuery query(sql, sharesDb);
+        extraSql += " WHERE path LIKE :search ESCAPE :escape";
+    extraSql += " ORDER BY path";
+    QSqlQuery query("SELECT path, size, hash, date FROM files" + extraSql, sharesDatabase->database());
     if (!like.isEmpty())
     {
         query.bindValue(":search", like);
@@ -461,7 +505,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
                 QXmppShareItem collection(QXmppShareItem::CollectionItem);
                 collection.setName(dirName);
                 QXmppShareLocation location;
-                location.setJid(sharesDatabase->jid());
+                location.setJid(requestIq.to());
                 location.setNode(prefix + dirPath + "/");
                 collection.setLocations(location);
                 subDirs[dirPath] = parentCollection->appendChild(collection);
@@ -472,7 +516,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         if (!maxDepth || relativeBits.size() < maxDepth)
         {
             // update file info
-            QFileInfo info(sharesDatabase->directory().filePath(cached.path));
+            QFileInfo info(sharesDatabase->filePath(cached.path));
             if (sharesDatabase->updateFile(cached, requestIq.hash()))
             {
                 QXmppShareItem shareFile(QXmppShareItem::FileItem);

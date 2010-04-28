@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
@@ -72,8 +73,8 @@ enum DataRoles {
 #define PROGRESS_COLUMN_WIDTH 100
 // display message in statusbar for 10 seconds
 #define STATUS_TIMEOUT 10000
-// keep directory listings for 60 seconds
-#define REFRESH_INTERVAL 60
+// keep directory listings for 10 seconds
+#define REFRESH_INTERVAL 10
 #define REGISTER_INTERVAL 60
 #define REQUEST_TIMEOUT 60
 
@@ -99,6 +100,8 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
 ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), rosterModel(0)
 {
+    db = ChatSharesDatabase::instance();
+
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
@@ -154,10 +157,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     downloadsWidget->setLayout(vbox);
 
     /* download location label */
-    const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
-        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString(),
-        SystemInfo::displayName(SystemInfo::SharesLocation));
-    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
+    downloadsLabel = new QLabel;
     downloadsLabel->setOpenExternalLinks(true);
     downloadsLabel->setWordWrap(true);
     vbox->addWidget(downloadsLabel);
@@ -178,10 +178,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     uploadsWidget->setLayout(vbox);
 
     /* shares location label */
-    const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
-        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString(),
-        SystemInfo::displayName(SystemInfo::SharesLocation));
-    QLabel *uploadsLabel = new QLabel(tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink));
+    uploadsLabel = new QLabel;
     uploadsLabel->setOpenExternalLinks(true);
     uploadsLabel->setWordWrap(true);
     vbox->addWidget(uploadsLabel);
@@ -206,18 +203,26 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
     footerLayout->addWidget(downloadButton);
 
+    /* directory button */
+    directoryButton = new QPushButton(tr("My shares folder"));
+    directoryButton->setIcon(QIcon(":/album.png"));
+    connect(directoryButton, SIGNAL(clicked()), this, SLOT(changeDirectory()));
+    footerLayout->addWidget(directoryButton);
+    directoryButton->hide();
+
+    /* rescan button */
+    indexButton = new QPushButton(tr("Refresh my shares"));
+    indexButton->setIcon(QIcon(":/refresh.png"));
+    connect(indexButton, SIGNAL(clicked()), db, SLOT(index()));
+    footerLayout->addWidget(indexButton);
+    indexButton->hide();
+
     /* remove button */
     removeButton = new QPushButton(tr("Remove"));
     removeButton->setIcon(QIcon(":/remove.png"));
     connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
     footerLayout->addWidget(removeButton);
     removeButton->hide();
-
-    /* rescan button */
-    indexButton = new QPushButton(tr("Refresh my shares"));
-    indexButton->setIcon(QIcon(":/refresh.png"));
-    footerLayout->addWidget(indexButton);
-    indexButton->hide();
 
     setLayout(layout);
 
@@ -230,6 +235,43 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
         baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     setClient(baseClient);
+
+    /* database signals */
+    connect(db, SIGNAL(directoryChanged(QString)),
+        this, SLOT(directoryChanged(QString)));
+    connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+        baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
+    connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
+        this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
+    connect(db, SIGNAL(indexStarted()),
+        this, SLOT(indexStarted()));
+    connect(db, SIGNAL(indexFinished(double, int, int)),
+        this, SLOT(indexFinished(double, int, int)));
+    connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
+        this, SLOT(searchFinished(QXmppShareSearchIq)));
+    directoryChanged(db->directory());
+}
+
+void ChatShares::changeDirectory()
+{
+    QFileDialog *dialog = new QFileDialog(this);
+    dialog->setDirectory(db->directory());
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setOption(QFileDialog::ShowDirsOnly, true);
+    dialog->setWindowTitle(tr("My shares folder"));
+    dialog->show();
+
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
+}
+
+void ChatShares::directoryChanged(const QString &path)
+{
+    const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
+        QUrl::fromLocalFile(path).toString(),
+        SystemInfo::displayName(SystemInfo::SharesLocation));
+    downloadsLabel->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
+    uploadsLabel->setText(tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink));
 }
 
 /** When the main XMPP stream is disconnected, disconnect the shares-specific
@@ -328,7 +370,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     const QString subdir = pathBits.join("/");
 
     // create directory
-    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::SharesLocation));
+    QDir downloadsDir(db->directory());
     if (!subdir.isEmpty())
     {
         if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
@@ -401,7 +443,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
 
                 // store to shares database
                 ChatSharesDatabase::Entry cached;
-                cached.path = db->directory().relativeFilePath(localPath);
+                cached.path = db->fileNode(localPath);
                 cached.size = job->fileSize();
                 cached.hash = job->fileHash();
                 cached.date = QFileInfo(localPath).lastModified();
@@ -449,7 +491,7 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
     // send file
     if (responseIq.type() != QXmppIq::Error)
     {
-        QString filePath = db->directory().filePath(shareItem.locations()[0].node());
+        QString filePath = db->filePath(shareItem.locations()[0].node());
         QXmppTransferFileInfo fileInfo;
         fileInfo.setName(shareItem.name());
         fileInfo.setDate(shareItem.fileDate());
@@ -546,11 +588,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     if (!view || !index.isValid() || !item)
         return;
 
-    if (item->type() == QXmppShareItem::FileItem)
-    {
-        queueItem(item);
-    }
-    else if (item->type() == QXmppShareItem::CollectionItem)
+    if (item->type() == QXmppShareItem::CollectionItem)
     {
         if (view->isExpanded(index))
             view->collapse(index);
@@ -841,6 +879,8 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
                 model->removeItem(oldItem);
         } else {
             QModelIndex index = model->updateItem(oldItem, newItem);
+            if (!newItem->size())
+                statusBar->showMessage(tr("No files found"), 3000);
             if (view == mainView)
             {
                 // when the search view receives results and there are less than 10 results
@@ -866,33 +906,8 @@ void ChatShares::searchFinished(const QXmppShareSearchIq &responseIq)
 
 void ChatShares::shareServerFound(const QString &server)
 {
-    shareServer = server;
-
-    if (!db)
-    {
-        // create shares directory
-        QString sharesPath = SystemInfo::storageLocation(SystemInfo::SharesLocation);
-        QFileInfo info(sharesPath);
-        if (!info.exists() && !info.dir().mkdir(info.fileName()))
-            logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + sharesPath);
-
-        db = new ChatSharesDatabase(sharesPath, this);
-        connect(indexButton, SIGNAL(clicked()), db, SLOT(index()));
-        connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-            baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
-        connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
-            this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
-        connect(db, SIGNAL(indexStarted()),
-            this, SLOT(indexStarted()));
-        connect(db, SIGNAL(indexFinished(double, int, int)),
-            this, SLOT(indexFinished(double, int, int)));
-        connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
-            this, SLOT(searchFinished(QXmppShareSearchIq)));
-        db->index();
-    }
-    db->setJid(client->getConfiguration().jid());
-
     // register with server
+    shareServer = server;
     registerWithServer();
     registerTimer->start();
 }
@@ -910,10 +925,13 @@ void ChatShares::tabChanged(int index)
     else
         removeButton->hide();
 
-    if (tab == uploadsWidget)
+    if (tab == uploadsWidget) {
+        directoryButton->show();
         indexButton->show();
-    else
+    } else {
+        directoryButton->hide();
         indexButton->hide();
+    }
 }
 
 ChatSharesDelegate::ChatSharesDelegate(QObject *parent)

@@ -39,23 +39,23 @@ public:
         QByteArray hash;
     };
 
-    ChatSharesDatabase(const QString &path, QObject *parent = 0);
+    ChatSharesDatabase(QObject *parent = 0);
     QSqlDatabase database() const;
-    QDir directory() const;
 
-    QString jid() const;
-    void setJid(const QString &jid);
+    QString directory() const;
 
-    // threaded operations
-    void get(const QXmppShareGetIq &requestIq);
-    void search(const QXmppShareSearchIq &requestIq);
+    QString filePath(const QString &node) const;
+    QString fileNode(const QString &path) const;
 
     // atomic operations
     bool deleteFile(const QString &path);
     bool saveFile(const ChatSharesDatabase::Entry &entry);
     bool updateFile(ChatSharesDatabase::Entry &entry, bool updateHash);
 
+    static ChatSharesDatabase *instance();
+
 signals:
+    void directoryChanged(const QString &path);
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
     void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
     void indexStarted();
@@ -63,13 +63,23 @@ signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
 public slots:
+    void setDirectory(const QString &path);
+
+    // threaded operations
+    void get(const QXmppShareGetIq &requestIq);
     void index();
+    void search(const QXmppShareSearchIq &requestIq);
+
+private slots:
+    void slotIndexFinished(double elapsed, int updated, int removed);
 
 private:
     QTimer *indexTimer;
-    QString sharesJid;
+    QThread *indexThread;
     QSqlDatabase sharesDb;
     QDir sharesDir;
+
+    static ChatSharesDatabase *globalInstance;
 };
 
 class ChatSharesThread : public QThread
