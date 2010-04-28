@@ -204,7 +204,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     footerLayout->addWidget(downloadButton);
 
     /* directory button */
-    directoryButton = new QPushButton(tr("My shares directory"));
+    directoryButton = new QPushButton(tr("My shares folder"));
     directoryButton->setIcon(QIcon(":/album.png"));
     connect(directoryButton, SIGNAL(clicked()), this, SLOT(changeDirectory()));
     footerLayout->addWidget(directoryButton);
@@ -255,10 +255,10 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 void ChatShares::changeDirectory()
 {
     QFileDialog *dialog = new QFileDialog(this);
-    //dialog->setCaption(tr("Open directory"));
     dialog->setDirectory(db->directory());
     dialog->setFileMode(QFileDialog::Directory);
     dialog->setOption(QFileDialog::ShowDirsOnly, true);
+    dialog->setWindowTitle(tr("My shares folder"));
     dialog->show();
 
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
@@ -879,6 +879,8 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
                 model->removeItem(oldItem);
         } else {
             QModelIndex index = model->updateItem(oldItem, newItem);
+            if (!newItem->size())
+                statusBar->showMessage(tr("No files found"), 3000);
             if (view == mainView)
             {
                 // when the search view receives results and there are less than 10 results

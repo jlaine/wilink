@@ -325,7 +325,11 @@ Acceptez-vous?</translation>
         <translation>Indexation des fichiers</translation>
     </message>
     <message>
-        <source>My shares directory</source>
+        <source>No files found</source>
+        <translation>Aucun fichier trouvé</translation>
+    </message>
+    <message>
+        <source>My shares folder</source>
         <translation>Mon dossier partages</translation>
     </message>
 </context>
