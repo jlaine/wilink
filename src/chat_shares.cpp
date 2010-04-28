@@ -20,7 +20,6 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
-#include <QFileDialog>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
@@ -225,13 +224,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
     footerLayout->addWidget(downloadButton);
 
-    /* directory button */
-    directoryButton = new QPushButton(tr("My shares folder"));
-    directoryButton->setIcon(QIcon(":/album.png"));
-    connect(directoryButton, SIGNAL(clicked()), this, SLOT(changeDirectory()));
-    footerLayout->addWidget(directoryButton);
-    directoryButton->hide();
-
     /* rescan button */
     indexButton = new QPushButton(tr("Refresh my shares"));
     indexButton->setIcon(QIcon(":/refresh.png"));
@@ -272,18 +264,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
         this, SLOT(searchFinished(QXmppShareSearchIq)));
     directoryChanged(db->directory());
-}
-
-void ChatShares::changeDirectory()
-{
-    QFileDialog *dialog = new QFileDialog(this);
-    dialog->setDirectory(db->directory());
-    dialog->setFileMode(QFileDialog::Directory);
-    dialog->setWindowTitle(tr("My shares folder"));
-    dialog->show();
-
-    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
-    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
 }
 
 void ChatShares::directoryChanged(const QString &path)
@@ -950,13 +930,10 @@ void ChatShares::tabChanged(int index)
     else
         removeButton->hide();
 
-    if (tab == uploadsWidget) {
-        directoryButton->show();
+    if (tab == uploadsWidget)
         indexButton->show();
-    } else {
-        directoryButton->hide();
+    else
         indexButton->hide();
-    }
 }
 
 ChatSharesDelegate::ChatSharesDelegate(QObject *parent)

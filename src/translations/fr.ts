@@ -330,7 +330,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>My shares folder</source>
-        <translation>Mon dossier partages</translation>
+        <translation type="obsolete">Mon dossier partages</translation>
     </message>
 </context>
 <context>
@@ -523,6 +523,10 @@ Acceptez-vous?</translation>
     <message>
         <source>&amp;Chat and shares</source>
         <translation>&amp;Chat et partages</translation>
+    </message>
+    <message>
+        <source>My shares folder</source>
+        <translation>Mon dossier partages</translation>
     </message>
 </context>
 <context>

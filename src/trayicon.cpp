@@ -23,6 +23,7 @@
 #include <QDesktopServices>
 #include <QDialog>
 #include <QDomDocument>
+#include <QFileDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -39,6 +40,7 @@
 
 #include "chat.h"
 #include "chat_accounts.h"
+#include "chat_shares_database.h"
 #include "application.h"
 #include "diagnostics.h"
 #include "photos.h"
@@ -121,6 +123,9 @@ void TrayIcon::addBaseMenu(QMenu *menu)
     QMenu *optionsMenu = new QMenu;
     QAction *action = optionsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
+
+    action = optionsMenu->addAction(tr("My shares folder"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showSharesFolder()));
 
     if (Application::isInstalled())
     {
@@ -471,5 +476,19 @@ void TrayIcon::showPhotos()
     }
     photos->show();
     photos->raise();
+}
+
+void TrayIcon::showSharesFolder()
+{
+    ChatSharesDatabase *db = ChatSharesDatabase::instance();
+
+    QFileDialog *dialog = new QFileDialog;
+    dialog->setDirectory(db->directory());
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setWindowTitle(tr("My shares folder"));
+    dialog->show();
+
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
 }
 

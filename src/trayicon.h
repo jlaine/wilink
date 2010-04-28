@@ -61,6 +61,7 @@ protected slots:
     void showIcon();
     void showMenu();
     void showPhotos();
+    void showSharesFolder();
 
 private:
     void addBaseMenu(QMenu *menu);
