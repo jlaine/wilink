@@ -255,12 +255,14 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 void ChatShares::changeDirectory()
 {
     QFileDialog *dialog = new QFileDialog(this);
-    QString path = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                 db->directory(),
-                                                 QFileDialog::ShowDirsOnly
-                                                 | QFileDialog::DontResolveSymlinks);
-    if (!path.isEmpty())
-        db->setDirectory(path);
+    //dialog->setCaption(tr("Open directory"));
+    dialog->setDirectory(db->directory());
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setOption(QFileDialog::ShowDirsOnly, true);
+    dialog->show();
+
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
 }
 
 void ChatShares::directoryChanged(const QString &path)
@@ -925,15 +927,13 @@ void ChatShares::tabChanged(int index)
     else
         removeButton->hide();
 
-    if (tab == uploadsWidget)
-        indexButton->show();
-    else
-        indexButton->hide();
-
-    if (tab == uploadsWidget || tab == downloadsWidget)
+    if (tab == uploadsWidget) {
         directoryButton->show();
-    else
+        indexButton->show();
+    } else {
         directoryButton->hide();
+        indexButton->hide();
+    }
 }
 
 ChatSharesDelegate::ChatSharesDelegate(QObject *parent)

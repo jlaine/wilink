@@ -43,7 +43,6 @@ public:
     QSqlDatabase database() const;
 
     QString directory() const;
-    void setDirectory(const QString &path);
 
     QString filePath(const QString &node) const;
     QString fileNode(const QString &path) const;
@@ -64,6 +63,8 @@ signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
 public slots:
+    void setDirectory(const QString &path);
+
     // threaded operations
     void get(const QXmppShareGetIq &requestIq);
     void index();
