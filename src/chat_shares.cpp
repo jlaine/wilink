@@ -129,6 +129,16 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->addWidget(tabWidget);
 
     /* create main tab */
+    sharesWidget = new QWidget;
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+    sharesWidget->setLayout(vbox);
+
+    sharesLabel = new QLabel;
+    sharesLabel->setOpenExternalLinks(true);
+    sharesLabel->setWordWrap(true);
+    vbox->addWidget(sharesLabel);
+
     ChatSharesModel *sharesModel = new ChatSharesModel;
     sharesView = new ChatSharesView;
     sharesView->setExpandsOnDoubleClick(false);
@@ -137,9 +147,21 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
     connect(sharesView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
-    tabWidget->addTab(sharesView, QIcon(":/album.png"), tr("Shares"));
+    vbox->addWidget(sharesView);
+
+    tabWidget->addTab(sharesWidget, QIcon(":/album.png"), tr("Shares"));
 
     /* create search tab */
+    searchWidget = new QWidget;
+    vbox = new QVBoxLayout;
+    vbox->setMargin(0);
+    searchWidget->setLayout(vbox);
+
+    searchLabel = new QLabel;
+    searchLabel->setOpenExternalLinks(true);
+    searchLabel->setWordWrap(true);
+    vbox->addWidget(searchLabel);
+
     ChatSharesModel *searchModel = new ChatSharesModel;
     searchView = new ChatSharesView;
     searchView->setExpandsOnDoubleClick(false);
@@ -148,15 +170,16 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)), this, SLOT(itemContextMenu(QModelIndex, QPoint)));
     connect(searchView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(itemDoubleClicked(QModelIndex)));
     connect(searchView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
-    tabWidget->addTab(searchView, QIcon(":/search.png"), tr("Search"));
+    vbox->addWidget(searchView);
+
+    tabWidget->addTab(searchWidget, QIcon(":/search.png"), tr("Search"));
 
     /* create queue tab */
     downloadsWidget = new QWidget;
-    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox = new QVBoxLayout;
     vbox->setMargin(0);
     downloadsWidget->setLayout(vbox);
 
-    /* download location label */
     downloadsLabel = new QLabel;
     downloadsLabel->setOpenExternalLinks(true);
     downloadsLabel->setWordWrap(true);
@@ -177,7 +200,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     vbox->setMargin(0);
     uploadsWidget->setLayout(vbox);
 
-    /* shares location label */
     uploadsLabel = new QLabel;
     uploadsLabel->setOpenExternalLinks(true);
     uploadsLabel->setWordWrap(true);
@@ -270,8 +292,12 @@ void ChatShares::directoryChanged(const QString &path)
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(path).toString(),
         SystemInfo::displayName(SystemInfo::SharesLocation));
+    const QString helpText = tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink);
+
+    sharesLabel->setText(helpText);
+    searchLabel->setText(helpText);
     downloadsLabel->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
-    uploadsLabel->setText(tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink));
+    uploadsLabel->setText(helpText);
 }
 
 /** When the main XMPP stream is disconnected, disconnect the shares-specific
@@ -768,9 +794,9 @@ void ChatShares::processDownloadQueue()
 void ChatShares::queryStringChanged()
 {
     if (lineEdit->text().isEmpty())
-        tabWidget->setCurrentWidget(sharesView);
+        tabWidget->setCurrentWidget(sharesWidget);
     else
-        tabWidget->setCurrentWidget(searchView);
+        tabWidget->setCurrentWidget(searchWidget);
 }
 
 void ChatShares::registerWithServer()
@@ -915,7 +941,7 @@ void ChatShares::shareServerFound(const QString &server)
 void ChatShares::tabChanged(int index)
 {
     QWidget *tab = tabWidget->widget(index);
-    if (tab == sharesView || tab == searchView)
+    if (tab == sharesWidget || tab == searchWidget)
         downloadButton->show();
     else
         downloadButton->hide();

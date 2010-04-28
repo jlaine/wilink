@@ -213,8 +213,13 @@ private:
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;
 
+    QLabel *sharesLabel;
     ChatSharesView *sharesView;
+    QWidget *sharesWidget;
+
+    QLabel *searchLabel;
     ChatSharesView *searchView;
+    QWidget *searchWidget;
 
     QLabel *downloadsLabel;
     ChatSharesView *downloadsView;
