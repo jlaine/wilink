@@ -107,10 +107,11 @@ protected slots:
     void refresh();
 
 private:
-    bool busy;
     FileSystem *fs;
     QList<Job> downloadQueue;
+    QIODevice *downloadDevice;
     QList< QPair<QUrl, QUrl> > uploadQueue;
+    QIODevice *uploadDevice;
 
     QPushButton *backButton;
     QPushButton *createButton;
@@ -121,7 +122,6 @@ private:
     QProgressBar *progressBar;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
-    QIODevice *fdPhoto;
 };
 
 #endif

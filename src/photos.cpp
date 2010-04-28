@@ -18,11 +18,14 @@
  */
 
 #include <QApplication>
+#include <QBuffer>
 #include <QDebug>
 #include <QDragEnterEvent>
 #include <QFile>
 #include <QFileIconProvider>
 #include <QFileInfo>
+#include <QImage>
+#include <QImageReader>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -40,6 +43,7 @@
 
 static const int PROGRESS_STEPS = 100;
 static const QSize ICON_SIZE(128, 128);
+static const QSize UPLOAD_SIZE(2048, 2048);
 
 PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseDrop(true), baseUrl(url)
@@ -185,7 +189,8 @@ QUrl PhotosList::url()
 
 Photos::Photos(const QString &url, QWidget *parent)
     : QWidget(parent),
-    busy(false),
+    downloadDevice(0),
+    uploadDevice(0),
     progressFiles(0),
     systemTrayIcon(NULL)
 {
@@ -273,10 +278,10 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         if (!error && photosView->indexOf(downloadJob.widget) >= 0)
         {
             /* load image */
-            fdPhoto->reset();
+            downloadDevice->reset();
             QImage img;
-            img.load(fdPhoto, NULL);
-            fdPhoto->close();
+            img.load(downloadDevice, NULL);
+            downloadDevice->close();
 
             /* display image */
             PhotosList *listView = qobject_cast<PhotosList *>(downloadJob.widget);
@@ -325,7 +330,8 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     case FileSystem::Put:
         progressFiles++;
         progressBar->setValue(PROGRESS_STEPS * progressFiles);
-        busy = false;
+        delete uploadDevice;
+        uploadDevice = 0;
         processUploadQueue();
         break;
     default:
@@ -448,14 +454,14 @@ void Photos::processDownloadQueue()
         return;
 
     downloadJob = downloadQueue.takeFirst();
-    fdPhoto = fs->get(downloadJob.remoteUrl, downloadJob.type);
+    downloadDevice = fs->get(downloadJob.remoteUrl, downloadJob.type);
 }
 
 /** If the upload queue is not empty, process the next item.
  */
 void Photos::processUploadQueue()
 {
-    if (busy)
+    if (uploadDevice)
         return;
 
     /* if the queue is empty, hide progress bar and reset it */
@@ -477,10 +483,23 @@ void Photos::processUploadQueue()
 
     /* process the next file to upload */
     QPair<QUrl, QUrl> item = uploadQueue.takeFirst();
-    QFile *file = new QFile(item.first.toLocalFile(), this);
-    showMessage(tr("Uploading %1").arg(QFileInfo(file->fileName()).fileName()));
-    busy = true;
-    fs->put(file, item.second.toString());
+    const QString filePath = item.first.toLocalFile();
+    const QByteArray imageFormat = QImageReader::imageFormat(filePath);
+    QImage image;
+    if (!imageFormat.isEmpty() && image.load(filePath, imageFormat.constData()))
+    {
+        if (image.width() > UPLOAD_SIZE.width() || image.height() > UPLOAD_SIZE.height())
+            image = image.scaled(UPLOAD_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        uploadDevice = new QBuffer(this);
+        uploadDevice->open(QIODevice::WriteOnly);
+        image.save(uploadDevice, imageFormat.constData());
+        uploadDevice->open(QIODevice::ReadOnly);
+    } else {
+        uploadDevice = new QFile(filePath, this);
+    }
+
+    showMessage(tr("Uploading %1").arg(QFileInfo(filePath).fileName()));
+    fs->put(uploadDevice, item.second.toString());
 }
 
 void Photos::pushView(QWidget *widget)
