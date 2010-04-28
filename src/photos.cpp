@@ -184,7 +184,9 @@ QUrl PhotosList::url()
 }
 
 Photos::Photos(const QString &url, QWidget *parent)
-    : QWidget(parent), busy(false),
+    : QWidget(parent),
+    busy(false),
+    progressFiles(0),
     systemTrayIcon(NULL)
 {
     /* create UI */
@@ -321,7 +323,8 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         refresh();
         break;
     case FileSystem::Put:
-        progressBar->setValue(PROGRESS_STEPS * ((progressBar->value() / PROGRESS_STEPS) + 1));
+        progressFiles++;
+        progressBar->setValue(PROGRESS_STEPS * progressFiles);
         busy = false;
         processUploadQueue();
         break;
@@ -465,6 +468,7 @@ void Photos::processUploadQueue()
         progressBar->hide();
         progressBar->setValue(0);
         progressBar->setMaximum(0);
+        progressFiles = 0;
 
         /* refresh the current view */
         refresh();
@@ -492,7 +496,7 @@ void Photos::putProgress(int done, int total)
 {
     if (!total)
         return;
-    progressBar->setValue(PROGRESS_STEPS * (int(progressBar->value() / PROGRESS_STEPS) + double(done) / double(total)));
+    progressBar->setValue(PROGRESS_STEPS * (progressFiles + double(done) / double(total)));
 }
 
 /** Refresh the contents of the current folder.

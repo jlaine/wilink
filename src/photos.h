@@ -117,6 +117,7 @@ private:
     Job downloadJob;
     QLabel *helpLabel;
     QStackedWidget *photosView;
+    int progressFiles;
     QProgressBar *progressBar;
     QLabel *statusLabel;
     QSystemTrayIcon *systemTrayIcon;
