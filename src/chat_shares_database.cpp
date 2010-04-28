@@ -80,9 +80,10 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
 
     // start indexing
     indexTimer = new QTimer(this);
-    indexTimer->setInterval(60 * 60 * 1000); // 1 hour
+    indexTimer->setInterval(0);
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
+    indexTimer->start();
 }
 
 QSqlDatabase ChatSharesDatabase::database() const
@@ -145,6 +146,7 @@ void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int remo
 {
     indexThread->deleteLater();
     indexThread = 0;
+    indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->start();
     emit indexFinished(elapsed, updated, removed);
 }
