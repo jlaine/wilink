@@ -279,7 +279,6 @@ void ChatShares::changeDirectory()
     QFileDialog *dialog = new QFileDialog(this);
     dialog->setDirectory(db->directory());
     dialog->setFileMode(QFileDialog::Directory);
-    dialog->setOption(QFileDialog::ShowDirsOnly, true);
     dialog->setWindowTitle(tr("My shares folder"));
     dialog->show();
 
