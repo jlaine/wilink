@@ -170,7 +170,6 @@ bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
         updateQuery.bindValue(":path", entry.path);
         return updateQuery.exec();
     } else {
-
         QSqlQuery insertQuery("INSERT INTO files (path, date, size, hash) "
                                "VALUES(:path, :date, :size, :hash)", sharesDb);
         insertQuery.bindValue(":path", entry.path);
