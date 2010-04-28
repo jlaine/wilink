@@ -11,6 +11,8 @@ wiLink 0.8.0 (UNRELEASED)
  * Don't copy message sender when copying text from a single person.
  * Make it possible to select entire chat history.
  * Mark users as away after 5 minutes of inactivity.
+ * Resize photos to a maximum of 2048x2048 before upload.
+ * Fix photo upload progress bar, really reaches 100% upon completion.
 
 wiLink 0.7.0 (2010-03-10)
  * Add support for chat state notifications.
