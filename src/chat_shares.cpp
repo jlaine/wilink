@@ -247,7 +247,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
 void ChatShares::directoryChanged(const QString &path)
 {
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
-        QUrl::fromLocalFile(db->directory()).toString(),
+        QUrl::fromLocalFile(path).toString(),
         SystemInfo::displayName(SystemInfo::SharesLocation));
     downloadsLabel->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
     uploadsLabel->setText(tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink));
