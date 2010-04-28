@@ -204,7 +204,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     footerLayout->addWidget(downloadButton);
 
     /* directory button */
-    directoryButton = new QPushButton(tr("Change shares location"));
+    directoryButton = new QPushButton(tr("My shares directory"));
     directoryButton->setIcon(QIcon(":/album.png"));
     connect(directoryButton, SIGNAL(clicked()), this, SLOT(changeDirectory()));
     footerLayout->addWidget(directoryButton);

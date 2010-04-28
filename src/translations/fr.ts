@@ -324,6 +324,10 @@ Acceptez-vous?</translation>
         <source>Indexing files</source>
         <translation>Indexation des fichiers</translation>
     </message>
+    <message>
+        <source>My shares directory</source>
+        <translation>Mon dossier partages</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
