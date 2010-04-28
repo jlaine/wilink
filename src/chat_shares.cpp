@@ -882,10 +882,13 @@ void ChatShares::shareServerFound(const QString &server)
             baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
         connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
             this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
+        connect(db, SIGNAL(indexStarted()),
+            this, SLOT(indexStarted()));
         connect(db, SIGNAL(indexFinished(double, int, int, int)),
             this, SLOT(indexFinished(double, int, int, int)));
         connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
             this, SLOT(searchFinished(QXmppShareSearchIq)));
+        db->index();
     }
     db->setJid(client->getConfiguration().jid());
 

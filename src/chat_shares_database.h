@@ -62,7 +62,7 @@ signals:
     void indexFinished(double elapsed, int added, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &packet);
 
-private slots:
+public slots:
     void index();
 
 private:

@@ -83,7 +83,6 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     indexTimer->setInterval(60 * 60 * 1000); // 1 hour
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
-    index();
 }
 
 QSqlDatabase ChatSharesDatabase::database() const
