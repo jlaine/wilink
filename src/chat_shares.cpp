@@ -468,9 +468,9 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
     }
 }
 
-void ChatShares::indexFinished(double elapsed, int added, int updated, int removed)
+void ChatShares::indexFinished(double elapsed, int updated, int removed)
 {
-    statusBar->showMessage(tr("Indexed %1 files in %2s").arg(added + updated).arg(elapsed), STATUS_TIMEOUT);
+    statusBar->showMessage(tr("Indexed %1 files in %2s").arg(updated).arg(elapsed), STATUS_TIMEOUT);
     indexButton->setEnabled(true);
 }
 
@@ -884,8 +884,8 @@ void ChatShares::shareServerFound(const QString &server)
             this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
         connect(db, SIGNAL(indexStarted()),
             this, SLOT(indexStarted()));
-        connect(db, SIGNAL(indexFinished(double, int, int, int)),
-            this, SLOT(indexFinished(double, int, int, int)));
+        connect(db, SIGNAL(indexFinished(double, int, int)),
+            this, SLOT(indexFinished(double, int, int)));
         connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
             this, SLOT(searchFinished(QXmppShareSearchIq)));
         db->index();

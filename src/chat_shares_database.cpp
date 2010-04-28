@@ -121,8 +121,8 @@ void ChatSharesDatabase::index()
             worker, SLOT(deleteLater()));
     connect(worker, SIGNAL(finished()),
             indexTimer, SLOT(start()));
-    connect(worker, SIGNAL(indexFinished(double, int, int, int)),
-            this, SIGNAL(indexFinished(double, int, int, int)));
+    connect(worker, SIGNAL(indexFinished(double, int, int)),
+            this, SIGNAL(indexFinished(double, int, int)));
     emit indexStarted();
     worker->start();
 }
@@ -266,7 +266,7 @@ void GetThread::run()
 }
 
 IndexThread::IndexThread(ChatSharesDatabase *database)
-    : ChatSharesThread(database), scanAdded(0), scanUpdated(0)
+    : ChatSharesThread(database), scanUpdated(0)
 {
 }
 
@@ -294,12 +294,11 @@ void IndexThread::run()
         sharesDatabase->deleteFile(path);
 
     const double elapsed = double(t.elapsed()) / 1000.0;
-    logMessage(QXmppLogger::DebugMessage, QString("Scan completed in %1 s ( %2 added, %3 updated, %4 removed )")
+    logMessage(QXmppLogger::DebugMessage, QString("Scan completed in %1 s ( %2 updated, %3 removed )")
                .arg(QString::number(elapsed))
-               .arg(scanAdded)
                .arg(scanUpdated)
                .arg(scanOld.size()));
-    emit indexFinished(elapsed, scanAdded, scanUpdated, scanOld.size());
+    emit indexFinished(elapsed, scanUpdated, scanOld.size());
 }
 
 void IndexThread::scanDir(const QDir &dir)
@@ -313,27 +312,8 @@ void IndexThread::scanDir(const QDir &dir)
         } else {
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
             ChatSharesDatabase::Entry cached = scanOld.take(relativePath);
-
-            // database entry is up to date, do nothing
-            if (cached.path == relativePath &&
-                cached.date == info.lastModified() &&
-                cached.size == info.size())
-            {
+            if (sharesDatabase->updateFile(cached, false))
                 scanUpdated++;
-                continue;
-            }
-
-            if (cached.path.isEmpty())
-                scanAdded++;
-            else
-                scanUpdated++;
-
-            // update database entry
-            cached.path = relativePath;
-            cached.size = info.size();
-            cached.date = info.lastModified();
-            cached.hash = QByteArray();
-            sharesDatabase->saveFile(cached);
         }
     }
 }
