@@ -180,10 +180,8 @@ bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
     }
 }
 
-bool ChatSharesDatabase::updateFile(QXmppShareItem &file, const QSqlQuery &selectQuery, bool updateHash)
+bool ChatSharesDatabase::updateFile(QXmppShareItem &file, ChatSharesDatabase::Entry &cached, bool updateHash)
 {
-    ChatSharesDatabase::Entry cached = getFile(selectQuery);
-
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
     if (!info.isReadable())
@@ -248,19 +246,22 @@ void GetThread::run()
     QXmppShareItem shareFile(QXmppShareItem::FileItem);
     QSqlQuery query("SELECT path, size, hash, date FROM files WHERE path = :path", sharesDatabase->database());
     query.bindValue(":path", requestIq.node());
-    query.exec();
-    if (!query.next() || !sharesDatabase->updateFile(shareFile, query, true))
+    if (query.exec() && query.next())
     {
-        logMessage(QXmppLogger::WarningMessage, "Could not find local file " + requestIq.node());
-        QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
-        responseIq.setError(error);
-        responseIq.setType(QXmppIq::Error);
-        emit getFinished(responseIq, shareFile);
-        return;
+        ChatSharesDatabase::Entry cached = getFile(query);
+        if (sharesDatabase->updateFile(shareFile, cached, true))
+        {
+            // FIXME : for some reason, random number generation fails
+            //responseIq.setSid(generateStanzaHash());
+            emit getFinished(responseIq, shareFile);
+            return;
+        }
     }
 
-    // FIXME : for some reason, random number generation fails
-    //responseIq.setSid(generateStanzaHash());
+    logMessage(QXmppLogger::WarningMessage, "Could not find local file " + requestIq.node());
+    QXmppStanza::Error error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ItemNotFound);
+    responseIq.setError(error);
+    responseIq.setType(QXmppIq::Error);
     emit getFinished(responseIq, shareFile);
 }
 
@@ -442,9 +443,13 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
     int fileCount = 0;
     query.exec();
     QMap<QString, QXmppShareItem*> subDirs;
+    QList<ChatSharesDatabase::Entry> dbHits;
     while (query.next())
+        dbHits << getFile(query);
+
+    for (int hit = 0; hit < dbHits.size(); hit++)
     {
-        const QString path = query.value(0).toString();
+        const QString path = dbHits[hit].path;
 
         QString prefix;
         if (!queryString.isEmpty())
@@ -498,7 +503,8 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         {
             // update file info
             QXmppShareItem file(QXmppShareItem::FileItem);
-            if (sharesDatabase->updateFile(file, query, requestIq.hash()))
+
+            if (sharesDatabase->updateFile(file, dbHits[hit], requestIq.hash()))
             {
                 fileCount++;
                 parentCollection->appendChild(file);
