@@ -119,8 +119,8 @@ int main(int argc, char *argv[])
         QProcess::execute("rm", QStringList() << "-rf" << appsDir.filePath("wDesktop.app"));
 #endif
 #ifdef Q_OS_WIN
-    if (appsDir.exists("wDesktop/uninstall.exe"))
-        QProcess::execute(appsDir.filePath("wDesktop/uninstall.exe"), QStringList() << "/S");
+    if (appsDir.exists("wDesktop/Uninstall.exe"))
+        QProcess::execute(appsDir.filePath("wDesktop/Uninstall.exe"), QStringList() << "/S");
 #endif
 
     /* Load translations */
