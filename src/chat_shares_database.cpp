@@ -358,8 +358,7 @@ void SearchThread::run()
         like.replace("%", "\\%");
         like.replace("_", "\\_");
         like += "%";
-        QSqlDatabase sharesDb = sharesDatabase->database();
-        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDb);
+        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDatabase->database());
         query.bindValue(":search", like);
         query.bindValue(":escape", "\\");
         query.exec();
@@ -401,12 +400,11 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         like += "%";
     }
 
-    QString sql("SELECT path, size, hash, date FROM files");
+    QString extraSql;
     if (!like.isEmpty())
-        sql += " WHERE path LIKE :search ESCAPE :escape";
-    sql += " ORDER BY path";
-    QSqlDatabase sharesDb = sharesDatabase->database();
-    QSqlQuery query(sql, sharesDb);
+        extraSql += " WHERE path LIKE :search ESCAPE :escape";
+    extraSql += " ORDER BY path";
+    QSqlQuery query("SELECT path, size, hash, date FROM files" + extraSql, sharesDatabase->database());
     if (!like.isEmpty())
     {
         query.bindValue(":search", like);
