@@ -158,26 +158,13 @@ bool ChatSharesDatabase::deleteFile(const QString &path)
 
 bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
 {
-    QSqlQuery query("SELECT 1 AS a FROM files WHERE path = :path", sharesDb);
-    query.bindValue(":path", entry.path);
-    if (query.exec() && query.next())
-    {
-        QSqlQuery updateQuery("UPDATE files SET date = :date, size = :size, hash = :hash "
-                               "WHERE path = :path", sharesDb);
-        updateQuery.bindValue(":date", entry.date);
-        updateQuery.bindValue(":size", entry.size);
-        updateQuery.bindValue(":hash", entry.hash.toHex());
-        updateQuery.bindValue(":path", entry.path);
-        return updateQuery.exec();
-    } else {
-        QSqlQuery insertQuery("INSERT INTO files (path, date, size, hash) "
-                               "VALUES(:path, :date, :size, :hash)", sharesDb);
-        insertQuery.bindValue(":path", entry.path);
-        insertQuery.bindValue(":date", entry.date);
-        insertQuery.bindValue(":size", entry.size);
-        insertQuery.bindValue(":hash", entry.hash.toHex());
-        return insertQuery.exec();
-    }
+    QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
+                           "VALUES(:path, :date, :size, :hash)", sharesDb);
+    replaceQuery.bindValue(":path", entry.path);
+    replaceQuery.bindValue(":date", entry.date);
+    replaceQuery.bindValue(":size", entry.size);
+    replaceQuery.bindValue(":hash", entry.hash.toHex());
+    return replaceQuery.exec();
 }
 
 bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool updateHash)
