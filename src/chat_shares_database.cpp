@@ -161,7 +161,7 @@ bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool upda
 {
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
-    if (!info.isReadable())
+    if (!info.isReadable() || !info.size())
     {
         deleteFile(cached.path);
         return false;
