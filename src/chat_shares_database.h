@@ -48,14 +48,12 @@ public:
     QString filePath(const QString &node) const;
     QString fileNode(const QString &path) const;
 
-    // threaded operations
-    void get(const QXmppShareGetIq &requestIq);
-    void search(const QXmppShareSearchIq &requestIq);
-
     // atomic operations
     bool deleteFile(const QString &path);
     bool saveFile(const ChatSharesDatabase::Entry &entry);
     bool updateFile(ChatSharesDatabase::Entry &entry, bool updateHash);
+
+    static ChatSharesDatabase *instance();
 
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
@@ -65,12 +63,21 @@ signals:
     void searchFinished(const QXmppShareSearchIq &packet);
 
 public slots:
+    // threaded operations
+    void get(const QXmppShareGetIq &requestIq);
     void index();
+    void search(const QXmppShareSearchIq &requestIq);
+
+private slots:
+    void slotIndexFinished(double elapsed, int updated, int removed);
 
 private:
     QTimer *indexTimer;
+    QThread *indexThread;
     QSqlDatabase sharesDb;
     QDir sharesDir;
+
+    ChatSharesDatabase *globalInstance();
 };
 
 class ChatSharesThread : public QThread

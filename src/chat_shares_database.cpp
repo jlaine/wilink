@@ -69,7 +69,7 @@ static QByteArray hashFile(const QString &path)
 }
 
 ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
-    : QObject(parent), sharesDir(path)
+    : QObject(parent), indexThread(0), sharesDir(path)
 {
     // prepare database
     sharesDb = QSqlDatabase::addDatabase("QSQLITE");
@@ -128,18 +128,25 @@ void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
  */
 void ChatSharesDatabase::index()
 {
+    if (indexThread)
+        return;
+
     // start indexing
-    QThread *worker = new IndexThread(this);
-    connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+    indexThread = new IndexThread(this);
+    connect(indexThread, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-    connect(worker, SIGNAL(finished()),
-            worker, SLOT(deleteLater()));
-    connect(worker, SIGNAL(finished()),
-            indexTimer, SLOT(start()));
-    connect(worker, SIGNAL(indexFinished(double, int, int)),
-            this, SIGNAL(indexFinished(double, int, int)));
+    connect(indexThread, SIGNAL(indexFinished(double, int, int)),
+            this, SLOT(slotIndexFinished(double, int, int)));
+    indexThread->start();
     emit indexStarted();
-    worker->start();
+}
+
+void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int removed)
+{
+    indexThread->deleteLater();
+    indexThread = 0;
+    indexTimer->start();
+    emit indexFinished(elapsed, updated, removed);
 }
 
 /** Handle a search request.
