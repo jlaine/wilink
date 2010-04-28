@@ -73,8 +73,8 @@ enum DataRoles {
 #define PROGRESS_COLUMN_WIDTH 100
 // display message in statusbar for 10 seconds
 #define STATUS_TIMEOUT 10000
-// keep directory listings for 60 seconds
-#define REFRESH_INTERVAL 60
+// keep directory listings for 10 seconds
+#define REFRESH_INTERVAL 10
 #define REGISTER_INTERVAL 60
 #define REQUEST_TIMEOUT 60
 
@@ -588,11 +588,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
     if (!view || !index.isValid() || !item)
         return;
 
-    if (item->type() == QXmppShareItem::FileItem)
-    {
-        queueItem(item);
-    }
-    else if (item->type() == QXmppShareItem::CollectionItem)
+    if (item->type() == QXmppShareItem::CollectionItem)
     {
         if (view->isExpanded(index))
             view->collapse(index);
