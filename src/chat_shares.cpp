@@ -401,7 +401,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
 
                 // store to shares database
                 ChatSharesDatabase::Entry cached;
-                cached.path = db->directory().relativeFilePath(localPath);
+                cached.path = db->fileNode(localPath);
                 cached.size = job->fileSize();
                 cached.hash = job->fileHash();
                 cached.date = QFileInfo(localPath).lastModified();
@@ -449,7 +449,7 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
     // send file
     if (responseIq.type() != QXmppIq::Error)
     {
-        QString filePath = db->directory().filePath(shareItem.locations()[0].node());
+        QString filePath = db->filePath(shareItem.locations()[0].node());
         QXmppTransferFileInfo fileInfo;
         fileInfo.setName(shareItem.name());
         fileInfo.setDate(shareItem.fileDate());

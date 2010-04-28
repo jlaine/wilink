@@ -90,9 +90,24 @@ QSqlDatabase ChatSharesDatabase::database() const
     return sharesDb;
 }
 
-QDir ChatSharesDatabase::directory() const
+QString ChatSharesDatabase::directory() const
 {
-    return sharesDir;
+    return sharesDir.path();
+}
+
+void ChatSharesDatabase::setDirectory(const QString &path)
+{
+    sharesDir.setPath(path);
+}
+
+QString ChatSharesDatabase::filePath(const QString &node) const
+{
+   return sharesDir.filePath(node);
+}
+
+QString ChatSharesDatabase::fileNode(const QString &path) const
+{
+    return sharesDir.relativeFilePath(path);
 }
 
 /** Handle a get request.
@@ -216,7 +231,7 @@ void GetThread::run()
     if (query.exec() && query.next())
     {
         ChatSharesDatabase::Entry cached = getFile(query);
-        QFileInfo info(sharesDatabase->directory().filePath(cached.path));
+        QFileInfo info(sharesDatabase->filePath(cached.path));
         if (sharesDatabase->updateFile(cached, true))
         {
             // fill meta-data
@@ -462,7 +477,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         if (!maxDepth || relativeBits.size() < maxDepth)
         {
             // update file info
-            QFileInfo info(sharesDatabase->directory().filePath(cached.path));
+            QFileInfo info(sharesDatabase->filePath(cached.path));
             if (sharesDatabase->updateFile(cached, requestIq.hash()))
             {
                 QXmppShareItem shareFile(QXmppShareItem::FileItem);
