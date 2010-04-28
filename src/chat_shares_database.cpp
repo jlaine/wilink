@@ -180,7 +180,7 @@ bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
     }
 }
 
-bool ChatSharesDatabase::updateFile(QXmppShareItem &file, ChatSharesDatabase::Entry &cached, bool updateHash)
+bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool updateHash)
 {
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
@@ -212,16 +212,6 @@ bool ChatSharesDatabase::updateFile(QXmppShareItem &file, ChatSharesDatabase::En
         saveFile(cached);
     }
 
-    // fill meta-data
-    file.setName(info.fileName());
-    file.setFileDate(cached.date);
-    file.setFileHash(cached.hash);
-    file.setFileSize(cached.size);
-
-    QXmppShareLocation location(sharesJid);
-    location.setNode(cached.path);
-    file.setLocations(location);
-
     return true;
 }
 
@@ -249,8 +239,18 @@ void GetThread::run()
     if (query.exec() && query.next())
     {
         ChatSharesDatabase::Entry cached = getFile(query);
-        if (sharesDatabase->updateFile(shareFile, cached, true))
+        if (sharesDatabase->updateFile(cached, true))
         {
+            // fill meta-data
+            shareFile.setName(QFileInfo(cached.path).fileName());
+            shareFile.setFileDate(cached.date);
+            shareFile.setFileHash(cached.hash);
+            shareFile.setFileSize(cached.size);
+
+            QXmppShareLocation location(requestIq.to());
+            location.setNode(cached.path);
+            shareFile.setLocations(location);
+
             // FIXME : for some reason, random number generation fails
             //responseIq.setSid(generateStanzaHash());
             emit getFinished(responseIq, shareFile);
@@ -449,7 +449,8 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
 
     for (int hit = 0; hit < dbHits.size(); hit++)
     {
-        const QString path = dbHits[hit].path;
+        ChatSharesDatabase::Entry &cached = dbHits[hit];
+        const QString path = cached.path;
 
         QString prefix;
         if (!queryString.isEmpty())
@@ -502,12 +503,20 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         if (!maxDepth || relativeBits.size() < maxDepth)
         {
             // update file info
-            QXmppShareItem file(QXmppShareItem::FileItem);
-
-            if (sharesDatabase->updateFile(file, dbHits[hit], requestIq.hash()))
+            if (sharesDatabase->updateFile(cached, requestIq.hash()))
             {
+                QXmppShareItem shareFile(QXmppShareItem::FileItem);
+                shareFile.setName(QFileInfo(cached.path).fileName());
+                shareFile.setFileDate(cached.date);
+                shareFile.setFileHash(cached.hash);
+                shareFile.setFileSize(cached.size);
+
+                QXmppShareLocation location(requestIq.to());
+                location.setNode(cached.path);
+                shareFile.setLocations(location);
+
                 fileCount++;
-                parentCollection->appendChild(file);
+                parentCollection->appendChild(shareFile);
             }
         }
 

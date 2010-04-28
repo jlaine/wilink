@@ -52,8 +52,8 @@ public:
 
     // atomic operations
     bool deleteFile(const QString &path);
-    bool saveFile(const ChatSharesDatabase::Entry &path);
-    bool updateFile(QXmppShareItem &shareFile, ChatSharesDatabase::Entry &cached, bool updateHash);
+    bool saveFile(const ChatSharesDatabase::Entry &entry);
+    bool updateFile(ChatSharesDatabase::Entry &entry, bool updateHash);
 
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
