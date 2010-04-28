@@ -497,10 +497,6 @@ Acceptez-vous?</translation>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <source>&amp;Chat</source>
-        <translation>&amp;Chat</translation>
-    </message>
-    <message>
         <source>Upload &amp;photos</source>
         <translation>Transfert de &amp;photos</translation>
     </message>
@@ -519,6 +515,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat</source>
         <translation>Chat</translation>
+    </message>
+    <message>
+        <source>&amp;Chat and shares</source>
+        <translation>&amp;Chat et partages</translation>
     </message>
 </context>
 <context>

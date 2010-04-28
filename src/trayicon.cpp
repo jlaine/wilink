@@ -396,7 +396,7 @@ void TrayIcon::showMenu()
     if (!menu->isEmpty())
         menu->addSeparator();
 
-    action = menu->addAction(QIcon(":/chat.png"), tr("&Chat"));
+    action = menu->addAction(QIcon(":/chat.png"), tr("&Chat and shares"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChats()));
 
     action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
