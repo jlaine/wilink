@@ -118,6 +118,10 @@ int main(int argc, char *argv[])
     if (appsDir.exists("wDesktop.app"))
         QProcess::execute("rm", QStringList() << "-rf" << appsDir.filePath("wDesktop.app"));
 #endif
+#ifdef Q_OS_WIN
+    if (appsDir.exists("wDesktop/uninstall.exe"))
+        QProcess::execute(appsDir.filePath("wDesktop/uninstall.exe"), QStringList() << "/S");
+#endif
 
     /* Load translations */
     QString localeName = QLocale::system().name().split("_").first();
