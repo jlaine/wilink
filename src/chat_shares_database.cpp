@@ -20,6 +20,7 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
+#include <QSettings>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
@@ -30,6 +31,7 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat_shares_database.h"
+#include "systeminfo.h"
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
@@ -73,6 +75,8 @@ static QByteArray hashFile(const QString &path)
 ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     : QObject(parent), indexThread(0)
 {
+    QSettings settings;
+
     // prepare database
     sharesDb = QSqlDatabase::addDatabase("QSQLITE");
     sharesDb.setDatabaseName(":memory:");
@@ -85,6 +89,9 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
+
+    // set directory
+    setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
 }
 
 ChatSharesDatabase *ChatSharesDatabase::instance()
@@ -113,6 +120,10 @@ void ChatSharesDatabase::setDirectory(const QString &path)
     QFileInfo info(path);
     if (!info.exists() && !info.dir().mkdir(info.fileName()))
        logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + path);
+
+    // remember directory
+    QSettings settings;
+    settings.setValue("SharesLocation", path);
     sharesDir.setPath(path);
 
     // schedule index

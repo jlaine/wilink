@@ -249,7 +249,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
         this, SLOT(indexFinished(double, int, int)));
     connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
         this, SLOT(searchFinished(QXmppShareSearchIq)));
-    db->setDirectory(SystemInfo::storageLocation(SystemInfo::SharesLocation));
+    directoryChanged(db->directory());
 }
 
 void ChatShares::changeDirectory()
