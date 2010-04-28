@@ -68,7 +68,8 @@ TrayIcon::TrayIcon()
 
     /* initialise settings */
     settings = new QSettings(this);
-    if (Application::isInstalled() && !settings->contains("OpenAtLogin"))
+    if (Application::isInstalled() &&
+        settings->value("OpenAtLogin", true).toBool())
         openAtLogin(true);
 
     /* set icon */
