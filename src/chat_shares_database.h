@@ -39,7 +39,7 @@ public:
         QByteArray hash;
     };
 
-    ChatSharesDatabase(const QString &path, QObject *parent = 0);
+    ChatSharesDatabase(QObject *parent = 0);
     QSqlDatabase database() const;
 
     QString directory() const;
@@ -77,7 +77,7 @@ private:
     QSqlDatabase sharesDb;
     QDir sharesDir;
 
-    ChatSharesDatabase *globalInstance();
+    static ChatSharesDatabase *globalInstance;
 };
 
 class ChatSharesThread : public QThread

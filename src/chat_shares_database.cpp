@@ -35,6 +35,8 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
 
+ChatSharesDatabase *ChatSharesDatabase::globalInstance = 0;
+
 static ChatSharesDatabase::Entry getFile(const QSqlQuery &selectQuery)
 {
     ChatSharesDatabase::Entry cached;
@@ -68,8 +70,8 @@ static QByteArray hashFile(const QString &path)
     return hasher.result();
 }
 
-ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
-    : QObject(parent), indexThread(0), sharesDir(path)
+ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
+    : QObject(parent), indexThread(0)
 {
     // prepare database
     sharesDb = QSqlDatabase::addDatabase("QSQLITE");
@@ -84,6 +86,13 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &path, QObject *parent)
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
     indexTimer->start();
+}
+
+ChatSharesDatabase *ChatSharesDatabase::instance()
+{
+    if (!globalInstance)
+        globalInstance = new ChatSharesDatabase();
+    return globalInstance;
 }
 
 QSqlDatabase ChatSharesDatabase::database() const

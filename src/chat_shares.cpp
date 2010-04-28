@@ -876,7 +876,8 @@ void ChatShares::shareServerFound(const QString &server)
         if (!info.exists() && !info.dir().mkdir(info.fileName()))
             logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + sharesPath);
 
-        db = new ChatSharesDatabase(sharesPath, this);
+        db = ChatSharesDatabase::instance();
+        db->setDirectory(sharesPath);
         connect(indexButton, SIGNAL(clicked()), db, SLOT(index()));
         connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
             baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
@@ -888,7 +889,6 @@ void ChatShares::shareServerFound(const QString &server)
             this, SLOT(indexFinished(double, int, int)));
         connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
             this, SLOT(searchFinished(QXmppShareSearchIq)));
-        db->index();
     }
 
     // register with server
