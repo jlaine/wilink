@@ -82,10 +82,9 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
 
     // start indexing
     indexTimer = new QTimer(this);
-    indexTimer->setInterval(0);
+    indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
-    indexTimer->start();
 }
 
 ChatSharesDatabase *ChatSharesDatabase::instance()
@@ -107,7 +106,20 @@ QString ChatSharesDatabase::directory() const
 
 void ChatSharesDatabase::setDirectory(const QString &path)
 {
+    if (path == sharesDir.path())
+        return;
+
+    // create directory if needed
+    QFileInfo info(path);
+    if (!info.exists() && !info.dir().mkdir(info.fileName()))
+       logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + path);
     sharesDir.setPath(path);
+
+    // schedule index
+    indexTimer->setInterval(0);
+    indexTimer->start();
+
+    emit directoryChanged(sharesDir.path());
 }
 
 QString ChatSharesDatabase::filePath(const QString &node) const

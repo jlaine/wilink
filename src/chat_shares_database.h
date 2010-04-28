@@ -56,6 +56,7 @@ public:
     static ChatSharesDatabase *instance();
 
 signals:
+    void directoryChanged(const QString &path);
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
     void getFinished(const QXmppShareGetIq &packet, const QXmppShareItem &fileInfo);
     void indexStarted();

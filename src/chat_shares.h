@@ -193,6 +193,7 @@ private slots:
     void indexFinished(double elapsed, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &responseIq);
     void tabChanged(int index);
+    void directoryChanged(const QString &path);
 
 private:
     void queueItem(QXmppShareItem *item);
@@ -209,13 +210,18 @@ private:
 
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;
+
     ChatSharesView *sharesView;
     ChatSharesView *searchView;
+
+    QLabel *downloadsLabel;
     ChatSharesView *downloadsView;
     QWidget *downloadsWidget;
+    QList<QXmppTransferJob*> downloadJobs;
+
+    QLabel *uploadsLabel;
     ChatTransfersView *uploadsView;
     QWidget *uploadsWidget;
-    QList<QXmppTransferJob*> downloadJobs;
 
     QPushButton *downloadButton;
     QPushButton *indexButton;
