@@ -127,16 +127,6 @@ void ChatSharesDatabase::index()
     worker->start();
 }
 
-QString ChatSharesDatabase::jid() const
-{
-    return sharesJid;
-}
-
-void ChatSharesDatabase::setJid(const QString &jid)
-{
-    sharesJid = jid;
-}
-
 /** Handle a search request.
  */
 void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
@@ -321,7 +311,7 @@ void SearchThread::run()
 
     // determine query type
     QXmppShareLocation location;
-    location.setJid(sharesDatabase->jid());
+    location.setJid(requestIq.to());
     location.setNode(requestIq.node());
     responseIq.collection().setLocations(location);
 
@@ -461,7 +451,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
                 QXmppShareItem collection(QXmppShareItem::CollectionItem);
                 collection.setName(dirName);
                 QXmppShareLocation location;
-                location.setJid(sharesDatabase->jid());
+                location.setJid(requestIq.to());
                 location.setNode(prefix + dirPath + "/");
                 collection.setLocations(location);
                 subDirs[dirPath] = parentCollection->appendChild(collection);

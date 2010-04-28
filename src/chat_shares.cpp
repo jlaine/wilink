@@ -890,7 +890,6 @@ void ChatShares::shareServerFound(const QString &server)
             this, SLOT(searchFinished(QXmppShareSearchIq)));
         db->index();
     }
-    db->setJid(client->getConfiguration().jid());
 
     // register with server
     registerWithServer();

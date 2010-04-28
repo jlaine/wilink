@@ -43,9 +43,6 @@ public:
     QSqlDatabase database() const;
     QDir directory() const;
 
-    QString jid() const;
-    void setJid(const QString &jid);
-
     // threaded operations
     void get(const QXmppShareGetIq &requestIq);
     void search(const QXmppShareSearchIq &requestIq);
@@ -67,7 +64,6 @@ public slots:
 
 private:
     QTimer *indexTimer;
-    QString sharesJid;
     QSqlDatabase sharesDb;
     QDir sharesDir;
 };
