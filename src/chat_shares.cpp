@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
@@ -202,12 +203,12 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
     footerLayout->addWidget(downloadButton);
 
-    /* remove button */
-    removeButton = new QPushButton(tr("Remove"));
-    removeButton->setIcon(QIcon(":/remove.png"));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
-    footerLayout->addWidget(removeButton);
-    removeButton->hide();
+    /* directory button */
+    directoryButton = new QPushButton(tr("Change shares location"));
+    directoryButton->setIcon(QIcon(":/album.png"));
+    connect(directoryButton, SIGNAL(clicked()), this, SLOT(changeDirectory()));
+    footerLayout->addWidget(directoryButton);
+    directoryButton->hide();
 
     /* rescan button */
     indexButton = new QPushButton(tr("Refresh my shares"));
@@ -215,6 +216,13 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(indexButton, SIGNAL(clicked()), db, SLOT(index()));
     footerLayout->addWidget(indexButton);
     indexButton->hide();
+
+    /* remove button */
+    removeButton = new QPushButton(tr("Remove"));
+    removeButton->setIcon(QIcon(":/remove.png"));
+    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
+    footerLayout->addWidget(removeButton);
+    removeButton->hide();
 
     setLayout(layout);
 
@@ -242,6 +250,17 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
         this, SLOT(searchFinished(QXmppShareSearchIq)));
     db->setDirectory(SystemInfo::storageLocation(SystemInfo::SharesLocation));
+}
+
+void ChatShares::changeDirectory()
+{
+    QFileDialog *dialog = new QFileDialog(this);
+    QString path = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                 db->directory(),
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+    if (!path.isEmpty())
+        db->setDirectory(path);
 }
 
 void ChatShares::directoryChanged(const QString &path)
@@ -910,6 +929,11 @@ void ChatShares::tabChanged(int index)
         indexButton->show();
     else
         indexButton->hide();
+
+    if (tab == uploadsWidget || tab == downloadsWidget)
+        directoryButton->show();
+    else
+        directoryButton->hide();
 }
 
 ChatSharesDelegate::ChatSharesDelegate(QObject *parent)

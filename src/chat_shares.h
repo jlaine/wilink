@@ -193,6 +193,8 @@ private slots:
     void indexFinished(double elapsed, int updated, int removed);
     void searchFinished(const QXmppShareSearchIq &responseIq);
     void tabChanged(int index);
+
+    void changeDirectory();
     void directoryChanged(const QString &path);
 
 private:
@@ -224,6 +226,7 @@ private:
     QWidget *uploadsWidget;
 
     QPushButton *downloadButton;
+    QPushButton *directoryButton;
     QPushButton *indexButton;
     QPushButton *removeButton;
     QStatusBar *statusBar;
