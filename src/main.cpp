@@ -112,6 +112,13 @@ int main(int argc, char *argv[])
         oldWallet.remove();
 #endif
 
+    /* Uninstall wDesktop */
+    QDir appsDir(QDesktopServices::storageLocation(QDesktopServices::ApplicationsLocation));
+#ifdef Q_OS_MAC
+    if (appsDir.exists("wDesktop.app"))
+        QProcess::execute("rm", QStringList() << "-rf" << appsDir.filePath("wDesktop.app"));
+#endif
+
     /* Load translations */
     QString localeName = QLocale::system().name().split("_").first();
 
