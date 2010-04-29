@@ -19,6 +19,7 @@
 
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QSettings>
 #include <QSqlError>
@@ -36,9 +37,15 @@
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
+#define DB_DRIVER "QSQLITE"
 
 ChatSharesDatabase *ChatSharesDatabase::globalInstance = 0;
 int ChatSharesThread::globalId = 1;
+
+static QString databaseName()
+{
+    return QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+}
 
 static bool deleteFile(QSqlDatabase sharesDb, const QString &path)
 {
@@ -97,8 +104,8 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     QSettings settings;
 
     // prepare database
-    QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-    sharesDb.setDatabaseName(":memory:");
+    QSqlDatabase sharesDb = QSqlDatabase::addDatabase(DB_DRIVER);
+    sharesDb.setDatabaseName(databaseName());
     Q_ASSERT(sharesDb.open());
     sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
@@ -248,8 +255,8 @@ ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
     QString connectionName = QString::number(globalId++);
-    sharesDb = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-    sharesDb.setDatabaseName(":memory:");
+    sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, connectionName);
+    sharesDb.setDatabaseName(databaseName());
     Q_ASSERT(sharesDb.open());
 }
 
