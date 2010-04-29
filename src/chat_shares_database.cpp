@@ -120,11 +120,6 @@ ChatSharesDatabase *ChatSharesDatabase::instance()
     return globalInstance;
 }
 
-QSqlDatabase ChatSharesDatabase::database() const
-{
-    return sharesDb;
-}
-
 QString ChatSharesDatabase::directory() const
 {
     return sharesDir.path();
@@ -252,9 +247,8 @@ bool ChatSharesDatabase::updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::E
 ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
-    id = globalId++;
-    qDebug() << "Creating thread" << id;
-    sharesDb = QSqlDatabase::addDatabase("QSQLITE", QString::number(id));
+    QString connectionName = QString::number(globalId++);
+    sharesDb = QSqlDatabase::addDatabase("QSQLITE", connectionName);
     sharesDb.setDatabaseName(":memory:");
     Q_ASSERT(sharesDb.open());
 }

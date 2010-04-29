@@ -40,8 +40,6 @@ public:
     };
 
     ChatSharesDatabase(QObject *parent = 0);
-    QSqlDatabase database() const;
-
     QString directory() const;
 
     QString filePath(const QString &node) const;
@@ -90,7 +88,6 @@ signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private:
-    int id;
     static int globalId;
 
 protected:
