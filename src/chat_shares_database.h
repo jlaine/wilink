@@ -47,10 +47,7 @@ public:
     QString filePath(const QString &node) const;
     QString fileNode(const QString &path) const;
 
-    // atomic operations
-    bool deleteFile(const QString &path);
-    bool saveFile(const ChatSharesDatabase::Entry &entry);
-    bool updateFile(ChatSharesDatabase::Entry &entry, bool updateHash);
+    bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &entry, bool updateHash);
 
     static ChatSharesDatabase *instance();
 
@@ -94,6 +91,7 @@ signals:
 
 protected:
     ChatSharesDatabase *sharesDatabase;
+    QSqlDatabase sharesDb;
 };
 
 class GetThread : public ChatSharesThread

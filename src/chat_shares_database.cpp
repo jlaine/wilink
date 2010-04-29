@@ -39,6 +39,24 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 ChatSharesDatabase *ChatSharesDatabase::globalInstance = 0;
 
+static bool deleteFile(QSqlDatabase sharesDb, const QString &path)
+{
+    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
+    deleteQuery.bindValue(":path", path);
+    return deleteQuery.exec();
+}
+
+static bool saveFile(QSqlDatabase sharesDb, const ChatSharesDatabase::Entry &entry)
+{
+    QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
+                           "VALUES(:path, :date, :size, :hash)", sharesDb);
+    replaceQuery.bindValue(":path", entry.path);
+    replaceQuery.bindValue(":date", entry.date);
+    replaceQuery.bindValue(":size", entry.size);
+    replaceQuery.bindValue(":hash", entry.hash.toHex());
+    return replaceQuery.exec();
+}
+
 static ChatSharesDatabase::Entry getFile(const QSqlQuery &selectQuery)
 {
     ChatSharesDatabase::Entry cached;
@@ -195,31 +213,13 @@ void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
     worker->start();
 }
 
-bool ChatSharesDatabase::deleteFile(const QString &path)
-{
-    QSqlQuery deleteQuery("DELETE FROM files WHERE path = :path", sharesDb);
-    deleteQuery.bindValue(":path", path);
-    return deleteQuery.exec();
-}
-
-bool ChatSharesDatabase::saveFile(const ChatSharesDatabase::Entry &entry)
-{
-    QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
-                           "VALUES(:path, :date, :size, :hash)", sharesDb);
-    replaceQuery.bindValue(":path", entry.path);
-    replaceQuery.bindValue(":date", entry.date);
-    replaceQuery.bindValue(":size", entry.size);
-    replaceQuery.bindValue(":hash", entry.hash.toHex());
-    return replaceQuery.exec();
-}
-
-bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool updateHash)
+bool ChatSharesDatabase::updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached, bool updateHash)
 {
     // check file is still readable
     QFileInfo info(sharesDir.filePath(cached.path));
     if (!info.isReadable() || !info.size())
     {
-        deleteFile(cached.path);
+        deleteFile(sharesDb, cached.path);
         return false;
     }
 
@@ -232,7 +232,7 @@ bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool upda
         if (cached.hash.isEmpty())
         {
             logMessage(QXmppLogger::WarningMessage, "Error hashing file " + cached.path);
-            deleteFile(cached.path);
+            deleteFile(sharesDb, cached.path);
             return false;
         }
     }
@@ -242,7 +242,7 @@ bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool upda
     {
         cached.date = info.lastModified();
         cached.size = info.size();
-        saveFile(cached);
+        saveFile(sharesDb, cached);
     }
 
     return true;
@@ -251,6 +251,8 @@ bool ChatSharesDatabase::updateFile(ChatSharesDatabase::Entry &cached, bool upda
 ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
+    // FIXME : establish own connection
+    sharesDb = sharesDatabase->database();
 }
 
 GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &request)
@@ -267,13 +269,13 @@ void GetThread::run()
 
     // look for file in database
     QXmppShareItem shareFile(QXmppShareItem::FileItem);
-    QSqlQuery query("SELECT path, size, hash, date FROM files WHERE path = :path", sharesDatabase->database());
+    QSqlQuery query("SELECT path, size, hash, date FROM files WHERE path = :path", sharesDb);
     query.bindValue(":path", requestIq.node());
     if (query.exec() && query.next())
     {
         ChatSharesDatabase::Entry cached = getFile(query);
         QFileInfo info(sharesDatabase->filePath(cached.path));
-        if (sharesDatabase->updateFile(cached, true))
+        if (sharesDatabase->updateFile(sharesDb, cached, true))
         {
             // fill meta-data
             shareFile.setName(info.fileName());
@@ -310,7 +312,7 @@ void IndexThread::run()
     logMessage(QXmppLogger::DebugMessage, "Scan started for " + sharesDir.path());
 
     // store existing entries
-    QSqlQuery query("SELECT path, size, hash, date FROM files", sharesDatabase->database());
+    QSqlQuery query("SELECT path, size, hash, date FROM files", sharesDb);
     query.exec();
     while (query.next())
     {
@@ -325,7 +327,7 @@ void IndexThread::run()
 
     // remove obsolete entries
     foreach (const QString &path, scanOld.keys())
-        sharesDatabase->deleteFile(path);
+        deleteFile(sharesDb, path);
 
     const double elapsed = double(t.elapsed()) / 1000.0;
     logMessage(QXmppLogger::DebugMessage, QString("Scan completed in %1 s ( %2 updated, %3 removed )")
@@ -347,7 +349,7 @@ void IndexThread::scanDir(const QDir &dir)
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
             ChatSharesDatabase::Entry cached = scanOld.take(relativePath);
             cached.path = relativePath;
-            if (sharesDatabase->updateFile(cached, false))
+            if (sharesDatabase->updateFile(sharesDb, cached, false))
                 scanUpdated++;
         }
     }
@@ -399,7 +401,7 @@ void SearchThread::run()
         like.replace("%", "\\%");
         like.replace("_", "\\_");
         like += "%";
-        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDatabase->database());
+        QSqlQuery query("DELETE FROM files WHERE PATH LIKE :search ESCAPE :escape", sharesDb);
         query.bindValue(":search", like);
         query.bindValue(":escape", "\\");
         query.exec();
@@ -445,7 +447,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
     if (!like.isEmpty())
         extraSql += " WHERE path LIKE :search ESCAPE :escape";
     extraSql += " ORDER BY path";
-    QSqlQuery query("SELECT path, size, hash, date FROM files" + extraSql, sharesDatabase->database());
+    QSqlQuery query("SELECT path, size, hash, date FROM files" + extraSql, sharesDb);
     if (!like.isEmpty())
     {
         query.bindValue(":search", like);
@@ -517,7 +519,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         {
             // update file info
             QFileInfo info(sharesDatabase->filePath(cached.path));
-            if (sharesDatabase->updateFile(cached, requestIq.hash()))
+            if (sharesDatabase->updateFile(sharesDb, cached, requestIq.hash()))
             {
                 QXmppShareItem shareFile(QXmppShareItem::FileItem);
                 shareFile.setName(info.fileName());
