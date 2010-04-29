@@ -40,6 +40,8 @@ public:
     };
 
     ChatSharesDatabase(QObject *parent = 0);
+
+    bool add(const ChatSharesDatabase::Entry &entry);
     QString directory() const;
 
     QString filePath(const QString &node) const;
@@ -70,6 +72,7 @@ private:
     QTimer *indexTimer;
     QThread *indexThread;
     QDir sharesDir;
+    QSqlDatabase sharesDb;
 };
 
 class ChatSharesThread : public QThread

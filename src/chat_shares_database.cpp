@@ -154,7 +154,7 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     QSettings settings;
 
     // prepare database
-    QSqlDatabase sharesDb = databaseConnection("main");
+    sharesDb = databaseConnection("main");
     sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
@@ -166,6 +166,11 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
 
     // set directory
     setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
+}
+
+bool ChatSharesDatabase::add(const ChatSharesDatabase::Entry &entry)
+{
+    return saveFile(sharesDb, entry);
 }
 
 ChatSharesDatabase *ChatSharesDatabase::instance()
