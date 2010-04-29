@@ -71,7 +71,6 @@ private slots:
 private:
     QTimer *indexTimer;
     QThread *indexThread;
-    QSqlDatabase sharesDb;
     QDir sharesDir;
 
     static ChatSharesDatabase *globalInstance;

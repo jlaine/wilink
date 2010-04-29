@@ -97,7 +97,7 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     QSettings settings;
 
     // prepare database
-    sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+    QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
     sharesDb.setDatabaseName(":memory:");
     Q_ASSERT(sharesDb.open());
     sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");
