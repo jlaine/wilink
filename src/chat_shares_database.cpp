@@ -324,11 +324,6 @@ void IndexThread::run()
         Q_ASSERT(sharesDb.open());
     }
 
-    // reset
-    scanOld.clear();
-    scanAdded = 0;
-    scanUpdated = 0;
-
     QDir sharesDir = sharesDatabase->directory();
     logMessage(QXmppLogger::DebugMessage, "Scan started for " + sharesDir.path());
 
@@ -356,6 +351,11 @@ void IndexThread::run()
                .arg(scanUpdated)
                .arg(scanOld.size()));
     emit indexFinished(elapsed, scanUpdated, scanOld.size());
+
+    // cleanup
+    scanOld.clear();
+    scanAdded = 0;
+    scanUpdated = 0;
 }
 
 void IndexThread::scanDir(const QDir &dir)
