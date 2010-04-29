@@ -139,8 +139,9 @@ void Highlighter::highlightBlock(const QString &text)
         int index = expression.indexIn(text);
         while (index >= 0) {
             int length = expression.matchedLength();
-            if (expression.captureCount() > 0)
-                setFormat(expression.pos(1), expression.cap(1).size(), rule.format);
+            QStringList captures = expression.capturedTexts();
+            if (captures.size() > 1)
+                setFormat(expression.pos(1), captures[1].size(), rule.format);
             else
                 setFormat(index, length, rule.format);
             index = expression.indexIn(text, index + length);
