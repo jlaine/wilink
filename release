@@ -3,17 +3,15 @@
 set -e
 
 if [ -n "`which sw_vers`" ]; then
-    GIT="/opt/local/bin/git"
-else
-    GIT="git"
+    export PATH="/opt/local/bin:$PATH"
 fi
 
-if [ -n "`$GIT diff`" ]; then
+if [ -n "`git diff`" ]; then
     echo "working copy is dirty!"
     exit 1
 fi
-$GIT pull
-$GIT submodule update --init
+git pull
+git submodule update --init
 
 if [ -n "`which sw_vers`" ]; then
     rm -rf release-mac
