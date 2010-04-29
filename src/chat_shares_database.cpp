@@ -182,23 +182,24 @@ void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
  */
 void ChatSharesDatabase::index()
 {
-    if (indexThread)
+    if (indexThread && indexThread->isRunning())
         return;
 
     // start indexing
-    indexThread = new IndexThread(this);
-    connect(indexThread, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-        this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-    connect(indexThread, SIGNAL(indexFinished(double, int, int)),
-            this, SLOT(slotIndexFinished(double, int, int)));
+    if (!indexThread)
+    {
+        indexThread = new IndexThread(this);
+        connect(indexThread, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
+        connect(indexThread, SIGNAL(indexFinished(double, int, int)),
+                this, SLOT(slotIndexFinished(double, int, int)));
+    }
     indexThread->start();
     emit indexStarted();
 }
 
 void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int removed)
 {
-    indexThread->deleteLater();
-    indexThread = 0;
     indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->start();
     emit indexFinished(elapsed, updated, removed);
@@ -254,10 +255,7 @@ bool ChatSharesDatabase::updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::E
 ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
-    QString connectionName = QString::number(globalId++);
-    sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, connectionName);
-    sharesDb.setDatabaseName(databaseName());
-    Q_ASSERT(sharesDb.open());
+    setObjectName("thread" + QString::number(globalId++));
 }
 
 GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &request)
@@ -267,6 +265,11 @@ GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &reques
 
 void GetThread::run()
 {
+    // open database
+    sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, objectName());
+    sharesDb.setDatabaseName(databaseName());
+    Q_ASSERT(sharesDb.open());
+
     QXmppShareGetIq responseIq;
     responseIq.setId(requestIq.id());
     responseIq.setTo(requestIq.from());
@@ -313,6 +316,19 @@ IndexThread::IndexThread(ChatSharesDatabase *database)
 
 void IndexThread::run()
 {
+    // open database
+    if (!sharesDb.isOpen())
+    {
+        sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, objectName());
+        sharesDb.setDatabaseName(databaseName());
+        Q_ASSERT(sharesDb.open());
+    }
+
+    // reset
+    scanOld.clear();
+    scanAdded = 0;
+    scanUpdated = 0;
+
     QDir sharesDir = sharesDatabase->directory();
     logMessage(QXmppLogger::DebugMessage, "Scan started for " + sharesDir.path());
 
@@ -367,6 +383,11 @@ SearchThread::SearchThread(ChatSharesDatabase *database, const QXmppShareSearchI
 
 void SearchThread::run()
 {
+    // open database
+    sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, objectName());
+    sharesDb.setDatabaseName(databaseName());
+    Q_ASSERT(sharesDb.open());
+
     QXmppShareSearchIq responseIq;
     responseIq.setId(requestIq.id());
     responseIq.setTo(requestIq.from());
