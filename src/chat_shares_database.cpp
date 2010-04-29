@@ -38,7 +38,6 @@
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
-#define DB_DRIVER "QSQLITE"
 
 static ChatSharesDatabase *globalInstance = 0;
 int ChatSharesThread::globalId = 1;
@@ -52,9 +51,13 @@ static void databaseCleanup()
     globalInstance = 0;
 }
 
-static QString databaseName()
+static QSqlDatabase databaseConnection(const QString &connectionName)
 {
-    return QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+    const QString name = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+    QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+    sharesDb.setDatabaseName(name);
+    Q_ASSERT(sharesDb.open());
+    return sharesDb;
 }
 
 static bool deleteFile(QSqlDatabase sharesDb, const QString &path)
@@ -151,9 +154,7 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     QSettings settings;
 
     // prepare database
-    QSqlDatabase sharesDb = QSqlDatabase::addDatabase(DB_DRIVER);
-    sharesDb.setDatabaseName(databaseName());
-    Q_ASSERT(sharesDb.open());
+    QSqlDatabase sharesDb = databaseConnection("main");
     sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
@@ -281,9 +282,7 @@ GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &reques
 void GetThread::run()
 {
     // open database
-    sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, objectName());
-    sharesDb.setDatabaseName(databaseName());
-    Q_ASSERT(sharesDb.open());
+    QSqlDatabase sharesDb = databaseConnection(objectName());
 
     QXmppShareGetIq responseIq;
     responseIq.setId(requestIq.id());
@@ -333,11 +332,7 @@ void IndexThread::run()
 {
     // open database
     if (!sharesDb.isOpen())
-    {
-        sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, objectName());
-        sharesDb.setDatabaseName(databaseName());
-        Q_ASSERT(sharesDb.open());
-    }
+        sharesDb = databaseConnection(objectName());
 
     QDir sharesDir = sharesDatabase->directory();
     logMessage(QXmppLogger::DebugMessage, "Scan started for " + sharesDir.path());
@@ -399,9 +394,7 @@ SearchThread::SearchThread(ChatSharesDatabase *database, const QXmppShareSearchI
 void SearchThread::run()
 {
     // open database
-    sharesDb = QSqlDatabase::addDatabase(DB_DRIVER, objectName());
-    sharesDb.setDatabaseName(databaseName());
-    Q_ASSERT(sharesDb.open());
+    sharesDb = databaseConnection(objectName());
 
     QXmppShareSearchIq responseIq;
     responseIq.setId(requestIq.id());

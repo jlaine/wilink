@@ -87,7 +87,6 @@ private:
 
 protected:
     ChatSharesDatabase *sharesDatabase;
-    QSqlDatabase sharesDb;
 };
 
 class GetThread : public ChatSharesThread
@@ -122,6 +121,7 @@ private:
     QHash<QString, ChatSharesDatabase::Entry> scanOld;
     qint64 scanAdded;
     qint64 scanUpdated;
+    QSqlDatabase sharesDb;
 };
 
 class SearchThread : public ChatSharesThread
@@ -139,4 +139,5 @@ private:
     void search(QXmppShareItem &rootCollection, const QString &basePrefix, const QString &queryString, int maxDepth);
 
     QXmppShareSearchIq requestIq;
+    QSqlDatabase sharesDb;
 };
