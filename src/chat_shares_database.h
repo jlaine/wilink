@@ -70,8 +70,6 @@ private:
     QTimer *indexTimer;
     QThread *indexThread;
     QDir sharesDir;
-
-    static ChatSharesDatabase *globalInstance;
 };
 
 class ChatSharesThread : public QThread

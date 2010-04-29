@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDesktopServices>
@@ -39,8 +40,17 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 #define SEARCH_MAX_TIME 5000
 #define DB_DRIVER "QSQLITE"
 
-ChatSharesDatabase *ChatSharesDatabase::globalInstance = 0;
+static ChatSharesDatabase *globalInstance = 0;
 int ChatSharesThread::globalId = 1;
+
+static void databaseCleanup()
+{
+    if (!globalInstance)
+        return;
+
+    delete globalInstance;
+    globalInstance = 0;
+}
 
 static QString databaseName()
 {
@@ -160,7 +170,10 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
 ChatSharesDatabase *ChatSharesDatabase::instance()
 {
     if (!globalInstance)
+    {
         globalInstance = new ChatSharesDatabase();
+        qAddPostRoutine(databaseCleanup);
+    }
     return globalInstance;
 }
 
