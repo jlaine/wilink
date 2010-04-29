@@ -54,17 +54,6 @@ static bool deleteFile(QSqlDatabase sharesDb, const QString &path)
     return deleteQuery.exec();
 }
 
-static bool saveFile(QSqlDatabase sharesDb, const ChatSharesDatabase::Entry &entry)
-{
-    QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
-                           "VALUES(:path, :date, :size, :hash)", sharesDb);
-    replaceQuery.bindValue(":path", entry.path);
-    replaceQuery.bindValue(":date", entry.date);
-    replaceQuery.bindValue(":size", entry.size);
-    replaceQuery.bindValue(":hash", entry.hash.toHex());
-    return replaceQuery.exec();
-}
-
 static ChatSharesDatabase::Entry getFile(const QSqlQuery &selectQuery)
 {
     ChatSharesDatabase::Entry cached;
@@ -96,6 +85,54 @@ static QByteArray hashFile(const QString &path)
         hashed += len;
     }
     return hasher.result();
+}
+
+/** Save a file's database entry.
+ */
+static bool saveFile(QSqlDatabase sharesDb, const ChatSharesDatabase::Entry &entry)
+{
+    QSqlQuery replaceQuery("REPLACE INTO files (path, date, size, hash) "
+                           "VALUES(:path, :date, :size, :hash)", sharesDb);
+    replaceQuery.bindValue(":path", entry.path);
+    replaceQuery.bindValue(":date", entry.date);
+    replaceQuery.bindValue(":size", entry.size);
+    replaceQuery.bindValue(":hash", entry.hash.toHex());
+    return replaceQuery.exec();
+}
+
+/** Update the database entry for a file.
+ */
+static bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached, const QFileInfo &info, bool updateHash)
+{
+    // check file is still readable
+    if (!info.isReadable() || !info.size())
+    {
+        deleteFile(sharesDb, cached.path);
+        return false;
+    }
+
+    // check whether we need to calculate checksum
+    if (cached.date != info.lastModified() || cached.size != info.size())
+        cached.hash = QByteArray();
+    if (updateHash && cached.hash.isEmpty())
+    {
+        cached.hash = hashFile(info.filePath());
+        if (cached.hash.isEmpty())
+        {
+            deleteFile(sharesDb, cached.path);
+            return false;
+        }
+    }
+
+    // update database entry
+    if (cached.date != info.lastModified() || cached.size != info.size())
+    {
+        cached.date = info.lastModified();
+        cached.size = info.size();
+        saveFile(sharesDb, cached);
+    }
+
+    return true;
 }
 
 ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
@@ -217,41 +254,6 @@ void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
     worker->start();
 }
 
-bool ChatSharesDatabase::updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached, bool updateHash)
-{
-    // check file is still readable
-    QFileInfo info(sharesDir.filePath(cached.path));
-    if (!info.isReadable() || !info.size())
-    {
-        deleteFile(sharesDb, cached.path);
-        return false;
-    }
-
-    // check whether we need to calculate checksum
-    if (cached.date != info.lastModified() || cached.size != info.size())
-        cached.hash = QByteArray();
-    if (updateHash && cached.hash.isEmpty())
-    {
-        cached.hash = hashFile(info.filePath());
-        if (cached.hash.isEmpty())
-        {
-            logMessage(QXmppLogger::WarningMessage, "Error hashing file " + cached.path);
-            deleteFile(sharesDb, cached.path);
-            return false;
-        }
-    }
-
-    // update database entry
-    if (cached.date != info.lastModified() || cached.size != info.size())
-    {
-        cached.date = info.lastModified();
-        cached.size = info.size();
-        saveFile(sharesDb, cached);
-    }
-
-    return true;
-}
-
 ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
@@ -283,7 +285,7 @@ void GetThread::run()
     {
         ChatSharesDatabase::Entry cached = getFile(query);
         QFileInfo info(sharesDatabase->filePath(cached.path));
-        if (sharesDatabase->updateFile(sharesDb, cached, true))
+        if (updateFile(sharesDb, cached, info, true))
         {
             // fill meta-data
             shareFile.setName(info.fileName());
@@ -370,7 +372,7 @@ void IndexThread::scanDir(const QDir &dir)
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
             ChatSharesDatabase::Entry cached = scanOld.take(relativePath);
             cached.path = relativePath;
-            if (sharesDatabase->updateFile(sharesDb, cached, false))
+            if (updateFile(sharesDb, cached, info, false))
                 scanUpdated++;
         }
     }
@@ -545,7 +547,7 @@ void SearchThread::search(QXmppShareItem &rootCollection, const QString &basePre
         {
             // update file info
             QFileInfo info(sharesDatabase->filePath(cached.path));
-            if (sharesDatabase->updateFile(sharesDb, cached, requestIq.hash()))
+            if (updateFile(sharesDb, cached, info, requestIq.hash()))
             {
                 QXmppShareItem shareFile(QXmppShareItem::FileItem);
                 shareFile.setName(info.fileName());

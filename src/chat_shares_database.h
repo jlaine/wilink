@@ -45,8 +45,6 @@ public:
     QString filePath(const QString &node) const;
     QString fileNode(const QString &path) const;
 
-    bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &entry, bool updateHash);
-
     static ChatSharesDatabase *instance();
 
 signals:
