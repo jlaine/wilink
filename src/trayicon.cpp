@@ -124,7 +124,7 @@ void TrayIcon::addBaseMenu(QMenu *menu)
     QAction *action = optionsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
 
-    action = optionsMenu->addAction(tr("My shares folder"));
+    action = optionsMenu->addAction(tr("Shares folder"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showSharesFolder()));
 
     if (Application::isInstalled())
@@ -485,7 +485,7 @@ void TrayIcon::showSharesFolder()
     QFileDialog *dialog = new QFileDialog;
     dialog->setDirectory(db->directory());
     dialog->setFileMode(QFileDialog::Directory);
-    dialog->setWindowTitle(tr("My shares folder"));
+    dialog->setWindowTitle(tr("Shares folder"));
     dialog->show();
 
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));

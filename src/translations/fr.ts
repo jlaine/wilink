@@ -328,10 +328,6 @@ Acceptez-vous?</translation>
         <source>No files found</source>
         <translation>Aucun fichier trouvé</translation>
     </message>
-    <message>
-        <source>My shares folder</source>
-        <translation type="obsolete">Mon dossier partages</translation>
-    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
@@ -525,8 +521,8 @@ Acceptez-vous?</translation>
         <translation>&amp;Chat et partages</translation>
     </message>
     <message>
-        <source>My shares folder</source>
-        <translation>Mon dossier partages</translation>
+        <source>Shares folder</source>
+        <translation>Dossier de partages</translation>
     </message>
 </context>
 <context>
