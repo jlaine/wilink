@@ -89,6 +89,10 @@ public:
 signals:
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
+private:
+    int id;
+    static int globalId;
+
 protected:
     ChatSharesDatabase *sharesDatabase;
     QSqlDatabase sharesDb;

@@ -38,6 +38,7 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 #define SEARCH_MAX_TIME 5000
 
 ChatSharesDatabase *ChatSharesDatabase::globalInstance = 0;
+int ChatSharesThread::globalId = 1;
 
 static bool deleteFile(QSqlDatabase sharesDb, const QString &path)
 {
@@ -251,8 +252,11 @@ bool ChatSharesDatabase::updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::E
 ChatSharesThread::ChatSharesThread(ChatSharesDatabase *database)
     : QThread(database), sharesDatabase(database)
 {
-    // FIXME : establish own connection
-    sharesDb = sharesDatabase->database();
+    id = globalId++;
+    qDebug() << "Creating thread" << id;
+    sharesDb = QSqlDatabase::addDatabase("QSQLITE", QString::number(id));
+    sharesDb.setDatabaseName(":memory:");
+    Q_ASSERT(sharesDb.open());
 }
 
 GetThread::GetThread(ChatSharesDatabase *database, const QXmppShareGetIq &request)
