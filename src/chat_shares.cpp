@@ -529,8 +529,13 @@ void ChatShares::indexStarted()
 
 void ChatShares::downloadItem()
 {
-    ChatSharesView *treeWidget = qobject_cast<ChatSharesView*>(tabWidget->currentWidget());
-    if (!treeWidget)
+    // determine current view
+    ChatSharesView *treeWidget;
+    if (tabWidget->currentWidget() == sharesWidget)
+        treeWidget = sharesView;
+    else if (tabWidget->currentWidget() == searchWidget)
+        treeWidget = searchView;
+    else
         return;
 
     QXmppShareItem *item = static_cast<QXmppShareItem*>(treeWidget->currentIndex().internalPointer());
