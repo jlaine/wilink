@@ -2,10 +2,6 @@
 
 set -e
 
-if [ -n "`which sw_vers`" ]; then
-    export PATH="/opt/local/bin:$PATH"
-fi
-
 if [ -n "`git diff`" ]; then
     echo "working copy is dirty!"
     exit 1
