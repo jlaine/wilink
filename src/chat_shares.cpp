@@ -128,16 +128,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     layout->addWidget(tabWidget);
 
     /* create main tab */
-    sharesWidget = new QWidget;
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->setMargin(0);
-    sharesWidget->setLayout(vbox);
-
-    sharesLabel = new QLabel;
-    sharesLabel->setOpenExternalLinks(true);
-    sharesLabel->setWordWrap(true);
-    vbox->addWidget(sharesLabel);
-
     ChatSharesModel *sharesModel = new ChatSharesModel;
     sharesView = new ChatSharesView;
     sharesView->setExpandsOnDoubleClick(false);
@@ -146,21 +136,12 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
     connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
     connect(sharesView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
-    vbox->addWidget(sharesView);
 
+    sharesWidget = new ChatSharesTab;
+    sharesWidget->addWidget(sharesView);
     tabWidget->addTab(sharesWidget, QIcon(":/album.png"), tr("Shares"));
 
     /* create search tab */
-    searchWidget = new QWidget;
-    vbox = new QVBoxLayout;
-    vbox->setMargin(0);
-    searchWidget->setLayout(vbox);
-
-    searchLabel = new QLabel;
-    searchLabel->setOpenExternalLinks(true);
-    searchLabel->setWordWrap(true);
-    vbox->addWidget(searchLabel);
-
     ChatSharesModel *searchModel = new ChatSharesModel;
     searchView = new ChatSharesView;
     searchView->setExpandsOnDoubleClick(false);
@@ -169,44 +150,26 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)), this, SLOT(itemContextMenu(QModelIndex, QPoint)));
     connect(searchView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(itemDoubleClicked(QModelIndex)));
     connect(searchView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
-    vbox->addWidget(searchView);
 
+    searchWidget = new ChatSharesTab;
+    searchWidget->addWidget(searchView);
     tabWidget->addTab(searchWidget, QIcon(":/search.png"), tr("Search"));
 
     /* create queue tab */
-    downloadsWidget = new QWidget;
-    vbox = new QVBoxLayout;
-    vbox->setMargin(0);
-    downloadsWidget->setLayout(vbox);
-
-    downloadsLabel = new QLabel;
-    downloadsLabel->setOpenExternalLinks(true);
-    downloadsLabel->setWordWrap(true);
-    vbox->addWidget(downloadsLabel);
-
     queueModel = new ChatSharesModel(this);
     downloadsView = new ChatSharesView;
     downloadsView->setModel(queueModel);
     connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(transferDoubleClicked(const QModelIndex&)));
     connect(downloadsView, SIGNAL(expandRequested(QModelIndex)), downloadsView, SLOT(expand(QModelIndex)));
-    vbox->addWidget(downloadsView);
 
+    downloadsWidget = new ChatSharesTab;
+    downloadsWidget->addWidget(downloadsView);
     tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
 
     /* create uploads tab */
-    uploadsWidget = new QWidget;
-    vbox = new QVBoxLayout;
-    vbox->setMargin(0);
-    uploadsWidget->setLayout(vbox);
-
-    uploadsLabel = new QLabel;
-    uploadsLabel->setOpenExternalLinks(true);
-    uploadsLabel->setWordWrap(true);
-    vbox->addWidget(uploadsLabel);
-
     uploadsView = new ChatTransfersView;
-    vbox->addWidget(uploadsView);
-
+    uploadsWidget = new ChatSharesTab;
+    uploadsWidget->addWidget(uploadsView);
     tabWidget->addTab(uploadsWidget, QIcon(":/upload.png"), tr("Uploads"));
 
     // FOOTER
@@ -273,10 +236,10 @@ void ChatShares::directoryChanged(const QString &path)
         SystemInfo::displayName(SystemInfo::SharesLocation));
     const QString helpText = tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink);
 
-    sharesLabel->setText(helpText);
-    searchLabel->setText(helpText);
-    downloadsLabel->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
-    uploadsLabel->setText(helpText);
+    sharesWidget->setText(helpText);
+    searchWidget->setText(helpText);
+    downloadsWidget->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
+    uploadsWidget->setText(helpText);
 }
 
 /** When the main XMPP stream is disconnected, disconnect the shares-specific
@@ -1370,4 +1333,28 @@ void ChatSharesView::setModel(QAbstractItemModel *model)
     QTreeView::setModel(model);
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
     setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
+}
+
+ChatSharesTab::ChatSharesTab(QWidget *parent)
+    : QWidget(parent)
+{
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->setMargin(5);
+
+    label = new QLabel;
+    label->setOpenExternalLinks(true);
+    label->setWordWrap(true);
+    vbox->addWidget(label);
+
+    setLayout(vbox);
+}
+
+void ChatSharesTab::addWidget(QWidget *widget)
+{
+    layout()->addWidget(widget);
+}
+
+void ChatSharesTab::setText(const QString &text)
+{
+    label->setText(text);
 }

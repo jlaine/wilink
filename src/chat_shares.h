@@ -33,6 +33,7 @@
 class ChatClient;
 class ChatRosterModel;
 class ChatSharesDatabase;
+class ChatSharesTab;
 class ChatTransfers;
 class ChatTransfersView;
 class QDialogButtonBox;
@@ -211,28 +212,35 @@ private:
     QLineEdit *lineEdit;
     QTabWidget *tabWidget;
 
-    QLabel *sharesLabel;
     ChatSharesView *sharesView;
-    QWidget *sharesWidget;
+    ChatSharesTab *sharesWidget;
 
-    QLabel *searchLabel;
     ChatSharesView *searchView;
-    QWidget *searchWidget;
+    ChatSharesTab *searchWidget;
 
-    QLabel *downloadsLabel;
     ChatSharesView *downloadsView;
-    QWidget *downloadsWidget;
+    ChatSharesTab *downloadsWidget;
     QList<QXmppTransferJob*> downloadJobs;
 
-    QLabel *uploadsLabel;
     ChatTransfersView *uploadsView;
-    QWidget *uploadsWidget;
+    ChatSharesTab *uploadsWidget;
 
     QPushButton *downloadButton;
     QPushButton *indexButton;
     QPushButton *removeButton;
     QStatusBar *statusBar;
     QTimer *registerTimer;
+};
+
+class ChatSharesTab : public QWidget
+{
+public:
+    ChatSharesTab(QWidget *parent = 0);
+    void addWidget(QWidget *widget);
+    void setText(const QString &text);
+
+private:
+    QLabel *label;
 };
 
 #endif
