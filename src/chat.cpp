@@ -59,6 +59,7 @@
 #include "chat_console.h"
 #include "chat_dialog.h"
 #include "chat_form.h"
+#include "chat_plugin.h"
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"

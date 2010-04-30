@@ -8,10 +8,12 @@ set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
 
 # wiLink
 
+add_definitions(-DQT_STATICPLUGIN)
 set(wiLink_SOURCES
     application.cpp
     chat.cpp
@@ -37,7 +39,8 @@ set(wiLink_SOURCES
     trayicon.cpp
     updates.cpp
     updatesdialog.cpp
-    utils.cpp)
+    utils.cpp
+    plugins/diagnostics.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
@@ -49,6 +52,7 @@ set(wiLink_MOC_HEADERS
     chat_form.h
     chat_history.h
     chat_panel.h
+    chat_plugin.h
     chat_room.h
     chat_roster.h
     chat_shares.h
@@ -58,7 +62,8 @@ set(wiLink_MOC_HEADERS
     photos.h
     trayicon.h
     updates.h
-    updatesdialog.h)
+    updatesdialog.h
+    plugins/diagnostics.cpp)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
