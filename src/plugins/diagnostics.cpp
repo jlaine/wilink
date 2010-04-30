@@ -18,7 +18,10 @@
  */
 
 #include <QDebug>
+#include <QShortcut>
 
+#include "chat.h"
+#include "chat_console.h"
 #include "chat_plugin.h"
 
 class DiagnosticsPlugin : public ChatPlugin
@@ -30,6 +33,14 @@ public:
 void DiagnosticsPlugin::registerPlugin(Chat *chat)
 {
     qDebug() << "register chat";
+
+    ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger(), chat);
+    chatConsole->setObjectName("console");
+    connect(chatConsole, SIGNAL(closeTab()), chat, SLOT(closePanel()));
+    connect(chatConsole, SIGNAL(showTab()), chat, SLOT(showPanel()));
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
+    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showTab()));
 }
 
 Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)
