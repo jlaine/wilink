@@ -17,17 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
+
 #include "chat_plugin.h"
 
 class DiagnosticsPlugin : public ChatPlugin
 {
 public:
-    void createTabs(ChatClient *client); 
+    void registerPlugin(Chat *chat);
 };
 
-void DiagnosticsPlugin::createTabs(ChatClient *client)
+void DiagnosticsPlugin::registerPlugin(Chat *chat)
 {
-
+    qDebug() << "register chat";
 }
 
 Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)

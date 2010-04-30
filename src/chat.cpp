@@ -29,6 +29,7 @@
 #include <QLineEdit>
 #include <QList>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
@@ -318,6 +319,15 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
+
+    /* load plugins */
+    QObjectList plugins = QPluginLoader::staticInstances();
+    foreach (QObject *object, plugins)
+    {
+        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
+        if (plugin)
+            plugin->registerPlugin(this);
+    }
 }
 
 Chat::~Chat()
