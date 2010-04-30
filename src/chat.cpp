@@ -36,8 +36,8 @@
 #include <QStackedWidget>
 #include <QStringList>
 #include <QSystemTrayIcon>
-#include <QTextBrowser>
 #include <QTimer>
+#include <QUrl>
 
 #include "idle/idle.h"
 
@@ -309,15 +309,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
-
-    /* load plugins */
-    QObjectList plugins = QPluginLoader::staticInstances();
-    foreach (QObject *object, plugins)
-    {
-        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
-        if (plugin)
-            plugin->registerPlugin(this);
-    }
 }
 
 Chat::~Chat()
@@ -733,6 +724,15 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 
     /* connect to server */
     client->connectToServer(config);
+
+    /* load plugins */
+    QObjectList plugins = QPluginLoader::staticInstances();
+    foreach (QObject *object, plugins)
+    {
+        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
+        if (plugin)
+            plugin->registerPlugin(this);
+    }
     return true;
 }
 

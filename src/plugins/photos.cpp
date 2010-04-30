@@ -563,7 +563,16 @@ public:
 
 void PhotosPlugin::registerPlugin(Chat *chat)
 {
-    Photos *photos = new Photos("wifirst://www.wifirst.net/w");
+    QString url;
+    QString domain = chat->chatClient()->getConfiguration().domain();
+    if (domain == "wifirst.net")
+        url = "wifirst://www.wifirst.net/w";
+    else if (domain == "gmail.com")
+        url = "picasa://default";
+    else
+        return;
+
+    Photos *photos = new Photos(url);
     //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
     connect(photos, SIGNAL(closeTab()), chat, SLOT(closePanel()));
@@ -574,12 +583,3 @@ void PhotosPlugin::registerPlugin(Chat *chat)
 }
 
 Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)
-#if 0
-    if (!photos)
-    {
-        QAction *action = qobject_cast<QAction *>(sender());
-        photos = new Photos("wifirst://www.wifirst.net/w");
-        photos->move(10, 10);
-        photos->setSystemTrayIcon(this);
-    }
-#endif
