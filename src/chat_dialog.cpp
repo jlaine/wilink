@@ -126,7 +126,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     chatHistory->addMessage(message);
 
     // notify
-    emit notifyTab();
+    emit notifyPanel();
 }
 
 void ChatDialog::sendMessage(const QString &text)

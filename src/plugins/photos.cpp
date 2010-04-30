@@ -575,11 +575,11 @@ void PhotosPlugin::registerPlugin(Chat *chat)
     Photos *photos = new Photos(url);
     //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
-    connect(photos, SIGNAL(closeTab()), chat, SLOT(closePanel()));
-    connect(photos, SIGNAL(showTab()), chat, SLOT(showPanel()));
+    connect(photos, SIGNAL(closePanel()), chat, SLOT(closePanel()));
+    connect(photos, SIGNAL(showPanel()), chat, SLOT(showPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
-    connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showTab()));
+    connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showPanel()));
 }
 
 Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)

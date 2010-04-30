@@ -65,8 +65,8 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
-    connect(this, SIGNAL(closeTab()), this, SLOT(slotClose()));
-    connect(this, SIGNAL(showTab()), this, SLOT(slotShow()));
+    connect(this, SIGNAL(closePanel()), this, SLOT(slotClose()));
+    connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
@@ -168,11 +168,11 @@ void ConsolePlugin::registerPlugin(Chat *chat)
 {
     ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger());
     chatConsole->setObjectName("console");
-    connect(chatConsole, SIGNAL(closeTab()), chat, SLOT(closePanel()));
-    connect(chatConsole, SIGNAL(showTab()), chat, SLOT(showPanel()));
+    connect(chatConsole, SIGNAL(closePanel()), chat, SLOT(closePanel()));
+    connect(chatConsole, SIGNAL(showPanel()), chat, SLOT(showPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
-    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showTab()));
+    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showPanel()));
 }
 
 Q_EXPORT_STATIC_PLUGIN2(console, ConsolePlugin)

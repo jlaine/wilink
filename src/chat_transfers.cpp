@@ -294,7 +294,7 @@ int ChatTransfers::activeJobs(QXmppTransferJob::Direction direction) const
 void ChatTransfers::addJob(QXmppTransferJob *job)
 {
     tableWidget->addJob(job);
-    emit registerTab();
+    emit registerPanel();
 }
 
 QString ChatTransfers::availableFilePath(const QString &dirPath, const QString &name)

@@ -39,10 +39,10 @@ protected:
     QLayout *headerLayout();
 
 signals:
-    void closeTab();
-    void notifyTab();
-    void registerTab();
-    void showTab();
+    void closePanel();
+    void notifyPanel();
+    void registerPanel();
+    void showPanel();
 
 private:
     QPushButton *closeButton;

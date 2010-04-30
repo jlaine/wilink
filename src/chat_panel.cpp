@@ -30,7 +30,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     closeButton->setFlat(true);
     closeButton->setMaximumWidth(32);
     closeButton->setIcon(QIcon(":/close.png"));
-    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closeTab()));
+    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(closePanel()));
 
     iconLabel = new QLabel;
     nameLabel = new QLabel;

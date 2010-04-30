@@ -222,9 +222,9 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
         QXmppTransferJob::SocksMethod);
     chatTransfers = new ChatTransfers(client);
     chatTransfers->setObjectName("transfers");
-    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatTransfers, SIGNAL(registerTab()), this, SLOT(registerPanel()));
-    connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
+    connect(chatTransfers, SIGNAL(closePanel()), this, SLOT(closePanel()));
+    connect(chatTransfers, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
+    connect(chatTransfers, SIGNAL(showPanel()), this, SLOT(showPanel()));
 
     /* build splitter */
     splitter = new QSplitter;
@@ -295,7 +295,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showTab()));
+    connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showPanel()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -512,8 +512,8 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(dialog, SIGNAL(notifyTab()), this, SLOT(notifyPanel()));
+    connect(dialog, SIGNAL(closePanel()), this, SLOT(closePanel()));
+    connect(dialog, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     addPanel(dialog);
 
     // join conversation
