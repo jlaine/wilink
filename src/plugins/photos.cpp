@@ -229,7 +229,8 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(10);
+    layout->setMargin(0);
+    layout->addItem(headerLayout());
     layout->addWidget(helpLabel);
     layout->addWidget(photosView);
     layout->addWidget(progressBar);
