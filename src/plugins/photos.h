@@ -20,10 +20,10 @@
 #ifndef __PHOTOS_H__
 #define __PHOTOS_H__
 
-#include <QWidget>
 #include <QListWidget>
 #include <QUrl>
 
+#include "chat_panel.h"
 #include "qnetio/filesystem.h"
 
 using namespace QNetIO;
@@ -69,7 +69,7 @@ private:
 
 /** Main window for photos application
  */
-class Photos : public QWidget
+class Photos : public ChatPanel
 {
     Q_OBJECT
 

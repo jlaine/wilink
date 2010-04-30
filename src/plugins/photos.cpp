@@ -33,12 +33,14 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QScrollArea>
 #include <QShortcut>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
 #include <QUrl>
 
-#include <QScrollArea>
+#include "chat.h"
+#include "chat_plugin.h"
 #include "photos.h"
 
 static const int PROGRESS_STEPS = 100;
@@ -188,7 +190,7 @@ QUrl PhotosList::url()
 }
 
 Photos::Photos(const QString &url, QWidget *parent)
-    : QWidget(parent),
+    : ChatPanel(parent),
     downloadDevice(0),
     uploadDevice(0),
     progressFiles(0),
@@ -550,3 +552,33 @@ void Photos::showMessage(const QString &message)
     }
 }
 
+// PLUGIN
+
+class PhotosPlugin : public ChatPlugin
+{
+public:
+    void registerPlugin(Chat *chat);
+};
+
+void PhotosPlugin::registerPlugin(Chat *chat)
+{
+    Photos *photos = new Photos("wifirst://www.wifirst.net/w");
+    //photos->setSystemTrayIcon(this);
+    photos->setObjectName("photos");
+    connect(photos, SIGNAL(closeTab()), chat, SLOT(closePanel()));
+    connect(photos, SIGNAL(showTab()), chat, SLOT(showPanel()));
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
+    connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showTab()));
+}
+
+Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)
+#if 0
+    if (!photos)
+    {
+        QAction *action = qobject_cast<QAction *>(sender());
+        photos = new Photos("wifirst://www.wifirst.net/w");
+        photos->move(10, 10);
+        photos->setSystemTrayIcon(this);
+    }
+#endif

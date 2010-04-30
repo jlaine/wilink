@@ -27,7 +27,6 @@
 
 class Chat;
 class Diagnostics;
-class Photos;
 class Release;
 class UpdatesDialog;
 
@@ -60,7 +59,6 @@ protected slots:
     void showDiagnostics();
     void showIcon();
     void showMenu();
-    void showPhotos();
     void showSharesFolder();
 
 private:
@@ -71,7 +69,6 @@ private:
 private:
     QList<Chat*> chats;
     Diagnostics *diagnostics;
-    Photos *photos;
     UpdatesDialog *updates;
 
     bool connected;

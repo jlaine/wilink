@@ -43,9 +43,10 @@
 #include "chat_shares_database.h"
 #include "application.h"
 #include "diagnostics.h"
-#include "photos.h"
 #include "trayicon.h"
 #include "updatesdialog.h"
+
+using namespace QNetIO;
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
@@ -62,7 +63,7 @@ static QString authRealm(const QString &jid)
 }
 
 TrayIcon::TrayIcon()
-    : diagnostics(NULL), photos(NULL), updates(NULL),
+    : diagnostics(NULL), updates(NULL),
     connected(false),
     refreshInterval(0)
 {
@@ -114,8 +115,6 @@ TrayIcon::~TrayIcon()
         delete chat;
     delete diagnostics;
     delete updates;
-    if (photos)
-        delete photos;
 }
 
 void TrayIcon::addBaseMenu(QMenu *menu)
@@ -404,9 +403,6 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/chat.png"), tr("&Chat and shares"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChats()));
 
-    action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
-
     addBaseMenu(menu);
     setContextMenu(menu);
 
@@ -463,19 +459,6 @@ void TrayIcon::showMenu()
         updates->check();
         updatesTimer->start(7 * 24 * 3600 * 1000);
     }
-}
-
-void TrayIcon::showPhotos()
-{
-    if (!photos)
-    {
-        QAction *action = qobject_cast<QAction *>(sender());
-        photos = new Photos("wifirst://www.wifirst.net/w");
-        photos->move(10, 10);
-        photos->setSystemTrayIcon(this);
-    }
-    photos->show();
-    photos->raise();
 }
 
 void TrayIcon::showSharesFolder()

@@ -38,6 +38,7 @@
 #include "trayicon.h"
 
 Q_IMPORT_PLUGIN(console)
+Q_IMPORT_PLUGIN(photos)
 
 static int aborted = 0;
 static void signal_handler(int sig)

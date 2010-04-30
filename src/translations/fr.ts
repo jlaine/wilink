@@ -502,7 +502,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Upload &amp;photos</source>
-        <translation>Transfert de &amp;photos</translation>
+        <translation type="obsolete">Transfert de &amp;photos</translation>
     </message>
     <message>
         <source>Open at login</source>

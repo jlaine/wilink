@@ -33,13 +33,13 @@ set(wiLink_SOURCES
     diagnostics.cpp
     main.cpp
     networkinfo.cpp
-    photos.cpp
     systeminfo.cpp
     trayicon.cpp
     updates.cpp
     updatesdialog.cpp
     utils.cpp
-    plugins/console.cpp)
+    plugins/console.cpp
+    plugins/photos.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
@@ -57,11 +57,11 @@ set(wiLink_MOC_HEADERS
     chat_shares_database.h
     chat_transfers.h
     diagnostics.h
-    photos.h
     trayicon.h
     updates.h
     updatesdialog.h
-    plugins/console.h)
+    plugins/console.h
+    plugins/photos.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
