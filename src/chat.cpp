@@ -227,14 +227,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(chatTransfers, SIGNAL(registerTab()), this, SLOT(registerPanel()));
     connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
 
-    /* set up shares */
-    chatShares = new ChatShares(client);
-    chatShares->setObjectName("shares");
-    connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatShares, SIGNAL(registerTab()), this, SLOT(registerPanel()));
-    connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
-    chatShares->setRoster(rosterModel);
-
     /* build splitter */
     splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
@@ -314,7 +306,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 Chat::~Chat()
 {
     delete idle;
-    delete chatShares;
     delete chatTransfers;
 
     // disconnect
@@ -680,6 +671,11 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 ChatClient *Chat::chatClient()
 {
     return client;
+}
+
+ChatRosterModel *Chat::chatRosterModel()
+{
+    return rosterModel;
 }
 
 /** Open the connection to the chat server.

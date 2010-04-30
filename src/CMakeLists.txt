@@ -39,7 +39,8 @@ set(wiLink_SOURCES
     updatesdialog.cpp
     utils.cpp
     plugins/console.cpp
-    plugins/photos.cpp)
+    plugins/photos.cpp
+    plugins/shares.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
