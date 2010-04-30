@@ -63,7 +63,6 @@
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
-#include "chat_shares.h"
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
