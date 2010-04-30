@@ -34,7 +34,7 @@ void DiagnosticsPlugin::registerPlugin(Chat *chat)
 {
     qDebug() << "register chat";
 
-    ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger(), chat);
+    ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger());
     chatConsole->setObjectName("console");
     connect(chatConsole, SIGNAL(closeTab()), chat, SLOT(closePanel()));
     connect(chatConsole, SIGNAL(showTab()), chat, SLOT(showPanel()));

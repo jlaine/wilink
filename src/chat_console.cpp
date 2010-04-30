@@ -26,8 +26,8 @@
 #include "chat_console.h"
 #include "utils.h"
 
-ChatConsole::ChatConsole(QWidget *parent)
-    : ChatPanel(parent), currentLogger(0)
+ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
+    : ChatPanel(parent), currentLogger(logger)
 {
     setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Debugging console"));
@@ -60,17 +60,10 @@ ChatConsole::ChatConsole(QWidget *parent)
     layout->addItem(hbox);
 
     setLayout(layout);
-}
 
-void ChatConsole::setLogger(QXmppLogger *newLogger)
-{
-    if (newLogger == currentLogger)
-        return;
-    if (currentLogger)
-        disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
-    if (newLogger)
-        connect(newLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
-    currentLogger = newLogger;
+    /* connect signals */
+    connect(this, SIGNAL(closeTab()), this, SLOT(slotClose()));
+    connect(this, SIGNAL(showTab()), this, SLOT(slotShow()));
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
@@ -109,6 +102,20 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
         browser->setTextCursor(savedCursor);
     }
 }
+
+void ChatConsole::slotClose()
+{
+//    disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
+}
+
+void ChatConsole::slotShow()
+{
+/*
+    if (currentLogger)
+        connect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
+*/
+}
+
 
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)

@@ -79,6 +79,7 @@ class Chat : public QWidget
 public:
     Chat(QSystemTrayIcon *trayIcon);
     ~Chat();
+    ChatClient *chatClient();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
 
 protected slots:
@@ -125,7 +126,6 @@ private:
 
     QPushButton *addButton;
     QPushButton *roomButton;
-    ChatConsole *chatConsole;
     ChatShares *chatShares;
     ChatTransfers *chatTransfers;
     ChatClient *client;

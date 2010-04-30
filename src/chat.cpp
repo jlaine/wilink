@@ -204,7 +204,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : autoAway(false),
     isBusy(false),
     isConnected(false),
-    chatConsole(0),
     systemTrayIcon(trayIcon)
 {
     client = new ChatClient(this);
@@ -219,12 +218,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     QXmppLogger *logger = new QXmppLogger(this);
     logger->setLoggingType(QXmppLogger::SignalLogging);
     client->setLogger(logger);
-
-    /* set up debugging console */
-    chatConsole = new ChatConsole;
-    chatConsole->setObjectName("console");
-    connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatConsole, SIGNAL(showTab()), this, SLOT(showPanel()));
 
     /* set up transfers window */
     client->getTransferManager().setSupportedMethods(
@@ -313,8 +306,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
     connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showTab()));
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), this);
-    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showTab()));
 #ifdef Q_OS_MAC
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
@@ -393,10 +384,6 @@ void Chat::closePanel()
         conversation->leave();
         conversation->deleteLater();
     }
-    else if (panel == chatConsole)
-    {
-        chatConsole->setLogger(0);
-    }
 }
 
 /** Notify the user of activity on a panel.
@@ -466,8 +453,6 @@ void Chat::registerPanel()
  */
 void Chat::showPanel(QWidget *panel)
 {
-    if (panel == chatConsole)
-        chatConsole->setLogger(client->logger());
     rosterModel->addItem(ChatRosterItem::Other,
         panel->objectName(),
         panel->windowTitle(),
@@ -702,6 +687,11 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     }
 }
 
+ChatClient *Chat::chatClient()
+{
+
+}
+
 /** Open the connection to the chat server.
  *
  * @param jid
@@ -914,8 +904,11 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 showPanel(chatShares);
             else if (jid == chatTransfers->objectName())
                 showPanel(chatTransfers);
+            /* FIXME */
+#if 0
             else if (jid == chatConsole->objectName())
                 showPanel(chatConsole);
+#endif
         }
     }
 }
