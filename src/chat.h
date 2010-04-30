@@ -25,7 +25,6 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
-class ChatConsole;
 class ChatConversation;
 class ChatRoom;
 class ChatRosterModel;

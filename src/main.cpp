@@ -37,7 +37,7 @@
 #include "qnetio/wallet.h"
 #include "trayicon.h"
 
-Q_IMPORT_PLUGIN(diagnostics)
+Q_IMPORT_PLUGIN(console)
 
 static int aborted = 0;
 static void signal_handler(int sig)

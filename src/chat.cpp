@@ -57,7 +57,6 @@
 
 #include "qnetio/dns.h"
 #include "chat.h"
-#include "chat_console.h"
 #include "chat_dialog.h"
 #include "chat_form.h"
 #include "chat_plugin.h"
@@ -689,7 +688,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 
 ChatClient *Chat::chatClient()
 {
-
+    return client;
 }
 
 /** Open the connection to the chat server.
@@ -900,15 +899,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
         {
-            if (jid == chatShares->objectName())
-                showPanel(chatShares);
-            else if (jid == chatTransfers->objectName())
-                showPanel(chatTransfers);
-            /* FIXME */
-#if 0
-            else if (jid == chatConsole->objectName())
-                showPanel(chatConsole);
-#endif
+            ChatPanel *panel = conversationPanel->findChild<ChatPanel*>(jid);
+            if (panel)
+                showPanel(panel);
         }
     }
 }

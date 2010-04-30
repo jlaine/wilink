@@ -18,7 +18,6 @@ set(wiLink_SOURCES
     application.cpp
     chat.cpp
     chat_accounts.cpp
-    chat_console.cpp
     chat_conversation.cpp
     chat_dialog.cpp
     chat_edit.cpp
@@ -40,12 +39,11 @@ set(wiLink_SOURCES
     updates.cpp
     updatesdialog.cpp
     utils.cpp
-    plugins/diagnostics.cpp)
+    plugins/console.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
     chat_accounts.h
-    chat_console.h
     chat_conversation.h
     chat_dialog.h
     chat_edit.h
@@ -63,7 +61,7 @@ set(wiLink_MOC_HEADERS
     trayicon.h
     updates.h
     updatesdialog.h
-    plugins/diagnostics.cpp)
+    plugins/console.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
