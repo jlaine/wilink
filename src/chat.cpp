@@ -306,6 +306,8 @@ Chat::~Chat()
 {
     delete idle;
     delete chatTransfers;
+    foreach (ChatPanel *panel, chatPanels)
+        delete panel;
 
     // disconnect
     client->disconnect();

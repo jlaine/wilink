@@ -30,7 +30,6 @@ class ChatPanel;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
-class ChatShares;
 class ChatTransfers;
 class Idle;
 class QComboBox;
@@ -142,6 +141,5 @@ private:
     QString chatRoomServer;
     QStringList discoQueue;
 };
-
 
 #endif

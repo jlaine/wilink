@@ -42,7 +42,6 @@
 #include "chat_accounts.h"
 #include "chat_shares_database.h"
 #include "application.h"
-#include "diagnostics.h"
 #include "trayicon.h"
 #include "updatesdialog.h"
 
@@ -63,7 +62,7 @@ static QString authRealm(const QString &jid)
 }
 
 TrayIcon::TrayIcon()
-    : diagnostics(NULL), updates(NULL),
+    : updates(NULL),
     connected(false),
     refreshInterval(0)
 {
@@ -97,15 +96,13 @@ TrayIcon::TrayIcon()
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
-    /* prepare diagnostics */
-    diagnostics = new Diagnostics;
-
     /* prepare updates */
     updates = new UpdatesDialog;
     updatesTimer = new QTimer(this);
     connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
 
-    /* fetch menu */
+    /* show chat windows and fetch menu */
+    QTimer::singleShot(500, this, SLOT(resetChats()));
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
@@ -113,7 +110,6 @@ TrayIcon::~TrayIcon()
 {
     foreach (Chat *chat, chats)
         delete chat;
-    delete diagnostics;
     delete updates;
 }
 
@@ -136,9 +132,6 @@ void TrayIcon::addBaseMenu(QMenu *menu)
 
     action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
     action->setMenu(optionsMenu);
-
-    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
     action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
@@ -353,12 +346,6 @@ void TrayIcon::showChatAccounts()
     }
 }
 
-void TrayIcon::showDiagnostics()
-{
-    diagnostics->show();
-    diagnostics->raise();
-}
-
 void TrayIcon::showMenu()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -368,12 +355,6 @@ void TrayIcon::showMenu()
     {
         qWarning("Failed to retrieve menu");
         QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
-        
-        if (!connected)
-        {
-            resetChats();
-            connected = true;
-        }
         return;
     }
 
@@ -447,8 +428,11 @@ void TrayIcon::showMenu()
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 
     urlString = item.firstChildElement("diagnostics").text();
+    // FIXME : restore this if we want to send diags
+#if 0
     if (!urlString.isEmpty())
         diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
+#endif
 
     /* fetch icons */
     fetchIcon();
@@ -457,9 +441,6 @@ void TrayIcon::showMenu()
     if (!connected)
     {
         connected = true;
-
-        /* create and show chat windows */
-        resetChats();
 
         /* check for updates now then every week */
         updates->check();

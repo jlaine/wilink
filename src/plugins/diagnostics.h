@@ -25,6 +25,7 @@
 #include <QThread>
 #include <QUrl>
 
+#include "chat_panel.h"
 #include "networkinfo.h"
 #include "wireless.h"
 
@@ -60,7 +61,7 @@ signals:
     void wirelessResult(const WirelessResult &result);
 };
 
-class Diagnostics : public QDialog
+class Diagnostics : public ChatPanel
 {
     Q_OBJECT
 

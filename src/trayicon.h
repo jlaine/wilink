@@ -20,13 +20,11 @@
 #ifndef __TRAYICON_H__
 #define __TRAYICON_H__
 
-#include <QDialog>
 #include <QList>
 #include <QSystemTrayIcon>
 #include <QUrl>
 
 class Chat;
-class Diagnostics;
 class Release;
 class UpdatesDialog;
 
@@ -54,9 +52,9 @@ protected slots:
     void openAtLogin(bool checked);
     void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
+    void resetChats();
     void showChats();
     void showChatAccounts();
-    void showDiagnostics();
     void showIcon();
     void showMenu();
     void showSharesFolder();
@@ -64,11 +62,9 @@ protected slots:
 private:
     void addBaseMenu(QMenu *menu);
     void fetchIcon();
-    void resetChats();
 
 private:
     QList<Chat*> chats;
-    Diagnostics *diagnostics;
     UpdatesDialog *updates;
 
     bool connected;

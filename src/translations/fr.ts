@@ -494,7 +494,7 @@ Acceptez-vous?</translation>
     <name>TrayIcon</name>
     <message>
         <source>&amp;Diagnostics</source>
-        <translation>&amp;Diagnostics</translation>
+        <translation type="obsolete">&amp;Diagnostics</translation>
     </message>
     <message>
         <source>&amp;Quit</source>

@@ -29,7 +29,6 @@ set(wiLink_SOURCES
     chat_roster_item.cpp
     chat_shares_database.cpp
     chat_transfers.cpp
-    diagnostics.cpp
     main.cpp
     networkinfo.cpp
     systeminfo.cpp
@@ -38,6 +37,7 @@ set(wiLink_SOURCES
     updatesdialog.cpp
     utils.cpp
     plugins/console.cpp
+    plugins/diagnostics.cpp
     plugins/photos.cpp
     plugins/shares.cpp)
 
@@ -55,11 +55,11 @@ set(wiLink_MOC_HEADERS
     chat_roster.h
     chat_shares_database.h
     chat_transfers.h
-    diagnostics.h
     trayicon.h
     updates.h
     updatesdialog.h
     plugins/console.h
+    plugins/diagnostics.h
     plugins/photos.h
     plugins/shares.h)
 

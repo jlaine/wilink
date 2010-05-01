@@ -38,6 +38,7 @@
 #include "trayicon.h"
 
 Q_IMPORT_PLUGIN(console)
+Q_IMPORT_PLUGIN(diagnostics)
 Q_IMPORT_PLUGIN(photos)
 Q_IMPORT_PLUGIN(shares)
 

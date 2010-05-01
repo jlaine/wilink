@@ -33,6 +33,8 @@
 #include "qnetio/mime.h"
 #include "qnetio/wallet.h"
 
+#include "chat.h"
+#include "chat_plugin.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
 
@@ -215,7 +217,7 @@ static QString dumpPings(const QList<Ping> &pings)
 }
 
 Diagnostics::Diagnostics(QWidget *parent)
-    : QDialog(parent), networkThread(NULL)
+    : ChatPanel(parent), networkThread(NULL)
 {
     /* prepare network access manager */
     network = new QNetworkAccessManager(this);
@@ -224,7 +226,8 @@ Diagnostics::Diagnostics(QWidget *parent)
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
-
+    layout->setMargin(0);
+    layout->addItem(headerLayout());
     text = new QTextBrowser;
     layout->addWidget(text);
 
@@ -239,6 +242,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     hbox->addWidget(sendButton);
 
     refreshButton = new QPushButton(tr("Refresh"));
+    refreshButton->setIcon(QIcon(":/refresh.png"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
     hbox->addWidget(refreshButton);
 
@@ -427,3 +431,22 @@ void Diagnostics::showWireless(const WirelessResult &result)
     addItem("Available networks", table.render());
 }
 
+// PLUGIN
+
+class DiagnosticsPlugin : public ChatPlugin
+{
+public:
+    ChatPanel *createPanel(Chat *chat);
+};
+
+ChatPanel *DiagnosticsPlugin::createPanel(Chat *chat)
+{
+    Diagnostics *diagnostics = new Diagnostics;
+    diagnostics->setObjectName("diagnostics");
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
+    connect(shortcut, SIGNAL(activated()), diagnostics, SIGNAL(showPanel()));
+    return diagnostics;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)
