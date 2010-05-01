@@ -96,7 +96,13 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wiLink idle qnetio qxmpp ${QT_LIBRARIES} ${WLAN_LIBRARIES})
+
+# libraries
+if(APPLE)
+    set(wilink_LIBRARIES "-framework AppKit" "-framework Carbon")
+endif(APPLE)
+target_link_libraries(wiLink idle qnetio qxmpp ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
+
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
     set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE TRUE)
