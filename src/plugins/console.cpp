@@ -161,18 +161,17 @@ void Highlighter::highlightBlock(const QString &text)
 class ConsolePlugin : public ChatPlugin
 {
 public:
-    void registerPlugin(Chat *chat);
+    ChatPanel *createPanel(Chat *chat);
 };
 
-void ConsolePlugin::registerPlugin(Chat *chat)
+ChatPanel *ConsolePlugin::createPanel(Chat *chat)
 {
     ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger());
     chatConsole->setObjectName("console");
-    connect(chatConsole, SIGNAL(closePanel()), chat, SLOT(closePanel()));
-    connect(chatConsole, SIGNAL(showPanel()), chat, SLOT(showPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
     connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showPanel()));
+    return chatConsole;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(console, ConsolePlugin)

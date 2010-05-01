@@ -26,6 +26,7 @@
 #include "qxmpp/QXmppRoster.h"
 
 class ChatConversation;
+class ChatPanel;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
@@ -129,7 +130,7 @@ private:
     QPushButton *roomButton;
     ChatTransfers *chatTransfers;
     ChatClient *client;
-
+    QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
     ChatRosterView *rosterView;
 

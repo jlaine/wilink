@@ -725,8 +725,15 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     foreach (QObject *object, plugins)
     {
         ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
-        if (plugin)
-            plugin->registerPlugin(this);
+        if (!plugin)
+            continue;
+        ChatPanel *panel = plugin->createPanel(this);
+        if (!panel)
+            continue;
+        chatPanels << panel;
+        connect(panel, SIGNAL(closePanel()), this, SLOT(closePanel()));
+        connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
+        connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     }
     return true;
 }

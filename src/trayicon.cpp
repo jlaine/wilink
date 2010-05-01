@@ -368,6 +368,12 @@ void TrayIcon::showMenu()
     {
         qWarning("Failed to retrieve menu");
         QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
+        
+        if (!connected)
+        {
+            resetChats();
+            connected = true;
+        }
         return;
     }
 

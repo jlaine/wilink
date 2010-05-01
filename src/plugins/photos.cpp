@@ -558,10 +558,10 @@ void Photos::showMessage(const QString &message)
 class PhotosPlugin : public ChatPlugin
 {
 public:
-    void registerPlugin(Chat *chat);
+    ChatPanel *createPanel(Chat *chat);
 };
 
-void PhotosPlugin::registerPlugin(Chat *chat)
+ChatPanel *PhotosPlugin::createPanel(Chat *chat)
 {
     QString url;
     QString domain = chat->chatClient()->getConfiguration().domain();
@@ -570,16 +570,15 @@ void PhotosPlugin::registerPlugin(Chat *chat)
     else if (domain == "gmail.com")
         url = "picasa://default";
     else
-        return;
+        return 0;
 
     Photos *photos = new Photos(url);
     //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
-    connect(photos, SIGNAL(closePanel()), chat, SLOT(closePanel()));
-    connect(photos, SIGNAL(showPanel()), chat, SLOT(showPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
     connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showPanel()));
+    return photos;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)
