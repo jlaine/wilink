@@ -37,8 +37,8 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
-#include "chat_transfers.h"
 #include "systeminfo.h"
+#include "transfers.h"
 
 #define KILOBYTE 1000
 #define MEGABYTE 1000000

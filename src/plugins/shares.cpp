@@ -44,7 +44,7 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_shares_database.h"
-#include "chat_transfers.h"
+#include "transfers.h"
 #include "shares.h"
 #include "systeminfo.h"
 

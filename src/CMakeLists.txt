@@ -28,7 +28,6 @@ set(wiLink_SOURCES
     chat_roster.cpp
     chat_roster_item.cpp
     chat_shares_database.cpp
-    chat_transfers.cpp
     main.cpp
     networkinfo.cpp
     systeminfo.cpp
@@ -39,7 +38,8 @@ set(wiLink_SOURCES
     plugins/console.cpp
     plugins/diagnostics.cpp
     plugins/photos.cpp
-    plugins/shares.cpp)
+    plugins/shares.cpp
+    plugins/transfers.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
@@ -54,14 +54,14 @@ set(wiLink_MOC_HEADERS
     chat_room.h
     chat_roster.h
     chat_shares_database.h
-    chat_transfers.h
     trayicon.h
     updates.h
     updatesdialog.h
     plugins/console.h
     plugins/diagnostics.h
     plugins/photos.h
-    plugins/shares.h)
+    plugins/shares.h
+    plugins/transfers.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
