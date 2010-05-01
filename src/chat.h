@@ -95,7 +95,6 @@ private slots:
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
-    void rejoinConversations();
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void renameContact(const QString &jid);
