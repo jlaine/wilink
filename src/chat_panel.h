@@ -39,7 +39,7 @@ protected:
     QLayout *headerLayout();
 
 signals:
-    void closePanel();
+    void hidePanel();
     void notifyPanel();
     void registerPanel();
     void showPanel();

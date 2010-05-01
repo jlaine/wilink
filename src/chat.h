@@ -106,7 +106,7 @@ protected slots:
 
     void mucServerFound(const QString &roomServer);
 
-    void closePanel();
+    void hidePanel();
     void notifyPanel();
     void registerPanel();
     void showPanel();

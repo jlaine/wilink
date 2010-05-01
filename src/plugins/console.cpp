@@ -65,7 +65,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
-    connect(this, SIGNAL(closePanel()), this, SLOT(slotClose()));
+    connect(this, SIGNAL(hidePanel()), this, SLOT(slotClose()));
     connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
 }
 

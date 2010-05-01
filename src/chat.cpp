@@ -222,7 +222,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
         QXmppTransferJob::SocksMethod);
     chatTransfers = new ChatTransfers(client);
     chatTransfers->setObjectName("transfers");
-    connect(chatTransfers, SIGNAL(closePanel()), this, SLOT(closePanel()));
+    connect(chatTransfers, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(chatTransfers, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(chatTransfers, SIGNAL(showPanel()), this, SLOT(showPanel()));
 
@@ -346,7 +346,7 @@ void Chat::addPanel(QWidget *panel)
         resizeContacts();
 }
 
-void Chat::closePanel()
+void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (conversationPanel->indexOf(panel) < 0)
@@ -512,7 +512,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(closePanel()), this, SLOT(closePanel()));
+    connect(dialog, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(dialog, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     addPanel(dialog);
 
@@ -731,7 +731,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
         if (!panel)
             continue;
         chatPanels << panel;
-        connect(panel, SIGNAL(closePanel()), this, SLOT(closePanel()));
+        connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
         connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
         connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     }
