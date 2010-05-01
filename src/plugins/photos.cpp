@@ -258,6 +258,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Backspace), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(goBack()));
 
+    setFocusProxy(photosView);
     resize(QSize(600, 400).expandedTo(minimumSizeHint()));
 }
 
@@ -289,7 +290,12 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             if (listView)
                 listView->setImage(downloadJob.remoteUrl, img);
             else if (label)
+            {
+                QSize maxSize(800, 600);
+                if (img.width() > maxSize.width() || img.height() > maxSize.height())
+                    img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 label->setPixmap(QPixmap::fromImage(img));
+            }
         }
 
         /* fetch next thumbnail */
