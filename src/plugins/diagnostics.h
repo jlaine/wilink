@@ -70,7 +70,7 @@ public:
     void setUrl(const QUrl &url);
 
 public slots:
-    void show();
+    void slotShow();
 
 protected slots:
     void addItem(const QString &title, const QString &value);
@@ -86,6 +86,7 @@ protected slots:
     void networkFinished();
 
 private:
+    bool displayed;
     QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
