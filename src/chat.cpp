@@ -732,6 +732,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
             continue;
         chatPanels << panel;
         connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
+        connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
         connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
         connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     }
@@ -901,9 +902,14 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
         {
-            ChatPanel *panel = conversationPanel->findChild<ChatPanel*>(jid);
-            if (panel)
-                showPanel(panel);
+            foreach (ChatPanel *panel, chatPanels)
+            {
+                if (panel->objectName() == jid)
+                {
+                    showPanel(panel);
+                    break;
+                }
+            }
         }
     }
 }
