@@ -260,8 +260,16 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 
 void ChatRosterModel::disconnected()
 {
+    QList<ChatRosterItem*> goners;
     clientFeatures.clear();
-    rootItem->clear();
+    for (int i = 0; i < rootItem->size(); i++)
+    {
+        ChatRosterItem *child = rootItem->child(i);
+        if (child->type() == ChatRosterItem::Contact)
+            goners << child;
+    }
+    foreach (ChatRosterItem *child, goners)
+        rootItem->remove(child);
     reset();
 }
 
