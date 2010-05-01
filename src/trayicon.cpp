@@ -56,8 +56,10 @@ static int retryInterval = 15000;
 static QString authRealm(const QString &jid)
 {
     QString domain = jid.split("@").last();
-    if ("www." + domain == baseUrl.host())
-        return baseUrl.host();
+    if (domain == "wifirst.net")
+        return "www.wifirst.net";
+    else if (domain == "gmail.com")
+        return "www.google.com";
     return domain;
 }
 
