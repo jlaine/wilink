@@ -37,7 +37,6 @@ class ChatConversation : public ChatPanel
 public:
     ChatConversation(const QString &jid, QWidget *parent = NULL);
 
-    virtual void join();
     virtual void leave();
 
     QXmppMessage::State localState() const;

@@ -47,17 +47,29 @@ enum MembersColumns {
 };
 
 ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent), client(xmppClient)
+    : ChatConversation(jid, parent), client(xmppClient), joined(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
+    connect(client, SIGNAL(connected()), this, SLOT(join()));
+    connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
+    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(this, SIGNAL(showPanel()), this, SLOT(join()));
+}
+
+void ChatRoom::disconnected()
+{
+    joined = false;
 }
 
 /** Send a request to join a multi-user chat.
  */
 void ChatRoom::join()
 {
+    if (joined)
+        return;
+
     // clear history
     chatHistory->clear();
 
@@ -69,6 +81,8 @@ void ChatRoom::join()
     x.setAttribute("xmlns", ns_muc);
     packet.setExtensions(x);
     client->sendPacket(packet);
+
+    joined = true;
 }
 
 /** Send a request to leave a multi-user chat.

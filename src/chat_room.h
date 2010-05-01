@@ -41,10 +41,11 @@ class ChatRoom : public ChatConversation
 
 public:
     ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
-    virtual void join();
     virtual void leave();
 
 protected slots:
+    void join();
+    void disconnected();
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
 
@@ -52,6 +53,7 @@ protected:
     virtual void sendMessage(const QString &text);
 
 private:
+    bool joined;
     QXmppClient *client;
 };
 

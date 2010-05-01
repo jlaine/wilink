@@ -425,7 +425,10 @@ void Chat::registerPanel()
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (!panel)
         return;
-    rosterModel->addItem(ChatRosterItem::Other,
+    ChatRosterItem::Type type = ChatRosterItem::Other;
+    if (qobject_cast<ChatRoom*>(panel))
+        type = ChatRosterItem::Room;
+    rosterModel->addItem(type,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -487,9 +490,6 @@ void Chat::connected()
     isConnected = true;
     addButton->setEnabled(true);
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
-
-    /* re-join conversations */
-    QTimer::singleShot(500, this, SLOT(rejoinConversations()));
 }
 
 /** Create a conversation dialog for the specified recipient.
@@ -512,10 +512,8 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setRemoteName(rosterModel->contactName(jid));
     connect(dialog, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(dialog, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
-    addPanel(dialog);
-
-    // join conversation
-    dialog->join();
+    connect(dialog, SIGNAL(showPanel()), this, SLOT(showPanel()));
+    QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
     return dialog;
 }
 
@@ -735,21 +733,6 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
         connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     }
     return true;
-}
-
-/** Re-join open conversations after reconnection.
- */
-void Chat::rejoinConversations()
-{
-    for (int i = 0; i < conversationPanel->count(); i++)
-    {
-        ChatConversation *dialog = qobject_cast<ChatRoom*>(conversationPanel->widget(i));
-        if (dialog)
-        {
-            rosterModel->addItem(ChatRosterItem::Room, dialog->objectName());
-            dialog->join();
-        }
-    }
 }
 
 /** Prompt the user for confirmation then remove a contact.
