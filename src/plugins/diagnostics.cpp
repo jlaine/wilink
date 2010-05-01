@@ -441,7 +441,7 @@ ChatPanel *DiagnosticsPlugin::createPanel(Chat *chat)
 {
     Diagnostics *diagnostics = new Diagnostics;
     diagnostics->setObjectName("diagnostics");
-    QTimer::singleShot(500, diagnostics, SIGNAL(registerPanel()));
+    QTimer::singleShot(0, diagnostics, SIGNAL(registerPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
     connect(shortcut, SIGNAL(activated()), diagnostics, SIGNAL(showPanel()));

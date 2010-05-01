@@ -37,6 +37,7 @@
 #include <QShortcut>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
+#include <QTimer>
 #include <QUrl>
 
 #include "chat.h"
@@ -571,6 +572,7 @@ ChatPanel *PhotosPlugin::createPanel(Chat *chat)
     Photos *photos = new Photos(url);
     //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
+    QTimer::singleShot(0, photos, SIGNAL(registerPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
     connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showPanel()));

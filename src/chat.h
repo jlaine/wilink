@@ -93,6 +93,7 @@ private slots:
     void joinConversation(const QString &jid, bool isRoom);
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
+    void mucServerFound(const QString &roomServer);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
     void rosterAction(int action, const QString &jid, int type);
@@ -102,14 +103,13 @@ private slots:
     void secondsIdle(int);
     void statusChanged(int currentIndex);
 
-    void mucServerFound(const QString &roomServer);
-
     void hidePanel();
     void notifyPanel();
     void registerPanel();
     void showPanel();
 
 private:
+    void addPanel(ChatPanel *panel);
     void changeEvent(QEvent *event);
     ChatConversation *createConversation(const QString &jid, bool room);
 

@@ -222,9 +222,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
         QXmppTransferJob::SocksMethod);
     chatTransfers = new ChatTransfers(client);
     chatTransfers->setObjectName("transfers");
-    connect(chatTransfers, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
-    connect(chatTransfers, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
-    connect(chatTransfers, SIGNAL(showPanel()), this, SLOT(showPanel()));
+    addPanel(chatTransfers);
 
     /* build splitter */
     splitter = new QSplitter;
@@ -335,6 +333,16 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
+/** Connect signal for the given panel.
+ */
+void Chat::addPanel(ChatPanel *panel)
+{
+    connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
+    connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
+    connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
+    connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
+}
+
 void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
@@ -442,6 +450,7 @@ void Chat::panelChanged(int index)
         return;
     rosterModel->clearPendingMessages(widget->objectName());
     rosterView->selectContact(widget->objectName());
+    widget->setFocus();
 }
 
 /** Prompt the user for a new group chat then join it.
@@ -461,12 +470,9 @@ void Chat::changeEvent(QEvent *event)
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange && isActiveWindow())
     {
-        QWidget *widget = conversationPanel->currentWidget();
-        if (widget)
-        {
-            rosterModel->clearPendingMessages(widget->objectName());
-            widget->setFocus();
-        }
+        int index = conversationPanel->currentIndex();
+        if (index >= 0)
+            panelChanged(index);
     }
 }
 
@@ -496,10 +502,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
-    connect(dialog, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
-    connect(dialog, SIGNAL(showPanel()), this, SLOT(showPanel()));
-    QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
+    addPanel(dialog);
     return dialog;
 }
 
@@ -552,9 +555,7 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
     if (!dialog)
         dialog = createConversation(jid, isRoom);
-
-    conversationPanel->setCurrentWidget(dialog);
-    dialog->setFocus();
+    QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
 }
 
 void Chat::messageReceived(const QXmppMessage &msg)
@@ -584,6 +585,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         if (!conversationPanel->findChild<ChatDialog*>(bareJid) && !msg.body().isEmpty())
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
+            QTimer::singleShot(0, dialog, SIGNAL(registerPanel()));
             dialog->messageReceived(msg);
         }
         break;
@@ -692,7 +694,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 
     /* set security parameters */
     config.setAutoAcceptSubscriptions(false);
-    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    //config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(ignoreSslErrors);
 
     /* set keep alive */
@@ -713,10 +715,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
         if (!panel)
             continue;
         chatPanels << panel;
-        connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
-        connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
-        connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
-        connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
+        addPanel(panel);
     }
     return true;
 }
