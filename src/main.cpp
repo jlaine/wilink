@@ -41,6 +41,7 @@ Q_IMPORT_PLUGIN(console)
 Q_IMPORT_PLUGIN(diagnostics)
 Q_IMPORT_PLUGIN(photos)
 Q_IMPORT_PLUGIN(shares)
+Q_IMPORT_PLUGIN(transfers)
 
 static int aborted = 0;
 static void signal_handler(int sig)

@@ -90,10 +90,12 @@ public:
 
     int activeJobs(QXmppTransferJob::Direction direction) const;
     void addJob(QXmppTransferJob *job);
-    void sendFile(const QString &fullJid);
 
     static QString availableFilePath(const QString &dirPath, const QString &fileName);
     static QString sizeToString(qint64 size);
+
+public slots:
+    void sendFile(const QString &fullJid);
 
 protected:
     QSize sizeHint() const;

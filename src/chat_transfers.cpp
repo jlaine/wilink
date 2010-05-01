@@ -35,6 +35,8 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppUtils.h"
 
+#include "chat.h"
+#include "chat_plugin.h"
 #include "chat_transfers.h"
 #include "systeminfo.h"
 
@@ -236,6 +238,10 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
 ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
     : ChatPanel(parent), client(xmppClient)
 {
+    // disable in-band bytestreams
+    client->getTransferManager().setSupportedMethods(
+        QXmppTransferJob::SocksMethod);
+
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
 
@@ -415,4 +421,25 @@ void ChatTransfers::updateButtons()
         removeButton->setEnabled(true);
     }
 }
+
+// PLUGIN
+
+class TransfersPlugin : public ChatPlugin
+{
+public:
+    ChatPanel *createPanel(Chat *chat);
+};
+
+ChatPanel *TransfersPlugin::createPanel(Chat *chat)
+{
+    ChatTransfers *transfers = new ChatTransfers(chat->chatClient());
+    transfers->setObjectName("transfers");
+    connect(chat, SIGNAL(sendFile(QString)), transfers, SLOT(sendFile(QString)));
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), chat);
+    connect(shortcut, SIGNAL(activated()), transfers, SIGNAL(showPanel()));
+    return transfers;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(transfers, TransfersPlugin)
 

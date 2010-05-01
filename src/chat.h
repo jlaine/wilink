@@ -30,7 +30,6 @@ class ChatPanel;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
-class ChatTransfers;
 class Idle;
 class QComboBox;
 class QLabel;
@@ -41,7 +40,6 @@ class QSystemTrayIcon;
 class QXmppArchiveChat;
 class QXmppShareGetIq;
 class QXmppShareSearchIq;
-class QXmppTransferJob;
 class QXmppVCard;
 class QXmppVCardManager;
 class QXmppMucOwnerIq;
@@ -83,6 +81,9 @@ public:
     ChatRosterModel *chatRosterModel();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
 
+signals:
+    void sendFile(const QString &jid);
+
 private slots:
     void addContact();
     void addRoom();
@@ -122,7 +123,6 @@ private:
 
     QPushButton *addButton;
     QPushButton *roomButton;
-    ChatTransfers *chatTransfers;
     ChatClient *client;
     QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;

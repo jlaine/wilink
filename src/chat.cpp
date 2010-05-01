@@ -63,7 +63,6 @@
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
-#include "chat_transfers.h"
 #include "systeminfo.h"
 
 #ifdef QT_MAC_USE_COCOA
@@ -217,13 +216,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     logger->setLoggingType(QXmppLogger::SignalLogging);
     client->setLogger(logger);
 
-    /* set up transfers window */
-    client->getTransferManager().setSupportedMethods(
-        QXmppTransferJob::SocksMethod);
-    chatTransfers = new ChatTransfers(client);
-    chatTransfers->setObjectName("transfers");
-    addPanel(chatTransfers);
-
     /* build splitter */
     splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
@@ -292,10 +284,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showPanel()));
 #ifdef Q_OS_MAC
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 }
@@ -303,7 +293,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 Chat::~Chat()
 {
     delete idle;
-    delete chatTransfers;
     foreach (ChatPanel *panel, chatPanels)
         delete panel;
 
@@ -825,7 +814,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             // find first resource supporting file transfer
             QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
             if (fullJids.size())
-                chatTransfers->sendFile(fullJids.first());
+                emit sendFile(fullJids.first());
        }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
