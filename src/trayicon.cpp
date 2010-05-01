@@ -298,7 +298,10 @@ void TrayIcon::resetChats()
         else
             chat->setWindowTitle(QString("%1 - %2").arg(auth.user(), qApp->applicationName()));
         chat->show();
-        chat->open(auth.user(), auth.password(), true);
+
+        QString domain = jid.split("@").last();
+        bool ignoreSslErrors = domain != "wifirst.net";
+        chat->open(auth.user(), auth.password(), ignoreSslErrors);
         chats << chat;
         xpos += 300;
     }
