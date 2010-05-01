@@ -433,21 +433,17 @@ void Chat::registerPanel()
 
 /** Show a panel.
  */
-void Chat::showPanel(QWidget *panel)
+void Chat::showPanel()
 {
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (!panel)
+        return;
     rosterModel->addItem(ChatRosterItem::Other,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
     addPanel(panel);
     conversationPanel->setCurrentWidget(panel);
-}
-
-void Chat::showPanel()
-{
-    QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (panel)
-        showPanel(panel);
 }
 
 void Chat::panelChanged(int index)
@@ -908,7 +904,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             {
                 if (panel->objectName() == jid)
                 {
-                    showPanel(panel);
+                    QTimer::singleShot(0, panel, SIGNAL(showPanel()));
                     break;
                 }
             }

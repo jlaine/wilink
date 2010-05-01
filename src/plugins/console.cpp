@@ -30,7 +30,7 @@
 #include "utils.h"
 
 ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
-    : ChatPanel(parent), currentLogger(logger)
+    : ChatPanel(parent), connected(false), currentLogger(logger)
 {
     setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Debugging console"));
@@ -65,7 +65,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
-    connect(this, SIGNAL(hidePanel()), this, SLOT(slotClose()));
+    connect(this, SIGNAL(hidePanel()), this, SLOT(slotHide()));
     connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
 }
 
@@ -106,14 +106,20 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     }
 }
 
-void ChatConsole::slotClose()
+void ChatConsole::slotHide()
 {
+    if (!connected)
+        return;
     disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
+    connected = false;
 }
 
 void ChatConsole::slotShow()
 {
+    if (connected)
+        return;
     connect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
+    connected = true;
 }
 
 

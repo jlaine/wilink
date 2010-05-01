@@ -83,7 +83,7 @@ public:
     ChatRosterModel *chatRosterModel();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
 
-protected slots:
+private slots:
     void addContact();
     void addRoom();
     void connected();
@@ -110,7 +110,7 @@ protected slots:
     void registerPanel();
     void showPanel();
 
-protected:
+private:
     void addPanel(QWidget *panel);
     void removePanel(QWidget *panel);
     void showPanel(QWidget *widget);

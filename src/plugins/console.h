@@ -41,11 +41,12 @@ public:
 
 private slots:
     void slotShow();
-    void slotClose();
+    void slotHide();
     void message(QXmppLogger::MessageType type, const QString &msg);
 
 private:
     QTextBrowser *browser;
+    bool connected;
     QXmppLogger *currentLogger;
     QCheckBox *showDebug;
     QCheckBox *showPackets;
