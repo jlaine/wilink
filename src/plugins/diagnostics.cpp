@@ -28,6 +28,7 @@
 #include <QProgressBar>
 #include <QShortcut>
 #include <QTextBrowser>
+#include <QTimer>
 #include <QThread>
 
 #include "qnetio/mime.h"
@@ -217,7 +218,7 @@ static QString dumpPings(const QList<Ping> &pings)
 }
 
 Diagnostics::Diagnostics(QWidget *parent)
-    : ChatPanel(parent), networkThread(NULL)
+    : ChatPanel(parent), displayed(false), networkThread(NULL)
 {
     /* prepare network access manager */
     network = new QNetworkAccessManager(this);
@@ -252,11 +253,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
 
-    /* set up keyboard shortcuts */
-#ifdef Q_OS_MAC
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
-#endif
+    connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
 }
 
 void Diagnostics::addItem(const QString &title, const QString &value)
@@ -345,11 +342,12 @@ void Diagnostics::setUrl(const QUrl &url)
         sendButton->show();
 }
 
-void Diagnostics::show()
+void Diagnostics::slotShow()
 {
-    if (!isVisible())
-        refresh();
-    QWidget::show();
+    if (displayed)
+        return;
+    refresh();
+    displayed = true;
 }
 
 void Diagnostics::showDns(const QList<QHostInfo> &results)
@@ -443,6 +441,7 @@ ChatPanel *DiagnosticsPlugin::createPanel(Chat *chat)
 {
     Diagnostics *diagnostics = new Diagnostics;
     diagnostics->setObjectName("diagnostics");
+    QTimer::singleShot(500, diagnostics, SIGNAL(registerPanel()));
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
     connect(shortcut, SIGNAL(activated()), diagnostics, SIGNAL(showPanel()));
