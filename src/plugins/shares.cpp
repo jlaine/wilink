@@ -215,6 +215,8 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     setClient(baseClient);
 
+    setFocusProxy(lineEdit);
+
     /* database signals */
     connect(db, SIGNAL(directoryChanged(QString)),
         this, SLOT(directoryChanged(QString)));
