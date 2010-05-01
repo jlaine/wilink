@@ -335,19 +335,6 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
-/** Add a panel or show it.
- */
-void Chat::addPanel(QWidget *panel)
-{
-    if (conversationPanel->indexOf(panel) >= 0)
-        return;
-
-    conversationPanel->addWidget(panel);
-    conversationPanel->show();
-    if (conversationPanel->count() == 1)
-        resizeContacts();
-}
-
 void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
@@ -355,7 +342,12 @@ void Chat::hidePanel()
         return;
 
     // close view
-    removePanel(panel);
+    if (conversationPanel->count() == 1)
+    {
+        conversationPanel->hide();
+        QTimer::singleShot(100, this, SLOT(resizeContacts()));
+    }
+    conversationPanel->removeWidget(panel);
 
     // cleanup
     ChatConversation *conversation = qobject_cast<ChatConversation*>(panel);
@@ -402,22 +394,6 @@ void Chat::notifyPanel()
 #endif
 }
 
-/** Remove a panel.
- */
-void Chat::removePanel(QWidget *panel)
-{
-    if (conversationPanel->indexOf(panel) < 0)
-        return;
-
-    // close view
-    if (conversationPanel->count() == 1)
-    {
-        conversationPanel->hide();
-        QTimer::singleShot(100, this, SLOT(resizeContacts()));
-    }
-    conversationPanel->removeWidget(panel);
-}
-
 /** Register a panel in the roster list.
   */
 void Chat::registerPanel()
@@ -441,11 +417,21 @@ void Chat::showPanel()
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (!panel)
         return;
+
+    // register panel
     rosterModel->addItem(ChatRosterItem::Other,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
-    addPanel(panel);
+
+    // add panel
+    if (conversationPanel->indexOf(panel) < 0)
+    {
+        conversationPanel->addWidget(panel);
+        conversationPanel->show();
+        if (conversationPanel->count() == 1)
+            resizeContacts();
+    }
     conversationPanel->setCurrentWidget(panel);
 }
 

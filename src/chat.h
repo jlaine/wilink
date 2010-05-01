@@ -110,9 +110,6 @@ private slots:
     void showPanel();
 
 private:
-    void addPanel(QWidget *panel);
-    void removePanel(QWidget *panel);
-
     void changeEvent(QEvent *event);
     ChatConversation *createConversation(const QString &jid, bool room);
 
