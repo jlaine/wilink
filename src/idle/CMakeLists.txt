@@ -4,6 +4,7 @@ include(${QT_USE_FILE})
 
 if(APPLE)
     set(idle_SOURCES ${idle_SOURCES} idle_mac.cpp)
+    set(IDLE_LIBRARIES "-framework Carbon")
 elseif(WIN32)
     set(idle_SOURCES ${idle_SOURCES} idle_win.cpp)
 else(APPLE)
