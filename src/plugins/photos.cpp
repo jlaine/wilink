@@ -421,6 +421,8 @@ void Photos::fileOpened(const QUrl &url)
 
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Return), label);
     connect(shortcut, SIGNAL(activated()), this, SLOT(fileNext()));
+    shortcut = new QShortcut(QKeySequence(Qt::Key_Enter), label);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(fileNext()));
     pushView(label);
 
     // download image
