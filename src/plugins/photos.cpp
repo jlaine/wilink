@@ -130,6 +130,11 @@ void PhotosList::setBaseDrop(bool accept)
     baseDrop = accept;
 }
 
+FileInfoList PhotosList::entries() const
+{
+    return fileList;
+}
+
 void PhotosList::setEntries(const FileInfoList &entries)
 {
     QFileIconProvider iconProvider;
@@ -363,6 +368,25 @@ void Photos::createFolder()
     }
 }
 
+void Photos::fileNext()
+{
+    QLabel *label = qobject_cast<QLabel*>(photosView->currentWidget());
+    if (!label)
+        return;
+
+    // check if we have reached end of playlist
+    playListPosition++;
+    if (playListPosition >= playList.size())
+    {
+        goBack();
+        return;
+    }
+
+    // download image
+    downloadQueue.append(Job(label, playList[playListPosition], FileSystem::LargeSize));
+    processDownloadQueue();
+}
+
 /** Display the file at the given URL.
  *
  * @param url
@@ -376,6 +400,17 @@ void Photos::fileOpened(const QUrl &url)
     createButton->setEnabled(false);
     helpLabel->hide();
 
+    // build playlist
+    PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
+    playList.clear();
+    playListPosition = 0;
+    foreach (const FileInfo &info, listView->entries())
+    {
+        if (info.url() == url)
+            playListPosition = playList.size();
+        playList << info.url();
+    }
+
     // create white label
     QLabel *label = new QLabel(tr("Loading image.."));
     label->setAlignment(Qt::AlignCenter);
@@ -383,6 +418,9 @@ void Photos::fileOpened(const QUrl &url)
     QPalette pal = label->palette();
     pal.setColor(QPalette::Background, Qt::white);
     label->setPalette(pal);
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Return), label);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(fileNext()));
     pushView(label);
 
     // download image
