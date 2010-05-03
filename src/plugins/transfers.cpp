@@ -36,6 +36,7 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_client.h"
 #include "chat_plugin.h"
 #include "systeminfo.h"
 #include "transfers.h"

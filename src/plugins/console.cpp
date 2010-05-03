@@ -25,6 +25,7 @@
 #include <QTextBrowser>
 
 #include "chat.h"
+#include "chat_client.h"
 #include "chat_plugin.h"
 #include "console.h"
 #include "utils.h"

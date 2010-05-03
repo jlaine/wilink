@@ -18,6 +18,7 @@ set(wiLink_SOURCES
     application.cpp
     chat.cpp
     chat_accounts.cpp
+    chat_client.cpp
     chat_conversation.cpp
     chat_dialog.cpp
     chat_edit.cpp
@@ -44,6 +45,7 @@ set(wiLink_SOURCES
 set(wiLink_MOC_HEADERS
     chat.h
     chat_accounts.h
+    chat_client.h
     chat_conversation.h
     chat_dialog.h
     chat_edit.h

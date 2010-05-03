@@ -25,6 +25,7 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
+class ChatClient;
 class ChatConversation;
 class ChatPanel;
 class ChatRoom;
@@ -38,36 +39,9 @@ class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppArchiveChat;
-class QXmppShareGetIq;
-class QXmppShareSearchIq;
 class QXmppVCard;
 class QXmppVCardManager;
 class QXmppMucOwnerIq;
-
-void dumpElement(const QXmppElement &item, int level = 0);
-
-class ChatClient : public QXmppClient
-{
-    Q_OBJECT
-
-public:
-    ChatClient(QObject *parent);
-    virtual bool handleStreamElement(const QDomElement &element);
-
-signals:
-    void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
-    void mucServerFound(const QString &mucServer);
-    void shareGetIqReceived(const QXmppShareGetIq &iq);
-    void shareSearchIqReceived(const QXmppShareSearchIq &iq);
-    void shareServerFound(const QString &shareServer);
-
-private slots:
-    void slotConnected();
-    void slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco);
-
-private:
-    QStringList discoQueue;
-};
 
 class Chat : public QWidget
 {
