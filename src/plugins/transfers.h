@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_CHAT_TRANSFERS_H__
-#define __WILINK_CHAT_TRANSFERS_H__
+#ifndef __WILINK_TRANSFERS_H__
+#define __WILINK_TRANSFERS_H__
 
 #include <QMessageBox>
 #include <QTableWidget>

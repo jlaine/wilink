@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PHOTOS_H__
-#define __PHOTOS_H__
+#ifndef __WILINK_PHOTOS_H__
+#define __WILINK_PHOTOS_H__
 
 #include <QListWidget>
 #include <QUrl>
