@@ -38,9 +38,6 @@ class QPushButton;
 class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
-class QXmppArchiveChat;
-class QXmppVCard;
-class QXmppVCardManager;
 class QXmppMucOwnerIq;
 
 class Chat : public QWidget

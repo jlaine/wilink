@@ -49,7 +49,6 @@
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppUtils.h"
-#include "qxmpp/QXmppVCardManager.h"
 #include "qxmpp/QXmppVersionIq.h"
 
 #include "qnetio/dns.h"
