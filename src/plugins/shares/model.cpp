@@ -17,12 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDesktopServices>
 #include <QFileIconProvider>
-#include <QStringList>
-#include <QUrl>
-
-#include "qxmpp/QXmppShareIq.h"
 
 #include "plugins/shares/database.h"
 #include "plugins/shares/model.h"

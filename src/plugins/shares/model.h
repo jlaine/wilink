@@ -25,9 +25,6 @@
 
 #include "qxmpp/QXmppShareIq.h"
 
-class ChatSharesDatabase;
-class QTimer;
-
 enum ChatSharesColumns
 {
     NameColumn,
