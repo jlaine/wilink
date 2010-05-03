@@ -38,6 +38,7 @@ set(wiLink_SOURCES
     utils.cpp
     plugins/console.cpp
     plugins/diagnostics.cpp
+    plugins/menu.cpp
     plugins/photos.cpp
     plugins/shares.cpp
     plugins/transfers.cpp)
