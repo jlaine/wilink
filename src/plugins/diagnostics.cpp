@@ -254,6 +254,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     setWindowTitle(tr("Diagnostics"));
 
     connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
+    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 void Diagnostics::addItem(const QString &title, const QString &value)
@@ -434,18 +435,20 @@ void Diagnostics::showWireless(const WirelessResult &result)
 class DiagnosticsPlugin : public ChatPlugin
 {
 public:
-    ChatPanel *createPanel(Chat *chat);
+    bool initialize(Chat *chat);
 };
 
-ChatPanel *DiagnosticsPlugin::createPanel(Chat *chat)
+bool DiagnosticsPlugin::initialize(Chat *chat)
 {
+    /* register panel */
     Diagnostics *diagnostics = new Diagnostics;
     diagnostics->setObjectName("diagnostics");
-    QTimer::singleShot(0, diagnostics, SIGNAL(registerPanel()));
+    chat->addPanel(diagnostics);
 
+    /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
     connect(shortcut, SIGNAL(activated()), diagnostics, SIGNAL(showPanel()));
-    return diagnostics;
+    return true;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)

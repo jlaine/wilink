@@ -43,20 +43,17 @@
 
 #include "qxmpp/QXmppConfiguration.h"
 #include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppMucIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
-#include "qxmpp/QXmppShareIq.h"
-#include "qxmpp/QXmppTransferManager.h"
 #include "qxmpp/QXmppUtils.h"
-#include "qxmpp/QXmppVCardManager.h"
 #include "qxmpp/QXmppVersionIq.h"
 
 #include "qnetio/dns.h"
 #include "chat.h"
+#include "chat_client.h"
 #include "chat_dialog.h"
 #include "chat_form.h"
 #include "chat_plugin.h"
@@ -81,121 +78,6 @@ enum StatusIndexes {
     AwayIndex = 2,
     OfflineIndex = 3,
 };
-
-void dumpElement(const QXmppElement &item, int level)
-{
-    QString pad(level * 2, ' ');
-    if (item.value().isEmpty())
-        qDebug() << (pad + "*").toAscii().constData() << item.tagName();
-    else
-        qDebug() << (pad + "*").toAscii().constData() << item.tagName() << ":" << item.value();
-    foreach (const QString &attr, item.attributeNames())
-        qDebug() << (pad + "  -").toAscii().constData() << attr << ":" << item.attribute(attr);
-    QXmppElement child = item.firstChildElement();
-    while (!child.isNull())
-    {
-        dumpElement(child, level+1);
-        child = child.nextSiblingElement();
-    }
-}
-
-ChatClient::ChatClient(QObject *parent)
-    : QXmppClient(parent)
-{
-    connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
-}
-
-bool ChatClient::handleStreamElement(const QDomElement &element)
-{
-    if (element.tagName() == "iq")
-    {
-        if (QXmppShareGetIq::isShareGetIq(element))
-        {
-            QXmppShareGetIq getIq;
-            getIq.parse(element);
-            emit shareGetIqReceived(getIq);
-            return true;
-        }
-        else if (QXmppShareSearchIq::isShareSearchIq(element))
-        {
-            QXmppShareSearchIq searchIq;
-            searchIq.parse(element);
-            emit shareSearchIqReceived(searchIq);
-            return true;
-        }
-        else if (QXmppMucOwnerIq::isMucOwnerIq(element))
-        {
-            QXmppMucOwnerIq mucIq;
-            mucIq.parse(element);
-            emit mucOwnerIqReceived(mucIq);
-            return true;
-        }
-    }
-    return false;
-}
-
-void ChatClient::slotConnected()
-{
-    /* discover services */
-    QXmppDiscoveryIq disco;
-    disco.setTo(getConfiguration().domain());
-    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    sendPacket(disco);
-}
-
-void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
-{
-    // we only want results
-    if (disco.type() != QXmppIq::Result)
-        return;
-
-    if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == getConfiguration().domain())
-    {
-        // root items
-        discoQueue.clear();
-        foreach (const QXmppDiscoveryIq::Item &item, disco.items())
-        {
-            if (!item.jid().isEmpty() && item.node().isEmpty())
-            {
-                discoQueue.append(item.jid());
-                // get info for item
-                QXmppDiscoveryIq info;
-                info.setQueryType(QXmppDiscoveryIq::InfoQuery);
-                info.setTo(item.jid());
-                sendPacket(info);
-            }
-        }
-    }
-    else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery &&
-             discoQueue.contains(disco.from()))
-    {
-        discoQueue.removeAll(disco.from());
-        // check if it's a conference server
-        foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
-        {
-            if (id.category() == "conference" &&
-                id.type() == "text")
-            {
-                logger()->log(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
-                emit mucServerFound(disco.from());
-            }
-            else if (id.category() == "proxy" &&
-                     id.type() == "bytestreams")
-            {
-                logger()->log(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
-                getTransferManager().setProxy(disco.from());
-            }
-            else if (id.category() == "store" &&
-                     id.type() == "file")
-            {
-                logger()->log(QXmppLogger::InformationMessage, "Found share server " + disco.from());
-                emit shareServerFound(disco.from());
-            }
-        }
-    }
-}
 
 Chat::Chat(QSystemTrayIcon *trayIcon)
     : autoAway(false),
@@ -322,14 +204,23 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
-/** Connect signal for the given panel.
+/** Connect signals for the given panel.
  */
 void Chat::addPanel(ChatPanel *panel)
 {
+    if (chatPanels.contains(panel))
+        return;
+    connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
+    chatPanels << panel;
+}
+
+void Chat::destroyPanel(QObject *obj)
+{
+    chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
 
 void Chat::hidePanel()
@@ -698,13 +589,8 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     foreach (QObject *object, plugins)
     {
         ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
-        if (!plugin)
-            continue;
-        ChatPanel *panel = plugin->createPanel(this);
-        if (!panel)
-            continue;
-        chatPanels << panel;
-        addPanel(panel);
+        if (plugin)
+            plugin->initialize(this);
     }
     return true;
 }

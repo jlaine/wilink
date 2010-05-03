@@ -25,6 +25,7 @@
 #include <QTextBrowser>
 
 #include "chat.h"
+#include "chat_client.h"
 #include "chat_plugin.h"
 #include "console.h"
 #include "utils.h"
@@ -167,17 +168,20 @@ void Highlighter::highlightBlock(const QString &text)
 class ConsolePlugin : public ChatPlugin
 {
 public:
-    ChatPanel *createPanel(Chat *chat);
+    bool initialize(Chat *chat);
 };
 
-ChatPanel *ConsolePlugin::createPanel(Chat *chat)
+bool ConsolePlugin::initialize(Chat *chat)
 {
-    ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger());
-    chatConsole->setObjectName("console");
+    /* register panel */
+    ChatConsole *console = new ChatConsole(chat->chatClient()->logger());
+    console->setObjectName("console");
+    chat->addPanel(console);
 
+    /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
-    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showPanel()));
-    return chatConsole;
+    connect(shortcut, SIGNAL(activated()), console, SIGNAL(showPanel()));
+    return true;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(console, ConsolePlugin)

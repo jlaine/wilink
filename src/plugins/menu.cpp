@@ -17,22 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtPlugin>
+#include "chat.h"
+#include "chat_client.h"
+#include "chat_plugin.h"
 
-class Chat;
-class ChatPanel;
+// PLUGIN
 
-class ChatPluginInterface
+class MenuPlugin : public ChatPlugin
 {
 public:
-    virtual bool initialize(Chat *chat) = 0;
+    bool initialize(Chat *chat);
 };
 
-Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")
-
-class ChatPlugin : public QObject, public ChatPluginInterface
+bool MenuPlugin::initialize(Chat *chat)
 {
-    Q_OBJECT
-    Q_INTERFACES(ChatPluginInterface)
-};
+    QString url;
+    QString domain = chat->chatClient()->getConfiguration().domain();
+    if (domain != "wifirst.net")
+        return false;
+
+    return true;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(menu, MenuPlugin)
 

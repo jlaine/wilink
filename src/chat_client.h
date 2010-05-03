@@ -17,22 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtPlugin>
+#include "qxmpp/QXmppClient.h"
 
-class Chat;
-class ChatPanel;
+class QXmppMucOwnerIq;
+class QXmppShareGetIq;
+class QXmppShareSearchIq;
 
-class ChatPluginInterface
-{
-public:
-    virtual bool initialize(Chat *chat) = 0;
-};
-
-Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")
-
-class ChatPlugin : public QObject, public ChatPluginInterface
+class ChatClient : public QXmppClient
 {
     Q_OBJECT
-    Q_INTERFACES(ChatPluginInterface)
+
+public:
+    ChatClient(QObject *parent);
+    virtual bool handleStreamElement(const QDomElement &element);
+
+signals:
+    void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
+    void mucServerFound(const QString &mucServer);
+    void shareGetIqReceived(const QXmppShareGetIq &iq);
+    void shareSearchIqReceived(const QXmppShareSearchIq &iq);
+    void shareServerFound(const QString &shareServer);
+
+private slots:
+    void slotConnected();
+    void slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco);
+
+private:
+    QStringList discoQueue;
 };
+
 

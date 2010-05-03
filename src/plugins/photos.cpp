@@ -41,6 +41,7 @@
 #include <QUrl>
 
 #include "chat.h"
+#include "chat_client.h"
 #include "chat_plugin.h"
 #include "photos.h"
 
@@ -265,6 +266,9 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     setFocusProxy(photosView);
     resize(QSize(600, 400).expandedTo(minimumSizeHint()));
+
+    /* register panel */
+    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 /** When a command finishes, process its results.
@@ -598,10 +602,10 @@ void Photos::showMessage(const QString &message)
 class PhotosPlugin : public ChatPlugin
 {
 public:
-    ChatPanel *createPanel(Chat *chat);
+    bool initialize(Chat *chat);
 };
 
-ChatPanel *PhotosPlugin::createPanel(Chat *chat)
+bool PhotosPlugin::initialize(Chat *chat)
 {
     QString url;
     QString domain = chat->chatClient()->getConfiguration().domain();
@@ -610,16 +614,18 @@ ChatPanel *PhotosPlugin::createPanel(Chat *chat)
     else if (domain == "gmail.com")
         url = "picasa://default";
     else
-        return 0;
+        return false;
 
+    /* register panel */
     Photos *photos = new Photos(url);
     //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
-    QTimer::singleShot(0, photos, SIGNAL(registerPanel()));
+    chat->addPanel(photos);
 
+    /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
     connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showPanel()));
-    return photos;
+    return true;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)
