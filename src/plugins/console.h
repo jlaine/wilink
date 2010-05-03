@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_CHAT_CONSOLE_H__
-#define __WILINK_CHAT_CONSOLE_H__
+#ifndef __WILINK_CONSOLE_H__
+#define __WILINK_CONSOLE_H__
 
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>

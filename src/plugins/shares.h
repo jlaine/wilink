@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_CHAT_SHARES_H__
-#define __WILINK_CHAT_SHARES_H__
+#ifndef __WILINK_SHARES_H__
+#define __WILINK_SHARES_H__
 
 #include <QIcon>
 #include <QStyledItemDelegate>
