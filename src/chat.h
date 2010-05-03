@@ -21,6 +21,7 @@
 #define __WILINK_CHAT_H__
 
 #include <QWidget>
+#include <QMainWindow>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
@@ -40,7 +41,7 @@ class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppMucOwnerIq;
 
-class Chat : public QWidget
+class Chat : public QMainWindow
 {
     Q_OBJECT
 

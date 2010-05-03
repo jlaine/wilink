@@ -28,12 +28,14 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QList>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QStatusBar>
 #include <QStringList>
 #include <QSystemTrayIcon>
 #include <QTimer>
@@ -85,6 +87,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     isConnected(false),
     systemTrayIcon(trayIcon)
 {
+    setWindowIcon(QIcon(":/chat.png"));
+
     client = new ChatClient(this);
     rosterModel =  new ChatRosterModel(client);
 
@@ -115,27 +119,22 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
     splitter->addWidget(conversationPanel);
     splitter->setStretchFactor(1, 1);
+    setCentralWidget(splitter);
 
     /* build status bar */
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->setMargin(10);
-    hbox->setSpacing(10);
-
     addButton = new QPushButton;
     addButton->setEnabled(false);
     addButton->setIcon(QIcon(":/add.png"));
     addButton->setToolTip(tr("Add a contact"));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
-    hbox->addWidget(addButton);
+    statusBar()->addWidget(addButton);
 
     roomButton = new QPushButton;
     roomButton->setEnabled(false);
     roomButton->setIcon(QIcon(":/chat.png"));
     roomButton->setToolTip(tr("Join a chat room"));
     connect(roomButton, SIGNAL(clicked()), this, SLOT(addRoom()));
-    hbox->addWidget(roomButton);
-
-    hbox->addStretch();
+    statusBar()->addWidget(roomButton);
 
     statusCombo = new QComboBox;
     statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
@@ -144,17 +143,12 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
     statusCombo->setCurrentIndex(OfflineIndex);
     connect(statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
-    hbox->addWidget(statusCombo);
+    statusBar()->addPermanentWidget(statusCombo);
 
-    /* assemble UI */
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-    layout->addWidget(splitter, 1);
-    layout->addLayout(hbox);
-
-    setLayout(layout);
-    setWindowIcon(QIcon(":/chat.png"));
+    /* create menu */
+    QMenu *menu = menuBar()->addMenu("&File");
+    QAction *action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
     /* set up client */
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
