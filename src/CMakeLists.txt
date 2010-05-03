@@ -41,6 +41,7 @@ set(wiLink_SOURCES
     plugins/photos.cpp
     plugins/shares.cpp
     plugins/shares/database.cpp
+    plugins/shares/model.cpp
     plugins/transfers.cpp)
 
 set(wiLink_MOC_HEADERS
@@ -65,6 +66,7 @@ set(wiLink_MOC_HEADERS
     plugins/photos.h
     plugins/shares.h
     plugins/shares/database.h
+    plugins/shares/model.h
     plugins/transfers.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)

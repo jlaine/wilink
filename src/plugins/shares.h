@@ -34,6 +34,7 @@ class Chat;
 class ChatClient;
 class ChatRosterModel;
 class ChatSharesDatabase;
+class ChatSharesModel;
 class ChatSharesTab;
 class ChatTransfers;
 class ChatTransfersView;
@@ -51,87 +52,6 @@ class ChatSharesDelegate : public QStyledItemDelegate
 public:
     ChatSharesDelegate(QObject *parent);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-};
-
-class ChatSharesModelQuery
-{
-public:
-    enum Operation
-    {
-        None,
-        Equals,
-        NotEquals,
-        // Contains,
-    };
-
-    ChatSharesModelQuery();
-    ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data);
-
-    bool match(QXmppShareItem *item) const;
-
-    ChatSharesModelQuery operator&&(const ChatSharesModelQuery &other) const;
-    ChatSharesModelQuery operator||(const ChatSharesModelQuery &other) const;
-
-private:
-    enum Combine
-    {
-        NoCombine,
-        AndCombine,
-        OrCombine,
-    };
-
-    int m_role;
-    ChatSharesModelQuery::Operation m_operation;
-    QVariant m_data;
-
-    QList<ChatSharesModelQuery> m_children;
-    ChatSharesModelQuery::Combine m_combine;
-};
-
-/** Model representing a tree of share items (collections and files).
- */
-class ChatSharesModel : public QAbstractItemModel
-{
-    Q_OBJECT
-
-public:
-    enum Recurse
-    {
-        DontRecurse,
-        PreRecurse,
-        PostRecurse,
-    };
-
-    class QueryOptions
-    {
-    public:
-        QueryOptions(Recurse recurse = PreRecurse);
-        Recurse recurse;
-    };
-
-    ChatSharesModel(QObject *parent = 0);
-    ~ChatSharesModel();
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
-    QXmppShareItem *addItem(const QXmppShareItem &item);
-    QList<QXmppShareItem*> filter(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
-    QXmppShareItem *get(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
-    void refreshItem(QXmppShareItem *item);
-    void removeItem(QXmppShareItem *item);
-    QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
-
-private:
-    QXmppShareItem *rootItem;
-
-    // cached icons, to avoid reloading them whenever an item is added
-    QIcon collectionIcon;
-    QIcon fileIcon;
-    QIcon peerIcon;
 };
 
 /** View for displaying a tree of share items.
