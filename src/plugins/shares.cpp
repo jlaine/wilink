@@ -1368,18 +1368,21 @@ void ChatSharesTab::setText(const QString &text)
 class SharesPlugin : public ChatPlugin
 {
 public:
-    ChatPanel *createPanel(Chat *chat);
+    bool initialize(Chat *chat);
 };
 
-ChatPanel *SharesPlugin::createPanel(Chat *chat)
+bool SharesPlugin::initialize(Chat *chat)
 {
+    /* register panel */
     ChatShares *shares = new ChatShares(chat->chatClient());
     shares->setObjectName("shares");
     shares->setRoster(chat->chatRosterModel());
+    chat->addPanel(shares);
 
+    /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), chat);
     connect(shortcut, SIGNAL(activated()), shares, SIGNAL(showPanel()));
-    return shares;
+    return true;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(shares, SharesPlugin)

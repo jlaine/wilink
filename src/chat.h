@@ -80,6 +80,7 @@ public:
     ChatClient *chatClient();
     ChatRosterModel *chatRosterModel();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
+    void addPanel(ChatPanel *panel);
 
 signals:
     void sendFile(const QString &jid);
@@ -104,13 +105,13 @@ private slots:
     void secondsIdle(int);
     void statusChanged(int currentIndex);
 
+    void destroyPanel(QObject *obj);
     void hidePanel();
     void notifyPanel();
     void registerPanel();
     void showPanel();
 
 private:
-    void addPanel(ChatPanel *panel);
     void changeEvent(QEvent *event);
     ChatConversation *createConversation(const QString &jid, bool room);
 

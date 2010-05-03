@@ -322,14 +322,23 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
-/** Connect signal for the given panel.
+/** Connect signals for the given panel.
  */
 void Chat::addPanel(ChatPanel *panel)
 {
+    if (chatPanels.contains(panel))
+        return;
+    connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
+    chatPanels << panel;
+}
+
+void Chat::destroyPanel(QObject *obj)
+{
+    chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
 
 void Chat::hidePanel()
@@ -698,13 +707,8 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     foreach (QObject *object, plugins)
     {
         ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
-        if (!plugin)
-            continue;
-        ChatPanel *panel = plugin->createPanel(this);
-        if (!panel)
-            continue;
-        chatPanels << panel;
-        addPanel(panel);
+        if (plugin)
+            plugin->initialize(this);
     }
     return true;
 }

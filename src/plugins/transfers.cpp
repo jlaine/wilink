@@ -427,18 +427,21 @@ void ChatTransfers::updateButtons()
 class TransfersPlugin : public ChatPlugin
 {
 public:
-    ChatPanel *createPanel(Chat *chat);
+    bool initialize(Chat *chat);
 };
 
-ChatPanel *TransfersPlugin::createPanel(Chat *chat)
+bool TransfersPlugin::initialize(Chat *chat)
 {
+    /* register panel */
     ChatTransfers *transfers = new ChatTransfers(chat->chatClient());
     transfers->setObjectName("transfers");
     connect(chat, SIGNAL(sendFile(QString)), transfers, SLOT(sendFile(QString)));
+    chat->addPanel(transfers);
 
+    /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), chat);
     connect(shortcut, SIGNAL(activated()), transfers, SIGNAL(showPanel()));
-    return transfers;
+    return true;
 }
 
 Q_EXPORT_STATIC_PLUGIN2(transfers, TransfersPlugin)

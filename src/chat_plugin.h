@@ -25,7 +25,7 @@ class ChatPanel;
 class ChatPluginInterface
 {
 public:
-    virtual ChatPanel *createPanel(Chat *chat) = 0;
+    virtual bool initialize(Chat *chat) = 0;
 };
 
 Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")
