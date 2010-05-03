@@ -56,7 +56,6 @@ protected slots:
     void showChats();
     void showChatAccounts();
     void showMenu();
-    void showSharesFolder();
 
 private:
     void addBaseMenu(QMenu *menu);

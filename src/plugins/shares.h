@@ -30,6 +30,7 @@
 
 #include "chat_panel.h"
 
+class Chat;
 class ChatClient;
 class ChatRosterModel;
 class ChatSharesDatabase;
@@ -160,7 +161,7 @@ class ChatShares : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatShares(ChatClient *client, QWidget *parent = 0);
+    ChatShares(ChatClient *client, Chat *chat, QWidget *parent = 0);
     void setClient(ChatClient *client);
     void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);
@@ -186,6 +187,7 @@ private slots:
     void processDownloadQueue();
     void registerWithServer();
     void queryStringChanged();
+    void shareFolder();
     void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
@@ -202,8 +204,9 @@ private:
 private:
     QString shareServer;
 
-    ChatClient *client;
     ChatClient *baseClient;
+    ChatClient *client;
+    Chat *chatWindow;
     ChatRosterModel *rosterModel;
     ChatSharesDatabase *db;
     ChatSharesModel *queueModel;

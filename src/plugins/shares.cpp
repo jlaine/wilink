@@ -20,12 +20,14 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QFileIconProvider>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMenuBar>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QShortcut>
@@ -99,8 +101,8 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
     }
 }
 
-ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent), baseClient(xmppClient), client(0), db(0), rosterModel(0)
+ChatShares::ChatShares(ChatClient *xmppClient, Chat *chat, QWidget *parent)
+    : ChatPanel(parent), baseClient(xmppClient), chatWindow(chat), client(0), db(0), rosterModel(0)
 {
     db = ChatSharesDatabase::instance();
 
@@ -639,6 +641,9 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             client->getTransferManager().setProxyOnly(true);
         }
 
+        QAction *action = chatWindow->optionsMenu()->addAction(tr("Shares folder"));
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(shareFolder()));
+
         emit registerPanel();
     }
     else if (presence.getType() == QXmppPresence::Error &&
@@ -782,6 +787,20 @@ void ChatShares::setClient(ChatClient *newClient)
 void ChatShares::setRoster(ChatRosterModel *roster)
 {
     rosterModel = roster;
+}
+
+void ChatShares::shareFolder()
+{
+    ChatSharesDatabase *db = ChatSharesDatabase::instance();
+
+    QFileDialog *dialog = new QFileDialog;
+    dialog->setDirectory(db->directory());
+    dialog->setFileMode(QFileDialog::Directory);
+    dialog->setWindowTitle(tr("Shares folder"));
+    dialog->show();
+
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
 }
 
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
@@ -1375,7 +1394,7 @@ public:
 bool SharesPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatShares *shares = new ChatShares(chat->chatClient());
+    ChatShares *shares = new ChatShares(chat->chatClient(), chat);
     shares->setObjectName("shares");
     shares->setRoster(chat->chatRosterModel());
     chat->addPanel(shares);

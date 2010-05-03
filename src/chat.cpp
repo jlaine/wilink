@@ -147,7 +147,25 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     /* create menu */
     QMenu *menu = menuBar()->addMenu("&File");
-    QAction *action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
+
+    optsMenu = new QMenu;
+    QAction *action = optsMenu->addAction(tr("Chat accounts"));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
+
+/*
+    if (Application::isInstalled())
+    {
+        action = optionsMenu->addAction(tr("Open at login"));
+        action->setCheckable(true);
+        action->setChecked(settings->value("OpenAtLogin").toBool());
+        connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
+    }
+*/
+
+    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
+    action->setMenu(optsMenu);
+
+    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
     /* set up client */
@@ -587,6 +605,11 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
             plugin->initialize(this);
     }
     return true;
+}
+
+QMenu *Chat::optionsMenu()
+{
+    return optsMenu;
 }
 
 /** Prompt the user for confirmation then remove a contact.

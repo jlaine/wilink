@@ -51,6 +51,7 @@ public:
 
     ChatClient *chatClient();
     ChatRosterModel *chatRosterModel();
+    QMenu *optionsMenu();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
     void addPanel(ChatPanel *panel);
 
@@ -98,6 +99,7 @@ private:
     QPushButton *roomButton;
     ChatClient *client;
     QList<ChatPanel*> chatPanels;
+    QMenu *optsMenu;
     ChatRosterModel *rosterModel;
     ChatRosterView *rosterView;
 

@@ -40,7 +40,6 @@
 
 #include "chat.h"
 #include "chat_accounts.h"
-#include "chat_shares_database.h"
 #include "application.h"
 #include "trayicon.h"
 #include "updatesdialog.h"
@@ -120,9 +119,6 @@ void TrayIcon::addBaseMenu(QMenu *menu)
     QMenu *optionsMenu = new QMenu;
     QAction *action = optionsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
-
-    action = optionsMenu->addAction(tr("Shares folder"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showSharesFolder()));
 
     if (Application::isInstalled())
     {
@@ -375,19 +371,5 @@ void TrayIcon::showMenu()
         updates->check();
         updatesTimer->start(7 * 24 * 3600 * 1000);
     }
-}
-
-void TrayIcon::showSharesFolder()
-{
-    ChatSharesDatabase *db = ChatSharesDatabase::instance();
-
-    QFileDialog *dialog = new QFileDialog;
-    dialog->setDirectory(db->directory());
-    dialog->setFileMode(QFileDialog::Directory);
-    dialog->setWindowTitle(tr("Shares folder"));
-    dialog->show();
-
-    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
-    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
 }
 
