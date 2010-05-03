@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QShortcut>
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
@@ -40,10 +41,11 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_plugin.h"
 #include "chat_roster.h"
-#include "chat_shares.h"
 #include "chat_shares_database.h"
-#include "chat_transfers.h"
+#include "transfers.h"
+#include "shares.h"
 #include "systeminfo.h"
 
 static int parallelDownloadLimit = 2;
@@ -212,6 +214,8 @@ ChatShares::ChatShares(ChatClient *xmppClient, QWidget *parent)
         baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     setClient(baseClient);
+
+    setFocusProxy(lineEdit);
 
     /* database signals */
     connect(db, SIGNAL(directoryChanged(QString)),
@@ -634,7 +638,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             client->getTransferManager().setProxyOnly(true);
         }
 
-        emit registerTab();
+        emit registerPanel();
     }
     else if (presence.getType() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
@@ -1358,3 +1362,25 @@ void ChatSharesTab::setText(const QString &text)
 {
     label->setText(text);
 }
+
+// PLUGIN
+
+class SharesPlugin : public ChatPlugin
+{
+public:
+    ChatPanel *createPanel(Chat *chat);
+};
+
+ChatPanel *SharesPlugin::createPanel(Chat *chat)
+{
+    ChatShares *shares = new ChatShares(chat->chatClient());
+    shares->setObjectName("shares");
+    shares->setRoster(chat->chatRosterModel());
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), chat);
+    connect(shortcut, SIGNAL(activated()), shares, SIGNAL(showPanel()));
+    return shares;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(shares, SharesPlugin)
+

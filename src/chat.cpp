@@ -29,14 +29,15 @@
 #include <QLineEdit>
 #include <QList>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStringList>
 #include <QSystemTrayIcon>
-#include <QTextBrowser>
 #include <QTimer>
+#include <QUrl>
 
 #include "idle/idle.h"
 
@@ -56,14 +57,12 @@
 
 #include "qnetio/dns.h"
 #include "chat.h"
-#include "chat_console.h"
 #include "chat_dialog.h"
 #include "chat_form.h"
+#include "chat_plugin.h"
 #include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
-#include "chat_shares.h"
-#include "chat_transfers.h"
 #include "systeminfo.h"
 
 #ifdef QT_MAC_USE_COCOA
@@ -202,7 +201,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     : autoAway(false),
     isBusy(false),
     isConnected(false),
-    chatConsole(0),
     systemTrayIcon(trayIcon)
 {
     client = new ChatClient(this);
@@ -217,29 +215,6 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     QXmppLogger *logger = new QXmppLogger(this);
     logger->setLoggingType(QXmppLogger::SignalLogging);
     client->setLogger(logger);
-
-    /* set up debugging console */
-    chatConsole = new ChatConsole;
-    chatConsole->setObjectName("console");
-    connect(chatConsole, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatConsole, SIGNAL(showTab()), this, SLOT(showPanel()));
-
-    /* set up transfers window */
-    client->getTransferManager().setSupportedMethods(
-        QXmppTransferJob::SocksMethod);
-    chatTransfers = new ChatTransfers(client);
-    chatTransfers->setObjectName("transfers");
-    connect(chatTransfers, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatTransfers, SIGNAL(registerTab()), this, SLOT(registerPanel()));
-    connect(chatTransfers, SIGNAL(showTab()), this, SLOT(showPanel()));
-
-    /* set up shares */
-    chatShares = new ChatShares(client);
-    chatShares->setObjectName("shares");
-    connect(chatShares, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(chatShares, SIGNAL(registerTab()), this, SLOT(registerPanel()));
-    connect(chatShares, SIGNAL(showTab()), this, SLOT(showPanel()));
-    chatShares->setRoster(rosterModel);
 
     /* build splitter */
     splitter = new QSplitter;
@@ -309,12 +284,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), this);
-    connect(shortcut, SIGNAL(activated()), chatTransfers, SIGNAL(showTab()));
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), this);
-    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showTab()));
 #ifdef Q_OS_MAC
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 }
@@ -322,8 +293,8 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 Chat::~Chat()
 {
     delete idle;
-    delete chatShares;
-    delete chatTransfers;
+    foreach (ChatPanel *panel, chatPanels)
+        delete panel;
 
     // disconnect
     client->disconnect();
@@ -351,27 +322,29 @@ void Chat::addContact()
     client->sendPacket(packet);
 }
 
-/** Add a panel or show it.
+/** Connect signal for the given panel.
  */
-void Chat::addPanel(QWidget *panel)
+void Chat::addPanel(ChatPanel *panel)
 {
-    if (conversationPanel->indexOf(panel) >= 0)
-        return;
-
-    conversationPanel->addWidget(panel);
-    conversationPanel->show();
-    if (conversationPanel->count() == 1)
-        resizeContacts();
+    connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
+    connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
+    connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
+    connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
 }
 
-void Chat::closePanel()
+void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (conversationPanel->indexOf(panel) < 0)
         return;
 
     // close view
-    removePanel(panel);
+    if (conversationPanel->count() == 1)
+    {
+        conversationPanel->hide();
+        QTimer::singleShot(100, this, SLOT(resizeContacts()));
+    }
+    conversationPanel->removeWidget(panel);
 
     // cleanup
     ChatConversation *conversation = qobject_cast<ChatConversation*>(panel);
@@ -381,10 +354,6 @@ void Chat::closePanel()
             rosterModel->removeItem(conversation->objectName());
         conversation->leave();
         conversation->deleteLater();
-    }
-    else if (panel == chatConsole)
-    {
-        chatConsole->setLogger(0);
     }
 }
 
@@ -422,22 +391,6 @@ void Chat::notifyPanel()
 #endif
 }
 
-/** Remove a panel.
- */
-void Chat::removePanel(QWidget *panel)
-{
-    if (conversationPanel->indexOf(panel) < 0)
-        return;
-
-    // close view
-    if (conversationPanel->count() == 1)
-    {
-        conversationPanel->hide();
-        QTimer::singleShot(100, this, SLOT(resizeContacts()));
-    }
-    conversationPanel->removeWidget(panel);
-}
-
 /** Register a panel in the roster list.
   */
 void Chat::registerPanel()
@@ -445,7 +398,10 @@ void Chat::registerPanel()
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (!panel)
         return;
-    rosterModel->addItem(ChatRosterItem::Other,
+    ChatRosterItem::Type type = ChatRosterItem::Other;
+    if (qobject_cast<ChatRoom*>(panel))
+        type = ChatRosterItem::Room;
+    rosterModel->addItem(type,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -453,23 +409,27 @@ void Chat::registerPanel()
 
 /** Show a panel.
  */
-void Chat::showPanel(QWidget *panel)
+void Chat::showPanel()
 {
-    if (panel == chatConsole)
-        chatConsole->setLogger(client->logger());
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (!panel)
+        return;
+
+    // register panel
     rosterModel->addItem(ChatRosterItem::Other,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
-    addPanel(panel);
-    conversationPanel->setCurrentWidget(panel);
-}
 
-void Chat::showPanel()
-{
-    QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (panel)
-        showPanel(panel);
+    // add panel
+    if (conversationPanel->indexOf(panel) < 0)
+    {
+        conversationPanel->addWidget(panel);
+        conversationPanel->show();
+        if (conversationPanel->count() == 1)
+            resizeContacts();
+    }
+    conversationPanel->setCurrentWidget(panel);
 }
 
 void Chat::panelChanged(int index)
@@ -479,6 +439,7 @@ void Chat::panelChanged(int index)
         return;
     rosterModel->clearPendingMessages(widget->objectName());
     rosterView->selectContact(widget->objectName());
+    widget->setFocus();
 }
 
 /** Prompt the user for a new group chat then join it.
@@ -498,12 +459,9 @@ void Chat::changeEvent(QEvent *event)
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange && isActiveWindow())
     {
-        QWidget *widget = conversationPanel->currentWidget();
-        if (widget)
-        {
-            rosterModel->clearPendingMessages(widget->objectName());
-            widget->setFocus();
-        }
+        int index = conversationPanel->currentIndex();
+        if (index >= 0)
+            panelChanged(index);
     }
 }
 
@@ -513,9 +471,6 @@ void Chat::connected()
     isConnected = true;
     addButton->setEnabled(true);
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
-
-    /* re-join conversations */
-    QTimer::singleShot(500, this, SLOT(rejoinConversations()));
 }
 
 /** Create a conversation dialog for the specified recipient.
@@ -536,12 +491,7 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     dialog->setObjectName(jid);
     dialog->setLocalName(rosterModel->ownName());
     dialog->setRemoteName(rosterModel->contactName(jid));
-    connect(dialog, SIGNAL(closeTab()), this, SLOT(closePanel()));
-    connect(dialog, SIGNAL(notifyTab()), this, SLOT(notifyPanel()));
     addPanel(dialog);
-
-    // join conversation
-    dialog->join();
     return dialog;
 }
 
@@ -594,9 +544,7 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
     ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
     if (!dialog)
         dialog = createConversation(jid, isRoom);
-
-    conversationPanel->setCurrentWidget(dialog);
-    dialog->setFocus();
+    QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
 }
 
 void Chat::messageReceived(const QXmppMessage &msg)
@@ -626,6 +574,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         if (!conversationPanel->findChild<ChatDialog*>(bareJid) && !msg.body().isEmpty())
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
+            QTimer::singleShot(0, dialog, SIGNAL(registerPanel()));
             dialog->messageReceived(msg);
         }
         break;
@@ -691,6 +640,16 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     }
 }
 
+ChatClient *Chat::chatClient()
+{
+    return client;
+}
+
+ChatRosterModel *Chat::chatRosterModel()
+{
+    return rosterModel;
+}
+
 /** Open the connection to the chat server.
  *
  * @param jid
@@ -724,7 +683,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 
     /* set security parameters */
     config.setAutoAcceptSubscriptions(false);
-    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    //config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(ignoreSslErrors);
 
     /* set keep alive */
@@ -733,22 +692,21 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 
     /* connect to server */
     client->connectToServer(config);
-    return true;
-}
 
-/** Re-join open conversations after reconnection.
- */
-void Chat::rejoinConversations()
-{
-    for (int i = 0; i < conversationPanel->count(); i++)
+    /* load plugins */
+    QObjectList plugins = QPluginLoader::staticInstances();
+    foreach (QObject *object, plugins)
     {
-        ChatConversation *dialog = qobject_cast<ChatRoom*>(conversationPanel->widget(i));
-        if (dialog)
-        {
-            rosterModel->addItem(ChatRosterItem::Room, dialog->objectName());
-            dialog->join();
-        }
+        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
+        if (!plugin)
+            continue;
+        ChatPanel *panel = plugin->createPanel(this);
+        if (!panel)
+            continue;
+        chatPanels << panel;
+        addPanel(panel);
     }
+    return true;
 }
 
 /** Prompt the user for confirmation then remove a contact.
@@ -856,7 +814,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             // find first resource supporting file transfer
             QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
             if (fullJids.size())
-                chatTransfers->sendFile(fullJids.first());
+                emit sendFile(fullJids.first());
        }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
@@ -899,12 +857,14 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
         {
-            if (jid == chatShares->objectName())
-                showPanel(chatShares);
-            else if (jid == chatTransfers->objectName())
-                showPanel(chatTransfers);
-            else if (jid == chatConsole->objectName())
-                showPanel(chatConsole);
+            foreach (ChatPanel *panel, chatPanels)
+            {
+                if (panel->objectName() == jid)
+                {
+                    QTimer::singleShot(0, panel, SIGNAL(showPanel()));
+                    break;
+                }
+            }
         }
     }
 }

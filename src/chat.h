@@ -25,13 +25,11 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
-class ChatConsole;
 class ChatConversation;
+class ChatPanel;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
-class ChatShares;
-class ChatTransfers;
 class Idle;
 class QComboBox;
 class QLabel;
@@ -42,7 +40,6 @@ class QSystemTrayIcon;
 class QXmppArchiveChat;
 class QXmppShareGetIq;
 class QXmppShareSearchIq;
-class QXmppTransferJob;
 class QXmppVCard;
 class QXmppVCardManager;
 class QXmppMucOwnerIq;
@@ -79,9 +76,15 @@ class Chat : public QWidget
 public:
     Chat(QSystemTrayIcon *trayIcon);
     ~Chat();
+
+    ChatClient *chatClient();
+    ChatRosterModel *chatRosterModel();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
 
-protected slots:
+signals:
+    void sendFile(const QString &jid);
+
+private slots:
     void addContact();
     void addRoom();
     void connected();
@@ -91,9 +94,9 @@ protected slots:
     void joinConversation(const QString &jid, bool isRoom);
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
+    void mucServerFound(const QString &roomServer);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
-    void rejoinConversations();
     void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void renameContact(const QString &jid);
@@ -101,18 +104,13 @@ protected slots:
     void secondsIdle(int);
     void statusChanged(int currentIndex);
 
-    void mucServerFound(const QString &roomServer);
-
-    void closePanel();
+    void hidePanel();
     void notifyPanel();
     void registerPanel();
     void showPanel();
 
-protected:
-    void addPanel(QWidget *panel);
-    void removePanel(QWidget *panel);
-    void showPanel(QWidget *widget);
-
+private:
+    void addPanel(ChatPanel *panel);
     void changeEvent(QEvent *event);
     ChatConversation *createConversation(const QString &jid, bool room);
 
@@ -125,11 +123,8 @@ private:
 
     QPushButton *addButton;
     QPushButton *roomButton;
-    ChatConsole *chatConsole;
-    ChatShares *chatShares;
-    ChatTransfers *chatTransfers;
     ChatClient *client;
-
+    QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
     ChatRosterView *rosterView;
 
@@ -141,6 +136,5 @@ private:
     QString chatRoomServer;
     QStringList discoQueue;
 };
-
 
 #endif

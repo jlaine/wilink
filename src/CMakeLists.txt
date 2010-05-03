@@ -8,15 +8,16 @@ set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
 
 # wiLink
 
+add_definitions(-DQT_STATICPLUGIN)
 set(wiLink_SOURCES
     application.cpp
     chat.cpp
     chat_accounts.cpp
-    chat_console.cpp
     chat_conversation.cpp
     chat_dialog.cpp
     chat_edit.cpp
@@ -26,39 +27,41 @@ set(wiLink_SOURCES
     chat_room.cpp
     chat_roster.cpp
     chat_roster_item.cpp
-    chat_shares.cpp
     chat_shares_database.cpp
-    chat_transfers.cpp
-    diagnostics.cpp
     main.cpp
     networkinfo.cpp
-    photos.cpp
     systeminfo.cpp
     trayicon.cpp
     updates.cpp
     updatesdialog.cpp
-    utils.cpp)
+    utils.cpp
+    plugins/console.cpp
+    plugins/diagnostics.cpp
+    plugins/photos.cpp
+    plugins/shares.cpp
+    plugins/transfers.cpp)
 
 set(wiLink_MOC_HEADERS
     chat.h
     chat_accounts.h
-    chat_console.h
     chat_conversation.h
     chat_dialog.h
     chat_edit.h
     chat_form.h
     chat_history.h
     chat_panel.h
+    chat_plugin.h
     chat_room.h
     chat_roster.h
-    chat_shares.h
     chat_shares_database.h
-    chat_transfers.h
-    diagnostics.h
-    photos.h
     trayicon.h
     updates.h
-    updatesdialog.h)
+    updatesdialog.h
+    plugins/console.h
+    plugins/diagnostics.h
+    plugins/photos.h
+    plugins/shares.h
+    plugins/transfers.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)

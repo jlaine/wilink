@@ -37,20 +37,18 @@ class ChatDialog : public ChatConversation
 public:
     ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
 
-    virtual void join();
-
 public slots:
     void messageReceived(const QXmppMessage &msg);
 
-protected slots:
+private slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void chatStateChanged(QXmppMessage::State state);
-
-protected:
-    virtual void sendMessage(const QString &body);
+    void join();
 
 private:
+    virtual void sendMessage(const QString &body);
+
     QXmppClient *client;
     ChatRosterModel *rosterModel;
     QStringList chatStatesJids;

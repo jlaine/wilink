@@ -42,10 +42,10 @@
 #include "chat_accounts.h"
 #include "chat_shares_database.h"
 #include "application.h"
-#include "diagnostics.h"
-#include "photos.h"
 #include "trayicon.h"
 #include "updatesdialog.h"
+
+using namespace QNetIO;
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
@@ -56,13 +56,15 @@ static int retryInterval = 15000;
 static QString authRealm(const QString &jid)
 {
     QString domain = jid.split("@").last();
-    if ("www." + domain == baseUrl.host())
-        return baseUrl.host();
+    if (domain == "wifirst.net")
+        return "www.wifirst.net";
+    else if (domain == "gmail.com")
+        return "www.google.com";
     return domain;
 }
 
 TrayIcon::TrayIcon()
-    : diagnostics(NULL), photos(NULL), updates(NULL),
+    : updates(NULL),
     connected(false),
     refreshInterval(0)
 {
@@ -96,15 +98,13 @@ TrayIcon::TrayIcon()
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
-    /* prepare diagnostics */
-    diagnostics = new Diagnostics;
-
     /* prepare updates */
     updates = new UpdatesDialog;
     updatesTimer = new QTimer(this);
     connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
 
-    /* fetch menu */
+    /* show chat windows and fetch menu */
+    QTimer::singleShot(500, this, SLOT(resetChats()));
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
@@ -112,10 +112,7 @@ TrayIcon::~TrayIcon()
 {
     foreach (Chat *chat, chats)
         delete chat;
-    delete diagnostics;
     delete updates;
-    if (photos)
-        delete photos;
 }
 
 void TrayIcon::addBaseMenu(QMenu *menu)
@@ -137,9 +134,6 @@ void TrayIcon::addBaseMenu(QMenu *menu)
 
     action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
     action->setMenu(optionsMenu);
-
-    action = menu->addAction(QIcon(":/diagnostics.png"), tr("&Diagnostics"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showDiagnostics()));
 
     action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
@@ -357,12 +351,6 @@ void TrayIcon::showChatAccounts()
     }
 }
 
-void TrayIcon::showDiagnostics()
-{
-    diagnostics->show();
-    diagnostics->raise();
-}
-
 void TrayIcon::showMenu()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -407,9 +395,6 @@ void TrayIcon::showMenu()
     action = menu->addAction(QIcon(":/chat.png"), tr("&Chat and shares"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showChats()));
 
-    action = menu->addAction(QIcon(":/photos.png"), tr("Upload &photos"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showPhotos()));
-
     addBaseMenu(menu);
     setContextMenu(menu);
 
@@ -448,8 +433,11 @@ void TrayIcon::showMenu()
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 
     urlString = item.firstChildElement("diagnostics").text();
+    // FIXME : restore this if we want to send diags
+#if 0
     if (!urlString.isEmpty())
         diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
+#endif
 
     /* fetch icons */
     fetchIcon();
@@ -459,26 +447,10 @@ void TrayIcon::showMenu()
     {
         connected = true;
 
-        /* create and show chat windows */
-        resetChats();
-
         /* check for updates now then every week */
         updates->check();
         updatesTimer->start(7 * 24 * 3600 * 1000);
     }
-}
-
-void TrayIcon::showPhotos()
-{
-    if (!photos)
-    {
-        QAction *action = qobject_cast<QAction *>(sender());
-        photos = new Photos("wifirst://www.wifirst.net/w");
-        photos->move(10, 10);
-        photos->setSystemTrayIcon(this);
-    }
-    photos->show();
-    photos->raise();
 }
 
 void TrayIcon::showSharesFolder()

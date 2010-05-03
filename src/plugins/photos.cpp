@@ -33,12 +33,15 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QScrollArea>
 #include <QShortcut>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
+#include <QTimer>
 #include <QUrl>
 
-#include <QScrollArea>
+#include "chat.h"
+#include "chat_plugin.h"
 #include "photos.h"
 
 static const int PROGRESS_STEPS = 100;
@@ -127,6 +130,11 @@ void PhotosList::setBaseDrop(bool accept)
     baseDrop = accept;
 }
 
+FileInfoList PhotosList::entries() const
+{
+    return fileList;
+}
+
 void PhotosList::setEntries(const FileInfoList &entries)
 {
     QFileIconProvider iconProvider;
@@ -188,7 +196,7 @@ QUrl PhotosList::url()
 }
 
 Photos::Photos(const QString &url, QWidget *parent)
-    : QWidget(parent),
+    : ChatPanel(parent),
     downloadDevice(0),
     uploadDevice(0),
     progressFiles(0),
@@ -227,7 +235,8 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(10);
+    layout->setMargin(0);
+    layout->addItem(headerLayout());
     layout->addWidget(helpLabel);
     layout->addWidget(photosView);
     layout->addWidget(progressBar);
@@ -253,11 +262,8 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Backspace), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(goBack()));
-#ifdef Q_OS_MAC
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
-#endif
 
+    setFocusProxy(photosView);
     resize(QSize(600, 400).expandedTo(minimumSizeHint()));
 }
 
@@ -289,7 +295,12 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
             if (listView)
                 listView->setImage(downloadJob.remoteUrl, img);
             else if (label)
+            {
+                QSize maxSize(800, 600);
+                if (img.width() > maxSize.width() || img.height() > maxSize.height())
+                    img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 label->setPixmap(QPixmap::fromImage(img));
+            }
         }
 
         /* fetch next thumbnail */
@@ -357,6 +368,25 @@ void Photos::createFolder()
     }
 }
 
+void Photos::fileNext()
+{
+    QLabel *label = qobject_cast<QLabel*>(photosView->currentWidget());
+    if (!label)
+        return;
+
+    // check if we have reached end of playlist
+    playListPosition++;
+    if (playListPosition >= playList.size())
+    {
+        goBack();
+        return;
+    }
+
+    // download image
+    downloadQueue.append(Job(label, playList[playListPosition], FileSystem::LargeSize));
+    processDownloadQueue();
+}
+
 /** Display the file at the given URL.
  *
  * @param url
@@ -370,6 +400,17 @@ void Photos::fileOpened(const QUrl &url)
     createButton->setEnabled(false);
     helpLabel->hide();
 
+    // build playlist
+    PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
+    playList.clear();
+    playListPosition = 0;
+    foreach (const FileInfo &info, listView->entries())
+    {
+        if (info.url() == url)
+            playListPosition = playList.size();
+        playList << info.url();
+    }
+
     // create white label
     QLabel *label = new QLabel(tr("Loading image.."));
     label->setAlignment(Qt::AlignCenter);
@@ -377,6 +418,11 @@ void Photos::fileOpened(const QUrl &url)
     QPalette pal = label->palette();
     pal.setColor(QPalette::Background, Qt::white);
     label->setPalette(pal);
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Return), label);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(fileNext()));
+    shortcut = new QShortcut(QKeySequence(Qt::Key_Enter), label);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(fileNext()));
     pushView(label);
 
     // download image
@@ -550,3 +596,33 @@ void Photos::showMessage(const QString &message)
     }
 }
 
+// PLUGIN
+
+class PhotosPlugin : public ChatPlugin
+{
+public:
+    ChatPanel *createPanel(Chat *chat);
+};
+
+ChatPanel *PhotosPlugin::createPanel(Chat *chat)
+{
+    QString url;
+    QString domain = chat->chatClient()->getConfiguration().domain();
+    if (domain == "wifirst.net")
+        url = "wifirst://www.wifirst.net/w";
+    else if (domain == "gmail.com")
+        url = "picasa://default";
+    else
+        return 0;
+
+    Photos *photos = new Photos(url);
+    //photos->setSystemTrayIcon(this);
+    photos->setObjectName("photos");
+    QTimer::singleShot(0, photos, SIGNAL(registerPanel()));
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
+    connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showPanel()));
+    return photos;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)

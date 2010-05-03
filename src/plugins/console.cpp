@@ -17,17 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCheckBox>
 #include <QLabel>
 #include <QLayout>
-#include <QCheckBox>
 #include <QPushButton>
+#include <QShortcut>
 #include <QTextBrowser>
 
-#include "chat_console.h"
+#include "chat.h"
+#include "chat_plugin.h"
+#include "console.h"
 #include "utils.h"
 
-ChatConsole::ChatConsole(QWidget *parent)
-    : ChatPanel(parent), currentLogger(0)
+ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
+    : ChatPanel(parent), connected(false), currentLogger(logger)
 {
     setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Debugging console"));
@@ -60,17 +63,10 @@ ChatConsole::ChatConsole(QWidget *parent)
     layout->addItem(hbox);
 
     setLayout(layout);
-}
 
-void ChatConsole::setLogger(QXmppLogger *newLogger)
-{
-    if (newLogger == currentLogger)
-        return;
-    if (currentLogger)
-        disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
-    if (newLogger)
-        connect(newLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
-    currentLogger = newLogger;
+    /* connect signals */
+    connect(this, SIGNAL(hidePanel()), this, SLOT(slotHide()));
+    connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
@@ -109,6 +105,23 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
         browser->setTextCursor(savedCursor);
     }
 }
+
+void ChatConsole::slotHide()
+{
+    if (!connected)
+        return;
+    disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
+    connected = false;
+}
+
+void ChatConsole::slotShow()
+{
+    if (connected)
+        return;
+    connect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
+    connected = true;
+}
+
 
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
@@ -149,3 +162,22 @@ void Highlighter::highlightBlock(const QString &text)
     }
 }
 
+// PLUGIN
+
+class ConsolePlugin : public ChatPlugin
+{
+public:
+    ChatPanel *createPanel(Chat *chat);
+};
+
+ChatPanel *ConsolePlugin::createPanel(Chat *chat)
+{
+    ChatConsole *chatConsole = new ChatConsole(chat->chatClient()->logger());
+    chatConsole->setObjectName("console");
+
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
+    connect(shortcut, SIGNAL(activated()), chatConsole, SIGNAL(showPanel()));
+    return chatConsole;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(console, ConsolePlugin)

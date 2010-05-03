@@ -20,10 +20,10 @@
 #ifndef __PHOTOS_H__
 #define __PHOTOS_H__
 
-#include <QWidget>
 #include <QListWidget>
 #include <QUrl>
 
+#include "chat_panel.h"
 #include "qnetio/filesystem.h"
 
 using namespace QNetIO;
@@ -42,6 +42,7 @@ class PhotosList : public QListWidget
 public:
     PhotosList(const QUrl &url, QWidget *parent = NULL);
     void setBaseDrop(bool accept);
+    FileInfoList entries() const;
     void setEntries(const FileInfoList &entries);
     void setImage(const QUrl &url, const QImage &img);
     QUrl url();
@@ -69,7 +70,7 @@ private:
 
 /** Main window for photos application
  */
-class Photos : public QWidget
+class Photos : public ChatPanel
 {
     Q_OBJECT
 
@@ -98,6 +99,7 @@ protected:
 protected slots:
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void fileNext();
     void fileOpened(const QUrl &url);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
     void folderOpened(const QUrl &url);
@@ -112,6 +114,8 @@ private:
     QIODevice *downloadDevice;
     QList< QPair<QUrl, QUrl> > uploadQueue;
     QIODevice *uploadDevice;
+    QList<QUrl> playList;
+    int playListPosition;
 
     QPushButton *backButton;
     QPushButton *createButton;

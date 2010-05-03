@@ -39,6 +39,7 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     : ChatConversation(jid, parent), client(xmppClient), rosterModel(chatRosterModel)
 {
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
+    connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
@@ -126,7 +127,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     chatHistory->addMessage(message);
 
     // notify
-    emit notifyTab();
+    emit notifyPanel();
 }
 
 void ChatDialog::sendMessage(const QString &text)

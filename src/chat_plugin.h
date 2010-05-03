@@ -17,38 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_CHAT_PANEL_H__
-#define __WILINK_CHAT_PANEL_H__
+#include <QtPlugin>
 
-#include <QWidget>
+class Chat;
+class ChatPanel;
 
-class QLabel;
-class QPushButton;
-
-class ChatPanel : public QWidget
+class ChatPluginInterface
 {
-    Q_OBJECT
-
 public:
-    ChatPanel(QWidget *parent);
-    void setWindowIcon(const QIcon &icon);
-    void setWindowExtra(const QString &extra);
-    void setWindowTitle(const QString &title);
-
-protected:
-    QLayout *headerLayout();
-
-signals:
-    void hidePanel();
-    void notifyPanel();
-    void registerPanel();
-    void showPanel();
-
-private:
-    QPushButton *closeButton;
-    QLabel *iconLabel;
-    QLabel *nameLabel;
-    QString windowExtra;
+    virtual ChatPanel *createPanel(Chat *chat) = 0;
 };
 
-#endif
+Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")
+
+class ChatPlugin : public QObject, public ChatPluginInterface
+{
+    Q_OBJECT
+    Q_INTERFACES(ChatPluginInterface)
+};
+

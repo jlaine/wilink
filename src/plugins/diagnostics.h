@@ -25,6 +25,7 @@
 #include <QThread>
 #include <QUrl>
 
+#include "chat_panel.h"
 #include "networkinfo.h"
 #include "wireless.h"
 
@@ -60,7 +61,7 @@ signals:
     void wirelessResult(const WirelessResult &result);
 };
 
-class Diagnostics : public QDialog
+class Diagnostics : public ChatPanel
 {
     Q_OBJECT
 
@@ -69,7 +70,7 @@ public:
     void setUrl(const QUrl &url);
 
 public slots:
-    void show();
+    void slotShow();
 
 protected slots:
     void addItem(const QString &title, const QString &value);
@@ -85,6 +86,7 @@ protected slots:
     void networkFinished();
 
 private:
+    bool displayed;
     QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
