@@ -19,8 +19,10 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDomDocument>
 #include <QMenu>
+#include <QMenuBar>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -38,8 +40,11 @@ static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
-Menu::Menu(QObject *parent)
-    : QObject(parent)
+Menu::Menu(QMenuBar *bar)
+    : QObject(bar),
+    menuBar(bar),
+    refreshInterval(0),
+    servicesMenu(0)
 {
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
 
@@ -73,6 +78,13 @@ void Menu::fetchMenu()
     connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
 
+void Menu::openUrl()
+{
+    QAction *action = qobject_cast<QAction *>(sender());
+    if (action)
+        QDesktopServices::openUrl(action->data().toUrl());
+}
+
 void Menu::showMenu()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -85,7 +97,13 @@ void Menu::showMenu()
         return;
     }
 
-    QMenu *menu = new QMenu;
+    if (servicesMenu)
+        servicesMenu->clear();
+    else {
+        servicesMenu = new QMenu(tr("&Services"));
+        menuBar->addMenu(servicesMenu);
+    }
+
     QAction *action;
 
     /* parse menu */
@@ -98,9 +116,9 @@ void Menu::showMenu()
         const QString link = item.firstChildElement("link").text();
         const QString text = item.firstChildElement("label").text();
         if (text.isEmpty())
-            menu->addSeparator();
+            servicesMenu->addSeparator();
         else {
-            action = menu->addAction(text);
+            action = servicesMenu->addAction(text);
             action->setData(baseUrl.resolved(link));
             connect(action, SIGNAL(triggered(bool)), this, SLOT(openUrl()));
             /* schedule retrieval of icon */
@@ -140,11 +158,13 @@ void Menu::showMenu()
     QString urlString = item.firstChildElement("updates").text();
     if (!urlString.isEmpty())
         updates->setUrl(baseUrl.resolved(QUrl(urlString)));
+#endif
 
     refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 
+#if 0
     urlString = item.firstChildElement("diagnostics").text();
     if (!urlString.isEmpty())
         diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
@@ -169,7 +189,7 @@ bool MenuPlugin::initialize(Chat *chat)
     if (domain != "wifirst.net")
         return false;
 
-    Menu *menu = new Menu(chat);
+    Menu *menu = new Menu(chat->menuBar());
     return true;
 }
 

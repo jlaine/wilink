@@ -26,6 +26,8 @@
 #include <QUrl>
 
 class QAction;
+class QMenu;
+class QMenuBar;
 class QNetworkAccessManager;
 
 class Menu : public QObject
@@ -33,11 +35,12 @@ class Menu : public QObject
     Q_OBJECT
 
 public:
-    Menu(QObject *parent);
+    Menu(QMenuBar *bar);
 
 private slots:
     void fetchIcon();
     void fetchMenu();
+    void openUrl();
     void showMenu();
 
 private:
@@ -46,6 +49,10 @@ private:
     int refreshInterval;
     QStringList seenMessages;
     QByteArray userAgent;
+
+private:
+    QMenu *servicesMenu;
+    QMenuBar *menuBar;
 };
 
 #endif
