@@ -176,12 +176,6 @@ void Menu::showMenu()
     refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
-
-#if 0
-    urlString = item.firstChildElement("diagnostics").text();
-    if (!urlString.isEmpty())
-        diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
-#endif
 }
 
 // PLUGIN

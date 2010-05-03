@@ -55,13 +55,11 @@ protected slots:
     void resetChats();
     void showChats();
     void showChatAccounts();
-    void showIcon();
     void showMenu();
     void showSharesFolder();
 
 private:
     void addBaseMenu(QMenu *menu);
-    void fetchIcon();
 
 private:
     QList<Chat*> chats;

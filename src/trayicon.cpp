@@ -140,18 +140,6 @@ void TrayIcon::addBaseMenu(QMenu *menu)
     setContextMenu(menu);
 }
 
-void TrayIcon::fetchIcon()
-{
-    if (icons.empty())
-        return;
-
-    QPair<QUrl, QAction*> entry = icons.first();
-    QNetworkRequest req(entry.first);
-    req.setRawHeader("User-Agent", userAgent);
-    QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
-}
-
 void TrayIcon::fetchMenu()
 {
     QNetworkRequest req(baseUrl);
@@ -215,28 +203,6 @@ void TrayIcon::openUrl()
     QAction *action = qobject_cast<QAction *>(sender());
     if (action)
         QDesktopServices::openUrl(action->data().toUrl());
-}
-
-void TrayIcon::showIcon()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    Q_ASSERT(reply != NULL);
-
-    /* display current icon */
-    if (icons.isEmpty())
-        return;
-    QPair<QUrl, QAction*> entry = icons.takeFirst();
-    QPixmap pixmap;
-    QByteArray data = reply->readAll();
-    if (!pixmap.loadFromData(data, 0))
-    {
-        qWarning() << "could not load icon" << entry.first;
-        return;
-    }
-    entry.second->setIcon(QIcon(pixmap));
-
-    /* fetch next icon */
-    fetchIcon();
 }
 
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
@@ -363,43 +329,10 @@ void TrayIcon::showMenu()
         return;
     }
 
-    QMenu *menu = new QMenu;
-    QAction *action;
-
-    /* parse menu */
+    /* parse messages */
     QDomDocument doc;
     doc.setContent(reply);
-    QDomElement item = doc.documentElement().firstChildElement("menu").firstChildElement("menu");
-    while (!item.isNull())
-    {
-        const QString image = item.firstChildElement("image").text();
-        const QString link = item.firstChildElement("link").text();
-        const QString text = item.firstChildElement("label").text();
-        if (text.isEmpty())
-            menu->addSeparator();
-        else {
-            action = menu->addAction(text);
-            action->setData(baseUrl.resolved(link));
-            connect(action, SIGNAL(triggered(bool)), this, SLOT(openUrl()));
-            /* schedule retrieval of icon */
-            if (!image.isEmpty())
-                icons.append(QPair<QUrl, QAction*>(baseUrl.resolved(image), action));
-        }
-        item = item.nextSiblingElement("menu");
-    }
-
-    /* add static entries */
-    if (!menu->isEmpty())
-        menu->addSeparator();
-
-    action = menu->addAction(QIcon(":/chat.png"), tr("&Chat and shares"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChats()));
-
-    addBaseMenu(menu);
-    setContextMenu(menu);
-
-    /* parse messages */
-    item = doc.documentElement().firstChildElement("messages").firstChildElement("message");
+    QDomElement item = doc.documentElement().firstChildElement("messages").firstChildElement("message");
     while (!item.isNull())
     {
         const QString id = item.firstChildElement("id").text();
@@ -432,15 +365,6 @@ void TrayIcon::showMenu()
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 
-    urlString = item.firstChildElement("diagnostics").text();
-    // FIXME : restore this if we want to send diags
-#if 0
-    if (!urlString.isEmpty())
-        diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
-#endif
-
-    /* fetch icons */
-    fetchIcon();
 
     /* connect to chat and check for updates */
     if (!connected)
