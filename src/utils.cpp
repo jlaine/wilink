@@ -22,6 +22,10 @@
 
 #include "utils.h"
 
+#define KILOBYTE 1000
+#define MEGABYTE 1000000
+#define GIGABYTE 1000000000
+
 QString indentXml(const QString &xml)
 {
     QRegExp expression("<([^>]+)>");
@@ -61,4 +65,15 @@ QString indentXml(const QString &xml)
     return output;
 }
 
+QString sizeToString(qint64 size)
+{
+    if (size < KILOBYTE)
+        return QString::fromUtf8("%1 B").arg(size);
+    else if (size < MEGABYTE)
+        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
+    else if (size < GIGABYTE)
+        return QString::fromUtf8("%1 MB").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
+    else
+        return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
+}
 

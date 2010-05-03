@@ -92,7 +92,6 @@ public:
     void addJob(QXmppTransferJob *job);
 
     static QString availableFilePath(const QString &dirPath, const QString &fileName);
-    static QString sizeToString(qint64 size);
 
 public slots:
     void sendFile(const QString &fullJid);

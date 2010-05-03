@@ -23,5 +23,6 @@
 #include <QString>
 
 QString indentXml(const QString &xml);
+QString sizeToString(qint64 size);
 
 #endif

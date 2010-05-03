@@ -19,9 +19,9 @@
 
 #include <QFileIconProvider>
 
-#include "plugins/shares/database.h"
-#include "plugins/shares/model.h"
-#include "plugins/transfers.h"
+#include "database.h"
+#include "model.h"
+#include "utils.h"
 
 // common queries
 #define Q ChatSharesModelQuery
@@ -78,7 +78,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole && index.column() == NameColumn)
         return item->name();
     else if (role == Qt::DisplayRole && index.column() == SizeColumn && item->fileSize())
-        return ChatTransfers::sizeToString(item->fileSize());
+        return sizeToString(item->fileSize());
     else if (role == Qt::DisplayRole && index.column() == ProgressColumn &&
              item->type() == QXmppShareItem::FileItem)
     {
@@ -110,7 +110,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
             done > 0 && t.isValid() && t.elapsed())
         {
             int speed = (done * 1000.0) / t.elapsed();
-            return tr("Downloading at %1").arg(ChatTransfers::sizeToString(speed) + "/s");
+            return tr("Downloading at %1").arg(sizeToString(speed) + "/s");
         }
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)

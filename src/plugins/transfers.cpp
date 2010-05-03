@@ -40,10 +40,7 @@
 #include "chat_plugin.h"
 #include "systeminfo.h"
 #include "transfers.h"
-
-#define KILOBYTE 1000
-#define MEGABYTE 1000000
-#define GIGABYTE 1000000000
+#include "utils.h"
 
 static qint64 fileSizeLimit = 10000000; // 10 MB
 
@@ -71,7 +68,7 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
 {
     setIcon(QMessageBox::Question);
     setText(tr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?")
-            .arg(contactName, job->fileName(), ChatTransfers::sizeToString(job->fileSize())));
+            .arg(contactName, job->fileName(), sizeToString(job->fileSize())));
     setWindowModality(Qt::NonModal);
     setWindowTitle(tr("File from %1").arg(contactName));
 
@@ -131,7 +128,7 @@ void ChatTransfersView::addJob(QXmppTransferJob *job)
     nameItem->setIcon(jobIcon(job));
     setItem(0, NameColumn, nameItem);
 
-    QTableWidgetItem *sizeItem = new QTableWidgetItem(ChatTransfers::sizeToString(job->fileSize()));
+    QTableWidgetItem *sizeItem = new QTableWidgetItem(sizeToString(job->fileSize()));
     sizeItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     setItem(0, SizeColumn, sizeItem);
 
@@ -376,7 +373,7 @@ void ChatTransfers::sendFile(const QString &fullJid)
         QMessageBox::warning(this,
             tr("Send a file"),
             tr("Sorry, but you cannot send files bigger than %1.")
-                .arg(ChatTransfers::sizeToString(fileSizeLimit)));
+                .arg(sizeToString(fileSizeLimit)));
         return;
     }
 
@@ -389,18 +386,6 @@ void ChatTransfers::sendFile(const QString &fullJid)
 QSize ChatTransfers::sizeHint() const
 {
     return QSize(400, 200);
-}
-
-QString ChatTransfers::sizeToString(qint64 size)
-{
-    if (size < KILOBYTE)
-        return QString::fromUtf8("%1 B").arg(size);
-    else if (size < MEGABYTE)
-        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
-    else if (size < GIGABYTE)
-        return QString::fromUtf8("%1 MB").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
-    else
-        return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
 }
 
 void ChatTransfers::updateButtons()
