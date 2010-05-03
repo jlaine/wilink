@@ -56,16 +56,13 @@ Menu::Menu(QMenuBar *bar)
     QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
-void Menu::fetchIcon()
+void Menu::fetchIcon(const QUrl &url, QAction *action)
 {
-    if (icons.empty())
-        return;
-
-    QPair<QUrl, QAction*> entry = icons.first();
-    QNetworkRequest req(entry.first);
+    QNetworkRequest req(url);
     req.setRawHeader("User-Agent", userAgent);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
+    icons[reply] = action;
 }
 
 void Menu::fetchMenu()
@@ -85,6 +82,20 @@ void Menu::openUrl()
         QDesktopServices::openUrl(action->data().toUrl());
 }
 
+void Menu::showIcon()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply || !icons.contains(reply))
+        return;
+
+    QAction *action = icons.take(reply);
+    QPixmap pixmap;
+    QByteArray data = reply->readAll();
+    if (!pixmap.loadFromData(data, 0))
+        return;
+    action->setIcon(QIcon(pixmap));
+}
+
 void Menu::showMenu()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -97,6 +108,8 @@ void Menu::showMenu()
         return;
     }
 
+    /* create menu bar */
+    icons.clear();
     if (servicesMenu)
         servicesMenu->clear();
     else {
@@ -121,9 +134,9 @@ void Menu::showMenu()
             action = servicesMenu->addAction(text);
             action->setData(baseUrl.resolved(link));
             connect(action, SIGNAL(triggered(bool)), this, SLOT(openUrl()));
-            /* schedule retrieval of icon */
+            /* request icon */
             if (!image.isEmpty())
-                icons.append(QPair<QUrl, QAction*>(baseUrl.resolved(image), action));
+                fetchIcon(baseUrl.resolved(image), action);
         }
         item = item.nextSiblingElement("menu");
     }
@@ -169,9 +182,6 @@ void Menu::showMenu()
     if (!urlString.isEmpty())
         diagnostics->setUrl(baseUrl.resolved(QUrl(urlString)));
 #endif
-
-    /* fetch icons */
-    fetchIcon();
 }
 
 // PLUGIN

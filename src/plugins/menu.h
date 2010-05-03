@@ -20,8 +20,8 @@
 #ifndef __WILINK_MENU_H__
 #define __WILINK_MENU_H__
 
+#include <QMap>
 #include <QObject>
-#include <QPair>
 #include <QStringList>
 #include <QUrl>
 
@@ -29,6 +29,7 @@ class QAction;
 class QMenu;
 class QMenuBar;
 class QNetworkAccessManager;
+class QNetworkReply;
 
 class Menu : public QObject
 {
@@ -38,13 +39,15 @@ public:
     Menu(QMenuBar *bar);
 
 private slots:
-    void fetchIcon();
     void fetchMenu();
     void openUrl();
+    void showIcon();
     void showMenu();
 
 private:
-    QList< QPair<QUrl, QAction *> > icons;
+    void fetchIcon(const QUrl &url, QAction *action);
+
+    QMap<QNetworkReply *, QAction *> icons;
     QNetworkAccessManager *network;
     int refreshInterval;
     QStringList seenMessages;
