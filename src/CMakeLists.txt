@@ -62,6 +62,7 @@ set(wiLink_MOC_HEADERS
     updatesdialog.h
     plugins/console.h
     plugins/diagnostics.h
+    plugins/menu.h
     plugins/photos.h
     plugins/shares.h
     plugins/transfers.h)
