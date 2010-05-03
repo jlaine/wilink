@@ -115,7 +115,6 @@ private:
     QList< QPair<QUrl, QUrl> > uploadQueue;
     QIODevice *uploadDevice;
     QList<QUrl> playList;
-    int playListPosition;
 
     QPushButton *backButton;
     QPushButton *createButton;

@@ -375,15 +375,14 @@ void Photos::fileNext()
         return;
 
     // check if we have reached end of playlist
-    playListPosition++;
-    if (playListPosition >= playList.size())
+    if (playList.isEmpty())
     {
         goBack();
         return;
     }
 
     // download image
-    downloadQueue.append(Job(label, playList[playListPosition], FileSystem::LargeSize));
+    downloadQueue.append(Job(label, playList.takeFirst(), FileSystem::LargeSize));
     processDownloadQueue();
 }
 
@@ -403,13 +402,11 @@ void Photos::fileOpened(const QUrl &url)
     // build playlist
     PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
     playList.clear();
-    playListPosition = 0;
     foreach (const FileInfo &info, listView->entries())
-    {
-        if (info.url() == url)
-            playListPosition = playList.size();
         playList << info.url();
-    }
+    qSort(playList);
+    int playListPosition = playList.indexOf(url);
+    playList = playList.mid(playListPosition + 1) + playList.mid(0, playListPosition);
 
     // create white label
     QLabel *label = new QLabel(tr("Loading image.."));
