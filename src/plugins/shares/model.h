@@ -28,6 +28,27 @@
 class ChatSharesDatabase;
 class QTimer;
 
+enum ChatSharesColumns
+{
+    NameColumn,
+    ProgressColumn,
+    SizeColumn,
+    MaxColumn,
+};
+
+enum ChatSharesDataRoles {
+    PacketId = QXmppShareItem::MaxRole,
+    PacketStart,
+    StreamId,
+    TransferStart,
+    TransferDone,
+    TransferPath,
+    TransferTotal,
+    TransferError,
+    UpdateTime,
+};
+
+
 class ChatSharesModelQuery
 {
 public:

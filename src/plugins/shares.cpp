@@ -54,26 +54,6 @@
 
 static int parallelDownloadLimit = 2;
 
-enum Columns
-{
-    NameColumn,
-    ProgressColumn,
-    SizeColumn,
-    MaxColumn,
-};
-
-enum DataRoles {
-    PacketId = QXmppShareItem::MaxRole,
-    PacketStart,
-    StreamId,
-    TransferStart,
-    TransferDone,
-    TransferPath,
-    TransferTotal,
-    TransferError,
-    UpdateTime,
-};
-
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 100
 // display message in statusbar for 10 seconds

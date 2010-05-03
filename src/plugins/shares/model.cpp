@@ -17,56 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
 #include <QDesktopServices>
 #include <QFileIconProvider>
-#include <QLabel>
 #include <QStringList>
-#include <QTimer>
 #include <QUrl>
 
 #include "qxmpp/QXmppShareIq.h"
-#include "qxmpp/QXmppUtils.h"
 
-#include "chat.h"
-#include "chat_client.h"
-#include "chat_plugin.h"
-#include "chat_roster.h"
-#include "systeminfo.h"
-
-#include "plugins/shares.h"
 #include "plugins/shares/database.h"
 #include "plugins/shares/model.h"
 #include "plugins/transfers.h"
 
-static int parallelDownloadLimit = 2;
-
-enum Columns
-{
-    NameColumn,
-    ProgressColumn,
-    SizeColumn,
-    MaxColumn,
-};
-
-enum DataRoles {
-    PacketId = QXmppShareItem::MaxRole,
-    PacketStart,
-    StreamId,
-    TransferStart,
-    TransferDone,
-    TransferPath,
-    TransferTotal,
-    TransferError,
-    UpdateTime,
-};
-
 // common queries
 #define Q ChatSharesModelQuery
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
-#define Q_FIND_TRANSFER(sid) \
-    (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
-     Q(StreamId, Q::Equals, sid))
 
 /** Update collection timestamps.
  */
