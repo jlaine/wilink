@@ -46,9 +46,9 @@
 #include "chat_client.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
-#include "chat_shares_database.h"
 #include "transfers.h"
 #include "shares.h"
+#include "shares/database.h"
 #include "systeminfo.h"
 
 static int parallelDownloadLimit = 2;

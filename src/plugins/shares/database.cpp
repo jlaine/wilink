@@ -32,7 +32,7 @@
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppUtils.h"
 
-#include "chat_shares_database.h"
+#include "database.h"
 #include "systeminfo.h"
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
