@@ -65,9 +65,6 @@ PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Return), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(slotReturnPressed()));
-
-    /* register panel */
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 void PhotosList::dragEnterEvent(QDragEnterEvent *event)
@@ -268,6 +265,9 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     setFocusProxy(photosView);
     resize(QSize(600, 400).expandedTo(minimumSizeHint()));
+
+    /* register panel */
+    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 /** When a command finishes, process its results.
