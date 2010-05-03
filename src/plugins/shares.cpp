@@ -19,10 +19,8 @@
 
 #include <QApplication>
 #include <QDesktopServices>
-#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileIconProvider>
-#include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -31,7 +29,6 @@
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QShortcut>
-#include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
 #include <QTabWidget>
