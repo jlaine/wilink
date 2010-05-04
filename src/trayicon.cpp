@@ -90,7 +90,7 @@ TrayIcon::TrayIcon()
     /* prepare network manager */
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
 
-    /* prepare updates */
+    /* check for updates */
     updates = new UpdatesDialog;
     updates->setUrl(QUrl("https://download.wifirst.net/wiLink/"));
     updatesTimer = new QTimer(this);
@@ -99,8 +99,8 @@ TrayIcon::TrayIcon()
     updatesTimer->start();
     QTimer::singleShot(500, updates, SLOT(check()));
 
-    /* show chat windows and fetch menu */
-    QTimer::singleShot(500, this, SLOT(resetChats()));
+    /* show chat windows */
+    QTimer::singleShot(0, this, SLOT(resetChats()));
 }
 
 TrayIcon::~TrayIcon()
