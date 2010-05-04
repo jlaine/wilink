@@ -20,16 +20,25 @@
 #ifndef __APPLICATION_H__
 #define __APPLICATION_H__
 
+#include <QApplication>
 #include <QString>
 
-class Application
+class Application : public QApplication
 {
+    Q_OBJECT
+
 public:
-    static bool isInstalled();
-    static void setOpenAtLogin(bool run);
+    Application(int &argc, char **argv);
+
+    bool isInstalled();
+    bool openAtLogin() const;
+
+public slots:
+    void setOpenAtLogin(bool run);
 
 private:
     static QString executablePath();
+    void migrateFromWdesktop();
 };
 
 #endif

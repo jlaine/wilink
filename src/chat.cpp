@@ -155,13 +155,13 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     QAction *action = optsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), this, SIGNAL(showAccounts()));
 
-    if (Application::isInstalled())
+    Application *wApp = qobject_cast<Application*>(qApp);
+    if (wApp && wApp->isInstalled())
     {
-        QSettings settings;
         action = optsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
-        action->setChecked(settings.value("OpenAtLogin").toBool());
-        connect(action, SIGNAL(toggled(bool)), this, SIGNAL(setOpenAtLogin(bool)));
+        action->setChecked(wApp->openAtLogin());
+        connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
     }
 
     action = menu->addAction(QIcon(":/options.png"), tr("&Options"));

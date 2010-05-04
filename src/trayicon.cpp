@@ -61,9 +61,6 @@ TrayIcon::TrayIcon()
 {
     /* initialise settings */
     settings = new QSettings(this);
-    if (Application::isInstalled() &&
-        settings->value("OpenAtLogin", true).toBool())
-        setOpenAtLogin(true);
 
     /* set icon */
 #ifdef Q_WS_MAC
@@ -71,11 +68,6 @@ TrayIcon::TrayIcon()
 #else
     setIcon(QIcon(":/wiLink.png"));
 #endif
-
-    /* set initial menu */
-    QMenu *menu = new QMenu;
-    addBaseMenu(menu);
-    setContextMenu(menu);
 
 #ifndef Q_WS_MAC
     /* catch left clicks, except on OS X */
@@ -97,28 +89,6 @@ TrayIcon::~TrayIcon()
     foreach (Chat *chat, chats)
         delete chat;
     delete updates;
-}
-
-void TrayIcon::addBaseMenu(QMenu *menu)
-{
-    QMenu *optionsMenu = new QMenu;
-    QAction *action = optionsMenu->addAction(tr("Chat accounts"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showAccounts()));
-
-    if (Application::isInstalled())
-    {
-        action = optionsMenu->addAction(tr("Open at login"));
-        action->setCheckable(true);
-        action->setChecked(settings->value("OpenAtLogin").toBool());
-        connect(action, SIGNAL(toggled(bool)), this, SLOT(setOpenAtLogin(bool)));
-    }
-
-    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
-    action->setMenu(optionsMenu);
-
-    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
-    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
-    setContextMenu(menu);
 }
 
 /** Prompt the user for credentials.
@@ -183,12 +153,6 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void TrayIcon::setOpenAtLogin(bool checked)
-{
-    Application::setOpenAtLogin(checked);
-    settings->setValue("OpenAtLogin", checked);
-}
-
 void TrayIcon::resetChats()
 {
     /* close any existing chats */
@@ -217,7 +181,6 @@ void TrayIcon::resetChats()
 
         Chat *chat = new Chat(this);
         connect(chat, SIGNAL(showAccounts()), this, SLOT(showAccounts()));
-        connect(chat, SIGNAL(setOpenAtLogin(bool)), this, SLOT(setOpenAtLogin(bool)));
         chat->move(xpos, ypos);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());

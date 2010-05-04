@@ -45,6 +45,7 @@ set(wiLink_SOURCES
     plugins/transfers.cpp)
 
 set(wiLink_MOC_HEADERS
+    application.h
     chat.h
     chat_accounts.h
     chat_client.h

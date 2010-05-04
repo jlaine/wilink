@@ -17,13 +17,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCoreApplication>
+#include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
 #include <QProcess>
 #include <QSettings>
 
+#include "qnetio/wallet.h"
+
 #include "application.h"
+#include "config.h"
+
+Application::Application(int &argc, char **argv)
+    : QApplication(argc, argv)
+{
+    /* set application properties */
+    setApplicationName("wiLink");
+    setApplicationVersion(WILINK_VERSION);
+    setOrganizationDomain("wifirst.net");
+    setOrganizationName("Wifirst");
+    setQuitOnLastWindowClosed(false);
+#ifndef Q_OS_MAC
+    setWindowIcon(QIcon(":/wiLink.png"));
+#endif
+
+    /* set data directory */
+    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    qDebug() << "Using data directory" << dataDir;
+    QDir().mkpath(dataDir);
+    QNetIO::Wallet::setDataPath(dataDir + "/wallet");
+
+    /* initialise settings */
+    migrateFromWdesktop();
+    if (isInstalled() && openAtLogin())
+        setOpenAtLogin(true);
+}
 
 QString Application::executablePath()
 {
@@ -43,6 +72,75 @@ bool Application::isInstalled()
 {
     QDir dir = QFileInfo(executablePath()).dir();
     return !dir.exists("CMakeFiles");
+}
+
+void Application::migrateFromWdesktop()
+{
+    /* Disable auto-launch of wDesktop */
+#ifdef Q_OS_MAC
+    QProcess process;
+    process.start("osascript");
+    process.write("tell application \"System Events\"\n\tdelete login item \"wDesktop\"\nend tell\n");
+    process.closeWriteChannel();
+    process.waitForFinished();
+#endif
+#ifdef Q_OS_WIN
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    settings.remove("wDesktop");
+#endif
+
+    /* Migrate old settings */
+#ifdef Q_OS_LINUX
+    QDir(QDir::home().filePath(".config/Wifirst")).rename("wDesktop.conf",
+        QString("%1.conf").arg(qApp->applicationName()));
+#endif
+#ifdef Q_OS_MAC
+    QDir(QDir::home().filePath("Library/Preferences")).rename("com.wifirst.wDesktop.plist",
+        QString("net.wifirst.%1.plist").arg(qApp->applicationName()));
+#endif
+#ifdef Q_OS_WIN
+    QSettings oldSettings("HKEY_CURRENT_USER\\Software\\Wifirst", QSettings::NativeFormat);
+    if (oldSettings.childGroups().contains("wDesktop"))
+    {
+        QSettings newSettings;
+        oldSettings.beginGroup("wDesktop");
+        foreach (const QString &key, oldSettings.childKeys())
+            newSettings.setValue(key, oldSettings.value(key));
+        oldSettings.endGroup();
+        oldSettings.remove("wDesktop");
+    }
+#endif
+
+    /* Migrate old passwords */
+    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#ifdef Q_OS_LINUX
+    QFile oldWallet(QDir::home().filePath("wDesktop"));
+    if (oldWallet.exists() && oldWallet.copy(dataDir + "/wallet.dummy"))
+        oldWallet.remove();
+#endif
+#ifdef Q_OS_WIN
+    QFile oldWallet(QDir::home().filePath("wDesktop.encrypted"));
+    if (oldWallet.exists() && oldWallet.copy(dataDir + "/wallet.windows"))
+        oldWallet.remove();
+#endif
+
+    /* Uninstall wDesktop */
+#ifdef Q_OS_MAC
+    QDir appsDir("/Applications");
+    if (appsDir.exists("wDesktop.app"))
+        QProcess::execute("rm", QStringList() << "-rf" << appsDir.filePath("wDesktop.app"));
+#endif
+#ifdef Q_OS_WIN
+    QString uninstaller("C:\\Program Files\\wDesktop\\Uninstall.exe");
+    if (QFileInfo(uninstaller).isExecutable())
+        QProcess::execute(uninstaller, QStringList() << "/S");
+#endif
+}
+
+bool Application::openAtLogin() const
+{
+    QSettings preferences;
+    return preferences.value("OpenAtLogin", true).toBool();
 }
 
 void Application::setOpenAtLogin(bool run)
@@ -70,5 +168,9 @@ void Application::setOpenAtLogin(bool run)
     else
         settings.remove(appName);
 #endif
+
+    // store preference
+    QSettings preferences;
+    preferences.setValue("OpenAtLogin", run);
 }
 

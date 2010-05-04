@@ -521,19 +521,19 @@ Acceptez-vous?</translation>
     <name>TrayIcon</name>
     <message>
         <source>&amp;Quit</source>
-        <translation>&amp;Quitter</translation>
+        <translation type="obsolete">&amp;Quitter</translation>
     </message>
     <message>
         <source>Open at login</source>
-        <translation>Ouvrir au démarrage</translation>
+        <translation type="obsolete">Ouvrir au démarrage</translation>
     </message>
     <message>
         <source>&amp;Options</source>
-        <translation>&amp;Options</translation>
+        <translation type="obsolete">&amp;Options</translation>
     </message>
     <message>
         <source>Chat accounts</source>
-        <translation>Comptes de chat</translation>
+        <translation type="obsolete">Comptes de chat</translation>
     </message>
 </context>
 <context>

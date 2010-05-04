@@ -44,7 +44,6 @@ protected slots:
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void onActivated(QSystemTrayIcon::ActivationReason reason);
     void resetChats();
-    void setOpenAtLogin(bool checked);
     void showAccounts();
     void showChats();
 
