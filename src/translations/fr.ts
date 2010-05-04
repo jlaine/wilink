@@ -59,6 +59,10 @@
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
+    <message>
+        <source>Open at login</source>
+        <translation type="unfinished">Ouvrir au démarrage</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>

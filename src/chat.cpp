@@ -32,6 +32,7 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QPushButton>
+#include <QSettings>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
@@ -54,6 +55,8 @@
 #include "qxmpp/QXmppVersionIq.h"
 
 #include "qnetio/dns.h"
+
+#include "application.h"
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_dialog.h"
@@ -152,15 +155,14 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
     QAction *action = optsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), this, SIGNAL(showAccounts()));
 
-/*
     if (Application::isInstalled())
     {
-        action = optionsMenu->addAction(tr("Open at login"));
+        QSettings settings;
+        action = optsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
-        action->setChecked(settings->value("OpenAtLogin").toBool());
-        connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
+        action->setChecked(settings.value("OpenAtLogin").toBool());
+        connect(action, SIGNAL(toggled(bool)), this, SIGNAL(setOpenAtLogin(bool)));
     }
-*/
 
     action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
     action->setMenu(optsMenu);

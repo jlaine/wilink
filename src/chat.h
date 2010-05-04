@@ -57,6 +57,7 @@ public:
 
 signals:
     void sendFile(const QString &jid);
+    void setOpenAtLogin(bool show);
     void showAccounts();
 
 private slots:

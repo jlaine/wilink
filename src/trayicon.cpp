@@ -63,7 +63,7 @@ TrayIcon::TrayIcon()
     settings = new QSettings(this);
     if (Application::isInstalled() &&
         settings->value("OpenAtLogin", true).toBool())
-        openAtLogin(true);
+        setOpenAtLogin(true);
 
     /* set icon */
 #ifdef Q_WS_MAC
@@ -110,7 +110,7 @@ void TrayIcon::addBaseMenu(QMenu *menu)
         action = optionsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(settings->value("OpenAtLogin").toBool());
-        connect(action, SIGNAL(toggled(bool)), this, SLOT(openAtLogin(bool)));
+        connect(action, SIGNAL(toggled(bool)), this, SLOT(setOpenAtLogin(bool)));
     }
 
     action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
@@ -183,7 +183,7 @@ void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void TrayIcon::openAtLogin(bool checked)
+void TrayIcon::setOpenAtLogin(bool checked)
 {
     Application::setOpenAtLogin(checked);
     settings->setValue("OpenAtLogin", checked);
@@ -217,6 +217,7 @@ void TrayIcon::resetChats()
 
         Chat *chat = new Chat(this);
         connect(chat, SIGNAL(showAccounts()), this, SLOT(showAccounts()));
+        connect(chat, SIGNAL(setOpenAtLogin(bool)), this, SLOT(setOpenAtLogin(bool)));
         chat->move(xpos, ypos);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
