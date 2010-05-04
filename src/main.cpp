@@ -30,6 +30,7 @@
 
 #include "application.h"
 #include "trayicon.h"
+#include "updatesdialog.h"
 
 Q_IMPORT_PLUGIN(console)
 Q_IMPORT_PLUGIN(diagnostics)
@@ -75,6 +76,9 @@ int main(int argc, char *argv[])
     /* Setup system tray icon */
     TrayIcon trayIcon;
     trayIcon.show();
+
+    /* Check for updates */
+    UpdatesDialog updates;
 
     /* Run application */
     return app.exec();

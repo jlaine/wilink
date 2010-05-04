@@ -17,14 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
-#include <QDebug>
-#include <QSettings>
 #include <QTimer>
 
 #include "application.h"
 #include "trayicon.h"
-#include "updatesdialog.h"
 
 TrayIcon::TrayIcon()
 {
@@ -35,18 +31,8 @@ TrayIcon::TrayIcon()
     setIcon(QIcon(":/wiLink.png"));
 #endif
 
-#ifndef Q_WS_MAC
-    /* catch left clicks, except on OS X */
+    /* catch left clicks */
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
-#endif
-
-    /* check for updates */
-    updates = new UpdatesDialog;
-}
-
-TrayIcon::~TrayIcon()
-{
-    delete updates;
 }
 
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)

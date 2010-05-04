@@ -22,8 +22,6 @@
 
 #include <QSystemTrayIcon>
 
-class UpdatesDialog;
-
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
 class TrayIcon : public QSystemTrayIcon
@@ -32,13 +30,9 @@ class TrayIcon : public QSystemTrayIcon
 
 public:
     TrayIcon();
-    ~TrayIcon();
 
 protected slots:
     void onActivated(QSystemTrayIcon::ActivationReason reason);
-
-private:
-    UpdatesDialog *updates;
 };
 
 #endif
