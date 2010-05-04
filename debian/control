@@ -7,7 +7,7 @@ Build-Depends: cdbs, debhelper (>= 5), cmake, libqt4-dev, libxss-dev
 
 Package: wilink
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, libqt4-sql-sqlite
 Description: Utilities for Wifirst services
  This package provides a set of utilities to interact with the Wifirst
  services.
