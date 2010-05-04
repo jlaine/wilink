@@ -32,7 +32,7 @@
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag
 {
     if (qApp)
-        QTimer::singleShot(0, qApp, SIGNAL(iconClicked()));
+        QTimer::singleShot(0, qApp, SLOT(showChats()));
     return NO;
 }
 @end

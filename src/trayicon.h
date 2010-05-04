@@ -20,15 +20,9 @@
 #ifndef __TRAYICON_H__
 #define __TRAYICON_H__
 
-#include <QList>
 #include <QSystemTrayIcon>
 
-class Chat;
 class UpdatesDialog;
-
-class QAuthenticator;
-class QLabel;
-class QSettings;
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
  */
@@ -42,13 +36,8 @@ public:
 
 protected slots:
     void onActivated(QSystemTrayIcon::ActivationReason reason);
-    void resetChats();
-    void showAccounts();
-    void showChats();
 
 private:
-    QList<Chat*> chats;
-    QSettings *settings;
     UpdatesDialog *updates;
 };
 

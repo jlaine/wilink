@@ -29,6 +29,7 @@
 #include <QProcess>
 #include <QPushButton>
 #include <QSettings>
+#include <QTimer>
 
 #include "qnetio/wallet.h"
 
@@ -77,6 +78,12 @@ Application::Application(int &argc, char **argv)
         setOpenAtLogin(true);
 }
 
+Application::~Application()
+{
+    foreach (Chat *chat, chats)
+        delete chat;
+}
+
 #ifndef Q_OS_MAC
 void Application::alert(QWidget *widget)
 {
@@ -87,6 +94,14 @@ void Application::platformInit()
 {
 }
 #endif
+
+int Application::exec()
+{
+    /* show chat windows */
+    QTimer::singleShot(0, this, SLOT(resetChats()));
+
+    return QApplication::exec();
+}
 
 QString Application::executablePath()
 {
