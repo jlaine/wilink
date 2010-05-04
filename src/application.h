@@ -17,14 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QString>
-
 #ifndef __APPLICATION_H__
 #define __APPLICATION_H__
 
-class Application
+#include <QApplication>
+#include <QString>
+
+class Application : public QApplication
 {
 public:
+    Application(int &argc, char **argv);
     static bool isInstalled();
     static void setOpenAtLogin(bool run);
 

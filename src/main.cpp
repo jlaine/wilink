@@ -33,6 +33,7 @@
 #include <windows.h>
 #endif
 
+#include "application.h"
 #include "config.h"
 #include "qnetio/wallet.h"
 #include "trayicon.h"
@@ -57,7 +58,7 @@ static void signal_handler(int sig)
 int main(int argc, char *argv[])
 {
     /* Create application */
-    QApplication app(argc, argv);
+    Application app(argc, argv);
     app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
     app.setOrganizationDomain("wifirst.net");
