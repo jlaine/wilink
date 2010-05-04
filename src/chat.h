@@ -46,7 +46,7 @@ class Chat : public QMainWindow
     Q_OBJECT
 
 public:
-    Chat(QSystemTrayIcon *trayIcon);
+    Chat(QWidget *parent = 0);
     ~Chat();
 
     ChatClient *chatClient();
@@ -107,7 +107,6 @@ private:
 
     QSplitter *splitter;
     QComboBox *statusCombo;
-    QSystemTrayIcon *systemTrayIcon;
     QStackedWidget *conversationPanel;
 
     QString chatRoomServer;

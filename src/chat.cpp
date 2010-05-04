@@ -80,11 +80,11 @@ enum StatusIndexes {
     OfflineIndex = 3,
 };
 
-Chat::Chat(QSystemTrayIcon *trayIcon)
-    : autoAway(false),
+Chat::Chat(QWidget *parent)
+    : QMainWindow(parent),
+    autoAway(false),
     isBusy(false),
-    isConnected(false),
-    systemTrayIcon(trayIcon)
+    isConnected(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
 

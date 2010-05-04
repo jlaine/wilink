@@ -23,7 +23,9 @@
 #include <QApplication>
 #include <QString>
 
+class Chat;
 class QAuthenticator;
+class QSettings;
 
 class Application : public QApplication
 {
@@ -46,10 +48,16 @@ public slots:
 
 private slots:
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
+    void resetChats();
+    void showAccounts();
+    void showChats();
 
 private:
     static QString executablePath();
     void migrateFromWdesktop();
+
+    QSettings *settings;
+    QList<Chat*> chats;
 };
 
 #endif

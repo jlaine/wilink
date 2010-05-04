@@ -113,7 +113,7 @@ void TrayIcon::resetChats()
         auth.setUser(jid);
         Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
 
-        Chat *chat = new Chat(this);
+        Chat *chat = new Chat;
         connect(chat, SIGNAL(showAccounts()), this, SLOT(showAccounts()));
         chat->move(xpos, ypos);
         if (chatJids.size() == 1)

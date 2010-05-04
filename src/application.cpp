@@ -34,9 +34,23 @@
 
 #include "application.h"
 #include "config.h"
+#include "chat.h"
+#include "chat_accounts.h"
+
+/** Returns the authentication realm for the given JID.
+ */
+static QString authRealm(const QString &jid)
+{
+    QString domain = jid.split("@").last();
+    if (domain == "wifirst.net")
+        return "www.wifirst.net";
+    else if (domain == "gmail.com")
+        return "www.google.com";
+    return domain;
+}
 
 Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv)
+    : QApplication(argc, argv), settings(0)
 {
     /* set application properties */
     setApplicationName("wiLink");
@@ -58,6 +72,7 @@ Application::Application(int &argc, char **argv)
 
     /* initialise settings */
     migrateFromWdesktop();
+    settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
 }
@@ -126,7 +141,7 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
         username = usernameEdit->text().trimmed().toLower();
         password = passwordEdit->text().trimmed();
     }
-    if (realm == "www.wifirst.net" && !username.endsWith("@wifirst.net"))
+    if (realm == "www.wifirst.net" && !username.contains("@"))
         username += "@wifirst.net";
     authenticator->setUser(username);
     authenticator->setPassword(password);
@@ -206,8 +221,7 @@ void Application::migrateFromWdesktop()
 
 bool Application::openAtLogin() const
 {
-    QSettings preferences;
-    return preferences.value("OpenAtLogin", true).toBool();
+    return settings->value("OpenAtLogin", true).toBool();
 }
 
 void Application::setOpenAtLogin(bool run)
@@ -229,15 +243,107 @@ void Application::setOpenAtLogin(bool run)
     process.waitForFinished();
 #endif
 #ifdef Q_OS_WIN
-    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    QSettings registry("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if (run)
-        settings.setValue(appName, appPath);
+        registry.setValue(appName, appPath);
     else
-        settings.remove(appName);
+        registry.remove(appName);
 #endif
 
     // store preference
-    QSettings preferences;
-    preferences.setValue("OpenAtLogin", run);
+    settings->setValue("OpenAtLogin", run);
+}
+
+void Application::showAccounts()
+{
+    ChatAccounts dlg;
+
+    QAuthenticator auth;
+    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
+    QString baseAccount = auth.user();
+
+    QStringList accounts = settings->value("ChatAccounts").toStringList();
+    accounts.prepend(baseAccount);
+    dlg.setAccounts(accounts);
+    if (dlg.exec() && dlg.accounts() != accounts)
+    {
+        QStringList newAccounts = dlg.accounts();
+
+        // clean credentials
+        foreach (const QString &account, accounts)
+        {
+            if (!newAccounts.contains(account))
+            {
+                const QString realm = authRealm(account);
+                qDebug() << "Removing credentials for" << realm;
+                QNetIO::Wallet::instance()->deleteCredentials(realm);
+            }
+        }
+
+        // store new settings
+        accounts.clear();
+        foreach (const QString &account, newAccounts)
+            if (!account.endsWith("@wifirst.net"))
+                accounts << account;
+        settings->setValue("ChatAccounts", accounts);
+
+        // reset chats
+        resetChats();
+    }
+}
+
+void Application::resetChats()
+{
+    /* close any existing chats */
+    foreach (Chat *chat, chats)
+        delete chat;
+    chats.clear();
+
+    /* get chat accounts */
+    QString baseJid;
+    QAuthenticator auth;
+    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
+    baseJid = auth.user();
+
+    QStringList chatJids;
+    chatJids.append(baseJid);
+    chatJids += settings->value("ChatAccounts").toStringList();
+
+    /* connect to chat accounts */
+    int xpos = 30;
+    int ypos = 20;
+    foreach (const QString &jid, chatJids)
+    {
+        QAuthenticator auth;
+        auth.setUser(jid);
+        QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
+
+        Chat *chat = new Chat;
+        connect(chat, SIGNAL(showAccounts()), this, SLOT(showAccounts()));
+        chat->move(xpos, ypos);
+        if (chatJids.size() == 1)
+            chat->setWindowTitle(qApp->applicationName());
+        else
+            chat->setWindowTitle(QString("%1 - %2").arg(auth.user(), qApp->applicationName()));
+        chat->show();
+
+        QString domain = jid.split("@").last();
+        bool ignoreSslErrors = domain != "wifirst.net";
+        chat->open(auth.user(), auth.password(), ignoreSslErrors);
+        chats << chat;
+        xpos += 300;
+    }
+
+    /* show chats */
+    showChats();
+}
+
+void Application::showChats()
+{
+    foreach (Chat *chat, chats)
+    {
+        chat->show();
+        chat->raise();
+    }
 }
 
