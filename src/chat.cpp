@@ -149,7 +149,7 @@ Chat::Chat(QWidget *parent)
 
     optsMenu = new QMenu;
     QAction *action = optsMenu->addAction(tr("Chat accounts"));
-    connect(action, SIGNAL(triggered(bool)), this, SIGNAL(showAccounts()));
+    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
     Application *wApp = qobject_cast<Application*>(qApp);
     if (wApp && wApp->isInstalled())

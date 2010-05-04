@@ -31,7 +31,6 @@
 #endif
 
 #include "application.h"
-#include "trayicon.h"
 #include "updatesdialog.h"
 
 Q_IMPORT_PLUGIN(console)

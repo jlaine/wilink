@@ -326,7 +326,6 @@ void Application::resetChats()
         QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
 
         Chat *chat = new Chat;
-        connect(chat, SIGNAL(showAccounts()), this, SLOT(showAccounts()));
         chat->move(xpos, ypos);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
