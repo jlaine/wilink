@@ -47,15 +47,12 @@ public:
     ~TrayIcon();
 
 protected slots:
-    void fetchMenu();
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void openAtLogin(bool checked);
-    void openUrl();
     void onActivated(QSystemTrayIcon::ActivationReason reason);
     void resetChats();
     void showChats();
     void showChatAccounts();
-    void showMenu();
 
 private:
     void addBaseMenu(QMenu *menu);

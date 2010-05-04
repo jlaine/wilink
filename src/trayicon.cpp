@@ -20,9 +20,7 @@
 #include <QApplication>
 #include <QAuthenticator>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDialog>
-#include <QDomDocument>
 #include <QFileDialog>
 #include <QLabel>
 #include <QLayout>
@@ -30,9 +28,6 @@
 #include <QLocale>
 #include <QPushButton>
 #include <QMenu>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QSettings>
 #include <QTimer>
 
@@ -93,18 +88,19 @@ TrayIcon::TrayIcon()
 #endif
 
     /* prepare network manager */
-    network = new QNetworkAccessManager(this);
     connect(Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)), this, SLOT(getCredentials(const QString&, QAuthenticator *)));
-    connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
     /* prepare updates */
     updates = new UpdatesDialog;
+    updates->setUrl(QUrl("https://download.wifirst.net/wiLink/"));
     updatesTimer = new QTimer(this);
+    updatesTimer->setInterval(7 * 24 * 3600 * 1000);
     connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
+    updatesTimer->start();
+    QTimer::singleShot(500, updates, SLOT(check()));
 
     /* show chat windows and fetch menu */
     QTimer::singleShot(500, this, SLOT(resetChats()));
-    QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
 TrayIcon::~TrayIcon()
@@ -134,16 +130,6 @@ void TrayIcon::addBaseMenu(QMenu *menu)
     action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
     setContextMenu(menu);
-}
-
-void TrayIcon::fetchMenu()
-{
-    QNetworkRequest req(baseUrl);
-    req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    req.setRawHeader("User-Agent", userAgent);
-    QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
 
 /** Prompt the user for credentials.
@@ -192,13 +178,6 @@ void TrayIcon::getCredentials(const QString &realm, QAuthenticator *authenticato
 
     /* store credentials */
     QNetIO::Wallet::instance()->setCredentials(realm, username, password);
-}
-
-void TrayIcon::openUrl()
-{
-    QAction *action = qobject_cast<QAction *>(sender());
-    if (action)
-        QDesktopServices::openUrl(action->data().toUrl());
 }
 
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
@@ -310,66 +289,6 @@ void TrayIcon::showChatAccounts()
 
         // reset chats
         resetChats();
-    }
-}
-
-void TrayIcon::showMenu()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    Q_ASSERT(reply != NULL);
-
-    if (reply->error() != QNetworkReply::NoError)
-    {
-        qWarning("Failed to retrieve menu");
-        QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
-        return;
-    }
-
-    /* parse messages */
-    QDomDocument doc;
-    doc.setContent(reply);
-    QDomElement item = doc.documentElement().firstChildElement("messages").firstChildElement("message");
-    while (!item.isNull())
-    {
-        const QString id = item.firstChildElement("id").text();
-        const QString title = item.firstChildElement("title").text();
-        const QString text = item.firstChildElement("text").text();
-        const int type = item.firstChildElement("type").text().toInt();
-        enum QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-        switch (type)
-        {
-            case 3: icon = QSystemTrayIcon::Critical; break;
-            case 2: icon = QSystemTrayIcon::Warning; break;
-            case 1: icon = QSystemTrayIcon::Information; break;
-            case 0: icon = QSystemTrayIcon::NoIcon; break;
-        }
-        if (!seenMessages.contains(id))
-        {
-            showMessage(title, text, icon);
-            seenMessages.append(id);
-        }
-        item = item.nextSiblingElement("message");
-    }
-
-    /* parse preferences */
-    item = doc.documentElement().firstChildElement("preferences");
-    QString urlString = item.firstChildElement("updates").text();
-    if (!urlString.isEmpty())
-        updates->setUrl(baseUrl.resolved(QUrl(urlString)));
-
-    refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
-    if (refreshInterval > 0)
-        QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
-
-
-    /* connect to chat and check for updates */
-    if (!connected)
-    {
-        connected = true;
-
-        /* check for updates now then every week */
-        updates->check();
-        updatesTimer->start(7 * 24 * 3600 * 1000);
     }
 }
 
