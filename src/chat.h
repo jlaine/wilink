@@ -57,6 +57,7 @@ public:
 
 signals:
     void sendFile(const QString &jid);
+    void showAccounts();
 
 private slots:
     void addContact();

@@ -103,7 +103,7 @@ void TrayIcon::addBaseMenu(QMenu *menu)
 {
     QMenu *optionsMenu = new QMenu;
     QAction *action = optionsMenu->addAction(tr("Chat accounts"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showAccounts()));
 
     if (Application::isInstalled())
     {
@@ -216,6 +216,7 @@ void TrayIcon::resetChats()
         Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
 
         Chat *chat = new Chat(this);
+        connect(chat, SIGNAL(showAccounts()), this, SLOT(showAccounts()));
         chat->move(xpos, ypos);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
@@ -234,16 +235,7 @@ void TrayIcon::resetChats()
     showChats();
 }
 
-void TrayIcon::showChats()
-{
-    foreach (Chat *chat, chats)
-    {
-        chat->show();
-        chat->raise();
-    }
-}
-
-void TrayIcon::showChatAccounts()
+void TrayIcon::showAccounts()
 {
     ChatAccounts dlg;
 
@@ -278,6 +270,15 @@ void TrayIcon::showChatAccounts()
 
         // reset chats
         resetChats();
+    }
+}
+
+void TrayIcon::showChats()
+{
+    foreach (Chat *chat, chats)
+    {
+        chat->show();
+        chat->raise();
     }
 }
 

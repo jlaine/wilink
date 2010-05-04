@@ -45,8 +45,8 @@ protected slots:
     void openAtLogin(bool checked);
     void onActivated(QSystemTrayIcon::ActivationReason reason);
     void resetChats();
+    void showAccounts();
     void showChats();
-    void showChatAccounts();
 
 private:
     void addBaseMenu(QMenu *menu);

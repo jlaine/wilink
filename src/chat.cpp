@@ -150,7 +150,7 @@ Chat::Chat(QSystemTrayIcon *trayIcon)
 
     optsMenu = new QMenu;
     QAction *action = optsMenu->addAction(tr("Chat accounts"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showChatAccounts()));
+    connect(action, SIGNAL(triggered(bool)), this, SIGNAL(showAccounts()));
 
 /*
     if (Application::isInstalled())
