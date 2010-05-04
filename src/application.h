@@ -20,13 +20,11 @@
 #ifndef __APPLICATION_H__
 #define __APPLICATION_H__
 
-#include <QApplication>
 #include <QString>
 
-class Application : public QApplication
+class Application
 {
 public:
-    Application(int &argc, char **argv);
     static bool isInstalled();
     static void setOpenAtLogin(bool run);
 

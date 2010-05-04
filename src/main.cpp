@@ -58,7 +58,7 @@ static void signal_handler(int sig)
 int main(int argc, char *argv[])
 {
     /* Create application */
-    Application app(argc, argv);
+    QApplication app(argc, argv);
     app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
     app.setOrganizationDomain("wifirst.net");

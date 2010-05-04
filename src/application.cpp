@@ -25,11 +25,6 @@
 
 #include "application.h"
 
-Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv)
-{
-}
-
 QString Application::executablePath()
 {
 #ifdef Q_OS_MAC
