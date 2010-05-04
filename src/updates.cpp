@@ -178,6 +178,11 @@ void Updates::processStatus()
         emit updateAvailable(release);
 }
 
+QUrl Updates::url() const
+{
+    return updatesUrl;
+}
+
 void Updates::setUrl(const QUrl &url)
 {
     updatesUrl = url;
