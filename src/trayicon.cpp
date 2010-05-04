@@ -20,14 +20,6 @@
 #include <QApplication>
 #include <QAuthenticator>
 #include <QDebug>
-#include <QDialog>
-#include <QFileDialog>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QLocale>
-#include <QPushButton>
-#include <QMenu>
 #include <QSettings>
 #include <QTimer>
 
@@ -73,6 +65,7 @@ TrayIcon::TrayIcon()
     /* catch left clicks, except on OS X */
     connect(this, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 #endif
+    connect(qApp, SIGNAL(iconClicked()), this, SLOT(showChats()));
 
     /* check for updates */
     updates = new UpdatesDialog;
@@ -91,15 +84,7 @@ TrayIcon::~TrayIcon()
 void TrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger)
-    {
         showChats();
-#if 0
-        // FIXME: this implies that the system tray is at the bottom of the screen..
-        QMenu *menu = contextMenu();
-        QPoint delta = QPoint(0, menu->sizeHint().height());
-        menu->popup(geometry().topLeft() - delta);
-#endif
-    }
 }
 
 void TrayIcon::resetChats()
