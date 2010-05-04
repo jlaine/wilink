@@ -48,9 +48,6 @@ protected slots:
     void showChats();
 
 private:
-    void addBaseMenu(QMenu *menu);
-
-private:
     QList<Chat*> chats;
     QSettings *settings;
     UpdatesDialog *updates;
