@@ -67,10 +67,6 @@
 #include "chat_roster_item.h"
 #include "systeminfo.h"
 
-#ifdef QT_MAC_USE_COCOA
-void application_alert_mac();
-#endif
-
 #define AWAY_TIME 300 // set away after 50s
 
 using namespace QNetIO;
@@ -289,11 +285,7 @@ void Chat::notifyPanel()
      * bouncing until the user focuses the window. To work around this
      * we implement our own version.
      */
-#ifdef QT_MAC_USE_COCOA
-    application_alert_mac();
-#else
-    QApplication::alert(panel);
-#endif
+    Application::alert(panel);
 }
 
 /** Register a panel in the roster list.

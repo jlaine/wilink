@@ -85,7 +85,7 @@ set(wiLink_RCCS
 if(WIN32)
     set(wiLink_SOURCES ${wiLink_SOURCES} wireless_win.cpp)
 elseif(APPLE)
-    set(wiLink_SOURCES ${wiLink_SOURCES} chat_mac.mm wireless_mac.mm)
+    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm wireless_mac.mm)
 elseif(UNIX)
     set(wiLink_SOURCES ${wiLink_SOURCES} wireless_nm.cpp)
 else(WIN32)

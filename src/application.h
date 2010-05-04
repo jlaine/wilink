@@ -29,6 +29,7 @@ class Application : public QApplication
 
 public:
     Application(int &argc, char **argv);
+    static void alert(QWidget *widget);
 
     bool isInstalled();
     bool openAtLogin() const;

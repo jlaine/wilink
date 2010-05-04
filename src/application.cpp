@@ -54,6 +54,13 @@ Application::Application(int &argc, char **argv)
         setOpenAtLogin(true);
 }
 
+#ifndef QT_MAC_USE_COCOA
+Application::alert(QWidget *widget)
+{
+    QApplication::alert(widget);
+}
+#endif
+
 QString Application::executablePath()
 {
 #ifdef Q_OS_MAC
