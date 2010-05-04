@@ -29,10 +29,15 @@ class Application : public QApplication
 
 public:
     Application(int &argc, char **argv);
+
     static void alert(QWidget *widget);
+    static void platformInit();
 
     bool isInstalled();
     bool openAtLogin() const;
+
+signals:
+    void iconClicked();
 
 public slots:
     void setOpenAtLogin(bool run);

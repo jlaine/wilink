@@ -20,9 +20,23 @@
 #include <AppKit/AppKit.h>
 #include <Foundation/NSAutoreleasePool.h>
 
+#include <QTimer>
+
 #include "application.h"
 
-#ifdef QT_MAC_USE_COCOA
+@interface AppController : NSObject 
+- (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag;
+@end
+
+@implementation AppController
+- (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag
+{
+    if (qApp)
+        QTimer::singleShot(0, qApp, SIGNAL(iconClicked()));
+    return NO;
+}
+@end
+
 void Application::alert(QWidget *widget)
 {
     NSApplicationLoad();
@@ -30,5 +44,13 @@ void Application::alert(QWidget *widget)
     [[NSApplication sharedApplication] requestUserAttention:NSCriticalRequest];
     [pool release];
 }
-#endif
+
+void Application::platformInit()
+{
+    NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
+    NSApplication *cocoaApp = [NSApplication sharedApplication];
+    AppController *delegate = [[AppController alloc] init];
+    [cocoaApp setDelegate:delegate];
+    [autoreleasepool release];
+}
 

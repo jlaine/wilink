@@ -51,6 +51,7 @@ static void signal_handler(int sig)
 int main(int argc, char *argv[])
 {
     /* Create application */
+    Application::platformInit();
     Application app(argc, argv);
 
     /* Load translations */
