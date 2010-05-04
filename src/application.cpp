@@ -17,11 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAuthenticator>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDialog>
 #include <QDir>
 #include <QFileInfo>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
 #include <QProcess>
+#include <QPushButton>
 #include <QSettings>
 
 #include "qnetio/wallet.h"
@@ -42,11 +48,13 @@ Application::Application(int &argc, char **argv)
     setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
-    /* set data directory */
+    /* initialise wallet */
     QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     qDebug() << "Using data directory" << dataDir;
     QDir().mkpath(dataDir);
     QNetIO::Wallet::setDataPath(dataDir + "/wallet");
+    connect(QNetIO::Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)),
+        this, SLOT(getCredentials(const QString&, QAuthenticator *)));
 
     /* initialise settings */
     migrateFromWdesktop();
@@ -77,6 +85,54 @@ QString Application::executablePath()
     return qApp->applicationFilePath().replace("/", "\\");
 #endif
     return qApp->applicationFilePath();
+}
+
+/** Prompt the user for credentials.
+ */
+void Application::getCredentials(const QString &realm, QAuthenticator *authenticator)
+{
+    const QString prompt = QString("Please enter your credentials for '%1'.").arg(realm);
+
+    /* create dialog */
+    QDialog *dialog = new QDialog;
+    QGridLayout *layout = new QGridLayout;
+
+    layout->addWidget(new QLabel(prompt), 0, 0, 1, 2);
+
+    layout->addWidget(new QLabel("User:"), 1, 0);
+    QLineEdit *usernameEdit = new QLineEdit();
+    layout->addWidget(usernameEdit, 1, 1);
+
+    layout->addWidget(new QLabel("Password:"), 2, 0);
+    QLineEdit *passwordEdit = new QLineEdit();
+    passwordEdit->setEchoMode(QLineEdit::Password);
+    layout->addWidget(passwordEdit, 2, 1);
+
+    QPushButton *btn = new QPushButton("OK");
+    dialog->connect(btn, SIGNAL(clicked()), dialog, SLOT(accept()));
+    layout->addWidget(btn, 3, 1);
+
+    dialog->setLayout(layout);
+
+    /* prompt user */
+    QString username, password;
+    username = authenticator->user();
+    while (username.isEmpty() || password.isEmpty())
+    {
+        usernameEdit->setText(username);
+        passwordEdit->setText(password);
+        if (!dialog->exec())
+            return;
+        username = usernameEdit->text().trimmed().toLower();
+        password = passwordEdit->text().trimmed();
+    }
+    if (realm == "www.wifirst.net" && !username.endsWith("@wifirst.net"))
+        username += "@wifirst.net";
+    authenticator->setUser(username);
+    authenticator->setPassword(password);
+
+    /* store credentials */
+    QNetIO::Wallet::instance()->setCredentials(realm, username, password);
 }
 
 bool Application::isInstalled()

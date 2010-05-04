@@ -23,6 +23,8 @@
 #include <QApplication>
 #include <QString>
 
+class QAuthenticator;
+
 class Application : public QApplication
 {
     Q_OBJECT
@@ -41,6 +43,9 @@ signals:
 
 public slots:
     void setOpenAtLogin(bool run);
+
+private slots:
+    void getCredentials(const QString &realm, QAuthenticator *authenticator);
 
 private:
     static QString executablePath();
