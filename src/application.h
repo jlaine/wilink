@@ -38,7 +38,6 @@ public:
     static void alert(QWidget *widget);
     static void platformInit();
 
-    int exec();
     bool isInstalled();
     bool openAtLogin() const;
 

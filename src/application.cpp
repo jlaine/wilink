@@ -95,14 +95,6 @@ void Application::platformInit()
 }
 #endif
 
-int Application::exec()
-{
-    /* show chat windows */
-    QTimer::singleShot(0, this, SLOT(resetChats()));
-
-    return QApplication::exec();
-}
-
 QString Application::executablePath()
 {
 #ifdef Q_OS_MAC

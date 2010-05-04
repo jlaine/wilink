@@ -31,7 +31,6 @@ set(wiLink_SOURCES
     main.cpp
     networkinfo.cpp
     systeminfo.cpp
-    trayicon.cpp
     updates.cpp
     updatesdialog.cpp
     utils.cpp
@@ -58,7 +57,6 @@ set(wiLink_MOC_HEADERS
     chat_plugin.h
     chat_room.h
     chat_roster.h
-    trayicon.h
     updates.h
     updatesdialog.h
     plugins/console.h

@@ -21,6 +21,8 @@
 
 #include <QLocale>
 #include <QSettings>
+#include <QSystemTrayIcon>
+#include <QTimer>
 #include <QTranslator>
 #include <QtPlugin>
 
@@ -74,11 +76,19 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Setup system tray icon */
-    TrayIcon trayIcon;
+#ifndef Q_OS_MAC
+    QSystemTrayIcon trayIcon;
+    trayIcon.setIcon(QIcon(":/wiLink.png"));
+    QObject::connect(&trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+        &app, SLOT(showChats()));
     trayIcon.show();
+#endif
 
     /* Check for updates */
     UpdatesDialog updates;
+
+    /* Show chat windows */
+    QTimer::singleShot(0, &app, SLOT(resetChats()));
 
     /* Run application */
     return app.exec();
