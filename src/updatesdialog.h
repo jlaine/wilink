@@ -27,6 +27,7 @@
 class QLabel;
 class QProgressBar;
 class QUrl;
+class QTimer;
 
 class UpdatesDialog : public QDialog
 {
@@ -34,10 +35,6 @@ class UpdatesDialog : public QDialog
 
 public:
     UpdatesDialog(QWidget *parent = NULL);
-    void setUrl(const QUrl &url);
-
-public slots:
-    void check();
 
 protected slots:
     void checkFailed(Updates::UpdatesError error, const QString &errorString);
@@ -53,6 +50,7 @@ private:
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;
+    QTimer *updatesTimer;
 };
 
 #endif

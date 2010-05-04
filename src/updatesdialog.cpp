@@ -26,6 +26,7 @@
 #include <QLayout>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QTimer>
 
 #include "systeminfo.h"
 #include "updatesdialog.h"
@@ -49,29 +50,26 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     layout->addWidget(progressBar);
     setLayout(layout);
 
-    /* check for updates */
+    /* updates */
     updates = new Updates(this);
     connect(updates, SIGNAL(checkFailed(Updates::UpdatesError, const QString&)), this, SLOT(checkFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
-}
+    updates->setUrl(QUrl("https://download.wifirst.net/wiLink/"));
 
-void UpdatesDialog::check()
-{
-    qDebug("Checking for updates");
-    updates->check();
+    /* check for updates */
+    updatesTimer = new QTimer(this);
+    updatesTimer->setInterval(7 * 24 * 3600 * 1000);
+    connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
+    updatesTimer->start();
+    QTimer::singleShot(500, updates, SLOT(check()));
 }
 
 void UpdatesDialog::checkFailed(Updates::UpdatesError error, const QString &errorString)
 {
     qWarning() << "Failed to check for updates" << errorString;
-}
-
-void UpdatesDialog::setUrl(const QUrl &url)
-{
-    updates->setUrl(url);
 }
 
 void UpdatesDialog::updateAvailable(const Release &release)

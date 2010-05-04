@@ -22,18 +22,12 @@
 
 #include <QList>
 #include <QSystemTrayIcon>
-#include <QUrl>
 
 class Chat;
-class Release;
 class UpdatesDialog;
 
-class QAction;
 class QAuthenticator;
 class QLabel;
-class QNetworkAccessManager;
-class QNetworkReply;
-class QProgressBar;
 class QSettings;
 
 /** A TrayIcon is a system tray icon for interacting with a Panel.
@@ -59,16 +53,8 @@ private:
 
 private:
     QList<Chat*> chats;
-    UpdatesDialog *updates;
-
-    bool connected;
-    int refreshInterval;
-    QNetworkAccessManager *network;
-    QList< QPair<QUrl, QAction *> > icons;
-    QStringList seenMessages;
     QSettings *settings;
-    QTimer *updatesTimer;
-    QByteArray userAgent;
+    UpdatesDialog *updates;
 };
 
 #endif

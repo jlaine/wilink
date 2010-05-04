@@ -53,13 +53,15 @@ public:
     } UpdatesError;
 
     Updates(QObject *parent);
-    void check();
     void download(const Release &release, const QString &dirPath);
 
     QUrl url() const;
     void setUrl(const QUrl &url);
 
     static int compareVersions(const QString &v1, const QString v2);
+
+public slots:
+    void check();
 
 protected slots:
     void saveUpdate();

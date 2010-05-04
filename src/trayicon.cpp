@@ -58,12 +58,7 @@ static QString authRealm(const QString &jid)
 }
 
 TrayIcon::TrayIcon()
-    : updates(NULL),
-    connected(false),
-    refreshInterval(0)
 {
-    userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
-
     /* initialise settings */
     settings = new QSettings(this);
     if (Application::isInstalled() &&
@@ -92,12 +87,6 @@ TrayIcon::TrayIcon()
 
     /* check for updates */
     updates = new UpdatesDialog;
-    updates->setUrl(QUrl("https://download.wifirst.net/wiLink/"));
-    updatesTimer = new QTimer(this);
-    updatesTimer->setInterval(7 * 24 * 3600 * 1000);
-    connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
-    updatesTimer->start();
-    QTimer::singleShot(500, updates, SLOT(check()));
 
     /* show chat windows */
     QTimer::singleShot(0, this, SLOT(resetChats()));
