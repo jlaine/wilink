@@ -47,6 +47,18 @@
         <source>Away</source>
         <translation>Absent</translation>
     </message>
+    <message>
+        <source>Chat accounts</source>
+        <translation>Comptes de chat</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Options</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>&amp;Quitter</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -328,6 +340,10 @@ Acceptez-vous?</translation>
         <source>No files found</source>
         <translation>Aucun fichier trouvé</translation>
     </message>
+    <message>
+        <source>Shares folder</source>
+        <translation>Dossier de partages</translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>
@@ -433,6 +449,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>Menu</name>
+    <message>
+        <source>&amp;Services</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Photos</name>
     <message>
         <source>Connecting..</source>
@@ -493,16 +516,8 @@ Acceptez-vous?</translation>
 <context>
     <name>TrayIcon</name>
     <message>
-        <source>&amp;Diagnostics</source>
-        <translation type="obsolete">&amp;Diagnostics</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
-    </message>
-    <message>
-        <source>Upload &amp;photos</source>
-        <translation type="obsolete">Transfert de &amp;photos</translation>
     </message>
     <message>
         <source>Open at login</source>
@@ -515,14 +530,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
-    </message>
-    <message>
-        <source>&amp;Chat and shares</source>
-        <translation>&amp;Chat et partages</translation>
-    </message>
-    <message>
-        <source>Shares folder</source>
-        <translation>Dossier de partages</translation>
     </message>
 </context>
 <context>
