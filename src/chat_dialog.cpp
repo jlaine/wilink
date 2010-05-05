@@ -97,10 +97,12 @@ void ChatDialog::disconnected()
  */
 void ChatDialog::leave()
 {
-    if (!joined)
-        return;
-    chatStateChanged(QXmppMessage::Gone);
-    joined = false;
+    if (joined)
+    {
+        chatStateChanged(QXmppMessage::Gone);
+        joined = false;
+    }
+    deleteLater();
 }
 
 /** Start a two party dialog.

@@ -251,13 +251,8 @@ void Chat::hidePanel()
     conversationPanel->removeWidget(panel);
 
     // cleanup
-    ChatConversation *conversation = qobject_cast<ChatConversation*>(panel);
-    if (conversation)
-    {
-        if (qobject_cast<ChatRoom*>(conversation))
-            rosterModel->removeItem(conversation->objectName());
-        conversation->deleteLater();
-    }
+    if (qobject_cast<ChatRoom*>(panel))
+        rosterModel->removeItem(panel->objectName());
 }
 
 /** Notify the user of activity on a panel.

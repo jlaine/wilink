@@ -117,15 +117,15 @@ void ChatRoom::join()
  */
 void ChatRoom::leave()
 {
-    if (!joined)
-        return;
-
-    QXmppPresence packet;
-    packet.setTo(chatLocalJid);
-    packet.setType(QXmppPresence::Unavailable);
-    client->sendPacket(packet);
-
-    joined = false;
+    if (joined)
+    {
+        QXmppPresence packet;
+        packet.setTo(chatLocalJid);
+        packet.setType(QXmppPresence::Unavailable);
+        client->sendPacket(packet);
+        joined = false;
+    }
+    deleteLater();
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -168,6 +168,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
             {
                 // leave room
+                joined = false;
                 emit hidePanel();
 
                 QXmppStanza::Error error = presence.error();
