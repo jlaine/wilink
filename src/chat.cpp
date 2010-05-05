@@ -465,7 +465,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
         {
             ChatDialog *dialog = new ChatDialog(client, rosterModel, bareJid);
             addPanel(dialog);
-            QTimer::singleShot(0, dialog, SIGNAL(registerPanel()));
             dialog->messageReceived(msg);
         }
         break;
