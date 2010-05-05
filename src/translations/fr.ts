@@ -20,10 +20,6 @@
         <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
     <message>
-        <source>Join a chat room</source>
-        <translation>Rejoindre un salon de discussion</translation>
-    </message>
-    <message>
         <source>Available</source>
         <translation>Disponible</translation>
     </message>
@@ -61,7 +57,11 @@
     </message>
     <message>
         <source>Open at login</source>
-        <translation type="unfinished">Ouvrir au démarrage</translation>
+        <translation>Ouvrir au démarrage</translation>
+    </message>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
     </message>
 </context>
 <context>
@@ -221,6 +221,29 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatRoomWatcher</name>
+    <message>
+        <source>Join a chat room</source>
+        <translation>Rejoindre un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Invite to a chat room</source>
+        <translation>Inviter à un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>Members</source>
+        <translation>Membres</translation>
+    </message>
+    <message>
+        <source>Kick user</source>
+        <translation>Ejecter l&apos;utilisateur</translation>
+    </message>
+</context>
+<context>
     <name>ChatRosterPrompt</name>
     <message>
         <source>%1 has asked to add you to his or her contact list.
@@ -233,45 +256,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
-    </message>
-</context>
-<context>
-    <name>ChatRosterView</name>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
-    </message>
-    <message>
-        <source>Invite to a chat room</source>
-        <translation>Inviter à un salon de discussion</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation>Options</translation>
-    </message>
-    <message>
-        <source>Kick user</source>
-        <translation>Ejecter l&apos;utilisateur</translation>
-    </message>
-    <message>
-        <source>Members</source>
-        <translation>Membres</translation>
-    </message>
-    <message>
-        <source>Send a file</source>
-        <translation>Envoyer un fichier</translation>
-    </message>
-    <message>
-        <source>Information</source>
-        <translation>Informations</translation>
-    </message>
-    <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
-    <message>
-        <source>Rename contact</source>
-        <translation>Renommer contact</translation>
     </message>
 </context>
 <context>
@@ -456,7 +440,7 @@ Acceptez-vous?</translation>
     <name>Menu</name>
     <message>
         <source>&amp;Services</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Services</translation>
     </message>
 </context>
 <context>
@@ -515,25 +499,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Shares</source>
         <translation>Partages</translation>
-    </message>
-</context>
-<context>
-    <name>TrayIcon</name>
-    <message>
-        <source>&amp;Quit</source>
-        <translation type="obsolete">&amp;Quitter</translation>
-    </message>
-    <message>
-        <source>Open at login</source>
-        <translation type="obsolete">Ouvrir au démarrage</translation>
-    </message>
-    <message>
-        <source>&amp;Options</source>
-        <translation type="obsolete">&amp;Options</translation>
-    </message>
-    <message>
-        <source>Chat accounts</source>
-        <translation type="obsolete">Comptes de chat</translation>
     </message>
 </context>
 <context>
