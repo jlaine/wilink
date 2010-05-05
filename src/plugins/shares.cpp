@@ -1031,7 +1031,7 @@ bool SharesPlugin::initialize(Chat *chat)
     /* register panel */
     ChatShares *shares = new ChatShares(chat->chatClient(), chat);
     shares->setObjectName("shares");
-    shares->setRoster(chat->chatRosterModel());
+    shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);
 
     /* register shortcut */

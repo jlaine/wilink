@@ -86,7 +86,7 @@ Chat::Chat(QWidget *parent)
     setWindowIcon(QIcon(":/chat.png"));
 
     client = new ChatClient(this);
-    rosterModel =  new ChatRosterModel(client);
+    m_rosterModel =  new ChatRosterModel(client);
 
     /* set up idle monitor */
     idle = new Idle;
@@ -103,7 +103,7 @@ Chat::Chat(QWidget *parent)
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
-    rosterView = new ChatRosterView(rosterModel);
+    rosterView = new ChatRosterView(m_rosterModel);
     connect(rosterView, SIGNAL(itemAction(int, QString, int)), this, SLOT(rosterAction(int, QString, int)));
     connect(rosterView, SIGNAL(itemMenu(QMenu*, QString, int)), this, SIGNAL(rosterMenu(QMenu*, QString, int)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
@@ -263,7 +263,7 @@ void Chat::notifyPanel()
 
     // add pending message
     if (!isActiveWindow() || conversationPanel->currentWidget() != panel)
-        rosterModel->addPendingMessage(panel->objectName());
+        m_rosterModel->addPendingMessage(panel->objectName());
 
     // show the chat window
     if (!isVisible())
@@ -294,7 +294,7 @@ void Chat::registerPanel()
     ChatRosterItem::Type type = ChatRosterItem::Other;
     if (qobject_cast<ChatRoom*>(panel))
         type = ChatRosterItem::Room;
-    rosterModel->addItem(type,
+    m_rosterModel->addItem(type,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -312,7 +312,7 @@ void Chat::showPanel()
     ChatRosterItem::Type type = ChatRosterItem::Other;
     if (qobject_cast<ChatRoom*>(panel))
         type = ChatRosterItem::Room;
-    rosterModel->addItem(type,
+    m_rosterModel->addItem(type,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -337,7 +337,7 @@ void Chat::panelChanged(int index)
     QWidget *widget = conversationPanel->widget(index);
     if (!widget)
         return;
-    rosterModel->clearPendingMessages(widget->objectName());
+    m_rosterModel->clearPendingMessages(widget->objectName());
     rosterView->selectContact(widget->objectName());
     widget->setFocus();
 }
@@ -438,7 +438,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         {
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
             {
-                const QString contactName = rosterModel->contactName(bareJid);
+                const QString contactName = m_rosterModel->contactName(bareJid);
                 const QString roomJid = extension.attribute("jid");
                 if (!roomJid.isEmpty() && !panel(roomJid))
                 {
@@ -453,7 +453,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
     case QXmppMessage::Chat:
         if (!panel(bareJid) && !msg.body().isEmpty())
         {
-            ChatDialog *dialog = new ChatDialog(client, rosterModel, bareJid);
+            ChatDialog *dialog = new ChatDialog(client, m_rosterModel, bareJid);
             addPanel(dialog);
             dialog->messageReceived(msg);
         }
@@ -531,9 +531,9 @@ ChatClient *Chat::chatClient()
 
 /** Return this window's chat roster model.
  */
-ChatRosterModel *Chat::chatRosterModel()
+ChatRosterModel *Chat::rosterModel()
 {
-    return rosterModel;
+    return m_rosterModel;
 }
 
 /** Open the connection to the chat server.
@@ -687,16 +687,16 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             inviteContact(jid);
         else if (action == ChatRosterView::JoinAction && !panel(jid))
             // create new conversation with the contact
-            addPanel(new ChatDialog(client, rosterModel, jid));
+            addPanel(new ChatDialog(client, m_rosterModel, jid));
         else if (action == ChatRosterView::OptionsAction)
         {
-            ChatRosterItem *item = rosterModel->contactItem(jid);
+            ChatRosterItem *item = m_rosterModel->contactItem(jid);
             QString url = item ? item->data(ChatRosterModel::UrlRole).toString() : QString();
             if (!url.isEmpty())
                 QDesktopServices::openUrl(url);
 
 #if 0
-            QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::VersionFeature);
+            QStringList fullJids = m_rosterModel->contactFeaturing(jid, ChatRosterModel::VersionFeature);
             if (!fullJids.size())
                 return;
 
@@ -713,7 +713,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction && !panel(jid))
             // create new panel for the chat room
-            addPanel(new ChatRoom(client, rosterModel, jid));
+            addPanel(new ChatRoom(client, m_rosterModel, jid));
         else if (action == ChatRosterView::OptionsAction)
         {
             // get room information
@@ -828,6 +828,6 @@ void Chat::unregisterPanel()
     if (!panel)
         return;
 
-    rosterModel->removeItem(panel->objectName());
+    m_rosterModel->removeItem(panel->objectName());
 }
 

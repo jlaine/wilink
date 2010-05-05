@@ -52,7 +52,7 @@ public:
     ~Chat();
 
     ChatClient *chatClient();
-    ChatRosterModel *chatRosterModel();
+    ChatRosterModel *rosterModel();
     QMenu *optionsMenu();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
     void addPanel(ChatPanel *panel);
@@ -102,7 +102,7 @@ private:
     ChatClient *client;
     QList<ChatPanel*> chatPanels;
     QMenu *optsMenu;
-    ChatRosterModel *rosterModel;
+    ChatRosterModel *m_rosterModel;
     ChatRosterView *rosterView;
 
     QSplitter *splitter;

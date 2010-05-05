@@ -449,7 +449,7 @@ public:
 bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatTransfers *transfers = new ChatTransfers(chat->chatClient(), chat->chatRosterModel());
+    ChatTransfers *transfers = new ChatTransfers(chat->chatClient(), chat->rosterModel());
     transfers->setObjectName("transfers");
     connect(chat, SIGNAL(rosterMenu(QMenu*, QString, int)), transfers, SLOT(rosterMenu(QMenu*, QString, int)));
     chat->addPanel(transfers);
