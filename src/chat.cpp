@@ -394,14 +394,10 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     if (room)
     {
         rosterModel->addItem(ChatRosterItem::Room, jid);
-        dialog  = new ChatRoom(client, jid);
+        dialog  = new ChatRoom(client, rosterModel, jid);
     } else {
         dialog = new ChatDialog(client, rosterModel, jid);
-        dialog->setWindowIcon(rosterModel->contactAvatar(jid));
     }
-    dialog->setObjectName(jid);
-    dialog->setLocalName(rosterModel->ownName());
-    dialog->setRemoteName(rosterModel->contactName(jid));
     addPanel(dialog);
     return dialog;
 }

@@ -38,6 +38,10 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient), joined(false), rosterModel(chatRosterModel)
 {
+    setLocalName(rosterModel->ownName());
+    setRemoteName(rosterModel->contactName(jid));
+    setWindowIcon(rosterModel->contactAvatar(jid));
+
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));

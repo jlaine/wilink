@@ -25,6 +25,7 @@
 #include <QDialog>
 #include <QMessageBox>
 
+class ChatRosterModel;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
@@ -40,7 +41,7 @@ class ChatRoom : public ChatConversation
     Q_OBJECT
 
 public:
-    ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
+    ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     virtual void leave();
 
 protected:
@@ -57,6 +58,7 @@ private:
     QXmppClient *client;
     bool joined;
     bool notifyMessages;
+    ChatRosterModel *rosterModel;
 };
 
 class ChatRoomMembers : public QDialog

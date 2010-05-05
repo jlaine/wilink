@@ -46,10 +46,17 @@ enum MembersColumns {
     AffiliationColumn,
 };
 
-ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent), client(xmppClient), joined(false), notifyMessages(false)
+ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
+    : ChatConversation(jid, parent),
+    client(xmppClient),
+    joined(false),
+    notifyMessages(false),
+    rosterModel(chatRosterModel)
 {
+    setLocalName(rosterModel->ownName());
+    setRemoteName(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
+
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
