@@ -56,6 +56,7 @@ public:
     QMenu *optionsMenu();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
     void addPanel(ChatPanel *panel);
+    ChatPanel *panel(const QString &objectName);
 
 signals:
     void sendFile(const QString &jid);

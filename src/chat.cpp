@@ -459,7 +459,7 @@ void Chat::inviteContact(const QString &jid)
 
 void Chat::joinConversation(const QString &jid, bool isRoom)
 {
-    ChatConversation *dialog = conversationPanel->findChild<ChatConversation*>(jid);
+    ChatPanel *dialog = panel(jid);
     if (!dialog)
         dialog = createConversation(jid, isRoom);
     QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
@@ -478,7 +478,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
             {
                 const QString contactName = rosterModel->contactName(bareJid);
                 const QString roomJid = extension.attribute("jid");
-                if (!roomJid.isEmpty() && !conversationPanel->findChild<ChatRoom*>(roomJid))
+                if (!roomJid.isEmpty() && !panel(roomJid))
                 {
                     ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, this);
                     connect(dlg, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
@@ -489,7 +489,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
         }
         break;
     case QXmppMessage::Chat:
-        if (!conversationPanel->findChild<ChatDialog*>(bareJid) && !msg.body().isEmpty())
+        if (!panel(bareJid) && !msg.body().isEmpty())
         {
             ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
             QTimer::singleShot(0, dialog, SIGNAL(registerPanel()));
@@ -633,6 +633,18 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 QMenu *Chat::optionsMenu()
 {
     return optsMenu;
+}
+
+/** Find a panel by its object name.
+ *
+ * @param objectName
+ */
+ChatPanel *Chat::panel(const QString &objectName)
+{
+    foreach (ChatPanel *panel, chatPanels)
+        if (panel->objectName() == objectName)
+            return panel;
+    return 0;
 }
 
 /** Prompt the user for confirmation then remove a contact.
@@ -785,14 +797,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     } else if (type == ChatRosterItem::Other) {
         if (action == ChatRosterView::JoinAction)
         {
-            foreach (ChatPanel *panel, chatPanels)
-            {
-                if (panel->objectName() == jid)
-                {
-                    QTimer::singleShot(0, panel, SIGNAL(showPanel()));
-                    break;
-                }
-            }
+            ChatPanel *chatPanel = panel(jid);
+            if (chatPanel)
+                QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
         }
     }
 }
