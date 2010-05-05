@@ -20,6 +20,7 @@
 #include <QMenu>
 
 #include "qxmpp/QXmppConstants.h"
+#include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"
@@ -29,9 +30,11 @@
 
 #include "rooms.h"
 
-ChatRoomWatcher::ChatRoomWatcher(ChatClient *chatClient, QObject *parent)
-    : QObject(parent), client(chatClient)
+ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
+    : QObject(chatWindow), chat(chatWindow)
 {
+    connect(chat->chatClient(), SIGNAL(messageReceived(QXmppMessage)),
+            this, SLOT(messageReceived(QXmppMessage)));
 }
 
 /** Invite a contact to join a chat room.
@@ -43,13 +46,13 @@ void ChatRoomWatcher::inviteContact()
         return;
     QString jid = action->data().toString();
 
-    ChatRoomPrompt prompt(client, chatRoomServer);
+    ChatRoomPrompt prompt(chat->chatClient(), chatRoomServer, chat);
     if (!prompt.exec())
         return;
 
     // join chat room
     const QString roomJid = prompt.textValue();
-    //rosterAction(ChatRosterView::JoinAction, roomJid, ChatRosterItem::Room);
+    chat->rosterAction(ChatRosterView::JoinAction, roomJid, ChatRosterItem::Room);
 
     // invite contact
     QXmppElement x;
@@ -62,8 +65,33 @@ void ChatRoomWatcher::inviteContact()
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
     message.setExtensions(x);
-    client->sendPacket(message);
+    chat->chatClient()->sendPacket(message);
 }
+
+void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
+{
+    const QString bareJid = jidToBareJid(msg.from());
+
+    if (msg.type() == QXmppMessage::Normal)
+    {
+        foreach (const QXmppElement &extension, msg.extensions())
+        {
+            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
+            {
+                const QString contactName = chat->rosterModel()->contactName(bareJid);
+                const QString roomJid = extension.attribute("jid");
+                if (!roomJid.isEmpty() && !chat->panel(roomJid))
+                {
+                    ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, chat);
+                    connect(dlg, SIGNAL(itemAction(int, const QString&, int)), chat, SLOT(rosterAction(int, const QString&, int)));
+                    dlg->show();
+                }
+                break;
+            }
+        }
+    }
+}
+
 
 void ChatRoomWatcher::rosterMenu(QMenu *menu, const QString &jid, int type)
 {
@@ -85,7 +113,7 @@ public:
 
 bool RoomsPlugin::initialize(Chat *chat)
 {
-    ChatRoomWatcher *rooms = new ChatRoomWatcher(chat->chatClient(), chat);
+    ChatRoomWatcher *rooms = new ChatRoomWatcher(chat);
     connect(chat, SIGNAL(rosterMenu(QMenu*, QString, int)), rooms, SLOT(rosterMenu(QMenu*, QString, int)));
     return true;
 }

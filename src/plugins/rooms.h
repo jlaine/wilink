@@ -22,22 +22,24 @@
 
 #include <QObject>
 
-class ChatClient;
+class Chat;
 class QMenu;
+class QXmppMessage;
 
 class ChatRoomWatcher : public QObject
 {
     Q_OBJECT
 
 public:
-    ChatRoomWatcher(ChatClient *chatClient, QObject *parent = 0);
+    ChatRoomWatcher(Chat *chatWindow);
 
 private slots:
     void inviteContact();
+    void messageReceived(const QXmppMessage &msg);
     void rosterMenu(QMenu *menu, const QString &jid, int type);
 
 private:
-    ChatClient *client;
+    Chat *chat;
     QString chatRoomServer;
 };
 

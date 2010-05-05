@@ -405,35 +405,11 @@ void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = jidToBareJid(msg.from());
 
-    switch (msg.type())
+    if (msg.type() == QXmppMessage::Chat && !panel(bareJid) && !msg.body().isEmpty())
     {
-    case QXmppMessage::Normal:
-        foreach (const QXmppElement &extension, msg.extensions())
-        {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
-            {
-                const QString contactName = m_rosterModel->contactName(bareJid);
-                const QString roomJid = extension.attribute("jid");
-                if (!roomJid.isEmpty() && !panel(roomJid))
-                {
-                    ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, this);
-                    connect(dlg, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
-                    dlg->show();
-                }
-                break;
-            }
-        }
-        break;
-    case QXmppMessage::Chat:
-        if (!panel(bareJid) && !msg.body().isEmpty())
-        {
-            ChatDialog *dialog = new ChatDialog(client, m_rosterModel, bareJid);
-            addPanel(dialog);
-            dialog->messageReceived(msg);
-        }
-        break;
-    default:
-        break;
+        ChatDialog *dialog = new ChatDialog(client, m_rosterModel, bareJid);
+        addPanel(dialog);
+        dialog->messageReceived(msg);
     }
 }
 

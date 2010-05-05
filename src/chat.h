@@ -61,6 +61,9 @@ public:
 signals:
     void rosterMenu(QMenu *menu, const QString &jid, int type);
 
+public slots:
+    void rosterAction(int action, const QString &jid, int type);
+
 private slots:
     void addContact();
     void addRoom();
@@ -72,7 +75,6 @@ private slots:
     void mucServerFound(const QString &roomServer);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
-    void rosterAction(int action, const QString &jid, int type);
     void removeContact(const QString &jid);
     void renameContact(const QString &jid);
     void resizeContacts();
