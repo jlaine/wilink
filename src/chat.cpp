@@ -259,7 +259,6 @@ void Chat::hidePanel()
     {
         if (qobject_cast<ChatRoom*>(conversation))
             rosterModel->removeItem(conversation->objectName());
-        conversation->leave();
         conversation->deleteLater();
     }
 }

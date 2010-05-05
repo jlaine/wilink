@@ -74,12 +74,6 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     setRemoteState(QXmppMessage::None);
 }
 
-void ChatConversation::leave()
-{
-    chatLocalState = QXmppMessage::Gone;
-    emit localStateChanged(chatLocalState);
-}
-
 QXmppMessage::State ChatConversation::localState() const
 {
     return chatLocalState;

@@ -46,6 +46,7 @@ private slots:
     void chatStateChanged(QXmppMessage::State state);
     void disconnected();
     void join();
+    void leave();
 
 private:
     virtual void sendMessage(const QString &body);

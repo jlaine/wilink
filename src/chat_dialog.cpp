@@ -47,6 +47,7 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
 }
 
@@ -91,6 +92,16 @@ void ChatDialog::disconnected()
 {
     // FIXME : we should re-join on connect
     // joined = false;
+}
+
+/** Leave a two party dialog.
+ */
+void ChatDialog::leave()
+{
+    if (!joined)
+        return;
+    chatStateChanged(QXmppMessage::Gone);
+    joined = false;
 }
 
 /** Start a two party dialog.
