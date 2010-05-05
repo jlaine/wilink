@@ -213,6 +213,8 @@ void Chat::addContact()
 }
 
 /** Connect signals for the given panel.
+ *
+ * @param panel
  */
 void Chat::addPanel(ChatPanel *panel)
 {
@@ -226,11 +228,17 @@ void Chat::addPanel(ChatPanel *panel)
     chatPanels << panel;
 }
 
+/** When a panel is destroyed, from it from our list of panels.
+ *
+ * @param obj
+ */
 void Chat::destroyPanel(QObject *obj)
 {
     chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
 
+/** Hide a panel.
+ */
 void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
@@ -327,6 +335,10 @@ void Chat::showPanel()
     conversationPanel->setCurrentWidget(panel);
 }
 
+/** Handle switching between panels.
+ *
+ * @param index
+ */
 void Chat::panelChanged(int index)
 {
     QWidget *widget = conversationPanel->widget(index);
@@ -348,6 +360,8 @@ void Chat::addRoom()
 }
 
 /** When the window is activated, pass focus to the active chat.
+ *
+ * @param event
  */
 void Chat::changeEvent(QEvent *event)
 {
@@ -360,9 +374,10 @@ void Chat::changeEvent(QEvent *event)
     }
 }
 
+/** Handle successful connection to the chat server.
+ */
 void Chat::connected()
 {
-    qWarning() << "Connected to chat server" << client->getConfiguration().host();
     isConnected = true;
     addButton->setEnabled(true);
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
@@ -371,6 +386,7 @@ void Chat::connected()
 /** Create a conversation dialog for the specified recipient.
  *
  * @param jid
+ * @param room
  */
 ChatConversation *Chat::createConversation(const QString &jid, bool room)
 {
@@ -390,15 +406,20 @@ ChatConversation *Chat::createConversation(const QString &jid, bool room)
     return dialog;
 }
 
+/** Handle disconnection from the chat server.
+ */
 void Chat::disconnected()
 {
-    qWarning("Disconnected from chat server");
     isConnected = false;
     addButton->setEnabled(false);
     roomButton->setEnabled(false);
     statusCombo->setCurrentIndex(OfflineIndex);
 }
 
+/** Handle an error talking to the chat server.
+ *
+ * @param error
+ */
 void Chat::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError &&
@@ -410,6 +431,8 @@ void Chat::error(QXmppClient::Error error)
     }
 }
 
+/** Invite a contact to join a chat room.
+ */
 void Chat::inviteContact(const QString &jid)
 {
     ChatRoomPrompt prompt(client, chatRoomServer, this);
@@ -494,6 +517,8 @@ void Chat::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
     }
 }
 
+/** Once a multi-user chat server is found, enable the "chat rooms" button.
+ */
 void Chat::mucServerFound(const QString &mucServer)
 {
     chatRoomServer = mucServer;
@@ -535,11 +560,15 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     }
 }
 
+/** Return this window's chat client.
+ */
 ChatClient *Chat::chatClient()
 {
     return client;
 }
 
+/** Return this window's chat roster model.
+ */
 ChatRosterModel *Chat::chatRosterModel()
 {
     return rosterModel;
@@ -599,6 +628,8 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     return true;
 }
 
+/** Return this window's "Options" menu.
+ */
 QMenu *Chat::optionsMenu()
 {
     return optsMenu;
@@ -716,7 +747,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             joinConversation(jid, true);
         else if (action == ChatRosterView::OptionsAction)
         {
-            // get room info
+            // get room information
             QXmppIq iq;
             QXmppElement query;
             query.setTagName("query");
@@ -727,12 +758,14 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         }
         else if (action == ChatRosterView::MembersAction)
         {
+            // manage room members
             ChatRoomMembers dialog(client, jid, this);
             dialog.exec();
         }
     } else if (type == ChatRosterItem::RoomMember) {
         if (action == ChatRosterView::RemoveAction)
         {
+            // kick a user from a chat room
             QXmppElement item;
             item.setTagName("item");
             item.setAttribute("nick", jidToResource(jid));
@@ -764,6 +797,10 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     }
 }
 
+/** Handle user inactivity.
+ *
+ * @param secs
+ */
 void Chat::secondsIdle(int secs)
 {
     if (secs >= AWAY_TIME)
