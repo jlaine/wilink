@@ -44,12 +44,14 @@ private slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void chatStateChanged(QXmppMessage::State state);
+    void disconnected();
     void join();
 
 private:
     virtual void sendMessage(const QString &body);
 
     QXmppClient *client;
+    bool joined;
     ChatRosterModel *rosterModel;
     QStringList chatStatesJids;
 };

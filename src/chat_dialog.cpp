@@ -36,13 +36,14 @@
 #include "chat_roster.h"
 
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent), client(xmppClient), rosterModel(chatRosterModel)
+    : ChatConversation(jid, parent), client(xmppClient), joined(false), rosterModel(chatRosterModel)
 {
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    connect(this, SIGNAL(showPanel()), this, SLOT(join()));
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -82,10 +83,18 @@ void ChatDialog::chatStateChanged(QXmppMessage::State state)
     }
 }
 
+void ChatDialog::disconnected()
+{
+    joined = false;
+}
+
 /** Start a two party dialog.
  */
 void ChatDialog::join()
 {
+    if (joined)
+        return;
+
     // send initial state
     chatStatesJids = rosterModel->contactFeaturing(chatRemoteJid, ChatRosterModel::ChatStatesFeature);
     foreach (const QString &fullJid, chatStatesJids)
