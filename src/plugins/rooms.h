@@ -25,6 +25,7 @@
 class Chat;
 class QMenu;
 class QXmppMessage;
+class QXmppMucOwnerIq;
 
 class ChatRoomWatcher : public QObject
 {
@@ -36,6 +37,8 @@ public:
 private slots:
     void inviteContact();
     void messageReceived(const QXmppMessage &msg);
+    void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
+    void mucServerFound(const QString &roomServer);
     void rosterMenu(QMenu *menu, const QString &jid, int type);
 
 private:

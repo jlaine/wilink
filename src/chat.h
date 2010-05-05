@@ -39,7 +39,6 @@ class QPushButton;
 class QSplitter;
 class QStackedWidget;
 class QSystemTrayIcon;
-class QXmppMucOwnerIq;
 
 /** Chat represents the user interface's main window.
  */
@@ -71,7 +70,6 @@ private slots:
     void disconnected();
     void error(QXmppClient::Error error);
     void messageReceived(const QXmppMessage &msg);
-    void mucOwnerIqReceived(const QXmppMucOwnerIq&);
     void mucServerFound(const QString &roomServer);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);

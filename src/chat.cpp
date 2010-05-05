@@ -45,7 +45,6 @@
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppMucIq.h"
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppUtils.h"
@@ -165,7 +164,6 @@ Chat::Chat(QWidget *parent)
     /* set up client */
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)), this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
     connect(client, SIGNAL(mucServerFound(const QString&)), this, SLOT(mucServerFound(const QString&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
@@ -410,22 +408,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
         ChatDialog *dialog = new ChatDialog(client, m_rosterModel, bareJid);
         addPanel(dialog);
         dialog->messageReceived(msg);
-    }
-}
-
-void Chat::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
-{
-    if (iq.type() != QXmppIq::Result || iq.form().isNull())
-        return;
-
-    ChatForm dialog(iq.form(), this);
-    if (dialog.exec())
-    {
-        QXmppMucOwnerIq iqPacket;
-        iqPacket.setType(QXmppIq::Set);
-        iqPacket.setTo(iq.from());
-        iqPacket.setForm(dialog.form());
-        client->sendPacket(iqPacket);
     }
 }
 

@@ -20,10 +20,12 @@
 #include <QMenu>
 
 #include "qxmpp/QXmppConstants.h"
+#include "qxmpp/QXmppMucIq.h"
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"
+#include "chat_form.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_room.h"
@@ -33,8 +35,13 @@
 ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    connect(chat->chatClient(), SIGNAL(messageReceived(QXmppMessage)),
+    ChatClient *client = chat->chatClient();
+    connect(client, SIGNAL(messageReceived(QXmppMessage)),
             this, SLOT(messageReceived(QXmppMessage)));
+    connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)),
+            this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
+    connect(client, SIGNAL(mucServerFound(const QString&)),
+            this, SLOT(mucServerFound(const QString&)));
 }
 
 /** Invite a contact to join a chat room.
@@ -92,6 +99,29 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
     }
 }
 
+void ChatRoomWatcher::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
+{
+    if (iq.type() != QXmppIq::Result || iq.form().isNull())
+        return;
+
+    ChatForm dialog(iq.form(), chat);
+    if (dialog.exec())
+    {
+        QXmppMucOwnerIq iqPacket;
+        iqPacket.setType(QXmppIq::Set);
+        iqPacket.setTo(iq.from());
+        iqPacket.setForm(dialog.form());
+        chat->chatClient()->sendPacket(iqPacket);
+    }
+}
+
+/** Once a multi-user chat server is found, enable the "chat rooms" button.
+ */
+void ChatRoomWatcher::mucServerFound(const QString &mucServer)
+{
+    chatRoomServer = mucServer;
+//    roomButton->setEnabled(true);
+}
 
 void ChatRoomWatcher::rosterMenu(QMenu *menu, const QString &jid, int type)
 {
