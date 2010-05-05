@@ -123,12 +123,6 @@ class ChatRosterView : public QTreeView
     Q_OBJECT
 
 public:
-    enum Action
-    {
-        NoAction,
-        JoinAction,
-    };
-
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
     void selectContact(const QString &jid);
     QSize sizeHint() const;
@@ -138,13 +132,10 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 signals:
-    void itemAction(int action, const QString &jid, int type);
     void itemMenu(QMenu *menu, const QModelIndex &index);
 
 protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
-    void slotAction();
-    void slotActivated(const QModelIndex &index);
 
 private:
     ChatRosterModel *rosterModel;

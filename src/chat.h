@@ -66,7 +66,7 @@ private slots:
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
     void resizeContacts();
-    void rosterAction(int action, const QString &jid, int type);
+    void rosterClicked(const QModelIndex &index);
     void secondsIdle(int);
     void statusChanged(int currentIndex);
 

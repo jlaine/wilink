@@ -554,10 +554,6 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     sortedModel->setDynamicSortFilter(true);
     setModel(sortedModel);
 
-    /* prepare context menu */
-    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(slotActivated(const QModelIndex&)));
-    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(slotActivated(const QModelIndex&)));
-
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);
     setColumnWidth(ImageColumn, 40);
@@ -627,29 +623,5 @@ QSize ChatRosterView::sizeHint () const
     QSize hint(200, 0);
     hint.setHeight(model()->rowCount() * sizeHintForRow(0));
     return hint;
-}
-
-void ChatRosterView::slotAction()
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-
-    emit itemAction(action->data().toInt(),
-        index.data(ChatRosterModel::IdRole).toString(),
-        index.data(ChatRosterModel::TypeRole).toInt());
-}
-
-void ChatRosterView::slotActivated(const QModelIndex &index)
-{
-    if (!index.isValid())
-        return;
-
-    emit itemAction(JoinAction,
-        index.data(ChatRosterModel::IdRole).toString(),
-        index.data(ChatRosterModel::TypeRole).toInt());
 }
 

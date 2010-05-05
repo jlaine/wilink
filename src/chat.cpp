@@ -101,7 +101,7 @@ Chat::Chat(QWidget *parent)
 
     /* left panel */
     rosterView = new ChatRosterView(m_rosterModel);
-    connect(rosterView, SIGNAL(itemAction(int, QString, int)), this, SLOT(rosterAction(int, QString, int)));
+    connect(rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SLOT(contactsRosterMenu(QMenu*, QModelIndex)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
@@ -611,22 +611,19 @@ void Chat::resizeContacts()
     resize(hint);
 }
 
-void Chat::rosterAction(int action, const QString &jid, int type)
+void Chat::rosterClicked(const QModelIndex &index)
 {
-    if (type == ChatRosterItem::Contact)
-    {
-        if (action == ChatRosterView::JoinAction && !panel(jid))
-            // create new conversation with the contact
-            addPanel(new ChatDialog(client, m_rosterModel, jid));
-    }
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+
+    // create conversation if necessary
+    if (type == ChatRosterItem::Contact && !panel(jid))
+        addPanel(new ChatDialog(client, m_rosterModel, jid));
 
     // show requested panel
-    if (action == ChatRosterView::JoinAction)
-    {
-        ChatPanel *chatPanel = panel(jid);
-        if (chatPanel)
-            QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
-    }
+    ChatPanel *chatPanel = panel(jid);
+    if (chatPanel)
+        QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
 }
 
 /** Handle user inactivity.
