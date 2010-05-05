@@ -46,6 +46,7 @@ signals:
     void notifyPanel();
     void registerPanel();
     void showPanel();
+    void unregisterPanel();
 
 private:
     QPushButton *closeButton;

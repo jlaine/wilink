@@ -53,7 +53,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     notifyMessages(false),
     rosterModel(chatRosterModel)
 {
-    chatLocalJid = chatRemoteJid + "/" + rosterModel->ownName();
+    chatLocalJid = jid + "/" + rosterModel->ownName();
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -64,6 +64,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
+    connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
 }
 

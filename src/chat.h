@@ -85,6 +85,7 @@ private slots:
     void notifyPanel();
     void registerPanel();
     void showPanel();
+    void unregisterPanel();
 
 private:
     void changeEvent(QEvent *event);

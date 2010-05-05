@@ -222,6 +222,7 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
+    connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
     chatPanels << panel;
 }
 
@@ -249,10 +250,6 @@ void Chat::hidePanel()
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
     conversationPanel->removeWidget(panel);
-
-    // cleanup
-    if (qobject_cast<ChatRoom*>(panel))
-        rosterModel->removeItem(panel->objectName());
 }
 
 /** Notify the user of activity on a panel.
@@ -827,5 +824,16 @@ void Chat::statusChanged(int currentIndex)
         if (isConnected)
             client->disconnect();
     }
+}
+
+/** Unregister a panel from the roster list.
+  */
+void Chat::unregisterPanel()
+{
+    QWidget *panel = qobject_cast<QWidget*>(sender());
+    if (!panel)
+        return;
+
+    rosterModel->removeItem(panel->objectName());
 }
 
