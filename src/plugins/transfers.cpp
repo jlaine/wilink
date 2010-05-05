@@ -360,13 +360,8 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
-void ChatTransfers::sendFile(const QString &fullJid)
+void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
 {
-    // get file name
-    QString filePath = QFileDialog::getOpenFileName(this, tr("Send a file"));
-    if (filePath.isEmpty())
-        return;
-
     // check file size
     if (QFileInfo(filePath).size() > fileSizeLimit)
     {
@@ -382,6 +377,22 @@ void ChatTransfers::sendFile(const QString &fullJid)
     job->setData(LocalPathRole, filePath);
     addJob(job);
 }
+
+void ChatTransfers::sendFileAccepted(const QString &filePath)
+{
+    QString fullJid = sender()->objectName();
+    sendFile(fullJid, filePath);
+}
+
+void ChatTransfers::sendFileRequested(const QString &fullJid)
+{
+    QFileDialog *dialog = new QFileDialog(this, tr("Send a file"));
+    dialog->setFileMode(QFileDialog::ExistingFile);
+    dialog->setObjectName(fullJid);
+    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
+    dialog->open(this, SLOT(sendFileAccepted(QString)));
+}
+
 
 QSize ChatTransfers::sizeHint() const
 {
@@ -421,7 +432,7 @@ bool TransfersPlugin::initialize(Chat *chat)
     /* register panel */
     ChatTransfers *transfers = new ChatTransfers(chat->chatClient());
     transfers->setObjectName("transfers");
-    connect(chat, SIGNAL(sendFile(QString)), transfers, SLOT(sendFile(QString)));
+    connect(chat, SIGNAL(sendFile(QString)), transfers, SLOT(sendFileRequested(QString)));
     chat->addPanel(transfers);
 
     /* register shortcut */

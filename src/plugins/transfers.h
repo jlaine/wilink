@@ -94,7 +94,7 @@ public:
     static QString availableFilePath(const QString &dirPath, const QString &fileName);
 
 public slots:
-    void sendFile(const QString &fullJid);
+    void sendFile(const QString &fullJid, const QString &filePath);
 
 protected:
     QSize sizeHint() const;
@@ -103,6 +103,8 @@ private slots:
     void fileAccepted(QXmppTransferJob *job);
     void fileDeclined(QXmppTransferJob *job);
     void fileReceived(QXmppTransferJob *job);
+    void sendFileAccepted(const QString &filePath);
+    void sendFileRequested(const QString &fullJid);
     void updateButtons();
 
 private:
