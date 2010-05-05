@@ -383,25 +383,6 @@ void Chat::connected()
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 }
 
-/** Create a conversation dialog for the specified recipient.
- *
- * @param jid
- * @param room
- */
-ChatConversation *Chat::createConversation(const QString &jid, bool room)
-{
-    ChatConversation *dialog;
-    if (room)
-    {
-        rosterModel->addItem(ChatRosterItem::Room, jid);
-        dialog  = new ChatRoom(client, rosterModel, jid);
-    } else {
-        dialog = new ChatDialog(client, rosterModel, jid);
-    }
-    addPanel(dialog);
-    return dialog;
-}
-
 /** Handle disconnection from the chat server.
  */
 void Chat::disconnected()
@@ -457,7 +438,16 @@ void Chat::joinConversation(const QString &jid, bool isRoom)
 {
     ChatPanel *dialog = panel(jid);
     if (!dialog)
-        dialog = createConversation(jid, isRoom);
+    {
+        if (isRoom)
+        {
+            dialog  = new ChatRoom(client, rosterModel, jid);
+            rosterModel->addItem(ChatRosterItem::Room, jid);
+        } else {
+            dialog = new ChatDialog(client, rosterModel, jid);
+        }
+        addPanel(dialog);
+    }
     QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
 }
 
@@ -487,7 +477,8 @@ void Chat::messageReceived(const QXmppMessage &msg)
     case QXmppMessage::Chat:
         if (!panel(bareJid) && !msg.body().isEmpty())
         {
-            ChatDialog *dialog = qobject_cast<ChatDialog*>(createConversation(bareJid, false));
+            ChatDialog *dialog = new ChatDialog(client, rosterModel, bareJid);
+            addPanel(dialog);
             QTimer::singleShot(0, dialog, SIGNAL(registerPanel()));
             dialog->messageReceived(msg);
         }

@@ -89,7 +89,6 @@ private slots:
 
 private:
     void changeEvent(QEvent *event);
-    ChatConversation *createConversation(const QString &jid, bool room);
 
 private:
     bool autoAway;
