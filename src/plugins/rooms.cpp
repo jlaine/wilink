@@ -99,6 +99,35 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
     }
 }
 
+void ChatRoomWatcher::roomOptions()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString jid = action->data().toString();
+
+    // get room information
+    QXmppIq iq;
+    QXmppElement query;
+    query.setTagName("query");
+    query.setAttribute("xmlns", ns_muc_owner);
+    iq.setExtensions(query);
+    iq.setTo(jid);
+    chat->chatClient()->sendPacket(iq);
+}
+
+void ChatRoomWatcher::roomMembers()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString jid = action->data().toString();
+
+    // manage room members
+    ChatRoomMembers dialog(chat->chatClient(), jid, chat);
+    dialog.exec();
+}
+
 void ChatRoomWatcher::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
 {
     if (iq.type() != QXmppIq::Result || iq.form().isNull())
@@ -133,6 +162,21 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
         action->setData(jid);
         connect(action, SIGNAL(triggered()), this, SLOT(inviteContact()));
+    } else if (type == ChatRosterItem::Room) {
+        int flags = index.data(ChatRosterModel::FlagsRole).toInt();
+        if (flags & ChatRosterModel::OptionsFlag)
+        {
+            QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
+            action->setData(jid);
+            connect(action, SIGNAL(triggered()), this, SLOT(roomOptions()));
+        }
+
+        if (flags & ChatRosterModel::MembersFlag)
+        {
+            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
+            action->setData(jid);
+            connect(action, SIGNAL(triggered()), this, SLOT(roomMembers()));
+        }
     }
 }
 

@@ -613,21 +613,6 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         action->setData(RemoveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
-    } else if (type == ChatRosterItem::Room) {
-        int flags = index.data(ChatRosterModel::FlagsRole).toInt();
-        if (flags & ChatRosterModel::OptionsFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
-            action->setData(OptionsAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
-
-        if (flags & ChatRosterModel::MembersFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
-            action->setData(MembersAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
     } else if (type == ChatRosterItem::RoomMember) {
         QModelIndex room = index.parent();
         if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)

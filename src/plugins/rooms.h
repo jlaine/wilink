@@ -40,6 +40,8 @@ private slots:
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &roomServer);
+    void roomOptions();
+    void roomMembers();
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:

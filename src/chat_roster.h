@@ -129,7 +129,6 @@ public:
         AddAction,
         JoinAction,
         OptionsAction,
-        MembersAction,
         RemoveAction,
         RenameAction,
     };

@@ -56,7 +56,6 @@
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_dialog.h"
-#include "chat_form.h"
 #include "chat_plugin.h"
 #include "chat_room.h"
 #include "chat_roster.h"
@@ -641,26 +640,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         else if (action == ChatRosterView::RenameAction)
             renameContact(jid);
     } else if (type == ChatRosterItem::Room) {
+        // create new panel for the chat room
         if (action == ChatRosterView::JoinAction && !panel(jid))
-            // create new panel for the chat room
             addPanel(new ChatRoom(client, m_rosterModel, jid));
-        else if (action == ChatRosterView::OptionsAction)
-        {
-            // get room information
-            QXmppIq iq;
-            QXmppElement query;
-            query.setTagName("query");
-            query.setAttribute("xmlns", ns_muc_owner);
-            iq.setExtensions(query);
-            iq.setTo(jid);
-            client->sendPacket(iq);
-        }
-        else if (action == ChatRosterView::MembersAction)
-        {
-            // manage room members
-            ChatRoomMembers dialog(client, jid, this);
-            dialog.exec();
-        }
     } else if (type == ChatRosterItem::RoomMember) {
         if (action == ChatRosterView::RemoveAction)
         {
