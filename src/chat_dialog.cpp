@@ -38,7 +38,7 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient), joined(false), rosterModel(chatRosterModel)
 {
-    setLocalName(rosterModel->ownName());
+    chatLocalName = rosterModel->ownName();
     setRemoteName(rosterModel->contactName(jid));
     setWindowIcon(rosterModel->contactAvatar(jid));
 

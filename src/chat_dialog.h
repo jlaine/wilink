@@ -51,6 +51,7 @@ private slots:
 private:
     virtual void sendMessage(const QString &body);
 
+    QString chatLocalName;
     QXmppClient *client;
     bool joined;
     ChatRosterModel *rosterModel;

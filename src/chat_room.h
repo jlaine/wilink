@@ -55,6 +55,7 @@ private slots:
     void presenceReceived(const QXmppPresence &msg);
 
 private:
+    QString chatLocalJid;
     QXmppClient *client;
     bool joined;
     bool notifyMessages;

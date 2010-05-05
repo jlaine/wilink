@@ -52,7 +52,6 @@ signals:
 
 protected:
     virtual void sendMessage(const QString &body) = 0;
-    void setLocalName(const QString &name);
     void setRemoteName(const QString &name);
     void setRemoteState(QXmppMessage::State state);
 
@@ -60,7 +59,6 @@ protected:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
 
-    QString chatLocalName;
     QString chatRemoteJid;
     QString chatRemoteName;
 

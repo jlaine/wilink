@@ -53,7 +53,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     notifyMessages(false),
     rosterModel(chatRosterModel)
 {
-    setLocalName(rosterModel->ownName());
+    chatLocalJid = chatRemoteJid + "/" + rosterModel->ownName();
     setRemoteName(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -102,7 +102,7 @@ void ChatRoom::join()
     
     // send join request
     QXmppPresence packet;
-    packet.setTo(chatRemoteJid + "/" + chatLocalName);
+    packet.setTo(chatLocalJid);
     packet.setType(QXmppPresence::Available);
     QXmppElement x;
     x.setTagName("x");
@@ -121,7 +121,7 @@ void ChatRoom::leave()
         return;
 
     QXmppPresence packet;
-    packet.setTo(chatRemoteJid + "/" + chatLocalName);
+    packet.setTo(chatLocalJid);
     packet.setType(QXmppPresence::Unavailable);
     client->sendPacket(packet);
 
@@ -137,7 +137,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     ChatHistoryMessage message;
     message.body = msg.body();
     message.from = from;
-    message.received = (from != chatLocalName);
+    message.received = (msg.from() != chatLocalJid);
     message.date = QDateTime::currentDateTime();
     foreach (const QXmppElement &extension, msg.extensions())
     {
@@ -181,7 +181,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
         }
         break;
     case QXmppPresence::Unavailable:
-        if (chatLocalName != jidToResource(presence.from()))
+        if (presence.from() != chatLocalJid)
             return;
 
         // leave room
@@ -212,7 +212,7 @@ void ChatRoom::sendMessage(const QString &text)
 {
     QXmppMessage msg;
     msg.setBody(text);
-    msg.setFrom(chatRemoteJid + "/" + chatLocalName);
+    msg.setFrom(chatLocalJid);
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
     client->sendPacket(msg);

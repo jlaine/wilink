@@ -79,11 +79,6 @@ QXmppMessage::State ChatConversation::localState() const
     return chatLocalState;
 }
 
-void ChatConversation::setLocalName(const QString &name)
-{
-    chatLocalName = name;
-}
-
 void ChatConversation::setRemoteName(const QString &name)
 {
     chatRemoteName = name;
