@@ -32,7 +32,6 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     chatRemoteJid(jid), chatLocalState(QXmppMessage::None)
 {
     setObjectName(chatRemoteJid);
-    setWindowTitle(chatRemoteJid);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
