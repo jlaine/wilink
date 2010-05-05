@@ -356,7 +356,7 @@ void Chat::addRoom()
     ChatRoomPrompt prompt(client, chatRoomServer, this);
     if (!prompt.exec())
         return;
-    joinConversation(prompt.textValue(), true);
+    joinRoom(prompt.textValue());
 }
 
 /** When the window is activated, pass focus to the active chat.
@@ -418,7 +418,7 @@ void Chat::inviteContact(const QString &jid)
 
     // join chat room
     const QString roomJid = prompt.textValue();
-    joinConversation(roomJid, true);
+    joinRoom(roomJid);
 
     // invite contact
     QXmppElement x;
@@ -434,18 +434,15 @@ void Chat::inviteContact(const QString &jid)
     client->sendPacket(message);
 }
 
-void Chat::joinConversation(const QString &jid, bool isRoom)
+/** Join the given chat room.
+ */
+void Chat::joinRoom(const QString &jid)
 {
     ChatPanel *dialog = panel(jid);
     if (!dialog)
     {
-        if (isRoom)
-        {
-            dialog  = new ChatRoom(client, rosterModel, jid);
-            rosterModel->addItem(ChatRosterItem::Room, jid);
-        } else {
-            dialog = new ChatDialog(client, rosterModel, jid);
-        }
+        dialog  = new ChatRoom(client, rosterModel, jid);
+        rosterModel->addItem(ChatRosterItem::Room, jid);
         addPanel(dialog);
     }
     QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
@@ -711,7 +708,15 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         if (action == ChatRosterView::InviteAction)
             inviteContact(jid);
         else if (action == ChatRosterView::JoinAction)
-            joinConversation(jid, false);
+        {
+            ChatPanel *chatPanel = panel(jid);
+            if (!chatPanel)
+            {
+                chatPanel = new ChatDialog(client, rosterModel, jid);
+                addPanel(chatPanel);
+            }
+            QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
+        }
         else if (action == ChatRosterView::OptionsAction)
         {
             ChatRosterItem *item = rosterModel->contactItem(jid);
@@ -743,7 +748,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
        }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction)
-            joinConversation(jid, true);
+            joinRoom(jid);
         else if (action == ChatRosterView::OptionsAction)
         {
             // get room information

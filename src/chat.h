@@ -68,7 +68,6 @@ private slots:
     void disconnected();
     void error(QXmppClient::Error error);
     void inviteContact(const QString &jid);
-    void joinConversation(const QString &jid, bool isRoom);
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
     void mucServerFound(const QString &roomServer);
@@ -89,6 +88,7 @@ private slots:
 
 private:
     void changeEvent(QEvent *event);
+    void joinRoom(const QString &jid);
 
 private:
     bool autoAway;
