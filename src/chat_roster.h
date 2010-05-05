@@ -126,11 +126,7 @@ public:
     enum Action
     {
         NoAction,
-        AddAction,
         JoinAction,
-        OptionsAction,
-        RemoveAction,
-        RenameAction,
     };
 
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);

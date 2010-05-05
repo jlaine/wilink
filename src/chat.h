@@ -27,9 +27,7 @@
 #include "qxmpp/QXmppRoster.h"
 
 class ChatClient;
-class ChatConversation;
 class ChatPanel;
-class ChatRoom;
 class ChatRosterModel;
 class ChatRosterView;
 class Idle;
@@ -39,7 +37,6 @@ class QModelIndex;
 class QPushButton;
 class QSplitter;
 class QStackedWidget;
-class QSystemTrayIcon;
 
 /** Chat represents the user interface's main window.
  */
@@ -61,22 +58,23 @@ public:
 signals:
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
-public slots:
-    void rosterAction(int action, const QString &jid, int type);
-
 private slots:
-    void addContact();
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
     void messageReceived(const QXmppMessage &msg);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
-    void removeContact(const QString &jid);
-    void renameContact(const QString &jid);
     void resizeContacts();
+    void rosterAction(int action, const QString &jid, int type);
     void secondsIdle(int);
     void statusChanged(int currentIndex);
+
+    void addContact();
+    void contactsRosterMenu(QMenu *menu, const QModelIndex &index);
+    void removeContact();
+    void renameContact();
+    void showContactPage();
 
     void destroyPanel(QObject *obj);
     void hidePanel();

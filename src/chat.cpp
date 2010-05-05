@@ -103,6 +103,7 @@ Chat::Chat(QWidget *parent)
     rosterView = new ChatRosterView(m_rosterModel);
     connect(rosterView, SIGNAL(itemAction(int, QString, int)), this, SLOT(rosterAction(int, QString, int)));
     connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
+    connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SLOT(contactsRosterMenu(QMenu*, QModelIndex)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
@@ -213,6 +214,34 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
     chatPanels << panel;
+}
+
+void Chat::contactsRosterMenu(QMenu *menu, const QModelIndex &index)
+{
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
+    
+    if (type == ChatRosterItem::Contact)
+    {
+        QAction *action;
+
+        const QString url = index.data(ChatRosterModel::UrlRole).toString();
+        if (!url.isEmpty())
+        {
+            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
+            action->setData(url);
+            connect(action, SIGNAL(triggered()), this, SLOT(showContactPage()));
+        }
+
+        action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
+        action->setData(bareJid);
+        connect(action, SIGNAL(triggered()), this, SLOT(renameContact()));
+
+        action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
+        action->setData(bareJid);
+        connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
+    }
+
 }
 
 /** When a panel is destroyed, from it from our list of panels.
@@ -507,11 +536,14 @@ ChatPanel *Chat::panel(const QString &objectName)
 }
 
 /** Prompt the user for confirmation then remove a contact.
- *
- * @param jid
  */
-void Chat::removeContact(const QString &jid)
+void Chat::removeContact()
 {
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString jid = action->data().toString();
+
     if (QMessageBox::question(this, tr("Remove contact"),
         tr("Do you want to remove %1 from your contact list?").arg(jid),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
@@ -527,11 +559,14 @@ void Chat::removeContact(const QString &jid)
 }
 
 /** Prompt the user to rename a contact.
- *
- * @param jid
  */
-void Chat::renameContact(const QString &jid)
+void Chat::renameContact()
 {
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString jid = action->data().toString();
+
     bool ok = true;
     QXmppRosterIq::Item item = client->getRoster().getRosterEntry(jid);
     QString name = QInputDialog::getText(this, tr("Rename contact"),
@@ -583,28 +618,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         if (action == ChatRosterView::JoinAction && !panel(jid))
             // create new conversation with the contact
             addPanel(new ChatDialog(client, m_rosterModel, jid));
-        else if (action == ChatRosterView::OptionsAction)
-        {
-            ChatRosterItem *item = m_rosterModel->contactItem(jid);
-            QString url = item ? item->data(ChatRosterModel::UrlRole).toString() : QString();
-            if (!url.isEmpty())
-                QDesktopServices::openUrl(url);
-
-#if 0
-            QStringList fullJids = m_rosterModel->contactFeaturing(jid, ChatRosterModel::VersionFeature);
-            if (!fullJids.size())
-                return;
-
-            QXmppVersionIq iq;
-            iq.setType(QXmppIq::Get);
-            iq.setTo(fullJids.first());
-            client->sendPacket(iq);
-#endif
-        }
-        else if (action == ChatRosterView::RemoveAction)
-            removeContact(jid);
-        else if (action == ChatRosterView::RenameAction)
-            renameContact(jid);
     }
 
     // show requested panel
@@ -633,6 +646,17 @@ void Chat::secondsIdle(int secs)
         const int oldIndex = isBusy ? BusyIndex : AvailableIndex;
         statusCombo->setCurrentIndex(oldIndex);
     }
+}
+
+void Chat::showContactPage()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+
+    QString url = action->data().toString();
+    if (!url.isEmpty())
+        QDesktopServices::openUrl(url);
 }
 
 void Chat::statusChanged(int currentIndex)

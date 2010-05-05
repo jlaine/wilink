@@ -579,41 +579,11 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString &bareJid = index.data(ChatRosterModel::IdRole).toString();
+    const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
     
     // allow plugins to populate menu
     QMenu *menu = new QMenu(this);
     emit itemMenu(menu, index);
-
-    if (type == ChatRosterItem::Contact)
-    {
-        QAction *action;
-
-        if (!index.data(ChatRosterModel::UrlRole).toString().isEmpty())
-        {
-            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
-            action->setData(OptionsAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
-
-#if 0
-        if (!rosterModel->contactFeaturing(bareJid, ChatRosterModel::VersionFeature).isEmpty())
-        {
-            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Information"));
-            action->setData(OptionsAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
-#endif
-
-        action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
-        action->setData(RenameAction);
-        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-
-        action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-        action->setData(RemoveAction);
-        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-
-    }
 
     // FIXME : is there a better way to test if a menu is empty?
     if (menu->sizeHint().height() > 4)
