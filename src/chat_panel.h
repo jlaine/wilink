@@ -25,6 +25,9 @@
 class QLabel;
 class QPushButton;
 
+/** ChatPanel is the base class for all the panels displayed in the right-hand
+ *  part of the user interface, such as conversations.
+ */
 class ChatPanel : public QWidget
 {
     Q_OBJECT

@@ -41,6 +41,8 @@ class QStackedWidget;
 class QSystemTrayIcon;
 class QXmppMucOwnerIq;
 
+/** Chat represents the user interface's main window.
+ */
 class Chat : public QMainWindow
 {
     Q_OBJECT

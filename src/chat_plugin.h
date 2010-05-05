@@ -22,6 +22,8 @@
 class Chat;
 class ChatPanel;
 
+/** Interface for all plugins.
+ */
 class ChatPluginInterface
 {
 public:
