@@ -43,18 +43,20 @@ public:
     ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent = NULL);
     virtual void leave();
 
-protected slots:
+protected:
+    virtual void sendMessage(const QString &text);
+
+private slots:
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void join();
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
 
-protected:
-    virtual void sendMessage(const QString &text);
-
 private:
-    bool joined;
     QXmppClient *client;
+    bool joined;
+    bool notifyMessages;
 };
 
 class ChatRoomMembers : public QDialog

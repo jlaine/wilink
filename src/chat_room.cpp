@@ -47,12 +47,13 @@ enum MembersColumns {
 };
 
 ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent), client(xmppClient), joined(false)
+    : ChatConversation(jid, parent), client(xmppClient), joined(false), notifyMessages(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(client, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)), this, SLOT(discoveryIqReceived(QXmppDiscoveryIq)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
@@ -61,6 +62,18 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, const QString &jid, QWidget *parent)
 void ChatRoom::disconnected()
 {
     joined = false;
+}
+
+void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+{
+    if (disco.from() != chatRemoteJid ||
+        disco.type() != QXmppIq::Result ||
+        disco.queryType() != QXmppDiscoveryIq::InfoQuery)
+        return;
+
+    // notify user of received messages if the room is not publicly listed
+    if (disco.features().contains("muc_hidden"))
+        notifyMessages = true;
 }
 
 /** Send a request to join a multi-user chat.
@@ -73,6 +86,13 @@ void ChatRoom::join()
     // clear history
     chatHistory->clear();
 
+    // request room information
+    QXmppDiscoveryIq disco;
+    disco.setTo(chatRemoteJid);
+    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    client->sendPacket(disco);
+    
+    // send join request
     QXmppPresence packet;
     packet.setTo(chatRemoteJid + "/" + chatLocalName);
     packet.setType(QXmppPresence::Available);
@@ -81,7 +101,7 @@ void ChatRoom::join()
     x.setAttribute("xmlns", ns_muc);
     packet.setExtensions(x);
     client->sendPacket(packet);
-
+    
     joined = true;
 }
 
@@ -116,6 +136,10 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         }
     }
     chatHistory->addMessage(message);
+
+    // notify
+    if (notifyMessages)
+        emit notifyPanel();    
 }
 
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
