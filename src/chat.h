@@ -72,6 +72,7 @@ private slots:
     void secondsIdle(int);
     void statusChanged(int currentIndex);
 
+    void detachPanel();
     void destroyPanel(QObject *obj);
     void hidePanel();
     void notifyPanel();
