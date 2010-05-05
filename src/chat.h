@@ -88,7 +88,6 @@ private slots:
 
 private:
     void changeEvent(QEvent *event);
-    void joinRoom(const QString &jid);
 
 private:
     bool autoAway;

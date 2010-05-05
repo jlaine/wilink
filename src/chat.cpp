@@ -360,7 +360,7 @@ void Chat::addRoom()
     ChatRoomPrompt prompt(client, chatRoomServer, this);
     if (!prompt.exec())
         return;
-    joinRoom(prompt.textValue());
+    rosterAction(ChatRosterView::JoinAction, prompt.textValue(), ChatRosterItem::Room);
 }
 
 /** When the window is activated, pass focus to the active chat.
@@ -422,7 +422,7 @@ void Chat::inviteContact(const QString &jid)
 
     // join chat room
     const QString roomJid = prompt.textValue();
-    joinRoom(roomJid);
+    rosterAction(ChatRosterView::JoinAction, roomJid, ChatRosterItem::Room);
 
     // invite contact
     QXmppElement x;
@@ -436,19 +436,6 @@ void Chat::inviteContact(const QString &jid)
     message.setType(QXmppMessage::Normal);
     message.setExtensions(x);
     client->sendPacket(message);
-}
-
-/** Join the given chat room.
- */
-void Chat::joinRoom(const QString &jid)
-{
-    ChatPanel *dialog = panel(jid);
-    if (!dialog)
-    {
-        dialog  = new ChatRoom(client, rosterModel, jid);
-        addPanel(dialog);
-    }
-    QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
 }
 
 void Chat::messageReceived(const QXmppMessage &msg)
@@ -743,7 +730,10 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 emit sendFile(fullJids.first());
        }
     } else if (type == ChatRosterItem::Room) {
-        if (action == ChatRosterView::OptionsAction)
+        if (action == ChatRosterView::JoinAction && !panel(jid))
+            // create new panel for the chat room
+            addPanel(new ChatRoom(client, rosterModel, jid));
+        else if (action == ChatRosterView::OptionsAction)
         {
             // get room information
             QXmppIq iq;
