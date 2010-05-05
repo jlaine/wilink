@@ -38,11 +38,7 @@ public:
     ChatConversation(const QString &jid, QWidget *parent = NULL);
 
     virtual void leave();
-
     QXmppMessage::State localState() const;
-    void setLocalName(const QString &name);
-    void setRemoteName(const QString &name);
-    void setRemoteState(QXmppMessage::State state);
 
 protected slots:
     void slotFocused();
@@ -57,6 +53,9 @@ signals:
 
 protected:
     virtual void sendMessage(const QString &body) = 0;
+    void setLocalName(const QString &name);
+    void setRemoteName(const QString &name);
+    void setRemoteState(QXmppMessage::State state);
 
 protected:
     ChatHistory *chatHistory;
