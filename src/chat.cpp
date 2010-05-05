@@ -20,7 +20,6 @@
 #include <QApplication>
 #include <QComboBox>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QInputDialog>
 #include <QLabel>
@@ -103,7 +102,6 @@ Chat::Chat(QWidget *parent)
     rosterView = new ChatRosterView(m_rosterModel);
     connect(rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
-    connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SLOT(contactsRosterMenu(QMenu*, QModelIndex)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
@@ -117,13 +115,6 @@ Chat::Chat(QWidget *parent)
     setCentralWidget(splitter);
 
     /* build status bar */
-    addButton = new QPushButton;
-    addButton->setEnabled(false);
-    addButton->setIcon(QIcon(":/add.png"));
-    addButton->setToolTip(tr("Add a contact"));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
-    statusBar()->addWidget(addButton);
-
     statusCombo = new QComboBox;
     statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
     statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
@@ -177,28 +168,6 @@ Chat::~Chat()
     client->disconnect();
 }
 
-/** Prompt the user for a new contact then add it to the roster.
- */
-void Chat::addContact()
-{
-    bool ok = true;
-    QString jid = "@" + client->getConfiguration().domain();
-    while (!jidValidator.exactMatch(jid))
-    {
-        jid = QInputDialog::getText(this, tr("Add a contact"),
-            tr("Enter the address of the contact you want to add."),
-            QLineEdit::Normal, jid, &ok).toLower();
-        if (!ok)
-            return;
-        jid = jid.trimmed().toLower();
-    }
-
-    QXmppPresence packet;
-    packet.setTo(jid);
-    packet.setType(QXmppPresence::Subscribe);
-    client->sendPacket(packet);
-}
-
 /** Connect signals for the given panel.
  *
  * @param panel
@@ -214,34 +183,6 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
     chatPanels << panel;
-}
-
-void Chat::contactsRosterMenu(QMenu *menu, const QModelIndex &index)
-{
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
-    
-    if (type == ChatRosterItem::Contact)
-    {
-        QAction *action;
-
-        const QString url = index.data(ChatRosterModel::UrlRole).toString();
-        if (!url.isEmpty())
-        {
-            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
-            action->setData(url);
-            connect(action, SIGNAL(triggered()), this, SLOT(showContactPage()));
-        }
-
-        action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
-        action->setData(bareJid);
-        connect(action, SIGNAL(triggered()), this, SLOT(renameContact()));
-
-        action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-        action->setData(bareJid);
-        connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
-    }
-
 }
 
 /** When a panel is destroyed, from it from our list of panels.
@@ -373,7 +314,6 @@ void Chat::changeEvent(QEvent *event)
 void Chat::connected()
 {
     isConnected = true;
-    addButton->setEnabled(true);
     statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 }
 
@@ -382,7 +322,6 @@ void Chat::connected()
 void Chat::disconnected()
 {
     isConnected = false;
-    addButton->setEnabled(false);
     statusCombo->setCurrentIndex(OfflineIndex);
 }
 
@@ -535,53 +474,6 @@ ChatPanel *Chat::panel(const QString &objectName)
     return 0;
 }
 
-/** Prompt the user for confirmation then remove a contact.
- */
-void Chat::removeContact()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString jid = action->data().toString();
-
-    if (QMessageBox::question(this, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(jid),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
-    {
-        QXmppRosterIq::Item item;
-        item.setBareJid(jid);
-        item.setSubscriptionType(QXmppRosterIq::Item::Remove);
-        QXmppRosterIq packet;
-        packet.setType(QXmppIq::Set);
-        packet.addItem(item);
-        client->sendPacket(packet);
-    }
-}
-
-/** Prompt the user to rename a contact.
- */
-void Chat::renameContact()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString jid = action->data().toString();
-
-    bool ok = true;
-    QXmppRosterIq::Item item = client->getRoster().getRosterEntry(jid);
-    QString name = QInputDialog::getText(this, tr("Rename contact"),
-        tr("Enter the name for this contact."),
-        QLineEdit::Normal, item.name(), &ok);
-    if (ok)
-    {
-        item.setName(name);
-        QXmppRosterIq packet;
-        packet.setType(QXmppIq::Set);
-        packet.addItem(item);
-        client->sendPacket(packet);
-    }
-}
-
 /** Try to resize the window to fit the contents of the contacts list.
  */
 void Chat::resizeContacts()
@@ -643,17 +535,6 @@ void Chat::secondsIdle(int secs)
         const int oldIndex = isBusy ? BusyIndex : AvailableIndex;
         statusCombo->setCurrentIndex(oldIndex);
     }
-}
-
-void Chat::showContactPage()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-
-    QString url = action->data().toString();
-    if (!url.isEmpty())
-        QDesktopServices::openUrl(url);
 }
 
 void Chat::statusChanged(int currentIndex)

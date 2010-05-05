@@ -72,12 +72,6 @@ private slots:
     void secondsIdle(int);
     void statusChanged(int currentIndex);
 
-    void addContact();
-    void contactsRosterMenu(QMenu *menu, const QModelIndex &index);
-    void removeContact();
-    void renameContact();
-    void showContactPage();
-
     void destroyPanel(QObject *obj);
     void hidePanel();
     void notifyPanel();
@@ -95,7 +89,6 @@ private:
 
     Idle *idle;
 
-    QPushButton *addButton;
     ChatClient *client;
     QList<ChatPanel*> chatPanels;
     QMenu *optsMenu;

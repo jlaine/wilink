@@ -4,22 +4,6 @@
 <context>
     <name>Chat</name>
     <message>
-        <source>Enter the address of the contact you want to add.</source>
-        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
-        <source>Add a contact</source>
-        <translation>Ajouter un contact</translation>
-    </message>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
-    </message>
-    <message>
-        <source>Do you want to remove %1 from your contact list?</source>
-        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
-    </message>
-    <message>
         <source>Available</source>
         <translation>Disponible</translation>
     </message>
@@ -30,14 +14,6 @@
     <message>
         <source>Offline</source>
         <translation>Déconnecté</translation>
-    </message>
-    <message>
-        <source>Rename contact</source>
-        <translation>Renommer contact</translation>
-    </message>
-    <message>
-        <source>Enter the name for this contact.</source>
-        <translation>Saisissez le nom pour ce contact.</translation>
     </message>
     <message>
         <source>Away</source>
@@ -58,10 +34,6 @@
     <message>
         <source>Open at login</source>
         <translation>Ouvrir au démarrage</translation>
-    </message>
-    <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
     </message>
 </context>
 <context>
@@ -442,6 +414,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Enter the address of the contact you want to add.</source>
         <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>Enter the name for this contact.</source>
+        <translation>Saisissez le nom pour ce contact.</translation>
+    </message>
+    <message>
+        <source>Do you want to remove %1 from your contact list?</source>
+        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
 </context>
 <context>
