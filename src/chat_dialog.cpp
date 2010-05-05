@@ -38,8 +38,7 @@
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient), joined(false), rosterModel(chatRosterModel)
 {
-    chatLocalName = rosterModel->ownName();
-    setRemoteName(rosterModel->contactName(jid));
+    setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(rosterModel->contactAvatar(jid));
 
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
@@ -62,7 +61,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
-        message.from = msg.isReceived() ? chatRemoteName : chatLocalName;
+        message.from = msg.isReceived() ? rosterModel->contactName(chatRemoteJid) : rosterModel->ownName();
         message.received = msg.isReceived();
         chatHistory->addMessage(message);
     }
@@ -151,7 +150,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
             message.date.setTimeSpec(Qt::UTC);
         }
     }
-    message.from = chatRemoteName;
+    message.from = rosterModel->contactName(chatRemoteJid);
     message.received = true;
     chatHistory->addMessage(message);
 
@@ -165,7 +164,7 @@ void ChatDialog::sendMessage(const QString &text)
     ChatHistoryMessage message;
     message.body = text;
     message.date = QDateTime::currentDateTime();
-    message.from = chatLocalName;
+    message.from = rosterModel->ownName();
     message.received = false;
     chatHistory->addMessage(message);
 

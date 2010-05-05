@@ -54,7 +54,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     rosterModel(chatRosterModel)
 {
     chatLocalJid = chatRemoteJid + "/" + rosterModel->ownName();
-    setRemoteName(rosterModel->contactName(jid));
+    setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
     connect(client, SIGNAL(connected()), this, SLOT(join()));
