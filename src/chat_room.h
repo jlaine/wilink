@@ -42,7 +42,6 @@ class ChatRoom : public ChatConversation
 
 public:
     ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
-    virtual void leave();
 
 protected:
     virtual void sendMessage(const QString &text);
@@ -50,6 +49,7 @@ protected:
 private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void join();
+    void leave();
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);

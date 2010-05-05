@@ -63,6 +63,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     connect(client, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)), this, SLOT(discoveryIqReceived(QXmppDiscoveryIq)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
 }
 
@@ -116,10 +117,15 @@ void ChatRoom::join()
  */
 void ChatRoom::leave()
 {
+    if (!joined)
+        return;
+
     QXmppPresence packet;
     packet.setTo(chatRemoteJid + "/" + chatLocalName);
     packet.setType(QXmppPresence::Unavailable);
     client->sendPacket(packet);
+
+    joined = false;
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
