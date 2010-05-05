@@ -39,6 +39,7 @@ public:
 private slots:
     void disconnected();
     void inviteContact();
+    void joinRoom(const QString &jid);
     void kickUser();
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);

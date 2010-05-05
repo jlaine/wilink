@@ -76,7 +76,7 @@ void ChatRoomWatcher::inviteContact()
 
     // join chat room
     const QString roomJid = prompt.textValue();
-    chat->rosterAction(ChatRosterView::JoinAction, roomJid, ChatRosterItem::Room);
+    joinRoom(jid);
 
     // invite contact
     QXmppElement x;
@@ -90,6 +90,11 @@ void ChatRoomWatcher::inviteContact()
     message.setType(QXmppMessage::Normal);
     message.setExtensions(x);
     chat->chatClient()->sendPacket(message);
+}
+
+void ChatRoomWatcher::joinRoom(const QString &jid)
+{
+    chat->rosterAction(ChatRosterView::JoinAction, jid, ChatRosterItem::Room);
 }
 
 /** Kick a user from a chat room.
@@ -134,7 +139,7 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
                 if (!roomJid.isEmpty() && !chat->panel(roomJid))
                 {
                     ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, chat);
-                    connect(dlg, SIGNAL(itemAction(int, const QString&, int)), chat, SLOT(rosterAction(int, const QString&, int)));
+                    connect(dlg, SIGNAL(roomSelected(QString)), this, SLOT(joinRoom(QString)));
                     dlg->show();
                 }
                 break;
@@ -150,7 +155,7 @@ void ChatRoomWatcher::roomJoin()
     ChatRoomPrompt prompt(chat->chatClient(), chatRoomServer, chat);
     if (!prompt.exec())
         return;
-    chat->rosterAction(ChatRosterView::JoinAction, prompt.textValue(), ChatRosterItem::Room);
+    joinRoom(prompt.textValue());
 }
 
 /** Display a chat room's options.

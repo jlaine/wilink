@@ -94,7 +94,7 @@ public:
     ChatRoomInvitePrompt(const QString &contactName, const QString &jid, QWidget *parent = 0);
 
 signals:
-    void itemAction(int action, const QString &jid, int type);
+    void roomSelected(const QString &jid);
 
 private slots:
     void slotButtonClicked(QAbstractButton *button);

@@ -317,7 +317,7 @@ ChatRoomInvitePrompt::ChatRoomInvitePrompt(const QString &contactName, const QSt
 void ChatRoomInvitePrompt::slotButtonClicked(QAbstractButton *button)
 {
     if (standardButton(button) == QMessageBox::Yes)
-        emit itemAction(ChatRosterView::JoinAction, m_jid, ChatRosterItem::Room);
+        emit roomSelected(m_jid);
 }
 
 ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
