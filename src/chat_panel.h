@@ -21,6 +21,7 @@
 #define __WILINK_CHAT_PANEL_H__
 
 #include <QWidget>
+#include "chat_roster_item.h"
 
 class QLabel;
 class QPushButton;
@@ -34,6 +35,7 @@ class ChatPanel : public QWidget
 
 public:
     ChatPanel(QWidget *parent);
+    virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
     void setWindowTitle(const QString &title);

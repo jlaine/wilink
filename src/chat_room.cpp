@@ -39,7 +39,6 @@
 #include "chat_history.h"
 #include "chat_room.h"
 #include "chat_roster.h"
-#include "chat_roster_item.h"
 
 enum MembersColumns {
     JidColumn = 0,
@@ -155,6 +154,14 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     if (notifyMessages)
         emit notifyPanel();    
 }
+
+/** Return the type of entry to add to the roster.
+ */
+ChatRosterItem::Type ChatRoom::objectType() const
+{
+    return ChatRosterItem::Room;
+}
+
 
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {

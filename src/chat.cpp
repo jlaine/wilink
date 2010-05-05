@@ -276,14 +276,11 @@ void Chat::notifyPanel()
   */
 void Chat::registerPanel()
 {
-    QWidget *panel = qobject_cast<QWidget*>(sender());
+    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
     if (!panel)
         return;
 
-    ChatRosterItem::Type type = ChatRosterItem::Other;
-    if (qobject_cast<ChatRoom*>(panel))
-        type = ChatRosterItem::Room;
-    m_rosterModel->addItem(type,
+    m_rosterModel->addItem(panel->objectType(),
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -293,15 +290,12 @@ void Chat::registerPanel()
  */
 void Chat::showPanel()
 {
-    QWidget *panel = qobject_cast<QWidget*>(sender());
+    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
     if (!panel)
         return;
 
     // register panel
-    ChatRosterItem::Type type = ChatRosterItem::Other;
-    if (qobject_cast<ChatRoom*>(panel))
-        type = ChatRosterItem::Room;
-    m_rosterModel->addItem(type,
+    m_rosterModel->addItem(panel->objectType(),
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -616,26 +610,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
         // create new panel for the chat room
         if (action == ChatRosterView::JoinAction && !panel(jid))
             addPanel(new ChatRoom(client, m_rosterModel, jid));
-    } else if (type == ChatRosterItem::RoomMember) {
-        if (action == ChatRosterView::RemoveAction)
-        {
-            // kick a user from a chat room
-            QXmppElement item;
-            item.setTagName("item");
-            item.setAttribute("nick", jidToResource(jid));
-            item.setAttribute("role", "none");
-
-            QXmppElement query;
-            query.setTagName("query");
-            query.setAttribute("xmlns", ns_muc_admin);
-            query.appendChild(item);
-
-            QXmppIq iq(QXmppIq::Set);
-            iq.setTo(jidToBareJid(jid));
-            iq.setExtensions(query);
-
-            client->sendPacket(iq);
-        }
     }
 
     // show requested panel

@@ -92,6 +92,33 @@ void ChatRoomWatcher::inviteContact()
     chat->chatClient()->sendPacket(message);
 }
 
+/** Kick a user from a chat room.
+ */
+void ChatRoomWatcher::kickUser()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString jid = action->data().toString();
+
+
+    QXmppElement item;
+    item.setTagName("item");
+    item.setAttribute("nick", jidToResource(jid));
+    item.setAttribute("role", "none");
+
+    QXmppElement query;
+    query.setTagName("query");
+    query.setAttribute("xmlns", ns_muc_admin);
+    query.appendChild(item);
+
+    QXmppIq iq(QXmppIq::Set);
+    iq.setTo(jidToBareJid(jid));
+    iq.setExtensions(query);
+
+    chat->chatClient()->sendPacket(iq);
+}
+
 void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = jidToBareJid(msg.from());
@@ -205,6 +232,14 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
             QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
             action->setData(jid);
             connect(action, SIGNAL(triggered()), this, SLOT(roomMembers()));
+        }
+    } else if (type == ChatRosterItem::RoomMember) {
+        QModelIndex room = index.parent();
+        if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
+        {
+            QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
+            action->setData(jid);
+            connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
         }
     }
 }

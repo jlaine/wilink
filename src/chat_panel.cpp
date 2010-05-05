@@ -36,6 +36,13 @@ ChatPanel::ChatPanel(QWidget* parent)
     nameLabel = new QLabel;
 }
 
+/** Return the type of entry to add to the roster.
+ */
+ChatRosterItem::Type ChatPanel::objectType() const
+{
+    return ChatRosterItem::Other;
+}
+
 /** When additional text is set, update the header text.
  */
 void ChatPanel::setWindowExtra(const QString &extra)

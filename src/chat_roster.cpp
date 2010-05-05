@@ -613,14 +613,6 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         action->setData(RemoveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
-    } else if (type == ChatRosterItem::RoomMember) {
-        QModelIndex room = index.parent();
-        if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
-            action->setData(RemoveAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
     }
 
     // FIXME : is there a better way to test if a menu is empty?

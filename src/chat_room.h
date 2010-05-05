@@ -42,6 +42,7 @@ class ChatRoom : public ChatConversation
 
 public:
     ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatRosterItem::Type objectType() const;
 
 protected:
     virtual void sendMessage(const QString &text);
