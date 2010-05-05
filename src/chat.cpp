@@ -124,13 +124,6 @@ Chat::Chat(QWidget *parent)
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
     statusBar()->addWidget(addButton);
 
-    roomButton = new QPushButton;
-    roomButton->setEnabled(false);
-    roomButton->setIcon(QIcon(":/chat.png"));
-    roomButton->setToolTip(tr("Join a chat room"));
-    connect(roomButton, SIGNAL(clicked()), this, SLOT(addRoom()));
-    statusBar()->addWidget(roomButton);
-
     statusCombo = new QComboBox;
     statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
     statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
@@ -163,7 +156,6 @@ Chat::Chat(QWidget *parent)
     /* set up client */
     connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(client, SIGNAL(mucServerFound(const QString&)), this, SLOT(mucServerFound(const QString&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -339,16 +331,6 @@ void Chat::panelChanged(int index)
     widget->setFocus();
 }
 
-/** Prompt the user for a new group chat then join it.
- */
-void Chat::addRoom()
-{
-    ChatRoomPrompt prompt(client, chatRoomServer, this);
-    if (!prompt.exec())
-        return;
-    rosterAction(ChatRosterView::JoinAction, prompt.textValue(), ChatRosterItem::Room);
-}
-
 /** When the window is activated, pass focus to the active chat.
  *
  * @param event
@@ -379,7 +361,6 @@ void Chat::disconnected()
 {
     isConnected = false;
     addButton->setEnabled(false);
-    roomButton->setEnabled(false);
     statusCombo->setCurrentIndex(OfflineIndex);
 }
 
@@ -408,14 +389,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
         addPanel(dialog);
         dialog->messageReceived(msg);
     }
-}
-
-/** Once a multi-user chat server is found, enable the "chat rooms" button.
- */
-void Chat::mucServerFound(const QString &mucServer)
-{
-    chatRoomServer = mucServer;
-    roomButton->setEnabled(true);
 }
 
 void Chat::presenceReceived(const QXmppPresence &presence)

@@ -66,12 +66,10 @@ public slots:
 
 private slots:
     void addContact();
-    void addRoom();
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
     void messageReceived(const QXmppMessage &msg);
-    void mucServerFound(const QString &roomServer);
     void panelChanged(int index);
     void presenceReceived(const QXmppPresence &presence);
     void removeContact(const QString &jid);
@@ -98,7 +96,6 @@ private:
     Idle *idle;
 
     QPushButton *addButton;
-    QPushButton *roomButton;
     ChatClient *client;
     QList<ChatPanel*> chatPanels;
     QMenu *optsMenu;

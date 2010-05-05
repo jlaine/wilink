@@ -25,6 +25,7 @@
 class Chat;
 class QMenu;
 class QModelIndex;
+class QPushButton;
 class QXmppMessage;
 class QXmppMucOwnerIq;
 
@@ -36,10 +37,12 @@ public:
     ChatRoomWatcher(Chat *chatWindow);
 
 private slots:
+    void disconnected();
     void inviteContact();
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &roomServer);
+    void roomJoin();
     void roomOptions();
     void roomMembers();
     void rosterMenu(QMenu *menu, const QModelIndex &index);
@@ -47,6 +50,7 @@ private slots:
 private:
     Chat *chat;
     QString chatRoomServer;
+    QPushButton *roomButton;
 };
 
 #endif

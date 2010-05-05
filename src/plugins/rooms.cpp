@@ -18,6 +18,8 @@
  */
 
 #include <QMenu>
+#include <QPushButton>
+#include <QStatusBar>
 
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMucIq.h"
@@ -36,12 +38,27 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
     ChatClient *client = chat->chatClient();
+    connect(client, SIGNAL(disconnected()),
+            this, SLOT(disconnected()));
     connect(client, SIGNAL(messageReceived(QXmppMessage)),
             this, SLOT(messageReceived(QXmppMessage)));
     connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)),
             this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
     connect(client, SIGNAL(mucServerFound(const QString&)),
             this, SLOT(mucServerFound(const QString&)));
+
+    // add room button
+    roomButton = new QPushButton;
+    roomButton->setEnabled(false);
+    roomButton->setIcon(QIcon(":/chat.png"));
+    roomButton->setToolTip(tr("Join a chat room"));
+    connect(roomButton, SIGNAL(clicked()), this, SLOT(roomJoin()));
+    chat->statusBar()->addWidget(roomButton);
+}
+
+void ChatRoomWatcher::disconnected()
+{
+    roomButton->setEnabled(false);
 }
 
 /** Invite a contact to join a chat room.
@@ -99,6 +116,18 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
     }
 }
 
+/** Prompt the user for a new group chat then join it.
+ */
+void ChatRoomWatcher::roomJoin()
+{
+    ChatRoomPrompt prompt(chat->chatClient(), chatRoomServer, chat);
+    if (!prompt.exec())
+        return;
+    chat->rosterAction(ChatRosterView::JoinAction, prompt.textValue(), ChatRosterItem::Room);
+}
+
+/** Display a chat room's options.
+ */
 void ChatRoomWatcher::roomOptions()
 {
     QAction *action = qobject_cast<QAction*>(sender());
@@ -149,7 +178,7 @@ void ChatRoomWatcher::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
 void ChatRoomWatcher::mucServerFound(const QString &mucServer)
 {
     chatRoomServer = mucServer;
-//    roomButton->setEnabled(true);
+    roomButton->setEnabled(true);
 }
 
 void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
