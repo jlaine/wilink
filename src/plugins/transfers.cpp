@@ -362,8 +362,11 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
-void ChatTransfers::rosterMenu(QMenu *menu, const QString &jid, int type)
+void ChatTransfers::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+
     if (type == ChatRosterItem::Contact)
     {
         QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
@@ -452,7 +455,8 @@ bool TransfersPlugin::initialize(Chat *chat)
     /* register panel */
     ChatTransfers *transfers = new ChatTransfers(chat->chatClient(), chat->rosterModel());
     transfers->setObjectName("transfers");
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QString, int)), transfers, SLOT(rosterMenu(QMenu*, QString, int)));
+    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
+            transfers, SLOT(rosterMenu(QMenu*, QModelIndex)));
     chat->addPanel(transfers);
 
     /* register shortcut */

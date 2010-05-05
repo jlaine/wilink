@@ -35,6 +35,7 @@ class ChatRosterView;
 class Idle;
 class QComboBox;
 class QLabel;
+class QModelIndex;
 class QPushButton;
 class QSplitter;
 class QStackedWidget;
@@ -58,7 +59,7 @@ public:
     ChatPanel *panel(const QString &objectName);
 
 signals:
-    void rosterMenu(QMenu *menu, const QString &jid, int type);
+    void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 public slots:
     void rosterAction(int action, const QString &jid, int type);

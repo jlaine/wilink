@@ -24,6 +24,7 @@
 
 class Chat;
 class QMenu;
+class QModelIndex;
 class QXmppMessage;
 class QXmppMucOwnerIq;
 
@@ -39,7 +40,7 @@ private slots:
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &roomServer);
-    void rosterMenu(QMenu *menu, const QString &jid, int type);
+    void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:
     Chat *chat;

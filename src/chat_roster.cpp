@@ -583,7 +583,7 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     
     // allow plugins to populate menu
     QMenu *menu = new QMenu(this);
-    emit itemMenu(menu, bareJid, type);
+    emit itemMenu(menu, index);
 
     if (type == ChatRosterItem::Contact)
     {

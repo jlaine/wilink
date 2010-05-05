@@ -123,8 +123,11 @@ void ChatRoomWatcher::mucServerFound(const QString &mucServer)
 //    roomButton->setEnabled(true);
 }
 
-void ChatRoomWatcher::rosterMenu(QMenu *menu, const QString &jid, int type)
+void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+
     if (type == ChatRosterItem::Contact)
     {
         QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
@@ -144,7 +147,8 @@ public:
 bool RoomsPlugin::initialize(Chat *chat)
 {
     ChatRoomWatcher *rooms = new ChatRoomWatcher(chat);
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QString, int)), rooms, SLOT(rosterMenu(QMenu*, QString, int)));
+    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
+            rooms, SLOT(rosterMenu(QMenu*, QModelIndex)));
     return true;
 }
 

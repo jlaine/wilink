@@ -144,7 +144,7 @@ protected:
 
 signals:
     void itemAction(int action, const QString &jid, int type);
-    void itemMenu(QMenu *menu, const QString &jid, int type);
+    void itemMenu(QMenu *menu, const QModelIndex &index);
 
 protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);

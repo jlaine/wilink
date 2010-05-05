@@ -104,7 +104,7 @@ Chat::Chat(QWidget *parent)
     /* left panel */
     rosterView = new ChatRosterView(m_rosterModel);
     connect(rosterView, SIGNAL(itemAction(int, QString, int)), this, SLOT(rosterAction(int, QString, int)));
-    connect(rosterView, SIGNAL(itemMenu(QMenu*, QString, int)), this, SIGNAL(rosterMenu(QMenu*, QString, int)));
+    connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);

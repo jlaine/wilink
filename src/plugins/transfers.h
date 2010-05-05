@@ -27,6 +27,7 @@
 
 #include "chat_panel.h"
 
+class QModelIndex;
 class QPushButton;
 class ChatClient;
 class ChatRosterModel;
@@ -96,7 +97,7 @@ public:
 
 public slots:
     void sendFile(const QString &fullJid, const QString &filePath);
-    void rosterMenu(QMenu *menu, const QString &jid, int type);
+    void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 protected:
     QSize sizeHint() const;
