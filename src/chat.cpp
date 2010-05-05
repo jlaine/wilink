@@ -85,9 +85,9 @@ Chat::Chat(QWidget *parent)
     m_rosterModel =  new ChatRosterModel(m_client);
 
     /* set up idle monitor */
-    idle = new Idle;
-    connect(idle, SIGNAL(secondsIdle(int)), this, SLOT(secondsIdle(int)));
-    idle->start();
+    m_idle = new Idle;
+    connect(m_idle, SIGNAL(secondsIdle(int)), this, SLOT(secondsIdle(int)));
+    m_idle->start();
 
     /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
@@ -95,34 +95,34 @@ Chat::Chat(QWidget *parent)
     m_client->setLogger(logger);
 
     /* build splitter */
-    splitter = new QSplitter;
+    QSplitter *splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
-    rosterView = new ChatRosterView(m_rosterModel);
-    connect(rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
-    connect(rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
-    connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
-    splitter->addWidget(rosterView);
+    m_rosterView = new ChatRosterView(m_rosterModel);
+    connect(m_rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
+    connect(m_rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
+    connect(m_rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
+    splitter->addWidget(m_rosterView);
     splitter->setStretchFactor(0, 0);
 
     /* right panel */
-    conversationPanel = new QStackedWidget;
-    conversationPanel->hide();
-    connect(conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
-    splitter->addWidget(conversationPanel);
+    m_conversationPanel = new QStackedWidget;
+    m_conversationPanel->hide();
+    connect(m_conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
+    splitter->addWidget(m_conversationPanel);
     splitter->setStretchFactor(1, 1);
     setCentralWidget(splitter);
 
     /* build status bar */
-    statusCombo = new QComboBox;
-    statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
-    statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
-    statusCombo->addItem(QIcon(":/contact-away.png"), tr("Away"));
-    statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
-    statusCombo->setCurrentIndex(OfflineIndex);
-    connect(statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
-    statusBar()->addPermanentWidget(statusCombo);
+    m_statusCombo = new QComboBox;
+    m_statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
+    m_statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
+    m_statusCombo->addItem(QIcon(":/contact-away.png"), tr("Away"));
+    m_statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
+    m_statusCombo->setCurrentIndex(OfflineIndex);
+    connect(m_statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
+    statusBar()->addPermanentWidget(m_statusCombo);
 
     /* create menu */
     QMenu *menu = menuBar()->addMenu("&File");
@@ -160,7 +160,7 @@ Chat::Chat(QWidget *parent)
 
 Chat::~Chat()
 {
-    delete idle;
+    delete m_idle;
     foreach (ChatPanel *panel, m_chatPanels)
         delete panel;
 
@@ -199,16 +199,16 @@ void Chat::destroyPanel(QObject *obj)
 void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (conversationPanel->indexOf(panel) < 0)
+    if (m_conversationPanel->indexOf(panel) < 0)
         return;
 
     // close view
-    if (conversationPanel->count() == 1)
+    if (m_conversationPanel->count() == 1)
     {
-        conversationPanel->hide();
+        m_conversationPanel->hide();
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
-    conversationPanel->removeWidget(panel);
+    m_conversationPanel->removeWidget(panel);
 }
 
 /** Notify the user of activity on a panel.
@@ -216,11 +216,11 @@ void Chat::hidePanel()
 void Chat::notifyPanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (conversationPanel->indexOf(panel) < 0)
+    if (m_conversationPanel->indexOf(panel) < 0)
         return;
 
     // add pending message
-    if (!isActiveWindow() || conversationPanel->currentWidget() != panel)
+    if (!isActiveWindow() || m_conversationPanel->currentWidget() != panel)
         m_rosterModel->addPendingMessage(panel->objectName());
 
     // show the chat window
@@ -270,14 +270,14 @@ void Chat::showPanel()
         panel->windowIcon());
 
     // add panel
-    if (conversationPanel->indexOf(panel) < 0)
+    if (m_conversationPanel->indexOf(panel) < 0)
     {
-        conversationPanel->addWidget(panel);
-        conversationPanel->show();
-        if (conversationPanel->count() == 1)
+        m_conversationPanel->addWidget(panel);
+        m_conversationPanel->show();
+        if (m_conversationPanel->count() == 1)
             resizeContacts();
     }
-    conversationPanel->setCurrentWidget(panel);
+    m_conversationPanel->setCurrentWidget(panel);
 }
 
 /** Handle switching between panels.
@@ -286,11 +286,11 @@ void Chat::showPanel()
  */
 void Chat::panelChanged(int index)
 {
-    QWidget *widget = conversationPanel->widget(index);
+    QWidget *widget = m_conversationPanel->widget(index);
     if (!widget)
         return;
     m_rosterModel->clearPendingMessages(widget->objectName());
-    rosterView->selectContact(widget->objectName());
+    m_rosterView->selectContact(widget->objectName());
     widget->setFocus();
 }
 
@@ -303,7 +303,7 @@ void Chat::changeEvent(QEvent *event)
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange && isActiveWindow())
     {
-        int index = conversationPanel->currentIndex();
+        int index = m_conversationPanel->currentIndex();
         if (index >= 0)
             panelChanged(index);
     }
@@ -314,7 +314,7 @@ void Chat::changeEvent(QEvent *event)
 void Chat::connected()
 {
     isConnected = true;
-    statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
+    m_statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 }
 
 /** Handle disconnection from the chat server.
@@ -322,7 +322,7 @@ void Chat::connected()
 void Chat::disconnected()
 {
     isConnected = false;
-    statusCombo->setCurrentIndex(OfflineIndex);
+    m_statusCombo->setCurrentIndex(OfflineIndex);
 }
 
 /** Handle an error talking to the chat server.
@@ -478,13 +478,13 @@ ChatPanel *Chat::panel(const QString &objectName)
  */
 void Chat::resizeContacts()
 {
-    QSize hint = rosterView->sizeHint();
+    QSize hint = m_rosterView->sizeHint();
     hint.setHeight(hint.height() + 32);
-    if (conversationPanel->isVisible())
+    if (m_conversationPanel->isVisible())
         hint.setWidth(hint.width() + 500);
 
     // respect current size
-    if (conversationPanel->isVisible() && hint.width() < size().width())
+    if (m_conversationPanel->isVisible() && hint.width() < size().width())
         hint.setWidth(size().width());
     if (hint.height() < size().height())
         hint.setHeight(size().height());
@@ -526,14 +526,14 @@ void Chat::secondsIdle(int secs)
 {
     if (secs >= AWAY_TIME)
     {
-        if (statusCombo->currentIndex() == AvailableIndex)
+        if (m_statusCombo->currentIndex() == AvailableIndex)
         {
-            statusCombo->setCurrentIndex(AwayIndex);
+            m_statusCombo->setCurrentIndex(AwayIndex);
             autoAway = true;
         }
     } else if (autoAway) {
         const int oldIndex = isBusy ? BusyIndex : AvailableIndex;
-        statusCombo->setCurrentIndex(oldIndex);
+        m_statusCombo->setCurrentIndex(oldIndex);
     }
 }
 

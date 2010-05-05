@@ -87,19 +87,16 @@ private:
     bool isBusy;
     bool isConnected;
 
-    Idle *idle;
+    Idle *m_idle;
 
     ChatClient *m_client;
     QList<ChatPanel*> m_chatPanels;
     QMenu *m_optionsMenu;
     ChatRosterModel *m_rosterModel;
-    ChatRosterView *rosterView;
+    ChatRosterView *m_rosterView;
 
-    QSplitter *splitter;
-    QComboBox *statusCombo;
-    QStackedWidget *conversationPanel;
-
-    QString chatRoomServer;
+    QComboBox *m_statusCombo;
+    QStackedWidget *m_conversationPanel;
 };
 
 #endif
