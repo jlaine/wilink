@@ -36,12 +36,18 @@ ChatPanel::ChatPanel(QWidget* parent)
     nameLabel = new QLabel;
 }
 
+/** When additional text is set, update the header text.
+ */
 void ChatPanel::setWindowExtra(const QString &extra)
 {
     windowExtra = extra;
     nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
 }
 
+/** When the window icon is set, update the header icon.
+ *
+ * @param icon
+ */
 void ChatPanel::setWindowIcon(const QIcon &icon)
 {
     QWidget::setWindowIcon(icon);
@@ -49,15 +55,20 @@ void ChatPanel::setWindowIcon(const QIcon &icon)
     iconLabel->setPixmap(icon.pixmap(actualSize));
 }
 
+/** When the window title is set, update the header text.
+ *
+ * @param title
+ */
 void ChatPanel::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title);
     nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
 }
 
+/** Return a layout object for the panel header.
+ */
 QLayout* ChatPanel::headerLayout()
 {
-    /* status bar */
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addSpacing(16);
     hbox->addWidget(nameLabel);
