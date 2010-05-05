@@ -22,7 +22,6 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDesktopWidget>
-#include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -32,13 +31,11 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QPushButton>
-#include <QSettings>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
-#include <QSystemTrayIcon>
 #include <QTimer>
 #include <QUrl>
 
