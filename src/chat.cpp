@@ -147,7 +147,8 @@ Chat::Chat(QWidget *parent)
     /* create menu */
     QMenu *menu = menuBar()->addMenu("&File");
 
-    optsMenu = new QMenu;
+    optsMenu = menu->addMenu(QIcon(":/options.png"), tr("&Options"));
+
     QAction *action = optsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
@@ -159,9 +160,6 @@ Chat::Chat(QWidget *parent)
         action->setChecked(wApp->openAtLogin());
         connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
     }
-
-    action = menu->addAction(QIcon(":/options.png"), tr("&Options"));
-    action->setMenu(optsMenu);
 
     action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
