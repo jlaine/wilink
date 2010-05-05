@@ -109,7 +109,6 @@ private:
     QStackedWidget *conversationPanel;
 
     QString chatRoomServer;
-    QStringList discoQueue;
 };
 
 #endif
