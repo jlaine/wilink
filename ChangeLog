@@ -1,5 +1,9 @@
 wiLink 0.9.0 (UNRELEASED)
  * Merge photo uploads and diagnostics into the main window.
+ * Add a menu to the chat window instead of the system tray icon.
+ * Make it possible to access Picasa photo albums.
+ * Fix "Send a file" dialog disappearing when a message is received.
+ * Notify user when a message is received in a private chatroom.
 
 wiLink 0.8.0 (2010-05-03)
  * Rename wDesktop to wiLink.
