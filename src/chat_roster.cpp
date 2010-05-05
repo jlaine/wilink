@@ -596,10 +596,6 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }
 
-        action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
-        action->setData(InviteAction);
-        connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-
 #if 0
         if (!rosterModel->contactFeaturing(bareJid, ChatRosterModel::VersionFeature).isEmpty())
         {

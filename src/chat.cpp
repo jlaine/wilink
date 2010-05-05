@@ -401,32 +401,6 @@ void Chat::error(QXmppClient::Error error)
     }
 }
 
-/** Invite a contact to join a chat room.
- */
-void Chat::inviteContact(const QString &jid)
-{
-    ChatRoomPrompt prompt(client, chatRoomServer, this);
-    if (!prompt.exec())
-        return;
-
-    // join chat room
-    const QString roomJid = prompt.textValue();
-    rosterAction(ChatRosterView::JoinAction, roomJid, ChatRosterItem::Room);
-
-    // invite contact
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_conference);
-    x.setAttribute("jid", roomJid);
-    x.setAttribute("reason", "Let's talk");
-
-    QXmppMessage message;
-    message.setTo(jid);
-    message.setType(QXmppMessage::Normal);
-    message.setExtensions(x);
-    client->sendPacket(message);
-}
-
 void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = jidToBareJid(msg.from());
@@ -683,9 +657,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
 {
     if (type == ChatRosterItem::Contact)
     {
-        if (action == ChatRosterView::InviteAction)
-            inviteContact(jid);
-        else if (action == ChatRosterView::JoinAction && !panel(jid))
+        if (action == ChatRosterView::JoinAction && !panel(jid))
             // create new conversation with the contact
             addPanel(new ChatDialog(client, m_rosterModel, jid));
         else if (action == ChatRosterView::OptionsAction)

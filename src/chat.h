@@ -67,7 +67,6 @@ private slots:
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
-    void inviteContact(const QString &jid);
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq&);
     void mucServerFound(const QString &roomServer);

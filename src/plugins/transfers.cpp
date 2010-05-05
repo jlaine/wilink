@@ -364,15 +364,16 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
 void ChatTransfers::rosterMenu(QMenu *menu, const QString &jid, int type)
 {
-    qDebug() << "roster menu";
+    if (type == ChatRosterItem::Contact)
+    {
+        QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+        if (fullJids.isEmpty())
+            return;
 
-    QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-    if (fullJids.isEmpty())
-        return;
-
-    QAction *action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
-    action->setData(fullJids.first());
-    connect(action, SIGNAL(triggered()), this, SLOT(sendFilePrompt()));
+        QAction *action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
+        action->setData(fullJids.first());
+        connect(action, SIGNAL(triggered()), this, SLOT(sendFilePrompt()));
+    }
 }
 
 void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)

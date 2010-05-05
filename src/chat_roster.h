@@ -127,7 +127,6 @@ public:
     {
         NoAction,
         AddAction,
-        InviteAction,
         JoinAction,
         OptionsAction,
         MembersAction,

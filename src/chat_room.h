@@ -107,7 +107,7 @@ class ChatRoomPrompt : public QDialog
     Q_OBJECT
 
 public:
-    ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent);
+    ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent = 0);
     QString textValue() const;
 
 protected slots:

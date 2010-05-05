@@ -23,6 +23,7 @@
 #include <QObject>
 
 class ChatClient;
+class QMenu;
 
 class ChatRoomWatcher : public QObject
 {
@@ -31,8 +32,13 @@ class ChatRoomWatcher : public QObject
 public:
     ChatRoomWatcher(ChatClient *chatClient, QObject *parent = 0);
 
+private slots:
+    void inviteContact();
+    void rosterMenu(QMenu *menu, const QString &jid, int type);
+
 private:
     ChatClient *client;
+    QString chatRoomServer;
 };
 
 #endif
