@@ -81,8 +81,8 @@ Chat::Chat(QWidget *parent)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
-    client = new ChatClient(this);
-    m_rosterModel =  new ChatRosterModel(client);
+    m_client = new ChatClient(this);
+    m_rosterModel =  new ChatRosterModel(m_client);
 
     /* set up idle monitor */
     idle = new Idle;
@@ -92,7 +92,7 @@ Chat::Chat(QWidget *parent)
     /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
     logger->setLoggingType(QXmppLogger::SignalLogging);
-    client->setLogger(logger);
+    m_client->setLogger(logger);
 
     /* build splitter */
     splitter = new QSplitter;
@@ -127,15 +127,15 @@ Chat::Chat(QWidget *parent)
     /* create menu */
     QMenu *menu = menuBar()->addMenu("&File");
 
-    optsMenu = menu->addMenu(QIcon(":/options.png"), tr("&Options"));
+    m_optionsMenu = menu->addMenu(QIcon(":/options.png"), tr("&Options"));
 
-    QAction *action = optsMenu->addAction(tr("Chat accounts"));
+    QAction *action = m_optionsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
     Application *wApp = qobject_cast<Application*>(qApp);
     if (wApp && wApp->isInstalled())
     {
-        action = optsMenu->addAction(tr("Open at login"));
+        action = m_optionsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(wApp->openAtLogin());
         connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
@@ -145,11 +145,11 @@ Chat::Chat(QWidget *parent)
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
     /* set up client */
-    connect(client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
-    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(connected()), this, SLOT(connected()));
-    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
+    connect(m_client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
+    connect(m_client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
+    connect(m_client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     /* set up keyboard shortcuts */
 #ifdef Q_OS_MAC
@@ -161,11 +161,11 @@ Chat::Chat(QWidget *parent)
 Chat::~Chat()
 {
     delete idle;
-    foreach (ChatPanel *panel, chatPanels)
+    foreach (ChatPanel *panel, m_chatPanels)
         delete panel;
 
     // disconnect
-    client->disconnect();
+    m_client->disconnect();
 }
 
 /** Connect signals for the given panel.
@@ -174,7 +174,7 @@ Chat::~Chat()
  */
 void Chat::addPanel(ChatPanel *panel)
 {
-    if (chatPanels.contains(panel))
+    if (m_chatPanels.contains(panel))
         return;
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
@@ -182,7 +182,7 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
-    chatPanels << panel;
+    m_chatPanels << panel;
 }
 
 /** When a panel is destroyed, from it from our list of panels.
@@ -191,7 +191,7 @@ void Chat::addPanel(ChatPanel *panel)
  */
 void Chat::destroyPanel(QObject *obj)
 {
-    chatPanels.removeAll(static_cast<ChatPanel*>(obj));
+    m_chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
 
 /** Hide a panel.
@@ -332,7 +332,7 @@ void Chat::disconnected()
 void Chat::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError &&
-       client->getXmppStreamError() == QXmppClient::ConflictStreamError)
+       m_client->getXmppStreamError() == QXmppClient::ConflictStreamError)
     {
         // if we received a resource conflict, exit
         qWarning("Received a resource conflict from chat server");
@@ -346,7 +346,7 @@ void Chat::messageReceived(const QXmppMessage &msg)
 
     if (msg.type() == QXmppMessage::Chat && !panel(bareJid) && !msg.body().isEmpty())
     {
-        ChatDialog *dialog = new ChatDialog(client, m_rosterModel, bareJid);
+        ChatDialog *dialog = new ChatDialog(m_client, m_rosterModel, bareJid);
         addPanel(dialog);
         dialog->messageReceived(msg);
     }
@@ -362,7 +362,7 @@ void Chat::presenceReceived(const QXmppPresence &presence)
     {
     case QXmppPresence::Subscribe:
         {
-            QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
+            QXmppRoster::QXmppRosterEntry entry = m_client->getRoster().getRosterEntry(presence.from());
             QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
 
             /* if the contact is in our roster accept subscribe */
@@ -370,15 +370,15 @@ void Chat::presenceReceived(const QXmppPresence &presence)
             {
                 qDebug("Subscribe accepted");
                 packet.setType(QXmppPresence::Subscribed);
-                client->sendPacket(packet);
+                m_client->sendPacket(packet);
 
                 packet.setType(QXmppPresence::Subscribe);
-                client->sendPacket(packet);
+                m_client->sendPacket(packet);
                 return;
             }
 
             /* otherwise ask user */
-            ChatRosterPrompt *dlg = new ChatRosterPrompt(client, presence.from(), this);
+            ChatRosterPrompt *dlg = new ChatRosterPrompt(m_client, presence.from(), this);
             dlg->show();
         }
         break;
@@ -389,9 +389,9 @@ void Chat::presenceReceived(const QXmppPresence &presence)
 
 /** Return this window's chat client.
  */
-ChatClient *Chat::chatClient()
+ChatClient *Chat::client()
 {
-    return client;
+    return m_client;
 }
 
 /** Return this window's chat roster model.
@@ -442,7 +442,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setKeepAliveTimeout(15);
 
     /* connect to server */
-    client->connectToServer(config);
+    m_client->connectToServer(config);
 
     /* load plugins */
     QObjectList plugins = QPluginLoader::staticInstances();
@@ -459,7 +459,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
  */
 QMenu *Chat::optionsMenu()
 {
-    return optsMenu;
+    return m_optionsMenu;
 }
 
 /** Find a panel by its object name.
@@ -468,7 +468,7 @@ QMenu *Chat::optionsMenu()
  */
 ChatPanel *Chat::panel(const QString &objectName)
 {
-    foreach (ChatPanel *panel, chatPanels)
+    foreach (ChatPanel *panel, m_chatPanels)
         if (panel->objectName() == objectName)
             return panel;
     return 0;
@@ -510,7 +510,7 @@ void Chat::rosterClicked(const QModelIndex &index)
 
     // create conversation if necessary
     if (type == ChatRosterItem::Contact && !panel(jid))
-        addPanel(new ChatDialog(client, m_rosterModel, jid));
+        addPanel(new ChatDialog(m_client, m_rosterModel, jid));
 
     // show requested panel
     ChatPanel *chatPanel = panel(jid);
@@ -547,17 +547,17 @@ void Chat::statusChanged(int currentIndex)
         {
             QXmppPresence presence;
             presence.setType(QXmppPresence::Available);
-            client->sendPacket(presence);
+            m_client->sendPacket(presence);
         }
         else
-            client->connectToServer(client->getConfiguration());
+            m_client->connectToServer(m_client->getConfiguration());
     } else if (currentIndex == AwayIndex) {
         if (isConnected)
         {
             QXmppPresence presence;
             presence.setType(QXmppPresence::Available);
             presence.setStatus(QXmppPresence::Status::Away);
-            client->sendPacket(presence);
+            m_client->sendPacket(presence);
         }
     } else if (currentIndex == BusyIndex) {
         isBusy = true;
@@ -566,13 +566,13 @@ void Chat::statusChanged(int currentIndex)
             QXmppPresence presence;
             presence.setType(QXmppPresence::Available);
             presence.setStatus(QXmppPresence::Status::DND);
-            client->sendPacket(presence);
+            m_client->sendPacket(presence);
         }
         else
-            client->connectToServer(client->getConfiguration());
+            m_client->connectToServer(m_client->getConfiguration());
     } else if (currentIndex == OfflineIndex) {
         if (isConnected)
-            client->disconnect();
+            m_client->disconnect();
     }
 }
 

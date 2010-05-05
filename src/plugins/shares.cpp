@@ -1029,7 +1029,7 @@ public:
 bool SharesPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatShares *shares = new ChatShares(chat->chatClient(), chat);
+    ChatShares *shares = new ChatShares(chat->client(), chat);
     shares->setObjectName("shares");
     shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);

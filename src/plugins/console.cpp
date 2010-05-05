@@ -174,7 +174,7 @@ public:
 bool ConsolePlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatConsole *console = new ChatConsole(chat->chatClient()->logger());
+    ChatConsole *console = new ChatConsole(chat->client()->logger());
     console->setObjectName("console");
     chat->addPanel(console);
 

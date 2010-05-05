@@ -50,7 +50,7 @@ public:
     Chat(QWidget *parent = 0);
     ~Chat();
 
-    ChatClient *chatClient();
+    ChatClient *client();
     ChatRosterModel *rosterModel();
     QMenu *optionsMenu();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
@@ -89,9 +89,9 @@ private:
 
     Idle *idle;
 
-    ChatClient *client;
-    QList<ChatPanel*> chatPanels;
-    QMenu *optsMenu;
+    ChatClient *m_client;
+    QList<ChatPanel*> m_chatPanels;
+    QMenu *m_optionsMenu;
     ChatRosterModel *m_rosterModel;
     ChatRosterView *rosterView;
 

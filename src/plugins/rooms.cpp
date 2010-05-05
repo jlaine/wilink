@@ -57,7 +57,7 @@ enum MembersColumns {
 ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    ChatClient *client = chat->chatClient();
+    ChatClient *client = chat->client();
     connect(client, SIGNAL(disconnected()),
             this, SLOT(disconnected()));
     connect(client, SIGNAL(messageReceived(QXmppMessage)),
@@ -90,7 +90,7 @@ void ChatRoomWatcher::inviteContact()
         return;
     QString jid = action->data().toString();
 
-    ChatRoomPrompt prompt(chat->chatClient(), chatRoomServer, chat);
+    ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
     if (!prompt.exec())
         return;
 
@@ -109,7 +109,7 @@ void ChatRoomWatcher::inviteContact()
     message.setTo(jid);
     message.setType(QXmppMessage::Normal);
     message.setExtensions(x);
-    chat->chatClient()->sendPacket(message);
+    chat->client()->sendPacket(message);
 }
 
 void ChatRoomWatcher::joinRoom(const QString &jid)
@@ -117,7 +117,7 @@ void ChatRoomWatcher::joinRoom(const QString &jid)
     ChatPanel *room = chat->panel(jid);
     if (!room)
     {
-        room = new ChatRoom(chat->chatClient(), chat->rosterModel(), jid);
+        room = new ChatRoom(chat->client(), chat->rosterModel(), jid);
         chat->addPanel(room);
     }
     QTimer::singleShot(0, room, SIGNAL(showPanel()));
@@ -147,7 +147,7 @@ void ChatRoomWatcher::kickUser()
     iq.setTo(jidToBareJid(jid));
     iq.setExtensions(query);
 
-    chat->chatClient()->sendPacket(iq);
+    chat->client()->sendPacket(iq);
 }
 
 void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
@@ -178,7 +178,7 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
  */
 void ChatRoomWatcher::roomJoin()
 {
-    ChatRoomPrompt prompt(chat->chatClient(), chatRoomServer, chat);
+    ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
     if (!prompt.exec())
         return;
     joinRoom(prompt.textValue());
@@ -200,7 +200,7 @@ void ChatRoomWatcher::roomOptions()
     query.setAttribute("xmlns", ns_muc_owner);
     iq.setExtensions(query);
     iq.setTo(jid);
-    chat->chatClient()->sendPacket(iq);
+    chat->client()->sendPacket(iq);
 }
 
 void ChatRoomWatcher::roomMembers()
@@ -211,7 +211,7 @@ void ChatRoomWatcher::roomMembers()
     QString jid = action->data().toString();
 
     // manage room members
-    ChatRoomMembers dialog(chat->chatClient(), jid, chat);
+    ChatRoomMembers dialog(chat->client(), jid, chat);
     dialog.exec();
 }
 
@@ -227,7 +227,7 @@ void ChatRoomWatcher::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
         iqPacket.setType(QXmppIq::Set);
         iqPacket.setTo(iq.from());
         iqPacket.setForm(dialog.form());
-        chat->chatClient()->sendPacket(iqPacket);
+        chat->client()->sendPacket(iqPacket);
     }
 }
 

@@ -189,7 +189,7 @@ public:
 bool MenuPlugin::initialize(Chat *chat)
 {
     QString url;
-    QString domain = chat->chatClient()->getConfiguration().domain();
+    QString domain = chat->client()->getConfiguration().domain();
     if (domain != "wifirst.net")
         return false;
 

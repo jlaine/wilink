@@ -35,7 +35,7 @@
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    ChatClient *client = chat->chatClient();
+    ChatClient *client = chat->client();
     connect(client, SIGNAL(connected()),
             this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()),
@@ -55,7 +55,7 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
 void ContactsWatcher::addContact()
 {
     bool ok = true;
-    QString jid = "@" + chat->chatClient()->getConfiguration().domain();
+    QString jid = "@" + chat->client()->getConfiguration().domain();
     while (!jidValidator.exactMatch(jid))
     {
         jid = QInputDialog::getText(chat, tr("Add a contact"),
@@ -69,7 +69,7 @@ void ContactsWatcher::addContact()
     QXmppPresence packet;
     packet.setTo(jid);
     packet.setType(QXmppPresence::Subscribe);
-    chat->chatClient()->sendPacket(packet);
+    chat->client()->sendPacket(packet);
 }
 
 void ContactsWatcher::connected()
@@ -101,7 +101,7 @@ void ContactsWatcher::removeContact()
         QXmppRosterIq packet;
         packet.setType(QXmppIq::Set);
         packet.addItem(item);
-        chat->chatClient()->sendPacket(packet);
+        chat->client()->sendPacket(packet);
     }
 }
 
@@ -115,7 +115,7 @@ void ContactsWatcher::renameContact()
     QString jid = action->data().toString();
 
     bool ok = true;
-    QXmppRosterIq::Item item = chat->chatClient()->getRoster().getRosterEntry(jid);
+    QXmppRosterIq::Item item = chat->client()->getRoster().getRosterEntry(jid);
     QString name = QInputDialog::getText(chat, tr("Rename contact"),
         tr("Enter the name for this contact."),
         QLineEdit::Normal, item.name(), &ok);
@@ -125,7 +125,7 @@ void ContactsWatcher::renameContact()
         QXmppRosterIq packet;
         packet.setType(QXmppIq::Set);
         packet.addItem(item);
-        chat->chatClient()->sendPacket(packet);
+        chat->client()->sendPacket(packet);
     }
 }
 
