@@ -38,6 +38,7 @@ set(wiLink_SOURCES
     plugins/diagnostics.cpp
     plugins/menu.cpp
     plugins/photos.cpp
+    plugins/rooms.cpp
     plugins/shares.cpp
     plugins/shares/database.cpp
     plugins/shares/model.cpp
@@ -63,6 +64,7 @@ set(wiLink_MOC_HEADERS
     plugins/diagnostics.h
     plugins/menu.h
     plugins/photos.h
+    plugins/rooms.h
     plugins/shares.h
     plugins/shares/database.h
     plugins/shares/model.h
