@@ -85,7 +85,8 @@ void ChatDialog::chatStateChanged(QXmppMessage::State state)
 
 void ChatDialog::disconnected()
 {
-    joined = false;
+    // FIXME : we should re-join on connect
+    // joined = false;
 }
 
 /** Start a two party dialog.
@@ -106,8 +107,12 @@ void ChatDialog::join()
     }
 
     // list archives for the past week.
+    // FIXME : we need to check whether archives are supported
+    // to clear the display appropriately
     client->getArchiveManager().listCollections(chatRemoteJid,
         QDateTime::currentDateTime().addDays(-7));
+
+    joined = true;
 }
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
