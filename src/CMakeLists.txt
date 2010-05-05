@@ -34,6 +34,7 @@ set(wiLink_SOURCES
     updatesdialog.cpp
     utils.cpp
     plugins/console.cpp
+    plugins/contacts.cpp
     plugins/diagnostics.cpp
     plugins/menu.cpp
     plugins/photos.cpp
@@ -59,6 +60,7 @@ set(wiLink_MOC_HEADERS
     updates.h
     updatesdialog.h
     plugins/console.h
+    plugins/contacts.h
     plugins/diagnostics.h
     plugins/menu.h
     plugins/photos.h

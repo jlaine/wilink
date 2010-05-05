@@ -40,6 +40,7 @@ Q_IMPORT_PLUGIN(photos)
 Q_IMPORT_PLUGIN(rooms)
 Q_IMPORT_PLUGIN(shares)
 Q_IMPORT_PLUGIN(transfers)
+Q_IMPORT_PLUGIN(contacts)
 
 static int aborted = 0;
 static void signal_handler(int sig)

@@ -65,7 +65,7 @@
 
 using namespace QNetIO;
 
-static QRegExp jidValidator("[^@]+@[^@]+");
+QRegExp jidValidator("[^@]+@[^@]+");
 
 enum StatusIndexes {
     AvailableIndex = 0,

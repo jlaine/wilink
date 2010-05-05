@@ -26,6 +26,8 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
+extern QRegExp jidValidator;
+
 class ChatClient;
 class ChatPanel;
 class ChatRosterModel;

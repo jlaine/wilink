@@ -422,6 +422,29 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ContactsWatcher</name>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
+    </message>
+    <message>
+        <source>Enter the address of the contact you want to add.</source>
+        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
+    </message>
+</context>
+<context>
     <name>Diagnostics</name>
     <message>
         <source>Refresh</source>
