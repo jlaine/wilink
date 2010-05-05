@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __WILINK_CHAT_PLUGIN_H__
+#define __WILINK_CHAT_PLUGIN_H__
+
 #include <QtPlugin>
 
 class Chat;
@@ -38,3 +41,4 @@ class ChatPlugin : public QObject, public ChatPluginInterface
     Q_INTERFACES(ChatPluginInterface)
 };
 
+#endif
