@@ -57,7 +57,6 @@
 #include "chat_client.h"
 #include "chat_dialog.h"
 #include "chat_plugin.h"
-#include "chat_room.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 #include "systeminfo.h"
@@ -606,10 +605,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             removeContact(jid);
         else if (action == ChatRosterView::RenameAction)
             renameContact(jid);
-    } else if (type == ChatRosterItem::Room) {
-        // create new panel for the chat room
-        if (action == ChatRosterView::JoinAction && !panel(jid))
-            addPanel(new ChatRoom(client, m_rosterModel, jid));
     }
 
     // show requested panel

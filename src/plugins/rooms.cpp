@@ -20,6 +20,7 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QStatusBar>
+#include <QTimer>
 
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMucIq.h"
@@ -94,7 +95,13 @@ void ChatRoomWatcher::inviteContact()
 
 void ChatRoomWatcher::joinRoom(const QString &jid)
 {
-    chat->rosterAction(ChatRosterView::JoinAction, jid, ChatRosterItem::Room);
+    ChatPanel *room = chat->panel(jid);
+    if (!room)
+    {
+        room = new ChatRoom(chat->chatClient(), chat->rosterModel(), jid);
+        chat->addPanel(room);
+    }
+    QTimer::singleShot(0, room, SIGNAL(showPanel()));
 }
 
 /** Kick a user from a chat room.
