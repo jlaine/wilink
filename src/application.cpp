@@ -148,8 +148,13 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
         username = usernameEdit->text().trimmed().toLower();
         password = passwordEdit->text().trimmed();
     }
-    if (realm == "www.wifirst.net" && !username.contains("@"))
-        username += "@wifirst.net";
+
+    /* try to fix username */
+    if (realm == "www.wifirst.net")
+        username = username.split("@").first() + "@wifirst.net";
+    else if (realm == "www.google.com")
+        username = username.split("@").first() + "@gmail.com";
+
     authenticator->setUser(username);
     authenticator->setPassword(password);
 
@@ -265,19 +270,14 @@ void Application::showAccounts()
 {
     ChatAccounts dlg;
 
-    QAuthenticator auth;
-    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
-    QString baseAccount = auth.user();
-
-    QStringList accounts = settings->value("ChatAccounts").toStringList();
-    accounts.prepend(baseAccount);
-    dlg.setAccounts(accounts);
-    if (dlg.exec() && dlg.accounts() != accounts)
+    const QStringList oldAccounts = settings->value("ChatAccounts").toStringList();
+    dlg.setAccounts(oldAccounts);
+    if (dlg.exec() && dlg.accounts() != oldAccounts)
     {
         QStringList newAccounts = dlg.accounts();
 
         // clean credentials
-        foreach (const QString &account, accounts)
+        foreach (const QString &account, oldAccounts)
         {
             if (!newAccounts.contains(account))
             {
@@ -288,11 +288,7 @@ void Application::showAccounts()
         }
 
         // store new settings
-        accounts.clear();
-        foreach (const QString &account, newAccounts)
-            if (!account.endsWith("@wifirst.net"))
-                accounts << account;
-        settings->setValue("ChatAccounts", accounts);
+        settings->setValue("ChatAccounts", newAccounts);
 
         // reset chats
         resetChats();
@@ -307,14 +303,15 @@ void Application::resetChats()
     chats.clear();
 
     /* get chat accounts */
-    QString baseJid;
-    QAuthenticator auth;
-    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
-    baseJid = auth.user();
-
-    QStringList chatJids;
-    chatJids.append(baseJid);
-    chatJids += settings->value("ChatAccounts").toStringList();
+    QStringList chatJids = settings->value("ChatAccounts").toStringList();
+    if (chatJids.isEmpty())
+    {
+        QString baseJid;
+        QAuthenticator auth;
+        QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
+        chatJids += auth.user();
+        settings->setValue("ChatAccounts", chatJids);
+    }
 
     /* connect to chat accounts */
     int xpos = 30;
