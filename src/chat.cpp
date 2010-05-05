@@ -104,7 +104,8 @@ Chat::Chat(QWidget *parent)
 
     /* left panel */
     rosterView = new ChatRosterView(rosterModel);
-    connect(rosterView, SIGNAL(itemAction(int, const QString&, int)), this, SLOT(rosterAction(int, const QString&, int)));
+    connect(rosterView, SIGNAL(itemAction(int, QString, int)), this, SLOT(rosterAction(int, QString, int)));
+    connect(rosterView, SIGNAL(itemMenu(QMenu*, QString, int)), this, SIGNAL(rosterMenu(QMenu*, QString, int)));
     connect(rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
     splitter->addWidget(rosterView);
     splitter->setStretchFactor(0, 0);
@@ -709,13 +710,6 @@ void Chat::rosterAction(int action, const QString &jid, int type)
             removeContact(jid);
         else if (action == ChatRosterView::RenameAction)
             renameContact(jid);
-        else if (action == ChatRosterView::SendAction)
-        {
-            // find first resource supporting file transfer
-            QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-            if (fullJids.size())
-                emit sendFile(fullJids.first());
-       }
     } else if (type == ChatRosterItem::Room) {
         if (action == ChatRosterView::JoinAction && !panel(jid))
             // create new panel for the chat room

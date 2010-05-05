@@ -59,7 +59,7 @@ public:
     ChatPanel *panel(const QString &objectName);
 
 signals:
-    void sendFile(const QString &jid);
+    void rosterMenu(QMenu *menu, const QString &jid, int type);
 
 private slots:
     void addContact();

@@ -28,7 +28,8 @@
 #include "chat_panel.h"
 
 class QPushButton;
-class QXmppClient;
+class ChatClient;
+class ChatRosterModel;
 
 enum JobDataRoles
 {
@@ -85,7 +86,7 @@ class ChatTransfers : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatTransfers(QXmppClient *xmppClient, QWidget *parent = 0);
+    ChatTransfers(ChatClient *xmppClient, ChatRosterModel *rosterModel, QWidget *parent = 0);
     ~ChatTransfers();
 
     int activeJobs(QXmppTransferJob::Direction direction) const;
@@ -95,6 +96,7 @@ public:
 
 public slots:
     void sendFile(const QString &fullJid, const QString &filePath);
+    void rosterMenu(QMenu *menu, const QString &jid, int type);
 
 protected:
     QSize sizeHint() const;
@@ -104,13 +106,14 @@ private slots:
     void fileDeclined(QXmppTransferJob *job);
     void fileReceived(QXmppTransferJob *job);
     void sendFileAccepted(const QString &filePath);
-    void sendFileRequested(const QString &fullJid);
+    void sendFilePrompt();
     void updateButtons();
 
 private:
     QPushButton *removeButton;
     ChatTransfersView *tableWidget;
-    QXmppClient *client;
+    ChatClient *client;
+    ChatRosterModel *rosterModel;
 };
 
 #endif

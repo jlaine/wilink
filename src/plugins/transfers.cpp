@@ -24,6 +24,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
+#include <QMenu>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QShortcut>
@@ -38,6 +39,7 @@
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_plugin.h"
+#include "chat_roster.h"
 #include "systeminfo.h"
 #include "transfers.h"
 #include "utils.h"
@@ -233,8 +235,8 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
     emit updateButtons();
 }
 
-ChatTransfers::ChatTransfers(QXmppClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent), client(xmppClient)
+ChatTransfers::ChatTransfers(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, QWidget *parent)
+    : ChatPanel(parent), client(xmppClient), rosterModel(chatRosterModel)
 {
     // disable in-band bytestreams
     client->getTransferManager().setSupportedMethods(
@@ -360,6 +362,19 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
+void ChatTransfers::rosterMenu(QMenu *menu, const QString &jid, int type)
+{
+    qDebug() << "roster menu";
+
+    QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+    if (fullJids.isEmpty())
+        return;
+
+    QAction *action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
+    action->setData(fullJids.first());
+    connect(action, SIGNAL(triggered()), this, SLOT(sendFilePrompt()));
+}
+
 void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
 {
     // check file size
@@ -384,15 +399,19 @@ void ChatTransfers::sendFileAccepted(const QString &filePath)
     sendFile(fullJid, filePath);
 }
 
-void ChatTransfers::sendFileRequested(const QString &fullJid)
+void ChatTransfers::sendFilePrompt()
 {
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString fullJid = action->data().toString();
+
     QFileDialog *dialog = new QFileDialog(this, tr("Send a file"));
     dialog->setFileMode(QFileDialog::ExistingFile);
     dialog->setObjectName(fullJid);
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
     dialog->open(this, SLOT(sendFileAccepted(QString)));
 }
-
 
 QSize ChatTransfers::sizeHint() const
 {
@@ -430,9 +449,9 @@ public:
 bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatTransfers *transfers = new ChatTransfers(chat->chatClient());
+    ChatTransfers *transfers = new ChatTransfers(chat->chatClient(), chat->chatRosterModel());
     transfers->setObjectName("transfers");
-    connect(chat, SIGNAL(sendFile(QString)), transfers, SLOT(sendFileRequested(QString)));
+    connect(chat, SIGNAL(rosterMenu(QMenu*, QString, int)), transfers, SLOT(rosterMenu(QMenu*, QString, int)));
     chat->addPanel(transfers);
 
     /* register shortcut */

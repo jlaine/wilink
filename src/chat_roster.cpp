@@ -581,10 +581,12 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString &bareJid = index.data(ChatRosterModel::IdRole).toString();
     
+    // allow plugins to populate menu
+    QMenu *menu = new QMenu(this);
+    emit itemMenu(menu, bareJid, type);
+
     if (type == ChatRosterItem::Contact)
     {
-        QMenu *menu = new QMenu(this);
-
         QAction *action;
 
         if (!index.data(ChatRosterModel::UrlRole).toString().isEmpty())
@@ -597,13 +599,6 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
         action->setData(InviteAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-
-        if (!rosterModel->contactFeaturing(bareJid, ChatRosterModel::FileTransferFeature).isEmpty())
-        {
-            action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
-            action->setData(SendAction);
-            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-        }
 
 #if 0
         if (!rosterModel->contactFeaturing(bareJid, ChatRosterModel::VersionFeature).isEmpty())
@@ -622,42 +617,36 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         action->setData(RemoveAction);
         connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
 
-        menu->popup(event->globalPos());
     } else if (type == ChatRosterItem::Room) {
         int flags = index.data(ChatRosterModel::FlagsRole).toInt();
-        if (flags & ChatRosterModel::OptionsFlag || flags & ChatRosterModel::MembersFlag)
+        if (flags & ChatRosterModel::OptionsFlag)
         {
-            QMenu *menu = new QMenu(this);
+            QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
+            action->setData(OptionsAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
+        }
 
-            if (flags & ChatRosterModel::OptionsFlag)
-            {
-                QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
-                action->setData(OptionsAction);
-                connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-            }
-
-            if (flags & ChatRosterModel::MembersFlag)
-            {
-                QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
-                action->setData(MembersAction);
-                connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-            }
-
-            menu->popup(event->globalPos());
+        if (flags & ChatRosterModel::MembersFlag)
+        {
+            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
+            action->setData(MembersAction);
+            connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
         }
     } else if (type == ChatRosterItem::RoomMember) {
         QModelIndex room = index.parent();
         if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
         {
-            QMenu *menu = new QMenu(this);
-
             QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
             action->setData(RemoveAction);
             connect(action, SIGNAL(triggered()), this, SLOT(slotAction()));
-
-            menu->popup(event->globalPos());
         }
     }
+
+    // FIXME : is there a better way to test if a menu is empty?
+    if (menu->sizeHint().height() > 4)
+        menu->popup(event->globalPos());
+    else
+        delete menu;
 }
 
 void ChatRosterView::resizeEvent(QResizeEvent *e)

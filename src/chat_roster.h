@@ -31,6 +31,7 @@
 #include "chat_roster_item.h"
 
 class QContextMenuEvent;
+class QMenu;
 class QXmppClient;
 class QXmppVCardManager;
 
@@ -132,7 +133,6 @@ public:
         MembersAction,
         RemoveAction,
         RenameAction,
-        SendAction,
     };
 
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
@@ -145,6 +145,7 @@ protected:
 
 signals:
     void itemAction(int action, const QString &jid, int type);
+    void itemMenu(QMenu *menu, const QString &jid, int type);
 
 protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
