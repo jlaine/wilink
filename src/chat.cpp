@@ -301,6 +301,7 @@ void Chat::registerPanel()
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (!panel)
         return;
+
     ChatRosterItem::Type type = ChatRosterItem::Other;
     if (qobject_cast<ChatRoom*>(panel))
         type = ChatRosterItem::Room;
@@ -319,7 +320,10 @@ void Chat::showPanel()
         return;
 
     // register panel
-    rosterModel->addItem(ChatRosterItem::Other,
+    ChatRosterItem::Type type = ChatRosterItem::Other;
+    if (qobject_cast<ChatRoom*>(panel))
+        type = ChatRosterItem::Room;
+    rosterModel->addItem(type,
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -442,7 +446,6 @@ void Chat::joinRoom(const QString &jid)
     if (!dialog)
     {
         dialog  = new ChatRoom(client, rosterModel, jid);
-        rosterModel->addItem(ChatRosterItem::Room, jid);
         addPanel(dialog);
     }
     QTimer::singleShot(0, dialog, SIGNAL(showPanel()));
@@ -707,16 +710,9 @@ void Chat::rosterAction(int action, const QString &jid, int type)
     {
         if (action == ChatRosterView::InviteAction)
             inviteContact(jid);
-        else if (action == ChatRosterView::JoinAction)
-        {
-            ChatPanel *chatPanel = panel(jid);
-            if (!chatPanel)
-            {
-                chatPanel = new ChatDialog(client, rosterModel, jid);
-                addPanel(chatPanel);
-            }
-            QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
-        }
+        else if (action == ChatRosterView::JoinAction && !panel(jid))
+            // create new conversation with the contact
+            addPanel(new ChatDialog(client, rosterModel, jid));
         else if (action == ChatRosterView::OptionsAction)
         {
             ChatRosterItem *item = rosterModel->contactItem(jid);
@@ -747,9 +743,7 @@ void Chat::rosterAction(int action, const QString &jid, int type)
                 emit sendFile(fullJids.first());
        }
     } else if (type == ChatRosterItem::Room) {
-        if (action == ChatRosterView::JoinAction)
-            joinRoom(jid);
-        else if (action == ChatRosterView::OptionsAction)
+        if (action == ChatRosterView::OptionsAction)
         {
             // get room information
             QXmppIq iq;
@@ -786,13 +780,14 @@ void Chat::rosterAction(int action, const QString &jid, int type)
 
             client->sendPacket(iq);
         }
-    } else if (type == ChatRosterItem::Other) {
-        if (action == ChatRosterView::JoinAction)
-        {
-            ChatPanel *chatPanel = panel(jid);
-            if (chatPanel)
-                QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
-        }
+    }
+
+    // show requested panel
+    if (action == ChatRosterView::JoinAction)
+    {
+        ChatPanel *chatPanel = panel(jid);
+        if (chatPanel)
+            QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
     }
 }
 
