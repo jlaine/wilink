@@ -21,7 +21,6 @@
 #define __WILINK_CHAT_ROSTER_H__
 
 #include <QAbstractItemModel>
-#include <QTableView>
 #include <QTreeView>
 
 #include "qxmpp/QXmppRoster.h"
@@ -64,6 +63,7 @@ public:
     ~ChatRosterModel();
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
     Qt::ItemFlags flags(const QModelIndex &index) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QMimeData *mimeData(const QModelIndexList &indexes) const;
@@ -116,6 +116,7 @@ public:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
     void resizeEvent(QResizeEvent *e);
 
 signals:

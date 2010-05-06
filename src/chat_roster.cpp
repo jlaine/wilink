@@ -267,6 +267,15 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     clientFeatures.insert(disco.from(), features);
 }
 
+bool ChatRosterModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    if (action == Qt::IgnoreAction)
+        return true;
+
+    qDebug() << "data dropped";
+    return false;
+}
+
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
@@ -276,6 +285,8 @@ Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     if (item->type() == ChatRosterItem::Contact)
         return Qt::ItemIsDragEnabled | defaultFlags;
+    else if (item->type() == ChatRosterItem::Room)
+        return Qt::ItemIsDropEnabled | defaultFlags;
     else
         return defaultFlags;
 }
@@ -557,8 +568,10 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setColumnHidden(SortingColumn, true);
     setColumnWidth(ImageColumn, 40);
     setContextMenuPolicy(Qt::DefaultContextMenu);
-    setDragDropMode(QAbstractItemView::DragOnly);
+    setAcceptDrops(true);
+    setDragDropMode(QAbstractItemView::DragDrop);
     setDragEnabled(true);
+    setDropIndicatorShown(false);
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setMinimumWidth(200);
@@ -587,6 +600,17 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         menu->popup(event->globalPos());
     else
         delete menu;
+}
+
+void ChatRosterView::dragMoveEvent(QDragMoveEvent *event)
+{
+    QTreeView::dragMoveEvent(event);
+
+    // FIXME : for some reason, QTreeView doesn't seem to accept
+    // the drag action on its own
+    QModelIndex index = indexAt(event->pos());
+    if (index.isValid() && (model()->flags(index) & Qt::ItemIsDropEnabled))
+        event->acceptProposedAction();
 }
 
 void ChatRosterView::resizeEvent(QResizeEvent *e)
