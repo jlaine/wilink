@@ -24,6 +24,7 @@
 #include <QPainter>
 #include <QStringList>
 #include <QSortFilterProxyModel>
+#include <QUrl>
 
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
@@ -313,6 +314,23 @@ QModelIndex ChatRosterModel::parent(const QModelIndex & index) const
         return QModelIndex();
 
     return createIndex(parentItem->row(), 0, parentItem);
+}
+
+QMimeData *ChatRosterModel::mimeData(const QModelIndexList &indexes) const
+{
+    QList<QUrl> urls;
+    foreach (QModelIndex index, indexes)
+        if (index.isValid() && index.column() == ContactColumn)
+            urls << QUrl(index.data(ChatRosterModel::IdRole).toString());
+
+    QMimeData *mimeData = new QMimeData();
+    mimeData->setUrls(urls);
+    return mimeData;
+}
+
+QStringList ChatRosterModel::mimeTypes() const
+{
+    return QStringList() << "text/uri-list";
 }
 
 void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& resource)

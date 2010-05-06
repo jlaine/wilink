@@ -423,6 +423,33 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
+void ChatHistory::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+}
+
+void ChatHistory::dragLeaveEvent(QDragLeaveEvent *event)
+{
+}
+
+void ChatHistory::dragMoveEvent(QDragMoveEvent *event)
+{
+    if (event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+    else
+        event->ignore();
+}
+
+void ChatHistory::dropEvent(QDropEvent *event)
+{
+    if (event->mimeData()->hasUrls())
+    {
+        emit urlsDropped(event->mimeData()->urls());
+        event->acceptProposedAction();
+    }
+}
+
 void ChatHistory::focusInEvent(QFocusEvent *e)
 {
     QGraphicsView::focusInEvent(e);
