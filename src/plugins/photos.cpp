@@ -230,6 +230,11 @@ Photos::Photos(const QString &url, QWidget *parent)
     backButton->setEnabled(false);
     connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
 
+    stopButton = new QPushButton(tr("Stop"));
+    stopButton->setIcon(QIcon(":/close.png"));
+    connect(stopButton, SIGNAL(clicked()), this, SLOT(abortUpload()));
+    stopButton->hide();
+
     createButton = new QPushButton(tr("Create an album"));
     createButton->setIcon(QIcon(":/add.png"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
@@ -240,13 +245,16 @@ Photos::Photos(const QString &url, QWidget *parent)
     layout->addItem(headerLayout());
     layout->addWidget(helpLabel);
     layout->addWidget(photosView);
-    layout->addWidget(progressBar);
+    QHBoxLayout *hbox_upload = new QHBoxLayout;
+    hbox_upload->addWidget(stopButton);
+    hbox_upload->addWidget(progressBar);
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addWidget(statusLabel);
     hbox->addStretch();
     hbox->addWidget(backButton);
     hbox->addWidget(createButton);
+    layout->addItem(hbox_upload);
     layout->addItem(hbox);
-    layout->addWidget(statusLabel);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/photos.png"));
@@ -355,6 +363,13 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     }
 }
 
+void Photos::abortUpload()
+{
+    uploadQueue.clear();
+    showMessage("Aborting...");
+    progressBar->setMaximum(progressFiles);
+}
+
 /** Prompt the user for a new folder name and create it.
  */
 void Photos::createFolder()
@@ -449,6 +464,7 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
     }
     progressBar->setMaximum(progressBar->maximum() + PROGRESS_STEPS * files.size());
     progressBar->show();
+    stopButton->show();
     processUploadQueue();
 }
 
@@ -518,6 +534,7 @@ void Photos::processUploadQueue()
         if (systemTrayIcon)
             systemTrayIcon->showMessage(tr("Photos upload complete."),
                 tr("Your photos have been uploaded."));
+        stopButton->hide();
         progressBar->hide();
         progressBar->setValue(0);
         progressBar->setMaximum(0);

@@ -97,6 +97,7 @@ protected:
     void showMessage(const QString &message = QString());
 
 protected slots:
+    void abortUpload();
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
     void fileNext();
@@ -118,6 +119,7 @@ private:
 
     QPushButton *backButton;
     QPushButton *createButton;
+    QPushButton *stopButton;
     Job downloadJob;
     QLabel *helpLabel;
     QStackedWidget *photosView;
