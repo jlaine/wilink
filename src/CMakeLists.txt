@@ -83,13 +83,13 @@ set(wiLink_RCCS
     ${CMAKE_CURRENT_SOURCE_DIR}/data/wiLink.qrc)
 
 if(WIN32)
-    set(wiLink_SOURCES ${wiLink_SOURCES} wireless_win.cpp)
+    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/diagnostics/wireless_win.cpp)
 elseif(APPLE)
-    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm wireless_mac.mm)
+    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm plugins/diagnostics/wireless_mac.mm)
 elseif(UNIX)
-    set(wiLink_SOURCES ${wiLink_SOURCES} wireless_nm.cpp)
+    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/diagnostics/wireless_nm.cpp)
 else(WIN32)
-    set(wiLink_SOURCES ${wiLink_SOURCES} wireless_stub.cpp)
+    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/diagnostics/wireless_stub.cpp)
 endif(WIN32)
 
 qt4_add_resources(wiLink_RCC_SOURCES ${wiLink_RCCS})

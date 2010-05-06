@@ -27,7 +27,7 @@
 
 #include "chat_panel.h"
 #include "networkinfo.h"
-#include "wireless.h"
+#include "diagnostics/wireless.h"
 
 class QNetworkAccessManager;
 class QPushButton;

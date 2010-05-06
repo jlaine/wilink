@@ -36,8 +36,9 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
-#include "diagnostics.h"
 #include "systeminfo.h"
+
+#include "diagnostics.h"
 
 static const QHostAddress serverAddress("213.91.4.201");
 
