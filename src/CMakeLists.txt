@@ -28,7 +28,6 @@ set(wiLink_SOURCES
     chat_roster.cpp
     chat_roster_item.cpp
     main.cpp
-    networkinfo.cpp
     systeminfo.cpp
     updates.cpp
     updatesdialog.cpp
@@ -36,6 +35,7 @@ set(wiLink_SOURCES
     plugins/console.cpp
     plugins/contacts.cpp
     plugins/diagnostics.cpp
+    plugins/diagnostics/networkinfo.cpp
     plugins/menu.cpp
     plugins/photos.cpp
     plugins/rooms.cpp

@@ -26,7 +26,7 @@
 #include <QUrl>
 
 #include "chat_panel.h"
-#include "networkinfo.h"
+#include "diagnostics/networkinfo.h"
 #include "diagnostics/wireless.h"
 
 class QNetworkAccessManager;
