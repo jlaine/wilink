@@ -25,6 +25,8 @@
 #include <QStatusBar>
 #include <QUrl>
 
+#include "qxmpp/QXmppUtils.h"
+
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_plugin.h"
@@ -40,6 +42,8 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
             this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()),
             this, SLOT(disconnected()));
+    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
+            this, SLOT(presenceReceived(const QXmppPresence&)));
 
     // add button to status bar
     addButton = new QPushButton;
@@ -81,6 +85,37 @@ void ContactsWatcher::disconnected()
 {
     addButton->setEnabled(false);
 }
+
+void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
+{
+    const QString bareJid = jidToBareJid(presence.from());
+
+    if (presence.getType() == QXmppPresence::Subscribe)
+    {
+        ChatClient *client = chat->client();
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
+        QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
+
+        /* if the contact is in our roster accept subscribe */
+        if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
+        {
+            qDebug("Subscribe accepted");
+            QXmppPresence packet;
+            packet.setTo(presence.from());
+            packet.setType(QXmppPresence::Subscribed);
+            client->sendPacket(packet);
+
+            packet.setType(QXmppPresence::Subscribe);
+            client->sendPacket(packet);
+            return;
+        }
+
+        /* otherwise ask user */
+        ChatRosterPrompt *dlg = new ChatRosterPrompt(client, presence.from(), chat);
+        dlg->show();
+    }
+}
+
 
 /** Prompt the user for confirmation then remove a contact.
  */

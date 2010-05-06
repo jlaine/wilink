@@ -66,7 +66,6 @@ private slots:
     void error(QXmppClient::Error error);
     void messageReceived(const QXmppMessage &msg);
     void panelChanged(int index);
-    void presenceReceived(const QXmppPresence &presence);
     void resizeContacts();
     void rosterClicked(const QModelIndex &index);
     void secondsIdle(int);

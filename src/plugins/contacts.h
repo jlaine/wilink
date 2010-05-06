@@ -26,6 +26,7 @@ class Chat;
 class QMenu;
 class QModelIndex;
 class QPushButton;
+class QXmppPresence;
 
 class ContactsWatcher : public QObject
 {
@@ -38,6 +39,7 @@ private slots:
     void addContact();
     void connected();
     void disconnected();
+    void presenceReceived(const QXmppPresence &presence);
     void removeContact();
     void renameContact();
     void rosterMenu(QMenu *menu, const QModelIndex &index);

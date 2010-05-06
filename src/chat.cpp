@@ -147,7 +147,6 @@ Chat::Chat(QWidget *parent)
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(m_client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(m_client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
     connect(m_client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
@@ -379,41 +378,6 @@ void Chat::messageReceived(const QXmppMessage &msg)
         ChatDialog *dialog = new ChatDialog(m_client, m_rosterModel, bareJid);
         addPanel(dialog);
         dialog->messageReceived(msg);
-    }
-}
-
-void Chat::presenceReceived(const QXmppPresence &presence)
-{
-    QXmppPresence packet;
-    packet.setTo(presence.from());
-    const QString bareJid = jidToBareJid(presence.from());
-
-    switch (presence.getType())
-    {
-    case QXmppPresence::Subscribe:
-        {
-            QXmppRoster::QXmppRosterEntry entry = m_client->getRoster().getRosterEntry(presence.from());
-            QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
-
-            /* if the contact is in our roster accept subscribe */
-            if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
-            {
-                qDebug("Subscribe accepted");
-                packet.setType(QXmppPresence::Subscribed);
-                m_client->sendPacket(packet);
-
-                packet.setType(QXmppPresence::Subscribe);
-                m_client->sendPacket(packet);
-                return;
-            }
-
-            /* otherwise ask user */
-            ChatRosterPrompt *dlg = new ChatRosterPrompt(m_client, presence.from(), this);
-            dlg->show();
-        }
-        break;
-    default:
-        break;
     }
 }
 
