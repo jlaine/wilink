@@ -188,12 +188,20 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
     bodyText->setHtml(bodyHtml);
 }
 
-void ChatMessageWidget::setSelected(bool selected)
+void ChatMessageWidget::setSelection(const QRectF &rect)
 {
-    QGraphicsWidget::setSelected(selected);
+    QRectF localRect = bodyText->mapRectFromScene(rect);
+    localRect = bodyText->boundingRect().intersected(localRect);
+
+    // determine selected text
+    QAbstractTextDocumentLayout *layout = bodyText->document()->documentLayout();
+    int startPos = layout->hitTest(localRect.topLeft(), Qt::FuzzyHit);
+    int endPos = layout->hitTest(localRect.bottomRight(), Qt::FuzzyHit);
+
+    // set cursor
     QTextCursor cursor(bodyText->document());
-    if (selected)
-        cursor.select(QTextCursor::Document);
+    cursor.setPosition(startPos);
+    cursor.setPosition(endPos, QTextCursor::KeepAnchor);
     bodyText->setTextCursor(cursor);
 }
 
@@ -416,8 +424,20 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
     emit focused();
 }
 
+void ChatHistory::mouseMoveEvent(QMouseEvent *e)
+{
+    QGraphicsView::mouseMoveEvent(e);
+    if (e->buttons() == Qt::LeftButton && !lastSelection.isEmpty())
+    {
+        QRectF rect = scene->selectionArea().boundingRect();
+        foreach (ChatMessageWidget *child, lastSelection)
+            child->setSelection(rect);
+    }
+}
+
 void ChatHistory::mousePressEvent(QMouseEvent *e)
 {
+    // FIXME : why are we blocking right clicks?
     if (e->button() != Qt::RightButton)
         QGraphicsView::mousePressEvent(e);
 }
@@ -443,12 +463,12 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
 
 void ChatHistory::selectAll()
 {
-    QList<QGraphicsItem*> selection;
+    QList<ChatMessageWidget*> selection;
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
         if (!lastSelection.contains(child))
-            child->setSelected(true);
+            child->setSelection(scene->sceneRect());
         selection.append(child);
     }
     lastSelection = selection;
@@ -461,17 +481,20 @@ void ChatHistory::slotLinkHoverChanged(const QString &link)
 
 void ChatHistory::slotSelectionChanged()
 {
+    QRectF rect = scene->selectionArea().boundingRect();
+
     // highlight the selected items
     QList<QGraphicsItem*> selection = scene->selectedItems();
+    QList<ChatMessageWidget*> newSelection;
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
         if (selection.contains(child))
         {
-            if (!lastSelection.contains(child))
-                child->setSelected(true);
+            newSelection << child;
+            child->setSelection(rect);
         } else if (lastSelection.contains(child)) {
-            child->setSelected(false);
+            child->setSelection(QRectF());
         }
     }
 
@@ -482,7 +505,7 @@ void ChatHistory::slotSelectionChanged()
         clipboard->setText(copyText(), QClipboard::Selection);
     }
 
-    lastSelection = selection;
+    lastSelection = newSelection;
 }
 
 ChatHistoryMessage::ChatHistoryMessage()

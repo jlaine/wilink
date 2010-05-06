@@ -48,7 +48,7 @@ signals:
 protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     QString lastAnchor;
@@ -66,7 +66,7 @@ public:
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
-    void setSelected(bool selected);
+    void setSelection(const QRectF &rect);
     void setShowDate(bool show);
     void setShowSender(bool show);
 
@@ -116,6 +116,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
     QString copyText();
     void focusInEvent(QFocusEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
 
@@ -124,7 +125,7 @@ private:
 
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
-    QList<QGraphicsItem*> lastSelection;
+    QList<ChatMessageWidget*> lastSelection;
     QString lastText;
 };
 
