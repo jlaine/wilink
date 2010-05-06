@@ -308,7 +308,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
                 listView->setImage(downloadJob.remoteUrl, img);
             else if (label)
             {
-                QSize maxSize(800, 600);
+                QSize maxSize = photosView->size();
                 if (img.width() > maxSize.width() || img.height() > maxSize.height())
                     img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
                 label->setPixmap(QPixmap::fromImage(img));
