@@ -24,6 +24,7 @@ class TestIndent : public QObject
     Q_OBJECT
 
 private slots:
+    void checkJid();
     void indentCollapsed();
     void indentElement();
 };

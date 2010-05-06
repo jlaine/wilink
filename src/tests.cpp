@@ -52,6 +52,21 @@ void TestIndent::indentElement()
         QString::fromLatin1("<sometag>\n    <nested>value</nested>\n</sometag>"));
 }
 
+void TestIndent::checkJid()
+{
+    QCOMPARE(isBareJid("foo"), false);
+    QCOMPARE(isBareJid("foo@bar"), true);
+    QCOMPARE(isBareJid("foo@bar/wiz"), false);
+    QCOMPARE(isBareJid("foo@bar/wiz/woo"), false);
+    QCOMPARE(isBareJid("foo/wiz"), false);
+
+    QCOMPARE(isFullJid("foo"), false);
+    QCOMPARE(isFullJid("foo@bar"), false);
+    QCOMPARE(isFullJid("foo@bar/wiz"), true);
+    QCOMPARE(isFullJid("foo@bar/wiz/woo"), false);
+    QCOMPARE(isFullJid("foo/wiz"), false);
+}
+
 void TestUpdates::compareVersions()
 {
     QVERIFY(Updates::compareVersions("1.0", "1.0") == 0);

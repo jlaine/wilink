@@ -26,9 +26,15 @@
 #define MEGABYTE 1000000
 #define GIGABYTE 1000000000
 
-bool jidIsValid(const QString &jid)
+bool isBareJid(const QString &jid)
 {
-    QRegExp jidValidator("[^@]+@[^@]+");
+    QRegExp jidValidator("^[^@/]+@[^@/]+$");
+    return jidValidator.exactMatch(jid);
+}
+
+bool isFullJid(const QString &jid)
+{
+    QRegExp jidValidator("[^@/]+@[^@/]+/[^@/]+");
     return jidValidator.exactMatch(jid);
 }
 

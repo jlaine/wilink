@@ -22,7 +22,8 @@
 
 #include <QString>
 
-bool jidIsValid(const QString &jid);
+bool isBareJid(const QString &jid);
+bool isFullJid(const QString &jid);
 QString indentXml(const QString &xml);
 QString sizeToString(qint64 size);
 
