@@ -128,6 +128,11 @@ ChatHistoryMessage ChatMessageWidget::message() const
     return msg;
 }
 
+QString ChatMessageWidget::selectedText() const
+{
+    return bodyText->textCursor().selectedText();
+}
+
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 {
     QGraphicsWidget::setGeometry(baseRect);
@@ -388,7 +393,7 @@ QString ChatHistory::copyText()
             if (senders.size() > 1)
                 copyText += message.from + "> ";
 
-            copyText += message.body.replace("\r\n", "\n");
+            copyText += child->selectedText().replace("\r\n", "\n");
         }
     }
 

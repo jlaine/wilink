@@ -63,6 +63,7 @@ public:
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     ChatHistoryMessage message() const;
 
+    QString selectedText() const;
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
