@@ -265,6 +265,19 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     clientFeatures.insert(disco.from(), features);
 }
 
+Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
+    if (!index.isValid())
+        return defaultFlags;
+
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+    if (item->type() == ChatRosterItem::Contact)
+        return Qt::ItemIsDragEnabled | defaultFlags;
+    else
+        return defaultFlags;
+}
+
 QModelIndex ChatRosterModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
@@ -525,6 +538,8 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setColumnHidden(SortingColumn, true);
     setColumnWidth(ImageColumn, 40);
     setContextMenuPolicy(Qt::DefaultContextMenu);
+    setDragDropMode(QAbstractItemView::DragOnly);
+    setDragEnabled(true);
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setMinimumWidth(200);
