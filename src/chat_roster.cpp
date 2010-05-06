@@ -219,10 +219,11 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatuser_") + bareJid.toLower();
             }
-        } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-            return QVariant();
         }
     }
+    if (role == Qt::DecorationRole && index.column() == ImageColumn)
+        return QVariant();
+
     return item->data(role);
 }
 
