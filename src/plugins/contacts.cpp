@@ -103,15 +103,15 @@ void ContactsWatcher::presenceHandled(QAbstractButton *button)
     packet.setTo(jid);
     if (box->standardButton(button) == QMessageBox::Yes)
     {
-        qDebug("Subscribe accepted");
+        // accept subscription
         packet.setType(QXmppPresence::Subscribed);
         client->sendPacket(packet);
 
-        // FIXME : no need to subscribe if already in our roster
+        // request reciprocal subscription
         packet.setType(QXmppPresence::Subscribe);
         client->sendPacket(packet);
     } else {
-        qDebug("Subscribe refused");
+        // refuse subscription
         packet.setType(QXmppPresence::Unsubscribed);
         client->sendPacket(packet);
     }
@@ -134,12 +134,13 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         /* if the contact is in our roster accept subscribe */
         if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
         {
-            qDebug("Subscribe accepted");
+            // accept subscription
             QXmppPresence packet;
             packet.setTo(jid);
             packet.setType(QXmppPresence::Subscribed);
             client->sendPacket(packet);
 
+            // request reciprocal subscription
             packet.setType(QXmppPresence::Subscribe);
             client->sendPacket(packet);
             return;
@@ -155,10 +156,6 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         box->setDefaultButton(QMessageBox::Yes);
         box->setEscapeButton(QMessageBox::No);
         box->open(this, SLOT(presenceHandled(QAbstractButton*)));
-        #if 0
-        ChatRosterPrompt *dlg = new ChatRosterPrompt(client, jid, chat);
-        dlg->show();
-        #endif
     }
 }
 
