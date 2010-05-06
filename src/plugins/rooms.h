@@ -68,6 +68,7 @@ private:
     Chat *chat;
     QString chatRoomServer;
     QPushButton *roomButton;
+    QStringList invitations;
 };
 
 class ChatRoom : public ChatConversation

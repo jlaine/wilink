@@ -148,11 +148,15 @@ void ChatRoomWatcher::kickUser()
     chat->client()->sendPacket(iq);
 }
 
-void ChatRoomWatcher::messageHandled(QAbstractButton*)
+void ChatRoomWatcher::messageHandled(QAbstractButton *button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
-    if (box)
-        joinRoom(box->objectName());
+    if (box && box->standardButton(button) == QMessageBox::Yes)
+    {
+        const QString roomJid = box->objectName();
+        joinRoom(roomJid);
+        invitations.removeAll(roomJid);
+    }
 }
 
 void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
@@ -168,7 +172,7 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
         {
             const QString contactName = chat->rosterModel()->contactName(bareJid);
             const QString roomJid = extension.attribute("jid");
-            if (!roomJid.isEmpty() && !chat->panel(roomJid))
+            if (!roomJid.isEmpty() && !chat->panel(roomJid) && !invitations.contains(roomJid))
             {
                 QMessageBox *box = new QMessageBox(QMessageBox::Question,
                     tr("Invitation from %1").arg(bareJid),
@@ -179,6 +183,8 @@ void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
                 box->setDefaultButton(QMessageBox::Yes);
                 box->setEscapeButton(QMessageBox::No);
                 box->open(this, SLOT(messageHandled(QAbstractButton*)));
+
+                invitations << roomJid;
             }
             break;
         }
