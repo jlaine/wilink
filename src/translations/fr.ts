@@ -75,7 +75,11 @@
     </message>
     <message>
         <source>Show debug</source>
-        <translation>Afficher débogage</translation>
+        <translation type="obsolete">Afficher débogage</translation>
+    </message>
+    <message>
+        <source>Show messages</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

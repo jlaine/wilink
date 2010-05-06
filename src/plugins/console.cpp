@@ -51,9 +51,11 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     showPackets->setCheckState(Qt::Checked);
     hbox->addWidget(showPackets);
 
-    showDebug = new QCheckBox(tr("Show debug"));
-    showDebug->setCheckState(Qt::Checked);
-    hbox->addWidget(showDebug);
+    hbox->addSpacing(16);
+
+    showMessages = new QCheckBox(tr("Show messages"));
+    showMessages->setCheckState(Qt::Checked);
+    hbox->addWidget(showMessages);
 
     hbox->addStretch();
 
@@ -72,12 +74,12 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 {
-    if (showDebug->checkState() != Qt::Checked &&
-        type == QXmppLogger::DebugMessage)
+    if (showMessages->checkState() != Qt::Checked &&
+        (type == QXmppLogger::DebugMessage || type == QXmppLogger::InformationMessage || type == QXmppLogger::WarningMessage))
         return;
 
     if (showPackets->checkState() != Qt::Checked &&
-        (type == QXmppLogger::ReceivedMessage || QXmppLogger::SentMessage))
+        (type == QXmppLogger::ReceivedMessage || type == QXmppLogger::SentMessage))
         return;
 
     QColor color;
@@ -92,7 +94,7 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
         color = (type == QXmppLogger::WarningMessage) ? QColor(0xff, 0x95, 0x95) : Qt::white;
         message = msg;
     }
-  
+
     if (!message.isEmpty())
     {
         const QTextCursor savedCursor = browser->textCursor();

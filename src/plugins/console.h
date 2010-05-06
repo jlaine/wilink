@@ -48,7 +48,7 @@ private:
     QTextBrowser *browser;
     bool connected;
     QXmppLogger *currentLogger;
-    QCheckBox *showDebug;
+    QCheckBox *showMessages;
     QCheckBox *showPackets;
 };
 
