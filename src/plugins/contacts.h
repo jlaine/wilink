@@ -21,12 +21,29 @@
 #define __WILINK_CONTACTS_H__
 
 #include <QObject>
+#include <QMessageBox>
 
 class Chat;
+class ChatClient;
 class QMenu;
 class QModelIndex;
 class QPushButton;
 class QXmppPresence;
+
+class ChatRosterPrompt : public QMessageBox
+{
+    Q_OBJECT
+
+public:
+    ChatRosterPrompt(ChatClient *client, const QString &jid, QWidget *parent = 0);
+
+private slots:
+    void slotButtonClicked(QAbstractButton *button);
+
+private:
+    ChatClient *m_client;
+    QString m_jid;
+};
 
 class ContactsWatcher : public QObject
 {

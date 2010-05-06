@@ -21,7 +21,6 @@
 #define __WILINK_CHAT_ROSTER_H__
 
 #include <QAbstractItemModel>
-#include <QMessageBox>
 #include <QTableView>
 #include <QTreeView>
 
@@ -34,21 +33,6 @@ class QContextMenuEvent;
 class QMenu;
 class QXmppClient;
 class QXmppVCardManager;
-
-class ChatRosterPrompt : public QMessageBox
-{
-    Q_OBJECT
-
-public:
-    ChatRosterPrompt(QXmppClient *client, const QString &jid, QWidget *parent = 0);
-
-private slots:
-    void slotButtonClicked(QAbstractButton *button);
-
-private:
-    QXmppClient *m_client;
-    QString m_jid;
-};
 
 class ChatRosterModel : public QAbstractItemModel
 {

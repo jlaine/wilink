@@ -34,6 +34,39 @@
 
 #include "contacts.h"
 
+ChatRosterPrompt::ChatRosterPrompt(ChatClient *client, const QString &jid, QWidget *parent)
+    : QMessageBox(parent), m_client(client), m_jid(jid)
+{
+    setText(tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(jid));
+    setWindowModality(Qt::NonModal);
+    setWindowTitle(tr("Invitation from %1").arg(jid));
+
+    setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    setDefaultButton(QMessageBox::Yes);
+    setEscapeButton(QMessageBox::No);
+
+    connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
+}
+
+void ChatRosterPrompt::slotButtonClicked(QAbstractButton *button)
+{
+    QXmppPresence packet;
+    packet.setTo(m_jid);
+    if (standardButton(button) == QMessageBox::Yes)
+    {
+        qDebug("Subscribe accepted");
+        packet.setType(QXmppPresence::Subscribed);
+        m_client->sendPacket(packet);
+
+        packet.setType(QXmppPresence::Subscribe);
+        m_client->sendPacket(packet);
+    } else {
+        qDebug("Subscribe refused");
+        packet.setType(QXmppPresence::Unsubscribed);
+        m_client->sendPacket(packet);
+    }
+}
+
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
