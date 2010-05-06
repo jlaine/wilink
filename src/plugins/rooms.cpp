@@ -68,6 +68,12 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     connect(client, SIGNAL(mucServerFound(const QString&)),
             this, SLOT(mucServerFound(const QString&)));
 
+    // add roster hooks
+    connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
+            this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
+    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
+            this, SLOT(rosterMenu(QMenu*, QModelIndex)));
+ 
     // add room button
     roomButton = new QPushButton;
     roomButton->setEnabled(false);
@@ -230,6 +236,26 @@ void ChatRoomWatcher::mucServerFound(const QString &mucServer)
     roomButton->setEnabled(true);
 }
 
+/** Handle a drop event on a roster entry.
+ */
+void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
+{
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    if (type != ChatRosterItem::Room || !event->mimeData()->hasUrls())
+        return;
+
+    const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
+    if (event->type() == QEvent::Drop)
+    {
+        ChatRoom *room = joinRoom(roomJid);
+        foreach (const QUrl &url, event->mimeData()->urls())
+            room->invite(url.toString());
+    }
+    event->acceptProposedAction();
+}
+
+/** Add entries to a roster entry's context menu.
+ */
 void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
     int type = index.data(ChatRosterModel::TypeRole).toInt();
@@ -312,6 +338,8 @@ void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
  */
 void ChatRoom::invite(const QString &jid)
 {
+    qDebug() << "Inviting" << jid << "to room" << chatRemoteJid;
+
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_conference);
@@ -471,11 +499,7 @@ void ChatRoom::sendMessage(const QString &text)
 void ChatRoom::urlsDropped(const QList<QUrl> &urls)
 {
     foreach (const QUrl &url, urls)
-    {
-        QString jid = url.toString();
-        qDebug() << "Inviting" << jid;
-        invite(jid);
-    }
+        invite(url.toString());
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)
@@ -740,8 +764,6 @@ public:
 bool RoomsPlugin::initialize(Chat *chat)
 {
     ChatRoomWatcher *rooms = new ChatRoomWatcher(chat);
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-            rooms, SLOT(rosterMenu(QMenu*, QModelIndex)));
     return true;
 }
 

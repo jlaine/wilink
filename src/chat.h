@@ -56,6 +56,11 @@ public:
     ChatPanel *panel(const QString &objectName);
 
 signals:
+    /** Plugin should connect to this signal to handle drop events
+     *  on a roster entry.
+     */
+    void rosterDrop(QDropEvent *event, const QModelIndex &index);
+
     /** Plugins should connect to this signal to add entries
      *  to the context menu for a roster entry.
      */

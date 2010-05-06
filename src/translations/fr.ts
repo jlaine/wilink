@@ -489,6 +489,10 @@ Acceptez-vous?</translation>
         <source>Loading image..</source>
         <translation>Chargement de l&apos;image..</translation>
     </message>
+    <message>
+        <source>Stop</source>
+        <translation>Arrêter</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

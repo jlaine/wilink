@@ -60,6 +60,7 @@ private slots:
     void roomJoin();
     void roomOptions();
     void roomMembers();
+    void rosterDrop(QDropEvent *event, const QModelIndex &index);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:

@@ -267,15 +267,6 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     clientFeatures.insert(disco.from(), features);
 }
 
-bool ChatRosterModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
-{
-    if (action == Qt::IgnoreAction)
-        return true;
-
-    qDebug() << "data dropped";
-    return false;
-}
-
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
@@ -604,13 +595,24 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
 
 void ChatRosterView::dragMoveEvent(QDragMoveEvent *event)
 {
-    QTreeView::dragMoveEvent(event);
+    // ignore by default
+    event->ignore();
 
-    // FIXME : for some reason, QTreeView doesn't seem to accept
-    // the drag action on its own
+    // let plugins process event
     QModelIndex index = indexAt(event->pos());
-    if (index.isValid() && (model()->flags(index) & Qt::ItemIsDropEnabled))
-        event->acceptProposedAction();
+    if (index.isValid())
+        emit itemDrop(event, index);
+}
+
+void ChatRosterView::dropEvent(QDropEvent *event)
+{
+    // ignore by default
+    event->ignore();
+
+    // let plugins process event
+    QModelIndex index = indexAt(event->pos());
+    if (index.isValid())
+        emit itemDrop(event, index);
 }
 
 void ChatRosterView::resizeEvent(QResizeEvent *e)
