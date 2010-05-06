@@ -107,6 +107,9 @@ Chat::Chat(QWidget *parent)
     setCentralWidget(splitter);
 
     /* build status bar */
+    // avoid border around widgets on OS X
+    statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
+
     m_statusCombo = new QComboBox;
     m_statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
     m_statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
