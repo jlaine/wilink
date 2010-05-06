@@ -143,8 +143,10 @@ Chat::Chat(QWidget *parent)
     connect(m_client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     /* set up keyboard shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_N), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(detachPanel()));
 #ifdef Q_OS_MAC
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 }
@@ -168,7 +170,6 @@ void Chat::addPanel(ChatPanel *panel)
     if (m_chatPanels.contains(panel))
         return;
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
-    connect(panel, SIGNAL(detachPanel()), this, SLOT(detachPanel()));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
@@ -186,32 +187,24 @@ void Chat::destroyPanel(QObject *obj)
     m_chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
 
-/** Toggle a panel between attached / detached mode.
+/** Detach the current panel as a window.
  */
 void Chat::detachPanel()
 {
-    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
+    ChatPanel *panel = qobject_cast<ChatPanel*>(m_conversationPanel->currentWidget());
     if (!panel)
         return;
 
-    if (panel->windowFlags() & Qt::Window)
+    QPoint oldPos = m_conversationPanel->mapToGlobal(panel->pos());
+    if (m_conversationPanel->count() == 1)
     {
-        m_conversationPanel->addWidget(panel);
-        m_conversationPanel->show();
-        if (m_conversationPanel->count() == 1)
-            resizeContacts();
-    } else {
-        QPoint oldPos = m_conversationPanel->mapToGlobal(panel->pos());
-        if (m_conversationPanel->count() == 1)
-        {
-            m_conversationPanel->hide();
-            QTimer::singleShot(100, this, SLOT(resizeContacts()));
-        }
-        m_conversationPanel->removeWidget(panel);
-        panel->setParent(0, Qt::Window);
-        panel->move(oldPos);
-        panel->show();
+        m_conversationPanel->hide();
+        QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
+    m_conversationPanel->removeWidget(panel);
+    panel->setParent(0, Qt::Window);
+    panel->move(oldPos);
+    panel->show();
 }
 
 /** Hide a panel.

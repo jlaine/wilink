@@ -44,7 +44,6 @@ protected:
     QLayout *headerLayout();
 
 signals:
-    void detachPanel();
     void hidePanel();
     void notifyPanel();
     void registerPanel();
