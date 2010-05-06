@@ -24,17 +24,29 @@
 
 #include "application.h"
 
-@interface AppController : NSObject 
+@interface AppController : NSObject <NSApplicationDelegate>
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag;
+- (NSApplicationTerminateReply)applicationShouldTerminate: (NSApplication *)sender;
 @end
 
 @implementation AppController
+
+/** Catch clicks on the dock icon and show chat windows.
+ */
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag
 {
     if (qApp)
         QTimer::singleShot(0, qApp, SLOT(showChats()));
     return NO;
 }
+
+/** Make sure we don't prevent logout.
+ */
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+{
+    return NSTerminateNow;
+}
+
 @end
 
 void Application::alert(QWidget *widget)
