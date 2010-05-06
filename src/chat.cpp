@@ -21,22 +21,16 @@
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopWidget>
-#include <QInputDialog>
-#include <QLabel>
 #include <QLayout>
-#include <QLineEdit>
 #include <QList>
 #include <QMenuBar>
-#include <QMessageBox>
 #include <QPluginLoader>
-#include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
 #include <QTimer>
-#include <QUrl>
 
 #include "idle/idle.h"
 
@@ -47,7 +41,6 @@
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppUtils.h"
-#include "qxmpp/QXmppVersionIq.h"
 
 #include "qnetio/dns.h"
 
