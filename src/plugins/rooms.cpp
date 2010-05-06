@@ -28,6 +28,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStatusBar>
 #include <QTableWidget>
@@ -147,26 +148,39 @@ void ChatRoomWatcher::kickUser()
     chat->client()->sendPacket(iq);
 }
 
+void ChatRoomWatcher::messageHandled(QAbstractButton*)
+{
+    QMessageBox *box = qobject_cast<QMessageBox*>(sender());
+    if (box)
+        joinRoom(box->objectName());
+}
+
 void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
 {
-    const QString bareJid = jidToBareJid(msg.from());
+    if (msg.type() != QXmppMessage::Normal)
+        return;
 
-    if (msg.type() == QXmppMessage::Normal)
+    // process room invitations
+    const QString bareJid = jidToBareJid(msg.from());
+    foreach (const QXmppElement &extension, msg.extensions())
     {
-        foreach (const QXmppElement &extension, msg.extensions())
+        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
         {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
+            const QString contactName = chat->rosterModel()->contactName(bareJid);
+            const QString roomJid = extension.attribute("jid");
+            if (!roomJid.isEmpty() && !chat->panel(roomJid))
             {
-                const QString contactName = chat->rosterModel()->contactName(bareJid);
-                const QString roomJid = extension.attribute("jid");
-                if (!roomJid.isEmpty() && !chat->panel(roomJid))
-                {
-                    ChatRoomInvitePrompt *dlg = new ChatRoomInvitePrompt(contactName, roomJid, chat);
-                    connect(dlg, SIGNAL(roomSelected(QString)), this, SLOT(joinRoom(QString)));
-                    dlg->show();
-                }
-                break;
+                QMessageBox *box = new QMessageBox(QMessageBox::Question,
+                    tr("Invitation from %1").arg(bareJid),
+                    tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
+                    QMessageBox::Yes | QMessageBox::No,
+                    chat);
+                box->setObjectName(roomJid);
+                box->setDefaultButton(QMessageBox::Yes);
+                box->setEscapeButton(QMessageBox::No);
+                box->open(this, SLOT(messageHandled(QAbstractButton*)));
             }
+            break;
         }
     }
 }
@@ -573,26 +587,6 @@ void ChatRoomPrompt::validate()
     else
         lineEdit->setText(jid.toLower());
     accept();
-}
-
-ChatRoomInvitePrompt::ChatRoomInvitePrompt(const QString &contactName, const QString &roomJid, QWidget *parent)
-    : QMessageBox(parent), m_jid(roomJid)
-{
-    setText(tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid));
-    setWindowModality(Qt::NonModal);
-    setWindowTitle(tr("Invitation from %1").arg(contactName));
-
-    setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    setDefaultButton(QMessageBox::Yes);
-    setEscapeButton(QMessageBox::No);
-
-    connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
-}
-
-void ChatRoomInvitePrompt::slotButtonClicked(QAbstractButton *button)
-{
-    if (standardButton(button) == QMessageBox::Yes)
-        emit roomSelected(m_jid);
 }
 
 ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)

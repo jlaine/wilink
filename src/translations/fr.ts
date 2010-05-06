@@ -128,21 +128,6 @@
     </message>
 </context>
 <context>
-    <name>ChatRoomInvitePrompt</name>
-    <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-    <message>
-        <source>%1 has asked to add you to join the &apos;%2&apos; chat room.
-
-Do you accept?</source>
-        <translation>%1 vous invite au salon de discussion &apos;%2&apos;.
-
-Acceptez-vous?</translation>
-    </message>
-</context>
-<context>
     <name>ChatRoomMembers</name>
     <message>
         <source>User</source>
@@ -213,6 +198,26 @@ Acceptez-vous?</translation>
     <message>
         <source>Kick user</source>
         <translation>Ejecter l&apos;utilisateur</translation>
+    </message>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
+    </message>
+    <message>
+        <source>%1 has asked to add you to join the &apos;%2&apos; chat room.
+
+Do you accept?</source>
+        <translation>%1 vous invite au salon de discussion &apos;%2&apos;.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>%1 has asked to add you to his or her contact list.
+
+Do you accept?</source>
+        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
+
+Acceptez-vous?</translation>
     </message>
 </context>
 <context>

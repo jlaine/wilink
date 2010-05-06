@@ -21,7 +21,6 @@
 #define __WILINK_ROOMS_H__
 
 #include <QDialog>
-#include <QMessageBox>
 
 #include "chat_conversation.h"
 
@@ -31,6 +30,7 @@ class ChatRosterModel;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
+class QAbstractButton;
 class QMenu;
 class QModelIndex;
 class QPushButton;
@@ -54,6 +54,7 @@ private slots:
     void inviteContact();
     ChatRoom *joinRoom(const QString &jid);
     void kickUser();
+    void messageHandled(QAbstractButton *button);
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &roomServer);
@@ -119,23 +120,6 @@ private:
     QTableWidget *tableWidget;
     QMap<QString, QString> initialMembers;
     QMap<QString, QString> affiliations;
-};
-
-class ChatRoomInvitePrompt : public QMessageBox
-{
-    Q_OBJECT
-
-public:
-    ChatRoomInvitePrompt(const QString &contactName, const QString &jid, QWidget *parent = 0);
-
-signals:
-    void roomSelected(const QString &jid);
-
-private slots:
-    void slotButtonClicked(QAbstractButton *button);
-
-private:
-    QString m_jid;
 };
 
 class ChatRoomPrompt : public QDialog

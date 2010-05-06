@@ -96,7 +96,7 @@ void ContactsWatcher::presenceHandled(QAbstractButton *button)
     if (!box)
         return;
     
-    QString jid = sender()->objectName();
+    QString jid = box->objectName();
     ChatClient *client = chat->client();
             
     QXmppPresence packet;
@@ -152,7 +152,7 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
             tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(jid),
             QMessageBox::Yes | QMessageBox::No,
             chat);
-        box->setObjectName(jid);            
+        box->setObjectName(jid);
         box->setDefaultButton(QMessageBox::Yes);
         box->setEscapeButton(QMessageBox::No);
         box->open(this, SLOT(presenceHandled(QAbstractButton*)));
