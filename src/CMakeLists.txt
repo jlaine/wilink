@@ -133,9 +133,6 @@ endif(WIN32)
 install(TARGETS wiLink DESTINATION bin)
 
 # tests
-add_executable(hasher hasher.cpp)
-target_link_libraries(hasher ${QT_LIBRARIES})
-
 set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 add_executable(tests systeminfo.cpp tests.cpp updates.cpp utils.cpp ${tests_MOC_SOURCES})
