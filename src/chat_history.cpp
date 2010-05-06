@@ -463,15 +463,9 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
 
 void ChatHistory::selectAll()
 {
-    QList<ChatMessageWidget*> selection;
-    for (int i = 0; i < layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        if (!lastSelection.contains(child))
-            child->setSelection(scene->sceneRect());
-        selection.append(child);
-    }
-    lastSelection = selection;
+    QPainterPath path;
+    path.addRect(scene->sceneRect());
+    scene->setSelectionArea(path);
 }
 
 void ChatHistory::slotLinkHoverChanged(const QString &link)
