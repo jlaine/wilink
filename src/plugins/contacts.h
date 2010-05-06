@@ -30,21 +30,6 @@ class QModelIndex;
 class QPushButton;
 class QXmppPresence;
 
-class ChatRosterPrompt : public QMessageBox
-{
-    Q_OBJECT
-
-public:
-    ChatRosterPrompt(ChatClient *client, const QString &jid, QWidget *parent = 0);
-
-private slots:
-    void slotButtonClicked(QAbstractButton *button);
-
-private:
-    ChatClient *m_client;
-    QString m_jid;
-};
-
 class ContactsWatcher : public QObject
 {
     Q_OBJECT
@@ -56,6 +41,7 @@ private slots:
     void addContact();
     void connected();
     void disconnected();
+    void presenceHandled(QAbstractButton*);
     void presenceReceived(const QXmppPresence &presence);
     void removeContact();
     void renameContact();

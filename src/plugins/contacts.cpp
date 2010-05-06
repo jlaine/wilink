@@ -35,39 +35,6 @@
 
 #include "contacts.h"
 
-ChatRosterPrompt::ChatRosterPrompt(ChatClient *client, const QString &jid, QWidget *parent)
-    : QMessageBox(parent), m_client(client), m_jid(jid)
-{
-    setText(tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(jid));
-    setWindowModality(Qt::NonModal);
-    setWindowTitle(tr("Invitation from %1").arg(jid));
-
-    setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    setDefaultButton(QMessageBox::Yes);
-    setEscapeButton(QMessageBox::No);
-
-    connect(this, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(slotButtonClicked(QAbstractButton*)));
-}
-
-void ChatRosterPrompt::slotButtonClicked(QAbstractButton *button)
-{
-    QXmppPresence packet;
-    packet.setTo(m_jid);
-    if (standardButton(button) == QMessageBox::Yes)
-    {
-        qDebug("Subscribe accepted");
-        packet.setType(QXmppPresence::Subscribed);
-        m_client->sendPacket(packet);
-
-        packet.setType(QXmppPresence::Subscribe);
-        m_client->sendPacket(packet);
-    } else {
-        qDebug("Subscribe refused");
-        packet.setType(QXmppPresence::Unsubscribed);
-        m_client->sendPacket(packet);
-    }
-}
-
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
@@ -120,8 +87,38 @@ void ContactsWatcher::disconnected()
     addButton->setEnabled(false);
 }
 
-/** When a subscription request is received, prompt the user
- *  to accept or refuse it.
+/** When the user has decided whether or not to accept a subscription request,
+ *  update the roster accordingly.
+ */
+void ContactsWatcher::presenceHandled(QAbstractButton *button)
+{
+    QMessageBox *box = qobject_cast<QMessageBox*>(sender());
+    if (!box)
+        return;
+    
+    QString jid = sender()->objectName();
+    ChatClient *client = chat->client();
+            
+    QXmppPresence packet;
+    packet.setTo(jid);
+    if (box->standardButton(button) == QMessageBox::Yes)
+    {
+        qDebug("Subscribe accepted");
+        packet.setType(QXmppPresence::Subscribed);
+        client->sendPacket(packet);
+
+        // FIXME : no need to subscribe if already in our roster
+        packet.setType(QXmppPresence::Subscribe);
+        client->sendPacket(packet);
+    } else {
+        qDebug("Subscribe refused");
+        packet.setType(QXmppPresence::Unsubscribed);
+        client->sendPacket(packet);
+    }
+    box->deleteLater();
+}
+
+/** Prompt the user to accept or refuse a subscription request.
  */
 void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
 {
@@ -130,7 +127,8 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
     if (presence.getType() == QXmppPresence::Subscribe)
     {
         ChatClient *client = chat->client();
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(presence.from());
+        const QString jid = presence.from();
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
         QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
 
         /* if the contact is in our roster accept subscribe */
@@ -138,7 +136,7 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         {
             qDebug("Subscribe accepted");
             QXmppPresence packet;
-            packet.setTo(presence.from());
+            packet.setTo(jid);
             packet.setType(QXmppPresence::Subscribed);
             client->sendPacket(packet);
 
@@ -148,8 +146,19 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         }
 
         /* otherwise ask user */
-        ChatRosterPrompt *dlg = new ChatRosterPrompt(client, presence.from(), chat);
+        QMessageBox *box = new QMessageBox(QMessageBox::Question,
+            tr("Invitation from %1").arg(jid),
+            tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(jid),
+            QMessageBox::Yes | QMessageBox::No,
+            chat);
+        box->setObjectName(jid);            
+        box->setDefaultButton(QMessageBox::Yes);
+        box->setEscapeButton(QMessageBox::No);
+        box->open(this, SLOT(presenceHandled(QAbstractButton*)));
+        #if 0
+        ChatRosterPrompt *dlg = new ChatRosterPrompt(client, jid, chat);
         dlg->show();
+        #endif
     }
 }
 

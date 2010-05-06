@@ -216,21 +216,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatRosterPrompt</name>
-    <message>
-        <source>%1 has asked to add you to his or her contact list.
-
-Do you accept?</source>
-        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-</context>
-<context>
     <name>ChatShares</name>
     <message>
         <source>Enter the name of the file you are looking for.</source>
@@ -422,6 +407,18 @@ Acceptez-vous?</translation>
     <message>
         <source>Do you want to remove %1 from your contact list?</source>
         <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
+    </message>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
+    </message>
+    <message>
+        <source>%1 has asked to add you to his or her contact list.
+
+Do you accept?</source>
+        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
+
+Acceptez-vous?</translation>
     </message>
 </context>
 <context>
