@@ -120,6 +120,9 @@ void ContactsWatcher::disconnected()
     addButton->setEnabled(false);
 }
 
+/** When a subscription request is received, prompt the user
+ *  to accept or refuse it.
+ */
 void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
 {
     const QString bareJid = jidToBareJid(presence.from());
@@ -149,7 +152,6 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         dlg->show();
     }
 }
-
 
 /** Prompt the user for confirmation then remove a contact.
  */
@@ -225,6 +227,8 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     }
 }
 
+/** Show a contact's web page.
+ */
 void ContactsWatcher::showContactPage()
 {
     QAction *action = qobject_cast<QAction*>(sender());

@@ -236,8 +236,6 @@ void Chat::hidePanel()
 void Chat::notifyPanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (m_conversationPanel->indexOf(panel) < 0)
-        return;
 
     // add pending message
     if (!isActiveWindow() || m_conversationPanel->currentWidget() != panel)
@@ -360,6 +358,8 @@ void Chat::error(QXmppClient::Error error)
     }
 }
 
+/** Handle a chat message.
+ */
 void Chat::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = jidToBareJid(msg.from());
