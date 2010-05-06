@@ -213,7 +213,10 @@ void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
     if (m_conversationPanel->indexOf(panel) < 0)
+    {
+        panel->hide();
         return;
+    }
 
     // close view
     if (m_conversationPanel->count() == 1)
