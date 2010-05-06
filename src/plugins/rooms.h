@@ -26,6 +26,7 @@
 #include "chat_conversation.h"
 
 class Chat;
+class ChatRoom;
 class ChatRosterModel;
 class QLineEdit;
 class QListWidget;
@@ -51,7 +52,7 @@ public:
 private slots:
     void disconnected();
     void inviteContact();
-    void joinRoom(const QString &jid);
+    ChatRoom *joinRoom(const QString &jid);
     void kickUser();
     void messageReceived(const QXmppMessage &msg);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
@@ -74,6 +75,7 @@ class ChatRoom : public ChatConversation
 public:
     ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     ChatRosterItem::Type objectType() const;
+    void invite(const QString &jid);
 
 protected:
     virtual void sendMessage(const QString &text);
@@ -85,6 +87,7 @@ private slots:
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
+    void urlsDropped(const QList<QUrl> &urls);
 
 private:
     QString chatLocalJid;

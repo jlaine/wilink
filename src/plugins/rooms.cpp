@@ -32,6 +32,7 @@
 #include <QStatusBar>
 #include <QTableWidget>
 #include <QTimer>
+#include <QUrl>
 
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppConstants.h"
@@ -90,37 +91,27 @@ void ChatRoomWatcher::inviteContact()
         return;
     QString jid = action->data().toString();
 
+    // prompt the user for chat room
     ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
     if (!prompt.exec())
         return;
 
-    // join chat room
+    // join chat room and invite contact
     const QString roomJid = prompt.textValue();
-    joinRoom(jid);
-
-    // invite contact
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_conference);
-    x.setAttribute("jid", roomJid);
-    x.setAttribute("reason", "Let's talk");
-
-    QXmppMessage message;
-    message.setTo(jid);
-    message.setType(QXmppMessage::Normal);
-    message.setExtensions(x);
-    chat->client()->sendPacket(message);
+    ChatRoom *room = joinRoom(roomJid);
+    room->invite(jid);
 }
 
-void ChatRoomWatcher::joinRoom(const QString &jid)
+ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
 {
-    ChatPanel *room = chat->panel(jid);
+    ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
     if (!room)
     {
         room = new ChatRoom(chat->client(), chat->rosterModel(), jid);
         chat->addPanel(room);
     }
     QTimer::singleShot(0, room, SIGNAL(showPanel()));
+    return room;
 }
 
 /** Kick a user from a chat room.
@@ -288,7 +279,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
 
     // accept drops
     chatHistory->setAcceptDrops(true);
-
+    connect(chatHistory, SIGNAL(urlsDropped(QList<QUrl>)), this, SLOT(urlsDropped(QList<QUrl>)));
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -315,6 +306,23 @@ void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     // notify user of received messages if the room is not publicly listed
     if (disco.features().contains("muc_hidden"))
         notifyMessages = true;
+}
+
+/** Invite a user to the chat room.
+ */
+void ChatRoom::invite(const QString &jid)
+{
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_conference);
+    x.setAttribute("jid", chatRemoteJid);
+    x.setAttribute("reason", "Let's talk");
+
+    QXmppMessage message;
+    message.setTo(jid);
+    message.setType(QXmppMessage::Normal);
+    message.setExtensions(x);
+    client->sendPacket(message);
 }
 
 /** Send a request to join a multi-user chat.
@@ -458,6 +466,16 @@ void ChatRoom::sendMessage(const QString &text)
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
     client->sendPacket(msg);
+}
+
+void ChatRoom::urlsDropped(const QList<QUrl> &urls)
+{
+    foreach (const QUrl &url, urls)
+    {
+        QString jid = url.toString();
+        qDebug() << "Inviting" << jid;
+        invite(jid);
+    }
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)
