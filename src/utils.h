@@ -22,6 +22,7 @@
 
 #include <QString>
 
+bool jidIsValid(const QString &jid);
 QString indentXml(const QString &xml);
 QString sizeToString(qint64 size);
 

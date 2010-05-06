@@ -26,6 +26,12 @@
 #define MEGABYTE 1000000
 #define GIGABYTE 1000000000
 
+bool jidIsValid(const QString &jid)
+{
+    QRegExp jidValidator("[^@]+@[^@]+");
+    return jidValidator.exactMatch(jid);
+}
+
 QString indentXml(const QString &xml)
 {
     QRegExp expression("<([^>]+)>");

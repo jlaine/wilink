@@ -31,6 +31,7 @@
 #include "chat_client.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
+#include "utils.h"
 
 #include "contacts.h"
 
@@ -93,7 +94,7 @@ void ContactsWatcher::addContact()
 {
     bool ok = true;
     QString jid = "@" + chat->client()->getConfiguration().domain();
-    while (!jidValidator.exactMatch(jid))
+    while (!jidIsValid(jid))
     {
         jid = QInputDialog::getText(chat, tr("Add a contact"),
             tr("Enter the address of the contact you want to add."),

@@ -26,8 +26,6 @@
 #include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppRoster.h"
 
-extern QRegExp jidValidator;
-
 class ChatClient;
 class ChatPanel;
 class ChatRosterModel;
@@ -58,6 +56,9 @@ public:
     ChatPanel *panel(const QString &objectName);
 
 signals:
+    /** Plugins should connect to this signal to add entries
+     *  to the context menu for a roster entry.
+     */
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private slots:

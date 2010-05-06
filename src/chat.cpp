@@ -52,12 +52,11 @@
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 #include "systeminfo.h"
+#include "utils.h"
 
 #define AWAY_TIME 300 // set away after 50s
 
 using namespace QNetIO;
-
-QRegExp jidValidator("[^@]+@[^@]+");
 
 enum StatusIndexes {
     AvailableIndex = 0,
@@ -186,7 +185,6 @@ void Chat::destroyPanel(QObject *obj)
 {
     m_chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
-
 
 /** Toggle a panel between attached / detached mode.
  */
@@ -399,7 +397,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setResource(qApp->applicationName());
 
     /* get user and domain */
-    if (!jidValidator.exactMatch(jid))
+    if (!jidIsValid(jid))
     {
         qWarning("Cannot connect to chat server using invalid JID");
         return false;
