@@ -84,7 +84,7 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     addButton->setIcon(QIcon(":/add.png"));
     addButton->setToolTip(tr("Add a contact"));
     connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
-    chat->statusBar()->addWidget(addButton);
+    chat->statusBar()->insertWidget(0, addButton);
 }
 
 /** Prompt the user for a new contact then add it to the roster.
