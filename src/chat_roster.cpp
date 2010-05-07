@@ -276,8 +276,6 @@ Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     if (item->type() == ChatRosterItem::Contact)
         return Qt::ItemIsDragEnabled | defaultFlags;
-    else if (item->type() == ChatRosterItem::Room)
-        return Qt::ItemIsDropEnabled | defaultFlags;
     else
         return defaultFlags;
 }
@@ -591,6 +589,11 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         menu->popup(event->globalPos());
     else
         delete menu;
+}
+
+void ChatRosterView::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
 }
 
 void ChatRosterView::dragMoveEvent(QDragMoveEvent *event)

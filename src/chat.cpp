@@ -397,7 +397,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setResource(qApp->applicationName());
 
     /* get user and domain */
-    if (!jidIsValid(jid))
+    if (!isBareJid(jid))
     {
         qWarning("Cannot connect to chat server using invalid JID");
         return false;

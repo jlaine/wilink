@@ -6,6 +6,7 @@ wiLink 0.9.0 (UNRELEASED)
  * Notify user when a message is received in a private chatroom.
  * Make it possible to copy only part of a message.
  * Make it possible to invite contacts to a chat room using drag & drop.
+ * Make it possible to send a file to a contact using drag & drop.
 
 wiLink 0.8.0 (2010-05-03)
  * Rename wDesktop to wiLink.

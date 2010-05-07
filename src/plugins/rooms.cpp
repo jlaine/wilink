@@ -48,6 +48,7 @@
 #include "chat_history.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
+#include "utils.h"
 
 #include "rooms.h"
 
@@ -265,13 +266,22 @@ void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
         return;
 
     const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
-    if (event->type() == QEvent::Drop)
+    int found = 0;
+    foreach (const QUrl &url, event->mimeData()->urls())
     {
-        ChatRoom *room = joinRoom(roomJid);
-        foreach (const QUrl &url, event->mimeData()->urls())
-            room->invite(url.toString());
+        const QString jid = url.toString();
+        if (!isBareJid(jid))
+            continue;
+        if (event->type() == QEvent::Drop)
+        {
+            ChatRoom *room = joinRoom(roomJid);
+            foreach (const QUrl &url, event->mimeData()->urls())
+                room->invite(jid);
+        }
+        found++;
     }
-    event->acceptProposedAction();
+    if (found)
+        event->acceptProposedAction();
 }
 
 /** Add entries to a roster entry's context menu.

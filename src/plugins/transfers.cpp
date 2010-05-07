@@ -19,6 +19,7 @@
 
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QDropEvent>
 #include <QDir>
 #include <QFileDialog>
 #include <QHeaderView>
@@ -362,6 +363,32 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
+/** Handle file drag & drop on roster entries.
+ */
+void ChatTransfers::rosterDrop(QDropEvent *event, const QModelIndex &index)
+{
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    if (type != ChatRosterItem::Contact || !event->mimeData()->hasUrls())
+        return;
+
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+    if (fullJids.isEmpty())
+        return;
+
+    int found = 0;
+    foreach (const QUrl &url, event->mimeData()->urls())
+    {
+        if (url.scheme() != "file")
+            continue;
+        if (event->type() == QEvent::Drop)
+            sendFile(fullJids.first(), url.toLocalFile());
+        found++;
+    }
+    if (found)
+        event->acceptProposedAction();
+}
+
 void ChatTransfers::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
     int type = index.data(ChatRosterModel::TypeRole).toInt();
@@ -455,9 +482,13 @@ bool TransfersPlugin::initialize(Chat *chat)
     /* register panel */
     ChatTransfers *transfers = new ChatTransfers(chat->client(), chat->rosterModel());
     transfers->setObjectName("transfers");
+    chat->addPanel(transfers);
+
+    /* add roster hooks */
+    connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
+            transfers, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
             transfers, SLOT(rosterMenu(QMenu*, QModelIndex)));
-    chat->addPanel(transfers);
 
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), chat);

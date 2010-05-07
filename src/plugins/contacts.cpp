@@ -61,7 +61,7 @@ void ContactsWatcher::addContact()
 {
     bool ok = true;
     QString jid = "@" + chat->client()->getConfiguration().domain();
-    while (!jidIsValid(jid))
+    while (!isBareJid(jid))
     {
         jid = QInputDialog::getText(chat, tr("Add a contact"),
             tr("Enter the address of the contact you want to add."),
