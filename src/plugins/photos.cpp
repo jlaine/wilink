@@ -242,8 +242,10 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
+    layout->setSpacing(0);
     layout->addItem(headerLayout());
     layout->addWidget(helpLabel);
+    layout->addSpacing(10);
     layout->addWidget(photosView);
     QHBoxLayout *hbox_upload = new QHBoxLayout;
     hbox_upload->addWidget(stopButton);

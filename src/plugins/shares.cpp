@@ -101,10 +101,12 @@ ChatShares::ChatShares(ChatClient *xmppClient, Chat *chat, QWidget *parent)
 
     layout->addItem(headerLayout());
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
+    layout->addSpacing(10);
     lineEdit = new QLineEdit;
     connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
     connect(lineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(queryStringChanged()));
     layout->addWidget(lineEdit);
+    layout->addSpacing(10);
 
     // MAIN
 

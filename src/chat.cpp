@@ -201,6 +201,7 @@ void Chat::detachPanel()
         return;
 
     QPoint oldPos = m_conversationPanel->mapToGlobal(panel->pos());
+    oldPos.setY(oldPos.y() - 20);
     if (m_conversationPanel->count() == 1)
     {
         m_conversationPanel->hide();
