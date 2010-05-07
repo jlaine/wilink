@@ -44,6 +44,7 @@ protected:
     QLayout *headerLayout();
 
 signals:
+    void dropPanel(QDropEvent *event);
     void hidePanel();
     void notifyPanel();
     void registerPanel();

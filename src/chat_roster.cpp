@@ -119,11 +119,6 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     return jids;
 }
 
-ChatRosterItem *ChatRosterModel::contactItem(const QString &bareJid) const
-{
-    return rootItem->find(bareJid);
-}
-
 QString ChatRosterModel::contactName(const QString &bareJid) const
 {
     ChatRosterItem *item = rootItem->find(bareJid);
@@ -265,6 +260,15 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             features |= ChatStatesFeature;
     }
     clientFeatures.insert(disco.from(), features);
+}
+
+QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
+{
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (item)
+        return createIndex(item->row(), 0, item);
+    else
+        return QModelIndex();
 }
 
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const

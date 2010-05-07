@@ -174,6 +174,7 @@ void Chat::addPanel(ChatPanel *panel)
     if (m_chatPanels.contains(panel))
         return;
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
+    connect(panel, SIGNAL(dropPanel(QDropEvent*)), this, SLOT(dropPanel(QDropEvent*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
@@ -209,6 +210,17 @@ void Chat::detachPanel()
     panel->setParent(0, Qt::Window);
     panel->move(oldPos);
     panel->show();
+}
+
+void Chat::dropPanel(QDropEvent *event)
+{
+    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
+    if (!panel)
+        return;
+
+    QModelIndex index = m_rosterModel->findItem(panel->objectName());
+    if (index.isValid())
+        emit rosterDrop(event, index);
 }
 
 /** Hide a panel.

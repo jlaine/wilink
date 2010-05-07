@@ -79,6 +79,7 @@ private slots:
 
     void detachPanel();
     void destroyPanel(QObject *obj);
+    void dropPanel(QDropEvent *event);
     void hidePanel();
     void notifyPanel();
     void registerPanel();
