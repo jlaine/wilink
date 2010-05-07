@@ -300,6 +300,15 @@ void Chat::showPanel()
         panel->windowTitle(),
         panel->windowIcon());
 
+    // if the panel is detached, stop here
+    if (panel->isVisible() && !panel->parent())
+    {
+        panel->raise();
+        panel->activateWindow();
+        panel->setFocus();
+        return;
+    }
+
     // add panel
     if (m_conversationPanel->indexOf(panel) < 0)
     {
