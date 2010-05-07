@@ -44,6 +44,7 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     chatHistory = new ChatHistory;
     connect(chatHistory, SIGNAL(focused()), this, SLOT(slotFocused()));
     layout->addWidget(chatHistory);
+    filterDrops(chatHistory->viewport());
 
     /* text edit */
     chatInput = new ChatEdit(80);

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDropEvent>
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
@@ -83,5 +84,33 @@ QLayout* ChatPanel::headerLayout()
     hbox->addWidget(iconLabel);
     hbox->addWidget(closeButton);
     return hbox;
+}
+
+bool ChatPanel::eventFilter(QObject *obj, QEvent *e)
+{
+    if (e->type() == QEvent::DragEnter)
+    {
+        QDragEnterEvent *event = static_cast<QDragEnterEvent*>(e);
+        event->acceptProposedAction();
+        return true;
+    }
+    else if (e->type() == QEvent::DragLeave)
+    {
+        return true;
+    }
+    else if (e->type() == QEvent::DragMove || e->type() == QEvent::Drop)
+    {
+        QDropEvent *event = static_cast<QDropEvent*>(e);
+        event->ignore();
+        emit dropPanel(event);
+        return true;
+    }
+    return false;
+}
+
+void ChatPanel::filterDrops(QWidget *widget)
+{
+    widget->setAcceptDrops(true);
+    widget->installEventFilter(this);
 }
 

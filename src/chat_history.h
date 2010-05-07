@@ -106,7 +106,6 @@ public slots:
     void selectAll();
 
 signals:
-    void urlsDropped(const QList<QUrl> &urls);
     void focused();
 
 protected slots:
@@ -118,10 +117,6 @@ protected:
     qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
     QString copyText();
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
     void focusInEvent(QFocusEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);

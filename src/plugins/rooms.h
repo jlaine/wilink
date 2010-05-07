@@ -90,7 +90,6 @@ private slots:
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
-    void urlsDropped(const QList<QUrl> &urls);
 
 private:
     QString chatLocalJid;

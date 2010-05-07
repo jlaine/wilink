@@ -335,7 +335,6 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
 
     // accept drops
     chatHistory->setAcceptDrops(true);
-    connect(chatHistory, SIGNAL(urlsDropped(QList<QUrl>)), this, SLOT(urlsDropped(QList<QUrl>)));
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -524,12 +523,6 @@ void ChatRoom::sendMessage(const QString &text)
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
     client->sendPacket(msg);
-}
-
-void ChatRoom::urlsDropped(const QList<QUrl> &urls)
-{
-    foreach (const QUrl &url, urls)
-        invite(url.toString());
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)

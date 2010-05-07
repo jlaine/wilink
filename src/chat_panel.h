@@ -41,6 +41,8 @@ public:
     void setWindowTitle(const QString &title);
 
 protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void filterDrops(QWidget *widget);
     QLayout *headerLayout();
 
 signals:
