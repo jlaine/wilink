@@ -429,10 +429,6 @@ void ChatHistory::dragEnterEvent(QDragEnterEvent *event)
         event->acceptProposedAction();
 }
 
-void ChatHistory::dragLeaveEvent(QDragLeaveEvent *event)
-{
-}
-
 void ChatHistory::dragMoveEvent(QDragMoveEvent *event)
 {
     if (event->mimeData()->hasUrls())
