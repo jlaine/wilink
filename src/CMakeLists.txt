@@ -27,6 +27,7 @@ set(wiLink_SOURCES
     chat_panel.cpp
     chat_roster.cpp
     chat_roster_item.cpp
+    chat_tip.cpp
     main.cpp
     systeminfo.cpp
     updates.cpp
@@ -57,6 +58,7 @@ set(wiLink_MOC_HEADERS
     chat_panel.h
     chat_plugin.h
     chat_roster.h
+    chat_tip.h
     updates.h
     updatesdialog.h
     plugins/console.h
