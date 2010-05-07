@@ -151,6 +151,8 @@ private:
     QPushButton *removeButton;
     QStatusBar *statusBar;
     QTimer *registerTimer;
+
+    QAction *menuAction;
 };
 
 class ChatSharesTab : public QWidget

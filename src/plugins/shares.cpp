@@ -80,7 +80,8 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
 }
 
 ChatShares::ChatShares(ChatClient *xmppClient, Chat *chat, QWidget *parent)
-    : ChatPanel(parent), baseClient(xmppClient), chatWindow(chat), client(0), db(0), rosterModel(0)
+    : ChatPanel(parent), baseClient(xmppClient), chatWindow(chat), client(0), db(0), rosterModel(0),
+    menuAction(0)
 {
     db = ChatSharesDatabase::instance();
 
@@ -619,8 +620,12 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             client->getTransferManager().setProxyOnly(true);
         }
 
-        QAction *action = chatWindow->optionsMenu()->addAction(tr("Shares folder"));
-        connect(action, SIGNAL(triggered(bool)), this, SLOT(shareFolder()));
+        // add entries to options menu
+        if (!menuAction)
+        {
+            menuAction = chatWindow->optionsMenu()->addAction(tr("Shares folder"));
+            connect(menuAction, SIGNAL(triggered(bool)), this, SLOT(shareFolder()));
+        }
 
         emit registerPanel();
     }
