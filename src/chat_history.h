@@ -119,6 +119,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
     QString copyText();
     void dragEnterEvent(QDragEnterEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
     void focusInEvent(QFocusEvent *e);

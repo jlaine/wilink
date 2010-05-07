@@ -429,6 +429,11 @@ void ChatHistory::dragEnterEvent(QDragEnterEvent *event)
         event->acceptProposedAction();
 }
 
+void ChatHistory::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    // purposefully empty to avoid calling parent implementation
+}
+
 void ChatHistory::dragMoveEvent(QDragMoveEvent *event)
 {
     if (event->mimeData()->hasUrls())
