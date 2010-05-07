@@ -333,8 +333,6 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
-    // accept drops
-    chatHistory->setAcceptDrops(true);
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
