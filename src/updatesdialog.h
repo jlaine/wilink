@@ -27,7 +27,6 @@
 class QLabel;
 class QProgressBar;
 class QUrl;
-class QTimer;
 
 class UpdatesDialog : public QDialog
 {
@@ -50,7 +49,6 @@ private:
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;
-    QTimer *updatesTimer;
 };
 
 #endif

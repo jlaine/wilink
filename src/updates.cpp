@@ -29,6 +29,7 @@
 #include <QNetworkRequest>
 #include <QStringList>
 #include <QUrl>
+#include <QTimer>
 
 #include "qnetio/wallet.h"
 
@@ -40,6 +41,13 @@ Updates::Updates(QObject *parent)
 {
     network = new QNetworkAccessManager(this);
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+
+    /* schedule updates */
+    timer = new QTimer(this);
+    timer->setInterval(500);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(check()));
+    timer->start();
 }
 
 void Updates::check()
@@ -146,6 +154,9 @@ void Updates::processStatus()
 
     if (reply->error() != QNetworkReply::NoError)
     {
+        /* retry in 5mn */
+        timer->setInterval(300 * 1000);
+        timer->start();
         emit checkFailed(DownloadFailed, reply->errorString());
         return;
     }
@@ -176,6 +187,10 @@ void Updates::processStatus()
     if (compareVersions(release.version, qApp->applicationVersion()) > 0 &&
         release.url.scheme() == "https" && release.hashes.contains("sha1"))
         emit updateAvailable(release);
+
+    /* check again in one week */
+    timer->setInterval(7 * 24 * 3600 * 1000);
+    timer->start();
 }
 
 QUrl Updates::url() const

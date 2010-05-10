@@ -26,6 +26,7 @@
 
 class QNetworkAccessManager;
 class QNetworkReply;
+class QTimer;
 
 class Release
 {
@@ -76,6 +77,7 @@ signals:
 
 private:
     QNetworkAccessManager *network;
+    QTimer *timer;
     QFile downloadFile;
     Release downloadRelease;
     QUrl updatesUrl;

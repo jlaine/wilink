@@ -58,13 +58,6 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
     updates->setUrl(QUrl("https://download.wifirst.net/wiLink/"));
-
-    /* check for updates */
-    updatesTimer = new QTimer(this);
-    updatesTimer->setInterval(7 * 24 * 3600 * 1000);
-    connect(updatesTimer, SIGNAL(timeout()), updates, SLOT(check()));
-    updatesTimer->start();
-    QTimer::singleShot(500, updates, SLOT(check()));
 }
 
 void UpdatesDialog::checkFailed(Updates::UpdatesError error, const QString &errorString)
