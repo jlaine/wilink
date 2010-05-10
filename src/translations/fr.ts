@@ -126,6 +126,10 @@
 
 %2</translation>
     </message>
+    <message>
+        <source>To invite a contact to this chat room, drag and drop it onto the chat room.</source>
+        <translation>Pour inviter un contact à ce salon de discussion, faites le glisser sur le salon.</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoomMembers</name>

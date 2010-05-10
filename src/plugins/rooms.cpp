@@ -333,6 +333,15 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
+    /* help label */
+    QVBoxLayout *vbox = qobject_cast<QVBoxLayout*>(layout());
+    int index = vbox->indexOf(chatHistory);
+    vbox->insertSpacing(index++, 10);
+    QLabel *helpLabel = new QLabel(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
+    helpLabel->setWordWrap(true);
+    vbox->insertWidget(index++, helpLabel);
+    vbox->insertSpacing(index++, 10);
+
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
