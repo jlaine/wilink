@@ -396,9 +396,9 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 
 void Photos::abortUpload()
 {
-    uploadQueue.clear();
     showMessage(tr("Aborting upload.."));
-    progressBar->setMaximum(progressFiles);
+    uploadQueue.clear();
+    fs->abort();
 }
 
 /** Prompt the user for a new folder name and create it.
