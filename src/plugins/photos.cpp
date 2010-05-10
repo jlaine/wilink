@@ -112,7 +112,7 @@ void PhotosList::dropEvent(QDropEvent *event)
         info.isDir() ? info.url() : baseUrl);
 }
 
-FileInfo PhotosList::itemEntry(QListWidgetItem *item)
+FileInfo PhotosList::itemEntry(QListWidgetItem *item) const
 {
     if (!item)
         return FileInfo();
@@ -173,6 +173,14 @@ void PhotosList::setImage(const QUrl &url, const QImage &img)
             currentItem->setIcon(pixmap);
         }
     }
+}
+
+FileInfoList PhotosList::selectedEntries() const
+{
+    FileInfoList entries;
+    foreach (QListWidgetItem *item, selectedItems())
+        entries << itemEntry(item);
+    return entries;
 }
 
 void PhotosList::slotItemDoubleClicked(QListWidgetItem *item)
@@ -369,6 +377,10 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         uploadDevice = 0;
         processUploadQueue();
         break;
+    case FileSystem::Remove:
+        if (!error)
+            refresh();
+        break;
     default:
         qWarning() << fs->commandName(cmd) << "was not expected";
         break;
@@ -401,7 +413,14 @@ void Photos::createFolder()
 
 void Photos::deleteFile()
 {
+    PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
+    if (!listView)
+        return;
 
+    FileInfoList entries = listView->selectedEntries();
+    foreach (const FileInfo &entry, entries)
+        if (!entry.isDir())
+            fs->remove(entry.url());
 }
 
 void Photos::fileNext()

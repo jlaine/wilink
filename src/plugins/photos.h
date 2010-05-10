@@ -45,6 +45,7 @@ public:
     FileInfoList entries() const;
     void setEntries(const FileInfoList &entries);
     void setImage(const QUrl &url, const QImage &img);
+    FileInfoList selectedEntries() const;
     QUrl url();
 
 signals:
@@ -56,7 +57,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
-    FileInfo itemEntry(QListWidgetItem *item);
+    FileInfo itemEntry(QListWidgetItem *item) const;
 
 protected slots:
     void slotItemDoubleClicked(QListWidgetItem *item);
