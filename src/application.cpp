@@ -302,11 +302,14 @@ void Application::resetChats()
         delete chat;
     chats.clear();
 
-    /* get chat accounts */
+    /* check we have a wifirst.net account */
+    bool foundAccount = false;
     QStringList chatJids = settings->value("ChatAccounts").toStringList();
-    if (chatJids.isEmpty())
+    foreach (const QString &jid, chatJids)
+        if (jid.split("@").last() == "wifirst.net")
+            foundAccount = true;
+    if (!foundAccount)
     {
-        QString baseJid;
         QAuthenticator auth;
         QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
         chatJids += auth.user();
