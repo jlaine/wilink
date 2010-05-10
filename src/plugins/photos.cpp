@@ -238,7 +238,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     backButton->setEnabled(false);
     connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
 
-    stopButton = new QPushButton(tr("Stop"));
+    stopButton = new QPushButton(tr("Cancel"));
     stopButton->setIcon(QIcon(":/close.png"));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(abortUpload()));
     stopButton->hide();
@@ -396,7 +396,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 
 void Photos::abortUpload()
 {
-    showMessage(tr("Aborting upload.."));
+    showMessage(tr("Cancelling upload.."));
     uploadQueue.clear();
     fs->abort();
 }

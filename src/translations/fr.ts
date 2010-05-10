@@ -487,10 +487,6 @@ Acceptez-vous?</translation>
         <translation>Chargement de l&apos;image..</translation>
     </message>
     <message>
-        <source>Stop</source>
-        <translation>Arrêter</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
@@ -499,7 +495,11 @@ Acceptez-vous?</translation>
         <translation>Suppression de %1</translation>
     </message>
     <message>
-        <source>Aborting upload..</source>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Cancelling upload..</source>
         <translation>Annulation du transfert..</translation>
     </message>
 </context>
