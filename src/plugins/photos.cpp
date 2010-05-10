@@ -461,6 +461,7 @@ void Photos::fileOpened(const QUrl &url)
         return;
 
     // disable controls
+    deleteButton->hide();
     helpLabel->hide();
 
     // build playlist
@@ -553,6 +554,8 @@ void Photos::goBack()
         backButton->setEnabled(false);
         createButton->show();
         deleteButton->hide();
+    } else {
+        deleteButton->show();
     }
     helpLabel->show();
 }
