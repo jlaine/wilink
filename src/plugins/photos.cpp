@@ -287,6 +287,13 @@ Photos::Photos(const QString &url, QWidget *parent)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Backspace), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(goBack()));
+#ifdef Q_OS_MAC
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Backspace), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteFile()));
+#else
+    shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteFile()));
+#endif
 
     setFocusProxy(photosView);
     resize(QSize(600, 400).expandedTo(minimumSizeHint()));
