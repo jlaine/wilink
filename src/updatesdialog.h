@@ -36,7 +36,6 @@ public:
     UpdatesDialog(QWidget *parent = NULL);
 
 protected slots:
-    void checkFailed(Updates::UpdatesError error, const QString &errorString);
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);

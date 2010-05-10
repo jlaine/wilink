@@ -37,7 +37,7 @@
 #include "updates.h"
 
 Updates::Updates(QObject *parent)
-    : QObject(parent)
+    : QObject(parent), updatesUrl("https://download.wifirst.net/wiLink/")
 {
     network = new QNetworkAccessManager(this);
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
@@ -191,15 +191,5 @@ void Updates::processStatus()
     /* check again in one week */
     timer->setInterval(7 * 24 * 3600 * 1000);
     timer->start();
-}
-
-QUrl Updates::url() const
-{
-    return updatesUrl;
-}
-
-void Updates::setUrl(const QUrl &url)
-{
-    updatesUrl = url;
 }
 

@@ -52,17 +52,10 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* updates */
     updates = new Updates(this);
-    connect(updates, SIGNAL(checkFailed(Updates::UpdatesError, const QString&)), this, SLOT(checkFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
-    updates->setUrl(QUrl("https://download.wifirst.net/wiLink/"));
-}
-
-void UpdatesDialog::checkFailed(Updates::UpdatesError error, const QString &errorString)
-{
-    qWarning() << "Failed to check for updates" << errorString;
 }
 
 void UpdatesDialog::updateAvailable(const Release &release)
