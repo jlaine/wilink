@@ -494,6 +494,10 @@ Acceptez-vous?</translation>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
+    <message>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

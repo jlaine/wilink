@@ -239,6 +239,11 @@ Photos::Photos(const QString &url, QWidget *parent)
     createButton->setIcon(QIcon(":/add.png"));
     connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
 
+    deleteButton = new QPushButton(tr("Delete"));
+    deleteButton->setIcon(QIcon(":/remove.png"));
+    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteFile()));
+    deleteButton->hide();
+
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -255,6 +260,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     hbox->addStretch();
     hbox->addWidget(backButton);
     hbox->addWidget(createButton);
+    hbox->addWidget(deleteButton);
     layout->addItem(hbox_upload);
     layout->addItem(hbox);
 
@@ -338,7 +344,11 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         showMessage();
         listView->setAcceptDrops(true);
         if (photosView->count() > 1)
+        {
             backButton->setEnabled(true);
+            createButton->hide();
+            deleteButton->show();
+        }
 
         /* fetch thumbnails */
         foreach (const FileInfo& info, results)
@@ -389,6 +399,11 @@ void Photos::createFolder()
     }
 }
 
+void Photos::deleteFile()
+{
+
+}
+
 void Photos::fileNext()
 {
     QLabel *label = qobject_cast<QLabel*>(photosView->currentWidget());
@@ -417,7 +432,6 @@ void Photos::fileOpened(const QUrl &url)
         return;
 
     // disable controls
-    createButton->setEnabled(false);
     helpLabel->hide();
 
     // build playlist
@@ -506,8 +520,11 @@ void Photos::goBack()
 
     /* enable controls */
     if (photosView->count() == 1)
+    {
         backButton->setEnabled(false);
-    createButton->setEnabled(true);
+        createButton->show();
+        deleteButton->hide();
+    }
     helpLabel->show();
 }
 

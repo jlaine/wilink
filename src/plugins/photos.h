@@ -100,6 +100,7 @@ protected slots:
     void abortUpload();
     void createFolder();
     void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void deleteFile();
     void fileNext();
     void fileOpened(const QUrl &url);
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
@@ -119,6 +120,7 @@ private:
 
     QPushButton *backButton;
     QPushButton *createButton;
+    QPushButton *deleteButton;
     QPushButton *stopButton;
     Job downloadJob;
     QLabel *helpLabel;
