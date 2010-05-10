@@ -74,12 +74,8 @@
         <translation>Effacer</translation>
     </message>
     <message>
-        <source>Show debug</source>
-        <translation type="obsolete">Afficher débogage</translation>
-    </message>
-    <message>
         <source>Show messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les messages</translation>
     </message>
 </context>
 <context>
@@ -497,6 +493,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Delete</source>
         <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Deleting %1</source>
+        <translation>Suppression de %1</translation>
+    </message>
+    <message>
+        <source>Aborting upload..</source>
+        <translation>Annulation du transfert..</translation>
     </message>
 </context>
 <context>

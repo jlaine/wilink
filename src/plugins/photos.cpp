@@ -397,7 +397,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
 void Photos::abortUpload()
 {
     uploadQueue.clear();
-    showMessage("Aborting...");
+    showMessage(tr("Aborting upload.."));
     progressBar->setMaximum(progressFiles);
 }
 
@@ -427,7 +427,10 @@ void Photos::deleteFile()
     FileInfoList entries = listView->selectedEntries();
     foreach (const FileInfo &entry, entries)
         if (!entry.isDir())
+        {
+            showMessage(tr("Deleting %1").arg(entry.name()));
             fs->remove(entry.url());
+        }
 }
 
 void Photos::fileNext()
