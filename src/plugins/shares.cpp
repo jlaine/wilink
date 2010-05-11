@@ -20,7 +20,6 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFileDialog>
-#include <QFileIconProvider>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
