@@ -136,7 +136,7 @@ void ChatTransfersView::addJob(QXmppTransferJob *job)
     setItem(0, SizeColumn, sizeItem);
 
     QProgressBar *progress = new QProgressBar;
-    progress->setMaximum(job->fileSize());
+    progress->setMaximum(100);
     setCellWidget(0, ProgressColumn, progress);
 
     connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(slotDestroyed(QObject*)));
@@ -221,8 +221,8 @@ void ChatTransfersView::slotProgress(qint64 done, qint64 total)
         return;
 
     QProgressBar *progress = qobject_cast<QProgressBar*>(cellWidget(jobRow, ProgressColumn));
-    if (progress)
-        progress->setValue(done);
+    if (progress && total > 0)
+        progress->setValue((100 * done) / total);
 }
 
 void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
