@@ -52,8 +52,6 @@ Menu::Menu(QMenuBar *bar)
     network = new QNetworkAccessManager(this);
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
-
-    QTimer::singleShot(1000, this, SLOT(fetchMenu()));
 }
 
 void Menu::fetchIcon(const QUrl &url, QAction *action)
@@ -194,6 +192,7 @@ bool MenuPlugin::initialize(Chat *chat)
         return false;
 
     Menu *menu = new Menu(chat->menuBar());
+    connect(chat->client(), SIGNAL(connected()), menu, SLOT(fetchMenu()));
     return true;
 }
 
