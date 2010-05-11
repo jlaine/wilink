@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QAuthenticator>
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopWidget>
@@ -43,6 +44,7 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "qnetio/dns.h"
+#include "qnetio/wallet.h"
 
 #include "application.h"
 #include "chat.h"
@@ -381,7 +383,8 @@ void Chat::error(QXmppClient::Error error)
         }
         else if (m_client->getXmppStreamError() == QXmppStanza::Error::NotAuthorized)
         {
-            qWarning("Bad credentials");
+            // prompt user for credentials at the next main loop execution
+            QTimer::singleShot(0, this, SLOT(promptCredentials()));
         }
     }
 }
@@ -397,6 +400,23 @@ void Chat::messageReceived(const QXmppMessage &msg)
         ChatDialog *dialog = new ChatDialog(m_client, m_rosterModel, bareJid);
         addPanel(dialog);
         dialog->messageReceived(msg);
+    }
+}
+
+/** Prompt for credentials then connect.
+ */
+void Chat::promptCredentials()
+{
+    QXmppConfiguration config = m_client->getConfiguration();
+    QAuthenticator auth;
+    auth.setUser(config.jidBare());
+    auth.setPassword(config.passwd());
+    Wallet::instance()->onAuthenticationRequired(
+        Application::authRealm(config.jidBare()), &auth);
+    if (auth.password() != config.passwd())
+    {
+        config.setPasswd(auth.password());
+        m_client->connectToServer(config);
     }
 }
 

@@ -38,18 +38,6 @@
 #include "chat.h"
 #include "chat_accounts.h"
 
-/** Returns the authentication realm for the given JID.
- */
-static QString authRealm(const QString &jid)
-{
-    QString domain = jid.split("@").last();
-    if (domain == "wifirst.net")
-        return "www.wifirst.net";
-    else if (domain == "gmail.com")
-        return "www.google.com";
-    return domain;
-}
-
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv), settings(0)
 {
@@ -95,6 +83,18 @@ void Application::platformInit()
 }
 #endif
 
+/** Returns the authentication realm for the given JID.
+ */
+QString Application::authRealm(const QString &jid)
+{
+    QString domain = jid.split("@").last();
+    if (domain == "wifirst.net")
+        return "www.wifirst.net";
+    else if (domain == "gmail.com")
+        return "www.google.com";
+    return domain;
+}
+
 QString Application::executablePath()
 {
 #ifdef Q_OS_MAC
@@ -123,6 +123,8 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
 
     layout->addWidget(new QLabel("User:"), 1, 0);
     QLineEdit *usernameEdit = new QLineEdit();
+    if (!authenticator->user().isEmpty())
+        usernameEdit->setEnabled(false);
     layout->addWidget(usernameEdit, 1, 1);
 
     layout->addWidget(new QLabel("Password:"), 2, 0);
