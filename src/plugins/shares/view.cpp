@@ -40,13 +40,15 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     qint64 done = index.data(TransferDone).toLongLong();
     qint64 total = index.data(TransferTotal).toLongLong();
     QString localPath = index.data(TransferPath).toString();
-    if (index.column() == ProgressColumn && done > 0 && total > 0 && !error && localPath.isEmpty())
+    if (index.column() == ProgressColumn &&
+        done > 0 && total > 0 && done <= total &&
+        !error && localPath.isEmpty())
     {
         QStyleOptionProgressBar progressBarOption;
         progressBarOption.rect = option.rect;
         progressBarOption.minimum = 0;
-        progressBarOption.maximum = total; 
-        progressBarOption.progress = done;
+        progressBarOption.maximum = 100;
+        progressBarOption.progress = (100 * done) / total;
         progressBarOption.state = QStyle::State_Active | QStyle::State_Enabled | QStyle::State_HasFocus | QStyle::State_Selected;
         progressBarOption.text = index.data(Qt::DisplayRole).toString();
         progressBarOption.textVisible = true;
