@@ -125,12 +125,13 @@ static bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached,
     }
 
     // check whether we need to calculate checksum
+    QByteArray fileHash = cached.hash;
     if (cached.date != info.lastModified() || cached.size != info.size())
-        cached.hash = QByteArray();
+        fileHash = QByteArray();
     if (updateHash && cached.hash.isEmpty())
     {
-        cached.hash = hashFile(info.filePath());
-        if (cached.hash.isEmpty())
+        fileHash = hashFile(info.filePath());
+        if (fileHash.isEmpty())
         {
             deleteFile(sharesDb, cached.path);
             return false;
@@ -138,9 +139,12 @@ static bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached,
     }
 
     // update database entry
-    if (cached.date != info.lastModified() || cached.size != info.size())
+    if (cached.date != info.lastModified() ||
+        cached.hash != fileHash ||
+        cached.size != info.size())
     {
         cached.date = info.lastModified();
+        cached.hash = fileHash;
         cached.size = info.size();
         saveFile(sharesDb, cached);
     }
