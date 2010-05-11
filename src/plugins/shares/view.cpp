@@ -37,8 +37,8 @@ ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
 void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     int error = index.data(TransferError).toInt();
-    int done = index.data(TransferDone).toInt();
-    int total = index.data(TransferTotal).toInt();
+    qint64 done = index.data(TransferDone).toLongLong();
+    qint64 total = index.data(TransferTotal).toLongLong();
     QString localPath = index.data(TransferPath).toString();
     if (index.column() == ProgressColumn && done > 0 && total > 0 && !error && localPath.isEmpty())
     {

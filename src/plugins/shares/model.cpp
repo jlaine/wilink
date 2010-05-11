@@ -83,14 +83,14 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
              item->type() == QXmppShareItem::FileItem)
     {
         const QString localPath = item->data(TransferPath).toString();
-        int done = item->data(TransferDone).toInt();
+        qint64 done = item->data(TransferDone).toLongLong();
         if (!localPath.isEmpty())
             return tr("Downloaded");
         else if (item->data(TransferError).toInt())
             return tr("Failed");
         else if (done > 0)
         {
-            int total = index.data(TransferTotal).toInt();
+            qint64 total = index.data(TransferTotal).toLongLong();
             int progress = total ? (qreal(done) * 100.0 / total) : 0;
             return QString::number(progress) + "%";
         }
@@ -104,7 +104,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     {
         const QString localPath = item->data(TransferPath).toString();
         QTime t = index.data(TransferStart).toTime();
-        int done = item->data(TransferDone).toInt();
+        qint64 done = item->data(TransferDone).toLongLong();
         if (!item->data(TransferError).toInt() &&
             localPath.isEmpty() &&
             done > 0 && t.isValid() && t.elapsed())

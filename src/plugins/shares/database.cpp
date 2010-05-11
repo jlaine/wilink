@@ -71,7 +71,7 @@ static ChatSharesDatabase::Entry getFile(const QSqlQuery &selectQuery)
 {
     ChatSharesDatabase::Entry cached;
     cached.path = selectQuery.value(0).toString();
-    cached.size = selectQuery.value(1).toInt();
+    cached.size = selectQuery.value(1).toLongLong();
     cached.hash = QByteArray::fromHex(selectQuery.value(2).toByteArray());
     cached.date = selectQuery.value(3).toDateTime();
     return cached;
