@@ -296,7 +296,12 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
         // update progress
         queueItem->setData(TransferDone, done);
         queueItem->setData(TransferTotal, total);
-        queueModel->refreshItem(queueItem);
+        qint64 oldDone = queueItem->data(TransferPainted).toLongLong();
+        if ((done - oldDone) >= total/100)
+        {
+            queueItem->setData(TransferPainted, done);
+            queueModel->refreshItem(queueItem);
+        }
     }
 }
 

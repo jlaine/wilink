@@ -39,6 +39,7 @@ enum ChatSharesDataRoles {
     StreamId,
     TransferStart,
     TransferDone,
+    TransferPainted,
     TransferPath,
     TransferTotal,
     TransferError,
