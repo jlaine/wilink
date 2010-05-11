@@ -206,6 +206,7 @@ QUrl PhotosList::url()
 
 Photos::Photos(const QString &url, QWidget *parent)
     : ChatPanel(parent),
+    baseUrl(url),
     downloadDevice(0),
     uploadDevice(0),
     progressFiles(0),
@@ -281,8 +282,6 @@ Photos::Photos(const QString &url, QWidget *parent)
     connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this,
             SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
-    showMessage(tr("Connecting.."));
-    fs->open(url);
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Backspace), this);
@@ -560,6 +559,14 @@ void Photos::goBack()
     helpLabel->show();
 }
 
+/** Open filesystem.
+ */
+void Photos::open()
+{
+    showMessage(tr("Connecting.."));
+    fs->open(baseUrl);
+}
+
 /** If the download queue is not empty, process the next item.
  */
 void Photos::processDownloadQueue()
@@ -689,6 +696,7 @@ bool PhotosPlugin::initialize(Chat *chat)
     //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
     chat->addPanel(photos);
+    connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));
 
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);

@@ -107,12 +107,14 @@ protected slots:
     void filesDropped(const QList<QUrl> &files, const QUrl &destination);
     void folderOpened(const QUrl &url);
     void goBack();
+    void open();
     void pushView(QWidget *widget);
     void putProgress(int done, int total);
     void refresh();
 
 private:
     FileSystem *fs;
+    QUrl baseUrl;
     QList<Job> downloadQueue;
     QIODevice *downloadDevice;
     QList< QPair<QUrl, QUrl> > uploadQueue;
