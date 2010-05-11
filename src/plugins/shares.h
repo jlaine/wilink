@@ -20,10 +20,6 @@
 #ifndef __WILINK_SHARES_H__
 #define __WILINK_SHARES_H__
 
-#include <QIcon>
-#include <QStyledItemDelegate>
-#include <QTreeView>
-
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppTransferManager.h"
@@ -36,41 +32,16 @@ class ChatRosterModel;
 class ChatSharesDatabase;
 class ChatSharesModel;
 class ChatSharesTab;
+class ChatSharesView;
 class ChatTransfers;
 class ChatTransfersView;
 class QLineEdit;
+class QModelIndex;
 class QStatusBar;
 class QTabWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppPresence;
-
-class ChatSharesDelegate : public QStyledItemDelegate
-{
-public:
-    ChatSharesDelegate(QObject *parent);
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-};
-
-/** View for displaying a tree of share items.
- */
-class ChatSharesView : public QTreeView
-{
-    Q_OBJECT
-
-public:
-    ChatSharesView(QWidget *parent = 0);
-    void setModel(QAbstractItemModel *model);
-
-signals:
-    void contextMenu(const QModelIndex &index, const QPoint &globalPos);
-    void expandRequested(const QModelIndex &index);
-
-protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent *e);
-};
 
 /** The shares panel.
  */

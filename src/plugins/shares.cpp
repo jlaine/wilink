@@ -33,7 +33,6 @@
 #include <QStringList>
 #include <QTabWidget>
 #include <QTimer>
-#include <QTreeWidget>
 #include <QUrl>
 
 #include "qxmpp/QXmppShareIq.h"
@@ -47,6 +46,7 @@
 #include "shares.h"
 #include "shares/database.h"
 #include "shares/model.h"
+#include "shares/view.h"
 #include "systeminfo.h"
 
 static int parallelDownloadLimit = 2;
@@ -911,94 +911,6 @@ void ChatShares::tabChanged(int index)
         indexButton->show();
     else
         indexButton->hide();
-}
-
-ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
-{
-}
-
-void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    int error = index.data(TransferError).toInt();
-    int done = index.data(TransferDone).toInt();
-    int total = index.data(TransferTotal).toInt();
-    QString localPath = index.data(TransferPath).toString();
-    if (index.column() == ProgressColumn && done > 0 && total > 0 && !error && localPath.isEmpty())
-    {
-        QStyleOptionProgressBar progressBarOption;
-        progressBarOption.rect = option.rect;
-        progressBarOption.minimum = 0;
-        progressBarOption.maximum = total; 
-        progressBarOption.progress = done;
-        progressBarOption.state = QStyle::State_Active | QStyle::State_Enabled | QStyle::State_HasFocus | QStyle::State_Selected;
-        progressBarOption.text = index.data(Qt::DisplayRole).toString();
-        progressBarOption.textVisible = true;
-
-        QApplication::style()->drawControl(QStyle::CE_ProgressBar,
-                                           &progressBarOption, painter);
-    } else {
-        QStyledItemDelegate::paint(painter, option, index);
-    }
-}
-
-ChatSharesView::ChatSharesView(QWidget *parent)
-    : QTreeView(parent)
-{
-    setItemDelegate(new ChatSharesDelegate(this));
-    setRootIsDecorated(false);
-    setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::SingleSelection);
-}
-
-void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    emit contextMenu(index, event->globalPos());
-}
-
-void ChatSharesView::keyPressEvent(QKeyEvent *event)
-{
-    QModelIndex current = currentIndex();
-    if (current.isValid())
-    {
-        switch (event->key())
-        {
-        case Qt::Key_Plus:
-        case Qt::Key_Right:
-            emit expandRequested(current);
-            return;
-        case Qt::Key_Minus:
-        case Qt::Key_Left:
-            collapse(current);
-            return;
-        }
-    }
-    QTreeView::keyPressEvent(event);
-}
-
-/** When the view is resized, adjust the width of the
- *  "name" column to take all the available space.
- */
-void ChatSharesView::resizeEvent(QResizeEvent *e)
-{
-    QTreeView::resizeEvent(e);
-    int nameWidth =  e->size().width();
-    if (!isColumnHidden(SizeColumn))
-        nameWidth -= SIZE_COLUMN_WIDTH;
-    if (!isColumnHidden(ProgressColumn))
-        nameWidth -= PROGRESS_COLUMN_WIDTH;
-    setColumnWidth(NameColumn, nameWidth);
-}
-
-void ChatSharesView::setModel(QAbstractItemModel *model)
-{
-    QTreeView::setModel(model);
-    setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
-    setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
 }
 
 ChatSharesTab::ChatSharesTab(QWidget *parent)
