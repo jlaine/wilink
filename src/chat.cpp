@@ -371,12 +371,18 @@ void Chat::disconnected()
  */
 void Chat::error(QXmppClient::Error error)
 {
-    if(error == QXmppClient::XmppStreamError &&
-       m_client->getXmppStreamError() == QXmppClient::ConflictStreamError)
+    if(error == QXmppClient::XmppStreamError)
     {
-        // if we received a resource conflict, exit
-        qWarning("Received a resource conflict from chat server");
-        qApp->quit();
+        if (m_client->getXmppStreamError() == QXmppStanza::Error::Conflict)
+        {
+            // if we received a resource conflict, exit
+            qWarning("Received a resource conflict from chat server");
+            qApp->quit();
+        }
+        else if (m_client->getXmppStreamError() == QXmppStanza::Error::Conflict)
+        {
+            qWarning("Bad credentials");
+        }
     }
 }
 
