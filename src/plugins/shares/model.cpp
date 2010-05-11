@@ -91,7 +91,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
         else if (done > 0)
         {
             qint64 total = index.data(TransferTotal).toLongLong();
-            int progress = total ? (qreal(done) * 100.0 / total) : 0;
+            int progress = total ? ((done * 100) / total) : 0;
             return QString::number(progress) + "%";
         }
         else if (!item->data(PacketId).toString().isEmpty())
