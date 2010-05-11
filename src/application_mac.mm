@@ -24,7 +24,11 @@
 
 #include "application.h"
 
+#if (MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_5)
+@interface AppController : NSObject
+#else
 @interface AppController : NSObject <NSApplicationDelegate>
+#endif
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag;
 - (NSApplicationTerminateReply)applicationShouldTerminate: (NSApplication *)sender;
 @end
