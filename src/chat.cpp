@@ -379,7 +379,7 @@ void Chat::error(QXmppClient::Error error)
             qWarning("Received a resource conflict from chat server");
             qApp->quit();
         }
-        else if (m_client->getXmppStreamError() == QXmppStanza::Error::Conflict)
+        else if (m_client->getXmppStreamError() == QXmppStanza::Error::NotAuthorized)
         {
             qWarning("Bad credentials");
         }
