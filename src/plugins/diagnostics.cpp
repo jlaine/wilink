@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QLayout>
+#include <QMenu>
 #include <QNetworkAccessManager>
 #include <QNetworkInterface>
 #include <QNetworkReply>
@@ -255,7 +256,6 @@ Diagnostics::Diagnostics(QWidget *parent)
     setWindowTitle(tr("Diagnostics"));
 
     connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 void Diagnostics::addItem(const QString &title, const QString &value)
@@ -445,6 +445,10 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     Diagnostics *diagnostics = new Diagnostics;
     diagnostics->setObjectName("diagnostics");
     chat->addPanel(diagnostics);
+
+    /* add menu entry */
+    QAction *action = chat->fileMenu()->addAction(QIcon(":/diagnostics.png"), tr("Diagnostics"));
+    connect(action, SIGNAL(triggered()), diagnostics, SIGNAL(showPanel()));
 
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);

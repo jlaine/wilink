@@ -124,9 +124,8 @@ Chat::Chat(QWidget *parent)
     statusBar()->addPermanentWidget(m_statusCombo);
 
     /* create menu */
-    QMenu *menu = menuBar()->addMenu("&File");
-
-    m_optionsMenu = menu->addMenu(QIcon(":/options.png"), tr("&Options"));
+    m_fileMenu = menuBar()->addMenu("&File");
+    m_optionsMenu = m_fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
 
     QAction *action = m_optionsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
@@ -140,7 +139,7 @@ Chat::Chat(QWidget *parent)
         connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
     }
 
-    action = menu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
     /* set up client */
@@ -473,6 +472,13 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
             plugin->initialize(this);
     }
     return true;
+}
+
+/** Return this window's "File" menu.
+ */
+QMenu *Chat::fileMenu()
+{
+    return m_fileMenu;
 }
 
 /** Return this window's "Options" menu.

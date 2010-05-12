@@ -50,6 +50,7 @@ public:
 
     ChatClient *client();
     ChatRosterModel *rosterModel();
+    QMenu *fileMenu();
     QMenu *optionsMenu();
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
     void addPanel(ChatPanel *panel);
@@ -101,9 +102,11 @@ private:
 
     Idle *m_idle;
 
+    QMenu *m_fileMenu;
+    QMenu *m_optionsMenu;
+
     ChatClient *m_client;
     QList<ChatPanel*> m_chatPanels;
-    QMenu *m_optionsMenu;
     ChatRosterModel *m_rosterModel;
     ChatRosterView *m_rosterView;
 
