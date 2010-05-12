@@ -256,6 +256,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     setWindowTitle(tr("Diagnostics"));
 
     connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
+    connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
 }
 
 void Diagnostics::addItem(const QString &title, const QString &value)
