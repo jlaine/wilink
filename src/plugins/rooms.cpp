@@ -468,7 +468,6 @@ ChatRosterItem::Type ChatRoom::objectType() const
     return ChatRosterItem::Room;
 }
 
-
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {
     if (jidToBareJid(presence.from()) != chatRemoteJid)
