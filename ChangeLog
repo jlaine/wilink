@@ -1,4 +1,4 @@
-wiLink 0.9.0 (UNRELEASED)
+wiLink 0.9.0 (2010-05-12)
  * Merge photo uploads and diagnostics into the main window.
  * Add a menu to the chat window instead of the system tray icon.
  * Make it possible to access Picasa photo albums.
