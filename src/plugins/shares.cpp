@@ -360,18 +360,20 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     job->accept(file);
 }
 
-/** When the user removes an item from the download queue, cancel any jobs
- *  associated with it.
+/** When the user removes items from the download queue, cancel any jobs
+ *  associated with them.
  */
 void ChatShares::transferRemoved()
 {
-    const QModelIndex &index = downloadsView->currentIndex();
-    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
-    if (!index.isValid() || !item)
-        return;
-
-    transferAbort(item);
-    queueModel->removeItem(item);
+    foreach (const QModelIndex &index, downloadsView->selectionModel()->selectedRows())
+    {
+        QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+        if (index.isValid() && item)
+        {
+            transferAbort(item);
+            queueModel->removeItem(item);
+        }
+    }
 }
 
 void ChatShares::transferStateChanged(QXmppTransferJob::State state)
@@ -482,6 +484,8 @@ void ChatShares::indexStarted()
     indexButton->setEnabled(false);
 }
 
+/** Add the selected items to the download queue.
+ */
 void ChatShares::downloadItem()
 {
     // determine current view
@@ -493,13 +497,21 @@ void ChatShares::downloadItem()
     else
         return;
 
-    QXmppShareItem *item = static_cast<QXmppShareItem*>(treeWidget->currentIndex().internalPointer());
-    if (item)
-        queueItem(item);
+    foreach (const QModelIndex &index, treeWidget->selectionModel()->selectedRows())
+    {
+        QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
+        if (item)
+            queueItem(item);
+    }
 }
 
 void ChatShares::queueItem(QXmppShareItem *item)
 {
+    // check item is not from local collection
+    foreach (const QXmppShareLocation &location, item->locations())
+        if (location.jid() == client->getConfiguration().jid())
+            return;
+
     // check item is not already in the queue
     if (queueModel->get(Q_FIND_LOCATIONS(item->locations())))
         return;
