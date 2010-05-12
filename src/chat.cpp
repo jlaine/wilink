@@ -513,7 +513,11 @@ ChatPanel *Chat::panel(const QString &objectName)
 void Chat::resizeContacts()
 {
     QSize hint = m_rosterView->sizeHint();
-    hint.setHeight(hint.height() + 32);
+    hint.setHeight(hint.height() + m_rosterView->sizeHintForRow(0) + 4);
+    QSize barHint = statusBar()->sizeHint();
+    hint.setHeight(hint.height() + barHint.height());
+    if (barHint.width() > hint.width())
+        hint.setWidth(barHint.width());
     if (m_conversationPanel->isVisible())
         hint.setWidth(hint.width() + 500);
 
