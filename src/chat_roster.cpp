@@ -441,11 +441,15 @@ void ChatRosterModel::rosterReceived()
 {
     // remove existing contacts
     QList <ChatRosterItem*> goners;
+    QMap<QString, int> pending;
     for (int i = 0; i < rootItem->size(); i++)
     {
         ChatRosterItem *child = rootItem->child(i);
         if (child->type() == ChatRosterItem::Contact)
+        {
+            pending.insert(child->id(), child->data(MessagesRole).toInt());
             goners << child;
+        }
     }
     foreach (ChatRosterItem *child, goners)
         rootItem->remove(child);
@@ -453,7 +457,9 @@ void ChatRosterModel::rosterReceived()
     // add received contacts
     foreach (const QString &jid, client->getRoster().getRosterBareJids())
     {
-        rootItem->append(new ChatRosterItem(ChatRosterItem::Contact, jid));
+        ChatRosterItem *item = new ChatRosterItem(ChatRosterItem::Contact, jid);
+        item->setData(MessagesRole, pending.value(jid));
+        rootItem->append(item);
 
         // fetch vCard
         client->getVCardManager().requestVCard(jid);
