@@ -69,12 +69,13 @@ ChatSharesSelectionModel::ChatSharesSelectionModel(QAbstractItemModel *model, QO
  */
 void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
 {
-    if ((command & QItemSelectionModel::ClearAndSelect) == QItemSelectionModel::Select)
+    if (command & QItemSelectionModel::Select)
     {
-        QItemSelection actualSelection;
+        bool isClear = (command & QItemSelectionModel::Clear);
 
         // select the requested items, filtering out items whose parent
         // is already selected (or about to be)
+        QItemSelection addSelection;
         foreach (const QModelIndex &index, selection.indexes())
         {
             // if a parent of this item is selected (or about to be),
@@ -83,7 +84,7 @@ void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSele
             QModelIndex parent = index.parent();
             while (parent.isValid())
             {
-                if (isSelected(parent) || selection.contains(parent))
+                if (selection.contains(parent) || (!isClear && isSelected(parent)))
                 {
                     skip = true;
                     break;
@@ -91,9 +92,13 @@ void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSele
                 parent = parent.parent();
             }
             if (!skip)
-                actualSelection.append(QItemSelectionRange(index));
+                addSelection.append(QItemSelectionRange(index));
         }
-        QItemSelectionModel::select(actualSelection, command);
+        QItemSelectionModel::select(addSelection, command);
+
+        // if a clear was requested, stop here
+        if (isClear)
+            return;
 
         // deselect any children of the selected items
         QItemSelection removeSelection;
