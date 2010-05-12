@@ -110,6 +110,7 @@ Chat::Chat(QWidget *parent)
     setCentralWidget(splitter);
 
     /* build status bar */
+    statusBar()->setSizeGripEnabled(false);
     // avoid border around widgets on OS X
     statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
 
