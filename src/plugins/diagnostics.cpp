@@ -447,7 +447,10 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     chat->addPanel(diagnostics);
 
     /* add menu entry */
-    QAction *action = chat->fileMenu()->addAction(QIcon(":/diagnostics.png"), tr("Diagnostics"));
+    QList<QAction*> actions = chat->fileMenu()->actions();
+    QAction *firstAction = actions.isEmpty() ? 0 : actions.first();
+    QAction *action = new QAction(QIcon(":/diagnostics.png"), tr("Diagnostics"), chat->fileMenu());
+    chat->fileMenu()->insertAction(firstAction, action);
     connect(action, SIGNAL(triggered()), diagnostics, SIGNAL(showPanel()));
 
     /* register shortcut */
