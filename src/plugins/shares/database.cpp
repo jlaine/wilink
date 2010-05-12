@@ -118,7 +118,7 @@ static bool saveFile(QSqlDatabase sharesDb, const ChatSharesDatabase::Entry &ent
 static bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached, const QFileInfo &info, bool updateHash)
 {
     // check file is still readable
-    if (!info.isReadable() || !info.size())
+    if (info.fileName().endsWith(".part") || !info.isReadable() || !info.size())
     {
         deleteFile(sharesDb, cached.path);
         return false;
