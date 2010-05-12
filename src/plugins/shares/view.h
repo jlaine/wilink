@@ -20,6 +20,7 @@
 #ifndef __WILINK_SHARES_VIEW_H__
 #define __WILINK_SHARES_VIEW_H__
 
+#include <QItemSelectionModel>
 #include <QStyledItemDelegate>
 #include <QTreeView>
 
@@ -35,6 +36,17 @@ class ChatSharesDelegate : public QStyledItemDelegate
 public:
     ChatSharesDelegate(QObject *parent);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+
+class ChatSharesSelectionModel : public QItemSelectionModel
+{
+    Q_OBJECT
+
+public:
+    ChatSharesSelectionModel(QAbstractItemModel *model, QObject *parent = 0);
+
+public slots:
+    void select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command);
 };
 
 /** View for displaying a tree of share items.

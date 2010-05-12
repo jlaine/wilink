@@ -60,13 +60,69 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     }
 }
 
+ChatSharesSelectionModel::ChatSharesSelectionModel(QAbstractItemModel *model, QObject *parent)
+    : QItemSelectionModel(model, parent)
+{
+}
+
+void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
+{
+    if ((command & QItemSelectionModel::ClearAndSelect) == QItemSelectionModel::Select)
+    {
+        QItemSelection actualSelection;
+
+        // select the requested items, filtering out items whose parent
+        // is already selected (or about to be)
+        foreach (const QModelIndex &index, selection.indexes())
+        {
+            qDebug() << "considering" << index.data(Qt::DisplayRole);
+
+            // if a parent of this item is selected (or about to be),
+            // skip the item
+            bool skip = false;
+            QModelIndex parent = index.parent();
+            while (parent.isValid())
+            {
+                if (isSelected(parent) || selection.contains(parent))
+                {
+                    skip = true;
+                    break;
+                }
+                parent = parent.parent();
+            }
+            if (!skip)
+                actualSelection.append(QItemSelectionRange(index));
+        }
+        QItemSelectionModel::select(actualSelection, command);
+
+        // deselect any children of the selected items
+        QItemSelection removeSelection;
+        foreach (const QModelIndex &index, selectedRows())
+        {
+            QModelIndex parent = index.parent();
+            while (parent.isValid())
+            {
+                if (selection.contains(parent))
+                {
+                    removeSelection.append(QItemSelectionRange(index));
+                    break;
+                }
+                parent = parent.parent();
+            }
+        }
+        QItemSelectionModel::select(removeSelection, QItemSelectionModel::Deselect | QItemSelectionModel::Rows);
+    } else {
+        QItemSelectionModel::select(selection, command);
+    }
+}
+
 ChatSharesView::ChatSharesView(QWidget *parent)
     : QTreeView(parent)
 {
     setItemDelegate(new ChatSharesDelegate(this));
     setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::SingleSelection);
+    setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
@@ -117,5 +173,6 @@ void ChatSharesView::setModel(QAbstractItemModel *model)
     QTreeView::setModel(model);
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
     setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
+    setSelectionModel(new ChatSharesSelectionModel(model, this));
 }
 
