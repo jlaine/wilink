@@ -338,7 +338,7 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     }
 
     // determine file name
-    const QString filePath = ChatTransfers::availableFilePath(downloadsDir.path(), job->fileName());
+    const QString filePath = ChatTransfers::availableFilePath(downloadsDir.path(), job->fileName() + ".part");
     QFile *file = new QFile(filePath, job);
     if (!file->open(QIODevice::WriteOnly))
     {
@@ -400,15 +400,21 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
             if (job->error() == QXmppTransferJob::NoError)
             {
                 statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
-                queueItem->setData(TransferPath, localPath);
+
+                // rename file
+                QFileInfo tempInfo(localPath);
+                QDir tempDir(tempInfo.dir());
+                QString finalPath = ChatTransfers::availableFilePath(tempDir.path(), tempInfo.fileName().remove(QRegExp("\\.part$")));
+                tempDir.rename(tempInfo.fileName(), QFileInfo(finalPath).fileName());
+                queueItem->setData(TransferPath, finalPath);
                 queueItem->setData(TransferError, QVariant());
 
                 // store to shares database
                 ChatSharesDatabase::Entry cached;
-                cached.path = db->fileNode(localPath);
+                cached.path = db->fileNode(finalPath);
                 cached.size = job->fileSize();
                 cached.hash = job->fileHash();
-                cached.date = QFileInfo(localPath).lastModified();
+                cached.date = QFileInfo(finalPath).lastModified();
                 db->add(cached);
 
             } else {
