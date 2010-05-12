@@ -21,14 +21,12 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QTimer>
 
 #include "qxmpp/QXmppArchiveIq.h"
 #include "qxmpp/QXmppArchiveManager.h"
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
@@ -52,6 +50,8 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
     connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
+
+    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -162,8 +162,15 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.received = true;
     chatHistory->addMessage(message);
 
-    // notify
-    emit notifyPanel();
+    // notify later, as we may have just added this panel
+    QTimer::singleShot(0, this, SIGNAL(notifyPanel()));
+}
+
+/** Return the type of entry to add to the roster.
+ */
+ChatRosterItem::Type ChatDialog::objectType() const
+{
+    return ChatRosterItem::Contact;
 }
 
 void ChatDialog::sendMessage(const QString &text)

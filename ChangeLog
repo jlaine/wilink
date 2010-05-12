@@ -9,6 +9,7 @@ wiLink 0.9.0 (UNRELEASED)
  * Make it possible to send a file to a contact using drag & drop.
  * Make it possible to delete photos.
  * Fix handling of large file sizes in shares.
+ * Show notifications for messages which arrived while offline.
 
 wiLink 0.8.0 (2010-05-03)
  * Rename wDesktop to wiLink.

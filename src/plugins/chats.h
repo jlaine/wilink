@@ -38,6 +38,7 @@ class ChatDialog : public ChatConversation
 
 public:
     ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatRosterItem::Type objectType() const;
 
 public slots:
     void messageReceived(const QXmppMessage &msg);
