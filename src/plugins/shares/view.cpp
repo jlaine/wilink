@@ -65,6 +65,8 @@ ChatSharesSelectionModel::ChatSharesSelectionModel(QAbstractItemModel *model, QO
 {
 }
 
+/** Reimplemented to never select both an item and one of its children.
+ */
 void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
 {
     if ((command & QItemSelectionModel::ClearAndSelect) == QItemSelectionModel::Select)
@@ -75,8 +77,6 @@ void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSele
         // is already selected (or about to be)
         foreach (const QModelIndex &index, selection.indexes())
         {
-            qDebug() << "considering" << index.data(Qt::DisplayRole);
-
             // if a parent of this item is selected (or about to be),
             // skip the item
             bool skip = false;
