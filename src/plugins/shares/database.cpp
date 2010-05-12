@@ -415,6 +415,8 @@ void IndexThread::scanDir(const QDir &dir)
     QDir sharesDir = sharesDatabase->directory();
     QList<QFileInfo> subdirs;
 
+    // if this is the shares directory or one of its immediate subdirectories,
+    // add it to the list of directory to monitor
     if (sharesDir.relativeFilePath(dir.path()).count("/") < 1)
         watchDirs << dir.path();
 
