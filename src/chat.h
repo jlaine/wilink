@@ -56,7 +56,12 @@ public:
     ChatPanel *panel(const QString &objectName);
 
 signals:
-    /** Plugin should connect to this signal to handle drop events
+    /** Plugins should connect to this signal to handle click events
+     *  on a roster entry.
+     */
+    void rosterClick(const QModelIndex &index);
+
+    /** Plugins should connect to this signal to handle drop events
      *  on a roster entry.
      */
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
@@ -70,7 +75,6 @@ private slots:
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
-    void messageReceived(const QXmppMessage &msg);
     void panelChanged(int index);
     void promptCredentials();
     void resizeContacts();

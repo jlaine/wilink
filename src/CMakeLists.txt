@@ -20,7 +20,6 @@ set(wiLink_SOURCES
     chat_accounts.cpp
     chat_client.cpp
     chat_conversation.cpp
-    chat_dialog.cpp
     chat_edit.cpp
     chat_form.cpp
     chat_history.cpp
@@ -33,6 +32,7 @@ set(wiLink_SOURCES
     updates.cpp
     updatesdialog.cpp
     utils.cpp
+    plugins/chats.cpp
     plugins/console.cpp
     plugins/contacts.cpp
     plugins/diagnostics.cpp
@@ -52,7 +52,6 @@ set(wiLink_MOC_HEADERS
     chat_accounts.h
     chat_client.h
     chat_conversation.h
-    chat_dialog.h
     chat_edit.h
     chat_form.h
     chat_history.h
@@ -62,6 +61,7 @@ set(wiLink_MOC_HEADERS
     chat_tip.h
     updates.h
     updatesdialog.h
+    plugins/chats.h
     plugins/console.h
     plugins/contacts.h
     plugins/diagnostics.h

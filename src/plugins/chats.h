@@ -26,7 +26,9 @@
 
 #include "chat_conversation.h"
 
+class Chat;
 class ChatRosterModel;
+class QModelIndex;
 class QXmppArchiveChat;
 class QXmppClient;
 
@@ -55,6 +57,21 @@ private:
     bool joined;
     ChatRosterModel *rosterModel;
     QStringList chatStatesJids;
+};
+
+class ChatsWatcher : public QObject
+{
+    Q_OBJECT
+
+public:
+    ChatsWatcher(Chat *chatWindow);
+
+private slots:
+    void messageReceived(const QXmppMessage &msg);
+    void rosterClick(const QModelIndex &index);
+
+private:
+    Chat *chat;
 };
 
 #endif

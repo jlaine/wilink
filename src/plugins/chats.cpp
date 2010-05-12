@@ -31,9 +31,13 @@
 #include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppUtils.h"
 
-#include "chat_dialog.h"
+#include "chat.h"
+#include "chat_client.h"
 #include "chat_history.h"
+#include "chat_plugin.h"
 #include "chat_roster.h"
+
+#include "chats.h"
 
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(jid, parent), client(xmppClient), joined(false), rosterModel(chatRosterModel)
@@ -179,4 +183,54 @@ void ChatDialog::sendMessage(const QString &text)
     msg.setState(QXmppMessage::Active);
     client->sendPacket(msg);
 }
+
+ChatsWatcher::ChatsWatcher(Chat *chatWindow)
+    : QObject(chatWindow), chat(chatWindow)
+{
+    ChatClient *client = chat->client();
+    connect(client, SIGNAL(messageReceived(QXmppMessage)),
+            this, SLOT(messageReceived(QXmppMessage)));
+
+    // add roster hooks
+    connect(chat, SIGNAL(rosterClick(QModelIndex)),
+            this, SLOT(rosterClick(QModelIndex)));
+}
+
+void ChatsWatcher::messageReceived(const QXmppMessage &msg)
+{
+    const QString bareJid = jidToBareJid(msg.from());
+
+    if (msg.type() == QXmppMessage::Chat && !chat->panel(bareJid) && !msg.body().isEmpty())
+    {
+        ChatDialog *dialog = new ChatDialog(chat->client(), chat->rosterModel(), bareJid);
+        chat->addPanel(dialog);
+        dialog->messageReceived(msg);
+    }
+}
+
+void ChatsWatcher::rosterClick(const QModelIndex &index)
+{
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+
+    // create conversation if necessary
+    if (type == ChatRosterItem::Contact && !chat->panel(jid))
+        chat->addPanel(new ChatDialog(chat->client(), chat->rosterModel(), jid));
+}
+
+// PLUGIN
+
+class ChatsPlugin : public ChatPlugin
+{
+public:
+    bool initialize(Chat *chat);
+};
+
+bool ChatsPlugin::initialize(Chat *chat)
+{
+    ChatsWatcher *chats = new ChatsWatcher(chat);
+    return true;
+}
+
+Q_EXPORT_STATIC_PLUGIN2(chats, ChatsPlugin)
 

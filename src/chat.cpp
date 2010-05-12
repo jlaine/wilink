@@ -49,7 +49,7 @@
 #include "application.h"
 #include "chat.h"
 #include "chat_client.h"
-#include "chat_dialog.h"
+#include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
@@ -145,7 +145,6 @@ Chat::Chat(QWidget *parent)
 
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
-    connect(m_client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
     connect(m_client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
@@ -222,6 +221,7 @@ void Chat::dropPanel(QDropEvent *event)
     if (!panel)
         return;
 
+    // notify plugins
     QModelIndex index = m_rosterModel->findItem(panel->objectName());
     if (index.isValid())
         emit rosterDrop(event, index);
@@ -390,20 +390,6 @@ void Chat::error(QXmppClient::Error error)
     }
 }
 
-/** Handle a chat message.
- */
-void Chat::messageReceived(const QXmppMessage &msg)
-{
-    const QString bareJid = jidToBareJid(msg.from());
-
-    if (msg.type() == QXmppMessage::Chat && !panel(bareJid) && !msg.body().isEmpty())
-    {
-        ChatDialog *dialog = new ChatDialog(m_client, m_rosterModel, bareJid);
-        addPanel(dialog);
-        dialog->messageReceived(msg);
-    }
-}
-
 /** Prompt for credentials then connect.
  */
 void Chat::promptCredentials()
@@ -543,12 +529,10 @@ void Chat::resizeContacts()
 
 void Chat::rosterClicked(const QModelIndex &index)
 {
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
-    // create conversation if necessary
-    if (type == ChatRosterItem::Contact && !panel(jid))
-        addPanel(new ChatDialog(m_client, m_rosterModel, jid));
+    // notify plugins
+    emit rosterClick(index);
 
     // show requested panel
     ChatPanel *chatPanel = panel(jid);
