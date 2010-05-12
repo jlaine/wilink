@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
+#include <QFileSystemWatcher>
 #include <QSettings>
 #include <QSqlError>
 #include <QSqlQuery>
@@ -162,7 +163,11 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");
     sharesDb.exec("CREATE UNIQUE INDEX files_path ON files (path)");
 
-    // start indexing
+    // prepare file system watcher
+    fsWatcher = new QFileSystemWatcher(this);
+    connect(fsWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(slotDirectoryChanged(QString)));
+
+    // prepare indexing
     indexTimer = new QTimer(this);
     indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->setSingleShot(true);
@@ -197,6 +202,11 @@ void ChatSharesDatabase::setDirectory(const QString &path)
     if (path == sharesDir.path())
         return;
 
+    // stop watching old directories
+    QStringList oldPaths = fsWatcher->directories();
+    if (!oldPaths.isEmpty())
+        fsWatcher->removePaths(oldPaths);
+
     // create directory if needed
     QFileInfo info(path);
     if (!info.exists() && !info.dir().mkdir(info.fileName()))
@@ -206,6 +216,9 @@ void ChatSharesDatabase::setDirectory(const QString &path)
     QSettings settings;
     settings.setValue("SharesLocation", path);
     sharesDir.setPath(path);
+
+    // watch directory
+    //fsWatcher->addPath(sharesDir.path());
 
     // schedule index
     indexTimer->setInterval(0);
@@ -251,17 +264,36 @@ void ChatSharesDatabase::index()
         indexThread = new IndexThread(this);
         connect(indexThread, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
-        connect(indexThread, SIGNAL(indexFinished(double, int, int)),
-                this, SLOT(slotIndexFinished(double, int, int)));
+        connect(indexThread, SIGNAL(indexFinished(double, int, int, QStringList)),
+                this, SLOT(slotIndexFinished(double, int, int, QStringList)));
     }
     indexThread->start();
     emit indexStarted();
 }
 
-void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int removed)
+void ChatSharesDatabase::slotDirectoryChanged(const QString &path)
 {
+    indexTimer->setInterval(10 * 1000); // 10 seconds
+    indexTimer->start();
+}
+
+void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int removed, const QStringList &watchPaths)
+{
+    // update watched directories
+    QStringList addPaths;
+    QStringList removePaths = fsWatcher->directories();
+    foreach (const QString &path, watchPaths)
+        if (!removePaths.removeAll(path))
+            addPaths << path;
+    if (!removePaths.isEmpty())
+        fsWatcher->removePaths(removePaths);
+    if (!addPaths.isEmpty())
+        fsWatcher->addPaths(addPaths);
+
+    // schedule next run
     indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->start();
+
     emit indexFinished(elapsed, updated, removed);
 }
 
@@ -369,22 +401,29 @@ void IndexThread::run()
                .arg(QString::number(elapsed))
                .arg(scanUpdated)
                .arg(scanOld.size()));
-    emit indexFinished(elapsed, scanUpdated, scanOld.size());
+    emit indexFinished(elapsed, scanUpdated, scanOld.size(), watchDirs);
 
     // cleanup
     scanOld.clear();
     scanAdded = 0;
     scanUpdated = 0;
+    watchDirs.clear();
 }
 
 void IndexThread::scanDir(const QDir &dir)
 {
     QDir sharesDir = sharesDatabase->directory();
+    QList<QFileInfo> subdirs;
+
+    if (sharesDir.relativeFilePath(dir.path()).count("/") < 1)
+        watchDirs << dir.path();
+
+    // scan files first
     foreach (const QFileInfo &info, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable))
     {
         if (info.isDir())
         {
-            scanDir(QDir(info.filePath()));
+            subdirs << info;
         } else {
             const QString relativePath = sharesDir.relativeFilePath(info.filePath());
             ChatSharesDatabase::Entry cached = scanOld.take(relativePath);
@@ -393,6 +432,10 @@ void IndexThread::scanDir(const QDir &dir)
                 scanUpdated++;
         }
     }
+
+    // recurse into subdirectories
+    foreach (const QFileInfo &info, subdirs)
+        scanDir(QDir(info.filePath()));
 }
 
 SearchThread::SearchThread(ChatSharesDatabase *database, const QXmppShareSearchIq &request)

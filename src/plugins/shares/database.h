@@ -24,6 +24,7 @@
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppShareIq.h"
 
+class QFileSystemWatcher;
 class QTimer;
 
 class ChatSharesDatabase : public QObject
@@ -66,11 +67,13 @@ public slots:
     void search(const QXmppShareSearchIq &requestIq);
 
 private slots:
-    void slotIndexFinished(double elapsed, int updated, int removed);
+    void slotDirectoryChanged(const QString &path);
+    void slotIndexFinished(double elapsed, int updated, int removed, const QStringList &watchDirs);
 
 private:
     QTimer *indexTimer;
     QThread *indexThread;
+    QFileSystemWatcher *fsWatcher;
     QDir sharesDir;
     QSqlDatabase sharesDb;
 };
@@ -116,7 +119,7 @@ public:
     void run();
 
 signals:
-    void indexFinished(double elapsed, int updated, int removed);
+    void indexFinished(double elapsed, int updated, int removed, const QStringList &watchDirs);
 
 private:
     void scanDir(const QDir &dir);
@@ -125,6 +128,7 @@ private:
     qint64 scanAdded;
     qint64 scanUpdated;
     QSqlDatabase sharesDb;
+    QStringList watchDirs;
 };
 
 class SearchThread : public ChatSharesThread
