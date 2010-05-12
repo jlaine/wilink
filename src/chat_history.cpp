@@ -298,24 +298,24 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     for (int i = 0; i < layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+
+        // check for collision
+        if (message.archived != child->message().archived &&
+            message.fromJid == child->message().fromJid &&
+            message.body == child->message().body &&
+            qAbs(message.date.secsTo(child->message().date)) < 10)
+            return;
+
         if (message.date > child->message().date)
         {
             previous = child;
             pos++;
-        } else if (message.archived) {
-            // check for collision
-            if (!child->message().archived &&
-                message.from == child->message().from &&
-                message.body == child->message().body)
-                return;
-        } else {
-            break;
         }
     }
 
     /* determine grouping */
     bool showSender = (!previous ||
-        message.from != previous->message().from ||
+        message.fromJid != previous->message().fromJid ||
         message.date > previous->message().date.addSecs(120 * 60));
     bool showDate = (showSender ||
         message.date > previous->message().date.addSecs(60));

@@ -442,6 +442,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     ChatHistoryMessage message;
     message.body = msg.body();
     message.from = from;
+    message.fromJid = msg.from();
     message.received = (msg.from() != chatLocalJid);
     message.date = QDateTime::currentDateTime();
     foreach (const QXmppElement &extension, msg.extensions())

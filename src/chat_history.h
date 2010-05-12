@@ -36,6 +36,7 @@ public:
     QString body;
     QDateTime date;
     QString from;
+    QString fromJid;
     bool received;
 };
 
