@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QTimer>
 
 #include "chat_panel.h"
 
@@ -112,5 +113,17 @@ void ChatPanel::filterDrops(QWidget *widget)
 {
     widget->setAcceptDrops(true);
     widget->installEventFilter(this);
+}
+
+void ChatPanel::queueNotification(const QString &message)
+{
+    notificationQueue << message;
+    QTimer::singleShot(0, this, SLOT(sendNotifications()));
+}
+
+void ChatPanel::sendNotifications()
+{
+    while (!notificationQueue.isEmpty())
+        emit notifyPanel(notificationQueue.takeFirst());
 }
 

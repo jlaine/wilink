@@ -44,6 +44,7 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void filterDrops(QWidget *widget);
     QLayout *headerLayout();
+    void queueNotification(const QString &message);
 
 signals:
     void dropPanel(QDropEvent *event);
@@ -53,11 +54,15 @@ signals:
     void showPanel();
     void unregisterPanel();
 
+private slots:
+    void sendNotifications();
+
 private:
     QPushButton *closeButton;
     QLabel *iconLabel;
     QLabel *nameLabel;
     QString windowExtra;
+    QStringList notificationQueue;
 };
 
 #endif

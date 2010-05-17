@@ -394,8 +394,8 @@ void ChatRoom::invite(const QString &jid)
     message.setExtensions(x);
     client->sendPacket(message);
 
-    // let user know about the invitation
-    emit notifyPanel(tr("%1 has been invited to %2")
+    // notify user
+    queueNotification(tr("%1 has been invited to %2")
         .arg(rosterModel->contactName(jid))
         .arg(rosterModel->contactName(chatRemoteJid)));
 }
@@ -467,9 +467,9 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     }
     chatHistory->addMessage(message);
 
-    // notify
-    if (notifyMessages)
-        emit notifyPanel(message.body);
+    // notify user
+    if (notifyMessages || message.body.contains("@" + jidToResource(chatLocalJid)))
+        queueNotification(message.body);
 }
 
 /** Return the type of entry to add to the roster.

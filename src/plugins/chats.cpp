@@ -162,15 +162,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.received = true;
     chatHistory->addMessage(message);
 
-    // notify later, as we may have just added this panel
-    notifyQueue.append(message.body);
+    // queue notification
+    queueNotification(message.body);
     QTimer::singleShot(0, this, SLOT(notifyMessages()));
-}
-
-void ChatDialog::notifyMessages()
-{
-    while (!notifyQueue.isEmpty())
-        notifyPanel(notifyQueue.takeFirst());
 }
 
 /** Return the type of entry to add to the roster.

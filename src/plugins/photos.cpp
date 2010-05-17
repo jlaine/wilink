@@ -593,9 +593,7 @@ void Photos::processUploadQueue()
     /* if the queue is empty, hide progress bar and reset it */
     if (uploadQueue.empty())
     {
-        showMessage(tr("Photos upload complete."));
-        emit notifyPanel(tr("Your photos have been uploaded."));
-
+        /* reset progress bar */
         stopButton->hide();
         progressBar->hide();
         progressBar->setValue(0);
@@ -604,6 +602,10 @@ void Photos::processUploadQueue()
 
         /* refresh the current view */
         refresh();
+
+        /* notify the user */
+        showMessage(tr("Photos upload complete."));
+        queueNotification(tr("Your photos have been uploaded."));
         return;
     }
 
