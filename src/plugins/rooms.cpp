@@ -539,9 +539,9 @@ void ChatRoom::rosterClick(const QModelIndex &index)
             if (!bits.contains(newAt))
             {
                 bits << newAt;
-                chatInput->setText(text.replace(oldPos, rx.matchedLength(), bits.join(", ") + ": "));
-                cursor.movePosition(QTextCursor::End);
-                chatInput->setTextCursor(cursor);
+                cursor.setPosition(oldPos);
+                cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
+                cursor.insertText(bits.join(", ") + ": ");
             }
         } else {
             cursor.insertText(newAt + ": ");
