@@ -44,6 +44,7 @@ public:
         MessagesRole,
         AvatarRole,
         FlagsRole,
+        StatusRole,
         UrlRole,
     };
 
@@ -93,9 +94,6 @@ protected slots:
     void rosterChanged(const QString &jid);
     void rosterReceived();
     void vCardReceived(const QXmppVCard&);
-
-private:
-    QString contactStatus(const QString &bareJid) const;
 
 private:
     QXmppClient *client;

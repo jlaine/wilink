@@ -44,24 +44,6 @@ enum RosterColumns {
     MaxColumn,
 };
 
-static QString presenceName(const QXmppPresence &presence)
-{
-    QXmppPresence::Status::Type type;
-    if (presence.type() == QXmppPresence::Unavailable)
-        type = QXmppPresence::Status::Offline;
-    else
-        type = presence.status().type();
-
-    if (type == QXmppPresence::Status::Offline)
-        return "offline";
-    else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
-        return "available";
-    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
-        return "away";
-    else
-        return "busy";
-}
-
 static void paintMessages(QPixmap &icon, int messages)
 {
     QString pending = QString::number(messages);
@@ -150,22 +132,18 @@ QString ChatRosterModel::contactName(const QString &bareJid) const
     return bareJid.split("@").first();
 }
 
-QString ChatRosterModel::contactStatus(const QString &bareJid) const
+static QString contactStatus(const QModelIndex &index)
 {
-    QString suffix = "offline";
-    foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
-    {
-        if (presence.type() != QXmppPresence::Available)
-            continue;
-        suffix = presenceName(presence);
-
-        // FIXME : we should probably be using the priority rather than
-        // stop at the first available contact
-        if (presence.status().type() == QXmppPresence::Status::Online ||
-            presence.status().type() == QXmppPresence::Status::Chat)
-            break;
-    }
-    return suffix;
+    const int typeVal = index.data(ChatRosterModel::StatusRole).toInt();
+    QXmppPresence::Status::Type type = static_cast<QXmppPresence::Status::Type>(typeVal);
+    if (type == QXmppPresence::Status::Offline)
+        return "offline";
+    else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
+        return "available";
+    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
+        return "away";
+    else
+        return "busy";
 }
 
 QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
@@ -181,6 +159,22 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
+    } else if (role == StatusRole && item->type() == ChatRosterItem::Contact) {
+        QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+        foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
+        {
+            QXmppPresence::Status::Type type = presence.status().type();
+            if (type == QXmppPresence::Status::Offline)
+                continue;
+            // FIXME : we should probably be using the priority rather than
+            // stop at the first available contact
+            else if (type == QXmppPresence::Status::Online ||
+                     type == QXmppPresence::Status::Chat)
+                return type;
+            else
+                statusType = type;
+        }
+        return statusType;
     } else if (role == Qt::DisplayRole && index.column() == ImageColumn) {
         return QVariant();
     } else if(role == Qt::FontRole && index.column() == ContactColumn) {
@@ -200,7 +194,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         {
             const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(bareJid)));
+                QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(index)));
                 if (messages)
                     paintMessages(icon, messages);
                 return icon;
@@ -209,7 +203,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
                 return contactName(bareJid);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return (contactStatus(bareJid) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
+                return (contactStatus(index) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::Room) {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
@@ -222,7 +216,9 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QString("chatuser_") + bareJid.toLower();
+                return QString("chatuser_") + contactStatus(index) + "_" + bareJid.toLower();
+            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+                return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
         }
     }
@@ -391,15 +387,13 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         {
             // create roster entry
             memberItem = new ChatRosterItem(ChatRosterItem::RoomMember, jid);
-            memberItem->setData(Qt::DecorationRole, QIcon(QString(":/contact-%1.png")
-                .arg(presenceName(presence))));
+            memberItem->setData(StatusRole, presence.status().type());
             beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
             roomItem->append(memberItem);
             endInsertRows();
         } else {
             // update roster entry
-            memberItem->setData(Qt::DecorationRole, QIcon(QString(":/contact-%1.png")
-                .arg(presenceName(presence))));
+            memberItem->setData(StatusRole, presence.status().type());
             emit dataChanged(createIndex(memberItem->row(), ContactColumn, memberItem),
                              createIndex(memberItem->row(), SortingColumn, memberItem));
         }
