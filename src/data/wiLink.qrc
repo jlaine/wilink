@@ -2,6 +2,7 @@
 <qresource>
     <file>add.png</file>
     <file>album.png</file>
+    <file>album-128.png</file>
     <file>back.png</file>
     <file>chat.png</file>
     <file>close.png</file>
