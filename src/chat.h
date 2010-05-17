@@ -97,8 +97,6 @@ private:
 
 private:
     bool autoAway;
-    bool isBusy;
-
     Idle *m_idle;
 
     QMenu *m_fileMenu;

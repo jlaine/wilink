@@ -69,8 +69,7 @@ enum StatusIndexes {
 
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
-    autoAway(false),
-    isBusy(false)
+    autoAway(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -354,7 +353,13 @@ void Chat::changeEvent(QEvent *event)
  */
 void Chat::connected()
 {
-    m_statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
+    QXmppPresence::Status::Type statusType = m_client->getClientPresence().status().type();
+    if (statusType == QXmppPresence::Status::Away)
+        m_statusCombo->setCurrentIndex(AwayIndex);
+    else if (statusType == QXmppPresence::Status::DND)
+        m_statusCombo->setCurrentIndex(BusyIndex);
+    else
+        m_statusCombo->setCurrentIndex(AvailableIndex);
 }
 
 /** Handle disconnection from the chat server.
@@ -564,7 +569,6 @@ void Chat::secondsIdle(int secs)
 void Chat::statusChanged(int currentIndex)
 {
     autoAway = false;
-    isBusy = (currentIndex == BusyIndex);
     if (currentIndex == AvailableIndex)
         m_client->setClientPresence(QXmppPresence::Status::Online);
     else if (currentIndex == AwayIndex)
