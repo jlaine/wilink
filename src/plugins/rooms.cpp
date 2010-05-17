@@ -287,7 +287,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 
         if (flags & ChatRosterModel::MembersFlag)
         {
-            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Members"));
+            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Permissions"));
             action->setData(jid);
             connect(action, SIGNAL(triggered()), this, SLOT(roomMembers()));
         }
@@ -568,7 +568,7 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     : QDialog(parent), chatRoomServer(roomServer)
 {
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join.")));
+    layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join or create.")));
     lineEdit = new QLineEdit;
     layout->addWidget(lineEdit);
 

@@ -188,8 +188,8 @@
         <translation>Rejoindre un salon de discussion</translation>
     </message>
     <message>
-        <source>Enter the name of the chat room you want to join.</source>
-        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre.</translation>
+        <source>Enter the name of the chat room you want to join or create.</source>
+        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre ou créer.</translation>
     </message>
 </context>
 <context>
@@ -201,10 +201,6 @@
     <message>
         <source>Options</source>
         <translation>Options</translation>
-    </message>
-    <message>
-        <source>Members</source>
-        <translation>Membres</translation>
     </message>
     <message>
         <source>Kick user</source>
@@ -221,6 +217,10 @@ Do you accept?</source>
         <translation>%1 vous invite au salon de discussion &apos;%2&apos;.
 
 Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation>Permissions</translation>
     </message>
 </context>
 <context>
