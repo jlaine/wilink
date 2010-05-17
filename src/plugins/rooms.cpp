@@ -92,26 +92,6 @@ void ChatRoomWatcher::disconnected()
     roomButton->setEnabled(false);
 }
 
-/** Invite a contact to join a chat room.
- */
-void ChatRoomWatcher::inviteContact()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString jid = action->data().toString();
-
-    // prompt the user for chat room
-    ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
-    if (!prompt.exec())
-        return;
-
-    // join chat room and invite contact
-    const QString roomJid = prompt.textValue();
-    ChatRoom *room = joinRoom(roomJid);
-    room->invite(jid);
-}
-
 ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
 {
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
@@ -296,12 +276,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
-    if (type == ChatRosterItem::Contact)
-    {
-        QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Invite to a chat room"));
-        action->setData(jid);
-        connect(action, SIGNAL(triggered()), this, SLOT(inviteContact()));
-    } else if (type == ChatRosterItem::Room) {
+    if (type == ChatRosterItem::Room) {
         int flags = index.data(ChatRosterModel::FlagsRole).toInt();
         if (flags & ChatRosterModel::OptionsFlag)
         {

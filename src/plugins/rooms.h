@@ -51,7 +51,6 @@ public:
 
 private slots:
     void disconnected();
-    void inviteContact();
     ChatRoom *joinRoom(const QString &jid);
     void kickUser();
     void messageHandled(QAbstractButton *button);
