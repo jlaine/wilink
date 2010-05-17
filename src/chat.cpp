@@ -70,8 +70,7 @@ enum StatusIndexes {
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
     autoAway(false),
-    isBusy(false),
-    isConnected(false)
+    isBusy(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -355,7 +354,6 @@ void Chat::changeEvent(QEvent *event)
  */
 void Chat::connected()
 {
-    isConnected = true;
     m_statusCombo->setCurrentIndex(isBusy ? BusyIndex : AvailableIndex);
 }
 
@@ -363,7 +361,6 @@ void Chat::connected()
  */
 void Chat::disconnected()
 {
-    isConnected = false;
     m_statusCombo->setCurrentIndex(OfflineIndex);
 }
 
@@ -560,37 +557,22 @@ void Chat::secondsIdle(int secs)
             autoAway = true;
         }
     } else if (autoAway) {
-        const int oldIndex = isBusy ? BusyIndex : AvailableIndex;
-        m_statusCombo->setCurrentIndex(oldIndex);
+        m_statusCombo->setCurrentIndex(AvailableIndex);
     }
 }
 
 void Chat::statusChanged(int currentIndex)
 {
     autoAway = false;
+    isBusy = (currentIndex == BusyIndex);
     if (currentIndex == AvailableIndex)
-    {
-        isBusy = false;
-        if (isConnected)
-            m_client->setClientPresence(QXmppPresence::Status::Online);
-        else
-            m_client->connectToServer(m_client->getConfiguration());
-    } else if (currentIndex == AwayIndex) {
-        isBusy = false;
-        if (isConnected)
-            m_client->setClientPresence(QXmppPresence::Status::Away);
-        else
-            m_client->connectToServer(m_client->getConfiguration());
-    } else if (currentIndex == BusyIndex) {
-        isBusy = true;
-        if (isConnected)
-            m_client->setClientPresence(QXmppPresence::Status::DND);
-        else
-            m_client->connectToServer(m_client->getConfiguration());
-    } else if (currentIndex == OfflineIndex) {
-        if (isConnected)
-            m_client->disconnect();
-    }
+        m_client->setClientPresence(QXmppPresence::Status::Online);
+    else if (currentIndex == AwayIndex)
+        m_client->setClientPresence(QXmppPresence::Status::Away);
+    else if (currentIndex == BusyIndex)
+        m_client->setClientPresence(QXmppPresence::Status::DND);
+    else if (currentIndex == OfflineIndex)
+        m_client->setClientPresence(QXmppPresence::Status::Offline);
 }
 
 /** Unregister a panel from the roster list.

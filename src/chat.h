@@ -98,7 +98,6 @@ private:
 private:
     bool autoAway;
     bool isBusy;
-    bool isConnected;
 
     Idle *m_idle;
 
