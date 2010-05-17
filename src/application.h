@@ -25,6 +25,7 @@
 
 class Chat;
 class QAuthenticator;
+class QMenu;
 class QSettings;
 class QSystemTrayIcon;
 
@@ -65,6 +66,7 @@ private:
     QList<Chat*> chats;
     QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
+    QMenu *trayMenu;
 };
 
 #endif

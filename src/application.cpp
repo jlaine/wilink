@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QMenu>
 #include <QProcess>
 #include <QPushButton>
 #include <QSettings>
@@ -43,7 +44,8 @@ Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
     settings(0),
     trayContext(0),
-    trayIcon(0)
+    trayIcon(0),
+    trayMenu(0)
 {
     /* set application properties */
     setApplicationName("wiLink");
@@ -73,6 +75,10 @@ Application::Application(int &argc, char **argv)
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon;
     trayIcon->setIcon(QIcon(":/wiLink.png"));
+    trayMenu = new QMenu;
+    QAction *action = trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    connect(action, SIGNAL(triggered()), this, SLOT(quit()));
+    trayIcon->setContextMenu(trayMenu);
     QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
         this, SLOT(showChats()));
     QObject::connect(trayIcon, SIGNAL(messageClicked()),
