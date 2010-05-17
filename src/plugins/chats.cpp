@@ -164,7 +164,6 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     // queue notification
     queueNotification(message.body);
-    QTimer::singleShot(0, this, SLOT(notifyMessages()));
 }
 
 /** Return the type of entry to add to the roster.

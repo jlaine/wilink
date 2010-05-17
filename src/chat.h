@@ -76,6 +76,7 @@ private slots:
     void connected();
     void disconnected();
     void error(QXmppClient::Error error);
+    void messageClicked(QWidget *context);
     void panelChanged(int index);
     void promptCredentials();
     void resizeContacts();

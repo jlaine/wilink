@@ -40,7 +40,10 @@
 #include "chat_accounts.h"
 
 Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv), settings(0), trayIcon(0)
+    : QApplication(argc, argv),
+    settings(0),
+    trayContext(0),
+    trayIcon(0)
 {
     /* set application properties */
     setApplicationName("wiLink");
@@ -72,6 +75,8 @@ Application::Application(int &argc, char **argv)
     trayIcon->setIcon(QIcon(":/wiLink.png"));
     QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
         this, SLOT(showChats()));
+    QObject::connect(trayIcon, SIGNAL(messageClicked()),
+        this, SLOT(messageClicked()));
     trayIcon->show();
 #endif
 }
@@ -365,9 +370,17 @@ void Application::showChats()
     }
 }
 
-void Application::showMessage(const QString &title, const QString &message)
+void Application::messageClicked()
+{
+    emit messageClicked(trayContext);
+}
+
+void Application::showMessage(QWidget *context, const QString &title, const QString &message)
 {
     if (trayIcon)
+    {
+        trayContext = context;
         trayIcon->showMessage(title, message);
+    }
 }
 

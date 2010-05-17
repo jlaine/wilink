@@ -42,13 +42,17 @@ public:
 
     bool isInstalled();
     bool openAtLogin() const;
-    void showMessage(const QString &title, const QString &message);
+    void showMessage(QWidget *context, const QString &title, const QString &message);
+
+signals:
+    void messageClicked(QWidget *context);
 
 public slots:
     void setOpenAtLogin(bool run);
 
 private slots:
     void getCredentials(const QString &realm, QAuthenticator *authenticator);
+    void messageClicked();
     void resetChats();
     void showAccounts();
     void showChats();
@@ -59,6 +63,7 @@ private:
 
     QSettings *settings;
     QList<Chat*> chats;
+    QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
 };
 

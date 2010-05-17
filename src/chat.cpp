@@ -129,13 +129,16 @@ Chat::Chat(QWidget *parent)
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
     Application *wApp = qobject_cast<Application*>(qApp);
-    if (wApp && wApp->isInstalled())
+    Q_ASSERT(wApp);
+    if (wApp->isInstalled())
     {
         action = m_optionsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(wApp->openAtLogin());
         connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
     }
+    QObject::connect(wApp, SIGNAL(messageClicked(QWidget*)),
+        this, SLOT(messageClicked(QWidget*)));
 
     action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
@@ -255,7 +258,7 @@ void Chat::notifyPanel(const QString &message)
     // add pending message
     if (!window->isActiveWindow() || (window == this && m_conversationPanel->currentWidget() != panel))
     {
-        wApp->showMessage(panel->windowTitle(), message);
+        wApp->showMessage(panel, panel->windowTitle(), message);
         m_rosterModel->addPendingMessage(panel->objectName());
     }
 
@@ -322,6 +325,10 @@ void Chat::showPanel()
         if (m_conversationPanel->count() == 1)
             resizeContacts();
     }
+
+    // make sure window is visible
+    show();
+    raise();
     m_conversationPanel->setCurrentWidget(panel);
 }
 
@@ -486,6 +493,15 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
 QMenu *Chat::fileMenu()
 {
     return m_fileMenu;
+}
+
+/** Handle a click on a system tray message.
+ */
+void Chat::messageClicked(QWidget *context)
+{
+    ChatPanel *panel = qobject_cast<ChatPanel*>(context);
+    if (panel && m_chatPanels.contains(panel))
+        QTimer::singleShot(0, panel, SIGNAL(showPanel()));
 }
 
 /** Return this window's "Options" menu.
