@@ -572,30 +572,19 @@ void Chat::statusChanged(int currentIndex)
     {
         isBusy = false;
         if (isConnected)
-        {
-            QXmppPresence presence;
-            presence.setType(QXmppPresence::Available);
-            m_client->sendPacket(presence);
-        }
+            m_client->setClientPresence(QXmppPresence::Status::Online);
         else
             m_client->connectToServer(m_client->getConfiguration());
     } else if (currentIndex == AwayIndex) {
+        isBusy = false;
         if (isConnected)
-        {
-            QXmppPresence presence;
-            presence.setType(QXmppPresence::Available);
-            presence.setStatus(QXmppPresence::Status::Away);
-            m_client->sendPacket(presence);
-        }
+            m_client->setClientPresence(QXmppPresence::Status::Away);
+        else
+            m_client->connectToServer(m_client->getConfiguration());
     } else if (currentIndex == BusyIndex) {
         isBusy = true;
         if (isConnected)
-        {
-            QXmppPresence presence;
-            presence.setType(QXmppPresence::Available);
-            presence.setStatus(QXmppPresence::Status::DND);
-            m_client->sendPacket(presence);
-        }
+            m_client->setClientPresence(QXmppPresence::Status::DND);
         else
             m_client->connectToServer(m_client->getConfiguration());
     } else if (currentIndex == OfflineIndex) {
