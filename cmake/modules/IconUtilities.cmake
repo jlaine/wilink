@@ -55,10 +55,11 @@ endmacro(generate_ico)
 #
 macro(generate_png OUTPUT)
 	set(${OUTPUT})
+	set(SIZE 32)
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_png ${_this_svg} png)
 		add_custom_command(OUTPUT ${_this_png} DEPENDS ${_this_svg}
-			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=32 --export-height=32)
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=${SIZE} --export-height=${SIZE})
 		list(APPEND ${OUTPUT} ${_this_png})
 	endforeach()
 endmacro(generate_png)
@@ -69,6 +70,7 @@ endmacro(generate_png)
 #
 macro(generate_xpm OUTPUT)
 	set(${OUTPUT})
+	set(SIZE 32)
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_xpm ${_this_svg} xpm)
 		get_filename_component(_this_xpm_title ${_this_svg} NAME_WE)
@@ -76,7 +78,7 @@ macro(generate_xpm OUTPUT)
 		set(_this_alpha ${_this_xpm}.tmp.alpha)
 		set(_this_png ${_this_xpm}.tmp.png)
 		add_custom_command(OUTPUT ${_this_xpm} DEPENDS ${_this_svg}
-			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=32 --export-height=32
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=${SIZE} --export-height=${SIZE}
 			COMMAND ${PNGTOPNM} -alpha ${_this_png} > ${_this_alpha}
 			COMMAND ${PNGTOPNM} ${_this_png} | ${PPMTOXPM} -alpha ${_this_alpha} -name ${_this_xpm_title}_xpm | sed -e 's/static char/static const char/g' > ${_this_xpm}
 			COMMAND rm -f ${_this_alpha} ${_this_png})
