@@ -175,7 +175,7 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(dropPanel(QDropEvent*)), this, SLOT(dropPanel(QDropEvent*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
-    connect(panel, SIGNAL(notifyPanel()), this, SLOT(notifyPanel()));
+    connect(panel, SIGNAL(notifyPanel(QString)), this, SLOT(notifyPanel(QString)));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
@@ -246,21 +246,22 @@ void Chat::hidePanel()
 
 /** Notify the user of activity on a panel.
  */
-void Chat::notifyPanel()
+void Chat::notifyPanel(const QString &message)
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
+    QWidget *window = panel->window();
 
     // add pending message
-    if (!isActiveWindow() || m_conversationPanel->currentWidget() != panel)
+    if (!window->isActiveWindow() || m_conversationPanel->currentWidget() != panel)
         m_rosterModel->addPendingMessage(panel->objectName());
 
     // show the chat window
-    if (!isVisible())
+    if (!window->isVisible())
     {
 #ifdef Q_OS_MAC
-        show();
+        window->show();
 #else
-        showMinimized();
+        window->showMinimized();
 #endif
     }
 
@@ -269,7 +270,7 @@ void Chat::notifyPanel()
      * bouncing until the user focuses the window. To work around this
      * we implement our own version.
      */
-    Application::alert(panel);
+    Application::alert(window);
 }
 
 /** Register a panel in the roster list.

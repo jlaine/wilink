@@ -382,8 +382,6 @@ void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
  */
 void ChatRoom::invite(const QString &jid)
 {
-    qDebug() << "Inviting" << jid << "to room" << chatRemoteJid;
-
     QXmppElement x;
     x.setTagName("x");
     x.setAttribute("xmlns", ns_conference);
@@ -395,6 +393,11 @@ void ChatRoom::invite(const QString &jid)
     message.setType(QXmppMessage::Normal);
     message.setExtensions(x);
     client->sendPacket(message);
+
+    // let user know about the invitation
+    emit notifyPanel(tr("%1 has been invited to %2")
+        .arg(rosterModel->contactName(jid))
+        .arg(rosterModel->contactName(chatRemoteJid)));
 }
 
 /** Send a request to join a multi-user chat.
@@ -466,7 +469,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
 
     // notify
     if (notifyMessages)
-        emit notifyPanel();    
+        emit notifyPanel(message.body);
 }
 
 /** Return the type of entry to add to the roster.

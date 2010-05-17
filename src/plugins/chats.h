@@ -50,6 +50,7 @@ private slots:
     void disconnected();
     void join();
     void leave();
+    void notifyMessages();
 
 private:
     virtual void sendMessage(const QString &body);
@@ -58,6 +59,7 @@ private:
     bool joined;
     ChatRosterModel *rosterModel;
     QStringList chatStatesJids;
+    QStringList notifyQueue;
 };
 
 class ChatsWatcher : public QObject

@@ -48,7 +48,7 @@ protected:
 signals:
     void dropPanel(QDropEvent *event);
     void hidePanel();
-    void notifyPanel();
+    void notifyPanel(const QString &message);
     void registerPanel();
     void showPanel();
     void unregisterPanel();
