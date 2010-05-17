@@ -552,6 +552,7 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid)
     {
         chatInput->textCursor().insertText("@" + jidToResource(jid) + ": ");
+        emit showPanel();
         chatInput->setFocus();
     }
 }
