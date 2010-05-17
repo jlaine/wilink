@@ -31,6 +31,7 @@
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
+#include <QSystemTrayIcon>
 #include <QTimer>
 
 #include "idle/idle.h"
@@ -254,7 +255,11 @@ void Chat::notifyPanel(const QString &message)
 
     // add pending message
     if (!window->isActiveWindow() || m_conversationPanel->currentWidget() != panel)
+    {
+        if (m_systemTrayIcon)
+            m_systemTrayIcon->showMessage(panel->windowTitle(), message);
         m_rosterModel->addPendingMessage(panel->objectName());
+    }
 
     // show the chat window
     if (!window->isVisible())
