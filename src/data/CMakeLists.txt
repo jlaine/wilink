@@ -13,6 +13,7 @@ generate_png(png
     contact-offline.svg
     diagnostics.svg
     download.svg
+    file.svg
     options.svg
     photos.svg
     refresh.svg
