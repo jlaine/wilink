@@ -164,7 +164,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     // notify later, as we may have just added this panel
     notifyQueue.append(message.body);
-    QTimer::singleShot(0, this, SIGNAL(notifyMessages()));
+    QTimer::singleShot(0, this, SLOT(notifyMessages()));
 }
 
 void ChatDialog::notifyMessages()
