@@ -82,7 +82,7 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     roomButton = new QPushButton;
     roomButton->setEnabled(false);
     roomButton->setIcon(QIcon(":/chat.png"));
-    roomButton->setToolTip(tr("Join a chat room"));
+    roomButton->setToolTip(tr("Join or create a chat room"));
     connect(roomButton, SIGNAL(clicked()), this, SLOT(roomJoin()));
     chat->statusBar()->addWidget(roomButton);
 }
@@ -568,7 +568,9 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     : QDialog(parent), chatRoomServer(roomServer)
 {
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(new QLabel(tr("Enter the name of the chat room you want to join or create.")));
+    QLabel *label = new QLabel(tr("Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you."));
+    label->setWordWrap(true);
+    layout->addWidget(label);
     lineEdit = new QLineEdit;
     layout->addWidget(lineEdit);
 
@@ -584,7 +586,7 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     setLayout(layout);
 
-    setWindowTitle(tr("Join a chat room"));
+    setWindowTitle(tr("Join or create a chat room"));
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
 
     // get rooms
@@ -670,7 +672,7 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     layout->addWidget(buttonBox);
     setLayout(layout);
 
-    setWindowTitle(tr("Chat room members"));
+    setWindowTitle(tr("Chat room permissions"));
     connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
 
     affiliations["member"] = tr("member");

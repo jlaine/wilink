@@ -153,10 +153,6 @@
         <translation>Role</translation>
     </message>
     <message>
-        <source>Chat room members</source>
-        <translation>Membres du salon de discussion</translation>
-    </message>
-    <message>
         <source>Add a user</source>
         <translation>Ajouter un utilisateur</translation>
     </message>
@@ -180,24 +176,24 @@
         <source>banned</source>
         <translation>banni</translation>
     </message>
+    <message>
+        <source>Chat room permissions</source>
+        <translation>Permissions du salon de discussion</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoomPrompt</name>
     <message>
-        <source>Join a chat room</source>
-        <translation>Rejoindre un salon de discussion</translation>
+        <source>Join or create a chat room</source>
+        <translation>Rejoindre ou créer un salon de discussion</translation>
     </message>
     <message>
-        <source>Enter the name of the chat room you want to join or create.</source>
-        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre ou créer.</translation>
+        <source>Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.</source>
+        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre ou créer. Si le salon n&apos;existe pas encore, il sera créé automatiquement.</translation>
     </message>
 </context>
 <context>
     <name>ChatRoomWatcher</name>
-    <message>
-        <source>Join a chat room</source>
-        <translation>Rejoindre un salon de discussion</translation>
-    </message>
     <message>
         <source>Options</source>
         <translation>Options</translation>
@@ -221,6 +217,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Permissions</source>
         <translation>Permissions</translation>
+    </message>
+    <message>
+        <source>Join or create a chat room</source>
+        <translation>Rejoindre ou créer un salon de discussion</translation>
     </message>
 </context>
 <context>
