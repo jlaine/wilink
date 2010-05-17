@@ -48,6 +48,14 @@ static const int PROGRESS_STEPS = 100;
 static const QSize ICON_SIZE(128, 128);
 static const QSize UPLOAD_SIZE(2048, 2048);
 
+static bool isImage(const QString &fileName)
+{
+    if (fileName.isEmpty())
+        return false;
+    QString extension = fileName.split(".").last().toLower();
+    return (extension == "gif" || extension == "jpg" || extension == "jpeg" || extension == "png");
+}
+
 PhotosList::PhotosList(const QUrl &url, QWidget *parent)
     : QListWidget(parent), baseDrop(true), baseUrl(url)
 {
@@ -364,7 +372,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
         /* fetch thumbnails */
         foreach (const FileInfo& info, results)
         {
-            if (!info.isDir() && info.name().endsWith(".jpg"))
+            if (!info.isDir() && isImage(info.name()))
                 downloadQueue.append(Job(listView, info.url(), FileSystem::SmallSize));
         }
         processDownloadQueue();
@@ -453,7 +461,7 @@ void Photos::fileNext()
  */
 void Photos::fileOpened(const QUrl &url)
 {
-    if (!url.toString().endsWith(".jpg"))
+    if (!isImage(url.toString()))
         return;
 
     // disable controls
