@@ -254,7 +254,7 @@ void Chat::notifyPanel(const QString &message)
     QWidget *window = panel->isVisible() ? panel->window() : this;
 
     // add pending message
-    if (!window->isActiveWindow() || m_conversationPanel->currentWidget() != panel)
+    if (!window->isActiveWindow() || (window == this && m_conversationPanel->currentWidget() != panel))
     {
         if (m_systemTrayIcon)
             m_systemTrayIcon->showMessage(panel->windowTitle(), message);
