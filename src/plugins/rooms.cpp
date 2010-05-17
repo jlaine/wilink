@@ -525,7 +525,7 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
     // talk "at" somebody
-    if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid)
+    if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
     {
         chatInput->textCursor().insertText("@" + jidToResource(jid) + ": ");
         emit showPanel();
