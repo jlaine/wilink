@@ -688,7 +688,6 @@ bool PhotosPlugin::initialize(Chat *chat)
 
     /* register panel */
     Photos *photos = new Photos(url);
-    //photos->setSystemTrayIcon(this);
     photos->setObjectName("photos");
     chat->addPanel(photos);
     connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));
