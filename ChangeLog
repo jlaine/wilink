@@ -4,6 +4,7 @@ wiLink 1.0.0 (UNRELEASED)
  * Make it possible to talk "at" somebody in a chat room.
  * Reflect the availability of chat room members in their icon.
  * Add system tray notifications on Windows and Linux.
+ * Restore "Quit" from system tray icon.
 
 wiLink 0.9.0 (2010-05-12)
  * Merge photo uploads and diagnostics into the main window.
