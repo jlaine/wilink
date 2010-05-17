@@ -31,7 +31,6 @@
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
-#include <QSystemTrayIcon>
 #include <QTimer>
 
 #include "idle/idle.h"
@@ -70,8 +69,7 @@ enum StatusIndexes {
 
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
-    autoAway(false),
-    m_systemTrayIcon(0)
+    autoAway(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -250,14 +248,14 @@ void Chat::hidePanel()
  */
 void Chat::notifyPanel(const QString &message)
 {
+    Application *wApp = qobject_cast<Application*>(qApp);
     QWidget *panel = qobject_cast<QWidget*>(sender());
     QWidget *window = panel->isVisible() ? panel->window() : this;
 
     // add pending message
     if (!window->isActiveWindow() || (window == this && m_conversationPanel->currentWidget() != panel))
     {
-        if (m_systemTrayIcon)
-            m_systemTrayIcon->showMessage(panel->windowTitle(), message);
+        wApp->showMessage(panel->windowTitle(), message);
         m_rosterModel->addPendingMessage(panel->objectName());
     }
 
@@ -276,7 +274,7 @@ void Chat::notifyPanel(const QString &message)
      * bouncing until the user focuses the window. To work around this
      * we implement our own version.
      */
-    Application::alert(window);
+    wApp->alert(window);
 }
 
 /** Register a panel in the roster list.
@@ -571,15 +569,6 @@ void Chat::secondsIdle(int secs)
     } else if (autoAway) {
         m_statusCombo->setCurrentIndex(AvailableIndex);
     }
-}
-
-/** Set the system tray icon.
- *
- * @param trayIcon
- */
-void Chat::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
-{
-    m_systemTrayIcon = trayIcon;
 }
 
 void Chat::statusChanged(int currentIndex)

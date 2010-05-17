@@ -338,7 +338,6 @@ void Application::resetChats()
         QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
 
         Chat *chat = new Chat;
-        chat->setSystemTrayIcon(trayIcon);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
         else
@@ -364,5 +363,11 @@ void Application::showChats()
         chat->show();
         chat->raise();
     }
+}
+
+void Application::showMessage(const QString &title, const QString &message)
+{
+    if (trayIcon)
+        trayIcon->showMessage(title, message);
 }
 

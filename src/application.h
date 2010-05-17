@@ -42,6 +42,7 @@ public:
 
     bool isInstalled();
     bool openAtLogin() const;
+    void showMessage(const QString &title, const QString &message);
 
 public slots:
     void setOpenAtLogin(bool run);
