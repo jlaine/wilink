@@ -37,6 +37,7 @@ class QModelIndex;
 class QPushButton;
 class QSplitter;
 class QStackedWidget;
+class QSystemTrayIcon;
 
 /** Chat represents the user interface's main window.
  */
@@ -55,6 +56,7 @@ public:
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
     void addPanel(ChatPanel *panel);
     ChatPanel *panel(const QString &objectName);
+    void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
 signals:
     /** Plugins should connect to this signal to handle click events
@@ -109,6 +111,7 @@ private:
 
     QComboBox *m_statusCombo;
     QStackedWidget *m_conversationPanel;
+    QSystemTrayIcon *m_systemTrayIcon;
 };
 
 #endif

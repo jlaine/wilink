@@ -29,6 +29,7 @@
 #include <QProcess>
 #include <QPushButton>
 #include <QSettings>
+#include <QSystemTrayIcon>
 #include <QTimer>
 
 #include "qnetio/wallet.h"
@@ -39,7 +40,7 @@
 #include "chat_accounts.h"
 
 Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv), settings(0)
+    : QApplication(argc, argv), settings(0), trayIcon(0)
 {
     /* set application properties */
     setApplicationName("wiLink");
@@ -64,6 +65,15 @@ Application::Application(int &argc, char **argv)
     settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
+
+    /* create system tray icon */
+#ifndef Q_OS_MAC
+    trayIcon = new QSystemTrayIcon;
+    trayIcon->setIcon(QIcon(":/wiLink.png"));
+    QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+        this, SLOT(showChats()));
+    trayIcon->show();
+#endif
 }
 
 Application::~Application()
@@ -328,11 +338,12 @@ void Application::resetChats()
         QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
 
         Chat *chat = new Chat;
-        chat->move(xpos, ypos);
+        chat->setSystemTrayIcon(trayIcon);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
         else
             chat->setWindowTitle(QString("%1 - %2").arg(auth.user(), qApp->applicationName()));
+        chat->move(xpos, ypos);
         chat->show();
 
         QString domain = jid.split("@").last();

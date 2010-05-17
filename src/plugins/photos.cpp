@@ -207,8 +207,7 @@ Photos::Photos(const QString &url, QWidget *parent)
     baseUrl(url),
     downloadDevice(0),
     uploadDevice(0),
-    progressFiles(0),
-    systemTrayIcon(NULL)
+    progressFiles(0)
 {
     /* create UI */
     helpLabel = new QLabel(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
@@ -587,9 +586,8 @@ void Photos::processUploadQueue()
     if (uploadQueue.empty())
     {
         showMessage(tr("Photos upload complete."));
-        if (systemTrayIcon)
-            systemTrayIcon->showMessage(tr("Photos upload complete."),
-                tr("Your photos have been uploaded."));
+        emit notifyPanel(tr("Your photos have been uploaded."));
+
         stopButton->hide();
         progressBar->hide();
         progressBar->setValue(0);
@@ -649,15 +647,6 @@ void Photos::refresh()
     showMessage(tr("Loading your albums.."));
     listView->setAcceptDrops(false);
     fs->list(listView->url());
-}
-
-/** Set the system tray icon.
- *
- * @param trayIcon
- */
-void Photos::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
-{
-    systemTrayIcon = trayIcon;
 }
 
 void Photos::showMessage(const QString &message)

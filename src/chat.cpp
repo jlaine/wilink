@@ -69,7 +69,8 @@ enum StatusIndexes {
 
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
-    autoAway(false)
+    autoAway(false),
+    m_systemTrayIcon(0)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -565,6 +566,15 @@ void Chat::secondsIdle(int secs)
     } else if (autoAway) {
         m_statusCombo->setCurrentIndex(AvailableIndex);
     }
+}
+
+/** Set the system tray icon.
+ *
+ * @param trayIcon
+ */
+void Chat::setSystemTrayIcon(QSystemTrayIcon *trayIcon)
+{
+    m_systemTrayIcon = trayIcon;
 }
 
 void Chat::statusChanged(int currentIndex)

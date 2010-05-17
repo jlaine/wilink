@@ -77,15 +77,6 @@ int main(int argc, char *argv[])
 #endif
     signal(SIGTERM, signal_handler);
 
-    /* Setup system tray icon */
-#ifndef Q_OS_MAC
-    QSystemTrayIcon trayIcon;
-    trayIcon.setIcon(QIcon(":/wiLink.png"));
-    QObject::connect(&trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-        &app, SLOT(showChats()));
-    trayIcon.show();
-#endif
-
     /* Check for updates */
     UpdatesDialog updates;
 

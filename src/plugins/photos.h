@@ -33,7 +33,6 @@ class QLabel;
 class QProgressBar;
 class QPushButton;
 class QStackedWidget;
-class QSystemTrayIcon;
 
 class PhotosList : public QListWidget
 {
@@ -90,7 +89,6 @@ class Photos : public ChatPanel
 
 public:
     Photos(const QString &url, QWidget *parent = NULL);
-    void setSystemTrayIcon(QSystemTrayIcon *trayIcon);
 
 protected:
     void processDownloadQueue();
@@ -131,7 +129,6 @@ private:
     int progressFiles;
     QProgressBar *progressBar;
     QLabel *statusLabel;
-    QSystemTrayIcon *systemTrayIcon;
 };
 
 #endif

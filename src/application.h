@@ -26,6 +26,7 @@
 class Chat;
 class QAuthenticator;
 class QSettings;
+class QSystemTrayIcon;
 
 class Application : public QApplication
 {
@@ -57,6 +58,7 @@ private:
 
     QSettings *settings;
     QList<Chat*> chats;
+    QSystemTrayIcon *trayIcon;
 };
 
 #endif
