@@ -459,7 +459,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         child->setMaximumWidth(w);
     }
     adjustSize();
-    //QGraphicsView::resizeEvent(e);
+    QGraphicsView::resizeEvent(e);
 
     /* scroll to end if we were previous at end */
     if (atEnd)
