@@ -330,8 +330,12 @@ void Chat::showPanel()
     }
 
     // make sure window is visible
-    show();
-    raise();
+    if (!isActiveWindow())
+    {
+        show();
+        raise();
+        activateWindow();
+    }
     m_conversationPanel->setCurrentWidget(panel);
 }
 
