@@ -251,7 +251,7 @@ void Chat::hidePanel()
 void Chat::notifyPanel(const QString &message)
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
-    QWidget *window = panel->window();
+    QWidget *window = panel->isVisible() ? panel->window() : this;
 
     // add pending message
     if (!window->isActiveWindow() || m_conversationPanel->currentWidget() != panel)
