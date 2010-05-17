@@ -22,7 +22,6 @@
 #include <QDebug>
 #include <QDragEnterEvent>
 #include <QFile>
-#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QImage>
 #include <QImageReader>
@@ -138,16 +137,15 @@ FileInfoList PhotosList::entries() const
 
 void PhotosList::setEntries(const FileInfoList &entries)
 {
-    QFileIconProvider iconProvider;
     fileList = entries;
     clear();
     foreach (const FileInfo& info, fileList)
     {
         QListWidgetItem *newItem = new QListWidgetItem;
         if (info.isDir()) {
-            newItem->setIcon(iconProvider.icon(QFileIconProvider::Folder));
+            newItem->setIcon(QIcon(":/album-128.png"));
         } else {
-            newItem->setIcon(iconProvider.icon(QFileIconProvider::File));
+            newItem->setIcon(QIcon(":/file-128.png"));
         }
         newItem->setData(Qt::UserRole, QUrl(info.url()));
         newItem->setText(info.name());
