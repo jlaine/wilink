@@ -605,7 +605,7 @@ void Photos::processUploadQueue()
 
         /* notify the user */
         showMessage(tr("Photos upload complete."));
-        queueNotification(tr("Your photos have been uploaded."));
+        queueNotification(tr("Your photos have been uploaded."), ForceNotification);
         return;
     }
 

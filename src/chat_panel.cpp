@@ -115,15 +115,18 @@ void ChatPanel::filterDrops(QWidget *widget)
     widget->installEventFilter(this);
 }
 
-void ChatPanel::queueNotification(const QString &message)
+void ChatPanel::queueNotification(const QString &message, int options)
 {
-    notificationQueue << message;
+    notificationQueue << qMakePair(message, options);
     QTimer::singleShot(0, this, SLOT(sendNotifications()));
 }
 
 void ChatPanel::sendNotifications()
 {
     while (!notificationQueue.isEmpty())
-        emit notifyPanel(notificationQueue.takeFirst());
+    {
+        QPair<QString, int> entry = notificationQueue.takeFirst();
+        emit notifyPanel(entry.first, entry.second);
+    }
 }
 

@@ -88,7 +88,7 @@ private slots:
     void destroyPanel(QObject *obj);
     void dropPanel(QDropEvent *event);
     void hidePanel();
-    void notifyPanel(const QString &message);
+    void notifyPanel(const QString &message, int options);
     void registerPanel();
     void showPanel();
     void unregisterPanel();

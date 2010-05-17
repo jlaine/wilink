@@ -34,6 +34,12 @@ class ChatPanel : public QWidget
     Q_OBJECT
 
 public:
+    enum NotificationOptions
+    {
+        ForceNotification = 1,
+    };
+
+public:
     ChatPanel(QWidget *parent);
     virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
@@ -44,12 +50,12 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void filterDrops(QWidget *widget);
     QLayout *headerLayout();
-    void queueNotification(const QString &message);
+    void queueNotification(const QString &message, int options = 0);
 
 signals:
     void dropPanel(QDropEvent *event);
     void hidePanel();
-    void notifyPanel(const QString &message);
+    void notifyPanel(const QString &message, int options);
     void registerPanel();
     void showPanel();
     void unregisterPanel();
@@ -62,7 +68,7 @@ private:
     QLabel *iconLabel;
     QLabel *nameLabel;
     QString windowExtra;
-    QStringList notificationQueue;
+    QList< QPair<QString, int> > notificationQueue;
 };
 
 #endif

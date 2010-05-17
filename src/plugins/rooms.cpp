@@ -397,7 +397,8 @@ void ChatRoom::invite(const QString &jid)
     // notify user
     queueNotification(tr("%1 has been invited to %2")
         .arg(rosterModel->contactName(jid))
-        .arg(rosterModel->contactName(chatRemoteJid)));
+        .arg(rosterModel->contactName(chatRemoteJid)),
+        ForceNotification);
 }
 
 /** Send a request to join a multi-user chat.

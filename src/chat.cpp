@@ -178,7 +178,7 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(dropPanel(QDropEvent*)), this, SLOT(dropPanel(QDropEvent*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
-    connect(panel, SIGNAL(notifyPanel(QString)), this, SLOT(notifyPanel(QString)));
+    connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
@@ -249,18 +249,21 @@ void Chat::hidePanel()
 
 /** Notify the user of activity on a panel.
  */
-void Chat::notifyPanel(const QString &message)
+void Chat::notifyPanel(const QString &message, int options)
 {
     Application *wApp = qobject_cast<Application*>(qApp);
     QWidget *panel = qobject_cast<QWidget*>(sender());
     QWidget *window = panel->isVisible() ? panel->window() : this;
 
     // add pending message
+    bool showMessage = (options & ChatPanel::ForceNotification);
     if (!window->isActiveWindow() || (window == this && m_conversationPanel->currentWidget() != panel))
     {
-        wApp->showMessage(panel, panel->windowTitle(), message);
         m_rosterModel->addPendingMessage(panel->objectName());
+        showMessage = true;
     }
+    if (showMessage)
+        wApp->showMessage(panel, panel->windowTitle(), message);
 
     // show the chat window
     if (!window->isVisible())
