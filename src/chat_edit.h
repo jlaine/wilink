@@ -36,6 +36,7 @@ public:
 signals:
     void focused();
     void returnPressed();
+    void tabPressed();
 
 protected:
     virtual void focusInEvent(QFocusEvent* e);

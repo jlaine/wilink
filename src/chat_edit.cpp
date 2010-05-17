@@ -47,6 +47,8 @@ void ChatEdit::keyPressEvent(QKeyEvent* e)
         else
             emit returnPressed();
     }
+    else if (e->key() == Qt::Key_Tab)
+        emit tabPressed();
     else
         QTextEdit::keyPressEvent(e);
 }

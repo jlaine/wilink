@@ -90,6 +90,8 @@ private slots:
     void disconnected();
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
+    void rosterClick(const QModelIndex &index);
+    void tabPressed();
 
 private:
     QString chatLocalJid;

@@ -32,6 +32,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QTableWidget>
+#include <QTextBlock>
 #include <QTimer>
 #include <QUrl>
 
@@ -44,6 +45,7 @@
 
 #include "chat.h"
 #include "chat_client.h"
+#include "chat_edit.h"
 #include "chat_form.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
@@ -116,6 +118,9 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
     if (!room)
     {
         room = new ChatRoom(chat->client(), chat->rosterModel(), jid);
+        // add roster hooks
+        connect(chat, SIGNAL(rosterClick(QModelIndex)),
+            room, SLOT(rosterClick(QModelIndex)));
         chat->addPanel(room);
     }
     QTimer::singleShot(0, room, SIGNAL(showPanel()));
@@ -351,6 +356,9 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
+
+    /* keyboard shortcut */
+    connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
 }
 
 void ChatRoom::disconnected()
@@ -522,6 +530,19 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     }
 }
 
+void ChatRoom::rosterClick(const QModelIndex &index)
+{
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+
+    // talk "at" somebody
+    if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid)
+    {
+        chatInput->append("@" + jidToResource(jid) + ": ");
+        chatInput->setFocus();
+    }
+}
+
 void ChatRoom::sendMessage(const QString &text)
 {
     QXmppMessage msg;
@@ -530,6 +551,27 @@ void ChatRoom::sendMessage(const QString &text)
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
     client->sendPacket(msg);
+}
+
+void ChatRoom::tabPressed()
+{
+    QTextCursor cursor = chatInput->textCursor();
+    cursor.select(QTextCursor::WordUnderCursor);
+    QString prefix = cursor.selectedText().toLower();
+    if (prefix.startsWith("@"))
+        prefix = prefix.mid(1);
+
+    /* find matching room members */
+    QStringList matches;
+    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
+    {
+        QString member = roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
+        if (member.toLower().startsWith(prefix))
+            matches << member;
+    }
+    if (matches.size() == 1)
+        cursor.insertText("@" + matches[0] + ": ");
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)
