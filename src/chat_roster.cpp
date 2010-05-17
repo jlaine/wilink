@@ -44,6 +44,24 @@ enum RosterColumns {
     MaxColumn,
 };
 
+static QString presenceName(const QXmppPresence &presence)
+{
+    QXmppPresence::Status::Type type;
+    if (presence.type() == QXmppPresence::Unavailable)
+        type = QXmppPresence::Status::Offline;
+    else
+        type = presence.status().type();
+
+    if (type == QXmppPresence::Status::Offline)
+        return "offline";
+    else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
+        return "available";
+    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
+        return "away";
+    else
+        return "busy";
+}
+
 static void paintMessages(QPixmap &icon, int messages)
 {
     QString pending = QString::number(messages);
@@ -139,18 +157,13 @@ QString ChatRosterModel::contactStatus(const QString &bareJid) const
     {
         if (presence.type() != QXmppPresence::Available)
             continue;
-        QXmppPresence::Status::Type type = presence.status().type();
-        if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
-        {
-            suffix = "available";
+        suffix = presenceName(presence);
+
+        // FIXME : we should probably be using the priority rather than
+        // stop at the first available contact
+        if (presence.status().type() == QXmppPresence::Status::Online ||
+            presence.status().type() == QXmppPresence::Status::Chat)
             break;
-        }
-        else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
-        {
-            suffix = "away";
-        } else {
-            suffix = "busy";
-        }
     }
     return suffix;
 }
@@ -208,9 +221,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QString("chatroom_") + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
-            if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                return QIcon(":/contact-available.png");
-            }
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QString("chatuser_") + bareJid.toLower();
             }
@@ -375,11 +385,24 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         return;
 
     ChatRosterItem *memberItem = roomItem->find(jid);
-    if (presence.type() == QXmppPresence::Available && !memberItem)
+    if (presence.type() == QXmppPresence::Available)
     {
-        beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
-        roomItem->append(new ChatRosterItem(ChatRosterItem::RoomMember, jid));
-        endInsertRows();
+        if (!memberItem)
+        {
+            // create roster entry
+            memberItem = new ChatRosterItem(ChatRosterItem::RoomMember, jid);
+            memberItem->setData(Qt::DecorationRole, QIcon(QString(":/contact-%1.png")
+                .arg(presenceName(presence))));
+            beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
+            roomItem->append(memberItem);
+            endInsertRows();
+        } else {
+            // update roster entry
+            memberItem->setData(Qt::DecorationRole, QIcon(QString(":/contact-%1.png")
+                .arg(presenceName(presence))));
+            emit dataChanged(createIndex(memberItem->row(), ContactColumn, memberItem),
+                             createIndex(memberItem->row(), SortingColumn, memberItem));
+        }
 
         // check whether we own the room
         foreach (const QXmppElement &x, presence.extensions())

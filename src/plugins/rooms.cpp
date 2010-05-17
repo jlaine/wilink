@@ -478,6 +478,16 @@ ChatRosterItem::Type ChatRoom::objectType() const
 
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {
+    // if our own presence changes, reflect it in the chat room
+    if (presence.from() == client->getConfiguration().jid())
+    {
+        QXmppPresence packet;
+        packet.setTo(chatLocalJid);
+        packet.setType(presence.type());
+        packet.setStatus(presence.status());
+        client->sendPacket(packet);
+    }
+
     if (jidToBareJid(presence.from()) != chatRemoteJid)
         return;
 

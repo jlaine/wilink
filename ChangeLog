@@ -2,6 +2,7 @@ wiLink 1.0.0 (UNRELEASED)
  * Hide diagnostics from roster when it is closed.
  * Fix spacing of photo previews on Windows.
  * Make it possible to talk "at" somebody in a chat room.
+ * Reflect the availability of chat room members in their icon.
 
 wiLink 0.9.0 (2010-05-12)
  * Merge photo uploads and diagnostics into the main window.
