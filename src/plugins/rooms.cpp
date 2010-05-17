@@ -538,7 +538,7 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     // talk "at" somebody
     if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid)
     {
-        chatInput->append("@" + jidToResource(jid) + ": ");
+        chatInput->textCursor().insertText("@" + jidToResource(jid) + ": ");
         chatInput->setFocus();
     }
 }
