@@ -124,7 +124,7 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
 {
     const QString bareJid = jidToBareJid(presence.from());
 
-    if (presence.getType() == QXmppPresence::Subscribe)
+    if (presence.type() == QXmppPresence::Subscribe)
     {
         ChatClient *client = chat->client();
         const QString jid = presence.from();

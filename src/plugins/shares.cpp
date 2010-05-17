@@ -635,7 +635,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
     if (shareExtension.attribute("xmlns") != ns_shares)
         return;
 
-    if (presence.getType() == QXmppPresence::Available)
+    if (presence.type() == QXmppPresence::Available)
     {
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
         if (forceProxy == "1" && !client->getTransferManager().proxyOnly())
@@ -653,7 +653,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 
         emit registerPanel();
     }
-    else if (presence.getType() == QXmppPresence::Error &&
+    else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
         presence.error().condition() == QXmppStanza::Error::Redirect)
     {

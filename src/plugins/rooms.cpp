@@ -481,7 +481,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     if (jidToBareJid(presence.from()) != chatRemoteJid)
         return;
 
-    switch (presence.getType())
+    switch (presence.type())
     {
     case QXmppPresence::Error:
         foreach (const QXmppElement &extension, presence.extensions())

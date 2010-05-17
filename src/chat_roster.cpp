@@ -137,9 +137,9 @@ QString ChatRosterModel::contactStatus(const QString &bareJid) const
     QString suffix = "offline";
     foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
     {
-        if (presence.getType() != QXmppPresence::Available)
+        if (presence.type() != QXmppPresence::Available)
             continue;
-        QXmppPresence::Status::Type type = presence.getStatus().getType();
+        QXmppPresence::Status::Type type = presence.status().type();
         if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
         {
             suffix = "available";
@@ -355,9 +355,9 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
     // handle features discovery
     if (!resource.isEmpty())
     {
-        if (presence.getType() == QXmppPresence::Unavailable)
+        if (presence.type() == QXmppPresence::Unavailable)
             clientFeatures.remove(jid);
-        else if (presence.getType() == QXmppPresence::Available && !clientFeatures.contains(jid))
+        else if (presence.type() == QXmppPresence::Available && !clientFeatures.contains(jid))
         {
             clientFeatures.insert(jid, 0);
 
@@ -375,7 +375,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         return;
 
     ChatRosterItem *memberItem = roomItem->find(jid);
-    if (presence.getType() == QXmppPresence::Available && !memberItem)
+    if (presence.type() == QXmppPresence::Available && !memberItem)
     {
         beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
         roomItem->append(new ChatRosterItem(ChatRosterItem::RoomMember, jid));
@@ -403,7 +403,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             }
         }
     }
-    else if (presence.getType() == QXmppPresence::Unavailable && memberItem)
+    else if (presence.type() == QXmppPresence::Unavailable && memberItem)
     {
         beginRemoveRows(createIndex(roomItem->row(), 0, roomItem), memberItem->row(), memberItem->row());
         roomItem->remove(memberItem);
