@@ -527,7 +527,25 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     // talk "at" somebody
     if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid)
     {
-        chatInput->textCursor().insertText("@" + jidToResource(jid) + ": ");
+        const QString newAt = "@" + jidToResource(jid);
+        QTextCursor cursor = chatInput->textCursor();
+
+        QRegExp rx("((@[^,:]+[,:] )+)");
+        QString text = chatInput->document()->toPlainText();
+        int oldPos;
+        if ((oldPos = rx.indexIn(text)) >= 0)
+        {
+            QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
+            if (!bits.contains(newAt))
+            {
+                bits << newAt;
+                chatInput->setText(text.replace(oldPos, rx.matchedLength(), bits.join(", ") + ": "));
+                cursor.movePosition(QTextCursor::End);
+                chatInput->setTextCursor(cursor);
+            }
+        } else {
+            cursor.insertText(newAt + ": ");
+        }
         emit showPanel();
         chatInput->setFocus();
     }
