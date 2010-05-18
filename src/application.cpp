@@ -371,7 +371,7 @@ void Application::showChats()
 {
     foreach (Chat *chat, chats)
     {
-        chat->show();
+        chat->showNormal();
         chat->raise();
     }
 }

@@ -332,7 +332,7 @@ void Chat::showPanel()
     // make sure window is visible
     if (!isActiveWindow())
     {
-        show();
+        showNormal();
         raise();
         activateWindow();
     }
