@@ -371,7 +371,9 @@ void Application::showChats()
 {
     foreach (Chat *chat, chats)
     {
-        chat->showNormal();
+        chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+        chat->show();
+        // FIXME : is this necessary?
         chat->raise();
     }
 }
