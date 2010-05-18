@@ -474,6 +474,10 @@ void ChatRosterModel::rosterReceived()
     // add received contacts
     foreach (const QString &jid, client->getRoster().getRosterBareJids())
     {
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+        if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
+            continue;
+
         ChatRosterItem *item = new ChatRosterItem(ChatRosterItem::Contact, jid);
         item->setData(MessagesRole, pending.value(jid));
         rootItem->append(item);
