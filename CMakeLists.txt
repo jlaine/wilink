@@ -74,6 +74,7 @@ if(APPLE)
     set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/wiLink.app)
     set(_dmg_temp ${BUNDLE_DMG}.temp)
     add_custom_command(OUTPUT ${BUNDLE_DMG}
+        COMMAND rm -rf ${_dmg_temp} ${BUNDLE_DMG}
         COMMAND mkdir ${_dmg_temp}
         COMMAND cp -r ${BUNDLE_LOCATION} ${_dmg_temp}
         COMMAND ln -s /Applications ${_dmg_temp}/Applications
