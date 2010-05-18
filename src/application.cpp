@@ -313,8 +313,8 @@ void Application::showAccounts()
         // store new settings
         settings->setValue("ChatAccounts", newAccounts);
 
-        // reset chats
-        resetChats();
+        // reset chats later as we may delete the calling window
+        QTimer::singleShot(0, this, SLOT(resetChats()));
     }
 }
 
