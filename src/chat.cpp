@@ -332,10 +332,10 @@ void Chat::showPanel()
     // make sure window is visible
     if (!isActiveWindow())
     {
-        setWindowState(windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+        setWindowState(windowState() & ~Qt::WindowMinimized);
         show();
-        // FIXME : is this necessary?
         raise();
+        activateWindow();
     }
     m_conversationPanel->setCurrentWidget(panel);
 }

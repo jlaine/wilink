@@ -371,10 +371,10 @@ void Application::showChats()
 {
     foreach (Chat *chat, chats)
     {
-        chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+        chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized);
         chat->show();
-        // FIXME : is this necessary?
         chat->raise();
+        chat->activateWindow();
     }
 }
 
