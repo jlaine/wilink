@@ -31,6 +31,7 @@
 #include "qxmpp/QXmppLogger.h"
 
 #include "chat_client.h"
+#include "headless.h"
 
 static int aborted = 0;
 static void signal_handler(int sig)
@@ -40,6 +41,28 @@ static void signal_handler(int sig)
 
     qApp->quit();
     aborted = 1;
+}
+
+Headless::Headless()
+{
+    /* create configuration */
+    QXmppConfiguration config;
+    config.setUser("user");
+    config.setDomain("wireless.wifirst.fr");
+    config.setPasswd("password");
+    config.setHost(config.domain());
+    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    config.setIgnoreSslErrors(false);
+    config.setKeepAliveInterval(60);
+    config.setKeepAliveTimeout(15);
+
+    /* connect to server */
+    QXmppLogger *logger = new QXmppLogger(this);
+    logger->setLoggingType(QXmppLogger::StdoutLogging);
+
+    m_client = new ChatClient(this);
+    m_client->setLogger(logger);
+    m_client->connectToServer(config);
 }
 
 int main(int argc, char *argv[])
@@ -54,38 +77,8 @@ int main(int argc, char *argv[])
 #endif
     signal(SIGTERM, signal_handler);
 
-    /* Set up logger */
-    QXmppLogger logger;
-    logger.setLoggingType(QXmppLogger::StdoutLogging);
-
-    /* Prepare client */
-    ChatClient client(0);
-    client.setLogger(&logger);
-    QXmppConfiguration config;
-    config.setUser("user");
-    config.setDomain("wireless.wifirst.fr");
-    config.setPasswd("password");
-    config.setHost(config.domain());
-
-    /* set security parameters */
-    config.setAutoAcceptSubscriptions(false);
-    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
-    config.setIgnoreSslErrors(false);
-
-    /* set keep alive */
-    config.setKeepAliveInterval(60);
-    config.setKeepAliveTimeout(15);
-
-    /* connect to server */
-    client.connectToServer(config);
-
-
-#if 0
-    /* Show chat windows */
-    QTimer::singleShot(0, &app, SLOT(resetChats()));
-#endif
-
     /* Run application */
+    Headless headless;
     return app.exec();
 }
 
