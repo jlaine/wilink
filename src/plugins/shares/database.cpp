@@ -247,6 +247,9 @@ QString ChatSharesDatabase::fileNode(const QString &path) const
   */
 void ChatSharesDatabase::get(const QXmppShareGetIq &requestIq)
 {
+    if (requestIq.type() != QXmppIq::Get)
+        return;
+
     QThread *worker = new GetThread(this, requestIq);
     connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
@@ -307,6 +310,9 @@ void ChatSharesDatabase::slotIndexFinished(double elapsed, int updated, int remo
  */
 void ChatSharesDatabase::search(const QXmppShareSearchIq &requestIq)
 {
+    if (requestIq.type() != QXmppIq::Get)
+        return;
+
     QThread *worker = new SearchThread(this, requestIq);
     connect(worker, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));

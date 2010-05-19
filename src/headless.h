@@ -20,6 +20,10 @@
 #include <QObject>
 
 class ChatClient;
+class ChatSharesDatabase;
+class QXmppShareGetIq;
+class QXmppShareSearchIq;
+class QXmppShareItem;
 
 class Headless : public QObject
 {
@@ -28,7 +32,13 @@ class Headless : public QObject
 public:
     Headless();
 
+private slots:
+    void getFinished(const QXmppShareGetIq &reponseIq, const QXmppShareItem &fileInfo);
+    void searchFinished(const QXmppShareSearchIq &responseIq);
+    void shareServerFound(const QString &shareServer);
+
 private:
     ChatClient *m_client;
+    ChatSharesDatabase *m_db;
 };
 
