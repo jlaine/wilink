@@ -158,6 +158,12 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
 {
     QSettings settings;
 
+    // register meta types
+    qRegisterMetaType<QXmppShareItem>("QXmppShareItem");
+    qRegisterMetaType<QXmppShareGetIq>("QXmppShareGetIq");
+    qRegisterMetaType<QXmppShareSearchIq>("QXmppShareSearchIq");
+    qRegisterMetaType<QXmppLogger::MessageType>("QXmppLogger::MessageType");
+
     // prepare database
     sharesDb = databaseConnection("main");
     sharesDb.exec("CREATE TABLE files (path TEXT, date DATETIME, size INT, hash VARCHAR(32))");

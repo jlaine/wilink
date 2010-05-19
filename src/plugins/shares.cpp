@@ -87,11 +87,6 @@ ChatShares::ChatShares(ChatClient *xmppClient, Chat *chat, QWidget *parent)
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
-    qRegisterMetaType<QXmppShareItem>("QXmppShareItem");
-    qRegisterMetaType<QXmppShareGetIq>("QXmppShareGetIq");
-    qRegisterMetaType<QXmppShareSearchIq>("QXmppShareSearchIq");
-    qRegisterMetaType<QXmppLogger::MessageType>("QXmppLogger::MessageType");
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
