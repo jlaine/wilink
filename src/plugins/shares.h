@@ -50,7 +50,7 @@ class ChatShares : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatShares(Chat *chat, QWidget *parent = 0);
+    ChatShares(Chat *chat, ChatSharesDatabase *sharesDb, QWidget *parent = 0);
     void setClient(ChatClient *client);
     void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);

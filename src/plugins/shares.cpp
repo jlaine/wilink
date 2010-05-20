@@ -78,12 +78,10 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
     }
 }
 
-ChatShares::ChatShares(Chat *chat, QWidget *parent)
-    : ChatPanel(parent), chatWindow(chat), client(0), db(0), rosterModel(0),
+ChatShares::ChatShares(Chat *chat, ChatSharesDatabase *sharesDb, QWidget *parent)
+    : ChatPanel(parent), chatWindow(chat), client(0), db(sharesDb), rosterModel(0),
     menuAction(0)
 {
-    db = ChatSharesDatabase::instance();
-
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
@@ -796,8 +794,6 @@ void ChatShares::setRoster(ChatRosterModel *roster)
 
 void ChatShares::shareFolder()
 {
-    ChatSharesDatabase *db = ChatSharesDatabase::instance();
-
     QFileDialog *dialog = new QFileDialog;
     dialog->setDirectory(db->directory());
     dialog->setFileMode(QFileDialog::Directory);
@@ -967,8 +963,10 @@ public:
 
 bool SharesPlugin::initialize(Chat *chat)
 {
+    ChatSharesDatabase *db = ChatSharesDatabase::instance();
+
     /* register panel */
-    ChatShares *shares = new ChatShares(chat);
+    ChatShares *shares = new ChatShares(chat, db);
     shares->setObjectName("shares");
     shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);

@@ -30,7 +30,7 @@ class Headless : public QObject
     Q_OBJECT
 
 public:
-    Headless();
+    Headless(ChatSharesDatabase *db);
 
 private slots:
     void getFinished(const QXmppShareGetIq &reponseIq, const QXmppShareItem &fileInfo);

@@ -46,10 +46,10 @@ static void signal_handler(int sig)
     aborted = 1;
 }
 
-Headless::Headless()
+Headless::Headless(ChatSharesDatabase *db)
+    : m_db(db)
 {
     /* database */
-    m_db = ChatSharesDatabase::instance();
     connect(m_db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
         this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
     connect(m_db, SIGNAL(searchFinished(QXmppShareSearchIq)),
@@ -148,7 +148,8 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Run application */
-    Headless headless;
+    ChatSharesDatabase *db = ChatSharesDatabase::instance();
+    Headless headless(db);
     return app.exec();
 }
 
