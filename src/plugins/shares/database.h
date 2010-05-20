@@ -40,7 +40,7 @@ public:
         QByteArray hash;
     };
 
-    ChatSharesDatabase(QObject *parent = 0);
+    ChatSharesDatabase(const QString &databaseName, QObject *parent = 0);
 
     bool add(const ChatSharesDatabase::Entry &entry);
     QString directory() const;

@@ -972,7 +972,10 @@ SharesPlugin::SharesPlugin()
 bool SharesPlugin::initialize(Chat *chat)
 {
     if (!db)
-        db = new ChatSharesDatabase(this);
+    {
+        const QString name = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+        db = new ChatSharesDatabase(name, this);
+    }
 
     /* register panel */
     ChatShares *shares = new ChatShares(chat, db);

@@ -20,7 +20,6 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QSettings>
@@ -41,12 +40,12 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 #define SEARCH_MAX_TIME 5000
 
 int ChatSharesThread::globalId = 1;
+static QString globalDatabaseName;
 
 static QSqlDatabase databaseConnection(const QString &connectionName)
 {
-    const QString name = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
     QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-    sharesDb.setDatabaseName(name);
+    sharesDb.setDatabaseName(globalDatabaseName);
     Q_ASSERT(sharesDb.open());
     return sharesDb;
 }
@@ -143,10 +142,11 @@ static bool updateFile(QSqlDatabase sharesDb, ChatSharesDatabase::Entry &cached,
     return true;
 }
 
-ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
+ChatSharesDatabase::ChatSharesDatabase(const QString &databaseName, QObject *parent)
     : QObject(parent), indexThread(0)
 {
-    QSettings settings;
+    // FIXME : this should be per-instance
+    globalDatabaseName = databaseName;
 
     // register meta types
     qRegisterMetaType<QXmppShareItem>("QXmppShareItem");
@@ -170,6 +170,7 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
 
     // set directory
+    QSettings settings;
     setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
 }
 
@@ -202,9 +203,6 @@ void ChatSharesDatabase::setDirectory(const QString &path)
     QSettings settings;
     settings.setValue("SharesLocation", path);
     sharesDir.setPath(path);
-
-    // watch directory
-    //fsWatcher->addPath(sharesDir.path());
 
     // schedule index
     indexTimer->setInterval(0);
