@@ -78,8 +78,8 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
     }
 }
 
-ChatShares::ChatShares(ChatClient *xmppClient, Chat *chat, QWidget *parent)
-    : ChatPanel(parent), baseClient(xmppClient), chatWindow(chat), client(0), db(0), rosterModel(0),
+ChatShares::ChatShares(Chat *chat, QWidget *parent)
+    : ChatPanel(parent), chatWindow(chat), client(0), db(0), rosterModel(0),
     menuAction(0)
 {
     db = ChatSharesDatabase::instance();
@@ -184,6 +184,7 @@ ChatShares::ChatShares(ChatClient *xmppClient, Chat *chat, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
+    ChatClient *baseClient = chatWindow->client();
     registerTimer = new QTimer(this);
     registerTimer->setInterval(REGISTER_INTERVAL * 1000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
@@ -229,6 +230,7 @@ void ChatShares::directoryChanged(const QString &path)
  */
 void ChatShares::disconnected()
 {
+    ChatClient *baseClient = chatWindow->client();
     if (client && client != baseClient)
     {
         shareServer = "";
@@ -660,6 +662,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         // reconnect to another server
         registerTimer->stop();
 
+        ChatClient *baseClient = chatWindow->client();
         QXmppConfiguration config = baseClient->getConfiguration();
         config.setDomain(domain);
         config.setHost(server);
@@ -965,7 +968,7 @@ public:
 bool SharesPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatShares *shares = new ChatShares(chat->client(), chat);
+    ChatShares *shares = new ChatShares(chat);
     shares->setObjectName("shares");
     shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);

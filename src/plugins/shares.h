@@ -50,7 +50,7 @@ class ChatShares : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatShares(ChatClient *client, Chat *chat, QWidget *parent = 0);
+    ChatShares(Chat *chat, QWidget *parent = 0);
     void setClient(ChatClient *client);
     void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);
@@ -93,7 +93,6 @@ private:
 private:
     QString shareServer;
 
-    ChatClient *baseClient;
     ChatClient *client;
     Chat *chatWindow;
     ChatRosterModel *rosterModel;
