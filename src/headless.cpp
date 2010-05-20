@@ -22,6 +22,7 @@
 
 #include <QCoreApplication>
 #include <QSettings>
+#include <QTemporaryFile>
 #include <QTimer>
 
 #ifdef Q_OS_WIN
@@ -137,6 +138,13 @@ void Headless::shareServerFound(const QString &shareServer)
 
 int main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        fprintf(stderr, "Usage: headless <shares_directory>\n");
+        return EXIT_FAILURE;
+    }
+    QString sharesDirectory = QString::fromLocal8Bit(argv[1]);
+
     /* Create application */
     QCoreApplication app(argc, argv);
 
@@ -148,8 +156,10 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Run application */
-    ChatSharesDatabase db(":memory:");
-    db.setDirectory("/tmp");
+    QTemporaryFile sharesDatabase;
+    sharesDatabase.open();
+    ChatSharesDatabase db(sharesDatabase.fileName());
+    db.setDirectory(sharesDirectory);
     Headless headless(&db);
     return app.exec();
 }
