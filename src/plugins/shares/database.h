@@ -48,8 +48,6 @@ public:
     QString filePath(const QString &node) const;
     QString fileNode(const QString &path) const;
 
-    static ChatSharesDatabase *instance();
-
 signals:
     void directoryChanged(const QString &path);
     void logMessage(QXmppLogger::MessageType type, const QString &msg);

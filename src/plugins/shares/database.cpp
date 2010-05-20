@@ -40,17 +40,7 @@ Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
 #define SEARCH_MAX_TIME 5000
 
-static ChatSharesDatabase *globalInstance = 0;
 int ChatSharesThread::globalId = 1;
-
-static void databaseCleanup()
-{
-    if (!globalInstance)
-        return;
-
-    delete globalInstance;
-    globalInstance = 0;
-}
 
 static QSqlDatabase databaseConnection(const QString &connectionName)
 {
@@ -186,16 +176,6 @@ ChatSharesDatabase::ChatSharesDatabase(QObject *parent)
 bool ChatSharesDatabase::add(const ChatSharesDatabase::Entry &entry)
 {
     return saveFile(sharesDb, entry);
-}
-
-ChatSharesDatabase *ChatSharesDatabase::instance()
-{
-    if (!globalInstance)
-    {
-        globalInstance = new ChatSharesDatabase();
-        qAddPostRoutine(databaseCleanup);
-    }
-    return globalInstance;
 }
 
 QString ChatSharesDatabase::directory() const

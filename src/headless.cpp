@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Run application */
-    ChatSharesDatabase *db = ChatSharesDatabase::instance();
-    Headless headless(db);
+    ChatSharesDatabase db;
+    Headless headless(&db);
     return app.exec();
 }
 

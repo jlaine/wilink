@@ -958,12 +958,21 @@ void ChatSharesTab::setText(const QString &text)
 class SharesPlugin : public ChatPlugin
 {
 public:
+    SharesPlugin();
     bool initialize(Chat *chat);
+
+private:
+    ChatSharesDatabase *db;
 };
 
+SharesPlugin::SharesPlugin()
+    : db(0)
+{
+}
 bool SharesPlugin::initialize(Chat *chat)
 {
-    ChatSharesDatabase *db = ChatSharesDatabase::instance();
+    if (!db)
+        db = new ChatSharesDatabase(this);
 
     /* register panel */
     ChatShares *shares = new ChatShares(chat, db);
