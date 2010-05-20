@@ -149,6 +149,7 @@ int main(int argc, char *argv[])
 
     /* Run application */
     ChatSharesDatabase db(":memory:");
+    db.setDirectory("/tmp");
     Headless headless(&db);
     return app.exec();
 }

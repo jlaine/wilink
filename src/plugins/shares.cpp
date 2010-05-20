@@ -802,7 +802,16 @@ void ChatShares::shareFolder()
     dialog->show();
 
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
-    connect(dialog, SIGNAL(fileSelected(QString)), db, SLOT(setDirectory(QString)));
+    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(shareFolderSelected(QString)));
+}
+
+void ChatShares::shareFolderSelected(const QString &path)
+{
+    // remember directory
+    QSettings settings;
+    settings.setValue("SharesLocation", path);
+
+    db->setDirectory(path);
 }
 
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)

@@ -22,7 +22,6 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileSystemWatcher>
-#include <QSettings>
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QStringList>
@@ -193,10 +192,6 @@ void ChatSharesDatabase::setDirectory(const QString &path)
     QFileInfo info(path);
     if (!info.exists() && !info.dir().mkdir(info.fileName()))
        logMessage(QXmppLogger::WarningMessage, "Could not create shares directory: " + path);
-
-    // remember directory
-    QSettings settings;
-    settings.setValue("SharesLocation", path);
     sharesDir.setPath(path);
 
     // schedule index

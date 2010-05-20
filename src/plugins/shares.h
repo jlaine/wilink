@@ -77,6 +77,7 @@ private slots:
     void registerWithServer();
     void queryStringChanged();
     void shareFolder();
+    void shareFolderSelected(const QString &path);
     void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);

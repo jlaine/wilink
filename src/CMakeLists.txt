@@ -115,7 +115,7 @@ endif(APPLE)
 target_link_libraries(wiLink idle qnetio qxmpp ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 
 # headless
-set(headless_SOURCES chat_client.cpp headless.cpp plugins/shares/database.cpp systeminfo.cpp)
+set(headless_SOURCES chat_client.cpp headless.cpp plugins/shares/database.cpp)
 set(headless_MOC_HEADERS chat_client.h headless.h plugins/shares/database.h)
 qt4_wrap_cpp(headless_MOC_SOURCES ${headless_MOC_HEADERS})
 add_executable(headless ${headless_SOURCES} ${headless_MOC_SOURCES})
