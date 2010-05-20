@@ -27,6 +27,7 @@
 #include <QMenuBar>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QSettings>
 #include <QShortcut>
 #include <QStatusBar>
 #include <QStringList>
@@ -971,10 +972,14 @@ SharesPlugin::SharesPlugin()
 }
 bool SharesPlugin::initialize(Chat *chat)
 {
+    /* initialise database */
     if (!db)
     {
         const QString name = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+
+        QSettings settings;
         db = new ChatSharesDatabase(name, this);
+        db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
     }
 
     /* register panel */

@@ -33,7 +33,6 @@
 #include "qxmpp/QXmppUtils.h"
 
 #include "database.h"
-#include "systeminfo.h"
 
 Q_DECLARE_METATYPE(QXmppShareSearchIq)
 
@@ -168,10 +167,6 @@ ChatSharesDatabase::ChatSharesDatabase(const QString &databaseName, QObject *par
     indexTimer->setInterval(30 * 60 * 1000); // 30mn
     indexTimer->setSingleShot(true);
     connect(indexTimer, SIGNAL(timeout()), this, SLOT(index()));
-
-    // set directory
-    QSettings settings;
-    setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
 }
 
 bool ChatSharesDatabase::add(const ChatSharesDatabase::Entry &entry)
