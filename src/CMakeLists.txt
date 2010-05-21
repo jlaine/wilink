@@ -41,7 +41,6 @@ set(wiLink_SOURCES
     plugins/photos.cpp
     plugins/rooms.cpp
     plugins/shares.cpp
-    plugins/shares/database.cpp
     plugins/shares/model.cpp
     plugins/shares/view.cpp
     plugins/transfers.cpp)
@@ -69,7 +68,6 @@ set(wiLink_MOC_HEADERS
     plugins/photos.h
     plugins/rooms.h
     plugins/shares.h
-    plugins/shares/database.h
     plugins/shares/model.h
     plugins/shares/view.h
     plugins/transfers.h)
@@ -115,8 +113,8 @@ endif(APPLE)
 target_link_libraries(wiLink idle qnetio qxmpp ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 
 # headless
-set(headless_SOURCES chat_client.cpp headless.cpp plugins/shares/database.cpp)
-set(headless_MOC_HEADERS chat_client.h headless.h plugins/shares/database.h)
+set(headless_SOURCES chat_client.cpp headless.cpp)
+set(headless_MOC_HEADERS chat_client.h headless.h)
 qt4_wrap_cpp(headless_MOC_SOURCES ${headless_MOC_HEADERS})
 add_executable(headless ${headless_SOURCES} ${headless_MOC_SOURCES})
 target_link_libraries(headless qxmpp ${QT_QTCORE_LIBRARY} ${QT_QTSQL_LIBRARY})

@@ -35,6 +35,7 @@
 #include <QTimer>
 #include <QUrl>
 
+#include "qxmpp/QXmppShareDatabase.h"
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppUtils.h"
 
@@ -44,7 +45,6 @@
 #include "chat_roster.h"
 #include "transfers.h"
 #include "shares.h"
-#include "shares/database.h"
 #include "shares/model.h"
 #include "shares/view.h"
 #include "systeminfo.h"
@@ -79,7 +79,7 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
     }
 }
 
-ChatShares::ChatShares(Chat *chat, ChatSharesDatabase *sharesDb, QWidget *parent)
+ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent)
     : ChatPanel(parent), chatWindow(chat), client(0), db(sharesDb), rosterModel(0),
     menuAction(0)
 {
@@ -406,7 +406,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
                 queueItem->setData(TransferError, QVariant());
 
                 // store to shares database
-                ChatSharesDatabase::Entry cached;
+                QXmppShareDatabase::Entry cached;
                 cached.path = db->fileNode(finalPath);
                 cached.size = job->fileSize();
                 cached.hash = job->fileHash();
@@ -972,7 +972,7 @@ public:
     bool initialize(Chat *chat);
 
 private:
-    ChatSharesDatabase *db;
+    QXmppShareDatabase *db;
 };
 
 SharesPlugin::SharesPlugin()
@@ -987,7 +987,7 @@ bool SharesPlugin::initialize(Chat *chat)
         const QString name = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
 
         QSettings settings;
-        db = new ChatSharesDatabase(name, this);
+        db = new QXmppShareDatabase(name, this);
         db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
     }
 

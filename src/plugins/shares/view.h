@@ -28,7 +28,6 @@
 #include "qxmpp/QXmppTransferManager.h"
 
 class ChatRosterModel;
-class ChatSharesDatabase;
 class ChatSharesModel;
 
 class ChatSharesDelegate : public QStyledItemDelegate

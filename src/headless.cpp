@@ -30,12 +30,12 @@
 #endif
 
 #include "qxmpp/QXmppLogger.h"
+#include "qxmpp/QXmppShareDatabase.h"
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppTransferManager.h"
 
 #include "chat_client.h"
 #include "headless.h"
-#include "plugins/shares/database.h"
 
 static int aborted = 0;
 static void signal_handler(int sig)
@@ -47,7 +47,7 @@ static void signal_handler(int sig)
     aborted = 1;
 }
 
-Headless::Headless(ChatSharesDatabase *db)
+Headless::Headless(QXmppShareDatabase *db)
     : m_db(db)
 {
     /* database */
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
     /* Run application */
     QTemporaryFile sharesDatabase;
     sharesDatabase.open();
-    ChatSharesDatabase db(sharesDatabase.fileName());
+    QXmppShareDatabase db(sharesDatabase.fileName());
     db.setDirectory(sharesDirectory);
     Headless headless(&db);
     return app.exec();
