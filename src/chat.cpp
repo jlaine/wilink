@@ -165,6 +165,10 @@ Chat::~Chat()
 
     // disconnect
     m_client->disconnect();
+
+    // unload plugins
+    for (int i = m_plugins.size() - 1; i >= 0; i--)
+        m_plugins[i]->finalize(this);
 }
 
 /** Connect signals for the given panel.
@@ -491,7 +495,10 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     {
         ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
         if (plugin)
+        {
             plugin->initialize(this);
+            m_plugins << plugin;
+        }
     }
     return true;
 }

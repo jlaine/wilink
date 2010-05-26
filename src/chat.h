@@ -28,6 +28,7 @@
 
 class ChatClient;
 class ChatPanel;
+class ChatPlugin;
 class ChatRosterModel;
 class ChatRosterView;
 class Idle;
@@ -110,6 +111,8 @@ private:
 
     QComboBox *m_statusCombo;
     QStackedWidget *m_conversationPanel;
+
+    QList<ChatPlugin*> m_plugins;
 };
 
 #endif
