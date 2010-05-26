@@ -114,13 +114,6 @@ if(APPLE)
 endif(APPLE)
 target_link_libraries(wiLink idle qnetio qxmpp ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 
-# headless
-set(headless_SOURCES chat_client.cpp headless.cpp plugins/shares/database.cpp)
-set(headless_MOC_HEADERS chat_client.h headless.h plugins/shares/database.h)
-qt4_wrap_cpp(headless_MOC_SOURCES ${headless_MOC_HEADERS})
-add_executable(headless ${headless_SOURCES} ${headless_MOC_SOURCES})
-target_link_libraries(headless qxmpp ${QT_QTCORE_LIBRARY} ${QT_QTSQL_LIBRARY})
-
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
     set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE TRUE)
