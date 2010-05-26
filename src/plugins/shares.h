@@ -29,7 +29,7 @@
 class Chat;
 class ChatClient;
 class ChatRosterModel;
-class ChatSharesDatabase;
+class QXmppShareDatabase;
 class ChatSharesModel;
 class ChatSharesTab;
 class ChatSharesView;
@@ -50,7 +50,7 @@ class ChatShares : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatShares(Chat *chat, ChatSharesDatabase *sharesDb, QWidget *parent = 0);
+    ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
     void setClient(ChatClient *client);
     void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);
@@ -97,7 +97,7 @@ private:
     ChatClient *client;
     Chat *chatWindow;
     ChatRosterModel *rosterModel;
-    ChatSharesDatabase *db;
+    QXmppShareDatabase *db;
     ChatSharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 

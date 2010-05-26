@@ -19,7 +19,6 @@
 
 #include <QFileIconProvider>
 
-#include "database.h"
 #include "model.h"
 #include "utils.h"
 

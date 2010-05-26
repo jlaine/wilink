@@ -22,7 +22,6 @@
 #include <QStringList>
 #include <QUrl>
 
-#include "database.h"
 #include "model.h"
 #include "view.h"
 
