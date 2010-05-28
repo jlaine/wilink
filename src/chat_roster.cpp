@@ -109,6 +109,11 @@ QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
     return QPixmap();
 }
 
+/** Returns the full JID of an online contact which has the requested feature.
+ *
+ * @param bareJid
+ * @param feature
+ */
 QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRosterModel::Feature feature) const
 {
     QStringList jids;
@@ -119,6 +124,13 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     return jids;
 }
 
+/** Determine the display name for a contact.
+ *
+ *  If the user has set a name for the roster entry, it will be used,
+ *  otherwise we fall back to information from the vCard.
+ *
+ * @param bareJid
+ */
 QString ChatRosterModel::contactName(const QString &bareJid) const
 {
     ChatRosterItem *item = rootItem->find(bareJid);
@@ -507,10 +519,14 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         const QImage &image = vcard.photoAsImage();
         item->setData(AvatarRole, QPixmap::fromImage(image));
 
+        // Store the nickName or fullName found in the vCard for display.
+        // NOTE : if the roster entry has a name, it will override the
+        // vCard data, see contactName()
         if (!vcard.nickName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.nickName());
         else if (!vcard.fullName().isEmpty())
             item->setData(Qt::DisplayRole, vcard.fullName());
+
         const QString url = vcard.url();
         if (!url.isEmpty())
             item->setData(UrlRole, vcard.url());
