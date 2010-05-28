@@ -970,15 +970,18 @@ class SharesPlugin : public ChatPlugin
 public:
     SharesPlugin();
     bool initialize(Chat *chat);
+    void finalize(Chat *chat);
 
 private:
     QXmppShareDatabase *db;
+    QSet<Chat*> chats;
 };
 
 SharesPlugin::SharesPlugin()
     : db(0)
 {
 }
+
 bool SharesPlugin::initialize(Chat *chat)
 {
     /* initialise database */
@@ -990,6 +993,7 @@ bool SharesPlugin::initialize(Chat *chat)
         db = new QXmppShareDatabase(name, this);
         db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
     }
+    chats << chat;
 
     /* register panel */
     ChatShares *shares = new ChatShares(chat, db);
@@ -1001,6 +1005,17 @@ bool SharesPlugin::initialize(Chat *chat)
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), chat);
     connect(shortcut, SIGNAL(activated()), shares, SIGNAL(showPanel()));
     return true;
+}
+
+void SharesPlugin::finalize(Chat *chat)
+{
+    /* cleanup database */
+    chats.remove(chat);
+    if (db && chats.isEmpty())
+    {
+        delete db;
+        db = 0;
+    }
 }
 
 Q_EXPORT_STATIC_PLUGIN2(shares, SharesPlugin)
