@@ -31,36 +31,10 @@ ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent)
 {
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
-}
-
-bool ChatClient::handleStreamElement(const QDomElement &element)
-{
-    if (element.tagName() == "iq")
-    {
-        if (QXmppShareGetIq::isShareGetIq(element))
-        {
-            QXmppShareGetIq getIq;
-            getIq.parse(element);
-            emit shareGetIqReceived(getIq);
-            return true;
-        }
-        else if (QXmppShareSearchIq::isShareSearchIq(element))
-        {
-            QXmppShareSearchIq searchIq;
-            searchIq.parse(element);
-            emit shareSearchIqReceived(searchIq);
-            return true;
-        }
-        else if (QXmppMucOwnerIq::isMucOwnerIq(element))
-        {
-            QXmppMucOwnerIq mucIq;
-            mucIq.parse(element);
-            emit mucOwnerIqReceived(mucIq);
-            return true;
-        }
-    }
-    return false;
+    connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)),
+        this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
+    connect(this, SIGNAL(elementReceived(const QDomElement&, bool&)),
+        this, SLOT(slotElementReceived(const QDomElement&, bool&)));
 }
 
 void ChatClient::slotConnected()
@@ -121,6 +95,34 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
                 logger()->log(QXmppLogger::InformationMessage, "Found share server " + disco.from());
                 emit shareServerFound(disco.from());
             }
+        }
+    }
+}
+
+void ChatClient::slotElementReceived(const QDomElement &element, bool &handled)
+{
+    if (element.tagName() == "iq")
+    {
+        if (QXmppShareGetIq::isShareGetIq(element))
+        {
+            QXmppShareGetIq getIq;
+            getIq.parse(element);
+            emit shareGetIqReceived(getIq);
+            handled = true;
+        }
+        else if (QXmppShareSearchIq::isShareSearchIq(element))
+        {
+            QXmppShareSearchIq searchIq;
+            searchIq.parse(element);
+            emit shareSearchIqReceived(searchIq);
+            handled = true;
+        }
+        else if (QXmppMucOwnerIq::isMucOwnerIq(element))
+        {
+            QXmppMucOwnerIq mucIq;
+            mucIq.parse(element);
+            emit mucOwnerIqReceived(mucIq);
+            handled = true;
         }
     }
 }

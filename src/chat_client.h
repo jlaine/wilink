@@ -29,7 +29,6 @@ class ChatClient : public QXmppClient
 
 public:
     ChatClient(QObject *parent);
-    virtual bool handleStreamElement(const QDomElement &element);
 
 signals:
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
@@ -41,6 +40,7 @@ signals:
 private slots:
     void slotConnected();
     void slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void slotElementReceived(const QDomElement &element, bool &handled);
 
 private:
     QStringList discoQueue;
