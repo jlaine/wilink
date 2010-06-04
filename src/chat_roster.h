@@ -69,6 +69,7 @@ public:
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     QStringList mimeTypes() const;
     QModelIndex parent(const QModelIndex & index) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     QPixmap contactAvatar(const QString &bareJid) const;

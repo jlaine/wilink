@@ -500,6 +500,21 @@ void ChatRosterModel::rosterReceived()
     reset();
 }
 
+bool ChatRosterModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    ChatRosterItem *parentItem;
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
+
+    const int minIndex = qMax(0, row);
+    const int maxIndex = qMin(row + count, parentItem->size()) - 1;
+    for (int i = maxIndex; i >= minIndex; --i)
+        parentItem->removeAt(i);
+    return maxIndex > minIndex;
+}
+
 int ChatRosterModel::rowCount(const QModelIndex &parent) const
 {
     ChatRosterItem *parentItem;
