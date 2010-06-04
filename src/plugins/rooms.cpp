@@ -336,9 +336,16 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
 }
 
+/** Handle disconnection from server.
+ */
 void ChatRoom::disconnected()
 {
     joined = false;
+
+    // clear chat room participants
+    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    if (roomIndex.isValid())
+        rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
 }
 
 void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
