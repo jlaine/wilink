@@ -52,7 +52,7 @@ private slots:
     void leave();
 
 private:
-    virtual void sendMessage(const QString &body);
+    virtual bool sendMessage(const QString &body);
 
     QXmppClient *client;
     bool joined;

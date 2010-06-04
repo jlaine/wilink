@@ -558,14 +558,14 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     }
 }
 
-void ChatRoom::sendMessage(const QString &text)
+bool ChatRoom::sendMessage(const QString &text)
 {
     QXmppMessage msg;
     msg.setBody(text);
     msg.setFrom(chatLocalJid);
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
-    client->sendPacket(msg);
+    return client->sendPacket(msg);
 }
 
 void ChatRoom::tabPressed()

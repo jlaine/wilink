@@ -51,7 +51,7 @@ signals:
     void localStateChanged(QXmppMessage::State state);
 
 protected:
-    virtual void sendMessage(const QString &body) = 0;
+    virtual bool sendMessage(const QString &body) = 0;
     void setRemoteState(QXmppMessage::State state);
 
 protected:

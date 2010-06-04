@@ -139,8 +139,8 @@ void ChatConversation::slotSend()
         return;
 
     chatLocalState = QXmppMessage::Active;
-    chatInput->document()->clear();
-    sendMessage(text);
+    if (sendMessage(text))
+        chatInput->document()->clear();
 }
 
 void ChatConversation::slotTextChanged()

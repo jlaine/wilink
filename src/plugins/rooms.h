@@ -80,7 +80,7 @@ public:
     void invite(const QString &jid);
 
 protected:
-    virtual void sendMessage(const QString &text);
+    virtual bool sendMessage(const QString &text);
 
 private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
