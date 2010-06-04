@@ -96,6 +96,12 @@ void ChatRosterItem::remove(ChatRosterItem *child)
     }
 }
 
+void ChatRosterItem::removeAt(int row)
+{
+    if (row >= 0 && row < childItems.size())
+        childItems.removeAt(row);
+}
+
 int ChatRosterItem::row() const
 {
     if (parentItem)

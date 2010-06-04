@@ -173,8 +173,16 @@ ChatRosterItem::Type ChatDialog::objectType() const
     return ChatRosterItem::Contact;
 }
 
-void ChatDialog::sendMessage(const QString &text)
+bool ChatDialog::sendMessage(const QString &text)
 {
+    // send message
+    QXmppMessage msg;
+    msg.setBody(text);
+    msg.setTo(chatRemoteJid);
+    msg.setState(QXmppMessage::Active);
+    if (!client->sendPacket(msg))
+        return false;
+
     // add message to history
     ChatHistoryMessage message;
     message.body = text;
@@ -183,12 +191,7 @@ void ChatDialog::sendMessage(const QString &text)
     message.received = false;
     chatHistory->addMessage(message);
 
-    // send message
-    QXmppMessage msg;
-    msg.setBody(text);
-    msg.setTo(chatRemoteJid);
-    msg.setState(QXmppMessage::Active);
-    client->sendPacket(msg);
+    return true;
 }
 
 ChatsWatcher::ChatsWatcher(Chat *chatWindow)

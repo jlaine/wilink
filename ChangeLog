@@ -1,5 +1,7 @@
 wiLink 0.9.5 (UNRELEASED)
  * Close shares database at exit.
+ * Clear chat room participants upon disconnection from server.
+ * When messages cannot be sent, don't clear the user's input.
 
 wiLink 0.9.4 (2010-05-18)
  * Hide diagnostics from roster when it is closed.

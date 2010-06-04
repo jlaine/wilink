@@ -336,9 +336,16 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
 }
 
+/** Handle disconnection from server.
+ */
 void ChatRoom::disconnected()
 {
     joined = false;
+
+    // clear chat room participants
+    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    if (roomIndex.isValid())
+        rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
 }
 
 void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -551,14 +558,14 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     }
 }
 
-void ChatRoom::sendMessage(const QString &text)
+bool ChatRoom::sendMessage(const QString &text)
 {
     QXmppMessage msg;
     msg.setBody(text);
     msg.setFrom(chatLocalJid);
     msg.setTo(chatRemoteJid);
     msg.setType(QXmppMessage::GroupChat);
-    client->sendPacket(msg);
+    return client->sendPacket(msg);
 }
 
 void ChatRoom::tabPressed()

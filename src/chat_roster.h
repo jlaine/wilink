@@ -62,6 +62,8 @@ public:
 
     ChatRosterModel(QXmppClient *client);
     ~ChatRosterModel();
+
+    // QAbstractItemModel interface
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -69,6 +71,7 @@ public:
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     QStringList mimeTypes() const;
     QModelIndex parent(const QModelIndex & index) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
     QPixmap contactAvatar(const QString &bareJid) const;
@@ -76,7 +79,7 @@ public:
     QString contactName(const QString &bareJid) const;
     QString ownName() const;
 
-    void addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon());
+    void addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
     QModelIndex findItem(const QString &bareJid) const;
     void removeItem(const QString &bareJid);
 

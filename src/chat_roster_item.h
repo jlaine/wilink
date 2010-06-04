@@ -47,6 +47,7 @@ public:
     QString id() const;
     ChatRosterItem* parent();
     void remove(ChatRosterItem *item);
+    void removeAt(int row);
     int row() const;
     void setData(int role, const QVariant &value);
     int size() const;

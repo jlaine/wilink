@@ -500,6 +500,21 @@ void ChatRosterModel::rosterReceived()
     reset();
 }
 
+bool ChatRosterModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    ChatRosterItem *parentItem;
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
+
+    const int minIndex = qMax(0, row);
+    const int maxIndex = qMin(row + count, parentItem->size()) - 1;
+    for (int i = maxIndex; i >= minIndex; --i)
+        parentItem->removeAt(i);
+    return maxIndex > minIndex;
+}
+
 int ChatRosterModel::rowCount(const QModelIndex &parent) const
 {
     ChatRosterItem *parentItem;
@@ -552,9 +567,16 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon)
+void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &parent)
 {
-    if (rootItem->find(id))
+    ChatRosterItem *parentItem;
+    if (parent.isValid())
+        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
+    else
+        parentItem = rootItem;
+
+    // check the item does not already exist
+    if (parentItem->find(id))
         return;
 
     // prepare item
@@ -565,7 +587,7 @@ void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, cons
         item->setData(Qt::DecorationRole, icon);
 
     // add item
-    beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+    beginInsertRows(parent, parentItem->size(), parentItem->size());
     rootItem->append(item);
     endInsertRows();
 }
