@@ -182,44 +182,38 @@ void ChatRoomWatcher::roomJoin()
     joinRoom(prompt.textValue());
 }
 
-/** Display a chat room's options.
+/** Request a chat room's configuration.
  */
 void ChatRoomWatcher::roomOptions()
 {
     QAction *action = qobject_cast<QAction*>(sender());
     if (!action)
         return;
-    QString jid = action->data().toString();
-
-    // get room information
-    QXmppMucOwnerIq iq;
-    iq.setTo(jid);
-    chat->client()->sendPacket(iq);
+    const QString jid = action->data().toString();
+    chat->client()->mucManager().requestRoomConfiguration(jid);
 }
 
+/** Request a chat room's members.
+ */
 void ChatRoomWatcher::roomMembers()
 {
     QAction *action = qobject_cast<QAction*>(sender());
     if (!action)
         return;
-    QString jid = action->data().toString();
+    const QString jid = action->data().toString();
 
     // manage room members
     ChatRoomMembers dialog(chat->client(), jid, chat);
     dialog.exec();
 }
 
+/** Display room configuration dialog.
+ */
 void ChatRoomWatcher::roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &form)
 {
     ChatForm dialog(form, chat);
     if (dialog.exec())
-    {
-        QXmppMucOwnerIq iqPacket;
-        iqPacket.setType(QXmppIq::Set);
-        iqPacket.setTo(roomJid);
-        iqPacket.setForm(dialog.form());
-        chat->client()->sendPacket(iqPacket);
-    }
+        chat->client()->mucManager().setRoomConfiguration(roomJid, dialog.form());
 }
 
 /** Once a multi-user chat server is found, enable the "chat rooms" button.
