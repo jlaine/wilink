@@ -736,20 +736,22 @@ void ChatRoomMembers::iqReceived(const QXmppIq &iq)
 
 void ChatRoomMembers::submit()
 {
-    QXmppElementList elements;
-    for (int i=0; i < tableWidget->rowCount(); i++)
+    QList<QXmppMucAdminIq::Item> items;
+
+    // Process changed members
+    for (int i = 0; i < tableWidget->rowCount(); i++)
     {
         const QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(i, AffiliationColumn));
         Q_ASSERT(tableWidget->item(i, JidColumn) && combo);
 
         const QString currentJid = tableWidget->item(i, JidColumn)->text();
         const QString currentAffiliation = combo->itemData(combo->currentIndex()).toString();
-        if (initialMembers.value(currentJid) != currentAffiliation) {
-            QXmppElement item;
-            item.setTagName("item");
-            item.setAttribute("affiliation", currentAffiliation);
-            item.setAttribute("jid", currentJid);
-            elements.append(item);
+        if (initialMembers.value(currentJid) != currentAffiliation)
+        {
+            QXmppMucAdminIq::Item item;
+            item.setAffiliation(currentAffiliation);
+            item.setJid(currentJid);
+            items.append(item);
         }
         initialMembers.remove(currentJid);
     }
@@ -757,24 +759,18 @@ void ChatRoomMembers::submit()
     // Process deleted members (i.e. remaining entries in initialMember)
     foreach(const QString &entry, initialMembers.keys())
     {
-        QXmppElement item;
-        item.setTagName("item");
-        item.setAttribute("affiliation", "none");
-        item.setAttribute("jid", entry);
-        elements.append(item);
+        QXmppMucAdminIq::Item item;
+        item.setAffiliation("none");
+        item.setJid(entry);
+        items.append(item);
     }
 
-    if (! elements.isEmpty()) {
-        QXmppElement query;
-        query.setTagName("query");
-        query.setAttribute("xmlns", ns_muc_admin);
-        foreach (const QXmppElement &child, elements)
-            query.appendChild(child);
-
-        QXmppIq iq;
+    if (!items.isEmpty())
+    {
+        QXmppMucAdminIq iq;
         iq.setTo(chatRoomJid);
         iq.setType(QXmppIq::Set);
-        iq.setExtensions(query);
+        iq.setItems(items);
         client->sendPacket(iq);
     }
     accept();
