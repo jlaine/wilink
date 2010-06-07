@@ -393,7 +393,7 @@ void ChatRoom::leave()
 {
     if (joined)
     {
-        client->mucManager().leaveRoom(chatRemoteJid, nickName);
+        client->mucManager().leaveRoom(chatRemoteJid);
         joined = false;
     }
     deleteLater();
