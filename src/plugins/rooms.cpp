@@ -700,18 +700,12 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     affiliations["outcast"] = tr("banned");
     foreach (const QString &affiliation, affiliations.keys())
     {
-        QXmppElement item;
-        item.setTagName("item");
-        item.setAttribute("affiliation", affiliation);
+        QXmppMucAdminIq::Item item;
+        item.setAffiliation(affiliation);
 
-        QXmppElement query;
-        query.setTagName("query");
-        query.setAttribute("xmlns", ns_muc_admin);
-        query.appendChild(item);
-
-        QXmppIq iq;
+        QXmppMucAdminIq iq;
         iq.setTo(chatRoomJid);
-        iq.setExtensions(query);
+        iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
         client->sendPacket(iq);
     }
 }
