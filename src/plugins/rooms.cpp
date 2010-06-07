@@ -530,14 +530,11 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     }
 }
 
+/** Send a message to the chat room.
+ */
 bool ChatRoom::sendMessage(const QString &text)
 {
-    QXmppMessage msg;
-    msg.setBody(text);
-    msg.setFrom(chatLocalJid);
-    msg.setTo(chatRemoteJid);
-    msg.setType(QXmppMessage::GroupChat);
-    return client->sendPacket(msg);
+    return client->mucManager().sendMessage(chatRemoteJid, text);
 }
 
 void ChatRoom::tabPressed()

@@ -109,7 +109,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
             done > 0 && t.isValid() && t.elapsed())
         {
             int speed = (done * 1000.0) / t.elapsed();
-            return tr("Downloading at %1").arg(sizeToString(speed) + "/s");
+            return tr("Downloading at %1").arg(speedToString(speed));
         }
     }
     else if (role == Qt::DecorationRole && index.column() == NameColumn)

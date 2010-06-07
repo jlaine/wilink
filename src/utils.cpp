@@ -89,3 +89,16 @@ QString sizeToString(qint64 size)
         return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
 }
 
+QString speedToString(qint64 size)
+{
+    size *= 8;
+    if (size < KILOBYTE)
+        return QString::fromUtf8("%1 b/s").arg(size);
+    else if (size < MEGABYTE)
+        return QString::fromUtf8("%1 Kb/s").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
+    else if (size < GIGABYTE)
+        return QString::fromUtf8("%1 Mb/s").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
+    else
+        return QString::fromUtf8("%1 Gb/s").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
+}
+
