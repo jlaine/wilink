@@ -39,6 +39,7 @@ class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppIq;
 class QXmppMessage;
+class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
 class QXmppPresence;
 
@@ -110,7 +111,7 @@ public:
 protected slots:
     void addMember();
     void removeMember();
-    void iqReceived(const QXmppIq &iq);
+    void mucAdminIqReceived(const QXmppMucAdminIq &iq);
     void submit();
 
 private:

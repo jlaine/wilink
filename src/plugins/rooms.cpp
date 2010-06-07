@@ -688,7 +688,8 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     setLayout(layout);
 
     setWindowTitle(tr("Chat room permissions"));
-    connect(client, SIGNAL(iqReceived(const QXmppIq&)), this, SLOT(iqReceived(const QXmppIq&)));
+    connect(client, SIGNAL(mucAdminIqReceived(const QXmppMucAdminIq&)),
+            this, SLOT(mucAdminIqReceived(const QXmppMucAdminIq&)));
 
     affiliations["member"] = tr("member");
     affiliations["admin"] = tr("administrator");
@@ -706,26 +707,20 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     }
 }
 
-void ChatRoomMembers::iqReceived(const QXmppIq &iq)
+void ChatRoomMembers::mucAdminIqReceived(const QXmppMucAdminIq &iq)
 {
     if (iq.type() != QXmppIq::Result ||
         iq.from() != chatRoomJid)
         return;
-    const QXmppElement query = iq.extensions().first();
-    if (query.tagName() != "query" || query.attribute("xmlns") != ns_muc_admin)
-        return;
-
-    QXmppElement element = query.firstChildElement();
-    while (!element.isNull())
+    foreach (const QXmppMucAdminIq::Item &item, iq.items())
     {
-        const QString jid = element.attribute("jid");
-        const QString affiliation = element.attribute("affiliation");
+        const QString jid = item.jid();
+        const QString affiliation = item.affiliation();
         if (!initialMembers.contains(jid))
         {
             addEntry(jid, affiliation);
             initialMembers[jid] = affiliation;
         }
-        element = element.nextSiblingElement();
     }
     tableWidget->sortItems(JidColumn, Qt::AscendingOrder);;
 }

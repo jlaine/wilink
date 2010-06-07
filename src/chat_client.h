@@ -19,6 +19,7 @@
 
 #include "qxmpp/QXmppClient.h"
 
+class QXmppMucAdminIq;
 class QXmppMucOwnerIq;
 class QXmppShareGetIq;
 class QXmppShareSearchIq;
@@ -31,6 +32,7 @@ public:
     ChatClient(QObject *parent);
 
 signals:
+    void mucAdminIqReceived(const QXmppMucAdminIq &iq);
     void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
     void mucServerFound(const QString &mucServer);
     void shareGetIqReceived(const QXmppShareGetIq &iq);

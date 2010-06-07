@@ -117,6 +117,13 @@ void ChatClient::slotElementReceived(const QDomElement &element, bool &handled)
             emit shareSearchIqReceived(searchIq);
             handled = true;
         }
+        else if (QXmppMucAdminIq::isMucAdminIq(element))
+        {
+            QXmppMucAdminIq mucIq;
+            mucIq.parse(element);
+            emit mucAdminIqReceived(mucIq);
+            handled = true;
+        }
         else if (QXmppMucOwnerIq::isMucOwnerIq(element))
         {
             QXmppMucOwnerIq mucIq;
