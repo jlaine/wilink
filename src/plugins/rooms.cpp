@@ -191,11 +191,7 @@ void ChatRoomWatcher::roomOptions()
     QString jid = action->data().toString();
 
     // get room information
-    QXmppIq iq;
-    QXmppElement query;
-    query.setTagName("query");
-    query.setAttribute("xmlns", ns_muc_owner);
-    iq.setExtensions(query);
+    QXmppMucOwnerIq iq;
     iq.setTo(jid);
     chat->client()->sendPacket(iq);
 }
