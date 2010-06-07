@@ -116,20 +116,14 @@ void ChatRoomWatcher::kickUser()
         return;
     QString jid = action->data().toString();
 
+    QXmppMucAdminIq::Item item;
+    item.setNick(jidToResource(jid));
+    item.setRole("none");
 
-    QXmppElement item;
-    item.setTagName("item");
-    item.setAttribute("nick", jidToResource(jid));
-    item.setAttribute("role", "none");
-
-    QXmppElement query;
-    query.setTagName("query");
-    query.setAttribute("xmlns", ns_muc_admin);
-    query.appendChild(item);
-
-    QXmppIq iq(QXmppIq::Set);
+    QXmppMucAdminIq iq;
+    iq.setType(QXmppIq::Set);
     iq.setTo(jidToBareJid(jid));
-    iq.setExtensions(query);
+    iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
 
     chat->client()->sendPacket(iq);
 }
