@@ -97,6 +97,7 @@ private:
     QString chatLocalJid;
     QXmppClient *client;
     bool joined;
+    QString nickName;
     bool notifyMessages;
     ChatRosterModel *rosterModel;
 };

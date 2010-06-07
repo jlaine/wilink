@@ -291,7 +291,8 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     notifyMessages(false),
     rosterModel(chatRosterModel)
 {
-    chatLocalJid = jid + "/" + rosterModel->ownName();
+    nickName = rosterModel->ownName();
+    chatLocalJid = jid + "/" + nickName;
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -382,15 +383,7 @@ void ChatRoom::join()
     client->sendPacket(disco);
     
     // send join request
-    QXmppPresence packet;
-    packet.setTo(chatLocalJid);
-    packet.setType(QXmppPresence::Available);
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_muc);
-    packet.setExtensions(x);
-    client->sendPacket(packet);
-    
+    client->mucManager().joinRoom(chatRemoteJid, nickName);
     joined = true;
 }
 
@@ -400,10 +393,7 @@ void ChatRoom::leave()
 {
     if (joined)
     {
-        QXmppPresence packet;
-        packet.setTo(chatLocalJid);
-        packet.setType(QXmppPresence::Unavailable);
-        client->sendPacket(packet);
+        client->mucManager().leaveRoom(chatRemoteJid, nickName);
         joined = false;
     }
     deleteLater();
@@ -419,7 +409,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     message.body = msg.body();
     message.from = from;
     message.fromJid = msg.from();
-    message.received = (msg.from() != chatLocalJid);
+    message.received = jidToResource(msg.from()) != nickName;
     message.date = QDateTime::currentDateTime();
     foreach (const QXmppElement &extension, msg.extensions())
     {
@@ -433,7 +423,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     chatHistory->addMessage(message);
 
     // notify user
-    if (notifyMessages || message.body.contains("@" + jidToResource(chatLocalJid)))
+    if (notifyMessages || message.body.contains("@" + nickName))
         queueNotification(message.body);
 }
 
@@ -481,7 +471,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
         }
         break;
     case QXmppPresence::Unavailable:
-        if (presence.from() != chatLocalJid)
+        if (jidToResource(presence.from()) != nickName)
             return;
 
         // leave room
