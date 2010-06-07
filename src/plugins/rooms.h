@@ -36,11 +36,11 @@ class QModelIndex;
 class QPushButton;
 class QTableWidget;
 class QXmppClient;
+class QXmppDataForm;
 class QXmppDiscoveryIq;
 class QXmppIq;
 class QXmppMessage;
 class QXmppMucAdminIq;
-class QXmppMucOwnerIq;
 class QXmppPresence;
 
 class ChatRoomWatcher : public QObject
@@ -56,7 +56,7 @@ private slots:
     void kickUser();
     void messageHandled(QAbstractButton *button);
     void messageReceived(const QXmppMessage &msg);
-    void mucOwnerIqReceived(const QXmppMucOwnerIq &iq);
+    void roomConfigurationReceived(const QString &bareJid, const QXmppDataForm &form);
     void mucServerFound(const QString &roomServer);
     void roomJoin();
     void roomOptions();

@@ -41,6 +41,7 @@
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppMucIq.h"
+#include "qxmpp/QXmppMucManager.h"
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
@@ -67,8 +68,8 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
             this, SLOT(disconnected()));
     connect(client, SIGNAL(messageReceived(QXmppMessage)),
             this, SLOT(messageReceived(QXmppMessage)));
-    connect(client, SIGNAL(mucOwnerIqReceived(const QXmppMucOwnerIq&)),
-            this, SLOT(mucOwnerIqReceived(const QXmppMucOwnerIq&)));
+    connect(&client->mucManager(), SIGNAL(roomConfigurationReceived(QString,QXmppDataForm)),
+            this, SLOT(roomConfigurationReceived(QString,QXmppDataForm)));
     connect(client, SIGNAL(mucServerFound(const QString&)),
             this, SLOT(mucServerFound(const QString&)));
 
@@ -208,17 +209,14 @@ void ChatRoomWatcher::roomMembers()
     dialog.exec();
 }
 
-void ChatRoomWatcher::mucOwnerIqReceived(const QXmppMucOwnerIq &iq)
+void ChatRoomWatcher::roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &form)
 {
-    if (iq.type() != QXmppIq::Result || iq.form().isNull())
-        return;
-
-    ChatForm dialog(iq.form(), chat);
+    ChatForm dialog(form, chat);
     if (dialog.exec())
     {
         QXmppMucOwnerIq iqPacket;
         iqPacket.setType(QXmppIq::Set);
-        iqPacket.setTo(iq.from());
+        iqPacket.setTo(roomJid);
         iqPacket.setForm(dialog.form());
         chat->client()->sendPacket(iqPacket);
     }
