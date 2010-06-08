@@ -385,6 +385,14 @@ Acceptez-vous?</translation>
         <source>Progress</source>
         <translation>Progrès</translation>
     </message>
+    <message>
+        <source>Downloading at %1</source>
+        <translation>Téléchargement à %1</translation>
+    </message>
+    <message>
+        <source>Uploading at %1</source>
+        <translation>Téléchargement à %1</translation>
+    </message>
 </context>
 <context>
     <name>ContactsWatcher</name>

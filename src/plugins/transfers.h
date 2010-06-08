@@ -35,6 +35,7 @@ class ChatRosterModel;
 enum JobDataRoles
 {
     LocalPathRole = Qt::UserRole,
+    TransferStartRole,
 };
 
 class ChatTransferPrompt : public QMessageBox
