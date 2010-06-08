@@ -1,5 +1,6 @@
 add_subdirectory(data)
 add_subdirectory(idle)
+add_subdirectory(qdjango)
 add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
 

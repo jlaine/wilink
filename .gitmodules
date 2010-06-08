@@ -4,3 +4,6 @@
 [submodule "src/qxmpp"]
 	path = src/qxmpp
 	url = git://git.bolloretelecom.eu/qxmpp.git
+[submodule "src/qdjango"]
+	path = src/qdjango
+	url = git://git.bolloretelecom.eu/qdjango.git
