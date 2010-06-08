@@ -111,7 +111,7 @@ add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURC
 if(APPLE)
     set(wilink_LIBRARIES "-framework AppKit")
 endif(APPLE)
-target_link_libraries(wiLink idle qnetio qxmpp ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
+target_link_libraries(wiLink idle qdjango qnetio qxmpp ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
