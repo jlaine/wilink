@@ -22,9 +22,10 @@
 
 #include "utils.h"
 
-#define KILOBYTE 1000
-#define MEGABYTE 1000000
-#define GIGABYTE 1000000000
+static const qint64 KILO = 1000;
+static const qint64 MEGA = 1000000;
+static const qint64 GIGA = 1000000000;
+static const qint64 TERA = 1000000000000;
 
 bool isBareJid(const QString &jid)
 {
@@ -79,26 +80,30 @@ QString indentXml(const QString &xml)
 
 QString sizeToString(qint64 size)
 {
-    if (size < KILOBYTE)
+    if (size < KILO)
         return QString::fromUtf8("%1 B").arg(size);
-    else if (size < MEGABYTE)
-        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
-    else if (size < GIGABYTE)
-        return QString::fromUtf8("%1 MB").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
+    else if (size < MEGA)
+        return QString::fromUtf8("%1 KB").arg(double(size) / double(KILO), 0, 'f', 1);
+    else if (size < GIGA)
+        return QString::fromUtf8("%1 MB").arg(double(size) / double(MEGA), 0, 'f', 1);
+    else if (size < TERA)
+        return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGA), 0, 'f', 1);
     else
-        return QString::fromUtf8("%1 GB").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 TB").arg(double(size) / double(TERA), 0, 'f', 1);
 }
 
 QString speedToString(qint64 size)
 {
     size *= 8;
-    if (size < KILOBYTE)
+    if (size < KILO)
         return QString::fromUtf8("%1 b/s").arg(size);
-    else if (size < MEGABYTE)
-        return QString::fromUtf8("%1 Kb/s").arg(double(size) / double(KILOBYTE), 0, 'f', 1);
-    else if (size < GIGABYTE)
-        return QString::fromUtf8("%1 Mb/s").arg(double(size) / double(MEGABYTE), 0, 'f', 1);
+    else if (size < MEGA)
+        return QString::fromUtf8("%1 Kb/s").arg(double(size) / double(KILO), 0, 'f', 1);
+    else if (size < GIGA)
+        return QString::fromUtf8("%1 Mb/s").arg(double(size) / double(MEGA), 0, 'f', 1);
+    else if (size < TERA)
+        return QString::fromUtf8("%1 Gb/s").arg(double(size) / double(GIGA), 0, 'f', 1);
     else
-        return QString::fromUtf8("%1 Gb/s").arg(double(size) / double(GIGABYTE), 0, 'f', 1);
+        return QString::fromUtf8("%1 Tb/s").arg(double(size) / double(TERA), 0, 'f', 1);
 }
 
