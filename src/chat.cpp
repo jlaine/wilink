@@ -161,7 +161,8 @@ Chat::~Chat()
 {
     delete m_idle;
     foreach (ChatPanel *panel, m_chatPanels)
-        delete panel;
+        if (!panel->parent())
+            delete panel;
 
     // disconnect
     m_client->disconnect();
