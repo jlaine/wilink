@@ -29,12 +29,14 @@
 #include <QResizeEvent>
 #include <QSettings>
 #include <QShortcut>
+#include <QSqlDatabase>
 #include <QStatusBar>
 #include <QStringList>
 #include <QTabWidget>
 #include <QTimer>
 #include <QUrl>
 
+#include "qdjango/QDjango.h"
 #include "qxmpp/QXmppShareDatabase.h"
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppUtils.h"
@@ -987,10 +989,14 @@ bool SharesPlugin::initialize(Chat *chat)
     /* initialise database */
     if (!db)
     {
-        const QString name = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+        const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+        QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+        sharesDb.setDatabaseName(databaseName);
+        Q_ASSERT(sharesDb.open());
+        QDjango::setDatabase(sharesDb);
 
         QSettings settings;
-        db = new QXmppShareDatabase(name, this);
+        db = new QXmppShareDatabase(this);
         db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
     }
     chats << chat;
