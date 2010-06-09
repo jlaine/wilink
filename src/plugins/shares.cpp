@@ -30,6 +30,7 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QStatusBar>
 #include <QStringList>
 #include <QTabWidget>
@@ -994,6 +995,8 @@ bool SharesPlugin::initialize(Chat *chat)
         sharesDb.setDatabaseName(databaseName);
         Q_ASSERT(sharesDb.open());
         QDjango::setDatabase(sharesDb);
+        // drop wiLink <= 0.9.4 table
+        sharesDb.exec("DROP TABLE files");
 
         QSettings settings;
         db = new QXmppShareDatabase(this);
