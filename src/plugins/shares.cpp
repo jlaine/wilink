@@ -448,6 +448,10 @@ void ChatShares::findRemoteFiles()
 
 void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &shareItem)
 {
+    // check the IQ the response is for this connection
+    if (iq.from() != client->getConfiguration().jid())
+        return;
+
     QXmppShareGetIq responseIq(iq);
 
     // FIXME: for some reason, random number generation in thread is broken
@@ -912,6 +916,10 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 
 void ChatShares::searchFinished(const QXmppShareSearchIq &responseIq)
 {
+    // check the IQ the response is for this connection
+    if (responseIq.from() != client->getConfiguration().jid())
+        return;
+
     client->sendPacket(responseIq);
 }
 
