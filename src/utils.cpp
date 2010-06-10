@@ -22,10 +22,10 @@
 
 #include "utils.h"
 
-static const qint64 KILO = 1000;
-static const qint64 MEGA = 1000000;
-static const qint64 GIGA = 1000000000;
-static const qint64 TERA = 1000000000000;
+static const qint64 KILO = 1000LL;
+static const qint64 MEGA = 1000000LL;
+static const qint64 GIGA = 1000000000LL;
+static const qint64 TERA = 1000000000000LL;
 
 bool isBareJid(const QString &jid)
 {
