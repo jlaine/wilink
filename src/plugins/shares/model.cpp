@@ -273,7 +273,9 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     oldItem->setFileHash(newItem->fileHash());
     oldItem->setFileSize(newItem->fileSize());
     oldItem->setLocations(newItem->locations());
-    //oldItem->setName(newItem->name());
+    // root collections have empty names
+    if (!newItem->name().isEmpty())
+        oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
     if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
         oldItem->setData(UpdateTime, stamp);
