@@ -233,13 +233,14 @@ void ChatShares::directoryChanged(const QString &path)
 void ChatShares::disconnected()
 {
     ChatClient *baseClient = chatWindow->client();
-    if (client && client != baseClient)
+    if (client && client != baseClient && QObject::sender() == baseClient)
     {
         shareServer = "";
         client->disconnect();
         client->deleteLater();
         client = baseClient;
     }
+    sharesView->setEnabled(false);
 }
 
 /** Recursively cancel any transfer jobs associated with a download queue item.
@@ -654,6 +655,9 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             connect(menuAction, SIGNAL(triggered(bool)), this, SLOT(shareFolder()));
         }
 
+        // activate the shares view
+        sharesView->setEnabled(true);
+
         emit registerPanel();
     }
     else if (presence.type() == QXmppPresence::Error &&
@@ -788,7 +792,7 @@ void ChatShares::registerWithServer()
 void ChatShares::setClient(ChatClient *newClient)
 {
     client = newClient;
-
+    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
