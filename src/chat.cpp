@@ -69,7 +69,8 @@ enum StatusIndexes {
 
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
-    autoAway(false)
+    m_autoAway(false),
+    m_freezeStatus(false)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -391,7 +392,9 @@ void Chat::connected()
  */
 void Chat::disconnected()
 {
+    m_freezeStatus = true;
     m_statusCombo->setCurrentIndex(OfflineIndex);
+    m_freezeStatus = false;
 }
 
 /** Handle an error talking to the chat server.
@@ -596,16 +599,21 @@ void Chat::secondsIdle(int secs)
         if (m_statusCombo->currentIndex() == AvailableIndex)
         {
             m_statusCombo->setCurrentIndex(AwayIndex);
-            autoAway = true;
+            m_autoAway = true;
         }
-    } else if (autoAway) {
+    } else if (m_autoAway) {
         m_statusCombo->setCurrentIndex(AvailableIndex);
     }
 }
 
 void Chat::statusChanged(int currentIndex)
 {
-    autoAway = false;
+    // don't change client presence when the status change
+    // was due to a disconnection from the server
+    if (m_freezeStatus)
+        return;
+
+    m_autoAway = false;
     if (currentIndex == AvailableIndex)
         m_client->setClientPresence(QXmppPresence::Status::Online);
     else if (currentIndex == AwayIndex)

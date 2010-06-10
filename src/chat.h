@@ -98,7 +98,8 @@ private:
     void changeEvent(QEvent *event);
 
 private:
-    bool autoAway;
+    bool m_autoAway;
+    bool m_freezeStatus;
     Idle *m_idle;
 
     QMenu *m_fileMenu;
