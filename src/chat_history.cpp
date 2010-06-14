@@ -210,6 +210,9 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
     bodyText->setTextCursor(cursor);
 }
 
+/** Determine whether to show message sender and date depending
+ *  on the previous message in the list.
+ */
 void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
 {
     // calculate new values
