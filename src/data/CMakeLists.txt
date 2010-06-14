@@ -15,6 +15,7 @@ generate_png(png
     download.svg
     file.svg
     options.svg
+    peer.svg
     photos.svg
     refresh.svg
     remove.svg
