@@ -117,9 +117,20 @@ void ChatRoomWatcher::kickUser()
         return;
     QString jid = action->data().toString();
 
+    // prompt for reason
+    const QString contactName = chat->rosterModel()->contactName(jidToBareJid(jid));
+    bool ok = false;
+    QString reason;
+    reason = QInputDialog::getText(chat, tr("Kick user"),
+                  tr("Enter the reason for kicking the user from '%1'.").arg(contactName),
+                  QLineEdit::Normal, reason, &ok);
+    if (!ok)
+        return;
+
     QXmppMucAdminIq::Item item;
     item.setNick(jidToResource(jid));
     item.setRole("none");
+    item.setReason(reason);
 
     QXmppMucAdminIq iq;
     iq.setType(QXmppIq::Set);
@@ -463,7 +474,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
                 QXmppStanza::Error error = presence.error();
                 QMessageBox::warning(window(),
                     tr("Chat room error"),
-                    tr("Sorry, but you cannot join chat room %1.\n\n%2")
+                    tr("Sorry, but you cannot join chat room '%1'.\n\n%2")
                         .arg(chatRemoteJid)
                         .arg(error.text()));
                 break;
@@ -487,7 +498,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
                     QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
                     QMessageBox::warning(window(),
                         tr("Chat room error"),
-                        tr("Sorry, but you were kicked from chat room %1.\n\n%2")
+                        tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
                             .arg(chatRemoteJid)
                             .arg(reason.value()));
                 }

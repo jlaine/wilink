@@ -118,28 +118,28 @@
         <translation>Erreur de salon de discussion</translation>
     </message>
     <message>
-        <source>Sorry, but you were kicked from chat room %1.
-
-%2</source>
-        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion %1.
-
-%2</translation>
-    </message>
-    <message>
-        <source>Sorry, but you cannot join chat room %1.
-
-%2</source>
-        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion %1.
-
-%2</translation>
-    </message>
-    <message>
         <source>To invite a contact to this chat room, drag and drop it onto the chat room.</source>
         <translation>Pour inviter un contact à ce salon de discussion, faites le glisser sur le salon.</translation>
     </message>
     <message>
         <source>%1 has been invited to %2</source>
         <translation>%1 a été invité(e) à %2</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot join chat room &apos;%1&apos;.
+
+%2</source>
+        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion &apos;%1&apos;.
+
+%2</translation>
+    </message>
+    <message>
+        <source>Sorry, but you were kicked from chat room &apos;%1&apos;.
+
+%2</source>
+        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion &apos;%1&apos;.
+
+%2</translation>
     </message>
 </context>
 <context>
@@ -221,6 +221,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Join or create a chat room</source>
         <translation>Rejoindre ou créer un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Enter the reason for kicking the user from &apos;%1&apos;.</source>
+        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur de &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
