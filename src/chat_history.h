@@ -69,10 +69,9 @@ public:
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
+    void setPrevious(ChatMessageWidget *previous);
     void setSelection(const QRectF &rect);
-    bool showDate() const;
     void setShowDate(bool show);
-    bool showSender() const;
     void setShowSender(bool show);
 
 signals:

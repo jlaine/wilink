@@ -210,9 +210,23 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
     bodyText->setTextCursor(cursor);
 }
 
-bool ChatMessageWidget::showDate() const
+void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
 {
-    return show_date;
+    // calculate new values
+    bool showSender = (!previous ||
+        msg.fromJid != previous->message().fromJid ||
+        msg.date > previous->message().date.addSecs(120 * 60));
+    bool showDate = (showSender ||
+        msg.date > previous->message().date.addSecs(60));
+
+    // check whether anything changed
+    if (showSender == show_sender && showDate == show_date)
+        return;
+
+    // update values
+    setShowSender(showSender);
+    setShowDate(showDate);
+    updateGeometry();
 }
 
 void ChatMessageWidget::setShowDate(bool show)
@@ -226,11 +240,6 @@ void ChatMessageWidget::setShowDate(bool show)
         dateText->hide();
     }
     show_date = show;
-}
-
-bool ChatMessageWidget::showSender() const
-{
-    return show_sender;
 }
 
 void ChatMessageWidget::setShowSender(bool show)
@@ -323,21 +332,21 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
         }
     }
 
-    /* determine grouping */
-    bool showSender = (!previous ||
-        message.fromJid != previous->message().fromJid ||
-        message.date > previous->message().date.addSecs(120 * 60));
-    bool showDate = (showSender ||
-        message.date > previous->message().date.addSecs(60));
-
-    /* add message */
+    /* prepare message */
     ChatMessageWidget *msg = new ChatMessageWidget(message.received, obj);
     msg->setMessage(message);
-    msg->setShowDate(showDate);
-    msg->setShowSender(showSender);
-
-    connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
+    msg->setPrevious(previous);
     msg->setMaximumWidth(availableWidth());
+
+    /* adjust next message */
+    if (pos < layout->count())
+    {
+        ChatMessageWidget *next = static_cast<ChatMessageWidget*>(layout->itemAt(pos));
+        next->setPrevious(msg);
+    }
+
+    /* insert new message */
+    connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
     layout->insertItem(pos, msg);
     adjustSize();
 
