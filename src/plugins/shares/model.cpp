@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QFileIconProvider>
-
 #include "model.h"
 #include "utils.h"
 
@@ -44,10 +42,9 @@ ChatSharesModel::ChatSharesModel(QObject *parent)
     rootItem = new QXmppShareItem(QXmppShareItem::CollectionItem);
 
     /* load icons */
-    QFileIconProvider iconProvider;
     collectionIcon = QIcon(":/album.png");
     fileIcon = QIcon(":/file.png");
-    peerIcon = iconProvider.icon(QFileIconProvider::Network);
+    peerIcon = QIcon(":/peer.png");
 }
 
 ChatSharesModel::~ChatSharesModel()
