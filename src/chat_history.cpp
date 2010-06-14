@@ -210,6 +210,11 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
     bodyText->setTextCursor(cursor);
 }
 
+bool ChatMessageWidget::showDate() const
+{
+    return show_date;
+}
+
 void ChatMessageWidget::setShowDate(bool show)
 {
     if (show)
@@ -221,6 +226,11 @@ void ChatMessageWidget::setShowDate(bool show)
         dateText->hide();
     }
     show_date = show;
+}
+
+bool ChatMessageWidget::showSender() const
+{
+    return show_sender;
 }
 
 void ChatMessageWidget::setShowSender(bool show)
