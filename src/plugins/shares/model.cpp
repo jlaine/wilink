@@ -45,8 +45,8 @@ ChatSharesModel::ChatSharesModel(QObject *parent)
 
     /* load icons */
     QFileIconProvider iconProvider;
-    collectionIcon = iconProvider.icon(QFileIconProvider::Folder);
-    fileIcon = iconProvider.icon(QFileIconProvider::File);
+    collectionIcon = QIcon(":/album.png");
+    fileIcon = QIcon(":/file.png");
     peerIcon = iconProvider.icon(QFileIconProvider::Network);
 }
 
