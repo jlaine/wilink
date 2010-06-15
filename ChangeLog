@@ -7,6 +7,7 @@ wiLink 0.9.5 (UNRELEASED)
  * Fix message grouping for out-of-order messages.
  * Add new icon set.
  * Make it possible to download files using double click.
+ * Respect peer/folder/file orders when updating shares view.
 
 wiLink 0.9.4 (2010-05-18)
  * Hide diagnostics from roster when it is closed.
