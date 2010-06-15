@@ -61,7 +61,8 @@ static int parallelDownloadLimit = 2;
 // keep directory listings for 10 seconds
 #define REFRESH_INTERVAL 10
 #define REGISTER_INTERVAL 60
-#define REQUEST_TIMEOUT 60
+// maximum time to wait for an answer to a "get" request (2mn)
+#define REQUEST_TIMEOUT 120
 
 // common queries
 #define Q ChatSharesModelQuery
