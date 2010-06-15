@@ -582,6 +582,10 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
         else
             itemExpandRequested(index);
     }
+    else if (item->type() == QXmppShareItem::FileItem)
+    {
+        queueItem(item);
+    }
 }
 
 /** When the user asks to expand a node, check whether we need to refresh
