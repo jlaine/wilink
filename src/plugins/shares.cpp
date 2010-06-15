@@ -190,7 +190,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     registerTimer = new QTimer(this);
     registerTimer->setInterval(REGISTER_INTERVAL * 1000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
-    connect(baseClient, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
