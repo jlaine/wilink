@@ -8,6 +8,7 @@ wiLink 0.9.5 (UNRELEASED)
  * Add new icon set.
  * Make it possible to download files using double click.
  * Respect peer/folder/file orders when updating shares view.
+ * Update share entries when new versions are received.
 
 wiLink 0.9.4 (2010-05-18)
  * Hide diagnostics from roster when it is closed.
