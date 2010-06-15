@@ -296,16 +296,28 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
 
     // update existing children
     QList<QXmppShareItem*> removed = oldItem->children();
-    QList<QXmppShareItem*> added;
-    foreach (QXmppShareItem *newChild, newItem->children())
+    for (int newRow = 0; newRow < newItem->size(); newRow++)
     {
+        QXmppShareItem *newChild = newItem->child(newRow);
         QXmppShareItem *oldChild = get(Q_FIND_LOCATIONS(newChild->locations()), QueryOptions(DontRecurse), oldItem);
         if (oldChild)
         {
+            // update existing child
+            const int oldRow = oldChild->row();
+            if (oldRow != newRow)
+            {
+                beginMoveRows(oldIndex, oldRow, oldRow, oldIndex, newRow);
+                oldItem->moveChild(oldRow, newRow);
+                endMoveRows();
+            }
             updateItem(oldChild, newChild);
             removed.removeAll(oldChild);
         } else {
-            added << newChild;
+            // insert new child
+            beginInsertRows(oldIndex, newRow, newRow);
+            QXmppShareItem *item = oldItem->insertChild(newRow, *newChild);
+            updateTime(item, stamp);
+            endInsertRows();
         }
     }
 
@@ -315,18 +327,6 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
         beginRemoveRows(oldIndex, oldChild->row(), oldChild->row());
         oldItem->removeChild(oldChild);
         endRemoveRows();
-    }
-
-    // add new children
-    if (added.size())
-    {
-        beginInsertRows(oldIndex, oldItem->size(), oldItem->size() + added.size());
-        foreach (QXmppShareItem *newChild, added)
-        {
-            QXmppShareItem *item = oldItem->appendChild(*newChild);
-            updateTime(item, stamp);
-        }
-        endInsertRows();
     }
 
     return oldIndex;
