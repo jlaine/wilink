@@ -274,9 +274,27 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     if (!newItem->name().isEmpty())
         oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
-    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
-        oldItem->setData(UpdateTime, stamp);
 
+    // if we received an empty collection, stop here
+    if (newItem->type() == QXmppShareItem::CollectionItem && !newItem->size())
+        return oldIndex;
+
+    // if we received a file, clear any children and stop here
+    if (newItem->type() == QXmppShareItem::FileItem)
+    {
+        if (oldItem->size())
+        {
+            beginRemoveRows(oldIndex, 0, oldItem->size());
+            oldItem->clearChildren();
+            endRemoveRows();
+        }
+        return oldIndex;
+    }
+
+    // update own timestamp
+    oldItem->setData(UpdateTime, stamp);
+
+    // update existing children
     QList<QXmppShareItem*> removed = oldItem->children();
     QList<QXmppShareItem*> added;
     foreach (QXmppShareItem *newChild, newItem->children())
@@ -291,15 +309,12 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
         }
     }
 
-    // remove old children if we received a file or a non-empty collection
-    if (newItem->type() == QXmppShareItem::FileItem || newItem->size())
+    // remove old children
+    foreach (QXmppShareItem *oldChild, removed)
     {
-        foreach (QXmppShareItem *oldChild, removed)
-        {
-            beginRemoveRows(oldIndex, oldChild->row(), oldChild->row());
-            oldItem->removeChild(oldChild);
-            endRemoveRows();
-        }
+        beginRemoveRows(oldIndex, oldChild->row(), oldChild->row());
+        oldItem->removeChild(oldChild);
+        endRemoveRows();
     }
 
     // add new children
