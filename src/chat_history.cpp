@@ -328,7 +328,9 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
             qAbs(message.date.secsTo(child->message().date)) < 10)
             return;
 
-        if (message.date > child->message().date)
+        // we use greater or equal comparison (and not strictly greater) dates
+        // because messages are usually received in chronological order
+        if (message.date >= child->message().date)
         {
             previous = child;
             pos++;
