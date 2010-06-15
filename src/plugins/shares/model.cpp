@@ -267,6 +267,7 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     if (oldItem != rootItem)
         oldIndex = createIndex(oldItem->row(), 0, oldItem);
 
+    // update own data
     oldItem->setFileHash(newItem->fileHash());
     oldItem->setFileSize(newItem->fileSize());
     oldItem->setLocations(newItem->locations());
@@ -274,6 +275,9 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     if (!newItem->name().isEmpty())
         oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
+    if (oldItem != rootItem)
+        emit dataChanged(createIndex(oldItem->row(), NameColumn, oldItem),
+                         createIndex(oldItem->row(), SizeColumn, oldItem));
 
     // if we received an empty collection, stop here
     if (newItem->type() == QXmppShareItem::CollectionItem && !newItem->size())
