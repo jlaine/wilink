@@ -35,9 +35,12 @@ class UpdatesDialog : public QDialog
 public:
     UpdatesDialog(QWidget *parent = NULL);
 
+public slots:
+    void check();
+
 protected slots:
     void checkStarted();
-    void updateAvailable(const Release &release);
+    void checkFinished(const Release &release);
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);
     void updateProgress(qint64 done, qint64 total);

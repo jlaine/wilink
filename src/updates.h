@@ -31,6 +31,8 @@ class QTimer;
 class Release
 {
 public:
+    bool isValid() const;
+
     QString changes;
     QString package;
     QUrl url;
@@ -67,8 +69,7 @@ protected slots:
 
 signals:
     void checkStarted();
-    void checkFailed(Updates::UpdatesError error, const QString &errorString);
-    void updateAvailable(const Release &release);
+    void checkFinished(const Release &release, const QString &errorString);
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);
     void updateProgress(qint64 done, qint64 total);

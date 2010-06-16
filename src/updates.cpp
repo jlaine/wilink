@@ -36,6 +36,12 @@
 #include "systeminfo.h"
 #include "updates.h"
 
+bool Release::isValid() const
+{
+    return (Updates::compareVersions(version, qApp->applicationVersion()) > 0) &&
+           url.isValid() && url.scheme() == "https" && hashes.contains("sha1");
+}
+
 Updates::Updates(QObject *parent)
     : QObject(parent), updatesUrl("https://download.wifirst.net/wiLink/")
 {
@@ -57,7 +63,7 @@ void Updates::check()
     /* only download files over HTTPS */
     if (updatesUrl.scheme() != "https")
     {
-        emit checkFailed(InsecureLocation, "Refusing to check for updates from non-HTTPS site");
+        emit checkFinished(Release(), "Refusing to check for updates from non-HTTPS site");
         return;
     }
 
@@ -95,7 +101,7 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 void Updates::download(const Release &release, const QString &dirPath)
 {
     /* only download files over HTTPS with an SHA1 hash */
-    if (release.url.scheme() != "https" || !release.hashes.contains("sha1"))
+    if (!release.isValid())
     {
         emit updateFailed(InsecureLocation, "Refusing to download update from non-HTTPS site or without checksum");
         return;
@@ -159,7 +165,7 @@ void Updates::processStatus()
         /* retry in 5mn */
         timer->setInterval(300 * 1000);
         timer->start();
-        emit checkFailed(DownloadFailed, reply->errorString());
+        emit checkFinished(Release(), reply->errorString());
         return;
     }
 
@@ -185,10 +191,8 @@ void Updates::processStatus()
     if (!urlString.isEmpty())
         release.url = updatesUrl.resolved(QUrl(urlString));
 
-    /* check whether this version is more recent than the installed one */
-    if (compareVersions(release.version, qApp->applicationVersion()) > 0 &&
-        release.url.scheme() == "https" && release.hashes.contains("sha1"))
-        emit updateAvailable(release);
+    /* emit information about available release */
+    emit checkFinished(release, QString());
 
     /* check again in one week */
     timer->setInterval(7 * 24 * 3600 * 1000);

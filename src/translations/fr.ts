@@ -563,8 +563,8 @@ Acceptez-vous?</translation>
         <translation>Une fois le téléchargement terminé, %1 quittera afin de vous laisser installer la nouvelle version.</translation>
     </message>
     <message>
-        <source>Downloading..</source>
-        <translation>Téléchargement..</translation>
+        <source>Downloading update..</source>
+        <translation>Téléchargement de la mise à jour..</translation>
     </message>
     <message>
         <source>Download failed</source>
@@ -575,8 +575,8 @@ Acceptez-vous?</translation>
         <translation>Le téléchargement de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
     <message>
-        <source>Installing..</source>
-        <translation>Installation..</translation>
+        <source>Installing update..</source>
+        <translation>Installation de la mise à jour..</translation>
     </message>
     <message>
         <source>Installation failed</source>
@@ -587,8 +587,12 @@ Acceptez-vous?</translation>
         <translation>L&apos;installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
     <message>
-        <source>Checking..</source>
-        <translation>Recherche..</translation>
+        <source>Checking for updates..</source>
+        <translation>Recherche de mise à jour..</translation>
+    </message>
+    <message>
+        <source>No update available</source>
+        <translation>Aucune mise à jour disponible</translation>
     </message>
 </context>
 </TS>

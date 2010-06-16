@@ -46,7 +46,9 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     QLabel *statusIcon = new QLabel;
     statusIcon->setPixmap(QPixmap(":/wiLink.png"));
     hbox->addWidget(statusIcon);
+    hbox->addSpacing(10);
     statusLabel = new QLabel;
+    statusLabel->setWordWrap(true);
     hbox->addWidget(statusLabel);
     layout->addItem(hbox);
 
@@ -57,20 +59,34 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* updates */
     updates = new Updates(this);
-    connect(updates, SIGNAL(checkStarted()), this, SLOT(checkStarted()));
-    connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
+    connect(updates, SIGNAL(checkStarted()),
+        this, SLOT(checkStarted()));
+    connect(updates, SIGNAL(checkFinished(Release,QString)),
+        this, SLOT(checkFinished(Release)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
 }
 
-void UpdatesDialog::checkStarted()
+void UpdatesDialog::check()
 {
-    statusLabel->setText(tr("Checking.."));
+    updates->check();
 }
 
-void UpdatesDialog::updateAvailable(const Release &release)
+void UpdatesDialog::checkStarted()
 {
+    statusLabel->setText(tr("Checking for updates.."));
+}
+
+void UpdatesDialog::checkFinished(const Release &release)
+{
+    show();
+    if (!release.isValid())
+    {
+        statusLabel->setText(tr("No update available"));
+        return;
+    }
+    statusLabel->setText(tr("Update available"));
     const QString message = QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
             .arg(tr("Version %1 of %2 is available. Do you want to download it?")
                 .arg(release.version)
@@ -84,7 +100,7 @@ void UpdatesDialog::updateAvailable(const Release &release)
         message,
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
-        statusLabel->setText(tr("Downloading.."));
+        statusLabel->setText(tr("Downloading update.."));
         show();
         updates->download(release, SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
     }
@@ -92,7 +108,7 @@ void UpdatesDialog::updateAvailable(const Release &release)
 
 void UpdatesDialog::updateDownloaded(const QUrl &url)
 {
-    statusLabel->setText(tr("Installing.."));
+    statusLabel->setText(tr("Installing update.."));
 #ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());
