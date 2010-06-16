@@ -25,11 +25,16 @@
 #include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
+#include <QProcess>
 #include <QProgressBar>
 #include <QTimer>
 
 #include "systeminfo.h"
 #include "updatesdialog.h"
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 UpdatesDialog::UpdatesDialog(QWidget *parent)
     : QDialog(parent)
@@ -81,7 +86,37 @@ void UpdatesDialog::updateAvailable(const Release &release)
 
 void UpdatesDialog::updateDownloaded(const QUrl &url)
 {
+#ifdef Q_OS_WIN
+    // invoke the downloaded installer on the same path as the current install
+    QDir installDir(qApp->applicationDirPath());
+    installDir.cdUp();
+
+    // we cannot use QProcess::startDetached() because NSIS wants the
+    // /D=.. argument to be absolutely unescaped.
+    QString args = QString("\"%1\" /D=%2")
+        .arg(url.toLocalFile().replace(QLatin1Char('/'), QLatin1Char('\\')))
+        .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
+
+    STARTUPINFOW startupInfo = { sizeof( STARTUPINFO ), 0, 0, 0,
+                                 (ulong)CW_USEDEFAULT, (ulong)CW_USEDEFAULT,
+                                 (ulong)CW_USEDEFAULT, (ulong)CW_USEDEFAULT,
+                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                               };
+    PROCESS_INFORMATION pinfo;
+    bool success = CreateProcessW(0, (wchar_t*)args.utf16(),
+                                 0, 0, FALSE, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE, 0,
+                                 0,
+                                 &startupInfo, &pinfo);
+
+    if (success) {
+        CloseHandle(pinfo.hThread);
+        CloseHandle(pinfo.hProcess);
+    }
+#else
+    // open the downloaded archive
     QDesktopServices::openUrl(url);
+#endif
+    // quit application to allow installation
     qApp->quit();
 }
 
