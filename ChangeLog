@@ -9,6 +9,7 @@ wiLink 0.9.5 (UNRELEASED)
  * Make it possible to download files using double click.
  * Respect peer/folder/file orders when updating shares view.
  * Update share entries when new versions are received.
+ * Don't bring chat windows to front upon right click on tray icon.
 
 wiLink 0.9.4 (2010-05-18)
  * Hide diagnostics from roster when it is closed.

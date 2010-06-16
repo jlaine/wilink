@@ -80,7 +80,7 @@ Application::Application(int &argc, char **argv)
     connect(action, SIGNAL(triggered()), this, SLOT(quit()));
     trayIcon->setContextMenu(trayMenu);
     QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-        this, SLOT(showChats()));
+        this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
     QObject::connect(trayIcon, SIGNAL(messageClicked()),
         this, SLOT(messageClicked()));
     trayIcon->show();
@@ -392,3 +392,8 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
     }
 }
 
+void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason != QSystemTrayIcon::Context)
+        showChats();
+}
