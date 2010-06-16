@@ -35,7 +35,7 @@ enum ChatSharesColumns
 
 enum ChatSharesDataRoles {
     PacketId = QXmppShareItem::MaxRole,
-    PacketStart,
+    PacketTimeout,
     StreamId,
     TransferStart,
     TransferDone,

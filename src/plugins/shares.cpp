@@ -701,15 +701,15 @@ void ChatShares::processDownloadQueue()
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
             Q(PacketId, Q::NotEquals, QVariant()));
 
-    QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REQUEST_TIMEOUT);
+    const QDateTime currentTime = QDateTime::currentDateTime();
     foreach (QXmppShareItem *queueItem, active)
     {
-        QDateTime startTime = queueItem->data(PacketStart).toDateTime();
-        if (startTime.isValid() && startTime <= cutoffTime)
+        QDateTime timeoutTime = queueItem->data(PacketTimeout).toDateTime();
+        if (timeoutTime.isValid() && timeoutTime <= currentTime)
         {
             logMessage(QXmppLogger::WarningMessage, "Request timed out for file: " + queueItem->name());
             queueItem->setData(PacketId, QVariant());
-            queueItem->setData(PacketStart, QVariant());
+            queueItem->setData(PacketTimeout, QVariant());
             queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
             queueModel->refreshItem(queueItem);
             active.removeAll(queueItem);
@@ -755,9 +755,10 @@ void ChatShares::processDownloadQueue()
         iq.setNode(location.node());
         client->sendPacket(iq);
 
+        const int maxSeconds = REQUEST_TIMEOUT;
         file->setData(PacketId, iq.id());
-        file->setData(PacketStart, QDateTime::currentDateTime());
-        QTimer::singleShot(REQUEST_TIMEOUT * 1000, this, SLOT(processDownloadQueue()));
+        file->setData(PacketTimeout, QDateTime::currentDateTime().addSecs(maxSeconds));
+        QTimer::singleShot(maxSeconds * 1000, this, SLOT(processDownloadQueue()));
 
         queueModel->refreshItem(file);
 
@@ -845,14 +846,14 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 
     if (shareIq.type() == QXmppIq::Result)
     {
-        queueItem->setData(PacketStart, QVariant());
+        queueItem->setData(PacketTimeout, QVariant());
         queueItem->setData(StreamId, shareIq.sid());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
         logMessage(QXmppLogger::WarningMessage, "Error requesting file " + queueItem->name() + " from " + shareIq.from());
         queueItem->setData(PacketId, QVariant());
-        queueItem->setData(PacketStart, QVariant());
+        queueItem->setData(PacketTimeout, QVariant());
         queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
         queueModel->refreshItem(queueItem);
     }
