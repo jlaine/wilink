@@ -574,5 +574,17 @@ Acceptez-vous?</translation>
         <source>Could not download the new version, please try again later.</source>
         <translation>Le téléchargement de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
+    <message>
+        <source>Installing..</source>
+        <translation>Installation..</translation>
+    </message>
+    <message>
+        <source>Installation failed</source>
+        <translation>Echec de l'installation</translation>
+    </message>
+    <message>
+        <source>Could not install the new version, please try again later.</source>
+        <translation>L'installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
+    </message>
 </context>
 </TS>
