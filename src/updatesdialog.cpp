@@ -70,6 +70,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
 void UpdatesDialog::check()
 {
+    show();
     updates->check();
 }
 
@@ -80,7 +81,6 @@ void UpdatesDialog::checkStarted()
 
 void UpdatesDialog::checkFinished(const Release &release)
 {
-    show();
     if (!release.isValid())
     {
         statusLabel->setText(tr("No update available"));

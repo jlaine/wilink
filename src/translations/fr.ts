@@ -42,6 +42,10 @@
         <source>Open at login</source>
         <translation>Ouvrir au démarrage</translation>
     </message>
+    <message>
+        <source>Check for &amp;updates</source>
+        <translation>&amp;Mettre à jour</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>

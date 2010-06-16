@@ -54,6 +54,7 @@
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 #include "systeminfo.h"
+#include "updatesdialog.h"
 #include "utils.h"
 
 #define AWAY_TIME 300 // set away after 50s
@@ -122,6 +123,10 @@ Chat::Chat(QWidget *parent)
     connect(m_statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
     statusBar()->addPermanentWidget(m_statusCombo);
 
+    /* get handle to application */
+    Application *wApp = qobject_cast<Application*>(qApp);
+    Q_ASSERT(wApp);
+
     /* create menu */
     m_fileMenu = menuBar()->addMenu("&File");
     m_optionsMenu = m_fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
@@ -129,8 +134,6 @@ Chat::Chat(QWidget *parent)
     QAction *action = m_optionsMenu->addAction(tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
-    Application *wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
     if (wApp->isInstalled())
     {
         action = m_optionsMenu->addAction(tr("Open at login"));
@@ -140,6 +143,9 @@ Chat::Chat(QWidget *parent)
     }
     QObject::connect(wApp, SIGNAL(messageClicked(QWidget*)),
         this, SLOT(messageClicked(QWidget*)));
+
+    action = m_fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
+    connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
 
     action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
