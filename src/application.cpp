@@ -43,6 +43,7 @@
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
     settings(0),
+    updates(0),
     trayContext(0),
     trayIcon(0),
     trayMenu(0)

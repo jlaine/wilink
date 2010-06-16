@@ -25,6 +25,7 @@
 #include <QSystemTrayIcon>
 
 class Chat;
+class UpdatesDialog;
 class QAuthenticator;
 class QMenu;
 class QSettings;
@@ -40,6 +41,8 @@ public:
     static void alert(QWidget *widget);
     static QString authRealm(const QString &jid);
     static void platformInit();
+    UpdatesDialog *updatesDialog() { return updates; };
+    void setUpdatesDialog(UpdatesDialog *updatesDialog) { updates = updatesDialog; };
 
     bool isInstalled();
     bool openAtLogin() const;
@@ -65,6 +68,7 @@ private:
 
     QSettings *settings;
     QList<Chat*> chats;
+    UpdatesDialog *updates;
     QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;

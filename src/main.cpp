@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
 
     /* Check for updates */
     UpdatesDialog updates;
+    app.setUpdatesDialog(&updates);
 
     /* Show chat windows */
     QTimer::singleShot(0, &app, SLOT(resetChats()));
