@@ -85,6 +85,9 @@ if(APPLE)
 else(APPLE)
     if(WIN32)
         set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\";")
+        # in silent mode, automatically run installed program
+        set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "  IfSilent 0 +2
+  Exec \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\"")
     endif(WIN32)
     # Source package
     set(CPACK_SOURCE_GENERATOR "TBZ2")
