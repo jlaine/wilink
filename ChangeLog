@@ -10,7 +10,6 @@ wiLink 0.9.5 (2010-06-16)
  * Respect peer/folder/file orders when updating shares view.
  * Update share entries when new versions are received.
  * Don't bring chat windows to front upon right click on tray icon.
- * On Windows, make sure upgrades honour current installation directory.
  * Allow longer timeouts for large files.
  * Check for updates daily and make it possible to manually trigger update.
 
