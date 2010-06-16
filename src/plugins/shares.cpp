@@ -61,8 +61,6 @@ static int parallelDownloadLimit = 2;
 // keep directory listings for 10 seconds
 #define REFRESH_INTERVAL 10
 #define REGISTER_INTERVAL 60
-// maximum time to wait for an answer to a "get" request (2mn)
-#define REQUEST_TIMEOUT 120
 
 // common queries
 #define Q ChatSharesModelQuery
@@ -755,7 +753,8 @@ void ChatShares::processDownloadQueue()
         iq.setNode(location.node());
         client->sendPacket(iq);
 
-        const int maxSeconds = REQUEST_TIMEOUT;
+        // allow hashing speeds as low as 10MB/s
+        const int maxSeconds = qMax(60, int(file->fileSize() / 10000000));
         file->setData(PacketId, iq.id());
         file->setData(PacketTimeout, QDateTime::currentDateTime().addSecs(maxSeconds));
         QTimer::singleShot(maxSeconds * 1000, this, SLOT(processDownloadQueue()));
