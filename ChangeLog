@@ -11,6 +11,7 @@ wiLink 0.9.5 (UNRELEASED)
  * Update share entries when new versions are received.
  * Don't bring chat windows to front upon right click on tray icon.
  * On Windows, make sure upgrades honour current installation directory.
+ * Allow longer timeouts for large files.
 
 wiLink 0.9.4 (2010-05-18)
  * Hide diagnostics from roster when it is closed.
