@@ -22,12 +22,12 @@
 
 #include <QApplication>
 #include <QString>
+#include <QSystemTrayIcon>
 
 class Chat;
 class QAuthenticator;
 class QMenu;
 class QSettings;
-class QSystemTrayIcon;
 
 class Application : public QApplication
 {
@@ -57,6 +57,7 @@ private slots:
     void resetChats();
     void showAccounts();
     void showChats();
+    void trayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     static QString executablePath();
