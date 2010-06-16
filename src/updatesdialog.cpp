@@ -57,10 +57,16 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* updates */
     updates = new Updates(this);
+    connect(updates, SIGNAL(checkStarted()), this, SLOT(checkStarted()));
     connect(updates, SIGNAL(updateAvailable(const Release&)), this, SLOT(updateAvailable(const Release&)));
     connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
     connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
     connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
+}
+
+void UpdatesDialog::checkStarted()
+{
+    statusLabel->setText(tr("Checking.."));
 }
 
 void UpdatesDialog::updateAvailable(const Release &release)

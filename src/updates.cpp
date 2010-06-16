@@ -52,6 +52,8 @@ Updates::Updates(QObject *parent)
 
 void Updates::check()
 {
+    emit checkStarted();
+
     /* only download files over HTTPS */
     if (updatesUrl.scheme() != "https")
     {

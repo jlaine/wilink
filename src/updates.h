@@ -66,6 +66,7 @@ protected slots:
     void processStatus();
 
 signals:
+    void checkStarted();
     void checkFailed(Updates::UpdatesError error, const QString &errorString);
     void updateAvailable(const Release &release);
     void updateDownloaded(const QUrl &url);

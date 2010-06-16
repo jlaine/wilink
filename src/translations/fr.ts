@@ -580,11 +580,15 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Installation failed</source>
-        <translation>Echec de l'installation</translation>
+        <translation>Echec de l&apos;installation</translation>
     </message>
     <message>
         <source>Could not install the new version, please try again later.</source>
-        <translation>L'installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
+        <translation>L&apos;installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
+    </message>
+    <message>
+        <source>Checking..</source>
+        <translation>Recherche..</translation>
     </message>
 </context>
 </TS>
