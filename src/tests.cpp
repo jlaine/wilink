@@ -82,6 +82,9 @@ void TestUpdates::compareVersions()
 
     QVERIFY(Updates::compareVersions("0.9.5", "0.9.401") == 1);
     QVERIFY(Updates::compareVersions("0.9.401", "0.9.5") == -1);
+
+    QVERIFY(Updates::compareVersions("0.9.402", "0.9.401") == 1);
+    QVERIFY(Updates::compareVersions("0.9.401", "0.9.402") == -1);
 }
 
 int main(int argc, char *argv[])
