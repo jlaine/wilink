@@ -89,6 +89,8 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+    if (trayIcon)
+        trayIcon->hide();
     foreach (Chat *chat, chats)
         delete chat;
 }
