@@ -24,7 +24,7 @@ Requirements
 On Debian
 ----------
 
-$ sudo aptitude install cmake libgnome-keyring-dev libgphoto2-2-dev libqt4-dev
+$ sudo aptitude install cmake libgnome-keyring-dev libgphoto2-2-dev libqt4-dev libqt4-sql-sqlite
 
 On Mac OS X
 -----------
