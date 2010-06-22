@@ -432,7 +432,7 @@ void Chat::pendingMessages(int messages)
 {
     QString title = m_windowTitle;
     if (messages)
-        title += " [" + tr("%n message(s)", "", messages) + "]";
+        title += " - " + tr("%n message(s)", "", messages);
     QWidget::setWindowTitle(title);
 }
 
