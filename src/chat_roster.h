@@ -86,6 +86,9 @@ public:
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
 
+signals:
+    void rosterReady();
+
 public slots:
     void connected();
     void disconnected();

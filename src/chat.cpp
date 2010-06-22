@@ -97,7 +97,7 @@ Chat::Chat(QWidget *parent)
     connect(m_rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(m_rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(m_rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
-    connect(m_rosterView->model(), SIGNAL(modelReset()), this, SLOT(resizeContacts()));
+    connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
     splitter->addWidget(m_rosterView);
     splitter->setStretchFactor(0, 0);
 

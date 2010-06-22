@@ -438,7 +438,6 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     ChatRosterItem *item = rootItem->find(jid);
     QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
 
-    qDebug() << "roster changed" << jid;
     // remove an existing entry
     if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
     {
@@ -474,38 +473,36 @@ void ChatRosterModel::rosterChanged(const QString &jid)
 
 void ChatRosterModel::rosterReceived()
 {
-    // remove existing contacts
-    QList <ChatRosterItem*> goners;
-    QMap<QString, int> pending;
+    // make a note of existing contacts
+    QStringList oldJids;
     for (int i = 0; i < rootItem->size(); i++)
     {
         ChatRosterItem *child = rootItem->child(i);
         if (child->type() == ChatRosterItem::Contact)
-        {
-            pending.insert(child->id(), child->data(MessagesRole).toInt());
-            goners << child;
-        }
+            oldJids << child->id();
     }
-    foreach (ChatRosterItem *child, goners)
-        rootItem->remove(child);
 
-    // add received contacts
+    // process received entries
     foreach (const QString &jid, client->getRoster().getRosterBareJids())
     {
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
-        if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
-            continue;
-
-        ChatRosterItem *item = new ChatRosterItem(ChatRosterItem::Contact, jid);
-        if (!entry.name().isEmpty())
-            item->setData(Qt::DisplayRole, entry.name());
-        item->setData(MessagesRole, pending.value(jid));
-        rootItem->append(item);
-
-        // fetch vCard
-        client->getVCardManager().requestVCard(jid);
+        rosterChanged(jid);
+        oldJids.removeAll(jid);
     }
-    reset();
+
+    // remove obsolete entries
+    foreach (const QString &jid, oldJids)
+    {
+        ChatRosterItem *item = rootItem->find(jid);
+        if (item)
+        {
+            beginRemoveRows(QModelIndex(), item->row(), item->row());
+            rootItem->remove(item);
+            endRemoveRows();
+        }
+    }
+
+    // trigger resize
+    emit rosterReady();
 }
 
 bool ChatRosterModel::removeRows(int row, int count, const QModelIndex &parent)
