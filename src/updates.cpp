@@ -194,8 +194,8 @@ void Updates::processStatus()
     /* emit information about available release */
     emit checkFinished(release, QString());
 
-    /* check again in one day */
-    timer->setInterval(24 * 3600 * 1000);
+    /* check again in two days */
+    timer->setInterval(2 * 24 * 3600 * 1000);
     timer->start();
 }
 

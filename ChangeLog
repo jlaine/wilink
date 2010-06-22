@@ -1,6 +1,7 @@
 wiLink 0.9.7 (UNRELEASED)
  * After renaming a contact, display the new name.
  * Upon disconnection, mark contacts as offline instead of clearing roster.
+ * Display the number of pending messages in the window title.
 
 wiLink 0.9.6 (2010-06-16)
  * When reconnecting to the chat server, preserve busy/away information.
