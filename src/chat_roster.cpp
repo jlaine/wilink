@@ -204,7 +204,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else {
         if (item->type() == ChatRosterItem::Contact)
         {
-            const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(index)));
                 if (messages)
