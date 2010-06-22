@@ -135,12 +135,7 @@ QString ChatRosterModel::contactName(const QString &bareJid) const
 {
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
-    {
-        const QXmppRoster::QXmppRosterEntry &entry = client->getRoster().getRosterEntry(bareJid);
-        if (!entry.name().isEmpty())
-            return entry.name();
         return item->data(Qt::DisplayRole).toString();
-    }
     return bareJid.split("@").first();
 }
 
@@ -241,17 +236,16 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 
 void ChatRosterModel::disconnected()
 {
-    QList<ChatRosterItem*> goners;
     clientFeatures.clear();
     for (int i = 0; i < rootItem->size(); i++)
     {
         ChatRosterItem *child = rootItem->child(i);
-        if (child->type() == ChatRosterItem::Contact)
-            goners << child;
+        if (child->type() != ChatRosterItem::Contact)
+            continue;
+
+        emit dataChanged(createIndex(child->row(), ContactColumn, child),
+                         createIndex(child->row(), SortingColumn, child));
     }
-    foreach (ChatRosterItem *child, goners)
-        rootItem->remove(child);
-    reset();
 }
 
 void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -442,22 +436,35 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 void ChatRosterModel::rosterChanged(const QString &jid)
 {
     ChatRosterItem *item = rootItem->find(jid);
-    if (item)
+    QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+
+    qDebug() << "roster changed" << jid;
+    // remove an existing entry
+    if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
     {
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
-        if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
+        if (item)
         {
             beginRemoveRows(QModelIndex(), item->row(), item->row());
             rootItem->remove(item);
             endRemoveRows();
-            return;
-        } else {
-            emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                             createIndex(item->row(), SortingColumn, item));
         }
+        return;
+    }
+
+    if (item)
+    {
+        // update an existing entry
+        if (!entry.name().isEmpty())
+            item->setData(Qt::DisplayRole, entry.name());
+        emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                         createIndex(item->row(), SortingColumn, item));
     } else {
+        // add a new entry
+        item = new ChatRosterItem(ChatRosterItem::Contact, jid);
+        if (!entry.name().isEmpty())
+            item->setData(Qt::DisplayRole, entry.name());
         beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-        rootItem->append(new ChatRosterItem(ChatRosterItem::Contact, jid));
+        rootItem->append(item);
         endInsertRows();
     }
 
@@ -490,6 +497,8 @@ void ChatRosterModel::rosterReceived()
             continue;
 
         ChatRosterItem *item = new ChatRosterItem(ChatRosterItem::Contact, jid);
+        if (!entry.name().isEmpty())
+            item->setData(Qt::DisplayRole, entry.name());
         item->setData(MessagesRole, pending.value(jid));
         rootItem->append(item);
 
@@ -533,13 +542,16 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         const QImage &image = vcard.photoAsImage();
         item->setData(AvatarRole, QPixmap::fromImage(image));
 
-        // Store the nickName or fullName found in the vCard for display.
-        // NOTE : if the roster entry has a name, it will override the
-        // vCard data, see contactName()
-        if (!vcard.nickName().isEmpty())
-            item->setData(Qt::DisplayRole, vcard.nickName());
-        else if (!vcard.fullName().isEmpty())
-            item->setData(Qt::DisplayRole, vcard.fullName());
+        // Store the nickName or fullName found in the vCard for display,
+        // unless the roster entry has a name.
+        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(bareJid);
+        if (entry.name().isEmpty())
+        {
+            if (!vcard.nickName().isEmpty())
+                item->setData(Qt::DisplayRole, vcard.nickName());
+            else if (!vcard.fullName().isEmpty())
+                item->setData(Qt::DisplayRole, vcard.fullName());
+        }
 
         const QString url = vcard.url();
         if (!url.isEmpty())
