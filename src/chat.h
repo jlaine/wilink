@@ -56,6 +56,7 @@ public:
     bool open(const QString &jid, const QString &password, bool ignoreSslErrors);
     void addPanel(ChatPanel *panel);
     ChatPanel *panel(const QString &objectName);
+    void setWindowTitle(const QString &title);
 
 signals:
     /** Plugins should connect to this signal to handle click events
@@ -79,6 +80,7 @@ private slots:
     void error(QXmppClient::Error error);
     void messageClicked(QWidget *context);
     void panelChanged(int index);
+    void pendingMessages(int messages);
     void promptCredentials();
     void resizeContacts();
     void rosterClicked(const QModelIndex &index);
@@ -109,6 +111,7 @@ private:
     QList<ChatPanel*> m_chatPanels;
     ChatRosterModel *m_rosterModel;
     ChatRosterView *m_rosterView;
+    QString m_windowTitle;
 
     QComboBox *m_statusCombo;
     QStackedWidget *m_conversationPanel;

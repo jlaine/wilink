@@ -87,6 +87,7 @@ public:
     void clearPendingMessages(const QString &bareJid);
 
 signals:
+    void pendingMessages(int messages);
     void rosterReady();
 
 public slots:
@@ -102,6 +103,8 @@ protected slots:
     void vCardReceived(const QXmppVCard&);
 
 private:
+    void countPendingMessages();
+
     QXmppClient *client;
     ChatRosterItem *rootItem;
     QString nickName;

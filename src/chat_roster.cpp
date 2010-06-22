@@ -153,6 +153,17 @@ static QString contactStatus(const QModelIndex &index)
         return "busy";
 }
 
+void ChatRosterModel::countPendingMessages()
+{
+    int pending = 0;
+    for (int i = 0; i < rootItem->size(); i++)
+    {
+        ChatRosterItem *item = rootItem->child(i);
+        pending += item->data(MessagesRole).toInt();
+    }
+    emit pendingMessages(pending);
+}
+
 QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 {
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
@@ -572,6 +583,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
         item->setData(MessagesRole, item->data(MessagesRole).toInt() + 1);
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
+        countPendingMessages();
     }
 }
 
@@ -608,6 +620,7 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
         item->setData(MessagesRole, 0);
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
+        countPendingMessages();
     }
 }
 

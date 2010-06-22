@@ -46,6 +46,13 @@
         <source>Check for &amp;updates</source>
         <translation>&amp;Mettre à jour</translation>
     </message>
+    <message numerus="yes">
+        <source>%n message(s)</source>
+        <translation>
+            <numerusform>%n message</numerusform>
+            <numerusform>%n messages</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>

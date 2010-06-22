@@ -77,6 +77,8 @@ Chat::Chat(QWidget *parent)
 
     m_client = new ChatClient(this);
     m_rosterModel =  new ChatRosterModel(m_client);
+    connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
+    connect(m_rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
     /* set up idle monitor */
     m_idle = new Idle;
@@ -97,7 +99,6 @@ Chat::Chat(QWidget *parent)
     connect(m_rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(m_rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(m_rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
-    connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
     splitter->addWidget(m_rosterView);
     splitter->setStretchFactor(0, 0);
 
@@ -425,6 +426,16 @@ void Chat::error(QXmppClient::Error error)
     }
 }
 
+/** The number of pending messages changed.
+ */
+void Chat::pendingMessages(int messages)
+{
+    QString title = m_windowTitle;
+    if (messages)
+        title += " [" + tr("%n message(s)", "", messages) + "]";
+    QWidget::setWindowTitle(title);
+}
+
 /** Prompt for credentials then connect.
  */
 void Chat::promptCredentials()
@@ -610,6 +621,12 @@ void Chat::secondsIdle(int secs)
     } else if (m_autoAway) {
         m_statusCombo->setCurrentIndex(AvailableIndex);
     }
+}
+
+void Chat::setWindowTitle(const QString &title)
+{
+    m_windowTitle = title;
+    QWidget::setWindowTitle(title);
 }
 
 void Chat::statusChanged(int currentIndex)
