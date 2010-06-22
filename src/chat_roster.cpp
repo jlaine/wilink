@@ -217,10 +217,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return icon;
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(contactAvatar(bareJid));
-            } else if (role == Qt::DisplayRole && index.column() == ContactColumn) {
-                return contactName(bareJid);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return (contactStatus(index) + "_" + contactName(bareJid)).toLower() + "_" + bareJid.toLower();
+                return contactStatus(index) + "_" + item->data(Qt::DisplayRole).toString().toLower();
             }
         } else if (item->type() == ChatRosterItem::Room) {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
