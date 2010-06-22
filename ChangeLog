@@ -1,4 +1,4 @@
-wiLink 0.9.5 (2010-06-16)
+wiLink 0.9.6 (2010-06-16)
  * When reconnecting to the chat server, preserve busy/away information.
  * Close shares database at exit.
  * Clear chat room participants upon disconnection from server.
