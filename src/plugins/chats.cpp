@@ -46,8 +46,8 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
     connect(client, SIGNAL(connected()), this, SLOT(join()));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(&client->getArchiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
-    connect(&client->getArchiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    connect(&client->archiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
+    connect(&client->archiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
     connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
 
@@ -76,7 +76,7 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
         if (jidToBareJid(chats[i].with()) == chatRemoteJid)
-            client->getArchiveManager().retrieveCollection(chats[i].with(), chats[i].start());
+            client->archiveManager().retrieveCollection(chats[i].with(), chats[i].start());
 }
 
 /** When the chat state changes, notify the remote party.
@@ -130,7 +130,7 @@ void ChatDialog::join()
     // list archives for the past week.
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately
-    client->getArchiveManager().listCollections(chatRemoteJid,
+    client->archiveManager().listCollections(chatRemoteJid,
         QDateTime::currentDateTime().addDays(-7));
 
     joined = true;

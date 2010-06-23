@@ -258,7 +258,7 @@ ChatTransfers::ChatTransfers(ChatClient *xmppClient, ChatRosterModel *chatRoster
     : ChatPanel(parent), client(xmppClient), rosterModel(chatRosterModel)
 {
     // disable in-band bytestreams
-    client->getTransferManager().setSupportedMethods(
+    client->transferManager().setSupportedMethods(
         QXmppTransferJob::SocksMethod);
 
     setWindowIcon(QIcon(":/album.png"));
@@ -303,7 +303,7 @@ ChatTransfers::ChatTransfers(ChatClient *xmppClient, ChatRosterModel *chatRoster
     updateButtons();
 
     /* connect signals */
-    connect(&client->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+    connect(&client->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
 }
 
@@ -437,7 +437,7 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     }
 
     // send file
-    QXmppTransferJob *job = client->getTransferManager().sendFile(fullJid, filePath);
+    QXmppTransferJob *job = client->transferManager().sendFile(fullJid, filePath);
     job->setData(LocalPathRole, filePath);
     addJob(job);
 }

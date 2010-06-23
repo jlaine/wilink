@@ -472,7 +472,7 @@ void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &sh
 
         QFile *file = new QFile(filePath);
         file->open(QIODevice::ReadOnly);
-        QXmppTransferJob *job = client->getTransferManager().sendFile(responseIq.to(), file, fileInfo, responseIq.sid());
+        QXmppTransferJob *job = client->transferManager().sendFile(responseIq.to(), file, fileInfo, responseIq.sid());
         file->setParent(job);
         connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
         job->setData(LocalPathRole, filePath);
@@ -644,10 +644,10 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
     if (presence.type() == QXmppPresence::Available)
     {
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
-        if (forceProxy == "1" && !client->getTransferManager().proxyOnly())
+        if (forceProxy == "1" && !client->transferManager().proxyOnly())
         {
             logMessage(QXmppLogger::InformationMessage, "Forcing SOCKS5 proxy");
-            client->getTransferManager().setProxyOnly(true);
+            client->transferManager().setProxyOnly(true);
         }
 
         // add entries to options menu
@@ -680,7 +680,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         config.setHost(server);
 
         ChatClient *newClient = new ChatClient(this);
-        connect(&newClient->getTransferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+        connect(&newClient->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
             this, SLOT(transferReceived(QXmppTransferJob*)));
         newClient->setLogger(baseClient->logger());
 

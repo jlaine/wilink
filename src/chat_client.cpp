@@ -87,7 +87,7 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
                      id.type() == "bytestreams")
             {
                 logger()->log(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
-                getTransferManager().setProxy(disco.from());
+                transferManager().setProxy(disco.from());
             }
             else if (id.category() == "store" &&
                      id.type() == "file")
