@@ -517,6 +517,9 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
 
 void ChatRoom::rosterClick(const QModelIndex &index)
 {
+    if (!client->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 

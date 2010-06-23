@@ -385,6 +385,9 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
  */
 void ChatTransfers::rosterDrop(QDropEvent *event, const QModelIndex &index)
 {
+    if (!client->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     if (type != ChatRosterItem::Contact || !event->mimeData()->hasUrls())
         return;
@@ -409,6 +412,9 @@ void ChatTransfers::rosterDrop(QDropEvent *event, const QModelIndex &index)
 
 void ChatTransfers::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
+    if (!client->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
