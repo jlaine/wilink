@@ -26,6 +26,7 @@
 #include <QSortFilterProxyModel>
 #include <QUrl>
 
+#include "qxmpp/QXmppClient.h"
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"

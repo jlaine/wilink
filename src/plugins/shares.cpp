@@ -189,8 +189,8 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     registerTimer = new QTimer(this);
     registerTimer->setInterval(REGISTER_INTERVAL * 1000);
     connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
-    connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-        baseClient->logger(), SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+        baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     setClient(baseClient);
 
@@ -200,7 +200,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     connect(db, SIGNAL(directoryChanged(QString)),
         this, SLOT(directoryChanged(QString)));
     connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        baseClient->logger(), SLOT(log(QXmppLogger::MessageType, QString)));
+        baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
         this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
     connect(db, SIGNAL(indexStarted()),

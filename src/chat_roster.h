@@ -31,6 +31,7 @@
 class QContextMenuEvent;
 class QMenu;
 class QXmppClient;
+class QXmppDiscoveryIq;
 class QXmppVCardManager;
 
 class ChatRosterModel : public QAbstractItemModel
