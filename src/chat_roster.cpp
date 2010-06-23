@@ -530,9 +530,11 @@ bool ChatRosterModel::removeRows(int row, int count, const QModelIndex &parent)
 
     const int minIndex = qMax(0, row);
     const int maxIndex = qMin(row + count, parentItem->size()) - 1;
+    beginRemoveRows(parent, minIndex, maxIndex);
     for (int i = maxIndex; i >= minIndex; --i)
         parentItem->removeAt(i);
-    return maxIndex > minIndex;
+    endRemoveRows();
+    return true;
 }
 
 int ChatRosterModel::rowCount(const QModelIndex &parent) const
