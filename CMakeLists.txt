@@ -85,6 +85,12 @@ if(APPLE)
 else(APPLE)
     if(WIN32)
         set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\";")
+
+        # make sure wiLink is closed before installing
+        set(CPACK_NSIS_FULL_INSTALL "ExecWait '\\\"taskkill.exe\\\" /F /IM wiLink.exe' \\\$0
+  Sleep 1000
+  File /r \\\"\\\${INST_DIR}\\\\*.*\\\"")
+
         # in silent mode, automatically run installed program
         set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "  IfSilent 0 +2
   Exec \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\"")
