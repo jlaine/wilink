@@ -208,6 +208,9 @@ void ContactsWatcher::renameContact()
 
 void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
+    if (!chat->client()->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
     

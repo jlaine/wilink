@@ -239,6 +239,9 @@ void ChatRoomWatcher::mucServerFound(const QString &mucServer)
  */
 void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
 {
+    if (!chat->client()->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     if (type != ChatRosterItem::Room || !event->mimeData()->hasUrls())
         return;
@@ -266,6 +269,9 @@ void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
  */
 void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
+    if (!chat->client()->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 

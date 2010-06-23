@@ -220,6 +220,9 @@ void ChatsWatcher::messageReceived(const QXmppMessage &msg)
 
 void ChatsWatcher::rosterClick(const QModelIndex &index)
 {
+    if (!chat->client()->isConnected())
+        return;
+
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 

@@ -3,6 +3,7 @@ wiLink 0.9.7 (UNRELEASED)
  * Upon disconnection, mark contacts as offline instead of clearing roster.
  * Display the number of pending messages in the window title.
  * Fix a crash when accessing logger during exit.
+ * Make Windows installer kill running wiLink instances.
 
 wiLink 0.9.6 (2010-06-16)
  * When reconnecting to the chat server, preserve busy/away information.
