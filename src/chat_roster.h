@@ -109,6 +109,7 @@ private:
     ChatRosterItem *rootItem;
     QString nickName;
     QMap<QString, int> clientFeatures;
+    bool m_isConnected;
 };
 
 class ChatRosterView : public QTreeView

@@ -70,7 +70,7 @@ static void paintMessages(QPixmap &icon, int messages)
 }
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
-    : client(xmppClient)
+    : client(xmppClient), m_isConnected(false)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
@@ -95,6 +95,8 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 
 void ChatRosterModel::connected()
 {
+    m_isConnected = true;
+
     /* request own vCard */
     nickName = client->getConfiguration().user();
     client->getVCardManager().requestVCard(
@@ -179,6 +181,10 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return item->type();
     } else if (role == StatusRole && item->type() == ChatRosterItem::Contact) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+        // NOTE : we test the connection status, otherwise we encounter a race
+        // condition upon disconnection, because the roster has not yet been cleared
+        if (!m_isConnected)
+            return statusType;
         foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
         {
             QXmppPresence::Status::Type type = presence.status().type();
@@ -245,15 +251,15 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 
 void ChatRosterModel::disconnected()
 {
+    m_isConnected = false;
     clientFeatures.clear();
-    for (int i = 0; i < rootItem->size(); i++)
-    {
-        ChatRosterItem *child = rootItem->child(i);
-        if (child->type() != ChatRosterItem::Contact)
-            continue;
 
-        emit dataChanged(createIndex(child->row(), ContactColumn, child),
-                         createIndex(child->row(), SortingColumn, child));
+    if (rootItem->size() > 0)
+    {
+        ChatRosterItem *first = rootItem->child(0);
+        ChatRosterItem *last = rootItem->child(rootItem->size() - 1);
+        emit dataChanged(createIndex(first->row(), ContactColumn, first),
+                         createIndex(last->row(), SortingColumn, last));
     }
 }
 
