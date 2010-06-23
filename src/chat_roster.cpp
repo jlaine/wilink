@@ -71,7 +71,7 @@ static void paintMessages(QPixmap &icon, int messages)
 }
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
-    : client(xmppClient), m_isConnected(false)
+    : client(xmppClient)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
@@ -96,8 +96,6 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 
 void ChatRosterModel::connected()
 {
-    m_isConnected = true;
-
     /* request own vCard */
     nickName = client->getConfiguration().user();
     client->getVCardManager().requestVCard(
@@ -184,7 +182,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
         // condition upon disconnection, because the roster has not yet been cleared
-        if (!m_isConnected)
+        if (!client->isConnected())
             return statusType;
         foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
         {
@@ -252,7 +250,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 
 void ChatRosterModel::disconnected()
 {
-    m_isConnected = false;
     clientFeatures.clear();
 
     if (rootItem->size() > 0)
