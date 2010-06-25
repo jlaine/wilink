@@ -1,4 +1,7 @@
-wiLink 0.9.7 (UNRELEASED)
+wiLink 0.9.8 (UNRELEASED)
+ * Improve insertion of line breaks in the chat input.
+
+wiLink 0.9.7 (2010-06-23)
  * After renaming a contact, display the new name.
  * Upon disconnection, mark contacts as offline instead of clearing roster.
  * Display the number of pending messages in the window title.

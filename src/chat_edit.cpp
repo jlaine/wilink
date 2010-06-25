@@ -43,8 +43,10 @@ void ChatEdit::keyPressEvent(QKeyEvent* e)
     if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
     {
         if (QApplication::keyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier))
-            append("");
-        else
+        {
+            QTextCursor cursor = textCursor();
+            cursor.insertBlock();
+        } else
             emit returnPressed();
     }
     else if (e->key() == Qt::Key_Tab)
