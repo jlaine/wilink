@@ -135,6 +135,8 @@ QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height, bool close)
 {
     QPainterPath path;
     qreal bodyY = 0;
+
+    // top
     if (show_sender)
     {
         path.moveTo(0, HEADER_HEIGHT);
@@ -152,11 +154,17 @@ QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height, bool close)
         else
             path.moveTo(width, bodyY);
     }
+
+    // right
     path.lineTo(width, bodyY + height);
+
+    // bottom
     if (close || show_footer)
         path.lineTo(0, bodyY + height);
     else
         path.moveTo(0, bodyY + height);
+
+    // left
     path.lineTo(0, bodyY);
     return path;
 }
