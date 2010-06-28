@@ -566,7 +566,7 @@ void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 
 void ChatHistory::mousePressEvent(QMouseEvent *e)
 {
-    // FIXME : why are we blocking right clicks?
+    // do not propagate right clicks, in order to preserve the selected text
     if (e->button() != Qt::RightButton)
         QGraphicsView::mousePressEvent(e);
 }
