@@ -36,10 +36,8 @@
 #define DATE_WIDTH 80
 #define FROM_HEIGHT 15
 #define HEADER_HEIGHT 10
-#define BODY_HEIGHT 15
 #define BODY_OFFSET 5
 #define FOOTER_HEIGHT 5
-#define MESSAGE_WIDTH 200
 #define MESSAGE_MAX 100
 
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
@@ -85,12 +83,11 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
     // draw body
-    messageBackground = scene()->addPath(bodyPath(MESSAGE_WIDTH, BODY_HEIGHT, true), QPen(Qt::NoPen), QBrush(backgroundColor));
+    messageBackground = scene()->addPath(QPainterPath(), QPen(Qt::NoPen), QBrush(backgroundColor));
     messageBackground->setParentItem(this);
-    messageBackground->setZValue(-2);
-    messageFrame = scene()->addPath(bodyPath(MESSAGE_WIDTH, BODY_HEIGHT, false), QPen(baseColor), QBrush(Qt::NoBrush));
+    messageBackground->setZValue(-1);
+    messageFrame = scene()->addPath(QPainterPath(), QPen(baseColor), QBrush(Qt::NoBrush));
     messageFrame->setParentItem(this);
-    messageFrame->setZValue(-1);
 
     // draw footer
     QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
@@ -99,7 +96,7 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     shadowGradient.setColorAt(1, shadowColor);
     shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     shadowGradient.setSpread(QGradient::PadSpread);
-    messageFooter = scene()->addPath(footerPath(MESSAGE_WIDTH), QPen(Qt::white), QBrush(shadowGradient));
+    messageFooter = scene()->addPath(QPainterPath(), QPen(Qt::white), QBrush(shadowGradient));
     messageFooter->setParentItem(this);
     messageFooter->setZValue(-2);
  
