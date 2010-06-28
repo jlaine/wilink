@@ -186,13 +186,13 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 
     // calculate space available for body
     qreal bodyHeight = rect.height();
-    qreal bodyY = rect.y();
     qreal frameTop = rect.y();
+    qreal textY = rect.y() - 1;
     if (show_sender)
     {
         bodyHeight -= (FROM_HEIGHT + HEADER_HEIGHT);
-        bodyY += HEADER_HEIGHT + FROM_HEIGHT;
         frameTop += FROM_HEIGHT;
+        textY += HEADER_HEIGHT + FROM_HEIGHT - 2;
     }
     if (show_footer)
         bodyHeight -= FOOTER_HEIGHT;
@@ -202,7 +202,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         fromText->setPos(rect.x(), rect.y());
 
     // position body
-    bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - (show_sender ? 3 : 1));
+    bodyText->setPos(rect.x() + BODY_OFFSET, textY);
     messageBackground->setPath(bodyPath(rect.width(), bodyHeight, true));
     messageBackground->setPos(rect.x(), frameTop);
     messageFrame->setPath(bodyPath(rect.width(), bodyHeight, false));

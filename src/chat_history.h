@@ -85,9 +85,7 @@ private slots:
     void slotTextClicked();
 
 private:
-    QPainterPath headerPath(qreal width);
     QPainterPath bodyPath(qreal width, qreal height, bool close);
-    QPainterPath footerPath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
     int maxWidth;
