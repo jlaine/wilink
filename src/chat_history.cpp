@@ -200,26 +200,24 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         bodyText->setPos(rect.x() + BODY_OFFSET, rect.y() + HEADER_HEIGHT + FROM_HEIGHT - 3);
         messageBody->setPath(bodyPath(rect.width(), rect.height() - FROM_HEIGHT - HEADER_HEIGHT + 1));
         messageBody->setPos(rect.x(), rect.y() + HEADER_HEIGHT + FROM_HEIGHT);
-
-        // position of the date (if any)
-        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, rect.y() + HEADER_HEIGHT + FROM_HEIGHT - 3);
     } else {
-		// show a message with no header
+        // show a message with no header
         bodyText->setPos(rect.x() + BODY_OFFSET, rect.y());
+
         messageBody->setPath(bodyPath(rect.width(), rect.height() + 1));
         messageBody->setPos(rect.x(), rect.y());
- 
-        // position of the date (if any)
-        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, rect.y());
     }
 
-	if(show_footer)
-	{
-		// show a shadow
-		messageFooter->setPath(footerPath(rect.width()));
-		messageFooter->setPos(rect.x(), rect.y() + rect.height() + 2);
-	}
+    // position the date
+    if (show_date)
+        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, bodyText->y());
 
+    // position the footer shadow
+    if(show_footer)
+    {
+        messageFooter->setPath(footerPath(rect.width()));
+        messageFooter->setPos(rect.x(), rect.y() + rect.height() + 2);
+    }
 }
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
