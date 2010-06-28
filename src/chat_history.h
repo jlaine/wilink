@@ -72,13 +72,17 @@ public:
     void setPrevious(ChatMessageWidget *previous);
     void setSelection(const QRectF &rect);
     void setShowDate(bool show);
+    bool showFooter();
+    void setShowFooter(bool show);
     void setShowSender(bool show);
 
 signals:
     void linkHoverChanged(const QString &link);
 
 protected:
-    QPainterPath bubblePath(qreal width);
+    QPainterPath headerPath(qreal width);
+    QPainterPath bodyPath(qreal width, qreal height);
+    QPainterPath footerPath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
 private:
@@ -86,12 +90,17 @@ private:
     ChatHistoryMessage msg;
     bool show_date;
     bool show_sender;
+    bool show_footer;
 
+    // Text
     ChatTextItem *bodyText;
-    QGraphicsPathItem *dateBubble;
-    QGraphicsLineItem *dateLine;
     QGraphicsTextItem *dateText;
     QGraphicsTextItem *fromText;
+
+    // Graphics
+    QGraphicsPathItem *messageHeader;
+    QGraphicsPathItem *messageBody;
+    QGraphicsPathItem *messageFooter;
 };
 
 class ChatHistory : public QGraphicsView
