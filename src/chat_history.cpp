@@ -34,7 +34,6 @@
 #include <QUrl>
 
 #define DATE_WIDTH 80
-#define DATE_HEIGHT 12
 #define FROM_HEIGHT 15
 #define HEADER_HEIGHT 10
 #define BODY_HEIGHT 15
@@ -184,13 +183,10 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 
     QRectF rect(baseRect);
     rect.moveLeft(0);
-    if (!show_sender)
-        rect.moveTop(-DATE_HEIGHT/2);
-    else
-        rect.moveTop(0);
+    rect.moveTop(0);
 
     // calculate space available for body
-    qreal bodyHeight = rect.height() + 1;
+    qreal bodyHeight = rect.height();
     qreal bodyY = rect.y();
     if (show_sender)
     {
@@ -203,18 +199,13 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     // position header
     if (show_sender)
     {
-        // show a message with header
         fromText->setPos(rect.x(), rect.y());
         messageHeader->setPath(headerPath(rect.width()));
         messageHeader->setPos(rect.x(), rect.y() + FROM_HEIGHT);
-
-        bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - 3);
-    } else {
-        // show a message with no header
-        bodyText->setPos(rect.x() + BODY_OFFSET, bodyY);
     }
 
     // position body
+    bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - 3);
     messageBody->setPath(bodyPath(rect.width(), bodyHeight));
     messageBody->setPos(rect.x(), bodyY);
 
