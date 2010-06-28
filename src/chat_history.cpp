@@ -85,12 +85,12 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
     // draw header
-    messageHeader = scene()->addPath( headerPath(MESSAGE_WIDTH), QPen(baseColor), QBrush(backgroundColor));
+    messageHeader = scene()->addPath(headerPath(MESSAGE_WIDTH), QPen(baseColor), QBrush(backgroundColor));
     messageHeader->setParentItem(this);
     messageHeader->setZValue(-1);
 
     // draw body
-    messageBody = scene()->addPath( bodyPath(MESSAGE_WIDTH, BODY_HEIGHT), QPen(baseColor), QBrush(backgroundColor));
+    messageBody = scene()->addPath(bodyPath(MESSAGE_WIDTH, BODY_HEIGHT), QPen(baseColor), QBrush(backgroundColor));
     messageBody->setParentItem(this);
     messageBody->setZValue(-1);
 
@@ -101,9 +101,9 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     shadowGradient.setColorAt(1, shadowColor);
     shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     shadowGradient.setSpread(QGradient::PadSpread);
-    messageFooter = scene()->addPath( footerPath(MESSAGE_WIDTH), QPen(Qt::white), QBrush(shadowGradient));
+    messageFooter = scene()->addPath(footerPath(MESSAGE_WIDTH), QPen(Qt::white), QBrush(shadowGradient));
     messageFooter->setParentItem(this);
-    messageFooter->setZValue(-1);
+    messageFooter->setZValue(-2);
  
     // create text objects
     bodyText = new ChatTextItem;
@@ -197,7 +197,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     rect.moveTop(0);
 
     // calculate space available for body
-    qreal bodyHeight = rect.height();
+    qreal bodyHeight = rect.height() - 1;
     qreal bodyY = rect.y();
     if (show_sender)
     {
@@ -205,7 +205,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         bodyY += HEADER_HEIGHT + FROM_HEIGHT;
     }
     if (show_footer)
-        bodyHeight -= (FOOTER_HEIGHT + 1);
+        bodyHeight -= FOOTER_HEIGHT;
 
     // position header
     if (show_sender)
@@ -216,7 +216,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     }
 
     // position body
-    bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - 3);
+    bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - (show_sender ? 3 : 1));
     messageBody->setPath(bodyPath(rect.width(), bodyHeight));
     messageBody->setPos(rect.x(), bodyY);
 
@@ -228,7 +228,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     if(show_footer)
     {
         messageFooter->setPath(footerPath(rect.width()));
-        messageFooter->setPos(rect.x(), bodyY + bodyHeight + 1);
+        messageFooter->setPos(rect.x(), bodyY + bodyHeight);
     }
 }
 
