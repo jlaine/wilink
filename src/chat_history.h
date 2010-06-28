@@ -45,6 +45,7 @@ class ChatTextItem : public QGraphicsTextItem
     Q_OBJECT
 
 signals:
+    void clicked();
     void linkHoverChanged(const QString &link);
 
 protected:
@@ -77,15 +78,18 @@ public:
     void setShowSender(bool show);
 
 signals:
+    void messageClicked(const ChatHistoryMessage &message);
     void linkHoverChanged(const QString &link);
 
-protected:
+private slots:
+    void slotTextClicked();
+
+private:
     QPainterPath headerPath(qreal width);
     QPainterPath bodyPath(qreal width, qreal height);
     QPainterPath footerPath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
-private:
     int maxWidth;
     ChatHistoryMessage msg;
     bool show_date;
@@ -118,6 +122,7 @@ public slots:
 
 signals:
     void focused();
+    void messageClicked(const ChatHistoryMessage &message);
 
 protected slots:
     void slotLinkHoverChanged(const QString &link);

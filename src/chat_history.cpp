@@ -66,6 +66,8 @@ void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     if (!lastAnchor.isEmpty())
         QDesktopServices::openUrl(lastAnchor);
+    else
+        emit clicked();
     QGraphicsTextItem::mousePressEvent(event);
 }
 
@@ -115,7 +117,8 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     dateText->setParentItem(this);
     dateText->setTextWidth(90);
 
-    fromText = scene()->addText("");
+    fromText = new ChatTextItem;
+    scene()->addItem(fromText);
     fromText->setFont(font);
     fromText->setParentItem(this);
     fromText->setDefaultTextColor(baseColor);
@@ -127,6 +130,7 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     connect(bodyText, SIGNAL(linkHoverChanged(QString)), this, SIGNAL(linkHoverChanged(QString)));
+    connect(fromText, SIGNAL(clicked()), this, SLOT(slotTextClicked()));
 }
 
 /** Returns the QPainterPath used to draw the top of a chat bubble.
@@ -363,6 +367,11 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     }
 }
 
+void ChatMessageWidget::slotTextClicked()
+{
+    emit messageClicked(msg);
+}
+
 ChatHistory::ChatHistory(QWidget *parent)
     : QGraphicsView(parent)
 {
@@ -437,6 +446,7 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
 
     /* insert new message */
     connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
+    connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)), this, SIGNAL(messageClicked(ChatHistoryMessage)));
     layout->insertItem(pos, msg);
     adjustSize();
 
