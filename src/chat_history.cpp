@@ -40,6 +40,7 @@
 #define BODY_OFFSET 5
 #define FOOTER_HEIGHT 5
 #define MESSAGE_WIDTH 200
+#define MESSAGE_MAX 100
 
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -404,6 +405,14 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
 {
     if (message.body.isEmpty())
         return;
+
+    // check we hit the message limit and this message is too old
+    if (layout->count() >= MESSAGE_MAX)
+    {
+        ChatMessageWidget *oldest = static_cast<ChatMessageWidget*>(layout->itemAt(0));
+        if (message.date < oldest->message().date)
+            return;
+    }
 
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
