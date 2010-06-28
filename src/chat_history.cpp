@@ -89,16 +89,16 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     messageFrame = scene()->addPath(QPainterPath(), QPen(baseColor), QBrush(Qt::NoBrush));
     messageFrame->setParentItem(this);
 
-    // draw footer
+    // draw shadow
     QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
     shadowGradient.setColorAt(0, shadowColor);
     shadowColor.setAlpha(0x00);
     shadowGradient.setColorAt(1, shadowColor);
     shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     shadowGradient.setSpread(QGradient::PadSpread);
-    messageFooter = scene()->addPath(QPainterPath(), QPen(Qt::white), QBrush(shadowGradient));
-    messageFooter->setParentItem(this);
-    messageFooter->setZValue(-2);
+    messageShadow = scene()->addRect(QRectF(), QPen(Qt::white), QBrush(shadowGradient));
+    messageShadow->setParentItem(this);
+    messageShadow->setZValue(-2);
  
     // create text objects
     bodyText = new ChatTextItem;
@@ -161,18 +161,6 @@ QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height, bool close)
     return path;
 }
 
-/** Returns the QPainterPath used to draw the shadow under a chat bubble.
- */
-QPainterPath ChatMessageWidget::footerPath(qreal width)
-{
-    QPainterPath path;
-    path.moveTo(0,0);
-    path.lineTo(0,FOOTER_HEIGHT);
-    path.lineTo(width,FOOTER_HEIGHT);
-    path.lineTo(width,0);
-    return path;
-}
-
 bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode) const
 {
     return bodyText->collidesWithPath(path, mode);
@@ -227,8 +215,8 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     // position the footer shadow
     if(show_footer)
     {
-        messageFooter->setPath(footerPath(rect.width()));
-        messageFooter->setPos(rect.x(), rect.height() - FOOTER_HEIGHT);
+        messageShadow->setRect(0, 0, rect.width(), FOOTER_HEIGHT);
+        messageShadow->setPos(rect.x(), rect.height() - FOOTER_HEIGHT);
     }
 }
 
@@ -326,9 +314,9 @@ void ChatMessageWidget::setShowFooter(bool show)
 {
     if (show)
     {
-        messageFooter->show();
+        messageShadow->show();
     } else {
-        messageFooter->hide();
+        messageShadow->hide();
     }
     show_footer = show;
 }

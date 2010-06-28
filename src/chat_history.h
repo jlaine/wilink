@@ -104,7 +104,7 @@ private:
     // Graphics
     QGraphicsPathItem *messageBackground;
     QGraphicsPathItem *messageFrame;
-    QGraphicsPathItem *messageFooter;
+    QGraphicsRectItem *messageShadow;
 };
 
 class ChatHistory : public QGraphicsView
