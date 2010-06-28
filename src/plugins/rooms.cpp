@@ -328,6 +328,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     connect(client, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)), this, SLOT(discoveryIqReceived(QXmppDiscoveryIq)));
     connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(chatHistory, SIGNAL(messageClicked(ChatHistoryMessage)), this, SLOT(messageClicked(ChatHistoryMessage)));
     connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
     connect(this, SIGNAL(showPanel()), this, SLOT(join()));
@@ -414,6 +415,20 @@ void ChatRoom::leave()
         joined = false;
     }
     deleteLater();
+}
+
+void ChatRoom::messageClicked(const ChatHistoryMessage &msg)
+{
+    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
+    {
+        QModelIndex index = roomIndex.child(i, 0);
+        if (index.data(ChatRosterModel::IdRole).toString() == msg.fromJid)
+        {
+            rosterClick(index);
+            break;
+        }
+    }
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)

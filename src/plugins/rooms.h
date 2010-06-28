@@ -25,6 +25,7 @@
 #include "chat_conversation.h"
 
 class Chat;
+class ChatHistoryMessage;
 class ChatRoom;
 class ChatRosterModel;
 class QLineEdit;
@@ -88,6 +89,7 @@ private slots:
     void join();
     void leave();
     void disconnected();
+    void messageClicked(const ChatHistoryMessage &msg);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
     void rosterClick(const QModelIndex &index);
