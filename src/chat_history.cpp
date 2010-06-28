@@ -376,7 +376,7 @@ ChatHistory::ChatHistory(QWidget *parent)
 
     obj = new QGraphicsWidget;
     layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(5, 0, 5, 0);
     layout->setSpacing(0);
     obj->setLayout(layout);
     scene->addItem(obj);
@@ -455,7 +455,12 @@ void ChatHistory::adjustSize()
 
 qreal ChatHistory::availableWidth() const
 {
-    return width() - verticalScrollBar()->sizeHint().width() - 10;
+    qreal leftMargin = 0;
+    qreal rightMargin = 0;
+    layout->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
+
+    // FIXME : why do we need the extra 8 pixels?
+    return width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
 }
 
 void ChatHistory::clear()
