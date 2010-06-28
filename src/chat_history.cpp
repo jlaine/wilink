@@ -84,15 +84,13 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
-    // draw header
-    messageHeader = scene()->addPath(headerPath(MESSAGE_WIDTH), QPen(baseColor), QBrush(backgroundColor));
-    messageHeader->setParentItem(this);
-    messageHeader->setZValue(-1);
-
     // draw body
-    messageBody = scene()->addPath(bodyPath(MESSAGE_WIDTH, BODY_HEIGHT), QPen(baseColor), QBrush(backgroundColor));
-    messageBody->setParentItem(this);
-    messageBody->setZValue(-1);
+    messageBackground = scene()->addPath(bodyPath(MESSAGE_WIDTH, BODY_HEIGHT, true), QPen(Qt::NoPen), QBrush(backgroundColor));
+    messageBackground->setParentItem(this);
+    messageBackground->setZValue(-2);
+    messageFrame = scene()->addPath(bodyPath(MESSAGE_WIDTH, BODY_HEIGHT, false), QPen(baseColor), QBrush(Qt::NoBrush));
+    messageFrame->setParentItem(this);
+    messageFrame->setZValue(-1);
 
     // draw footer
     QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
@@ -134,30 +132,35 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     connect(fromText, SIGNAL(clicked()), this, SLOT(slotTextClicked()));
 }
 
-/** Returns the QPainterPath used to draw the top of a chat bubble.
+/** Returns the QPainterPath used to draw the chat bubble.
  */
-QPainterPath ChatMessageWidget::headerPath(qreal width)
+QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height, bool close)
 {
     QPainterPath path;
-    path.moveTo(0, HEADER_HEIGHT);
-    path.lineTo(0, 5);
-    path.lineTo(20, 5);
-    path.lineTo(17, 0);
-    path.lineTo(27, 5);
-    path.lineTo(width, 5);
-    path.lineTo(width, HEADER_HEIGHT);
-    return path;
-}
-
-/** Returns the QPainterPath used to draw the background of a chat bubble.
- */
-QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height)
-{
-    QPainterPath path;
-    path.moveTo(0,0);
-    path.lineTo(0,height);
-    path.lineTo(width,height);
-    path.lineTo(width,0);
+    qreal bodyY = 0;
+    if (show_sender)
+    {
+        path.moveTo(0, HEADER_HEIGHT);
+        path.lineTo(0, 5);
+        path.lineTo(20, 5);
+        path.lineTo(17, 0);
+        path.lineTo(27, 5);
+        path.lineTo(width, 5);
+        path.lineTo(width, HEADER_HEIGHT);
+        bodyY += HEADER_HEIGHT;
+    } else {
+        path.moveTo(0, 0);
+        if (close)
+            path.lineTo(width, bodyY);
+        else
+            path.moveTo(width, bodyY);
+    }
+    path.lineTo(width, bodyY + height);
+    if (close || show_footer)
+        path.lineTo(0, bodyY + height);
+    else
+        path.moveTo(0, bodyY + height);
+    path.lineTo(0, bodyY);
     return path;
 }
 
@@ -197,28 +200,28 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     rect.moveTop(0);
 
     // calculate space available for body
-    qreal bodyHeight = rect.height() - 1;
+    qreal bodyHeight = rect.height();
     qreal bodyY = rect.y();
+    qreal frameTop = rect.y();
     if (show_sender)
     {
         bodyHeight -= (FROM_HEIGHT + HEADER_HEIGHT);
         bodyY += HEADER_HEIGHT + FROM_HEIGHT;
+        frameTop += FROM_HEIGHT;
     }
     if (show_footer)
         bodyHeight -= FOOTER_HEIGHT;
 
-    // position header
+    // position sender
     if (show_sender)
-    {
         fromText->setPos(rect.x(), rect.y());
-        messageHeader->setPath(headerPath(rect.width()));
-        messageHeader->setPos(rect.x(), rect.y() + FROM_HEIGHT);
-    }
 
     // position body
     bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - (show_sender ? 3 : 1));
-    messageBody->setPath(bodyPath(rect.width(), bodyHeight));
-    messageBody->setPos(rect.x(), bodyY);
+    messageBackground->setPath(bodyPath(rect.width(), bodyHeight, true));
+    messageBackground->setPos(rect.x(), frameTop);
+    messageFrame->setPath(bodyPath(rect.width(), bodyHeight, false));
+    messageFrame->setPos(rect.x(), frameTop);
 
     // position the date
     if (show_date)
@@ -228,7 +231,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     if(show_footer)
     {
         messageFooter->setPath(footerPath(rect.width()));
-        messageFooter->setPos(rect.x(), bodyY + bodyHeight);
+        messageFooter->setPos(rect.x(), rect.height() - FOOTER_HEIGHT);
     }
 }
 
@@ -337,10 +340,8 @@ void ChatMessageWidget::setShowSender(bool show)
 {
     if (show)
     {
-        messageHeader->show();
         fromText->show();
     } else {
-        messageHeader->hide();
         fromText->hide();
     }
     show_sender = show;

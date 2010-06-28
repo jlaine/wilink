@@ -86,7 +86,7 @@ private slots:
 
 private:
     QPainterPath headerPath(qreal width);
-    QPainterPath bodyPath(qreal width, qreal height);
+    QPainterPath bodyPath(qreal width, qreal height, bool close);
     QPainterPath footerPath(qreal width);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
@@ -102,8 +102,8 @@ private:
     QGraphicsTextItem *fromText;
 
     // Graphics
-    QGraphicsPathItem *messageHeader;
-    QGraphicsPathItem *messageBody;
+    QGraphicsPathItem *messageBackground;
+    QGraphicsPathItem *messageFrame;
     QGraphicsPathItem *messageFooter;
 };
 
