@@ -129,6 +129,8 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     connect(bodyText, SIGNAL(linkHoverChanged(QString)), this, SIGNAL(linkHoverChanged(QString)));
 }
 
+/** Returns the QPainterPath used to draw the top of a chat bubble.
+ */
 QPainterPath ChatMessageWidget::headerPath(qreal width)
 {
     QPainterPath path;
@@ -142,6 +144,8 @@ QPainterPath ChatMessageWidget::headerPath(qreal width)
     return path;
 }
 
+/** Returns the QPainterPath used to draw the background of a chat bubble.
+ */
 QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height)
 {
     QPainterPath path;
@@ -152,6 +156,8 @@ QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height)
     return path;
 }
 
+/** Returns the QPainterPath used to draw the shadow under a chat bubble.
+ */
 QPainterPath ChatMessageWidget::footerPath(qreal width)
 {
     QPainterPath path;
@@ -295,6 +301,17 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
     }
 }
 
+void ChatMessageWidget::setShowDate(bool show)
+{
+    if (show)
+    {
+        dateText->show();
+    } else {
+        dateText->hide();
+    }
+    show_date = show;
+}
+
 bool ChatMessageWidget::showFooter()
 {
     return show_footer;
@@ -309,17 +326,6 @@ void ChatMessageWidget::setShowFooter(bool show)
         messageFooter->hide();
     }
     show_footer = show;
-}
-
-void ChatMessageWidget::setShowDate(bool show)
-{
-    if (show)
-    {
-        dateText->show();
-    } else {
-        dateText->hide();
-    }
-    show_date = show;
 }
 
 void ChatMessageWidget::setShowSender(bool show)
