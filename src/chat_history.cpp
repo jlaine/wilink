@@ -194,7 +194,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         bodyY += HEADER_HEIGHT + FROM_HEIGHT;
     }
     if (show_footer)
-        bodyHeight -= FOOTER_HEIGHT;
+        bodyHeight -= (FOOTER_HEIGHT + 1);
 
     // position header
     if (show_sender)
