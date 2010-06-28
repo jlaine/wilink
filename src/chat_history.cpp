@@ -41,7 +41,6 @@
 #define BODY_OFFSET 5
 #define FOOTER_HEIGHT 5
 #define MESSAGE_WIDTH 200
-#define MESSAGE_MARGIN 5
 
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -189,24 +188,35 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
         rect.moveTop(-DATE_HEIGHT/2);
     else
         rect.moveTop(0);
- 
-    if(show_sender)
+
+    // calculate space available for body
+    qreal bodyHeight = rect.height() + 1;
+    qreal bodyY = rect.y();
+    if (show_sender)
+    {
+        bodyHeight -= (FROM_HEIGHT + HEADER_HEIGHT);
+        bodyY += HEADER_HEIGHT + FROM_HEIGHT;
+    }
+    if (show_footer)
+        bodyHeight -= FOOTER_HEIGHT;
+
+    // position header
+    if (show_sender)
     {
         // show a message with header
         fromText->setPos(rect.x(), rect.y());
         messageHeader->setPath(headerPath(rect.width()));
         messageHeader->setPos(rect.x(), rect.y() + FROM_HEIGHT);
 
-        bodyText->setPos(rect.x() + BODY_OFFSET, rect.y() + HEADER_HEIGHT + FROM_HEIGHT - 3);
-        messageBody->setPath(bodyPath(rect.width(), rect.height() - FROM_HEIGHT - HEADER_HEIGHT + 1));
-        messageBody->setPos(rect.x(), rect.y() + HEADER_HEIGHT + FROM_HEIGHT);
+        bodyText->setPos(rect.x() + BODY_OFFSET, bodyY - 3);
     } else {
         // show a message with no header
-        bodyText->setPos(rect.x() + BODY_OFFSET, rect.y());
-
-        messageBody->setPath(bodyPath(rect.width(), rect.height() + 1));
-        messageBody->setPos(rect.x(), rect.y());
+        bodyText->setPos(rect.x() + BODY_OFFSET, bodyY);
     }
+
+    // position body
+    messageBody->setPath(bodyPath(rect.width(), bodyHeight));
+    messageBody->setPos(rect.x(), bodyY);
 
     // position the date
     if (show_date)
@@ -216,7 +226,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     if(show_footer)
     {
         messageFooter->setPath(footerPath(rect.width()));
-        messageFooter->setPos(rect.x(), rect.y() + rect.height() + 2);
+        messageFooter->setPos(rect.x(), bodyY + bodyHeight + 1);
     }
 }
 
@@ -347,6 +357,8 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
                 hint.setWidth(maxWidth);
             if (show_sender)
                 hint.setHeight(hint.height() + HEADER_HEIGHT + FROM_HEIGHT);
+            if (show_footer)
+                hint.setHeight(hint.height() + FOOTER_HEIGHT);
             return hint;
         }
         default:
@@ -430,15 +442,6 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
     layout->insertItem(pos, msg);
     adjustSize();
-
-    /* insert space if needed */
-    if(previous)
-    {
-        if(previous->showFooter())
-            layout->setItemSpacing(pos-1,  MESSAGE_MARGIN);
-        else
-            layout->setItemSpacing(pos-1, 0);
-    }
 
     /* scroll to end if we were previous at end */
     if (atEnd)
