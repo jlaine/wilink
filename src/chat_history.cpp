@@ -77,7 +77,7 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     maxWidth(2 * DATE_WIDTH)
 {
     // set colors
-    QColor baseColor = received ? QColor(0x36, 0xa9, 0xf6) : QColor(0x9b, 0x9b, 0x9b);
+    QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
     QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
@@ -119,7 +119,7 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     fromText->setFont(font);
     fromText->setParentItem(this);
     fromText->setDefaultTextColor(baseColor);
-    
+
     font.setPixelSize(12);
     bodyText->setFont(font);
     
@@ -136,9 +136,9 @@ QPainterPath ChatMessageWidget::headerPath(qreal width)
     QPainterPath path;
     path.moveTo(0, HEADER_HEIGHT);
     path.lineTo(0, 5);
-    path.lineTo(10, 5);
-    path.lineTo(7, 0);
-    path.lineTo(17, 5);
+    path.lineTo(20, 5);
+    path.lineTo(17, 0);
+    path.lineTo(27, 5);
     path.lineTo(width, 5);
     path.lineTo(width, HEADER_HEIGHT);
     return path;
