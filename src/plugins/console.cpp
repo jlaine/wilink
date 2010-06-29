@@ -20,6 +20,7 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QShortcut>
 #include <QTextBrowser>
@@ -44,10 +45,28 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     browser = new QTextBrowser;
     layout->addWidget(browser);
-    Highlighter *highlighter = new Highlighter(browser->document());
+    highlighter = new Highlighter(browser->document());
 
     QHBoxLayout *hbox = new QHBoxLayout;
+
+    // search box
+    findBox = new QLineEdit;
+    connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotFindForward()));
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
+    connect(shortcut, SIGNAL(activated()), findBox, SLOT(setFocus()));
+    hbox->addWidget(findBox);
+
+    QPushButton *prev = new QPushButton(QIcon(":/back.png"), QString());
+    connect(prev, SIGNAL(clicked()), this, SLOT(slotFindBackward()));
+    hbox->addWidget(prev);
+
+    QPushButton *next = new QPushButton(QIcon(":/forward.png"), QString());
+    connect(next, SIGNAL(clicked()), this, SLOT(slotFindForward()));
+    hbox->addWidget(next);
+
     hbox->addStretch();
+
+    // buttons
 
     startButton = new QPushButton(tr("Start"));
     connect(startButton, SIGNAL(clicked()), this, SLOT(slotStart()));
@@ -109,6 +128,42 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     }
 }
 
+void ChatConsole::find(bool backward)
+{
+    QTextDocument::FindFlags flags;
+    QTextCursor start(browser->document());
+    if (backward)
+    {
+        flags |= QTextDocument::FindBackward;
+        start.movePosition(QTextCursor::End);
+    }
+    QString needle = findBox->text();
+
+    if (!needle.isEmpty())
+    {
+        QTextCursor found = browser->document()->find(needle, browser->textCursor(), flags);
+        // if search fails, retry from start of document
+        if (found.isNull())
+            found = browser->document()->find(needle, start, flags);
+        if (!found.isNull())
+        {
+            browser->setTextCursor(found);
+            browser->ensureCursorVisible();
+        }
+    }
+    highlighter->setNeedle(needle, Qt::CaseInsensitive);
+}
+
+void ChatConsole::slotFindBackward()
+{
+    find(true);
+}
+
+void ChatConsole::slotFindForward()
+{
+    find(false);
+}
+
 void ChatConsole::slotStop()
 {
     if (!connected)
@@ -133,6 +188,8 @@ Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
+
+    findFormat.setBackground(Qt::darkRed);
 
     tagFormat.setForeground(Qt::darkBlue);
     tagFormat.setFontWeight(QFont::Bold);
@@ -165,6 +222,23 @@ void Highlighter::highlightBlock(const QString &text)
                 setFormat(index, length, rule.format);
             index = expression.indexIn(text, index + length);
         }
+    }
+
+    if (!findNeedle.isEmpty())
+    {
+        int index = text.indexOf(findNeedle, findSensitivity);
+        if (index >= 0)
+            setFormat(index, findNeedle.length(), findFormat);
+    }
+}
+
+void Highlighter::setNeedle(const QString &needle, Qt::CaseSensitivity cs)
+{
+    if (needle != findNeedle || cs != findSensitivity)
+    {
+        findNeedle = needle;
+        findSensitivity = cs;
+        rehighlight();
     }
 }
 
