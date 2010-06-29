@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QScrollBar>
 #include <QShortcut>
+#include <QTextBlock>
 #include <QTextDocument>
 #include <QUrl>
 
@@ -265,6 +266,18 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
     bodyText->setHtml(bodyHtml);
 }
 
+/** Return the rectangle for the current selection.
+ */
+QRectF ChatMessageWidget::selection() const
+{
+    // FIXME: this is not precise, we are returning the whole block.
+    QAbstractTextDocumentLayout *layout = bodyText->document()->documentLayout();
+    QRectF rect = layout->blockBoundingRect(bodyText->textCursor().block());
+    return bodyText->mapRectToScene(rect);
+}
+
+/** Set the text cursor to select the given rectangle.
+ */
 void ChatMessageWidget::setSelection(const QRectF &rect)
 {
     QRectF localRect = bodyText->mapRectFromScene(rect);
@@ -377,7 +390,7 @@ void ChatMessageWidget::slotTextClicked()
     emit messageClicked(msg);
 }
 
-QTextCursor ChatMessageWidget::textCursor()
+QTextCursor ChatMessageWidget::textCursor() const
 {
     return bodyText->textCursor();
 }
@@ -583,7 +596,6 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             if (layout->itemAt(i) == lastFind)
             {
                 startIndex = i;
-                //lastFind->setTextCursor(QTextCursor());
                 break;
             }
         }
@@ -600,7 +612,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         if (!found.isNull())
         {
             child->setTextCursor(found);
-            //browser->ensureCursorVisible();
+            ensureVisible(child->selection());
             lastFind = child;
             return;
         } else {

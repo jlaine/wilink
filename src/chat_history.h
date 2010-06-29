@@ -73,12 +73,13 @@ public:
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
     void setPrevious(ChatMessageWidget *previous);
+    QRectF selection() const;
     void setSelection(const QRectF &rect);
     void setShowDate(bool show);
     bool showFooter();
     void setShowFooter(bool show);
     void setShowSender(bool show);
-    QTextCursor textCursor();
+    QTextCursor textCursor() const;
     void setTextCursor(const QTextCursor &cursor);
 
 signals:
