@@ -88,10 +88,6 @@
         <translation>Effacer</translation>
     </message>
     <message>
-        <source>Match case</source>
-        <translation>Sensible à la casse</translation>
-    </message>
-    <message>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>

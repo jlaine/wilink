@@ -17,10 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCheckBox>
 #include <QLabel>
 #include <QLayout>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QShortcut>
 #include <QTextBrowser>
@@ -28,6 +26,7 @@
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_plugin.h"
+#include "chat_search.h"
 #include "console.h"
 #include "utils.h"
 
@@ -50,23 +49,10 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
 
     // search box
-    QLabel *findIcon = new QLabel;
-    findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
-    hbox->addWidget(findIcon);
-    findBox = new QLineEdit;
-    connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotFindForward()));
-    hbox->addWidget(findBox);
-
-    QPushButton *prev = new QPushButton(QIcon(":/back.png"), QString());
-    connect(prev, SIGNAL(clicked()), this, SLOT(slotFindBackward()));
-    hbox->addWidget(prev);
-
-    QPushButton *next = new QPushButton(QIcon(":/forward.png"), QString());
-    connect(next, SIGNAL(clicked()), this, SLOT(slotFindForward()));
-    hbox->addWidget(next);
-
-    findCase = new QCheckBox(tr("Match case"));
-    hbox->addWidget(findCase);
+    searchBar = new ChatSearchBar;
+    connect(searchBar, SIGNAL(searchBackward()), this, SLOT(slotFindBackward()));
+    connect(searchBar, SIGNAL(searchForward()), this, SLOT(slotFindForward()));
+    hbox->addWidget(searchBar);
 
     hbox->addStretch();
 
@@ -94,7 +80,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     /* shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
-    connect(shortcut, SIGNAL(activated()), findBox, SLOT(setFocus()));
+    connect(shortcut, SIGNAL(activated()), searchBar, SLOT(setFocus()));
 
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(slotFindForward()));
@@ -138,9 +124,9 @@ void ChatConsole::find(bool backward)
         flags |= QTextDocument::FindBackward;
         start.movePosition(QTextCursor::End);
     }
-    if (findCase->checkState() == Qt::Checked)
+    if (searchBar->caseSensitive())
         flags |= QTextDocument::FindCaseSensitively;
-    QString needle = findBox->text();
+    QString needle = searchBar->search();
 
     if (!needle.isEmpty())
     {
@@ -154,7 +140,7 @@ void ChatConsole::find(bool backward)
             browser->ensureCursorVisible();
         }
     }
-    highlighter->setNeedle(needle, (findCase->checkState() == Qt::Checked) ? Qt::CaseSensitive : Qt::CaseInsensitive);
+    highlighter->setNeedle(needle, searchBar->caseSensitive() ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }
 
 void ChatConsole::slotFindBackward()

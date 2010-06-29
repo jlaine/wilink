@@ -28,9 +28,8 @@
 
 #include "chat_panel.h"
 
+class ChatSearchBar;
 class Highlighter;
-class QCheckBox;
-class QLineEdit;
 class QPushButton;
 class QTextDocument;
 class QTextBrowser;
@@ -55,8 +54,7 @@ private:
     QTextBrowser *browser;
     bool connected;
     QXmppLogger *currentLogger;
-    QLineEdit *findBox;
-    QCheckBox *findCase;
+    ChatSearchBar *searchBar;
     Highlighter *highlighter;
     QPushButton *startButton;
     QPushButton *stopButton;

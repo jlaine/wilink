@@ -30,7 +30,13 @@ class ChatSearchBar : public QWidget
     Q_OBJECT
 
 public:
-    ChatSearchBar(QWidget *parent);
+    ChatSearchBar(QWidget *parent = 0);
+    bool caseSensitive() const;
+    QString search() const;
+
+signals:
+    void searchForward();
+    void searchBackward();
 
 private:
     QLineEdit *findBox;

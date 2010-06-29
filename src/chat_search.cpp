@@ -35,20 +35,31 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     hbox->addWidget(findIcon);
 
     findBox = new QLineEdit;
-    connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotFindForward()));
+    connect(findBox, SIGNAL(returnPressed()), this, SIGNAL(searchForward()));
     hbox->addWidget(findBox);
 
     QPushButton *prev = new QPushButton(QIcon(":/back.png"), QString());
-    connect(prev, SIGNAL(clicked()), this, SLOT(slotFindBackward()));
+    connect(prev, SIGNAL(clicked()), this, SIGNAL(searchBackward()));
     hbox->addWidget(prev);
 
     QPushButton *next = new QPushButton(QIcon(":/forward.png"), QString());
-    connect(next, SIGNAL(clicked()), this, SLOT(slotFindForward()));
+    connect(next, SIGNAL(clicked()), this, SIGNAL(searchForward()));
     hbox->addWidget(next);
 
     findCase = new QCheckBox(tr("Match case"));
     hbox->addWidget(findCase);
     
     setLayout(hbox);
+    setFocusProxy(findBox);
+}
+
+bool ChatSearchBar::caseSensitive() const
+{
+    return (findCase->checkState() == Qt::Checked);
+}
+
+QString ChatSearchBar::search() const
+{
+    return findBox->text();
 }
 
