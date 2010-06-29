@@ -50,6 +50,9 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
 
     // search box
+    QLabel *findIcon = new QLabel;
+    findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
+    hbox->addWidget(findIcon);
     findBox = new QLineEdit;
     connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotFindForward()));
     hbox->addWidget(findBox);

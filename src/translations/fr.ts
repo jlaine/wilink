@@ -243,6 +243,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatSearchBar</name>
+    <message>
+        <source>Match case</source>
+        <translation>Sensible à la casse</translation>
+    </message>
+</context>
+<context>
     <name>ChatShares</name>
     <message>
         <source>Enter the name of the file you are looking for.</source>
