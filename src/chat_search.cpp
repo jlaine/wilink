@@ -48,7 +48,16 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 
     findCase = new QCheckBox(tr("Match case"));
     hbox->addWidget(findCase);
-    
+
+    hbox->addStretch();
+
+    QPushButton *close = new QPushButton;
+    close->setFlat(true);
+    close->setMaximumWidth(32);
+    close->setIcon(QIcon(":/close.png"));
+    connect(close, SIGNAL(clicked()), this, SLOT(hide()));
+    hbox->addWidget(close);
+
     setLayout(hbox);
     setFocusProxy(findBox);
 }

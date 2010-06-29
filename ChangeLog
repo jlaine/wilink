@@ -2,6 +2,7 @@ wiLink 0.9.8 (UNRELEASED)
  * Improve insertion of line breaks in the chat input.
  * Add a new layout for the chat history.
  * Make it possible to search in debugging console.
+ * Make it possible to search in chat history.
 
 wiLink 0.9.7 (2010-06-23)
  * After renaming a contact, display the new name.
