@@ -69,11 +69,11 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     // buttons
 
-    startButton = new QPushButton(tr("Start"));
+    startButton = new QPushButton(QIcon(":/contact-available.png"), tr("Start"));
     connect(startButton, SIGNAL(clicked()), this, SLOT(slotStart()));
     hbox->addWidget(startButton);
 
-    stopButton = new QPushButton(tr("Stop"));
+    stopButton = new QPushButton(QIcon(":/contact-busy.png"), tr("Stop"));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(slotStop()));
     hbox->addWidget(stopButton);
 
@@ -99,16 +99,6 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 {
-#if 0
-    if (showMessages->checkState() != Qt::Checked &&
-        (type == QXmppLogger::DebugMessage || type == QXmppLogger::InformationMessage || type == QXmppLogger::WarningMessage))
-        return;
-
-    if (showPackets->checkState() != Qt::Checked &&
-        (type == QXmppLogger::ReceivedMessage || type == QXmppLogger::SentMessage))
-        return;
-#endif
-
     QColor color;
     QString message;
     if (type == QXmppLogger::SentMessage || type == QXmppLogger::ReceivedMessage)

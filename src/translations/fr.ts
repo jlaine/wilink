@@ -84,16 +84,20 @@
         <translation>Console de débogage</translation>
     </message>
     <message>
-        <source>Show packets</source>
-        <translation>Afficher les paquets</translation>
-    </message>
-    <message>
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
     <message>
-        <source>Show messages</source>
-        <translation>Afficher les messages</translation>
+        <source>Match case</source>
+        <translation>Sensible à la casse</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation>Démarrer</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Arrêter</translation>
     </message>
 </context>
 <context>
