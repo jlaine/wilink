@@ -126,7 +126,6 @@ void ChatConsole::slotSearch(const QString &needle, QTextDocument::FindFlags fla
             browser->ensureCursorVisible();
         }
     }
-    highlighter->setNeedle(needle, (flags && QTextDocument::FindCaseSensitively) ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }
 
 void ChatConsole::slotStop()
@@ -153,8 +152,6 @@ Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
-
-    findFormat.setBackground(Qt::darkRed);
 
     tagFormat.setForeground(Qt::darkBlue);
     tagFormat.setFontWeight(QFont::Bold);
@@ -187,23 +184,6 @@ void Highlighter::highlightBlock(const QString &text)
                 setFormat(index, length, rule.format);
             index = expression.indexIn(text, index + length);
         }
-    }
-
-    if (!findNeedle.isEmpty())
-    {
-        int index = text.indexOf(findNeedle, findSensitivity);
-        if (index >= 0)
-            setFormat(index, findNeedle.length(), findFormat);
-    }
-}
-
-void Highlighter::setNeedle(const QString &needle, Qt::CaseSensitivity cs)
-{
-    if (needle != findNeedle || cs != findSensitivity)
-    {
-        findNeedle = needle;
-        findSensitivity = cs;
-        rehighlight();
     }
 }
 

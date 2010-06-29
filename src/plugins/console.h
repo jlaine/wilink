@@ -63,7 +63,6 @@ class Highlighter : public QSyntaxHighlighter
 
 public:
     Highlighter(QTextDocument *parent = 0);
-    void setNeedle(const QString &needle, Qt::CaseSensitivity cs);
 
 protected:
     void highlightBlock(const QString &text);
@@ -76,9 +75,6 @@ private:
     };
     QVector<HighlightingRule> highlightingRules;
 
-    QTextCharFormat findFormat;
-    QString findNeedle;
-    Qt::CaseSensitivity findSensitivity;
     QTextCharFormat tagFormat;
     QTextCharFormat quotationFormat;
 };
