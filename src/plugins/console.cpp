@@ -48,7 +48,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     // search box
     searchBar = new ChatSearchBar;
-    connect(searchBar, SIGNAL(search(QString, bool, bool)), this, SLOT(slotSearch(QString, bool, bool)));
+    connect(searchBar, SIGNAL(search(QString, QTextDocument::FindFlags)), this, SLOT(slotSearch(QString, QTextDocument::FindFlags)));
     layout->addWidget(searchBar);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -109,18 +109,11 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     }
 }
 
-void ChatConsole::slotSearch(const QString &needle, bool backward, bool caseSensitive)
+void ChatConsole::slotSearch(const QString &needle, QTextDocument::FindFlags flags)
 {
-    QTextDocument::FindFlags flags;
     QTextCursor start(browser->document());
-    if (backward)
-    {
-        flags |= QTextDocument::FindBackward;
+    if (flags && QTextDocument::FindBackward)
         start.movePosition(QTextCursor::End);
-    }
-    if (caseSensitive)
-        flags |= QTextDocument::FindCaseSensitively;
-
     if (!needle.isEmpty())
     {
         QTextCursor found = browser->document()->find(needle, browser->textCursor(), flags);
@@ -133,7 +126,7 @@ void ChatConsole::slotSearch(const QString &needle, bool backward, bool caseSens
             browser->ensureCursorVisible();
         }
     }
-    highlighter->setNeedle(needle, caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
+    highlighter->setNeedle(needle, (flags && QTextDocument::FindCaseSensitively) ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }
 
 void ChatConsole::slotStop()

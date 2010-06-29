@@ -20,6 +20,7 @@
 #ifndef __WILINK_CHAT_SEARCH_H__
 #define __WILINK_CHAT_SEARCH_H__
 
+#include <QTextDocument>
 #include <QWidget>
 
 class QCheckBox;
@@ -33,7 +34,7 @@ public:
     ChatSearchBar(QWidget *parent = 0);
 
 signals:
-    void search(const QString &search, bool backward, bool cs);
+    void search(const QString &search, QTextDocument::FindFlags flags);
 
 public slots:
     void activate();

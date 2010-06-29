@@ -61,11 +61,17 @@ void ChatSearchBar::activate()
 
 void ChatSearchBar::slotSearchBackward()
 {
-    emit search(findBox->text(), true, findCase->checkState() == Qt::Checked);
+    QTextDocument::FindFlags flags = QTextDocument::FindBackward;
+    if (findCase->checkState() == Qt::Checked)
+        flags |= QTextDocument::FindCaseSensitively;
+    emit search(findBox->text(), flags);
 }
 
 void ChatSearchBar::slotSearchForward()
 {
-    emit search(findBox->text(), false, findCase->checkState() == Qt::Checked);
+    QTextDocument::FindFlags flags;
+    if (findCase->checkState() == Qt::Checked)
+        flags |= QTextDocument::FindCaseSensitively;
+    emit search(findBox->text(), flags);
 }
 

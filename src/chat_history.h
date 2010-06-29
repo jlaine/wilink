@@ -23,6 +23,7 @@
 #include <QDateTime>
 #include <QGraphicsView>
 #include <QGraphicsWidget>
+#include <QTextDocument>
 
 class QGraphicsLinearLayout;
 class QUrl;
@@ -125,7 +126,7 @@ signals:
 private slots:
     void slotLinkHoverChanged(const QString &link);
     void slotSelectionChanged();
-    void slotSearch(const QString &needle, bool backward, bool cs);
+    void slotSearch(const QString &needle, QTextDocument::FindFlags flags);
 
 protected:
     void adjustSize();
