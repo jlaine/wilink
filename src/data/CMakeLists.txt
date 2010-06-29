@@ -14,6 +14,7 @@ generate_png(png
     diagnostics.svg
     download.svg
     file.svg
+    forward.svg
     options.svg
     peer.svg
     photos.svg
