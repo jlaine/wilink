@@ -550,6 +550,21 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
+void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
+{
+    qDebug() << "search" << needle;
+    for (int i = 0; i < layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        int index = child->message().body.indexOf(needle,
+            (flags && QTextDocument::FindCaseSensitively) ? Qt::CaseSensitive : Qt::CaseInsensitive);
+        if (index >= 0)
+        {
+            qDebug() << "found" << child->message().body;
+        }
+    }
+}
+
 void ChatHistory::focusInEvent(QFocusEvent *e)
 {
     QGraphicsView::focusInEvent(e);
@@ -632,21 +647,6 @@ void ChatHistory::slotSelectionChanged()
     }
 
     lastSelection = newSelection;
-}
-
-void ChatHistory::slotSearch(const QString &needle, QTextDocument::FindFlags flags)
-{
-    qDebug() << "search" << needle;
-    for (int i = 0; i < layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        int index = child->message().body.indexOf(needle,
-            (flags && QTextDocument::FindCaseSensitively) ? Qt::CaseSensitive : Qt::CaseInsensitive);
-        if (index >= 0)
-        {
-            qDebug() << "found" << child->message().body;
-        }
-    }
 }
 
 ChatHistoryMessage::ChatHistoryMessage()

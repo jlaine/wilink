@@ -117,6 +117,7 @@ public:
 public slots:
     void clear();
     void copy();
+    void find(const QString &needle, QTextDocument::FindFlags flags);
     void selectAll();
 
 signals:
@@ -126,7 +127,6 @@ signals:
 private slots:
     void slotLinkHoverChanged(const QString &link);
     void slotSelectionChanged();
-    void slotSearch(const QString &needle, QTextDocument::FindFlags flags);
 
 protected:
     void adjustSize();
