@@ -52,8 +52,6 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     // search box
     findBox = new QLineEdit;
     connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotFindForward()));
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
-    connect(shortcut, SIGNAL(activated()), findBox, SLOT(setFocus()));
     hbox->addWidget(findBox);
 
     QPushButton *prev = new QPushButton(QIcon(":/back.png"), QString());
@@ -63,6 +61,9 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     QPushButton *next = new QPushButton(QIcon(":/forward.png"), QString());
     connect(next, SIGNAL(clicked()), this, SLOT(slotFindForward()));
     hbox->addWidget(next);
+
+    findCase = new QCheckBox(tr("Match case"));
+    hbox->addWidget(findCase);
 
     hbox->addStretch();
 
@@ -87,6 +88,13 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     /* connect signals */
     connect(this, SIGNAL(hidePanel()), this, SLOT(slotStop()));
     connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
+
+    /* shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
+    connect(shortcut, SIGNAL(activated()), findBox, SLOT(setFocus()));
+
+    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G), this);
+    connect(shortcut, SIGNAL(activated()), this, SLOT(slotFindForward()));
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
@@ -137,6 +145,8 @@ void ChatConsole::find(bool backward)
         flags |= QTextDocument::FindBackward;
         start.movePosition(QTextCursor::End);
     }
+    if (findCase->checkState() == Qt::Checked)
+        flags |= QTextDocument::FindCaseSensitively;
     QString needle = findBox->text();
 
     if (!needle.isEmpty())
@@ -151,7 +161,7 @@ void ChatConsole::find(bool backward)
             browser->ensureCursorVisible();
         }
     }
-    highlighter->setNeedle(needle, Qt::CaseInsensitive);
+    highlighter->setNeedle(needle, (findCase->checkState() == Qt::Checked) ? Qt::CaseSensitive : Qt::CaseInsensitive);
 }
 
 void ChatConsole::slotFindBackward()

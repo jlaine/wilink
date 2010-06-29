@@ -56,6 +56,7 @@ private:
     bool connected;
     QXmppLogger *currentLogger;
     QLineEdit *findBox;
+    QCheckBox *findCase;
     Highlighter *highlighter;
     QPushButton *startButton;
     QPushButton *stopButton;
