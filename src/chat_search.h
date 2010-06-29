@@ -31,12 +31,16 @@ class ChatSearchBar : public QWidget
 
 public:
     ChatSearchBar(QWidget *parent = 0);
-    bool caseSensitive() const;
-    QString search() const;
 
 signals:
-    void searchForward();
-    void searchBackward();
+    void search(const QString &search, bool backward, bool cs);
+
+public slots:
+    void activate();
+
+private slots:
+    void slotSearchForward();
+    void slotSearchBackward();
 
 private:
     QLineEdit *findBox;

@@ -21,11 +21,13 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QShortcut>
 #include <QTimer>
 
 #include "chat_conversation.h"
 #include "chat_edit.h"
 #include "chat_history.h"
+#include "chat_search.h"
 
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     : ChatPanel(parent),
@@ -46,6 +48,11 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
 
+    /* search bar */
+    chatSearch = new ChatSearchBar;
+    chatSearch->hide();
+    layout->addWidget(chatSearch);
+
     /* text edit */
     chatInput = new ChatEdit(80);
     connect(chatInput, SIGNAL(focused()), this, SLOT(slotFocused()));
@@ -57,6 +64,10 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     setFocusProxy(chatInput);
     setLayout(layout);
     setMinimumWidth(300);
+
+    /* shortcuts */
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
+    connect(shortcut, SIGNAL(activated()), chatSearch, SLOT(activate()));
 
     /* timers */
     pausedTimer = new QTimer(this);

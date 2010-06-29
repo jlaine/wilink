@@ -26,6 +26,7 @@
 
 class ChatEdit;
 class ChatHistory;
+class ChatSearchBar;
 class QLabel;
 class QLineEdit;
 class QXmppVCard;
@@ -57,6 +58,7 @@ protected:
 protected:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
+    ChatSearchBar *chatSearch;
 
     QString chatRemoteJid;
 
