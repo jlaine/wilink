@@ -69,11 +69,11 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     // buttons
 
-    startButton = new QPushButton(QIcon(":/contact-available.png"), tr("Start"));
+    startButton = new QPushButton(QIcon(":/start.png"), tr("Start"));
     connect(startButton, SIGNAL(clicked()), this, SLOT(slotStart()));
     hbox->addWidget(startButton);
 
-    stopButton = new QPushButton(QIcon(":/contact-busy.png"), tr("Stop"));
+    stopButton = new QPushButton(QIcon(":/stop.png"), tr("Stop"));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(slotStop()));
     hbox->addWidget(stopButton);
 
