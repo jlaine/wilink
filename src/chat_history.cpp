@@ -174,6 +174,16 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
+QTextCursor ChatMessageWidget::find(const QString &needle, const QTextCursor &cursor, QTextDocument::FindFlags flags)
+{
+    QTextCursor start(bodyText->document());
+    if (!cursor.isNull())
+        start = cursor;
+    else if (flags && QTextDocument::FindBackward)
+        start.movePosition(QTextCursor::End);
+    return bodyText->document()->find(needle, start, flags);
+}
+
 ChatHistoryMessage ChatMessageWidget::message() const
 {
     return msg;
@@ -367,8 +377,18 @@ void ChatMessageWidget::slotTextClicked()
     emit messageClicked(msg);
 }
 
+QTextCursor ChatMessageWidget::textCursor()
+{
+    return bodyText->textCursor();
+}
+
+void ChatMessageWidget::setTextCursor(const QTextCursor &cursor)
+{
+    bodyText->setTextCursor(cursor);
+}
+
 ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent)
+    : QGraphicsView(parent), lastFind(0)
 {
     scene = new QGraphicsScene;
     setScene(scene);
@@ -550,17 +570,45 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
+/** Find and highlight the given text.
+ */
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
 {
-    qDebug() << "search" << needle;
-    for (int i = 0; i < layout->count(); i++)
+    // retrieve previous cursor
+    int startIndex = -1;
+    if (lastFind)
+    {
+        for (int i = 0; i < layout->count(); ++i)
+        {
+            if (layout->itemAt(i) == lastFind)
+            {
+                startIndex = i;
+                //lastFind->setTextCursor(QTextCursor());
+                break;
+            }
+        }
+    }
+    lastFind = 0;
+    if (startIndex < 0)
+        startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
+    
+    int i = startIndex;
+    while (i >= 0 && i < layout->count())
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        int index = child->message().body.indexOf(needle,
-            (flags && QTextDocument::FindCaseSensitively) ? Qt::CaseSensitive : Qt::CaseInsensitive);
-        if (index >= 0)
+        QTextCursor found = child->find(needle, child->textCursor(), flags);
+        if (!found.isNull())
         {
-            qDebug() << "found" << child->message().body;
+            child->setTextCursor(found);
+            //browser->ensureCursorVisible();
+            lastFind = child;
+            return;
+        } else {
+            child->setTextCursor(QTextCursor());
+            if (flags && QTextDocument::FindBackward)
+                --i;
+            else
+                ++i;
         }
     }
 }

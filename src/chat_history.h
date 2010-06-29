@@ -65,6 +65,7 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+    QTextCursor find(const QString &needle, const QTextCursor &cursor, QTextDocument::FindFlags flags);
     ChatHistoryMessage message() const;
 
     QString selectedText() const;
@@ -77,6 +78,8 @@ public:
     bool showFooter();
     void setShowFooter(bool show);
     void setShowSender(bool show);
+    QTextCursor textCursor();
+    void setTextCursor(const QTextCursor &cursor);
 
 signals:
     void messageClicked(const ChatHistoryMessage &message);
@@ -143,6 +146,7 @@ private:
 
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
+    ChatMessageWidget *lastFind;
     QList<ChatMessageWidget*> lastSelection;
     QString lastText;
 };
