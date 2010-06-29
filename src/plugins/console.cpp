@@ -47,17 +47,15 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     Highlighter *highlighter = new Highlighter(browser->document());
 
     QHBoxLayout *hbox = new QHBoxLayout;
-    showPackets = new QCheckBox(tr("Show packets"));
-    showPackets->setCheckState(Qt::Checked);
-    hbox->addWidget(showPackets);
-
-    hbox->addSpacing(16);
-
-    showMessages = new QCheckBox(tr("Show messages"));
-    showMessages->setCheckState(Qt::Checked);
-    hbox->addWidget(showMessages);
-
     hbox->addStretch();
+
+    startButton = new QPushButton(tr("Start"));
+    connect(startButton, SIGNAL(clicked()), this, SLOT(slotStart()));
+    hbox->addWidget(startButton);
+
+    stopButton = new QPushButton(tr("Stop"));
+    connect(stopButton, SIGNAL(clicked()), this, SLOT(slotStop()));
+    hbox->addWidget(stopButton);
 
     QPushButton *clearButton = new QPushButton(QIcon(":/close.png"), tr("Clear"));
     connect(clearButton, SIGNAL(clicked()), browser, SLOT(clear()));
@@ -68,12 +66,13 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
-    connect(this, SIGNAL(hidePanel()), this, SLOT(slotHide()));
-    connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
+    connect(this, SIGNAL(hidePanel()), this, SLOT(slotStop()));
+    connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 {
+#if 0
     if (showMessages->checkState() != Qt::Checked &&
         (type == QXmppLogger::DebugMessage || type == QXmppLogger::InformationMessage || type == QXmppLogger::WarningMessage))
         return;
@@ -81,6 +80,7 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     if (showPackets->checkState() != Qt::Checked &&
         (type == QXmppLogger::ReceivedMessage || type == QXmppLogger::SentMessage))
         return;
+#endif
 
     QColor color;
     QString message;
@@ -109,22 +109,25 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     }
 }
 
-void ChatConsole::slotHide()
+void ChatConsole::slotStop()
 {
     if (!connected)
         return;
+    stopButton->hide();
     disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
     connected = false;
+    startButton->show();
 }
 
-void ChatConsole::slotShow()
+void ChatConsole::slotStart()
 {
     if (connected)
         return;
+    startButton->hide();
     connect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
     connected = true;
+    stopButton->show();
 }
-
 
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)

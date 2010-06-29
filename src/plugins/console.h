@@ -29,6 +29,7 @@
 #include "chat_panel.h"
 
 class QCheckBox;
+class QPushButton;
 class QTextDocument;
 class QTextBrowser;
 
@@ -40,16 +41,16 @@ public:
     ChatConsole(QXmppLogger *logger, QWidget *parent = 0);
 
 private slots:
-    void slotShow();
-    void slotHide();
+    void slotStart();
+    void slotStop();
     void message(QXmppLogger::MessageType type, const QString &msg);
 
 private:
     QTextBrowser *browser;
     bool connected;
     QXmppLogger *currentLogger;
-    QCheckBox *showMessages;
-    QCheckBox *showPackets;
+    QPushButton *startButton;
+    QPushButton *stopButton;
 };
 
 class Highlighter : public QSyntaxHighlighter
