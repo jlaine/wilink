@@ -147,16 +147,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     ChatHistoryMessage message;
     message.body = msg.body();
-    message.date = QDateTime::currentDateTime();
-    foreach (const QXmppElement &extension, msg.extensions())
-    {
-        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_delay)
-        {
-            const QString str = extension.attribute("stamp");
-            message.date = QDateTime::fromString(str, "yyyyMMddThh:mm:ss");
-            message.date.setTimeSpec(Qt::UTC);
-        }
-    }
+    message.date = msg.stamp();
+    if (!message.date.isValid())
+        message.date = QDateTime::currentDateTime();
     message.from = rosterModel->contactName(chatRemoteJid);
     message.fromJid = chatRemoteJid;
     message.received = true;
