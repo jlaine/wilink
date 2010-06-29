@@ -634,6 +634,11 @@ void ChatHistory::slotSelectionChanged()
     lastSelection = newSelection;
 }
 
+void ChatHistory::slotSearch(const QString &needle, bool backward, bool caseSensitive)
+{
+    qDebug() << "search" << needle;
+}
+
 ChatHistoryMessage::ChatHistoryMessage()
     : archived(false), received(true)
 {

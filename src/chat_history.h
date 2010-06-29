@@ -122,9 +122,10 @@ signals:
     void focused();
     void messageClicked(const ChatHistoryMessage &message);
 
-protected slots:
+private slots:
     void slotLinkHoverChanged(const QString &link);
     void slotSelectionChanged();
+    void slotSearch(const QString &needle, bool backward, bool cs);
 
 protected:
     void adjustSize();

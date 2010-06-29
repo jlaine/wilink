@@ -48,7 +48,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     // search box
     searchBar = new ChatSearchBar;
-    connect(searchBar, SIGNAL(search(QString, bool, bool)), this, SLOT(slotFind(QString, bool, bool)));
+    connect(searchBar, SIGNAL(search(QString, bool, bool)), this, SLOT(slotSearch(QString, bool, bool)));
     layout->addWidget(searchBar);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -109,7 +109,7 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     }
 }
 
-void ChatConsole::slotFind(const QString &needle, bool backward, bool caseSensitive)
+void ChatConsole::slotSearch(const QString &needle, bool backward, bool caseSensitive)
 {
     QTextDocument::FindFlags flags;
     QTextCursor start(browser->document());

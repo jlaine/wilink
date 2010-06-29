@@ -42,7 +42,7 @@ public:
     ChatConsole(QXmppLogger *logger, QWidget *parent = 0);
 
 private slots:
-    void slotFind(const QString &needle, bool backward, bool cs);
+    void slotSearch(const QString &needle, bool backward, bool cs);
     void slotStart();
     void slotStop();
     void message(QXmppLogger::MessageType type, const QString &msg);
