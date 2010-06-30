@@ -43,11 +43,15 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findBox);
 
-    QPushButton *prev = new QPushButton(QIcon(":/back.png"), QString());
+    QPushButton *prev = new QPushButton;
+    prev->setIcon(QIcon(":/back.png"));
+    prev->setMaximumWidth(32);
     connect(prev, SIGNAL(clicked()), this, SLOT(slotSearchBackward()));
     hbox->addWidget(prev);
 
-    QPushButton *next = new QPushButton(QIcon(":/forward.png"), QString());
+    QPushButton *next = new QPushButton;
+    next->setIcon(QIcon(":/forward.png"));
+    next->setMaximumWidth(32);
     connect(next, SIGNAL(clicked()), this, SLOT(slotSearchForward()));
     hbox->addWidget(next);
 
