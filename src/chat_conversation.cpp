@@ -172,10 +172,10 @@ void ChatConversation::slotSearchDisplayed(bool visible)
 {
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
-        spacerItem->changeSize(0, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
     else
         spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
-    spacerItem->invalidate();
+    vbox->invalidate();
 }
 
 void ChatConversation::slotTextChanged()
