@@ -143,11 +143,6 @@ void ChatConversation::slotInactive()
     }
 }
 
-void ChatConversation::slotNewLine()
-{
-    chatInput->append("");
-}
-
 void ChatConversation::slotPaused()
 {
     if (chatLocalState == QXmppMessage::Composing)

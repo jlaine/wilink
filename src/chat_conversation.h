@@ -44,7 +44,6 @@ public:
 protected slots:
     void slotFocused();
     void slotInactive();
-    void slotNewLine();
     void slotPaused();
     void slotSend();
     void slotSearchDisplayed(bool visible);
