@@ -27,19 +27,28 @@
 #include "chat_search.h"
 
 #define BUTTON_SIZE 24
+#ifdef Q_OS_MAC
+#define BUTTON_MARGIN (32 - BUTTON_SIZE)/2
+#else
+#define BUTTON_MARGIN 0
+#endif
+#define MARGIN 5
+#define SPACING 10
 
 ChatSearchBar::ChatSearchBar(QWidget *parent)
     : QWidget(parent)
 {
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setMargin(0);
-    hbox->setSpacing(10);
+    hbox->setSpacing(0);
 
-    hbox->addSpacing(10);
+    hbox->addSpacing(MARGIN);
 
     QLabel *findIcon = new QLabel;
     findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
     hbox->addWidget(findIcon);
+
+    hbox->addSpacing(SPACING);
 
     findBox = new QLineEdit;
     normalPalette = findBox->palette();
@@ -49,9 +58,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findBox);
 
-#ifdef Q_OS_MAC
-    hbox->addSpacing(16);
-#endif
+    hbox->addSpacing(SPACING + BUTTON_MARGIN);
 
     QPushButton *prev = new QPushButton;
     prev->setIcon(QIcon(":/back.png"));
@@ -60,6 +67,8 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(prev, SIGNAL(clicked()), this, SLOT(findPrevious()));
     hbox->addWidget(prev);
 
+    hbox->addSpacing(SPACING + 2 * BUTTON_MARGIN);
+
     QPushButton *next = new QPushButton;
     next->setIcon(QIcon(":/forward.png"));
     next->setMaximumHeight(BUTTON_SIZE);
@@ -67,9 +76,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(next, SIGNAL(clicked()), this, SLOT(findNext()));
     hbox->addWidget(next);
 
-#ifdef Q_OS_MAC
-    hbox->addSpacing(16);
-#endif
+    hbox->addSpacing(SPACING + BUTTON_MARGIN);
 
     findCase = new QCheckBox(tr("Match case"));
     connect(findCase, SIGNAL(stateChanged(int)), this, SLOT(slotSearchChanged()));
@@ -85,7 +92,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(close, SIGNAL(clicked()), this, SLOT(hide()));
     hbox->addWidget(close);
 
-    hbox->addSpacing(10);
+    hbox->addSpacing(MARGIN);
 
     setLayout(hbox);
     setFocusProxy(findBox);
