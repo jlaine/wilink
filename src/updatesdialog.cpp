@@ -109,7 +109,7 @@ void UpdatesDialog::checkFinished(const Release &release)
 void UpdatesDialog::updateDownloaded(const QUrl &url)
 {
     statusLabel->setText(tr("Installing update.."));
-#if Q_OS_WIN32
+#ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());
     installDir.cdUp();
