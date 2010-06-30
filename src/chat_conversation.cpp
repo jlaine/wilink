@@ -28,6 +28,12 @@
 #include "chat_history.h"
 #include "chat_search.h"
 
+#ifdef Q_OS_MAC
+#define SPACING 6
+#else
+#define SPACING 2
+#endif
+
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     : ChatPanel(parent),
     chatRemoteJid(jid), chatLocalState(QXmppMessage::None), spacerItem(0)
@@ -48,11 +54,9 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     filterDrops(chatHistory->viewport());
 
     /* spacer */
-#ifdef Q_OS_MAC
-    spacerItem = new QSpacerItem(6, 6, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     spacerIndex = layout->count();
     layout->addSpacerItem(spacerItem);
-#endif
 
     /* search bar */
     chatSearch = new ChatSearchBar;
@@ -167,13 +171,11 @@ void ChatConversation::slotSend()
 
 void ChatConversation::slotSearchDisplayed(bool visible)
 {
-#ifdef Q_OS_MAC
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
         vbox->takeAt(spacerIndex);
     else
         vbox->insertSpacerItem(spacerIndex, spacerItem);
-#endif
 }
 
 void ChatConversation::slotTextChanged()
