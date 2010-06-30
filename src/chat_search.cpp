@@ -32,7 +32,10 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     : QWidget(parent)
 {
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setMargin(0);
     hbox->setSpacing(10);
+
+    hbox->addSpacing(10);
 
     QLabel *findIcon = new QLabel;
     findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
@@ -45,6 +48,10 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(findBox, SIGNAL(returnPressed()), this, SLOT(findNext()));
     connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findBox);
+
+#ifdef Q_OS_MAC
+    hbox->addSpacing(16);
+#endif
 
     QPushButton *prev = new QPushButton;
     prev->setIcon(QIcon(":/back.png"));
@@ -60,6 +67,10 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     connect(next, SIGNAL(clicked()), this, SLOT(findNext()));
     hbox->addWidget(next);
 
+#ifdef Q_OS_MAC
+    hbox->addSpacing(16);
+#endif
+
     findCase = new QCheckBox(tr("Match case"));
     connect(findCase, SIGNAL(stateChanged(int)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findCase);
@@ -73,6 +84,8 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     close->setIcon(QIcon(":/close.png"));
     connect(close, SIGNAL(clicked()), this, SLOT(hide()));
     hbox->addWidget(close);
+
+    hbox->addSpacing(10);
 
     setLayout(hbox);
     setFocusProxy(findBox);
