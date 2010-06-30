@@ -48,7 +48,8 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     // search box
     searchBar = new ChatSearchBar;
-    connect(searchBar, SIGNAL(search(QString, QTextDocument::FindFlags)), this, SLOT(slotSearch(QString, QTextDocument::FindFlags)));
+    connect(searchBar, SIGNAL(find(QString, QTextDocument::FindFlags)),
+        this, SLOT(slotFind(QString, QTextDocument::FindFlags)));
     layout->addWidget(searchBar);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -109,22 +110,28 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
     }
 }
 
-void ChatConsole::slotSearch(const QString &needle, QTextDocument::FindFlags flags)
+/** Find the given text in the console history.
+ *
+ * @param needle
+ * @param flags
+ */
+void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags)
 {
+    if (needle.isEmpty())
+        return;
+
     QTextCursor start(browser->document());
     if (flags && QTextDocument::FindBackward)
         start.movePosition(QTextCursor::End);
-    if (!needle.isEmpty())
+
+    QTextCursor found = browser->document()->find(needle, browser->textCursor(), flags);
+    // if search fails, retry from start of document
+    if (found.isNull())
+        found = browser->document()->find(needle, start, flags);
+    if (!found.isNull())
     {
-        QTextCursor found = browser->document()->find(needle, browser->textCursor(), flags);
-        // if search fails, retry from start of document
-        if (found.isNull())
-            found = browser->document()->find(needle, start, flags);
-        if (!found.isNull())
-        {
-            browser->setTextCursor(found);
-            browser->ensureCursorVisible();
-        }
+        browser->setTextCursor(found);
+        browser->ensureCursorVisible();
     }
 }
 

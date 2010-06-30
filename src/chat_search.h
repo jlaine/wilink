@@ -34,7 +34,7 @@ public:
     ChatSearchBar(QWidget *parent = 0);
 
 signals:
-    void search(const QString &search, QTextDocument::FindFlags flags);
+    void find(const QString &search, QTextDocument::FindFlags flags);
 
 public slots:
     void activate();

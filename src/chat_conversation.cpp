@@ -51,7 +51,8 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     /* search bar */
     chatSearch = new ChatSearchBar;
     chatSearch->hide();
-    connect(chatSearch, SIGNAL(search(QString, QTextDocument::FindFlags)), chatHistory, SLOT(find(QString, QTextDocument::FindFlags)));
+    connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags)),
+        chatHistory, SLOT(find(QString, QTextDocument::FindFlags)));
     layout->addWidget(chatSearch);
 
     /* text edit */
