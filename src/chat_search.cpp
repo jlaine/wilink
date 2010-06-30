@@ -26,10 +26,13 @@
 
 #include "chat_search.h"
 
+#define BUTTON_SIZE 24
+
 ChatSearchBar::ChatSearchBar(QWidget *parent)
     : QWidget(parent)
 {
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setSpacing(10);
 
     QLabel *findIcon = new QLabel;
     findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
@@ -45,13 +48,15 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 
     QPushButton *prev = new QPushButton;
     prev->setIcon(QIcon(":/back.png"));
-    prev->setMaximumWidth(32);
+    prev->setMaximumHeight(BUTTON_SIZE);
+    prev->setMaximumWidth(BUTTON_SIZE);
     connect(prev, SIGNAL(clicked()), this, SLOT(findPrevious()));
     hbox->addWidget(prev);
 
     QPushButton *next = new QPushButton;
     next->setIcon(QIcon(":/forward.png"));
-    next->setMaximumWidth(32);
+    next->setMaximumHeight(BUTTON_SIZE);
+    next->setMaximumWidth(BUTTON_SIZE);
     connect(next, SIGNAL(clicked()), this, SLOT(findNext()));
     hbox->addWidget(next);
 
@@ -63,7 +68,8 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 
     QPushButton *close = new QPushButton;
     close->setFlat(true);
-    close->setMaximumWidth(32);
+    close->setMaximumHeight(BUTTON_SIZE);
+    close->setMaximumWidth(BUTTON_SIZE);
     close->setIcon(QIcon(":/close.png"));
     connect(close, SIGNAL(clicked()), this, SLOT(hide()));
     hbox->addWidget(close);
