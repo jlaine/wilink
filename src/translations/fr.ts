@@ -331,6 +331,10 @@ Acceptez-vous?</translation>
         <source>Shares folder</source>
         <translation>Dossier de partages</translation>
     </message>
+    <message>
+        <source>Searching for &quot;%1&quot;</source>
+        <translation>Recherche de &quot;%1&quot;></translation>
+    </message>
 </context>
 <context>
     <name>ChatSharesModel</name>

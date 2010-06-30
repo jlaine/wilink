@@ -444,6 +444,9 @@ void ChatShares::findRemoteFiles()
     iq.setSearch(search);
     searches.insert(iq.tag(), search.isEmpty() ? sharesView : searchView);
     client->sendPacket(iq);
+
+    if (!search.isEmpty())
+        statusBar->showMessage(tr("Searching for \"%1\"").arg(search), STATUS_TIMEOUT);
 }
 
 void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &shareItem)
@@ -903,7 +906,9 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
                 model->removeItem(oldItem);
         } else {
             QModelIndex index = model->updateItem(oldItem, newItem);
-            if (!newItem->size())
+            if (newItem->size())
+                statusBar->clearMessage();
+            else
                 statusBar->showMessage(tr("No files found"), 3000);
             if (view == mainView)
             {
