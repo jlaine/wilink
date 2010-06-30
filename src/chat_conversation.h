@@ -28,6 +28,7 @@ class ChatEdit;
 class ChatHistory;
 class ChatSearchBar;
 class QLabel;
+class QSpacerItem;
 class QLineEdit;
 class QXmppVCard;
 
@@ -46,6 +47,7 @@ protected slots:
     void slotNewLine();
     void slotPaused();
     void slotSend();
+    void slotSearchDisplayed(bool visible);
     void slotTextChanged();
 
 signals:
@@ -63,6 +65,8 @@ protected:
     QString chatRemoteJid;
 
 private:
+    QSpacerItem *spacerItem;
+    int spacerIndex;
     QXmppMessage::State chatLocalState;
     QTimer *inactiveTimer;
     QTimer *pausedTimer;

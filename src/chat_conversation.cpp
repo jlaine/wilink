@@ -47,9 +47,16 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
 
+    /* spacer */
+    spacerItem = new QSpacerItem(6, 6, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    spacerIndex = layout->count();
+    layout->addSpacerItem(spacerItem);
+
     /* search bar */
     chatSearch = new ChatSearchBar;
     chatSearch->hide();
+    connect(chatSearch, SIGNAL(displayed(bool)),
+        this, SLOT(slotSearchDisplayed(bool)));
     connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags)),
         chatHistory, SLOT(find(QString, QTextDocument::FindFlags)));
     connect(chatHistory, SIGNAL(findFinished(bool)),
@@ -154,6 +161,15 @@ void ChatConversation::slotSend()
     chatLocalState = QXmppMessage::Active;
     if (sendMessage(text))
         chatInput->document()->clear();
+}
+
+void ChatConversation::slotSearchDisplayed(bool visible)
+{
+    QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
+    if (visible)
+        vbox->takeAt(spacerIndex);
+    else
+        vbox->insertSpacerItem(spacerIndex, spacerItem);
 }
 
 void ChatConversation::slotTextChanged()

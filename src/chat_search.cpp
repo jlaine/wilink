@@ -89,7 +89,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     close->setMaximumHeight(BUTTON_SIZE);
     close->setMaximumWidth(BUTTON_SIZE);
     close->setIcon(QIcon(":/close.png"));
-    connect(close, SIGNAL(clicked()), this, SLOT(hide()));
+    connect(close, SIGNAL(clicked()), this, SLOT(deactivate()));
     hbox->addWidget(close);
 
     hbox->addSpacing(MARGIN);
@@ -100,8 +100,21 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 
 void ChatSearchBar::activate()
 {
-    show();
+    if (!isVisible())
+    {
+        show();
+        emit displayed(true);
+    }
     findBox->setFocus();
+}
+
+void ChatSearchBar::deactivate()
+{
+    if (isVisible())
+    {
+        hide();
+        emit displayed(false);
+    }
 }
 
 void ChatSearchBar::findFinished(bool found)

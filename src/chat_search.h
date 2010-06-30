@@ -35,9 +35,11 @@ public:
 
 signals:
     void find(const QString &search, QTextDocument::FindFlags flags);
+    void displayed(bool visible);
 
 public slots:
     void activate();
+    void deactivate();
     void findFinished(bool found);
     void findNext();
     void findPrevious();
