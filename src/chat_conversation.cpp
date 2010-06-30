@@ -59,7 +59,6 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     connect(chatInput, SIGNAL(focused()), this, SLOT(slotFocused()));
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(slotSend()));
     connect(chatInput, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
-    layout->addSpacing(10);
     layout->addWidget(chatInput);
 
     setFocusProxy(chatInput);

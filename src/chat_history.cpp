@@ -584,9 +584,16 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 }
 
 /** Find and highlight the given text.
+ *
+ * @param needle
+ * @param flags
  */
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
 {
+    // exit if the history is empty
+    if (!layout->count())
+        return;
+
     // retrieve previous cursor
     int startIndex = -1;
     if (lastFind)
@@ -604,6 +611,8 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
     if (startIndex < 0)
         startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
     
+    // perform search
+    bool looped = false;
     int i = startIndex;
     while (i >= 0 && i < layout->count())
     {
@@ -617,10 +626,17 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             return;
         } else {
             child->setTextCursor(QTextCursor());
-            if (flags && QTextDocument::FindBackward)
-                --i;
-            else
-                ++i;
+            if (looped)
+                break;
+            if (flags && QTextDocument::FindBackward) {
+                if (--i < 0)
+                    i = layout->count() - 1;
+            } else {
+                if (++i >= layout->count())
+                    i = 0;
+            }
+            if (i == startIndex)
+                looped = true;
         }
     }
 }
