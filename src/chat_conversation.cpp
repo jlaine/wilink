@@ -55,7 +55,6 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
 
     /* spacer */
     spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
-    spacerIndex = layout->count();
     layout->addSpacerItem(spacerItem);
 
     /* search bar */
@@ -173,9 +172,10 @@ void ChatConversation::slotSearchDisplayed(bool visible)
 {
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
-        vbox->takeAt(spacerIndex);
+        spacerItem->changeSize(0, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     else
-        vbox->insertSpacerItem(spacerIndex, spacerItem);
+        spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    spacerItem->invalidate();
 }
 
 void ChatConversation::slotTextChanged()

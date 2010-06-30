@@ -66,7 +66,6 @@ protected:
 
 private:
     QSpacerItem *spacerItem;
-    int spacerIndex;
     QXmppMessage::State chatLocalState;
     QTimer *inactiveTimer;
     QTimer *pausedTimer;
