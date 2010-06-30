@@ -194,6 +194,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
     setClient(baseClient);
 
+    connect(this, SIGNAL(findPanel()), lineEdit, SLOT(setFocus()));
     setFocusProxy(lineEdit);
 
     /* database signals */
