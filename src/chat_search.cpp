@@ -39,20 +39,20 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     normalPalette = findBox->palette();
     failedPalette = findBox->palette();
     failedPalette.setColor(QPalette::Active, QPalette::Base, QColor(255, 0, 0, 127));
-    connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotSearchForward()));
+    connect(findBox, SIGNAL(returnPressed()), this, SLOT(findNext()));
     connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findBox);
 
     QPushButton *prev = new QPushButton;
     prev->setIcon(QIcon(":/back.png"));
     prev->setMaximumWidth(32);
-    connect(prev, SIGNAL(clicked()), this, SLOT(slotSearchBackward()));
+    connect(prev, SIGNAL(clicked()), this, SLOT(findPrevious()));
     hbox->addWidget(prev);
 
     QPushButton *next = new QPushButton;
     next->setIcon(QIcon(":/forward.png"));
     next->setMaximumWidth(32);
-    connect(next, SIGNAL(clicked()), this, SLOT(slotSearchForward()));
+    connect(next, SIGNAL(clicked()), this, SLOT(findNext()));
     hbox->addWidget(next);
 
     findCase = new QCheckBox(tr("Match case"));
@@ -86,7 +86,15 @@ void ChatSearchBar::findFinished(bool found)
         findBox->setPalette(failedPalette);
 }
 
-void ChatSearchBar::slotSearchBackward()
+void ChatSearchBar::findNext()
+{
+    QTextDocument::FindFlags flags;
+    if (findCase->checkState() == Qt::Checked)
+        flags |= QTextDocument::FindCaseSensitively;
+    emit find(findBox->text(), flags);
+}
+
+void ChatSearchBar::findPrevious()
 {
     QTextDocument::FindFlags flags = QTextDocument::FindBackward;
     if (findCase->checkState() == Qt::Checked)
@@ -97,13 +105,5 @@ void ChatSearchBar::slotSearchBackward()
 void ChatSearchBar::slotSearchChanged()
 {
     findBox->setPalette(normalPalette);
-}
-
-void ChatSearchBar::slotSearchForward()
-{
-    QTextDocument::FindFlags flags;
-    if (findCase->checkState() == Qt::Checked)
-        flags |= QTextDocument::FindCaseSensitively;
-    emit find(findBox->text(), flags);
 }
 

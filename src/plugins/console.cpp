@@ -76,12 +76,10 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setLayout(layout);
 
     /* connect signals */
+    connect(this, SIGNAL(findPanel()), searchBar, SLOT(activate()));
+    connect(this, SIGNAL(findAgainPanel()), searchBar, SLOT(findNext()));
     connect(this, SIGNAL(hidePanel()), this, SLOT(slotStop()));
     connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
-
-    /* shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
-    connect(shortcut, SIGNAL(activated()), searchBar, SLOT(activate()));
 }
 
 void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)

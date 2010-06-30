@@ -149,7 +149,18 @@ Chat::Chat(QWidget *parent)
     connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
 
     action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+
+    QMenu *m_editMenu = menuBar()->addMenu(tr("&Edit"));
+
+    m_findAction = m_editMenu->addAction(QIcon(":/search.png"), tr("&Find"));
+    m_findAction->setEnabled(false);
+    m_findAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F));
+
+    m_findAgainAction = m_editMenu->addAction(tr("Find a&gain"));
+    m_findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
+    m_findAgainAction->setEnabled(false);
 
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
@@ -359,9 +370,23 @@ void Chat::showPanel()
  */
 void Chat::panelChanged(int index)
 {
+    disconnect(m_findAction, SIGNAL(triggered(bool)));
+    disconnect(m_findAgainAction, SIGNAL(triggered(bool)));
+
     QWidget *widget = m_conversationPanel->widget(index);
     if (!widget)
+    {
+        m_findAction->setEnabled(false);
+        m_findAgainAction->setEnabled(false);
         return;
+    }
+
+    // connect find actions
+    connect(m_findAction, SIGNAL(triggered(bool)), widget, SIGNAL(findPanel()));
+    connect(m_findAgainAction, SIGNAL(triggered(bool)), widget, SIGNAL(findAgainPanel()));
+    m_findAction->setEnabled(true);
+    m_findAgainAction->setEnabled(true);
+
     m_rosterModel->clearPendingMessages(widget->objectName());
     m_rosterView->selectContact(widget->objectName());
     widget->setFocus();

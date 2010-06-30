@@ -106,6 +106,8 @@ private:
 
     QMenu *m_fileMenu;
     QMenu *m_optionsMenu;
+    QAction *m_findAction;
+    QAction *m_findAgainAction;
 
     ChatClient *m_client;
     QList<ChatPanel*> m_chatPanels;

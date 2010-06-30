@@ -21,7 +21,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
-#include <QShortcut>
 #include <QTimer>
 
 #include "chat_conversation.h"
@@ -69,8 +68,8 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     setMinimumWidth(300);
 
     /* shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F), this);
-    connect(shortcut, SIGNAL(activated()), chatSearch, SLOT(activate()));
+    connect(this, SIGNAL(findPanel()), chatSearch, SLOT(activate()));
+    connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 
     /* timers */
     pausedTimer = new QTimer(this);

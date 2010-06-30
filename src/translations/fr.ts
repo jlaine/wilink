@@ -53,6 +53,18 @@
             <numerusform>%n messages</numerusform>
         </translation>
     </message>
+    <message>
+        <source>&amp;Find</source>
+        <translation>Recherc&amp;her</translation>
+    </message>
+    <message>
+        <source>Find a&amp;gain</source>
+        <translation>Rechercher le sui&amp;vant</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>Éditio&amp;n</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
