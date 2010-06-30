@@ -591,7 +591,10 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
 {
     if (needle.isEmpty() || !layout->count())
+    {
+        emit findFinished(false);
         return;
+    }
 
     // retrieve previous cursor
     int startIndex = -1;

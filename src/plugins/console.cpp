@@ -48,8 +48,11 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
 
     // search box
     searchBar = new ChatSearchBar;
+    searchBar->hide();
     connect(searchBar, SIGNAL(find(QString, QTextDocument::FindFlags)),
         this, SLOT(slotFind(QString, QTextDocument::FindFlags)));
+    connect(this, SIGNAL(findFinished(bool)),
+        searchBar, SLOT(findFinished(bool)));
     layout->addWidget(searchBar);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -118,7 +121,10 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags)
 {
     if (needle.isEmpty())
+    {
+        emit findFinished(false);
         return;
+    }
 
     QTextCursor start(browser->document());
     if (flags && QTextDocument::FindBackward)
@@ -132,9 +138,9 @@ void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags
     {
         browser->setTextCursor(found);
         browser->ensureCursorVisible();
-        searchBar->findFinished(true);
+        emit findFinished(true);
     } else {
-        searchBar->findFinished(false);
+        emit findFinished(false);
     }
 }
 

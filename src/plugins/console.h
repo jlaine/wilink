@@ -41,6 +41,9 @@ class ChatConsole : public ChatPanel
 public:
     ChatConsole(QXmppLogger *logger, QWidget *parent = 0);
 
+signals:
+    void findFinished(bool found);
+
 private slots:
     void slotFind(const QString &needle, QTextDocument::FindFlags flags);
     void slotStart();
