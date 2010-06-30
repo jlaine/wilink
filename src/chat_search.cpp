@@ -29,11 +29,12 @@
 #define BUTTON_SIZE 24
 #ifdef Q_OS_MAC
 #define BUTTON_MARGIN (32 - BUTTON_SIZE)/2
+#define SPACING 16
 #else
 #define BUTTON_MARGIN 0
+#define SPACING 8
 #endif
 #define MARGIN 5
-#define SPACING 10
 
 ChatSearchBar::ChatSearchBar(QWidget *parent)
     : QWidget(parent)
