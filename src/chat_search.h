@@ -38,10 +38,12 @@ signals:
 
 public slots:
     void activate();
+    void findFinished(bool found);
 
 private slots:
-    void slotSearchForward();
     void slotSearchBackward();
+    void slotSearchChanged();
+    void slotSearchForward();
 
 private:
     QLineEdit *findBox;

@@ -622,6 +622,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             child->setTextCursor(found);
             ensureVisible(child->selection());
             lastFind = child;
+            emit findFinished(true);
             return;
         } else {
             child->setTextCursor(QTextCursor());
@@ -638,6 +639,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
                 looped = true;
         }
     }
+    emit findFinished(false);
 }
 
 void ChatHistory::focusInEvent(QFocusEvent *e)

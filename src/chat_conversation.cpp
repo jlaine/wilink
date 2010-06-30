@@ -53,6 +53,8 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     chatSearch->hide();
     connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags)),
         chatHistory, SLOT(find(QString, QTextDocument::FindFlags)));
+    connect(chatHistory, SIGNAL(findFinished(bool)),
+        chatSearch, SLOT(findFinished(bool)));
     layout->addWidget(chatSearch);
 
     /* text edit */

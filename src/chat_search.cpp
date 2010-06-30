@@ -22,6 +22,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QVariant>
 
 #include "chat_search.h"
 
@@ -36,6 +37,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 
     findBox = new QLineEdit;
     connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotSearchForward()));
+    connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findBox);
 
     QPushButton *prev = new QPushButton(QIcon(":/back.png"), QString());
@@ -47,6 +49,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     hbox->addWidget(next);
 
     findCase = new QCheckBox(tr("Match case"));
+    connect(findCase, SIGNAL(stateChanged(int)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findCase);
 
     hbox->addStretch();
@@ -68,12 +71,22 @@ void ChatSearchBar::activate()
     findBox->setFocus();
 }
 
+void ChatSearchBar::findFinished(bool found)
+{
+    findBox->setProperty("failed", !found);
+}
+
 void ChatSearchBar::slotSearchBackward()
 {
     QTextDocument::FindFlags flags = QTextDocument::FindBackward;
     if (findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;
     emit find(findBox->text(), flags);
+}
+
+void ChatSearchBar::slotSearchChanged()
+{
+    findBox->setProperty("failed", false);
 }
 
 void ChatSearchBar::slotSearchForward()

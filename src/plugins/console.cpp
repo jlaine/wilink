@@ -132,6 +132,9 @@ void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags
     {
         browser->setTextCursor(found);
         browser->ensureCursorVisible();
+        searchBar->findFinished(true);
+    } else {
+        searchBar->findFinished(false);
     }
 }
 

@@ -125,6 +125,7 @@ public slots:
     void selectAll();
 
 signals:
+    void findFinished(bool found);
     void focused();
     void messageClicked(const ChatHistoryMessage &message);
 
