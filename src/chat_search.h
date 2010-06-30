@@ -48,6 +48,8 @@ private slots:
 private:
     QLineEdit *findBox;
     QCheckBox *findCase;
+    QPalette normalPalette;
+    QPalette failedPalette;
 };
 
 #endif

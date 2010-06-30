@@ -36,6 +36,9 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     hbox->addWidget(findIcon);
 
     findBox = new QLineEdit;
+    normalPalette = findBox->palette();
+    failedPalette = findBox->palette();
+    failedPalette.setColor(QPalette::Active, QPalette::Base, QColor(255, 0, 0, 127));
     connect(findBox, SIGNAL(returnPressed()), this, SLOT(slotSearchForward()));
     connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
     hbox->addWidget(findBox);
@@ -73,7 +76,10 @@ void ChatSearchBar::activate()
 
 void ChatSearchBar::findFinished(bool found)
 {
-    findBox->setProperty("failed", !found);
+    if (found)
+        findBox->setPalette(normalPalette);
+    else
+        findBox->setPalette(failedPalette);
 }
 
 void ChatSearchBar::slotSearchBackward()
@@ -86,7 +92,7 @@ void ChatSearchBar::slotSearchBackward()
 
 void ChatSearchBar::slotSearchChanged()
 {
-    findBox->setProperty("failed", false);
+    findBox->setPalette(normalPalette);
 }
 
 void ChatSearchBar::slotSearchForward()
