@@ -30,7 +30,7 @@
 
 ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     : ChatPanel(parent),
-    chatRemoteJid(jid), chatLocalState(QXmppMessage::None)
+    chatRemoteJid(jid), chatLocalState(QXmppMessage::None), spacerItem(0)
 {
     setObjectName(chatRemoteJid);
 
@@ -48,9 +48,11 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     filterDrops(chatHistory->viewport());
 
     /* spacer */
+#ifdef Q_OS_MAC
     spacerItem = new QSpacerItem(6, 6, QSizePolicy::Expanding, QSizePolicy::Fixed);
     spacerIndex = layout->count();
     layout->addSpacerItem(spacerItem);
+#endif
 
     /* search bar */
     chatSearch = new ChatSearchBar;
@@ -165,11 +167,13 @@ void ChatConversation::slotSend()
 
 void ChatConversation::slotSearchDisplayed(bool visible)
 {
+#ifdef Q_OS_MAC
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
         vbox->takeAt(spacerIndex);
     else
         vbox->insertSpacerItem(spacerIndex, spacerItem);
+#endif
 }
 
 void ChatConversation::slotTextChanged()
