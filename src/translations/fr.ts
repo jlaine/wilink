@@ -65,6 +65,10 @@
         <source>&amp;Edit</source>
         <translation>Éditio&amp;n</translation>
     </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fichier</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccounts</name>
@@ -333,7 +337,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Searching for &quot;%1&quot;</source>
-        <translation>Recherche de &quot;%1&quot;></translation>
+        <translation>Recherche de &quot;%1&quot;</translation>
     </message>
 </context>
 <context>

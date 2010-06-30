@@ -129,7 +129,7 @@ Chat::Chat(QWidget *parent)
     Q_ASSERT(wApp);
 
     /* create menu */
-    m_fileMenu = menuBar()->addMenu("&File");
+    m_fileMenu = menuBar()->addMenu(tr("&File"));
     m_optionsMenu = m_fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
 
     QAction *action = m_optionsMenu->addAction(tr("Chat accounts"));
