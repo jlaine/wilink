@@ -270,10 +270,24 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
  */
 QRectF ChatMessageWidget::selection() const
 {
-    // FIXME: this is not precise, we are returning the whole block.
-    QAbstractTextDocumentLayout *layout = bodyText->document()->documentLayout();
-    QRectF rect = layout->blockBoundingRect(bodyText->textCursor().block());
-    return bodyText->mapRectToScene(rect);
+    QTextCursor cursor = bodyText->textCursor();
+    const QTextLayout *layout = cursor.block().layout();
+
+    QRectF localRect;
+
+    const int startPos = cursor.anchor() - cursor.block().position();
+    QTextLine startLine = layout->lineForTextPosition(startPos);
+    QPointF topLeft = startLine.rect().topLeft();
+    topLeft.setX(topLeft.x() + startLine.cursorToX(startPos));
+    localRect.setTopLeft(topLeft);
+
+    const int endPos = cursor.position() - cursor.block().position();
+    QTextLine endLine = layout->lineForTextPosition(endPos);
+    QPointF bottomRight = endLine.rect().bottomLeft();
+    bottomRight.setX(bottomRight.x() + endLine.cursorToX(endPos));
+    localRect.setBottomRight(bottomRight);
+
+    return bodyText->mapRectToScene(localRect);
 }
 
 /** Set the text cursor to select the given rectangle.
