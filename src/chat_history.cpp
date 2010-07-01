@@ -263,11 +263,12 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 
 /** Return the rectangle for the current selection.
  */
-QRectF ChatMessageWidget::selection(const QTextCursor &cursor) const
+QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
 {
     const QTextLayout *layout = cursor.block().layout();
     qreal margin = bodyText->document()->documentMargin();
 
+    QList<QRectF> rectangles;
     QRectF localRect;
 
     const int startPos = cursor.anchor() - cursor.block().position();
@@ -284,7 +285,9 @@ QRectF ChatMessageWidget::selection(const QTextCursor &cursor) const
     bottomRight.setY(margin + bottomRight.y());
     localRect.setBottomRight(bottomRight);
 
-    return bodyText->mapRectToScene(localRect);
+    rectangles << bodyText->mapRectToScene(localRect);
+
+    return rectangles;
 }
 
 /** Set the text cursor to select the given rectangle.
@@ -646,19 +649,22 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         if (!found.isNull())
         {
             // build new glass
-            QRectF glassRect = child->selection(found);
-            glassRect.moveLeft(glassRect.left() - 4);
-            glassRect.moveTop(glassRect.top() - 4);
-            glassRect.setWidth(glassRect.width() + 8);
-            glassRect.setHeight(glassRect.height() + 8);
+            QRectF glassRect;
+            foreach (glassRect, child->selection(found))
+            {
+                glassRect.moveLeft(glassRect.left() - 4);
+                glassRect.moveTop(glassRect.top() - 4);
+                glassRect.setWidth(glassRect.width() + 8);
+                glassRect.setHeight(glassRect.height() + 8);
 
-            QGraphicsRectItem *glass = new QGraphicsRectItem(0, 0, 10, 10);
-            glass->setPen(QPen(QColor(255, 0, 0, 127)));
-            glass->setBrush(QBrush(QColor(255, 255, 0, 127)));
-            glass->setZValue(1);
-            glass->setRect(glassRect);
-            scene->addItem(glass);
-            glassItems << glass;
+                QGraphicsRectItem *glass = new QGraphicsRectItem(0, 0, 10, 10);
+                glass->setPen(QPen(QColor(255, 0, 0, 127)));
+                glass->setBrush(QBrush(QColor(255, 255, 0, 127)));
+                glass->setZValue(1);
+                glass->setRect(glassRect);
+                scene->addItem(glass);
+                glassItems << glass;
+            }
 
             ensureVisible(glassRect);
             lastFindCursor = found;

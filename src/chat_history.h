@@ -73,7 +73,7 @@ public:
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
     void setPrevious(ChatMessageWidget *previous);
-    QRectF selection(const QTextCursor &cursor) const;
+    QList<QRectF> selection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
     QTextCursor textCursor() const;
     void setTextCursor(const QTextCursor &cursor);
