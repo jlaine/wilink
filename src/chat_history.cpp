@@ -272,19 +272,22 @@ QRectF ChatMessageWidget::selection() const
 {
     QTextCursor cursor = bodyText->textCursor();
     const QTextLayout *layout = cursor.block().layout();
+    qreal margin = bodyText->document()->documentMargin();
 
     QRectF localRect;
 
     const int startPos = cursor.anchor() - cursor.block().position();
     QTextLine startLine = layout->lineForTextPosition(startPos);
     QPointF topLeft = startLine.rect().topLeft();
-    topLeft.setX(topLeft.x() + startLine.cursorToX(startPos));
+    topLeft.setX(margin + topLeft.x() + startLine.cursorToX(startPos));
+    topLeft.setY(margin + topLeft.y());
     localRect.setTopLeft(topLeft);
 
     const int endPos = cursor.position() - cursor.block().position();
     QTextLine endLine = layout->lineForTextPosition(endPos);
     QPointF bottomRight = endLine.rect().bottomLeft();
-    bottomRight.setX(bottomRight.x() + endLine.cursorToX(endPos));
+    bottomRight.setX(margin + bottomRight.x() + endLine.cursorToX(endPos));
+    bottomRight.setY(margin + bottomRight.y());
     localRect.setBottomRight(bottomRight);
 
     return bodyText->mapRectToScene(localRect);
