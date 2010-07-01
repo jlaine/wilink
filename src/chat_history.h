@@ -42,7 +42,7 @@ public:
     bool received;
 };
 
-class ChatSearchBubble : public QObject, public QGraphicsRectItem
+class ChatSearchBubble : public QObject, public QGraphicsPathItem
 {
     Q_OBJECT
     Q_PROPERTY(int margin READ margin WRITE setMargin)

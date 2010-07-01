@@ -622,7 +622,7 @@ ChatSearchBubble *ChatHistory::addSearchBubble(const QRectF &selection)
  */
 void ChatHistory::clearSearchBubbles()
 {
-    foreach (QGraphicsRectItem *item, glassItems)
+    foreach (ChatSearchBubble *item, glassItems)
     {
         scene->removeItem(item);
         delete item;
@@ -701,9 +701,9 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             {
                 ChatSearchBubble *glass = addSearchBubble(textRect);
                 if (boundingRect.isEmpty())
-                    boundingRect = glass->rect();
+                    boundingRect = glass->boundingRect();
                 else
-                    boundingRect = boundingRect.united(glass->rect());
+                    boundingRect = boundingRect.united(glass->boundingRect());
             }
             ensureVisible(boundingRect);
 
@@ -825,8 +825,17 @@ ChatHistoryMessage::ChatHistoryMessage()
 ChatSearchBubble::ChatSearchBubble()
     : m_margin(4)
 {
-    setPen(QPen(QColor(255, 0, 0, 159)));
-    setBrush(QBrush(QColor(255, 255, 0, 95)));
+    QPen pen(QColor(63, 63, 63, 95));
+    //pen.setWidth(2);
+    setPen(pen);
+
+    QLinearGradient gradient(QPointF(0, 0), QPointF(0, 1));
+    gradient.setColorAt(0, QColor(255, 255, 0, 95));
+    gradient.setColorAt(1, QColor(228, 212, 0, 95));
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setSpread(QGradient::PadSpread);
+    setBrush(gradient);
+
     setZValue(1);
 }
 
@@ -851,6 +860,9 @@ void ChatSearchBubble::setSelection(const QRectF &selection)
     glassRect.setY(m_selection.y() - m_margin);
     glassRect.setWidth(m_selection.width() + 2 * m_margin);
     glassRect.setHeight(m_selection.height() + 2 * m_margin);
-    setRect(glassRect);
+
+    QPainterPath path;
+    path.addRoundedRect(glassRect, m_margin, m_margin);
+    setPath(path);
 }
 
