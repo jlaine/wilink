@@ -160,6 +160,9 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
+    ChatSearchBubble *addSearchBubble(const QRectF &selection);
+    void clearSearchBubbles();
+
     QGraphicsScene *scene;
 
     QList<ChatSearchBubble*> glassItems;

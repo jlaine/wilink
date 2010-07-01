@@ -597,6 +597,39 @@ QString ChatHistory::copyText()
 #endif
 }
 
+/** Add a search bubble.
+ */
+ChatSearchBubble *ChatHistory::addSearchBubble(const QRectF &selection)
+{
+    ChatSearchBubble *glass = new ChatSearchBubble;
+    glass->setSelection(selection);
+
+    QPropertyAnimation *animation = new QPropertyAnimation(glass, "margin");
+    animation->setDuration(300);
+    animation->setStartValue(glass->margin());
+    animation->setKeyValueAt(0.5, glass->margin() * 3);
+    animation->setEndValue(glass->margin());
+    animation->setEasingCurve(QEasingCurve::InOutQuad);
+    animation->start();
+
+    scene->addItem(glass);
+    glassItems << glass;
+
+    return glass;
+}
+
+/** Clear all the search bubbles.
+ */
+void ChatHistory::clearSearchBubbles()
+{
+    foreach (QGraphicsRectItem *item, glassItems)
+    {
+        scene->removeItem(item);
+        delete item;
+    }
+    glassItems.clear();
+}
+
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu;
@@ -623,6 +656,9 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
  */
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
 {
+    // clear search bubbles
+    clearSearchBubbles();
+
     // retrieve previous cursor
     int startIndex = -1;
     if (lastFindWidget)
@@ -642,14 +678,6 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         lastFindCursor = QTextCursor();
         startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
     }
-
-    // hide old glass
-    foreach (QGraphicsRectItem *item, glassItems)
-    {
-        scene->removeItem(item);
-        delete item;
-    }
-    glassItems.clear();
 
     // handle empty search
     if (needle.isEmpty() || !layout->count())
@@ -671,24 +699,11 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             QRectF boundingRect;
             foreach (const QRectF &textRect, child->selection(found))
             {
-                ChatSearchBubble *glass = new ChatSearchBubble;
-                glass->setSelection(textRect);
-
+                ChatSearchBubble *glass = addSearchBubble(textRect);
                 if (boundingRect.isEmpty())
                     boundingRect = glass->rect();
                 else
                     boundingRect = boundingRect.united(glass->rect());
-
-                QPropertyAnimation *animation = new QPropertyAnimation(glass, "margin");
-                animation->setDuration(300);
-                animation->setStartValue(glass->margin());
-                animation->setKeyValueAt(0.5, glass->margin() * 3);
-                animation->setEndValue(glass->margin());
-                animation->setEasingCurve(QEasingCurve::InOutQuad);
-                animation->start();
-
-                scene->addItem(glass);
-                glassItems << glass;
             }
             ensureVisible(boundingRect);
 
@@ -743,6 +758,10 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
 
+    // clear search bubbles
+    clearSearchBubbles();
+
+    // resize widgets
     const qreal w = availableWidth();
     for (int i = 0; i < layout->count(); i++)
     {
@@ -752,7 +771,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     adjustSize();
     QGraphicsView::resizeEvent(e);
 
-    /* scroll to end if we were previous at end */
+    // scroll to end if we were previous at end
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
