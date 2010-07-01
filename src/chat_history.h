@@ -146,6 +146,7 @@ protected:
 private:
     QGraphicsScene *scene;
 
+    QList<QGraphicsRectItem*> glassItems;
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
     ChatMessageWidget *lastFind;

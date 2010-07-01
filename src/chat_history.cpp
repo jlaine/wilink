@@ -640,6 +640,29 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         if (!found.isNull())
         {
             child->setTextCursor(found);
+
+            // hide old glass
+            foreach (QGraphicsRectItem *item, glassItems)
+            {
+                scene->removeItem(item);
+                delete item;
+            }
+            glassItems.clear();
+
+            QRectF glassRect = child->selection();
+            glassRect.moveLeft(glassRect.left() - 4);
+            glassRect.moveTop(glassRect.top() - 4);
+            glassRect.setWidth(glassRect.width() + 8);
+            glassRect.setHeight(glassRect.height() + 8);
+
+            QGraphicsRectItem *glass = new QGraphicsRectItem(0, 0, 10, 10);
+            glass->setPen(QPen(QColor(255, 0, 0, 127)));
+            glass->setBrush(QBrush(QColor(255, 255, 0, 127)));
+            glass->setZValue(1);
+            glass->setRect(glassRect);
+            scene->addItem(glass);
+            glassItems << glass;
+
             ensureVisible(child->selection());
             lastFind = child;
             emit findFinished(true);
