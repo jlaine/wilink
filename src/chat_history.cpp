@@ -266,28 +266,48 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
 {
     const QTextLayout *layout = cursor.block().layout();
-    qreal margin = bodyText->document()->documentMargin();
 
     QList<QRectF> rectangles;
-    QRectF localRect;
 
     const int startPos = cursor.anchor() - cursor.block().position();
-    QTextLine startLine = layout->lineForTextPosition(startPos);
-    QPointF topLeft = startLine.rect().topLeft();
-    topLeft.setX(margin + topLeft.x() + startLine.cursorToX(startPos));
-    topLeft.setY(margin + topLeft.y());
-    localRect.setTopLeft(topLeft);
-
     const int endPos = cursor.position() - cursor.block().position();
-    QTextLine endLine = layout->lineForTextPosition(endPos);
-    QPointF bottomRight = endLine.rect().bottomLeft();
-    bottomRight.setX(margin + bottomRight.x() + endLine.cursorToX(endPos));
-    bottomRight.setY(margin + bottomRight.y());
-    localRect.setBottomRight(bottomRight);
+    for (int i = 0; i < layout->lineCount(); ++i)
+    {
+        QTextLine line = layout->lineAt(i);
+        const int lineEnd = line.textStart() + line.textLength();
+        if (lineEnd <= startPos)
+            continue;
 
-    rectangles << bodyText->mapRectToScene(localRect);
+        QRectF localRect = line.rect();
+        if (!rectangles.size())
+        {
+            QPointF topLeft = line.rect().topLeft();
+            topLeft.setX(topLeft.x() + line.cursorToX(startPos));
+            localRect.setTopLeft(topLeft);
+        }
+        if (lineEnd > endPos)
+        {
+            QPointF bottomRight = line.rect().bottomLeft();
+            bottomRight.setX(bottomRight.x() + line.cursorToX(endPos));
+            localRect.setBottomRight(bottomRight);
+        }
+        rectangles << localRect;
 
-    return rectangles;
+        if (lineEnd > endPos)
+            break;
+    }
+
+    // map to scene coordinates
+    const qreal margin = bodyText->document()->documentMargin();
+    QList<QRectF> output;
+    QRectF rect;
+    foreach (rect, rectangles)
+    {
+        rect.moveLeft(rect.left() + margin);
+        rect.moveTop(rect.top() + margin);
+        output << bodyText->mapRectToScene(rect);
+    }
+    return output;
 }
 
 /** Set the text cursor to select the given rectangle.
