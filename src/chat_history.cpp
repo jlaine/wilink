@@ -825,8 +825,8 @@ ChatHistoryMessage::ChatHistoryMessage()
 ChatSearchBubble::ChatSearchBubble()
     : m_margin(4)
 {
-    setPen(QPen(QColor(255, 0, 0, 127)));
-    setBrush(QBrush(QColor(255, 255, 0, 127)));
+    setPen(QPen(QColor(255, 0, 0, 159)));
+    setBrush(QBrush(QColor(255, 255, 0, 95)));
     setZValue(1);
 }
 
