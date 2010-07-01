@@ -116,7 +116,7 @@ void UpdatesDialog::updateDownloaded(const QUrl &url)
 
     // we cannot use QProcess::startDetached() because NSIS wants the
     // /D=.. argument to be absolutely unescaped.
-    QString args = QString("\"%1\" /D=%2")
+    QString args = QString("\"%1\" /S /D=%2")
         .arg(url.toLocalFile().replace(QLatin1Char('/'), QLatin1Char('\\')))
         .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
 

@@ -119,9 +119,10 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
  */
 void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
+    // handle empty search
     if (needle.isEmpty())
     {
-        emit findFinished(false);
+        emit findFinished(true);
         return;
     }
 
