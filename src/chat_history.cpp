@@ -808,7 +808,7 @@ ChatSearchBubble::ChatSearchBubble()
 {
     setPen(QPen(QColor(255, 0, 0, 127)));
     setBrush(QBrush(QColor(255, 255, 0, 127)));
-    setZValue(-1);
+    setZValue(1);
 }
 
 int ChatSearchBubble::margin() const
