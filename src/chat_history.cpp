@@ -176,16 +176,6 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
-QTextCursor ChatMessageWidget::find(const QString &needle, const QTextCursor &cursor, QTextDocument::FindFlags flags)
-{
-    QTextCursor start(bodyText->document());
-    if (!cursor.isNull())
-        start = cursor;
-    else if (flags && QTextDocument::FindBackward)
-        start.movePosition(QTextCursor::End);
-    return bodyText->document()->find(needle, start, flags);
-}
-
 ChatHistoryMessage ChatMessageWidget::message() const
 {
     return msg;
@@ -421,6 +411,11 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 void ChatMessageWidget::slotTextClicked()
 {
     emit messageClicked(msg);
+}
+
+QTextDocument *ChatMessageWidget::document() const
+{
+    return bodyText->document();
 }
 
 QTextCursor ChatMessageWidget::textCursor() const
@@ -659,8 +654,16 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
     // clear search bubbles
     clearSearchBubbles();
 
+    // handle empty search
+    if (needle.isEmpty())
+    {
+        emit findFinished(false);
+        return;
+    }
+
     // retrieve previous cursor
-    int startIndex = -1;
+    QTextCursor cursor;
+    int startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
     if (lastFindWidget)
     {
         for (int i = 0; i < layout->count(); ++i)
@@ -668,22 +671,10 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             if (layout->itemAt(i) == lastFindWidget)
             {
                 startIndex = i;
+                cursor = lastFindCursor;
                 break;
             }
         }
-    }
-    lastFindWidget = 0;
-    if (startIndex < 0)
-    {
-        lastFindCursor = QTextCursor();
-        startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
-    }
-
-    // handle empty search
-    if (needle.isEmpty() || !layout->count())
-    {
-        emit findFinished(false);
-        return;
     }
 
     // perform search
@@ -692,12 +683,21 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
     while (i >= 0 && i < layout->count())
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        QTextCursor found = child->find(needle, lastFindCursor, flags);
-        if (!found.isNull())
+
+        // position cursor
+        if (cursor.isNull())
+        {
+            cursor = QTextCursor(child->document());
+            if (flags && QTextDocument::FindBackward)
+                cursor.movePosition(QTextCursor::End);
+        }
+
+        cursor = child->document()->find(needle, cursor, flags);
+        if (!cursor.isNull())
         {
             // build new glass
             QRectF boundingRect;
-            foreach (const QRectF &textRect, child->selection(found))
+            foreach (const QRectF &textRect, child->selection(cursor))
             {
                 ChatSearchBubble *glass = addSearchBubble(textRect);
                 if (boundingRect.isEmpty())
@@ -707,12 +707,11 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             }
             ensureVisible(boundingRect);
 
-            lastFindCursor = found;
+            lastFindCursor = cursor;
             lastFindWidget = child;
             emit findFinished(true);
             return;
         } else {
-            lastFindCursor = QTextCursor();
             if (looped)
                 break;
             if (flags && QTextDocument::FindBackward) {
@@ -726,6 +725,9 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
                 looped = true;
         }
     }
+
+    lastFindWidget = 0;
+    lastFindCursor = QTextCursor();
     emit findFinished(false);
 }
 

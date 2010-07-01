@@ -82,7 +82,6 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
-    QTextCursor find(const QString &needle, const QTextCursor &cursor, QTextDocument::FindFlags flags);
     ChatHistoryMessage message() const;
 
     void setGeometry(const QRectF &rect);
@@ -91,6 +90,7 @@ public:
     void setPrevious(ChatMessageWidget *previous);
     QList<QRectF> selection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
+    QTextDocument *document() const;
     QTextCursor textCursor() const;
     void setTextCursor(const QTextCursor &cursor);
 
