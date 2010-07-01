@@ -268,9 +268,8 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 
 /** Return the rectangle for the current selection.
  */
-QRectF ChatMessageWidget::selection() const
+QRectF ChatMessageWidget::selection(const QTextCursor &cursor) const
 {
-    QTextCursor cursor = bodyText->textCursor();
     const QTextLayout *layout = cursor.block().layout();
     qreal margin = bodyText->document()->documentMargin();
 
@@ -418,7 +417,7 @@ void ChatMessageWidget::setTextCursor(const QTextCursor &cursor)
 }
 
 ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent), lastFind(0)
+    : QGraphicsView(parent), lastFindWidget(0)
 {
     scene = new QGraphicsScene;
     setScene(scene);
@@ -615,20 +614,23 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
 
     // retrieve previous cursor
     int startIndex = -1;
-    if (lastFind)
+    if (lastFindWidget)
     {
         for (int i = 0; i < layout->count(); ++i)
         {
-            if (layout->itemAt(i) == lastFind)
+            if (layout->itemAt(i) == lastFindWidget)
             {
                 startIndex = i;
                 break;
             }
         }
     }
-    lastFind = 0;
+    lastFindWidget = 0;
     if (startIndex < 0)
+    {
+        lastFindCursor = QTextCursor();
         startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
+    }
     
     // perform search
     bool looped = false;
@@ -636,11 +638,9 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
     while (i >= 0 && i < layout->count())
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
-        QTextCursor found = child->find(needle, child->textCursor(), flags);
+        QTextCursor found = child->find(needle, lastFindCursor, flags);
         if (!found.isNull())
         {
-            child->setTextCursor(found);
-
             // hide old glass
             foreach (QGraphicsRectItem *item, glassItems)
             {
@@ -649,7 +649,8 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             }
             glassItems.clear();
 
-            QRectF glassRect = child->selection();
+            // build new glass
+            QRectF glassRect = child->selection(found);
             glassRect.moveLeft(glassRect.left() - 4);
             glassRect.moveTop(glassRect.top() - 4);
             glassRect.setWidth(glassRect.width() + 8);
@@ -663,12 +664,13 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
             scene->addItem(glass);
             glassItems << glass;
 
-            ensureVisible(child->selection());
-            lastFind = child;
+            ensureVisible(glassRect);
+            lastFindCursor = found;
+            lastFindWidget = child;
             emit findFinished(true);
             return;
         } else {
-            child->setTextCursor(QTextCursor());
+            lastFindCursor = QTextCursor();
             if (looped)
                 break;
             if (flags && QTextDocument::FindBackward) {

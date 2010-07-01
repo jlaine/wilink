@@ -23,6 +23,7 @@
 #include <QDateTime>
 #include <QGraphicsView>
 #include <QGraphicsWidget>
+#include <QTextCursor>
 #include <QTextDocument>
 
 class QGraphicsLinearLayout;
@@ -73,7 +74,7 @@ public:
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
     void setPrevious(ChatMessageWidget *previous);
-    QRectF selection() const;
+    QRectF selection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
     void setShowDate(bool show);
     bool showFooter();
@@ -149,7 +150,8 @@ private:
     QList<QGraphicsRectItem*> glassItems;
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
-    ChatMessageWidget *lastFind;
+    ChatMessageWidget *lastFindWidget;
+    QTextCursor lastFindCursor;
     QList<ChatMessageWidget*> lastSelection;
     QString lastText;
 };
