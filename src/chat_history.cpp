@@ -303,8 +303,7 @@ QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
  */
 void ChatMessageWidget::setSelection(const QRectF &rect)
 {
-    QRectF localRect = bodyText->mapRectFromScene(rect);
-    localRect = bodyText->boundingRect().intersected(localRect);
+    QRectF localRect = bodyText->boundingRect().intersected(bodyText->mapRectFromScene(rect));
 
     // determine selected text
     QAbstractTextDocumentLayout *layout = bodyText->document()->documentLayout();
@@ -434,7 +433,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     scene = new QGraphicsScene;
     setScene(scene);
     setDragMode(QGraphicsView::RubberBandDrag);
-    setRubberBandSelectionMode(Qt::IntersectsItemShape);
+    setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     //setRenderHints(QPainter::Antialiasing);
