@@ -28,6 +28,7 @@
 #include <QGraphicsLinearLayout>
 #include <QGraphicsSceneHoverEvent>
 #include <QMenu>
+#include <QPropertyAnimation>
 #include <QScrollBar>
 #include <QShortcut>
 #include <QTextBlock>
@@ -668,25 +669,29 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         {
             // build new glass
             QRectF boundingRect;
-            QRectF glassRect;
-            foreach (glassRect, child->selection(found))
+            foreach (const QRectF &textRect, child->selection(found))
             {
-                glassRect.moveLeft(glassRect.left() - 4);
-                glassRect.moveTop(glassRect.top() - 4);
-                glassRect.setWidth(glassRect.width() + 8);
-                glassRect.setHeight(glassRect.height() + 8);
-                if (boundingRect.isEmpty())
-                    boundingRect = glassRect;
-                else
-                    boundingRect = boundingRect.united(glassRect);
+                ChatSearchBubble *glass = new ChatSearchBubble;
+                glass->setSelection(textRect);
 
-                QGraphicsRectItem *glass = new ChatSearchBubble;
-                glass->setZValue(1);
-                glass->setRect(glassRect);
+                if (boundingRect.isEmpty())
+                    boundingRect = glass->rect();
+                else
+                    boundingRect = boundingRect.united(glass->rect());
+
+                QPropertyAnimation *animation = new QPropertyAnimation(glass, "margin");
+                animation->setDuration(300);
+                animation->setStartValue(glass->margin());
+                animation->setKeyValueAt(0.5, glass->margin() * 3);
+                animation->setEndValue(glass->margin());
+                animation->setEasingCurve(QEasingCurve::InOutQuad);
+                animation->start();
+
                 scene->addItem(glass);
                 glassItems << glass;
             }
             ensureVisible(boundingRect);
+
             lastFindCursor = found;
             lastFindWidget = child;
             emit findFinished(true);
@@ -799,9 +804,34 @@ ChatHistoryMessage::ChatHistoryMessage()
 }
 
 ChatSearchBubble::ChatSearchBubble()
+    : m_margin(4)
 {
     setPen(QPen(QColor(255, 0, 0, 127)));
     setBrush(QBrush(QColor(255, 255, 0, 127)));
-    setZValue(1);
+    setZValue(-1);
+}
+
+int ChatSearchBubble::margin() const
+{
+    return m_margin;
+}
+
+void ChatSearchBubble::setMargin(int margin)
+{
+    m_margin = margin;
+
+    setSelection(m_selection);
+}
+
+void ChatSearchBubble::setSelection(const QRectF &selection)
+{
+    m_selection = selection;
+
+    QRectF glassRect;
+    glassRect.setX(m_selection.x() - m_margin);
+    glassRect.setY(m_selection.y() - m_margin);
+    glassRect.setWidth(m_selection.width() + 2 * m_margin);
+    glassRect.setHeight(m_selection.height() + 2 * m_margin);
+    setRect(glassRect);
 }
 

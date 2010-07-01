@@ -45,10 +45,17 @@ public:
 class ChatSearchBubble : public QObject, public QGraphicsRectItem
 {
     Q_OBJECT
-    Q_PROPERTY(QRectF rect READ rect WRITE setRect)
+    Q_PROPERTY(int margin READ margin WRITE setMargin)
  
 public:
     ChatSearchBubble();
+    int margin() const;
+    void setMargin(int margin);
+    void setSelection(const QRectF &selection);
+
+private:
+    int m_margin;
+    QRectF m_selection;
 };
  
 class ChatTextItem : public QGraphicsTextItem
@@ -155,7 +162,7 @@ protected:
 private:
     QGraphicsScene *scene;
 
-    QList<QGraphicsRectItem*> glassItems;
+    QList<ChatSearchBubble*> glassItems;
     QGraphicsWidget *obj;
     QGraphicsLinearLayout *layout;
     ChatMessageWidget *lastFindWidget;
