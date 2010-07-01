@@ -42,6 +42,15 @@ public:
     bool received;
 };
 
+class ChatSearchBubble : public QObject, public QGraphicsRectItem
+{
+    Q_OBJECT
+    Q_PROPERTY(QRectF rect READ rect WRITE setRect)
+ 
+public:
+    ChatSearchBubble();
+};
+ 
 class ChatTextItem : public QGraphicsTextItem
 {
     Q_OBJECT

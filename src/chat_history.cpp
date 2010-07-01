@@ -299,9 +299,7 @@ QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
         localRect.setBottomRight(bottomRight);
 
         // map to scene coordinates
-        localRect.moveLeft(localRect.left() + margin);
-        localRect.moveTop(localRect.top() + margin);
-        rectangles << bodyText->mapRectToScene(localRect);
+        rectangles << bodyText->mapRectToScene(localRect.translated(margin, margin));
 
         if (lineEnd > endPos)
             break;
@@ -669,6 +667,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         if (!found.isNull())
         {
             // build new glass
+            QRectF boundingRect;
             QRectF glassRect;
             foreach (glassRect, child->selection(found))
             {
@@ -676,17 +675,18 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
                 glassRect.moveTop(glassRect.top() - 4);
                 glassRect.setWidth(glassRect.width() + 8);
                 glassRect.setHeight(glassRect.height() + 8);
+                if (boundingRect.isEmpty())
+                    boundingRect = glassRect;
+                else
+                    boundingRect = boundingRect.united(glassRect);
 
-                QGraphicsRectItem *glass = new QGraphicsRectItem(0, 0, 10, 10);
-                glass->setPen(QPen(QColor(255, 0, 0, 127)));
-                glass->setBrush(QBrush(QColor(255, 255, 0, 127)));
+                QGraphicsRectItem *glass = new ChatSearchBubble;
                 glass->setZValue(1);
                 glass->setRect(glassRect);
                 scene->addItem(glass);
                 glassItems << glass;
             }
-
-            ensureVisible(glassRect);
+            ensureVisible(boundingRect);
             lastFindCursor = found;
             lastFindWidget = child;
             emit findFinished(true);
@@ -797,3 +797,11 @@ ChatHistoryMessage::ChatHistoryMessage()
     : archived(false), received(true)
 {
 }
+
+ChatSearchBubble::ChatSearchBubble()
+{
+    setPen(QPen(QColor(255, 0, 0, 127)));
+    setBrush(QBrush(QColor(255, 255, 0, 127)));
+    setZValue(1);
+}
+
