@@ -75,10 +75,6 @@ public:
     void setPrevious(ChatMessageWidget *previous);
     QRectF selection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
-    void setShowDate(bool show);
-    bool showFooter();
-    void setShowFooter(bool show);
-    void setShowSender(bool show);
     QTextCursor textCursor() const;
     void setTextCursor(const QTextCursor &cursor);
 
@@ -92,6 +88,10 @@ private slots:
 private:
     QPainterPath bodyPath(qreal width, qreal height, bool close);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
+    void setShowDate(bool show);
+    bool showFooter();
+    void setShowFooter(bool show);
+    void setShowSender(bool show);
 
     int maxWidth;
     ChatHistoryMessage msg;
