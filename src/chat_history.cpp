@@ -190,11 +190,6 @@ ChatHistoryMessage ChatMessageWidget::message() const
     return msg;
 }
 
-QString ChatMessageWidget::selectedText() const
-{
-    return bodyText->textCursor().selectedText();
-}
-
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 {
     QGraphicsWidget::setGeometry(baseRect);
@@ -569,7 +564,7 @@ QString ChatHistory::copyText()
             if (senders.size() > 1)
                 copyText += message.from + "> ";
 
-            copyText += child->selectedText().replace("\r\n", "\n");
+            copyText += child->textCursor().selectedText().replace("\r\n", "\n");
         }
     }
 
@@ -606,12 +601,6 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
  */
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
 {
-    if (needle.isEmpty() || !layout->count())
-    {
-        emit findFinished(false);
-        return;
-    }
-
     // retrieve previous cursor
     int startIndex = -1;
     if (lastFindWidget)
@@ -631,7 +620,22 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         lastFindCursor = QTextCursor();
         startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
     }
-    
+
+    // hide old glass
+    foreach (QGraphicsRectItem *item, glassItems)
+    {
+        scene->removeItem(item);
+        delete item;
+    }
+    glassItems.clear();
+
+    // handle empty search
+    if (needle.isEmpty() || !layout->count())
+    {
+        emit findFinished(false);
+        return;
+    }
+
     // perform search
     bool looped = false;
     int i = startIndex;
@@ -641,14 +645,6 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
         QTextCursor found = child->find(needle, lastFindCursor, flags);
         if (!found.isNull())
         {
-            // hide old glass
-            foreach (QGraphicsRectItem *item, glassItems)
-            {
-                scene->removeItem(item);
-                delete item;
-            }
-            glassItems.clear();
-
             // build new glass
             QRectF glassRect = child->selection(found);
             glassRect.moveLeft(glassRect.left() - 4);

@@ -69,7 +69,6 @@ public:
     QTextCursor find(const QString &needle, const QTextCursor &cursor, QTextDocument::FindFlags flags);
     ChatHistoryMessage message() const;
 
-    QString selectedText() const;
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
