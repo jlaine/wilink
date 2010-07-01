@@ -45,7 +45,7 @@ signals:
     void findFinished(bool found);
 
 private slots:
-    void slotFind(const QString &needle, QTextDocument::FindFlags flags);
+    void slotFind(const QString &needle, QTextDocument::FindFlags flags, bool changed);
     void slotStart();
     void slotStop();
     void message(QXmppLogger::MessageType type, const QString &msg);

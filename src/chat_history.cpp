@@ -648,8 +648,9 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
  *
  * @param needle
  * @param flags
+ * @param changed
  */
-void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
+void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
     // clear search bubbles
     clearSearchBubbles();
@@ -664,7 +665,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags)
     // retrieve previous cursor
     QTextCursor cursor;
     int startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
-    if (lastFindWidget)
+    if (!changed && lastFindWidget)
     {
         for (int i = 0; i < layout->count(); ++i)
         {

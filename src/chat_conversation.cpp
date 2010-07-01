@@ -62,8 +62,8 @@ ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
     chatSearch->hide();
     connect(chatSearch, SIGNAL(displayed(bool)),
         this, SLOT(slotSearchDisplayed(bool)));
-    connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags)),
-        chatHistory, SLOT(find(QString, QTextDocument::FindFlags)));
+    connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
+        chatHistory, SLOT(find(QString, QTextDocument::FindFlags, bool)));
     connect(chatHistory, SIGNAL(findFinished(bool)),
         chatSearch, SLOT(findFinished(bool)));
     layout->addWidget(chatSearch);

@@ -131,7 +131,7 @@ void ChatSearchBar::findNext()
     QTextDocument::FindFlags flags;
     if (findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;
-    emit find(findBox->text(), flags);
+    emit find(findBox->text(), flags, false);
 }
 
 void ChatSearchBar::findPrevious()
@@ -139,11 +139,16 @@ void ChatSearchBar::findPrevious()
     QTextDocument::FindFlags flags = QTextDocument::FindBackward;
     if (findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;
-    emit find(findBox->text(), flags);
+    emit find(findBox->text(), flags, false);
 }
 
 void ChatSearchBar::slotSearchChanged()
 {
     findBox->setPalette(normalPalette);
+
+    QTextDocument::FindFlags flags;
+    if (findCase->checkState() == Qt::Checked)
+        flags |= QTextDocument::FindCaseSensitively;
+    emit find(findBox->text(), flags, true);
 }
 

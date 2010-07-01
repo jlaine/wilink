@@ -137,7 +137,7 @@ public:
 public slots:
     void clear();
     void copy();
-    void find(const QString &needle, QTextDocument::FindFlags flags);
+    void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
     void selectAll();
 
 signals:
