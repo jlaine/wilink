@@ -658,7 +658,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
     // handle empty search
     if (needle.isEmpty())
     {
-        emit findFinished(false);
+        emit findFinished(true);
         return;
     }
 
