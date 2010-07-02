@@ -109,7 +109,7 @@ void UpdatesDialog::checkFinished(const Release &release)
 void UpdatesDialog::updateDownloaded(const QUrl &url)
 {
     statusLabel->setText(tr("Installing update.."));
-#if 0
+#ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());
     installDir.cdUp();
@@ -134,17 +134,15 @@ void UpdatesDialog::updateDownloaded(const QUrl &url)
     if (success) {
         CloseHandle(pinfo.hThread);
         CloseHandle(pinfo.hProcess);
-    } else {
-        QMessageBox::warning(this,
-            tr("Installation failed"),
-            tr("Could not install the new version, please try again later."));
-        hide();
+
+        // quit application to allow installation
+        qApp->quit();
         return;
     }
-#else
+#endif
     // open the downloaded archive
     QDesktopServices::openUrl(url);
-#endif
+
     // quit application to allow installation
     qApp->quit();
 }

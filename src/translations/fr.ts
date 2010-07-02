@@ -618,11 +618,11 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Installation failed</source>
-        <translation>Echec de l&apos;installation</translation>
+        <translation type="obsolete">Echec de l&apos;installation</translation>
     </message>
     <message>
         <source>Could not install the new version, please try again later.</source>
-        <translation>L&apos;installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
+        <translation type="obsolete">L&apos;installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
     <message>
         <source>Checking for updates..</source>
