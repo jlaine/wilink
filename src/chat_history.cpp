@@ -602,18 +602,6 @@ QString ChatHistory::copyText()
 #endif
 }
 
-/** Clear all the search bubbles.
- */
-void ChatHistory::clearSearchBubbles()
-{
-    foreach (ChatSearchBubble *item, glassItems)
-    {
-        scene->removeItem(item);
-        delete item;
-    }
-    glassItems.clear();
-}
-
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu;
@@ -642,7 +630,7 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
     // clear search bubbles
-    clearSearchBubbles();
+    findClear();
 
     // handle empty search
     if (needle.isEmpty())
@@ -726,6 +714,18 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
     emit findFinished(false);
 }
 
+/** Clear all the search bubbles.
+ */
+void ChatHistory::findClear()
+{
+    foreach (ChatSearchBubble *item, glassItems)
+    {
+        scene->removeItem(item);
+        delete item;
+    }
+    glassItems.clear();
+}
+
 void ChatHistory::focusInEvent(QFocusEvent *e)
 {
     QGraphicsView::focusInEvent(e);
@@ -756,7 +756,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
 
     // clear search bubbles
-    clearSearchBubbles();
+    findClear();
 
     // resize widgets
     const qreal w = availableWidth();

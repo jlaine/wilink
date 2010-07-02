@@ -143,6 +143,7 @@ public slots:
     void clear();
     void copy();
     void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
+    void findClear();
     void selectAll();
 
 signals:
@@ -165,8 +166,6 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    void clearSearchBubbles();
-
     QGraphicsScene *scene;
 
     QList<ChatSearchBubble*> glassItems;
