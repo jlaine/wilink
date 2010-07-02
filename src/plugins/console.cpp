@@ -126,23 +126,25 @@ void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags
         return;
     }
 
-    QTextCursor start(browser->document());
-    if (flags && QTextDocument::FindBackward)
-        start.movePosition(QTextCursor::End);
-
-    QTextCursor found;
+    // position cursor and perform search
+    QTextCursor cursor = browser->textCursor();
     if (changed)
-        found = browser->document()->find(needle, start, flags);
-    else
+        cursor.setPosition(cursor.anchor());
+    cursor = browser->document()->find(needle, cursor, flags);
+
+    // if search fails, retry from start of document
+    if (cursor.isNull())
     {
-        found = browser->document()->find(needle, browser->textCursor(), flags);
-        // if search fails, retry from start of document
-        if (found.isNull())
-            found = browser->document()->find(needle, start, flags);
+        QTextCursor start(browser->document());
+        if (flags && QTextDocument::FindBackward)
+            start.movePosition(QTextCursor::End);
+        cursor = browser->document()->find(needle, start, flags);
     }
-    if (!found.isNull())
+
+    // process results
+    if (!cursor.isNull())
     {
-        browser->setTextCursor(found);
+        browser->setTextCursor(cursor);
         browser->ensureCursorVisible();
         emit findFinished(true);
     } else {
