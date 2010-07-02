@@ -254,9 +254,9 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 
 /** Return the rectangle for the current selection.
  */
-QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
+QList<RectCursor> ChatMessageWidget::selection(const QTextCursor &cursor) const
 {
-    QList<QRectF> rectangles;
+    QList<RectCursor> rectangles;
 
     const QTextLayout *layout = cursor.block().layout();
     const qreal margin = bodyText->document()->documentMargin();
@@ -272,6 +272,7 @@ QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
             continue;
 
         QRectF localRect = line.rect();
+        QTextCursor localCursor = cursor;
 
         // position left edge
         if (line.textStart() < startPos)
@@ -279,18 +280,22 @@ QList<QRectF> ChatMessageWidget::selection(const QTextCursor &cursor) const
             QPointF topLeft = line.rect().topLeft();
             topLeft.setX(topLeft.x() + line.cursorToX(startPos));
             localRect.setTopLeft(topLeft);
+        } else {
+            localCursor.movePosition(QTextCursor::StartOfLine);
         }
 
         // position right edge
         QPointF bottomRight = line.rect().bottomLeft();
         if (lineEnd > endPos)
             bottomRight.setX(bottomRight.x() + line.cursorToX(endPos));
-        else
+        else {
             bottomRight.setX(bottomRight.x() + line.cursorToX(lineEnd));
+            localCursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+        }
         localRect.setBottomRight(bottomRight);
 
         // map to scene coordinates
-        rectangles << bodyText->mapRectToScene(localRect.translated(margin, margin));
+        rectangles << qMakePair(bodyText->mapRectToScene(localRect.translated(margin, margin)), localCursor);
 
         if (lineEnd > endPos)
             break;
@@ -591,27 +596,6 @@ QString ChatHistory::copyText()
 #endif
 }
 
-/** Add a search bubble.
- */
-ChatSearchBubble *ChatHistory::addSearchBubble(const QRectF &selection)
-{
-    ChatSearchBubble *glass = new ChatSearchBubble;
-    glass->setSelection(selection);
-
-    QPropertyAnimation *animation = new QPropertyAnimation(glass, "margin");
-    animation->setDuration(300);
-    animation->setStartValue(glass->margin());
-    animation->setKeyValueAt(0.5, glass->margin() * 3);
-    animation->setEndValue(glass->margin());
-    animation->setEasingCurve(QEasingCurve::InOutQuad);
-    animation->start();
-
-    scene->addItem(glass);
-    glassItems << glass;
-
-    return glass;
-}
-
 /** Clear all the search bubbles.
  */
 void ChatHistory::clearSearchBubbles()
@@ -697,9 +681,14 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
         {
             // build new glass
             QRectF boundingRect;
-            foreach (const QRectF &textRect, child->selection(cursor))
+            foreach (const RectCursor &textRect, child->selection(cursor))
             {
-                ChatSearchBubble *glass = addSearchBubble(textRect);
+                ChatSearchBubble *glass = new ChatSearchBubble;
+                glass->setSelection(textRect);
+                glass->bounce();
+                scene->addItem(glass);
+                glassItems << glass;
+
                 if (boundingRect.isEmpty())
                     boundingRect = glass->boundingRect();
                 else
@@ -827,44 +816,80 @@ ChatHistoryMessage::ChatHistoryMessage()
 ChatSearchBubble::ChatSearchBubble()
     : m_margin(4)
 {
-    QPen pen(QColor(63, 63, 63, 95));
-    //pen.setWidth(2);
-    setPen(pen);
+    // shadow
+    shadow = new QGraphicsPathItem;
+    QColor shadowColor(0x99, 0x99, 0x99);
+    QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
+    shadowGradient.setColorAt(0, shadowColor);
+    shadowColor.setAlpha(0xff);
+    shadowGradient.setColorAt(.95, shadowColor);
+    shadowColor.setAlpha(0x0);
+    shadowGradient.setColorAt(1, shadowColor);
+    shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    shadowGradient.setSpread(QGradient::PadSpread);
+    shadow->setPen(Qt::NoPen);
+    shadow->setBrush(shadowGradient);
+    addToGroup(shadow);
 
+    // bubble
+    bubble = new QGraphicsPathItem;
+    bubble->setPen(QColor(63, 63, 63, 95));
     QLinearGradient gradient(QPointF(0, 0), QPointF(0, 1));
-    gradient.setColorAt(0, QColor(255, 255, 0, 95));
-    gradient.setColorAt(1, QColor(228, 212, 0, 95));
+    gradient.setColorAt(0, QColor(255, 255, 0, 255));
+    gradient.setColorAt(1, QColor(228, 212, 0, 255));
     gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     gradient.setSpread(QGradient::PadSpread);
-    setBrush(gradient);
+    bubble->setBrush(gradient);
+    addToGroup(bubble);
+
+    // text
+    text = new QGraphicsTextItem;
+    addToGroup(text);
 
     setZValue(1);
 }
 
-int ChatSearchBubble::margin() const
+void ChatSearchBubble::bounce()
 {
-    return m_margin;
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "scale");
+    animation->setDuration(300);
+    animation->setStartValue(1);
+    animation->setKeyValueAt(0.5, 2);
+    animation->setEndValue(1);
+    animation->setEasingCurve(QEasingCurve::InOutQuad);
+    animation->start();
 }
 
-void ChatSearchBubble::setMargin(int margin)
+QRectF ChatSearchBubble::boundingRect() const
 {
-    m_margin = margin;
-
-    setSelection(m_selection);
+    return bubble->boundingRect();
 }
 
-void ChatSearchBubble::setSelection(const QRectF &selection)
+void ChatSearchBubble::setSelection(const RectCursor &selection)
 {
     m_selection = selection;
 
+    setTransformOriginPoint(m_selection.first.center());
+
+    QPointF textPos = m_selection.first.topLeft();
+    textPos.setX(textPos.x() - text->document()->documentMargin());
+    textPos.setY(textPos.y() - text->document()->documentMargin());
+    text->setPos(textPos);
+    text->setPlainText(m_selection.second.selectedText());
+
     QRectF glassRect;
-    glassRect.setX(m_selection.x() - m_margin);
-    glassRect.setY(m_selection.y() - m_margin);
-    glassRect.setWidth(m_selection.width() + 2 * m_margin);
-    glassRect.setHeight(m_selection.height() + 2 * m_margin);
+    glassRect.setX(m_selection.first.x() - m_margin);
+    glassRect.setY(m_selection.first.y() - m_margin);
+    glassRect.setWidth(m_selection.first.width() + 2 * m_margin);
+    glassRect.setHeight(m_selection.first.height() + 2 * m_margin);
 
     QPainterPath path;
     path.addRoundedRect(glassRect, m_margin, m_margin);
-    setPath(path);
+    bubble->setPath(path);
+
+    QPainterPath shadowPath;
+    glassRect.moveTop(glassRect.top() + 3);
+    shadowPath.addRoundedRect(glassRect, m_margin, m_margin);
+    shadow->setPath(shadowPath);
 }
 

@@ -29,6 +29,8 @@
 class QGraphicsLinearLayout;
 class QUrl;
 
+typedef QPair<QRectF, QTextCursor> RectCursor;
+
 class ChatHistoryMessage
 {
 public:
@@ -42,20 +44,23 @@ public:
     bool received;
 };
 
-class ChatSearchBubble : public QObject, public QGraphicsPathItem
+class ChatSearchBubble : public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
-    Q_PROPERTY(int margin READ margin WRITE setMargin)
+    Q_PROPERTY(qreal scale READ scale WRITE setScale)
  
 public:
     ChatSearchBubble();
-    int margin() const;
-    void setMargin(int margin);
-    void setSelection(const QRectF &selection);
+    void bounce();
+    QRectF boundingRect() const;
+    void setSelection(const RectCursor &selection);
 
 private:
-    int m_margin;
-    QRectF m_selection;
+    QGraphicsPathItem *bubble;
+    QGraphicsPathItem *shadow;
+    QGraphicsTextItem *text;
+    const int m_margin;
+    RectCursor m_selection;
 };
  
 class ChatTextItem : public QGraphicsTextItem
@@ -88,7 +93,7 @@ public:
     void setMaximumWidth(qreal width);
     void setMessage(const ChatHistoryMessage &message);
     void setPrevious(ChatMessageWidget *previous);
-    QList<QRectF> selection(const QTextCursor &cursor) const;
+    QList<RectCursor> selection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
     QTextDocument *document() const;
     QTextCursor textCursor() const;
@@ -160,7 +165,6 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    ChatSearchBubble *addSearchBubble(const QRectF &selection);
     void clearSearchBubbles();
 
     QGraphicsScene *scene;
