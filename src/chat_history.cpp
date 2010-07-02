@@ -760,7 +760,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
 
-    // clear search bubbles
+    // FIXME : move search bubbles instead of clearing them
     findClear();
 
     // resize widgets
