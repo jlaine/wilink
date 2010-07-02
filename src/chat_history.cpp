@@ -42,6 +42,9 @@
 #define FOOTER_HEIGHT 5
 #define MESSAGE_MAX 100
 
+#define BODY_FONT 12
+#define DATE_FONT 10
+
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!lastAnchor.isEmpty())
@@ -107,10 +110,13 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     scene()->addItem(bodyText);
     bodyText->setParentItem(this);
     bodyText->setDefaultTextColor(Qt::black);
+    QFont font = bodyText->font();
+    font.setPixelSize(BODY_FONT);
+    bodyText->setFont(font);
 
     dateText = scene()->addText("");
-    QFont font = dateText->font();
-    font.setPixelSize(10);
+    font = dateText->font();
+    font.setPixelSize(DATE_FONT);
     dateText->setFont(font);
     dateText->setParentItem(this);
     dateText->setTextWidth(90);
@@ -121,9 +127,6 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     fromText->setParentItem(this);
     fromText->setDefaultTextColor(baseColor);
 
-    font.setPixelSize(12);
-    bodyText->setFont(font);
-    
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -252,9 +255,9 @@ void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
     bodyText->setHtml(bodyHtml);
 }
 
-/** Return the rectangle for the current selection.
+/** Break a text selection into a list of rectangles, which one rectangle per line.
  */
-QList<RectCursor> ChatMessageWidget::selection(const QTextCursor &cursor) const
+QList<RectCursor> ChatMessageWidget::chunkSelection(const QTextCursor &cursor) const
 {
     QList<RectCursor> rectangles;
 
@@ -280,15 +283,18 @@ QList<RectCursor> ChatMessageWidget::selection(const QTextCursor &cursor) const
             QPointF topLeft = line.rect().topLeft();
             topLeft.setX(topLeft.x() + line.cursorToX(startPos));
             localRect.setTopLeft(topLeft);
+            localCursor.setPosition(cursor.anchor());
         } else {
-            localCursor.movePosition(QTextCursor::StartOfLine);
+            localCursor.setPosition(line.textStart() + cursor.block().position());
         }
 
         // position right edge
         QPointF bottomRight = line.rect().bottomLeft();
         if (lineEnd > endPos)
+        {
             bottomRight.setX(bottomRight.x() + line.cursorToX(endPos));
-        else {
+            localCursor.setPosition(cursor.position(), QTextCursor::KeepAnchor);
+        } else {
             bottomRight.setX(bottomRight.x() + line.cursorToX(lineEnd));
             localCursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
         }
@@ -681,7 +687,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
         {
             // build new glass
             QRectF boundingRect;
-            foreach (const RectCursor &textRect, child->selection(cursor))
+            foreach (const RectCursor &textRect, child->chunkSelection(cursor))
             {
                 ChatSearchBubble *glass = new ChatSearchBubble;
                 glass->setSelection(textRect);
@@ -844,6 +850,9 @@ ChatSearchBubble::ChatSearchBubble()
 
     // text
     text = new QGraphicsTextItem;
+    QFont font = text->font();
+    font.setPixelSize(BODY_FONT);
+    text->setFont(font);
     addToGroup(text);
 
     setZValue(1);
