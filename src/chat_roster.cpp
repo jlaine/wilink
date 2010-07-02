@@ -238,7 +238,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QString("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
+                return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
