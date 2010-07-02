@@ -861,9 +861,9 @@ ChatSearchBubble::ChatSearchBubble()
 void ChatSearchBubble::bounce()
 {
     QPropertyAnimation *animation = new QPropertyAnimation(this, "scale");
-    animation->setDuration(300);
+    animation->setDuration(250);
     animation->setStartValue(1);
-    animation->setKeyValueAt(0.5, 2);
+    animation->setKeyValueAt(0.5, 1.5);
     animation->setEndValue(1);
     animation->setEasingCurve(QEasingCurve::InOutQuad);
     animation->start();
