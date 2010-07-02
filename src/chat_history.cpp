@@ -760,9 +760,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
 
-    // FIXME : move search bubbles instead of clearing them
-    findClear();
-
     // resize widgets
     const qreal w = availableWidth();
     for (int i = 0; i < layout->count(); i++)
@@ -772,6 +769,20 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     }
     adjustSize();
     QGraphicsView::resizeEvent(e);
+
+    // reposition search bubbles
+    const bool hadBubbles = glassItems.size() > 0;
+    findClear();
+    if (hadBubbles && lastFindWidget)
+    {
+        foreach (const RectCursor &textRect, lastFindWidget->chunkSelection(lastFindCursor))
+        {
+            ChatSearchBubble *glass = new ChatSearchBubble;
+            glass->setSelection(textRect);
+            scene->addItem(glass);
+            glassItems << glass;
+        }
+    }
 
     // scroll to end if we were previous at end
     if (atEnd)
@@ -825,7 +836,7 @@ ChatHistoryMessage::ChatHistoryMessage()
 }
 
 ChatSearchBubble::ChatSearchBubble()
-    : m_margin(4)
+    : m_margin(3), m_radius(4)
 {
     // shadow
     shadow = new QGraphicsPathItem;
@@ -898,12 +909,12 @@ void ChatSearchBubble::setSelection(const RectCursor &selection)
     glassRect.setHeight(m_selection.first.height() + 2 * m_margin);
 
     QPainterPath path;
-    path.addRoundedRect(glassRect, m_margin, m_margin);
+    path.addRoundedRect(glassRect, m_radius, m_radius);
     bubble->setPath(path);
 
     QPainterPath shadowPath;
-    glassRect.moveTop(glassRect.top() + 3);
-    shadowPath.addRoundedRect(glassRect, m_margin, m_margin);
+    glassRect.moveTop(glassRect.top() + 2);
+    shadowPath.addRoundedRect(glassRect, m_radius, m_radius);
     shadow->setPath(shadowPath);
 }
 

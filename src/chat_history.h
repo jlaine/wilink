@@ -60,6 +60,7 @@ private:
     QGraphicsPathItem *shadow;
     QGraphicsTextItem *text;
     const int m_margin;
+    const int m_radius;
     RectCursor m_selection;
 };
  
