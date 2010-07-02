@@ -38,6 +38,8 @@
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 
+static const QChar sortSeparator('\0');
+
 enum RosterColumns {
     ContactColumn = 0,
     ImageColumn,
@@ -223,7 +225,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(contactAvatar(bareJid));
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return contactStatus(index) + "_" + item->data(Qt::DisplayRole).toString().toLower();
+                return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::Room) {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
@@ -232,11 +234,11 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                     paintMessages(icon, messages);
                 return icon;
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QString("chatroom_") + bareJid.toLower();
+                return QLatin1String("chatroom") + sortSeparator + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::RoomMember) {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QString("chatuser_") + contactStatus(index) + "_" + bareJid.toLower();
+                return QString("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
