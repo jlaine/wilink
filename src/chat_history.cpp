@@ -642,7 +642,7 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
     // retrieve previous cursor
     QTextCursor cursor;
     int startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
-    if (!changed && lastFindWidget)
+    if (lastFindWidget)
     {
         for (int i = 0; i < layout->count(); ++i)
         {
@@ -654,6 +654,8 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
             }
         }
     }
+    if (changed)
+        cursor.setPosition(cursor.anchor());
 
     // perform search
     bool looped = false;
