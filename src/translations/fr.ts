@@ -9,6 +9,13 @@
     </message>
 </context>
 <context>
+    <name>CallWatcher</name>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+</context>
+<context>
     <name>Chat</name>
     <message>
         <source>Available</source>

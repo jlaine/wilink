@@ -20,4 +20,28 @@
 #ifndef __WILINK_CALLS_H__
 #define __WILINK_CALLS_H__
 
+#include <QObject>
+
+class Chat;
+class ChatClient;
+class ChatRosterModel;
+class QMenu;
+class QModelIndex;
+
+class CallWatcher : public QObject
+{
+    Q_OBJECT
+
+public:
+    CallWatcher(Chat *chatWindow);
+
+private slots:
+    void callContact();
+    void rosterMenu(QMenu *menu, const QModelIndex &index);
+
+private:
+    ChatClient *m_client;
+    ChatRosterModel *m_roster;
+};
+
 #endif

@@ -64,6 +64,7 @@ set(wiLink_MOC_HEADERS
     chat_tip.h
     updates.h
     updatesdialog.h
+    plugins/calls.h
     plugins/chats.h
     plugins/console.h
     plugins/contacts.h
