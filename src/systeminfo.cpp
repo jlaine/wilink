@@ -118,6 +118,7 @@ QString SystemInfo::osVersion()
         return QString();
     }
 #endif
+    return QString();
 }
 
 
