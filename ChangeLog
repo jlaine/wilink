@@ -5,6 +5,7 @@ wiLink 0.9.8 (UNRELEASED)
  * Make it possible to search in chat history.
  * Use silent installer for upgrades on Windows.
  * Fix sorting of roster entries with identical names.
+ * Detect Linux desktop environment and prefer KDE/GNOME wallet accordingly.
 
 wiLink 0.9.7 (2010-06-23)
  * After renaming a contact, display the new name.
