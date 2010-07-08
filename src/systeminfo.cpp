@@ -99,6 +99,8 @@ QString SystemInfo::osVersion()
         return QString::fromLatin1("10.5");
     case QSysInfo::MV_10_6:
         return QString::fromLatin1("10.6");
+    default:
+        return QString();
     }
 #endif
 #ifdef Q_OS_WIN
@@ -112,9 +114,10 @@ QString SystemInfo::osVersion()
         return QString::fromLatin1("Vista");
     case QSysInfo::WV_WINDOWS7:
         return QString::fromLatin1("7");
+    default:
+        return QString();
     }
 #endif
-    return QString();
 }
 
 
