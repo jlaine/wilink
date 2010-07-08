@@ -27,6 +27,7 @@ class ChatClient;
 class ChatRosterModel;
 class QMenu;
 class QModelIndex;
+class QXmppCall;
 
 class CallWatcher : public QObject
 {
@@ -37,6 +38,7 @@ public:
 
 private slots:
     void callContact();
+    void callReceived(QXmppCall *call);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:

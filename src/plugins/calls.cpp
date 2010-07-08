@@ -19,6 +19,8 @@
 
 #include <QMenu>
 
+#include "QXmppCallManager.h"
+
 #include "calls.h"
 
 #include "chat.h"
@@ -31,6 +33,9 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 {
     m_client = chatWindow->client();
     m_roster = chatWindow->rosterModel();
+
+    connect(&m_client->callManager(), SIGNAL(callReceived(QXmppCall*)),
+            this, SLOT(callReceived(QXmppCall*)));
 }
 
 void CallWatcher::callContact()
@@ -39,7 +44,15 @@ void CallWatcher::callContact()
     if (!action)
         return;
     QString fullJid = action->data().toString();
-    qDebug() << "call" << fullJid;
+
+    QXmppCall *call = m_client->callManager().call(fullJid);
+    Q_UNUSED(call);
+}
+
+void CallWatcher::callReceived(QXmppCall *call)
+{
+    qDebug() << "call received from" << call->jid();
+    call->accept();
 }
 
 void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
