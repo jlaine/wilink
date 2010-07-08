@@ -64,10 +64,10 @@ protected:
     QString chatRemoteJid;
 
 private:
-    QSpacerItem *spacerItem;
     QXmppMessage::State chatLocalState;
     QTimer *inactiveTimer;
     QTimer *pausedTimer;
+    QSpacerItem *spacerItem;
 };
 
 #endif

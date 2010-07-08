@@ -77,10 +77,10 @@ void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 
 ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
+    maxWidth(2 * DATE_WIDTH),
     show_date(true),
-    show_sender(true),
     show_footer(true),
-    maxWidth(2 * DATE_WIDTH)
+    show_sender(true)
 {
     // set colors
     QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);

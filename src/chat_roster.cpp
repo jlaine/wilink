@@ -673,9 +673,6 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
     if (!index.isValid())
         return;
 
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
-    
     // allow plugins to populate menu
     QMenu *menu = new QMenu(this);
     emit itemMenu(menu, index);

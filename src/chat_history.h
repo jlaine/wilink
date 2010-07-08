@@ -118,8 +118,8 @@ private:
     int maxWidth;
     ChatHistoryMessage msg;
     bool show_date;
-    bool show_sender;
     bool show_footer;
+    bool show_sender;
 
     // Text
     ChatTextItem *bodyText;

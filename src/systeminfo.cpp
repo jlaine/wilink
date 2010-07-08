@@ -29,6 +29,7 @@ QString SystemInfo::displayName(SystemInfo::StorageLocation type)
         return QObject::tr("Downloads");
     else if (type == SystemInfo::SharesLocation)
         return QObject::tr("Shares");
+    return QString();
 }
 
 QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
@@ -51,6 +52,7 @@ QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
     {
         return QDir::home().filePath("Public");
     }
+    return QString();
 }
 
 QString SystemInfo::osName()
