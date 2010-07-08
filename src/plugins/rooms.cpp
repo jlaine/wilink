@@ -256,8 +256,7 @@ void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
         if (event->type() == QEvent::Drop)
         {
             ChatRoom *room = joinRoom(roomJid);
-            foreach (const QUrl &url, event->mimeData()->urls())
-                room->invite(jid);
+            room->invite(jid);
         }
         found++;
     }
@@ -519,6 +518,8 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
                 break;
             }
         }
+        break;
+    default:
         break;
     }
 }

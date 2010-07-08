@@ -94,10 +94,10 @@ private:
 private:
     QString shareServer;
 
-    ChatClient *client;
     Chat *chatWindow;
-    ChatRosterModel *rosterModel;
+    ChatClient *client;
     QXmppShareDatabase *db;
+    ChatRosterModel *rosterModel;
     ChatSharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 
