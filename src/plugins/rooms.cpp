@@ -814,7 +814,7 @@ public:
 
 bool RoomsPlugin::initialize(Chat *chat)
 {
-    ChatRoomWatcher *rooms = new ChatRoomWatcher(chat);
+    new ChatRoomWatcher(chat);
     return true;
 }
 

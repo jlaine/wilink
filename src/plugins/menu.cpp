@@ -42,8 +42,8 @@ static int retryInterval = 15000;
 
 Menu::Menu(QMenuBar *bar)
     : QObject(bar),
-    menuBar(bar),
     refreshInterval(0),
+    menuBar(bar),
     servicesMenu(0)
 {
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();

@@ -234,7 +234,7 @@ public:
 
 bool ChatsPlugin::initialize(Chat *chat)
 {
-    ChatsWatcher *chats = new ChatsWatcher(chat);
+    new ChatsWatcher(chat);
     return true;
 }
 

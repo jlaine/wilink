@@ -53,9 +53,8 @@ private:
     QStringList seenMessages;
     QByteArray userAgent;
 
-private:
-    QMenu *servicesMenu;
     QMenuBar *menuBar;
+    QMenu *servicesMenu;
 };
 
 #endif
