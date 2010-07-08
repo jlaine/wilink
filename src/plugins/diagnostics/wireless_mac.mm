@@ -97,7 +97,6 @@ QList<WirelessNetwork> WirelessInterface::availableNetworks()
     if(!err) {
         for(uint row=0; row < [apArray count]; row++ ) {
             CWNetwork *apNetwork = [apArray objectAtIndex:row];
-            NSNumber *num;
 
             WirelessNetwork info;
             info.setCinr(nsnumberToInt([apNetwork noise]));
