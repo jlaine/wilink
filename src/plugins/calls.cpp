@@ -36,18 +36,15 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
-const int DurationSeconds = 1;
 const int ToneFrequencyHz = 600;
 const int DataFrequencyHz = 11025;
 //const int DataFrequencyHz = 44100;
-const int BufferSize      = 32768;
 
 Generator::Generator(const QAudioFormat &format,
                      qint64 durationUs,
                      int frequency,
                      QObject *parent)
-                         :   QIODevice(parent)
-                         ,   m_pos(0)
+    : QObject(parent)
 {
     generateData(format, durationUs, frequency);
     m_timer = new QTimer(this);
@@ -60,16 +57,16 @@ Generator::~Generator()
 
 }
 
-void Generator::start()
+void Generator::start(QIODevice *device)
 {
-    open(QIODevice::ReadOnly);
+    m_device = device;
     m_timer->start();
 }
 
 void Generator::stop()
 {
-    m_pos = 0;
-    close();
+    m_timer->stop();
+    m_device = 0;
 }
 
 void Generator::generateData(const QAudioFormat &format, qint64 durationUs, int frequency)
@@ -86,6 +83,7 @@ void Generator::generateData(const QAudioFormat &format, qint64 durationUs, int 
     m_buffer.resize(length);
     unsigned char *ptr = reinterpret_cast<unsigned char *>(m_buffer.data());
     int sampleIndex = 0;
+    qDebug() << "size" << length;
 
     while (length) {
         const qreal x = qSin(2 * M_PI * frequency * qreal(sampleIndex % format.frequency()) / format.frequency());
@@ -117,37 +115,10 @@ void Generator::generateData(const QAudioFormat &format, qint64 durationUs, int 
     }
 }
 
-qint64 Generator::bufferSize() const
-{
-    return m_buffer.size();
-}
-
-qint64 Generator::readData(char *data, qint64 len)
-{
-    const qint64 chunk = qMin((m_buffer.size() - m_pos), len);
-    memcpy(data, m_buffer.constData() + m_pos, chunk);
-    //m_pos = (m_pos + chunk) % m_buffer.size();
-    m_pos += chunk;
-    return chunk;
-}
-
 void Generator::tick()
 {
-    m_pos = 0;
-    emit readyRead();
-}
-
-qint64 Generator::writeData(const char *data, qint64 len)
-{
-    Q_UNUSED(data);
-    Q_UNUSED(len);
-
-    return 0;
-}
-
-qint64 Generator::bytesAvailable() const
-{
-    return m_buffer.size() - m_pos;
+    if (m_device)
+        m_device->write(m_buffer);
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)
@@ -194,14 +165,11 @@ void CallWatcher::callConnected()
     if (call->direction() == QXmppCall::IncomingDirection)
     {
         qDebug() << "start playback";
-        //m_generator->start();
-        //m_audioOutput->start(m_generator);
         m_audioOutput->start(call);
     }
     else {
         qDebug() << "start capture";
-        m_call = call;
-        m_generator->start();
+        m_generator->start(call);
         //m_audioInput->start(call);
     }
 }
@@ -258,15 +226,6 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
     }
-}
-
-void CallWatcher::readyRead()
-{
-    if (!m_call)
-        return;
-
-    QByteArray chunk = m_generator->read(m_generator->bufferSize());
-    m_call->write(chunk);
 }
 
 void CallWatcher::stateChanged(QAudio::State state)

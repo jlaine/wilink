@@ -36,7 +36,7 @@ class QModelIndex;
 class QTimer;
 class QXmppCall;
 
-class Generator : public QIODevice
+class Generator : public QObject
 {
     Q_OBJECT
 
@@ -44,13 +44,8 @@ public:
     Generator(const QAudioFormat &format, qint64 durationUs, int frequency, QObject *parent);
     ~Generator();
 
-    void start();
+    void start(QIODevice *device);
     void stop();
-
-    qint64 bufferSize() const;
-    qint64 readData(char *data, qint64 maxlen);
-    qint64 writeData(const char *data, qint64 len);
-    qint64 bytesAvailable() const;
 
 private:
     void generateData(const QAudioFormat &format, qint64 durationUs, int frequency);
@@ -59,9 +54,9 @@ private slots:
     void tick();
 
 private:
-    qint64 m_pos;
     QByteArray m_buffer;
     QTimer *m_timer;
+    QIODevice *m_device;
  };
 
 class CallWatcher : public QObject
@@ -76,7 +71,6 @@ private slots:
     void callClicked(QAbstractButton * button);
     void callContact();
     void callReceived(QXmppCall *call);
-    void readyRead();
     void rosterMenu(QMenu *menu, const QModelIndex &index);
     void stateChanged(QAudio::State state);
 
