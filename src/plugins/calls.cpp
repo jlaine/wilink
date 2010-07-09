@@ -142,7 +142,6 @@ CallWatcher::CallWatcher(Chat *chatWindow)
     m_audioOutput = new QAudioOutput(m_format, this);
     connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
     m_generator = new Generator(m_format, 100000, ToneFrequencyHz, this);
-    connect(m_generator, SIGNAL(readyRead()), this, SLOT(readyRead()));
 }
 
 void CallWatcher::callClicked(QAbstractButton * button)
