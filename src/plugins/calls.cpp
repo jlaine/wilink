@@ -37,8 +37,18 @@
 #include "chat_roster.h"
 
 const int ToneFrequencyHz = 600;
-//const int DataFrequencyHz = 11025;
-const int DataFrequencyHz = 8000;
+
+static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
+{
+    QAudioFormat format;
+    format.setFrequency(type.clockrate());
+    format.setChannels(type.channels());
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+    return format;
+}
 
 Generator::Generator(const QAudioFormat &format,
                      qint64 durationUs,
@@ -83,7 +93,7 @@ void Generator::generateData(const QAudioFormat &format, qint64 durationUs, int 
     m_buffer.resize(length);
     unsigned char *ptr = reinterpret_cast<unsigned char *>(m_buffer.data());
     int sampleIndex = 0;
-    qDebug() << "size" << length;
+    //qDebug() << "size" << length;
 
     while (length) {
         const qreal x = qSin(2 * M_PI * frequency * qreal(sampleIndex % format.frequency()) / format.frequency());
@@ -129,30 +139,19 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
     connect(&m_client->callManager(), SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
-
-    QAudioFormat m_format;
-    m_format.setFrequency(DataFrequencyHz);
-    m_format.setChannels(1);
-    m_format.setSampleSize(16);
-    m_format.setCodec("audio/pcm");
-    m_format.setByteOrder(QAudioFormat::LittleEndian);
-    m_format.setSampleType(QAudioFormat::SignedInt);
-
-    m_audioInput = new QAudioInput(m_format, this);
-    m_audioOutput = new QAudioOutput(m_format, this);
-    connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
-    m_generator = new Generator(m_format, 100000, ToneFrequencyHz, this);
 }
 
 void CallWatcher::callBuffered()
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    QAudioFormat format = formatFor(call->payloadType());
+    QAudioOutput *audioOutput = new QAudioOutput(format, call);
+    connect(audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
+
     if (call->direction() == QXmppCall::IncomingDirection)
     {
         qDebug() << "start playback";
-        //m_generator->start();
-        //m_audioOutput->start(m_generator);
-        m_audioOutput->start(call);
+        audioOutput->start(call);
     }
 }
 void CallWatcher::callClicked(QAbstractButton * button)
@@ -172,11 +171,15 @@ void CallWatcher::callClicked(QAbstractButton * button)
 void CallWatcher::callConnected()
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    QAudioFormat format = formatFor(call->payloadType());
+
+    //QAudioInput *audioInput = new QAudioInput(m_format, this);
+    Generator *generator = new Generator(format, 100000, ToneFrequencyHz, this);
     if (call->direction() == QXmppCall::OutgoingDirection)
     {
         qDebug() << "start capture";
-        m_generator->start(call);
-        //m_audioInput->start(call);
+        generator->start(call);
+        //audioInput->start(call);
     }
 }
 

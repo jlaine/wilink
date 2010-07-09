@@ -76,9 +76,6 @@ private slots:
     void stateChanged(QAudio::State state);
 
 private:
-    QAudioInput *m_audioInput;
-    QAudioOutput *m_audioOutput;
-    Generator *m_generator;
     ChatClient *m_client;
     ChatRosterModel *m_roster;
     Chat *m_window;
