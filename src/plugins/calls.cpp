@@ -66,6 +66,10 @@ void CallWatcher::callContact()
 
 void CallWatcher::callReceived(QXmppCall *call)
 {
+    // FIXME : for debugging purposes, always accept calls
+    call->accept();
+    return;
+
     const QString bareJid = jidToBareJid(call->jid());
     const QString contactName = m_roster->contactName(bareJid);
 
