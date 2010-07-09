@@ -67,6 +67,7 @@ public:
     CallWatcher(Chat *chatWindow);
 
 private slots:
+    void callBuffered();
     void callConnected();
     void callClicked(QAbstractButton * button);
     void callContact();

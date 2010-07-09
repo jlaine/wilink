@@ -144,6 +144,17 @@ CallWatcher::CallWatcher(Chat *chatWindow)
     m_generator = new Generator(m_format, 100000, ToneFrequencyHz, this);
 }
 
+void CallWatcher::callBuffered()
+{
+    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    if (call->direction() == QXmppCall::IncomingDirection)
+    {
+        qDebug() << "start playback";
+        //m_generator->start();
+        //m_audioOutput->start(m_generator);
+        m_audioOutput->start(call);
+    }
+}
 void CallWatcher::callClicked(QAbstractButton * button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
@@ -161,12 +172,8 @@ void CallWatcher::callClicked(QAbstractButton * button)
 void CallWatcher::callConnected()
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (call->direction() == QXmppCall::IncomingDirection)
+    if (call->direction() == QXmppCall::OutgoingDirection)
     {
-        qDebug() << "start playback";
-        m_audioOutput->start(call);
-    }
-    else {
         qDebug() << "start capture";
         m_generator->start(call);
         //m_audioInput->start(call);
@@ -181,6 +188,7 @@ void CallWatcher::callContact()
     QString fullJid = action->data().toString();
 
     QXmppCall *call = m_client->callManager().call(fullJid);
+    connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
     connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
 }
 
