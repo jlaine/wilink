@@ -124,7 +124,6 @@ qint64 Generator::bufferSize() const
 
 qint64 Generator::readData(char *data, qint64 len)
 {
-    qDebug() << "read req" << len;
     const qint64 chunk = qMin((m_buffer.size() - m_pos), len);
     memcpy(data, m_buffer.constData() + m_pos, chunk);
     //m_pos = (m_pos + chunk) % m_buffer.size();
@@ -267,7 +266,6 @@ void CallWatcher::readyRead()
         return;
 
     QByteArray chunk = m_generator->read(m_generator->bufferSize());
-    qDebug() << "read chunk" << chunk.size();
     m_call->write(chunk);
 }
 
