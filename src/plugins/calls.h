@@ -20,15 +20,42 @@
 #ifndef __WILINK_CALLS_H__
 #define __WILINK_CALLS_H__
 
+#include <QIODevice>
 #include <QObject>
 
 class Chat;
 class ChatClient;
 class ChatRosterModel;
 class QAbstractButton;
+class QAudioFormat;
+class QAudioInput;
+class QAudioOutput;
 class QMenu;
 class QModelIndex;
 class QXmppCall;
+
+class Generator : public QIODevice
+{
+    Q_OBJECT
+
+public:
+    Generator(const QAudioFormat &format, qint64 durationUs, int frequency, QObject *parent);
+    ~Generator();
+
+    void start();
+    void stop();
+
+    qint64 readData(char *data, qint64 maxlen);
+    qint64 writeData(const char *data, qint64 len);
+    qint64 bytesAvailable() const;
+
+private:
+    void generateData(const QAudioFormat &format, qint64 durationUs, int frequency);
+
+private:
+    qint64 m_pos;
+    QByteArray m_buffer;
+ };
 
 class CallWatcher : public QObject
 {
@@ -38,12 +65,16 @@ public:
     CallWatcher(Chat *chatWindow);
 
 private slots:
+    void callConnected();
     void callClicked(QAbstractButton * button);
     void callContact();
     void callReceived(QXmppCall *call);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:
+    QAudioInput *m_audioInput;
+    QAudioOutput *m_audioOutput;
+    Generator *m_generator;
     ChatClient *m_client;
     ChatRosterModel *m_roster;
     Chat *m_window;

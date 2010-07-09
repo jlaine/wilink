@@ -5,6 +5,7 @@ add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
 
 set(QT_USE_QTNETWORK 1)
+set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
