@@ -37,8 +37,8 @@
 #include "chat_roster.h"
 
 const int ToneFrequencyHz = 600;
-const int DataFrequencyHz = 11025;
-//const int DataFrequencyHz = 44100;
+//const int DataFrequencyHz = 11025;
+const int DataFrequencyHz = 8000;
 
 Generator::Generator(const QAudioFormat &format,
                      qint64 durationUs,
