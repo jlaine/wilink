@@ -42,7 +42,15 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
 void CallWatcher::callClicked(QAbstractButton * button)
 {
+    QMessageBox *box = qobject_cast<QMessageBox*>(sender());
+    QXmppCall *call = qobject_cast<QXmppCall*>(box->property("call").value<QObject*>());
+    if (!call)
+        return;
 
+    if (box->standardButton(button) == QMessageBox::Yes)
+        call->accept();
+    else
+        call->hangup();
 }
 
 void CallWatcher::callContact()
@@ -66,13 +74,12 @@ void CallWatcher::callReceived(QXmppCall *call)
         tr("%1 wants to talk to you.\n\nDo you accept?").arg(contactName),
         QMessageBox::Yes | QMessageBox::No, m_window);
     box->setDefaultButton(QMessageBox::NoButton);
+    box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
 
     /* connect signals */
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callClicked(QAbstractButton*)));
     box->show();
-
-    call->accept();
 }
 
 void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
