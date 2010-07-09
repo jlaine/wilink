@@ -25,6 +25,7 @@
 class Chat;
 class ChatClient;
 class ChatRosterModel;
+class QAbstractButton;
 class QMenu;
 class QModelIndex;
 class QXmppCall;
@@ -37,6 +38,7 @@ public:
     CallWatcher(Chat *chatWindow);
 
 private slots:
+    void callClicked(QAbstractButton * button);
     void callContact();
     void callReceived(QXmppCall *call);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
@@ -44,6 +46,7 @@ private slots:
 private:
     ChatClient *m_client;
     ChatRosterModel *m_roster;
+    Chat *m_window;
 };
 
 #endif

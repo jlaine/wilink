@@ -18,8 +18,10 @@
  */
 
 #include <QMenu>
+#include <QMessageBox>
 
 #include "QXmppCallManager.h"
+#include "QXmppUtils.h"
 
 #include "calls.h"
 
@@ -29,13 +31,18 @@
 #include "chat_roster.h"
 
 CallWatcher::CallWatcher(Chat *chatWindow)
-    : QObject(chatWindow)
+    : QObject(chatWindow), m_window(chatWindow)
 {
     m_client = chatWindow->client();
     m_roster = chatWindow->rosterModel();
 
     connect(&m_client->callManager(), SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
+}
+
+void CallWatcher::callClicked(QAbstractButton * button)
+{
+
 }
 
 void CallWatcher::callContact()
@@ -51,7 +58,20 @@ void CallWatcher::callContact()
 
 void CallWatcher::callReceived(QXmppCall *call)
 {
-    qDebug() << "call received from" << call->jid();
+    const QString bareJid = jidToBareJid(call->jid());
+    const QString contactName = m_roster->contactName(bareJid);
+
+    QMessageBox *box = new QMessageBox(QMessageBox::Question,
+        tr("Call from %1").arg(contactName),
+        tr("%1 wants to talk to you.\n\nDo you accept?").arg(contactName),
+        QMessageBox::Yes | QMessageBox::No, m_window);
+    box->setDefaultButton(QMessageBox::NoButton);
+
+    /* connect signals */
+    connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
+        this, SLOT(callClicked(QAbstractButton*)));
+    box->show();
+
     call->accept();
 }
 
