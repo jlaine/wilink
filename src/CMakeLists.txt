@@ -9,6 +9,12 @@ set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
+# FIXME: for some reason on OS X we need to include QtMultimedia explicitly
+if (APPLE)
+set(QT_LIBRARIES ${QT_LIBRARIES} ${QT_QTMULTIMEDIA_LIBRARY})
+include_directories(${QT_QTMULTIMEDIA_INCLUDE_DIR})
+endif(APPLE)
+
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
