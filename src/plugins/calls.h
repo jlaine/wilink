@@ -22,6 +22,7 @@
 
 #include <QIODevice>
 #include <QObject>
+#include <QAudio>
 
 class Chat;
 class ChatClient;
@@ -70,6 +71,7 @@ private slots:
     void callContact();
     void callReceived(QXmppCall *call);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
+    void stateChanged(QAudio::State state);
 
 private:
     QAudioInput *m_audioInput;

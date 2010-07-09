@@ -155,6 +155,7 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
     m_audioInput = new QAudioInput(m_format, this);
     m_audioOutput = new QAudioOutput(m_format, this);
+    connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
     m_generator = new Generator(m_format, DurationSeconds*1000000, ToneFrequencyHz, this);
 }
 
@@ -167,7 +168,6 @@ void CallWatcher::callClicked(QAbstractButton * button)
 
     if (box->standardButton(button) == QMessageBox::Yes)
     {
-        connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
         call->accept();
     } else
         call->hangup();
@@ -176,11 +176,15 @@ void CallWatcher::callClicked(QAbstractButton * button)
 void CallWatcher::callConnected()
 {
     QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    //m_generator->start();
     if (call->direction() == QXmppCall::IncomingDirection)
+    {
+        qDebug() << "start playback";
         m_audioOutput->start(call);
-    else
+    }
+    else {
+        qDebug() << "start capture";
         m_audioInput->start(call);
+    }
 }
 
 void CallWatcher::callContact()
@@ -197,6 +201,7 @@ void CallWatcher::callContact()
 void CallWatcher::callReceived(QXmppCall *call)
 {
     // FIXME : for debugging purposes, always accept calls
+    connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
     call->accept();
     return;
 
@@ -234,6 +239,11 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
     }
+}
+
+void CallWatcher::stateChanged(QAudio::State state)
+{
+    qDebug() << "state changed" << state;
 }
 
 // PLUGIN
