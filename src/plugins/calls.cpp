@@ -195,6 +195,7 @@ void CallWatcher::callContact()
 void CallWatcher::callReceived(QXmppCall *call)
 {
     // FIXME : for debugging purposes, always accept calls
+    connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
     connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
     call->accept();
     return;
