@@ -240,3 +240,56 @@ qint64 G711a::decode(QDataStream &input, QDataStream &output)
     }
     return samples;
 }
+
+qint64 G711u::encode(QDataStream &input, QDataStream &output)
+{
+    qint64 samples = 0;
+    qint16 pcm;
+    while (!input.atEnd())
+    {
+        input >> pcm;
+        output << linear2ulaw(pcm);
+        ++samples;
+    }
+    return samples;
+}
+
+qint64 G711u::decode(QDataStream &input, QDataStream &output)
+{
+    qint64 samples = 0;
+    quint8 g711;
+    while (!input.atEnd())
+    {
+        input >> g711;
+        output << ulaw2linear(g711);
+        ++samples;
+    }
+    return samples;
+}
+
+qint64 L16::encode(QDataStream &input, QDataStream &output)
+{
+    qint64 samples = 0;
+    qint16 pcm;
+    while (!input.atEnd())
+    {
+        input >> pcm;
+        output << pcm;
+        ++samples;
+    }
+    return samples;
+}
+
+qint64 L16::decode(QDataStream &input, QDataStream &output)
+{
+    qint64 samples = 0;
+    quint8 g711;
+    while (!input.atEnd())
+    {
+        input >> g711;
+        output << g711;
+        ++samples;
+    }
+    return samples;
+}
+

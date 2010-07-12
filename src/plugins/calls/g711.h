@@ -17,9 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class QDataStream;
+#include "QXmppCallManager.h"
 
-class G711a
+class G711a : public QXmppCallCodec
+{
+public:
+    qint64 encode(QDataStream &input, QDataStream &output);
+    qint64 decode(QDataStream &input, QDataStream &output);
+};
+
+class G711u : public QXmppCallCodec
+{
+public:
+    qint64 encode(QDataStream &input, QDataStream &output);
+    qint64 decode(QDataStream &input, QDataStream &output);
+};
+
+class L16 : public QXmppCallCodec
 {
 public:
     qint64 encode(QDataStream &input, QDataStream &output);
