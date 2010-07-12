@@ -20,6 +20,7 @@
 #include <QAudioFormat>
 #include <QAudioInput>
 #include <QAudioOutput>
+#include <QFile>
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
@@ -133,6 +134,32 @@ void Generator::tick()
         m_device->write(m_buffer);
 }
 
+Reader::Reader(const QAudioFormat &format, QObject *parent)
+    : QObject(parent)
+{
+    int durationMs = 100;
+
+    // 100ms
+    m_block = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * durationMs / 1000;
+    m_input = new QFile("test.raw");
+    m_input->open(QIODevice::ReadOnly);
+    m_timer = new QTimer(this);
+    m_timer->setInterval(durationMs);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(tick()));
+}
+
+void Reader::start(QIODevice *device)
+{
+    m_output = device;
+    m_timer->start();
+}
+
+void Reader::tick()
+{
+    QByteArray block = m_input->read(m_block);
+    m_output->write(block);
+}
+
 CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     : ChatPanel(parent), m_call(call)
 {
@@ -183,7 +210,7 @@ void CallPanel::callConnected()
     if (m_call->direction() == QXmppCall::OutgoingDirection)
     {
         qDebug() << "start capture";
-        Generator *generator = new Generator(format, 100000, ToneFrequencyHz, this);
+        Reader *generator = new Reader(format, this);
         generator->start(m_call);
         //audioInput->start(m_call);
     }

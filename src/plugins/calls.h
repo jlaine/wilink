@@ -62,6 +62,25 @@ private:
     QIODevice *m_device;
 };
 
+class Reader : public QObject
+{
+    Q_OBJECT
+
+public:
+    Reader(const QAudioFormat &format, QObject *parent);
+    void start(QIODevice *device);
+    void stop();
+
+private slots:
+    void tick();
+
+private:
+    qint64 m_block;
+    QTimer *m_timer;
+    QIODevice *m_input;
+    QIODevice *m_output;
+};
+
 class CallPanel : public ChatPanel
 {
     Q_OBJECT
