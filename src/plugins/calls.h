@@ -35,6 +35,7 @@ class QAudioInput;
 class QAudioOutput;
 class QMenu;
 class QModelIndex;
+class QPushButton;
 class QTimer;
 class QXmppCall;
 

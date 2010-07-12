@@ -20,8 +20,10 @@
 #include <QAudioFormat>
 #include <QAudioInput>
 #include <QAudioOutput>
+#include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QtCore/qmath.h>
 #include <QtCore/qendian.h>
 #include <QTimer>
@@ -134,6 +136,25 @@ void Generator::tick()
 CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     : ChatPanel(parent), m_call(call)
 {
+    setWindowIcon(QIcon(":/chat.png"));
+    setWindowTitle(tr("Call"));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
+    // HEADER
+
+    layout->addItem(headerLayout());
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QPushButton *hangupButton = new QPushButton(tr("Hang up"));
+    hbox->addWidget(hangupButton);
+
+    layout->addItem(hbox);
+
+    setLayout(layout);
+
     connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
     connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
 
