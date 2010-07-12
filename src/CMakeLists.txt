@@ -42,6 +42,7 @@ set(wiLink_SOURCES
     updatesdialog.cpp
     utils.cpp
     plugins/calls.cpp
+    plugins/calls/g711.cpp
     plugins/chats.cpp
     plugins/console.cpp
     plugins/contacts.cpp

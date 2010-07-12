@@ -2,6 +2,9 @@
 'directories': [
     'src',
     'src/plugins',
+    'src/plugins/calls',
+    'src/plugins/diagnostics',
+    'src/plugins/shares',
 ],
 
 'license': """wiLink

@@ -1,8 +1,29 @@
-/**
+/*
+ * wiLink
+ * Copyright (C) 2009-2010 Bolloré telecom
+ * See AUTHORS file for a full list of contributors.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  *  Based on reference implementation by Sun Microsystems, Inc.
  */
 
-#include <QCoreApplication>
+#include <QDataStream>
+
+#include "g711.h"
 
 #define BIAS        (0x84)  /* Bias for linear code. */
 #define CLIP        8159
@@ -194,3 +215,28 @@ qint16 ulaw2linear(quint8 u_val)
    return ((u_val & SIGN_BIT) ? (BIAS - t) : (t - BIAS));
 }
 
+qint64 G711a::encode(QDataStream &input, QDataStream &output)
+{
+    qint64 samples = 0;
+    qint16 pcm;
+    while (!input.atEnd())
+    {
+        input >> pcm;
+        output << linear2alaw(pcm);
+        ++samples;
+    }
+    return samples;
+}
+
+qint64 G711a::decode(QDataStream &input, QDataStream &output)
+{
+    qint64 samples = 0;
+    quint8 g711;
+    while (!input.atEnd())
+    {
+        input >> g711;
+        output << alaw2linear(g711);
+        ++samples;
+    }
+    return samples;
+}
