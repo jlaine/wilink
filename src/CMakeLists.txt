@@ -42,7 +42,6 @@ set(wiLink_SOURCES
     updatesdialog.cpp
     utils.cpp
     plugins/calls.cpp
-    plugins/calls/g711.cpp
     plugins/chats.cpp
     plugins/console.cpp
     plugins/contacts.cpp
@@ -152,6 +151,9 @@ set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 add_executable(tests systeminfo.cpp tests.cpp updates.cpp utils.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+
+add_executable(codec codec.cpp qxmpp/QXmppCodec.cpp)
+target_link_libraries(codec ${QT_LIBRARIES})
 
 # hash
 add_executable(hasher hasher.cpp)
