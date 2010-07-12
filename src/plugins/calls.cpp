@@ -149,6 +149,7 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
 
     QHBoxLayout *hbox = new QHBoxLayout;
     QPushButton *hangupButton = new QPushButton(tr("Hang up"));
+    connect(hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
     hbox->addWidget(hangupButton);
 
     layout->addItem(hbox);
