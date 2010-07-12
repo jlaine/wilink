@@ -24,6 +24,8 @@
 #include <QObject>
 #include <QAudio>
 
+#include "chat_panel.h"
+
 class Chat;
 class ChatClient;
 class ChatRosterModel;
@@ -57,7 +59,23 @@ private:
     QByteArray m_buffer;
     QTimer *m_timer;
     QIODevice *m_device;
- };
+};
+
+class CallPanel : public ChatPanel
+{
+    Q_OBJECT
+
+public:
+    CallPanel(QXmppCall *call, QWidget *parent = 0);
+
+private slots:
+    void callBuffered();
+    void callConnected();
+    void stateChanged(QAudio::State state);
+
+private:
+    QXmppCall *m_call;
+};
 
 class CallWatcher : public QObject
 {
@@ -67,19 +85,15 @@ public:
     CallWatcher(Chat *chatWindow);
 
 private slots:
-    void callBuffered();
-    void callConnected();
     void callClicked(QAbstractButton * button);
     void callContact();
     void callReceived(QXmppCall *call);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
-    void stateChanged(QAudio::State state);
 
 private:
     ChatClient *m_client;
     ChatRosterModel *m_roster;
     Chat *m_window;
-    QXmppCall *m_call;
 };
 
 #endif

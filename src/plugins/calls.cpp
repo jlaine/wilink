@@ -131,8 +131,49 @@ void Generator::tick()
         m_device->write(m_buffer);
 }
 
+CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
+    : ChatPanel(parent), m_call(call)
+{
+    connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
+    connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
+
+    QTimer::singleShot(0, this, SIGNAL(showPanel()));
+}
+
+void CallPanel::callBuffered()
+{
+    QAudioFormat format = formatFor(m_call->payloadType());
+    QAudioOutput *audioOutput = new QAudioOutput(format, this);
+    connect(audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
+
+    if (m_call->direction() == QXmppCall::IncomingDirection)
+    {
+        qDebug() << "start playback";
+        audioOutput->start(m_call);
+    }
+}
+
+void CallPanel::callConnected()
+{
+    QAudioFormat format = formatFor(m_call->payloadType());
+
+    //QAudioInput *audioInput = new QAudioInput(m_format, this);
+    if (m_call->direction() == QXmppCall::OutgoingDirection)
+    {
+        qDebug() << "start capture";
+        Generator *generator = new Generator(format, 100000, ToneFrequencyHz, this);
+        generator->start(m_call);
+        //audioInput->start(m_call);
+    }
+}
+
+void CallPanel::stateChanged(QAudio::State state)
+{
+    qDebug() << "state changed" << state;
+}
+
 CallWatcher::CallWatcher(Chat *chatWindow)
-    : QObject(chatWindow), m_window(chatWindow), m_call(0)
+    : QObject(chatWindow), m_window(chatWindow)
 {
     m_client = chatWindow->client();
     m_roster = chatWindow->rosterModel();
@@ -141,19 +182,6 @@ CallWatcher::CallWatcher(Chat *chatWindow)
             this, SLOT(callReceived(QXmppCall*)));
 }
 
-void CallWatcher::callBuffered()
-{
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    QAudioFormat format = formatFor(call->payloadType());
-    QAudioOutput *audioOutput = new QAudioOutput(format, call);
-    connect(audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
-
-    if (call->direction() == QXmppCall::IncomingDirection)
-    {
-        qDebug() << "start playback";
-        audioOutput->start(call);
-    }
-}
 void CallWatcher::callClicked(QAbstractButton * button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
@@ -163,24 +191,11 @@ void CallWatcher::callClicked(QAbstractButton * button)
 
     if (box->standardButton(button) == QMessageBox::Yes)
     {
+        CallPanel *panel = new CallPanel(call, m_window);
+        m_window->addPanel(panel);
         call->accept();
     } else
         call->hangup();
-}
-
-void CallWatcher::callConnected()
-{
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    QAudioFormat format = formatFor(call->payloadType());
-
-    //QAudioInput *audioInput = new QAudioInput(m_format, this);
-    Generator *generator = new Generator(format, 100000, ToneFrequencyHz, this);
-    if (call->direction() == QXmppCall::OutgoingDirection)
-    {
-        qDebug() << "start capture";
-        generator->start(call);
-        //audioInput->start(call);
-    }
 }
 
 void CallWatcher::callContact()
@@ -191,18 +206,12 @@ void CallWatcher::callContact()
     QString fullJid = action->data().toString();
 
     QXmppCall *call = m_client->callManager().call(fullJid);
-    connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
-    connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
+    CallPanel *panel = new CallPanel(call, m_window);
+    m_window->addPanel(panel);
 }
 
 void CallWatcher::callReceived(QXmppCall *call)
 {
-    // FIXME : for debugging purposes, always accept calls
-    connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
-    connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
-    call->accept();
-    return;
-
     const QString bareJid = jidToBareJid(call->jid());
     const QString contactName = m_roster->contactName(bareJid);
 
@@ -237,11 +246,6 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
     }
-}
-
-void CallWatcher::stateChanged(QAudio::State state)
-{
-    qDebug() << "state changed" << state;
 }
 
 // PLUGIN
