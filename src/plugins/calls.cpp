@@ -53,87 +53,6 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
     return format;
 }
 
-Generator::Generator(const QAudioFormat &format,
-                     qint64 durationUs,
-                     int frequency,
-                     QObject *parent)
-    : QObject(parent)
-{
-    generateData(format, durationUs, frequency);
-    m_timer = new QTimer(this);
-    m_timer->setInterval(durationUs/1000);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(tick()));
-}
-
-Generator::~Generator()
-{
-
-}
-
-void Generator::start(QIODevice *device)
-{
-    m_device = device;
-    m_timer->start();
-}
-
-void Generator::stop()
-{
-    m_timer->stop();
-    m_device = 0;
-}
-
-void Generator::generateData(const QAudioFormat &format, qint64 durationUs, int frequency)
-{
-    const int channelBytes = format.sampleSize() / 8;
-    const int sampleBytes = format.channels() * channelBytes;
-
-    qint64 length = (format.frequency() * format.channels() * (format.sampleSize() / 8))
-                    * durationUs / 100000;
-
-    Q_ASSERT(length % sampleBytes == 0);
-    Q_UNUSED(sampleBytes) // suppress warning in release builds
-
-    m_buffer.resize(length);
-    unsigned char *ptr = reinterpret_cast<unsigned char *>(m_buffer.data());
-    int sampleIndex = 0;
-    //qDebug() << "size" << length;
-
-    while (length) {
-        const qreal x = qSin(2 * M_PI * frequency * qreal(sampleIndex % format.frequency()) / format.frequency());
-        for (int i=0; i<format.channels(); ++i) {
-            if (format.sampleSize() == 8 && format.sampleType() == QAudioFormat::UnSignedInt) {
-                const quint8 value = static_cast<quint8>((1.0 + x) / 2 * 255);
-                *reinterpret_cast<quint8*>(ptr) = value;
-            } else if (format.sampleSize() == 8 && format.sampleType() == QAudioFormat::SignedInt) {
-                const qint8 value = static_cast<qint8>(x * 127);
-                *reinterpret_cast<quint8*>(ptr) = value;
-            } else if (format.sampleSize() == 16 && format.sampleType() == QAudioFormat::UnSignedInt) {
-                quint16 value = static_cast<quint16>((1.0 + x) / 2 * 65535);
-                if (format.byteOrder() == QAudioFormat::LittleEndian)
-                    qToLittleEndian<quint16>(value, ptr);
-                else
-                    qToBigEndian<quint16>(value, ptr);
-            } else if (format.sampleSize() == 16 && format.sampleType() == QAudioFormat::SignedInt) {
-                qint16 value = static_cast<qint16>(x * 32767);
-                if (format.byteOrder() == QAudioFormat::LittleEndian)
-                    qToLittleEndian<qint16>(value, ptr);
-                else
-                    qToBigEndian<qint16>(value, ptr);
-            }
-
-            ptr += channelBytes;
-            length -= channelBytes;
-        }
-        ++sampleIndex;
-    }
-}
-
-void Generator::tick()
-{
-    if (m_device)
-        m_device->write(m_buffer);
-}
-
 Reader::Reader(const QAudioFormat &format, QObject *parent)
     : QObject(parent)
 {
@@ -205,14 +124,12 @@ void CallPanel::callBuffered()
 void CallPanel::callConnected()
 {
     QAudioFormat format = formatFor(m_call->payloadType());
+    QAudioInput *audioInput = new QAudioInput(format, this);
 
-    //QAudioInput *audioInput = new QAudioInput(m_format, this);
     if (m_call->direction() == QXmppCall::OutgoingDirection)
     {
         qDebug() << "start capture";
-        Reader *generator = new Reader(format, this);
-        generator->start(m_call);
-        //audioInput->start(m_call);
+        audioInput->start(m_call);
     }
 }
 

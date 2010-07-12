@@ -39,29 +39,6 @@ class QPushButton;
 class QTimer;
 class QXmppCall;
 
-class Generator : public QObject
-{
-    Q_OBJECT
-
-public:
-    Generator(const QAudioFormat &format, qint64 durationUs, int frequency, QObject *parent);
-    ~Generator();
-
-    void start(QIODevice *device);
-    void stop();
-
-private:
-    void generateData(const QAudioFormat &format, qint64 durationUs, int frequency);
-
-private slots:
-    void tick();
-
-private:
-    QByteArray m_buffer;
-    QTimer *m_timer;
-    QIODevice *m_device;
-};
-
 class Reader : public QObject
 {
     Q_OBJECT
