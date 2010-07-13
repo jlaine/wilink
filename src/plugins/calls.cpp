@@ -80,7 +80,7 @@ void Reader::tick()
 }
 
 CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
-    : ChatPanel(parent), m_call(call)
+    : ChatPanel(parent), m_call(call), m_audioInput(0), m_audioOutput(0)
 {
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Call"));
@@ -102,34 +102,43 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
 
     setLayout(layout);
 
-    connect(call, SIGNAL(buffered()), this, SLOT(callBuffered()));
-    connect(call, SIGNAL(connected()), this, SLOT(callConnected()));
+    connect(call, SIGNAL(openModeChanged(QIODevice::OpenMode)), this, SLOT(openModeChanged(QIODevice::OpenMode)));
 
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
 }
 
-void CallPanel::callBuffered()
+void CallPanel::openModeChanged(QIODevice::OpenMode mode)
 {
     QAudioFormat format = formatFor(m_call->payloadType());
-    QAudioOutput *audioOutput = new QAudioOutput(format, this);
-    connect(audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
 
-    if (m_call->direction() == QXmppCall::IncomingDirection)
-    {
-        qDebug() << "start playback";
-        audioOutput->start(m_call);
-    }
-}
-
-void CallPanel::callConnected()
-{
-    QAudioFormat format = formatFor(m_call->payloadType());
-    QAudioInput *audioInput = new QAudioInput(format, this);
-
-    if (m_call->direction() == QXmppCall::OutgoingDirection)
+    // capture
+    if ((mode & QIODevice::WriteOnly) && !m_audioInput)
     {
         qDebug() << "start capture";
-        audioInput->start(m_call);
+        m_audioInput = new QAudioInput(format, this);
+        m_audioInput->start(m_call);
+    }
+    else if (!(mode & QIODevice::WriteOnly) && m_audioInput)
+    {
+        qDebug() << "stop capture";
+        m_audioInput->stop();
+        delete m_audioInput;
+        m_audioInput = 0;
+    }
+
+    // playback
+    if ((mode & QIODevice::ReadOnly) && !m_audioOutput)
+    {
+        qDebug() << "start playback";
+        m_audioOutput = new QAudioOutput(format, this);
+        m_audioOutput->start(m_call);
+    }
+    else if (!(mode & QIODevice::ReadOnly) && m_audioOutput)
+    {
+        qDebug() << "stop playback";
+        m_audioOutput->stop();
+        delete m_audioOutput;
+        m_audioOutput = 0;
     }
 }
 

@@ -66,12 +66,13 @@ public:
     CallPanel(QXmppCall *call, QWidget *parent = 0);
 
 private slots:
-    void callBuffered();
-    void callConnected();
+    void openModeChanged(QIODevice::OpenMode mode);
     void stateChanged(QAudio::State state);
 
 private:
     QXmppCall *m_call;
+    QAudioInput *m_audioInput;
+    QAudioOutput *m_audioOutput;
 };
 
 class CallWatcher : public QObject
