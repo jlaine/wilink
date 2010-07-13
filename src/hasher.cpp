@@ -130,7 +130,7 @@ void stunHash()
     stream << fingerprint;
 
     // output
-    buffer.prepend(QByteArray(2, 0));
+    buffer.prepend(QByteArray(10, 0));
     for (int i = 0; i < buffer.size(); i += 16)
     {
         QByteArray chunk = buffer.mid(i, 16);
