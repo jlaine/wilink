@@ -84,7 +84,7 @@ void stunHash()
     QByteArray buffer;
     QDataStream stream(&buffer, QIODevice::WriteOnly);
     quint16 type = BindingRequest;
-    quint16 length = 60;
+    quint16 length = 0;
     QByteArray id = QByteArray::fromHex("93be62deb6e5418f9f87b68b");
     stream << type;
     stream << length;
@@ -103,17 +103,34 @@ void stunHash()
     stream << usernameSize;
     stream.writeRawData(username.data(), username.size());
 
-    length = buffer.size() - 20;
-    qDebug() << "length" << length;
-
     // integrity
+    length = buffer.size() - 20 + 24;
+    qint64 pos = stream.device()->pos();
+    stream.device()->seek(2);
+    stream << length;
+    stream.device()->seek(pos);
+
     QByteArray integrity = generateHmacSha1(key, buffer);
     qDebug() << "integrity" << integrity.toHex();
     stream << quint16(MessageIntegrity);
     stream << quint16(integrity.size());
     stream.writeRawData(integrity.data(), integrity.size());
 
-    buffer.prepend(QByteArray(10, 0));
+    // fingerprint
+    length = buffer.size() - 20 + 8;
+    pos = stream.device()->pos();
+    stream.device()->seek(2);
+    stream << length;
+    stream.device()->seek(pos);
+
+    quint32 fingerprint = generateCrc32(buffer) ^ 0x5354554eL;
+    qDebug() << "fingerprint" << fingerprint;
+    stream << quint16(Fingerprint);
+    stream << quint16(sizeof(fingerprint));
+    stream << fingerprint;
+
+    // output
+    buffer.prepend(QByteArray(2, 0));
     for (int i = 0; i < buffer.size(); i += 16)
     {
         QByteArray chunk = buffer.mid(i, 16);
