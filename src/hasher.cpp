@@ -46,8 +46,40 @@ static QByteArray hashFile(const QString &path)
     return hasher.result();
 }
 
+QByteArray hmac(QCryptographicHash::Algorithm algorithm, const QByteArray &key, const QByteArray &text)
+{
+    QCryptographicHash hasher(algorithm);
+
+    const int B = 64;
+    QByteArray kpad = key + QByteArray(B - key.size(), 0);
+
+    QByteArray ba;
+    for (int i = 0; i < B; ++i)
+        ba += kpad[i] ^ 0x5c;
+
+    QByteArray tmp;
+    for (int i = 0; i < B; ++i)
+        tmp += kpad[i] ^ 0x36;
+    hasher.addData(tmp);
+    hasher.addData(text);
+    ba += hasher.result();
+
+    hasher.reset();
+    hasher.addData(ba);
+    return hasher.result();
+}
+
 int main(int argc, char *argv[])
 {
+    QByteArray h = hmac(QCryptographicHash::Md5, QByteArray(16, 0x0b), QByteArray("Hi There"));
+    Q_ASSERT(h.toHex() == "9294727a3638bb1c13f48ef8158bfc9d");
+
+    h = hmac(QCryptographicHash::Md5, QByteArray("Jefe"), QByteArray("what do ya want for nothing?"));
+    Q_ASSERT(h.toHex() == "750c783e6ab0b503eaa86e310a5db738");
+
+    h = hmac(QCryptographicHash::Md5, QByteArray(16, 0xaa), QByteArray(50, 0xdd));
+    Q_ASSERT(h.toHex() == "56be34521d144c88dbb8c733f0e8b3f6");
+
     for (int i = 1; i < argc; ++i)
     {
         QString path = QString::fromLocal8Bit(argv[i]);
