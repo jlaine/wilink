@@ -23,6 +23,27 @@
 #include <QFileInfo>
 #include <QTime>
 
+#include "qxmpp/QXmppUtils.h"
+
+static const quint32 MAGIC_COOKIE = 0x2112A442;
+
+enum MessageType {
+    BindingRequest  = 0x0001,
+    BindingResponse = 0x0101,
+    BindingError    = 0x0111,
+    SharedSecretRequest  = 0x0002,
+    SharedSecretResponse = 0x0102,
+    SharedSecretError    = 0x0112,
+};
+
+enum AttributeType {
+    Username         = 0x0006,
+    MessageIntegrity = 0x0008,
+    Priority         = 0x0024,
+    Unknown          = 0x0029,
+    Fingerprint      = 0x8028,
+};
+
 /** Fingerprint a file.
  */
 static QByteArray hashFile(const QString &path)
@@ -46,39 +67,67 @@ static QByteArray hashFile(const QString &path)
     return hasher.result();
 }
 
-QByteArray hmac(QCryptographicHash::Algorithm algorithm, const QByteArray &key, const QByteArray &text)
+void stunHash()
 {
-    QCryptographicHash hasher(algorithm);
+    QString m_localUser = "XiSh";
+    QString m_remoteUser = "B23U";
+    QString m_remotePassword = "EXlVjyYgSRcC4OAxMSYDFF";
 
-    const int B = 64;
-    QByteArray kpad = key + QByteArray(B - key.size(), 0);
+    QByteArray username = QString("%1:%2").arg(m_remoteUser, m_localUser).toUtf8();
+    quint16 usernameSize = username.size();
+    username += QByteArray::fromHex("e1c318");
+//    username += QByteArray(4 * ((usernameSize + 3) / 4) - usernameSize, 0);
+    quint32 priority = 1862270975;
+    QByteArray unknown(8, 0);
+    QByteArray key = m_remotePassword.toUtf8();
 
-    QByteArray ba;
-    for (int i = 0; i < B; ++i)
-        ba += kpad[i] ^ 0x5c;
+    QByteArray buffer;
+    QDataStream stream(&buffer, QIODevice::WriteOnly);
+    quint16 type = BindingRequest;
+    quint16 length = 60;
+    QByteArray id = QByteArray::fromHex("93be62deb6e5418f9f87b68b");
+    stream << type;
+    stream << length;
+    stream << MAGIC_COOKIE;
+    stream.writeRawData(id.data(), id.size());
 
-    QByteArray tmp;
-    for (int i = 0; i < B; ++i)
-        tmp += kpad[i] ^ 0x36;
-    hasher.addData(tmp);
-    hasher.addData(text);
-    ba += hasher.result();
+    stream << quint16(Priority);
+    stream << quint16(sizeof(priority));
+    stream << priority;
 
-    hasher.reset();
-    hasher.addData(ba);
-    return hasher.result();
+    stream << quint16(Unknown);
+    stream << quint16(unknown.size());
+    stream.writeRawData(unknown.data(), unknown.size());
+
+    stream << quint16(Username);
+    stream << usernameSize;
+    stream.writeRawData(username.data(), username.size());
+
+    length = buffer.size() - 20;
+    qDebug() << "length" << length;
+
+    // integrity
+    QByteArray integrity = generateHmacSha1(key, buffer);
+    qDebug() << "integrity" << integrity.toHex();
+    stream << quint16(MessageIntegrity);
+    stream << quint16(integrity.size());
+    stream.writeRawData(integrity.data(), integrity.size());
+
+    buffer.prepend(QByteArray(10, 0));
+    for (int i = 0; i < buffer.size(); i += 16)
+    {
+        QByteArray chunk = buffer.mid(i, 16);
+        QString str;
+        for (int j = 0; j < 16; j += 1)
+            str += chunk.mid(j, 1).toHex() + " ";
+        qDebug() << str;
+    }
+
 }
 
 int main(int argc, char *argv[])
 {
-    QByteArray h = hmac(QCryptographicHash::Md5, QByteArray(16, 0x0b), QByteArray("Hi There"));
-    Q_ASSERT(h.toHex() == "9294727a3638bb1c13f48ef8158bfc9d");
-
-    h = hmac(QCryptographicHash::Md5, QByteArray("Jefe"), QByteArray("what do ya want for nothing?"));
-    Q_ASSERT(h.toHex() == "750c783e6ab0b503eaa86e310a5db738");
-
-    h = hmac(QCryptographicHash::Md5, QByteArray(16, 0xaa), QByteArray(50, 0xdd));
-    Q_ASSERT(h.toHex() == "56be34521d144c88dbb8c733f0e8b3f6");
+    stunHash();
 
     for (int i = 1; i < argc; ++i)
     {

@@ -154,5 +154,5 @@ add_executable(codec codec.cpp qxmpp/QXmppCodec.cpp)
 target_link_libraries(codec ${QT_LIBRARIES})
 
 # hash
-add_executable(hasher hasher.cpp)
+add_executable(hasher hasher.cpp qxmpp/QXmppUtils.cpp)
 target_link_libraries(hasher ${QT_LIBRARIES})
