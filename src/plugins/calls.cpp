@@ -56,11 +56,11 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 Reader::Reader(const QAudioFormat &format, QObject *parent)
     : QObject(parent)
 {
-    int durationMs = 100;
+    int durationMs = 20;
 
     // 100ms
     m_block = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * durationMs / 1000;
-    m_input = new QFile("test.raw", this);
+    m_input = new QFile(QString("test-%1.raw").arg(format.frequency()), this);
     if (!m_input->open(QIODevice::ReadOnly))
         qDebug() << "Could not open" << m_input->fileName();
     m_timer = new QTimer(this);
