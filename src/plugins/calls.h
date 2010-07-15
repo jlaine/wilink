@@ -66,6 +66,7 @@ public:
     CallPanel(QXmppCall *call, QWidget *parent = 0);
 
 private slots:
+    void finished();
     void openModeChanged(QIODevice::OpenMode mode);
     void stateChanged(QAudio::State state);
 
@@ -73,6 +74,7 @@ private:
     QXmppCall *m_call;
     QAudioInput *m_audioInput;
     QAudioOutput *m_audioOutput;
+    QPushButton *m_hangupButton;
 };
 
 class CallWatcher : public QObject

@@ -94,17 +94,23 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     layout->addItem(headerLayout());
 
     QHBoxLayout *hbox = new QHBoxLayout;
-    QPushButton *hangupButton = new QPushButton(tr("Hang up"));
-    connect(hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
-    hbox->addWidget(hangupButton);
+    m_hangupButton = new QPushButton(tr("Hang up"));
+    connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
+    hbox->addWidget(m_hangupButton);
 
     layout->addItem(hbox);
 
     setLayout(layout);
 
+    connect(call, SIGNAL(finished()), this, SLOT(finished()));
     connect(call, SIGNAL(openModeChanged(QIODevice::OpenMode)), this, SLOT(openModeChanged(QIODevice::OpenMode)));
 
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
+}
+
+void CallPanel::finished()
+{
+    m_hangupButton->setEnabled(false);
 }
 
 void CallPanel::openModeChanged(QIODevice::OpenMode mode)
