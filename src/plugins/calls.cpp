@@ -102,6 +102,8 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
 
     setLayout(layout);
 
+    connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
+    connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
     connect(call, SIGNAL(finished()), this, SLOT(finished()));
     connect(call, SIGNAL(openModeChanged(QIODevice::OpenMode)), this, SLOT(openModeChanged(QIODevice::OpenMode)));
 
