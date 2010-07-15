@@ -60,8 +60,9 @@ Reader::Reader(const QAudioFormat &format, QObject *parent)
 
     // 100ms
     m_block = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * durationMs / 1000;
-    m_input = new QFile("test.raw");
-    m_input->open(QIODevice::ReadOnly);
+    m_input = new QFile("test.raw", this);
+    if (!m_input->open(QIODevice::ReadOnly))
+        qDebug() << "Could not open" << m_input->fileName();
     m_timer = new QTimer(this);
     m_timer->setInterval(durationMs);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -73,14 +74,25 @@ void Reader::start(QIODevice *device)
     m_timer->start();
 }
 
+void Reader::stop()
+{
+    m_timer->stop();
+}
+
 void Reader::tick()
 {
-    QByteArray block = m_input->read(m_block);
-    m_output->write(block);
+    QByteArray block(m_block, 0);
+    if (m_input->read(block.data(), block.size()) > 0)
+        m_output->write(block);
+    else
+        qWarning() << "Reader could not read from" << m_input->fileName();
 }
 
 CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
-    : ChatPanel(parent), m_call(call), m_audioInput(0), m_audioOutput(0)
+    : ChatPanel(parent),
+    m_call(call),
+    m_audioInput(0),
+    m_audioOutput(0)
 {
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Call"));
@@ -123,7 +135,11 @@ void CallPanel::openModeChanged(QIODevice::OpenMode mode)
     if ((mode & QIODevice::WriteOnly) && !m_audioInput)
     {
         qDebug() << "start capture";
+#ifdef FAKE_AUDIO_INPUT
+        m_audioInput = new Reader(format, this);
+#else
         m_audioInput = new QAudioInput(format, this);
+#endif
         m_audioInput->start(m_call);
     }
     else if (!(mode & QIODevice::WriteOnly) && m_audioInput)

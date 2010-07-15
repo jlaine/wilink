@@ -33,11 +33,14 @@ class QAbstractButton;
 class QAudioFormat;
 class QAudioInput;
 class QAudioOutput;
+class QFile;
 class QMenu;
 class QModelIndex;
 class QPushButton;
 class QTimer;
 class QXmppCall;
+
+//#define FAKE_AUDIO_INPUT
 
 class Reader : public QObject
 {
@@ -54,7 +57,7 @@ private slots:
 private:
     qint64 m_block;
     QTimer *m_timer;
-    QIODevice *m_input;
+    QFile *m_input;
     QIODevice *m_output;
 };
 
@@ -72,7 +75,11 @@ private slots:
 
 private:
     QXmppCall *m_call;
+#ifdef FAKE_AUDIO_INPUT
+    Reader *m_audioInput;
+#else
     QAudioInput *m_audioInput;
+#endif
     QAudioOutput *m_audioOutput;
     QPushButton *m_hangupButton;
 };
