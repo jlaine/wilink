@@ -21,6 +21,7 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QFile>
+#include <QLabel>
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
@@ -94,6 +95,7 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     m_audioInput(0),
     m_audioOutput(0)
 {
+    setObjectName(QString("call/%1").arg(m_call->sid()));
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Call"));
 
@@ -105,7 +107,18 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
 
     layout->addItem(headerLayout());
 
+    // STATUS
+
+    layout->addStretch();
+    QLabel *label = new QLabel;
+    label->setPixmap(QPixmap(":/peer-128.png"));
+    layout->addWidget(label);
+    layout->addStretch();
+
+    // BUTTONS
+
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addStretch();
     m_hangupButton = new QPushButton(tr("Hang up"));
     connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
     hbox->addWidget(m_hangupButton);
