@@ -155,13 +155,11 @@ void CallPanel::audioStateChanged(QAudio::State state)
         return;
     if (audio == m_audioInput)
     {
-        qDebug() << "audio input state changed" << state;
         if (m_audioInput->error() != QAudio::NoError)
-            qWarning() << "audio input error" << m_audioInput->error();
+            qWarning() << "audio input state" << state << "error" << m_audioInput->error();
     } else if (audio == m_audioOutput) {
-        qDebug() << "audio output state changed" << state;
         if (m_audioOutput->error() != QAudio::NoError)
-            qWarning() << "audio output error" << m_audioOutput->error();
+            qWarning() << "audio output state" << state << "error" << m_audioOutput->error();
     }
 }
 
