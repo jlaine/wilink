@@ -138,6 +138,7 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
     connect(call, SIGNAL(finished()), this, SLOT(finished()));
+    connect(call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(call, SIGNAL(openModeChanged(QIODevice::OpenMode)), this, SLOT(openModeChanged(QIODevice::OpenMode)));
 
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
@@ -145,6 +146,7 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
 
 void CallPanel::finished()
 {
+    m_statusLabel->setText(tr("Call finished."));
     m_hangupButton->setEnabled(false);
 }
 
@@ -185,6 +187,11 @@ void CallPanel::openModeChanged(QIODevice::OpenMode mode)
         delete m_audioOutput;
         m_audioOutput = 0;
     }
+}
+
+void CallPanel::ringing()
+{
+    m_statusLabel->setText(tr("Ringing.."));
 }
 
 void CallPanel::stateChanged(QAudio::State state)

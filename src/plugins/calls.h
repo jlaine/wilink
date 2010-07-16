@@ -71,6 +71,7 @@ public:
 private slots:
     void finished();
     void openModeChanged(QIODevice::OpenMode mode);
+    void ringing();
     void stateChanged(QAudio::State state);
 
 private:

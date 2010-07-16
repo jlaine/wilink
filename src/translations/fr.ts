@@ -9,6 +9,25 @@
     </message>
 </context>
 <context>
+    <name>CallPanel</name>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+    <message>
+        <source>Hang up</source>
+        <translation>Raccrocher</translation>
+    </message>
+    <message>
+        <source>Call finished.</source>
+        <translation>Appel terminé.</translation>
+    </message>
+    <message>
+        <source>Ringing..</source>
+        <translation>Sonne..</translation>
+    </message>
+</context>
+<context>
     <name>CallWatcher</name>
     <message>
         <source>Call</source>
