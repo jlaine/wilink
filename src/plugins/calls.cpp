@@ -157,6 +157,8 @@ void CallPanel::audioStateChanged(QAudio::State state)
             qWarning() << "audio input error" << m_audioInput->error();
     } else if (audio == m_audioOutput) {
         qDebug() << "audio output state changed" << state;
+        if (m_audioOutput->error() != QAudio::NoError)
+            qWarning() << "audio output error" << m_audioOutput->error();
     }
 }
 
@@ -235,11 +237,14 @@ void CallWatcher::callClicked(QAbstractButton * button)
 
     if (box->standardButton(button) == QMessageBox::Yes)
     {
+        disconnect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
         CallPanel *panel = new CallPanel(call, m_window);
         m_window->addPanel(panel);
         call->accept();
-    } else
+    } else {
         call->hangup();
+    }
+    box->deleteLater();
 }
 
 void CallWatcher::callContact()
@@ -267,6 +272,8 @@ void CallWatcher::callReceived(QXmppCall *call)
     box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
 
     /* connect signals */
+    connect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
+    connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callClicked(QAbstractButton*)));
     box->show();
