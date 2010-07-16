@@ -98,6 +98,7 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     setObjectName(QString("call/%1").arg(m_call->sid()));
     setWindowIcon(QIcon(":/chat.png"));
     setWindowTitle(tr("Call"));
+    setWindowExtra(QString("<br/>%1").arg(jidToBareJid(call->jid())));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
