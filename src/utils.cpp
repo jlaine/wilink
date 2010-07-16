@@ -41,6 +41,8 @@ bool isFullJid(const QString &jid)
 
 QString indentXml(const QString &xml)
 {
+    if (!xml.startsWith("<"))
+        return xml;
     QRegExp expression("<([^>]+)>");
     int level = 0;
     int index = expression.indexIn(xml);
