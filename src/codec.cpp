@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     outputStream.setByteOrder(QDataStream::LittleEndian);
 
     // perform encoding
-    QXmppG711aCodec codec;
+    QXmppG711aCodec codec(8000);
     qint64 samples = codec.decode(inputStream, outputStream);
     qDebug() << "transcoded" << samples << "samples";
 
