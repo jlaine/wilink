@@ -56,7 +56,7 @@ Cross compiling for win32
 -------------------------
 
 To cross compile for win32 on a Debian machine, install the libqt4-mingw32-dev
-package from:
+and libspeex-mingw32-dev packages from:
 
   http://dev.jerryweb.org/debian/pool/main/
 
