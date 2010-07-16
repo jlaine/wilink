@@ -35,14 +35,16 @@ if(WIN32)
     set(WILINK_EXTRA_RUNTIME
         ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtMultimedia4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtSql4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libgcc_s_dw2-1.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll)
+        ${CMAKE_FIND_ROOT_PATH}/bin/libspeex-1.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll)
     set(WILINK_IMAGE_PLUGINS
         ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
         ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
