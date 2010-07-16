@@ -82,6 +82,8 @@ private:
 #endif
     QAudioOutput *m_audioOutput;
     QPushButton *m_hangupButton;
+    QLabel *m_imageLabel;
+    QLabel *m_statusLabel;
 };
 
 class CallWatcher : public QObject

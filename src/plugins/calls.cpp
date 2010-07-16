@@ -111,9 +111,16 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     // STATUS
 
     layout->addStretch();
-    QLabel *label = new QLabel;
-    label->setPixmap(QPixmap(":/peer-128.png"));
-    layout->addWidget(label);
+    QHBoxLayout *box = new QHBoxLayout;
+
+    m_imageLabel = new QLabel;
+    m_imageLabel->setPixmap(QPixmap(":/peer-128.png"));
+    box->addWidget(m_imageLabel);
+
+    m_statusLabel = new QLabel;
+    box->addWidget(m_statusLabel);
+
+    layout->addLayout(box);
     layout->addStretch();
 
     // BUTTONS
