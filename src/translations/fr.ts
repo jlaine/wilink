@@ -26,6 +26,14 @@
         <source>Ringing..</source>
         <translation>Sonne..</translation>
     </message>
+    <message>
+        <source>Connecting..</source>
+        <translation type="unfinished">Connexion..</translation>
+    </message>
+    <message>
+        <source>Call connected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CallWatcher</name>

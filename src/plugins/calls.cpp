@@ -118,6 +118,7 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     box->addWidget(m_imageLabel);
 
     m_statusLabel = new QLabel;
+    m_statusLabel->setText(tr("Connecting.."));
     box->addWidget(m_statusLabel);
 
     layout->addLayout(box);
@@ -144,6 +145,21 @@ CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
 }
 
+void CallPanel::audioStateChanged(QAudio::State state)
+{
+    QObject *audio = sender();
+    if (!audio)
+        return;
+    if (audio == m_audioInput)
+    {
+        qDebug() << "audio input state changed" << state;
+        if (m_audioInput->error() != QAudio::NoError)
+            qWarning() << "audio input error" << m_audioInput->error();
+    } else if (audio == m_audioOutput) {
+        qDebug() << "audio output state changed" << state;
+    }
+}
+
 void CallPanel::finished()
 {
     m_statusLabel->setText(tr("Call finished."));
@@ -162,6 +178,7 @@ void CallPanel::openModeChanged(QIODevice::OpenMode mode)
         m_audioInput = new Reader(format, this);
 #else
         m_audioInput = new QAudioInput(format, this);
+        connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
 #endif
         m_audioInput->start(m_call);
     }
@@ -178,6 +195,7 @@ void CallPanel::openModeChanged(QIODevice::OpenMode mode)
     {
         qDebug() << "start playback";
         m_audioOutput = new QAudioOutput(format, this);
+        connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
         m_audioOutput->start(m_call);
     }
     else if (!(mode & QIODevice::ReadOnly) && m_audioOutput)
@@ -187,16 +205,15 @@ void CallPanel::openModeChanged(QIODevice::OpenMode mode)
         delete m_audioOutput;
         m_audioOutput = 0;
     }
+
+    // status
+    if (mode == QIODevice::ReadWrite)
+        m_statusLabel->setText(tr("Call connected."));
 }
 
 void CallPanel::ringing()
 {
     m_statusLabel->setText(tr("Ringing.."));
-}
-
-void CallPanel::stateChanged(QAudio::State state)
-{
-    qDebug() << "state changed" << state;
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)

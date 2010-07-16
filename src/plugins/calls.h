@@ -69,10 +69,10 @@ public:
     CallPanel(QXmppCall *call, QWidget *parent = 0);
 
 private slots:
+    void audioStateChanged(QAudio::State state);
     void finished();
     void openModeChanged(QIODevice::OpenMode mode);
     void ringing();
-    void stateChanged(QAudio::State state);
 
 private:
     QXmppCall *m_call;
