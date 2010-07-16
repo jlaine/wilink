@@ -53,6 +53,7 @@ public:
         ChatStatesFeature = 1,
         FileTransferFeature = 2,
         VersionFeature = 4,
+        VoiceFeature = 8,
     };
 
     enum Flag {

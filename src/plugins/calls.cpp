@@ -265,7 +265,7 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 
     if (type == ChatRosterItem::Contact)
     {
-        QStringList fullJids = m_roster->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+        QStringList fullJids = m_roster->contactFeaturing(jid, ChatRosterModel::VoiceFeature);
         if (fullJids.isEmpty())
             return;
 

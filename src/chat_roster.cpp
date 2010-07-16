@@ -279,6 +279,8 @@ void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             features |= FileTransferFeature;
         else if (var == ns_version)
             features |= VersionFeature;
+        else if (var == ns_jingle_rtp_audio)
+            features |= VoiceFeature;
     }
     foreach (const QXmppDiscoveryIq::Identity& id, disco.identities())
     {
