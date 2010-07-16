@@ -66,7 +66,7 @@ class CallPanel : public ChatPanel
     Q_OBJECT
 
 public:
-    CallPanel(QXmppCall *call, QWidget *parent = 0);
+    CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent = 0);
 
 private slots:
     void audioStateChanged(QAudio::State state);

@@ -89,16 +89,19 @@ void Reader::tick()
         qWarning() << "Reader could not read from" << m_input->fileName();
 }
 
-CallPanel::CallPanel(QXmppCall *call, QWidget *parent)
+CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
     : ChatPanel(parent),
     m_call(call),
     m_audioInput(0),
     m_audioOutput(0)
 {
+    const QString bareJid = jidToBareJid(call->jid());
+    const QString contactName = rosterModel->contactName(bareJid);
+
     setObjectName(QString("call/%1").arg(m_call->sid()));
     setWindowIcon(QIcon(":/chat.png"));
-    setWindowTitle(tr("Call"));
-    setWindowExtra(QString("<br/>%1").arg(jidToBareJid(call->jid())));
+    setWindowTitle(tr("Call with %1").arg(contactName));
+    setWindowExtra(QString("<br/>%1").arg(bareJid));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -238,7 +241,7 @@ void CallWatcher::callClicked(QAbstractButton * button)
     if (box->standardButton(button) == QMessageBox::Yes)
     {
         disconnect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
-        CallPanel *panel = new CallPanel(call, m_window);
+        CallPanel *panel = new CallPanel(call, m_roster, m_window);
         m_window->addPanel(panel);
         call->accept();
     } else {
@@ -255,7 +258,7 @@ void CallWatcher::callContact()
     QString fullJid = action->data().toString();
 
     QXmppCall *call = m_client->callManager().call(fullJid);
-    CallPanel *panel = new CallPanel(call, m_window);
+    CallPanel *panel = new CallPanel(call, m_roster, m_window);
     m_window->addPanel(panel);
 }
 

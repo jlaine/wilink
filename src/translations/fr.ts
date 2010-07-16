@@ -11,10 +11,6 @@
 <context>
     <name>CallPanel</name>
     <message>
-        <source>Call</source>
-        <translation>Appeler</translation>
-    </message>
-    <message>
         <source>Hang up</source>
         <translation>Raccrocher</translation>
     </message>
@@ -28,11 +24,15 @@
     </message>
     <message>
         <source>Connecting..</source>
-        <translation type="unfinished">Connexion..</translation>
+        <translation>Connexion..</translation>
     </message>
     <message>
         <source>Call connected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Appel connecté</translation>
+    </message>
+    <message>
+        <source>Call with %1</source>
+        <translation>Appel avec %1</translation>
     </message>
 </context>
 <context>
