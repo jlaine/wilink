@@ -28,11 +28,15 @@
     </message>
     <message>
         <source>Call connected.</source>
-        <translation>Appel connecté</translation>
+        <translation>Appel connecté.</translation>
     </message>
     <message>
         <source>Call with %1</source>
         <translation>Appel avec %1</translation>
+    </message>
+    <message>
+        <source>Disconnecting..</source>
+        <translation>Déconnexion..</translation>
     </message>
 </context>
 <context>

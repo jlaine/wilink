@@ -141,9 +141,10 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
 
     connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
-    connect(call, SIGNAL(finished()), this, SLOT(finished()));
     connect(call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(call, SIGNAL(openModeChanged(QIODevice::OpenMode)), this, SLOT(openModeChanged(QIODevice::OpenMode)));
+    connect(call, SIGNAL(stateChanged(QXmppCall::State)),
+        this, SLOT(callStateChanged(QXmppCall::State)));
 
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
 }
@@ -165,10 +166,26 @@ void CallPanel::audioStateChanged(QAudio::State state)
     }
 }
 
-void CallPanel::finished()
+void CallPanel::callStateChanged(QXmppCall::State state)
 {
-    m_statusLabel->setText(tr("Call finished."));
-    m_hangupButton->setEnabled(false);
+    switch (state)
+    {
+    case QXmppCall::ConnectingState:
+        m_statusLabel->setText(tr("Connecting.."));
+        break;
+        m_statusLabel->setText(tr("Call connected."));
+        break;
+    case QXmppCall::DisconnectingState:
+        m_statusLabel->setText(tr("Disconnecting.."));
+        break;
+    case QXmppCall::FinishedState:
+        m_statusLabel->setText(tr("Call finished."));
+        m_hangupButton->setEnabled(false);
+        break;
+    case QXmppCall::ActiveState:
+    default:
+        break;
+    }
 }
 
 void CallPanel::openModeChanged(QIODevice::OpenMode mode)

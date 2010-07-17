@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QAudio>
 
+#include "qxmpp/QXmppCallManager.h"
 #include "chat_panel.h"
 
 class Chat;
@@ -70,7 +71,7 @@ public:
 
 private slots:
     void audioStateChanged(QAudio::State state);
-    void finished();
+    void callStateChanged(QXmppCall::State state);
     void openModeChanged(QIODevice::OpenMode mode);
     void ringing();
 
