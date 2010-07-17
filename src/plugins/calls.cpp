@@ -170,10 +170,12 @@ void CallPanel::callStateChanged(QXmppCall::State state)
 {
     switch (state)
     {
+    case QXmppCall::OfferState:
     case QXmppCall::ConnectingState:
         m_statusLabel->setText(tr("Connecting.."));
         break;
-        m_statusLabel->setText(tr("Call connected."));
+    case QXmppCall::ActiveState:
+        // do nothing, we want media to be able to flow too
         break;
     case QXmppCall::DisconnectingState:
         m_statusLabel->setText(tr("Disconnecting.."));
@@ -181,9 +183,6 @@ void CallPanel::callStateChanged(QXmppCall::State state)
     case QXmppCall::FinishedState:
         m_statusLabel->setText(tr("Call finished."));
         m_hangupButton->setEnabled(false);
-        break;
-    case QXmppCall::ActiveState:
-    default:
         break;
     }
 }
@@ -229,7 +228,7 @@ void CallPanel::openModeChanged(QIODevice::OpenMode mode)
     }
 
     // status
-    if (mode == QIODevice::ReadWrite)
+    if (mode == QIODevice::ReadWrite && m_call->state() == QXmppCall::ActiveState)
         m_statusLabel->setText(tr("Call connected."));
 }
 
