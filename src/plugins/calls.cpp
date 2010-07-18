@@ -179,6 +179,7 @@ void CallPanel::callStateChanged(QXmppCall::State state)
         break;
     case QXmppCall::DisconnectingState:
         m_statusLabel->setText(tr("Disconnecting.."));
+        m_hangupButton->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
         m_statusLabel->setText(tr("Call finished."));
