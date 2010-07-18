@@ -80,10 +80,10 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(&client->getRoster(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
-    connect(&client->getRoster(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
-    connect(&client->getRoster(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
-    connect(&client->getVCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
+    connect(&client->rosterManager(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
+    connect(&client->rosterManager(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
+    connect(&client->rosterManager(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
+    connect(&client->vCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
 }
 
 ChatRosterModel::~ChatRosterModel()
@@ -100,7 +100,7 @@ void ChatRosterModel::connected()
 {
     /* request own vCard */
     nickName = client->getConfiguration().user();
-    client->getVCardManager().requestVCard(
+    client->vCardManager().requestVCard(
         client->getConfiguration().jidBare());
 }
 
@@ -186,7 +186,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         // condition upon disconnection, because the roster has not yet been cleared
         if (!client->isConnected())
             return statusType;
-        foreach (const QXmppPresence &presence, client->getRoster().getAllPresencesForBareJid(bareJid))
+        foreach (const QXmppPresence &presence, client->rosterManager().getAllPresencesForBareJid(bareJid))
         {
             QXmppPresence::Status::Type type = presence.status().type();
             if (type == QXmppPresence::Status::Offline)
@@ -453,7 +453,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 void ChatRosterModel::rosterChanged(const QString &jid)
 {
     ChatRosterItem *item = rootItem->find(jid);
-    QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+    QXmppRoster::QXmppRosterEntry entry = client->rosterManager().getRosterEntry(jid);
 
     // remove an existing entry
     if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
@@ -485,7 +485,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     }
 
     // fetch vCard
-    client->getVCardManager().requestVCard(jid);
+    client->vCardManager().requestVCard(jid);
 }
 
 void ChatRosterModel::rosterReceived()
@@ -500,7 +500,7 @@ void ChatRosterModel::rosterReceived()
     }
 
     // process received entries
-    foreach (const QString &jid, client->getRoster().getRosterBareJids())
+    foreach (const QString &jid, client->rosterManager().getRosterBareJids())
     {
         rosterChanged(jid);
         oldJids.removeAll(jid);
@@ -560,7 +560,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
 
         // Store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name.
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(bareJid);
+        QXmppRoster::QXmppRosterEntry entry = client->rosterManager().getRosterEntry(bareJid);
         if (entry.name().isEmpty())
         {
             if (!vcard.nickName().isEmpty())

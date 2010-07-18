@@ -128,7 +128,7 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
     {
         ChatClient *client = chat->client();
         const QString jid = presence.from();
-        QXmppRoster::QXmppRosterEntry entry = client->getRoster().getRosterEntry(jid);
+        QXmppRoster::QXmppRosterEntry entry = client->rosterManager().getRosterEntry(jid);
         QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
 
         /* if the contact is in our roster accept subscribe */
@@ -192,7 +192,7 @@ void ContactsWatcher::renameContact()
     QString jid = action->data().toString();
 
     bool ok = true;
-    QXmppRosterIq::Item item = chat->client()->getRoster().getRosterEntry(jid);
+    QXmppRosterIq::Item item = chat->client()->rosterManager().getRosterEntry(jid);
     QString name = QInputDialog::getText(chat, tr("Rename contact"),
         tr("Enter the name for this contact."),
         QLineEdit::Normal, item.name(), &ok);
