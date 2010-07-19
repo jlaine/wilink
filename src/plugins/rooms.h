@@ -55,8 +55,8 @@ private slots:
     void disconnected();
     ChatRoom *joinRoom(const QString &jid);
     void kickUser();
-    void messageHandled(QAbstractButton *button);
-    void messageReceived(const QXmppMessage &msg);
+    void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
+    void invitationHandled(QAbstractButton *button);
     void roomConfigurationReceived(const QString &bareJid, const QXmppDataForm &form);
     void mucServerFound(const QString &roomServer);
     void roomJoin();
