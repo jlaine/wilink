@@ -23,7 +23,6 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
-#include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppVCard.h"
 
 #include "chat_roster_item.h"
@@ -32,6 +31,7 @@ class QContextMenuEvent;
 class QMenu;
 class QXmppClient;
 class QXmppDiscoveryIq;
+class QXmppPresence;
 class QXmppVCardManager;
 
 class ChatRosterModel : public QAbstractItemModel

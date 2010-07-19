@@ -25,6 +25,7 @@
 #include <QStatusBar>
 #include <QUrl>
 
+#include "qxmpp/QXmppRosterManager.h"
 #include "qxmpp/QXmppUtils.h"
 
 #include "chat.h"
@@ -128,11 +129,11 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
     {
         ChatClient *client = chat->client();
         const QString jid = presence.from();
-        QXmppRoster::QXmppRosterEntry entry = client->rosterManager().getRosterEntry(jid);
-        QXmppRoster::QXmppRosterEntry::SubscriptionType type = entry.subscriptionType();
+        QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(jid);
+        QXmppRosterIq::Item::SubscriptionType type = entry.subscriptionType();
 
         /* if the contact is in our roster accept subscribe */
-        if (type == QXmppRoster::QXmppRosterEntry::To || type == QXmppRoster::QXmppRosterEntry::Both)
+        if (type == QXmppRosterIq::Item::To || type == QXmppRosterIq::Item::Both)
         {
             // accept subscription
             QXmppPresence packet;

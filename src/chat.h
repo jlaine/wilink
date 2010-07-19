@@ -24,7 +24,6 @@
 #include <QMainWindow>
 
 #include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppRoster.h"
 
 class ChatClient;
 class ChatPanel;

@@ -39,8 +39,8 @@
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppLogger.h"
 #include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppRosterManager.h"
 #include "qxmpp/QXmppUtils.h"
 
 #include "qnetio/dns.h"
@@ -437,13 +437,13 @@ void Chat::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError)
     {
-        if (m_client->getXmppStreamError() == QXmppStanza::Error::Conflict)
+        if (m_client->xmppStreamError() == QXmppStanza::Error::Conflict)
         {
             // if we received a resource conflict, exit
             qWarning("Received a resource conflict from chat server");
             qApp->quit();
         }
-        else if (m_client->getXmppStreamError() == QXmppStanza::Error::NotAuthorized)
+        else if (m_client->xmppStreamError() == QXmppStanza::Error::NotAuthorized)
         {
             // prompt user for credentials at the next main loop execution
             QTimer::singleShot(0, this, SLOT(promptCredentials()));

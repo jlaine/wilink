@@ -30,8 +30,8 @@
 #include "qxmpp/QXmppConstants.h"
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppRoster.h"
 #include "qxmpp/QXmppRosterIq.h"
+#include "qxmpp/QXmppRosterManager.h"
 #include "qxmpp/QXmppUtils.h"
 #include "qxmpp/QXmppVCardManager.h"
 
@@ -453,10 +453,10 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 void ChatRosterModel::rosterChanged(const QString &jid)
 {
     ChatRosterItem *item = rootItem->find(jid);
-    QXmppRoster::QXmppRosterEntry entry = client->rosterManager().getRosterEntry(jid);
+    QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(jid);
 
     // remove an existing entry
-    if (entry.subscriptionType() == QXmppRoster::QXmppRosterEntry::Remove)
+    if (entry.subscriptionType() == QXmppRosterIq::Item::Remove)
     {
         if (item)
         {
@@ -560,7 +560,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
 
         // Store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name.
-        QXmppRoster::QXmppRosterEntry entry = client->rosterManager().getRosterEntry(bareJid);
+        QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(bareJid);
         if (entry.name().isEmpty())
         {
             if (!vcard.nickName().isEmpty())
