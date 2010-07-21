@@ -66,8 +66,8 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     ChatClient *client = chat->client();
     connect(client, SIGNAL(disconnected()),
             this, SLOT(disconnected()));
-    connect(client, SIGNAL(messageReceived(QXmppMessage)),
-            this, SLOT(messageReceived(QXmppMessage)));
+    connect(&client->mucManager(), SIGNAL(invitationReceived(QString,QString,QString)),
+            this, SLOT(invitationReceived(QString,QString,QString)));
     connect(&client->mucManager(), SIGNAL(roomConfigurationReceived(QString,QXmppDataForm)),
             this, SLOT(roomConfigurationReceived(QString,QXmppDataForm)));
     connect(client, SIGNAL(mucServerFound(const QString&)),
@@ -140,7 +140,7 @@ void ChatRoomWatcher::kickUser()
     chat->client()->sendPacket(iq);
 }
 
-void ChatRoomWatcher::messageHandled(QAbstractButton *button)
+void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
     if (box && box->standardButton(button) == QMessageBox::Yes)
@@ -151,36 +151,29 @@ void ChatRoomWatcher::messageHandled(QAbstractButton *button)
     }
 }
 
-void ChatRoomWatcher::messageReceived(const QXmppMessage &msg)
+/*** Notify the user when an invitation is received.
+ */
+void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &jid, const QString &reason)
 {
-    if (msg.type() != QXmppMessage::Normal)
+    // Skip invitations to rooms which we have already joined or
+    // which we have already received
+    if (chat->panel(roomJid) || invitations.contains(roomJid))
         return;
 
-    // process room invitations
-    const QString bareJid = jidToBareJid(msg.from());
-    foreach (const QXmppElement &extension, msg.extensions())
-    {
-        if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_conference)
-        {
-            const QString contactName = chat->rosterModel()->contactName(bareJid);
-            const QString roomJid = extension.attribute("jid");
-            if (!roomJid.isEmpty() && !chat->panel(roomJid) && !invitations.contains(roomJid))
-            {
-                QMessageBox *box = new QMessageBox(QMessageBox::Question,
-                    tr("Invitation from %1").arg(bareJid),
-                    tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
-                    QMessageBox::Yes | QMessageBox::No,
-                    chat);
-                box->setObjectName(roomJid);
-                box->setDefaultButton(QMessageBox::Yes);
-                box->setEscapeButton(QMessageBox::No);
-                box->open(this, SLOT(messageHandled(QAbstractButton*)));
+    const QString bareJid = jidToBareJid(jid);
+    const QString contactName = chat->rosterModel()->contactName(bareJid);
 
-                invitations << roomJid;
-            }
-            break;
-        }
-    }
+    QMessageBox *box = new QMessageBox(QMessageBox::Question,
+        tr("Invitation from %1").arg(bareJid),
+        tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
+        QMessageBox::Yes | QMessageBox::No,
+        chat);
+    box->setObjectName(roomJid);
+    box->setDefaultButton(QMessageBox::Yes);
+    box->setEscapeButton(QMessageBox::No);
+    box->open(this, SLOT(invitationHandled(QAbstractButton*)));
+
+    invitations << roomJid;
 }
 
 /** Prompt the user for a new group chat then join it.
@@ -364,17 +357,8 @@ void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
  */
 void ChatRoom::invite(const QString &jid)
 {
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_conference);
-    x.setAttribute("jid", chatRemoteJid);
-    x.setAttribute("reason", "Let's talk");
-
-    QXmppMessage message;
-    message.setTo(jid);
-    message.setType(QXmppMessage::Normal);
-    message.setExtensions(x);
-    client->sendPacket(message);
+    if (!client->mucManager().sendInvitation(chatRemoteJid, jid, "Let's talk"))
+        return;
 
     // notify user
     queueNotification(tr("%1 has been invited to %2")
