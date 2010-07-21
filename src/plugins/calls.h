@@ -20,7 +20,6 @@
 #ifndef __WILINK_CALLS_H__
 #define __WILINK_CALLS_H__
 
-#include <QIODevice>
 #include <QObject>
 #include <QAudio>
 
@@ -72,7 +71,6 @@ public:
 private slots:
     void audioStateChanged(QAudio::State state);
     void callStateChanged(QXmppCall::State state);
-    void openModeChanged(QIODevice::OpenMode mode);
     void ringing();
 
 private:

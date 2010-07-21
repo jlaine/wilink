@@ -63,7 +63,7 @@ Reader::Reader(const QAudioFormat &format, QObject *parent)
     m_block = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * durationMs / 1000;
     m_input = new QFile(QString("test-%1.raw").arg(format.frequency()), this);
     if (!m_input->open(QIODevice::ReadOnly))
-        qDebug() << "Could not open" << m_input->fileName();
+        qWarning() << "Could not open" << m_input->fileName();
     m_timer = new QTimer(this);
     m_timer->setInterval(durationMs);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -142,7 +142,6 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
     connect(call, SIGNAL(ringing()), this, SLOT(ringing()));
-    connect(call, SIGNAL(openModeChanged(QIODevice::OpenMode)), this, SLOT(openModeChanged(QIODevice::OpenMode)));
     connect(call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
 
@@ -168,6 +167,43 @@ void CallPanel::audioStateChanged(QAudio::State state)
 
 void CallPanel::callStateChanged(QXmppCall::State state)
 {
+    // start or stop capture
+    if (state == QXmppCall::ActiveState)
+    {
+        QAudioFormat format = formatFor(m_call->payloadType());
+        if (!m_audioOutput)
+        {
+            m_audioOutput = new QAudioOutput(format, this);
+            connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+            m_audioOutput->start(m_call);
+        }
+
+        if (!m_audioInput)
+        {
+#ifdef FAKE_AUDIO_INPUT
+            m_audioInput = new Reader(format, this);
+#else
+            m_audioInput = new QAudioInput(format, this);
+            connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+#endif
+            m_audioInput->start(m_call);
+        }
+    } else {
+        if (m_audioInput)
+        {
+            m_audioInput->stop();
+            delete m_audioInput;
+            m_audioInput = 0;
+        }
+        if (m_audioOutput)
+        {
+            m_audioOutput->stop();
+            delete m_audioOutput;
+            m_audioOutput = 0;
+        }
+    }
+
+    // update status
     switch (state)
     {
     case QXmppCall::OfferState:
@@ -175,7 +211,7 @@ void CallPanel::callStateChanged(QXmppCall::State state)
         m_statusLabel->setText(tr("Connecting.."));
         break;
     case QXmppCall::ActiveState:
-        // do nothing, we want media to be able to flow too
+        m_statusLabel->setText(tr("Call connected."));
         break;
     case QXmppCall::DisconnectingState:
         m_statusLabel->setText(tr("Disconnecting.."));
@@ -186,51 +222,6 @@ void CallPanel::callStateChanged(QXmppCall::State state)
         m_hangupButton->setEnabled(false);
         break;
     }
-}
-
-void CallPanel::openModeChanged(QIODevice::OpenMode mode)
-{
-    QAudioFormat format = formatFor(m_call->payloadType());
-
-    // capture
-    if ((mode & QIODevice::WriteOnly) && !m_audioInput)
-    {
-        qDebug() << "start capture";
-#ifdef FAKE_AUDIO_INPUT
-        m_audioInput = new Reader(format, this);
-#else
-        m_audioInput = new QAudioInput(format, this);
-        connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-#endif
-        m_audioInput->start(m_call);
-    }
-    else if (!(mode & QIODevice::WriteOnly) && m_audioInput)
-    {
-        qDebug() << "stop capture";
-        m_audioInput->stop();
-        delete m_audioInput;
-        m_audioInput = 0;
-    }
-
-    // playback
-    if ((mode & QIODevice::ReadOnly) && !m_audioOutput)
-    {
-        qDebug() << "start playback";
-        m_audioOutput = new QAudioOutput(format, this);
-        connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-        m_audioOutput->start(m_call);
-    }
-    else if (!(mode & QIODevice::ReadOnly) && m_audioOutput)
-    {
-        qDebug() << "stop playback";
-        m_audioOutput->stop();
-        delete m_audioOutput;
-        m_audioOutput = 0;
-    }
-
-    // status
-    if (mode == QIODevice::ReadWrite && m_call->state() == QXmppCall::ActiveState)
-        m_statusLabel->setText(tr("Call connected."));
 }
 
 void CallPanel::ringing()
