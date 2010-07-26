@@ -90,8 +90,18 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+    // destroy tray icon
     if (trayIcon)
+#ifdef Q_OS_WIN
+        // FIXME : on Windows, deleting the icon crashes the program
         trayIcon->hide();
+#else
+        delete trayIcon;
+#endif
+    if (trayMenu)
+        delete trayMenu;
+
+    // destroy chat windows
     foreach (Chat *chat, chats)
         delete chat;
 }
@@ -170,10 +180,14 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
         usernameEdit->setText(username);
         passwordEdit->setText(password);
         if (!dialog->exec())
+        {
+            delete dialog;
             return;
+        }
         username = usernameEdit->text().trimmed().toLower();
         password = passwordEdit->text().trimmed();
     }
+    delete dialog;
 
     /* try to fix username */
     if (realm == "www.wifirst.net")
