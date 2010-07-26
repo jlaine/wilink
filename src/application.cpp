@@ -92,14 +92,15 @@ Application::~Application()
 {
     // destroy tray icon
     if (trayIcon)
+    {
 #ifdef Q_OS_WIN
         // FIXME : on Windows, deleting the icon crashes the program
         trayIcon->hide();
 #else
         delete trayIcon;
-#endif
-    if (trayMenu)
         delete trayMenu;
+#endif
+    }
 
     // destroy chat windows
     foreach (Chat *chat, chats)
