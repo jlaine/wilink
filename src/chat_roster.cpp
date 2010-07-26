@@ -72,8 +72,8 @@ static void paintMessages(QPixmap &icon, int messages)
     painter.drawText(rect, Qt::AlignCenter, pending);
 }
 
-ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient)
-    : client(xmppClient)
+ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
+    : QAbstractItemModel(parent), client(xmppClient)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));

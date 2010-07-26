@@ -62,7 +62,7 @@ public:
         KickFlag = 4,
     };
 
-    ChatRosterModel(QXmppClient *client);
+    ChatRosterModel(QXmppClient *client, QObject *parent = 0);
     ~ChatRosterModel();
 
     // QAbstractItemModel interface
