@@ -109,7 +109,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->addWidget(tabWidget);
 
     /* create main tab */
-    ChatSharesModel *sharesModel = new ChatSharesModel;
+    ChatSharesModel *sharesModel = new ChatSharesModel(this);
     sharesView = new ChatSharesView;
     sharesView->setExpandsOnDoubleClick(false);
     sharesView->setModel(sharesModel);
@@ -123,7 +123,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     tabWidget->addTab(sharesWidget, QIcon(":/album.png"), tr("Shares"));
 
     /* create search tab */
-    ChatSharesModel *searchModel = new ChatSharesModel;
+    ChatSharesModel *searchModel = new ChatSharesModel(this);
     searchView = new ChatSharesView;
     searchView->setExpandsOnDoubleClick(false);
     searchView->setModel(searchModel);
