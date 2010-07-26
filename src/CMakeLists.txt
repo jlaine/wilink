@@ -9,9 +9,12 @@ set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
-# FIXME: for some reason we need to include QtMultimedia explicitly
-set(QT_LIBRARIES ${QT_LIBRARIES} ${QT_QTMULTIMEDIA_LIBRARY})
-include_directories(${QT_QTMULTIMEDIA_INCLUDE_DIR})
+
+# On old cmake versions we need to include QtMultimedia explicitly
+if(CMAKE_MAJOR_VERSION EQUAL 2 AND (CMAKE_MINOR_VERSION LESS 8 OR (CMAKE_MINOR_VERSION EQUAL 8 AND CMAKE_PATCH_VERSION LESS 3)))
+set(QT_LIBRARIES ${QT_LIBRARIES} QtMultimedia)
+include_directories(${QT_INCLUDE_DIR}/QtMultimedia)
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
