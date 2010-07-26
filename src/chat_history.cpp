@@ -441,7 +441,7 @@ void ChatMessageWidget::setTextCursor(const QTextCursor &cursor)
 ChatHistory::ChatHistory(QWidget *parent)
     : QGraphicsView(parent), lastFindWidget(0)
 {
-    scene = new QGraphicsScene;
+    scene = new QGraphicsScene(this);
     setScene(scene);
     setDragMode(QGraphicsView::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
