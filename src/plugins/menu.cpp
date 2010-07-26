@@ -54,6 +54,12 @@ Menu::Menu(QMenuBar *bar)
             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 }
 
+Menu::~Menu()
+{
+    if (servicesMenu)
+        delete servicesMenu;
+}
+
 void Menu::fetchIcon(const QUrl &url, QAction *action)
 {
     QNetworkRequest req(url);

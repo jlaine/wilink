@@ -37,6 +37,7 @@ class Menu : public QObject
 
 public:
     Menu(QMenuBar *bar);
+    ~Menu();
 
 private slots:
     void fetchMenu();
