@@ -47,6 +47,7 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(rosterModel->contactAvatar(jid));
+    setWindowExtra(jid);
 
     connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
     connect(client, SIGNAL(connected()), this, SLOT(join()));

@@ -44,6 +44,7 @@ public:
     virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
+    void setWindowStatus(const QString &status);
     void setWindowTitle(const QString &title);
 
 protected:
@@ -66,10 +67,13 @@ private slots:
     void sendNotifications();
 
 private:
+    void updateTitle();
+
     QPushButton *closeButton;
     QLabel *iconLabel;
     QLabel *nameLabel;
     QString windowExtra;
+    QString windowStatus;
     QList< QPair<QString, int> > notificationQueue;
 };
 

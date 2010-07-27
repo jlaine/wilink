@@ -306,6 +306,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
+    setWindowExtra(chatRemoteJid);
 
     /* help label */
     QVBoxLayout *vbox = qobject_cast<QVBoxLayout*>(layout());

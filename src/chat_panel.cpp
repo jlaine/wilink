@@ -50,7 +50,7 @@ ChatRosterItem::Type ChatPanel::objectType() const
 void ChatPanel::setWindowExtra(const QString &extra)
 {
     windowExtra = extra;
-    nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
+    updateTitle();
 }
 
 /** When the window icon is set, update the header icon.
@@ -64,6 +64,14 @@ void ChatPanel::setWindowIcon(const QIcon &icon)
     iconLabel->setPixmap(icon.pixmap(actualSize));
 }
 
+/** When additional text is set, update the header text.
+ */
+void ChatPanel::setWindowStatus(const QString &status)
+{
+    windowStatus = status;
+    updateTitle();
+}
+
 /** When the window title is set, update the header text.
  *
  * @param title
@@ -71,7 +79,7 @@ void ChatPanel::setWindowIcon(const QIcon &icon)
 void ChatPanel::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title);
-    nameLabel->setText(QString("<b>%1</b> %2").arg(windowTitle(), windowExtra));
+    updateTitle();
 }
 
 /** Return a layout object for the panel header.
@@ -130,3 +138,7 @@ void ChatPanel::sendNotifications()
     }
 }
 
+void ChatPanel::updateTitle()
+{
+    nameLabel->setText(QString("<b>%1</b> %2<br/>%3").arg(windowTitle(), windowStatus, windowExtra));
+}

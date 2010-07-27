@@ -116,9 +116,7 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
     if (!stateName.isEmpty())
         stateName = QString(" %1").arg(stateName);
 
-    setWindowExtra(QString("%1<br/>%2")
-        .arg(stateName)
-        .arg("FIXME"));
+    setWindowStatus(stateName);
 }
 
 void ChatConversation::slotFocused()
