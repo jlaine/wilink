@@ -76,12 +76,13 @@ void ContactsWatcher::addContact()
     if (domain == "wifirst.net")
     {
         prompt = QString("<p>%1</p>").arg(
-            tr("<b>Tip</b>: the easiest way to add Wifirst contacts is to <a href=\"%1\">go to the wAmis page</a>.").arg("http://www.wifirst.net/w/friends?from=wiLink"));
+            tr("<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>!").arg("http://www.wifirst.net/w/friends?from=wiLink"));
     }
     prompt += QString("<p>%1</p>").arg(
         tr("Enter the address of the contact you want to add."));
     QLabel *label = new QLabel(prompt);
     label->setOpenExternalLinks(true);
+    label->setWordWrap(true);
     vbox->addWidget(label);
 
     // input box
