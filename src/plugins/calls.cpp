@@ -99,7 +99,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     const QString contactName = rosterModel->contactName(bareJid);
 
     setObjectName(QString("call/%1").arg(m_call->sid()));
-    setWindowIcon(QIcon(":/chat.png"));
+    setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Call with %1").arg(contactName));
     setWindowExtra(QString("<br/>%1").arg(bareJid));
 
@@ -132,6 +132,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addStretch();
     m_hangupButton = new QPushButton(tr("Hang up"));
+    m_hangupButton->setIcon(QIcon(":/hangup.png"));
     connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
     hbox->addWidget(m_hangupButton);
 
@@ -304,7 +305,7 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         if (fullJids.isEmpty())
             return;
 
-        QAction *action = menu->addAction(tr("Call"));
+        QAction *action = menu->addAction(QIcon(":/call.png"), tr("Call"));
         action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
     }
