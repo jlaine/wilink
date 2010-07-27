@@ -33,7 +33,9 @@
 #include "application.h"
 #include "updatesdialog.h"
 
+#if 0
 Q_IMPORT_PLUGIN(calls)
+#endif
 Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(console)
 Q_IMPORT_PLUGIN(diagnostics)
