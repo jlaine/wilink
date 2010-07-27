@@ -18,7 +18,11 @@
  */
 
 #include <QDesktopServices>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QInputDialog>
+#include <QLabel>
+#include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
 #include <QPushButton>
@@ -61,15 +65,48 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
 void ContactsWatcher::addContact()
 {
     bool ok = true;
-    QString jid = "@" + chat->client()->getConfiguration().domain();
+    const QString domain = chat->client()->getConfiguration().domain();
+    QString jid = QLatin1String("@") + domain;
+
+    QDialog dialog(chat);
+    QVBoxLayout *vbox = new QVBoxLayout;
+
+    // prompt label
+    QString prompt;
+    if (domain == "wifirst.net")
+    {
+        prompt = QString("<p>%1</p>").arg(
+            tr("<b>Tip</b>: the easiest way to add Wifirst contacts is to <a href=\"%1\">go to the wAmis page</a>.").arg("http://www.wifirst.net/w/friends?from=wiLink"));
+    }
+    prompt += QString("<p>%1</p>").arg(
+        tr("Enter the address of the contact you want to add."));
+    QLabel *label = new QLabel(prompt);
+    label->setOpenExternalLinks(true);
+    vbox->addWidget(label);
+
+    // input box
+    QLineEdit *lineEdit = new QLineEdit;
+    lineEdit->setText(jid);
+    lineEdit->setCursorPosition(0);
+    vbox->addWidget(lineEdit);
+
+    // buttons
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok |
+        QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+    vbox->addWidget(buttonBox);
+
+    dialog.setLayout(vbox);
+    dialog.setWindowIcon(QIcon(":/add.png"));
+    dialog.setWindowTitle(tr("Add a contact"));
+
     while (!isBareJid(jid))
     {
-        jid = QInputDialog::getText(chat, tr("Add a contact"),
-            tr("Enter the address of the contact you want to add."),
-            QLineEdit::Normal, jid, &ok).toLower();
-        if (!ok)
+        // show prompt
+        if (dialog.exec() != QDialog::Accepted)
             return;
-        jid = jid.trimmed().toLower();
+        jid = lineEdit->text().trimmed().toLower();
     }
 
     QXmppPresence packet;
