@@ -71,18 +71,18 @@ void ContactsWatcher::addContact()
     QDialog dialog(chat);
     QVBoxLayout *vbox = new QVBoxLayout;
 
-    // prompt label
-    QString prompt;
+    // tip
     if (domain == "wifirst.net")
     {
-        prompt = QString("<p>%1</p>").arg(
-            tr("<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>!").arg("http://www.wifirst.net/w/friends?from=wiLink"));
+        QLabel *tip = new QLabel(tr("<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>!").arg("http://www.wifirst.net/w/friends?from=wiLink"));
+        tip->setOpenExternalLinks(true);
+        tip->setWordWrap(true);
+        vbox->addWidget(tip);
+
     }
-    prompt += QString("<p>%1</p>").arg(
-        tr("Enter the address of the contact you want to add."));
-    QLabel *label = new QLabel(prompt);
-    label->setOpenExternalLinks(true);
-    label->setWordWrap(true);
+
+    // prompt label
+    QLabel *label = new QLabel(tr("Enter the address of the contact you want to add."));
     vbox->addWidget(label);
 
     // input box
@@ -99,7 +99,6 @@ void ContactsWatcher::addContact()
     vbox->addWidget(buttonBox);
 
     dialog.setLayout(vbox);
-    dialog.setMinimumWidth(400);
     dialog.setWindowIcon(QIcon(":/add.png"));
     dialog.setWindowTitle(tr("Add a contact"));
 
