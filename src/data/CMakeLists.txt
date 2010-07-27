@@ -5,6 +5,7 @@ generate_png(png
     add.svg
     album.svg
     back.svg
+    call.svg
     chat.svg
     close.svg
     contact-available.svg
@@ -15,6 +16,7 @@ generate_png(png
     download.svg
     file.svg
     forward.svg
+    hangup.svg
     options.svg
     peer.svg
     photos.svg
