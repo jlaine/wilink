@@ -136,7 +136,22 @@ QString ChatRosterModel::contactExtra(const QString &bareJid) const
     ChatRosterItem *item = rootItem->find(bareJid);
     if (!item)
         return QString();
-    return bareJid;
+
+    const QString remoteDomain = bareJid.split("@").last();
+    if (client->getConfiguration().domain() == "wifirst.net" &&
+        remoteDomain == "wifirst.net")
+    {
+        // for wifirst accounts, return the wifirst nickname if it is
+        // different from the display name
+        const QString nickName = item->data(NicknameRole).toString();
+        if (nickName != item->data(Qt::DisplayRole).toString())
+            return nickName;
+        else
+            return QString();
+    } else {
+        // for other accounts, return the JID
+        return bareJid;
+    }
 }
 
 /** Determine the display name for a contact.
