@@ -205,14 +205,15 @@ void ContactsWatcher::removeContact()
     QAction *action = qobject_cast<QAction*>(sender());
     if (!action)
         return;
-    QString jid = action->data().toString();
+    const QString bareJid = action->data().toString();
+    const QString contactName = chat->rosterModel()->contactName(bareJid);
 
     if (QMessageBox::question(chat, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(jid),
+        tr("Do you want to remove %1 from your contact list?").arg(contactName),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
     {
         QXmppRosterIq::Item item;
-        item.setBareJid(jid);
+        item.setBareJid(bareJid);
         item.setSubscriptionType(QXmppRosterIq::Item::Remove);
         QXmppRosterIq packet;
         packet.setType(QXmppIq::Set);
