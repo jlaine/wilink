@@ -99,6 +99,7 @@ void ContactsWatcher::addContact()
     vbox->addWidget(buttonBox);
 
     dialog.setLayout(vbox);
+    dialog.setMinimumWidth(400);
     dialog.setWindowIcon(QIcon(":/add.png"));
     dialog.setWindowTitle(tr("Add a contact"));
 
