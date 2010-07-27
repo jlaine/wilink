@@ -1,8 +1,8 @@
-wiLink 0.9.8 (UNRELEASED)
- * Improve insertion of line breaks in the chat input.
+wiLink 0.9.8 (2010-06-27)
  * Add a new layout for the chat history.
- * Make it possible to search in debugging console.
  * Make it possible to search in chat history.
+ * Make it possible to search in debugging console.
+ * Improve insertion of line breaks in the chat input.
  * Use silent installer for upgrades on Windows.
  * Fix sorting of roster entries with identical names.
  * Detect Linux desktop environment and prefer KDE/GNOME wallet accordingly.
