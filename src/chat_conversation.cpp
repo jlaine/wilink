@@ -34,12 +34,11 @@
 #define SPACING 2
 #endif
 
-ChatConversation::ChatConversation(const QString &jid, QWidget *parent)
+ChatConversation::ChatConversation(QWidget *parent)
     : ChatPanel(parent),
-    chatRemoteJid(jid), chatLocalState(QXmppMessage::None), spacerItem(0)
+    chatLocalState(QXmppMessage::None),
+    spacerItem(0)
 {
-    setObjectName(chatRemoteJid);
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
     layout->setSpacing(0);
@@ -119,7 +118,7 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
 
     setWindowExtra(QString("%1<br/>%2")
         .arg(stateName)
-        .arg(chatRemoteJid));
+        .arg("FIXME"));
 }
 
 void ChatConversation::slotFocused()

@@ -294,7 +294,8 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 }
 
 ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent),
+    : ChatConversation(parent),
+    chatRemoteJid(jid),
     client(xmppClient),
     joined(false),
     notifyMessages(false),
@@ -302,6 +303,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
 {
     nickName = rosterModel->ownName();
     chatLocalJid = jid + "/" + nickName;
+    setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 

@@ -38,8 +38,13 @@
 #include "chats.h"
 
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatConversation(jid, parent), client(xmppClient), joined(false), rosterModel(chatRosterModel)
+    : ChatConversation(parent),
+    chatRemoteJid(jid), 
+    client(xmppClient),
+    joined(false),
+    rosterModel(chatRosterModel)
 {
+    setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(rosterModel->contactAvatar(jid));
 

@@ -37,7 +37,7 @@ class ChatConversation : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatConversation(const QString &jid, QWidget *parent = NULL);
+    ChatConversation(QWidget *parent = NULL);
 
     QXmppMessage::State localState() const;
 
@@ -60,8 +60,6 @@ protected:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
     ChatSearchBar *chatSearch;
-
-    QString chatRemoteJid;
 
 private:
     QXmppMessage::State chatLocalState;

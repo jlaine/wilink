@@ -97,6 +97,7 @@ private slots:
 
 private:
     QString chatLocalJid;
+    QString chatRemoteJid;
     QXmppClient *client;
     bool joined;
     QString nickName;
