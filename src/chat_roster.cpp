@@ -561,6 +561,8 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         // Store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name.
         QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(bareJid);
+        if (!vcard.nickName().isEmpty())
+            item->setData(NicknameRole, vcard.nickName());
         if (entry.name().isEmpty())
         {
             if (!vcard.nickName().isEmpty())

@@ -47,6 +47,7 @@ public:
         FlagsRole,
         StatusRole,
         UrlRole,
+        NicknameRole,
     };
 
     enum Feature {
