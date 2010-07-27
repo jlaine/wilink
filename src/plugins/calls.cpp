@@ -101,7 +101,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     setObjectName(QString("call/%1").arg(m_call->sid()));
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Call with %1").arg(contactName));
-    setWindowExtra(bareJid);
+    setWindowExtra(rosterModel->contactExtra(bareJid));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);

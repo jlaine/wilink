@@ -127,6 +127,18 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     return jids;
 }
 
+/** Determine extra information for a contact.
+ *
+ * @param bareJid
+ */
+QString ChatRosterModel::contactExtra(const QString &bareJid) const
+{
+    ChatRosterItem *item = rootItem->find(bareJid);
+    if (!item)
+        return QString();
+    return bareJid;
+}
+
 /** Determine the display name for a contact.
  *
  *  If the user has set a name for the roster entry, it will be used,
