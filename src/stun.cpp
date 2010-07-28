@@ -25,8 +25,11 @@ void StunTester::readyRead()
     m_socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
     QXmppStunMessage msg;
-    if (msg.decode(buffer))
+    QStringList errors;
+    if (msg.decode(buffer, QString(), &errors))
         qDebug() << "Received response from" << remoteHost << msg.toString();
+    else
+        qDebug() << "Bad response from" << remoteHost << errors;
 }
 
 void StunTester::run(const QHostAddress &host, quint16 port)
