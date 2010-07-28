@@ -1,6 +1,6 @@
 #include <QObject>
-#include <QHostAddress>
 
+class QHostAddress;
 class QUdpSocket;
 
 class StunTester : public QObject
@@ -9,10 +9,9 @@ class StunTester : public QObject
 
 public:
     StunTester();
+    void run(const QHostAddress &host, quint16 port);
 
 private:
-    QHostAddress m_host;
-    quint16 m_port;
     QUdpSocket *m_socket;
 };
 
