@@ -1,6 +1,7 @@
 #include <cstdlib>
 
 #include <QCoreApplication>
+#include <QDebug>
 #include <QHostInfo>
 #include <QUdpSocket>
 
@@ -11,13 +12,28 @@
 StunTester::StunTester()
 {
     m_socket = new QUdpSocket;
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     Q_ASSERT(m_socket->bind());
+}
+
+void StunTester::readyRead()
+{
+    const qint64 size = m_socket->pendingDatagramSize();
+    QHostAddress remoteHost;
+    quint16 remotePort;
+    QByteArray buffer(size, 0);
+    m_socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+    QXmppStunMessage msg;
+    if (msg.decode(buffer))
+        qDebug() << "Received response from" << remoteHost << msg.toString();
 }
 
 void StunTester::run(const QHostAddress &host, quint16 port)
 {
     QXmppStunMessage msg;
     msg.setType(0x0001);
+    qDebug() << "Sending request to" << host << msg.toString();
     if (m_socket->writeDatagram(msg.encode(), host, port) < 0)
         qWarning("Could not send packet");
 }

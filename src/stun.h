@@ -11,6 +11,9 @@ public:
     StunTester();
     void run(const QHostAddress &host, quint16 port);
 
+private slots:
+    void readyRead();
+
 private:
     QUdpSocket *m_socket;
 };
