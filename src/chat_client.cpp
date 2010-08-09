@@ -41,7 +41,7 @@ void ChatClient::slotConnected()
 {
     /* discover services */
     QXmppDiscoveryIq disco;
-    disco.setTo(getConfiguration().domain());
+    disco.setTo(configuration().domain());
     disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     sendPacket(disco);
 }
@@ -53,7 +53,7 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
         return;
 
     if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == getConfiguration().domain())
+        disco.from() == configuration().domain())
     {
         // root items
         discoQueue.clear();

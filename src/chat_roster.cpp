@@ -99,9 +99,9 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 void ChatRosterModel::connected()
 {
     /* request own vCard */
-    nickName = client->getConfiguration().user();
+    nickName = client->configuration().user();
     client->vCardManager().requestVCard(
-        client->getConfiguration().jidBare());
+        client->configuration().jidBare());
 }
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
@@ -138,7 +138,7 @@ QString ChatRosterModel::contactExtra(const QString &bareJid) const
         return QString();
 
     const QString remoteDomain = bareJid.split("@").last();
-    if (client->getConfiguration().domain() == "wifirst.net" &&
+    if (client->configuration().domain() == "wifirst.net" &&
         remoteDomain == "wifirst.net")
     {
         // for wifirst accounts, return the wifirst nickname if it is
@@ -453,7 +453,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
             {
                 QXmppElement item = x.firstChildElement("item");
-                if (item.attribute("jid") == client->getConfiguration().jid())
+                if (item.attribute("jid") == client->configuration().jid())
                 {
                     int flags = 0;
                     // role
@@ -605,7 +605,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
-    if (bareJid == client->getConfiguration().jidBare())
+    if (bareJid == client->configuration().jidBare())
     {
         if (!vcard.nickName().isEmpty())
             nickName = vcard.nickName();

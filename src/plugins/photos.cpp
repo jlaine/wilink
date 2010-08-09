@@ -680,7 +680,7 @@ public:
 bool PhotosPlugin::initialize(Chat *chat)
 {
     QString url;
-    QString domain = chat->client()->getConfiguration().domain();
+    QString domain = chat->client()->configuration().domain();
     if (domain == "wifirst.net")
         url = "wifirst://www.wifirst.net/w";
     else if (domain == "gmail.com")

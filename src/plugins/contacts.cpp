@@ -65,7 +65,7 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
 void ContactsWatcher::addContact()
 {
     bool ok = true;
-    const QString domain = chat->client()->getConfiguration().domain();
+    const QString domain = chat->client()->configuration().domain();
     QString jid = QLatin1String("@") + domain;
 
     QDialog dialog(chat);

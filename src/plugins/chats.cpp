@@ -72,7 +72,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.body = msg.body();
         message.date = msg.date();
         message.from = msg.isReceived() ? rosterModel->contactName(chatRemoteJid) : rosterModel->ownName();
-        message.fromJid = msg.isReceived() ? chatRemoteJid : client->getConfiguration().jid();
+        message.fromJid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
         message.received = msg.isReceived();
         chatHistory->addMessage(message);
     }

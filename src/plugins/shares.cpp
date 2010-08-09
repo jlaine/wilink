@@ -452,7 +452,7 @@ void ChatShares::findRemoteFiles()
 void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &shareItem)
 {
     // check the IQ the response is for this connection
-    if (iq.from() != client->getConfiguration().jid())
+    if (iq.from() != client->configuration().jid())
         return;
 
     QXmppShareGetIq responseIq(iq);
@@ -521,7 +521,7 @@ void ChatShares::queueItem(QXmppShareItem *item)
 {
     // check item is not from local collection
     foreach (const QXmppShareLocation &location, item->locations())
-        if (location.jid() == client->getConfiguration().jid())
+        if (location.jid() == client->configuration().jid())
             return;
 
     // check item is not already in the queue
@@ -679,7 +679,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         registerTimer->stop();
 
         ChatClient *baseClient = chatWindow->client();
-        QXmppConfiguration config = baseClient->getConfiguration();
+        QXmppConfiguration config = baseClient->configuration();
         config.setDomain(domain);
         config.setHost(server);
 
@@ -736,7 +736,7 @@ void ChatShares::processDownloadQueue()
         foreach (location, file->locations())
         {
             if (!location.jid().isEmpty() &&
-                location.jid() != client->getConfiguration().jid() &&
+                location.jid() != client->configuration().jid() &&
                 !location.node().isEmpty())
             {
                 locationFound = true;
@@ -931,7 +931,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 void ChatShares::searchFinished(const QXmppShareSearchIq &responseIq)
 {
     // check the IQ the response is for this connection
-    if (responseIq.from() != client->getConfiguration().jid())
+    if (responseIq.from() != client->configuration().jid())
         return;
 
     client->sendPacket(responseIq);

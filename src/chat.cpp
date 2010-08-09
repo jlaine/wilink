@@ -465,7 +465,7 @@ void Chat::pendingMessages(int messages)
  */
 void Chat::promptCredentials()
 {
-    QXmppConfiguration config = m_client->getConfiguration();
+    QXmppConfiguration config = m_client->configuration();
     QAuthenticator auth;
     auth.setUser(config.jidBare());
     auth.setPassword(config.passwd());

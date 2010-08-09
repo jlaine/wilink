@@ -448,7 +448,7 @@ ChatRosterItem::Type ChatRoom::objectType() const
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {
     // if our own presence changes, reflect it in the chat room
-    if (presence.from() == client->getConfiguration().jid())
+    if (presence.from() == client->configuration().jid())
     {
         QXmppPresence packet;
         packet.setTo(chatLocalJid);
@@ -765,7 +765,7 @@ void ChatRoomMembers::submit()
 void ChatRoomMembers::addMember()
 {
     bool ok = false;
-    QString jid = "@" + client->getConfiguration().domain();
+    QString jid = "@" + client->configuration().domain();
     jid = QInputDialog::getText(this, tr("Add a user"),
                   tr("Enter the address of the user you want to add."),
                   QLineEdit::Normal, jid, &ok).toLower();
