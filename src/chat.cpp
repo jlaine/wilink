@@ -411,7 +411,7 @@ void Chat::changeEvent(QEvent *event)
  */
 void Chat::connected()
 {
-    QXmppPresence::Status::Type statusType = m_client->getClientPresence().status().type();
+    QXmppPresence::Status::Type statusType = m_client->clientPresence().status().type();
     if (statusType == QXmppPresence::Status::Away)
         m_statusCombo->setCurrentIndex(AwayIndex);
     else if (statusType == QXmppPresence::Status::DND)
