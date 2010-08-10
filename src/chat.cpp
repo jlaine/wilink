@@ -662,14 +662,28 @@ void Chat::statusChanged(int currentIndex)
         return;
 
     m_autoAway = false;
+    QXmppPresence presence = m_client->clientPresence();
     if (currentIndex == AvailableIndex)
-        m_client->setClientPresence(QXmppPresence::Status::Online);
+    {
+        presence.setType(QXmppPresence::Available);
+        presence.status().setType(QXmppPresence::Status::Online);
+    }
     else if (currentIndex == AwayIndex)
-        m_client->setClientPresence(QXmppPresence::Status::Away);
+    {
+        presence.setType(QXmppPresence::Available);
+        presence.status().setType(QXmppPresence::Status::Away);
+    }
     else if (currentIndex == BusyIndex)
-        m_client->setClientPresence(QXmppPresence::Status::DND);
+    {
+        presence.setType(QXmppPresence::Available);
+        presence.status().setType(QXmppPresence::Status::DND);
+    }
     else if (currentIndex == OfflineIndex)
-        m_client->setClientPresence(QXmppPresence::Status::Offline);
+    {
+        presence.setType(QXmppPresence::Unavailable);
+        presence.status().setType(QXmppPresence::Status::Offline);
+    }
+    m_client->setClientPresence(presence);
 }
 
 /** Unregister a panel from the roster list.
