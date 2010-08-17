@@ -14,13 +14,10 @@ public:
     StunTester();
     void run(const QHostAddress &host, quint16 port);
 
-private slots:
-    void readyRead();
+signals:
+    void finished();
 
 private:
-    bool sendPacket(const QXmppStunMessage &req, const QHostAddress &host, quint16 port);
-
     QXmppIceConnection *m_connection;
-    QUdpSocket *m_socket;
 };
 

@@ -5,6 +5,7 @@
 #include <QHostInfo>
 #include <QUdpSocket>
 
+#include "QXmppLogger.h"
 #include "QXmppStun.h"
 
 #include "stun.h"
@@ -15,48 +16,6 @@ enum MessageType {
 
 StunTester::StunTester()
 {
-    m_connection = new QXmppIceConnection(true, this);
-
-    m_socket = new QUdpSocket;
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    Q_ASSERT(m_socket->bind());
-}
-
-void StunTester::readyRead()
-{
-    const qint64 size = m_socket->pendingDatagramSize();
-    QHostAddress remoteHost;
-    quint16 remotePort;
-    QByteArray buffer(size, 0);
-    m_socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
-
-    QXmppStunMessage msg;
-    QStringList errors;
-    if (msg.decode(buffer, QString(), &errors))
-        qDebug() << "Received response from" << remoteHost << msg.toString();
-    else
-        qDebug() << "Bad response from" << remoteHost << errors;
-
-    qDebug() << "Have UDP connectivity";
-}
-
-void StunTester::run(const QHostAddress &host, quint16 port)
-{
-    // Test I request
-    QXmppStunMessage msg;
-    msg.setType(BindingRequest);
-    sendPacket(msg, host, port);
-}
-
-bool StunTester::sendPacket(const QXmppStunMessage &req, const QHostAddress &host, quint16 port)
-{
-    qDebug() << "Sending request to" << host << port << req.toString();
-    if (m_socket->writeDatagram(req.encode(), host, port) < 0)
-    {
-        qWarning("Could not send packet");
-        return false;
-    }
-    return true;
 }
 
 int main(int argc, char* argv[])
@@ -88,8 +47,13 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    StunTester tester;
-    tester.run(stunAddress, stunPort);
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::StdoutLogging);
 
+    QXmppIceConnection connection(true);
+    connection.setStunServer(stunAddress, stunPort);
+    QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    connection.addComponent(1);
     return app.exec();
 }
