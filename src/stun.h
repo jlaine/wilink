@@ -22,8 +22,5 @@ private:
 
     QXmppIceConnection *m_connection;
     QUdpSocket *m_socket;
-    int m_test;
-    QHostAddress m_primaryHost;
-    quint16 m_primaryPort;
 };
 

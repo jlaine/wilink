@@ -13,16 +13,7 @@ enum MessageType {
     BindingRequest       = 0x0001,
 };
 
-// http://tools.ietf.org/html/rfc5780
-enum StunTest
-{
-    PrimaryAddressAndPort,   // TEST I
-    AlternateAddress,        // TEST II
-    AlternateAddressAndPort, // TEST III 
-};
-
 StunTester::StunTester()
-    : m_test(0)
 {
     m_connection = new QXmppIceConnection(true, this);
 
@@ -51,14 +42,10 @@ void StunTester::readyRead()
 
 void StunTester::run(const QHostAddress &host, quint16 port)
 {
-    m_primaryHost = host;
-    m_primaryPort = port;
-
     // Test I request
-    m_test = PrimaryAddressAndPort;
     QXmppStunMessage msg;
     msg.setType(BindingRequest);
-    sendPacket(msg, m_primaryHost, m_primaryPort);
+    sendPacket(msg, host, port);
 }
 
 bool StunTester::sendPacket(const QXmppStunMessage &req, const QHostAddress &host, quint16 port)
@@ -82,7 +69,19 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Usage: stun <hostname>\n");
         return EXIT_FAILURE;
     }
+
+    // lookup STUN server
+    QHostAddress stunAddress;
+    const quint16 stunPort = 3478;
     QHostInfo hostInfo = QHostInfo::fromName(argv[1]);
+    foreach (const QHostAddress &address, hostInfo.addresses())
+    {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol)
+        {
+            stunAddress = address;
+            break;
+        }
+    }
     if (hostInfo.addresses().isEmpty())
     {
         qWarning("Could not lookup host");
@@ -90,7 +89,7 @@ int main(int argc, char* argv[])
     }
 
     StunTester tester;
-    tester.run(hostInfo.addresses().first(), 3478);
+    tester.run(stunAddress, stunPort);
 
     return app.exec();
 }
