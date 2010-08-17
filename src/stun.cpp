@@ -18,29 +18,11 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    // lookup STUN server
-    QHostAddress stunAddress;
-    const quint16 stunPort = 3478;
-    QHostInfo hostInfo = QHostInfo::fromName(argv[1]);
-    foreach (const QHostAddress &address, hostInfo.addresses())
-    {
-        if (address.protocol() == QAbstractSocket::IPv4Protocol)
-        {
-            stunAddress = address;
-            break;
-        }
-    }
-    if (hostInfo.addresses().isEmpty())
-    {
-        qWarning("Could not lookup host");
-        return EXIT_FAILURE;
-    }
-
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     QXmppIceConnection connection(true);
-    connection.setStunServer(stunAddress, stunPort);
+    connection.setStunServer(QString::fromLocal8Bit(argv[1]));
     QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
         &app, SLOT(quit()));
     QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
