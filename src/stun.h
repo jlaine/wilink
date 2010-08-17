@@ -3,6 +3,7 @@
 
 class QUdpSocket;
 
+class QXmppIceConnection;
 class QXmppStunMessage;
 
 class StunTester : public QObject
@@ -19,11 +20,10 @@ private slots:
 private:
     bool sendPacket(const QXmppStunMessage &req, const QHostAddress &host, quint16 port);
 
+    QXmppIceConnection *m_connection;
     QUdpSocket *m_socket;
     int m_test;
     QHostAddress m_primaryHost;
     quint16 m_primaryPort;
-    QHostAddress m_alternateHost;
-    quint16 m_alternatePort;
 };
 

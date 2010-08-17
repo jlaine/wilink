@@ -24,6 +24,8 @@ enum StunTest
 StunTester::StunTester()
     : m_test(0)
 {
+    m_connection = new QXmppIceConnection(true, this);
+
     m_socket = new QUdpSocket;
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     Q_ASSERT(m_socket->bind());
@@ -44,19 +46,7 @@ void StunTester::readyRead()
     else
         qDebug() << "Bad response from" << remoteHost << errors;
 
-    // Test I response
-    if (m_test == PrimaryAddressAndPort)
-    {
-        qDebug() << "Have UDP connectivity";
-        m_alternateHost = msg.otherHost;
-        m_alternatePort = msg.otherPort;
-
-        // Test II request
-        m_test = AlternateAddress;
-        QXmppStunMessage req;
-        req.setType(BindingRequest);
-        sendPacket(req, m_alternateHost, m_primaryPort);
-    }
+    qDebug() << "Have UDP connectivity";
 }
 
 void StunTester::run(const QHostAddress &host, quint16 port)
