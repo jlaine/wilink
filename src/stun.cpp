@@ -3,20 +3,9 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QHostInfo>
-#include <QUdpSocket>
 
 #include "QXmppLogger.h"
 #include "QXmppStun.h"
-
-#include "stun.h"
-
-enum MessageType {
-    BindingRequest       = 0x0001,
-};
-
-StunTester::StunTester()
-{
-}
 
 int main(int argc, char* argv[])
 {
@@ -52,6 +41,8 @@ int main(int argc, char* argv[])
 
     QXmppIceConnection connection(true);
     connection.setStunServer(stunAddress, stunPort);
+    QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
+        &app, SLOT(quit()));
     QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     connection.addComponent(1);

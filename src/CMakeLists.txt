@@ -156,8 +156,7 @@ target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 add_executable(codec codec.cpp qxmpp/QXmppCodec.cpp)
 target_link_libraries(codec ${QT_LIBRARIES})
 
-qt4_wrap_cpp(stun_MOC_SOURCES stun.h)
-add_executable(stun stun.cpp ${stun_MOC_SOURCES})
+add_executable(stun stun.cpp)
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})
 
 # hash
