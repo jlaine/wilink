@@ -54,8 +54,8 @@ void StunTester::readyRead()
         // Test II request
         m_test = AlternateAddress;
         QXmppStunMessage req;
-        msg.setType(BindingRequest);
-        sendPacket(msg, m_alternateHost, m_primaryPort);
+        req.setType(BindingRequest);
+        sendPacket(req, m_alternateHost, m_primaryPort);
     }
 }
 
