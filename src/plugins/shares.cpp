@@ -235,7 +235,7 @@ void ChatShares::disconnected()
     if (client && client != baseClient && QObject::sender() == baseClient)
     {
         shareServer = "";
-        client->disconnect();
+        client->disconnectFromServer();
         client->deleteLater();
         client = baseClient;
     }

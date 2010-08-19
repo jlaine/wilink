@@ -184,7 +184,7 @@ Chat::~Chat()
             delete panel;
 
     // disconnect
-    m_client->disconnect();
+    m_client->disconnectFromServer();
 
     // unload plugins
     for (int i = m_plugins.size() - 1; i >= 0; i--)
