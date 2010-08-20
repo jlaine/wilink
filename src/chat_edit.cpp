@@ -27,6 +27,7 @@ ChatEdit::ChatEdit(int maxheight, QWidget* parent)
 {
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     sizePolicy.setVerticalPolicy(QSizePolicy::Fixed);
+    setAcceptRichText(false);
     setSizePolicy(sizePolicy);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
