@@ -22,6 +22,7 @@
 
 #include <QDialog>
 
+#include "qxmpp/QXmppMucIq.h"
 #include "chat_conversation.h"
 
 class Chat;
@@ -115,7 +116,7 @@ public:
 protected slots:
     void addMember();
     void removeMember();
-    void mucAdminIqReceived(const QXmppMucAdminIq &iq);
+    void roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions);
     void submit();
 
 private:

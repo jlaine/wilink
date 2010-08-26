@@ -683,31 +683,21 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     setLayout(layout);
 
     setWindowTitle(tr("Chat room permissions"));
-    connect(&client->mucManager(), SIGNAL(adminIqReceived(const QXmppMucAdminIq&)),
-            this, SLOT(mucAdminIqReceived(const QXmppMucAdminIq&)));
+    connect(&client->mucManager(), SIGNAL(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)),
+            this, SLOT(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)));
 
     affiliations["member"] = tr("member");
     affiliations["admin"] = tr("administrator");
     affiliations["owner"] = tr("owner");
     affiliations["outcast"] = tr("banned");
-    foreach (const QString &affiliation, affiliations.keys())
-    {
-        QXmppMucAdminIq::Item item;
-        item.setAffiliation(affiliation);
-
-        QXmppMucAdminIq iq;
-        iq.setTo(chatRoomJid);
-        iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
-        client->sendPacket(iq);
-    }
+    client->mucManager().requestRoomPermissions(chatRoomJid);
 }
 
-void ChatRoomMembers::mucAdminIqReceived(const QXmppMucAdminIq &iq)
+void ChatRoomMembers::roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions)
 {
-    if (iq.type() != QXmppIq::Result ||
-        iq.from() != chatRoomJid)
+    if (roomJid != chatRoomJid)
         return;
-    foreach (const QXmppMucAdminIq::Item &item, iq.items())
+    foreach (const QXmppMucAdminIq::Item &item, permissions)
     {
         const QString jid = item.jid();
         const QString affiliation = item.affiliation();
