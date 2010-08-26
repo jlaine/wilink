@@ -648,13 +648,6 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
 
     if (presence.type() == QXmppPresence::Available)
     {
-        const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
-        if (forceProxy == "1" && !client->transferManager().proxyOnly())
-        {
-            logMessage(QXmppLogger::InformationMessage, "Forcing SOCKS5 proxy");
-            client->transferManager().setProxyOnly(true);
-        }
-
         // add entries to options menu
         if (!menuAction)
         {
