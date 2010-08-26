@@ -810,7 +810,7 @@ void ChatShares::setClient(ChatClient *newClient)
     Q_ASSERT(check);
 
     // add shares extension
-    QXmppShareExtension *extension = new QXmppShareExtension;
+    QXmppShareExtension *extension = new QXmppShareExtension(client);
     client->addExtension(extension);
 
     check = connect(extension, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)),
