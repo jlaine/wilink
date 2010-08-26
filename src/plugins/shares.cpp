@@ -39,6 +39,7 @@
 
 #include "qdjango/QDjango.h"
 #include "qxmpp/QXmppShareDatabase.h"
+#include "qxmpp/QXmppShareExtension.h"
 #include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppUtils.h"
 
@@ -800,11 +801,29 @@ void ChatShares::registerWithServer()
 void ChatShares::setClient(ChatClient *newClient)
 {
     client = newClient;
-    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(client, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)), this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
-    connect(client, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)), this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
-    connect(client, SIGNAL(shareServerFound(const QString&)), this, SLOT(shareServerFound(const QString&)));
+    bool check = connect(client, SIGNAL(disconnected()),
+        this, SLOT(disconnected()));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
+        this, SLOT(presenceReceived(const QXmppPresence&)));
+    Q_ASSERT(check);
+
+    // add shares extension
+    QXmppShareExtension *extension = new QXmppShareExtension;
+    client->addExtension(extension);
+
+    check = connect(extension, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)),
+        this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
+    Q_ASSERT(check);
+
+    check = connect(extension, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)),
+        this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(shareServerFound(const QString&)),
+        this, SLOT(shareServerFound(const QString&)));
+    Q_ASSERT(check);
 }
 
 void ChatShares::setRoster(ChatRosterModel *roster)

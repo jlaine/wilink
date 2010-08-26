@@ -103,21 +103,7 @@ void ChatClient::slotElementReceived(const QDomElement &element, bool &handled)
 {
     if (element.tagName() == "iq")
     {
-        if (QXmppShareGetIq::isShareGetIq(element))
-        {
-            QXmppShareGetIq getIq;
-            getIq.parse(element);
-            emit shareGetIqReceived(getIq);
-            handled = true;
-        }
-        else if (QXmppShareSearchIq::isShareSearchIq(element))
-        {
-            QXmppShareSearchIq searchIq;
-            searchIq.parse(element);
-            emit shareSearchIqReceived(searchIq);
-            handled = true;
-        }
-        else if (QXmppMucAdminIq::isMucAdminIq(element))
+        if (QXmppMucAdminIq::isMucAdminIq(element))
         {
             QXmppMucAdminIq mucIq;
             mucIq.parse(element);
