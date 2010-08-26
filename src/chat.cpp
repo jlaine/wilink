@@ -508,10 +508,9 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
         qWarning("Cannot connect to chat server using invalid JID");
         return false;
     }
-    QStringList bits = jid.split("@");
     config.setPasswd(password);
-    config.setUser(bits[0]);
-    config.setDomain(bits[1]);
+    config.setUser(jidToUser(jid));
+    config.setDomain(jidToDomain(jid));
 
     /* get the server */
     QList<ServiceInfo> results;

@@ -25,6 +25,8 @@
 #include <QListWidget>
 #include <QPushButton>
 
+#include "qxmpp/QXmppUtils.h"
+
 #include "chat_accounts.h"
 
 ChatAccounts::ChatAccounts(QWidget *parent)
@@ -93,10 +95,10 @@ void ChatAccounts::addAccount()
         }
 
         valid = true;
-        const QString domain = jid.split("@").last();
+        const QString domain = jidToDomain(jid);
         for (int i = 0; i < listWidget->count(); i++)
         {
-            if (listWidget->item(i)->text().split("@").last() == domain)
+            if (jidToDomain(listWidget->item(i)->text()) == domain)
             {
                 error = tr("You already have an account for '%1'.").arg(domain);
                 valid = false;

@@ -137,7 +137,7 @@ QString ChatRosterModel::contactExtra(const QString &bareJid) const
     if (!item)
         return QString();
 
-    const QString remoteDomain = bareJid.split("@").last();
+    const QString remoteDomain = jidToDomain(bareJid);
     if (client->configuration().domain() == "wifirst.net" &&
         remoteDomain == "wifirst.net")
     {
@@ -166,7 +166,7 @@ QString ChatRosterModel::contactName(const QString &bareJid) const
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
         return item->data(Qt::DisplayRole).toString();
-    return bareJid.split("@").first();
+    return jidToUser(bareJid);
 }
 
 static QString contactStatus(const QModelIndex &index)

@@ -34,6 +34,7 @@
 #include <QTimer>
 
 #include "qnetio/wallet.h"
+#include "qxmpp/QXmppUtils.h"
 
 #include "application.h"
 #include "config.h"
@@ -122,11 +123,11 @@ void Application::platformInit()
  */
 QString Application::authRealm(const QString &jid)
 {
-    QString domain = jid.split("@").last();
+    const QString domain = jidToDomain(jid);
     if (domain == "wifirst.net")
-        return "www.wifirst.net";
+        return QLatin1String("www.wifirst.net");
     else if (domain == "gmail.com")
-        return "www.google.com";
+        return QLatin1String("www.google.com");
     return domain;
 }
 
@@ -192,9 +193,9 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
 
     /* try to fix username */
     if (realm == "www.wifirst.net")
-        username = username.split("@").first() + "@wifirst.net";
+        username = jidToUser(username) + "@wifirst.net";
     else if (realm == "www.google.com")
-        username = username.split("@").first() + "@gmail.com";
+        username = jidToUser(username) + "@gmail.com";
 
     authenticator->setUser(username);
     authenticator->setPassword(password);
@@ -347,7 +348,7 @@ void Application::resetChats()
     bool foundAccount = false;
     QStringList chatJids = settings->value("ChatAccounts").toStringList();
     foreach (const QString &jid, chatJids)
-        if (jid.split("@").last() == "wifirst.net")
+        if (jidToDomain(jid) == "wifirst.net")
             foundAccount = true;
     if (!foundAccount)
     {
@@ -374,8 +375,7 @@ void Application::resetChats()
         chat->move(xpos, ypos);
         chat->show();
 
-        QString domain = jid.split("@").last();
-        bool ignoreSslErrors = domain != "wifirst.net";
+        bool ignoreSslErrors = jidToDomain(jid) != "wifirst.net";
         chat->open(auth.user(), auth.password(), ignoreSslErrors);
         chats << chat;
         xpos += 300;
