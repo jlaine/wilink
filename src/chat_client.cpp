@@ -17,12 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDomElement>
-
 #include "qxmpp/QXmppDiscoveryIq.h"
 #include "qxmpp/QXmppLogger.h"
-#include "qxmpp/QXmppMucIq.h"
-#include "qxmpp/QXmppShareIq.h"
 #include "qxmpp/QXmppTransferManager.h"
 
 #include "chat_client.h"
@@ -33,8 +29,6 @@ ChatClient::ChatClient(QObject *parent)
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
     connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)),
         this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
-    connect(this, SIGNAL(elementReceived(const QDomElement&, bool&)),
-        this, SLOT(slotElementReceived(const QDomElement&, bool&)));
 }
 
 void ChatClient::slotConnected()
@@ -95,20 +89,6 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
                 emit logMessage(QXmppLogger::InformationMessage, "Found share server " + disco.from());
                 emit shareServerFound(disco.from());
             }
-        }
-    }
-}
-
-void ChatClient::slotElementReceived(const QDomElement &element, bool &handled)
-{
-    if (element.tagName() == "iq")
-    {
-        if (QXmppMucAdminIq::isMucAdminIq(element))
-        {
-            QXmppMucAdminIq mucIq;
-            mucIq.parse(element);
-            emit mucAdminIqReceived(mucIq);
-            handled = true;
         }
     }
 }

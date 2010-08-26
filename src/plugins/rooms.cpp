@@ -683,7 +683,7 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     setLayout(layout);
 
     setWindowTitle(tr("Chat room permissions"));
-    connect(client, SIGNAL(mucAdminIqReceived(const QXmppMucAdminIq&)),
+    connect(&client->mucManager(), SIGNAL(adminIqReceived(const QXmppMucAdminIq&)),
             this, SLOT(mucAdminIqReceived(const QXmppMucAdminIq&)));
 
     affiliations["member"] = tr("member");

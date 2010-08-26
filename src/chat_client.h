@@ -19,11 +19,6 @@
 
 #include "qxmpp/QXmppClient.h"
 
-class QXmppMucAdminIq;
-class QXmppMucOwnerIq;
-class QXmppShareGetIq;
-class QXmppShareSearchIq;
-
 class ChatClient : public QXmppClient
 {
     Q_OBJECT
@@ -32,16 +27,12 @@ public:
     ChatClient(QObject *parent);
 
 signals:
-    void mucAdminIqReceived(const QXmppMucAdminIq &iq);
     void mucServerFound(const QString &mucServer);
-    void shareGetIqReceived(const QXmppShareGetIq &iq);
-    void shareSearchIqReceived(const QXmppShareSearchIq &iq);
     void shareServerFound(const QString &shareServer);
 
 private slots:
     void slotConnected();
     void slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco);
-    void slotElementReceived(const QDomElement &element, bool &handled);
 
 private:
     QStringList discoQueue;
