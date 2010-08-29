@@ -41,9 +41,9 @@
 #include "qxmpp/QXmppMessage.h"
 #include "qxmpp/QXmppRosterIq.h"
 #include "qxmpp/QXmppRosterManager.h"
+#include "qxmpp/QXmppServiceInfo.h"
 #include "qxmpp/QXmppUtils.h"
 
-#include "qnetio/dns.h"
 #include "qnetio/wallet.h"
 
 #include "application.h"
@@ -513,8 +513,8 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setDomain(jidToDomain(jid));
 
     /* get the server */
-    QList<ServiceInfo> results;
-    if (ServiceInfo::lookupService("_xmpp-client._tcp." + config.domain(), results))
+    QList<QXmppServiceInfo> results;
+    if (QXmppServiceInfo::lookupService("_xmpp-client._tcp." + config.domain(), results))
     {
         config.setHost(results[0].hostName());
         config.setPort(results[0].port());
