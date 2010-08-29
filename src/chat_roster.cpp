@@ -17,8 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QBuffer>
 #include <QContextMenuEvent>
 #include <QDebug>
+#include <QImageReader>
 #include <QList>
 #include <QMenu>
 #include <QPainter>
@@ -582,8 +584,12 @@ void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
-        const QImage &image = vcard.photoAsImage();
-        item->setData(AvatarRole, QPixmap::fromImage(image));
+        // Read image.
+        QBuffer buffer;
+        buffer.setData(vcard.photo());
+        buffer.open(QIODevice::ReadOnly);
+        QImageReader imageReader(&buffer);
+        item->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
         // Store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name.
