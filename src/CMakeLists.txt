@@ -48,6 +48,7 @@ set(wiLink_SOURCES
     plugins/contacts.cpp
     plugins/diagnostics.cpp
     plugins/diagnostics/networkinfo.cpp
+    plugins/discovery.cpp
     plugins/menu.cpp
     plugins/photos.cpp
     plugins/rooms.cpp
@@ -77,6 +78,7 @@ set(wiLink_MOC_HEADERS
     plugins/console.h
     plugins/contacts.h
     plugins/diagnostics.h
+    plugins/discovery.h
     plugins/menu.h
     plugins/photos.h
     plugins/rooms.h
