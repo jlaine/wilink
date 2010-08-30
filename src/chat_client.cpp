@@ -37,37 +37,36 @@ void ChatClient::slotConnected()
     QXmppDiscoveryIq disco;
     disco.setTo(configuration().domain());
     disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+    discoQueue.clear();
+    discoQueue.append(disco.id());
     sendPacket(disco);
 }
 
 void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
-    if (disco.type() != QXmppIq::Result)
+    if (!discoQueue.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
         return;
 
     if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
         disco.from() == configuration().domain())
     {
         // root items
-        discoQueue.clear();
         foreach (const QXmppDiscoveryIq::Item &item, disco.items())
         {
             if (!item.jid().isEmpty() && item.node().isEmpty())
             {
-                discoQueue.append(item.jid());
                 // get info for item
                 QXmppDiscoveryIq info;
                 info.setQueryType(QXmppDiscoveryIq::InfoQuery);
                 info.setTo(item.jid());
+                discoQueue.append(info.id());
                 sendPacket(info);
             }
         }
     }
-    else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery &&
-             discoQueue.contains(disco.from()))
+    else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery)
     {
-        discoQueue.removeAll(disco.from());
         // check if it's a conference server
         foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
         {
