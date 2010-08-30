@@ -20,7 +20,10 @@
 #ifndef __WILINK_DISCOVERY_H__
 #define __WILINK_DISCOVERY_H__
 
+class QListWidget;
+class QListWidgetItem;
 class QXmppClient;
+class QXmppDiscoveryIq;
 
 #include "chat_panel.h"
 
@@ -32,10 +35,14 @@ public:
     Discovery(QXmppClient *client, QWidget *parent);
 
 private slots:
+    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void itemDoubleClicked(QListWidgetItem *item);
     void slotShow();
 
 private:
     QXmppClient *m_client;
+    QListWidget *m_listWidget;
+    QStringList m_requests;
 };
 
 #endif
