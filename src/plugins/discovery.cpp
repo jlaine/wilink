@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLabel>
 #include <QLayout>
 #include <QListWidget>
 #include <QPushButton>
@@ -34,7 +35,7 @@ enum Roles
     NameRole,
 };
 
-static void updateText(QListWidgetItem *item)
+static QString itemText(QListWidgetItem *item)
 {
     const QString jid = item->data(JidRole).toString();
     const QString node = item->data(NodeRole).toString();
@@ -42,11 +43,11 @@ static void updateText(QListWidgetItem *item)
 
     QString text;
     if (!name.isEmpty())
-        text += name + "\n";
+        text += "<b>" + name + "</b><br/>";
     text += jid;
     if (!node.isEmpty())
         text += QString(" (%1)").arg(node);
-    item->setText(text);
+    return text;
 }
 
 Discovery::Discovery(QXmppClient *client, QWidget *parent)
@@ -61,6 +62,7 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     layout->addItem(headerLayout());
 
     m_listWidget = new QListWidget;
+    m_listWidget->setIconSize(QSize(32, 32));
     layout->addWidget(m_listWidget);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -117,12 +119,14 @@ void Discovery::discoveryIqReceived(const QXmppDiscoveryIq &disco)
             foreach (const QXmppDiscoveryIq::Item &item, disco.items())
             {
                 // insert item
-                QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.jid());
+                QListWidgetItem *wdgItem = new QListWidgetItem;
+                wdgItem->setIcon(QIcon(":/chat.png"));
                 wdgItem->setData(JidRole, item.jid());
                 wdgItem->setData(NodeRole, item.node());
                 wdgItem->setData(NameRole, item.name());
-                updateText(wdgItem);
+                QLabel *label = new QLabel(itemText(wdgItem));
                 m_listWidget->addItem(wdgItem);
+                m_listWidget->setItemWidget(wdgItem, label);
 
                 // request information
                 QXmppDiscoveryIq iq;
@@ -146,7 +150,9 @@ void Discovery::discoveryIqReceived(const QXmppDiscoveryIq &disco)
                 if (!disco.identities().isEmpty())
                 {
                     wdgItem->setData(NameRole, disco.identities().first().name());
-                    updateText(wdgItem);
+                    QLabel *label = qobject_cast<QLabel*>(m_listWidget->itemWidget(wdgItem));
+                    if (label)
+                        label->setText(itemText(wdgItem));
                 }
             }
         }
@@ -155,13 +161,19 @@ void Discovery::discoveryIqReceived(const QXmppDiscoveryIq &disco)
 
 void Discovery::explore(const QXmppDiscoveryIq::Item &item)
 {
+    // update window title
+    QString extra = item.jid();
+    if (!item.node().isEmpty())
+        extra += QString(" (%1)").arg(item.node());
+    setWindowExtra(extra);
+    m_listWidget->clear();
+
+    // request items
     QXmppDiscoveryIq iq;
     iq.setTo(item.jid());
     iq.setType(QXmppIq::Get);
     iq.setQueryType(QXmppDiscoveryIq::ItemsQuery);
     iq.setQueryNode(item.node());
-
-    m_listWidget->clear();
     m_requests.append(iq.id());
     m_client->sendPacket(iq);
 }
