@@ -19,9 +19,8 @@
 
 #include <QLayout>
 #include <QListWidget>
+#include <QPushButton>
 #include <QShortcut>
-
-#include "QXmppDiscoveryIq.h"
 
 #include "chat.h"
 #include "chat_client.h"
@@ -32,12 +31,30 @@ enum Roles
 {
     JidRole = Qt::UserRole,
     NodeRole,
+    NameRole,
 };
+
+static void updateText(QListWidgetItem *item)
+{
+    const QString jid = item->data(JidRole).toString();
+    const QString node = item->data(NodeRole).toString();
+    const QString name = item->data(NameRole).toString();
+
+    QString text;
+    if (!name.isEmpty())
+        text += name + "\n";
+    text += jid;
+    if (!node.isEmpty())
+        text += QString(" (%1)").arg(node);
+    item->setText(text);
+}
 
 Discovery::Discovery(QXmppClient *client, QWidget *parent)
     : ChatPanel(parent),
     m_client(client)
 {
+    bool check;
+
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(0);
@@ -46,12 +63,22 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     m_listWidget = new QListWidget;
     layout->addWidget(m_listWidget);
 
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addStretch();
+
+    m_backButton = new QPushButton(tr("Go back"));
+    m_backButton->setIcon(QIcon(":/back.png"));
+    m_backButton->setEnabled(false);
+    hbox->addWidget(m_backButton);
+    layout->addItem(hbox);
+
     setLayout(layout);
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Service discovery"));
 
+
     /* connect signals */
-    bool check = connect(this, SIGNAL(showPanel()),
+    check = connect(this, SIGNAL(showPanel()),
         this, SLOT(slotShow()));
     Q_ASSERT(check);
 
@@ -63,8 +90,12 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
         this, SLOT(discoveryIqReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
+    check = connect(m_backButton, SIGNAL(clicked()),
+        this, SLOT(goBack()));
+    Q_ASSERT(check);
+
     check = connect(m_listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-        this, SLOT(itemDoubleClicked(QListWidgetItem*)));
+        this, SLOT(goForward(QListWidgetItem*)));
     Q_ASSERT(check);
 }
 
@@ -77,13 +108,20 @@ void Discovery::discoveryIqReceived(const QXmppDiscoveryIq &disco)
     {
         if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery)
         {
-            m_listWidget->clear();
+            // check the results are for the current item
+            if (m_trail.isEmpty() ||
+                m_trail.last().jid() != disco.from() ||
+                m_trail.last().node() != disco.queryNode())
+                return;
+
             foreach (const QXmppDiscoveryIq::Item &item, disco.items())
             {
                 // insert item
                 QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.jid());
                 wdgItem->setData(JidRole, item.jid());
                 wdgItem->setData(NodeRole, item.node());
+                wdgItem->setData(NameRole, item.name());
+                updateText(wdgItem);
                 m_listWidget->addItem(wdgItem);
 
                 // request information
@@ -106,31 +144,58 @@ void Discovery::discoveryIqReceived(const QXmppDiscoveryIq &disco)
                     continue;
 
                 if (!disco.identities().isEmpty())
-                    wdgItem->setText(disco.identities().first().name() + "\n" + wdgItem->text());
+                {
+                    wdgItem->setData(NameRole, disco.identities().first().name());
+                    updateText(wdgItem);
+                }
             }
         }
     }
 }
 
-void Discovery::itemDoubleClicked(QListWidgetItem *item)
+void Discovery::explore(const QXmppDiscoveryIq::Item &item)
 {
     QXmppDiscoveryIq iq;
-    iq.setTo(item->data(JidRole).toString());
+    iq.setTo(item.jid());
     iq.setType(QXmppIq::Get);
     iq.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    iq.setQueryNode(item->data(NodeRole).toString());
+    iq.setQueryNode(item.node());
+
+    m_listWidget->clear();
     m_requests.append(iq.id());
     m_client->sendPacket(iq);
 }
 
+void Discovery::goBack()
+{
+    if (m_trail.size() < 2)
+        return;
+
+    // pop location
+    m_trail.pop_back();
+    if (m_trail.size() < 2)
+        m_backButton->setEnabled(false);
+    explore(m_trail.last());
+}
+
+void Discovery::goForward(QListWidgetItem *wdgItem)
+{
+    QXmppDiscoveryIq::Item item;
+    item.setJid(wdgItem->data(JidRole).toString());
+    item.setNode(wdgItem->data(NodeRole).toString());
+    m_trail.append(item);
+    m_backButton->setEnabled(true);
+
+    explore(item);
+}
+
 void Discovery::slotShow()
 {
-    QXmppDiscoveryIq iq;
-    iq.setTo(m_client->configuration().domain());
-    iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    m_requests.append(iq.id());
-    m_client->sendPacket(iq);
+    QXmppDiscoveryIq::Item item;
+    item.setJid(m_client->configuration().domain());
+    m_trail.clear();
+    m_trail.append(item);
+    explore(item);
 }
 
 // PLUGIN

@@ -22,8 +22,10 @@
 
 class QListWidget;
 class QListWidgetItem;
+class QPushButton;
 class QXmppClient;
-class QXmppDiscoveryIq;
+
+#include "QXmppDiscoveryIq.h"
 
 #include "chat_panel.h"
 
@@ -36,12 +38,17 @@ public:
 
 private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
-    void itemDoubleClicked(QListWidgetItem *item);
+    void goBack();
+    void goForward(QListWidgetItem *item);
     void slotShow();
 
 private:
+    void explore(const QXmppDiscoveryIq::Item &item);
+
     QXmppClient *m_client;
     QListWidget *m_listWidget;
+    QPushButton *m_backButton;
+    QList<QXmppDiscoveryIq::Item> m_trail;
     QStringList m_requests;
 };
 
