@@ -467,12 +467,12 @@ void Chat::promptCredentials()
     QXmppConfiguration config = m_client->configuration();
     QAuthenticator auth;
     auth.setUser(config.jidBare());
-    auth.setPassword(config.passwd());
+    auth.setPassword(config.password());
     Wallet::instance()->onAuthenticationRequired(
         Application::authRealm(config.jidBare()), &auth);
-    if (auth.password() != config.passwd())
+    if (auth.password() != config.password())
     {
-        config.setPasswd(auth.password());
+        config.setPassword(auth.password());
         m_client->connectToServer(config);
     }
 }
@@ -507,7 +507,7 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
         qWarning("Cannot connect to chat server using invalid JID");
         return false;
     }
-    config.setPasswd(password);
+    config.setPassword(password);
     config.setUser(jidToUser(jid));
     config.setDomain(jidToDomain(jid));
 
