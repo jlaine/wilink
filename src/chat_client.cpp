@@ -19,6 +19,7 @@
 
 #include "QXmppDiscoveryIq.h"
 #include "QXmppLogger.h"
+#include "QXmppPubSubManager.h"
 #include "QXmppTransferManager.h"
 
 #include "chat_client.h"
@@ -29,6 +30,9 @@ ChatClient::ChatClient(QObject *parent)
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
     connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)),
         this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
+
+    QXmppPubSubManager *pubSub = new QXmppPubSubManager;
+    addExtension(pubSub);
 }
 
 void ChatClient::slotConnected()
@@ -76,6 +80,13 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
                 emit logMessage(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
                 emit mucServerFound(disco.from());
             }
+            else if (id.category() == "pubsub" &&
+                     id.type() == "service")
+            {
+                emit logMessage(QXmppLogger::InformationMessage, "Found pubsub server " + disco.from());
+                emit pubSubServerFound(disco.from());
+            }
+
             else if (id.category() == "proxy" &&
                      id.type() == "bytestreams")
             {

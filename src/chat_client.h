@@ -28,6 +28,7 @@ public:
 
 signals:
     void mucServerFound(const QString &mucServer);
+    void pubSubServerFound(const QString &pubSubServer);
     void shareServerFound(const QString &shareServer);
 
 private slots:
