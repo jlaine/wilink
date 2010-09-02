@@ -507,17 +507,14 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
         qWarning("Cannot connect to chat server using invalid JID");
         return false;
     }
+    config.setJid(jid);
     config.setPassword(password);
-    config.setUser(jidToUser(jid));
-    config.setDomain(jidToDomain(jid));
 
     /* set security parameters */
-    config.setAutoAcceptSubscriptions(false);
     //config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(ignoreSslErrors);
 
     /* set keep alive */
-    config.setKeepAliveInterval(60);
     config.setKeepAliveTimeout(15);
 
     /* connect to server */
