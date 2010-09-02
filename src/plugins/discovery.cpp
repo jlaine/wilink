@@ -19,6 +19,7 @@
 
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
 #include <QShortcut>
@@ -61,23 +62,38 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     layout->setMargin(0);
     layout->addItem(headerLayout());
 
+    /* location bar */
+    QHBoxLayout *hbox = new QHBoxLayout;
+
+    m_backButton = new QPushButton;
+    m_backButton->setIcon(QIcon(":/back.png"));
+    m_backButton->setToolTip(tr("Go back"));
+    m_backButton->setEnabled(false);
+    hbox->addWidget(m_backButton);
+
+    QPushButton *m_refreshButton = new QPushButton;
+    m_refreshButton->setIcon(QIcon(":/refresh.png"));
+    m_refreshButton->setToolTip(tr("Refresh"));
+    hbox->addWidget(m_refreshButton);
+
+    hbox->addSpacing(6);
+
+    m_locationJid = new QLineEdit;
+    hbox->addWidget(m_locationJid);
+
+    m_locationNode = new QLineEdit;
+    hbox->addWidget(m_locationNode);
+
+    layout->addItem(hbox);
+
+    /* main view */
     m_listWidget = new QListWidget;
     m_listWidget->setIconSize(QSize(32, 32));
     layout->addWidget(m_listWidget);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addStretch();
-
-    m_backButton = new QPushButton(tr("Go back"));
-    m_backButton->setIcon(QIcon(":/back.png"));
-    m_backButton->setEnabled(false);
-    hbox->addWidget(m_backButton);
-    layout->addItem(hbox);
-
     setLayout(layout);
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Service discovery"));
-
 
     /* connect signals */
     check = connect(this, SIGNAL(showPanel()),
@@ -95,6 +111,13 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     check = connect(m_backButton, SIGNAL(clicked()),
         this, SLOT(goBack()));
     Q_ASSERT(check);
+
+    check = connect(m_refreshButton, SIGNAL(clicked()),
+        this, SLOT(goTo()));
+    Q_ASSERT(check);
+
+    check = connect(m_locationJid, SIGNAL(returnPressed()),
+        this, SLOT(goTo()));
 
     check = connect(m_listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
         this, SLOT(goForward(QListWidgetItem*)));
@@ -168,6 +191,16 @@ void Discovery::explore(const QXmppDiscoveryIq::Item &item)
     setWindowExtra(extra);
     m_listWidget->clear();
 
+    // update location bar
+    m_locationJid->setText(item.jid());
+    m_locationNode->setText(item.node());
+
+    // update back button
+    if (m_trail.size() < 2)
+        m_backButton->setEnabled(false);
+    else
+        m_backButton->setEnabled(true);
+
     // request items
     QXmppDiscoveryIq iq;
     iq.setTo(item.jid());
@@ -185,8 +218,6 @@ void Discovery::goBack()
 
     // pop location
     m_trail.pop_back();
-    if (m_trail.size() < 2)
-        m_backButton->setEnabled(false);
     explore(m_trail.last());
 }
 
@@ -196,16 +227,39 @@ void Discovery::goForward(QListWidgetItem *wdgItem)
     item.setJid(wdgItem->data(JidRole).toString());
     item.setNode(wdgItem->data(NodeRole).toString());
     m_trail.append(item);
-    m_backButton->setEnabled(true);
-
     explore(item);
+}
+
+void Discovery::goTo()
+{
+    const QString newJid = m_locationJid->text();
+    const QString newNode = m_locationNode->text();
+    if (newJid.isEmpty())
+        return;
+
+    if (!m_trail.isEmpty() &&
+        m_trail.last().jid() == newJid &&
+        m_trail.last().node() == newNode)
+    {
+        explore(m_trail.last());
+    }
+    else
+    {
+        QXmppDiscoveryIq::Item item;
+        item.setJid(newJid);
+        item.setNode(newNode);
+        m_trail.append(item);
+        explore(item);
+    }
 }
 
 void Discovery::slotShow()
 {
+    if (!m_trail.isEmpty())
+        return;
+
     QXmppDiscoveryIq::Item item;
     item.setJid(m_client->configuration().domain());
-    m_trail.clear();
     m_trail.append(item);
     explore(item);
 }

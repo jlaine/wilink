@@ -20,6 +20,7 @@
 #ifndef __WILINK_DISCOVERY_H__
 #define __WILINK_DISCOVERY_H__
 
+class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
 class QPushButton;
@@ -40,12 +41,15 @@ private slots:
     void discoveryIqReceived(const QXmppDiscoveryIq &disco);
     void goBack();
     void goForward(QListWidgetItem *item);
+    void goTo();
     void slotShow();
 
 private:
     void explore(const QXmppDiscoveryIq::Item &item);
 
     QXmppClient *m_client;
+    QLineEdit *m_locationJid;
+    QLineEdit *m_locationNode;
     QListWidget *m_listWidget;
     QPushButton *m_backButton;
     QList<QXmppDiscoveryIq::Item> m_trail;
