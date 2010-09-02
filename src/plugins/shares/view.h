@@ -24,8 +24,8 @@
 #include <QStyledItemDelegate>
 #include <QTreeView>
 
-#include "qxmpp/QXmppShareIq.h"
-#include "qxmpp/QXmppTransferManager.h"
+#include "QXmppShareIq.h"
+#include "QXmppTransferManager.h"
 
 class ChatRosterModel;
 class ChatSharesModel;

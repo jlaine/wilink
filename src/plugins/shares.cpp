@@ -37,7 +37,7 @@
 #include <QTimer>
 #include <QUrl>
 
-#include "qdjango/QDjango.h"
+#include "QDjango.h"
 #include "QXmppShareDatabase.h"
 #include "QXmppShareExtension.h"
 #include "QXmppShareIq.h"

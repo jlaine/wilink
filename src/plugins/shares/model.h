@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QIcon>
 
-#include "qxmpp/QXmppShareIq.h"
+#include "QXmppShareIq.h"
 
 enum ChatSharesColumns
 {
