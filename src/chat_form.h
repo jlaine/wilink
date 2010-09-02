@@ -22,7 +22,7 @@
 
 #include <QDialog>
 
-#include "qxmpp/QXmppDataForm.h"
+#include "QXmppDataForm.h"
 
 class ChatForm : public QDialog
 {

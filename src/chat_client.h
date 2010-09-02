@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "qxmpp/QXmppClient.h"
+#include "QXmppClient.h"
 
 class ChatClient : public QXmppClient
 {

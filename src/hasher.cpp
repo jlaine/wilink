@@ -23,7 +23,7 @@
 #include <QFileInfo>
 #include <QTime>
 
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppUtils.h"
 
 static const quint32 MAGIC_COOKIE = 0x2112A442;
 

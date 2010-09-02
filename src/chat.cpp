@@ -35,13 +35,13 @@
 
 #include "idle/idle.h"
 
-#include "qxmpp/QXmppConfiguration.h"
-#include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppLogger.h"
-#include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppRosterIq.h"
-#include "qxmpp/QXmppRosterManager.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppConfiguration.h"
+#include "QXmppConstants.h"
+#include "QXmppLogger.h"
+#include "QXmppMessage.h"
+#include "QXmppRosterIq.h"
+#include "QXmppRosterManager.h"
+#include "QXmppUtils.h"
 
 #include "qnetio/wallet.h"
 

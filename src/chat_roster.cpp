@@ -28,14 +28,14 @@
 #include <QSortFilterProxyModel>
 #include <QUrl>
 
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
-#include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppRosterIq.h"
-#include "qxmpp/QXmppRosterManager.h"
-#include "qxmpp/QXmppUtils.h"
-#include "qxmpp/QXmppVCardManager.h"
+#include "QXmppClient.h"
+#include "QXmppConstants.h"
+#include "QXmppDiscoveryIq.h"
+#include "QXmppMessage.h"
+#include "QXmppRosterIq.h"
+#include "QXmppRosterManager.h"
+#include "QXmppUtils.h"
+#include "QXmppVCardManager.h"
 
 #include "chat_roster.h"
 #include "chat_roster_item.h"

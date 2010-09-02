@@ -25,7 +25,7 @@
 #include <QListWidget>
 #include <QPushButton>
 
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppUtils.h"
 
 #include "chat_accounts.h"
 

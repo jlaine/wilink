@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <QFile>
 
-#include "qxmpp/QXmppCodec.h"
+#include "QXmppCodec.h"
 
 int main(int argc, char* argv[])
 {

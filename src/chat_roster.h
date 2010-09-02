@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
-#include "qxmpp/QXmppVCard.h"
+#include "QXmppVCard.h"
 
 #include "chat_roster_item.h"
 

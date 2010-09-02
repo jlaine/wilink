@@ -23,7 +23,7 @@
 #include <QWidget>
 #include <QMainWindow>
 
-#include "qxmpp/QXmppClient.h"
+#include "QXmppClient.h"
 
 class ChatClient;
 class ChatPanel;

@@ -20,7 +20,7 @@
 #ifndef __WILINK_CHAT_CONVERSATION_H__
 #define __WILINK_CHAT_CONVERSATION_H__
 
-#include "qxmpp/QXmppMessage.h"
+#include "QXmppMessage.h"
 
 #include "chat_panel.h"
 

@@ -17,9 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "qxmpp/QXmppDiscoveryIq.h"
-#include "qxmpp/QXmppLogger.h"
-#include "qxmpp/QXmppTransferManager.h"
+#include "QXmppDiscoveryIq.h"
+#include "QXmppLogger.h"
+#include "QXmppTransferManager.h"
 
 #include "chat_client.h"
 

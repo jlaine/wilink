@@ -34,7 +34,7 @@
 #include <QTimer>
 
 #include "qnetio/wallet.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppUtils.h"
 
 #include "application.h"
 #include "config.h"
