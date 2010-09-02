@@ -22,7 +22,7 @@
 
 #include <QWidget>
 
-#include "qxmpp/QXmppMessage.h"
+#include "QXmppMessage.h"
 
 #include "chat_conversation.h"
 

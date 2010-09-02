@@ -18,7 +18,7 @@ endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp/src)
 
 # wiLink
 
@@ -155,12 +155,11 @@ qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 add_executable(tests systeminfo.cpp tests.cpp updates.cpp utils.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
-add_executable(codec codec.cpp qxmpp/QXmppCodec.cpp)
-target_link_libraries(codec ${QT_LIBRARIES})
+add_executable(codec codec.cpp)
+target_link_libraries(codec qxmpp ${QT_LIBRARIES})
 
 add_executable(stun stun.cpp)
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})
 
-# hash
-add_executable(hasher hasher.cpp qxmpp/QXmppUtils.cpp)
-target_link_libraries(hasher ${QT_LIBRARIES})
+add_executable(hasher hasher.cpp)
+target_link_libraries(hasher qxmpp ${QT_LIBRARIES})

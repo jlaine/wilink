@@ -23,7 +23,7 @@
 #include <QMessageBox>
 #include <QTableWidget>
 
-#include "qxmpp/QXmppTransferManager.h"
+#include "QXmppTransferManager.h"
 
 #include "chat_panel.h"
 

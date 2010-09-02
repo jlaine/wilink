@@ -20,9 +20,9 @@
 #ifndef __WILINK_SHARES_H__
 #define __WILINK_SHARES_H__
 
-#include "qxmpp/QXmppLogger.h"
-#include "qxmpp/QXmppShareIq.h"
-#include "qxmpp/QXmppTransferManager.h"
+#include "QXmppLogger.h"
+#include "QXmppShareIq.h"
+#include "QXmppTransferManager.h"
 
 #include "chat_panel.h"
 

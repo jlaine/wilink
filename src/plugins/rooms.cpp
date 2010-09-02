@@ -36,13 +36,13 @@
 #include <QTimer>
 #include <QUrl>
 
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppDiscoveryIq.h"
-#include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppMucIq.h"
-#include "qxmpp/QXmppMucManager.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppClient.h"
+#include "QXmppConstants.h"
+#include "QXmppDiscoveryIq.h"
+#include "QXmppMessage.h"
+#include "QXmppMucIq.h"
+#include "QXmppMucManager.h"
+#include "QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"

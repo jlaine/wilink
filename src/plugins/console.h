@@ -25,7 +25,7 @@
 #include <QTextDocument>
 #include <QVector>
 
-#include "qxmpp/QXmppLogger.h"
+#include "QXmppLogger.h"
 
 #include "chat_panel.h"
 

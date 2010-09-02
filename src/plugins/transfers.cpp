@@ -34,8 +34,8 @@
 #include <QTime>
 #include <QUrl>
 
-#include "qxmpp/QXmppClient.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppClient.h"
+#include "QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"

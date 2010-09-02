@@ -23,7 +23,7 @@
 #include <QObject>
 #include <QAudio>
 
-#include "qxmpp/QXmppCallManager.h"
+#include "QXmppCallManager.h"
 #include "chat_panel.h"
 
 class Chat;

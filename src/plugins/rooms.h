@@ -22,7 +22,7 @@
 
 #include <QDialog>
 
-#include "qxmpp/QXmppMucIq.h"
+#include "QXmppMucIq.h"
 #include "chat_conversation.h"
 
 class Chat;

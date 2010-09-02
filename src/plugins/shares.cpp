@@ -38,10 +38,10 @@
 #include <QUrl>
 
 #include "qdjango/QDjango.h"
-#include "qxmpp/QXmppShareDatabase.h"
-#include "qxmpp/QXmppShareExtension.h"
-#include "qxmpp/QXmppShareIq.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppShareDatabase.h"
+#include "QXmppShareExtension.h"
+#include "QXmppShareIq.h"
+#include "QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"

@@ -23,11 +23,11 @@
 #include <QPushButton>
 #include <QTimer>
 
-#include "qxmpp/QXmppArchiveIq.h"
-#include "qxmpp/QXmppArchiveManager.h"
-#include "qxmpp/QXmppConstants.h"
-#include "qxmpp/QXmppMessage.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppArchiveIq.h"
+#include "QXmppArchiveManager.h"
+#include "QXmppConstants.h"
+#include "QXmppMessage.h"
+#include "QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"

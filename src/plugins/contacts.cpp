@@ -29,8 +29,8 @@
 #include <QStatusBar>
 #include <QUrl>
 
-#include "qxmpp/QXmppRosterManager.h"
-#include "qxmpp/QXmppUtils.h"
+#include "QXmppRosterManager.h"
+#include "QXmppUtils.h"
 
 #include "chat.h"
 #include "chat_client.h"
