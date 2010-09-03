@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFileInfo>
 #include <QLabel>
@@ -168,9 +169,12 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
     passwordEdit->setEchoMode(QLineEdit::Password);
     layout->addWidget(passwordEdit, 2, 1);
 
-    QPushButton *btn = new QPushButton("OK");
-    dialog->connect(btn, SIGNAL(clicked()), dialog, SLOT(accept()));
-    layout->addWidget(btn, 3, 1);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(QDialogButtonBox::Ok);
+    buttonBox->addButton(QDialogButtonBox::Cancel);
+    dialog->connect(buttonBox, SIGNAL(accepted()), dialog, SLOT(accept()));
+    dialog->connect(buttonBox, SIGNAL(rejected()), dialog, SLOT(reject()));
+    layout->addWidget(buttonBox, 3, 1);
 
     dialog->setLayout(layout);
 
@@ -181,7 +185,7 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
     {
         usernameEdit->setText(username);
         passwordEdit->setText(password);
-        if (!dialog->exec())
+        if (dialog->exec() != QDialog::Accepted)
         {
             delete dialog;
             return;
@@ -193,9 +197,9 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
 
     /* try to fix username */
     if (realm == "www.wifirst.net")
-        username = jidToUser(username) + "@wifirst.net";
+        username = username.split("@").first() + "@wifirst.net";
     else if (realm == "www.google.com")
-        username = jidToUser(username) + "@gmail.com";
+        username = username.split("@").first()+ "@gmail.com";
 
     authenticator->setUser(username);
     authenticator->setPassword(password);
