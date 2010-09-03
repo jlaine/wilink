@@ -56,9 +56,7 @@ public:
 
 private slots:
     void bookmarksReceived(const QXmppBookmarkSet &bookmarks);
-    void connected();
     void disconnected();
-    ChatRoom *joinRoom(const QString &jid);
     void kickUser();
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
     void invitationHandled(QAbstractButton *button);
@@ -71,6 +69,8 @@ private slots:
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:
+    ChatRoom *joinRoom(const QString &jid);
+
     Chat *chat;
     QXmppBookmarkManager *bookmarkManager;
     QString chatRoomServer;

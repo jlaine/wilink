@@ -66,14 +66,10 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
     ChatClient *client = chat->client();
-    bookmarkManager = new QXmppBookmarkManager;
+    bookmarkManager = new QXmppBookmarkManager(client);
     client->addExtension(bookmarkManager);
 
     bool check;
-    check = connect(client, SIGNAL(connected()),
-                    this, SLOT(connected()));
-    Q_ASSERT(check);
-
     check = connect(client, SIGNAL(disconnected()),
                     this, SLOT(disconnected()));
     Q_ASSERT(check);
@@ -111,12 +107,12 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
 
 void ChatRoomWatcher::bookmarksReceived(const QXmppBookmarkSet &bookmarks)
 {
-    qDebug("GOT BOOKMARKS");
-}
-
-void ChatRoomWatcher::connected()
-{
-    bookmarkManager->requestBookmarks();
+    // rejoin room from bookmarks
+    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences())
+    {
+        if (conference.autoJoin())
+            joinRoom(conference.jid());
+    }
 }
 
 void ChatRoomWatcher::disconnected()
@@ -214,7 +210,27 @@ void ChatRoomWatcher::roomJoin()
     ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
     if (!prompt.exec())
         return;
-    joinRoom(prompt.textValue());
+    const QString roomJid = prompt.textValue();
+    if (roomJid.isEmpty())
+        return;
+
+    // join room
+    joinRoom(roomJid);
+
+    // store bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    foreach (const QXmppBookmarkConference &conference, conferences)
+    {
+        if (conference.jid() == roomJid)
+            return;
+    }
+    QXmppBookmarkConference conference;
+    conference.setAutoJoin(true);
+    conference.setJid(roomJid);
+    conferences << conference;
+    bookmarks.setConferences(conferences);
+    bookmarkManager->setBookmarks(bookmarks);
 }
 
 /** Request a chat room's configuration.
