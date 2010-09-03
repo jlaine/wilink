@@ -79,7 +79,9 @@ Application::Application(int &argc, char **argv)
     trayIcon = new QSystemTrayIcon;
     trayIcon->setIcon(QIcon(":/wiLink.png"));
     trayMenu = new QMenu;
-    QAction *action = trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    QAction *action = trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
+    connect(action, SIGNAL(triggered()), this, SLOT(showAccounts()));
+    action = trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered()), this, SLOT(quit()));
     trayIcon->setContextMenu(trayMenu);
     QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
@@ -348,15 +350,29 @@ void Application::resetChats()
         delete chat;
     chats.clear();
 
+    /* clean any bad accounts */
+    QStringList chatJids = settings->value("ChatAccounts").toStringList();
+    for (int i = chatJids.size() - 1; i >= 0; --i)
+    {
+        const QString account = chatJids.at(i);
+        if (jidToUser(account).isEmpty() || jidToDomain(account).isEmpty())
+        {
+            qDebug() << "Removing bad account" << account;
+            QNetIO::Wallet::instance()->deleteCredentials(authRealm(account));
+            chatJids.removeAt(i);
+            settings->setValue("ChatAccounts", chatJids);
+        }
+    }
+
     /* check we have a wifirst.net account */
     bool foundAccount = false;
-    QStringList chatJids = settings->value("ChatAccounts").toStringList();
     foreach (const QString &jid, chatJids)
         if (jidToDomain(jid) == "wifirst.net")
             foundAccount = true;
     if (!foundAccount)
     {
         QAuthenticator auth;
+        QNetIO::Wallet::instance()->deleteCredentials("www.wifirst.net");
         QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
         chatJids += auth.user();
         settings->setValue("ChatAccounts", chatJids);
