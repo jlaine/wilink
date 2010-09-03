@@ -28,6 +28,7 @@
 #include "QXmppUtils.h"
 
 #include "chat_accounts.h"
+#include "utils.h"
 
 ChatAccounts::ChatAccounts(QWidget *parent)
     : QDialog(parent)
@@ -88,7 +89,7 @@ void ChatAccounts::addAccount()
         if (!ok)
             return;
 
-        if (jid.count("@") != 1)
+        if (!isBareJid(jid))
         {
             error = tr("The address you entered is invalid.");
             continue;

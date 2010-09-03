@@ -41,6 +41,7 @@
 #include "config.h"
 #include "chat.h"
 #include "chat_accounts.h"
+#include "utils.h"
 
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
@@ -355,7 +356,7 @@ void Application::resetChats()
     for (int i = chatJids.size() - 1; i >= 0; --i)
     {
         const QString account = chatJids.at(i);
-        if (jidToUser(account).isEmpty() || jidToDomain(account).isEmpty())
+        if (!isBareJid(account))
         {
             qDebug() << "Removing bad account" << account;
             QNetIO::Wallet::instance()->deleteCredentials(authRealm(account));
@@ -374,7 +375,7 @@ void Application::resetChats()
         QAuthenticator auth;
         QNetIO::Wallet::instance()->deleteCredentials("www.wifirst.net");
         QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
-        if (auth.user().isEmpty() || auth.password().isEmpty())
+        if (!isBareJid(auth.user()) || auth.password().isEmpty())
         {
             quit();
             return;
