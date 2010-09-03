@@ -91,6 +91,8 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     Q_ASSERT(check);
 
     // add roster hooks
+    connect(chat, SIGNAL(rosterClick(QModelIndex)),
+            this, SLOT(rosterClick(QModelIndex)));
     connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
             this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
@@ -101,17 +103,70 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     roomButton->setEnabled(false);
     roomButton->setIcon(QIcon(":/chat.png"));
     roomButton->setToolTip(tr("Join or create a chat room"));
-    connect(roomButton, SIGNAL(clicked()), this, SLOT(roomJoin()));
+    connect(roomButton, SIGNAL(clicked()), this, SLOT(roomPrompt()));
     chat->statusBar()->addWidget(roomButton);
+}
+
+bool ChatRoomWatcher::bookmarkRoom(const QString &roomJid)
+{
+    // find bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    foreach (const QXmppBookmarkConference &conference, conferences)
+    {
+        if (conference.jid() == roomJid)
+            return true;
+    }
+
+    // add bookmark
+    QXmppBookmarkConference conference;
+    conference.setAutoJoin(true);
+    conference.setJid(roomJid);
+    conferences << conference;
+    bookmarks.setConferences(conferences);
+    return bookmarkManager->setBookmarks(bookmarks);
+}
+
+bool ChatRoomWatcher::unbookmarkRoom(const QString &roomJid)
+{
+    // find bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    int foundAt = -1;
+    for (int i = 0; i < conferences.size(); ++i)
+    {
+        if (conferences.at(i).jid() == roomJid)
+        {
+            foundAt = i;
+            break;
+        }
+    }
+    if (foundAt < 0)
+        return true;
+
+    // remove bookmark
+    conferences.removeAt(foundAt);
+    bookmarks.setConferences(conferences);
+    return bookmarkManager->setBookmarks(bookmarks);
 }
 
 void ChatRoomWatcher::bookmarksReceived(const QXmppBookmarkSet &bookmarks)
 {
-    // rejoin room from bookmarks
     foreach (const QXmppBookmarkConference &conference, bookmarks.conferences())
     {
         if (conference.autoJoin())
+        {
+            // if autojoin is enabled, join room
             joinRoom(conference.jid());
+        }
+        else
+        {
+            // otherwise, just add an entry in the roster
+            chat->rosterModel()->addItem(ChatRosterItem::Room,
+                conference.jid(),
+                jidToUser(conference.jid()),
+                QIcon(":/room.png"));
+        }
     }
 }
 
@@ -126,6 +181,9 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
     if (!room)
     {
         room = new ChatRoom(chat->client(), chat->rosterModel(), jid);
+        // get notified when room is closed
+        connect(room, SIGNAL(hidePanel()),
+            this, SLOT(roomClose()));
         // add roster hooks
         connect(chat, SIGNAL(rosterClick(QModelIndex)),
             room, SLOT(rosterClick(QModelIndex)));
@@ -203,9 +261,19 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
     invitations << roomJid;
 }
 
+/** When the user closes a chat room, unbookmark it.
+ */
+void ChatRoomWatcher::roomClose()
+{
+    ChatRoom *room = qobject_cast<ChatRoom*>(sender());
+    if (!room)
+        return;
+    unbookmarkRoom(room->objectName());
+}
+
 /** Prompt the user for a new group chat then join it.
  */
-void ChatRoomWatcher::roomJoin()
+void ChatRoomWatcher::roomPrompt()
 {
     ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
     if (!prompt.exec())
@@ -214,23 +282,9 @@ void ChatRoomWatcher::roomJoin()
     if (roomJid.isEmpty())
         return;
 
-    // join room
+    // join room and bookmark it
     joinRoom(roomJid);
-
-    // store bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    foreach (const QXmppBookmarkConference &conference, conferences)
-    {
-        if (conference.jid() == roomJid)
-            return;
-    }
-    QXmppBookmarkConference conference;
-    conference.setAutoJoin(true);
-    conference.setJid(roomJid);
-    conferences << conference;
-    bookmarks.setConferences(conferences);
-    bookmarkManager->setBookmarks(bookmarks);
+    bookmarkRoom(roomJid);
 }
 
 /** Request a chat room's configuration.
@@ -273,6 +327,18 @@ void ChatRoomWatcher::mucServerFound(const QString &mucServer)
 {
     chatRoomServer = mucServer;
     roomButton->setEnabled(true);
+}
+
+/** Handle a click event on a roster entry.
+ */
+void ChatRoomWatcher::rosterClick(const QModelIndex &index)
+{
+    const int type = index.data(ChatRosterModel::TypeRole).toInt();
+    if (type != ChatRosterItem::Room)
+        return;
+
+    const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
+    joinRoom(roomJid);
 }
 
 /** Handle a drop event on a roster entry.
