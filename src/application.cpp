@@ -374,6 +374,11 @@ void Application::resetChats()
         QAuthenticator auth;
         QNetIO::Wallet::instance()->deleteCredentials("www.wifirst.net");
         QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
+        if (auth.user().isEmpty() || auth.password().isEmpty())
+        {
+            quit();
+            return;
+        }
         chatJids += auth.user();
         settings->setValue("ChatAccounts", chatJids);
     }
