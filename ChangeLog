@@ -1,6 +1,7 @@
 wiLink 0.9.9 (UNRELEASED)
  * Add initial support for Jingle voice calls.
  * Do not allow rich text in chat input box as it is discarded afterwards.
+ * Do not display error messages in chat history.
 
 wiLink 0.9.8 (2010-06-27)
  * Add a new layout for the chat history.

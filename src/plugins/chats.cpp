@@ -49,13 +49,34 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     setWindowIcon(rosterModel->contactAvatar(jid));
     setWindowExtra(rosterModel->contactExtra(jid));
 
-    connect(this, SIGNAL(localStateChanged(QXmppMessage::State)), this, SLOT(chatStateChanged(QXmppMessage::State)));
-    connect(client, SIGNAL(connected()), this, SLOT(join()));
-    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(&client->archiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)), this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
-    connect(&client->archiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)), this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
-    connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
-    connect(this, SIGNAL(showPanel()), this, SLOT(join()));
+    bool check;
+    check = connect(this, SIGNAL(localStateChanged(QXmppMessage::State)),
+                    this, SLOT(chatStateChanged(QXmppMessage::State)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(connected()),
+                    this, SLOT(join()));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(messageReceived(const QXmppMessage&)),
+                    this, SLOT(messageReceived(const QXmppMessage&)));
+    Q_ASSERT(check);
+
+    check = connect(&client->archiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)),
+                    this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
+    Q_ASSERT(check);
+
+    check = connect(&client->archiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)),
+                    this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(hidePanel()),
+                    this, SLOT(leave()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(showPanel()),
+                    this, SLOT(join()));
+    Q_ASSERT(check);
 
     QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
@@ -144,7 +165,8 @@ void ChatDialog::join()
 
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
-    if (jidToBareJid(msg.from()) != chatRemoteJid)
+    if (msg.type() != QXmppMessage::Chat ||
+        jidToBareJid(msg.from()) != chatRemoteJid)
         return;
 
     setRemoteState(msg.state());
