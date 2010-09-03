@@ -37,6 +37,8 @@ class QMenu;
 class QModelIndex;
 class QPushButton;
 class QTableWidget;
+class QXmppBookmarkManager;
+class QXmppBookmarkSet;
 class QXmppClient;
 class QXmppDataForm;
 class QXmppDiscoveryIq;
@@ -53,6 +55,8 @@ public:
     ChatRoomWatcher(Chat *chatWindow);
 
 private slots:
+    void bookmarksReceived(const QXmppBookmarkSet &bookmarks);
+    void connected();
     void disconnected();
     ChatRoom *joinRoom(const QString &jid);
     void kickUser();
@@ -68,6 +72,7 @@ private slots:
 
 private:
     Chat *chat;
+    QXmppBookmarkManager *bookmarkManager;
     QString chatRoomServer;
     QPushButton *roomButton;
     QStringList invitations;

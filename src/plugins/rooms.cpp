@@ -36,6 +36,8 @@
 #include <QTimer>
 #include <QUrl>
 
+#include "QXmppBookmarkManager.h"
+#include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
@@ -64,14 +66,33 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
     ChatClient *client = chat->client();
-    connect(client, SIGNAL(disconnected()),
-            this, SLOT(disconnected()));
-    connect(&client->mucManager(), SIGNAL(invitationReceived(QString,QString,QString)),
-            this, SLOT(invitationReceived(QString,QString,QString)));
-    connect(&client->mucManager(), SIGNAL(roomConfigurationReceived(QString,QXmppDataForm)),
-            this, SLOT(roomConfigurationReceived(QString,QXmppDataForm)));
-    connect(client, SIGNAL(mucServerFound(const QString&)),
-            this, SLOT(mucServerFound(const QString&)));
+    bookmarkManager = new QXmppBookmarkManager;
+    client->addExtension(bookmarkManager);
+
+    bool check;
+    check = connect(client, SIGNAL(connected()),
+                    this, SLOT(connected()));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(disconnected()),
+                    this, SLOT(disconnected()));
+    Q_ASSERT(check);
+
+    check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
+                    this, SLOT(bookmarksReceived(QXmppBookmarkSet)));
+    Q_ASSERT(check);
+
+    check = connect(&client->mucManager(), SIGNAL(invitationReceived(QString,QString,QString)),
+                    this, SLOT(invitationReceived(QString,QString,QString)));
+    Q_ASSERT(check);
+
+    check = connect(&client->mucManager(), SIGNAL(roomConfigurationReceived(QString,QXmppDataForm)),
+                    this, SLOT(roomConfigurationReceived(QString,QXmppDataForm)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(mucServerFound(const QString&)),
+                    this, SLOT(mucServerFound(const QString&)));
+    Q_ASSERT(check);
 
     // add roster hooks
     connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
@@ -86,6 +107,16 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     roomButton->setToolTip(tr("Join or create a chat room"));
     connect(roomButton, SIGNAL(clicked()), this, SLOT(roomJoin()));
     chat->statusBar()->addWidget(roomButton);
+}
+
+void ChatRoomWatcher::bookmarksReceived(const QXmppBookmarkSet &bookmarks)
+{
+    qDebug("GOT BOOKMARKS");
+}
+
+void ChatRoomWatcher::connected()
+{
+    bookmarkManager->requestBookmarks();
 }
 
 void ChatRoomWatcher::disconnected()
