@@ -11,6 +11,26 @@
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
+    <message>
+        <source>Add an account</source>
+        <translation>Ajouter un compte</translation>
+    </message>
+    <message>
+        <source>Please check your username and password.</source>
+        <translation>Merci de vérifier votre nom d&apos;utilisateur et mot de passe.</translation>
+    </message>
+    <message>
+        <source>The address you entered is invalid.</source>
+        <translation>L&apos;adresse que vous avez saisie n&apos;est pas valide.</translation>
+    </message>
+    <message>
+        <source>Checking your username and password..</source>
+        <translation>Vérification de votre nom d'utilisateur et mot de passe..</translation>
+    </message>
+    <message>
+        <source>Please enter your password.</source>
+        <translation>Merci de saisir votre mot de passe.</translation>
+    </message>
 </context>
 <context>
     <name>Application</name>

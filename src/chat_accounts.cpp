@@ -51,6 +51,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     layout->addWidget(m_passwordEdit, 2, 1);
 
     m_statusLabel = new QLabel;
+    m_statusLabel->hide();
     layout->addWidget(m_statusLabel, 3, 1, 1, 2);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -58,6 +59,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     buttonBox->addButton(QDialogButtonBox::Cancel);
     layout->addWidget(buttonBox, 4, 1, 1, 2);
     setLayout(layout);
+    setWindowTitle(tr("Add an account"));
 
     /* connect signals */
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(testAccount()));
@@ -86,9 +88,21 @@ void AddChatAccount::setDomain(const QString &domain)
 
 void AddChatAccount::testAccount()
 {
-    QString username = m_jidEdit->text();
-    if (!m_domain.isEmpty())
-        username = username.split('@').first() + "@" + m_domain;
+    if (!isBareJid(jid()))
+    {
+        m_statusLabel->setText(tr("The address you entered is invalid."));
+        m_statusLabel->show();
+        return;
+    }
+    else if (password().isEmpty())
+    {
+        m_statusLabel->setText(tr("Please enter your password."));
+        m_statusLabel->show();
+        return;
+    }
+
+    m_statusLabel->setText(tr("Checking your username and password.."));
+    m_statusLabel->show();
 
     QXmppConfiguration config;
     config.setJid(jid());
@@ -99,7 +113,8 @@ void AddChatAccount::testAccount()
 
 void AddChatAccount::testFailed()
 {
-    qDebug("TEST FAILED");
+    m_statusLabel->setText(tr("Please check your username and password."));
+    m_statusLabel->show();
 }
 
 ChatAccounts::ChatAccounts(QWidget *parent)
