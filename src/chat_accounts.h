@@ -22,14 +22,40 @@
 
 #include <QDialog>
 
+class QLabel;
+class QLineEdit;
 class QListWidget;
+class QXmppClient;
+
+class AddChatAccount : public QDialog
+{
+    Q_OBJECT
+
+public:
+    AddChatAccount(QWidget *parent = 0);
+
+    QString jid() const;
+    QString password() const;
+    void setDomain(const QString &domain);
+
+private slots:
+    void testAccount();
+    void testFailed();
+
+private:
+    QString m_domain;
+    QLineEdit *m_jidEdit;
+    QLineEdit *m_passwordEdit;
+    QLabel *m_statusLabel;
+    QXmppClient *m_testClient;
+};
 
 class ChatAccounts : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatAccounts(QWidget *parent = NULL);
+    ChatAccounts(QWidget *parent = 0);
     QStringList accounts() const;
     void setAccounts(const QStringList &accounts);
 

@@ -25,10 +25,82 @@
 #include <QListWidget>
 #include <QPushButton>
 
+#include "QXmppClient.h"
 #include "QXmppUtils.h"
 
 #include "chat_accounts.h"
 #include "utils.h"
+
+
+AddChatAccount::AddChatAccount(QWidget *parent)
+    : QDialog(parent)
+{
+    m_testClient = new QXmppClient(this);
+
+    QGridLayout *layout = new QGridLayout;
+
+    layout->addWidget(new QLabel("test"), 0, 0, 1, 2);
+
+    layout->addWidget(new QLabel(tr("User")), 1, 0);
+    m_jidEdit = new QLineEdit();
+    layout->addWidget(m_jidEdit, 1, 1);
+
+    layout->addWidget(new QLabel(tr("Password")), 2, 0);
+    m_passwordEdit = new QLineEdit();
+    m_passwordEdit->setEchoMode(QLineEdit::Password);
+    layout->addWidget(m_passwordEdit, 2, 1);
+
+    m_statusLabel = new QLabel;
+    layout->addWidget(m_statusLabel, 3, 1, 1, 2);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(QDialogButtonBox::Ok);
+    buttonBox->addButton(QDialogButtonBox::Cancel);
+    layout->addWidget(buttonBox, 4, 1, 1, 2);
+    setLayout(layout);
+
+    /* connect signals */
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(testAccount()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(m_testClient, SIGNAL(connected()), this, SLOT(accept()));
+    connect(m_testClient, SIGNAL(disconnected()), this, SLOT(testFailed()));
+}
+
+QString AddChatAccount::jid() const
+{
+    QString jid = m_jidEdit->text();
+    if (!m_domain.isEmpty())
+        jid = jid.split('@').first() + "@" + m_domain;
+    return jid;
+}
+
+QString AddChatAccount::password() const
+{
+    return m_passwordEdit->text();
+}
+
+void AddChatAccount::setDomain(const QString &domain)
+{
+    m_domain = domain;
+}
+
+void AddChatAccount::testAccount()
+{
+    QString username = m_jidEdit->text();
+    if (!m_domain.isEmpty())
+        username = username.split('@').first() + "@" + m_domain;
+
+    QXmppConfiguration config;
+    config.setJid(jid());
+    config.setPassword(password());
+    config.setResource("AccountCheck");
+    m_testClient->connectToServer(config);
+}
+
+void AddChatAccount::testFailed()
+{
+    qDebug("TEST FAILED");
+}
 
 ChatAccounts::ChatAccounts(QWidget *parent)
     : QDialog(parent)
