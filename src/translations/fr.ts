@@ -2,10 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
+    <name>AddChatAccount</name>
+    <message>
+        <source>User</source>
+        <translation>Utilisateur</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+</context>
+<context>
     <name>Application</name>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
+    </message>
+    <message>
+        <source>Chat accounts</source>
+        <translation>Comptes de chat</translation>
     </message>
 </context>
 <context>
@@ -553,6 +568,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
+    </message>
+</context>
+<context>
+    <name>Discovery</name>
+    <message>
+        <source>Go back</source>
+        <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>Rafraîchir</translation>
+    </message>
+    <message>
+        <source>Service discovery</source>
+        <translation>Découverte de services</translation>
     </message>
 </context>
 <context>
