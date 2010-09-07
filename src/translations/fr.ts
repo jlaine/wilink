@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Checking your username and password..</source>
-        <translation>Vérification de votre nom d'utilisateur et mot de passe..</translation>
+        <translation>Vérification de votre nom d&apos;utilisateur et mot de passe..</translation>
     </message>
     <message>
         <source>Please enter your password.</source>
