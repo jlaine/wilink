@@ -31,8 +31,6 @@
 #include <QUrl>
 #include <QTimer>
 
-#include "qnetio/wallet.h"
-
 #include "systeminfo.h"
 #include "updates.h"
 
@@ -46,7 +44,6 @@ Updates::Updates(QObject *parent)
     : QObject(parent), updatesUrl("https://download.wifirst.net/wiLink/")
 {
     network = new QNetworkAccessManager(this);
-    connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
     /* schedule updates */
     timer = new QTimer(this);
