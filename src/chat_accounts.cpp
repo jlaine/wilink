@@ -71,7 +71,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     /* connect signals */
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(testAccount()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(m_testClient, SIGNAL(connected()), this, SLOT(accept()));
+    connect(m_testClient, SIGNAL(connected()), this, SLOT(testSucceeded()));
     connect(m_testClient, SIGNAL(disconnected()), this, SLOT(testFailed()));
 }
 
@@ -140,6 +140,15 @@ void AddChatAccount::testFailed()
     m_statusLabel->show();
 }
 
+void AddChatAccount::testSucceeded()
+{
+    // store credentials
+    QNetIO::Wallet::instance()->setCredentials(Application::authRealm(jid()),
+        jid(), password());
+
+    accept();
+}
+
 ChatAccounts::ChatAccounts(QWidget *parent)
     : QDialog(parent)
 {
@@ -190,11 +199,7 @@ void ChatAccounts::addAccount()
     AddChatAccount dlg;
     dlg.setAccounts(accounts());
     if (dlg.exec())
-    {
         addEntry(dlg.jid());
-        QNetIO::Wallet::instance()->setCredentials(Application::authRealm(dlg.jid()),
-            dlg.jid(), dlg.password());
-    }
 }
 
 void ChatAccounts::addEntry(const QString &jid)

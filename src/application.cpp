@@ -380,7 +380,6 @@ void Application::resetChats()
             quit();
             return;
         }
-        QNetIO::Wallet::instance()->setCredentials(authRealm(dlg.jid()), dlg.jid(), dlg.password());
         chatJids += dlg.jid();
         settings->setValue("ChatAccounts", chatJids);
     }

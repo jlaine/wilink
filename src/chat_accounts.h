@@ -43,6 +43,7 @@ public:
 private slots:
     void testAccount();
     void testFailed();
+    void testSucceeded();
 
 private:
     QString m_domain;
