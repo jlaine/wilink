@@ -47,7 +47,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
 
     m_promptLabel = new QLabel;
     m_promptLabel->setText(tr("Enter the address of the account you want to add."));
-    m_promptLabel->hide();
+    m_promptLabel->setWordWrap(true);
     layout->addWidget(m_promptLabel, 0, 0, 1, 2);
 
     layout->addWidget(new QLabel(tr("User")), 1, 0);
@@ -60,13 +60,14 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     layout->addWidget(m_passwordEdit, 2, 1);
 
     m_statusLabel = new QLabel;
+    m_statusLabel->setWordWrap(true);
     m_statusLabel->hide();
-    layout->addWidget(m_statusLabel, 3, 1, 1, 2);
+    layout->addWidget(m_statusLabel, 3, 0, 1, 2);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     buttonBox->addButton(QDialogButtonBox::Ok);
     buttonBox->addButton(QDialogButtonBox::Cancel);
-    layout->addWidget(buttonBox, 4, 1, 1, 2);
+    layout->addWidget(buttonBox, 4, 0, 1, 2);
     setLayout(layout);
     setWindowTitle(tr("Add an account"));
 
@@ -100,6 +101,16 @@ void AddChatAccount::setDomain(const QString &domain)
     m_domain = domain;
 }
 
+void AddChatAccount::showMessage(const QString &message, bool isError)
+{
+    m_statusLabel->setStyleSheet(isError ? m_errorStyle : QString());
+    m_statusLabel->setText(message);
+    m_statusLabel->show();
+    qDebug() << "size" << size();
+    qDebug() << "size hint" << sizeHint();
+    resize(size().expandedTo(sizeHint()));
+}
+
 void AddChatAccount::testAccount()
 {
     // normalise input
@@ -110,9 +121,7 @@ void AddChatAccount::testAccount()
     // check JID is valid
     if (!isBareJid(jid()))
     {
-        m_statusLabel->setStyleSheet(m_errorStyle);
-        m_statusLabel->setText(tr("The address you entered is invalid."));
-        m_statusLabel->show();
+        showMessage(tr("The address you entered is invalid."), true);
         return;
     }
 
@@ -122,17 +131,13 @@ void AddChatAccount::testAccount()
     {
         if (jidToDomain(account) == domain)
         {
-            m_statusLabel->setStyleSheet(m_errorStyle);
-            m_statusLabel->setText(tr("You already have an account for '%1'.").arg(domain));
-            m_statusLabel->show();
+            showMessage(tr("You already have an account for '%1'.").arg(domain), true);
             return;
         }
     }
 
-    m_statusLabel->setStyleSheet(QString());
-    m_statusLabel->setText(tr("Checking your username and password.."));
-    m_statusLabel->show();
-
+    // test account
+    showMessage(tr("Checking your username and password.."), false);
     QXmppConfiguration config;
     config.setJid(jid());
     config.setPassword(password());
@@ -142,9 +147,7 @@ void AddChatAccount::testAccount()
 
 void AddChatAccount::testFailed()
 {
-    m_statusLabel->setStyleSheet(m_errorStyle);
-    m_statusLabel->setText(tr("Could not connect, please check your username and password."));
-    m_statusLabel->show();
+    showMessage(tr("Could not connect, please check your username and password."), true);
 }
 
 void AddChatAccount::testSucceeded()

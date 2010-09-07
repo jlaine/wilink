@@ -48,6 +48,8 @@ private slots:
     void testSucceeded();
 
 private:
+    void showMessage(const QString &message, bool isError);
+
     QString m_domain;
     QStringList m_accounts;
     QString m_errorStyle;
