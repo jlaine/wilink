@@ -4,10 +4,6 @@
 <context>
     <name>AddChatAccount</name>
     <message>
-        <source>User</source>
-        <translation>Utilisateur</translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
@@ -21,11 +17,11 @@
     </message>
     <message>
         <source>Checking your username and password..</source>
-        <translation>Vérification de votre nom d&apos;utilisateur et mot de passe..</translation>
+        <translation>Vérification de votre identifiant et mot de passe..</translation>
     </message>
     <message>
-        <source>Enter the address of the account you want to add.</source>
-        <translation>Saisissez l&apos;adresse du compte que vous souhaitez ajouter.</translation>
+        <source>Enter the address and password of the account you want to add.</source>
+        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
     </message>
     <message>
         <source>You already have an account for &apos;%1&apos;.</source>
@@ -34,6 +30,14 @@
     <message>
         <source>Could not connect, please check your username and password.</source>
         <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>Identifiant</translation>
+    </message>
+    <message>
+        <source>Enter the username and password of your &apos;%1&apos; account.</source>
+        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>

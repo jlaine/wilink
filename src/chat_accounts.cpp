@@ -46,11 +46,10 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     QGridLayout *layout = new QGridLayout;
 
     m_promptLabel = new QLabel;
-    m_promptLabel->setText(tr("Enter the address of the account you want to add."));
     m_promptLabel->setWordWrap(true);
     layout->addWidget(m_promptLabel, 0, 0, 1, 2);
 
-    layout->addWidget(new QLabel(tr("User")), 1, 0);
+    layout->addWidget(new QLabel(tr("Username")), 1, 0);
     m_jidEdit = new QLineEdit;
     layout->addWidget(m_jidEdit, 1, 1);
 
@@ -68,6 +67,8 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     buttonBox->addButton(QDialogButtonBox::Ok);
     buttonBox->addButton(QDialogButtonBox::Cancel);
     layout->addWidget(buttonBox, 4, 0, 1, 2);
+
+    setDomain(QString());
     setLayout(layout);
     setWindowTitle(tr("Add an account"));
 
@@ -99,6 +100,10 @@ void AddChatAccount::setAccounts(const QStringList &accounts)
 void AddChatAccount::setDomain(const QString &domain)
 {
     m_domain = domain;
+    if (m_domain.isEmpty())
+        m_promptLabel->setText(tr("Enter the address and password of the account you want to add."));
+    else
+        m_promptLabel->setText(tr("Enter the username and password of your '%1' account.").arg(m_domain));
 }
 
 void AddChatAccount::showMessage(const QString &message, bool isError)
@@ -106,8 +111,6 @@ void AddChatAccount::showMessage(const QString &message, bool isError)
     m_statusLabel->setStyleSheet(isError ? m_errorStyle : QString());
     m_statusLabel->setText(message);
     m_statusLabel->show();
-    qDebug() << "size" << size();
-    qDebug() << "size hint" << sizeHint();
     resize(size().expandedTo(sizeHint()));
 }
 
