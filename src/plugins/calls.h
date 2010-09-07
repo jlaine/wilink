@@ -21,7 +21,7 @@
 #define __WILINK_CALLS_H__
 
 #include <QObject>
-#include <QAudio>
+#include <QAudioInput>
 
 #include "QXmppCallManager.h"
 #include "chat_panel.h"
