@@ -179,8 +179,9 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     connect(listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(updateButtons()));
     layout->addWidget(listWidget);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(QDialogButtonBox::Ok);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QPushButton *addButton = new QPushButton;
@@ -265,10 +266,5 @@ void ChatAccounts::updateButtons()
         removeButton->setEnabled(item->data(Qt::UserRole).toBool());
     else
         removeButton->setEnabled(false);
-}
-
-void ChatAccounts::validate()
-{
-    accept();
 }
 

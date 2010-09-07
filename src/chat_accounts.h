@@ -73,7 +73,6 @@ private slots:
     void addAccount();
     void removeAccount();
     void updateButtons();
-    void validate();
 
 private:
     void addEntry(const QString &jid);
