@@ -101,9 +101,9 @@ void AddChatAccount::setDomain(const QString &domain)
 {
     m_domain = domain;
     if (m_domain.isEmpty())
-        m_promptLabel->setText(tr("Enter the address and password of the account you want to add."));
+        m_promptLabel->setText(tr("Enter the address and password for the account you want to add."));
     else
-        m_promptLabel->setText(tr("Enter the username and password of your '%1' account.").arg(m_domain));
+        m_promptLabel->setText(tr("Enter the username and password for your '%1' account.").arg(m_domain));
 }
 
 void AddChatAccount::showMessage(const QString &message, bool isError)

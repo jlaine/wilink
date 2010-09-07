@@ -20,7 +20,7 @@
         <translation>Vérification de votre identifiant et mot de passe..</translation>
     </message>
     <message>
-        <source>Enter the address and password of the account you want to add.</source>
+        <source>Enter the address and password for the account you want to add.</source>
         <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
     </message>
     <message>
@@ -36,7 +36,7 @@
         <translation>Identifiant</translation>
     </message>
     <message>
-        <source>Enter the username and password of your &apos;%1&apos; account.</source>
+        <source>Enter the username and password for your &apos;%1&apos; account.</source>
         <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
     </message>
 </context>
@@ -57,6 +57,10 @@
     <message>
         <source>Password</source>
         <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Enter the username and password for your &apos;%1&apos; account.</source>
+        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>

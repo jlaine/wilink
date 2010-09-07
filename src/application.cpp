@@ -153,7 +153,7 @@ QString Application::executablePath()
  */
 void Application::getCredentials(const QString &realm, QAuthenticator *authenticator)
 {
-    const QString prompt = QString("Please enter your credentials for '%1'.").arg(realm);
+    const QString prompt = tr("Enter the username and password for your '%1' account.").arg(realm);
 
     /* create dialog */
     QDialog *dialog = new QDialog;
