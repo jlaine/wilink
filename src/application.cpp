@@ -161,13 +161,13 @@ void Application::getCredentials(const QString &realm, QAuthenticator *authentic
 
     layout->addWidget(new QLabel(prompt), 0, 0, 1, 2);
 
-    layout->addWidget(new QLabel("User:"), 1, 0);
+    layout->addWidget(new QLabel(tr("Username")), 1, 0);
     QLineEdit *usernameEdit = new QLineEdit();
     if (!authenticator->user().isEmpty())
         usernameEdit->setEnabled(false);
     layout->addWidget(usernameEdit, 1, 1);
 
-    layout->addWidget(new QLabel("Password:"), 2, 0);
+    layout->addWidget(new QLabel(tr("Password")), 2, 0);
     QLineEdit *passwordEdit = new QLineEdit();
     passwordEdit->setEchoMode(QLineEdit::Password);
     layout->addWidget(passwordEdit, 2, 1);

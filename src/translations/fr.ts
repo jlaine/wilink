@@ -50,6 +50,14 @@
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
     </message>
+    <message>
+        <source>Username</source>
+        <translation>Identifiant</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
 </context>
 <context>
     <name>CallPanel</name>
