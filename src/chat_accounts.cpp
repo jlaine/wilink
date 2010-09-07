@@ -29,6 +29,9 @@
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
 
+#include "qnetio/wallet.h"
+
+#include "application.h"
 #include "chat_accounts.h"
 #include "utils.h"
 
@@ -41,6 +44,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     QGridLayout *layout = new QGridLayout;
 
     m_promptLabel = new QLabel;
+    m_promptLabel->setText(tr("Enter the address of the account you want to add."));
     m_promptLabel->hide();
     layout->addWidget(m_promptLabel, 0, 0, 1, 2);
 
@@ -84,6 +88,11 @@ QString AddChatAccount::password() const
     return m_passwordEdit->text();
 }
 
+void AddChatAccount::setAccounts(const QStringList &accounts)
+{
+    m_accounts = accounts;
+}
+
 void AddChatAccount::setDomain(const QString &domain)
 {
     m_domain = domain;
@@ -102,6 +111,17 @@ void AddChatAccount::testAccount()
         m_statusLabel->setText(tr("Please enter your password."));
         m_statusLabel->show();
         return;
+    }
+
+    const QString domain = jidToDomain(jid());
+    foreach (const QString &account, m_accounts)
+    {
+        if (jidToDomain(account) == domain)
+        {
+            m_statusLabel->setText(tr("You already have an account for '%1'.").arg(domain));
+            m_statusLabel->show();
+            return;
+        }
     }
 
     m_statusLabel->setText(tr("Checking your username and password.."));
@@ -167,38 +187,14 @@ QStringList ChatAccounts::accounts() const
 
 void ChatAccounts::addAccount()
 {
-    bool valid = false;
-    QString jid, error;
-    while (!valid)
+    AddChatAccount dlg;
+    dlg.setAccounts(accounts());
+    if (dlg.exec())
     {
-        bool ok = false;
-        QString prompt = tr("Enter the address of the account you want to add.");
-        jid = QInputDialog::getText(this, tr("Add an account"),
-                      tr("Enter the address of the account you want to add.") + (error.isEmpty() ? QString() : "\n\n" + error),
-                      QLineEdit::Normal, jid, &ok).toLower();
-        if (!ok)
-            return;
-
-        if (!isBareJid(jid))
-        {
-            error = tr("The address you entered is invalid.");
-            continue;
-        }
-
-        valid = true;
-        const QString domain = jidToDomain(jid);
-        for (int i = 0; i < listWidget->count(); i++)
-        {
-            if (jidToDomain(listWidget->item(i)->text()) == domain)
-            {
-                error = tr("You already have an account for '%1'.").arg(domain);
-                valid = false;
-                break;
-            }
-        }
+        addEntry(dlg.jid());
+        QNetIO::Wallet::instance()->setCredentials(Application::authRealm(dlg.jid()),
+            dlg.jid(), dlg.password());
     }
-
-    addEntry(jid);
 }
 
 void ChatAccounts::addEntry(const QString &jid)

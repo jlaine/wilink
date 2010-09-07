@@ -37,6 +37,7 @@ public:
     QString jid() const;
     QString password() const;
 
+    void setAccounts(const QStringList &accounts);
     void setDomain(const QString &domain);
 
 private slots:
@@ -45,6 +46,8 @@ private slots:
 
 private:
     QString m_domain;
+    QStringList m_accounts;
+
     QLineEdit *m_jidEdit;
     QLineEdit *m_passwordEdit;
     QLabel *m_promptLabel;
