@@ -38,7 +38,8 @@
 static const char *accountsKey = "ChatAccounts";
 
 AddChatAccount::AddChatAccount(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent),
+    m_errorStyle("QLabel { color: red; }")
 {
     m_testClient = new QXmppClient(this);
 
@@ -101,30 +102,34 @@ void AddChatAccount::setDomain(const QString &domain)
 
 void AddChatAccount::testAccount()
 {
+    // normalise input
+    m_jidEdit->setText(m_jidEdit->text().trimmed().toLower());
+    if (m_jidEdit->text().isEmpty() || m_passwordEdit->text().isEmpty())
+        return;
+
+    // check JID is valid
     if (!isBareJid(jid()))
     {
+        m_statusLabel->setStyleSheet(m_errorStyle);
         m_statusLabel->setText(tr("The address you entered is invalid."));
         m_statusLabel->show();
         return;
     }
-    else if (password().isEmpty())
-    {
-        m_statusLabel->setText(tr("Please enter your password."));
-        m_statusLabel->show();
-        return;
-    }
 
+    // check we don't already have an account for this domain
     const QString domain = jidToDomain(jid());
     foreach (const QString &account, m_accounts)
     {
         if (jidToDomain(account) == domain)
         {
+            m_statusLabel->setStyleSheet(m_errorStyle);
             m_statusLabel->setText(tr("You already have an account for '%1'.").arg(domain));
             m_statusLabel->show();
             return;
         }
     }
 
+    m_statusLabel->setStyleSheet(QString());
     m_statusLabel->setText(tr("Checking your username and password.."));
     m_statusLabel->show();
 
@@ -137,7 +142,8 @@ void AddChatAccount::testAccount()
 
 void AddChatAccount::testFailed()
 {
-    m_statusLabel->setText(tr("Please check your username and password."));
+    m_statusLabel->setStyleSheet(m_errorStyle);
+    m_statusLabel->setText(tr("Could not connect, please check your username and password."));
     m_statusLabel->show();
 }
 

@@ -21,6 +21,7 @@
 #define __WILINK_CHAT_ACCOUNTS_H__
 
 #include <QDialog>
+#include <QPalette>
 
 class QLabel;
 class QLineEdit;
@@ -49,6 +50,7 @@ private slots:
 private:
     QString m_domain;
     QStringList m_accounts;
+    QString m_errorStyle;
 
     QLineEdit *m_jidEdit;
     QLineEdit *m_passwordEdit;

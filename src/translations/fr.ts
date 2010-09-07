@@ -16,10 +16,6 @@
         <translation>Ajouter un compte</translation>
     </message>
     <message>
-        <source>Please check your username and password.</source>
-        <translation>Merci de vérifier votre nom d&apos;utilisateur et mot de passe.</translation>
-    </message>
-    <message>
         <source>The address you entered is invalid.</source>
         <translation>L&apos;adresse que vous avez saisie n&apos;est pas valide.</translation>
     </message>
@@ -28,16 +24,16 @@
         <translation>Vérification de votre nom d&apos;utilisateur et mot de passe..</translation>
     </message>
     <message>
-        <source>Please enter your password.</source>
-        <translation>Merci de saisir votre mot de passe.</translation>
-    </message>
-    <message>
         <source>Enter the address of the account you want to add.</source>
         <translation>Saisissez l&apos;adresse du compte que vous souhaitez ajouter.</translation>
     </message>
     <message>
         <source>You already have an account for &apos;%1&apos;.</source>
-        <translation type="unfinished">Vous avez déjà un compte pour &apos;%1&apos;.</translation>
+        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not connect, please check your username and password.</source>
+        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
     </message>
 </context>
 <context>
