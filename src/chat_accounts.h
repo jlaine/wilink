@@ -36,6 +36,7 @@ public:
 
     QString jid() const;
     QString password() const;
+
     void setDomain(const QString &domain);
 
 private slots:
@@ -46,6 +47,7 @@ private:
     QString m_domain;
     QLineEdit *m_jidEdit;
     QLineEdit *m_passwordEdit;
+    QLabel *m_promptLabel;
     QLabel *m_statusLabel;
     QXmppClient *m_testClient;
 };

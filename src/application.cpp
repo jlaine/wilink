@@ -366,21 +366,22 @@ void Application::resetChats()
     }
 
     /* check we have a wifirst.net account */
+    const QString requiredDomain("wifirst.net");
     bool foundAccount = false;
     foreach (const QString &jid, chatJids)
-        if (jidToDomain(jid) == "wifirst.net")
+        if (jidToDomain(jid) == requiredDomain)
             foundAccount = true;
     if (!foundAccount)
     {
-        QAuthenticator auth;
-        QNetIO::Wallet::instance()->deleteCredentials("www.wifirst.net");
-        QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", &auth);
-        if (!isBareJid(auth.user()) || auth.password().isEmpty())
+        AddChatAccount dlg;
+        dlg.setDomain(requiredDomain);
+        if (!dlg.exec())
         {
             quit();
             return;
         }
-        chatJids += auth.user();
+        QNetIO::Wallet::instance()->setCredentials(authRealm(dlg.jid()), dlg.jid(), dlg.password());
+        chatJids += dlg.jid();
         settings->setValue("ChatAccounts", chatJids);
     }
 

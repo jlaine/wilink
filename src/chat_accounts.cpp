@@ -23,6 +23,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QListWidget>
+#include <QPropertyAnimation>
 #include <QPushButton>
 
 #include "QXmppClient.h"
@@ -39,14 +40,16 @@ AddChatAccount::AddChatAccount(QWidget *parent)
 
     QGridLayout *layout = new QGridLayout;
 
-    layout->addWidget(new QLabel("test"), 0, 0, 1, 2);
+    m_promptLabel = new QLabel;
+    m_promptLabel->hide();
+    layout->addWidget(m_promptLabel, 0, 0, 1, 2);
 
     layout->addWidget(new QLabel(tr("User")), 1, 0);
-    m_jidEdit = new QLineEdit();
+    m_jidEdit = new QLineEdit;
     layout->addWidget(m_jidEdit, 1, 1);
 
     layout->addWidget(new QLabel(tr("Password")), 2, 0);
-    m_passwordEdit = new QLineEdit();
+    m_passwordEdit = new QLineEdit;
     m_passwordEdit->setEchoMode(QLineEdit::Password);
     layout->addWidget(m_passwordEdit, 2, 1);
 
