@@ -23,8 +23,8 @@
 #include <QLabel>
 #include <QLayout>
 #include <QListWidget>
-#include <QPropertyAnimation>
 #include <QPushButton>
+#include <QSettings>
 
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
@@ -35,6 +35,7 @@
 #include "chat_accounts.h"
 #include "utils.h"
 
+static const char *accountsKey = "ChatAccounts";
 
 AddChatAccount::AddChatAccount(QWidget *parent)
     : QDialog(parent)
@@ -183,6 +184,12 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     layout->addWidget(buttonBox);
 
     setLayout(layout);
+
+    /* load accounts */
+    m_settings = new QSettings(this);
+    const QStringList accounts = m_settings->value(accountsKey).toStringList();
+    foreach (const QString &jid, accounts)
+        addEntry(jid);
     updateButtons();
 }
 
@@ -199,7 +206,14 @@ void ChatAccounts::addAccount()
     AddChatAccount dlg;
     dlg.setAccounts(accounts());
     if (dlg.exec())
+    {
+        // add account
+        QStringList accounts = m_settings->value(accountsKey).toStringList();
+        accounts << dlg.jid();
+        m_settings->setValue(accountsKey, accounts);
+
         addEntry(dlg.jid());
+    }
 }
 
 void ChatAccounts::addEntry(const QString &jid)
@@ -212,19 +226,24 @@ void ChatAccounts::addEntry(const QString &jid)
 
 void ChatAccounts::removeAccount()
 {
-    QListWidgetItem *item = listWidget->item(listWidget->currentRow());
-    if (item && item->data(Qt::UserRole).toBool())
-    {
-        listWidget->takeItem(listWidget->currentRow());
-        updateButtons();
-    }
-}
+    QListWidgetItem *item = listWidget->takeItem(listWidget->currentRow());
+    if (!item)
+        return;
+    const QString jid = item->text();
 
-void ChatAccounts::setAccounts(const QStringList &accounts)
-{
-    listWidget->clear();
-    foreach (const QString &jid, accounts)
-        addEntry(jid);
+    // remove credentials
+    const QString realm = Application::authRealm(jid);
+    qDebug() << "Removing credentials for" << realm;
+    QNetIO::Wallet::instance()->deleteCredentials(realm);
+
+    // remove account
+    QStringList accounts = m_settings->value(accountsKey).toStringList();
+    accounts.removeAll(jid);
+    m_settings->setValue(accountsKey, accounts);
+
+    // update buttons
+    delete item;
+    updateButtons();
 }
 
 void ChatAccounts::updateButtons()

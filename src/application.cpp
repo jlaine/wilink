@@ -318,30 +318,10 @@ void Application::setOpenAtLogin(bool run)
 void Application::showAccounts()
 {
     ChatAccounts dlg;
+    dlg.exec();
 
-    const QStringList oldAccounts = settings->value("ChatAccounts").toStringList();
-    dlg.setAccounts(oldAccounts);
-    if (dlg.exec() && dlg.accounts() != oldAccounts)
-    {
-        QStringList newAccounts = dlg.accounts();
-
-        // clean credentials
-        foreach (const QString &account, oldAccounts)
-        {
-            if (!newAccounts.contains(account))
-            {
-                const QString realm = authRealm(account);
-                qDebug() << "Removing credentials for" << realm;
-                QNetIO::Wallet::instance()->deleteCredentials(realm);
-            }
-        }
-
-        // store new settings
-        settings->setValue("ChatAccounts", newAccounts);
-
-        // reset chats later as we may delete the calling window
-        QTimer::singleShot(0, this, SLOT(resetChats()));
-    }
+    // reset chats later as we may delete the calling window
+    QTimer::singleShot(0, this, SLOT(resetChats()));
 }
 
 void Application::resetChats()

@@ -25,6 +25,7 @@
 class QLabel;
 class QLineEdit;
 class QListWidget;
+class QSettings;
 class QXmppClient;
 
 class AddChatAccount : public QDialog
@@ -63,7 +64,6 @@ class ChatAccounts : public QDialog
 public:
     ChatAccounts(QWidget *parent = 0);
     QStringList accounts() const;
-    void setAccounts(const QStringList &accounts);
 
 private slots:
     void addAccount();
@@ -76,6 +76,7 @@ private:
 
     QListWidget *listWidget;
     QPushButton *removeButton;
+    QSettings *m_settings;
 };
 
 #endif
