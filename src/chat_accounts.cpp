@@ -49,7 +49,8 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     m_promptLabel->setWordWrap(true);
     layout->addWidget(m_promptLabel, 0, 0, 1, 2);
 
-    layout->addWidget(new QLabel(tr("Username")), 1, 0);
+    m_jidLabel = new QLabel;
+    layout->addWidget(m_jidLabel, 1, 0);
     m_jidEdit = new QLineEdit;
     layout->addWidget(m_jidEdit, 1, 1);
 
@@ -101,9 +102,15 @@ void AddChatAccount::setDomain(const QString &domain)
 {
     m_domain = domain;
     if (m_domain.isEmpty())
+    {
+        m_jidLabel->setText(tr("Address"));
         m_promptLabel->setText(tr("Enter the address and password for the account you want to add."));
+    }
     else
+    {
+        m_jidLabel->setText(tr("Username"));
         m_promptLabel->setText(tr("Enter the username and password for your '%1' account.").arg(m_domain));
+    }
 }
 
 void AddChatAccount::showMessage(const QString &message, bool isError)

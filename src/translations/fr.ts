@@ -39,6 +39,10 @@
         <source>Enter the username and password for your &apos;%1&apos; account.</source>
         <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
     </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
+    </message>
 </context>
 <context>
     <name>Application</name>

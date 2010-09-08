@@ -55,6 +55,7 @@ private:
     QString m_errorStyle;
 
     QLineEdit *m_jidEdit;
+    QLabel *m_jidLabel;
     QLineEdit *m_passwordEdit;
     QLabel *m_promptLabel;
     QLabel *m_statusLabel;
