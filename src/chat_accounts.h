@@ -23,6 +23,7 @@
 #include <QDialog>
 #include <QPalette>
 
+class QDialogButtonBox;
 class QLabel;
 class QLineEdit;
 class QListWidget;
@@ -54,6 +55,7 @@ private:
     QStringList m_accounts;
     QString m_errorStyle;
 
+    QDialogButtonBox *m_buttonBox;
     QLineEdit *m_jidEdit;
     QLabel *m_jidLabel;
     QLineEdit *m_passwordEdit;

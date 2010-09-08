@@ -64,18 +64,18 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     m_statusLabel->hide();
     layout->addWidget(m_statusLabel, 3, 0, 1, 2);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
-    buttonBox->addButton(QDialogButtonBox::Ok);
-    buttonBox->addButton(QDialogButtonBox::Cancel);
-    layout->addWidget(buttonBox, 4, 0, 1, 2);
+    m_buttonBox = new QDialogButtonBox;
+    m_buttonBox->addButton(QDialogButtonBox::Ok);
+    m_buttonBox->addButton(QDialogButtonBox::Cancel);
+    layout->addWidget(m_buttonBox, 4, 0, 1, 2);
 
     setDomain(QString());
     setLayout(layout);
     setWindowTitle(tr("Add an account"));
 
     /* connect signals */
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(testAccount()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(testAccount()));
+    connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     connect(m_testClient, SIGNAL(connected()), this, SLOT(testSucceeded()));
     connect(m_testClient, SIGNAL(disconnected()), this, SLOT(testFailed()));
 }
@@ -147,6 +147,7 @@ void AddChatAccount::testAccount()
     }
 
     // test account
+    m_buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
     showMessage(tr("Checking your username and password.."), false);
     QXmppConfiguration config;
     config.setJid(jid());
@@ -158,6 +159,7 @@ void AddChatAccount::testAccount()
 void AddChatAccount::testFailed()
 {
     showMessage(tr("Could not connect, please check your username and password."), true);
+    m_buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 }
 
 void AddChatAccount::testSucceeded()
