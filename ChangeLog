@@ -4,6 +4,7 @@ wiLink 0.9.9 (UNRELEASED)
  * Do not display error messages in chat history.
  * Add an explicit "Cancel" button to credentials prompt.
  * Make chat accounts accessible from system tray.
+ * Fix autoscrolling of debugging console.
 
 wiLink 0.9.8 (2010-06-27)
  * Add a new layout for the chat history.

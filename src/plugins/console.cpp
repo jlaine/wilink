@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QShortcut>
 #include <QTextBrowser>
 
@@ -99,15 +100,18 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
 
     if (!message.isEmpty())
     {
-        const QTextCursor savedCursor = browser->textCursor();
+        QScrollBar *scrollBar = browser->verticalScrollBar();
+        const bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
 
         QTextCursor cursor = browser->textCursor();
         cursor.movePosition(QTextCursor::End);
-        browser->setTextCursor(cursor);
-        browser->setTextBackgroundColor(color);
-        browser->insertPlainText(message + "\n");
+        QTextCharFormat fmt = cursor.blockCharFormat();
+        fmt.setBackground(QBrush(color));
+        cursor.setBlockCharFormat(fmt);
+        cursor.insertText(message + "\n");
 
-        browser->setTextCursor(savedCursor);
+        if (atEnd)
+            scrollBar->setSliderPosition(scrollBar->maximum());
     }
 }
 
