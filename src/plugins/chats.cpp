@@ -158,7 +158,7 @@ void ChatDialog::join()
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately
     client->archiveManager().listCollections(chatRemoteJid,
-        QDateTime::currentDateTime().addDays(-7));
+        QDateTime::currentDateTime().addDays(-14));
 
     joined = true;
 }
