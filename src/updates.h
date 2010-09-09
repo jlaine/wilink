@@ -31,6 +31,7 @@ class QTimer;
 class Release
 {
 public:
+    bool checkHashes(const QByteArray &data) const;
     bool isValid() const;
 
     QString changes;
@@ -56,7 +57,7 @@ public:
     } UpdatesError;
 
     Updates(QObject *parent);
-    void download(const Release &release, const QString &dirPath);
+    void download(const Release &release);
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString &cacheDir);

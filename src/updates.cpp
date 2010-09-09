@@ -34,6 +34,26 @@
 #include "systeminfo.h"
 #include "updates.h"
 
+/** Checks whether the given data matches the hashes specified
+ *  in the release.
+ *
+ * @param data
+ */
+bool Release::checkHashes(const QByteArray &data) const
+{
+    foreach (const QString &type, hashes.keys())
+    {
+        if (type == "sha1")
+        {
+            QCryptographicHash hash(QCryptographicHash::Sha1);
+            hash.addData(data);
+            if (hash.result() != hashes[type])
+                return false;
+        }
+    }
+    return true;
+}
+
 /** Returns true if the release is a valid update from the
  *  currently installed version.
  */
@@ -119,7 +139,7 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 
 /** Downloads the specified release to the given file.
  */
-void Updates::download(const Release &release, const QString &dirPath)
+void Updates::download(const Release &release)
 {
     /* only download files over HTTPS with an SHA1 hash */
     if (!release.isValid())
@@ -128,7 +148,7 @@ void Updates::download(const Release &release, const QString &dirPath)
         return;
     }
 
-    downloadFile.setFileName(QDir(dirPath).filePath(QFileInfo(release.url.path()).fileName()));
+    downloadFile.setFileName(QDir(m_cacheDirectory).filePath(QFileInfo(release.url.path()).fileName()));
     downloadRelease = release;
 
     QNetworkRequest req(release.url);
@@ -152,19 +172,11 @@ void Updates::saveUpdate()
     }
 
     /* check data */
-    const QByteArray &data = reply->readAll();
-    foreach (const QString &type, downloadRelease.hashes.keys())
+    const QByteArray data = reply->readAll();
+    if (!downloadRelease.checkHashes(data))
     {
-        if (type == "sha1")
-        {
-            QCryptographicHash hash(QCryptographicHash::Sha1);
-            hash.addData(data);
-            if (hash.result() != downloadRelease.hashes[type])
-            {
-                emit updateFailed(BadHash, "The checksum of the downloaded file is incorrect");
-                return;
-            } 
-        }
+        emit updateFailed(BadHash, "The checksum of the downloaded file is incorrect");
+        return;
     }
 
     /* save file */

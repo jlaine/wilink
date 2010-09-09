@@ -103,7 +103,7 @@ void UpdatesDialog::checkFinished(const Release &release)
     {
         statusLabel->setText(tr("Downloading update.."));
         show();
-        updates->download(release, SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
+        updates->download(release);
     }
 }
 
