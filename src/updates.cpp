@@ -198,7 +198,7 @@ void Updates::download(const Release &release)
         downloadFile.close();
         if (release.checkHashes(data))
         {
-            emit downloadFinished(release, QUrl::fromLocalFile(downloadFile.fileName()));
+            emit downloadFinished(release);
             return;
         }
     }
@@ -212,8 +212,9 @@ void Updates::download(const Release &release)
     emit downloadStarted(release);
 }
 
-void Updates::install(const Release &release, const QUrl &url)
+void Updates::install(const Release &release)
 {
+    const QString filePath = d->cacheFile(release);
     emit installStarted(release);
 
 #ifdef Q_OS_WIN
@@ -224,7 +225,7 @@ void Updates::install(const Release &release, const QUrl &url)
     // we cannot use QProcess::startDetached() because NSIS wants the
     // /D=.. argument to be absolutely unescaped.
     QString args = QString("\"%1\" /S /D=%2")
-        .arg(url.toLocalFile().replace(QLatin1Char('/'), QLatin1Char('\\')))
+        .arg(filePath.replace(QLatin1Char('/'), QLatin1Char('\\')))
         .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
 
     STARTUPINFOW startupInfo = { sizeof( STARTUPINFO ), 0, 0, 0,
@@ -248,7 +249,7 @@ void Updates::install(const Release &release, const QUrl &url)
     }
 #endif
     // open the downloaded archive
-    QDesktopServices::openUrl(url);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 
     // quit application to allow installation
     qApp->quit();
@@ -286,7 +287,7 @@ void Updates::saveUpdate()
     downloadFile.write(data);
     downloadFile.close();
 
-    emit downloadFinished(d->downloadRelease, QUrl::fromLocalFile(downloadFile.fileName()));
+    emit downloadFinished(d->downloadRelease);
 }
 
 /** Handle a response from the updates server containing the current

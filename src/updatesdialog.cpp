@@ -72,8 +72,8 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
                     this, SLOT(installStarted(Release)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(downloadFinished(Release,QUrl)),
-                    this, SLOT(downloadFinished(Release,QUrl)));
+    check = connect(updates, SIGNAL(downloadFinished(Release)),
+                    this, SLOT(downloadFinished(Release)));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(error(Updates::UpdatesError, const QString&)),
@@ -140,9 +140,9 @@ void UpdatesDialog::installStarted(const Release &release)
     statusLabel->setText(tr("Installing update.."));
 }
 
-void UpdatesDialog::downloadFinished(const Release &release, const QUrl &url)
+void UpdatesDialog::downloadFinished(const Release &release)
 {
-    updates->install(release, url);
+    updates->install(release);
 }
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
