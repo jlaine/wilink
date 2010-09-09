@@ -462,8 +462,9 @@ void Chat::pendingMessages(int messages)
 void Chat::promptCredentials()
 {
     QXmppConfiguration config = m_client->configuration();
-    QString password;
-    if (ChatAccounts::getPassword(config.jidBare(), password))
+    QString password = config.password();
+    if (ChatAccounts::getPassword(config.jidBare(), password) &&
+        password != config.password())
     {
         config.setPassword(password);
         m_client->connectToServer(config);
