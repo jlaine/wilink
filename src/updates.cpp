@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
 #include <QFileInfo>
@@ -30,6 +31,10 @@
 #include <QStringList>
 #include <QUrl>
 #include <QTimer>
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 #include "systeminfo.h"
 #include "updates.h"
@@ -175,6 +180,46 @@ void Updates::download(const Release &release)
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
+}
+
+void Updates::install(const QUrl &url)
+{
+#ifdef Q_OS_WIN
+    // invoke the downloaded installer on the same path as the current install
+    QDir installDir(qApp->applicationDirPath());
+    installDir.cdUp();
+
+    // we cannot use QProcess::startDetached() because NSIS wants the
+    // /D=.. argument to be absolutely unescaped.
+    QString args = QString("\"%1\" /S /D=%2")
+        .arg(url.toLocalFile().replace(QLatin1Char('/'), QLatin1Char('\\')))
+        .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
+
+    STARTUPINFOW startupInfo = { sizeof( STARTUPINFO ), 0, 0, 0,
+                                 (ulong)CW_USEDEFAULT, (ulong)CW_USEDEFAULT,
+                                 (ulong)CW_USEDEFAULT, (ulong)CW_USEDEFAULT,
+                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                               };
+    PROCESS_INFORMATION pinfo;
+    bool success = CreateProcessW(0, (wchar_t*)args.utf16(),
+                                 0, 0, FALSE, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE, 0,
+                                 0,
+                                 &startupInfo, &pinfo);
+
+    if (success) {
+        CloseHandle(pinfo.hThread);
+        CloseHandle(pinfo.hProcess);
+
+        // quit application to allow installation
+        qApp->quit();
+        return;
+    }
+#endif
+    // open the downloaded archive
+    QDesktopServices::openUrl(url);
+
+    // quit application to allow installation
+    qApp->quit();
 }
 
 /** Once a release has been downloaded, verify its checksum and write it

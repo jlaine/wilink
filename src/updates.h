@@ -58,6 +58,7 @@ public:
 
     Updates(QObject *parent);
     void download(const Release &release);
+    void install(const QUrl &url);
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString &cacheDir);
