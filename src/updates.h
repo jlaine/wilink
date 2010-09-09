@@ -20,13 +20,10 @@
 #ifndef __UPDATES_H__
 #define __UPDATES_H__
 
-#include <QFile>
 #include <QMap>
 #include <QUrl>
 
-class QNetworkAccessManager;
 class QNetworkReply;
-class QTimer;
 
 class Release
 {
@@ -40,6 +37,8 @@ public:
     QString version;
     QMap<QString, QByteArray> hashes;
 };
+
+class UpdatesPrivate;
 
 /** The Updates class handling checking for software updates
  *  and installing them.
@@ -57,6 +56,8 @@ public:
     } UpdatesError;
 
     Updates(QObject *parent);
+    ~Updates();
+
     void download(const Release &release);
     void install(const QUrl &url);
 
@@ -82,13 +83,7 @@ private slots:
     void processStatus();
 
 private:
-    QNetworkAccessManager *network;
-    QTimer *timer;
-    QFile downloadFile;
-    Release downloadRelease;
-
-    QString m_cacheDirectory;
-    const QUrl m_updatesUrl;
+    UpdatesPrivate * const d;
 };
 
 #endif

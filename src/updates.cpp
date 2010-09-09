@@ -23,6 +23,7 @@
 #include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
+#include <QFile>
 #include <QFileInfo>
 #include <QLocale>
 #include <QNetworkAccessManager>
@@ -68,25 +69,54 @@ bool Release::isValid() const
            url.isValid() && url.scheme() == "https" && hashes.contains("sha1");
 }
 
+class UpdatesPrivate
+{
+public:
+    QString cacheFile(const Release &release) const;
+    QString cacheDirectory;
+    Release downloadRelease;
+    QUrl updatesUrl;
+
+    QNetworkAccessManager *network;
+    QTimer *timer;
+};
+
+QString UpdatesPrivate::cacheFile(const Release &release) const
+{
+    return QDir(cacheDirectory).filePath(QFileInfo(release.url.path()).fileName());
+}
+
+/** Constructs a new updates checker.
+ *
+ * @param parent
+ */
 Updates::Updates(QObject *parent)
     : QObject(parent),
-    m_updatesUrl("https://download.wifirst.net/wiLink/")
+    d(new UpdatesPrivate)
 {
-    network = new QNetworkAccessManager(this);
+    d->updatesUrl = QUrl("https://download.wifirst.net/wiLink/");
+    d->network = new QNetworkAccessManager(this);
 
     /* schedule updates */
-    timer = new QTimer(this);
-    timer->setInterval(500);
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(check()));
-    timer->start();
+    d->timer = new QTimer(this);
+    d->timer->setInterval(500);
+    d->timer->setSingleShot(true);
+    connect(d->timer, SIGNAL(timeout()), this, SLOT(check()));
+    d->timer->start();
+}
+
+/** Destroys an updates checker.
+ */
+Updates::~Updates()
+{
+    delete d;
 }
 
 /** Returns the location where downloaded updates will be stored.
  */
 QString Updates::cacheDirectory() const
 {
-    return m_cacheDirectory;
+    return d->cacheDirectory;
 }
 
 /** Sets the location where downloaded updates will be stored.
@@ -95,7 +125,7 @@ QString Updates::cacheDirectory() const
  */
 void Updates::setCacheDirectory(const QString &cacheDir)
 {
-    m_cacheDirectory = cacheDir;
+    d->cacheDirectory = cacheDir;
 }
 
 /** Requests the current release information from the updates server.
@@ -105,13 +135,13 @@ void Updates::check()
     emit checkStarted();
 
     /* only download files over HTTPS */
-    if (m_updatesUrl.scheme() != "https")
+    if (d->updatesUrl.scheme() != "https")
     {
         emit error(SecurityError, "Refusing to check for updates from non-HTTPS site");
         return;
     }
 
-    QUrl statusUrl = m_updatesUrl;
+    QUrl statusUrl = d->updatesUrl;
     QList< QPair<QString, QString> > query = statusUrl.queryItems();
     query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
     query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
@@ -121,7 +151,7 @@ void Updates::check()
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
     req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    QNetworkReply *reply = network->get(req);
+    QNetworkReply *reply = d->network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(processStatus()));
 }
 
@@ -153,9 +183,8 @@ void Updates::download(const Release &release)
         return;
     }
 
-    downloadFile.setFileName(QDir(m_cacheDirectory).filePath(QFileInfo(release.url.path()).fileName()));
-
     /* check existing file */
+    QFile downloadFile(d->cacheFile(release));
     if (downloadFile.exists())
     {
         if (!downloadFile.open(QIODevice::ReadOnly))
@@ -175,9 +204,9 @@ void Updates::download(const Release &release)
     }
 
     /* download release */
-    downloadRelease = release;
+    d->downloadRelease = release;
     QNetworkRequest req(release.url);
-    QNetworkReply *reply = network->get(req);
+    QNetworkReply *reply = d->network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(downloadProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
     emit downloadStarted();
@@ -241,13 +270,14 @@ void Updates::saveUpdate()
 
     /* check data */
     const QByteArray data = reply->readAll();
-    if (!downloadRelease.checkHashes(data))
+    if (!d->downloadRelease.checkHashes(data))
     {
         emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
 
     /* save file */
+    QFile downloadFile(d->cacheFile(d->downloadRelease));
     if (!downloadFile.open(QIODevice::WriteOnly))
     {
         emit error(FileError, "Could not save downloaded file to disk");
@@ -270,8 +300,8 @@ void Updates::processStatus()
     if (reply->error() != QNetworkReply::NoError)
     {
         /* retry in 5mn */
-        timer->setInterval(300 * 1000);
-        timer->start();
+        d->timer->setInterval(300 * 1000);
+        d->timer->start();
         emit error(NetworkError, reply->errorString());
         return;
     }
@@ -296,13 +326,13 @@ void Updates::processStatus()
     }
     const QString urlString = item.firstChildElement("url").text();
     if (!urlString.isEmpty())
-        release.url = m_updatesUrl.resolved(QUrl(urlString));
+        release.url = d->updatesUrl.resolved(QUrl(urlString));
 
     /* emit information about available release */
     emit checkFinished(release);
 
     /* check again in two days */
-    timer->setInterval(2 * 24 * 3600 * 1000);
-    timer->start();
+    d->timer->setInterval(2 * 24 * 3600 * 1000);
+    d->timer->start();
 }
 
