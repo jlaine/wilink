@@ -80,6 +80,9 @@ void TestUpdates::compareVersions()
     QVERIFY(Updates::compareVersions("1.0.0", "0.99.7") == 1);
     QVERIFY(Updates::compareVersions("0.99.7", "1.0.0") == -1);
 
+    QVERIFY(Updates::compareVersions("0.9.5", "0.9.4") == 1);
+    QVERIFY(Updates::compareVersions("0.9.4", "0.9.5") == -1);
+
     QVERIFY(Updates::compareVersions("0.9.5", "0.9.401") == 1);
     QVERIFY(Updates::compareVersions("0.9.401", "0.9.5") == -1);
 
