@@ -73,6 +73,7 @@ signals:
     void checkFinished(const Release &release, const QString &errorString);
     void downloadStarted();
     void downloadProgress(qint64 done, qint64 total);
+    void installStarted();
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);
 

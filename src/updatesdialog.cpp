@@ -68,6 +68,10 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
                     this, SLOT(downloadStarted()));
     Q_ASSERT(check);
 
+    check = connect(updates, SIGNAL(installStarted()),
+                    this, SLOT(installStarted()));
+    Q_ASSERT(check);
+
     check = connect(updates, SIGNAL(updateDownloaded(const QUrl&)),
                     this, SLOT(updateDownloaded(const QUrl&)));
     Q_ASSERT(check);
@@ -129,9 +133,13 @@ void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
     progressBar->setValue(done);
 }
 
-void UpdatesDialog::updateDownloaded(const QUrl &url)
+void UpdatesDialog::installStarted()
 {
     statusLabel->setText(tr("Installing update.."));
+}
+
+void UpdatesDialog::updateDownloaded(const QUrl &url)
+{
     updates->install(url);
 }
 

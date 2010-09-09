@@ -185,6 +185,8 @@ void Updates::download(const Release &release)
 
 void Updates::install(const QUrl &url)
 {
+    emit installStarted();
+
 #ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());

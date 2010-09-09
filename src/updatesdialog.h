@@ -43,6 +43,7 @@ protected slots:
     void checkFinished(const Release &release);
     void downloadStarted();
     void downloadProgress(qint64 done, qint64 total);
+    void installStarted();
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);
 
