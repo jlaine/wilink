@@ -54,13 +54,31 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     /* updates */
     updates = new Updates(this);
     updates->setCacheDirectory(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
-    connect(updates, SIGNAL(checkStarted()),
-        this, SLOT(checkStarted()));
-    connect(updates, SIGNAL(checkFinished(Release,QString)),
-        this, SLOT(checkFinished(Release)));
-    connect(updates, SIGNAL(updateDownloaded(const QUrl&)), this, SLOT(updateDownloaded(const QUrl&)));
-    connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)), this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
-    connect(updates, SIGNAL(updateProgress(qint64, qint64)), this, SLOT(updateProgress(qint64, qint64)));
+
+    bool check;
+    check = connect(updates, SIGNAL(checkStarted()),
+                    this, SLOT(checkStarted()));
+    Q_ASSERT(check);
+
+    check = connect(updates, SIGNAL(checkFinished(Release,QString)),
+                    this, SLOT(checkFinished(Release)));
+    Q_ASSERT(check);
+
+    check = connect(updates, SIGNAL(downloadStarted()),
+                    this, SLOT(downloadStarted()));
+    Q_ASSERT(check);
+
+    check = connect(updates, SIGNAL(updateDownloaded(const QUrl&)),
+                    this, SLOT(updateDownloaded(const QUrl&)));
+    Q_ASSERT(check);
+
+    check = connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)),
+                    this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
+    Q_ASSERT(check);
+
+    check = connect(updates, SIGNAL(downloadProgress(qint64, qint64)),
+                    this, SLOT(downloadProgress(qint64, qint64)));
+    Q_ASSERT(check);
 }
 
 void UpdatesDialog::check()
@@ -95,10 +113,20 @@ void UpdatesDialog::checkFinished(const Release &release)
         message,
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
-        statusLabel->setText(tr("Downloading update.."));
         show();
         updates->download(release);
     }
+}
+
+void UpdatesDialog::downloadStarted()
+{
+    statusLabel->setText(tr("Downloading update.."));
+}
+
+void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
+{
+    progressBar->setMaximum(total);
+    progressBar->setValue(done);
 }
 
 void UpdatesDialog::updateDownloaded(const QUrl &url)
@@ -114,11 +142,5 @@ void UpdatesDialog::updateFailed(Updates::UpdatesError error, const QString &err
         tr("Download failed"),
         tr("Could not download the new version, please try again later."));
     hide();
-}
-
-void UpdatesDialog::updateProgress(qint64 done, qint64 total)
-{
-    progressBar->setMaximum(total);
-    progressBar->setValue(done);
 }
 

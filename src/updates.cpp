@@ -178,8 +178,9 @@ void Updates::download(const Release &release)
     downloadRelease = release;
     QNetworkRequest req(release.url);
     QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(downloadProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
+    emit downloadStarted();
 }
 
 void Updates::install(const QUrl &url)

@@ -68,16 +68,17 @@ public:
 public slots:
     void check();
 
-protected slots:
-    void saveUpdate();
-    void processStatus();
-
 signals:
     void checkStarted();
     void checkFinished(const Release &release, const QString &errorString);
+    void downloadStarted();
+    void downloadProgress(qint64 done, qint64 total);
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);
-    void updateProgress(qint64 done, qint64 total);
+
+private slots:
+    void saveUpdate();
+    void processStatus();
 
 private:
     QNetworkAccessManager *network;

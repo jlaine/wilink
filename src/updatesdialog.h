@@ -41,9 +41,10 @@ public slots:
 protected slots:
     void checkStarted();
     void checkFinished(const Release &release);
+    void downloadStarted();
+    void downloadProgress(qint64 done, qint64 total);
     void updateDownloaded(const QUrl &url);
     void updateFailed(Updates::UpdatesError error, const QString &errorString);
-    void updateProgress(qint64 done, qint64 total);
 
 signals:
     void installRelease(const Release &release);
