@@ -321,7 +321,8 @@ void Application::showAccounts()
     dlg.exec();
 
     // reset chats later as we may delete the calling window
-    QTimer::singleShot(0, this, SLOT(resetChats()));
+    if (dlg.changed())
+        QTimer::singleShot(0, this, SLOT(resetChats()));
 }
 
 void Application::resetChats()

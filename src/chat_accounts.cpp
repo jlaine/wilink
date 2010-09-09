@@ -172,7 +172,8 @@ void AddChatAccount::testSucceeded()
 }
 
 ChatAccounts::ChatAccounts(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent),
+    m_changed(false)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
@@ -229,6 +230,8 @@ void ChatAccounts::addAccount()
     dlg.setAccounts(accounts());
     if (dlg.exec())
     {
+        m_changed = true;
+
         // add account
         QStringList accounts = m_settings->value(accountsKey).toStringList();
         accounts << dlg.jid();
@@ -246,11 +249,18 @@ void ChatAccounts::addEntry(const QString &jid)
     listWidget->addItem(wdgItem);
 }
 
+bool ChatAccounts::changed() const
+{
+    return m_changed;
+}
+
 void ChatAccounts::removeAccount()
 {
     QListWidgetItem *item = listWidget->takeItem(listWidget->currentRow());
     if (!item)
         return;
+
+    m_changed = true;
     const QString jid = item->text();
 
     // remove credentials

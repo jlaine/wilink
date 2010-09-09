@@ -71,6 +71,7 @@ class ChatAccounts : public QDialog
 public:
     ChatAccounts(QWidget *parent = 0);
     QStringList accounts() const;
+    bool changed() const;
 
 private slots:
     void addAccount();
@@ -80,6 +81,7 @@ private slots:
 private:
     void addEntry(const QString &jid);
 
+    bool m_changed;
     QListWidget *listWidget;
     QPushButton *removeButton;
     QSettings *m_settings;
