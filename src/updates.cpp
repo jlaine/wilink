@@ -249,8 +249,6 @@ void Updates::install(const Release &release)
         return;
     }
 
-    const QString filePath = d->cacheFile(release);
-
 #ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());
@@ -259,7 +257,7 @@ void Updates::install(const Release &release)
     // we cannot use QProcess::startDetached() because NSIS wants the
     // /D=.. argument to be absolutely unescaped.
     QString args = QString("\"%1\" /S /D=%2")
-        .arg(filePath.replace(QLatin1Char('/'), QLatin1Char('\\')))
+        .arg(d->cacheFile(release).replace(QLatin1Char('/'), QLatin1Char('\\')))
         .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
 
     STARTUPINFOW startupInfo = { sizeof( STARTUPINFO ), 0, 0, 0,
@@ -283,7 +281,7 @@ void Updates::install(const Release &release)
     }
 #endif
     // open the downloaded archive
-    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(release)));
 
     // quit application to allow installation
     qApp->quit();
