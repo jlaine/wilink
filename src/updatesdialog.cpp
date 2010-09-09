@@ -147,12 +147,6 @@ void UpdatesDialog::downloadFinished(const Release &release)
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
 {
-    qWarning() << "Update error" << errorString;
-    if (isVisible())
-    {
-        QMessageBox::warning(this,
-            tr("Update failed"),
-            tr("Could not run update, please try again later.") + "\n\n" + errorString);
-    }
+    statusLabel->setText(tr("Could not run update, please try again later.") + "\n\n" + errorString);
 }
 
