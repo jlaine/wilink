@@ -64,16 +64,16 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
                     this, SLOT(checkFinished(Release)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(downloadStarted()),
-                    this, SLOT(downloadStarted()));
+    check = connect(updates, SIGNAL(downloadStarted(Release)),
+                    this, SLOT(downloadStarted(Release)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(installStarted()),
-                    this, SLOT(installStarted()));
+    check = connect(updates, SIGNAL(installStarted(Release)),
+                    this, SLOT(installStarted(Release)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(updateDownloaded(const QUrl&)),
-                    this, SLOT(updateDownloaded(const QUrl&)));
+    check = connect(updates, SIGNAL(downloadFinished(Release,QUrl)),
+                    this, SLOT(downloadFinished(Release,QUrl)));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(error(Updates::UpdatesError, const QString&)),
@@ -122,8 +122,9 @@ void UpdatesDialog::checkFinished(const Release &release)
     }
 }
 
-void UpdatesDialog::downloadStarted()
+void UpdatesDialog::downloadStarted(const Release &release)
 {
+    Q_UNUSED(release);
     statusLabel->setText(tr("Downloading update.."));
 }
 
@@ -133,14 +134,15 @@ void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
     progressBar->setValue(done);
 }
 
-void UpdatesDialog::installStarted()
+void UpdatesDialog::installStarted(const Release &release)
 {
+    Q_UNUSED(release);
     statusLabel->setText(tr("Installing update.."));
 }
 
-void UpdatesDialog::updateDownloaded(const QUrl &url)
+void UpdatesDialog::downloadFinished(const Release &release, const QUrl &url)
 {
-    updates->install(url);
+    updates->install(release, url);
 }
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)

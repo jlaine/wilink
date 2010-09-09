@@ -198,7 +198,7 @@ void Updates::download(const Release &release)
         downloadFile.close();
         if (release.checkHashes(data))
         {
-            emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
+            emit downloadFinished(release, QUrl::fromLocalFile(downloadFile.fileName()));
             return;
         }
     }
@@ -209,12 +209,12 @@ void Updates::download(const Release &release)
     QNetworkReply *reply = d->network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(downloadProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
-    emit downloadStarted();
+    emit downloadStarted(release);
 }
 
-void Updates::install(const QUrl &url)
+void Updates::install(const Release &release, const QUrl &url)
 {
-    emit installStarted();
+    emit installStarted(release);
 
 #ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install
@@ -286,7 +286,7 @@ void Updates::saveUpdate()
     downloadFile.write(data);
     downloadFile.close();
 
-    emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
+    emit downloadFinished(d->downloadRelease, QUrl::fromLocalFile(downloadFile.fileName()));
 }
 
 /** Handle a response from the updates server containing the current

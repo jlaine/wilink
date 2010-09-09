@@ -59,7 +59,7 @@ public:
     ~Updates();
 
     void download(const Release &release);
-    void install(const QUrl &url);
+    void install(const Release &release, const QUrl &url);
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString &cacheDir);
@@ -72,10 +72,10 @@ public slots:
 signals:
     void checkStarted();
     void checkFinished(const Release &release);
-    void downloadStarted();
+    void downloadStarted(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
-    void installStarted();
-    void updateDownloaded(const QUrl &url);
+    void downloadFinished(const Release &release, const QUrl &url);
+    void installStarted(const Release &release);
     void error(Updates::UpdatesError error, const QString &errorString);
 
 private slots:
