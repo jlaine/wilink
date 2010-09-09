@@ -149,8 +149,28 @@ void Updates::download(const Release &release)
     }
 
     downloadFile.setFileName(QDir(m_cacheDirectory).filePath(QFileInfo(release.url.path()).fileName()));
-    downloadRelease = release;
 
+    /* check existing file */
+    if (downloadFile.exists())
+    {
+        if (!downloadFile.open(QIODevice::ReadOnly))
+        {
+            emit updateFailed(SaveFailed, "Could not read downloaded file from disk");
+            return;
+        }
+
+        /* if the hashes match, we are done here */
+        const QByteArray data = downloadFile.readAll();
+        downloadFile.close();
+        if (release.checkHashes(data))
+        {
+            emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
+            return;
+        }
+    }
+
+    /* download release */
+    downloadRelease = release;
     QNetworkRequest req(release.url);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(updateProgress(qint64, qint64)));
