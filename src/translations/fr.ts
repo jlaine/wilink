@@ -705,36 +705,20 @@ Acceptez-vous?</translation>
         <translation>Changements :</translation>
     </message>
     <message>
-        <source>Version %1 of %2 is available. Do you want to download it?</source>
-        <translation>La version %1 de %2 est disponible. Voulez-vous la télécharger ?</translation>
+        <source>Version %1 of %2 is available. Do you want to install it?</source>
+        <translation>La version %1 de %2 est disponible. Voulez-vous l&apos;installer ?</translation>
     </message>
     <message>
-        <source>Once the download is complete, %1 will exit to allow you to install the new version.</source>
-        <translation>Une fois le téléchargement terminé, %1 quittera afin de vous laisser installer la nouvelle version.</translation>
+        <source>%1 will automatically exit to allow you to install the new version.</source>
+        <translation>%1 quittera automatiquement afin de vous laisser installer la nouvelle version.</translation>
     </message>
     <message>
         <source>Downloading update..</source>
         <translation>Téléchargement de la mise à jour..</translation>
     </message>
     <message>
-        <source>Download failed</source>
-        <translation>Echec du téléchargement</translation>
-    </message>
-    <message>
-        <source>Could not download the new version, please try again later.</source>
-        <translation>Le téléchargement de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
-    </message>
-    <message>
         <source>Installing update..</source>
         <translation>Installation de la mise à jour..</translation>
-    </message>
-    <message>
-        <source>Installation failed</source>
-        <translation type="obsolete">Echec de l&apos;installation</translation>
-    </message>
-    <message>
-        <source>Could not install the new version, please try again later.</source>
-        <translation type="obsolete">L&apos;installation de la nouvelle version a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
     <message>
         <source>Checking for updates..</source>
@@ -743,6 +727,14 @@ Acceptez-vous?</translation>
     <message>
         <source>No update available</source>
         <translation>Aucune mise à jour disponible</translation>
+    </message>
+    <message>
+        <source>Update failed</source>
+        <translation>Echec de la mise à jour</translation>
+    </message>
+    <message>
+        <source>Could not run update, please try again later.</source>
+        <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
 </context>
 </TS>

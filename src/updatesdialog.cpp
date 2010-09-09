@@ -105,12 +105,12 @@ void UpdatesDialog::checkFinished(const Release &release)
     }
     statusLabel->setText(tr("Update available"));
     const QString message = QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
-            .arg(tr("Version %1 of %2 is available. Do you want to download it?")
+            .arg(tr("Version %1 of %2 is available. Do you want to install it?")
                 .arg(release.version)
                 .arg(release.package))
             .arg(tr("Changes:"))
             .arg(release.changes)
-            .arg(tr("Once the download is complete, %1 will exit to allow you to install the new version.")
+            .arg(tr("%1 will automatically exit to allow you to install the new version.")
                 .arg(release.package));
     if (QMessageBox::question(NULL,
         tr("Update available"),
@@ -148,9 +148,11 @@ void UpdatesDialog::downloadFinished(const Release &release)
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
 {
     qWarning() << "Update error" << errorString;
-    QMessageBox::warning(this,
-        tr("Download failed"),
-        tr("Could not download the new version, please try again later."));
-    hide();
+    if (isVisible())
+    {
+        QMessageBox::warning(this,
+            tr("Update failed"),
+            tr("Could not run update, please try again later.") + "\n\n" + errorString);
+    }
 }
 
