@@ -49,7 +49,9 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     /* progress */
     progressBar = new QProgressBar;
     layout->addWidget(progressBar);
+
     setLayout(layout);
+    setWindowTitle(tr("%1 software update").arg(qApp->applicationName()));
 
     /* updates */
     updates = new Updates(this);
@@ -135,18 +137,21 @@ void UpdatesDialog::downloadFinished(const Release &release)
             .arg(release.changes)
             .arg(tr("%1 will automatically exit to allow you to install the new version.")
                 .arg(release.package));
+    statusLabel->setText(message);
+    show();
     if (QMessageBox::question(NULL,
         tr("Update available"),
         message,
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
     {
-        show();
         updates->install(release);
+    } else {
+        hide();
     }
 }
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
 {
-    statusLabel->setText(tr("Could not run update, please try again later.") + "\n\n" + errorString);
+    statusLabel->setText(tr("Could not run software update, please try again later.") + "\n\n" + errorString);
 }
 

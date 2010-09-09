@@ -729,11 +729,11 @@ Acceptez-vous?</translation>
         <translation>Aucune mise à jour disponible</translation>
     </message>
     <message>
-        <source>Update failed</source>
-        <translation>Echec de la mise à jour</translation>
+        <source>%1 software update</source>
+        <translation>Mise à jour de %1</translation>
     </message>
     <message>
-        <source>Could not run update, please try again later.</source>
+        <source>Could not run software update, please try again later.</source>
         <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
 </context>
