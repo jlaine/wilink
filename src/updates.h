@@ -50,10 +50,10 @@ class Updates : public QObject
 
 public:
     typedef enum {
-        BadHash,
-        DownloadFailed,
-        InsecureLocation,
-        SaveFailed,
+        IntegrityError,
+        FileError,
+        NetworkError,
+        SecurityError,
     } UpdatesError;
 
     Updates(QObject *parent);
@@ -70,12 +70,12 @@ public slots:
 
 signals:
     void checkStarted();
-    void checkFinished(const Release &release, const QString &errorString);
+    void checkFinished(const Release &release);
     void downloadStarted();
     void downloadProgress(qint64 done, qint64 total);
     void installStarted();
     void updateDownloaded(const QUrl &url);
-    void updateFailed(Updates::UpdatesError error, const QString &errorString);
+    void error(Updates::UpdatesError error, const QString &errorString);
 
 private slots:
     void saveUpdate();

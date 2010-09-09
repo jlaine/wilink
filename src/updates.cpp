@@ -107,7 +107,7 @@ void Updates::check()
     /* only download files over HTTPS */
     if (m_updatesUrl.scheme() != "https")
     {
-        emit checkFinished(Release(), "Refusing to check for updates from non-HTTPS site");
+        emit error(SecurityError, "Refusing to check for updates from non-HTTPS site");
         return;
     }
 
@@ -149,7 +149,7 @@ void Updates::download(const Release &release)
     /* only download files over HTTPS with an SHA1 hash */
     if (!release.isValid())
     {
-        emit updateFailed(InsecureLocation, "Refusing to download update from non-HTTPS site or without checksum");
+        emit error(SecurityError, "Refusing to download update from non-HTTPS site or without checksum");
         return;
     }
 
@@ -160,7 +160,7 @@ void Updates::download(const Release &release)
     {
         if (!downloadFile.open(QIODevice::ReadOnly))
         {
-            emit updateFailed(SaveFailed, "Could not read downloaded file from disk");
+            emit error(FileError, "Could not read downloaded file from disk");
             return;
         }
 
@@ -235,7 +235,7 @@ void Updates::saveUpdate()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        emit updateFailed(DownloadFailed, reply->errorString());
+        emit error(NetworkError, reply->errorString());
         return;
     }
 
@@ -243,14 +243,14 @@ void Updates::saveUpdate()
     const QByteArray data = reply->readAll();
     if (!downloadRelease.checkHashes(data))
     {
-        emit updateFailed(BadHash, "The checksum of the downloaded file is incorrect");
+        emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
 
     /* save file */
     if (!downloadFile.open(QIODevice::WriteOnly))
     {
-        emit updateFailed(SaveFailed, "Could not save downloaded file to disk");
+        emit error(FileError, "Could not save downloaded file to disk");
         return;
     }
     downloadFile.write(data);
@@ -272,7 +272,7 @@ void Updates::processStatus()
         /* retry in 5mn */
         timer->setInterval(300 * 1000);
         timer->start();
-        emit checkFinished(Release(), reply->errorString());
+        emit error(NetworkError, reply->errorString());
         return;
     }
 
@@ -299,7 +299,7 @@ void Updates::processStatus()
         release.url = m_updatesUrl.resolved(QUrl(urlString));
 
     /* emit information about available release */
-    emit checkFinished(release, QString());
+    emit checkFinished(release);
 
     /* check again in two days */
     timer->setInterval(2 * 24 * 3600 * 1000);

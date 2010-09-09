@@ -60,7 +60,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
                     this, SLOT(checkStarted()));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(checkFinished(Release,QString)),
+    check = connect(updates, SIGNAL(checkFinished(Release)),
                     this, SLOT(checkFinished(Release)));
     Q_ASSERT(check);
 
@@ -76,8 +76,8 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
                     this, SLOT(updateDownloaded(const QUrl&)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(updateFailed(Updates::UpdatesError, const QString&)),
-                    this, SLOT(updateFailed(Updates::UpdatesError, const QString&)));
+    check = connect(updates, SIGNAL(error(Updates::UpdatesError, const QString&)),
+                    this, SLOT(error(Updates::UpdatesError, const QString&)));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(downloadProgress(qint64, qint64)),
@@ -143,9 +143,9 @@ void UpdatesDialog::updateDownloaded(const QUrl &url)
     updates->install(url);
 }
 
-void UpdatesDialog::updateFailed(Updates::UpdatesError error, const QString &errorString)
+void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
 {
-    qWarning() << "Failed to download update" << errorString;
+    qWarning() << "Update error" << errorString;
     QMessageBox::warning(this,
         tr("Download failed"),
         tr("Could not download the new version, please try again later."));
