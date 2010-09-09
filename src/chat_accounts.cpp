@@ -265,7 +265,7 @@ QStringList ChatAccounts::accounts() const
 
 bool ChatAccounts::addAccount(const QString &domain)
 {
-    ChatAccountPrompt dlg;
+    ChatAccountPrompt dlg(this);
     dlg.setAccounts(accounts());
     dlg.setDomain(domain);
     if (dlg.exec())
@@ -311,7 +311,7 @@ bool ChatAccounts::changed() const
     return m_changed;
 }
 
-bool ChatAccounts::getPassword(const QString &jid, QString &password)
+bool ChatAccounts::getPassword(const QString &jid, QString &password, QWidget *parent)
 {
     const QString realm = authRealm(jid);
 
@@ -325,7 +325,7 @@ bool ChatAccounts::getPassword(const QString &jid, QString &password)
     }
 
     /* prompt user */
-    ChatPasswordPrompt dialog(jid);
+    ChatPasswordPrompt dialog(jid, parent);
     while (dialog.password().isEmpty())
     {
         if (dialog.exec() != QDialog::Accepted)
@@ -333,6 +333,7 @@ bool ChatAccounts::getPassword(const QString &jid, QString &password)
     }
 
     /* store new password */
+    password = dialog.password();
     QNetIO::Wallet::instance()->setCredentials(realm, jid, password);
     return true;
 }

@@ -83,7 +83,7 @@ public:
     bool changed() const;
 
     void check();
-    static bool getPassword(const QString &jid, QString &password);
+    static bool getPassword(const QString &jid, QString &password, QWidget *parent);
 
 private slots:
     bool addAccount(const QString &domain = QString());

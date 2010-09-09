@@ -463,7 +463,7 @@ void Chat::promptCredentials()
 {
     QXmppConfiguration config = m_client->configuration();
     QString password = config.password();
-    if (ChatAccounts::getPassword(config.jidBare(), password) &&
+    if (ChatAccounts::getPassword(config.jidBare(), password, this) &&
         password != config.password())
     {
         config.setPassword(password);
@@ -504,7 +504,7 @@ bool Chat::open(const QString &jid)
 
     /* get password */
     QString password;
-    if (!ChatAccounts::getPassword(config.jidBare(), password))
+    if (!ChatAccounts::getPassword(config.jidBare(), password, this))
     {
         qWarning("Cannot connect to chat server without a password");
         return false;
