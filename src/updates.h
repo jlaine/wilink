@@ -72,10 +72,8 @@ public slots:
 signals:
     void checkStarted();
     void checkFinished(const Release &release);
-    void downloadStarted(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
     void downloadFinished(const Release &release);
-    void installStarted(const Release &release);
     void error(Updates::UpdatesError error, const QString &errorString);
 
 private slots:

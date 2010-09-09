@@ -209,13 +209,13 @@ void Updates::download(const Release &release)
     QNetworkReply *reply = d->network->get(req);
     connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(downloadProgress(qint64, qint64)));
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
-    emit downloadStarted(release);
 }
 
 void Updates::install(const Release &release)
 {
+    Q_ASSERT(release.isValid());
+
     const QString filePath = d->cacheFile(release);
-    emit installStarted(release);
 
 #ifdef Q_OS_WIN
     // invoke the downloaded installer on the same path as the current install

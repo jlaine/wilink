@@ -697,10 +697,6 @@ Acceptez-vous?</translation>
 <context>
     <name>UpdatesDialog</name>
     <message>
-        <source>Update available</source>
-        <translation>Mise à jour disponible</translation>
-    </message>
-    <message>
         <source>Changes:</source>
         <translation>Changements :</translation>
     </message>
@@ -725,16 +721,20 @@ Acceptez-vous?</translation>
         <translation>Recherche de mise à jour..</translation>
     </message>
     <message>
-        <source>No update available</source>
-        <translation>Aucune mise à jour disponible</translation>
-    </message>
-    <message>
         <source>%1 software update</source>
         <translation>Mise à jour de %1</translation>
     </message>
     <message>
         <source>Could not run software update, please try again later.</source>
         <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
+    </message>
+    <message>
+        <source>Not installing update.</source>
+        <translation>La mise à jour ne sera pas installée.</translation>
+    </message>
+    <message>
+        <source>Your version of %1 is up to date.</source>
+        <translation>Votre version de %1 est à jour.</translation>
     </message>
 </context>
 </TS>

@@ -24,6 +24,7 @@
 
 #include "updates.h"
 
+class QAbstractButton;
 class QDialogButtonBox;
 class QLabel;
 class QProgressBar;
@@ -39,23 +40,20 @@ public:
 public slots:
     void check();
 
-protected slots:
+private slots:
+    void buttonClicked(QAbstractButton *button);
     void checkStarted();
     void checkFinished(const Release &release);
-    void downloadStarted(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
     void downloadFinished(const Release &release);
-    void installStarted(const Release &release);
     void error(Updates::UpdatesError error, const QString &errorString);
-
-signals:
-    void installRelease(const Release &release);
 
 private:
     QDialogButtonBox *buttonBox;
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;
+    Release promptRelease;
 };
 
 #endif

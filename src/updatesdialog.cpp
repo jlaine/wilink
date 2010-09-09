@@ -67,20 +67,16 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     updates->setCacheDirectory(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
 
     bool check;
+    check = connect(buttonBox, SIGNAL(clicked(QAbstractButton*)),
+                    this, SLOT(buttonClicked(QAbstractButton*)));
+    Q_ASSERT(check);
+
     check = connect(updates, SIGNAL(checkStarted()),
                     this, SLOT(checkStarted()));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(checkFinished(Release)),
                     this, SLOT(checkFinished(Release)));
-    Q_ASSERT(check);
-
-    check = connect(updates, SIGNAL(downloadStarted(Release)),
-                    this, SLOT(downloadStarted(Release)));
-    Q_ASSERT(check);
-
-    check = connect(updates, SIGNAL(installStarted(Release)),
-                    this, SLOT(installStarted(Release)));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(downloadFinished(Release)),
@@ -96,6 +92,19 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     Q_ASSERT(check);
 }
 
+void UpdatesDialog::buttonClicked(QAbstractButton *button)
+{
+    buttonBox->hide();
+    if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
+    {
+        statusLabel->setText(tr("Installing update.."));
+        updates->install(promptRelease);
+    } else {
+        statusLabel->setText(tr("Not installing update."));
+        hide();
+    }
+}
+
 void UpdatesDialog::check()
 {
     show();
@@ -109,20 +118,14 @@ void UpdatesDialog::checkStarted()
 
 void UpdatesDialog::checkFinished(const Release &release)
 {
-    if (!release.isValid())
+    if (release.isValid())
     {
-        statusLabel->setText(tr("No update available"));
+        statusLabel->setText(tr("Downloading update.."));
+        progressBar->show();
+        updates->download(release);
     } else {
-        statusLabel->setText(tr("Update available"));
+        statusLabel->setText(tr("Your version of %1 is up to date.").arg(qApp->applicationName()));
     }
-    updates->download(release);
-}
-
-void UpdatesDialog::downloadStarted(const Release &release)
-{
-    Q_UNUSED(release);
-    statusLabel->setText(tr("Downloading update.."));
-    progressBar->show();
 }
 
 void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
@@ -131,34 +134,20 @@ void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
     progressBar->setValue(done);
 }
 
-void UpdatesDialog::installStarted(const Release &release)
-{
-    Q_UNUSED(release);
-    statusLabel->setText(tr("Installing update.."));
-}
-
 void UpdatesDialog::downloadFinished(const Release &release)
 {
-    const QString message = QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
+    progressBar->hide();
+    promptRelease = release;
+    statusLabel->setText(QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
             .arg(tr("Version %1 of %2 is available. Do you want to install it?")
                 .arg(release.version)
                 .arg(release.package))
             .arg(tr("Changes:"))
             .arg(release.changes)
             .arg(tr("%1 will automatically exit to allow you to install the new version.")
-                .arg(release.package));
-    statusLabel->setText(message);
+                .arg(release.package)));
     buttonBox->show();
     show();
-    if (QMessageBox::question(NULL,
-        tr("Update available"),
-        message,
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
-    {
-        updates->install(release);
-    } else {
-        hide();
-    }
 }
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
