@@ -43,8 +43,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
-#include "qnetio/wallet.h"
-
 #include "application.h"
 #include "chat.h"
 #include "chat_accounts.h"
@@ -58,8 +56,6 @@
 #include "utils.h"
 
 #define AWAY_TIME 300 // set away after 50s
-
-using namespace QNetIO;
 
 enum StatusIndexes {
     AvailableIndex = 0,
@@ -466,14 +462,10 @@ void Chat::pendingMessages(int messages)
 void Chat::promptCredentials()
 {
     QXmppConfiguration config = m_client->configuration();
-    QAuthenticator auth;
-    auth.setUser(config.jidBare());
-    auth.setPassword(config.password());
-    Wallet::instance()->onAuthenticationRequired(
-        ChatAccounts::authRealm(config.jidBare()), &auth);
-    if (auth.password() != config.password())
+    QString password;
+    if (ChatAccounts::getPassword(config.jidBare(), password))
     {
-        config.setPassword(auth.password());
+        config.setPassword(password);
         m_client->connectToServer(config);
     }
 }
@@ -509,6 +501,15 @@ bool Chat::open(const QString &jid)
     }
     config.setJid(jid);
 
+    /* get password */
+    QString password;
+    if (!ChatAccounts::getPassword(config.jidBare(), password))
+    {
+        qWarning("Cannot connect to chat server without a password");
+        return false;
+    }
+    config.setPassword(password);
+
     /* set security parameters */
     if (config.domain() == QLatin1String("wifirst.net"))
     {
@@ -520,10 +521,6 @@ bool Chat::open(const QString &jid)
     config.setKeepAliveTimeout(15);
 
     /* connect to server */
-    QAuthenticator auth;
-    auth.setUser(config.jidBare());
-    Wallet::instance()->onAuthenticationRequired(
-        ChatAccounts::authRealm(config.jidBare()), &auth);
     m_client->connectToServer(config);
 
     /* load plugins */

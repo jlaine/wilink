@@ -73,7 +73,7 @@ public:
     bool changed() const;
 
     void check();
-    static QString authRealm(const QString &jid);
+    static bool getPassword(const QString &jid, QString &password);
 
 private slots:
     bool addAccount(const QString &domain = QString());

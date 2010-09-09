@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QAuthenticator>
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QLabel>
@@ -36,6 +37,18 @@
 #include "utils.h"
 
 static const char *accountsKey = "ChatAccounts";
+
+/** Returns the authentication realm for the given JID.
+ */
+static QString authRealm(const QString &jid)
+{
+    const QString domain = jidToDomain(jid);
+    if (domain == "wifirst.net")
+        return QLatin1String("www.wifirst.net");
+    else if (domain == "gmail.com")
+        return QLatin1String("www.google.com");
+    return domain;
+}
 
 AddChatAccount::AddChatAccount(QWidget *parent)
     : QDialog(parent),
@@ -231,18 +244,6 @@ bool ChatAccounts::addAccount(const QString &domain)
     return false;
 }
 
-/** Returns the authentication realm for the given JID.
- */
-QString ChatAccounts::authRealm(const QString &jid)
-{
-    const QString domain = jidToDomain(jid);
-    if (domain == "wifirst.net")
-        return QLatin1String("www.wifirst.net");
-    else if (domain == "gmail.com")
-        return QLatin1String("www.google.com");
-    return domain;
-}
-
 /** Check we have a valid account.
  */
 void ChatAccounts::check()
@@ -272,6 +273,19 @@ void ChatAccounts::check()
 bool ChatAccounts::changed() const
 {
     return m_changed;
+}
+
+bool ChatAccounts::getPassword(const QString &jid, QString &password)
+{
+    QAuthenticator auth;
+    auth.setUser(jidToBareJid(jid));
+    QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(auth.user()), &auth);
+    if (!auth.password().isEmpty())
+    {
+        password = auth.password();
+        return true;
+    }
+    return false;
 }
 
 void ChatAccounts::removeAccount()
