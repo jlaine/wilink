@@ -34,6 +34,9 @@
 #include "systeminfo.h"
 #include "updates.h"
 
+/** Returns true if the release is a valid update from the
+ *  currently installed version.
+ */
 bool Release::isValid() const
 {
     return (Updates::compareVersions(version, qApp->applicationVersion()) > 0) &&
@@ -53,6 +56,8 @@ Updates::Updates(QObject *parent)
     timer->start();
 }
 
+/** Requests the current release information from the updates server.
+ */
 void Updates::check()
 {
     emit checkStarted();
@@ -95,6 +100,8 @@ int Updates::compareVersions(const QString &v1, const QString v2)
     return 0;
 }
 
+/** Downloads the specified release to the given file.
+ */
 void Updates::download(const Release &release, const QString &dirPath)
 {
     /* only download files over HTTPS with an SHA1 hash */
@@ -113,6 +120,9 @@ void Updates::download(const Release &release, const QString &dirPath)
     connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
 }
 
+/** Once a release has been downloaded, verify its checksum and write it
+ *  to disk.
+ */
 void Updates::saveUpdate()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
@@ -152,6 +162,9 @@ void Updates::saveUpdate()
     emit updateDownloaded(QUrl::fromLocalFile(downloadFile.fileName()));
 }
 
+/** Handle a response from the updates server containing the current
+ *  release information.
+ */
 void Updates::processStatus()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());

@@ -163,6 +163,10 @@ void ChatDialog::join()
     joined = true;
 }
 
+/** Handles an incoming chat message.
+ *
+ * @param msg The received message.
+ */
 void ChatDialog::messageReceived(const QXmppMessage &msg)
 {
     if (msg.type() != QXmppMessage::Chat ||
@@ -187,13 +191,17 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     queueNotification(message.body);
 }
 
-/** Return the type of entry to add to the roster.
+/** Returns the type of entry to add to the roster.
  */
 ChatRosterItem::Type ChatDialog::objectType() const
 {
     return ChatRosterItem::Contact;
 }
 
+/** Sends a message to the remote party.
+ *
+ * @param text The message's contents.
+ */
 bool ChatDialog::sendMessage(const QString &text)
 {
     // send message
@@ -215,6 +223,11 @@ bool ChatDialog::sendMessage(const QString &text)
     return true;
 }
 
+/** Constructs a new ChatsWatcher, an observer which catches incoming messages
+ *  and clicks on the roster and opens conversations as appropriate.
+ *
+ * @param chatWindow
+ */
 ChatsWatcher::ChatsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
@@ -227,6 +240,11 @@ ChatsWatcher::ChatsWatcher(Chat *chatWindow)
             this, SLOT(rosterClick(QModelIndex)));
 }
 
+/** When a chat message is received, if we do not have an open conversation
+ *  with the sender, create one.
+ *
+ * @param msg The received message.
+ */
 void ChatsWatcher::messageReceived(const QXmppMessage &msg)
 {
     const QString bareJid = jidToBareJid(msg.from());
@@ -239,6 +257,10 @@ void ChatsWatcher::messageReceived(const QXmppMessage &msg)
     }
 }
 
+/** When the user clicks on a contact in his roster, open a conversation.
+ *
+ * @param index The roster entry that was clicked.
+ */
 void ChatsWatcher::rosterClick(const QModelIndex &index)
 {
     if (!chat->client()->isConnected())
