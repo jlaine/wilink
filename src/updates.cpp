@@ -44,7 +44,8 @@ bool Release::isValid() const
 }
 
 Updates::Updates(QObject *parent)
-    : QObject(parent), updatesUrl("https://download.wifirst.net/wiLink/")
+    : QObject(parent),
+    m_updatesUrl("https://download.wifirst.net/wiLink/")
 {
     network = new QNetworkAccessManager(this);
 
@@ -56,6 +57,22 @@ Updates::Updates(QObject *parent)
     timer->start();
 }
 
+/** Returns the location where downloaded updates will be stored.
+ */
+QString Updates::cacheDirectory() const
+{
+    return m_cacheDirectory;
+}
+
+/** Sets the location where downloaded updates will be stored.
+ *
+ * @param cacheDir
+ */
+void Updates::setCacheDirectory(const QString &cacheDir)
+{
+    m_cacheDirectory = cacheDir;
+}
+
 /** Requests the current release information from the updates server.
  */
 void Updates::check()
@@ -63,13 +80,13 @@ void Updates::check()
     emit checkStarted();
 
     /* only download files over HTTPS */
-    if (updatesUrl.scheme() != "https")
+    if (m_updatesUrl.scheme() != "https")
     {
         emit checkFinished(Release(), "Refusing to check for updates from non-HTTPS site");
         return;
     }
 
-    QUrl statusUrl = updatesUrl;
+    QUrl statusUrl = m_updatesUrl;
     QList< QPair<QString, QString> > query = statusUrl.queryItems();
     query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
     query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
@@ -199,7 +216,7 @@ void Updates::processStatus()
     }
     const QString urlString = item.firstChildElement("url").text();
     if (!urlString.isEmpty())
-        release.url = updatesUrl.resolved(QUrl(urlString));
+        release.url = m_updatesUrl.resolved(QUrl(urlString));
 
     /* emit information about available release */
     emit checkFinished(release, QString());

@@ -59,6 +59,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* updates */
     updates = new Updates(this);
+    updates->setCacheDirectory(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
     connect(updates, SIGNAL(checkStarted()),
         this, SLOT(checkStarted()));
     connect(updates, SIGNAL(checkFinished(Release,QString)),

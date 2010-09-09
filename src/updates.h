@@ -58,6 +58,9 @@ public:
     Updates(QObject *parent);
     void download(const Release &release, const QString &dirPath);
 
+    QString cacheDirectory() const;
+    void setCacheDirectory(const QString &cacheDir);
+
     static int compareVersions(const QString &v1, const QString v2);
 
 public slots:
@@ -79,7 +82,9 @@ private:
     QTimer *timer;
     QFile downloadFile;
     Release downloadRelease;
-    QUrl updatesUrl;
+
+    QString m_cacheDirectory;
+    const QUrl m_updatesUrl;
 };
 
 #endif
