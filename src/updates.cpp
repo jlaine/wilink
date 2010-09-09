@@ -148,6 +148,12 @@ void Updates::setCacheDirectory(const QString &cacheDir)
  */
 void Updates::check()
 {
+    if (isDownloading())
+    {
+        qWarning("Not checking for updates, download in progress");
+        return;
+    }
+
     emit checkStarted();
 
     /* only download files over HTTPS */
@@ -192,6 +198,12 @@ int Updates::compareVersions(const QString &v1, const QString v2)
  */
 void Updates::download(const Release &release)
 {
+    if (isDownloading())
+    {
+        qWarning("Not starting download, download already in progress");
+        return;
+    }
+
     /* only download files over HTTPS with an SHA1 hash */
     if (!release.isValid())
     {
@@ -210,8 +222,22 @@ void Updates::download(const Release &release)
     d->downloadRelease = release;
     QNetworkRequest req(release.url);
     QNetworkReply *reply = d->network->get(req);
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(downloadProgress(qint64, qint64)));
-    connect(reply, SIGNAL(finished()), this, SLOT(saveUpdate()));
+
+    bool check;
+    check = connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
+                    this, SIGNAL(downloadProgress(qint64, qint64)));
+    Q_ASSERT(check);
+
+    check = connect(reply, SIGNAL(finished()),
+                    this, SLOT(saveUpdate()));
+    Q_ASSERT(check);
+}
+
+/** Returns true if an update is currently being downloaded.
+ */
+bool Updates::isDownloading() const
+{
+    return d->downloadRelease.isValid();
 }
 
 void Updates::install(const Release &release)
@@ -271,6 +297,9 @@ void Updates::saveUpdate()
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
 
+    const Release release = d->downloadRelease;
+    d->downloadRelease = Release();
+
     if (reply->error() != QNetworkReply::NoError)
     {
         emit error(NetworkError, reply->errorString());
@@ -278,7 +307,7 @@ void Updates::saveUpdate()
     }
 
     /* save file */
-    QFile downloadFile(d->cacheFile(d->downloadRelease));
+    QFile downloadFile(d->cacheFile(release));
     if (!downloadFile.open(QIODevice::WriteOnly))
     {
         emit error(FileError, "Could not save downloaded file to disk");
@@ -288,13 +317,13 @@ void Updates::saveUpdate()
     downloadFile.close();
 
     /* if integrity check fails, delete downloaded file */
-    if (!d->checkCachedFile(d->downloadRelease))
+    if (!d->checkCachedFile(release))
     {
         downloadFile.remove();
         emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
-    emit downloadFinished(d->downloadRelease);
+    emit downloadFinished(release);
 }
 
 /** Handle a response from the updates server containing the current

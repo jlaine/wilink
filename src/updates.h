@@ -60,6 +60,7 @@ public:
 
     void download(const Release &release);
     void install(const Release &release);
+    bool isDownloading() const;
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString &cacheDir);
