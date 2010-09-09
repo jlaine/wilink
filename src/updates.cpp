@@ -287,9 +287,10 @@ void Updates::saveUpdate()
     downloadFile.write(reply->readAll());
     downloadFile.close();
 
-    /* check integrity */
+    /* if integrity check fails, delete downloaded file */
     if (!d->checkCachedFile(d->downloadRelease))
     {
+        downloadFile.remove();
         emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
