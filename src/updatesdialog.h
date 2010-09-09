@@ -24,6 +24,7 @@
 
 #include "updates.h"
 
+class QDialogButtonBox;
 class QLabel;
 class QProgressBar;
 class QUrl;
@@ -51,6 +52,7 @@ signals:
     void installRelease(const Release &release);
 
 private:
+    QDialogButtonBox *buttonBox;
     QProgressBar *progressBar;
     QLabel *statusLabel;
     Updates *updates;

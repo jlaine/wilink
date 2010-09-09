@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
@@ -37,10 +38,10 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* status */
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setSpacing(20);
     QLabel *statusIcon = new QLabel;
     statusIcon->setPixmap(QPixmap(":/wiLink.png"));
     hbox->addWidget(statusIcon);
-    hbox->addSpacing(10);
     statusLabel = new QLabel;
     statusLabel->setWordWrap(true);
     hbox->addWidget(statusLabel);
@@ -48,7 +49,15 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* progress */
     progressBar = new QProgressBar;
+    progressBar->hide();
     layout->addWidget(progressBar);
+
+    /* button box */
+    buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(QDialogButtonBox::Yes);
+    buttonBox->addButton(QDialogButtonBox::No);
+    buttonBox->hide();
+    layout->addWidget(buttonBox);
 
     setLayout(layout);
     setWindowTitle(tr("%1 software update").arg(qApp->applicationName()));
@@ -113,6 +122,7 @@ void UpdatesDialog::downloadStarted(const Release &release)
 {
     Q_UNUSED(release);
     statusLabel->setText(tr("Downloading update.."));
+    progressBar->show();
 }
 
 void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
@@ -138,6 +148,7 @@ void UpdatesDialog::downloadFinished(const Release &release)
             .arg(tr("%1 will automatically exit to allow you to install the new version.")
                 .arg(release.package));
     statusLabel->setText(message);
+    buttonBox->show();
     show();
     if (QMessageBox::question(NULL,
         tr("Update available"),
