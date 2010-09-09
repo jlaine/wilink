@@ -511,7 +511,7 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setPassword(password);
 
     /* set security parameters */
-    if (jidToDomain("jid") == QLatin1String("wifirst.net"))
+    if (config.domain() == QLatin1String("wifirst.net"))
     {
         config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
         config.setIgnoreSslErrors(false);
