@@ -40,24 +40,14 @@
 #include "systeminfo.h"
 #include "updates.h"
 
-/** Checks whether the given data matches the hashes specified
- *  in the release.
- *
- * @param data
+/** Returns the running application's release.
  */
-bool Release::checkHashes(const QByteArray &data) const
+Release Release::applicationRelease()
 {
-    foreach (const QString &type, hashes.keys())
-    {
-        if (type == "sha1")
-        {
-            QCryptographicHash hash(QCryptographicHash::Sha1);
-            hash.addData(data);
-            if (hash.result() != hashes[type])
-                return false;
-        }
-    }
-    return true;
+    Release release;
+    release.package = qApp->applicationName();
+    release.version = qApp->applicationVersion();
+    return release;
 }
 
 /** Returns true if the release is a valid update from the
@@ -73,6 +63,8 @@ class UpdatesPrivate
 {
 public:
     QString cacheFile(const Release &release) const;
+    bool checkCachedFile(const Release &release) const;
+
     QString cacheDirectory;
     Release downloadRelease;
     QUrl updatesUrl;
@@ -84,6 +76,30 @@ public:
 QString UpdatesPrivate::cacheFile(const Release &release) const
 {
     return QDir(cacheDirectory).filePath(QFileInfo(release.url.path()).fileName());
+}
+
+bool UpdatesPrivate::checkCachedFile(const Release &release) const
+{
+    /* check existing file */
+    QFile downloadFile(cacheFile(release));
+    if (!downloadFile.open(QIODevice::ReadOnly))
+        return false;
+
+    /* check file integrity */
+    const QByteArray data = downloadFile.readAll();
+    downloadFile.close();
+    foreach (const QString &type, release.hashes.keys())
+    {
+        if (type == "sha1")
+        {
+            QCryptographicHash hash(QCryptographicHash::Sha1);
+            hash.addData(data);
+            if (hash.result() == release.hashes[type])
+                return true;
+        }
+    }
+
+    return false;
 }
 
 /** Constructs a new updates checker.
@@ -183,24 +199,11 @@ void Updates::download(const Release &release)
         return;
     }
 
-    /* check existing file */
-    QFile downloadFile(d->cacheFile(release));
-    if (downloadFile.exists())
+    /* check cached file */
+    if (d->checkCachedFile(release))
     {
-        if (!downloadFile.open(QIODevice::ReadOnly))
-        {
-            emit error(FileError, "Could not read downloaded file from disk");
-            return;
-        }
-
-        /* if the hashes match, we are done here */
-        const QByteArray data = downloadFile.readAll();
-        downloadFile.close();
-        if (release.checkHashes(data))
-        {
-            emit downloadFinished(release);
-            return;
-        }
+        emit downloadFinished(release);
+        return;
     }
 
     /* download release */
@@ -213,7 +216,12 @@ void Updates::download(const Release &release)
 
 void Updates::install(const Release &release)
 {
-    Q_ASSERT(release.isValid());
+    /* check file integrity */
+    if (!d->checkCachedFile(release))
+    {
+        emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
+        return;
+    }
 
     const QString filePath = d->cacheFile(release);
 
@@ -269,14 +277,6 @@ void Updates::saveUpdate()
         return;
     }
 
-    /* check data */
-    const QByteArray data = reply->readAll();
-    if (!d->downloadRelease.checkHashes(data))
-    {
-        emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
-        return;
-    }
-
     /* save file */
     QFile downloadFile(d->cacheFile(d->downloadRelease));
     if (!downloadFile.open(QIODevice::WriteOnly))
@@ -284,9 +284,15 @@ void Updates::saveUpdate()
         emit error(FileError, "Could not save downloaded file to disk");
         return;
     }
-    downloadFile.write(data);
+    downloadFile.write(reply->readAll());
     downloadFile.close();
 
+    /* check integrity */
+    if (!d->checkCachedFile(d->downloadRelease))
+    {
+        emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
+        return;
+    }
     emit downloadFinished(d->downloadRelease);
 }
 
@@ -330,7 +336,10 @@ void Updates::processStatus()
         release.url = d->updatesUrl.resolved(QUrl(urlString));
 
     /* emit information about available release */
-    emit checkFinished(release);
+    if (release.isValid())
+        emit checkFinished(release);
+    else
+        emit checkFinished(Release());
 
     /* check again in two days */
     d->timer->setInterval(2 * 24 * 3600 * 1000);

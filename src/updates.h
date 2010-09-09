@@ -28,7 +28,7 @@ class QNetworkReply;
 class Release
 {
 public:
-    bool checkHashes(const QByteArray &data) const;
+    static Release applicationRelease();
     bool isValid() const;
 
     QString changes;
