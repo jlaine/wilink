@@ -249,6 +249,45 @@ void ChatAccounts::addEntry(const QString &jid)
     listWidget->addItem(wdgItem);
 }
 
+/** Check we have a valid account.
+ */
+void ChatAccounts::check()
+{
+    /* clean any bad accounts */
+    QStringList chatJids = m_settings->value(accountsKey).toStringList();
+    for (int i = chatJids.size() - 1; i >= 0; --i)
+    {
+        const QString account = chatJids.at(i);
+        if (!isBareJid(account))
+        {
+            qDebug() << "Removing bad account" << account;
+            QNetIO::Wallet::instance()->deleteCredentials(Application::authRealm(account));
+            chatJids.removeAt(i);
+            m_settings->setValue(accountsKey, chatJids);
+        }
+    }
+
+    /* check we have a wifirst.net account */
+    const QString requiredDomain("wifirst.net");
+    bool foundAccount = false;
+    foreach (const QString &jid, chatJids)
+        if (jidToDomain(jid) == requiredDomain)
+            foundAccount = true;
+    if (!foundAccount)
+    {
+        AddChatAccount dlg;
+        dlg.setDomain(requiredDomain);
+        if (!dlg.exec())
+        {
+            qApp->quit();
+            return;
+        }
+        chatJids += dlg.jid();
+        addEntry(dlg.jid());
+        m_settings->setValue(accountsKey, chatJids);
+    }
+}
+
 bool ChatAccounts::changed() const
 {
     return m_changed;

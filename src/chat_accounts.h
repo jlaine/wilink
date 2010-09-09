@@ -73,6 +73,8 @@ public:
     QStringList accounts() const;
     bool changed() const;
 
+    void check();
+
 private slots:
     void addAccount();
     void removeAccount();

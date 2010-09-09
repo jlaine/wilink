@@ -333,41 +333,13 @@ void Application::resetChats()
     chats.clear();
 
     /* clean any bad accounts */
-    QStringList chatJids = settings->value("ChatAccounts").toStringList();
-    for (int i = chatJids.size() - 1; i >= 0; --i)
-    {
-        const QString account = chatJids.at(i);
-        if (!isBareJid(account))
-        {
-            qDebug() << "Removing bad account" << account;
-            QNetIO::Wallet::instance()->deleteCredentials(authRealm(account));
-            chatJids.removeAt(i);
-            settings->setValue("ChatAccounts", chatJids);
-        }
-    }
-
-    /* check we have a wifirst.net account */
-    const QString requiredDomain("wifirst.net");
-    bool foundAccount = false;
-    foreach (const QString &jid, chatJids)
-        if (jidToDomain(jid) == requiredDomain)
-            foundAccount = true;
-    if (!foundAccount)
-    {
-        AddChatAccount dlg;
-        dlg.setDomain(requiredDomain);
-        if (!dlg.exec())
-        {
-            quit();
-            return;
-        }
-        chatJids += dlg.jid();
-        settings->setValue("ChatAccounts", chatJids);
-    }
+    ChatAccounts dlg;
+    dlg.check();
 
     /* connect to chat accounts */
     int xpos = 30;
     int ypos = 20;
+    const QStringList chatJids = dlg.accounts();
     foreach (const QString &jid, chatJids)
     {
         QAuthenticator auth;
