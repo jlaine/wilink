@@ -101,25 +101,10 @@ void UpdatesDialog::checkFinished(const Release &release)
     if (!release.isValid())
     {
         statusLabel->setText(tr("No update available"));
-        return;
+    } else {
+        statusLabel->setText(tr("Update available"));
     }
-    statusLabel->setText(tr("Update available"));
-    const QString message = QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
-            .arg(tr("Version %1 of %2 is available. Do you want to install it?")
-                .arg(release.version)
-                .arg(release.package))
-            .arg(tr("Changes:"))
-            .arg(release.changes)
-            .arg(tr("%1 will automatically exit to allow you to install the new version.")
-                .arg(release.package));
-    if (QMessageBox::question(NULL,
-        tr("Update available"),
-        message,
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
-    {
-        show();
-        updates->download(release);
-    }
+    updates->download(release);
 }
 
 void UpdatesDialog::downloadStarted(const Release &release)
@@ -142,7 +127,22 @@ void UpdatesDialog::installStarted(const Release &release)
 
 void UpdatesDialog::downloadFinished(const Release &release)
 {
-    updates->install(release);
+    const QString message = QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
+            .arg(tr("Version %1 of %2 is available. Do you want to install it?")
+                .arg(release.version)
+                .arg(release.package))
+            .arg(tr("Changes:"))
+            .arg(release.changes)
+            .arg(tr("%1 will automatically exit to allow you to install the new version.")
+                .arg(release.package));
+    if (QMessageBox::question(NULL,
+        tr("Update available"),
+        message,
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+    {
+        show();
+        updates->install(release);
+    }
 }
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
