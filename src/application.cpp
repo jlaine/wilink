@@ -123,18 +123,6 @@ void Application::platformInit()
 }
 #endif
 
-/** Returns the authentication realm for the given JID.
- */
-QString Application::authRealm(const QString &jid)
-{
-    const QString domain = jidToDomain(jid);
-    if (domain == "wifirst.net")
-        return QLatin1String("www.wifirst.net");
-    else if (domain == "gmail.com")
-        return QLatin1String("www.google.com");
-    return domain;
-}
-
 QString Application::executablePath()
 {
 #ifdef Q_OS_MAC
@@ -342,19 +330,15 @@ void Application::resetChats()
     const QStringList chatJids = dlg.accounts();
     foreach (const QString &jid, chatJids)
     {
-        QAuthenticator auth;
-        auth.setUser(jid);
-        QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(jid), &auth);
-
         Chat *chat = new Chat;
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
         else
-            chat->setWindowTitle(QString("%1 - %2").arg(auth.user(), qApp->applicationName()));
+            chat->setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
         chat->move(xpos, ypos);
         chat->show();
 
-        chat->open(auth.user(), auth.password());
+        chat->open(jid);
         chats << chat;
         xpos += 300;
     }

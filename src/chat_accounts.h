@@ -46,7 +46,6 @@ public:
 private slots:
     void testAccount();
     void testFailed();
-    void testSucceeded();
 
 private:
     void showMessage(const QString &message, bool isError);
@@ -74,6 +73,7 @@ public:
     bool changed() const;
 
     void check();
+    static QString authRealm(const QString &jid);
 
 private slots:
     bool addAccount(const QString &domain = QString());

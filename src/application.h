@@ -39,7 +39,6 @@ public:
     ~Application();
 
     static void alert(QWidget *widget);
-    static QString authRealm(const QString &jid);
     static void platformInit();
     UpdatesDialog *updatesDialog() { return updates; };
     void setUpdatesDialog(UpdatesDialog *updatesDialog) { updates = updatesDialog; };

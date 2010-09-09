@@ -52,7 +52,7 @@ public:
     ChatRosterModel *rosterModel();
     QMenu *fileMenu();
     QMenu *optionsMenu();
-    bool open(const QString &jid, const QString &password);
+    bool open(const QString &jid);
     void addPanel(ChatPanel *panel);
     ChatPanel *panel(const QString &objectName);
     void setWindowTitle(const QString &title);

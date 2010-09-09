@@ -76,7 +76,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     /* connect signals */
     connect(m_buttonBox, SIGNAL(accepted()), this, SLOT(testAccount()));
     connect(m_buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(m_testClient, SIGNAL(connected()), this, SLOT(testSucceeded()));
+    connect(m_testClient, SIGNAL(connected()), this, SLOT(accept()));
     connect(m_testClient, SIGNAL(disconnected()), this, SLOT(testFailed()));
 }
 
@@ -162,15 +162,6 @@ void AddChatAccount::testFailed()
     m_buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 }
 
-void AddChatAccount::testSucceeded()
-{
-    // store credentials
-    QNetIO::Wallet::instance()->setCredentials(Application::authRealm(jid()),
-        jid(), password());
-
-    accept();
-}
-
 ChatAccounts::ChatAccounts(QWidget *parent)
     : QDialog(parent),
     m_changed(false)
@@ -231,11 +222,25 @@ bool ChatAccounts::addAccount(const QString &domain)
     if (dlg.exec())
     {
         m_changed = true;
-        m_settings->setValue(accountsKey, accounts() << dlg.jid());
-        m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), dlg.jid()));
+        const QString jid = dlg.jid();
+        QNetIO::Wallet::instance()->setCredentials(authRealm(jid), jid, dlg.password());
+        m_settings->setValue(accountsKey, accounts() << jid);
+        m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), jid));
         return true;
     }
     return false;
+}
+
+/** Returns the authentication realm for the given JID.
+ */
+QString ChatAccounts::authRealm(const QString &jid)
+{
+    const QString domain = jidToDomain(jid);
+    if (domain == "wifirst.net")
+        return QLatin1String("www.wifirst.net");
+    else if (domain == "gmail.com")
+        return QLatin1String("www.google.com");
+    return domain;
 }
 
 /** Check we have a valid account.
@@ -281,7 +286,7 @@ void ChatAccounts::removeAccount(const QString &jid)
     m_changed = true;
 
     // remove credentials
-    const QString realm = Application::authRealm(jid);
+    const QString realm = authRealm(jid);
     qDebug() << "Removing credentials for" << realm;
     QNetIO::Wallet::instance()->deleteCredentials(realm);
 

@@ -47,6 +47,7 @@
 
 #include "application.h"
 #include "chat.h"
+#include "chat_accounts.h"
 #include "chat_client.h"
 #include "chat_panel.h"
 #include "chat_plugin.h"
@@ -469,7 +470,7 @@ void Chat::promptCredentials()
     auth.setUser(config.jidBare());
     auth.setPassword(config.password());
     Wallet::instance()->onAuthenticationRequired(
-        Application::authRealm(config.jidBare()), &auth);
+        ChatAccounts::authRealm(config.jidBare()), &auth);
     if (auth.password() != config.password())
     {
         config.setPassword(auth.password());
@@ -494,9 +495,8 @@ ChatRosterModel *Chat::rosterModel()
 /** Open the connection to the chat server.
  *
  * @param jid
- * @param password
  */
-bool Chat::open(const QString &jid, const QString &password)
+bool Chat::open(const QString &jid)
 {
     QXmppConfiguration config;
     config.setResource(qApp->applicationName());
@@ -508,7 +508,6 @@ bool Chat::open(const QString &jid, const QString &password)
         return false;
     }
     config.setJid(jid);
-    config.setPassword(password);
 
     /* set security parameters */
     if (config.domain() == QLatin1String("wifirst.net"))
@@ -521,6 +520,10 @@ bool Chat::open(const QString &jid, const QString &password)
     config.setKeepAliveTimeout(15);
 
     /* connect to server */
+    QAuthenticator auth;
+    auth.setUser(config.jidBare());
+    Wallet::instance()->onAuthenticationRequired(
+        ChatAccounts::authRealm(config.jidBare()), &auth);
     m_client->connectToServer(config);
 
     /* load plugins */
