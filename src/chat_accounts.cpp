@@ -184,10 +184,11 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     helpLabel->setWordWrap(true);
     layout->addWidget(helpLabel);
 
-    listWidget = new QListWidget;
-    listWidget->setIconSize(QSize(32, 32));
-    connect(listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(updateButtons()));
-    layout->addWidget(listWidget);
+    m_listWidget = new QListWidget;
+    m_listWidget->setIconSize(QSize(32, 32));
+    connect(m_listWidget, SIGNAL(currentRowChanged(int)),
+            this, SLOT(updateButtons()));
+    layout->addWidget(m_listWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     buttonBox->addButton(QDialogButtonBox::Ok);
@@ -199,10 +200,11 @@ ChatAccounts::ChatAccounts(QWidget *parent)
     connect(addButton, SIGNAL(clicked()), this, SLOT(addAccount()));
     buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
 
-    removeButton = new QPushButton;
-    removeButton->setIcon(QIcon(":/remove.png"));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeAccount()));
-    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
+    m_removeButton = new QPushButton;
+    m_removeButton->setIcon(QIcon(":/remove.png"));
+    connect(m_removeButton, SIGNAL(clicked()),
+            this, SLOT(removeAccount()));
+    buttonBox->addButton(m_removeButton, QDialogButtonBox::ActionRole);
 
     layout->addWidget(buttonBox);
 
@@ -210,81 +212,55 @@ ChatAccounts::ChatAccounts(QWidget *parent)
 
     /* load accounts */
     m_settings = new QSettings(this);
-    const QStringList accounts = m_settings->value(accountsKey).toStringList();
-    foreach (const QString &jid, accounts)
-        addEntry(jid);
+    const QStringList accountJids = accounts();
+    foreach (const QString &jid, accountJids)
+        m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), jid));
     updateButtons();
 }
 
 QStringList ChatAccounts::accounts() const
 {
-    QStringList accounts;
-    for (int i = 0; i < listWidget->count(); i++)
-        accounts << listWidget->item(i)->text();
-    return accounts;
+    return m_settings->value(accountsKey).toStringList();
 }
 
-void ChatAccounts::addAccount()
+bool ChatAccounts::addAccount(const QString &domain)
 {
     AddChatAccount dlg;
     dlg.setAccounts(accounts());
+    dlg.setDomain(domain);
     if (dlg.exec())
     {
         m_changed = true;
-
-        // add account
-        QStringList accounts = m_settings->value(accountsKey).toStringList();
-        accounts << dlg.jid();
-        m_settings->setValue(accountsKey, accounts);
-
-        addEntry(dlg.jid());
+        m_settings->setValue(accountsKey, accounts() << dlg.jid());
+        m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), dlg.jid()));
+        return true;
     }
-}
-
-void ChatAccounts::addEntry(const QString &jid)
-{
-    QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), jid);
-    // FIXME : do accounts need to be locked ?
-    wdgItem->setData(Qt::UserRole, true); //listWidget->count() > 0);
-    listWidget->addItem(wdgItem);
+    return false;
 }
 
 /** Check we have a valid account.
  */
 void ChatAccounts::check()
 {
-    /* clean any bad accounts */
-    QStringList chatJids = m_settings->value(accountsKey).toStringList();
-    for (int i = chatJids.size() - 1; i >= 0; --i)
+    const QString requiredDomain("wifirst.net");
+
+    bool foundAccount = false;
+    const QStringList accountJids = accounts();
+    foreach (const QString &jid, accountJids)
     {
-        const QString account = chatJids.at(i);
-        if (!isBareJid(account))
+        if (!isBareJid(jid))
         {
-            qDebug() << "Removing bad account" << account;
-            QNetIO::Wallet::instance()->deleteCredentials(Application::authRealm(account));
-            chatJids.removeAt(i);
-            m_settings->setValue(accountsKey, chatJids);
+            qDebug() << "Removing bad account" << jid;
+            removeAccount(jid);
         }
+        else if (jidToDomain(jid) == requiredDomain)
+            foundAccount = true;
     }
 
-    /* check we have a wifirst.net account */
-    const QString requiredDomain("wifirst.net");
-    bool foundAccount = false;
-    foreach (const QString &jid, chatJids)
-        if (jidToDomain(jid) == requiredDomain)
-            foundAccount = true;
-    if (!foundAccount)
+    if (!foundAccount && !addAccount(requiredDomain))
     {
-        AddChatAccount dlg;
-        dlg.setDomain(requiredDomain);
-        if (!dlg.exec())
-        {
-            qApp->quit();
-            return;
-        }
-        chatJids += dlg.jid();
-        addEntry(dlg.jid());
-        m_settings->setValue(accountsKey, chatJids);
+        qApp->quit();
+        return;
     }
 }
 
@@ -295,12 +271,14 @@ bool ChatAccounts::changed() const
 
 void ChatAccounts::removeAccount()
 {
-    QListWidgetItem *item = listWidget->takeItem(listWidget->currentRow());
-    if (!item)
-        return;
+    QListWidgetItem *item = m_listWidget->currentItem();
+    if (item)
+        removeAccount(item->text());
+}
 
+void ChatAccounts::removeAccount(const QString &jid)
+{
     m_changed = true;
-    const QString jid = item->text();
 
     // remove credentials
     const QString realm = Application::authRealm(jid);
@@ -313,16 +291,18 @@ void ChatAccounts::removeAccount()
     m_settings->setValue(accountsKey, accounts);
 
     // update buttons
-    delete item;
+    QList<QListWidgetItem*> goners = m_listWidget->findItems(jid, Qt::MatchExactly);
+    foreach (QListWidgetItem *item, goners)
+    {
+        int row = m_listWidget->row(item);
+        delete m_listWidget->takeItem(row);
+    }
     updateButtons();
 }
 
 void ChatAccounts::updateButtons()
 {
-    QListWidgetItem *item = listWidget->currentItem();
-    if (item)
-        removeButton->setEnabled(item->data(Qt::UserRole).toBool());
-    else
-        removeButton->setEnabled(false);
+    QListWidgetItem *item = m_listWidget->currentItem();
+    m_removeButton->setEnabled(item != 0);
 }
 

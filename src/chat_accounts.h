@@ -76,16 +76,16 @@ public:
     void check();
 
 private slots:
-    void addAccount();
+    bool addAccount(const QString &domain = QString());
     void removeAccount();
     void updateButtons();
 
 private:
-    void addEntry(const QString &jid);
+    void removeAccount(const QString &jid);
 
     bool m_changed;
-    QListWidget *listWidget;
-    QPushButton *removeButton;
+    QListWidget *m_listWidget;
+    QPushButton *m_removeButton;
     QSettings *m_settings;
 };
 
