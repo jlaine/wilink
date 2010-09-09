@@ -496,7 +496,7 @@ ChatRosterModel *Chat::rosterModel()
  * @param jid
  * @param password
  */
-bool Chat::open(const QString &jid, const QString &password, bool ignoreSslErrors)
+bool Chat::open(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
     config.setResource(qApp->applicationName());
@@ -511,8 +511,11 @@ bool Chat::open(const QString &jid, const QString &password, bool ignoreSslError
     config.setPassword(password);
 
     /* set security parameters */
-    //config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
-    config.setIgnoreSslErrors(ignoreSslErrors);
+    if (jidToDomain("jid") == QLatin1String("wifirst.net"))
+    {
+        config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+        config.setIgnoreSslErrors(false);
+    }
 
     /* set keep alive */
     config.setKeepAliveTimeout(15);

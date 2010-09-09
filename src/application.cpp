@@ -354,8 +354,7 @@ void Application::resetChats()
         chat->move(xpos, ypos);
         chat->show();
 
-        bool ignoreSslErrors = jidToDomain(jid) != "wifirst.net";
-        chat->open(auth.user(), auth.password(), ignoreSslErrors);
+        chat->open(auth.user(), auth.password());
         chats << chat;
         xpos += 300;
     }
