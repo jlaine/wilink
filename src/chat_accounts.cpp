@@ -50,7 +50,7 @@ static QString authRealm(const QString &jid)
     return domain;
 }
 
-AddChatAccount::AddChatAccount(QWidget *parent)
+ChatAccountPrompt::ChatAccountPrompt(QWidget *parent)
     : QDialog(parent),
     m_errorStyle("QLabel { color: red; }")
 {
@@ -93,7 +93,7 @@ AddChatAccount::AddChatAccount(QWidget *parent)
     connect(m_testClient, SIGNAL(disconnected()), this, SLOT(testFailed()));
 }
 
-QString AddChatAccount::jid() const
+QString ChatAccountPrompt::jid() const
 {
     QString jid = m_jidEdit->text();
     if (!m_domain.isEmpty())
@@ -101,17 +101,17 @@ QString AddChatAccount::jid() const
     return jid;
 }
 
-QString AddChatAccount::password() const
+QString ChatAccountPrompt::password() const
 {
     return m_passwordEdit->text();
 }
 
-void AddChatAccount::setAccounts(const QStringList &accounts)
+void ChatAccountPrompt::setAccounts(const QStringList &accounts)
 {
     m_accounts = accounts;
 }
 
-void AddChatAccount::setDomain(const QString &domain)
+void ChatAccountPrompt::setDomain(const QString &domain)
 {
     m_domain = domain;
     if (m_domain.isEmpty())
@@ -126,7 +126,7 @@ void AddChatAccount::setDomain(const QString &domain)
     }
 }
 
-void AddChatAccount::showMessage(const QString &message, bool isError)
+void ChatAccountPrompt::showMessage(const QString &message, bool isError)
 {
     m_statusLabel->setStyleSheet(isError ? m_errorStyle : QString());
     m_statusLabel->setText(message);
@@ -134,7 +134,7 @@ void AddChatAccount::showMessage(const QString &message, bool isError)
     resize(size().expandedTo(sizeHint()));
 }
 
-void AddChatAccount::testAccount()
+void ChatAccountPrompt::testAccount()
 {
     // normalise input
     m_jidEdit->setText(m_jidEdit->text().trimmed().toLower());
@@ -169,10 +169,46 @@ void AddChatAccount::testAccount()
     m_testClient->connectToServer(config);
 }
 
-void AddChatAccount::testFailed()
+void ChatAccountPrompt::testFailed()
 {
     showMessage(tr("Could not connect, please check your username and password."), true);
     m_buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+}
+
+ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
+    : QDialog(parent)
+{
+    QGridLayout *layout = new QGridLayout;
+
+    QLabel *promptLabel = new QLabel;
+    promptLabel->setText(tr("Enter the password for your '%1' account.").arg(jidToDomain(jid)));
+    promptLabel->setWordWrap(true);
+    layout->addWidget(promptLabel, 0, 0, 1, 2);
+
+    layout->addWidget(new QLabel(tr("Address")), 1, 0);
+    QLineEdit *usernameEdit = new QLineEdit;
+    usernameEdit->setText(jid);
+    usernameEdit->setEnabled(false);
+    layout->addWidget(usernameEdit, 1, 1);
+
+    layout->addWidget(new QLabel(tr("Password")), 2, 0);
+    m_passwordEdit = new QLineEdit;
+    m_passwordEdit->setEchoMode(QLineEdit::Password);
+    layout->addWidget(m_passwordEdit, 2, 1);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(QDialogButtonBox::Ok);
+    buttonBox->addButton(QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    layout->addWidget(buttonBox, 3, 1);
+
+    setLayout(layout);
+}
+
+QString ChatPasswordPrompt::password() const
+{
+    return m_passwordEdit->text();
 }
 
 ChatAccounts::ChatAccounts(QWidget *parent)
@@ -229,7 +265,7 @@ QStringList ChatAccounts::accounts() const
 
 bool ChatAccounts::addAccount(const QString &domain)
 {
-    AddChatAccount dlg;
+    ChatAccountPrompt dlg;
     dlg.setAccounts(accounts());
     dlg.setDomain(domain);
     if (dlg.exec())
@@ -277,15 +313,26 @@ bool ChatAccounts::changed() const
 
 bool ChatAccounts::getPassword(const QString &jid, QString &password)
 {
-    QAuthenticator auth;
-    auth.setUser(jidToBareJid(jid));
-    QNetIO::Wallet::instance()->onAuthenticationRequired(authRealm(auth.user()), &auth);
-    if (!auth.password().isEmpty())
+    const QString realm = authRealm(jid);
+
+    QString tmpJid(jid), tmpPassword(password);
+    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, tmpPassword) && tmpJid == jid)
     {
-        password = auth.password();
+        password = tmpPassword;
         return true;
     }
-    return false;
+
+    /* prompt user */
+    ChatPasswordPrompt dialog(jid);
+    while (dialog.password().isEmpty())
+    {
+        if (dialog.exec() != QDialog::Accepted)
+            return false;
+    }
+
+    /* store new password */
+    QNetIO::Wallet::instance()->setCredentials(realm, jid, password);
+    return true;
 }
 
 void ChatAccounts::removeAccount()

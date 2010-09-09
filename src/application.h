@@ -54,7 +54,6 @@ public slots:
     void setOpenAtLogin(bool run);
 
 private slots:
-    void getCredentials(const QString &realm, QAuthenticator *authenticator);
     void messageClicked();
     void resetChats();
     void showAccounts();

@@ -66,8 +66,6 @@ Application::Application(int &argc, char **argv)
     qDebug() << "Using data directory" << dataDir;
     QDir().mkpath(dataDir);
     QNetIO::Wallet::setDataPath(dataDir + "/wallet");
-    connect(QNetIO::Wallet::instance(), SIGNAL(credentialsRequired(const QString&, QAuthenticator *)),
-        this, SLOT(getCredentials(const QString&, QAuthenticator *)));
 
     /* initialise settings */
     migrateFromWdesktop();
@@ -135,68 +133,6 @@ QString Application::executablePath()
     return qApp->applicationFilePath().replace("/", "\\");
 #endif
     return qApp->applicationFilePath();
-}
-
-/** Prompt the user for credentials.
- */
-void Application::getCredentials(const QString &realm, QAuthenticator *authenticator)
-{
-    const QString prompt = tr("Enter the username and password for your '%1' account.").arg(realm);
-
-    /* create dialog */
-    QDialog *dialog = new QDialog;
-    QGridLayout *layout = new QGridLayout;
-
-    layout->addWidget(new QLabel(prompt), 0, 0, 1, 2);
-
-    layout->addWidget(new QLabel(tr("Username")), 1, 0);
-    QLineEdit *usernameEdit = new QLineEdit();
-    if (!authenticator->user().isEmpty())
-        usernameEdit->setEnabled(false);
-    layout->addWidget(usernameEdit, 1, 1);
-
-    layout->addWidget(new QLabel(tr("Password")), 2, 0);
-    QLineEdit *passwordEdit = new QLineEdit();
-    passwordEdit->setEchoMode(QLineEdit::Password);
-    layout->addWidget(passwordEdit, 2, 1);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
-    buttonBox->addButton(QDialogButtonBox::Ok);
-    buttonBox->addButton(QDialogButtonBox::Cancel);
-    dialog->connect(buttonBox, SIGNAL(accepted()), dialog, SLOT(accept()));
-    dialog->connect(buttonBox, SIGNAL(rejected()), dialog, SLOT(reject()));
-    layout->addWidget(buttonBox, 3, 1);
-
-    dialog->setLayout(layout);
-
-    /* prompt user */
-    QString username, password;
-    username = authenticator->user();
-    while (username.isEmpty() || password.isEmpty())
-    {
-        usernameEdit->setText(username);
-        passwordEdit->setText(password);
-        if (dialog->exec() != QDialog::Accepted)
-        {
-            delete dialog;
-            return;
-        }
-        username = usernameEdit->text().trimmed().toLower();
-        password = passwordEdit->text().trimmed();
-    }
-    delete dialog;
-
-    /* try to fix username */
-    if (realm == "www.wifirst.net")
-        username = username.split("@").first() + "@wifirst.net";
-    else if (realm == "www.google.com")
-        username = username.split("@").first()+ "@gmail.com";
-
-    authenticator->setUser(username);
-    authenticator->setPassword(password);
-
-    /* store credentials */
-    QNetIO::Wallet::instance()->setCredentials(realm, username, password);
 }
 
 bool Application::isInstalled()

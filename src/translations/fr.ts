@@ -2,49 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
-    <name>AddChatAccount</name>
-    <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
-        <source>Add an account</source>
-        <translation>Ajouter un compte</translation>
-    </message>
-    <message>
-        <source>The address you entered is invalid.</source>
-        <translation>L&apos;adresse que vous avez saisie n&apos;est pas valide.</translation>
-    </message>
-    <message>
-        <source>Checking your username and password..</source>
-        <translation>Vérification de votre identifiant et mot de passe..</translation>
-    </message>
-    <message>
-        <source>Enter the address and password for the account you want to add.</source>
-        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
-        <source>You already have an account for &apos;%1&apos;.</source>
-        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Could not connect, please check your username and password.</source>
-        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation>Identifiant</translation>
-    </message>
-    <message>
-        <source>Enter the username and password for your &apos;%1&apos; account.</source>
-        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation>Adresse</translation>
-    </message>
-</context>
-<context>
     <name>Application</name>
     <message>
         <source>&amp;Quit</source>
@@ -53,18 +10,6 @@
     <message>
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation>Identifiant</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
-        <source>Enter the username and password for your &apos;%1&apos; account.</source>
-        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -180,6 +125,49 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatAccountPrompt</name>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Add an account</source>
+        <translation>Ajouter un compte</translation>
+    </message>
+    <message>
+        <source>The address you entered is invalid.</source>
+        <translation>L&apos;adresse que vous avez saisie n&apos;est pas valide.</translation>
+    </message>
+    <message>
+        <source>Checking your username and password..</source>
+        <translation>Vérification de votre identifiant et mot de passe..</translation>
+    </message>
+    <message>
+        <source>Enter the address and password for the account you want to add.</source>
+        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>You already have an account for &apos;%1&apos;.</source>
+        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not connect, please check your username and password.</source>
+        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>Identifiant</translation>
+    </message>
+    <message>
+        <source>Enter the username and password for your &apos;%1&apos; account.</source>
+        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
+    </message>
+</context>
+<context>
     <name>ChatAccounts</name>
     <message>
         <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
@@ -229,6 +217,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Select &amp;All</source>
         <translation>&amp;Tout sélectionner</translation>
+    </message>
+</context>
+<context>
+    <name>ChatPasswordPrompt</name>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Enter the password for your &apos;%1&apos; account.</source>
+        <translation>Saisissez le mot de passe de votre compte &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
     </message>
 </context>
 <context>

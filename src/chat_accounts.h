@@ -30,12 +30,12 @@ class QListWidget;
 class QSettings;
 class QXmppClient;
 
-class AddChatAccount : public QDialog
+class ChatAccountPrompt : public QDialog
 {
     Q_OBJECT
 
 public:
-    AddChatAccount(QWidget *parent = 0);
+    ChatAccountPrompt(QWidget *parent = 0);
 
     QString jid() const;
     QString password() const;
@@ -61,6 +61,16 @@ private:
     QLabel *m_promptLabel;
     QLabel *m_statusLabel;
     QXmppClient *m_testClient;
+};
+
+class ChatPasswordPrompt : public QDialog
+{
+public:
+    ChatPasswordPrompt(const QString &jid, QWidget *parent = 0);
+    QString password() const;
+
+private:
+    QLineEdit *m_passwordEdit;
 };
 
 class ChatAccounts : public QDialog
