@@ -882,10 +882,7 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
-    {
-        db->search(shareIq);
         return;
-    }
 
     // find target view(s)
     ChatSharesView *mainView = 0;
