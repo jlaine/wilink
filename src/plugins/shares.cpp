@@ -756,6 +756,7 @@ void ChatShares::registerWithServer()
     QXmppPresence presence;
     presence.setTo(shareServer);
     presence.setExtensions(x);
+    presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
     client->sendPacket(presence);
 }
 
