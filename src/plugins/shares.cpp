@@ -382,8 +382,10 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     if (!job)
         return;
     QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
+    if (!queueItem)
+        return;
 
-    if (state == QXmppTransferJob::TransferState && queueItem)
+    if (state == QXmppTransferJob::TransferState)
     {
         QTime t;
         t.start();
@@ -392,44 +394,20 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     else if (state == QXmppTransferJob::FinishedState)
     {
         const QString localPath = job->data(LocalPathRole).toString();
-        if (queueItem)
+        queueItem->setData(PacketId, QVariant());
+        queueItem->setData(StreamId, QVariant());
+        queueItem->setData(TransferStart, QVariant());
+        if (job->error() == QXmppTransferJob::NoError)
         {
-            queueItem->setData(PacketId, QVariant());
-            queueItem->setData(StreamId, QVariant());
-            queueItem->setData(TransferStart, QVariant());
-            if (job->error() == QXmppTransferJob::NoError)
-            {
-                statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
-
-                // rename file
-                QFileInfo tempInfo(localPath);
-                QDir tempDir(tempInfo.dir());
-                QString finalPath = ChatTransfers::availableFilePath(tempDir.path(), tempInfo.fileName().remove(QRegExp("\\.part$")));
-                tempDir.rename(tempInfo.fileName(), QFileInfo(finalPath).fileName());
-                queueItem->setData(TransferPath, finalPath);
-                queueItem->setData(TransferError, QVariant());
-
-                // store to shares database
-                File cached;
-                cached.setPath(db->fileNode(finalPath));
-                cached.setSize(job->fileSize());
-                cached.setHash(job->fileHash());
-                cached.setDate(QFileInfo(finalPath).lastModified());
-                cached.save();
-
-            } else {
-                statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
-                queueItem->setData(TransferPath, QVariant());
-                queueItem->setData(TransferError, job->error());
-            }
-            queueModel->refreshItem(queueItem);
+            statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
+            queueItem->setData(TransferPath, localPath);
+            queueItem->setData(TransferError, QVariant());
+        } else {
+            statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
+            queueItem->setData(TransferPath, QVariant());
+            queueItem->setData(TransferError, job->error());
         }
-
-        // if the transfer failed, delete the local file
-        if (job->error() != QXmppTransferJob::NoError)
-            QFile(localPath).remove();
-
-        job->deleteLater();
+        queueModel->refreshItem(queueItem);
     }
 }
 
@@ -454,6 +432,20 @@ void ChatShares::transferStarted(QXmppTransferJob *job)
 {
     if (job->direction() == QXmppTransferJob::OutgoingDirection)
         uploadsView->addJob(job);
+    else
+    {
+        // add transfer to list
+        connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(transferDestroyed(QObject*)));
+        connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
+        connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
+        downloadJobs.append(job);
+
+#if 0
+        // start transfer
+        QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
+        statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
+#endif
+    }
 }
 
 void ChatShares::indexFinished(double elapsed, int updated, int removed)
@@ -695,35 +687,18 @@ void ChatShares::processDownloadQueue()
         if (!file)
             return;
 
-        // pick location
-        QXmppShareLocation location;
-        bool locationFound = false;
-        foreach (location, file->locations())
+        // request file
+        QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+        const QString id = extension->get(*file);
+        if (id.isEmpty())
         {
-            if (!location.jid().isEmpty() &&
-                !location.node().isEmpty())
-            {
-                locationFound = true;
-                break;
-            }
-        }
-        if (!locationFound)
-        {
-            logMessage(QXmppLogger::WarningMessage, "No location found for file: " + file->name());
             queueModel->removeItem(file);
             continue;
         }
 
-        // request file
-        QXmppShareGetIq iq;
-        iq.setTo(location.jid());
-        iq.setType(QXmppIq::Get);
-        iq.setNode(location.node());
-        client->sendPacket(iq);
-
         // allow hashing speeds as low as 10MB/s
         const int maxSeconds = qMax(60, int(file->fileSize() / 10000000));
-        file->setData(PacketId, iq.id());
+        file->setData(PacketId, id);
         file->setData(PacketTimeout, QDateTime::currentDateTime().addSecs(maxSeconds));
         QTimer::singleShot(maxSeconds * 1000, this, SLOT(processDownloadQueue()));
 
@@ -773,12 +748,9 @@ void ChatShares::setClient(ChatClient *newClient)
         this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(&client->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
-            this, SLOT(transferReceived(QXmppTransferJob*)));
-    Q_ASSERT(check);
 
     // add shares extension
-    QXmppShareExtension *extension = new QXmppShareExtension(db);
+    QXmppShareExtension *extension = new QXmppShareExtension(client, db);
     client->addExtension(extension);
 
     check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
