@@ -308,7 +308,11 @@ void ChatShares::transferReceived(QXmppTransferJob *job)
     QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
     if (!queueItem)
     {
-        job->abort();
+        // if we did not request this job and the job is from
+        // the share-only client, refuse it
+        if (client != chatWindow->client() &&
+            qobject_cast<QXmppTransferManager*>(job->parent()) == &client->transferManager())
+            job->abort();
         return;
     }
 
@@ -647,8 +651,6 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         config.setHost(server);
 
         ChatClient *newClient = new ChatClient(this);
-        connect(&newClient->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
-            this, SLOT(transferReceived(QXmppTransferJob*)));
         newClient->setLogger(baseClient->logger());
 
         /* replace client */
@@ -769,6 +771,10 @@ void ChatShares::setClient(ChatClient *newClient)
 
     check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
         this, SLOT(presenceReceived(const QXmppPresence&)));
+    Q_ASSERT(check);
+
+    check = connect(&client->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+            this, SLOT(transferReceived(QXmppTransferJob*)));
     Q_ASSERT(check);
 
     // add shares extension

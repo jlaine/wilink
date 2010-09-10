@@ -371,6 +371,11 @@ void ChatTransfers::fileDeclined(QXmppTransferJob *job)
 
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
+    // if the job was already accepted or refused (by the shares plugin)
+    // stop here
+    if (job->state() != QXmppTransferJob::OfferState)
+        return;
+
     const QString bareJid = jidToBareJid(job->jid());
 //    const QString contactName = rosterModel->contactName(bareJid);
 
