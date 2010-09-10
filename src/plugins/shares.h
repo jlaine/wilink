@@ -84,7 +84,6 @@ private slots:
     void getFinished(const QXmppShareGetIq &reponseIq, const QXmppShareItem &fileInfo);
     void indexStarted();
     void indexFinished(double elapsed, int updated, int removed);
-    void searchFinished(const QXmppShareSearchIq &responseIq);
     void tabChanged(int index);
     void directoryChanged(const QString &path);
 

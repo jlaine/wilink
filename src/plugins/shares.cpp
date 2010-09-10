@@ -209,8 +209,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
         this, SLOT(indexStarted()));
     connect(db, SIGNAL(indexFinished(double, int, int)),
         this, SLOT(indexFinished(double, int, int)));
-    connect(db, SIGNAL(searchFinished(QXmppShareSearchIq)),
-        this, SLOT(searchFinished(QXmppShareSearchIq)));
     directoryChanged(db->directory());
 }
 
@@ -810,7 +808,7 @@ void ChatShares::setClient(ChatClient *newClient)
     Q_ASSERT(check);
 
     // add shares extension
-    QXmppShareExtension *extension = new QXmppShareExtension;
+    QXmppShareExtension *extension = new QXmppShareExtension(db);
     client->addExtension(extension);
 
     check = connect(extension, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)),
@@ -945,15 +943,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     // if we retrieved the contents of a download queue item, process queue
     if (mainView == downloadsView)
         processDownloadQueue();
-}
-
-void ChatShares::searchFinished(const QXmppShareSearchIq &responseIq)
-{
-    // check the IQ the response is for this connection
-    if (responseIq.from() != client->configuration().jid())
-        return;
-
-    client->sendPacket(responseIq);
 }
 
 void ChatShares::shareServerFound(const QString &server)
