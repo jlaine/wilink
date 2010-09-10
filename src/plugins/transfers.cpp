@@ -45,7 +45,7 @@
 #include "transfers.h"
 #include "utils.h"
 
-static qint64 fileSizeLimit = 10000000; // 10 MB
+static qint64 fileSizeLimit = 50000000; // 50 MB
 
 enum TransfersColumns {
     NameColumn,
