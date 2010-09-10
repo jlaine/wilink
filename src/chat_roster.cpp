@@ -85,7 +85,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     connect(&client->rosterManager(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->rosterManager(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
     connect(&client->rosterManager(), SIGNAL(rosterReceived()), this, SLOT(rosterReceived()));
-    connect(&client->vCardManager(), SIGNAL(vCardReceived(const QXmppVCard&)), this, SLOT(vCardReceived(const QXmppVCard&)));
+    connect(&client->vCardManager(), SIGNAL(vCardReceived(const QXmppVCardIq&)), this, SLOT(vCardReceived(const QXmppVCardIq&)));
 }
 
 ChatRosterModel::~ChatRosterModel()
@@ -578,7 +578,7 @@ int ChatRosterModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-void ChatRosterModel::vCardReceived(const QXmppVCard& vcard)
+void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 {
     const QString bareJid = vcard.from();
     ChatRosterItem *item = rootItem->find(bareJid);

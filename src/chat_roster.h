@@ -23,7 +23,7 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
-#include "QXmppVCard.h"
+#include "QXmppVCardIq.h"
 
 #include "chat_roster_item.h"
 
@@ -104,7 +104,7 @@ protected slots:
     void presenceReceived(const QXmppPresence &presence);
     void rosterChanged(const QString &jid);
     void rosterReceived();
-    void vCardReceived(const QXmppVCard&);
+    void vCardReceived(const QXmppVCardIq&);
 
 private:
     void countPendingMessages();
