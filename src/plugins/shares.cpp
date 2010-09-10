@@ -203,8 +203,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
         this, SLOT(directoryChanged(QString)));
     connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
         baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    connect(db, SIGNAL(getFinished(QXmppShareGetIq, QXmppShareItem)),
-        this, SLOT(getFinished(QXmppShareGetIq, QXmppShareItem)));
     connect(db, SIGNAL(indexStarted()),
         this, SLOT(indexStarted()));
     connect(db, SIGNAL(indexFinished(double, int, int)),
@@ -448,39 +446,10 @@ void ChatShares::findRemoteFiles()
         statusBar->showMessage(tr("Searching for \"%1\"").arg(search), STATUS_TIMEOUT);
 }
 
-void ChatShares::getFinished(const QXmppShareGetIq &iq, const QXmppShareItem &shareItem)
+void ChatShares::transferStarted(QXmppTransferJob *job)
 {
-    // check the IQ the response is for this connection
-    if (iq.from() != client->configuration().jid())
-        return;
-
-    QXmppShareGetIq responseIq(iq);
-
-    // FIXME: for some reason, random number generation in thread is broken
-    if (responseIq.type() != QXmppIq::Error)
-        responseIq.setSid(generateStanzaHash());
-    client->sendPacket(responseIq);
-
-    // send file
-    if (responseIq.type() != QXmppIq::Error)
-    {
-        QString filePath = db->filePath(shareItem.locations()[0].node());
-        QXmppTransferFileInfo fileInfo;
-        fileInfo.setName(shareItem.name());
-        fileInfo.setDate(shareItem.fileDate());
-        fileInfo.setHash(shareItem.fileHash());
-        fileInfo.setSize(shareItem.fileSize());
-
-        logMessage(QXmppLogger::InformationMessage, "Sending file: " + filePath);
-
-        QFile *file = new QFile(filePath);
-        file->open(QIODevice::ReadOnly);
-        QXmppTransferJob *job = client->transferManager().sendFile(responseIq.to(), file, fileInfo, responseIq.sid());
-        file->setParent(job);
-        connect(job, SIGNAL(finished()), job, SLOT(deleteLater()));
-        job->setData(LocalPathRole, filePath);
+    if (job->direction() == QXmppTransferJob::OutgoingDirection)
         uploadsView->addJob(job);
-    }
 }
 
 void ChatShares::indexFinished(double elapsed, int updated, int removed)
@@ -811,6 +780,10 @@ void ChatShares::setClient(ChatClient *newClient)
     QXmppShareExtension *extension = new QXmppShareExtension(db);
     client->addExtension(extension);
 
+    check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
+                    this, SLOT(transferStarted(QXmppTransferJob*)));
+    Q_ASSERT(check);
+
     check = connect(extension, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)),
         this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
     Q_ASSERT(check);
@@ -853,10 +826,7 @@ void ChatShares::shareFolderSelected(const QString &path)
 void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
-    {
-        db->get(shareIq);
         return;
-    }
 
     QXmppShareItem *queueItem = queueModel->get(
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
