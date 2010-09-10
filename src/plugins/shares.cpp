@@ -487,11 +487,6 @@ void ChatShares::downloadItem()
 
 void ChatShares::queueItem(QXmppShareItem *item)
 {
-    // check item is not from local collection
-    foreach (const QXmppShareLocation &location, item->locations())
-        if (location.jid() == client->configuration().jid())
-            return;
-
     // check item is not already in the queue
     if (queueModel->get(Q_FIND_LOCATIONS(item->locations())))
         return;
@@ -704,7 +699,6 @@ void ChatShares::processDownloadQueue()
         foreach (location, file->locations())
         {
             if (!location.jid().isEmpty() &&
-                location.jid() != client->configuration().jid() &&
                 !location.node().isEmpty())
             {
                 locationFound = true;
