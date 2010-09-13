@@ -136,7 +136,9 @@ Chat::Chat(QWidget *parent)
         action = m_optionsMenu->addAction(tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(wApp->openAtLogin());
+        action->setIcon(QIcon(wApp->openAtLogin() ? ":/favorite-active.png" : "favorite-inactive.png"));
         connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
+        connect(wApp, SIGNAL(openAtLoginChanged(bool)), action, SLOT(setChecked(bool)));
     }
     QObject::connect(wApp, SIGNAL(messageClicked(QWidget*)),
         this, SLOT(messageClicked(QWidget*)));

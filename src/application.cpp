@@ -236,7 +236,11 @@ void Application::setOpenAtLogin(bool run)
 #endif
 
     // store preference
-    settings->setValue("OpenAtLogin", run);
+    if (run != settings->value("OpenAtLogin").toBool())
+    {
+        settings->setValue("OpenAtLogin", run);
+        emit openAtLoginChanged(run);
+    }
 }
 
 void Application::showAccounts()

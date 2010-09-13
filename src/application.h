@@ -49,6 +49,7 @@ public:
 
 signals:
     void messageClicked(QWidget *context);
+    void openAtLoginChanged(bool run);
 
 public slots:
     void setOpenAtLogin(bool run);
