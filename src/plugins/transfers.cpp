@@ -31,7 +31,6 @@
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include <QTime>
 #include <QUrl>
 
 #include "QXmppClient.h"
@@ -224,15 +223,11 @@ void ChatTransfersView::slotProgress(qint64 done, qint64 total)
     if (progress && total > 0)
     {
         progress->setValue((100 * done) / total);
-        int elapsed = job->data(TransferStartRole).toTime().elapsed();
-        if (elapsed > 0)
-        {
-            int speed = (done * 1000.0) / elapsed;
-            if (job->direction() == QXmppTransferJob::IncomingDirection)
-                progress->setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
-            else
-                progress->setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
-        }
+        qint64 speed = job->speed();
+        if (job->direction() == QXmppTransferJob::IncomingDirection)
+            progress->setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
+        else
+            progress->setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
     }
 }
 
@@ -242,13 +237,6 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
     int jobRow = jobs.indexOf(job);
     if (!job || jobRow < 0)
         return;
-
-    if (state == QXmppTransferJob::TransferState)
-    {
-        QTime t;
-        t.start();
-        job->setData(TransferStartRole, t);
-    }
 
     item(jobRow, NameColumn)->setIcon(jobIcon(job));
     emit updateButtons();
