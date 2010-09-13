@@ -14,6 +14,8 @@ generate_png(png
     contact-offline.svg
     diagnostics.svg
     download.svg
+    favorite-active.svg
+    favorite-inactive.svg
     file.svg
     forward.svg
     hangup.svg
