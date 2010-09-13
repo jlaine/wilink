@@ -70,18 +70,6 @@ static int parallelDownloadLimit = 2;
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
      Q(PacketId, Q::Equals, job->data(QXmppShareExtension::TransactionRole)))
 
-/** Update collection timestamps.
- */
-static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
-{
-    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
-    {
-        oldItem->setData(UpdateTime, QDateTime::currentDateTime());
-        for (int i = 0; i < oldItem->size(); i++)
-            updateTime(oldItem->child(i), stamp);
-    }
-}
-
 ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent)
     : ChatPanel(parent), chatWindow(chat), client(0), db(sharesDb), rosterModel(0),
     menuAction(0)
@@ -555,7 +543,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
     // determine whether we need a refresh
     QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
     QDateTime updateTime = item->data(UpdateTime).toDateTime();
-    if (item->size() && updateTime.isValid() && updateTime >= cutoffTime)
+    if (updateTime.isValid() && updateTime >= cutoffTime)
     {
         view->expand(index);
         return;
