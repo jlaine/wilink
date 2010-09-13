@@ -86,18 +86,23 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     layout->addItem(headerLayout());
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
-    layout->addSpacing(10);
+    layout->addSpacing(4);
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *findIcon = new QLabel;
+    findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
+    hbox->addWidget(findIcon);
     lineEdit = new QLineEdit;
     check = connect(lineEdit, SIGNAL(returnPressed()),
                     this, SLOT(findRemoteFiles()));
     Q_ASSERT(check);
-
     check = connect(lineEdit, SIGNAL(textChanged(const QString&)),
                     this, SLOT(queryStringChanged()));
     Q_ASSERT(check);
+    hbox->addWidget(lineEdit);
 
-    layout->addWidget(lineEdit);
-    layout->addSpacing(10);
+    layout->addItem(hbox);
+    layout->addSpacing(4);
 
     // MAIN
 
