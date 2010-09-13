@@ -243,10 +243,10 @@ void ChatShares::disconnected()
  */
 void ChatShares::transferAbort(QXmppShareItem *item)
 {
-    QString sid = item->data(StreamId).toString();
+    const QVariant packetId = item->data(PacketId);
     foreach (QXmppTransferJob *job, downloadJobs)
     {
-        if (job->sid() == sid)
+        if (job->data(QXmppShareExtension::TransactionRole) == packetId)
         {
             job->abort();
             break;
@@ -395,7 +395,6 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     {
         const QString localPath = job->data(LocalPathRole).toString();
         queueItem->setData(PacketId, QVariant());
-        queueItem->setData(StreamId, QVariant());
         queueItem->setData(TransferStart, QVariant());
         if (job->error() == QXmppTransferJob::NoError)
         {
@@ -811,7 +810,6 @@ void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
     if (shareIq.type() == QXmppIq::Result)
     {
         queueItem->setData(PacketTimeout, QVariant());
-        queueItem->setData(StreamId, shareIq.sid());
     }
     else if (shareIq.type() == QXmppIq::Error)
     {
