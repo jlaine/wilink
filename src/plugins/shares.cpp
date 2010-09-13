@@ -66,9 +66,9 @@ static int parallelDownloadLimit = 2;
 // common queries
 #define Q ChatSharesModelQuery
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
-#define Q_FIND_TRANSFER(sid) \
+#define Q_FIND_TRANSFER(job) \
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
-     Q(StreamId, Q::Equals, sid))
+     Q(StreamId, Q::Equals, job->sid()))
 
 /** Update collection timestamps.
  */
@@ -286,7 +286,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
         return;
-    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
     if (queueItem)
     {
         // update progress
@@ -305,7 +305,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
  */
 void ChatShares::transferReceived(QXmppTransferJob *job)
 {
-    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
     if (!queueItem)
     {
         // if we did not request this job and the job is from
@@ -381,7 +381,7 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
         return;
-    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
     if (!queueItem)
         return;
 
@@ -442,7 +442,7 @@ void ChatShares::transferStarted(QXmppTransferJob *job)
 
 #if 0
         // start transfer
-        QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job->sid()));
+        QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
         statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
 #endif
     }
