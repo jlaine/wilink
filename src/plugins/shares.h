@@ -104,9 +104,7 @@ private:
 
     ChatSharesView *sharesView;
     ChatSharesTab *sharesWidget;
-
-    ChatSharesView *searchView;
-    ChatSharesTab *searchWidget;
+    QString sharesFilter;
 
     ChatSharesView *downloadsView;
     ChatSharesTab *downloadsWidget;

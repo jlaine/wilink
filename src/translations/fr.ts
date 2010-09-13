@@ -373,7 +373,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation>Recherche</translation>
+        <translation type="obsolete">Recherche</translation>
     </message>
     <message>
         <source>Downloads</source>

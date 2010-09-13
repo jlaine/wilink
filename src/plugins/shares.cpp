@@ -138,28 +138,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     sharesWidget->addWidget(sharesView);
     tabWidget->addTab(sharesWidget, QIcon(":/album.png"), tr("Shares"));
 
-    /* create search tab */
-    ChatSharesModel *searchModel = new ChatSharesModel(this);
-    searchView = new ChatSharesView;
-    searchView->setExpandsOnDoubleClick(false);
-    searchView->setModel(searchModel);
-    searchView->hideColumn(ProgressColumn);
-    check = connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)),
-                    this, SLOT(itemContextMenu(QModelIndex, QPoint)));
-    Q_ASSERT(check);
-
-    check = connect(searchView, SIGNAL(doubleClicked(QModelIndex)),
-                    this, SLOT(itemDoubleClicked(QModelIndex)));
-    Q_ASSERT(check);
-
-    check = connect(searchView, SIGNAL(expandRequested(QModelIndex)),
-                    this, SLOT(itemExpandRequested(QModelIndex)));
-    Q_ASSERT(check);
-
-    searchWidget = new ChatSharesTab;
-    searchWidget->addWidget(searchView);
-    tabWidget->addTab(searchWidget, QIcon(":/search.png"), tr("Search"));
-
     /* create queue tab */
     queueModel = new ChatSharesModel(this);
     downloadsView = new ChatSharesView;
@@ -271,7 +249,6 @@ void ChatShares::directoryChanged(const QString &path)
     const QString helpText = tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink);
 
     sharesWidget->setText(helpText);
-    searchWidget->setText(helpText);
     downloadsWidget->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
     uploadsWidget->setText(helpText);
 }
@@ -419,16 +396,17 @@ void ChatShares::transferRemoved()
 
 void ChatShares::findRemoteFiles()
 {
-    const QString search = lineEdit->text();
+    sharesFilter = lineEdit->text();
+    qobject_cast<ChatSharesModel*>(sharesView->model())->clear();
 
     // search for files
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
-    const QString requestId = extension->search(QXmppShareLocation(shareServer), 3, search);
+    const QString requestId = extension->search(QXmppShareLocation(shareServer), 3, sharesFilter);
     if (!requestId.isEmpty())
     {
-        searches.insert(requestId, search.isEmpty() ? sharesView : searchView);
-        if (!search.isEmpty())
-            statusBar->showMessage(tr("Searching for \"%1\"").arg(search), STATUS_TIMEOUT);
+        searches.insert(requestId, sharesView);
+        if (!sharesFilter.isEmpty())
+            statusBar->showMessage(tr("Searching for \"%1\"").arg(sharesFilter), STATUS_TIMEOUT);
     }
 }
 
@@ -476,15 +454,10 @@ void ChatShares::indexStarted()
 void ChatShares::downloadItem()
 {
     // determine current view
-    ChatSharesView *treeWidget;
-    if (tabWidget->currentWidget() == sharesWidget)
-        treeWidget = sharesView;
-    else if (tabWidget->currentWidget() == searchWidget)
-        treeWidget = searchView;
-    else
+    if (tabWidget->currentWidget() != sharesWidget)
         return;
 
-    foreach (const QModelIndex &index, treeWidget->selectionModel()->selectedRows())
+    foreach (const QModelIndex &index, sharesView->selectionModel()->selectedRows())
     {
         QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
         if (item)
@@ -518,7 +491,7 @@ void ChatShares::queueItem(QXmppShareItem *item)
 
         // retrieve full tree
         QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
-        const QString requestId = extension->search(location, 0, QString());
+        const QString requestId = extension->search(location, 0, sharesFilter);
         if (!requestId.isEmpty())
             searches.insert(requestId, downloadsView);
     }
@@ -582,7 +555,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
     // determine whether we need a refresh
     QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
     QDateTime updateTime = item->data(UpdateTime).toDateTime();
-    if (updateTime.isValid() && (view == searchView || updateTime >= cutoffTime))
+    if (!item->size() && updateTime.isValid() && updateTime >= cutoffTime)
     {
         view->expand(index);
         return;
@@ -598,7 +571,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
 
     // browse files
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
-    const QString requestId = extension->search(location, 1, QString());
+    const QString requestId = extension->search(location, 1, sharesFilter);
     if (!requestId.isEmpty())
         searches.insert(requestId, view);
 }
@@ -709,10 +682,12 @@ void ChatShares::processDownloadQueue()
  */
 void ChatShares::queryStringChanged()
 {
+#if 0
     if (lineEdit->text().isEmpty())
         tabWidget->setCurrentWidget(sharesWidget);
     else
         tabWidget->setCurrentWidget(searchWidget);
+#endif
 }
 
 void ChatShares::registerWithServer()
@@ -853,10 +828,10 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
             {
                 // when the search view receives results and there are less than 10 results
                 // expand one level of folders
-                if (view == searchView && newItem->size() < 10)
+                if ((newItem->locations().isEmpty() || newItem->locations().first().node().isEmpty()) && newItem->size() < 10)
                     view->expandToDepth(1);
-                // otherwise just expand the added item
-                else
+                else if (newItem->size() > 0)
+                    // otherwise just expand the added item
                     view->setExpanded(index, true);
             }
         }
@@ -878,7 +853,7 @@ void ChatShares::shareServerFound(const QString &server)
 void ChatShares::tabChanged(int index)
 {
     QWidget *tab = tabWidget->widget(index);
-    if (tab == sharesWidget || tab == searchWidget)
+    if (tab == sharesWidget)
         downloadButton->show();
     else
         downloadButton->hide();

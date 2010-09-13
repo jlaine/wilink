@@ -60,6 +60,12 @@ QXmppShareItem *ChatSharesModel::addItem(const QXmppShareItem &item)
    return child;
 }
 
+void ChatSharesModel::clear()
+{
+    rootItem->clearChildren();
+    reset();
+}
+
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
