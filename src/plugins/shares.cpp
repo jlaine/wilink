@@ -422,16 +422,14 @@ void ChatShares::findRemoteFiles()
     const QString search = lineEdit->text();
 
     // search for files
-    QXmppShareSearchIq iq;
-    iq.setTo(shareServer);
-    iq.setType(QXmppIq::Get);
-    iq.setDepth(3);
-    iq.setSearch(search);
-    searches.insert(iq.tag(), search.isEmpty() ? sharesView : searchView);
-    client->sendPacket(iq);
-
-    if (!search.isEmpty())
-        statusBar->showMessage(tr("Searching for \"%1\"").arg(search), STATUS_TIMEOUT);
+    QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+    const QString requestId = extension->search(QXmppShareLocation(shareServer), 3, search);
+    if (!requestId.isEmpty())
+    {
+        searches.insert(requestId, search.isEmpty() ? sharesView : searchView);
+        if (!search.isEmpty())
+            statusBar->showMessage(tr("Searching for \"%1\"").arg(search), STATUS_TIMEOUT);
+    }
 }
 
 void ChatShares::transferStarted(QXmppTransferJob *job)
@@ -519,13 +517,10 @@ void ChatShares::queueItem(QXmppShareItem *item)
         const QXmppShareLocation location = queueItem->locations().first();
 
         // retrieve full tree
-        QXmppShareSearchIq iq;
-        iq.setTo(location.jid());
-        iq.setType(QXmppIq::Get);
-        iq.setDepth(0);
-        iq.setNode(location.node());
-        searches.insert(iq.tag(), downloadsView);
-        client->sendPacket(iq);
+        QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+        const QString requestId = extension->search(location, 0, QString());
+        if (!requestId.isEmpty())
+            searches.insert(requestId, downloadsView);
     }
 
     // process the download queue
@@ -547,6 +542,11 @@ void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalP
     menu->popup(globalPos);
 }
 
+/** When the user double clicks on a node, expand it if it's a collection,
+ * otherwise addd it to the download queue.
+ *
+ * @param index
+ */
 void ChatShares::itemDoubleClicked(const QModelIndex &index)
 {
     ChatSharesView *view = qobject_cast<ChatSharesView*>(sender());
@@ -569,6 +569,8 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
 
 /** When the user asks to expand a node, check whether we need to refresh
  *  its contents.
+ *
+ * @param index
  */
 void ChatShares::itemExpandRequested(const QModelIndex &index)
 {
@@ -595,13 +597,10 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
     const QXmppShareLocation location = item->locations().first();
 
     // browse files
-    QXmppShareSearchIq iq;
-    iq.setTo(location.jid());
-    iq.setType(QXmppIq::Get);
-    iq.setDepth(1);
-    iq.setNode(location.node());
-    searches.insert(iq.tag(), view);
-    client->sendPacket(iq);
+    QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+    const QString requestId = extension->search(location, 1, QString());
+    if (!requestId.isEmpty())
+        searches.insert(requestId, view);
 }
 
 void ChatShares::presenceReceived(const QXmppPresence &presence)
@@ -811,8 +810,9 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 
     // find target view(s)
     ChatSharesView *mainView = 0;
-    if (searches.contains(shareIq.tag()))
-        mainView = qobject_cast<ChatSharesView*>(searches.take(shareIq.tag()));
+    const QString requestId = shareIq.tag();
+    if (searches.contains(requestId))
+        mainView = qobject_cast<ChatSharesView*>(searches.take(requestId));
     else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer)
         mainView = sharesView;
     else
