@@ -292,6 +292,8 @@ void ChatShares::disconnected()
     sharesView->setEnabled(false);
 }
 
+/** When a file get fails, updated the associated download queue item.
+ */
 void ChatShares::getFailed(const QString &packetId)
 {
     QXmppShareItem *queueItem = queueModel->get(
@@ -304,6 +306,9 @@ void ChatShares::getFailed(const QString &packetId)
     queueItem->setData(PacketId, QVariant());
     queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
     queueModel->refreshItem(queueItem);
+
+    // process download queue
+    processDownloadQueue();
 }
 
 /** Recursively cancel any transfer jobs associated with a download queue item.
