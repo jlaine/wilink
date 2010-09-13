@@ -292,6 +292,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
         // update progress
         queueItem->setData(TransferDone, done);
         queueItem->setData(TransferTotal, total);
+        queueItem->setData(TransferSpeed, job->speed());
         qint64 oldDone = queueItem->data(TransferPainted).toLongLong();
         if ((done - oldDone) >= total/100)
         {
@@ -385,17 +386,10 @@ void ChatShares::transferStateChanged(QXmppTransferJob::State state)
     if (!queueItem)
         return;
 
-    if (state == QXmppTransferJob::TransferState)
-    {
-        QTime t;
-        t.start();
-        queueItem->setData(TransferStart, t);
-    }
-    else if (state == QXmppTransferJob::FinishedState)
+    if (state == QXmppTransferJob::FinishedState)
     {
         const QString localPath = job->data(LocalPathRole).toString();
         queueItem->setData(PacketId, QVariant());
-        queueItem->setData(TransferStart, QVariant());
         if (job->error() == QXmppTransferJob::NoError)
         {
             statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);

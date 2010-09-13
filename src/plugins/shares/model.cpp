@@ -98,14 +98,10 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     else if (role == Qt::ToolTipRole && index.column() == ProgressColumn &&
              item->type() == QXmppShareItem::FileItem)
     {
-        const QString localPath = item->data(TransferPath).toString();
-        QTime t = index.data(TransferStart).toTime();
-        qint64 done = item->data(TransferDone).toLongLong();
         if (!item->data(TransferError).toInt() &&
-            localPath.isEmpty() &&
-            done > 0 && t.isValid() && t.elapsed())
+            item->data(TransferPath).toString().isEmpty())
         {
-            int speed = (done * 1000.0) / t.elapsed();
+            qint64 speed = item->data(TransferSpeed).toLongLong();
             return tr("Downloading at %1").arg(speedToString(speed));
         }
     }
