@@ -34,6 +34,7 @@
 #include <QUrl>
 
 #include "QXmppClient.h"
+#include "QXmppShareExtension.h"
 #include "QXmppUtils.h"
 
 #include "chat.h"
@@ -121,7 +122,7 @@ void ChatTransfersView::addJob(QXmppTransferJob *job)
     if (jobs.contains(job))
         return;
 
-    const QString fileName = QFileInfo(job->data(LocalPathRole).toString()).fileName();
+    const QString fileName = QFileInfo(job->data(QXmppShareExtension::LocalPathRole).toString()).fileName();
 
     jobs.insert(0, job);
     insertRow(0);
@@ -180,7 +181,7 @@ void ChatTransfersView::slotDoubleClicked(int row, int column)
         return;
 
     QXmppTransferJob *job = jobs.at(row);
-    const QString localFilePath = job->data(LocalPathRole).toString();
+    const QString localFilePath = job->data(QXmppShareExtension::LocalPathRole).toString();
     if (localFilePath.isEmpty())
         return;
     if (job->direction() == QXmppTransferJob::IncomingDirection &&
@@ -199,7 +200,7 @@ void ChatTransfersView::slotFinished()
         return;
 
     // if the job failed, reset the progress bar
-    const QString localFilePath = job->data(LocalPathRole).toString();
+    const QString localFilePath = job->data(QXmppShareExtension::LocalPathRole).toString();
     QProgressBar *progress = qobject_cast<QProgressBar*>(cellWidget(jobRow, ProgressColumn));
     if (progress && job->error() != QXmppTransferJob::NoError)
     {
@@ -345,7 +346,7 @@ void ChatTransfers::fileAccepted(QXmppTransferJob *job)
     }
 
     // add transfer to list
-    job->setData(LocalPathRole, filePath);
+    job->setData(QXmppShareExtension::LocalPathRole, filePath);
     addJob(job);
 
     // start transfer
@@ -437,7 +438,7 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
 
     // send file
     QXmppTransferJob *job = client->transferManager().sendFile(fullJid, filePath);
-    job->setData(LocalPathRole, filePath);
+    job->setData(QXmppShareExtension::LocalPathRole, filePath);
     addJob(job);
 }
 

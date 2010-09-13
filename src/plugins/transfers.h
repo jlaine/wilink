@@ -32,11 +32,6 @@ class QPushButton;
 class ChatClient;
 class ChatRosterModel;
 
-enum JobDataRoles
-{
-    LocalPathRole = Qt::UserRole,
-};
-
 class ChatTransferPrompt : public QMessageBox
 {
     Q_OBJECT
