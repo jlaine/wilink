@@ -311,30 +311,11 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
     emit registerPanel();
 }
 
-QString ChatTransfers::availableFilePath(const QString &dirPath, const QString &name)
-{
-    QString fileName = name;
-    QDir downloadsDir(dirPath);
-    if (downloadsDir.exists(fileName))
-    {
-        const QString fileBase = QFileInfo(fileName).completeBaseName();
-        const QString fileSuffix = QFileInfo(fileName).suffix();
-        int i = 2;
-        while (downloadsDir.exists(fileName))
-        {
-            fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
-            if (!fileSuffix.isEmpty())
-                fileName += "." + fileSuffix;
-        }
-    }
-    return downloadsDir.absoluteFilePath(fileName);
-}
-
 void ChatTransfers::fileAccepted(QXmppTransferJob *job)
 {
     // determine file location
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
-    const QString filePath = availableFilePath(downloadsDir.path(), job->fileName());
+    const QString filePath = QXmppShareExtension::availableFilePath(downloadsDir.path(), job->fileName());
 
     // open file
     QFile *file = new QFile(filePath, job);

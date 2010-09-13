@@ -88,8 +88,6 @@ public:
     int activeJobs(QXmppTransferJob::Direction direction) const;
     void addJob(QXmppTransferJob *job);
 
-    static QString availableFilePath(const QString &dirPath, const QString &fileName);
-
 public slots:
     void sendFile(const QString &fullJid, const QString &filePath);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
