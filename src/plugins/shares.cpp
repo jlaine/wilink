@@ -292,6 +292,20 @@ void ChatShares::disconnected()
     sharesView->setEnabled(false);
 }
 
+void ChatShares::getFailed(const QString &packetId)
+{
+    QXmppShareItem *queueItem = queueModel->get(
+            Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
+            Q(PacketId, Q::Equals, packetId));
+    if (!queueItem)
+        return;
+
+    logMessage(QXmppLogger::WarningMessage, "Error requesting file " + queueItem->name());
+    queueItem->setData(PacketId, QVariant());
+    queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
+    queueModel->refreshItem(queueItem);
+}
+
 /** Recursively cancel any transfer jobs associated with a download queue item.
  */
 void ChatShares::transferAbort(QXmppShareItem *item)
@@ -660,21 +674,6 @@ void ChatShares::processDownloadQueue()
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
             Q(PacketId, Q::NotEquals, QVariant()));
 
-    const QDateTime currentTime = QDateTime::currentDateTime();
-    foreach (QXmppShareItem *queueItem, active)
-    {
-        QDateTime timeoutTime = queueItem->data(PacketTimeout).toDateTime();
-        if (timeoutTime.isValid() && timeoutTime <= currentTime)
-        {
-            logMessage(QXmppLogger::WarningMessage, "Request timed out for file: " + queueItem->name());
-            queueItem->setData(PacketId, QVariant());
-            queueItem->setData(PacketTimeout, QVariant());
-            queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
-            queueModel->refreshItem(queueItem);
-            active.removeAll(queueItem);
-        }
-    }
-
     int activeDownloads = active.size();
     while (activeDownloads < parallelDownloadLimit)
     {
@@ -695,13 +694,7 @@ void ChatShares::processDownloadQueue()
             queueModel->removeItem(file);
             continue;
         }
-
-        // allow hashing speeds as low as 10MB/s
-        const int maxSeconds = qMax(60, int(file->fileSize() / 10000000));
         file->setData(PacketId, id);
-        file->setData(PacketTimeout, QDateTime::currentDateTime().addSecs(maxSeconds));
-        QTimer::singleShot(maxSeconds * 1000, this, SLOT(processDownloadQueue()));
-
         queueModel->refreshItem(file);
 
         activeDownloads++;
@@ -753,6 +746,10 @@ void ChatShares::setClient(ChatClient *newClient)
     QXmppShareExtension *extension = new QXmppShareExtension(client, db);
     client->addExtension(extension);
 
+    check = connect(extension, SIGNAL(getFailed(QString)),
+                    this, SLOT(getFailed(QString)));
+    Q_ASSERT(check);
+
     check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
                     this, SLOT(transferFinished(QXmppTransferJob*)));
     Q_ASSERT(check);
@@ -761,16 +758,12 @@ void ChatShares::setClient(ChatClient *newClient)
                     this, SLOT(transferStarted(QXmppTransferJob*)));
     Q_ASSERT(check);
 
-    check = connect(extension, SIGNAL(shareGetIqReceived(const QXmppShareGetIq&)),
-        this, SLOT(shareGetIqReceived(const QXmppShareGetIq&)));
-    Q_ASSERT(check);
-
     check = connect(extension, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)),
-        this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+                    this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(shareServerFound(const QString&)),
-        this, SLOT(shareServerFound(const QString&)));
+                    this, SLOT(shareServerFound(const QString&)));
     Q_ASSERT(check);
 }
 
@@ -804,31 +797,6 @@ void ChatShares::shareFolderSelected(const QString &path)
     settings.setValue("SharesLocation", path);
 
     db->setDirectory(path);
-}
-
-void ChatShares::shareGetIqReceived(const QXmppShareGetIq &shareIq)
-{
-    if (shareIq.type() == QXmppIq::Get)
-        return;
-
-    QXmppShareItem *queueItem = queueModel->get(
-            Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
-            Q(PacketId, Q::Equals, shareIq.id()));
-    if (!queueItem)
-        return;
-
-    if (shareIq.type() == QXmppIq::Result)
-    {
-        queueItem->setData(PacketTimeout, QVariant());
-    }
-    else if (shareIq.type() == QXmppIq::Error)
-    {
-        logMessage(QXmppLogger::WarningMessage, "Error requesting file " + queueItem->name() + " from " + shareIq.from());
-        queueItem->setData(PacketId, QVariant());
-        queueItem->setData(PacketTimeout, QVariant());
-        queueItem->setData(TransferError, QXmppTransferJob::ProtocolError);
-        queueModel->refreshItem(queueItem);
-    }
 }
 
 void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)

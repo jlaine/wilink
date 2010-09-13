@@ -60,6 +60,7 @@ signals:
 
 private slots:
     void disconnected();
+    void getFailed(const QString &packetId);
     void transferAbort(QXmppShareItem *item);
     void transferDestroyed(QObject *obj);
     void transferDoubleClicked(const QModelIndex &index);
@@ -78,7 +79,6 @@ private slots:
     void queryStringChanged();
     void shareFolder();
     void shareFolderSelected(const QString &path);
-    void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
     void indexStarted();
