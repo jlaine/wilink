@@ -68,7 +68,7 @@ static int parallelDownloadLimit = 2;
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
 #define Q_FIND_TRANSFER(job) \
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
-     Q(StreamId, Q::Equals, job->sid()))
+     Q(PacketId, Q::Equals, job->data(QXmppShareExtension::TransactionRole)))
 
 /** Update collection timestamps.
  */
@@ -434,17 +434,18 @@ void ChatShares::transferStarted(QXmppTransferJob *job)
         uploadsView->addJob(job);
     else
     {
+        QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
+        if (!queueItem)
+            return;
+
         // add transfer to list
         connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(transferDestroyed(QObject*)));
         connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
         connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
         downloadJobs.append(job);
 
-#if 0
-        // start transfer
-        QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
+        // update status
         statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
-#endif
     }
 }
 
