@@ -128,7 +128,7 @@ Chat::Chat(QWidget *parent)
     m_fileMenu = menuBar()->addMenu(tr("&File"));
     m_optionsMenu = m_fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
 
-    QAction *action = m_optionsMenu->addAction(tr("Chat accounts"));
+    QAction *action = m_optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
     if (wApp->isInstalled())
