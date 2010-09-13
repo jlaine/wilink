@@ -773,7 +773,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 
     // find target view(s)
     ChatSharesView *mainView = 0;
-    const QString requestId = shareIq.tag();
+    const QString requestId = shareIq.id();
     if (searches.contains(requestId))
         mainView = qobject_cast<ChatSharesView*>(searches.take(requestId));
     else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer)
