@@ -675,12 +675,7 @@ void ChatShares::processDownloadQueue()
  */
 void ChatShares::queryStringChanged()
 {
-#if 0
-    if (lineEdit->text().isEmpty())
-        tabWidget->setCurrentWidget(sharesWidget);
-    else
-        tabWidget->setCurrentWidget(searchWidget);
-#endif
+    tabWidget->setCurrentWidget(sharesWidget);
 }
 
 void ChatShares::registerWithServer()
