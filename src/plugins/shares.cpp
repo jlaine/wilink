@@ -86,6 +86,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     : ChatPanel(parent), chatWindow(chat), client(0), db(sharesDb), rosterModel(0),
     menuAction(0)
 {
+    bool check;
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
@@ -99,8 +100,14 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     layout->addSpacing(10);
     lineEdit = new QLineEdit;
-    connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(findRemoteFiles()));
-    connect(lineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(queryStringChanged()));
+    check = connect(lineEdit, SIGNAL(returnPressed()),
+                    this, SLOT(findRemoteFiles()));
+    Q_ASSERT(check);
+
+    check = connect(lineEdit, SIGNAL(textChanged(const QString&)),
+                    this, SLOT(queryStringChanged()));
+    Q_ASSERT(check);
+
     layout->addWidget(lineEdit);
     layout->addSpacing(10);
 
@@ -115,9 +122,17 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     sharesView->setExpandsOnDoubleClick(false);
     sharesView->setModel(sharesModel);
     sharesView->hideColumn(ProgressColumn);
-    connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)), this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
-    connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(itemDoubleClicked(const QModelIndex&)));
-    connect(sharesView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
+    check = connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)),
+                    this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
+    Q_ASSERT(check);
+
+    check = connect(sharesView, SIGNAL(doubleClicked(const QModelIndex&)),
+                    this, SLOT(itemDoubleClicked(const QModelIndex&)));
+    Q_ASSERT(check);
+
+    check = connect(sharesView, SIGNAL(expandRequested(QModelIndex)),
+                    this, SLOT(itemExpandRequested(QModelIndex)));
+    Q_ASSERT(check);
 
     sharesWidget = new ChatSharesTab;
     sharesWidget->addWidget(sharesView);
@@ -129,9 +144,17 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     searchView->setExpandsOnDoubleClick(false);
     searchView->setModel(searchModel);
     searchView->hideColumn(ProgressColumn);
-    connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)), this, SLOT(itemContextMenu(QModelIndex, QPoint)));
-    connect(searchView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(itemDoubleClicked(QModelIndex)));
-    connect(searchView, SIGNAL(expandRequested(QModelIndex)), this, SLOT(itemExpandRequested(QModelIndex)));
+    check = connect(searchView, SIGNAL(contextMenu(QModelIndex, QPoint)),
+                    this, SLOT(itemContextMenu(QModelIndex, QPoint)));
+    Q_ASSERT(check);
+
+    check = connect(searchView, SIGNAL(doubleClicked(QModelIndex)),
+                    this, SLOT(itemDoubleClicked(QModelIndex)));
+    Q_ASSERT(check);
+
+    check = connect(searchView, SIGNAL(expandRequested(QModelIndex)),
+                    this, SLOT(itemExpandRequested(QModelIndex)));
+    Q_ASSERT(check);
 
     searchWidget = new ChatSharesTab;
     searchWidget->addWidget(searchView);
@@ -141,8 +164,13 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     queueModel = new ChatSharesModel(this);
     downloadsView = new ChatSharesView;
     downloadsView->setModel(queueModel);
-    connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(transferDoubleClicked(const QModelIndex&)));
-    connect(downloadsView, SIGNAL(expandRequested(QModelIndex)), downloadsView, SLOT(expand(QModelIndex)));
+    check = connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)),
+                    this, SLOT(transferDoubleClicked(const QModelIndex&)));
+    Q_ASSERT(check);
+
+    check = connect(downloadsView, SIGNAL(expandRequested(QModelIndex)),
+                    downloadsView, SLOT(expand(QModelIndex)));
+    Q_ASSERT(check);
 
     downloadsWidget = new ChatSharesTab;
     downloadsWidget->addWidget(downloadsView);
@@ -166,20 +194,26 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     /* download button */
     downloadButton = new QPushButton(tr("Download"));
     downloadButton->setIcon(QIcon(":/download.png"));
-    connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadItem()));
+    check = connect(downloadButton, SIGNAL(clicked()),
+                    this, SLOT(downloadItem()));
+    Q_ASSERT(check);
     footerLayout->addWidget(downloadButton);
 
     /* rescan button */
     indexButton = new QPushButton(tr("Refresh my shares"));
     indexButton->setIcon(QIcon(":/refresh.png"));
-    connect(indexButton, SIGNAL(clicked()), db, SLOT(index()));
+    check = connect(indexButton, SIGNAL(clicked()),
+                    db, SLOT(index()));
+    Q_ASSERT(check);
     footerLayout->addWidget(indexButton);
     indexButton->hide();
 
     /* remove button */
     removeButton = new QPushButton(tr("Remove"));
     removeButton->setIcon(QIcon(":/remove.png"));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(transferRemoved()));
+    check = connect(removeButton, SIGNAL(clicked()),
+                    this, SLOT(transferRemoved()));
+    Q_ASSERT(check);
     footerLayout->addWidget(removeButton);
     removeButton->hide();
 
@@ -189,24 +223,43 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     ChatClient *baseClient = chatWindow->client();
     registerTimer = new QTimer(this);
     registerTimer->setInterval(REGISTER_INTERVAL * 1000);
-    connect(registerTimer, SIGNAL(timeout()), this, SLOT(registerWithServer()));
-    connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+    check = connect(registerTimer, SIGNAL(timeout()),
+                    this, SLOT(registerWithServer()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                    baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+
+    check = connect(tabWidget, SIGNAL(currentChanged(int)),
+                    this, SLOT(tabChanged(int)));
+    Q_ASSERT(check);
+
     setClient(baseClient);
 
-    connect(this, SIGNAL(findPanel()), lineEdit, SLOT(setFocus()));
+    check = connect(this, SIGNAL(findPanel()),
+                    lineEdit, SLOT(setFocus()));
+    Q_ASSERT(check);
+
     setFocusProxy(lineEdit);
 
     /* database signals */
-    connect(db, SIGNAL(directoryChanged(QString)),
-        this, SLOT(directoryChanged(QString)));
-    connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-        baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    connect(db, SIGNAL(indexStarted()),
-        this, SLOT(indexStarted()));
-    connect(db, SIGNAL(indexFinished(double, int, int)),
-        this, SLOT(indexFinished(double, int, int)));
+    check = connect(db, SIGNAL(directoryChanged(QString)),
+                    this, SLOT(directoryChanged(QString)));
+    Q_ASSERT(check);
+
+    check = connect(db, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                    baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+
+    check = connect(db, SIGNAL(indexStarted()),
+                    this, SLOT(indexStarted()));
+    Q_ASSERT(check);
+
+    check = connect(db, SIGNAL(indexFinished(double, int, int)),
+                    this, SLOT(indexFinished(double, int, int)));
+    Q_ASSERT(check);
+
     directoryChanged(db->directory());
 }
 
@@ -279,6 +332,30 @@ void ChatShares::transferDoubleClicked(const QModelIndex &index)
         QDesktopServices::openUrl(QUrl::fromLocalFile(localPath));
 }
 
+/** When a transfer finishes, update the queue entry.
+ *
+ * @param job
+ */
+void ChatShares::transferFinished(QXmppTransferJob *job)
+{
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
+    if (!queueItem)
+        return;
+
+    queueItem->setData(PacketId, QVariant());
+    if (job->error() == QXmppTransferJob::NoError)
+    {
+        statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
+        queueItem->setData(TransferPath, job->data(QXmppShareExtension::LocalPathRole));
+        queueItem->setData(TransferError, QVariant());
+    } else {
+        statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
+        queueItem->setData(TransferPath, QVariant());
+        queueItem->setData(TransferError, job->error());
+    }
+    queueModel->refreshItem(queueItem);
+}
+
 /** Update the progress bar for a transfer job.
  */
 void ChatShares::transferProgress(qint64 done, qint64 total)
@@ -318,33 +395,6 @@ void ChatShares::transferRemoved()
     }
 }
 
-void ChatShares::transferStateChanged(QXmppTransferJob::State state)
-{
-    QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
-    if (!job)
-        return;
-    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
-    if (!queueItem)
-        return;
-
-    if (state == QXmppTransferJob::FinishedState)
-    {
-        const QString localPath = job->data(LocalPathRole).toString();
-        queueItem->setData(PacketId, QVariant());
-        if (job->error() == QXmppTransferJob::NoError)
-        {
-            statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
-            queueItem->setData(TransferPath, localPath);
-            queueItem->setData(TransferError, QVariant());
-        } else {
-            statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
-            queueItem->setData(TransferPath, QVariant());
-            queueItem->setData(TransferError, job->error());
-        }
-        queueModel->refreshItem(queueItem);
-    }
-}
-
 void ChatShares::findRemoteFiles()
 {
     const QString search = lineEdit->text();
@@ -373,9 +423,15 @@ void ChatShares::transferStarted(QXmppTransferJob *job)
             return;
 
         // add transfer to list
-        connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(transferDestroyed(QObject*)));
-        connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
-        connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
+        bool check;
+        check = connect(job, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(transferDestroyed(QObject*)));
+        Q_ASSERT(check);
+
+        check = connect(job, SIGNAL(progress(qint64, qint64)),
+                        this, SLOT(transferProgress(qint64,qint64)));
+        Q_ASSERT(check);
+
         downloadJobs.append(job);
 
         // update status
@@ -459,7 +515,11 @@ void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalP
 
     QAction *action = menu->addAction(tr("Download"));
     action->setIcon(QIcon(":/download.png"));
-    connect(action, SIGNAL(triggered()), this, SLOT(downloadItem()));
+
+    bool check;
+    check = connect(action, SIGNAL(triggered()),
+                    this, SLOT(downloadItem()));
+    Q_ASSERT(check);
 
     menu->popup(globalPos);
 }
@@ -552,7 +612,8 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         if (!menuAction)
         {
             menuAction = chatWindow->optionsMenu()->addAction(tr("Shares folder"));
-            connect(menuAction, SIGNAL(triggered(bool)), this, SLOT(shareFolder()));
+            connect(menuAction, SIGNAL(triggered(bool)),
+                    this, SLOT(shareFolder()));
         }
 
         // activate the shares view
@@ -688,6 +749,10 @@ void ChatShares::setClient(ChatClient *newClient)
     QXmppShareExtension *extension = new QXmppShareExtension(client, db);
     client->addExtension(extension);
 
+    check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
+                    this, SLOT(transferFinished(QXmppTransferJob*)));
+    Q_ASSERT(check);
+
     check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
                     this, SLOT(transferStarted(QXmppTransferJob*)));
     Q_ASSERT(check);
@@ -718,8 +783,14 @@ void ChatShares::shareFolder()
     dialog->setWindowTitle(tr("Shares folder"));
     dialog->show();
 
-    connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
-    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(shareFolderSelected(QString)));
+    bool check;
+    check = connect(dialog, SIGNAL(finished(int)),
+                    dialog, SLOT(deleteLater()));
+    Q_ASSERT(check);
+
+    check = connect(dialog, SIGNAL(fileSelected(QString)),
+                    this, SLOT(shareFolderSelected(QString)));
+    Q_ASSERT(check);
 }
 
 void ChatShares::shareFolderSelected(const QString &path)
@@ -916,7 +987,8 @@ bool SharesPlugin::initialize(Chat *chat)
 
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), chat);
-    connect(shortcut, SIGNAL(activated()), shares, SIGNAL(showPanel()));
+    connect(shortcut, SIGNAL(activated()),
+            shares, SIGNAL(showPanel()));
     return true;
 }
 

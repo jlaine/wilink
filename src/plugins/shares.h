@@ -63,9 +63,10 @@ private slots:
     void transferAbort(QXmppShareItem *item);
     void transferDestroyed(QObject *obj);
     void transferDoubleClicked(const QModelIndex &index);
+    void transferFinished(QXmppTransferJob *job);
     void transferProgress(qint64, qint64);
     void transferRemoved();
-    void transferStateChanged(QXmppTransferJob::State state);
+    void transferStarted(QXmppTransferJob *job);
     void findRemoteFiles();
     void downloadItem();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
@@ -80,7 +81,6 @@ private slots:
     void shareGetIqReceived(const QXmppShareGetIq &getIq);
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
-    void transferStarted(QXmppTransferJob *job);
     void indexStarted();
     void indexFinished(double elapsed, int updated, int removed);
     void tabChanged(int index);
