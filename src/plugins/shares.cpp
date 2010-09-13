@@ -555,7 +555,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
     // determine whether we need a refresh
     QDateTime cutoffTime = QDateTime::currentDateTime().addSecs(-REFRESH_INTERVAL);
     QDateTime updateTime = item->data(UpdateTime).toDateTime();
-    if (!item->size() && updateTime.isValid() && updateTime >= cutoffTime)
+    if (item->size() && updateTime.isValid() && updateTime >= cutoffTime)
     {
         view->expand(index);
         return;
@@ -821,18 +821,15 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         } else {
             QModelIndex index = model->updateItem(oldItem, newItem);
             if (newItem->size())
-                statusBar->clearMessage();
-            else
-                statusBar->showMessage(tr("No files found"), 3000);
-            if (view == mainView)
             {
-                // when the search view receives results and there are less than 10 results
-                // expand one level of folders
-                if ((newItem->locations().isEmpty() || newItem->locations().first().node().isEmpty()) && newItem->size() < 10)
-                    view->expandToDepth(1);
-                else if (newItem->size() > 0)
-                    // otherwise just expand the added item
+                statusBar->clearMessage();
+                // expand the added item
+                if (view == mainView)
                     view->setExpanded(index, true);
+            }
+            else
+            {
+                statusBar->showMessage(tr("No files found"), 3000);
             }
         }
     }
