@@ -64,7 +64,6 @@ private slots:
     void transferDestroyed(QObject *obj);
     void transferDoubleClicked(const QModelIndex &index);
     void transferProgress(qint64, qint64);
-    void transferReceived(QXmppTransferJob *job);
     void transferRemoved();
     void transferStateChanged(QXmppTransferJob::State state);
     void findRemoteFiles();

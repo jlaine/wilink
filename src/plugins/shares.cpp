@@ -302,65 +302,6 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
     }
 }
 
-/** When we receive a file, check it is in the download queue and accept it.
- */
-void ChatShares::transferReceived(QXmppTransferJob *job)
-{
-    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
-    if (!queueItem)
-    {
-        // if we did not request this job and the job is from
-        // the share-only client, refuse it
-        if (client != chatWindow->client() &&
-            qobject_cast<QXmppTransferManager*>(job->parent()) == &client->transferManager())
-            job->abort();
-        return;
-    }
-
-    // determine full path
-    QStringList pathBits;
-    QXmppShareItem *parentItem = queueItem->parent();
-    while (parentItem && parentItem->parent())
-    {
-        // sanitize path
-        QString dirName = parentItem->name();
-        if (dirName != "." && dirName != ".." && !dirName.contains("/") && !dirName.contains("\\"))
-            pathBits.prepend(dirName);
-        parentItem = parentItem->parent();
-    }
-    const QString subdir = pathBits.join("/");
-
-    // create directory
-    QDir downloadsDir(db->directory());
-    if (!subdir.isEmpty())
-    {
-        if (downloadsDir.exists(subdir) || downloadsDir.mkpath(subdir))
-            downloadsDir.setPath(downloadsDir.filePath(subdir));
-    }
-
-    // determine file name
-    const QString filePath = ChatTransfers::availableFilePath(downloadsDir.path(), job->fileName() + ".part");
-    QFile *file = new QFile(filePath, job);
-    if (!file->open(QIODevice::WriteOnly))
-    {
-        logMessage(QXmppLogger::WarningMessage, "Could not open file for writing: " + filePath);
-        job->abort();
-        delete file;
-        return;
-    }
-
-    // add transfer to list
-    job->setData(LocalPathRole, filePath);
-    connect(job, SIGNAL(destroyed(QObject*)), this, SLOT(transferDestroyed(QObject*)));
-    connect(job, SIGNAL(progress(qint64, qint64)), this, SLOT(transferProgress(qint64,qint64)));
-    connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(transferStateChanged(QXmppTransferJob::State)));
-    downloadJobs.append(job);
-
-    // start transfer
-    statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
-    job->accept(file);
-}
-
 /** When the user removes items from the download queue, cancel any jobs
  *  associated with them.
  */
