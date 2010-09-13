@@ -213,7 +213,7 @@ void Application::setOpenAtLogin(bool run)
 {
     const QString appName = qApp->applicationName();
     const QString appPath = executablePath();
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
     QString script = run ?
         QString("tell application \"System Events\"\n"
             "\tmake login item at end with properties {path:\"%1\"}\n"
@@ -226,13 +226,21 @@ void Application::setOpenAtLogin(bool run)
     process.write(script.toAscii());
     process.closeWriteChannel();
     process.waitForFinished();
-#endif
-#ifdef Q_OS_WIN
+#elif defined(Q_OS_WIN)
     QSettings registry("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if (run)
         registry.setValue(appName, appPath);
     else
         registry.remove(appName);
+#else
+    QDir autostartDir(QDir::home().filePath(".kde/Autostart"));
+    if (autostartDir.exists())
+    {
+        if (run)
+            QFile(appPath).link(autostartDir.filePath(appName));
+        else
+            autostartDir.remove(appName);
+    }
 #endif
 
     // store preference
