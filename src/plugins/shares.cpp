@@ -354,6 +354,9 @@ void ChatShares::transferFinished(QXmppTransferJob *job)
         queueItem->setData(TransferError, job->error());
     }
     queueModel->refreshItem(queueItem);
+
+    // process the download queue
+    processDownloadQueue();
 }
 
 /** Update the progress bar for a transfer job.
@@ -506,6 +509,7 @@ void ChatShares::queueItem(QXmppShareItem *item)
         client->sendPacket(iq);
     }
 
+    // process the download queue
     processDownloadQueue();
 }
 
