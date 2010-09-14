@@ -118,6 +118,7 @@ private:
     QPushButton *removeButton;
     QStatusBar *statusBar;
     QTimer *registerTimer;
+    QTimer *searchTimer;
 
     QAction *menuAction;
 };

@@ -198,6 +198,13 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
                     this, SLOT(registerWithServer()));
     Q_ASSERT(check);
 
+    searchTimer = new QTimer(this);
+    searchTimer->setInterval(300);
+    searchTimer->setSingleShot(true);
+    check = connect(searchTimer, SIGNAL(timeout()),
+                    this, SLOT(findRemoteFiles()));
+    Q_ASSERT(check);
+
     check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
                     baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
@@ -394,7 +401,7 @@ void ChatShares::findRemoteFiles()
 
     // search for files
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
-    const QString requestId = extension->search(QXmppShareLocation(shareServer), 3, sharesFilter);
+    const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, sharesFilter);
     if (!requestId.isEmpty())
     {
         searches.insert(requestId, sharesView);
@@ -676,6 +683,9 @@ void ChatShares::processDownloadQueue()
 void ChatShares::queryStringChanged()
 {
     tabWidget->setCurrentWidget(sharesWidget);
+    const QString queryString  = lineEdit->text();
+    if (queryString.isEmpty() || queryString.size() >= 3)
+        searchTimer->start();
 }
 
 void ChatShares::registerWithServer()
