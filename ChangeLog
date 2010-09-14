@@ -8,6 +8,7 @@ wiLink 0.9.9 (UNRELEASED)
  * Download updates in the background and prompt user after download.
  * Merge shares browse / search views.
  * Fix "open at login" option when multiple accounts are used.
+ * Perform search on shares as the user types.
 
 wiLink 0.9.8 (2010-06-27)
  * Add a new layout for the chat history.
