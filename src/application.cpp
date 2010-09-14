@@ -248,7 +248,7 @@ void Application::setOpenAtLogin(bool run)
 #endif
 
     // store preference
-    if (run != settings->value("OpenAtLogin").toBool())
+    if (run != openAtLogin())
     {
         settings->setValue("OpenAtLogin", run);
         emit openAtLoginChanged(run);
@@ -321,6 +321,26 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
     {
         trayContext = context;
         trayIcon->showMessage(title, message);
+    }
+}
+
+/** Returns true if offline contacts should be displayed.
+ */
+bool Application::showOfflineContacts() const
+{
+    return settings->value("ShowOfflineContacts", true).toBool();
+}
+
+/** Sets whether offline contacts should be displayed.
+ *
+ * @param show
+ */
+void Application::setShowOfflineContacts(bool show)
+{
+    if (show != showOfflineContacts())
+    {
+        settings->setValue("ShowOfflineContacts", show);
+        emit showOfflineContactsChanged(show);
     }
 }
 

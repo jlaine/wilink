@@ -47,13 +47,16 @@ public:
     bool isInstalled();
     bool openAtLogin() const;
     void showMessage(QWidget *context, const QString &title, const QString &message);
+    bool showOfflineContacts() const;
 
 signals:
     void messageClicked(QWidget *context);
     void openAtLoginChanged(bool run);
+    void showOfflineContactsChanged(bool show);
 
 public slots:
     void setOpenAtLogin(bool run);
+    void setShowOfflineContacts(bool show);
 
 private slots:
     void messageClicked();

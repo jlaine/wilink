@@ -133,8 +133,10 @@ Chat::Chat(QWidget *parent)
 
     action = m_optionsMenu->addAction(QIcon(":/contact-offline.png"), tr("Show offline contacts"));
     action->setCheckable(true);
-    action->setChecked(true);
-    connect(action, SIGNAL(toggled(bool)), m_rosterView, SLOT(setShowOfflineContacts(bool)));
+    action->setChecked(wApp->showOfflineContacts());
+    m_rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
+    connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setShowOfflineContacts(bool)));
+    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), m_rosterView, SLOT(setShowOfflineContacts(bool)));
 
     if (wApp->isInstalled())
     {

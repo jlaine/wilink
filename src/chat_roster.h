@@ -125,20 +125,22 @@ public:
     void selectContact(const QString &jid);
     QSize sizeHint() const;
 
+signals:
+    void itemMenu(QMenu *menu, const QModelIndex &index);
+    void itemDrop(QDropEvent *event, const QModelIndex &index);
+
+public slots:
+    void setShowOfflineContacts(bool show);
+
+protected slots:
+    void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
+
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
     void resizeEvent(QResizeEvent *event);
-
-signals:
-    void itemMenu(QMenu *menu, const QModelIndex &index);
-    void itemDrop(QDropEvent *event, const QModelIndex &index);
-
-protected slots:
-    void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
-    void setShowOfflineContacts(bool show);
 
 private:
     ChatRosterModel *rosterModel;
