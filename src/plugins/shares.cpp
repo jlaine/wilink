@@ -89,6 +89,8 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->addSpacing(4);
 
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setSpacing(6);
+
     QLabel *findIcon = new QLabel;
     findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
     hbox->addWidget(findIcon);
