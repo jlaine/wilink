@@ -9,6 +9,7 @@ wiLink 0.9.9 (UNRELEASED)
  * Merge shares browse / search views.
  * Fix "open at login" option when multiple accounts are used.
  * Perform search on shares as the user types.
+ * Make it possible to show / hide offline contacts.
 
 wiLink 0.9.8 (2010-06-27)
  * Add a new layout for the chat history.

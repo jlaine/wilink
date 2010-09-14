@@ -681,9 +681,10 @@ void ChatRosterModel::removeItem(const QString &bareJid)
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     : QTreeView(parent), rosterModel(model)
 {
-    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
+    sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(model);
     sortedModel->setDynamicSortFilter(true);
+    sortedModel->setFilterKeyColumn(SortingColumn);
     setModel(sortedModel);
 
     setAlternatingRowColors(true);
@@ -773,6 +774,14 @@ void ChatRosterView::selectionChanged(const QItemSelection & selected, const QIt
 {
     foreach (const QModelIndex &index, selected.indexes())
         expand(index);
+}
+
+void ChatRosterView::setShowOfflineContacts(bool show)
+{
+    if (show)
+        sortedModel->setFilterRegExp(QRegExp());
+    else
+        sortedModel->setFilterRegExp(QRegExp("^(?!offline).+"));
 }
 
 QSize ChatRosterView::sizeHint () const

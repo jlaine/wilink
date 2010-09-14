@@ -123,6 +123,10 @@ Acceptez-vous?</translation>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
+    <message>
+        <source>Show offline contacts</source>
+        <translation>Afficher les contacts déconnectés</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccountPrompt</name>

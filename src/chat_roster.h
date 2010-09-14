@@ -29,6 +29,7 @@
 
 class QContextMenuEvent;
 class QMenu;
+class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;
@@ -137,9 +138,11 @@ signals:
 
 protected slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
+    void setShowOfflineContacts(bool show);
 
 private:
     ChatRosterModel *rosterModel;
+    QSortFilterProxyModel *sortedModel;
 };
 
 #endif

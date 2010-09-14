@@ -131,6 +131,11 @@ Chat::Chat(QWidget *parent)
     QAction *action = m_optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
+    action = m_optionsMenu->addAction(QIcon(":/contact-offline.png"), tr("Show offline contacts"));
+    action->setCheckable(true);
+    action->setChecked(true);
+    connect(action, SIGNAL(toggled(bool)), m_rosterView, SLOT(setShowOfflineContacts(bool)));
+
     if (wApp->isInstalled())
     {
         action = m_optionsMenu->addAction(QIcon(":/favorite-active.png"), tr("Open at login"));
