@@ -772,58 +772,48 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         return;
 
     // find target view(s)
-    ChatSharesView *mainView = 0;
+    ChatSharesView *view = 0;
     const QString requestId = shareIq.id();
-    if (searches.contains(requestId))
-        mainView = qobject_cast<ChatSharesView*>(searches.take(requestId));
-    else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer)
-        mainView = sharesView;
+    if ((shareIq.type() == QXmppIq::Result || shareIq.type() == QXmppIq::Error) && searches.contains(requestId))
+        view = qobject_cast<ChatSharesView*>(searches.take(requestId));
+    else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer && sharesFilter.isEmpty())
+        view = sharesView;
     else
         return;
-
-    QList<ChatSharesView*> views;
-    views << mainView;
-    if (mainView == downloadsView)
-        views << sharesView;
 
     // FIXME : we are casting away constness
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
 
     // update all concerned views
-    foreach (ChatSharesView *view, views)
+    ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
+    QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
+                                         ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+
+    if (!oldItem && shareIq.from() != shareServer)
     {
-        ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
-        QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
-                                             ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+        logMessage(QXmppLogger::WarningMessage, "Ignoring unwanted search result");
+        return;
+    }
 
-        if (!oldItem && shareIq.from() != shareServer)
+    if (shareIq.type() == QXmppIq::Error)
+    {
+        if ((shareIq.error().condition() == QXmppStanza::Error::ItemNotFound) && oldItem)
+            model->removeItem(oldItem);
+    } else {
+        QModelIndex index = model->updateItem(oldItem, newItem);
+        if (newItem->size())
         {
-            logMessage(QXmppLogger::WarningMessage, "Ignoring unwanted search result");
-            continue;
+            statusBar->clearMessage();
+            view->setExpanded(index, true);
         }
-
-        if (shareIq.type() == QXmppIq::Error)
+        else
         {
-            if ((shareIq.error().condition() == QXmppStanza::Error::ItemNotFound) && oldItem)
-                model->removeItem(oldItem);
-        } else {
-            QModelIndex index = model->updateItem(oldItem, newItem);
-            if (newItem->size())
-            {
-                statusBar->clearMessage();
-                // expand the added item
-                if (view == mainView)
-                    view->setExpanded(index, true);
-            }
-            else
-            {
-                statusBar->showMessage(tr("No files found"), 3000);
-            }
+            statusBar->showMessage(tr("No files found"), 3000);
         }
     }
 
     // if we retrieved the contents of a download queue item, process queue
-    if (mainView == downloadsView)
+    if (view == downloadsView)
         processDownloadQueue();
 }
 
