@@ -40,6 +40,7 @@ public:
 
     static void alert(QWidget *widget);
     static void platformInit();
+    void createSystemTrayIcon();
     UpdatesDialog *updatesDialog() { return updates; };
     void setUpdatesDialog(UpdatesDialog *updatesDialog) { updates = updatesDialog; };
 

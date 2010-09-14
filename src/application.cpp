@@ -72,23 +72,6 @@ Application::Application(int &argc, char **argv)
     settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
-
-    /* create system tray icon */
-#ifndef Q_OS_MAC
-    trayIcon = new QSystemTrayIcon;
-    trayIcon->setIcon(QIcon(":/wiLink.png"));
-    trayMenu = new QMenu;
-    QAction *action = trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showAccounts()));
-    action = trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
-    connect(action, SIGNAL(triggered()), this, SLOT(quit()));
-    trayIcon->setContextMenu(trayMenu);
-    QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-        this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
-    QObject::connect(trayIcon, SIGNAL(messageClicked()),
-        this, SLOT(messageClicked()));
-    trayIcon->show();
-#endif
 }
 
 Application::~Application()
@@ -120,6 +103,27 @@ void Application::platformInit()
 {
 }
 #endif
+
+/** Create the system tray icon.
+ */
+void Application::createSystemTrayIcon()
+{
+#ifndef Q_OS_MAC
+    trayIcon = new QSystemTrayIcon;
+    trayIcon->setIcon(QIcon(":/wiLink.png"));
+    trayMenu = new QMenu;
+    QAction *action = trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
+    connect(action, SIGNAL(triggered()), this, SLOT(showAccounts()));
+    action = trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    connect(action, SIGNAL(triggered()), this, SLOT(quit()));
+    trayIcon->setContextMenu(trayMenu);
+    QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+        this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+    QObject::connect(trayIcon, SIGNAL(messageClicked()),
+        this, SLOT(messageClicked()));
+    trayIcon->show();
+#endif
+}
 
 QString Application::executablePath()
 {

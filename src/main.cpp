@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
 #endif
     signal(SIGTERM, signal_handler);
 
+    /* Create system tray icon */
+    app.createSystemTrayIcon();
+
     /* Check for updates */
     UpdatesDialog updates;
     app.setUpdatesDialog(&updates);
