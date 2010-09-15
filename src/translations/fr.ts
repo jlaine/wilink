@@ -139,6 +139,10 @@ Acceptez-vous?</translation>
         <source>About %1</source>
         <translation>A propos de %1</translation>
     </message>
+    <message>
+        <source>version %1</source>
+        <translation>version %1</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccountPrompt</name>
