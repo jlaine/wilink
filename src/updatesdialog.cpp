@@ -26,6 +26,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QProgressBar>
+#include <QPushButton>
 #include <QTimer>
 
 #include "systeminfo.h"
@@ -148,6 +149,7 @@ void UpdatesDialog::downloadFinished(const Release &release)
                 .arg(release.package)));
     buttonBox->show();
     show();
+    buttonBox->button(QDialogButtonBox::Yes)->setFocus();
 }
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
