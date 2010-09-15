@@ -303,7 +303,7 @@ void ChatAccounts::check()
     {
         if (!isBareJid(jid))
         {
-            qDebug() << "Removing bad account" << jid;
+            qWarning() << "Removing bad account" << jid;
             removeAccount(jid);
         }
         else if (jidToDomain(jid) == requiredDomain)
