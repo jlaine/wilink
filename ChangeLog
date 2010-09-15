@@ -17,6 +17,7 @@ wiLink 0.9.9 (UNRELEASED)
    - Do not re-download a software update if it already has a valid checksum.
  * Miscellanous:
    - Fix "open at login" option when multiple accounts are used.
+   - Implement "open at login" option for freedesktop.org compliant desktops.
    - Make it possible to show / hide offline contacts.
    - Add a "Help" menu with "About wiLink" and a link to "wiLink FAQ".
    - Fix autoscrolling of debugging console.
