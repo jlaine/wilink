@@ -1,16 +1,25 @@
 wiLink 0.9.9 (UNRELEASED)
- * Do not allow rich text in chat input box as it is discarded afterwards.
- * Do not display error messages in chat history.
- * Add an explicit "Cancel" button to credentials prompt.
- * Make chat accounts accessible from system tray.
- * Fix autoscrolling of debugging console.
- * Show conversation history up to 2 weeks.
- * Download updates in the background and prompt user after download.
- * Merge shares browse / search views.
- * Fix "open at login" option when multiple accounts are used.
- * Perform search on shares as the user types.
- * Make it possible to show / hide offline contacts.
- * Add a "Help" menu with "About wiLink" and a link to "wiLink FAQ".
+ * Account management:
+   - Add an explicit "Cancel" button to credentials prompt.
+   - Test the credentials entered by the using in the account creation prompt.
+   - Add links to "wiLink FAQ" from credentials and account prompts.
+   - Make chat accounts accessible from the system tray.
+ * Chat conversations:
+   - Do not allow rich text in chat input box as it is discarded afterwards.
+   - Do not display error messages in chat history.
+   - Show conversation history up to 2 weeks.
+ * File sharing:
+   - Merge shares browse / search views.
+   - Perform search on shares as the user types.
+   - Support search requests with a base location.
+ * Sofware updates:
+   - Download updates in the background and prompt user after download.
+   - Do not re-download a software update if it already has a valid checksum.
+ * Miscellanous:
+   - Fix "open at login" option when multiple accounts are used.
+   - Make it possible to show / hide offline contacts.
+   - Add a "Help" menu with "About wiLink" and a link to "wiLink FAQ".
+   - Fix autoscrolling of debugging console.
 
 wiLink 0.9.8 (2010-06-27)
  * Add a new layout for the chat history.
