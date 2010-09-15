@@ -65,6 +65,8 @@ private:
 
 class ChatPasswordPrompt : public QDialog
 {
+    Q_OBJECT
+
 public:
     ChatPasswordPrompt(const QString &jid, QWidget *parent = 0);
     QString password() const;

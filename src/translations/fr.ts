@@ -623,13 +623,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>DiagnosticsPlugin</name>
-    <message>
-        <source>Diagnostics</source>
-        <translation>Diagnostics</translation>
-    </message>
-</context>
-<context>
     <name>Discovery</name>
     <message>
         <source>Go back</source>
