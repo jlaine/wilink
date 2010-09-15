@@ -174,7 +174,7 @@ Chat::Chat(QWidget *parent)
     /* "Help" menu */
     m_helpMenu = menuBar()->addMenu(tr("&Help"));
 
-    action = m_helpMenu->addAction(tr("Frequently asked questions"));
+    action = m_helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
 #ifdef Q_OS_MAC
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
 #else

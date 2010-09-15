@@ -132,16 +132,16 @@ Acceptez-vous?</translation>
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <source>Frequently asked questions</source>
-        <translation>Foire aux questions</translation>
-    </message>
-    <message>
         <source>About %1</source>
         <translation>À propos de %1</translation>
     </message>
     <message>
         <source>version %1</source>
         <translation>version %1</translation>
+    </message>
+    <message>
+        <source>%1 FAQ</source>
+        <translation>FAQ %1</translation>
     </message>
 </context>
 <context>
@@ -398,10 +398,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Download</source>
         <translation>Télécharger</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="obsolete">Recherche</translation>
     </message>
     <message>
         <source>Downloads</source>
