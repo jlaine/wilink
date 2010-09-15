@@ -171,20 +171,6 @@ Chat::Chat(QWidget *parent)
     m_findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
     m_findAgainAction->setEnabled(false);
 
-    /* "Help" menu */
-    m_helpMenu = menuBar()->addMenu(tr("&Help"));
-
-    action = m_helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
-#ifdef Q_OS_MAC
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
-#else
-    action->setShortcut(QKeySequence(Qt::Key_F1));
-#endif
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showHelp()));
-
-    action = m_helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
-
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
@@ -562,6 +548,21 @@ bool Chat::open(const QString &jid)
             m_plugins << plugin;
         }
     }
+
+    /* Create "Help" menu here, so that it remains last */
+    m_helpMenu = menuBar()->addMenu(tr("&Help"));
+
+    QAction *action = m_helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
+#ifdef Q_OS_MAC
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
+#else
+    action->setShortcut(QKeySequence(Qt::Key_F1));
+#endif
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showHelp()));
+
+    action = m_helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
+
     return true;
 }
 

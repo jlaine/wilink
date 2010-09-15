@@ -48,6 +48,9 @@ Menu::Menu(QMenuBar *bar)
 {
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
 
+    servicesMenu = new QMenu(tr("&Services"));
+    menuBar->addMenu(servicesMenu);
+
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
     connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
@@ -56,8 +59,7 @@ Menu::Menu(QMenuBar *bar)
 
 Menu::~Menu()
 {
-    if (servicesMenu)
-        delete servicesMenu;
+    delete servicesMenu;
 }
 
 void Menu::fetchIcon(const QUrl &url, QAction *action)
@@ -112,14 +114,9 @@ void Menu::showMenu()
         return;
     }
 
-    /* create menu bar */
+    /* clear menu bar */
     icons.clear();
-    if (servicesMenu)
-        servicesMenu->clear();
-    else {
-        servicesMenu = new QMenu(tr("&Services"));
-        menuBar->addMenu(servicesMenu);
-    }
+    servicesMenu->clear();
 
     QAction *action;
 
