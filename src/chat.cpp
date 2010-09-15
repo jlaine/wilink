@@ -680,9 +680,10 @@ void Chat::showAbout()
     QVBoxLayout *layout = new QVBoxLayout;
     QHBoxLayout *hbox = new QHBoxLayout;
     QLabel *icon = new QLabel;
-    icon->setPixmap(QPixmap(":/wiLink.png"));
+    icon->setPixmap(QPixmap(":/wiLink-64.png"));
     hbox->addWidget(icon);
-    hbox->addWidget(new QLabel(QString("<p><b>%1</b><br/>%2</p>")
+    hbox->addWidget(new QLabel(QString("<p style=\"font-size: xx-large;\">%1</p>"
+        "<p style=\"font-size: large;\">%2</p>")
         .arg(qApp->applicationName(),
             tr("version %1").arg(qApp->applicationVersion()))));
     layout->addItem(hbox);
