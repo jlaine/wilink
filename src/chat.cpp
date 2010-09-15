@@ -23,6 +23,8 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QDialogButtonBox>
+#include <QLabel>
 #include <QLayout>
 #include <QList>
 #include <QMenuBar>
@@ -672,18 +674,23 @@ void Chat::setWindowTitle(const QString &title)
  */
 void Chat::showAbout()
 {
-    QMessageBox::about(this, tr("About %1").arg(qApp->applicationName()),
-        QString("<p><b>%1</b><br/>%2</p>"
-        "<p>This program is free software: you can redistribute it and/or modify "
-        "it under the terms of the GNU General Public License as published by "
-        "he Free Software Foundation, either version 3 of the License, or "
-        "(at your option) any later version.</p>"
-        "<p>This program is distributed in the hope that it will be useful, "
-        "but WITHOUT ANY WARRANTY; without even the implied warranty of "
-        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
-        "GNU General Public License for more details.</p>")
+    QDialog dlg;
+    dlg.setWindowTitle(tr("About %1").arg(qApp->applicationName()));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QLabel *icon = new QLabel;
+    icon->setPixmap(QPixmap(":/wiLink.png"));
+    hbox->addWidget(icon);
+    hbox->addWidget(new QLabel(QString("<p><b>%1</b><br/>%2</p>")
         .arg(qApp->applicationName(),
-            tr("version %1").arg(qApp->applicationVersion())));
+            tr("version %1").arg(qApp->applicationVersion()))));
+    layout->addItem(hbox);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
+    connect(buttonBox, SIGNAL(accepted()), &dlg, SLOT(accept()));
+    layout->addWidget(buttonBox);
+    dlg.setLayout(layout);
+    dlg.exec();
 }
 
 /** Display the help web page.
