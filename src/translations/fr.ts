@@ -127,6 +127,14 @@ Acceptez-vous?</translation>
         <source>Show offline contacts</source>
         <translation>Afficher les contacts déconnectés</translation>
     </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Aide</translation>
+    </message>
+    <message>
+        <source>Frequently asked questions</source>
+        <translation>Foire aux questions</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccountPrompt</name>

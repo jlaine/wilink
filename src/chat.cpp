@@ -166,6 +166,15 @@ Chat::Chat(QWidget *parent)
     m_findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
     m_findAgainAction->setEnabled(false);
 
+    m_helpMenu = menuBar()->addMenu(tr("&Help"));
+    action = m_helpMenu->addAction(tr("Frequently asked questions"));
+#ifdef Q_OS_MAC
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
+#else
+    action->setShortcut(QKeySequence(Qt::Key_F1));
+#endif
+    connect(action, SIGNAL(triggered(bool)), wApp, SLOT(showHelp()));
+
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
     connect(m_client, SIGNAL(connected()), this, SLOT(connected()));

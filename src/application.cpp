@@ -33,6 +33,7 @@
 #include <QSettings>
 #include <QSystemTrayIcon>
 #include <QTimer>
+#include <QUrl>
 
 #include "qnetio/wallet.h"
 #include "QXmppUtils.h"
@@ -322,6 +323,13 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
         trayContext = context;
         trayIcon->showMessage(title, message);
     }
+}
+
+/** Displays the help web page.
+ */
+void Application::showHelp()
+{
+    QDesktopServices::openUrl(QUrl("https://www.wifirst.net/wilink/faq"));
 }
 
 /** Returns true if offline contacts should be displayed.

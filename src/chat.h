@@ -104,6 +104,7 @@ private:
     Idle *m_idle;
 
     QMenu *m_fileMenu;
+    QMenu *m_helpMenu;
     QMenu *m_optionsMenu;
     QAction *m_findAction;
     QAction *m_findAgainAction;

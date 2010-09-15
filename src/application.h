@@ -63,6 +63,7 @@ private slots:
     void resetChats();
     void showAccounts();
     void showChats();
+    void showHelp();
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
