@@ -37,13 +37,12 @@ ChatClient::ChatClient(QObject *parent)
 
 void ChatClient::slotConnected()
 {
-    /* discover services */
-    QXmppDiscoveryIq disco;
-    disco.setTo(configuration().domain());
-    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    discoQueue.clear();
-    discoQueue.append(disco.id());
-    sendPacket(disco);
+    // get info for root item
+    QXmppDiscoveryIq info;
+    info.setQueryType(QXmppDiscoveryIq::InfoQuery);
+    info.setTo(configuration().domain());
+    discoQueue.append(info.id());
+    sendPacket(info);
 }
 
 void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
@@ -53,7 +52,8 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
         return;
 
     if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == configuration().domain())
+        disco.from() == configuration().domain() &&
+        disco.queryNode().isEmpty())
     {
         // root items
         foreach (const QXmppDiscoveryIq::Item &item, disco.items())
@@ -71,34 +71,47 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
     }
     else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery)
     {
-        // check if it's a conference server
         foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
         {
+            // check if it's a conference server
             if (id.category() == "conference" &&
                 id.type() == "text")
             {
                 emit logMessage(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
                 emit mucServerFound(disco.from());
             }
+            // check if it's a publish-subscribe server
             else if (id.category() == "pubsub" &&
                      id.type() == "service")
             {
                 emit logMessage(QXmppLogger::InformationMessage, "Found pubsub server " + disco.from());
                 emit pubSubServerFound(disco.from());
             }
-
+            // check if it's a SOCKS5 proxy server
             else if (id.category() == "proxy" &&
                      id.type() == "bytestreams")
             {
                 emit logMessage(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
                 transferManager().setProxy(disco.from());
             }
+            // check if it's a file sharing server
             else if (id.category() == "store" &&
                      id.type() == "file")
             {
                 emit logMessage(QXmppLogger::InformationMessage, "Found share server " + disco.from());
                 emit shareServerFound(disco.from());
             }
+        }
+
+        // if it's the root server, ask for items
+        if (disco.from() == configuration().domain() && disco.queryNode().isEmpty())
+        {
+            QXmppDiscoveryIq disco;
+            disco.setTo(configuration().domain());
+            disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
+            discoQueue.clear();
+            discoQueue.append(disco.id());
+            sendPacket(disco);
         }
     }
 }
