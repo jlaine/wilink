@@ -238,13 +238,26 @@ void Application::setOpenAtLogin(bool run)
     else
         registry.remove(appName);
 #else
-    QDir autostartDir(QDir::home().filePath(".kde/Autostart"));
+    QDir autostartDir(QDir::home().filePath(".config/autostart"));
     if (autostartDir.exists())
     {
+        QFile desktop(autostartDir.filePath(appName + ".desktop"));
+        const QString fileName = appName + ".desktop";
         if (run)
-            QFile(appPath).link(autostartDir.filePath(appName));
+        {
+            if (desktop.open(QIODevice::WriteOnly))
+            {
+                QTextStream stream(&desktop);
+                stream << "[Desktop Entry]\n";
+                stream << QString("Name=%1\n").arg(appName);
+                stream << QString("Exec=%1\n").arg(appPath);
+                stream << "Type=Application\n";
+            }
+        }
         else
-            autostartDir.remove(appName);
+        {
+            desktop.remove();
+        }
     }
 #endif
 
