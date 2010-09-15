@@ -135,6 +135,10 @@ Acceptez-vous?</translation>
         <source>Frequently asked questions</source>
         <translation>Foire aux questions</translation>
     </message>
+    <message>
+        <source>About %1</source>
+        <translation>A propos de %1</translation>
+    </message>
 </context>
 <context>
     <name>ChatAccountPrompt</name>

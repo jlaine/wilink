@@ -24,6 +24,8 @@
 #include <QString>
 #include <QSystemTrayIcon>
 
+#define HELP_URL "https://www.wifirst.net/wilink/faq"
+
 class Chat;
 class UpdatesDialog;
 class QAuthenticator;
@@ -63,7 +65,6 @@ private slots:
     void resetChats();
     void showAccounts();
     void showChats();
-    void showHelp();
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:

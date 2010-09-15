@@ -325,13 +325,6 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
     }
 }
 
-/** Displays the help web page.
- */
-void Application::showHelp()
-{
-    QDesktopServices::openUrl(QUrl("https://www.wifirst.net/wilink/faq"));
-}
-
 /** Returns true if offline contacts should be displayed.
  */
 bool Application::showOfflineContacts() const

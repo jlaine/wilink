@@ -21,10 +21,12 @@
 #include <QAuthenticator>
 #include <QComboBox>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QLayout>
 #include <QList>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QPluginLoader>
 #include <QShortcut>
 #include <QSplitter>
@@ -156,6 +158,7 @@ Chat::Chat(QWidget *parent)
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
+    /* "Edit" menu */
     QMenu *m_editMenu = menuBar()->addMenu(tr("&Edit"));
 
     m_findAction = m_editMenu->addAction(QIcon(":/search.png"), tr("&Find"));
@@ -166,14 +169,19 @@ Chat::Chat(QWidget *parent)
     m_findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
     m_findAgainAction->setEnabled(false);
 
+    /* "Help" menu */
     m_helpMenu = menuBar()->addMenu(tr("&Help"));
+
     action = m_helpMenu->addAction(tr("Frequently asked questions"));
 #ifdef Q_OS_MAC
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
 #else
     action->setShortcut(QKeySequence(Qt::Key_F1));
 #endif
-    connect(action, SIGNAL(triggered(bool)), wApp, SLOT(showHelp()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showHelp()));
+
+    action = m_helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
+    connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
 
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
@@ -660,6 +668,20 @@ void Chat::setWindowTitle(const QString &title)
     QWidget::setWindowTitle(title);
 }
 
+/** Display an "about" dialog.
+ */
+void Chat::showAbout()
+{
+    QMessageBox::about(this, tr("About %1").arg(qApp->applicationName()), "test");
+}
+
+/** Display the help web page.
+ */
+void Chat::showHelp()
+{
+    QDesktopServices::openUrl(QUrl(HELP_URL));
+}
+
 void Chat::statusChanged(int currentIndex)
 {
     // don't change client presence when the status change
@@ -693,7 +715,7 @@ void Chat::statusChanged(int currentIndex)
 }
 
 /** Unregister a panel from the roster list.
-  */
+ */
 void Chat::unregisterPanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());

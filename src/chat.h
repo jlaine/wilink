@@ -84,6 +84,8 @@ private slots:
     void resizeContacts();
     void rosterClicked(const QModelIndex &index);
     void secondsIdle(int);
+    void showAbout();
+    void showHelp();
     void statusChanged(int currentIndex);
 
     void detachPanel();
