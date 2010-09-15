@@ -127,6 +127,8 @@ void UpdatesDialog::checkFinished(const Release &release)
     } else {
         statusLabel->setText(tr("Your version of %1 is up to date.").arg(qApp->applicationName()));
     }
+    if (isVisible())
+        resize(size().expandedTo(sizeHint()));
 }
 
 void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
@@ -148,6 +150,8 @@ void UpdatesDialog::downloadFinished(const Release &release)
             .arg(tr("%1 will automatically exit to allow you to install the new version.")
                 .arg(release.package)));
     buttonBox->show();
+    if (isVisible())
+        resize(size().expandedTo(sizeHint()));
     show();
     buttonBox->button(QDialogButtonBox::Yes)->setFocus();
 }
