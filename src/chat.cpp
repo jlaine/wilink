@@ -682,6 +682,7 @@ void Chat::showAbout()
     QLabel *icon = new QLabel;
     icon->setPixmap(QPixmap(":/wiLink-64.png"));
     hbox->addWidget(icon);
+    hbox->addSpacing(20);
     hbox->addWidget(new QLabel(QString("<p style=\"font-size: xx-large;\">%1</p>"
         "<p style=\"font-size: large;\">%2</p>")
         .arg(qApp->applicationName(),

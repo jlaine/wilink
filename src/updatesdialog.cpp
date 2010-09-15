@@ -40,7 +40,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setSpacing(20);
     QLabel *statusIcon = new QLabel;
-    statusIcon->setPixmap(QPixmap(":/wiLink.png"));
+    statusIcon->setPixmap(QPixmap(":/wiLink-64.png"));
     hbox->addWidget(statusIcon);
     statusLabel = new QLabel;
     statusLabel->setWordWrap(true);
