@@ -80,7 +80,6 @@ ChatAccountPrompt::ChatAccountPrompt(QWidget *parent)
     QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
         .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
     helpLabel->setOpenExternalLinks(true);
-    helpLabel->setWordWrap(true);
     layout->addWidget(helpLabel, 4, 0, 1, 2);
 
     m_buttonBox = new QDialogButtonBox;
@@ -205,7 +204,6 @@ ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
     QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
         .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
     helpLabel->setOpenExternalLinks(true);
-    helpLabel->setWordWrap(true);
     layout->addWidget(helpLabel, 3, 0, 1, 2);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -216,6 +214,7 @@ ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
     layout->addWidget(buttonBox, 4, 0, 1, 2);
 
     setLayout(layout);
+    setWindowTitle(tr("Password required"));
 }
 
 QString ChatPasswordPrompt::password() const

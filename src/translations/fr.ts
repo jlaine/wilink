@@ -261,6 +261,10 @@ Acceptez-vous?</translation>
         <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
         <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
     </message>
+    <message>
+        <source>Password required</source>
+        <translation>Mot de passe requis</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoom</name>
