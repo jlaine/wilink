@@ -67,7 +67,7 @@ ChatAccountPrompt::ChatAccountPrompt(QWidget *parent)
     m_jidEdit = new QLineEdit;
     layout->addWidget(m_jidEdit, 1, 1);
 
-    layout->addWidget(new QLabel(tr("Password")), 2, 0);
+    layout->addWidget(new QLabel("<b>" + tr("Password") + "</b>"), 2, 0);
     m_passwordEdit = new QLineEdit;
     m_passwordEdit->setEchoMode(QLineEdit::Password);
     layout->addWidget(m_passwordEdit, 2, 1);
@@ -77,10 +77,16 @@ ChatAccountPrompt::ChatAccountPrompt(QWidget *parent)
     m_statusLabel->hide();
     layout->addWidget(m_statusLabel, 3, 0, 1, 2);
 
+    QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
+        .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
+    helpLabel->setOpenExternalLinks(true);
+    helpLabel->setWordWrap(true);
+    layout->addWidget(helpLabel, 4, 0, 1, 2);
+
     m_buttonBox = new QDialogButtonBox;
     m_buttonBox->addButton(QDialogButtonBox::Ok);
     m_buttonBox->addButton(QDialogButtonBox::Cancel);
-    layout->addWidget(m_buttonBox, 4, 0, 1, 2);
+    layout->addWidget(m_buttonBox, 5, 0, 1, 2);
 
     setDomain(QString());
     setLayout(layout);
@@ -116,12 +122,12 @@ void ChatAccountPrompt::setDomain(const QString &domain)
     m_domain = domain;
     if (m_domain.isEmpty())
     {
-        m_jidLabel->setText(tr("Address"));
+        m_jidLabel->setText("<b>" + tr("Address") + "</b>");
         m_promptLabel->setText(tr("Enter the address and password for the account you want to add."));
     }
     else
     {
-        m_jidLabel->setText(tr("Username"));
+        m_jidLabel->setText("<b>" + tr("Username") + "</b>");
         m_promptLabel->setText(tr("Enter the username and password for your '%1' account.").arg(m_domain));
     }
 }
@@ -185,23 +191,29 @@ ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
     promptLabel->setWordWrap(true);
     layout->addWidget(promptLabel, 0, 0, 1, 2);
 
-    layout->addWidget(new QLabel(tr("Address")), 1, 0);
+    layout->addWidget(new QLabel("<b>" + tr("Address") + "</b>"), 1, 0);
     QLineEdit *usernameEdit = new QLineEdit;
     usernameEdit->setText(jid);
     usernameEdit->setEnabled(false);
     layout->addWidget(usernameEdit, 1, 1);
 
-    layout->addWidget(new QLabel(tr("Password")), 2, 0);
+    layout->addWidget(new QLabel("<b>" + tr("Password") + "</b>"), 2, 0);
     m_passwordEdit = new QLineEdit;
     m_passwordEdit->setEchoMode(QLineEdit::Password);
     layout->addWidget(m_passwordEdit, 2, 1);
+
+    QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
+        .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
+    helpLabel->setOpenExternalLinks(true);
+    helpLabel->setWordWrap(true);
+    layout->addWidget(helpLabel, 3, 0, 1, 2);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
     buttonBox->addButton(QDialogButtonBox::Ok);
     buttonBox->addButton(QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    layout->addWidget(buttonBox, 3, 1);
+    layout->addWidget(buttonBox, 4, 0, 1, 2);
 
     setLayout(layout);
 }
