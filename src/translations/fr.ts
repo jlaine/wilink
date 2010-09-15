@@ -137,7 +137,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>About %1</source>
-        <translation>A propos de %1</translation>
+        <translation>À propos de %1</translation>
     </message>
     <message>
         <source>version %1</source>
