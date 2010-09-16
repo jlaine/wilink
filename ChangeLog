@@ -1,3 +1,6 @@
+wiLink 0.9.10 (2010-09-16)
+ * Do not join bookmarked rooms until we receive our nickname.
+
 wiLink 0.9.9 (2010-09-16)
  * Account management:
    - Add an explicit "Cancel" button to credentials prompt.
