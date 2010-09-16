@@ -82,6 +82,7 @@ public:
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
     QString contactExtra(const QString &bareJid) const;
     QString contactName(const QString &bareJid) const;
+    bool isOwnNameReceived() const;
     QString ownName() const;
 
     void addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
@@ -92,6 +93,7 @@ public:
     void clearPendingMessages(const QString &bareJid);
 
 signals:
+    void ownNameReceived();
     void pendingMessages(int messages);
     void rosterReady();
 
@@ -113,6 +115,7 @@ private:
     QXmppClient *client;
     ChatRosterItem *rootItem;
     QString nickName;
+    bool nickNameReceived;
     QMap<QString, int> clientFeatures;
 };
 

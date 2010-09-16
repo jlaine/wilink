@@ -75,7 +75,9 @@ static void paintMessages(QPixmap &icon, int messages)
 }
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
-    : QAbstractItemModel(parent), client(xmppClient)
+    : QAbstractItemModel(parent),
+    client(xmppClient),
+    nickNameReceived(false)
 {
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
@@ -102,6 +104,7 @@ void ChatRosterModel::connected()
 {
     /* request own vCard */
     nickName = client->configuration().user();
+    nickNameReceived = false;
     client->vCardManager().requestVCard(
         client->configuration().jidBare());
 }
@@ -357,6 +360,11 @@ QModelIndex ChatRosterModel::index(int row, int column, const QModelIndex &paren
         return createIndex(row, column, childItem);
     else
         return QModelIndex();
+}
+
+bool ChatRosterModel::isOwnNameReceived() const
+{
+    return nickNameReceived;
 }
 
 QString ChatRosterModel::ownName() const
@@ -615,6 +623,8 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
     {
         if (!vcard.nickName().isEmpty())
             nickName = vcard.nickName();
+        nickNameReceived = true;
+        emit ownNameReceived();
     }
 }
 
