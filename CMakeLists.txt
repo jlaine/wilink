@@ -6,7 +6,7 @@ include(CheckIncludeFiles)
 project(wiLink)
 set(WILINK_VERSION_MAJOR 0)
 set(WILINK_VERSION_MINOR 9)
-set(WILINK_VERSION_PATCH 10)
+set(WILINK_VERSION_PATCH 9a)
 set(WILINK_VERSION ${WILINK_VERSION_MAJOR}.${WILINK_VERSION_MINOR}.${WILINK_VERSION_PATCH})
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_BINARY_DIR}/src/config.h)
 
