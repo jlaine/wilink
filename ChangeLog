@@ -23,7 +23,7 @@ wiLink 0.9.9 (2010-09-16)
    - Fix autoscrolling of debugging console.
    - Add a browser for XMPP service discovery information.
 
-wiLink 0.9.8 (2010-06-27)
+wiLink 0.9.8 (2010-07-27)
  * Add a new layout for the chat history.
  * Make it possible to search in chat history.
  * Make it possible to search in debugging console.
