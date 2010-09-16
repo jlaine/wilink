@@ -45,6 +45,7 @@
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
+#include "QXmppVCardManager.h"
 
 #include "chat.h"
 #include "chat_client.h"
@@ -75,7 +76,11 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     Q_ASSERT(check);
 
     check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
-                    this, SLOT(bookmarksReceived(QXmppBookmarkSet)));
+                    this, SLOT(bookmarksReceived()));
+    Q_ASSERT(check);
+
+    check = connect(chat->rosterModel(), SIGNAL(ownNameReceived()),
+                    this, SLOT(bookmarksReceived()));
     Q_ASSERT(check);
 
     check = connect(&client->mucManager(), SIGNAL(invitationReceived(QString,QString,QString)),
@@ -150,8 +155,14 @@ bool ChatRoomWatcher::unbookmarkRoom(const QString &roomJid)
     return bookmarkManager->setBookmarks(bookmarks);
 }
 
-void ChatRoomWatcher::bookmarksReceived(const QXmppBookmarkSet &bookmarks)
+void ChatRoomWatcher::bookmarksReceived()
 {
+    // if we are missing our bookmarks or nickname, don't do anything yet
+    if (!chat->rosterModel()->isOwnNameReceived() ||
+        !bookmarkManager->areBookmarksReceived())
+        return;
+
+    const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
     foreach (const QXmppBookmarkConference &conference, bookmarks.conferences())
     {
         if (conference.autoJoin())

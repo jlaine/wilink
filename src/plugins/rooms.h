@@ -55,7 +55,7 @@ public:
     ChatRoomWatcher(Chat *chatWindow);
 
 private slots:
-    void bookmarksReceived(const QXmppBookmarkSet &bookmarks);
+    void bookmarksReceived();
     void disconnected();
     void kickUser();
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
