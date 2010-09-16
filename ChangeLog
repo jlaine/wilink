@@ -1,4 +1,4 @@
-wiLink 0.9.9 (UNRELEASED)
+wiLink 0.9.9 (2010-09-16)
  * Account management:
    - Add an explicit "Cancel" button to credentials prompt.
    - Test the credentials entered by the using in the account creation prompt.
