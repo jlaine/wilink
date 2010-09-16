@@ -1,3 +1,6 @@
+wiLink 0.9.9b (UNRELEASED)
+ * When sending messages to a chat room, do not set "from".
+
 wiLink 0.9.9a (2010-09-16)
  * Do not join bookmarked rooms until we receive our nickname.
 
