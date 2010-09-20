@@ -4,7 +4,7 @@ include(../qxmpp/qxmpp.pri)
 
 QT += network xml
 
-TARGET = wiLite
+TARGET = wiLink
 
 DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED
 
