@@ -20,8 +20,7 @@ SOURCES += \
     ../chat_status.cpp \
     ../chat_utils.cpp \
     ../flickcharm.cpp \
-    main.cpp \
-    window.cpp
+    main.cpp
 
 HEADERS += \
     ../application.h \
@@ -35,8 +34,7 @@ HEADERS += \
     ../chat_roster_item.h \
     ../chat_status.h \
     ../chat_utils.h \
-    ../flickcharm.h \
-    window.h
+    ../flickcharm.h
 
 RESOURCES += ../data/wiLink.qrc
 

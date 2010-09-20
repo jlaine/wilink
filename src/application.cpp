@@ -301,8 +301,18 @@ void Application::resetChats()
             chat->setWindowTitle(qApp->applicationName());
         else
             chat->setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
+
+#ifdef WILINK_EMBEDDED
+#ifdef Q_OS_SYMBIAN
+        chat->showMaximized();
+#else
+        chat->resize(200, 320);
+        chat->show();
+#endif
+#else
         chat->move(xpos, ypos);
         chat->show();
+#endif
 
         chat->open(jid);
         chats << chat;
