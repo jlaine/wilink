@@ -27,6 +27,8 @@
 #include <QTranslator>
 //#include <QtPlugin>
 
+#include "window.h"
+
 static int aborted = 0;
 static void signal_handler(int)
 {
@@ -62,8 +64,9 @@ int main(int argc, char *argv[])
 #endif
     signal(SIGTERM, signal_handler);
 
-    /* Show chat windows */
-    //QTimer::singleShot(0, &app, SLOT(resetChats()));
+    /* Show main window */
+    MainWindow window;
+    window.show();
 
     /* Run application */
     return app.exec();
