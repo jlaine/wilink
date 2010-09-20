@@ -257,6 +257,9 @@ void Chat::hidePanel()
     if (m_conversationPanel->count() == 1)
     {
         m_conversationPanel->hide();
+#ifdef WILINK_EMBEDDED
+        m_rosterView->show();
+#endif
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
     m_conversationPanel->removeWidget(panel);
@@ -339,6 +342,9 @@ void Chat::showPanel()
     if (m_conversationPanel->indexOf(panel) < 0)
     {
         m_conversationPanel->addWidget(panel);
+#ifdef WILINK_EMBEDDED
+        m_rosterView->hide();
+#endif
         m_conversationPanel->show();
         if (m_conversationPanel->count() == 1)
             resizeContacts();

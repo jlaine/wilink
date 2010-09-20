@@ -23,6 +23,7 @@
 #include "application.h"
 
 Q_IMPORT_PLUGIN(chats)
+Q_IMPORT_PLUGIN(console)
 
 int main(int argc, char *argv[])
 {
