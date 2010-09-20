@@ -23,6 +23,7 @@
 #include <QScrollBar>
 #include <QShortcut>
 #include <QTextBrowser>
+#include <QTimer>
 
 #include "QXmppClient.h"
 
@@ -231,9 +232,13 @@ bool ConsolePlugin::initialize(Chat *chat)
     console->setObjectName("console");
     chat->addPanel(console);
 
+#ifdef WILINK_EMBEDDED
+    QTimer::singleShot(0, console, SIGNAL(registerPanel()));
+#else
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
     connect(shortcut, SIGNAL(activated()), console, SIGNAL(showPanel()));
+#endif
     return true;
 }
 
