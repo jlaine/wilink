@@ -1,3 +1,4 @@
+include(../idle/idle.pri)
 include(../qxmpp/qxmpp.pri)
 
 QT += network xml
@@ -8,6 +9,7 @@ SOURCES += \
     ../chat_client.cpp \
     ../chat_roster.cpp \
     ../chat_roster_item.cpp \
+    ../chat_status.cpp \
     ../chat_utils.cpp \
     flickcharm.cpp \
     main.cpp \
@@ -17,14 +19,15 @@ HEADERS += \
     ../chat_client.h \
     ../chat_roster.h \
     ../chat_roster_item.h \
+    ../chat_status.h \
     ../chat_utils.h \
     flickcharm.h \
     window.h
 
 RESOURCES += ../data/wiLink.qrc
 
-INCLUDEPATH += .. $$QXMPP_INCLUDE_DIR
-LIBS += $$QXMPP_LIBS
+INCLUDEPATH += .. $$IDLE_INCLUDE_DIR $$QXMPP_INCLUDE_DIR
+LIBS += $$IDLE_LIBS $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
 # Symbian packaging rules
