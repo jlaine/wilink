@@ -9,6 +9,7 @@ SOURCES += \
     ../chat_roster.cpp \
     ../chat_roster_item.cpp \
     ../chat_utils.cpp \
+    flickcharm.cpp \
     main.cpp \
     window.cpp
 
@@ -17,6 +18,7 @@ HEADERS += \
     ../chat_roster.h \
     ../chat_roster_item.h \
     ../chat_utils.h \
+    flickcharm.h \
     window.h
 
 RESOURCES += ../data/wiLink.qrc

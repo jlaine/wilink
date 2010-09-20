@@ -25,6 +25,7 @@
 #include "chat_roster.h"
 #include "chat_utils.h"
 
+#include "flickcharm.h"
 #include "window.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -37,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* left panel */
     m_rosterView = new ChatRosterView(m_rosterModel);
+    FlickCharm *charm = new FlickCharm(this);
+    charm->activateOn(m_rosterView);
     setCentralWidget(m_rosterView);
 }
 
