@@ -19,6 +19,8 @@
 
 #include "QXmppClient.h"
 
+class QXmppDiscoveryManager;
+
 class ChatClient : public QXmppClient
 {
     Q_OBJECT
@@ -33,10 +35,12 @@ signals:
 
 private slots:
     void slotConnected();
-    void slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco);
+    void slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco);
 
 private:
     QStringList discoQueue;
+    QXmppDiscoveryManager *discoManager;
 };
 
 

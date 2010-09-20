@@ -18,6 +18,7 @@
  */
 
 #include "QXmppDiscoveryIq.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppLogger.h"
 #include "QXmppTransferManager.h"
 
@@ -26,29 +27,77 @@
 ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent)
 {
+    discoManager = findExtension<QXmppDiscoveryManager*>();
+
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)),
-        this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
+    connect(discoManager, SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
+        this, SLOT(slotDiscoveryInfoReceived(const QXmppDiscoveryIq&)));
+    connect(discoManager, SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
+        this, SLOT(slotDiscoveryItemsReceived(const QXmppDiscoveryIq&)));
 }
 
 void ChatClient::slotConnected()
 {
     // get info for root item
-    QXmppDiscoveryIq info;
-    info.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    info.setTo(configuration().domain());
-    discoQueue.append(info.id());
-    sendPacket(info);
+    const QString id = discoManager->requestInfo(configuration().domain());
+    if (!id.isEmpty())
+        discoQueue.append(id);
 }
 
-void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
+void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
     if (!discoQueue.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
         return;
 
-    if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
-        disco.from() == configuration().domain() &&
+    foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
+    {
+        // check if it's a conference server
+        if (id.category() == "conference" &&
+            id.type() == "text")
+        {
+            emit logMessage(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
+            emit mucServerFound(disco.from());
+        }
+        // check if it's a publish-subscribe server
+        else if (id.category() == "pubsub" &&
+                 id.type() == "service")
+        {
+            emit logMessage(QXmppLogger::InformationMessage, "Found pubsub server " + disco.from());
+            emit pubSubServerFound(disco.from());
+        }
+        // check if it's a SOCKS5 proxy server
+        else if (id.category() == "proxy" &&
+                 id.type() == "bytestreams")
+        {
+            emit logMessage(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
+            transferManager().setProxy(disco.from());
+        }
+        // check if it's a file sharing server
+        else if (id.category() == "store" &&
+                 id.type() == "file")
+        {
+            emit logMessage(QXmppLogger::InformationMessage, "Found share server " + disco.from());
+            emit shareServerFound(disco.from());
+        }
+    }
+
+    // if it's the root server, ask for items
+    if (disco.from() == configuration().domain() && disco.queryNode().isEmpty())
+    {
+        const QString id = discoManager->requestItems(disco.from(), disco.queryNode());
+        if (!id.isEmpty())
+            discoQueue.append(id);
+    }
+}
+
+void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
+{
+    // we only want results
+    if (!discoQueue.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
+        return;
+
+    if (disco.from() == configuration().domain() &&
         disco.queryNode().isEmpty())
     {
         // root items
@@ -57,57 +106,10 @@ void ChatClient::slotDiscoveryIqReceived(const QXmppDiscoveryIq &disco)
             if (!item.jid().isEmpty() && item.node().isEmpty())
             {
                 // get info for item
-                QXmppDiscoveryIq info;
-                info.setQueryType(QXmppDiscoveryIq::InfoQuery);
-                info.setTo(item.jid());
-                discoQueue.append(info.id());
-                sendPacket(info);
+                const QString id = discoManager->requestInfo(item.jid(), item.node());
+                if (!id.isEmpty())
+                    discoQueue.append(id);
             }
-        }
-    }
-    else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery)
-    {
-        foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
-        {
-            // check if it's a conference server
-            if (id.category() == "conference" &&
-                id.type() == "text")
-            {
-                emit logMessage(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
-                emit mucServerFound(disco.from());
-            }
-            // check if it's a publish-subscribe server
-            else if (id.category() == "pubsub" &&
-                     id.type() == "service")
-            {
-                emit logMessage(QXmppLogger::InformationMessage, "Found pubsub server " + disco.from());
-                emit pubSubServerFound(disco.from());
-            }
-            // check if it's a SOCKS5 proxy server
-            else if (id.category() == "proxy" &&
-                     id.type() == "bytestreams")
-            {
-                emit logMessage(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
-                transferManager().setProxy(disco.from());
-            }
-            // check if it's a file sharing server
-            else if (id.category() == "store" &&
-                     id.type() == "file")
-            {
-                emit logMessage(QXmppLogger::InformationMessage, "Found share server " + disco.from());
-                emit shareServerFound(disco.from());
-            }
-        }
-
-        // if it's the root server, ask for items
-        if (disco.from() == configuration().domain() && disco.queryNode().isEmpty())
-        {
-            QXmppDiscoveryIq disco;
-            disco.setTo(configuration().domain());
-            disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-            discoQueue.clear();
-            discoQueue.append(disco.id());
-            sendPacket(disco);
         }
     }
 }
