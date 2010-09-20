@@ -18,11 +18,13 @@
  */
 
 #include <QCoreApplication>
+#include <QStatusBar>
 
 #include "QXmppUtils.h"
 
 #include "chat_client.h"
 #include "chat_roster.h"
+#include "chat_status.h"
 #include "chat_utils.h"
 
 #include "flickcharm.h"
@@ -42,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent)
     FlickCharm *charm = new FlickCharm(this);
     charm->activateOn(m_rosterView);
     setCentralWidget(m_rosterView);
+
+    /* status bar*/
+    statusBar()->addPermanentWidget(new ChatStatus(m_client));
 }
 
 bool MainWindow::open(const QString &jid, const QString &password)
