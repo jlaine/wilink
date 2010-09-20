@@ -35,6 +35,10 @@
 #include <QTextDocument>
 #include <QUrl>
 
+#ifdef WILINK_EMBEDDED
+#include "flickcharm.h"
+#endif
+
 #define DATE_WIDTH 80
 #define FROM_HEIGHT 15
 #define HEADER_HEIGHT 10
@@ -445,9 +449,13 @@ ChatHistory::ChatHistory(QWidget *parent)
     setScene(scene);
     setDragMode(QGraphicsView::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
+#ifdef WILINK_EMBEDDED
+    FlickCharm *charm = new FlickCharm(this);
+    charm->activateOn(this);
+#else
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    //setRenderHints(QPainter::Antialiasing);
+#endif
 
     obj = new QGraphicsWidget;
     layout = new QGraphicsLinearLayout(Qt::Vertical);

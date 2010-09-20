@@ -46,7 +46,11 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
 {
     setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
+#ifdef WILINK_EMBEDDED
+    setWindowIcon(rosterModel->contactAvatar(jid).scaled(32, 32));
+#else
     setWindowIcon(rosterModel->contactAvatar(jid));
+#endif
     setWindowExtra(rosterModel->contactExtra(jid));
 
     bool check;
