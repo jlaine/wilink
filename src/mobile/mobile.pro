@@ -7,6 +7,7 @@ TARGET = wiLite
 
 SOURCES += \
     ../chat_client.cpp \
+    ../chat_history.cpp \
     ../chat_roster.cpp \
     ../chat_roster_item.cpp \
     ../chat_status.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     ../chat_client.h \
+    ../chat_history.h \
     ../chat_roster.h \
     ../chat_roster_item.h \
     ../chat_status.h \
