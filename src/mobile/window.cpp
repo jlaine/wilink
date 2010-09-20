@@ -34,8 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_client = new ChatClient(this);
     m_rosterModel =  new ChatRosterModel(m_client, this);
-    connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
-    connect(m_rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
+
+    /* left panel */
+    m_rosterView = new ChatRosterView(m_rosterModel);
+    setCentralWidget(m_rosterView);
 }
 
 bool MainWindow::open(const QString &jid, const QString &password)

@@ -19,6 +19,8 @@ HEADERS += \
     ../chat_utils.h \
     window.h
 
+RESOURCES += ../data/wiLink.qrc
+
 INCLUDEPATH += .. $$QXMPP_INCLUDE_DIR
 LIBS += $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE

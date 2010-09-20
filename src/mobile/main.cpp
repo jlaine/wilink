@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
 
     /* Show main window */
     MainWindow window;
+    window.open("qxmpp.test1@gmail.com", "qxmpp123");
     window.show();
 
     /* Run application */
