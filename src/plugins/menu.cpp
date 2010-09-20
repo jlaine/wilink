@@ -29,10 +29,11 @@
 #include <QSystemTrayIcon>
 #include <QTimer>
 
+#include "QXmppClient.h"
+
 #include "qnetio/wallet.h"
 
 #include "chat.h"
-#include "chat_client.h"
 #include "chat_plugin.h"
 #include "menu.h"
 

@@ -31,12 +31,12 @@
 #include <QTimer>
 
 #include "QXmppCallManager.h"
+#include "QXmppClient.h"
 #include "QXmppUtils.h"
 
 #include "calls.h"
 
 #include "chat.h"
-#include "chat_client.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 

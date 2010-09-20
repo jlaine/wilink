@@ -39,8 +39,9 @@
 #include <QTimer>
 #include <QUrl>
 
+#include "QXmppClient.h"
+
 #include "chat.h"
-#include "chat_client.h"
 #include "chat_plugin.h"
 #include "photos.h"
 

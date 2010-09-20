@@ -49,7 +49,6 @@
 #include "QXmppVCardManager.h"
 
 #include "chat.h"
-#include "chat_client.h"
 #include "chat_edit.h"
 #include "chat_form.h"
 #include "chat_history.h"

@@ -24,10 +24,10 @@
 #include <QPushButton>
 #include <QShortcut>
 
+#include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 
 #include "chat.h"
-#include "chat_client.h"
 #include "chat_plugin.h"
 #include "discovery.h"
 

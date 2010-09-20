@@ -25,12 +25,12 @@
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
+#include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
 #include "chat.h"
-#include "chat_client.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
