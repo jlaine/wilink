@@ -791,7 +791,6 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
 void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
 {
     if (disco.type() == QXmppIq::Result &&
-        disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
         disco.from() == chatRoomServer)
     {
         // chat rooms list
