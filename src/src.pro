@@ -1,6 +1,8 @@
 TEMPLATE = subdirs
 
-SUBDIRS = qxmpp \
-          mobile
+SUBDIRS = \
+    idle \
+    qxmpp \
+    mobile
 
 CONFIG += ordered
