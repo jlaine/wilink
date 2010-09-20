@@ -1,4 +1,5 @@
 include(../idle/idle.pri)
+include(../qnetio/qnetio.pri)
 include(../qxmpp/qxmpp.pri)
 
 QT += network xml
@@ -28,8 +29,8 @@ HEADERS += \
 
 RESOURCES += ../data/wiLink.qrc
 
-INCLUDEPATH += .. $$IDLE_INCLUDE_DIR $$QXMPP_INCLUDE_DIR
-LIBS += $$IDLE_LIBS $$QXMPP_LIBS
+INCLUDEPATH += .. $$IDLE_INCLUDE_DIR $QNETIO_INCLUDE_DIR $$QXMPP_INCLUDE_DIR
+LIBS += $$IDLE_LIBS $$QNETIO_LIBS $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
 # Symbian packaging rules

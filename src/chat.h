@@ -25,7 +25,6 @@
 
 #include "QXmppClient.h"
 
-class ChatClient;
 class ChatPanel;
 class ChatPlugin;
 class ChatRosterModel;
@@ -101,7 +100,7 @@ private:
     QAction *m_findAction;
     QAction *m_findAgainAction;
 
-    ChatClient *m_client;
+    QXmppClient *m_client;
     QList<ChatPanel*> m_chatPanels;
     ChatRosterModel *m_rosterModel;
     ChatRosterView *m_rosterView;
