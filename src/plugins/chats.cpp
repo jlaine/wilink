@@ -37,6 +37,12 @@
 
 #include "chats.h"
 
+#ifdef WILINK_EMBEDDED
+#define HISTORY_DAYS 7
+#else
+#define HISTORY_DAYS 14
+#endif
+
 ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
     chatRemoteJid(jid), 
@@ -158,11 +164,10 @@ void ChatDialog::join()
         client->sendPacket(message);
     }
 
-    // list archives for the past week.
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately
     client->archiveManager().listCollections(chatRemoteJid,
-        QDateTime::currentDateTime().addDays(-14));
+        QDateTime::currentDateTime().addDays(-HISTORY_DAYS));
 
     joined = true;
 }
