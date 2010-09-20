@@ -47,10 +47,12 @@
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
     settings(0),
-    updates(0),
+#ifdef USE_SYSTRAY
     trayContext(0),
     trayIcon(0),
-    trayMenu(0)
+    trayMenu(0),
+#endif
+    updates(0)
 {
     /* set application properties */
     setApplicationName("wiLink");
@@ -77,6 +79,7 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+#ifdef USE_SYSTRAY
     // destroy tray icon
     if (trayIcon)
     {
@@ -88,6 +91,7 @@ Application::~Application()
         delete trayMenu;
 #endif
     }
+#endif
 
     // destroy chat windows
     foreach (Chat *chat, chats)
@@ -109,7 +113,7 @@ void Application::platformInit()
  */
 void Application::createSystemTrayIcon()
 {
-#ifndef Q_OS_MAC
+#ifdef USE_SYSTRAY
     trayIcon = new QSystemTrayIcon;
     trayIcon->setIcon(QIcon(":/wiLink.png"));
     trayMenu = new QMenu;
@@ -336,16 +340,20 @@ void Application::showChats()
 
 void Application::messageClicked()
 {
+#ifdef USE_SYSTRAY
     emit messageClicked(trayContext);
+#endif
 }
 
 void Application::showMessage(QWidget *context, const QString &title, const QString &message)
 {
+#ifdef USE_SYSTRAY
     if (trayIcon)
     {
         trayContext = context;
         trayIcon->showMessage(title, message);
     }
+#endif
 }
 
 /** Returns true if offline contacts should be displayed.
@@ -368,8 +376,10 @@ void Application::setShowOfflineContacts(bool show)
     }
 }
 
+#ifdef USE_SYSTRAY
 void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason != QSystemTrayIcon::Context)
         showChats();
 }
+#endif

@@ -22,7 +22,11 @@
 
 #include <QApplication>
 #include <QString>
+
+#if !defined(Q_OS_MAC) && !defined(Q_OS_SYMBIAN)
+#define USE_SYSTRAY
 #include <QSystemTrayIcon>
+#endif
 
 #define HELP_URL "https://www.wifirst.net/wilink/faq"
 
@@ -65,7 +69,9 @@ private slots:
     void resetChats();
     void showAccounts();
     void showChats();
+#ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
+#endif
 
 private:
     static QString executablePath();
@@ -73,10 +79,12 @@ private:
 
     QSettings *settings;
     QList<Chat*> chats;
-    UpdatesDialog *updates;
+#ifdef USE_SYSTRAY
     QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
+#endif
+    UpdatesDialog *updates;
 };
 
 #endif
