@@ -96,7 +96,7 @@ protected:
     virtual bool sendMessage(const QString &text);
 
 private slots:
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void join();
     void leave();
     void disconnected();
@@ -150,7 +150,7 @@ public:
     QString textValue() const;
 
 protected slots:
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void discoveryItemsReceived(const QXmppDiscoveryIq &disco);
     void itemClicked(QListWidgetItem * item);
     void validate();
 

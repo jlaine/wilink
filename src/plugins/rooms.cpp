@@ -41,6 +41,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
@@ -466,16 +467,38 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     vbox->insertWidget(index++, helpLabel);
     vbox->insertSpacing(index++, 10);
 
-    connect(client, SIGNAL(connected()), this, SLOT(join()));
-    connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
-    connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(client, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)), this, SLOT(discoveryIqReceived(QXmppDiscoveryIq)));
-    connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
-    connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(chatHistory, SIGNAL(messageClicked(ChatHistoryMessage)), this, SLOT(messageClicked(ChatHistoryMessage)));
-    connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
-    connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
-    connect(this, SIGNAL(showPanel()), this, SLOT(join()));
+    bool check;
+    check = connect(client, SIGNAL(connected()), this, SLOT(join()));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    Q_ASSERT(check);
+
+    check = connect(client->findExtension<QXmppDiscoveryManager*>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                    this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    Q_ASSERT(check);
+
+    check = connect(chatHistory, SIGNAL(messageClicked(ChatHistoryMessage)), this, SLOT(messageClicked(ChatHistoryMessage)));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(showPanel()), this, SLOT(join()));
+    Q_ASSERT(check);
+
 
     /* keyboard shortcut */
     connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
@@ -493,11 +516,9 @@ void ChatRoom::disconnected()
         rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
 }
 
-void ChatRoom::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.from() != chatRemoteJid ||
-        disco.type() != QXmppIq::Result ||
-        disco.queryType() != QXmppDiscoveryIq::InfoQuery)
+    if (disco.from() != chatRemoteJid || disco.type() != QXmppIq::Result)
         return;
 
     // notify user of received messages if the room is not publicly listed
@@ -755,7 +776,10 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     setLayout(layout);
 
     setWindowTitle(tr("Join or create a chat room"));
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+    bool check;
+    check = connect(client->findExtension<QXmppDiscoveryManager*>(), SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
+                    this, SLOT(discoveryItemsReceived(const QXmppDiscoveryIq&)));
+    Q_ASSERT(check);
 
     // get rooms
     QXmppDiscoveryIq disco;
@@ -764,7 +788,7 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     client->sendPacket(disco);
 }
 
-void ChatRoomPrompt::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
 {
     if (disco.type() == QXmppIq::Result &&
         disco.queryType() == QXmppDiscoveryIq::ItemsQuery &&
