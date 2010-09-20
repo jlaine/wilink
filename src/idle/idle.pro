@@ -8,12 +8,12 @@ SOURCES = idle.cpp
 LIBS += $$IDLE_INTERNAL_LIBS
 
 symbian {
-
+    SOURCES += idle_symbian.cpp
 } else:mac {
     SOURCES += idle_mac.cpp
 } else:unix {
     SOURCES += idle_x11.cpp
-    # add_definitions(-DHAVE_XSS)
+    DEFINES += HAVE_XSS
 } else:win32 {
     SOURCES += idle_win.cpp
 }
