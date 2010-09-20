@@ -31,6 +31,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
@@ -82,7 +83,8 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(client, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)), this, SLOT(discoveryIqReceived(const QXmppDiscoveryIq&)));
+    connect(client->findExtension<QXmppDiscoveryManager*>(), SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
+            this, SLOT(discoveryInfoReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(&client->rosterManager(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
     connect(&client->rosterManager(), SIGNAL(rosterChanged(const QString&)), this, SLOT(rosterChanged(const QString&)));
@@ -297,7 +299,7 @@ void ChatRosterModel::disconnected()
     }
 }
 
-void ChatRosterModel::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     if (!clientFeatures.contains(disco.from()) ||
         disco.type() != QXmppIq::Result ||

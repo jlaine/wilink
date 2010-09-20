@@ -103,7 +103,7 @@ public slots:
     void disconnected();
 
 protected slots:
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);
     void rosterChanged(const QString &jid);
