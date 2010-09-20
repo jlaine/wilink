@@ -12,14 +12,18 @@ SOURCES += \
     ../application.cpp \
     ../chat.cpp \
     ../chat_accounts.cpp \
+    ../chat_conversation.cpp \
     ../chat_client.cpp \
+    ../chat_edit.cpp \
     ../chat_history.cpp \
     ../chat_panel.cpp \
     ../chat_roster.cpp \
     ../chat_roster_item.cpp \
+    ../chat_search.cpp \
     ../chat_status.cpp \
     ../chat_utils.cpp \
     ../flickcharm.cpp \
+    ../plugins/chats.cpp \
     main.cpp
 
 HEADERS += \
@@ -27,14 +31,18 @@ HEADERS += \
     ../chat.h \
     ../chat_accounts.h \
     ../chat_client.h \
+    ../chat_conversation.h \
+    ../chat_edit.h \
     ../chat_history.h \
     ../chat_panel.h \
     ../chat_plugin.h \
     ../chat_roster.h \
     ../chat_roster_item.h \
+    ../chat_search.h \
     ../chat_status.h \
     ../chat_utils.h \
-    ../flickcharm.h
+    ../flickcharm.h \
+    ../plugins/chats.h
 
 RESOURCES += ../data/wiLink.qrc
 

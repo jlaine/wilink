@@ -18,26 +18,17 @@
  */
 
 #include <QTimer>
+#include <QtPlugin>
 
 #include "application.h"
+
+Q_IMPORT_PLUGIN(chats)
 
 int main(int argc, char *argv[])
 {
     /* Create application */
     Application::platformInit();
     Application app(argc, argv);
-
-#if 0
-    /* Show main window */
-    MainWindow window;
-    window.open("qxmpp.test1@gmail.com", "qxmpp123");
-#ifdef Q_OS_SYMBIAN
-    window.showMaximized();
-#else
-    window.resize(200, 320);
-    window.show();
-#endif
-#endif
 
     /* Show chat windows */
     QTimer::singleShot(0, &app, SLOT(resetChats()));
