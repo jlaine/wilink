@@ -38,5 +38,7 @@ symbian {
     mobile_deployment.pkg_prerules += vendorinfo
     DEPLOYMENT += mobile_deployment
 
+    ICON = ../data/wiLink.svg
+
     TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData"
 }
