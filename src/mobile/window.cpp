@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* left panel */
     m_rosterView = new ChatRosterView(m_rosterModel);
+    m_rosterView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     FlickCharm *charm = new FlickCharm(this);
     charm->activateOn(m_rosterView);
     setCentralWidget(m_rosterView);
