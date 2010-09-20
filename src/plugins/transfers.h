@@ -29,7 +29,6 @@
 
 class QModelIndex;
 class QPushButton;
-class ChatClient;
 class ChatRosterModel;
 
 class ChatTransferPrompt : public QMessageBox
@@ -82,7 +81,7 @@ class ChatTransfers : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatTransfers(ChatClient *xmppClient, ChatRosterModel *rosterModel, QWidget *parent = 0);
+    ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *rosterModel, QWidget *parent = 0);
     ~ChatTransfers();
 
     int activeJobs(QXmppTransferJob::Direction direction) const;
@@ -107,7 +106,7 @@ private slots:
 private:
     QPushButton *removeButton;
     ChatTransfersView *tableWidget;
-    ChatClient *client;
+    QXmppClient *client;
     ChatRosterModel *rosterModel;
 };
 

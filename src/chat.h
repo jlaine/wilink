@@ -30,7 +30,6 @@ class ChatPanel;
 class ChatPlugin;
 class ChatRosterModel;
 class ChatRosterView;
-class QComboBox;
 class QLabel;
 class QModelIndex;
 class QPushButton;
@@ -47,7 +46,7 @@ public:
     Chat(QWidget *parent = 0);
     ~Chat();
 
-    ChatClient *client();
+    QXmppClient *client();
     ChatRosterModel *rosterModel();
     QMenu *fileMenu();
     QMenu *optionsMenu();

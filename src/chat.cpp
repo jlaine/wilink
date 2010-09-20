@@ -437,7 +437,7 @@ void Chat::promptCredentials()
 
 /** Return this window's chat client.
  */
-ChatClient *Chat::client()
+QXmppClient *Chat::client()
 {
     return m_client;
 }

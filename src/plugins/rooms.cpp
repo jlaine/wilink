@@ -67,7 +67,7 @@ enum MembersColumns {
 ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    ChatClient *client = chat->client();
+    QXmppClient *client = chat->client();
     bookmarkManager = new QXmppBookmarkManager(client);
     client->addExtension(bookmarkManager);
 

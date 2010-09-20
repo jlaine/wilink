@@ -243,7 +243,7 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
     emit updateButtons();
 }
 
-ChatTransfers::ChatTransfers(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, QWidget *parent)
+ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, QWidget *parent)
     : ChatPanel(parent), client(xmppClient), rosterModel(chatRosterModel)
 {
     // disable in-band bytestreams

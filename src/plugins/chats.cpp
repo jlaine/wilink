@@ -231,8 +231,7 @@ bool ChatDialog::sendMessage(const QString &text)
 ChatsWatcher::ChatsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    ChatClient *client = chat->client();
-    connect(client, SIGNAL(messageReceived(QXmppMessage)),
+    connect(chat->client(), SIGNAL(messageReceived(QXmppMessage)),
             this, SLOT(messageReceived(QXmppMessage)));
 
     // add roster hooks

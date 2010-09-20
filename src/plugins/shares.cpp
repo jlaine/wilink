@@ -193,7 +193,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     setLayout(layout);
 
     /* connect signals */
-    ChatClient *baseClient = chatWindow->client();
+    QXmppClient *baseClient = chatWindow->client();
     registerTimer = new QTimer(this);
     registerTimer->setInterval(REGISTER_INTERVAL * 1000);
     check = connect(registerTimer, SIGNAL(timeout()),
@@ -260,7 +260,7 @@ void ChatShares::directoryChanged(const QString &path)
  */
 void ChatShares::disconnected()
 {
-    ChatClient *baseClient = chatWindow->client();
+    QXmppClient *baseClient = chatWindow->client();
     if (client && client != baseClient && QObject::sender() == baseClient)
     {
         shareServer = "";
@@ -630,12 +630,12 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         // reconnect to another server
         registerTimer->stop();
 
-        ChatClient *baseClient = chatWindow->client();
+        QXmppClient *baseClient = chatWindow->client();
         QXmppConfiguration config = baseClient->configuration();
         config.setDomain(domain);
         config.setHost(server);
 
-        ChatClient *newClient = new ChatClient(this);
+        QXmppClient *newClient = new ChatClient(this);
         newClient->setLogger(baseClient->logger());
 
         /* replace client */
@@ -709,7 +709,7 @@ void ChatShares::registerWithServer()
     client->sendPacket(presence);
 }
 
-void ChatShares::setClient(ChatClient *newClient)
+void ChatShares::setClient(QXmppClient *newClient)
 {
     client = newClient;
     bool check = connect(client, SIGNAL(disconnected()),

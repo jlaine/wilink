@@ -43,7 +43,7 @@
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    ChatClient *client = chat->client();
+    QXmppClient *client = chat->client();
     connect(client, SIGNAL(connected()),
             this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()),
@@ -135,7 +135,7 @@ void ContactsWatcher::presenceHandled(QAbstractButton *button)
         return;
     
     QString jid = box->objectName();
-    ChatClient *client = chat->client();
+    QXmppClient *client = chat->client();
             
     QXmppPresence packet;
     packet.setTo(jid);
@@ -164,7 +164,7 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
 
     if (presence.type() == QXmppPresence::Subscribe)
     {
-        ChatClient *client = chat->client();
+        QXmppClient *client = chat->client();
         const QString jid = presence.from();
         QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(jid);
         QXmppRosterIq::Item::SubscriptionType type = entry.subscriptionType();

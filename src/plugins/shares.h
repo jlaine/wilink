@@ -27,7 +27,6 @@
 #include "chat_panel.h"
 
 class Chat;
-class ChatClient;
 class ChatRosterModel;
 class QXmppShareDatabase;
 class ChatSharesModel;
@@ -51,7 +50,7 @@ class ChatShares : public ChatPanel
 
 public:
     ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
-    void setClient(ChatClient *client);
+    void setClient(QXmppClient *client);
     void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);
 
@@ -93,7 +92,7 @@ private:
     QString shareServer;
 
     Chat *chatWindow;
-    ChatClient *client;
+    QXmppClient *client;
     QXmppShareDatabase *db;
     ChatRosterModel *rosterModel;
     ChatSharesModel *queueModel;

@@ -100,7 +100,7 @@ private slots:
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:
-    ChatClient *m_client;
+    QXmppClient *m_client;
     ChatRosterModel *m_roster;
     Chat *m_window;
 };
