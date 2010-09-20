@@ -98,8 +98,7 @@ Chat::Chat(QWidget *parent)
     // avoid border around widgets on OS X
     statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
 
-    m_statusCombo = new ChatStatus(m_client);
-    statusBar()->addPermanentWidget(m_statusCombo);
+    statusBar()->addPermanentWidget(new ChatStatus(m_client));
 
     /* get handle to application */
     Application *wApp = qobject_cast<Application*>(qApp);

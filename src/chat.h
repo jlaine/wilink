@@ -108,7 +108,6 @@ private:
     ChatRosterView *m_rosterView;
     QString m_windowTitle;
 
-    QComboBox *m_statusCombo;
     QStackedWidget *m_conversationPanel;
 
     QList<ChatPlugin*> m_plugins;
