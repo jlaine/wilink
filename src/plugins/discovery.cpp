@@ -24,6 +24,8 @@
 #include <QPushButton>
 #include <QShortcut>
 
+#include "QXmppDiscoveryManager.h"
+
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_plugin.h"
@@ -56,6 +58,8 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     m_client(client)
 {
     bool check;
+
+    m_manager = client->findExtension<QXmppDiscoveryManager*>();
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -104,8 +108,12 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
         this, SIGNAL(unregisterPanel()));
     Q_ASSERT(check);
 
-    check = connect(m_client, SIGNAL(discoveryIqReceived(QXmppDiscoveryIq)),
-        this, SLOT(discoveryIqReceived(QXmppDiscoveryIq)));
+    check = connect(m_manager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+        this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
+
+    check = connect(m_manager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+        this, SLOT(discoveryItemsReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
     check = connect(m_backButton, SIGNAL(clicked()),
@@ -124,61 +132,55 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     Q_ASSERT(check);
 }
 
-void Discovery::discoveryIqReceived(const QXmppDiscoveryIq &disco)
+void Discovery::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
-    if (!m_requests.removeAll(disco.id()))
+    if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
         return;
-   
-    if (disco.type() == QXmppIq::Result)
+
+    for (int i = 0; i < m_listWidget->count(); ++i)
     {
-        if (disco.queryType() == QXmppDiscoveryIq::ItemsQuery)
+        QListWidgetItem *wdgItem = m_listWidget->item(i);
+        if (wdgItem->data(JidRole).toString() != disco.from() ||
+            wdgItem->data(NodeRole).toString() != disco.queryNode())
+            continue;
+
+        if (!disco.identities().isEmpty())
         {
-            // check the results are for the current item
-            if (m_trail.isEmpty() ||
-                m_trail.last().jid() != disco.from() ||
-                m_trail.last().node() != disco.queryNode())
-                return;
-
-            foreach (const QXmppDiscoveryIq::Item &item, disco.items())
-            {
-                // insert item
-                QListWidgetItem *wdgItem = new QListWidgetItem;
-                wdgItem->setIcon(QIcon(":/chat.png"));
-                wdgItem->setData(JidRole, item.jid());
-                wdgItem->setData(NodeRole, item.node());
-                wdgItem->setData(NameRole, item.name());
-                QLabel *label = new QLabel(itemText(wdgItem));
-                m_listWidget->addItem(wdgItem);
-                m_listWidget->setItemWidget(wdgItem, label);
-
-                // request information
-                QXmppDiscoveryIq iq;
-                iq.setTo(item.jid());
-                iq.setType(QXmppIq::Get);
-                iq.setQueryNode(item.node());
-                iq.setQueryType(QXmppDiscoveryIq::InfoQuery);
-                m_requests.append(iq.id());
-                m_client->sendPacket(iq);
-            }
+            wdgItem->setData(NameRole, disco.identities().first().name());
+            QLabel *label = qobject_cast<QLabel*>(m_listWidget->itemWidget(wdgItem));
+            if (label)
+                label->setText(itemText(wdgItem));
         }
-        else if (disco.queryType() == QXmppDiscoveryIq::InfoQuery)
-        {
-            for (int i = 0; i < m_listWidget->count(); ++i)
-            {
-                QListWidgetItem *wdgItem = m_listWidget->item(i);
-                if (wdgItem->data(JidRole).toString() != disco.from() ||
-                    wdgItem->data(NodeRole).toString() != disco.queryNode())
-                    continue;
+    }
+}
 
-                if (!disco.identities().isEmpty())
-                {
-                    wdgItem->setData(NameRole, disco.identities().first().name());
-                    QLabel *label = qobject_cast<QLabel*>(m_listWidget->itemWidget(wdgItem));
-                    if (label)
-                        label->setText(itemText(wdgItem));
-                }
-            }
-        }
+void Discovery::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
+{
+    if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
+        return;
+
+    // check the results are for the current item
+    if (m_trail.isEmpty() ||
+        m_trail.last().jid() != disco.from() ||
+        m_trail.last().node() != disco.queryNode())
+        return;
+
+    foreach (const QXmppDiscoveryIq::Item &item, disco.items())
+    {
+        // insert item
+        QListWidgetItem *wdgItem = new QListWidgetItem;
+        wdgItem->setIcon(QIcon(":/chat.png"));
+        wdgItem->setData(JidRole, item.jid());
+        wdgItem->setData(NodeRole, item.node());
+        wdgItem->setData(NameRole, item.name());
+        QLabel *label = new QLabel(itemText(wdgItem));
+        m_listWidget->addItem(wdgItem);
+        m_listWidget->setItemWidget(wdgItem, label);
+
+        // request information
+        const QString id = m_manager->requestInfo(item.jid(), item.node());
+        if (!id.isEmpty())
+            m_requests.append(id);
     }
 }
 
@@ -202,13 +204,9 @@ void Discovery::explore(const QXmppDiscoveryIq::Item &item)
         m_backButton->setEnabled(true);
 
     // request items
-    QXmppDiscoveryIq iq;
-    iq.setTo(item.jid());
-    iq.setType(QXmppIq::Get);
-    iq.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    iq.setQueryNode(item.node());
-    m_requests.append(iq.id());
-    m_client->sendPacket(iq);
+    const QString id = m_manager->requestItems(item.jid(), item.node());
+    if (!id.isEmpty())
+        m_requests.append(id);
 }
 
 void Discovery::goBack()

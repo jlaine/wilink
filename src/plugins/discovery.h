@@ -25,6 +25,7 @@ class QListWidget;
 class QListWidgetItem;
 class QPushButton;
 class QXmppClient;
+class QXmppDiscoveryManager;
 
 #include "QXmppDiscoveryIq.h"
 
@@ -38,7 +39,8 @@ public:
     Discovery(QXmppClient *client, QWidget *parent);
 
 private slots:
-    void discoveryIqReceived(const QXmppDiscoveryIq &disco);
+    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
+    void discoveryItemsReceived(const QXmppDiscoveryIq &disco);
     void goBack();
     void goForward(QListWidgetItem *item);
     void goTo();
@@ -53,6 +55,7 @@ private:
     QListWidget *m_listWidget;
     QPushButton *m_backButton;
     QList<QXmppDiscoveryIq::Item> m_trail;
+    QXmppDiscoveryManager *m_manager;
     QStringList m_requests;
 };
 
