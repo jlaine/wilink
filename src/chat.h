@@ -30,7 +30,6 @@ class ChatPanel;
 class ChatPlugin;
 class ChatRosterModel;
 class ChatRosterView;
-class Idle;
 class QComboBox;
 class QLabel;
 class QModelIndex;
@@ -74,8 +73,6 @@ signals:
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private slots:
-    void connected();
-    void disconnected();
     void error(QXmppClient::Error error);
     void messageClicked(QWidget *context);
     void panelChanged(int index);
@@ -83,10 +80,8 @@ private slots:
     void promptCredentials();
     void resizeContacts();
     void rosterClicked(const QModelIndex &index);
-    void secondsIdle(int);
     void showAbout();
     void showHelp();
-    void statusChanged(int currentIndex);
 
     void detachPanel();
     void destroyPanel(QObject *obj);
@@ -101,10 +96,6 @@ private:
     void changeEvent(QEvent *event);
 
 private:
-    bool m_autoAway;
-    bool m_freezeStatus;
-    Idle *m_idle;
-
     QMenu *m_fileMenu;
     QMenu *m_helpMenu;
     QMenu *m_optionsMenu;

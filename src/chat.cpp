@@ -37,8 +37,6 @@
 #include <QStringList>
 #include <QTimer>
 
-#include "idle/idle.h"
-
 #include "QXmppConfiguration.h"
 #include "QXmppConstants.h"
 #include "QXmppLogger.h"
@@ -55,23 +53,13 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
+#include "chat_status.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 #include "chat_utils.h"
 
-#define AWAY_TIME 300 // set away after 50s
-
-enum StatusIndexes {
-    AvailableIndex = 0,
-    BusyIndex = 1,
-    AwayIndex = 2,
-    OfflineIndex = 3,
-};
-
 Chat::Chat(QWidget *parent)
-    : QMainWindow(parent),
-    m_autoAway(false),
-    m_freezeStatus(false)
+    : QMainWindow(parent)
 {
     setWindowIcon(QIcon(":/chat.png"));
 
@@ -79,11 +67,6 @@ Chat::Chat(QWidget *parent)
     m_rosterModel =  new ChatRosterModel(m_client, this);
     connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
     connect(m_rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
-
-    /* set up idle monitor */
-    m_idle = new Idle;
-    connect(m_idle, SIGNAL(secondsIdle(int)), this, SLOT(secondsIdle(int)));
-    m_idle->start();
 
     /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
@@ -115,13 +98,7 @@ Chat::Chat(QWidget *parent)
     // avoid border around widgets on OS X
     statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
 
-    m_statusCombo = new QComboBox;
-    m_statusCombo->addItem(QIcon(":/contact-available.png"), tr("Available"));
-    m_statusCombo->addItem(QIcon(":/contact-busy.png"), tr("Busy"));
-    m_statusCombo->addItem(QIcon(":/contact-away.png"), tr("Away"));
-    m_statusCombo->addItem(QIcon(":/contact-offline.png"), tr("Offline"));
-    m_statusCombo->setCurrentIndex(OfflineIndex);
-    connect(m_statusCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusChanged(int)));
+    m_statusCombo = new ChatStatus(m_client);
     statusBar()->addPermanentWidget(m_statusCombo);
 
     /* get handle to application */
@@ -173,8 +150,6 @@ Chat::Chat(QWidget *parent)
 
     /* set up client */
     connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
-    connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
-    connect(m_client, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_N), this);
@@ -187,7 +162,6 @@ Chat::Chat(QWidget *parent)
 
 Chat::~Chat()
 {
-    delete m_idle;
     foreach (ChatPanel *panel, m_chatPanels)
         if (!panel->parent())
             delete panel;
@@ -416,28 +390,6 @@ void Chat::changeEvent(QEvent *event)
     }
 }
 
-/** Handle successful connection to the chat server.
- */
-void Chat::connected()
-{
-    QXmppPresence::Status::Type statusType = m_client->clientPresence().status().type();
-    if (statusType == QXmppPresence::Status::Away)
-        m_statusCombo->setCurrentIndex(AwayIndex);
-    else if (statusType == QXmppPresence::Status::DND)
-        m_statusCombo->setCurrentIndex(BusyIndex);
-    else
-        m_statusCombo->setCurrentIndex(AvailableIndex);
-}
-
-/** Handle disconnection from the chat server.
- */
-void Chat::disconnected()
-{
-    m_freezeStatus = true;
-    m_statusCombo->setCurrentIndex(OfflineIndex);
-    m_freezeStatus = false;
-}
-
 /** Handle an error talking to the chat server.
  *
  * @param error
@@ -647,24 +599,6 @@ void Chat::rosterClicked(const QModelIndex &index)
         QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
 }
 
-/** Handle user inactivity.
- *
- * @param secs
- */
-void Chat::secondsIdle(int secs)
-{
-    if (secs >= AWAY_TIME)
-    {
-        if (m_statusCombo->currentIndex() == AvailableIndex)
-        {
-            m_statusCombo->setCurrentIndex(AwayIndex);
-            m_autoAway = true;
-        }
-    } else if (m_autoAway) {
-        m_statusCombo->setCurrentIndex(AvailableIndex);
-    }
-}
-
 void Chat::setWindowTitle(const QString &title)
 {
     m_windowTitle = title;
@@ -701,38 +635,6 @@ void Chat::showAbout()
 void Chat::showHelp()
 {
     QDesktopServices::openUrl(QUrl(HELP_URL));
-}
-
-void Chat::statusChanged(int currentIndex)
-{
-    // don't change client presence when the status change
-    // was due to a disconnection from the server
-    if (m_freezeStatus)
-        return;
-
-    m_autoAway = false;
-    QXmppPresence presence = m_client->clientPresence();
-    if (currentIndex == AvailableIndex)
-    {
-        presence.setType(QXmppPresence::Available);
-        presence.status().setType(QXmppPresence::Status::Online);
-    }
-    else if (currentIndex == AwayIndex)
-    {
-        presence.setType(QXmppPresence::Available);
-        presence.status().setType(QXmppPresence::Status::Away);
-    }
-    else if (currentIndex == BusyIndex)
-    {
-        presence.setType(QXmppPresence::Available);
-        presence.status().setType(QXmppPresence::Status::DND);
-    }
-    else if (currentIndex == OfflineIndex)
-    {
-        presence.setType(QXmppPresence::Unavailable);
-        presence.status().setType(QXmppPresence::Status::Offline);
-    }
-    m_client->setClientPresence(presence);
 }
 
 /** Unregister a panel from the roster list.
