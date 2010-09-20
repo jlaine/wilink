@@ -323,6 +323,23 @@ void ChatRoomWatcher::roomMembers()
     dialog.exec();
 }
 
+/** Change the room's subject.
+ */
+void ChatRoomWatcher::roomSubject()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    const QString jid = action->data().toString();
+
+    bool ok;
+    QString subject = QInputDialog::getText(chat,
+        tr("Change subject"), tr("Subject:"), QLineEdit::Normal,
+        QString(), &ok);
+    if (ok)
+        chat->client()->mucManager().setRoomSubject(jid, subject);
+}
+
 /** Display room configuration dialog.
  */
 void ChatRoomWatcher::roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &form)
@@ -393,6 +410,14 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 
     if (type == ChatRosterItem::Room) {
         int flags = index.data(ChatRosterModel::FlagsRole).toInt();
+
+        if (flags & ChatRosterModel::SubjectFlag)
+        {
+            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Change subject"));
+            action->setData(jid);
+            connect(action, SIGNAL(triggered()), this, SLOT(roomSubject()));
+        }
+
         if (flags & ChatRosterModel::OptionsFlag)
         {
             QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
@@ -402,7 +427,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 
         if (flags & ChatRosterModel::MembersFlag)
         {
-            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Permissions"));
+            QAction *action = menu->addAction(QIcon(":/peer.png"), tr("Permissions"));
             action->setData(jid);
             connect(action, SIGNAL(triggered()), this, SLOT(roomMembers()));
         }
@@ -544,22 +569,31 @@ void ChatRoom::messageClicked(const ChatHistoryMessage &msg)
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
     const QString from = jidToResource(msg.from());
-    if (jidToBareJid(msg.from()) != chatRemoteJid || from.isEmpty())
+    if (jidToBareJid(msg.from()) != chatRemoteJid ||
+        msg.type() != QXmppMessage::GroupChat)
         return;
 
-    ChatHistoryMessage message;
-    message.body = msg.body();
-    message.from = from;
-    message.fromJid = msg.from();
-    message.received = jidToResource(msg.from()) != nickName;
-    message.date = msg.stamp();
-    if (!message.date.isValid())
-        message.date = QDateTime::currentDateTime();
-    chatHistory->addMessage(message);
+    // handle message subject
+    if (!msg.subject().isEmpty())
+        setWindowStatus(msg.subject());
 
-    // notify user
-    if (notifyMessages || message.body.contains("@" + nickName))
-        queueNotification(message.body);
+    // handle message body
+    if (!msg.body().isEmpty())
+    {
+        ChatHistoryMessage message;
+        message.body = msg.body();
+        message.from = from;
+        message.fromJid = msg.from();
+        message.received = jidToResource(msg.from()) != nickName;
+        message.date = msg.stamp();
+        if (!message.date.isValid())
+            message.date = QDateTime::currentDateTime();
+        chatHistory->addMessage(message);
+
+        // notify user
+        if (notifyMessages || message.body.contains("@" + nickName))
+            queueNotification(message.body);
+    }
 }
 
 /** Return the type of entry to add to the roster.

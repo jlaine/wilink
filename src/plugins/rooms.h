@@ -64,8 +64,9 @@ private slots:
     void mucServerFound(const QString &roomServer);
     void roomClose();
     void roomOptions();
-    void roomPrompt();
     void roomMembers();
+    void roomPrompt();
+    void roomSubject();
     void rosterClick(const QModelIndex &index);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
     void rosterMenu(QMenu *menu, const QModelIndex &index);

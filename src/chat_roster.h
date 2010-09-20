@@ -62,6 +62,7 @@ public:
         OptionsFlag = 1,
         MembersFlag = 2,
         KickFlag = 4,
+        SubjectFlag = 8,
     };
 
     ChatRosterModel(QXmppClient *client, QObject *parent = 0);

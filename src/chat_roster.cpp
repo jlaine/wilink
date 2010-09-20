@@ -468,12 +468,12 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
                     int flags = 0;
                     // role
                     if (item.attribute("role") == "moderator")
-                        flags |= KickFlag;
+                        flags |= (KickFlag | SubjectFlag);
                     // affiliation
                     if (item.attribute("affiliation") == "owner")
-                        flags |= (OptionsFlag | MembersFlag);
+                        flags |= (OptionsFlag | MembersFlag | SubjectFlag);
                     else if (item.attribute("affiliation") == "admin")
-                        flags |= MembersFlag;
+                        flags |= (MembersFlag | SubjectFlag);
                     roomItem->setData(FlagsRole, flags);
                 }
             }
