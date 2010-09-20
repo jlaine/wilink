@@ -17,17 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
+#include <QTimer>
 
+#include "application.h"
 #include "window.h"
 
 int main(int argc, char *argv[])
 {
     /* Create application */
-    QApplication app(argc, argv);
-    app.setApplicationName("wiLite");
-    app.setApplicationVersion("0.1.0");
+    Application::platformInit();
+    Application app(argc, argv);
 
+#if 0
     /* Show main window */
     MainWindow window;
     window.open("qxmpp.test1@gmail.com", "qxmpp123");
@@ -37,6 +38,10 @@ int main(int argc, char *argv[])
     window.resize(200, 320);
     window.show();
 #endif
+#endif
+
+    /* Show chat windows */
+    QTimer::singleShot(0, &app, SLOT(resetChats()));
 
     /* Run application */
     return app.exec();

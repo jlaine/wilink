@@ -39,6 +39,7 @@ set(wiLink_SOURCES
     chat_search.cpp
     chat_status.cpp
     chat_utils.cpp
+    flickcharm.cpp
     main.cpp
     systeminfo.cpp
     updates.cpp
@@ -72,6 +73,7 @@ set(wiLink_MOC_HEADERS
     chat_roster.h
     chat_search.h
     chat_status.h
+    flickcharm.h
     updates.h
     updatesdialog.h
     plugins/calls.h

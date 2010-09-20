@@ -325,6 +325,11 @@ bool ChatAccounts::changed() const
 bool ChatAccounts::getPassword(const QString &jid, QString &password, QWidget *parent)
 {
     const QString realm = authRealm(jid);
+    if (!QNetIO::Wallet::instance())
+    {
+        qWarning("No wallet!");
+        return false;
+    }
 
     /* check if we have a stored password that differs from the given one */
     QString tmpJid(jid), tmpPassword(password);

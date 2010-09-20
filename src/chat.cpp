@@ -54,9 +54,10 @@
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 #include "chat_status.h"
+#include "chat_utils.h"
+#include "flickcharm.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
-#include "chat_utils.h"
 
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent)
@@ -79,6 +80,11 @@ Chat::Chat(QWidget *parent)
 
     /* left panel */
     m_rosterView = new ChatRosterView(m_rosterModel);
+#ifdef WILINK_EMBEDDED
+    m_rosterView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    FlickCharm *charm = new FlickCharm(this);
+    charm->activateOn(m_rosterView);
+#endif
     connect(m_rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(m_rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(m_rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
@@ -129,8 +135,11 @@ Chat::Chat(QWidget *parent)
     QObject::connect(wApp, SIGNAL(messageClicked(QWidget*)),
         this, SLOT(messageClicked(QWidget*)));
 
-    action = m_fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
-    connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
+    if (wApp->updatesDialog())
+    {
+        action = m_fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
+        connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
+    }
 
     action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
