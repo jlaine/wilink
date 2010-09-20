@@ -29,7 +29,7 @@
 #include "chat_plugin.h"
 #include "chat_search.h"
 #include "console.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     : ChatPanel(parent), connected(false), currentLogger(logger)

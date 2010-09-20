@@ -43,7 +43,7 @@
 #include "chat_roster.h"
 #include "systeminfo.h"
 #include "transfers.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 static qint64 fileSizeLimit = 50000000; // 50 MB
 

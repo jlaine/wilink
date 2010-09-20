@@ -20,7 +20,7 @@
 #include <QDebug>
 #include <QRegExp>
 
-#include "utils.h"
+#include "chat_utils.h"
 
 static const qint64 KILO = 1000LL;
 static const qint64 MEGA = 1000000LL;

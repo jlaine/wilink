@@ -34,7 +34,7 @@
 
 #include "application.h"
 #include "chat_accounts.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 static const char *accountsKey = "ChatAccounts";
 

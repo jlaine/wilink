@@ -36,7 +36,7 @@
 #include "chat_client.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 #include "contacts.h"
 

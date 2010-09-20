@@ -42,7 +42,7 @@
 #include "config.h"
 #include "chat.h"
 #include "chat_accounts.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),

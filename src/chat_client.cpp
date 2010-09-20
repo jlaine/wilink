@@ -19,7 +19,6 @@
 
 #include "QXmppDiscoveryIq.h"
 #include "QXmppLogger.h"
-#include "QXmppPubSubManager.h"
 #include "QXmppTransferManager.h"
 
 #include "chat_client.h"
@@ -30,9 +29,6 @@ ChatClient::ChatClient(QObject *parent)
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
     connect(this, SIGNAL(discoveryIqReceived(const QXmppDiscoveryIq&)),
         this, SLOT(slotDiscoveryIqReceived(const QXmppDiscoveryIq&)));
-
-    QXmppPubSubManager *pubSub = new QXmppPubSubManager;
-    addExtension(pubSub);
 }
 
 void ChatClient::slotConnected()

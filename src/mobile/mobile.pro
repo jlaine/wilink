@@ -8,7 +8,7 @@ SOURCES += \
     ../chat_client.cpp \
     ../chat_roster.cpp \
     ../chat_roster_item.cpp \
-    ../utils.cpp \
+    ../chat_utils.cpp \
     main.cpp \
     window.cpp
 
@@ -16,7 +16,7 @@ HEADERS += \
     ../chat_client.h \
     ../chat_roster.h \
     ../chat_roster_item.h \
-    ../utils.h \
+    ../chat_utils.h \
     window.h
 
 INCLUDEPATH += .. $$QXMPP_INCLUDE_DIR

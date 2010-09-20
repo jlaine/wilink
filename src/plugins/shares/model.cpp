@@ -18,7 +18,7 @@
  */
 
 #include "model.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 // common queries
 #define Q ChatSharesModelQuery

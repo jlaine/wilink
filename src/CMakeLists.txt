@@ -37,11 +37,11 @@ set(wiLink_SOURCES
     chat_roster.cpp
     chat_roster_item.cpp
     chat_search.cpp
+    chat_utils.cpp
     main.cpp
     systeminfo.cpp
     updates.cpp
     updatesdialog.cpp
-    utils.cpp
     plugins/calls.cpp
     plugins/chats.cpp
     plugins/console.cpp
@@ -151,7 +151,7 @@ install(TARGETS wiLink DESTINATION bin)
 # tests
 set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests systeminfo.cpp tests.cpp updates.cpp utils.cpp ${tests_MOC_SOURCES})
+add_executable(tests systeminfo.cpp tests.cpp updates.cpp chat_utils.cpp ${tests_MOC_SOURCES})
 target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 add_executable(codec codec.cpp)

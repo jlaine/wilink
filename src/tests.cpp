@@ -21,7 +21,7 @@
 #include <QtTest/QtTest>
 
 #include "updates.h"
-#include "utils.h"
+#include "chat_utils.h"
 #include "tests.h"
 
 void TestIndent::indentCollapsed()

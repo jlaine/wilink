@@ -57,7 +57,7 @@
 #include "chat_roster_item.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
-#include "utils.h"
+#include "chat_utils.h"
 
 #define AWAY_TIME 300 // set away after 50s
 
