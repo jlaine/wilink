@@ -565,6 +565,7 @@ ChatPanel *Chat::panel(const QString &objectName)
  */
 void Chat::resizeContacts()
 {
+#ifndef WILINK_EMBEDDED
     QSize hint = m_rosterView->sizeHint();
     hint.setHeight(hint.height() + m_rosterView->sizeHintForRow(0) + 4);
     QSize barHint = statusBar()->sizeHint();
@@ -592,6 +593,7 @@ void Chat::resizeContacts()
     }
 
     resize(hint);
+#endif
 }
 
 void Chat::rosterClicked(const QModelIndex &index)
