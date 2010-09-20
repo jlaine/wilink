@@ -46,6 +46,11 @@ HEADERS += \
     ../plugins/console.h \
     ../plugins/chats.h
 
+mac {
+    SOURCES += ../application_mac.mm
+    LIBS += -framework AppKit
+}
+
 RESOURCES += ../data/wiLink.qrc
 
 INCLUDEPATH += .. $$IDLE_INCLUDE_DIR $QNETIO_INCLUDE_DIR $$QXMPP_INCLUDE_DIR
