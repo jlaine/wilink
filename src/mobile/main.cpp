@@ -31,7 +31,12 @@ int main(int argc, char *argv[])
     /* Show main window */
     MainWindow window;
     window.open("qxmpp.test1@gmail.com", "qxmpp123");
+#ifdef Q_OS_SYMBIAN
+    window.showMaximized();
+#else
+    window.resize(200, 320);
     window.show();
+#endif
 
     /* Run application */
     return app.exec();
