@@ -64,7 +64,6 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
  */
 void ContactsWatcher::addContact()
 {
-    bool ok = true;
     const QString domain = chat->client()->configuration().domain();
     QString jid = QLatin1String("@") + domain;
 
@@ -254,10 +253,9 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
     
-    if (type == ChatRosterItem::Contact)
+    QAction *action;
+    if (type == ChatRosterItem::Contact || type == ChatRosterItem::RoomMember)
     {
-        QAction *action;
-
         const QString url = index.data(ChatRosterModel::UrlRole).toString();
         if (!url.isEmpty())
         {
@@ -265,7 +263,10 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
             action->setData(url);
             connect(action, SIGNAL(triggered()), this, SLOT(showContactPage()));
         }
+    }
 
+    if (type == ChatRosterItem::Contact)
+    {
         action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
         action->setData(bareJid);
         connect(action, SIGNAL(triggered()), this, SLOT(renameContact()));

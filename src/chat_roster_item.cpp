@@ -71,9 +71,18 @@ QVariant ChatRosterItem::data(int role) const
 
 ChatRosterItem *ChatRosterItem::find(const QString &id)
 {
+    /* look at immediate children */
     foreach (ChatRosterItem *item, childItems)
         if (item->itemId == id)
             return item;
+
+    /* recurse */
+    foreach (ChatRosterItem *item, childItems)
+    {
+        ChatRosterItem *found = item->find(id);
+        if (found)
+            return found;
+    }
     return 0;
 }
 

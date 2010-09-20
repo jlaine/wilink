@@ -273,6 +273,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
+            } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+                return QIcon(contactAvatar(bareJid));
             }
         }
     }
@@ -450,6 +452,10 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
             roomItem->append(memberItem);
             endInsertRows();
+
+            // fetch vCard
+            client->vCardManager().requestVCard(jid);
+
         } else {
             // update roster entry
             memberItem->setData(StatusRole, presence.status().type());
@@ -589,6 +595,7 @@ int ChatRosterModel::rowCount(const QModelIndex &parent) const
 void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 {
     const QString bareJid = vcard.from();
+
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
@@ -601,15 +608,18 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 
         // Store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name.
-        QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(bareJid);
-        if (!vcard.nickName().isEmpty())
-            item->setData(NicknameRole, vcard.nickName());
-        if (entry.name().isEmpty())
+        if (item->type() == ChatRosterItem::Contact)
         {
+            QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(bareJid);
             if (!vcard.nickName().isEmpty())
-                item->setData(Qt::DisplayRole, vcard.nickName());
-            else if (!vcard.fullName().isEmpty())
-                item->setData(Qt::DisplayRole, vcard.fullName());
+                item->setData(NicknameRole, vcard.nickName());
+            if (entry.name().isEmpty())
+            {
+                if (!vcard.nickName().isEmpty())
+                    item->setData(Qt::DisplayRole, vcard.nickName());
+                else if (!vcard.fullName().isEmpty())
+                    item->setData(Qt::DisplayRole, vcard.fullName());
+            }
         }
 
         const QString url = vcard.url();
