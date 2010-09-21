@@ -62,8 +62,6 @@
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowIcon(QIcon(":/chat.png"));
-
     m_client = new ChatClient(this);
     m_rosterModel =  new ChatRosterModel(m_client, this);
     connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));

@@ -80,6 +80,9 @@ ChatAccountPrompt::ChatAccountPrompt(QWidget *parent)
     QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
         .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
     helpLabel->setOpenExternalLinks(true);
+#ifdef WILINK_EMBEDDED
+    helpLabel->setWordWrap(true);
+#endif
     layout->addWidget(helpLabel, 4, 0, 1, 2);
 
     m_buttonBox = new QDialogButtonBox;
