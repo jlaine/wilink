@@ -65,22 +65,6 @@ Acceptez-vous?</translation>
 <context>
     <name>Chat</name>
     <message>
-        <source>Available</source>
-        <translation>Disponible</translation>
-    </message>
-    <message>
-        <source>Busy</source>
-        <translation>Occupé</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Déconnecté</translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation>Absent</translation>
-    </message>
-    <message>
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
     </message>
@@ -381,6 +365,14 @@ Acceptez-vous?</translation>
         <source>Enter the reason for kicking the user from &apos;%1&apos;.</source>
         <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur de &apos;%1&apos;.</translation>
     </message>
+    <message>
+        <source>Change subject</source>
+        <translation>Changer le sujet</translation>
+    </message>
+    <message>
+        <source>Subject:</source>
+        <translation>Sujet :</translation>
+    </message>
 </context>
 <context>
     <name>ChatSearchBar</name>
@@ -497,6 +489,25 @@ Acceptez-vous?</translation>
     <message>
         <source>Downloading at %1</source>
         <translation>Téléchargement à %1</translation>
+    </message>
+</context>
+<context>
+    <name>ChatStatus</name>
+    <message>
+        <source>Available</source>
+        <translation>Disponible</translation>
+    </message>
+    <message>
+        <source>Busy</source>
+        <translation>Occupé</translation>
+    </message>
+    <message>
+        <source>Away</source>
+        <translation>Absent</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>Déconnecté</translation>
     </message>
 </context>
 <context>

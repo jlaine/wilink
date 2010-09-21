@@ -31,7 +31,7 @@ class ChatPluginInterface
 {
 public:
     virtual bool initialize(Chat *chat) = 0;
-    virtual void finalize(Chat *chat) {};
+    virtual void finalize(Chat *) {};
 };
 
 Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")
