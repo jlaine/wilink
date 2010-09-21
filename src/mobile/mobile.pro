@@ -43,8 +43,8 @@ HEADERS += \
     ../chat_status.h \
     ../chat_utils.h \
     ../flickcharm.h \
-    ../plugins/console.h \
-    ../plugins/chats.h
+    ../plugins/chats.h \
+    ../plugins/console.h
 
 mac {
     SOURCES += ../application_mac.mm

@@ -74,7 +74,19 @@ ChatConversation::ChatConversation(QWidget *parent)
     connect(chatInput, SIGNAL(focused()), this, SLOT(slotFocused()));
     connect(chatInput, SIGNAL(returnPressed()), this, SLOT(slotSend()));
     connect(chatInput, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
+#ifdef WILINK_EMBEDDED
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addWidget(chatInput);
+    QPushButton *sendButton = new QPushButton;
+    sendButton->setFlat(true);
+    sendButton->setMaximumWidth(32);
+    sendButton->setIcon(QIcon(":/upload.png"));
+    connect(sendButton, SIGNAL(clicked()), this, SLOT(slotSend()));
+    hbox->addWidget(sendButton);
+    layout->addItem(hbox);
+#else
     layout->addWidget(chatInput);
+#endif
 
     setFocusProxy(chatInput);
     setLayout(layout);
