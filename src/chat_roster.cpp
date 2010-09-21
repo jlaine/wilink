@@ -652,7 +652,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &parent)
+QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &parent)
 {
     ChatRosterItem *parentItem;
     if (parent.isValid())
@@ -661,11 +661,12 @@ void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, cons
         parentItem = rootItem;
 
     // check the item does not already exist
-    if (parentItem->find(id))
-        return;
+    ChatRosterItem *item = parentItem->find(id);
+    if (item)
+        return createIndex(item->row(), 0, item);
 
     // prepare item
-    ChatRosterItem *item = new ChatRosterItem(type, id);
+    item = new ChatRosterItem(type, id);
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
     if (!icon.isNull())
@@ -673,8 +674,9 @@ void ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, cons
 
     // add item
     beginInsertRows(parent, parentItem->size(), parentItem->size());
-    rootItem->append(item);
+    parentItem->append(item);
     endInsertRows();
+    return createIndex(item->row(), 0, item);
 }
 
 void ChatRosterModel::clearPendingMessages(const QString &bareJid)
