@@ -373,6 +373,10 @@ Acceptez-vous?</translation>
         <source>Subject:</source>
         <translation>Sujet :</translation>
     </message>
+    <message>
+        <source>Rooms</source>
+        <translation>Salons</translation>
+    </message>
 </context>
 <context>
     <name>ChatSearchBar</name>
@@ -653,6 +657,10 @@ Acceptez-vous?</translation>
     <message>
         <source>&amp;Services</source>
         <translation>&amp;Services</translation>
+    </message>
+    <message>
+        <source>My residence</source>
+        <translation>Ma résidence</translation>
     </message>
 </context>
 <context>

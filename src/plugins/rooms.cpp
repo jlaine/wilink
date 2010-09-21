@@ -107,6 +107,7 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     roomButton = new QPushButton;
     roomButton->setEnabled(false);
     roomButton->setIcon(QIcon(":/chat.png"));
+    roomButton->setText(tr("Rooms"));
     roomButton->setToolTip(tr("Join or create a chat room"));
     connect(roomButton, SIGNAL(clicked()), this, SLOT(roomPrompt()));
     chat->statusBar()->addWidget(roomButton);

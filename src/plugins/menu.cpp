@@ -35,6 +35,7 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
+#include "chat_roster.h"
 #include "menu.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
@@ -194,6 +195,12 @@ bool MenuPlugin::initialize(Chat *chat)
     QString domain = chat->client()->configuration().domain();
     if (domain != "wifirst.net")
         return false;
+
+    // add roster entry
+    chat->rosterModel()->addItem(ChatRosterItem::Other,
+        "home",
+        QCoreApplication::translate("Menu", "My residence"),
+        QIcon(":/favorite-active.png"));
 
     Menu *menu = new Menu(chat->menuBar());
     connect(chat->client(), SIGNAL(connected()), menu, SLOT(fetchMenu()));
