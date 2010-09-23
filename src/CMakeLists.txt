@@ -24,6 +24,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp/src)
 # wiLink
 
 add_definitions(-DQT_STATICPLUGIN)
+if(NOT APPLE)
+    add_definitions(-DUSE_SYSTRAY)
+endif(NOT APPLE)
+
 set(wiLink_SOURCES
     application.cpp
     chat.cpp

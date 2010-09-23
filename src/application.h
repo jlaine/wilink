@@ -23,8 +23,7 @@
 #include <QApplication>
 #include <QString>
 
-#if !defined(Q_OS_MAC) && !defined(Q_OS_SYMBIAN)
-#define USE_SYSTRAY
+#ifdef USE_SYSTRAY
 #include <QSystemTrayIcon>
 #endif
 
