@@ -47,6 +47,7 @@ public:
 
     QXmppClient *client();
     ChatRosterModel *rosterModel();
+    ChatRosterView *rosterView();
     QMenu *fileMenu();
     QMenu *optionsMenu();
     bool open(const QString &jid);

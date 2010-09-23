@@ -462,6 +462,13 @@ ChatRosterModel *Chat::rosterModel()
     return m_rosterModel;
 }
 
+/** Return this window's chat roster view.
+ */
+ChatRosterView *Chat::rosterView()
+{
+    return m_rosterView;
+}
+
 /** Open the connection to the chat server.
  *
  * @param jid

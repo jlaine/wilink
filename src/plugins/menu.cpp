@@ -26,6 +26,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSortFilterProxyModel>
 #include <QSystemTrayIcon>
 #include <QTimer>
 
@@ -38,16 +39,16 @@
 #include "chat_roster.h"
 #include "menu.h"
 
-static const QUrl baseUrl("https://www.wifirst.net/w/");
+static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/");
 
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
-Menu::Menu(QMenuBar *bar, ChatRosterModel *roster)
+Menu::Menu(QMenuBar *bar, Chat *window)
     : QObject(bar),
     refreshInterval(0),
+    chatWindow(window),
     menuBar(bar),
-    rosterModel(roster),
     servicesMenu(0)
 {
     bool check;
@@ -58,17 +59,22 @@ Menu::Menu(QMenuBar *bar, ChatRosterModel *roster)
     menuBar->addMenu(servicesMenu);
 
     /* add roster entry */
-    rosterModel->addItem(ChatRosterItem::Other,
+    QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterItem::Other,
         "home",
         tr("My residence"),
         QIcon(":/favorite-active.png"));
+    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(chatWindow->rosterView()->model());
+    chatWindow->rosterView()->expand(proxyModel->mapFromSource(index));
 
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
     check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
                     QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     Q_ASSERT(check);
-    Q_UNUSED(check);
+
+    check = connect(chatWindow->client(), SIGNAL(connected()),
+                    this, SLOT(fetchMenu()));
+    Q_ASSERT(check);
 }
 
 Menu::~Menu()
@@ -150,11 +156,11 @@ void Menu::showMenu()
         {
             if (linkUrl.scheme() == "xmpp")
             {
-                rosterModel->addItem(ChatRosterItem::Room,
+                chatWindow->rosterModel()->addItem(ChatRosterItem::Room,
                     linkUrl.path(),
                     tr("Chat room"),
                     QIcon(":/chat.png"),
-                    rosterModel->findItem("home"));
+                    chatWindow->rosterModel()->findItem("home"));
             }
             action = servicesMenu->addAction(text);
             action->setData(baseUrl.resolved(link));
@@ -219,8 +225,7 @@ bool MenuPlugin::initialize(Chat *chat)
     if (domain != "wifirst.net")
         return false;
 
-    Menu *menu = new Menu(chat->menuBar(), chat->rosterModel());
-    connect(chat->client(), SIGNAL(connected()), menu, SLOT(fetchMenu()));
+    new Menu(chat->menuBar(), chat);
     return true;
 }
 
