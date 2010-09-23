@@ -838,21 +838,6 @@ void ChatRosterView::resizeEvent(QResizeEvent *e)
     setColumnWidth(ContactColumn, e->size().width() - 40);
 }
 
-void ChatRosterView::selectContact(const QString &jid)
-{
-    for (int i = 0; i < model()->rowCount(); i++)
-    {
-        QModelIndex index = model()->index(i, 0);
-        if (index.data(ChatRosterModel::IdRole).toString() == jid)
-        {
-            if (index != currentIndex())
-                setCurrentIndex(index);
-            return;
-        }
-    }
-    setCurrentIndex(QModelIndex());
-}
-
 void ChatRosterView::selectionChanged(const QItemSelection & selected, const QItemSelection &deselected)
 {
     foreach (const QModelIndex &index, selected.indexes())

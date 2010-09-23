@@ -129,7 +129,6 @@ class ChatRosterView : public QTreeView
 
 public:
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
-    void selectContact(const QString &jid);
     QSize sizeHint() const;
 
 signals:
