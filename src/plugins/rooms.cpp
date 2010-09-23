@@ -483,7 +483,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     check = connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     Q_ASSERT(check);
 
-    check = connect(client->findExtension<QXmppDiscoveryManager*>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
+    check = connect(&client->discoveryManager(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
@@ -556,14 +556,12 @@ void ChatRoom::join()
     // clear history
     chatHistory->clear();
 
-    // request room information
-    QXmppDiscoveryIq disco;
-    disco.setTo(chatRemoteJid);
-    disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    client->sendPacket(disco);
-    
     // send join request
     client->mucManager().joinRoom(chatRemoteJid, nickName);
+
+    // request room information
+    client->discoveryManager().requestInfo(chatRemoteJid);
+
     joined = true;
 }
 
@@ -786,18 +784,14 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     setLayout(layout);
-
     setWindowTitle(tr("Join or create a chat room"));
-    bool check;
-    check = connect(client->findExtension<QXmppDiscoveryManager*>(), SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
-                    this, SLOT(discoveryItemsReceived(const QXmppDiscoveryIq&)));
-    Q_ASSERT(check);
 
     // get rooms
-    QXmppDiscoveryIq disco;
-    disco.setTo(chatRoomServer);
-    disco.setQueryType(QXmppDiscoveryIq::ItemsQuery);
-    client->sendPacket(disco);
+    bool check;
+    check = connect(&client->discoveryManager(), SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
+                    this, SLOT(discoveryItemsReceived(const QXmppDiscoveryIq&)));
+    Q_ASSERT(check);
+    client->discoveryManager()->requestItems(chatRoomServer);
 }
 
 void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)

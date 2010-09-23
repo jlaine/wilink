@@ -83,7 +83,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     rootItem = new ChatRosterItem(ChatRosterItem::Root);
     connect(client, SIGNAL(connected()), this, SLOT(connected()));
     connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(client->findExtension<QXmppDiscoveryManager*>(), SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
+    connect(&client->discoveryManager(), SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
             this, SLOT(discoveryInfoReceived(const QXmppDiscoveryIq&)));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(&client->rosterManager(), SIGNAL(presenceChanged(const QString&, const QString&)), this, SLOT(presenceChanged(const QString&, const QString&)));
