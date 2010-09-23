@@ -198,14 +198,8 @@ void Menu::showMenu()
     }
 
     /* parse preferences */
-#if 0
-    item = doc.documentElement().firstChildElement("preferences");
-    QString urlString = item.firstChildElement("updates").text();
-    if (!urlString.isEmpty())
-        updates->setUrl(baseUrl.resolved(QUrl(urlString)));
-#endif
-
-    refreshInterval = item.firstChildElement("refresh").text().toInt() * 1000;
+    QDomElement preferences = doc.documentElement().firstChildElement("preferences");
+    refreshInterval = preferences.firstChildElement("refresh").text().toInt() * 1000;
     if (refreshInterval > 0)
         QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
 }
