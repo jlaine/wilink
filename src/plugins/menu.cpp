@@ -39,7 +39,7 @@
 #include "chat_roster.h"
 #include "menu.h"
 
-static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/");
+static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/1");
 
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
