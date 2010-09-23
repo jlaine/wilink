@@ -696,8 +696,12 @@ void ChatRosterModel::removeItem(const QString &bareJid)
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
-        beginRemoveRows(QModelIndex(), item->row(), item->row());
-        rootItem->remove(item);
+        QModelIndex parentIndex;
+        ChatRosterItem *parentItem = item->parent();
+        if (parentItem != rootItem)
+            parentIndex = createIndex(parentItem->row(), 0, parentItem);
+        beginRemoveRows(parentIndex, item->row(), item->row());
+        parentItem->remove(item);
         endRemoveRows();
     }
 }
