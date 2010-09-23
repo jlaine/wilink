@@ -96,6 +96,17 @@ ChatRosterItem* ChatRosterItem::parent()
     return parentItem;
 }
 
+void ChatRosterItem::setParent(ChatRosterItem *parent)
+{
+    if (parentItem == parent)
+        return;
+    if (parentItem)
+        parentItem->childItems.removeAll(this);
+    if (parent && !parent->childItems.contains(this))
+        parent->childItems.append(this);
+    parentItem = parent;
+}
+
 void ChatRosterItem::remove(ChatRosterItem *child)
 {
     if (childItems.contains(child))

@@ -156,11 +156,15 @@ void Menu::showMenu()
         {
             if (linkUrl.scheme() == "xmpp")
             {
-                chatWindow->rosterModel()->addItem(ChatRosterItem::Room,
-                    linkUrl.path(),
-                    tr("Chat room"),
-                    QIcon(":/chat.png"),
-                    chatWindow->rosterModel()->findItem("home"));
+                /* add or move chat room entry */
+                ChatRosterModel *model = chatWindow->rosterModel();
+                QModelIndex homeIndex = model->findItem("home");
+                QModelIndex index = model->findItem(linkUrl.path());
+                if (index.isValid())
+                    model->reparentItem(index, homeIndex);
+                else
+                    model->addItem(ChatRosterItem::Room, linkUrl.path(),
+                        tr("Chat room"), QIcon(":/chat.png"), homeIndex);
             }
             action = servicesMenu->addAction(text);
             action->setData(baseUrl.resolved(link));

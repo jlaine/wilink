@@ -50,6 +50,7 @@ public:
     void removeAt(int row);
     int row() const;
     void setData(int role, const QVariant &value);
+    void setParent(ChatRosterItem *parent);
     int size() const;
     enum Type type() const;
 

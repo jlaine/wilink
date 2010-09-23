@@ -713,6 +713,43 @@ void ChatRosterModel::removeItem(const QString &bareJid)
     }
 }
 
+/** Move an item to the given parent.
+ *
+ * @param index
+ * @param newParent
+ */
+QModelIndex ChatRosterModel::reparentItem(const QModelIndex &index, const QModelIndex &newParent)
+{
+    if (!index.isValid())
+        return index;
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+
+    /* determine requested parent item */
+    ChatRosterItem *newParentItem;
+    if (!newParent.isValid())
+        newParentItem = rootItem;
+    else
+        newParentItem = static_cast<ChatRosterItem*>(newParent.internalPointer());
+
+    /* check if we need to do anything */
+    ChatRosterItem *currentParentItem = item->parent();
+    if (currentParentItem == newParentItem)
+        return index;
+
+    /* determine current parent index */
+    QModelIndex currentParent;
+    if (currentParentItem != rootItem)
+        currentParent = createIndex(currentParentItem->row(), 0, currentParentItem);
+
+    /* move item */
+    beginMoveRows(currentParent, item->row(), item->row(),
+                  newParent, newParentItem->size());
+    item->setParent(newParentItem);
+    endMoveRows();
+
+    return createIndex(item->row(), 0, item);
+}
+
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     : QTreeView(parent), rosterModel(model)
 {
