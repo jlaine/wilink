@@ -791,7 +791,7 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     check = connect(&client->discoveryManager(), SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
                     this, SLOT(discoveryItemsReceived(const QXmppDiscoveryIq&)));
     Q_ASSERT(check);
-    client->discoveryManager()->requestItems(chatRoomServer);
+    client->discoveryManager().requestItems(chatRoomServer);
 }
 
 void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
