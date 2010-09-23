@@ -301,11 +301,9 @@ void ChatRosterModel::disconnected()
 
 void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
-    if (!clientFeatures.contains(disco.from()) ||
-        disco.type() != QXmppIq::Result ||
+    if (disco.type() != QXmppIq::Result ||
         disco.queryType() != QXmppDiscoveryIq::InfoQuery)
         return;
-
     int features = 0;
     foreach (const QString &var, disco.features())
     {
@@ -318,12 +316,21 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
         else if (var == ns_jingle_rtp_audio)
             features |= VoiceFeature;
     }
+    ChatRosterItem *item = rootItem->find(disco.from());
     foreach (const QXmppDiscoveryIq::Identity& id, disco.identities())
     {
         if (id.name() == "iChatAgent")
             features |= ChatStatesFeature;
+        if (item && item->type() == ChatRosterItem::Room &&
+            id.category() == "conference")
+        {
+            item->setData(Qt::DisplayRole, id.name());
+            emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                             createIndex(item->row(), SortingColumn, item));
+        }
     }
-    clientFeatures.insert(disco.from(), features);
+    if (clientFeatures.contains(disco.from()))
+        clientFeatures.insert(disco.from(), features);
 }
 
 QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
