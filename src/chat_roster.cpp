@@ -342,6 +342,18 @@ QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
         return QModelIndex();
 }
 
+/** Check whether the vCard for the given roster item is cached, otherwise
+ *  request the vCard.
+ *
+ * @param item
+ */
+void ChatRosterModel::fetchVCard(ChatRosterItem *item)
+{
+    QTime stamp = item->data(vCardStampRole).toTime();
+    if (!stamp.isValid() || stamp.secsTo(QTime::currentTime()) > 3600)
+        client->vCardManager().requestVCard(item->id());
+}
+
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
@@ -435,13 +447,9 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             clientFeatures.remove(jid);
         else if (presence.type() == QXmppPresence::Available && !clientFeatures.contains(jid))
         {
-            clientFeatures.insert(jid, 0);
-
             // discover remote party features
-            QXmppDiscoveryIq disco;
-            disco.setTo(jid);
-            disco.setQueryType(QXmppDiscoveryIq::InfoQuery);
-            client->sendPacket(disco);
+            clientFeatures.insert(jid, 0);
+            client->discoveryManager().requestInfo(jid);
         }
     }
 
@@ -463,7 +471,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             endInsertRows();
 
             // fetch vCard
-            client->vCardManager().requestVCard(jid);
+            fetchVCard(memberItem);
 
         } else {
             // update roster entry
@@ -537,7 +545,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     }
 
     // fetch vCard
-    client->vCardManager().requestVCard(jid);
+    fetchVCard(item);
 }
 
 void ChatRosterModel::rosterReceived()
@@ -619,15 +627,15 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
     ChatRosterItem *item = rootItem->find(bareJid);
     if (item)
     {
-        // Read image.
+        // read vCard image
         QBuffer buffer;
         buffer.setData(vcard.photo());
         buffer.open(QIODevice::ReadOnly);
         QImageReader imageReader(&buffer);
         item->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
-        // Store the nickName or fullName found in the vCard for display,
-        // unless the roster entry has a name.
+        // store the nickName or fullName found in the vCard for display,
+        // unless the roster entry has a name
         if (item->type() == ChatRosterItem::Contact)
         {
             QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(bareJid);
@@ -642,9 +650,13 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
             }
         }
 
+        // store vCard URL
         const QString url = vcard.url();
         if (!url.isEmpty())
             item->setData(UrlRole, vcard.url());
+
+        // store vCard stamp
+        item->setData(vCardStampRole, QTime::currentTime());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));

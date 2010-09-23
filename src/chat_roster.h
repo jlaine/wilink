@@ -50,6 +50,8 @@ public:
         UrlRole,
         NicknameRole,
         PersistentRole,
+        // stamps
+        vCardStampRole,
     };
 
     enum Feature {
@@ -115,6 +117,7 @@ protected slots:
 
 private:
     void countPendingMessages();
+    void fetchVCard(ChatRosterItem *item);
 
     QXmppClient *client;
     ChatRosterItem *rootItem;
