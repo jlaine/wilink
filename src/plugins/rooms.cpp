@@ -524,6 +524,9 @@ void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     // notify user of received messages if the room is not publicly listed
     if (disco.features().contains("muc_hidden"))
         notifyMessages = true;
+
+    // update window title
+    setWindowTitle(rosterModel->contactName(chatRemoteJid));
 }
 
 /** Invite a user to the chat room.
