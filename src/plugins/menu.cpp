@@ -39,6 +39,7 @@
 #include "menu.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/w/");
+
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
@@ -49,21 +50,25 @@ Menu::Menu(QMenuBar *bar, ChatRosterModel *roster)
     rosterModel(roster),
     servicesMenu(0)
 {
+    bool check;
+
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
 
     servicesMenu = new QMenu(tr("&Services"));
     menuBar->addMenu(servicesMenu);
 
     /* add roster entry */
-    QModelIndex p = rosterModel->addItem(ChatRosterItem::Other,
+    rosterModel->addItem(ChatRosterItem::Other,
         "home",
         tr("My residence"),
         QIcon(":/favorite-active.png"));
 
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
-    connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-            QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
+                    QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 Menu::~Menu()
@@ -138,12 +143,23 @@ void Menu::showMenu()
         const QString image = item.firstChildElement("image").text();
         const QString link = item.firstChildElement("link").text();
         const QString text = item.firstChildElement("label").text();
+        QUrl linkUrl(link);
         if (text.isEmpty())
             servicesMenu->addSeparator();
-        else {
+        else if (linkUrl.isValid())
+        {
+            if (linkUrl.scheme() == "xmpp")
+            {
+                rosterModel->addItem(ChatRosterItem::Room,
+                    linkUrl.path(),
+                    tr("Chat room"),
+                    QIcon(":/chat.png"),
+                    rosterModel->findItem("home"));
+            }
             action = servicesMenu->addAction(text);
             action->setData(baseUrl.resolved(link));
             connect(action, SIGNAL(triggered(bool)), this, SLOT(openUrl()));
+
             /* request icon */
             if (!image.isEmpty())
                 fetchIcon(baseUrl.resolved(image), action);
