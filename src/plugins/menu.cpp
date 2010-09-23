@@ -26,7 +26,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QSortFilterProxyModel>
 #include <QSystemTrayIcon>
 #include <QTimer>
 
@@ -63,8 +62,8 @@ Menu::Menu(QMenuBar *bar, Chat *window)
         "home",
         tr("My residence"),
         QIcon(":/favorite-active.png"));
-    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(chatWindow->rosterView()->model());
-    chatWindow->rosterView()->expand(proxyModel->mapFromSource(index));
+    ChatRosterView *rosterView = chatWindow->rosterView();
+    rosterView->expand(rosterView->mapFromRoster(index));
 
     /* prepare network manager */
     network = new QNetworkAccessManager(this);

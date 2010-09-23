@@ -31,7 +31,6 @@
 #include <QMessageBox>
 #include <QPluginLoader>
 #include <QShortcut>
-#include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -387,8 +386,7 @@ void Chat::panelChanged(int index)
 
     // select the corresponding roster entry
     QModelIndex rosterIndex = m_rosterModel->findItem(widget->objectName());
-    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(m_rosterView->model());
-    m_rosterView->setCurrentIndex(proxyModel->mapFromSource(rosterIndex));
+    m_rosterView->setCurrentIndex(m_rosterView->mapFromRoster(rosterIndex));
 
     widget->setFocus();
 }

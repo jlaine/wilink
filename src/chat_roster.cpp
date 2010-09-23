@@ -832,6 +832,15 @@ void ChatRosterView::dropEvent(QDropEvent *event)
         emit itemDrop(event, index);
 }
 
+/** Map an index from the ChatRosterModel to the sorted / filtered model.
+ *
+ * @param index
+ */
+QModelIndex ChatRosterView::mapFromRoster(const QModelIndex &index)
+{
+    return sortedModel->mapFromSource(index);
+}
+
 void ChatRosterView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
