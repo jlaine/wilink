@@ -42,16 +42,23 @@ static const QUrl baseUrl("https://www.wifirst.net/w/");
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
-Menu::Menu(QMenuBar *bar)
+Menu::Menu(QMenuBar *bar, ChatRosterModel *roster)
     : QObject(bar),
     refreshInterval(0),
     menuBar(bar),
+    rosterModel(roster),
     servicesMenu(0)
 {
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
 
     servicesMenu = new QMenu(tr("&Services"));
     menuBar->addMenu(servicesMenu);
+
+    /* add roster entry */
+    QModelIndex p = rosterModel->addItem(ChatRosterItem::Other,
+        "home",
+        tr("My residence"),
+        QIcon(":/favorite-active.png"));
 
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
@@ -196,13 +203,7 @@ bool MenuPlugin::initialize(Chat *chat)
     if (domain != "wifirst.net")
         return false;
 
-    // add roster entry
-    chat->rosterModel()->addItem(ChatRosterItem::Other,
-        "home",
-        QCoreApplication::translate("Menu", "My residence"),
-        QIcon(":/favorite-active.png"));
-
-    Menu *menu = new Menu(chat->menuBar());
+    Menu *menu = new Menu(chat->menuBar(), chat->rosterModel());
     connect(chat->client(), SIGNAL(connected()), menu, SLOT(fetchMenu()));
     return true;
 }

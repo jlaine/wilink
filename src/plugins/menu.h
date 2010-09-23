@@ -30,13 +30,14 @@ class QMenu;
 class QMenuBar;
 class QNetworkAccessManager;
 class QNetworkReply;
+class ChatRosterModel;
 
 class Menu : public QObject
 {
     Q_OBJECT
 
 public:
-    Menu(QMenuBar *bar);
+    Menu(QMenuBar *bar, ChatRosterModel *roster);
     ~Menu();
 
 private slots:
@@ -55,6 +56,7 @@ private:
     QByteArray userAgent;
 
     QMenuBar *menuBar;
+    ChatRosterModel *rosterModel;
     QMenu *servicesMenu;
 };
 
