@@ -616,7 +616,11 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         // activate the shares view
         sharesView->setEnabled(true);
 
-        emit registerPanel();
+        // add roster entry
+        rosterModel->addItem(objectType(),
+            objectName(),
+            windowTitle(),
+            windowIcon(), rosterModel->findItem("home"));
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
