@@ -55,7 +55,6 @@ class ChatTransfersView : public QTableWidget
 
 public:
     ChatTransfersView(QWidget *parent = 0);
-    int activeJobs(QXmppTransferJob::Direction direction) const;
     void addJob(QXmppTransferJob *job);
     QXmppTransferJob *currentJob();
 
@@ -84,7 +83,6 @@ public:
     ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *rosterModel, QWidget *parent = 0);
     ~ChatTransfers();
 
-    int activeJobs(QXmppTransferJob::Direction direction) const;
     void addJob(QXmppTransferJob *job);
 
 public slots:

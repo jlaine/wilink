@@ -106,16 +106,6 @@ ChatTransfersView::ChatTransfersView(QWidget *parent)
     connect(this, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(slotDoubleClicked(int,int)));
 }
 
-int ChatTransfersView::activeJobs(QXmppTransferJob::Direction direction) const
-{
-    int active = 0;
-    foreach (QXmppTransferJob *job, jobs)
-        if (job->direction() == direction &&
-            job->state() != QXmppTransferJob::FinishedState)
-            active++;
-    return active;
-}
-
 void ChatTransfersView::addJob(QXmppTransferJob *job)
 {
     if (jobs.contains(job))
@@ -297,11 +287,6 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
 
 ChatTransfers::~ChatTransfers()
 {
-}
-
-int ChatTransfers::activeJobs(QXmppTransferJob::Direction direction) const
-{
-    return tableWidget->activeJobs(direction);
 }
 
 void ChatTransfers::addJob(QXmppTransferJob *job)
