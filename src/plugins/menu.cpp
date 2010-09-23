@@ -163,8 +163,10 @@ void Menu::showMenu()
                 if (index.isValid())
                     model->reparentItem(index, homeIndex);
                 else
-                    model->addItem(ChatRosterItem::Room, linkUrl.path(),
-                        tr("Chat room"), QIcon(":/chat.png"), homeIndex);
+                    index = model->addItem(ChatRosterItem::Room,
+                        linkUrl.path(), tr("Chat room"), QIcon(":/chat.png"),
+                        homeIndex);
+                model->setData(index, true, ChatRosterModel::PersistentRole);
             }
             action = servicesMenu->addAction(text);
             action->setData(baseUrl.resolved(link));

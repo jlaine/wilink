@@ -193,12 +193,18 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
     if (!room)
     {
         room = new ChatRoom(chat->client(), chat->rosterModel(), jid);
+
         // get notified when room is closed
-        connect(room, SIGNAL(hidePanel()),
-            this, SLOT(roomClose()));
+        bool check;
+        check = connect(room, SIGNAL(hidePanel()),
+                        this, SLOT(roomClose()));
+        Q_ASSERT(check);
+
         // add roster hooks
-        connect(chat, SIGNAL(rosterClick(QModelIndex)),
-            room, SLOT(rosterClick(QModelIndex)));
+        check = connect(chat, SIGNAL(rosterClick(QModelIndex)),
+                        room, SLOT(rosterClick(QModelIndex)));
+        Q_ASSERT(check);
+
         chat->addPanel(room);
     }
     QTimer::singleShot(0, room, SIGNAL(showPanel()));
@@ -493,9 +499,6 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
-    Q_ASSERT(check);
-
     check = connect(this, SIGNAL(showPanel()), this, SLOT(join()));
     Q_ASSERT(check);
 
@@ -573,6 +576,12 @@ void ChatRoom::leave()
         client->mucManager().leaveRoom(chatRemoteJid);
         joined = false;
     }
+
+    /* remove room from roster */
+    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    if (!roomIndex.data(ChatRosterModel::PersistentRole).toBool())
+        emit unregisterPanel();
+
     deleteLater();
 }
 

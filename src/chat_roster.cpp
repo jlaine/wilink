@@ -601,6 +601,17 @@ int ChatRosterModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
+bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid())
+        return false;
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+    item->setData(role, value);
+    emit dataChanged(createIndex(item->row(), ContactColumn, item),
+                     createIndex(item->row(), SortingColumn, item));
+    return true;
+}
+
 void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 {
     const QString bareJid = vcard.from();
