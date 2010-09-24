@@ -29,11 +29,11 @@
 
 #define HELP_URL "https://www.wifirst.net/wilink/faq"
 
-class Chat;
 class UpdatesDialog;
 class QAuthenticator;
-class QMenu;
-class QSettings;
+class QAbstractNetworkCache;
+
+class ApplicationPrivate;
 
 class Application : public QApplication
 {
@@ -46,8 +46,9 @@ public:
     static void alert(QWidget *widget);
     static void platformInit();
     void createSystemTrayIcon();
-    UpdatesDialog *updatesDialog() { return updates; };
-    void setUpdatesDialog(UpdatesDialog *updatesDialog) { updates = updatesDialog; };
+    QAbstractNetworkCache *networkCache();
+    UpdatesDialog *updatesDialog();
+    void setUpdatesDialog(UpdatesDialog *updatesDialog);
 
     bool isInstalled();
     bool openAtLogin() const;
@@ -76,14 +77,7 @@ private:
     static QString executablePath();
     void migrateFromWdesktop();
 
-    QSettings *settings;
-    QList<Chat*> chats;
-#ifdef USE_SYSTRAY
-    QWidget *trayContext;
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayMenu;
-#endif
-    UpdatesDialog *updates;
+    ApplicationPrivate * const d;
 };
 
 #endif

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAbstractNetworkCache>
 #include <QBuffer>
 #include <QContextMenuEvent>
 #include <QDebug>
@@ -27,7 +28,6 @@
 #include <QList>
 #include <QMenu>
 #include <QNetworkCacheMetaData>
-#include <QNetworkDiskCache>
 #include <QPainter>
 #include <QStringList>
 #include <QSortFilterProxyModel>
@@ -43,6 +43,7 @@
 #include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 
+#include "application.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 
@@ -116,7 +117,7 @@ public:
     }
 
     ChatRosterModel *q;
-    QNetworkDiskCache *cache;
+    QAbstractNetworkCache *cache;
     QXmppClient *client;
     ChatRosterItem *ownItem;
     ChatRosterItem *rootItem;
@@ -170,9 +171,12 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d(new ChatRosterModelPrivate)
 {
     d->q = this;
-    d->cache = new QNetworkDiskCache(this);
-    d->cache->setCacheDirectory(QDir(QDesktopServices::storageLocation(
-        QDesktopServices::DataLocation)).filePath("cache"));
+
+    /* get cache */
+    Application *wApp = qobject_cast<Application*>(qApp);
+    Q_ASSERT(wApp);
+    d->cache = wApp->networkCache();
+
     d->client = xmppClient;
     d->nickNameReceived = false;
     d->ownItem = new ChatRosterItem(ChatRosterItem::Contact);

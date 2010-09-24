@@ -28,6 +28,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QNetworkDiskCache>
 #include <QProcess>
 #include <QPushButton>
 #include <QSettings>
@@ -44,15 +45,36 @@
 #include "chat_accounts.h"
 #include "chat_utils.h"
 
-Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv),
-    settings(0),
+class ApplicationPrivate
+{
+public:
+    ApplicationPrivate();
+
+    QList<Chat*> chats;
+    QNetworkDiskCache *networkCache;
+    QSettings *settings;
+#ifdef USE_SYSTRAY
+    QWidget *trayContext;
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayMenu;
+#endif
+    UpdatesDialog *updates;
+};
+
+ApplicationPrivate::ApplicationPrivate()
+    : settings(0),
 #ifdef USE_SYSTRAY
     trayContext(0),
     trayIcon(0),
     trayMenu(0),
 #endif
     updates(0)
+{
+}
+
+Application::Application(int &argc, char **argv)
+    : QApplication(argc, argv),
+    d(new ApplicationPrivate)
 {
     /* set application properties */
     setApplicationName("wiLink");
@@ -64,15 +86,17 @@ Application::Application(int &argc, char **argv)
     setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
-    /* initialise wallet */
-    QString dataDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    qDebug() << "Using data directory" << dataDir;
-    QDir().mkpath(dataDir);
-    QNetIO::Wallet::setDataPath(dataDir + "/wallet");
+    /* initialise cache and wallet */
+    QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    qDebug() << "Using data directory" << dataPath;
+    QDir().mkpath(dataPath);
+    d->networkCache = new QNetworkDiskCache(this);
+    d->networkCache->setCacheDirectory(QDir(dataPath).filePath("cache"));
+    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 
     /* initialise settings */
     migrateFromWdesktop();
-    settings = new QSettings(this);
+    d->settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
 }
@@ -81,21 +105,23 @@ Application::~Application()
 {
 #ifdef USE_SYSTRAY
     // destroy tray icon
-    if (trayIcon)
+    if (d->trayIcon)
     {
 #ifdef Q_OS_WIN
         // FIXME : on Windows, deleting the icon crashes the program
-        trayIcon->hide();
+        d->trayIcon->hide();
 #else
-        delete trayIcon;
-        delete trayMenu;
+        delete d->trayIcon;
+        delete d->trayMenu;
 #endif
     }
 #endif
 
     // destroy chat windows
-    foreach (Chat *chat, chats)
+    foreach (Chat *chat, d->chats)
         delete chat;
+
+    delete d;
 }
 
 #ifndef Q_OS_MAC
@@ -114,19 +140,23 @@ void Application::platformInit()
 void Application::createSystemTrayIcon()
 {
 #ifdef USE_SYSTRAY
-    trayIcon = new QSystemTrayIcon;
-    trayIcon->setIcon(QIcon(":/wiLink.png"));
-    trayMenu = new QMenu;
-    QAction *action = trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
-    connect(action, SIGNAL(triggered()), this, SLOT(showAccounts()));
-    action = trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
-    connect(action, SIGNAL(triggered()), this, SLOT(quit()));
-    trayIcon->setContextMenu(trayMenu);
-    QObject::connect(trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-        this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
-    QObject::connect(trayIcon, SIGNAL(messageClicked()),
-        this, SLOT(messageClicked()));
-    trayIcon->show();
+    d->trayIcon = new QSystemTrayIcon;
+    d->trayIcon->setIcon(QIcon(":/wiLink.png"));
+
+    d->trayMenu = new QMenu;
+    QAction *action = d->trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
+    connect(action, SIGNAL(triggered()),
+            this, SLOT(showAccounts()));
+    action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    connect(action, SIGNAL(triggered()),
+            this, SLOT(quit()));
+    d->trayIcon->setContextMenu(d->trayMenu);
+
+    connect(d->trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
+    connect(d->trayIcon, SIGNAL(messageClicked()),
+            this, SLOT(messageClicked()));
+    d->trayIcon->show();
 #endif
 }
 
@@ -213,9 +243,14 @@ void Application::migrateFromWdesktop()
 #endif
 }
 
+QAbstractNetworkCache *Application::networkCache()
+{
+    return d->networkCache;
+}
+
 bool Application::openAtLogin() const
 {
-    return settings->value("OpenAtLogin", true).toBool();
+    return d->settings->value("OpenAtLogin", true).toBool();
 }
 
 void Application::setOpenAtLogin(bool run)
@@ -268,7 +303,7 @@ void Application::setOpenAtLogin(bool run)
     // store preference
     if (run != openAtLogin())
     {
-        settings->setValue("OpenAtLogin", run);
+        d->settings->setValue("OpenAtLogin", run);
         emit openAtLoginChanged(run);
     }
 }
@@ -286,9 +321,9 @@ void Application::showAccounts()
 void Application::resetChats()
 {
     /* close any existing chats */
-    foreach (Chat *chat, chats)
+    foreach (Chat *chat, d->chats)
         delete chat;
-    chats.clear();
+    d->chats.clear();
 
     /* clean any bad accounts */
     ChatAccounts dlg;
@@ -319,7 +354,7 @@ void Application::resetChats()
 #endif
 
         chat->open(jid);
-        chats << chat;
+        d->chats << chat;
         xpos += 300;
     }
 
@@ -329,7 +364,7 @@ void Application::resetChats()
 
 void Application::showChats()
 {
-    foreach (Chat *chat, chats)
+    foreach (Chat *chat, d->chats)
     {
         chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized);
         chat->show();
@@ -341,17 +376,17 @@ void Application::showChats()
 void Application::messageClicked()
 {
 #ifdef USE_SYSTRAY
-    emit messageClicked(trayContext);
+    emit messageClicked(d->trayContext);
 #endif
 }
 
 void Application::showMessage(QWidget *context, const QString &title, const QString &message)
 {
 #ifdef USE_SYSTRAY
-    if (trayIcon)
+    if (d->trayIcon)
     {
-        trayContext = context;
-        trayIcon->showMessage(title, message);
+        d->trayContext = context;
+        d->trayIcon->showMessage(title, message);
     }
 #endif
 }
@@ -360,7 +395,7 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
  */
 bool Application::showOfflineContacts() const
 {
-    return settings->value("ShowOfflineContacts", true).toBool();
+    return d->settings->value("ShowOfflineContacts", true).toBool();
 }
 
 /** Sets whether offline contacts should be displayed.
@@ -371,7 +406,7 @@ void Application::setShowOfflineContacts(bool show)
 {
     if (show != showOfflineContacts())
     {
-        settings->setValue("ShowOfflineContacts", show);
+        d->settings->setValue("ShowOfflineContacts", show);
         emit showOfflineContactsChanged(show);
     }
 }
@@ -383,3 +418,14 @@ void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
         showChats();
 }
 #endif
+
+UpdatesDialog *Application::updatesDialog()
+{
+    return d->updates;
+}
+
+void Application::setUpdatesDialog(UpdatesDialog *updatesDialog)
+{
+    d->updates = updatesDialog;
+}
+
