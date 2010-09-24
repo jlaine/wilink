@@ -52,8 +52,6 @@ public:
         UrlRole,
         NicknameRole,
         PersistentRole,
-        // stamps
-        vCardStampRole,
     };
 
     enum Feature {

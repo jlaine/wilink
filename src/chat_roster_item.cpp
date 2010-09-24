@@ -21,15 +21,9 @@
 
 #include "chat_roster_item.h"
 
-ChatRosterItem::ChatRosterItem(enum ChatRosterItem::Type type, const QString &id)
-    : itemId(id), itemType(type), parentItem(0)
+ChatRosterItem::ChatRosterItem(enum ChatRosterItem::Type type)
+    : itemType(type), parentItem(0)
 {
-    QString name;
-    if (type == RoomMember)
-        name = id.split('/').last();
-    else
-        name = id.split('@').first();
-    setData(Qt::DisplayRole, name);
 }
 
 ChatRosterItem::~ChatRosterItem()
@@ -89,6 +83,18 @@ ChatRosterItem *ChatRosterItem::find(const QString &id)
 QString ChatRosterItem::id() const
 {
     return itemId;
+}
+
+void ChatRosterItem::setId(const QString &id)
+{
+    itemId = id;
+
+    QString name;
+    if (itemType == RoomMember)
+        name = id.split('/').last();
+    else
+        name = id.split('@').first();
+    setData(Qt::DisplayRole, name);
 }
 
 ChatRosterItem* ChatRosterItem::parent()

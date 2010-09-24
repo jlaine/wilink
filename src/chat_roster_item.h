@@ -36,23 +36,28 @@ public:
         Other,
     };
 
-    ChatRosterItem(enum Type type, const QString &id = QString());
+    ChatRosterItem(enum Type type);
     ~ChatRosterItem();
+
+    QVariant data(int role) const;
+    void setData(int role, const QVariant &value);
+
+    QString id() const;
+    void setId(const QString &id);
+
+    ChatRosterItem* parent();
+    void setParent(ChatRosterItem *parent);
+
+    enum Type type() const;
 
     void append(ChatRosterItem *item);
     ChatRosterItem *child(int row);
     void clear();
-    QVariant data(int role) const;
     ChatRosterItem* find(const QString &id);
-    QString id() const;
-    ChatRosterItem* parent();
     void remove(ChatRosterItem *item);
     void removeAt(int row);
     int row() const;
-    void setData(int role, const QVariant &value);
-    void setParent(ChatRosterItem *parent);
     int size() const;
-    enum Type type() const;
 
 private:
     QString itemId;

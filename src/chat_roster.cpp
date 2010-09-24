@@ -89,8 +89,8 @@ public:
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
     QXmppClient *client;
+    ChatRosterItem *ownItem;
     ChatRosterItem *rootItem;
-    QString nickName;
     bool nickNameReceived;
     QMap<QString, int> clientFeatures;
 };
@@ -115,12 +115,6 @@ int ChatRosterModelPrivate::countPendingMessages()
  */
 void ChatRosterModelPrivate::fetchVCard(ChatRosterItem *item)
 {
-    QTime stamp = item->data(ChatRosterModel::vCardStampRole).toTime();
-
-    // if the roster data is up to date, do nothing
-    if (stamp.isValid() && stamp.secsTo(QTime::currentTime()) <= 3600)
-        return;
-
     // try to fetch data from cache
     QIODevice *ioDevice = cache->data(QUrl("vcard:" + item->id()));
     if (ioDevice)
@@ -148,6 +142,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
         QDesktopServices::DataLocation)).filePath("cache"));
     d->client = xmppClient;
     d->nickNameReceived = false;
+    d->ownItem = new ChatRosterItem(ChatRosterItem::Contact);
     d->rootItem = new ChatRosterItem(ChatRosterItem::Root);
 
     bool check;
@@ -198,10 +193,10 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 void ChatRosterModel::connected()
 {
     /* request own vCard */
-    d->nickName = d->client->configuration().user();
     d->nickNameReceived = false;
-    d->client->vCardManager().requestVCard(
-        d->client->configuration().jidBare());
+    d->ownItem->setId(d->client->configuration().jidBare());
+    d->ownItem->setData(NicknameRole, d->client->configuration().user());
+    d->fetchVCard(d->ownItem);
 }
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
@@ -462,7 +457,7 @@ bool ChatRosterModel::isOwnNameReceived() const
 
 QString ChatRosterModel::ownName() const
 {
-    return d->nickName;
+    return d->ownItem->data(NicknameRole).toString();
 }
 
 QModelIndex ChatRosterModel::parent(const QModelIndex & index) const
@@ -534,7 +529,8 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         if (!memberItem)
         {
             // create roster entry
-            memberItem = new ChatRosterItem(ChatRosterItem::RoomMember, jid);
+            memberItem = new ChatRosterItem(ChatRosterItem::RoomMember);
+            memberItem->setId(jid);
             memberItem->setData(StatusRole, presence.status().type());
             beginInsertRows(createIndex(roomItem->row(), 0, roomItem), roomItem->size(), roomItem->size());
             roomItem->append(memberItem);
@@ -605,7 +601,8 @@ void ChatRosterModel::rosterChanged(const QString &jid)
                          createIndex(item->row(), SortingColumn, item));
     } else {
         // add a new entry
-        item = new ChatRosterItem(ChatRosterItem::Contact, jid);
+        item = new ChatRosterItem(ChatRosterItem::Contact);
+        item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
         beginInsertRows(QModelIndex(), d->rootItem->size(), d->rootItem->size());
@@ -724,16 +721,13 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         if (!url.isEmpty())
             item->setData(UrlRole, vcard.url());
 
-        // store vCard stamp
-        item->setData(vCardStampRole, QTime::currentTime());
-
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
     }
     if (bareJid == d->client->configuration().jidBare())
     {
         if (!vcard.nickName().isEmpty())
-            d->nickName = vcard.nickName();
+            d->ownItem->setData(NicknameRole, vcard.nickName());
         d->nickNameReceived = true;
         emit ownNameReceived();
     }
@@ -780,7 +774,8 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
         return createIndex(item->row(), 0, item);
 
     // prepare item
-    item = new ChatRosterItem(type, id);
+    item = new ChatRosterItem(type);
+    item->setId(id);
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
     if (!icon.isNull())
