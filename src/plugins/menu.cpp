@@ -33,6 +33,7 @@
 
 #include "qnetio/wallet.h"
 
+#include "application.h"
 #include "chat.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
@@ -66,7 +67,10 @@ Menu::Menu(QMenuBar *bar, Chat *window)
     rosterView->expand(rosterView->mapFromRoster(index));
 
     /* prepare network manager */
+    Application *wApp = qobject_cast<Application*>(qApp);
+    Q_ASSERT(wApp);
     network = new QNetworkAccessManager(this);
+    network->setCache(wApp->networkCache());
     check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
                     QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     Q_ASSERT(check);

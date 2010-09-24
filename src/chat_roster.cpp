@@ -224,6 +224,7 @@ ChatRosterModel::~ChatRosterModel()
 
 int ChatRosterModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return MaxColumn;
 }
 
@@ -536,6 +537,7 @@ QStringList ChatRosterModel::mimeTypes() const
 
 void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& resource)
 {
+    Q_UNUSED(resource);
     ChatRosterItem *item = d->rootItem->find(bareJid);
     if (item)
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
@@ -975,8 +977,9 @@ void ChatRosterView::resizeEvent(QResizeEvent *e)
     setColumnWidth(ContactColumn, e->size().width() - 40);
 }
 
-void ChatRosterView::selectionChanged(const QItemSelection & selected, const QItemSelection &deselected)
+void ChatRosterView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    Q_UNUSED(deselected);
     foreach (const QModelIndex &index, selected.indexes())
         expand(index);
 }
