@@ -35,6 +35,8 @@ class QXmppDiscoveryIq;
 class QXmppPresence;
 class QXmppVCardManager;
 
+class ChatRosterModelPrivate;
+
 class ChatRosterModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -116,11 +118,7 @@ protected slots:
 private:
     void countPendingMessages();
 
-    QXmppClient *client;
-    ChatRosterItem *rootItem;
-    QString nickName;
-    bool nickNameReceived;
-    QMap<QString, int> clientFeatures;
+    ChatRosterModelPrivate * const d;
 };
 
 class ChatRosterView : public QTreeView
