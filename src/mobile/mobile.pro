@@ -26,6 +26,7 @@ SOURCES += \
     ../flickcharm.cpp \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
+    ../plugins/photos.cpp \
     ../plugins/rooms.cpp \
     main.cpp
 
@@ -48,6 +49,7 @@ HEADERS += \
     ../flickcharm.h \
     ../plugins/chats.h \
     ../plugins/console.h \
+    ../plugins/photos.h \
     ../plugins/rooms.h
 
 mac {
