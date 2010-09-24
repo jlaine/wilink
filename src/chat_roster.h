@@ -118,6 +118,9 @@ protected slots:
     void vCardReceived(const QXmppVCardIq&);
 
 private:
+    void vCardFound(const QXmppVCardIq&);
+
+    friend class ChatRosterModelPrivate;
     ChatRosterModelPrivate * const d;
 };
 

@@ -20,9 +20,14 @@
 #include <QBuffer>
 #include <QContextMenuEvent>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QDir>
+#include <QDomElement>
 #include <QImageReader>
 #include <QList>
 #include <QMenu>
+#include <QNetworkCacheMetaData>
+#include <QNetworkDiskCache>
 #include <QPainter>
 #include <QStringList>
 #include <QSortFilterProxyModel>
@@ -81,6 +86,8 @@ public:
     int countPendingMessages();
     void fetchVCard(ChatRosterItem *item);
 
+    ChatRosterModel *q;
+    QNetworkDiskCache *cache;
     QXmppClient *client;
     ChatRosterItem *rootItem;
     QString nickName;
@@ -109,14 +116,36 @@ int ChatRosterModelPrivate::countPendingMessages()
 void ChatRosterModelPrivate::fetchVCard(ChatRosterItem *item)
 {
     QTime stamp = item->data(ChatRosterModel::vCardStampRole).toTime();
-    if (!stamp.isValid() || stamp.secsTo(QTime::currentTime()) > 3600)
-        client->vCardManager().requestVCard(item->id());
+
+    // if the roster data is up to date, do nothing
+    if (stamp.isValid() && stamp.secsTo(QTime::currentTime()) <= 3600)
+        return;
+
+    // try to fetch data from cache
+    QIODevice *ioDevice = cache->data(QUrl("vcard:" + item->id()));
+    if (ioDevice)
+    {
+        QDomDocument doc;
+        doc.setContent(ioDevice);
+        QXmppVCardIq vCard;
+        vCard.parse(doc.documentElement());
+        q->vCardFound(vCard);
+        delete ioDevice;
+        return;
+    }
+
+    // request the vCard
+    client->vCardManager().requestVCard(item->id());
 }
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     : QAbstractItemModel(parent),
     d(new ChatRosterModelPrivate)
 {
+    d->q = this;
+    d->cache = new QNetworkDiskCache(this);
+    d->cache->setCacheDirectory(QDir(QDesktopServices::storageLocation(
+        QDesktopServices::DataLocation)).filePath("cache"));
     d->client = xmppClient;
     d->nickNameReceived = false;
     d->rootItem = new ChatRosterItem(ChatRosterItem::Root);
@@ -660,7 +689,7 @@ bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, i
     return true;
 }
 
-void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
+void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
 {
     const QString bareJid = vcard.from();
 
@@ -708,6 +737,21 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
         d->nickNameReceived = true;
         emit ownNameReceived();
     }
+}
+
+void ChatRosterModel::vCardReceived(const QXmppVCardIq& vCard)
+{
+    // store vCard to disk cache
+    QNetworkCacheMetaData metaData;
+    metaData.setUrl(QUrl("vcard:" + vCard.from()));
+    metaData.setExpirationDate(QDateTime::currentDateTime().addSecs(3600));
+    QIODevice *ioDevice = d->cache->prepare(metaData);
+    QXmlStreamWriter writer(ioDevice);
+    vCard.toXml(&writer);
+    d->cache->insert(ioDevice);
+
+    // handle vCard
+    vCardFound(vCard);
 }
 
 void ChatRosterModel::addPendingMessage(const QString &bareJid)
