@@ -33,6 +33,10 @@
 #include "console.h"
 #include "chat_utils.h"
 
+#ifdef WILINK_EMBEDDED
+#include "flickcharm.h"
+#endif
+
 ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     : ChatPanel(parent), connected(false), currentLogger(logger)
 {
@@ -46,6 +50,10 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     layout->addItem(headerLayout());
 
     browser = new QTextBrowser;
+#ifdef WILINK_EMBEDDED
+    FlickCharm *charm = new FlickCharm(this);
+    charm->activateOn(browser);
+#endif
     layout->addWidget(browser);
     highlighter = new Highlighter(browser->document());
 
