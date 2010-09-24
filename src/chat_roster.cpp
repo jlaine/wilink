@@ -78,12 +78,40 @@ static void paintMessages(QPixmap &icon, int messages)
 class ChatRosterModelPrivate
 {
 public:
+    int countPendingMessages();
+    void fetchVCard(ChatRosterItem *item);
+
     QXmppClient *client;
     ChatRosterItem *rootItem;
     QString nickName;
     bool nickNameReceived;
     QMap<QString, int> clientFeatures;
 };
+
+/** Count the current number of pending messages.
+ */
+int ChatRosterModelPrivate::countPendingMessages()
+{
+    int pending = 0;
+    for (int i = 0; i < rootItem->size(); i++)
+    {
+        ChatRosterItem *item = rootItem->child(i);
+        pending += item->data(ChatRosterModel::MessagesRole).toInt();
+    }
+    return pending;
+}
+
+/** Check whether the vCard for the given roster item is cached, otherwise
+ *  request the vCard.
+ *
+ * @param item
+ */
+void ChatRosterModelPrivate::fetchVCard(ChatRosterItem *item)
+{
+    QTime stamp = item->data(ChatRosterModel::vCardStampRole).toTime();
+    if (!stamp.isValid() || stamp.secsTo(QTime::currentTime()) > 3600)
+        client->vCardManager().requestVCard(item->id());
+}
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     : QAbstractItemModel(parent),
@@ -224,17 +252,6 @@ static QString contactStatus(const QModelIndex &index)
         return "away";
     else
         return "busy";
-}
-
-void ChatRosterModel::countPendingMessages()
-{
-    int pending = 0;
-    for (int i = 0; i < d->rootItem->size(); i++)
-    {
-        ChatRosterItem *item = d->rootItem->child(i);
-        pending += item->data(MessagesRole).toInt();
-    }
-    emit pendingMessages(pending);
 }
 
 QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
@@ -471,9 +488,8 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             d->clientFeatures.remove(jid);
         else if (presence.type() == QXmppPresence::Available && !d->clientFeatures.contains(jid))
         {
-            d->clientFeatures.insert(jid, 0);
-
             // discover remote party features
+            d->clientFeatures.insert(jid, 0);
             d->client->discoveryManager().requestInfo(jid);
         }
     }
@@ -496,8 +512,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             endInsertRows();
 
             // fetch vCard
-            d->client->vCardManager().requestVCard(jid);
-
+            d->fetchVCard(memberItem);
         } else {
             // update roster entry
             memberItem->setData(StatusRole, presence.status().type());
@@ -570,7 +585,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     }
 
     // fetch vCard
-    d->client->vCardManager().requestVCard(jid);
+    d->fetchVCard(item);
 }
 
 void ChatRosterModel::rosterReceived()
@@ -652,15 +667,15 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
     ChatRosterItem *item = d->rootItem->find(bareJid);
     if (item)
     {
-        // Read image.
+        // read vCard image
         QBuffer buffer;
         buffer.setData(vcard.photo());
         buffer.open(QIODevice::ReadOnly);
         QImageReader imageReader(&buffer);
         item->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
-        // Store the nickName or fullName found in the vCard for display,
-        // unless the roster entry has a name.
+        // store the nickName or fullName found in the vCard for display,
+        // unless the roster entry has a name
         if (item->type() == ChatRosterItem::Contact)
         {
             QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(bareJid);
@@ -675,9 +690,13 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
             }
         }
 
+        // store vCard URL
         const QString url = vcard.url();
         if (!url.isEmpty())
             item->setData(UrlRole, vcard.url());
+
+        // store vCard stamp
+        item->setData(vCardStampRole, QTime::currentTime());
 
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
@@ -699,7 +718,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
         item->setData(MessagesRole, item->data(MessagesRole).toInt() + 1);
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
-        countPendingMessages();
+        emit pendingMessages(d->countPendingMessages());
     }
 }
 
@@ -738,7 +757,7 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
         item->setData(MessagesRole, 0);
         emit dataChanged(createIndex(item->row(), ContactColumn, item),
                          createIndex(item->row(), SortingColumn, item));
-        countPendingMessages();
+        emit pendingMessages(d->countPendingMessages());
     }
 }
 
