@@ -294,6 +294,9 @@ void ChatRoomWatcher::roomClose()
 void ChatRoomWatcher::roomPrompt()
 {
     ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
+#ifdef WILINK_EMBEDDED
+    prompt.showMaximized();
+#endif
     if (!prompt.exec())
         return;
     const QString roomJid = prompt.textValue();
@@ -464,6 +467,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     setWindowIcon(QIcon(":/chat.png"));
     setWindowExtra(jid);
 
+#ifndef WILINK_EMBEDDED
     /* help label */
     QVBoxLayout *vbox = qobject_cast<QVBoxLayout*>(layout());
     int index = vbox->indexOf(chatHistory);
@@ -472,6 +476,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     helpLabel->setWordWrap(true);
     vbox->insertWidget(index++, helpLabel);
     vbox->insertSpacing(index++, 10);
+#endif
 
     bool check;
     check = connect(client, SIGNAL(connected()), this, SLOT(join()));
