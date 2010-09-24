@@ -15,6 +15,7 @@ SOURCES += \
     ../chat_conversation.cpp \
     ../chat_client.cpp \
     ../chat_edit.cpp \
+    ../chat_form.cpp \
     ../chat_history.cpp \
     ../chat_panel.cpp \
     ../chat_roster.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
     ../flickcharm.cpp \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
+    ../plugins/rooms.cpp \
     main.cpp
 
 HEADERS += \
@@ -34,6 +36,7 @@ HEADERS += \
     ../chat_client.h \
     ../chat_conversation.h \
     ../chat_edit.h \
+    ../chat_form.h \
     ../chat_history.h \
     ../chat_panel.h \
     ../chat_plugin.h \
@@ -44,7 +47,8 @@ HEADERS += \
     ../chat_utils.h \
     ../flickcharm.h \
     ../plugins/chats.h \
-    ../plugins/console.h
+    ../plugins/console.h \
+    ../plugins/rooms.h
 
 mac {
     SOURCES += ../application_mac.mm
