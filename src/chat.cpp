@@ -111,6 +111,7 @@ Chat::Chat(QWidget *parent)
     /* create menu */
     m_fileMenu = menuBar()->addMenu(tr("&File"));
     m_optionsMenu = m_fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
+    m_optionsMenu->menuAction()->setMenuRole(QAction::PreferencesRole);
 
     QAction *action = m_optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
@@ -140,6 +141,7 @@ Chat::Chat(QWidget *parent)
     }
 
     action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    action->setMenuRole(QAction::QuitRole);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
@@ -538,6 +540,7 @@ bool Chat::open(const QString &jid)
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showHelp()));
 
     action = m_helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
+    action->setMenuRole(QAction::AboutRole);
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
 
     return true;
