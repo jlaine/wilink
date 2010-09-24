@@ -89,9 +89,9 @@ public:
 
     // Try to read an IQ to disk cache.
     template <class T>
-    bool readIq(const QString &proto, const QString &jid, T &iq)
+    bool readIq(const QUrl &url, T &iq)
     {
-        QIODevice *ioDevice = cache->data(QUrl(proto + ":" + jid));
+        QIODevice *ioDevice = cache->data(url);
         if (!ioDevice)
             return false;
 
@@ -104,10 +104,10 @@ public:
 
     // Write an IQ to disk cache.
     template <class T>
-    void writeIq(const QString &proto, const T &iq, int cacheSeconds)
+    void writeIq(const QUrl &url, const T &iq, int cacheSeconds)
     {
         QNetworkCacheMetaData metaData;
-        metaData.setUrl(QUrl(proto + ":" + iq.from()));
+        metaData.setUrl(url);
         metaData.setExpirationDate(QDateTime::currentDateTime().addSecs(cacheSeconds));
         QIODevice *ioDevice = cache->prepare(metaData);
         QXmlStreamWriter writer(ioDevice);
@@ -145,7 +145,7 @@ int ChatRosterModelPrivate::countPendingMessages()
 void ChatRosterModelPrivate::fetchInfo(const QString &jid)
 {
     QXmppDiscoveryIq disco;
-    if (readIq("info", jid, disco))
+    if (readIq(QString("xmpp:%1?disco;type=get;request=info").arg(jid), disco))
         q->discoveryInfoFound(disco);
     else
         client->discoveryManager().requestInfo(jid);
@@ -159,7 +159,7 @@ void ChatRosterModelPrivate::fetchInfo(const QString &jid)
 void ChatRosterModelPrivate::fetchVCard(const QString &jid)
 {
     QXmppVCardIq vCard;
-    if (readIq("vcard", jid, vCard))
+    if (readIq(QString("xmpp:%1?vcard").arg(jid), vCard))
         q->vCardFound(vCard);
     else
         client->vCardManager().requestVCard(jid);
@@ -445,7 +445,7 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
-    d->writeIq("info", disco, 600);
+    d->writeIq(QString("xmpp:%1?disco;type=get;request=info").arg(disco.from()), disco, 600);
     discoveryInfoFound(disco);
 }
 
@@ -777,7 +777,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vCard)
     if (vCard.type() != QXmppIq::Result)
         return;
 
-    d->writeIq("vcard", vCard, 3600);
+    d->writeIq(QString("xmpp:%1?vcard").arg(vCard.from()), vCard, 3600);
     vCardFound(vCard);
 }
 
