@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
-#include <QDomElement>
+#include <QDomDocument>
 #include <QImageReader>
 #include <QList>
 #include <QMenu>
@@ -84,7 +84,36 @@ class ChatRosterModelPrivate
 {
 public:
     int countPendingMessages();
-    void fetchVCard(ChatRosterItem *item);
+    void fetchInfo(const QString &jid);
+    void fetchVCard(const QString &jid);
+
+    // Try to read an IQ to disk cache.
+    template <class T>
+    bool readIq(const QString &proto, const QString &jid, T &iq)
+    {
+        QIODevice *ioDevice = cache->data(QUrl(proto + ":" + jid));
+        if (!ioDevice)
+            return false;
+
+        QDomDocument doc;
+        doc.setContent(ioDevice);
+        iq.parse(doc.documentElement());
+        delete ioDevice;
+        return true;
+    }
+
+    // Write an IQ to disk cache.
+    template <class T>
+    void writeIq(const QString &proto, const T &iq, int cacheSeconds)
+    {
+        QNetworkCacheMetaData metaData;
+        metaData.setUrl(QUrl(proto + ":" + iq.from()));
+        metaData.setExpirationDate(QDateTime::currentDateTime().addSecs(cacheSeconds));
+        QIODevice *ioDevice = cache->prepare(metaData);
+        QXmlStreamWriter writer(ioDevice);
+        iq.toXml(&writer);
+        cache->insert(ioDevice);
+    }
 
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
@@ -108,28 +137,32 @@ int ChatRosterModelPrivate::countPendingMessages()
     return pending;
 }
 
+/** Check whether the discovery info for the given roster item is cached, otherwise
+ *  request the information.
+ *
+ * @param item
+ */
+void ChatRosterModelPrivate::fetchInfo(const QString &jid)
+{
+    QXmppDiscoveryIq disco;
+    if (readIq("info", jid, disco))
+        q->discoveryInfoFound(disco);
+    else
+        client->discoveryManager().requestInfo(jid);
+}
+
 /** Check whether the vCard for the given roster item is cached, otherwise
  *  request the vCard.
  *
  * @param item
  */
-void ChatRosterModelPrivate::fetchVCard(ChatRosterItem *item)
+void ChatRosterModelPrivate::fetchVCard(const QString &jid)
 {
-    // try to fetch data from cache
-    QIODevice *ioDevice = cache->data(QUrl("vcard:" + item->id()));
-    if (ioDevice)
-    {
-        QDomDocument doc;
-        doc.setContent(ioDevice);
-        QXmppVCardIq vCard;
-        vCard.parse(doc.documentElement());
+    QXmppVCardIq vCard;
+    if (readIq("vcard", jid, vCard))
         q->vCardFound(vCard);
-        delete ioDevice;
-        return;
-    }
-
-    // request the vCard
-    client->vCardManager().requestVCard(item->id());
+    else
+        client->vCardManager().requestVCard(jid);
 }
 
 ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
@@ -196,7 +229,7 @@ void ChatRosterModel::connected()
     d->nickNameReceived = false;
     d->ownItem->setId(d->client->configuration().jidBare());
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
-    d->fetchVCard(d->ownItem);
+    d->fetchVCard(d->ownItem->id());
 }
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
@@ -376,11 +409,8 @@ void ChatRosterModel::disconnected()
     }
 }
 
-void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
+void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
 {
-    if (disco.type() != QXmppIq::Result ||
-        disco.queryType() != QXmppDiscoveryIq::InfoQuery)
-        return;
     int features = 0;
     foreach (const QString &var, disco.features())
     {
@@ -408,6 +438,15 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     }
     if (d->clientFeatures.contains(disco.from()))
         d->clientFeatures.insert(disco.from(), features);
+}
+
+void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
+{
+    if (disco.type() != QXmppIq::Result)
+        return;
+
+    d->writeIq("info", disco, 600);
+    discoveryInfoFound(disco);
 }
 
 QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
@@ -514,7 +553,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         {
             // discover remote party features
             d->clientFeatures.insert(jid, 0);
-            d->client->discoveryManager().requestInfo(jid);
+            d->fetchInfo(jid);
         }
     }
 
@@ -537,7 +576,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             endInsertRows();
 
             // fetch vCard
-            d->fetchVCard(memberItem);
+            d->fetchVCard(memberItem->id());
         } else {
             // update roster entry
             memberItem->setData(StatusRole, presence.status().type());
@@ -611,7 +650,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     }
 
     // fetch vCard
-    d->fetchVCard(item);
+    d->fetchVCard(item->id());
 }
 
 void ChatRosterModel::rosterReceived()
@@ -735,16 +774,10 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
 
 void ChatRosterModel::vCardReceived(const QXmppVCardIq& vCard)
 {
-    // store vCard to disk cache
-    QNetworkCacheMetaData metaData;
-    metaData.setUrl(QUrl("vcard:" + vCard.from()));
-    metaData.setExpirationDate(QDateTime::currentDateTime().addSecs(3600));
-    QIODevice *ioDevice = d->cache->prepare(metaData);
-    QXmlStreamWriter writer(ioDevice);
-    vCard.toXml(&writer);
-    d->cache->insert(ioDevice);
+    if (vCard.type() != QXmppIq::Result)
+        return;
 
-    // handle vCard
+    d->writeIq("vcard", vCard, 3600);
     vCardFound(vCard);
 }
 
