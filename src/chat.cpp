@@ -546,6 +546,13 @@ bool Chat::open(const QString &jid)
     return true;
 }
 
+/** When asked to open an XMPP URI, let plugins handle it.
+ */
+void Chat::openUrl(const QUrl &url)
+{
+    emit urlClick(url);
+}
+
 /** Return this window's "File" menu.
  */
 QMenu *Chat::fileMenu()

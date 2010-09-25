@@ -107,8 +107,14 @@ void Menu::fetchMenu()
 void Menu::openUrl()
 {
     QAction *action = qobject_cast<QAction *>(sender());
-    if (action)
-        QDesktopServices::openUrl(action->data().toUrl());
+    if (!action)
+        return;
+
+    const QUrl linkUrl = action->data().toUrl();
+    if (linkUrl.scheme() == "xmpp")
+        chatWindow->openUrl(linkUrl);
+    else
+        QDesktopServices::openUrl(linkUrl);
 }
 
 void Menu::showIcon()
@@ -157,7 +163,7 @@ void Menu::showMenu()
             servicesMenu->addSeparator();
         else if (linkUrl.isValid())
         {
-            if (linkUrl.scheme() == "xmpp")
+            if (linkUrl.scheme() == "xmpp" && linkUrl.hasQueryItem("join"))
             {
                 /* add or move chat room entry */
                 ChatRosterModel *model = chatWindow->rosterModel();

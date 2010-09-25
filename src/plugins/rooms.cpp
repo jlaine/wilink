@@ -96,12 +96,21 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     Q_ASSERT(check);
 
     // add roster hooks
-    connect(chat, SIGNAL(rosterClick(QModelIndex)),
-            this, SLOT(rosterClick(QModelIndex)));
-    connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
-            this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-            this, SLOT(rosterMenu(QMenu*, QModelIndex)));
+    check = connect(chat, SIGNAL(rosterClick(QModelIndex)),
+                    this, SLOT(rosterClick(QModelIndex)));
+    Q_ASSERT(check);
+
+    check = connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
+                    this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
+    Q_ASSERT(check);
+
+    check = connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
+                    this, SLOT(rosterMenu(QMenu*, QModelIndex)));
+    Q_ASSERT(check);
+
+    check = connect(chat, SIGNAL(urlClick(QUrl)),
+                    this, SLOT(urlClick(QUrl)));
+    Q_ASSERT(check);
  
     // add room button
     roomButton = new QPushButton;
@@ -450,6 +459,14 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
             connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
         }
     }
+}
+
+/** Open a XMPP URI if it refers to a chat room.
+ */
+void ChatRoomWatcher::urlClick(const QUrl &url)
+{
+    if (url.scheme() == "xmpp" && url.hasQueryItem("join"))
+        joinRoom(url.path());
 }
 
 ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)

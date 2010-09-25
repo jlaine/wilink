@@ -70,6 +70,7 @@ private slots:
     void rosterClick(const QModelIndex &index);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
+    void urlClick(const QUrl &url);
 
 private:
     ChatRoom *joinRoom(const QString &jid);
