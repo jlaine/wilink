@@ -27,7 +27,6 @@
 
 class QAction;
 class QMenu;
-class QMenuBar;
 class QNetworkAccessManager;
 class QNetworkReply;
 class Chat;
@@ -37,8 +36,7 @@ class Menu : public QObject
     Q_OBJECT
 
 public:
-    Menu(QMenuBar *bar, Chat *window);
-    ~Menu();
+    Menu(Chat *window);
 
 private slots:
     void fetchMenu();
@@ -56,7 +54,6 @@ private:
     QByteArray userAgent;
 
     Chat *chatWindow;
-    QMenuBar *menuBar;
     QMenu *servicesMenu;
 };
 

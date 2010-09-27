@@ -44,19 +44,17 @@ static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/1");
 static const QString authSuffix = "@wifirst.net";
 static int retryInterval = 15000;
 
-Menu::Menu(QMenuBar *bar, Chat *window)
-    : QObject(bar),
+Menu::Menu(Chat *window)
+    : QObject(window),
     refreshInterval(0),
     chatWindow(window),
-    menuBar(bar),
     servicesMenu(0)
 {
     bool check;
 
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
 
-    servicesMenu = new QMenu(tr("&Services"));
-    menuBar->addMenu(servicesMenu);
+    servicesMenu = chatWindow->menuBar()->addMenu(tr("&Services"));
 
     /* add roster entry */
     QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterItem::Other,
@@ -78,11 +76,6 @@ Menu::Menu(QMenuBar *bar, Chat *window)
     check = connect(chatWindow->client(), SIGNAL(connected()),
                     this, SLOT(fetchMenu()));
     Q_ASSERT(check);
-}
-
-Menu::~Menu()
-{
-    delete servicesMenu;
 }
 
 void Menu::fetchIcon(const QUrl &url, QAction *action)
@@ -234,7 +227,7 @@ bool MenuPlugin::initialize(Chat *chat)
     if (domain != "wifirst.net")
         return false;
 
-    new Menu(chat->menuBar(), chat);
+    new Menu(chat);
     return true;
 }
 
