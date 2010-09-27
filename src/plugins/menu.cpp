@@ -26,7 +26,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QSystemTrayIcon>
 #include <QTimer>
 
 #include "QXmppClient.h"
@@ -181,30 +180,6 @@ void Menu::showMenu()
         item = item.nextSiblingElement("menu");
     }
 
-    /* parse messages */
-    item = doc.documentElement().firstChildElement("messages").firstChildElement("message");
-    while (!item.isNull())
-    {
-        const QString id = item.firstChildElement("id").text();
-        const QString title = item.firstChildElement("title").text();
-        const QString text = item.firstChildElement("text").text();
-        const int type = item.firstChildElement("type").text().toInt();
-        enum QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::Information;
-        switch (type)
-        {
-            case 3: icon = QSystemTrayIcon::Critical; break;
-            case 2: icon = QSystemTrayIcon::Warning; break;
-            case 1: icon = QSystemTrayIcon::Information; break;
-            case 0: icon = QSystemTrayIcon::NoIcon; break;
-        }
-        if (!seenMessages.contains(id))
-        {
-            //showMessage(title, text, icon);
-            seenMessages.append(id);
-        }
-        item = item.nextSiblingElement("message");
-    }
-
     /* parse preferences */
     QDomElement preferences = doc.documentElement().firstChildElement("preferences");
     refreshInterval = preferences.firstChildElement("refresh").text().toInt() * 1000;
@@ -222,7 +197,6 @@ public:
 
 bool MenuPlugin::initialize(Chat *chat)
 {
-    QString url;
     QString domain = chat->client()->configuration().domain();
     if (domain != "wifirst.net")
         return false;
