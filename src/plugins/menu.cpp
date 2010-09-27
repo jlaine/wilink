@@ -67,7 +67,6 @@ Menu::Menu(Chat *window)
     Application *wApp = qobject_cast<Application*>(qApp);
     Q_ASSERT(wApp);
     network = new QNetworkAccessManager(this);
-    network->setCache(wApp->networkCache());
     check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
                     QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     Q_ASSERT(check);
