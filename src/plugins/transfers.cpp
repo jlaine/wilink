@@ -247,11 +247,9 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
     setWindowTitle(tr("File transfers"));
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
 
     /* status bar */
-    QLayout *hbox = headerLayout();
-    layout->addItem(hbox);
+    layout->addItem(headerLayout());
 
     /* help label */
     QLabel *helpLabel = new QLabel(tr("The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection."));

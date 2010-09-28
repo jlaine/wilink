@@ -261,7 +261,6 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
     layout->setSpacing(0);
     layout->addItem(headerLayout());
     layout->addWidget(helpLabel);

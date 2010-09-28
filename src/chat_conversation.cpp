@@ -40,7 +40,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     spacerItem(0)
 {
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
     layout->setSpacing(0);
 
     /* status bar */

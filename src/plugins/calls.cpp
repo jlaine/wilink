@@ -103,7 +103,6 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     setWindowExtra(rosterModel->contactExtra(bareJid));
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
     layout->setSpacing(0);
 
     // HEADER

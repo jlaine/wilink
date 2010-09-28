@@ -44,7 +44,6 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setWindowTitle(tr("Debugging console"));
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
     layout->setSpacing(0);
 
     layout->addItem(headerLayout());

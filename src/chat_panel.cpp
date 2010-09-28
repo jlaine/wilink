@@ -147,9 +147,11 @@ void ChatPanel::changeEvent(QEvent *event)
     {
         if (parent())
         {
+            layout()->setMargin(0);
             d->attachButton->hide();
             d->closeButton->show();
         } else {
+            layout()->setMargin(6);
             d->attachButton->show();
             d->closeButton->hide();
         }
