@@ -34,6 +34,7 @@ class QAudioFormat;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
+class QLabel;
 class QMenu;
 class QModelIndex;
 class QPushButton;

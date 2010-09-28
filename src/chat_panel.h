@@ -23,9 +23,8 @@
 #include <QWidget>
 #include "chat_roster_item.h"
 
-class QLabel;
-class QPushButton;
 class QHBoxLayout;
+class ChatPanelPrivate;
 
 /** ChatPanel is the base class for all the panels displayed in the right-hand
  *  part of the user interface, such as conversations.
@@ -42,6 +41,8 @@ public:
 
 public:
     ChatPanel(QWidget *parent);
+    ~ChatPanel();
+
     virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
@@ -71,16 +72,7 @@ private slots:
     void sendNotifications();
 
 private:
-    void updateTitle();
-
-    QHBoxLayout *hbox;
-    QPushButton *attachButton;
-    QPushButton *closeButton;
-    QLabel *iconLabel;
-    QLabel *nameLabel;
-    QString windowExtra;
-    QString windowStatus;
-    QList< QPair<QString, int> > notificationQueue;
+    ChatPanelPrivate * const d;
 };
 
 #endif

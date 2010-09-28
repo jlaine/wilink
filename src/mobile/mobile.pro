@@ -3,7 +3,7 @@ include(../idle/idle.pri)
 include(../qnetio/qnetio.pri)
 include(../qxmpp/qxmpp.pri)
 
-QT += network xml
+QT += multimedia network xml
 
 TARGET = wiLink
 
@@ -26,6 +26,7 @@ SOURCES += \
     ../chat_utils.cpp \
     ../flickcharm.cpp \
     ../systeminfo.cpp \
+    ../plugins/calls.cpp \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/rooms.cpp \
@@ -49,6 +50,7 @@ HEADERS += \
     ../chat_utils.h \
     ../flickcharm.h \
     ../systeminfo.h \
+    ../plugins/calls.h \
     ../plugins/chats.h \
     ../plugins/console.h \
     ../plugins/rooms.h

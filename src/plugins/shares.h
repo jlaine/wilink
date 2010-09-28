@@ -28,19 +28,21 @@
 
 class Chat;
 class ChatRosterModel;
-class QXmppShareDatabase;
 class ChatSharesModel;
 class ChatSharesTab;
 class ChatSharesView;
 class ChatTransfers;
 class ChatTransfersView;
+class QLabel;
 class QLineEdit;
 class QModelIndex;
+class QPushButton;
 class QStatusBar;
 class QTabWidget;
 class QTimer;
 class QXmppPacket;
 class QXmppPresence;
+class QXmppShareDatabase;
 
 /** The shares panel.
  */

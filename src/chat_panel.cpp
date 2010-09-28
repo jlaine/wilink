@@ -25,38 +25,69 @@
 
 #include "chat_panel.h"
 
+class ChatPanelPrivate
+{
+public:
+    void updateTitle();
+
+    QVBoxLayout *layout;
+    QHBoxLayout *hbox;
+    QPushButton *attachButton;
+    QPushButton *closeButton;
+    QLabel *iconLabel;
+    QLabel *nameLabel;
+    QString windowExtra;
+    QString windowStatus;
+    QList< QPair<QString, int> > notificationQueue;
+
+    ChatPanel *q;
+};
+
+void ChatPanelPrivate::updateTitle()
+{
+    nameLabel->setText(QString("<b>%1</b> %2<br/>%3").arg(q->windowTitle(),
+        windowStatus, windowExtra));
+}
+
 ChatPanel::ChatPanel(QWidget* parent)
-    : QWidget(parent)
+    : QWidget(parent),
+    d(new ChatPanelPrivate)
 {
     bool check;
+    d->q = this;
 
-    attachButton = new QPushButton;
-    attachButton->setFlat(true);
-    attachButton->setMaximumWidth(32);
-    attachButton->setIcon(QIcon(":/add.png"));
-    attachButton->hide();
-    check = connect(attachButton, SIGNAL(clicked()),
+    d->attachButton = new QPushButton;
+    d->attachButton->setFlat(true);
+    d->attachButton->setMaximumWidth(32);
+    d->attachButton->setIcon(QIcon(":/add.png"));
+    d->attachButton->hide();
+    check = connect(d->attachButton, SIGNAL(clicked()),
                     this, SIGNAL(attachPanel()));
     Q_ASSERT(check);
 
-    closeButton = new QPushButton;
-    closeButton->setFlat(true);
-    closeButton->setMaximumWidth(32);
-    closeButton->setIcon(QIcon(":/close.png"));
-    check = connect(closeButton, SIGNAL(clicked()),
+    d->closeButton = new QPushButton;
+    d->closeButton->setFlat(true);
+    d->closeButton->setMaximumWidth(32);
+    d->closeButton->setIcon(QIcon(":/close.png"));
+    check = connect(d->closeButton, SIGNAL(clicked()),
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
 
-    iconLabel = new QLabel;
-    nameLabel = new QLabel;
+    d->iconLabel = new QLabel;
+    d->nameLabel = new QLabel;
 
-    hbox = new QHBoxLayout;
-    hbox->addSpacing(16);
-    hbox->addWidget(nameLabel);
-    hbox->addStretch();
-    hbox->addWidget(iconLabel);
-    hbox->addWidget(attachButton);
-    hbox->addWidget(closeButton);
+    d->hbox = new QHBoxLayout;
+    d->hbox->addSpacing(16);
+    d->hbox->addWidget(d->nameLabel);
+    d->hbox->addStretch();
+    d->hbox->addWidget(d->iconLabel);
+    d->hbox->addWidget(d->attachButton);
+    d->hbox->addWidget(d->closeButton);
+}
+
+ChatPanel::~ChatPanel()
+{
+    delete d;
 }
 
 /** Return the type of entry to add to the roster.
@@ -70,8 +101,8 @@ ChatRosterItem::Type ChatPanel::objectType() const
  */
 void ChatPanel::setWindowExtra(const QString &extra)
 {
-    windowExtra = extra;
-    updateTitle();
+    d->windowExtra = extra;
+    d->updateTitle();
 }
 
 /** When the window icon is set, update the header icon.
@@ -82,15 +113,15 @@ void ChatPanel::setWindowIcon(const QIcon &icon)
 {
     QWidget::setWindowIcon(icon);
     const QSize actualSize = icon.actualSize(QSize(64, 64));
-    iconLabel->setPixmap(icon.pixmap(actualSize));
+    d->iconLabel->setPixmap(icon.pixmap(actualSize));
 }
 
 /** When additional text is set, update the header text.
  */
 void ChatPanel::setWindowStatus(const QString &status)
 {
-    windowStatus = status;
-    updateTitle();
+    d->windowStatus = status;
+    d->updateTitle();
 }
 
 /** When the window title is set, update the header text.
@@ -100,14 +131,14 @@ void ChatPanel::setWindowStatus(const QString &status)
 void ChatPanel::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title);
-    updateTitle();
+    d->updateTitle();
 }
 
 /** Return a layout object for the panel header.
  */
 QLayout* ChatPanel::headerLayout()
 {
-    return hbox;
+    return d->hbox;
 }
 
 void ChatPanel::changeEvent(QEvent *event)
@@ -116,11 +147,11 @@ void ChatPanel::changeEvent(QEvent *event)
     {
         if (parent())
         {
-            attachButton->hide();
-            closeButton->show();
+            d->attachButton->hide();
+            d->closeButton->show();
         } else {
-            attachButton->show();
-            closeButton->hide();
+            d->attachButton->show();
+            d->closeButton->hide();
         }
     }
     QWidget::changeEvent(event);
@@ -162,20 +193,16 @@ void ChatPanel::filterDrops(QWidget *widget)
 
 void ChatPanel::queueNotification(const QString &message, int options)
 {
-    notificationQueue << qMakePair(message, options);
+    d->notificationQueue << qMakePair(message, options);
     QTimer::singleShot(0, this, SLOT(sendNotifications()));
 }
 
 void ChatPanel::sendNotifications()
 {
-    while (!notificationQueue.isEmpty())
+    while (!d->notificationQueue.isEmpty())
     {
-        QPair<QString, int> entry = notificationQueue.takeFirst();
+        QPair<QString, int> entry = d->notificationQueue.takeFirst();
         emit notifyPanel(entry.first, entry.second);
     }
 }
 
-void ChatPanel::updateTitle()
-{
-    nameLabel->setText(QString("<b>%1</b> %2<br/>%3").arg(windowTitle(), windowStatus, windowExtra));
-}
