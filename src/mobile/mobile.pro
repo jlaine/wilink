@@ -1,3 +1,4 @@
+include(../src.pri)
 include(../idle/idle.pri)
 include(../qdjango/qdjango.pri)
 include(../qnetio/qnetio.pri)
@@ -62,7 +63,8 @@ mac {
 
 RESOURCES += ../data/wiLink.qrc
 
-INCLUDEPATH += .. \
+INCLUDEPATH += \
+    $$WILINK_INCLUDE_DIR \
     $$IDLE_INCLUDE_DIR \
     $$QDJANGO_INCLUDE_DIR \
     $$QNETIO_INCLUDE_DIR \
