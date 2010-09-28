@@ -342,6 +342,7 @@ void Application::resetChats()
             chat->setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
 #ifdef WILINK_EMBEDDED
+        Q_UNUSED(ypos);
 #ifdef Q_OS_SYMBIAN
         chat->showMaximized();
 #else
@@ -388,6 +389,10 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
         d->trayContext = context;
         d->trayIcon->showMessage(title, message);
     }
+#else
+    Q_UNUSED(context);
+    Q_UNUSED(title);
+    Q_UNUSED(message);
 #endif
 }
 
