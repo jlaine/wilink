@@ -25,7 +25,6 @@
 Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(console)
 Q_IMPORT_PLUGIN(rooms)
-Q_IMPORT_PLUGIN(transfers)
 
 int main(int argc, char *argv[])
 {
