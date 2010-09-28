@@ -25,9 +25,11 @@ SOURCES += \
     ../chat_status.cpp \
     ../chat_utils.cpp \
     ../flickcharm.cpp \
+    ../systeminfo.cpp \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/rooms.cpp \
+    ../plugins/transfers.cpp \
     main.cpp
 
 HEADERS += \
@@ -47,9 +49,11 @@ HEADERS += \
     ../chat_status.h \
     ../chat_utils.h \
     ../flickcharm.h \
+    ../systeminfo.h \
     ../plugins/chats.h \
     ../plugins/console.h \
-    ../plugins/rooms.h
+    ../plugins/rooms.h \
+    ../plugins/transfers.h
 
 mac {
     SOURCES += ../application_mac.mm
@@ -65,9 +69,9 @@ INCLUDEPATH += .. \
     $$QXMPP_INCLUDE_DIR
 LIBS += \
     $$IDLE_LIBS \
+    $$QXMPP_LIBS \
     $$QDJANGO_LIBS \
-    $$QNETIO_LIBS \
-    $$QXMPP_LIBS
+    $$QNETIO_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
 # Symbian packaging rules

@@ -68,6 +68,7 @@ void ChatSharesModel::clear()
 
 int ChatSharesModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return MaxColumn;
 }
 
