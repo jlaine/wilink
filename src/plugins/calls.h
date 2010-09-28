@@ -71,6 +71,7 @@ public:
 private slots:
     void audioStateChanged(QAudio::State state);
     void callStateChanged(QXmppCall::State state);
+    void leave();
     void ringing();
 
 private:

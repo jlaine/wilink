@@ -140,7 +140,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     setLayout(layout);
 
     connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
-    connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
+    connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
@@ -231,6 +231,12 @@ void CallPanel::callStateChanged(QXmppCall::State state)
         m_hangupButton->setEnabled(false);
         break;
     }
+}
+
+void CallPanel::leave()
+{
+    emit unregisterPanel();
+    deleteLater();
 }
 
 void CallPanel::ringing()
