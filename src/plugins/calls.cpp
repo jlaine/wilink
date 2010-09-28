@@ -102,17 +102,11 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     setWindowTitle(tr("Call with %1").arg(contactName));
     setWindowExtra(rosterModel->contactExtra(bareJid));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-
-    // HEADER
-
-    layout->addItem(headerLayout());
+    layout()->setSpacing(0);
 
     // STATUS
 
-    layout->addStretch();
+    layout()->addStretch();
     QHBoxLayout *box = new QHBoxLayout;
 
     m_imageLabel = new QLabel;
@@ -123,8 +117,8 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     m_statusLabel->setText(tr("Connecting.."));
     box->addWidget(m_statusLabel);
 
-    layout->addLayout(box);
-    layout->addStretch();
+    layout()->addLayout(box);
+    layout()->addStretch();
 
     // BUTTONS
 
@@ -135,9 +129,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     connect(m_hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
     hbox->addWidget(m_hangupButton);
 
-    layout->addItem(hbox);
-
-    setLayout(layout);
+    layout()->addItem(hbox);
 
     connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
     connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));

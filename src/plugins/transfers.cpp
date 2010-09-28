@@ -246,17 +246,10 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("File transfers"));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-
-    /* status bar */
-    QLayout *hbox = headerLayout();
-    layout->addItem(hbox);
-
     /* help label */
     QLabel *helpLabel = new QLabel(tr("The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection."));
     helpLabel->setWordWrap(true);
-    layout->addWidget(helpLabel);
+    layout()->addWidget(helpLabel);
 
     /* download location label */
     const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
@@ -265,13 +258,13 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
     QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
     downloadsLabel->setOpenExternalLinks(true);
     downloadsLabel->setWordWrap(true);
-    layout->addWidget(downloadsLabel);
+    layout()->addWidget(downloadsLabel);
 
     /* transfers list */
     tableWidget = new ChatTransfersView;
     connect(tableWidget, SIGNAL(updateButtons()), this, SLOT(updateButtons()));
     connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
-    layout->addWidget(tableWidget);
+    layout()->addWidget(tableWidget);
 
     /* buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -279,9 +272,8 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
     connect(removeButton, SIGNAL(clicked()), tableWidget, SLOT(removeCurrentJob()));
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
 
-    layout->addWidget(buttonBox);
+    layout()->addWidget(buttonBox);
 
-    setLayout(layout);
     updateButtons();
 
     /* connect signals */

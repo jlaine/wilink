@@ -39,22 +39,17 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatLocalState(QXmppMessage::None),
     spacerItem(0)
 {
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-
-    /* status bar */
-    layout->addItem(headerLayout());
+    layout()->setSpacing(0);
 
     /* chat history */
     chatHistory = new ChatHistory;
     connect(chatHistory, SIGNAL(focused()), this, SLOT(slotFocused()));
-    layout->addWidget(chatHistory);
+    layout()->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
 
     /* spacer */
     spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
-    layout->addSpacerItem(spacerItem);
+    layout()->addSpacerItem(spacerItem);
 
     /* search bar */
     chatSearch = new ChatSearchBar;
@@ -67,7 +62,7 @@ ChatConversation::ChatConversation(QWidget *parent)
         chatHistory, SLOT(findClear()));
     connect(chatHistory, SIGNAL(findFinished(bool)),
         chatSearch, SLOT(findFinished(bool)));
-    layout->addWidget(chatSearch);
+    layout()->addWidget(chatSearch);
 
     /* text edit */
     chatInput = new ChatEdit(80);
@@ -83,13 +78,12 @@ ChatConversation::ChatConversation(QWidget *parent)
     sendButton->setIcon(QIcon(":/upload.png"));
     connect(sendButton, SIGNAL(clicked()), this, SLOT(slotSend()));
     hbox->addWidget(sendButton);
-    layout->addItem(hbox);
+    layout()->addItem(hbox);
 #else
-    layout->addWidget(chatInput);
+    layout()->addWidget(chatInput);
 #endif
 
     setFocusProxy(chatInput);
-    setLayout(layout);
     setMinimumWidth(300);
 
     /* shortcuts */

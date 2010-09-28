@@ -79,15 +79,12 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     setWindowIcon(QIcon(":/album.png"));
     setWindowTitle(tr("Shares"));
 
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
+    layout()->setSpacing(0);
 
     // HEADER
 
-    layout->addItem(headerLayout());
-    layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
-    layout->addSpacing(4);
+    layout()->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
+    layout()->addSpacing(4);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setSpacing(6);
@@ -104,13 +101,13 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
     hbox->addWidget(lineEdit);
 
-    layout->addItem(hbox);
-    layout->addSpacing(4);
+    layout()->addItem(hbox);
+    layout()->addSpacing(4);
 
     // MAIN
 
     tabWidget = new QTabWidget;
-    layout->addWidget(tabWidget);
+    layout()->addWidget(tabWidget);
 
     /* create main tab */
     ChatSharesModel *sharesModel = new ChatSharesModel(this);
@@ -159,7 +156,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     // FOOTER
 
     QHBoxLayout *footerLayout = new QHBoxLayout;
-    layout->addItem(footerLayout);
+    layout()->addItem(footerLayout);
 
     statusBar = new QStatusBar;
     statusBar->setSizeGripEnabled(false);
@@ -190,8 +187,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
     footerLayout->addWidget(removeButton);
     removeButton->hide();
-
-    setLayout(layout);
 
     /* connect signals */
     QXmppClient *baseClient = chatWindow->client();
