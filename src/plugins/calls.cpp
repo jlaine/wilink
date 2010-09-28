@@ -91,14 +91,13 @@ void Reader::tick()
 
 CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
     : ChatPanel(parent),
-    m_call(call),
     m_audioInput(0),
     m_audioOutput(0)
 {
     const QString bareJid = jidToBareJid(call->jid());
     const QString contactName = rosterModel->contactName(bareJid);
 
-    setObjectName(QString("call/%1").arg(m_call->sid()));
+    setObjectName(QString("call/%1").arg(call->sid()));
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Call with %1").arg(contactName));
     setWindowExtra(rosterModel->contactExtra(bareJid));
@@ -133,7 +132,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     hbox->addStretch();
     m_hangupButton = new QPushButton(tr("Hang up"));
     m_hangupButton->setIcon(QIcon(":/hangup.png"));
-    connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
+    connect(m_hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
     hbox->addWidget(m_hangupButton);
 
     layout->addItem(hbox);
@@ -168,19 +167,23 @@ void CallPanel::audioStateChanged(QAudio::State state)
 
 void CallPanel::callStateChanged(QXmppCall::State state)
 {
+    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    if (!call)
+        return;
+
     // start or stop capture
     if (state == QXmppCall::ActiveState)
     {
-        QAudioFormat format = formatFor(m_call->payloadType());
+        QAudioFormat format = formatFor(call->payloadType());
         // the size in bytes of the audio samples for a single RTP packet
-        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * m_call->payloadType().ptime() / 1000;
+        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * call->payloadType().ptime() / 1000;
 
         if (!m_audioOutput)
         {
             m_audioOutput = new QAudioOutput(format, this);
             m_audioOutput->setBufferSize(2 * packetSize);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-            m_audioOutput->start(m_call);
+            m_audioOutput->start(call);
         }
 
         if (!m_audioInput)
@@ -192,7 +195,7 @@ void CallPanel::callStateChanged(QXmppCall::State state)
             m_audioInput->setBufferSize(2 * packetSize);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
 #endif
-            m_audioInput->start(m_call);
+            m_audioInput->start(call);
         }
     } else {
         if (m_audioInput)

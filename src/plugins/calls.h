@@ -74,7 +74,6 @@ private slots:
     void ringing();
 
 private:
-    QXmppCall *m_call;
 #ifdef FAKE_AUDIO_INPUT
     Reader *m_audioInput;
 #else
