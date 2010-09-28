@@ -251,11 +251,17 @@ ChatAccounts::ChatAccounts(QWidget *parent)
 
     QPushButton *addButton = new QPushButton;
     addButton->setIcon(QIcon(":/add.png"));
+#ifdef WILINK_EMBEDDED
+    addButton->setText(tr("Add"));
+#endif
     connect(addButton, SIGNAL(clicked()), this, SLOT(addAccount()));
     buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
 
     m_removeButton = new QPushButton;
     m_removeButton->setIcon(QIcon(":/remove.png"));
+#ifdef WILINK_EMBEDDED
+    m_removeButton->setText(tr("Remove"));
+#endif
     connect(m_removeButton, SIGNAL(clicked()),
             this, SLOT(removeAccount()));
     buttonBox->addButton(m_removeButton, QDialogButtonBox::ActionRole);

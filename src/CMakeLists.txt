@@ -60,6 +60,7 @@ set(wiLink_SOURCES
     plugins/rooms.cpp
     plugins/shares.cpp
     plugins/shares/model.cpp
+    plugins/shares/options.cpp
     plugins/shares/view.cpp
     plugins/transfers.cpp)
 
@@ -90,6 +91,7 @@ set(wiLink_MOC_HEADERS
     plugins/photos.h
     plugins/rooms.h
     plugins/shares.h
+    plugins/shares/options.h
     plugins/shares/model.h
     plugins/shares/view.h
     plugins/transfers.h)

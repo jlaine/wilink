@@ -50,6 +50,7 @@
 #include "transfers.h"
 #include "shares.h"
 #include "shares/model.h"
+#include "shares/options.h"
 #include "shares/view.h"
 #include "systeminfo.h"
 
@@ -757,20 +758,15 @@ void ChatShares::setRoster(ChatRosterModel *roster)
 
 void ChatShares::shareFolder()
 {
-    QFileDialog *dialog = new QFileDialog;
-    dialog->setDirectory(db->directory());
-    dialog->setFileMode(QFileDialog::Directory);
-    dialog->setWindowTitle(tr("Shares folder"));
-    dialog->show();
+    ChatSharesOptions *dialog = new ChatSharesOptions(db);
 
     bool check;
     check = connect(dialog, SIGNAL(finished(int)),
                     dialog, SLOT(deleteLater()));
     Q_ASSERT(check);
+    Q_UNUSED(check);
 
-    check = connect(dialog, SIGNAL(fileSelected(QString)),
-                    this, SLOT(shareFolderSelected(QString)));
-    Q_ASSERT(check);
+    dialog->show();
 }
 
 void ChatShares::shareFolderSelected(const QString &path)
@@ -918,6 +914,7 @@ bool SharesPlugin::initialize(Chat *chat)
 
         QSettings settings;
         db = new QXmppShareDatabase(this);
+        db->setMappedDirectories(QStringList() << "/tmp/download");
         db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
     }
     chats << chat;
