@@ -25,6 +25,7 @@
 
 class QLabel;
 class QPushButton;
+class QHBoxLayout;
 
 /** ChatPanel is the base class for all the panels displayed in the right-hand
  *  part of the user interface, such as conversations.
@@ -48,6 +49,8 @@ public:
     void setWindowTitle(const QString &title);
 
 protected:
+    void changeEvent(QEvent *event);
+    void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
     void filterDrops(QWidget *widget);
     QLayout *headerLayout();
@@ -69,6 +72,7 @@ private slots:
 private:
     void updateTitle();
 
+    QHBoxLayout *hbox;
     QPushButton *closeButton;
     QLabel *iconLabel;
     QLabel *nameLabel;

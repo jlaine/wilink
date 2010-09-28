@@ -36,6 +36,13 @@ ChatPanel::ChatPanel(QWidget* parent)
 
     iconLabel = new QLabel;
     nameLabel = new QLabel;
+
+    hbox = new QHBoxLayout;
+    hbox->addSpacing(16);
+    hbox->addWidget(nameLabel);
+    hbox->addStretch();
+    hbox->addWidget(iconLabel);
+    hbox->addWidget(closeButton);
 }
 
 /** Return the type of entry to add to the roster.
@@ -86,13 +93,25 @@ void ChatPanel::setWindowTitle(const QString &title)
  */
 QLayout* ChatPanel::headerLayout()
 {
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addSpacing(16);
-    hbox->addWidget(nameLabel);
-    hbox->addStretch();
-    hbox->addWidget(iconLabel);
-    hbox->addWidget(closeButton);
     return hbox;
+}
+
+void ChatPanel::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::ParentChange)
+    {
+        if (parent())
+            closeButton->show();
+        else
+            closeButton->hide();
+    }
+    QWidget::changeEvent(event);
+}
+
+void ChatPanel::closeEvent(QCloseEvent *event)
+{
+    emit hidePanel();
+    QWidget::closeEvent(event);
 }
 
 bool ChatPanel::eventFilter(QObject *obj, QEvent *e)
