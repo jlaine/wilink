@@ -57,6 +57,7 @@ protected:
     void queueNotification(const QString &message, int options = 0);
 
 signals:
+    void attachPanel();
     void dropPanel(QDropEvent *event);
     void findPanel();
     void findAgainPanel();
@@ -73,6 +74,7 @@ private:
     void updateTitle();
 
     QHBoxLayout *hbox;
+    QPushButton *attachButton;
     QPushButton *closeButton;
     QLabel *iconLabel;
     QLabel *nameLabel;

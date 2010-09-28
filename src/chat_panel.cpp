@@ -28,11 +28,24 @@
 ChatPanel::ChatPanel(QWidget* parent)
     : QWidget(parent)
 {
+    bool check;
+
+    attachButton = new QPushButton;
+    attachButton->setFlat(true);
+    attachButton->setMaximumWidth(32);
+    attachButton->setIcon(QIcon(":/add.png"));
+    attachButton->hide();
+    check = connect(attachButton, SIGNAL(clicked()),
+                    this, SIGNAL(attachPanel()));
+    Q_ASSERT(check);
+
     closeButton = new QPushButton;
     closeButton->setFlat(true);
     closeButton->setMaximumWidth(32);
     closeButton->setIcon(QIcon(":/close.png"));
-    connect(closeButton, SIGNAL(clicked()), this, SIGNAL(hidePanel()));
+    check = connect(closeButton, SIGNAL(clicked()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
 
     iconLabel = new QLabel;
     nameLabel = new QLabel;
@@ -42,6 +55,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     hbox->addWidget(nameLabel);
     hbox->addStretch();
     hbox->addWidget(iconLabel);
+    hbox->addWidget(attachButton);
     hbox->addWidget(closeButton);
 }
 
@@ -101,9 +115,13 @@ void ChatPanel::changeEvent(QEvent *event)
     if (event->type() == QEvent::ParentChange)
     {
         if (parent())
+        {
+            attachButton->hide();
             closeButton->show();
-        else
+        } else {
+            attachButton->show();
             closeButton->hide();
+        }
     }
     QWidget::changeEvent(event);
 }

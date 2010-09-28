@@ -190,6 +190,7 @@ void Chat::addPanel(ChatPanel *panel)
 {
     if (m_chatPanels.contains(panel))
         return;
+    connect(panel, SIGNAL(attachPanel()), this, SLOT(attachPanel()));
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(dropPanel(QDropEvent*)), this, SLOT(dropPanel(QDropEvent*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
@@ -198,6 +199,25 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
     m_chatPanels << panel;
+}
+
+void Chat::attachPanel()
+{
+    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
+    if (!panel)
+        return;
+
+    // add panel
+    if (m_conversationPanel->indexOf(panel) < 0)
+    {
+        m_conversationPanel->addWidget(panel);
+#ifdef WILINK_EMBEDDED
+        m_rosterView->hide();
+#endif
+        m_conversationPanel->show();
+        if (m_conversationPanel->count() == 1)
+            resizeContacts();
+    }
 }
 
 /** When a panel is destroyed, from it from our list of panels.
