@@ -43,14 +43,18 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Debugging console"));
 
-    layout()->setSpacing(0);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
+    layout->addItem(headerLayout());
 
     browser = new QTextBrowser;
 #ifdef WILINK_EMBEDDED
     FlickCharm *charm = new FlickCharm(this);
     charm->activateOn(browser);
 #endif
-    layout()->addWidget(browser);
+    layout->addWidget(browser);
     highlighter = new Highlighter(browser->document());
 
     // search box
@@ -60,7 +64,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
         this, SLOT(slotFind(QString, QTextDocument::FindFlags, bool)));
     connect(this, SIGNAL(findFinished(bool)),
         searchBar, SLOT(findFinished(bool)));
-    layout()->addWidget(searchBar);
+    layout->addWidget(searchBar);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addStretch();
@@ -78,7 +82,9 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     connect(clearButton, SIGNAL(clicked()), browser, SLOT(clear()));
     hbox->addWidget(clearButton);
 
-    layout()->addItem(hbox);
+    layout->addItem(hbox);
+
+    setLayout(layout);
 
     /* connect signals */
     connect(this, SIGNAL(findPanel()), searchBar, SLOT(activate()));

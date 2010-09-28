@@ -61,6 +61,11 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
 
     m_manager = client->findExtension<QXmppDiscoveryManager*>();
 
+    /* build user interface */
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->addItem(headerLayout());
+
     /* location bar */
     QHBoxLayout *hbox = new QHBoxLayout;
 
@@ -83,13 +88,14 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     m_locationNode = new QLineEdit;
     hbox->addWidget(m_locationNode);
 
-    layout()->addItem(hbox);
+    layout->addItem(hbox);
 
     /* main view */
     m_listWidget = new QListWidget;
     m_listWidget->setIconSize(QSize(32, 32));
-    layout()->addWidget(m_listWidget);
+    layout->addWidget(m_listWidget);
 
+    setLayout(layout);
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Service discovery"));
 

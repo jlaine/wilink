@@ -30,8 +30,8 @@ class ChatPanelPrivate
 public:
     void updateTitle();
 
-    QHBoxLayout *hbox;
     QVBoxLayout *layout;
+    QHBoxLayout *hbox;
     QPushButton *attachButton;
     QPushButton *closeButton;
     QLabel *iconLabel;
@@ -83,21 +83,11 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->hbox->addWidget(d->iconLabel);
     d->hbox->addWidget(d->attachButton);
     d->hbox->addWidget(d->closeButton);
-
-    d->layout = new QVBoxLayout;
-    d->layout->setMargin(0);
-    d->layout->addItem(d->hbox);
-    setLayout(d->layout);
 }
 
 ChatPanel::~ChatPanel()
 {
     delete d;
-}
-
-QVBoxLayout *ChatPanel::layout()
-{
-    return d->layout;
 }
 
 /** Return the type of entry to add to the roster.
@@ -142,6 +132,13 @@ void ChatPanel::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title);
     d->updateTitle();
+}
+
+/** Return a layout object for the panel header.
+ */
+QLayout* ChatPanel::headerLayout()
+{
+    return d->hbox;
 }
 
 void ChatPanel::changeEvent(QEvent *event)

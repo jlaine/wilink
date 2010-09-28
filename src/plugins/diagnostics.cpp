@@ -228,8 +228,11 @@ Diagnostics::Diagnostics(QWidget *parent)
         QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
 
     /* build user interface */
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->addItem(headerLayout());
     text = new QTextBrowser;
-    layout()->addWidget(text);
+    layout->addWidget(text);
 
     QHBoxLayout *hbox = new QHBoxLayout;
 
@@ -246,8 +249,8 @@ Diagnostics::Diagnostics(QWidget *parent)
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
     hbox->addWidget(refreshButton);
 
-    layout()->addItem(hbox);
-
+    layout->addItem(hbox);
+    setLayout(layout);
     setMinimumSize(QSize(450, 400));
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));

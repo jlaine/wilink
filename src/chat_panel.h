@@ -24,7 +24,6 @@
 #include "chat_roster_item.h"
 
 class QHBoxLayout;
-class QVBoxLayout;
 class ChatPanelPrivate;
 
 /** ChatPanel is the base class for all the panels displayed in the right-hand
@@ -55,7 +54,7 @@ protected:
     void closeEvent(QCloseEvent *event);
     bool eventFilter(QObject *obj, QEvent *event);
     void filterDrops(QWidget *widget);
-    QVBoxLayout *layout();
+    QLayout *headerLayout();
     void queueNotification(const QString &message, int options = 0);
 
 signals:

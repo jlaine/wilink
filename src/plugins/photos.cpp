@@ -260,10 +260,13 @@ Photos::Photos(const QString &url, QWidget *parent)
     deleteButton->hide();
 
     /* assemble UI */
-    layout()->setSpacing(0);
-    layout()->addWidget(helpLabel);
-    layout()->addSpacing(10);
-    layout()->addWidget(photosView);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    layout->addItem(headerLayout());
+    layout->addWidget(helpLabel);
+    layout->addSpacing(10);
+    layout->addWidget(photosView);
     QHBoxLayout *hbox_upload = new QHBoxLayout;
     hbox_upload->addWidget(stopButton);
     hbox_upload->addWidget(progressBar);
@@ -273,9 +276,10 @@ Photos::Photos(const QString &url, QWidget *parent)
     hbox->addWidget(backButton);
     hbox->addWidget(createButton);
     hbox->addWidget(deleteButton);
-    layout()->addItem(hbox_upload);
-    layout()->addItem(hbox);
+    layout->addItem(hbox_upload);
+    layout->addItem(hbox);
 
+    setLayout(layout);
     setWindowIcon(QIcon(":/photos.png"));
     setWindowTitle(tr("Upload photos"));
 
