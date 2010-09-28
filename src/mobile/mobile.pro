@@ -1,6 +1,5 @@
 include(../src.pri)
 include(../idle/idle.pri)
-include(../qdjango/qdjango.pri)
 include(../qnetio/qnetio.pri)
 include(../qxmpp/qxmpp.pri)
 
@@ -30,7 +29,6 @@ SOURCES += \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/rooms.cpp \
-    ../plugins/transfers.cpp \
     main.cpp
 
 HEADERS += \
@@ -53,8 +51,7 @@ HEADERS += \
     ../systeminfo.h \
     ../plugins/chats.h \
     ../plugins/console.h \
-    ../plugins/rooms.h \
-    ../plugins/transfers.h
+    ../plugins/rooms.h
 
 mac {
     SOURCES += ../application_mac.mm
@@ -66,14 +63,12 @@ RESOURCES += ../data/wiLink.qrc
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
     $$IDLE_INCLUDE_DIR \
-    $$QDJANGO_INCLUDE_DIR \
     $$QNETIO_INCLUDE_DIR \
     $$QXMPP_INCLUDE_DIR
 LIBS += \
     $$IDLE_LIBS \
-    $$QXMPP_LIBS \
-    $$QDJANGO_LIBS \
-    $$QNETIO_LIBS
+    $$QNETIO_LIBS \
+    $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
 # Symbian packaging rules

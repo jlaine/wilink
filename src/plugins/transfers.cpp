@@ -166,6 +166,8 @@ void ChatTransfersView::slotDestroyed(QObject *obj)
 
 void ChatTransfersView::slotDoubleClicked(int row, int column)
 {
+    Q_UNUSED(column);
+
     if (row < 0 || row >= jobs.size())
         return;
 
@@ -223,6 +225,8 @@ void ChatTransfersView::slotProgress(qint64 done, qint64 total)
 
 void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
 {
+    Q_UNUSED(state);
+
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     int jobRow = jobs.indexOf(job);
     if (!job || jobRow < 0)
