@@ -766,7 +766,11 @@ void ChatShares::shareFolder()
     Q_ASSERT(check);
     Q_UNUSED(check);
 
+#ifdef WILINK_EMBEDDED
+    dialog->showMaximized();
+#else
     dialog->show();
+#endif
 }
 
 void ChatShares::shareFolderSelected(const QString &path)
