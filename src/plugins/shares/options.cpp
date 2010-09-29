@@ -26,6 +26,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSettings>
+#include <QTimer>
 #include <QTreeView>
 
 #include "QXmppShareDatabase.h"
@@ -161,9 +162,6 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_fsView->setColumnHidden(1, true);
     m_fsView->setColumnHidden(2, true);
     m_fsView->setColumnHidden(3, true);
-    QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
-    //m_fsView->setExpanded(homeIndex, true);
-    m_fsView->scrollTo(homeIndex);
     layout->addWidget(m_fsView);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -173,7 +171,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
 
     setLayout(layout);
     setWindowTitle(tr("Shares options"));
-    resize(QSize(400, 300).expandedTo(minimumSizeHint()));
+    resize(QSize(400, 400).expandedTo(minimumSizeHint()));
 }
 
 void ChatSharesOptions::browse()
@@ -197,6 +195,20 @@ void ChatSharesOptions::browse()
 void ChatSharesOptions::directorySelected(const QString &path)
 {
     m_directoryEdit->setText(path);
+}
+
+void ChatSharesOptions::scrollToHome()
+{
+    // scroll to home
+    QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
+    m_fsView->setExpanded(homeIndex, true);
+    m_fsView->scrollTo(homeIndex, QAbstractItemView::PositionAtTop);
+}
+
+void ChatSharesOptions::show()
+{
+    QDialog::show();
+    QTimer::singleShot(0, this, SLOT(scrollToHome()));
 }
 
 void ChatSharesOptions::validate()

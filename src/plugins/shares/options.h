@@ -36,9 +36,13 @@ class ChatSharesOptions : public QDialog
 public:
     ChatSharesOptions(QXmppShareDatabase *database, QWidget *parent = 0);
 
+public slots:
+    void show();
+
 private slots:
     void browse();
     void directorySelected(const QString &path);
+    void scrollToHome();
     void validate();
 
 private:

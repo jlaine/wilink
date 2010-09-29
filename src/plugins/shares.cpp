@@ -772,15 +772,6 @@ void ChatShares::shareFolder()
 #endif
 }
 
-void ChatShares::shareFolderSelected(const QString &path)
-{
-    // remember directory
-    QSettings settings;
-    settings.setValue("SharesLocation", path);
-
-    db->setDirectory(path);
-}
-
 void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
