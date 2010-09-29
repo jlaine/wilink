@@ -66,24 +66,33 @@ QVariant FoldersModel::data(const QModelIndex &index, int role) const
         return QFileSystemModel::data(index, role);
 }
 
-bool FoldersModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)
 {
-    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
+    if (role == Qt::CheckStateRole && changedIndex.isValid() && !changedIndex.column())
     {
-        const QString path = filePath(index);
-        if (path == QDir::rootPath() || !QFileInfo(path).isDir())
+        const QString changedPath = filePath(changedIndex);
+        if (changedPath == QDir::rootPath() || !QFileInfo(changedPath).isDir())
             return false;
-        int state = value.toInt();
-        if (state == Qt::Checked)
+        if (value.toInt() == Qt::Checked)
         {
-            if (!m_selected.contains(path))
-                m_selected << path;
+            // unselect any children or parents
+            for (int i = m_selected.size() - 1; i >= 0; --i)
+            {
+                const QString currentPath = m_selected[i];
+                if (currentPath.startsWith(changedPath + "/") ||
+                    changedPath.startsWith(currentPath + "/"))
+                {
+                    m_selected.removeAt(i);
+                    emit dataChanged(index(currentPath), index(currentPath));
+                }
+            }
+            if (!m_selected.contains(changedPath))
+                m_selected << changedPath;
         }
         else
         {
-            m_selected.removeAll(path);
+            m_selected.removeAll(changedPath);
         }
-        //emit dataChanged(index, index);
         return true;
     } else
         return false;
