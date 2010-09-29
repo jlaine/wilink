@@ -35,6 +35,7 @@ class FoldersModel : public QFileSystemModel
 {
 public:
     QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
     QStringList selectedFolders() const;
@@ -46,11 +47,28 @@ private:
 
 QVariant FoldersModel::data(const QModelIndex &index, int role) const
 {
-    if (role == Qt::CheckStateRole && !index.column())
+    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
     {
-        return m_selected.contains(filePath(index)) ? Qt::Checked : Qt::Unchecked;
+        const QString path = filePath(index);
+        if (path == QDir::rootPath() || !QFileInfo(path).isDir())
+            return QVariant();
+        return m_selected.contains(path) ? Qt::Checked : Qt::Unchecked;
     } else
         return QFileSystemModel::data(index, role);
+}
+
+bool FoldersModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
+    {
+        const QString path = filePath(index);
+        if (path == QDir::rootPath() || !QFileInfo(path).isDir())
+            return false;
+        if (!m_selected.contains(path))
+            m_selected << path;
+        return true;
+    } else
+        return false;
 }
 
 Qt::ItemFlags FoldersModel::flags(const QModelIndex &index) const
@@ -94,6 +112,12 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_fsModel->setReadOnly(true);
     m_fsView = new QTreeView;
     m_fsView->setModel(m_fsModel);
+    m_fsView->setColumnHidden(1, true);
+    m_fsView->setColumnHidden(2, true);
+    m_fsView->setColumnHidden(3, true);
+    QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
+    //m_fsView->setExpanded(homeIndex, true);
+    m_fsView->scrollTo(homeIndex);
     layout->addWidget(m_fsView);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -103,6 +127,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
 
     setLayout(layout);
     setWindowTitle(tr("Shares options"));
+    resize(QSize(400, 300).expandedTo(minimumSizeHint()));
 }
 
 void ChatSharesOptions::browse()
