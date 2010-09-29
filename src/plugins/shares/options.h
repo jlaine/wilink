@@ -71,6 +71,8 @@ private slots:
     void validate();
 
 private:
+    QPushButton *moreButton;
+    QPushButton *lessButton;
     QXmppShareDatabase *m_database;
     QLineEdit *m_directoryEdit;
     PlacesModel *m_placesModel;

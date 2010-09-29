@@ -460,12 +460,12 @@ Acceptez-vous?</translation>
         <translation>Aucun fichier trouvé</translation>
     </message>
     <message>
-        <source>Shares folder</source>
-        <translation>Dossier de partages</translation>
-    </message>
-    <message>
         <source>Searching for &quot;%1&quot;</source>
         <translation>Recherche de &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Shares options</source>
+        <translation>Options de partages</translation>
     </message>
 </context>
 <context>
@@ -512,6 +512,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Shares options</source>
         <translation>Options de partages</translation>
+    </message>
+    <message>
+        <source>Downloads folder</source>
+        <translation>Dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>Shared folders</source>
+        <translation>Dossier partagés</translation>
     </message>
 </context>
 <context>

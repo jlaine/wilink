@@ -608,7 +608,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         // add entries to options menu
         if (!menuAction)
         {
-            menuAction = chatWindow->optionsMenu()->addAction(QIcon(":/album.png"), tr("Shares folder"));
+            menuAction = chatWindow->optionsMenu()->addAction(QIcon(":/album.png"), tr("Shares options"));
             connect(menuAction, SIGNAL(triggered(bool)),
                     this, SLOT(shareFolder()));
         }

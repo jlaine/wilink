@@ -23,6 +23,7 @@
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileSystemModel>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -234,19 +235,10 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_database(database)
 {
     QVBoxLayout *layout = new QVBoxLayout;
+    QGroupBox *sharesBox = new QGroupBox(tr("Shared folders"));
+    QVBoxLayout *vbox = new QVBoxLayout;
 
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(new QLabel(tr("Shares folder")));
-    m_directoryEdit = new QLineEdit;
-    m_directoryEdit->setText(m_database->directory());
-    m_directoryEdit->setEnabled(false);
-    hbox->addWidget(m_directoryEdit);
-    QPushButton *directoryButton = new QPushButton;
-    directoryButton->setIcon(QIcon(":/album.png"));
-    connect(directoryButton, SIGNAL(clicked()), this, SLOT(browse()));
-    hbox->addWidget(directoryButton);
-    layout->addItem(hbox);
-
+    // full view
     m_fsModel = new FoldersModel(this);
     m_fsModel->setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
@@ -257,14 +249,36 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_fsView->setColumnHidden(1, true);
     m_fsView->setColumnHidden(2, true);
     m_fsView->setColumnHidden(3, true);
-    layout->addWidget(m_fsView);
+    m_fsView->hide();
+    vbox->addWidget(m_fsView);
 
+    // simple view
     m_placesModel = new PlacesModel(this);
     m_placesModel->setSourceModel(m_fsModel);
     m_placesView = new QTreeView;
     m_placesView->setModel(m_placesModel);
-    layout->addWidget(m_placesView);
+    vbox->addWidget(m_placesView);
 
+    sharesBox->setLayout(vbox);
+    layout->addWidget(sharesBox);
+
+    // downloads folder
+    QGroupBox *downloadsBox = new QGroupBox(tr("Downloads folder"));
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    m_directoryEdit = new QLineEdit;
+    m_directoryEdit->setText(m_database->directory());
+    m_directoryEdit->setEnabled(false);
+    hbox->addWidget(m_directoryEdit);
+    QPushButton *directoryButton = new QPushButton;
+    directoryButton->setIcon(QIcon(":/album.png"));
+    connect(directoryButton, SIGNAL(clicked()), this, SLOT(browse()));
+    hbox->addWidget(directoryButton);
+
+    downloadsBox->setLayout(hbox);
+    layout->addWidget(downloadsBox);
+
+    // buttons
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
