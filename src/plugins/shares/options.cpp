@@ -177,6 +177,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     layout->addWidget(m_placesView);
 
     m_fsModel = new FoldersModel;
+    m_fsModel->setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
     m_fsModel->setRootPath(QDir::rootPath());
     m_fsModel->setReadOnly(true);
