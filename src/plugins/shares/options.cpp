@@ -73,17 +73,23 @@ bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &valu
         const QString changedPath = filePath(changedIndex);
         if (changedPath == QDir::rootPath() || !QFileInfo(changedPath).isDir())
             return false;
+        QStringList changedLeafs;
         if (value.toInt() == Qt::Checked)
         {
             // unselect any children or parents
             for (int i = m_selected.size() - 1; i >= 0; --i)
             {
                 const QString currentPath = m_selected[i];
-                if (currentPath.startsWith(changedPath + "/") ||
-                    changedPath.startsWith(currentPath + "/"))
+                if (currentPath.startsWith(changedPath + "/"))
                 {
+                    // this is a child of the changed path
+                    changedLeafs << currentPath;
                     m_selected.removeAt(i);
-                    emit dataChanged(index(currentPath), index(currentPath));
+                }
+                else if (changedPath.startsWith(currentPath + "/"))
+                {
+                    // this is a parent of the changed path
+                    m_selected.removeAt(i);
                 }
             }
             if (!m_selected.contains(changedPath))
@@ -92,6 +98,19 @@ bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &valu
         else
         {
             m_selected.removeAll(changedPath);
+        }
+
+        // refresh items which have changed
+        if (changedLeafs.isEmpty())
+            changedLeafs << changedPath;
+        foreach (const QString &leaf, changedLeafs)
+        {
+            QModelIndex idx = index(leaf);
+            while (idx.isValid())
+            {
+                emit dataChanged(idx, idx);
+                idx = idx.parent();
+            }
         }
         return true;
     } else
