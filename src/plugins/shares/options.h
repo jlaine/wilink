@@ -23,8 +23,8 @@
 #include <QDialog>
 
 class FoldersModel;
+class PlacesModel;
 class QLineEdit;
-class QListWidget;
 class QTreeView;
 class QXmppShareDatabase;
 
@@ -49,7 +49,8 @@ private slots:
 private:
     QXmppShareDatabase *m_database;
     QLineEdit *m_directoryEdit;
-    QListWidget *m_placesView;
+    PlacesModel *m_placesModel;
+    QTreeView *m_placesView;
     FoldersModel *m_fsModel;
     QTreeView *m_fsView;
 };

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAbstractProxyModel>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
@@ -38,6 +39,7 @@
 class FoldersModel : public QFileSystemModel
 {
 public:
+    FoldersModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -48,6 +50,11 @@ public:
 private:
     QStringList m_selected;
 };
+
+FoldersModel::FoldersModel(QObject *parent)
+    : QFileSystemModel(parent)
+{
+}
 
 QVariant FoldersModel::data(const QModelIndex &index, int role) const
 {
@@ -137,6 +144,93 @@ void FoldersModel::setSelectedFolders(const QStringList &selected)
     m_selected = selected;
 }
 
+class PlacesModel : public QAbstractProxyModel
+{
+public:
+    PlacesModel(QObject *parent = 0);
+    QModelIndex index(int row, int column, const QModelIndex& parent) const;
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
+    QModelIndex parent(const QModelIndex &index) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    void setSourceModel(QFileSystemModel *sourceModel);
+
+private:
+    QFileSystemModel *m_fsModel;
+    QList<QString> m_paths;
+};
+
+PlacesModel::PlacesModel(QObject *parent)
+    : QAbstractProxyModel(parent)
+{
+    QList<QDesktopServices::StandardLocation> locations;
+    locations << QDesktopServices::DocumentsLocation;
+    locations << QDesktopServices::MusicLocation;
+    locations << QDesktopServices::MoviesLocation;
+    locations << QDesktopServices::PicturesLocation;
+    foreach (QDesktopServices::StandardLocation location, locations)
+    {
+        const QString path = QDesktopServices::storageLocation(location);
+        QDir dir(path);
+        if (path.isEmpty() || dir == QDir::home())
+            continue;
+        m_paths << path;
+    }
+}
+
+QModelIndex PlacesModel::index(int row, int column, const QModelIndex& parent) const
+{
+    if (parent.isValid() || row < 0 || row >= m_paths.size())
+        return QModelIndex();
+
+    return createIndex(row, column, 0);
+}
+
+QModelIndex PlacesModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+    const QString path = sourceIndex.data(QFileSystemModel::FilePathRole).toString();
+    int row = m_paths.indexOf(path);
+    if (row < 0)
+        return QModelIndex();
+    else
+        return createIndex(row, sourceIndex.column(), 0);
+}
+
+QModelIndex PlacesModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    int row = proxyIndex.row();
+    if (row < 0 || row >= m_paths.size())
+        return QModelIndex();
+    else
+        return m_fsModel->index(m_paths.at(row));
+}
+
+QModelIndex PlacesModel::parent(const QModelIndex &index) const
+{
+    return QModelIndex();
+}
+
+int PlacesModel::columnCount(const QModelIndex &parent) const
+{
+    return 1;
+}
+
+int PlacesModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    else
+        return m_paths.size();
+}
+
+void PlacesModel::setSourceModel(QFileSystemModel *sourceModel)
+{
+    m_fsModel = sourceModel;
+    QAbstractProxyModel::setSourceModel(sourceModel);
+}
+
+
 ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *parent)
     : QDialog(parent),
     m_database(database)
@@ -155,28 +249,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     hbox->addWidget(directoryButton);
     layout->addItem(hbox);
 
-    m_placesView = new QListWidget;
-    QList<QDesktopServices::StandardLocation> locations;
-    locations << QDesktopServices::DocumentsLocation;
-    locations << QDesktopServices::MusicLocation;
-    locations << QDesktopServices::MoviesLocation;
-    locations << QDesktopServices::PicturesLocation;
-    foreach (QDesktopServices::StandardLocation location, locations)
-    {
-        const QString path = QDesktopServices::storageLocation(location);
-        QDir dir(path);
-        if (path.isEmpty() || dir == QDir::home())
-            continue;
-        QString name = QDesktopServices::displayName(location);
-        if (name.isEmpty())
-            name = dir.dirName();
-        QListWidgetItem *item = new QListWidgetItem(QIcon(":/album.png"), name);
-        item->setData(Qt::UserRole, path);
-        m_placesView->addItem(item);
-    }
-    layout->addWidget(m_placesView);
-
-    m_fsModel = new FoldersModel;
+    m_fsModel = new FoldersModel(this);
     m_fsModel->setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
     m_fsModel->setRootPath(QDir::rootPath());
@@ -187,6 +260,12 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_fsView->setColumnHidden(2, true);
     m_fsView->setColumnHidden(3, true);
     layout->addWidget(m_fsView);
+
+    m_placesModel = new PlacesModel(this);
+    m_placesModel->setSourceModel(m_fsModel);
+    m_placesView = new QTreeView;
+    m_placesView->setModel(m_placesModel);
+    layout->addWidget(m_placesView);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
