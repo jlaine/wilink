@@ -18,12 +18,14 @@
  */
 
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileSystemModel>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QPushButton>
 #include <QSettings>
 #include <QTimer>
@@ -152,6 +154,27 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     connect(directoryButton, SIGNAL(clicked()), this, SLOT(browse()));
     hbox->addWidget(directoryButton);
     layout->addItem(hbox);
+
+    m_placesView = new QListWidget;
+    QList<QDesktopServices::StandardLocation> locations;
+    locations << QDesktopServices::DocumentsLocation;
+    locations << QDesktopServices::MusicLocation;
+    locations << QDesktopServices::MoviesLocation;
+    locations << QDesktopServices::PicturesLocation;
+    foreach (QDesktopServices::StandardLocation location, locations)
+    {
+        const QString path = QDesktopServices::storageLocation(location);
+        QDir dir(path);
+        if (path.isEmpty() || dir.canonicalPath() == QDir::homePath())
+            continue;
+        QString name = QDesktopServices::displayName(location);
+        if (name.isEmpty())
+            name = dir.dirName();
+        QListWidgetItem *item = new QListWidgetItem(QIcon(":/album.png"), name);
+        item->setData(Qt::UserRole, path);
+        m_placesView->addItem(item);
+    }
+    layout->addWidget(m_placesView);
 
     m_fsModel = new FoldersModel;
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
