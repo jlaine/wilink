@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileSystemModel>
@@ -52,7 +53,15 @@ QVariant FoldersModel::data(const QModelIndex &index, int role) const
         const QString path = filePath(index);
         if (path == QDir::rootPath() || !QFileInfo(path).isDir())
             return QVariant();
-        return m_selected.contains(path) ? Qt::Checked : Qt::Unchecked;
+        Qt::CheckState state = Qt::Unchecked;
+        for (int i = 0; i < m_selected.size(); ++i)
+        {
+            if (m_selected[i] == path)
+                return Qt::Checked;
+            else if (m_selected[i].startsWith(path + "/"))
+                state = Qt::PartiallyChecked;
+        }
+        return state;
     } else
         return QFileSystemModel::data(index, role);
 }
@@ -64,8 +73,17 @@ bool FoldersModel::setData(const QModelIndex &index, const QVariant &value, int 
         const QString path = filePath(index);
         if (path == QDir::rootPath() || !QFileInfo(path).isDir())
             return false;
-        if (!m_selected.contains(path))
-            m_selected << path;
+        int state = value.toInt();
+        if (state == Qt::Checked)
+        {
+            if (!m_selected.contains(path))
+                m_selected << path;
+        }
+        else
+        {
+            m_selected.removeAll(path);
+        }
+        //emit dataChanged(index, index);
         return true;
     } else
         return false;
