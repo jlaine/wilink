@@ -260,6 +260,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     vbox->addWidget(m_placesView);
 
     QHBoxLayout *toggleBox = new QHBoxLayout;
+    toggleBox->setMargin(0);
     toggleBox->addStretch();
     m_moreButton = new QPushButton(tr("More folders.."));
     connect(m_moreButton, SIGNAL(clicked()), this, SLOT(moreFolders()));
