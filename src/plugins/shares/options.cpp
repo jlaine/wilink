@@ -19,16 +19,56 @@
 
 #include <QDialogButtonBox>
 #include <QFileDialog>
+#include <QFileSystemModel>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListWidget>
 #include <QPushButton>
 #include <QSettings>
+#include <QTreeView>
 
 #include "QXmppShareDatabase.h"
 
 #include "options.h"
+
+class FoldersModel : public QFileSystemModel
+{
+public:
+    QVariant data(const QModelIndex &index, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+
+    QStringList selectedFolders() const;
+    void setSelectedFolders(const QStringList &selected);
+
+private:
+    QStringList m_selected;
+};
+
+QVariant FoldersModel::data(const QModelIndex &index, int role) const
+{
+    if (role == Qt::CheckStateRole && !index.column())
+    {
+        return m_selected.contains(filePath(index)) ? Qt::Checked : Qt::Unchecked;
+    } else
+        return QFileSystemModel::data(index, role);
+}
+
+Qt::ItemFlags FoldersModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = QFileSystemModel::flags(index);
+    flags |= Qt::ItemIsUserCheckable;
+    return flags;
+}
+
+QStringList FoldersModel::selectedFolders() const
+{
+    return m_selected;
+}
+
+void FoldersModel::setSelectedFolders(const QStringList &selected)
+{
+    m_selected = selected;
+}
 
 ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *parent)
     : QDialog(parent),
@@ -39,6 +79,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(new QLabel(tr("Shares folder")));
     m_directoryEdit = new QLineEdit;
+    m_directoryEdit->setText(m_database->directory());
     m_directoryEdit->setEnabled(false);
     hbox->addWidget(m_directoryEdit);
     QPushButton *directoryButton = new QPushButton;
@@ -47,8 +88,13 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     hbox->addWidget(directoryButton);
     layout->addItem(hbox);
 
-    m_listWidget = new QListWidget;
-    layout->addWidget(m_listWidget);
+    m_fsModel = new FoldersModel;
+    m_fsModel->setSelectedFolders(m_database->mappedDirectories());
+    m_fsModel->setRootPath(QDir::rootPath());
+    m_fsModel->setReadOnly(true);
+    m_fsView = new QTreeView;
+    m_fsView->setModel(m_fsModel);
+    layout->addWidget(m_fsView);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
@@ -57,11 +103,6 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
 
     setLayout(layout);
     setWindowTitle(tr("Shares options"));
-
-    /* load preferences */
-    m_directoryEdit->setText(m_database->directory());
-    foreach (const QString &dir, m_database->mappedDirectories())
-        m_listWidget->addItem(dir);
 }
 
 void ChatSharesOptions::browse()
@@ -90,9 +131,7 @@ void ChatSharesOptions::directorySelected(const QString &path)
 void ChatSharesOptions::validate()
 {
     const QString path = m_directoryEdit->text();
-    QStringList mapped;
-    for (int i = 0; i < m_listWidget->count(); ++i)
-        mapped << m_listWidget->item(i)->text();
+    const QStringList mapped = m_fsModel->selectedFolders();
 
     // remember directory
     QSettings settings;
