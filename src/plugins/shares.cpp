@@ -917,7 +917,7 @@ bool SharesPlugin::initialize(Chat *chat)
 
         QSettings settings;
         db = new QXmppShareDatabase(this);
-        db->setMappedDirectories(QStringList() << "/tmp/download");
+        db->setMappedDirectories(settings.value("SharesDirectories").toStringList());
         db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
     }
     chats << chat;

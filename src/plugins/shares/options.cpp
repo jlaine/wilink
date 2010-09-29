@@ -39,7 +39,6 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(new QLabel(tr("Shares folder")));
     m_directoryEdit = new QLineEdit;
-    m_directoryEdit->setText(m_database->directory());
     m_directoryEdit->setEnabled(false);
     hbox->addWidget(m_directoryEdit);
     QPushButton *directoryButton = new QPushButton;
@@ -48,8 +47,8 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     hbox->addWidget(directoryButton);
     layout->addItem(hbox);
 
-    QListWidget *listWidget = new QListWidget;
-    layout->addWidget(listWidget);
+    m_listWidget = new QListWidget;
+    layout->addWidget(m_listWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
@@ -58,6 +57,11 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
 
     setLayout(layout);
     setWindowTitle(tr("Shares options"));
+
+    /* load preferences */
+    m_directoryEdit->setText(m_database->directory());
+    foreach (const QString &dir, m_database->mappedDirectories())
+        m_listWidget->addItem(dir);
 }
 
 void ChatSharesOptions::browse()
@@ -86,12 +90,17 @@ void ChatSharesOptions::directorySelected(const QString &path)
 void ChatSharesOptions::validate()
 {
     const QString path = m_directoryEdit->text();
+    QStringList mapped;
+    for (int i = 0; i < m_listWidget->count(); ++i)
+        mapped << m_listWidget->item(i)->text();
 
     // remember directory
     QSettings settings;
     settings.setValue("SharesLocation", path);
+    settings.setValue("SharesDirectories", mapped);
 
     m_database->setDirectory(path);
+    m_database->setMappedDirectories(mapped);
     accept();
 }
 

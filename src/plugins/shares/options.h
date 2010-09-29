@@ -23,6 +23,7 @@
 #include <QDialog>
 
 class QLineEdit;
+class QListWidget;
 class QXmppShareDatabase;
 
 /** View for displaying a tree of share items.
@@ -42,6 +43,7 @@ private slots:
 private:
     QXmppShareDatabase *m_database;
     QLineEdit *m_directoryEdit;
+    QListWidget *m_listWidget;
 };
 
 #endif
