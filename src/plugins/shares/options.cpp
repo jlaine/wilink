@@ -144,23 +144,6 @@ void FoldersModel::setSelectedFolders(const QStringList &selected)
     m_selected = selected;
 }
 
-class PlacesModel : public QAbstractProxyModel
-{
-public:
-    PlacesModel(QObject *parent = 0);
-    QModelIndex index(int row, int column, const QModelIndex& parent) const;
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    void setSourceModel(QFileSystemModel *sourceModel);
-
-private:
-    QFileSystemModel *m_fsModel;
-    QList<QString> m_paths;
-};
-
 PlacesModel::PlacesModel(QObject *parent)
     : QAbstractProxyModel(parent)
 {
@@ -187,25 +170,6 @@ QModelIndex PlacesModel::index(int row, int column, const QModelIndex& parent) c
     return createIndex(row, column, 0);
 }
 
-QModelIndex PlacesModel::mapFromSource(const QModelIndex &sourceIndex) const
-{
-    const QString path = sourceIndex.data(QFileSystemModel::FilePathRole).toString();
-    int row = m_paths.indexOf(path);
-    if (row < 0)
-        return QModelIndex();
-    else
-        return createIndex(row, sourceIndex.column(), 0);
-}
-
-QModelIndex PlacesModel::mapToSource(const QModelIndex &proxyIndex) const
-{
-    int row = proxyIndex.row();
-    if (row < 0 || row >= m_paths.size())
-        return QModelIndex();
-    else
-        return m_fsModel->index(m_paths.at(row));
-}
-
 QModelIndex PlacesModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
@@ -224,12 +188,46 @@ int PlacesModel::rowCount(const QModelIndex &parent) const
         return m_paths.size();
 }
 
+QModelIndex PlacesModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+    if (!sourceIndex.isValid())
+        return QModelIndex();
+
+    const QString path = sourceIndex.data(QFileSystemModel::FilePathRole).toString();
+    const int row = m_paths.indexOf(path);
+    if (row < 0)
+        return QModelIndex();
+    else
+        return createIndex(row, sourceIndex.column(), 0);
+}
+
+QModelIndex PlacesModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    if (!proxyIndex.isValid())
+        return QModelIndex();
+
+    const int row = proxyIndex.row();
+    if (row < 0 || row >= m_paths.size())
+        return QModelIndex();
+    else
+        return m_fsModel->index(m_paths.at(row));
+}
+
+void PlacesModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    QModelIndex proxyTopLeft = mapFromSource(topLeft);
+    QModelIndex proxyBottomRight = mapFromSource(bottomRight);
+    if (proxyTopLeft.isValid() && proxyBottomRight.isValid())
+        emit dataChanged(proxyTopLeft, proxyBottomRight);
+}
+
 void PlacesModel::setSourceModel(QFileSystemModel *sourceModel)
 {
     m_fsModel = sourceModel;
+    connect(m_fsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+            this, SLOT(sourceDataChanged(QModelIndex,QModelIndex)));
     QAbstractProxyModel::setSourceModel(sourceModel);
 }
-
 
 ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *parent)
     : QDialog(parent),

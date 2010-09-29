@@ -20,13 +20,37 @@
 #ifndef __WILINK_SHARES_OPTIONS_H__
 #define __WILINK_SHARES_OPTIONS_H__
 
+#include <QAbstractProxyModel>
 #include <QDialog>
 
 class FoldersModel;
-class PlacesModel;
+class QFileSystemModel;
 class QLineEdit;
 class QTreeView;
 class QXmppShareDatabase;
+
+class PlacesModel : public QAbstractProxyModel
+{
+    Q_OBJECT
+
+public:
+    PlacesModel(QObject *parent = 0);
+    QModelIndex index(int row, int column, const QModelIndex& parent) const;
+    QModelIndex parent(const QModelIndex &index) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
+    void setSourceModel(QFileSystemModel *sourceModel);
+
+private slots:
+    void sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+
+private:
+    QFileSystemModel *m_fsModel;
+    QList<QString> m_paths;
+};
 
 /** View for displaying a tree of share items.
  */
