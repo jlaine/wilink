@@ -165,7 +165,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     {
         const QString path = QDesktopServices::storageLocation(location);
         QDir dir(path);
-        if (path.isEmpty() || dir.canonicalPath() == QDir::homePath())
+        if (path.isEmpty() || dir == QDir::home())
             continue;
         QString name = QDesktopServices::displayName(location);
         if (name.isEmpty())
