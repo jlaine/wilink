@@ -46,8 +46,13 @@
 #define FOOTER_HEIGHT 5
 #define MESSAGE_MAX 100
 
+#ifdef WILINK_EMBEDDED
+#define BODY_FONT 14
+#define DATE_FONT 12
+#else
 #define BODY_FONT 12
 #define DATE_FONT 10
+#endif
 
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
