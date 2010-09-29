@@ -218,6 +218,7 @@ void Chat::attachPanel()
         if (m_conversationPanel->count() == 1)
             resizeContacts();
     }
+    m_conversationPanel->setCurrentWidget(panel);
 }
 
 /** When a panel is destroyed, from it from our list of panels.
