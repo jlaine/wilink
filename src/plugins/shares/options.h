@@ -67,12 +67,14 @@ public slots:
 private slots:
     void browse();
     void directorySelected(const QString &path);
+    void fewerFolders();
+    void moreFolders();
     void scrollToHome();
     void validate();
 
 private:
-    QPushButton *moreButton;
-    QPushButton *lessButton;
+    QPushButton *m_moreButton;
+    QPushButton *m_fewerButton;
     QXmppShareDatabase *m_database;
     QLineEdit *m_directoryEdit;
     PlacesModel *m_placesModel;

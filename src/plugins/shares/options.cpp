@@ -259,6 +259,17 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_placesView->setModel(m_placesModel);
     vbox->addWidget(m_placesView);
 
+    QHBoxLayout *toggleBox = new QHBoxLayout;
+    toggleBox->addStretch();
+    m_moreButton = new QPushButton(tr("More folders.."));
+    connect(m_moreButton, SIGNAL(clicked()), this, SLOT(moreFolders()));
+    toggleBox->addWidget(m_moreButton);
+    m_fewerButton = new QPushButton(tr("Fewer folders.."));
+    m_fewerButton->hide();
+    connect(m_fewerButton, SIGNAL(clicked()), this, SLOT(fewerFolders()));
+    toggleBox->addWidget(m_fewerButton);
+    vbox->addItem(toggleBox);
+
     sharesBox->setLayout(vbox);
     layout->addWidget(sharesBox);
 
@@ -310,6 +321,22 @@ void ChatSharesOptions::browse()
 void ChatSharesOptions::directorySelected(const QString &path)
 {
     m_directoryEdit->setText(path);
+}
+
+void ChatSharesOptions::fewerFolders()
+{
+    m_fsView->hide();
+    m_placesView->show();
+    m_fewerButton->hide();
+    m_moreButton->show();
+}
+
+void ChatSharesOptions::moreFolders()
+{
+    m_placesView->hide();
+    m_fsView->show();
+    m_moreButton->hide();
+    m_fewerButton->show();
 }
 
 void ChatSharesOptions::scrollToHome()

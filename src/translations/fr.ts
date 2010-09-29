@@ -521,6 +521,14 @@ Acceptez-vous?</translation>
         <source>Shared folders</source>
         <translation>Dossier partagés</translation>
     </message>
+    <message>
+        <source>More folders..</source>
+        <translation>Plus de dossiers..</translation>
+    </message>
+    <message>
+        <source>Fewer folders..</source>
+        <translation>Moins de dossiers..</translation>
+    </message>
 </context>
 <context>
     <name>ChatStatus</name>
