@@ -180,8 +180,10 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     // CALL THREAD
     QThread *thread = new QThread;
     CallHandler *handler = new CallHandler(call);
-    handler->moveToThread(thread);
     connect(handler, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(handler, SIGNAL(finished()), handler, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    handler->moveToThread(thread);
     thread->start();
 
     const QString bareJid = jidToBareJid(call->jid());
