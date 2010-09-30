@@ -241,10 +241,10 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
  */
 void CallPanel::callFinished()
 {
-    qDebug() << "DESTROYING CALL";
     m_call->deleteLater();
     m_callHandler->deleteLater();
     m_callThread->deleteLater();
+    emit hidePanel();
 }
 
 void CallPanel::callStateChanged(QXmppCall::State state)
