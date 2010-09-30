@@ -90,12 +90,13 @@ void Reader::tick()
         qWarning() << "Reader could not read from" << m_input->fileName();
 }
 
-CallHandler::CallHandler(QXmppCall *call)
+CallHandler::CallHandler(QXmppCall *call, QThread *mainThread)
     : m_call(call),
     m_audioInput(0),
-    m_audioOutput(0)
+    m_audioOutput(0),
+    m_mainThread(mainThread)
 {
-    call->setParent(this);
+    m_call->setParent(this);
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
 }
@@ -121,9 +122,6 @@ void CallHandler::audioStateChanged(QAudio::State state)
 
 void CallHandler::callStateChanged(QXmppCall::State state)
 {
-    if (!m_call)
-        return;
-
     // start or stop capture
     if (state == QXmppCall::ActiveState)
     {
@@ -168,23 +166,23 @@ void CallHandler::callStateChanged(QXmppCall::State state)
     // handle completion
     if (state == QXmppCall::FinishedState)
     {
-        m_call->deleteLater();
-        m_call = 0;
+        m_call->setParent(0);
+        m_call->moveToThread(m_mainThread);
         emit finished();
     }
 }
 
 CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
-    : ChatPanel(parent)
+    : ChatPanel(parent),
+    m_call(call)
 {
     // CALL THREAD
-    QThread *thread = new QThread;
-    CallHandler *handler = new CallHandler(call);
-    connect(handler, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(handler, SIGNAL(finished()), handler, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    handler->moveToThread(thread);
-    thread->start();
+    m_callThread = new QThread;
+    m_callHandler = new CallHandler(call, QThread::currentThread());
+    connect(m_callHandler, SIGNAL(finished()), m_callThread, SLOT(quit()));
+    connect(m_callThread, SIGNAL(finished()), this, SLOT(callFinished()));
+    m_callHandler->moveToThread(m_callThread);
+    m_callThread->start();
 
     const QString bareJid = jidToBareJid(call->jid());
     const QString contactName = rosterModel->contactName(bareJid);
@@ -237,6 +235,16 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
         this, SLOT(callStateChanged(QXmppCall::State)));
 
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
+}
+
+/** When the call thread finishes, perform cleanup.
+ */
+void CallPanel::callFinished()
+{
+    qDebug() << "DESTROYING CALL";
+    m_call->deleteLater();
+    m_callHandler->deleteLater();
+    m_callThread->deleteLater();
 }
 
 void CallPanel::callStateChanged(QXmppCall::State state)

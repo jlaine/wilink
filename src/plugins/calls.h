@@ -38,6 +38,7 @@ class QLabel;
 class QMenu;
 class QModelIndex;
 class QPushButton;
+class QThread;
 class QTimer;
 class QXmppCall;
 
@@ -67,7 +68,7 @@ class CallHandler : public QObject
     Q_OBJECT
 
 public:
-    CallHandler(QXmppCall *call);
+    CallHandler(QXmppCall *call, QThread *mainThread);
 
 signals:
     void finished();
@@ -84,6 +85,7 @@ private:
     QAudioInput *m_audioInput;
 #endif
     QAudioOutput *m_audioOutput;
+    QThread *m_mainThread;
 };
 
 class CallPanel : public ChatPanel
@@ -94,11 +96,15 @@ public:
     CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent = 0);
 
 private slots:
+    void callFinished();
     void callStateChanged(QXmppCall::State state);
     void leave();
     void ringing();
 
 private:
+    QXmppCall *m_call;
+    CallHandler *m_callHandler;
+    QThread *m_callThread;
     QPushButton *m_hangupButton;
     QLabel *m_imageLabel;
     QLabel *m_statusLabel;
