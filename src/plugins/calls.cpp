@@ -28,6 +28,7 @@
 #include <QPushButton>
 #include <QtCore/qmath.h>
 #include <QtCore/qendian.h>
+#include <QThread>
 #include <QTimer>
 
 #include "QXmppCallManager.h"
@@ -94,6 +95,7 @@ CallHandler::CallHandler(QXmppCall *call)
     m_audioInput(0),
     m_audioOutput(0)
 {
+    call->setParent(this);
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
 }
@@ -119,6 +121,9 @@ void CallHandler::audioStateChanged(QAudio::State state)
 
 void CallHandler::callStateChanged(QXmppCall::State state)
 {
+    if (!m_call)
+        return;
+
     // start or stop capture
     if (state == QXmppCall::ActiveState)
     {
@@ -159,14 +164,25 @@ void CallHandler::callStateChanged(QXmppCall::State state)
             m_audioOutput = 0;
         }
     }
-}
 
+    // handle completion
+    if (state == QXmppCall::FinishedState)
+    {
+        m_call->deleteLater();
+        m_call = 0;
+        emit finished();
+    }
+}
 
 CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
     : ChatPanel(parent)
 {
     // CALL THREAD
+    QThread *thread = new QThread;
     CallHandler *handler = new CallHandler(call);
+    handler->moveToThread(thread);
+    connect(handler, SIGNAL(finished()), thread, SLOT(quit()));
+    thread->start();
 
     const QString bareJid = jidToBareJid(call->jid());
     const QString contactName = rosterModel->contactName(bareJid);

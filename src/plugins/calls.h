@@ -69,6 +69,9 @@ class CallHandler : public QObject
 public:
     CallHandler(QXmppCall *call);
 
+signals:
+    void finished();
+
 private slots:
     void audioStateChanged(QAudio::State state);
     void callStateChanged(QXmppCall::State state);
