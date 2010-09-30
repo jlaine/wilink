@@ -89,11 +89,85 @@ void Reader::tick()
         qWarning() << "Reader could not read from" << m_input->fileName();
 }
 
-CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
-    : ChatPanel(parent),
+CallHandler::CallHandler(QXmppCall *call)
+    : m_call(call),
     m_audioInput(0),
     m_audioOutput(0)
 {
+    connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
+        this, SLOT(callStateChanged(QXmppCall::State)));
+}
+
+void CallHandler::audioStateChanged(QAudio::State state)
+{
+    QObject *audio = sender();
+    if (!audio)
+        return;
+    if (audio == m_audioInput)
+    {
+#ifndef FAKE_AUDIO_INPUT
+        if (m_audioInput->error() != QAudio::NoError)
+            qWarning() << "audio input state" << state << "error" << m_audioInput->error();
+        if (m_audioInput->error() == QAudio::UnderrunError)
+            m_audioInput->start(m_call);
+#endif
+    } else if (audio == m_audioOutput) {
+        if (m_audioOutput->error() != QAudio::NoError)
+            qWarning() << "audio output state" << state << "error" << m_audioOutput->error();
+    }
+}
+
+void CallHandler::callStateChanged(QXmppCall::State state)
+{
+    // start or stop capture
+    if (state == QXmppCall::ActiveState)
+    {
+        QAudioFormat format = formatFor(m_call->payloadType());
+        // the size in bytes of the audio samples for a single RTP packet
+        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * m_call->payloadType().ptime() / 1000;
+
+        if (!m_audioOutput)
+        {
+            m_audioOutput = new QAudioOutput(format, this);
+            m_audioOutput->setBufferSize(2 * packetSize);
+            connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+            m_audioOutput->start(m_call);
+        }
+
+        if (!m_audioInput)
+        {
+#ifdef FAKE_AUDIO_INPUT
+            m_audioInput = new Reader(format, this);
+#else
+            m_audioInput = new QAudioInput(format, this);
+            m_audioInput->setBufferSize(2 * packetSize);
+            connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+#endif
+            m_audioInput->start(m_call);
+        }
+    } else {
+        if (m_audioInput)
+        {
+            m_audioInput->stop();
+            delete m_audioInput;
+            m_audioInput = 0;
+        }
+        if (m_audioOutput)
+        {
+            m_audioOutput->stop();
+            delete m_audioOutput;
+            m_audioOutput = 0;
+        }
+    }
+}
+
+
+CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
+    : ChatPanel(parent)
+{
+    // CALL THREAD
+    CallHandler *handler = new CallHandler(call);
+
     const QString bareJid = jidToBareJid(call->jid());
     const QString contactName = rosterModel->contactName(bareJid);
 
@@ -147,70 +221,8 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     QTimer::singleShot(0, this, SIGNAL(showPanel()));
 }
 
-void CallPanel::audioStateChanged(QAudio::State state)
-{
-    QObject *audio = sender();
-    if (!audio)
-        return;
-    if (audio == m_audioInput)
-    {
-#ifndef FAKE_AUDIO_INPUT
-        if (m_audioInput->error() != QAudio::NoError)
-            qWarning() << "audio input state" << state << "error" << m_audioInput->error();
-#endif
-    } else if (audio == m_audioOutput) {
-        if (m_audioOutput->error() != QAudio::NoError)
-            qWarning() << "audio output state" << state << "error" << m_audioOutput->error();
-    }
-}
-
 void CallPanel::callStateChanged(QXmppCall::State state)
 {
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call)
-        return;
-
-    // start or stop capture
-    if (state == QXmppCall::ActiveState)
-    {
-        QAudioFormat format = formatFor(call->payloadType());
-        // the size in bytes of the audio samples for a single RTP packet
-        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * call->payloadType().ptime() / 1000;
-
-        if (!m_audioOutput)
-        {
-            m_audioOutput = new QAudioOutput(format, this);
-            m_audioOutput->setBufferSize(2 * packetSize);
-            connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-            m_audioOutput->start(call);
-        }
-
-        if (!m_audioInput)
-        {
-#ifdef FAKE_AUDIO_INPUT
-            m_audioInput = new Reader(format, this);
-#else
-            m_audioInput = new QAudioInput(format, this);
-            m_audioInput->setBufferSize(2 * packetSize);
-            connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-#endif
-            m_audioInput->start(call);
-        }
-    } else {
-        if (m_audioInput)
-        {
-            m_audioInput->stop();
-            delete m_audioInput;
-            m_audioInput = 0;
-        }
-        if (m_audioOutput)
-        {
-            m_audioOutput->stop();
-            delete m_audioOutput;
-            m_audioOutput = 0;
-        }
-    }
-
     // update status
     switch (state)
     {

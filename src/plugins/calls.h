@@ -62,6 +62,27 @@ private:
     QIODevice *m_output;
 };
 
+class CallHandler : public QObject
+{
+    Q_OBJECT
+
+public:
+    CallHandler(QXmppCall *call);
+
+private slots:
+    void audioStateChanged(QAudio::State state);
+    void callStateChanged(QXmppCall::State state);
+
+private:
+    QXmppCall *m_call;
+#ifdef FAKE_AUDIO_INPUT
+    Reader *m_audioInput;
+#else
+    QAudioInput *m_audioInput;
+#endif
+    QAudioOutput *m_audioOutput;
+};
+
 class CallPanel : public ChatPanel
 {
     Q_OBJECT
@@ -70,18 +91,11 @@ public:
     CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent = 0);
 
 private slots:
-    void audioStateChanged(QAudio::State state);
     void callStateChanged(QXmppCall::State state);
     void leave();
     void ringing();
 
 private:
-#ifdef FAKE_AUDIO_INPUT
-    Reader *m_audioInput;
-#else
-    QAudioInput *m_audioInput;
-#endif
-    QAudioOutput *m_audioOutput;
     QPushButton *m_hangupButton;
     QLabel *m_imageLabel;
     QLabel *m_statusLabel;
