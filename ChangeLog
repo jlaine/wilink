@@ -5,8 +5,10 @@ wiLink 0.9.9b (UNRELEASED)
    - Display image and profile links for room members.
  * Shares:
    - Make it possible to select additional folders to share.
- * Miscellaneous:
+ * Menu:
     - Fix parsing of the menu refresh interval.
+    - Add support for links to chat rooms.
+ * Miscellaneous:
     - Add caching on vCards to reduce network traffic at connect.
 
 wiLink 0.9.9a (2010-09-16)
