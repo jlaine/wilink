@@ -392,7 +392,6 @@ WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
     }
 
     // find interface with matching GUID
-    qDebug() << "Looking for interface" << networkInterface.humanReadableName() << " with GUID" << networkInterface.name();
     for (unsigned int i = 0; i < interfaceList->dwNumberOfItems; ++i) {
         const WLAN_INTERFACE_INFO &wlanInterface = interfaceList->InterfaceInfo[i];
 
@@ -404,10 +403,8 @@ WirelessInterface::WirelessInterface(const QNetworkInterface &networkInterface)
             guid = guid.arg(wlanInterface.InterfaceGuid.Data4[i], 2, 16, QChar('0'));
         guid = guid.toUpper();
 
-        qDebug() << "Checking WLAN interface with GUID" << guid;
         if (guid == networkInterface.name())
         {
-            qDebug() << "Found interface!";
             d->interfaceFound = true;
             d->interfaceGuid = wlanInterface.InterfaceGuid;
         }
@@ -503,7 +500,7 @@ WirelessStandards WirelessInterface::supportedStandards()
         case dot11_phy_type_ofdm:
             standards |= Wireless_80211A;
             break;
-        case dot11_phy_type_dsss:
+        case dot11_phy_type_hrdsss:
             standards |= Wireless_80211B;
             break;
         case dot11_phy_type_erp:
