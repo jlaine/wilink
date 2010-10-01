@@ -289,6 +289,8 @@ typedef DWORD (WINAPI *WlanEnumInterfacesProto)
 typedef DWORD (WINAPI *WlanGetAvailableNetworkListProto)
     (HANDLE hClientHandle, const GUID* pInterfaceGuid, DWORD dwFlags, PVOID pReserved,
      WLAN_AVAILABLE_NETWORK_LIST **ppAvailableNetworkList);
+typedef DWORD (WINAPI *WlanGetInterfaceCapabilityProto)
+    (HANDLE hClientHandle, const GUID *pInterfaceGuid, PVOID pReserved, WLAN_INTERFACE_CAPABILITY **ppCapability);
 typedef DWORD (WINAPI *WlanQueryInterfaceProto)
     (HANDLE hClientHandle, const GUID *pInterfaceGuid, WLAN_INTF_OPCODE OpCode, PVOID pReserved,
      PDWORD pdwDataSize, PVOID *ppData, WLAN_OPCODE_VALUE_TYPE *pWlanOpcodeValueType);
@@ -307,6 +309,7 @@ static WlanOpenHandleProto local_WlanOpenHandle = 0;
 static WlanRegisterNotificationProto local_WlanRegisterNotification = 0;
 static WlanEnumInterfacesProto local_WlanEnumInterfaces = 0;
 static WlanGetAvailableNetworkListProto local_WlanGetAvailableNetworkList = 0;
+static WlanGetInterfaceCapabilityProto local_WlanGetInterfaceCapability = 0;
 static WlanQueryInterfaceProto local_WlanQueryInterface = 0;
 static WlanConnectProto local_WlanConnect = 0;
 static WlanDisconnectProto local_WlanDisconnect = 0;
@@ -329,6 +332,8 @@ static void resolveLibrary()
                 QLibrary::resolve(QLatin1String("wlanapi.dll"), "WlanEnumInterfaces");
             local_WlanGetAvailableNetworkList = (WlanGetAvailableNetworkListProto)
                 QLibrary::resolve(QLatin1String("wlanapi.dll"), "WlanGetAvailableNetworkList");
+            local_WlanGetInterfaceCapability = (WlanGetInterfaceCapabilityProto)
+                QLibrary::resolve(QLatin1String("wlanapi.dll"), "WlanGetInterfaceCapability");
             local_WlanQueryInterface = (WlanQueryInterfaceProto)
                 QLibrary::resolve(QLatin1String("wlanapi.dll"), "WlanQueryInterface");
             local_WlanConnect = (WlanConnectProto)
@@ -481,6 +486,36 @@ bool WirelessInterface::isValid() const
 WirelessStandards WirelessInterface::supportedStandards()
 {
     WirelessStandards standards;
+
+    WLAN_INTERFACE_CAPABILITY *interfaceCapabilities;
+    DWORD result = local_WlanGetInterfaceCapability(d->handle, &d->interfaceGuid,
+        NULL, &interfaceCapabilities);
+
+    if (result != ERROR_SUCCESS) {
+        qWarning("%s: WlanGetInterfaceCapability failed with error %ld\n", __FUNCTION__, result);
+        return standards;
+    }
+
+    for (int i = 0; i < interfaceCapabilities->dwNumberOfSupportedPhys; i++) {
+        DOT11_PHY_TYPE phyType = interfaceCapabilities->dot11PhyTypes[i];
+        switch (phyType)
+        {
+        case dot11_phy_type_ofdm:
+            standards |= Wireless_80211A;
+            break;
+        case dot11_phy_type_dsss:
+            standards |= Wireless_80211B;
+            break;
+        case dot11_phy_type_erp:
+            standards |= Wireless_80211G;
+            break;
+        case dot11_phy_type_ht:
+            standards |= Wireless_80211N;
+            break;
+        }
+    }
+    local_WlanFreeMemory(interfaceCapabilities);
+
     return standards;
 }
 
