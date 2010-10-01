@@ -25,6 +25,7 @@
 #include "wireless.h"
 
 #define WLAN_MAX_NAME_LENGTH 256
+#define WLAN_MAX_PHY_INDEX 64
 #define WLAN_MAX_PHY_TYPE_NUMBER 8
 #define WLAN_NOTIFICATION_SOURCE_ALL 0x0000ffff
 #define WLAN_AVAILABLE_NETWORK_CONNECTED 1
@@ -48,6 +49,12 @@ enum WLAN_INTERFACE_STATE {
     wlan_interface_state_associating,
     wlan_interface_state_discovering,
     wlan_interface_state_authenticating
+};
+
+enum WLAN_INTERFACE_TYPE {
+    wlan_interface_type_emulated_802_11 = 0,
+    wlan_interface_type_native_802_11,
+    wlan_interface_type_invalid
 };
 
 struct WLAN_INTERFACE_INFO {
@@ -258,6 +265,15 @@ struct WLAN_CONNECTION_ATTRIBUTES {
     WCHAR strProfileName[WLAN_MAX_NAME_LENGTH];
     WLAN_ASSOCIATION_ATTRIBUTES wlanAssociationAttributes;
     WLAN_SECURITY_ATTRIBUTES wlanSecurityAttributes;
+};
+
+struct WLAN_INTERFACE_CAPABILITY {
+    WLAN_INTERFACE_TYPE interfaceType;
+    BOOL                bDot11DSupported;
+    DWORD               dwMaxDesiredSsidListSize;
+    DWORD               dwMaxDesiredBssidListSize;
+    DWORD               dwNumberOfSupportedPhys;
+    DOT11_PHY_TYPE      dot11PhyTypes[WLAN_MAX_PHY_INDEX];
 };
 
 typedef void (WINAPI *WLAN_NOTIFICATION_CALLBACK)(WLAN_NOTIFICATION_DATA *, PVOID);
