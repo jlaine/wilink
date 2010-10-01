@@ -462,3 +462,9 @@ bool WirelessInterface::isValid() const
     return d->interfaceFound;
 }
 
+WirelessStandards WirelessInterface::supportedStandards()
+{
+    WirelessStandards standards;
+    return standards;
+}
+

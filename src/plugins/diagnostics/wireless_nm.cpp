@@ -119,3 +119,9 @@ WirelessNetwork WirelessInterface::currentNetwork()
     return WirelessInterfacePrivate::getFromDbusObject(activeAP.path());
 }
 
+WirelessStandards WirelessInterface::supportedStandards()
+{
+    WirelessStandards standards;
+    return standards;
+}
+

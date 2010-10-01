@@ -144,3 +144,36 @@ bool WirelessInterface::isValid() const
     return valid;
 }
 
+WirelessStandards WirelessInterface::supportedStandards()
+{
+    WirelessStandards standards;
+#ifdef USE_COREWLAN
+    NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
+
+    CWInterface *currentInterface = [CWInterface interfaceWithName:qstringToNSString(d->interfaceName)];
+    NSArray *phyModes = [currentInterface supportedPHYModes];
+
+    for( id phyMode in phyModes )
+    {
+        switch( [phyMode intValue] )
+        {
+        case kCWPHYMode11A:
+            standards |= Wireless_80211A;
+            break;
+        case kCWPHYMode11B:
+            standards |= Wireless_80211B;
+            break;
+        case kCWPHYMode11G:
+            standards |= Wireless_80211G;
+            break;
+        case kCWPHYMode11N:
+            standards |= Wireless_80211N;
+            break;
+        }
+    }
+
+    [autoreleasepool release];
+#endif
+    return standards;
+}
+

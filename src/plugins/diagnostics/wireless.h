@@ -44,6 +44,16 @@ private:
     QString w_ssid;
 };
 
+enum WirelessStandard
+{
+    Wireless_80211A = 1,
+    Wireless_80211B = 2,
+    Wireless_80211G = 4,
+    Wireless_80211N = 8,
+};
+Q_DECLARE_FLAGS(WirelessStandards, WirelessStandard)
+Q_DECLARE_OPERATORS_FOR_FLAGS(WirelessStandards)
+
 class WirelessInterfacePrivate;
 
 class WirelessInterface
@@ -55,6 +65,7 @@ public:
     WirelessNetwork currentNetwork();
     bool isValid() const;
     QList<WirelessNetwork> availableNetworks();
+    WirelessStandards supportedStandards();
 
 private:
     WirelessInterfacePrivate *d;
