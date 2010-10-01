@@ -163,9 +163,12 @@ void Menu::showMenu()
                 if (index.isValid())
                     model->reparentItem(index, homeIndex);
                 else
+                {
                     index = model->addItem(ChatRosterItem::Room,
                         linkUrl.path(), tr("Chat room"), QIcon(":/chat.png"),
                         homeIndex);
+                    QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
+                }
                 model->setData(index, true, ChatRosterModel::PersistentRole);
             }
             action = servicesMenu->addAction(text);
