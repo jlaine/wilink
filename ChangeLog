@@ -10,6 +10,7 @@ wiLink 0.9.9b (UNRELEASED)
     - Add support for links to chat rooms.
  * Miscellaneous:
     - Add caching on vCards to reduce network traffic at connect.
+    - Report which standards WiFi interfaces support.
 
 wiLink 0.9.9a (2010-09-16)
  * Do not join bookmarked rooms until we receive our nickname.

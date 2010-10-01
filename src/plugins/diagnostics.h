@@ -42,6 +42,7 @@ public:
     QNetworkInterface interface;
     QList<WirelessNetwork> availableNetworks;
     WirelessNetwork currentNetwork;
+    WirelessStandards supportedStandards;
 };
 
 class NetworkThread : public QThread

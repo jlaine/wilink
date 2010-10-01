@@ -85,7 +85,7 @@ void NetworkThread::run()
         result.interface = interface;
         result.availableNetworks = wireless.availableNetworks();
         result.currentNetwork = wireless.currentNetwork();
-        qDebug() << "standards" << wireless.supportedStandards();
+        result.supportedStandards = wireless.supportedStandards();
         emit wirelessResult(result);
         emit progress(++done, ++total);
     }
@@ -400,6 +400,17 @@ void Diagnostics::showWireless(const WirelessResult &result)
 {
     const bool showCinr = false;
     addSection("Wireless interface " + interfaceName(result.interface));
+
+    QStringList supported;
+    if (result.supportedStandards & Wireless_80211A)
+        supported << "A";
+    if (result.supportedStandards & Wireless_80211B)
+        supported << "B";
+    if (result.supportedStandards & Wireless_80211G)
+        supported << "G";
+    if (result.supportedStandards & Wireless_80211N)
+        supported << "N";
+    addItem("Supported standards", supported.join(","));
 
     if (result.currentNetwork.isValid())
     {
