@@ -67,10 +67,13 @@ QVariant FoldersModel::data(const QModelIndex &index, int role) const
         Qt::CheckState state = Qt::Unchecked;
         for (int i = 0; i < m_selected.size(); ++i)
         {
-            if (m_selected[i] == path)
+            const QString currentPath = m_selected[i];
+            if (currentPath == path)
                 return Qt::Checked;
-            else if (m_selected[i].startsWith(path + "/"))
+            else if (currentPath.startsWith(path + "/"))
                 state = Qt::PartiallyChecked;
+            else if (path.startsWith(currentPath + "/"))
+                return QVariant();
         }
         return state;
     } else
@@ -84,24 +87,15 @@ bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &valu
         const QString changedPath = filePath(changedIndex);
         if (changedPath == QDir::rootPath() || !QFileInfo(changedPath).isDir())
             return false;
-        QStringList changedLeafs;
         if (value.toInt() == Qt::Checked)
         {
             // unselect any children or parents
             for (int i = m_selected.size() - 1; i >= 0; --i)
             {
                 const QString currentPath = m_selected[i];
-                if (currentPath.startsWith(changedPath + "/"))
-                {
-                    // this is a child of the changed path
-                    changedLeafs << currentPath;
+                if (currentPath.startsWith(changedPath + "/") ||
+                    changedPath.startsWith(currentPath + "/"))
                     m_selected.removeAt(i);
-                }
-                else if (changedPath.startsWith(currentPath + "/"))
-                {
-                    // this is a parent of the changed path
-                    m_selected.removeAt(i);
-                }
             }
             if (!m_selected.contains(changedPath))
                 m_selected << changedPath;
@@ -112,17 +106,17 @@ bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &valu
         }
 
         // refresh items which have changed
-        if (changedLeafs.isEmpty())
-            changedLeafs << changedPath;
-        foreach (const QString &leaf, changedLeafs)
+        QModelIndex idx = changedIndex;
+        while (idx.isValid())
         {
-            QModelIndex idx = index(leaf);
-            while (idx.isValid())
-            {
-                emit dataChanged(idx, idx);
-                idx = idx.parent();
-            }
+            emit dataChanged(idx, idx);
+            idx = idx.parent();
         }
+
+        // refresh children of the changed index
+        emit dataChanged(
+            index(0, 0, changedIndex),
+            index(rowCount(changedIndex), columnCount(changedIndex), changedIndex));
         return true;
     } else
         return false;
