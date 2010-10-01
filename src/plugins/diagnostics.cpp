@@ -85,6 +85,7 @@ void NetworkThread::run()
         result.interface = interface;
         result.availableNetworks = wireless.availableNetworks();
         result.currentNetwork = wireless.currentNetwork();
+        qDebug() << "standards" << wireless.supportedStandards();
         emit wirelessResult(result);
         emit progress(++done, ++total);
     }
