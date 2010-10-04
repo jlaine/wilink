@@ -23,7 +23,7 @@
 #include <QDBusMessage>
 #include <QDBusObjectPath>
 #include <QDBusReply>
-#include <QDebug>
+#include <QProcess>
 
 #include "wireless.h"
 
@@ -35,6 +35,7 @@ class WirelessInterfacePrivate
 {
 public:
     WirelessInterfacePrivate() {};
+    QString interfaceName;
     QString objectName;
     static int percentToRssi(int percent);
     static WirelessNetwork getFromDbusObject(QString path);
@@ -61,10 +62,11 @@ WirelessNetwork WirelessInterfacePrivate::getFromDbusObject(QString path)
     return myNetwork;
 }
 
-WirelessInterface::WirelessInterface(const QNetworkInterface &name)
+WirelessInterface::WirelessInterface(const QNetworkInterface &iface)
 {
     d = new WirelessInterfacePrivate();
-    d->objectName = "/org/freedesktop/Hal/devices/net_" + name.hardwareAddress().toLower().replace(':','_');
+    d->interfaceName = iface.name();
+    d->objectName = "/org/freedesktop/Hal/devices/net_" + iface.hardwareAddress().toLower().replace(':','_');
 }
 
 WirelessInterface::~WirelessInterface()
@@ -109,6 +111,27 @@ WirelessNetwork WirelessInterface::currentNetwork()
 WirelessStandards WirelessInterface::supportedStandards()
 {
     WirelessStandards standards;
+    QProcess proc;
+    proc.start("/sbin/ifconfig", QStringList() << d->interfaceName, QIODevice::ReadOnly);
+    if (proc.waitForFinished())
+    {
+        QString output = QString::fromLocal8Bit(proc.readAll());
+        qDebug() << "GOT" << output;
+        QRegExp rx("IEEE 802.11([abgn]+)");
+        if (rx.indexIn(output) != -1)
+        {
+            QString modes = rx.cap(1);
+            qDebug() << "CAP" << modes;
+            if (modes.contains('a'))
+                standards |= Wireless_80211A;
+            if (modes.contains('b'))
+                standards |= Wireless_80211B;
+            if (modes.contains('g'))
+                standards |= Wireless_80211G;
+            if (modes.contains('n'))
+                standards |= Wireless_80211N;
+        }
+    }
     return standards;
 }
 
