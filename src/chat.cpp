@@ -703,6 +703,7 @@ void Chat::unregisterPanel()
     if (!panel)
         return;
 
-    m_rosterModel->removeItem(panel->objectName());
+    QModelIndex index = m_rosterModel->findItem(panel->objectName());
+    m_rosterModel->removeRow(index.row(), index.parent());
 }
 

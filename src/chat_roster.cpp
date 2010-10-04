@@ -839,21 +839,6 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::removeItem(const QString &bareJid)
-{
-    ChatRosterItem *item = d->rootItem->find(bareJid);
-    if (item)
-    {
-        QModelIndex parentIndex;
-        ChatRosterItem *parentItem = item->parent();
-        if (parentItem != d->rootItem)
-            parentIndex = createIndex(parentItem->row(), 0, parentItem);
-        beginRemoveRows(parentIndex, item->row(), item->row());
-        parentItem->remove(item);
-        endRemoveRows();
-    }
-}
-
 /** Move an item to the given parent.
  *
  * @param index
