@@ -31,17 +31,6 @@
 #define FALLBACK_SIGNAL_MAX_DBM   (-20)
 #define FALLBACK_MAX_CINR (FALLBACK_SIGNAL_MAX_DBM - FALLBACK_NOISE_FLOOR_DBM)
 
-/* FIXME: this is only for the debug phase (listing properties can be useful) */
-#include <QMetaProperty>
-void printProps(QObject &obj)
-{
-    const QMetaObject* metaObject = obj.metaObject();
-    QStringList properties;
-    for(int i = metaObject->propertyOffset(); i < metaObject->propertyCount(); ++i)
-        properties << QString::fromLatin1(metaObject->property(i).name());
-    qDebug() << properties;
-}
-
 class WirelessInterfacePrivate
 {
 public:
@@ -111,10 +100,8 @@ WirelessNetwork WirelessInterface::currentNetwork()
 {
     QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName,
         "org.freedesktop.NetworkManager.Device.Wireless", QDBusConnection::systemBus());
-    if (! interface.isValid()) {
-        qDebug() << d->objectName << "error line" << __LINE__;
+    if (!interface.isValid())
         return WirelessNetwork();
-    }
     QDBusObjectPath activeAP = interface.property("ActiveAccessPoint").value<QDBusObjectPath>();
     return WirelessInterfacePrivate::getFromDbusObject(activeAP.path());
 }
