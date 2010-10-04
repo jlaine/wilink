@@ -66,7 +66,21 @@ WirelessInterface::WirelessInterface(const QNetworkInterface &iface)
 {
     d = new WirelessInterfacePrivate();
     d->interfaceName = iface.name();
-    d->objectName = "/org/freedesktop/Hal/devices/net_" + iface.hardwareAddress().toLower().replace(':','_');
+    QDBusInterface listInterface("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager",
+        "org.freedesktop.NetworkManager", QDBusConnection::systemBus());
+    if (!listInterface.isValid())
+        return;
+    QDBusReply< QList<QDBusObjectPath> > reply = listInterface.call("GetDevices");
+    foreach (const QDBusObjectPath &objectPath, reply.value())
+    {
+        QDBusInterface interface("org.freedesktop.NetworkManager", objectPath.path(),
+            "org.freedesktop.NetworkManager.Device", QDBusConnection::systemBus());
+        if (interface.property("Interface") == iface.name())
+        {
+            d->objectName = objectPath.path();
+            break;
+        }
+    }
 }
 
 WirelessInterface::~WirelessInterface()
@@ -78,7 +92,7 @@ bool WirelessInterface::isValid() const
 {
     QDBusInterface interface("org.freedesktop.NetworkManager", d->objectName,
         "org.freedesktop.NetworkManager.Device", QDBusConnection::systemBus());
-    return ( interface.isValid() && interface.property("DeviceType").toInt()==2 );
+    return ( interface.isValid() && interface.property("DeviceType").toInt() == 2 );
 }
 
 QList<WirelessNetwork> WirelessInterface::availableNetworks()
@@ -112,16 +126,14 @@ WirelessStandards WirelessInterface::supportedStandards()
 {
     WirelessStandards standards;
     QProcess proc;
-    proc.start("/sbin/ifconfig", QStringList() << d->interfaceName, QIODevice::ReadOnly);
+    proc.start("/sbin/iwconfig", QStringList() << d->interfaceName, QIODevice::ReadOnly);
     if (proc.waitForFinished())
     {
         QString output = QString::fromLocal8Bit(proc.readAll());
-        qDebug() << "GOT" << output;
         QRegExp rx("IEEE 802.11([abgn]+)");
         if (rx.indexIn(output) != -1)
         {
             QString modes = rx.cap(1);
-            qDebug() << "CAP" << modes;
             if (modes.contains('a'))
                 standards |= Wireless_80211A;
             if (modes.contains('b'))
