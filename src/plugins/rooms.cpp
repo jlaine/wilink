@@ -602,8 +602,10 @@ void ChatRoom::leave()
 
     /* remove room from roster */
     QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
-    if (!roomIndex.data(ChatRosterModel::PersistentRole).toBool())
-        emit unregisterPanel();
+    if (roomIndex.data(ChatRosterModel::PersistentRole).toBool())
+        rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
+    else
+        rosterModel->removeRow(roomIndex.row(), roomIndex.parent());
 
     deleteLater();
 }
