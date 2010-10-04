@@ -45,10 +45,13 @@ public:
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
+    void setForcedFolder(const QString &excluded);
+
     QStringList selectedFolders() const;
     void setSelectedFolders(const QStringList &selected);
 
 private:
+    QString m_forced;
     QStringList m_selected;
 };
 
@@ -64,6 +67,12 @@ QVariant FoldersModel::data(const QModelIndex &index, int role) const
         const QString path = filePath(index);
         if (path == QDir::rootPath() || !QFileInfo(path).isDir())
             return QVariant();
+
+        if (path == m_forced)
+            return Qt::Checked;
+        else if (path.startsWith(m_forced + "/"))
+            return QVariant();
+
         Qt::CheckState state = Qt::Unchecked;
         for (int i = 0; i < m_selected.size(); ++i)
         {
@@ -87,6 +96,11 @@ bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &valu
         const QString changedPath = filePath(changedIndex);
         if (changedPath == QDir::rootPath() || !QFileInfo(changedPath).isDir())
             return false;
+
+        if (changedPath == m_forced ||
+            changedPath.startsWith(m_forced + "/"))
+            return false;
+
         if (value.toInt() == Qt::Checked)
         {
             // unselect any children or parents
@@ -127,6 +141,37 @@ Qt::ItemFlags FoldersModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = QFileSystemModel::flags(index);
     flags |= Qt::ItemIsUserCheckable;
     return flags;
+}
+
+void FoldersModel::setForcedFolder(const QString &forced)
+{
+    if (forced == m_forced)
+        return;
+
+    // make a note of changed directories
+    QStringList changed;
+    if (!m_forced.isEmpty())
+        changed << m_forced;
+    changed << forced;
+    for (int i = m_selected.size() - 1; i >= 0; --i)
+    {
+        const QString currentPath = m_selected[i];
+        if (currentPath == forced ||
+            currentPath.startsWith(forced + "/"))
+        {
+            changed << currentPath;
+            m_selected.removeAt(i);
+        }
+    }
+
+    m_forced = forced;
+
+    // emit changes
+    foreach (const QString changedPath, changed)
+    {
+        QModelIndex idx = index(changedPath);
+        emit dataChanged(idx, idx);
+    }
 }
 
 QStringList FoldersModel::selectedFolders() const
@@ -235,6 +280,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     // full view
     m_fsModel = new FoldersModel(this);
     m_fsModel->setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
+    m_fsModel->setForcedFolder(m_database->directory());
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
     m_fsModel->setRootPath(QDir::rootPath());
     m_fsModel->setReadOnly(true);
@@ -316,6 +362,7 @@ void ChatSharesOptions::browse()
 void ChatSharesOptions::directorySelected(const QString &path)
 {
     m_directoryEdit->setText(path);
+    m_fsModel->setForcedFolder(path);
 }
 
 void ChatSharesOptions::fewerFolders()
