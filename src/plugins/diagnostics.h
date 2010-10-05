@@ -25,6 +25,8 @@
 #include <QThread>
 #include <QUrl>
 
+#include "QXmppIq.h"
+
 #include "chat_panel.h"
 #include "diagnostics/networkinfo.h"
 #include "diagnostics/wireless.h"
@@ -43,6 +45,8 @@ public:
     QList<WirelessNetwork> availableNetworks;
     WirelessNetwork currentNetwork;
     WirelessStandards supportedStandards;
+
+    void toXml(QXmlStreamWriter *writer) const;
 };
 
 class NetworkThread : public QThread
@@ -60,6 +64,15 @@ signals:
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Ping> &results);
     void wirelessResult(const WirelessResult &result);
+};
+
+class DiagnosticsIq : public QXmppIq
+{
+public:
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
+private:
+    QList<WirelessResult> m_wirelessResults;
 };
 
 class Diagnostics : public ChatPanel

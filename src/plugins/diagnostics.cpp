@@ -35,11 +35,15 @@
 #include "qnetio/mime.h"
 #include "qnetio/wallet.h"
 
+#include "QXmppUtils.h"
+
 #include "chat.h"
 #include "chat_plugin.h"
 #include "systeminfo.h"
 
 #include "diagnostics.h"
+
+const char* ns_diagnostics = "http://wifirst.net/protocol/diagnostics";
 
 static const QHostAddress serverAddress("213.91.4.201");
 
@@ -441,6 +445,37 @@ void Diagnostics::showWireless(const WirelessResult &result)
         }
     }
     addItem("Available networks", table.render());
+}
+
+// SERIALISATION
+
+static void networkToXml(const WirelessNetwork &network, QXmlStreamWriter *writer)
+{
+    writer->writeStartElement("network");
+    helperToXmlAddAttribute(writer, "cinr", QString::number(network.cinr()));
+    helperToXmlAddAttribute(writer, "rssi", QString::number(network.rssi()));
+    helperToXmlAddAttribute(writer, "ssid", network.ssid());
+    writer->writeEndElement();
+}
+
+void WirelessResult::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("wirelessInterface");
+    helperToXmlAddAttribute(writer, "name", interface.name());
+    if (currentNetwork.isValid())
+        networkToXml(currentNetwork, writer);
+    foreach (const WirelessNetwork &network, availableNetworks)
+        networkToXml(network, writer);
+    writer->writeEndElement();
+}
+
+void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("query");
+    helperToXmlAddAttribute(writer, "xmlns", ns_diagnostics);
+    foreach (const WirelessResult &result, m_wirelessResults)
+        result.toXml(writer);
+    writer->writeEndElement();
 }
 
 // PLUGIN
