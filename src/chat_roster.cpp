@@ -131,6 +131,7 @@ public:
     QXmppClient *client;
     ChatRosterItem *contactsItem;
     ChatRosterItem *ownItem;
+    ChatRosterItem *roomsItem;
     ChatRosterItem *rootItem;
     bool nickNameReceived;
     QMap<QString, int> clientFeatures;
@@ -201,6 +202,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->contactsItem->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
     d->rootItem->append(d->contactsItem);
 #endif
+    d->roomsItem = 0;
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
@@ -814,11 +816,25 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &parent)
+QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &reqParent)
 {
     ChatRosterItem *parentItem;
-    if (parent.isValid())
-        parentItem = static_cast<ChatRosterItem*>(parent.internalPointer());
+    if (reqParent.isValid())
+        parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
+#if 0
+    else if (type == ChatRosterItem::Room)
+    {
+        if (!d->roomsItem)
+        {
+            d->roomsItem = new ChatRosterItem(ChatRosterItem::Other);
+            d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
+            beginInsertRows(QModelIndex(), d->rootItem->size(), d->rootItem->size());
+            d->rootItem->append(d->roomsItem);
+            endInsertRows();
+        }
+        parentItem = d->roomsItem;
+    }
+#endif
     else
         parentItem = d->rootItem;
 
@@ -836,10 +852,10 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
         item->setData(Qt::DecorationRole, icon);
 
     // add item
-    beginInsertRows(parent, parentItem->size(), parentItem->size());
+    beginInsertRows(d->index(parentItem, 0), parentItem->size(), parentItem->size());
     parentItem->append(item);
     endInsertRows();
-    return createIndex(item->row(), 0, item);
+    return d->index(item, 0);
 }
 
 void ChatRosterModel::clearPendingMessages(const QString &bareJid)
@@ -912,6 +928,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setRootIsDecorated(false);
+    setMinimumHeight(400);
 #ifdef FLAT_VIEW
     setMinimumWidth(200);
 #else
@@ -998,8 +1015,14 @@ QSize ChatRosterView::sizeHint () const
     if (!model()->rowCount())
         return QTreeView::sizeHint();
 
-    QSize hint(minimumWidth(), 0);
-    hint.setHeight(model()->rowCount() * sizeHintForRow(0));
+    QSize hint(minimumWidth(), minimumHeight());
+    int rowCount = sortedModel->rowCount();
+#ifndef FLAT_VIEW
+    rowCount += sortedModel->rowCount(sortedModel->mapFromSource(rosterModel->contactsItem()));
+#endif
+    int rowHeight = rowCount * sizeHintForRow(0);
+    if (rowHeight > hint.height())
+        hint.setHeight(rowHeight);
     return hint;
 }
 

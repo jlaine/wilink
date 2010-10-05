@@ -392,6 +392,10 @@ Acceptez-vous?</translation>
         <source>My contacts</source>
         <translation>Mes contacts</translation>
     </message>
+    <message>
+        <source>My rooms</source>
+        <translation>Mes salons</translation>
+    </message>
 </context>
 <context>
     <name>ChatSearchBar</name>
