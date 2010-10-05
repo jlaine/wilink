@@ -68,15 +68,12 @@ QVariant FoldersModel::data(const QModelIndex &index, int role) const
         if (path == QDir::rootPath() || !QFileInfo(path).isDir())
             return QVariant();
 
-        if (path == m_forced)
-            return Qt::Checked;
-        else if (path.startsWith(m_forced + "/"))
-            return QVariant();
-
         Qt::CheckState state = Qt::Unchecked;
-        for (int i = 0; i < m_selected.size(); ++i)
+        QStringList allSelected = m_selected;
+        allSelected << m_forced;
+        for (int i = 0; i < allSelected.size(); ++i)
         {
-            const QString currentPath = m_selected[i];
+            const QString currentPath = allSelected[i];
             if (currentPath == path)
                 return Qt::Checked;
             else if (currentPath.startsWith(path + "/"))
