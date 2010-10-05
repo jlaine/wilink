@@ -474,10 +474,14 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     discoveryInfoFound(disco);
 }
 
+QModelIndex ChatRosterModel::contactsItem() const
+{
+    return d->index(d->contactsItem, 0);
+}
+
 QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
 {
-    ChatRosterItem *item = d->rootItem->find(bareJid);
-    return d->index(item, 0);
+    return d->index(d->rootItem->find(bareJid), 0);
 }
 
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
@@ -907,9 +911,9 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setDropIndicatorShown(false);
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
+    setRootIsDecorated(false);
 #ifdef FLAT_VIEW
     setMinimumWidth(200);
-    setRootIsDecorated(false);
 #else
     setMinimumWidth(250);
 #endif
@@ -917,6 +921,9 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSortingEnabled(true);
     sortByColumn(SortingColumn, Qt::AscendingOrder);
+
+    // expand contacts
+    setExpanded(sortedModel->mapFromSource(rosterModel->contactsItem()), true);
 }
 
 void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
@@ -976,13 +983,6 @@ void ChatRosterView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
     setColumnWidth(ContactColumn, e->size().width() - 40);
-}
-
-void ChatRosterView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-{
-    Q_UNUSED(deselected);
-    foreach (const QModelIndex &index, selected.indexes())
-        expand(index);
 }
 
 void ChatRosterView::setShowOfflineContacts(bool show)

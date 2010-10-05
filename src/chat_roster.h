@@ -91,6 +91,7 @@ public:
     QString ownName() const;
 
     QModelIndex addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
+    QModelIndex contactsItem() const;
     QModelIndex findItem(const QString &bareJid) const;
     QModelIndex reparentItem(const QModelIndex &index, const QModelIndex &parent);
 
@@ -137,9 +138,6 @@ signals:
 
 public slots:
     void setShowOfflineContacts(bool show);
-
-protected slots:
-    void selectionChanged(const QItemSelection & selected, const QItemSelection &deselected);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
