@@ -431,8 +431,8 @@ void ChatRosterModel::disconnected()
     {
         ChatRosterItem *first = d->rootItem->child(0);
         ChatRosterItem *last = d->rootItem->child(d->rootItem->size() - 1);
-        emit dataChanged(createIndex(first->row(), ContactColumn, first),
-                         createIndex(last->row(), SortingColumn, last));
+        emit dataChanged(d->index(first, ContactColumn),
+                         d->index(last, SortingColumn));
     }
 }
 
@@ -459,8 +459,8 @@ void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
             id.category() == "conference")
         {
             item->setData(Qt::DisplayRole, id.name());
-            emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                             createIndex(item->row(), SortingColumn, item));
+            emit dataChanged(d->index(item, ContactColumn),
+                             d->index(item, SortingColumn));
         }
     }
     if (d->clientFeatures.contains(disco.from()))
@@ -555,8 +555,8 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
     Q_UNUSED(resource);
     ChatRosterItem *item = d->rootItem->find(bareJid);
     if (item)
-        emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                         createIndex(item->row(), SortingColumn, item));
+        emit dataChanged(d->index(item, ContactColumn),
+                         d->index(item, SortingColumn));
 }
 
 void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
@@ -601,8 +601,8 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         } else {
             // update roster entry
             memberItem->setData(StatusRole, presence.status().type());
-            emit dataChanged(createIndex(memberItem->row(), ContactColumn, memberItem),
-                             createIndex(memberItem->row(), SortingColumn, memberItem));
+            emit dataChanged(d->index(memberItem, ContactColumn),
+                             d->index(memberItem, SortingColumn));
         }
 
         // check whether we own the room
@@ -658,8 +658,8 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         // update an existing entry
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
-        emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                         createIndex(item->row(), SortingColumn, item));
+        emit dataChanged(d->index(item, ContactColumn),
+                         d->index(item, SortingColumn));
     } else {
         // add a new entry
         item = new ChatRosterItem(ChatRosterItem::Contact);
@@ -743,8 +743,8 @@ bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, i
         return false;
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     item->setData(role, value);
-    emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                     createIndex(item->row(), SortingColumn, item));
+    emit dataChanged(d->index(item, ContactColumn),
+                     d->index(item, SortingColumn));
     return true;
 }
 
@@ -783,8 +783,8 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         if (!url.isEmpty())
             item->setData(UrlRole, vcard.url());
 
-        emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                         createIndex(item->row(), SortingColumn, item));
+        emit dataChanged(d->index(item, ContactColumn),
+                         d->index(item, SortingColumn));
     }
     if (bareJid == d->client->configuration().jidBare())
     {
@@ -810,8 +810,8 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     if (item)
     {
         item->setData(MessagesRole, item->data(MessagesRole).toInt() + 1);
-        emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                         createIndex(item->row(), SortingColumn, item));
+        emit dataChanged(d->index(item, ContactColumn),
+                         d->index(item, SortingColumn));
         emit pendingMessages(d->countPendingMessages());
     }
 }
@@ -821,27 +821,26 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
     ChatRosterItem *parentItem;
     if (reqParent.isValid())
         parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
-#if 0
     else if (type == ChatRosterItem::Room)
     {
         if (!d->roomsItem)
         {
             d->roomsItem = new ChatRosterItem(ChatRosterItem::Other);
             d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
+            d->roomsItem->setData(Qt::DecorationRole, QPixmap(":/chat.png"));
             beginInsertRows(QModelIndex(), d->rootItem->size(), d->rootItem->size());
             d->rootItem->append(d->roomsItem);
             endInsertRows();
         }
         parentItem = d->roomsItem;
     }
-#endif
     else
         parentItem = d->rootItem;
 
     // check the item does not already exist
-    ChatRosterItem *item = parentItem->find(id);
+    ChatRosterItem *item = d->rootItem->find(id);
     if (item)
-        return createIndex(item->row(), 0, item);
+        return d->index(item, 0);
 
     // prepare item
     item = new ChatRosterItem(type);
@@ -864,8 +863,8 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     if (item)
     {
         item->setData(MessagesRole, 0);
-        emit dataChanged(createIndex(item->row(), ContactColumn, item),
-                         createIndex(item->row(), SortingColumn, item));
+        emit dataChanged(d->index(item, ContactColumn),
+                         d->index(item, SortingColumn));
         emit pendingMessages(d->countPendingMessages());
     }
 }
@@ -896,7 +895,7 @@ QModelIndex ChatRosterModel::reparentItem(const QModelIndex &index, const QModel
     /* determine current parent index */
     QModelIndex currentParent;
     if (currentParentItem != d->rootItem)
-        currentParent = createIndex(currentParentItem->row(), 0, currentParentItem);
+        currentParent = d->index(currentParentItem, 0);
 
     /* move item */
     beginMoveRows(currentParent, item->row(), item->row(),
@@ -904,7 +903,7 @@ QModelIndex ChatRosterModel::reparentItem(const QModelIndex &index, const QModel
     item->setParent(newParentItem);
     endMoveRows();
 
-    return createIndex(item->row(), 0, item);
+    return d->index(item, 0);
 }
 
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
