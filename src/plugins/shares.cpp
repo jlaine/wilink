@@ -906,10 +906,17 @@ bool SharesPlugin::initialize(Chat *chat)
         // drop wiLink <= 0.9.4 table
         sharesDb.exec("DROP TABLE files");
 
+        // sanitize settings
         QSettings settings;
+        QString sharesDirectory = settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString();
+        if (sharesDirectory.endsWith("/"))
+            sharesDirectory.chop(1);
+        QStringList mappedDirectories = settings.value("SharesDirectories").toStringList();
+
+        // create shares database
         db = new QXmppShareDatabase(this);
-        db->setMappedDirectories(settings.value("SharesDirectories").toStringList());
-        db->setDirectory(settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString());
+        db->setDirectory(sharesDirectory);
+        db->setMappedDirectories(mappedDirectories);
     }
     chats << chat;
 
