@@ -280,7 +280,7 @@ Photos::Photos(const QString &url, QWidget *parent)
 
     setLayout(layout);
     setWindowIcon(QIcon(":/photos.png"));
-    setWindowTitle(tr("Upload photos"));
+    setWindowTitle(tr("My photos"));
 
     /* open filesystem */
     fs = FileSystem::factory(url, this);

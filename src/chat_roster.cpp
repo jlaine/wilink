@@ -471,10 +471,7 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
 {
     ChatRosterItem *item = d->rootItem->find(bareJid);
-    if (item)
-        return createIndex(item->row(), 0, item);
-    else
-        return QModelIndex();
+    return d->index(item, 0);
 }
 
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const

@@ -733,10 +733,6 @@ Acceptez-vous?</translation>
         <translation>Retour</translation>
     </message>
     <message>
-        <source>Upload photos</source>
-        <translation>Transfert de photos</translation>
-    </message>
-    <message>
         <source>Album name:</source>
         <translation>Nom de l&apos;album :</translation>
     </message>
@@ -763,6 +759,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Cancelling upload..</source>
         <translation>Annulation du transfert..</translation>
+    </message>
+    <message>
+        <source>My photos</source>
+        <translation>Mes photos</translation>
     </message>
 </context>
 <context>
