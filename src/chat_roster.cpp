@@ -47,6 +47,8 @@
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 
+//#define FLAT_VIEW
+
 static const QChar sortSeparator('\0');
 
 enum RosterColumns {
@@ -190,9 +192,13 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->nickNameReceived = false;
     d->ownItem = new ChatRosterItem(ChatRosterItem::Contact);
     d->rootItem = new ChatRosterItem(ChatRosterItem::Root);
+#ifdef FLAT_VIEW
     d->contactsItem = d->rootItem;
-#if 0
-    d->contactsItem = new ChatRosterItem(ChatRosterItem::Contact);
+#else
+    d->contactsItem = new ChatRosterItem(ChatRosterItem::Other);
+    d->contactsItem->setId("contacts");
+    d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
+    d->contactsItem->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
     d->rootItem->append(d->contactsItem);
 #endif
 
@@ -901,8 +907,12 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setDropIndicatorShown(false);
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
+#ifdef FLAT_VIEW
     setMinimumWidth(200);
     setRootIsDecorated(false);
+#else
+    setMinimumWidth(250);
+#endif
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSortingEnabled(true);
@@ -988,7 +998,7 @@ QSize ChatRosterView::sizeHint () const
     if (!model()->rowCount())
         return QTreeView::sizeHint();
 
-    QSize hint(200, 0);
+    QSize hint(minimumWidth(), 0);
     hint.setHeight(model()->rowCount() * sizeHintForRow(0));
     return hint;
 }
