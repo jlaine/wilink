@@ -25,6 +25,7 @@ generate_png(png
     refresh.svg
     remove.svg
     search.svg
+    share.svg
     start.svg
     stop.svg
     upload.svg

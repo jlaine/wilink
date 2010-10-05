@@ -76,7 +76,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     menuAction(0)
 {
     bool check;
-    setWindowIcon(QIcon(":/album.png"));
+    setWindowIcon(QIcon(":/share.png"));
     setWindowTitle(tr("Shares"));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -131,7 +131,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     sharesWidget = new ChatSharesTab;
     sharesWidget->addWidget(sharesView);
-    tabWidget->addTab(sharesWidget, QIcon(":/album.png"), tr("Shares"));
+    tabWidget->addTab(sharesWidget, QIcon(":/share.png"), tr("Shares"));
 
     /* create queue tab */
     queueModel = new ChatSharesModel(this);
@@ -608,7 +608,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         // add entries to options menu
         if (!menuAction)
         {
-            menuAction = chatWindow->optionsMenu()->addAction(QIcon(":/album.png"), tr("Shares options"));
+            menuAction = chatWindow->optionsMenu()->addAction(QIcon(":/share.png"), tr("Shares options"));
             connect(menuAction, SIGNAL(triggered(bool)),
                     this, SLOT(shareFolder()));
         }
