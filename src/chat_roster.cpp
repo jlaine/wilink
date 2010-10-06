@@ -197,7 +197,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->contactsItem = d->rootItem;
 #else
     d->contactsItem = new ChatRosterItem(ChatRosterItem::Other);
-    d->contactsItem->setId("contacts");
+    d->contactsItem->setId(CONTACTS_ROSTER_ID);
     d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
     d->contactsItem->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
     d->rootItem->append(d->contactsItem);
@@ -414,6 +414,10 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(contactAvatar(bareJid));
+            }
+        } else {
+            if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+                return bareJid;
             }
         }
     }
@@ -826,6 +830,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
         if (!d->roomsItem)
         {
             d->roomsItem = new ChatRosterItem(ChatRosterItem::Other);
+            d->roomsItem->setId(ROOMS_ROSTER_ID);
             d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
             d->roomsItem->setData(Qt::DecorationRole, QPixmap(":/chat.png"));
             beginInsertRows(QModelIndex(), d->rootItem->size(), d->rootItem->size());

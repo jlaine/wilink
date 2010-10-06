@@ -57,7 +57,7 @@ Menu::Menu(Chat *window)
 
     /* add roster entry */
     QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterItem::Other,
-        "home",
+        HOME_ROSTER_ID,
         tr("My residence"),
         QIcon(":/favorite-active.png"));
     ChatRosterView *rosterView = chatWindow->rosterView();
@@ -158,7 +158,7 @@ void Menu::showMenu()
             {
                 /* add or move chat room entry */
                 ChatRosterModel *model = chatWindow->rosterModel();
-                QModelIndex homeIndex = model->findItem("home");
+                QModelIndex homeIndex = model->findItem(HOME_ROSTER_ID);
                 QModelIndex index = model->findItem(linkUrl.path());
                 if (index.isValid())
                     model->reparentItem(index, homeIndex);

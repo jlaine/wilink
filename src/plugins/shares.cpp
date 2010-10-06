@@ -620,7 +620,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         rosterModel->addItem(objectType(),
             objectName(),
             windowTitle(),
-            windowIcon(), rosterModel->findItem("home"));
+            windowIcon(), rosterModel->findItem(HOME_ROSTER_ID));
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&

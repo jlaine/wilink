@@ -37,6 +37,12 @@ class QXmppVCardManager;
 
 class ChatRosterModelPrivate;
 
+#define HOME_ROSTER_ID      "0_home"
+#define CONTACTS_ROSTER_ID  "1_contacts"
+#define ROOMS_ROSTER_ID     "2_rooms"
+#define PHOTOS_ROSTER_ID    "3_photos"
+#define TRANSFERS_ROSTER_ID "4_transfers"
+
 class ChatRosterModel : public QAbstractItemModel
 {
     Q_OBJECT

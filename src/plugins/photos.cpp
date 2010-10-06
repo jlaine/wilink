@@ -43,6 +43,7 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
+#include "chat_roster.h"
 #include "photos.h"
 
 static const int PROGRESS_STEPS = 100;
@@ -690,7 +691,7 @@ bool PhotosPlugin::initialize(Chat *chat)
 
     /* register panel */
     Photos *photos = new Photos(url);
-    photos->setObjectName("photos");
+    photos->setObjectName(PHOTOS_ROSTER_ID);
     chat->addPanel(photos);
     connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));
 

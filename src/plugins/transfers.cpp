@@ -466,7 +466,7 @@ bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
     ChatTransfers *transfers = new ChatTransfers(chat->client(), chat->rosterModel());
-    transfers->setObjectName("transfers");
+    transfers->setObjectName(TRANSFERS_ROSTER_ID);
     chat->addPanel(transfers);
 
     /* add roster hooks */
