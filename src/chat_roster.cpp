@@ -931,10 +931,10 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setDropIndicatorShown(false);
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
-    setRootIsDecorated(false);
     setMinimumHeight(400);
 #ifdef FLAT_VIEW
     setMinimumWidth(200);
+    setRootIsDecorated(false);
 #else
     setMinimumWidth(250);
 #endif
