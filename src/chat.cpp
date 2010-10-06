@@ -414,21 +414,6 @@ void Chat::panelChanged(int index)
     widget->setFocus();
 }
 
-/** When the window is activated, pass focus to the active chat.
- *
- * @param event
- */
-void Chat::changeEvent(QEvent *event)
-{
-    QWidget::changeEvent(event);
-    if (event->type() == QEvent::ActivationChange && isActiveWindow())
-    {
-        int index = m_conversationPanel->currentIndex();
-        if (index >= 0)
-            panelChanged(index);
-    }
-}
-
 /** Handle an error talking to the chat server.
  *
  * @param error

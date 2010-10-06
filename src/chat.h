@@ -100,9 +100,6 @@ private slots:
     void unregisterPanel();
 
 private:
-    void changeEvent(QEvent *event);
-
-private:
     QMenu *m_fileMenu;
     QMenu *m_helpMenu;
     QMenu *m_optionsMenu;
