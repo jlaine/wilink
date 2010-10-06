@@ -408,10 +408,30 @@ void Chat::panelChanged(int index)
     m_rosterModel->clearPendingMessages(widget->objectName());
 
     // select the corresponding roster entry
-    QModelIndex rosterIndex = m_rosterModel->findItem(widget->objectName());
-    m_rosterView->setCurrentIndex(m_rosterView->mapFromRoster(rosterIndex));
+    QModelIndex newIndex = m_rosterView->mapFromRoster(
+        m_rosterModel->findItem(widget->objectName()));
+    QModelIndex currentIndex = m_rosterView->currentIndex();
+    while (currentIndex.isValid() && currentIndex != newIndex)
+        currentIndex = currentIndex.parent();
+    if (currentIndex != newIndex)
+        m_rosterView->setCurrentIndex(newIndex);
 
     widget->setFocus();
+}
+
+/** When the window is activated, pass focus to the active chat.
+ *
+ * @param event
+ */
+void Chat::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::ActivationChange && isActiveWindow())
+    {
+        int index = m_conversationPanel->currentIndex();
+        if (index >= 0)
+            panelChanged(index);
+    }
 }
 
 /** Handle an error talking to the chat server.
