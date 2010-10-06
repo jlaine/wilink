@@ -243,7 +243,7 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
     client->transferManager().setSupportedMethods(
         QXmppTransferJob::SocksMethod);
 
-    setWindowIcon(QIcon(":/album.png"));
+    setWindowIcon(QIcon(":/transfers.png"));
     setWindowTitle(tr("My transfers"));
 
     QVBoxLayout *layout = new QVBoxLayout;
