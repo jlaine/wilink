@@ -37,11 +37,11 @@ class QXmppVCardManager;
 
 class ChatRosterModelPrivate;
 
-#define HOME_ROSTER_ID      "0_home"
-#define CONTACTS_ROSTER_ID  "1_contacts"
+#define HOME_ROSTER_ID      "1_home"
 #define ROOMS_ROSTER_ID     "2_rooms"
-#define PHOTOS_ROSTER_ID    "3_photos"
-#define TRANSFERS_ROSTER_ID "4_transfers"
+#define CONTACTS_ROSTER_ID  "3_contacts"
+#define PHOTOS_ROSTER_ID    "4_photos"
+#define TRANSFERS_ROSTER_ID "5_transfers"
 
 class ChatRosterModel : public QAbstractItemModel
 {

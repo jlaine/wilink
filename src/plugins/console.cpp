@@ -236,7 +236,7 @@ bool ConsolePlugin::initialize(Chat *chat)
 {
     /* register panel */
     ChatConsole *console = new ChatConsole(chat->client()->logger());
-    console->setObjectName("console");
+    console->setObjectName("0_console");
     chat->addPanel(console);
 
 #ifdef WILINK_EMBEDDED

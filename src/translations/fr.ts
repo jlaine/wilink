@@ -578,10 +578,6 @@ Acceptez-vous?</translation>
 <context>
     <name>ChatTransfers</name>
     <message>
-        <source>File transfers</source>
-        <translation>Transferts de fichiers</translation>
-    </message>
-    <message>
         <source>The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection.</source>
         <translation>La fonctionalité transfert de fichiers est expérimentale et la vitesse de transfert est limitée pour ne pas perturber votre connexion internet.</translation>
     </message>
@@ -596,6 +592,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>My transfers</source>
+        <translation>Mes transferts</translation>
     </message>
 </context>
 <context>
