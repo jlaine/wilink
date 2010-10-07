@@ -167,15 +167,14 @@ protected:
     void resizeEvent(QResizeEvent *e);
 
 private:
-    QGraphicsScene *scene;
+    QGraphicsScene *m_scene;
+    QList<ChatSearchBubble*> m_glassItems;
+    QGraphicsWidget *m_obj;
+    QGraphicsLinearLayout *m_layout;
 
-    QList<ChatSearchBubble*> glassItems;
-    QGraphicsWidget *obj;
-    QGraphicsLinearLayout *layout;
-    ChatMessageWidget *lastFindWidget;
-    QTextCursor lastFindCursor;
-    QList<ChatMessageWidget*> lastSelection;
-    QString lastText;
+    ChatMessageWidget *m_lastFindWidget;
+    QTextCursor m_lastFindCursor;
+    QList<ChatMessageWidget*> m_lastSelection;
 };
 
 #endif

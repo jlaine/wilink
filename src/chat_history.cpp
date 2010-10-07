@@ -448,10 +448,11 @@ void ChatMessageWidget::setTextCursor(const QTextCursor &cursor)
 }
 
 ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent), lastFindWidget(0)
+    : QGraphicsView(parent),
+    m_lastFindWidget(0)
 {
-    scene = new QGraphicsScene(this);
-    setScene(scene);
+    m_scene = new QGraphicsScene(this);
+    setScene(m_scene);
     setDragMode(QGraphicsView::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
 #ifdef WILINK_EMBEDDED
@@ -462,14 +463,14 @@ ChatHistory::ChatHistory(QWidget *parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 #endif
 
-    obj = new QGraphicsWidget;
-    layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(5, 0, 5, 0);
-    layout->setSpacing(0);
-    obj->setLayout(layout);
-    scene->addItem(obj);
+    m_obj = new QGraphicsWidget;
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_layout->setContentsMargins(5, 0, 5, 0);
+    m_layout->setSpacing(0);
+    m_obj->setLayout(m_layout);
+    m_scene->addItem(m_obj);
 
-    connect(scene, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
+    connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
@@ -485,9 +486,9 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
         return;
 
     // check we hit the message limit and this message is too old
-    if (layout->count() >= MESSAGE_MAX)
+    if (m_layout->count() >= MESSAGE_MAX)
     {
-        ChatMessageWidget *oldest = static_cast<ChatMessageWidget*>(layout->itemAt(0));
+        ChatMessageWidget *oldest = static_cast<ChatMessageWidget*>(m_layout->itemAt(0));
         if (message.date < oldest->message().date)
             return;
     }
@@ -498,9 +499,9 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     /* position cursor */
     ChatMessageWidget *previous = NULL;
     int pos = 0;
-    for (int i = 0; i < layout->count(); i++)
+    for (int i = 0; i < m_layout->count(); i++)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
 
         // check for collision
         if (message.archived != child->message().archived &&
@@ -519,22 +520,22 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     }
 
     /* prepare message */
-    ChatMessageWidget *msg = new ChatMessageWidget(message.received, obj);
+    ChatMessageWidget *msg = new ChatMessageWidget(message.received, m_obj);
     msg->setMessage(message);
     msg->setPrevious(previous);
     msg->setMaximumWidth(availableWidth());
 
     /* adjust next message */
-    if (pos < layout->count())
+    if (pos < m_layout->count())
     {
-        ChatMessageWidget *next = static_cast<ChatMessageWidget*>(layout->itemAt(pos));
+        ChatMessageWidget *next = static_cast<ChatMessageWidget*>(m_layout->itemAt(pos));
         next->setPrevious(msg);
     }
 
     /* insert new message */
     connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
     connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)), this, SIGNAL(messageClicked(ChatHistoryMessage)));
-    layout->insertItem(pos, msg);
+    m_layout->insertItem(pos, msg);
     adjustSize();
 
     /* scroll to end if we were previous at end */
@@ -544,8 +545,8 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
 
 void ChatHistory::adjustSize()
 {
-    obj->adjustSize();
-    QRectF rect = obj->boundingRect();
+    m_obj->adjustSize();
+    QRectF rect = m_obj->boundingRect();
     rect.setHeight(rect.height() - 10);
     setSceneRect(rect);
 }
@@ -554,7 +555,7 @@ qreal ChatHistory::availableWidth() const
 {
     qreal leftMargin = 0;
     qreal rightMargin = 0;
-    layout->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
+    m_layout->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
 
     // FIXME : why do we need the extra 8 pixels?
     return width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
@@ -562,8 +563,8 @@ qreal ChatHistory::availableWidth() const
 
 void ChatHistory::clear()
 {
-    for (int i = layout->count() - 1; i >= 0; i--)
-        delete layout->itemAt(i);
+    for (int i = m_layout->count() - 1; i >= 0; i--)
+        delete m_layout->itemAt(i);
     adjustSize();
 }
 
@@ -578,21 +579,21 @@ void ChatHistory::copy()
 QString ChatHistory::copyText()
 {
     QString copyText;
-    QList<QGraphicsItem*> selection = scene->selectedItems();
+    QList<QGraphicsItem*> selection = m_scene->selectedItems();
 
     // gather the message senders
     QSet<QString> senders;
-    for (int i = 0; i < layout->count(); i++)
+    for (int i = 0; i < m_layout->count(); i++)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
         if (selection.contains(child))
             senders.insert(child->message().from);
     }
 
     // copy selected messages
-    for (int i = 0; i < layout->count(); i++)
+    for (int i = 0; i < m_layout->count(); i++)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
         if (selection.contains(child))
         {
             ChatHistoryMessage message = child->message();
@@ -654,15 +655,15 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
 
     // retrieve previous cursor
     QTextCursor cursor;
-    int startIndex = (flags && QTextDocument::FindBackward) ? layout->count() -1 : 0;
-    if (lastFindWidget)
+    int startIndex = (flags && QTextDocument::FindBackward) ? m_layout->count() -1 : 0;
+    if (m_lastFindWidget)
     {
-        for (int i = 0; i < layout->count(); ++i)
+        for (int i = 0; i < m_layout->count(); ++i)
         {
-            if (layout->itemAt(i) == lastFindWidget)
+            if (m_layout->itemAt(i) == m_lastFindWidget)
             {
                 startIndex = i;
-                cursor = lastFindCursor;
+                cursor = m_lastFindCursor;
                 break;
             }
         }
@@ -673,9 +674,9 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
     // perform search
     bool looped = false;
     int i = startIndex;
-    while (i >= 0 && i < layout->count())
+    while (i >= 0 && i < m_layout->count())
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
 
         // position cursor
         if (cursor.isNull())
@@ -695,8 +696,8 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
                 ChatSearchBubble *glass = new ChatSearchBubble;
                 glass->setSelection(textRect);
                 glass->bounce();
-                scene->addItem(glass);
-                glassItems << glass;
+                m_scene->addItem(glass);
+                m_glassItems << glass;
 
                 if (boundingRect.isEmpty())
                     boundingRect = glass->boundingRect();
@@ -705,8 +706,8 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
             }
             ensureVisible(boundingRect);
 
-            lastFindCursor = cursor;
-            lastFindWidget = child;
+            m_lastFindCursor = cursor;
+            m_lastFindWidget = child;
             emit findFinished(true);
             return;
         } else {
@@ -714,9 +715,9 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
                 break;
             if (flags && QTextDocument::FindBackward) {
                 if (--i < 0)
-                    i = layout->count() - 1;
+                    i = m_layout->count() - 1;
             } else {
-                if (++i >= layout->count())
+                if (++i >= m_layout->count())
                     i = 0;
             }
             if (i == startIndex)
@@ -724,8 +725,8 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
         }
     }
 
-    lastFindWidget = 0;
-    lastFindCursor = QTextCursor();
+    m_lastFindWidget = 0;
+    m_lastFindCursor = QTextCursor();
     emit findFinished(false);
 }
 
@@ -733,12 +734,12 @@ void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bo
  */
 void ChatHistory::findClear()
 {
-    foreach (ChatSearchBubble *item, glassItems)
+    foreach (ChatSearchBubble *item, m_glassItems)
     {
-        scene->removeItem(item);
+        m_scene->removeItem(item);
         delete item;
     }
-    glassItems.clear();
+    m_glassItems.clear();
 }
 
 void ChatHistory::focusInEvent(QFocusEvent *e)
@@ -750,10 +751,10 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
 void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
-    if (e->buttons() == Qt::LeftButton && !lastSelection.isEmpty())
+    if (e->buttons() == Qt::LeftButton && !m_lastSelection.isEmpty())
     {
-        QRectF rect = scene->selectionArea().boundingRect();
-        foreach (ChatMessageWidget *child, lastSelection)
+        QRectF rect = m_scene->selectionArea().boundingRect();
+        foreach (ChatMessageWidget *child, m_lastSelection)
             child->setSelection(rect);
     }
 }
@@ -775,25 +776,25 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
 
     // resize widgets
     const qreal w = availableWidth();
-    for (int i = 0; i < layout->count(); i++)
+    for (int i = 0; i < m_layout->count(); i++)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
         child->setMaximumWidth(w);
     }
     adjustSize();
     QGraphicsView::resizeEvent(e);
 
     // reposition search bubbles
-    const bool hadBubbles = glassItems.size() > 0;
+    const bool hadBubbles = m_glassItems.size() > 0;
     findClear();
-    if (hadBubbles && lastFindWidget)
+    if (hadBubbles && m_lastFindWidget)
     {
-        foreach (const RectCursor &textRect, lastFindWidget->chunkSelection(lastFindCursor))
+        foreach (const RectCursor &textRect, m_lastFindWidget->chunkSelection(m_lastFindCursor))
         {
             ChatSearchBubble *glass = new ChatSearchBubble;
             glass->setSelection(textRect);
-            scene->addItem(glass);
-            glassItems << glass;
+            m_scene->addItem(glass);
+            m_glassItems << glass;
         }
     }
 
@@ -805,8 +806,8 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
 void ChatHistory::selectAll()
 {
     QPainterPath path;
-    path.addRect(scene->sceneRect());
-    scene->setSelectionArea(path);
+    path.addRect(m_scene->sceneRect());
+    m_scene->setSelectionArea(path);
 }
 
 void ChatHistory::slotLinkHoverChanged(const QString &link)
@@ -816,19 +817,19 @@ void ChatHistory::slotLinkHoverChanged(const QString &link)
 
 void ChatHistory::slotSelectionChanged()
 {
-    QRectF rect = scene->selectionArea().boundingRect();
+    QRectF rect = m_scene->selectionArea().boundingRect();
 
     // highlight the selected items
-    QList<QGraphicsItem*> selection = scene->selectedItems();
+    QList<QGraphicsItem*> selection = m_scene->selectedItems();
     QList<ChatMessageWidget*> newSelection;
-    for (int i = 0; i < layout->count(); i++)
+    for (int i = 0; i < m_layout->count(); i++)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(layout->itemAt(i));
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
         if (selection.contains(child))
         {
             newSelection << child;
             child->setSelection(rect);
-        } else if (lastSelection.contains(child)) {
+        } else if (m_lastSelection.contains(child)) {
             child->setSelection(QRectF());
         }
     }
@@ -840,7 +841,7 @@ void ChatHistory::slotSelectionChanged()
         clipboard->setText(copyText(), QClipboard::Selection);
     }
 
-    lastSelection = newSelection;
+    m_lastSelection = newSelection;
 }
 
 ChatHistoryMessage::ChatHistoryMessage()
