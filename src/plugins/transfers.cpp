@@ -382,24 +382,10 @@ ChatTransfers::ChatTransfers(Chat *window, QXmppClient *xmppClient, QWidget *par
     layout->addLayout(headerLayout());
 
     /* transfers list */
-    tableWidget = new ChatTransfersView;
-    connect(tableWidget, SIGNAL(updateButtons()), this, SLOT(updateButtons()));
-    connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
-    layout->addWidget(tableWidget);
-
     tableLayout = new QVBoxLayout;
     layout->addLayout(tableLayout);
 
-    /* buttons */
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
-    removeButton = new QPushButton;
-    connect(removeButton, SIGNAL(clicked()), tableWidget, SLOT(removeCurrentJob()));
-    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
-
-    layout->addWidget(buttonBox);
-
     setLayout(layout);
-    updateButtons();
 
     /* connect signals */
     connect(&client->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
@@ -408,6 +394,24 @@ ChatTransfers::ChatTransfers(Chat *window, QXmppClient *xmppClient, QWidget *par
 
 ChatTransfers::~ChatTransfers()
 {
+}
+
+void ChatTransfers::addJob(QXmppTransferJob *job)
+{
+    ChatTransferWidget *widget = new ChatTransferWidget(job);
+    const QString bareJid = jidToBareJid(job->jid());
+    QModelIndex index = chatWindow->rosterModel()->findItem(bareJid);
+    if (index.isValid())
+        QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
+
+    ChatPanel *panel = chatWindow->panel(bareJid);
+    if (panel)
+    {
+        panel->addWidget(widget);
+    } else {
+        tableLayout->addWidget(widget);
+        emit registerPanel();
+    }
 }
 
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
@@ -422,11 +426,8 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
     // prompt user
     ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, this);
-    connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), tableWidget, SLOT(addJob(QXmppTransferJob*)));
+    connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(addJob(QXmppTransferJob*)));
     dlg->show();
-    ChatTransferWidget *widget = new ChatTransferWidget(job, this);
-    tableLayout->addWidget(widget);
-    emit registerPanel();
 }
 
 /** Handle file drag & drop on roster entries.
@@ -493,22 +494,7 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     // send file
     QXmppTransferJob *job = client->transferManager().sendFile(fullJid, filePath);
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
-    tableWidget->addJob(job);
-
-    ChatTransferWidget *widget = new ChatTransferWidget(job);
-    const QString bareJid = jidToBareJid(job->jid());
-    QModelIndex index = chatWindow->rosterModel()->findItem(bareJid);
-    if (index.isValid())
-        QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
-
-    ChatPanel *panel = chatWindow->panel(bareJid);
-    if (panel)
-    {
-        panel->addWidget(widget);
-    } else {
-        tableLayout->addWidget(widget);
-        emit registerPanel();
-    }
+    addJob(job);
 }
 
 void ChatTransfers::sendFileAccepted(const QString &filePath)
@@ -529,31 +515,6 @@ void ChatTransfers::sendFilePrompt()
     dialog->setObjectName(fullJid);
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
     dialog->open(this, SLOT(sendFileAccepted(QString)));
-}
-
-QSize ChatTransfers::sizeHint() const
-{
-    return QSize(400, 200);
-}
-
-void ChatTransfers::updateButtons()
-{
-    QXmppTransferJob *job = tableWidget->currentJob();
-    if (!job)
-    {
-        removeButton->setEnabled(false);
-        removeButton->setIcon(QIcon(":/remove.png"));
-    }
-    else if (job->state() == QXmppTransferJob::FinishedState)
-    {
-        removeButton->setIcon(QIcon(":/remove.png"));
-        removeButton->setEnabled(true);
-    }
-    else
-    {
-        removeButton->setIcon(QIcon(":/close.png"));
-        removeButton->setEnabled(true);
-    }
 }
 
 // PLUGIN

@@ -108,23 +108,18 @@ public:
     ~ChatTransfers();
 
 public slots:
+    void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid, const QString &filePath);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
-
-protected:
-    QSize sizeHint() const;
 
 private slots:
     void fileReceived(QXmppTransferJob *job);
     void sendFileAccepted(const QString &filePath);
     void sendFilePrompt();
-    void updateButtons();
 
 private:
     Chat *chatWindow;
-    QPushButton *removeButton;
-    ChatTransfersView *tableWidget;
     QVBoxLayout *tableLayout;
     QXmppClient *client;
 };
