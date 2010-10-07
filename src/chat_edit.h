@@ -36,9 +36,11 @@ public:
     ChatEdit(int maxheight = 80, QWidget* parent = NULL);
     ~ChatEdit();
 
+    void clear();
     virtual QSize minimumSizeHint() const;
     virtual QSize sizeHint() const;
     QXmppMessage::State state() const;
+    QString text() const;
 
 signals:
     void focused();

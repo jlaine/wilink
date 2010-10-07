@@ -126,13 +126,12 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
 
 void ChatConversation::slotSend()
 {
-    QString text = chatInput->document()->toPlainText();
+    QString text = chatInput->text();
     if (text.isEmpty())
         return;
 
-    //chatLocalState = QXmppMessage::Active;
     if (sendMessage(text))
-        chatInput->document()->clear();
+        chatInput->clear();
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)
