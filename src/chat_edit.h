@@ -22,7 +22,11 @@
 
 #include <QTextEdit>
 
+#include "QXmppMessage.h"
+
 class QKeyEvent;
+
+class ChatEditPrivate;
 
 class ChatEdit : public QTextEdit
 {
@@ -30,12 +34,16 @@ class ChatEdit : public QTextEdit
 
 public:
     ChatEdit(int maxheight = 80, QWidget* parent = NULL);
+    ~ChatEdit();
+
     virtual QSize minimumSizeHint() const;
     virtual QSize sizeHint() const;
+    QXmppMessage::State state() const;
 
 signals:
     void focused();
     void returnPressed();
+    void stateChanged(QXmppMessage::State state);
     void tabPressed();
 
 protected:
@@ -46,7 +54,11 @@ protected:
 public slots:
     void onTextChanged();
 
+private slots:
+    void slotInactive();
+    void slotPaused();
+
 private:
-    int maxHeight;
+    ChatEditPrivate * const d;
 };
 #endif
