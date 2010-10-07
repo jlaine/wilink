@@ -50,10 +50,9 @@ private slots:
     void disconnected();
     void join();
     void leave();
+    void returnPressed();
 
 private:
-    virtual bool sendMessage(const QString &body);
-
     QString chatRemoteJid;
     QXmppClient *client;
     bool joined;

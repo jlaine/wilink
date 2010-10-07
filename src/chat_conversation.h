@@ -37,11 +37,9 @@ public:
     ChatConversation(QWidget *parent = NULL);
 
 protected slots:
-    void slotSend();
     void slotSearchDisplayed(bool visible);
 
 protected:
-    virtual bool sendMessage(const QString &body) = 0;
     void setRemoteState(QXmppMessage::State state);
 
 protected:

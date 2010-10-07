@@ -93,9 +93,6 @@ public:
     ChatRosterItem::Type objectType() const;
     void invite(const QString &jid);
 
-protected:
-    virtual bool sendMessage(const QString &text);
-
 private slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void join();
@@ -104,6 +101,7 @@ private slots:
     void messageClicked(const ChatHistoryMessage &msg);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
+    void returnPressed();
     void rosterClick(const QModelIndex &index);
     void tabPressed();
 

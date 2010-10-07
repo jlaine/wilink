@@ -48,7 +48,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     /* chat history */
     chatHistory = new ChatHistory;
-    //connect(chatHistory, SIGNAL(focused()), this, SLOT(slotFocused()));
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
 
@@ -79,10 +78,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     /* text edit */
     chatInput = new ChatEdit(80);
-    check = connect(chatInput, SIGNAL(returnPressed()),
-                    this, SLOT(slotSend()));
-    Q_ASSERT(check);
-
 #ifdef WILINK_EMBEDDED
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(chatInput);
@@ -91,7 +86,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     sendButton->setMaximumWidth(32);
     sendButton->setIcon(QIcon(":/upload.png"));
     check = connect(sendButton, SIGNAL(clicked()),
-                    this, SLOT(slotSend()));
+                    chatInput, SIGNAL(returnPressed()));
     Q_ASSERT(check);
     hbox->addWidget(sendButton);
     layout->addItem(hbox);
@@ -122,16 +117,6 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
         stateName = QString(" %1").arg(stateName);
 
     setWindowStatus(stateName);
-}
-
-void ChatConversation::slotSend()
-{
-    QString text = chatInput->text();
-    if (text.isEmpty())
-        return;
-
-    if (sendMessage(text))
-        chatInput->clear();
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)

@@ -489,6 +489,10 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     setWindowHelp(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
 
     bool check;
+    check = connect(chatInput, SIGNAL(returnPressed()),
+                    this, SLOT(returnPressed()));
+    Q_ASSERT(check);
+
     check = connect(client, SIGNAL(connected()), this, SLOT(join()));
     Q_ASSERT(check);
 
@@ -754,9 +758,14 @@ void ChatRoom::rosterClick(const QModelIndex &index)
 
 /** Send a message to the chat room.
  */
-bool ChatRoom::sendMessage(const QString &text)
+void ChatRoom::returnPressed()
 {
-    return client->mucManager().sendMessage(chatRemoteJid, text);
+    QString text = chatInput->text();
+    if (text.isEmpty())
+        return;
+
+    if (client->mucManager().sendMessage(chatRemoteJid, text))
+        chatInput->clear();
 }
 
 void ChatRoom::tabPressed()

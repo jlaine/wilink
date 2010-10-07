@@ -61,6 +61,10 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     setWindowExtra(rosterModel->contactExtra(jid));
 
     bool check;
+    check = connect(chatInput, SIGNAL(returnPressed()),
+                    this, SLOT(returnPressed()));
+    Q_ASSERT(check);
+
     check = connect(chatInput, SIGNAL(stateChanged(QXmppMessage::State)),
                     this, SLOT(chatStateChanged(QXmppMessage::State)));
     Q_ASSERT(check);
@@ -209,18 +213,23 @@ ChatRosterItem::Type ChatDialog::objectType() const
 }
 
 /** Sends a message to the remote party.
- *
- * @param text The message's contents.
  */
-bool ChatDialog::sendMessage(const QString &text)
+void ChatDialog::returnPressed()
 {
+    QString text = chatInput->text();
+    if (text.isEmpty())
+        return;
+
     // send message
     QXmppMessage msg;
     msg.setBody(text);
     msg.setTo(chatRemoteJid);
     msg.setState(QXmppMessage::Active);
     if (!client->sendPacket(msg))
-        return false;
+        return;
+
+    // clear input
+    chatInput->clear();
 
     // add message to history
     ChatHistoryMessage message;
@@ -229,8 +238,6 @@ bool ChatDialog::sendMessage(const QString &text)
     message.from = rosterModel->ownName();
     message.received = false;
     chatHistory->addMessage(message);
-
-    return true;
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages
