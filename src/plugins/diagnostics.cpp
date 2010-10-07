@@ -236,7 +236,7 @@ Diagnostics::Diagnostics(QWidget *parent)
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
     text = new QTextBrowser;
     layout->addWidget(text);
 

@@ -43,6 +43,7 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
+    void addWidget(QWidget *widget);
     virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);

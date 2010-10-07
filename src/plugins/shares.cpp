@@ -84,7 +84,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     // HEADER
 
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     layout->addSpacing(4);
 

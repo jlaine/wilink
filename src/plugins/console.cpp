@@ -48,7 +48,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
 
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
 
     browser = new QTextBrowser;
 #ifdef WILINK_EMBEDDED

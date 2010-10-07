@@ -89,7 +89,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->header = new QVBoxLayout;
     d->header->setMargin(0);
     d->header->setSpacing(10);
-    d->header->addItem(d->hbox);
+    d->header->addLayout(d->hbox);
 
     d->helpLabel = new QLabel;
     d->helpLabel->setWordWrap(true);
@@ -103,6 +103,11 @@ ChatPanel::ChatPanel(QWidget* parent)
 ChatPanel::~ChatPanel()
 {
     delete d;
+}
+
+void ChatPanel::addWidget(QWidget *widget)
+{
+    d->header->addWidget(widget);
 }
 
 /** Return the type of entry to add to the roster.

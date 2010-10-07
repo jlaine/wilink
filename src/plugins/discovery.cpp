@@ -65,7 +65,7 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
 
     /* location bar */
     QHBoxLayout *hbox = new QHBoxLayout;

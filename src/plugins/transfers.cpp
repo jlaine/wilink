@@ -168,13 +168,17 @@ void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ChatTransferWidget::slotCancel()
 {
-    if (!m_job)
-        return;
-
-    if (m_job->state() == QXmppTransferJob::FinishedState)
-        m_job->deleteLater();
-    else
+    // cancel job
+    if (m_job && m_job->state() != QXmppTransferJob::FinishedState)
+    {
         m_job->abort();
+        return;
+    }
+
+    // delete job and widget
+    if (m_job)
+        m_job->deleteLater();
+    deleteLater();
 }
 
 void ChatTransferWidget::slotDestroyed(QObject *object)
@@ -356,8 +360,10 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
     emit updateButtons();
 }
 
-ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, QWidget *parent)
-    : ChatPanel(parent), client(xmppClient), rosterModel(chatRosterModel)
+ChatTransfers::ChatTransfers(Chat *window, QXmppClient *xmppClient, QWidget *parent)
+    : ChatPanel(parent),
+    chatWindow(window),
+    client(xmppClient)
 {
     // disable in-band bytestreams
     client->transferManager().setSupportedMethods(
@@ -435,7 +441,7 @@ void ChatTransfers::rosterDrop(QDropEvent *event, const QModelIndex &index)
         return;
 
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+    QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
     if (fullJids.isEmpty())
         return;
 
@@ -462,7 +468,7 @@ void ChatTransfers::rosterMenu(QMenu *menu, const QModelIndex &index)
 
     if (type == ChatRosterItem::Contact)
     {
-        QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+        QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
         if (fullJids.isEmpty())
             return;
 
@@ -489,10 +495,20 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
     tableWidget->addJob(job);
 
-    ChatTransferWidget *widget = new ChatTransferWidget(job, this);
-    tableLayout->addWidget(widget);
+    ChatTransferWidget *widget = new ChatTransferWidget(job);
+    const QString bareJid = jidToBareJid(job->jid());
+    QModelIndex index = chatWindow->rosterModel()->findItem(bareJid);
+    if (index.isValid())
+        QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    emit registerPanel();
+    ChatPanel *panel = chatWindow->panel(bareJid);
+    if (panel)
+    {
+        panel->addWidget(widget);
+    } else {
+        tableLayout->addWidget(widget);
+        emit registerPanel();
+    }
 }
 
 void ChatTransfers::sendFileAccepted(const QString &filePath)
@@ -551,7 +567,7 @@ public:
 bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatTransfers *transfers = new ChatTransfers(chat->client(), chat->rosterModel());
+    ChatTransfers *transfers = new ChatTransfers(chat, chat->client());
     transfers->setObjectName(TRANSFERS_ROSTER_ID);
     chat->addPanel(transfers);
 

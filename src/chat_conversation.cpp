@@ -44,7 +44,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     layout->setSpacing(0);
 
     /* status bar */
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
 
     /* chat history */
     chatHistory = new ChatHistory;
@@ -89,7 +89,7 @@ ChatConversation::ChatConversation(QWidget *parent)
                     chatInput, SIGNAL(returnPressed()));
     Q_ASSERT(check);
     hbox->addWidget(sendButton);
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
 #else
     layout->addWidget(chatInput);
 #endif

@@ -197,7 +197,7 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
 
     // HEADER
 
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
 
     // STATUS
 
