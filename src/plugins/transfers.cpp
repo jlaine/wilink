@@ -150,6 +150,22 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
             this, SLOT(slotStateChanged(QXmppTransferJob::State)));
 }
 
+void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (!m_job)
+        return;
+
+    const QString localFilePath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
+    if (localFilePath.isEmpty())
+        return;
+    if (m_job->direction() == QXmppTransferJob::IncomingDirection &&
+        (m_job->state() != QXmppTransferJob::FinishedState ||
+         m_job->error() != QXmppTransferJob::NoError))
+        return;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
+}
+
 void ChatTransferWidget::slotCancel()
 {
     if (!m_job)
@@ -402,6 +418,8 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
     ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, this);
     connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), tableWidget, SLOT(addJob(QXmppTransferJob*)));
     dlg->show();
+    ChatTransferWidget *widget = new ChatTransferWidget(job, this);
+    tableLayout->addWidget(widget);
     emit registerPanel();
 }
 
@@ -471,7 +489,7 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
     tableWidget->addJob(job);
 
-    ChatTransferWidget *widget = new ChatTransferWidget(job);
+    ChatTransferWidget *widget = new ChatTransferWidget(job, this);
     tableLayout->addWidget(widget);
 
     emit registerPanel();

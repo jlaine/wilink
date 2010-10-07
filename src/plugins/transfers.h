@@ -57,6 +57,9 @@ class ChatTransferWidget : public QWidget
 public:
     ChatTransferWidget(QXmppTransferJob *job, QWidget *parent = 0);
 
+protected:
+    void mouseDoubleClickEvent(QMouseEvent * event);
+
 private slots:
     void slotCancel();
     void slotDestroyed(QObject *object);
