@@ -278,8 +278,8 @@ Photos::Photos(const QString &url, QWidget *parent)
     hbox->addWidget(backButton);
     hbox->addWidget(createButton);
     hbox->addWidget(deleteButton);
-    layout->addItem(hbox_upload);
-    layout->addItem(hbox);
+    layout->addLayout(hbox_upload);
+    layout->addLayout(hbox);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/photos.png"));

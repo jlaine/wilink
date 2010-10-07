@@ -89,7 +89,7 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     m_locationNode = new QLineEdit;
     hbox->addWidget(m_locationNode);
 
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
 
     /* main view */
     m_listWidget = new QListWidget;

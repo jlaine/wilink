@@ -255,7 +255,7 @@ Diagnostics::Diagnostics(QWidget *parent)
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
     hbox->addWidget(refreshButton);
 
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
     setLayout(layout);
     setMinimumSize(QSize(450, 400));
     setWindowIcon(QIcon(":/diagnostics.png"));

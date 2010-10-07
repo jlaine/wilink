@@ -306,7 +306,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_fewerButton->hide();
     connect(m_fewerButton, SIGNAL(clicked()), this, SLOT(fewerFolders()));
     toggleBox->addWidget(m_fewerButton);
-    vbox->addItem(toggleBox);
+    vbox->addLayout(toggleBox);
 
     sharesBox->setLayout(vbox);
     layout->addWidget(sharesBox);

@@ -103,7 +103,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
     hbox->addWidget(lineEdit);
 
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
     layout->addSpacing(4);
 
     // MAIN
@@ -158,7 +158,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     // FOOTER
 
     QHBoxLayout *footerLayout = new QHBoxLayout;
-    layout->addItem(footerLayout);
+    layout->addLayout(footerLayout);
 
     statusBar = new QStatusBar;
     statusBar->setSizeGripEnabled(false);

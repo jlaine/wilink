@@ -83,7 +83,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     connect(clearButton, SIGNAL(clicked()), browser, SLOT(clear()));
     hbox->addWidget(clearButton);
 
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
 
     setLayout(layout);
 

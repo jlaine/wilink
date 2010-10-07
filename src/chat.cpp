@@ -685,7 +685,7 @@ void Chat::showAbout()
         "<p style=\"font-size: large;\">%2</p>")
         .arg(qApp->applicationName(),
             tr("version %1").arg(qApp->applicationVersion()))));
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), &dlg, SLOT(accept()));
     layout->addWidget(buttonBox);

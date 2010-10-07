@@ -51,7 +51,7 @@ ChatForm::ChatForm(const QXmppDataForm &form, QWidget *parent)
             QLineEdit *edit = new QLineEdit(field.value().toString());
             edit->setObjectName(key);
             hbox->addWidget(edit);
-            vbox->addItem(hbox);
+            vbox->addLayout(hbox);
         }
         else if (field.type() == QXmppDataForm::Field::ListSingleField)
         {
@@ -69,7 +69,7 @@ ChatForm::ChatForm(const QXmppDataForm &form, QWidget *parent)
             }
             combo->setCurrentIndex(currentIndex);
             hbox->addWidget(combo);
-            vbox->addItem(hbox);
+            vbox->addLayout(hbox);
         }
     }
 

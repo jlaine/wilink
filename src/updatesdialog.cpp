@@ -46,7 +46,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     statusLabel = new QLabel;
     statusLabel->setWordWrap(true);
     hbox->addWidget(statusLabel);
-    layout->addItem(hbox);
+    layout->addLayout(hbox);
 
     /* progress */
     progressBar = new QProgressBar;
