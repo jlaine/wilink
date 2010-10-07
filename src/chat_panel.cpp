@@ -30,10 +30,11 @@ class ChatPanelPrivate
 public:
     void updateTitle();
 
-    QVBoxLayout *layout;
+    QVBoxLayout *header;
     QHBoxLayout *hbox;
     QPushButton *attachButton;
     QPushButton *closeButton;
+    QLabel *helpLabel;
     QLabel *iconLabel;
     QLabel *nameLabel;
     QString windowExtra;
@@ -83,6 +84,17 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->hbox->addWidget(d->iconLabel);
     d->hbox->addWidget(d->attachButton);
     d->hbox->addWidget(d->closeButton);
+
+    // assemble header
+    d->header = new QVBoxLayout;
+    d->header->setMargin(0);
+    d->header->setSpacing(10);
+    d->header->addItem(d->hbox);
+
+    d->helpLabel = new QLabel;
+    d->helpLabel->setWordWrap(true);
+    d->helpLabel->hide();
+    d->header->addWidget(d->helpLabel);
 }
 
 ChatPanel::~ChatPanel()
@@ -103,6 +115,21 @@ void ChatPanel::setWindowExtra(const QString &extra)
 {
     d->windowExtra = extra;
     d->updateTitle();
+}
+
+/** Sets the window's help text.
+ *
+ * @param help
+ */
+void ChatPanel::setWindowHelp(const QString &help)
+{
+    d->helpLabel->setText(help);
+#ifndef WILINK_EMBEDDED
+    if (help.isEmpty())
+        d->helpLabel->hide();
+    else
+        d->helpLabel->show();
+#endif
 }
 
 /** When the window icon is set, update the header icon.
@@ -138,7 +165,7 @@ void ChatPanel::setWindowTitle(const QString &title)
  */
 QLayout* ChatPanel::headerLayout()
 {
-    return d->hbox;
+    return d->header;
 }
 
 void ChatPanel::changeEvent(QEvent *event)
