@@ -836,6 +836,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
     ChatRosterItem *parentItem;
     if (reqParent.isValid())
         parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
+#if 0
     else if (type == ChatRosterItem::Room)
     {
         if (!d->roomsItem)
@@ -850,6 +851,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
         }
         parentItem = d->roomsItem;
     }
+#endif
     else
         parentItem = d->rootItem;
 
