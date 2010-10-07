@@ -247,25 +247,15 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
 
     setWindowIcon(QIcon(":/transfers.png"));
     setWindowTitle(tr("My transfers"));
+    const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
+        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::DownloadsLocation)).toString(),
+        SystemInfo::displayName(SystemInfo::DownloadsLocation));
+    setWindowHelp(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
 
     QVBoxLayout *layout = new QVBoxLayout;
 
     /* status bar */
     layout->addItem(headerLayout());
-
-    /* help label */
-    QLabel *helpLabel = new QLabel(tr("The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection."));
-    helpLabel->setWordWrap(true);
-    layout->addWidget(helpLabel);
-
-    /* download location label */
-    const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
-        QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::DownloadsLocation)).toString(),
-        SystemInfo::displayName(SystemInfo::DownloadsLocation));
-    QLabel *downloadsLabel = new QLabel(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
-    downloadsLabel->setOpenExternalLinks(true);
-    downloadsLabel->setWordWrap(true);
-    layout->addWidget(downloadsLabel);
 
     /* transfers list */
     tableWidget = new ChatTransfersView;

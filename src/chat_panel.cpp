@@ -93,6 +93,7 @@ ChatPanel::ChatPanel(QWidget* parent)
 
     d->helpLabel = new QLabel;
     d->helpLabel->setWordWrap(true);
+    d->helpLabel->setOpenExternalLinks(true);
     d->helpLabel->hide();
     d->header->addWidget(d->helpLabel);
 }

@@ -578,10 +578,6 @@ Acceptez-vous?</translation>
 <context>
     <name>ChatTransfers</name>
     <message>
-        <source>The file transfer feature is experimental and the transfer speed is limited so as not to interfere with your internet connection.</source>
-        <translation>La fonctionalité transfert de fichiers est expérimentale et la vitesse de transfert est limitée pour ne pas perturber votre connexion internet.</translation>
-    </message>
-    <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
