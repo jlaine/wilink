@@ -86,10 +86,30 @@ ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &con
 
 void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 {
-    if (standardButton(button) == QMessageBox::Yes)
-        emit fileAccepted(m_job);
-    else
-        emit fileDeclined(m_job);
+    if (standardButton(button) != QMessageBox::Yes)
+    {
+        m_job->abort();
+        return;
+    }
+
+    // determine file location
+    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
+    const QString filePath = QXmppShareExtension::availableFilePath(downloadsDir.path(), m_job->fileName());
+
+    // open file
+    QFile *file = new QFile(filePath, m_job);
+    if (!file->open(QIODevice::WriteOnly))
+    {
+        qWarning() << "Could not write to" << filePath;
+        m_job->abort();
+        return;
+    }
+
+    // start transfer
+    m_job->setData(QXmppShareExtension::LocalPathRole, filePath);
+    m_job->accept(file);
+
+    emit fileAccepted(m_job);
 }
 
 ChatTransfersView::ChatTransfersView(QWidget *parent)
@@ -283,40 +303,6 @@ ChatTransfers::~ChatTransfers()
 {
 }
 
-void ChatTransfers::addJob(QXmppTransferJob *job)
-{
-    tableWidget->addJob(job);
-    emit registerPanel();
-}
-
-void ChatTransfers::fileAccepted(QXmppTransferJob *job)
-{
-    // determine file location
-    QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
-    const QString filePath = QXmppShareExtension::availableFilePath(downloadsDir.path(), job->fileName());
-
-    // open file
-    QFile *file = new QFile(filePath, job);
-    if (!file->open(QIODevice::WriteOnly))
-    {
-        qWarning() << "Could not write to" << filePath;
-        job->abort();
-        return;
-    }
-
-    // add transfer to list
-    job->setData(QXmppShareExtension::LocalPathRole, filePath);
-    addJob(job);
-
-    // start transfer
-    job->accept(file);
-}
-
-void ChatTransfers::fileDeclined(QXmppTransferJob *job)
-{
-    job->abort();
-}
-
 void ChatTransfers::fileReceived(QXmppTransferJob *job)
 {
     // if the job was already accepted or refused (by the shares plugin)
@@ -329,9 +315,9 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 
     // prompt user
     ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, this);
-    connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(fileAccepted(QXmppTransferJob*)));
-    connect(dlg, SIGNAL(fileDeclined(QXmppTransferJob*)), this, SLOT(fileDeclined(QXmppTransferJob*)));
+    connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), tableWidget, SLOT(addJob(QXmppTransferJob*)));
     dlg->show();
+    emit registerPanel();
 }
 
 /** Handle file drag & drop on roster entries.
@@ -398,7 +384,8 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     // send file
     QXmppTransferJob *job = client->transferManager().sendFile(fullJid, filePath);
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
-    addJob(job);
+    tableWidget->addJob(job);
+    emit registerPanel();
 }
 
 void ChatTransfers::sendFileAccepted(const QString &filePath)

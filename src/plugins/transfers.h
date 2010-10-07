@@ -40,7 +40,6 @@ public:
 
 signals:
     void fileAccepted(QXmppTransferJob *job);
-    void fileDeclined(QXmppTransferJob *job);
 
 private slots:
     void slotButtonClicked(QAbstractButton *button);
@@ -55,10 +54,10 @@ class ChatTransfersView : public QTableWidget
 
 public:
     ChatTransfersView(QWidget *parent = 0);
-    void addJob(QXmppTransferJob *job);
     QXmppTransferJob *currentJob();
 
 public slots:
+    void addJob(QXmppTransferJob *job);
     void removeCurrentJob();
 
 signals:
@@ -83,8 +82,6 @@ public:
     ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *rosterModel, QWidget *parent = 0);
     ~ChatTransfers();
 
-    void addJob(QXmppTransferJob *job);
-
 public slots:
     void sendFile(const QString &fullJid, const QString &filePath);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
@@ -94,8 +91,6 @@ protected:
     QSize sizeHint() const;
 
 private slots:
-    void fileAccepted(QXmppTransferJob *job);
-    void fileDeclined(QXmppTransferJob *job);
     void fileReceived(QXmppTransferJob *job);
     void sendFileAccepted(const QString &filePath);
     void sendFilePrompt();
