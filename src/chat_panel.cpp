@@ -106,7 +106,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     setStyleSheet("ChatPanelWidget { \
         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \
             stop: 0 #E0E0E0, \
-            stop: 0.75 #FFFFFF, \
+            stop: 0.6 #FFFFFF, \
             stop: 1 #E0E0E0); \
         border: 1px solid gray; \
         border-radius: 5px; }");
