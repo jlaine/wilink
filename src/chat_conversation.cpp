@@ -36,9 +36,10 @@
 
 ChatConversation::ChatConversation(QWidget *parent)
     : ChatPanel(parent),
-    chatLocalState(QXmppMessage::None),
     spacerItem(0)
 {
+    bool check;
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
 
@@ -47,7 +48,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     /* chat history */
     chatHistory = new ChatHistory;
-    connect(chatHistory, SIGNAL(focused()), this, SLOT(slotFocused()));
+    //connect(chatHistory, SIGNAL(focused()), this, SLOT(slotFocused()));
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
 
@@ -58,21 +59,34 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* search bar */
     chatSearch = new ChatSearchBar;
     chatSearch->hide();
-    connect(chatSearch, SIGNAL(displayed(bool)),
-        this, SLOT(slotSearchDisplayed(bool)));
-    connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
-        chatHistory, SLOT(find(QString, QTextDocument::FindFlags, bool)));
-    connect(chatSearch, SIGNAL(findClear()),
-        chatHistory, SLOT(findClear()));
-    connect(chatHistory, SIGNAL(findFinished(bool)),
-        chatSearch, SLOT(findFinished(bool)));
+    check = connect(chatSearch, SIGNAL(displayed(bool)),
+                    this, SLOT(slotSearchDisplayed(bool)));
+    Q_ASSERT(check);
+
+    check = connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
+                    chatHistory, SLOT(find(QString, QTextDocument::FindFlags, bool)));
+    Q_ASSERT(check);
+
+    check = connect(chatSearch, SIGNAL(findClear()),
+                    chatHistory, SLOT(findClear()));
+    Q_ASSERT(check);
+
+    check = connect(chatHistory, SIGNAL(findFinished(bool)),
+                    chatSearch, SLOT(findFinished(bool)));
+    Q_ASSERT(check);
+
     layout->addWidget(chatSearch);
 
     /* text edit */
     chatInput = new ChatEdit(80);
-    connect(chatInput, SIGNAL(focused()), this, SLOT(slotFocused()));
-    connect(chatInput, SIGNAL(returnPressed()), this, SLOT(slotSend()));
-    connect(chatInput, SIGNAL(textChanged()), this, SLOT(slotTextChanged()));
+    check = connect(chatInput, SIGNAL(returnPressed()),
+                    this, SLOT(slotSend()));
+    Q_ASSERT(check);
+
+    check = connect(chatInput, SIGNAL(stateChanged(QXmppMessage::State)),
+                    this, SIGNAL(localStateChanged(QXmppMessage::State)));
+    Q_ASSERT(check);
+
 #ifdef WILINK_EMBEDDED
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(chatInput);
@@ -80,7 +94,9 @@ ChatConversation::ChatConversation(QWidget *parent)
     sendButton->setFlat(true);
     sendButton->setMaximumWidth(32);
     sendButton->setIcon(QIcon(":/upload.png"));
-    connect(sendButton, SIGNAL(clicked()), this, SLOT(slotSend()));
+    check = connect(sendButton, SIGNAL(clicked()),
+                    this, SLOT(slotSend()));
+    Q_ASSERT(check);
     hbox->addWidget(sendButton);
     layout->addItem(hbox);
 #else
@@ -95,25 +111,12 @@ ChatConversation::ChatConversation(QWidget *parent)
     connect(this, SIGNAL(findPanel()), chatSearch, SLOT(activate()));
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 
-    /* timers */
-    pausedTimer = new QTimer(this);
-    pausedTimer->setInterval(30000);
-    pausedTimer->setSingleShot(true);
-    connect(pausedTimer, SIGNAL(timeout()), this, SLOT(slotPaused()));
-
-    inactiveTimer = new QTimer(this);
-    inactiveTimer->setInterval(120000);
-    inactiveTimer->setSingleShot(true);
-    connect(inactiveTimer, SIGNAL(timeout()), this, SLOT(slotInactive()));
-
-    /* start inactivity timer */
-    inactiveTimer->start();
     setRemoteState(QXmppMessage::None);
 }
 
 QXmppMessage::State ChatConversation::localState() const
 {
-    return chatLocalState;
+    return chatInput->state();
 }
 
 void ChatConversation::setRemoteState(QXmppMessage::State state)
@@ -130,45 +133,13 @@ void ChatConversation::setRemoteState(QXmppMessage::State state)
     setWindowStatus(stateName);
 }
 
-void ChatConversation::slotFocused()
-{
-    if (chatLocalState != QXmppMessage::Active &&
-        chatLocalState != QXmppMessage::Composing &&
-        chatLocalState != QXmppMessage::Paused)
-    {
-        chatLocalState = QXmppMessage::Active;
-        emit localStateChanged(chatLocalState);
-    }
-    // reset inactivity timer
-    inactiveTimer->stop();
-    inactiveTimer->start();
-}
-
-void ChatConversation::slotInactive()
-{
-    if (chatLocalState != QXmppMessage::Inactive)
-    {
-        chatLocalState = QXmppMessage::Inactive;
-        emit localStateChanged(chatLocalState);
-    }
-}
-
-void ChatConversation::slotPaused()
-{
-    if (chatLocalState == QXmppMessage::Composing)
-    {
-        chatLocalState = QXmppMessage::Paused;
-        emit localStateChanged(chatLocalState);
-    }
-}
-
 void ChatConversation::slotSend()
 {
     QString text = chatInput->document()->toPlainText();
     if (text.isEmpty())
         return;
 
-    chatLocalState = QXmppMessage::Active;
+    //chatLocalState = QXmppMessage::Active;
     if (sendMessage(text))
         chatInput->document()->clear();
 }
@@ -183,29 +154,5 @@ void ChatConversation::slotSearchDisplayed(bool visible)
         spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
     vbox->invalidate();
-}
-
-void ChatConversation::slotTextChanged()
-{
-    QString text = chatInput->document()->toPlainText();
-    if (!text.isEmpty())
-    {
-        if (chatLocalState != QXmppMessage::Composing)
-        {
-            chatLocalState = QXmppMessage::Composing;
-            emit localStateChanged(chatLocalState);
-        }
-        pausedTimer->start();
-    } else {
-        if (chatLocalState != QXmppMessage::Active)
-        {
-            chatLocalState = QXmppMessage::Active;
-            emit localStateChanged(chatLocalState);
-        }
-        pausedTimer->stop();
-    }
-    // reset inactivity timer
-    inactiveTimer->stop();
-    inactiveTimer->start();
 }
 

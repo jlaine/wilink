@@ -42,12 +42,8 @@ public:
     QXmppMessage::State localState() const;
 
 protected slots:
-    void slotFocused();
-    void slotInactive();
-    void slotPaused();
     void slotSend();
     void slotSearchDisplayed(bool visible);
-    void slotTextChanged();
 
 signals:
     void localStateChanged(QXmppMessage::State state);
@@ -62,9 +58,6 @@ protected:
     ChatSearchBar *chatSearch;
 
 private:
-    QXmppMessage::State chatLocalState;
-    QTimer *inactiveTimer;
-    QTimer *pausedTimer;
     QSpacerItem *spacerItem;
 };
 

@@ -116,6 +116,29 @@ void ChatEdit::onTextChanged()
     if (myHeight != oldHeight)
         updateGeometry();
     oldHeight = myHeight;
+
+    // update state
+    QString text = document()->toPlainText();
+    if (!text.isEmpty())
+    {
+        if (d->state != QXmppMessage::Composing)
+        {
+            d->state = QXmppMessage::Composing;
+            emit stateChanged(d->state);
+        }
+        d->pausedTimer->start();
+    } else {
+        if (d->state != QXmppMessage::Active)
+        {
+            d->state = QXmppMessage::Active;
+            emit stateChanged(d->state);
+        }
+        d->pausedTimer->stop();
+    }
+
+    // reset inactivity timer
+    d->inactiveTimer->stop();
+    d->inactiveTimer->start();
 }
 
 void ChatEdit::resizeEvent(QResizeEvent *e)
