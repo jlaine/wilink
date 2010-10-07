@@ -43,6 +43,8 @@
 
 #include "diagnostics.h"
 
+#define DIAGNOSTICS_ROSTER_ID "0_diagnostics"
+
 const char* ns_diagnostics = "http://wifirst.net/protocol/diagnostics";
 
 static const QHostAddress serverAddress("213.91.4.201");
@@ -490,7 +492,7 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
 {
     /* register panel */
     Diagnostics *diagnostics = new Diagnostics;
-    diagnostics->setObjectName("diagnostics");
+    diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
     chat->addPanel(diagnostics);
 
     /* add menu entry */

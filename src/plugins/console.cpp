@@ -37,6 +37,8 @@
 #include "flickcharm.h"
 #endif
 
+#define CONSOLE_ROSTER_ID "0_console"
+
 ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     : ChatPanel(parent), connected(false), currentLogger(logger)
 {
@@ -236,7 +238,7 @@ bool ConsolePlugin::initialize(Chat *chat)
 {
     /* register panel */
     ChatConsole *console = new ChatConsole(chat->client()->logger());
-    console->setObjectName("0_console");
+    console->setObjectName(CONSOLE_ROSTER_ID);
     chat->addPanel(console);
 
 #ifdef WILINK_EMBEDDED

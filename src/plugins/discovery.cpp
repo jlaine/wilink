@@ -31,6 +31,8 @@
 #include "chat_plugin.h"
 #include "discovery.h"
 
+#define DISCOVERY_ROSTER_ID "0_discovery"
+
 enum Roles
 {
     JidRole = Qt::UserRole,
@@ -273,7 +275,7 @@ bool DiscoveryPlugin::initialize(Chat *chat)
 {
     /* register panel */
     Discovery *discovery = new Discovery(chat->client(), chat);
-    discovery->setObjectName("discovery");
+    discovery->setObjectName(DISCOVERY_ROSTER_ID);
     chat->addPanel(discovery);
 
     /* register shortcut */

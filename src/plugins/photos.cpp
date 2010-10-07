@@ -46,6 +46,8 @@
 #include "chat_roster.h"
 #include "photos.h"
 
+#define PHOTOS_ROSTER_ID "z_2_photos"
+
 static const int PROGRESS_STEPS = 100;
 static const QSize ICON_SIZE(128, 128);
 static const QSize UPLOAD_SIZE(2048, 2048);

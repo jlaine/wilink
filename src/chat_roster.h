@@ -39,9 +39,7 @@ class ChatRosterModelPrivate;
 
 #define HOME_ROSTER_ID      "1_home"
 #define ROOMS_ROSTER_ID     "2_rooms"
-#define CONTACTS_ROSTER_ID  "3_contacts"
-#define PHOTOS_ROSTER_ID    "4_photos"
-#define TRANSFERS_ROSTER_ID "5_transfers"
+#define CONTACTS_ROSTER_ID  "z_1_contacts"
 
 class ChatRosterModel : public QAbstractItemModel
 {
