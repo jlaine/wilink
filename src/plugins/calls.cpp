@@ -298,8 +298,7 @@ void CallWatcher::callContact()
 
 void CallWatcher::callReceived(QXmppCall *call)
 {
-    const QString bareJid = jidToBareJid(call->jid());
-    const QString contactName = m_window->rosterModel()->contactName(bareJid);
+    const QString contactName = m_window->rosterModel()->contactName(call->jid());
 
     QMessageBox *box = new QMessageBox(QMessageBox::Question,
         tr("Call from %1").arg(contactName),

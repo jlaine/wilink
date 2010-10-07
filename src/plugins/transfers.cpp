@@ -401,11 +401,9 @@ void ChatTransfersWatcher::fileReceived(QXmppTransferJob *job)
     if (job->state() != QXmppTransferJob::OfferState)
         return;
 
-    const QString bareJid = jidToBareJid(job->jid());
-//    const QString contactName = rosterModel->contactName(bareJid);
-
     // prompt user
-    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, chatWindow);
+    const QString contactName = chatWindow->rosterModel()->contactName(job->jid());
+    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, contactName, chatWindow);
     connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(addJob(QXmppTransferJob*)));
     dlg->show();
 }
