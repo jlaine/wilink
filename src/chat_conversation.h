@@ -40,9 +40,6 @@ protected slots:
     void slotSearchDisplayed(bool visible);
 
 protected:
-    void setRemoteState(QXmppMessage::State state);
-
-protected:
     ChatHistory *chatHistory;
     ChatEdit *chatInput;
     ChatSearchBar *chatSearch;

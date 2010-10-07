@@ -101,22 +101,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* shortcuts */
     connect(this, SIGNAL(findPanel()), chatSearch, SLOT(activate()));
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
-
-    setRemoteState(QXmppMessage::None);
-}
-
-void ChatConversation::setRemoteState(QXmppMessage::State state)
-{
-    QString stateName;
-    if (state == QXmppMessage::Composing)
-        stateName = tr("is composing a message");
-    else if (state == QXmppMessage::Gone)
-        stateName = tr("has closed the conversation");
-
-    if (!stateName.isEmpty())
-        stateName = QString(" %1").arg(stateName);
-
-    setWindowStatus(stateName);
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)

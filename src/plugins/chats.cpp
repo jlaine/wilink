@@ -187,7 +187,15 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
         jidToBareJid(msg.from()) != chatRemoteJid)
         return;
 
-    setRemoteState(msg.state());
+    // handle chat state
+    QString stateName;
+    if (msg.state() == QXmppMessage::Composing)
+        stateName = tr("is composing a message");
+    else if (msg.state() == QXmppMessage::Gone)
+        stateName = tr("has closed the conversation");
+    setWindowStatus(stateName);
+
+    // handle message body
     if (msg.body().isEmpty())
         return;
 

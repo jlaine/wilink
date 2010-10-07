@@ -210,7 +210,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatConversation</name>
+    <name>ChatDialog</name>
     <message>
         <source>is composing a message</source>
         <translation>compose un message</translation>
