@@ -233,11 +233,12 @@ void ChatRoomWatcher::kickUser()
     QString jid = action->data().toString();
 
     // prompt for reason
-    const QString contactName = chat->rosterModel()->contactName(jidToBareJid(jid));
+    const QString roomJid = jidToBareJid(jid);
+    const QString roomName = chat->rosterModel()->contactName(roomJid);
     bool ok = false;
     QString reason;
     reason = QInputDialog::getText(chat, tr("Kick user"),
-                  tr("Enter the reason for kicking the user from '%1'.").arg(contactName),
+                  tr("Enter the reason for kicking the user from '%1'.").arg(roomName),
                   QLineEdit::Normal, reason, &ok);
     if (!ok)
         return;
@@ -249,7 +250,7 @@ void ChatRoomWatcher::kickUser()
 
     QXmppMucAdminIq iq;
     iq.setType(QXmppIq::Set);
-    iq.setTo(jidToBareJid(jid));
+    iq.setTo(roomJid);
     iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
 
     chat->client()->sendPacket(iq);
@@ -275,11 +276,10 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
     if (chat->panel(roomJid) || invitations.contains(roomJid))
         return;
 
-    const QString bareJid = jidToBareJid(jid);
-    const QString contactName = chat->rosterModel()->contactName(bareJid);
+    const QString contactName = chat->rosterModel()->contactName(jid);
 
     QMessageBox *box = new QMessageBox(QMessageBox::Question,
-        tr("Invitation from %1").arg(bareJid),
+        tr("Invitation from %1").arg(jid),
         tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
         QMessageBox::Yes | QMessageBox::No,
         chat);
