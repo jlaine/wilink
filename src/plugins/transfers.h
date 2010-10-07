@@ -28,6 +28,7 @@
 #include "chat_panel.h"
 
 class QModelIndex;
+class QProgressBar;
 class QPushButton;
 class ChatRosterModel;
 
@@ -45,7 +46,22 @@ private slots:
     void slotButtonClicked(QAbstractButton *button);
 
 private:
-    QXmppTransferJob *m_job; 
+    QXmppTransferJob *m_job;
+};
+
+class ChatTransferWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    ChatTransferWidget(QXmppTransferJob *job, QWidget *parent = 0);
+
+private slots:
+    void slotProgress(qint64, qint64);
+
+private:
+    QProgressBar *m_progress;
+    QXmppTransferJob *m_job;
 };
 
 class ChatTransfersView : public QTableWidget

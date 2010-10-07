@@ -112,6 +112,29 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
     emit fileAccepted(m_job);
 }
 
+ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
+    : QWidget(parent),
+    m_job(job)
+{
+    QHBoxLayout *layout = new QHBoxLayout;
+    m_progress = new QProgressBar;
+    layout->addWidget(m_progress);
+    setLayout(layout);
+}
+
+void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
+{
+    if (total > 0)
+    {
+        m_progress->setValue((100 * done) / total);
+        qint64 speed = m_job->speed();
+        if (m_job->direction() == QXmppTransferJob::IncomingDirection)
+            m_progress->setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
+        else
+            m_progress->setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
+    }
+}
+
 ChatTransfersView::ChatTransfersView(QWidget *parent)
     : QTableWidget(parent)
 {
