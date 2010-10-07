@@ -99,13 +99,12 @@ private:
     QList<QXmppTransferJob*> jobs;
 };
 
-class ChatTransfers : public ChatPanel
+class ChatTransfersWatcher : public QObject
 {
     Q_OBJECT
 
 public:
-    ChatTransfers(Chat *chatWindow, QXmppClient *xmppClient, QWidget *parent = 0);
-    ~ChatTransfers();
+    ChatTransfersWatcher(Chat *chatWindow);
 
 public slots:
     void addJob(QXmppTransferJob *job);
@@ -121,7 +120,7 @@ private slots:
 private:
     Chat *chatWindow;
     QVBoxLayout *tableLayout;
-    QXmppClient *client;
+//    QXmppClient *client;
 };
 
 #endif

@@ -360,43 +360,27 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
     emit updateButtons();
 }
 
-ChatTransfers::ChatTransfers(Chat *window, QXmppClient *xmppClient, QWidget *parent)
-    : ChatPanel(parent),
-    chatWindow(window),
-    client(xmppClient)
+ChatTransfersWatcher::ChatTransfersWatcher(Chat *window)
+    : QObject(window),
+    chatWindow(window)
 {
     // disable in-band bytestreams
-    client->transferManager().setSupportedMethods(
+    chatWindow->client()->transferManager().setSupportedMethods(
         QXmppTransferJob::SocksMethod);
 
-    setWindowIcon(QIcon(":/transfers.png"));
-    setWindowTitle(tr("My transfers"));
+#if 0
     const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(SystemInfo::storageLocation(SystemInfo::DownloadsLocation)).toString(),
         SystemInfo::displayName(SystemInfo::DownloadsLocation));
     setWindowHelp(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(downloadsLink));
-
-    QVBoxLayout *layout = new QVBoxLayout;
-
-    /* status bar */
-    layout->addLayout(headerLayout());
-
-    /* transfers list */
-    tableLayout = new QVBoxLayout;
-    layout->addLayout(tableLayout);
-
-    setLayout(layout);
+#endif
 
     /* connect signals */
-    connect(&client->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+    connect(&chatWindow->client()->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
 }
 
-ChatTransfers::~ChatTransfers()
-{
-}
-
-void ChatTransfers::addJob(QXmppTransferJob *job)
+void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
 {
     ChatTransferWidget *widget = new ChatTransferWidget(job);
     const QString bareJid = jidToBareJid(job->jid());
@@ -406,15 +390,10 @@ void ChatTransfers::addJob(QXmppTransferJob *job)
 
     ChatPanel *panel = chatWindow->panel(bareJid);
     if (panel)
-    {
         panel->addWidget(widget);
-    } else {
-        tableLayout->addWidget(widget);
-        emit registerPanel();
-    }
 }
 
-void ChatTransfers::fileReceived(QXmppTransferJob *job)
+void ChatTransfersWatcher::fileReceived(QXmppTransferJob *job)
 {
     // if the job was already accepted or refused (by the shares plugin)
     // stop here
@@ -425,16 +404,16 @@ void ChatTransfers::fileReceived(QXmppTransferJob *job)
 //    const QString contactName = rosterModel->contactName(bareJid);
 
     // prompt user
-    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, this);
+    ChatTransferPrompt *dlg = new ChatTransferPrompt(job, bareJid, chatWindow);
     connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(addJob(QXmppTransferJob*)));
     dlg->show();
 }
 
 /** Handle file drag & drop on roster entries.
  */
-void ChatTransfers::rosterDrop(QDropEvent *event, const QModelIndex &index)
+void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
 {
-    if (!client->isConnected())
+    if (!chatWindow->client()->isConnected())
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
@@ -459,9 +438,9 @@ void ChatTransfers::rosterDrop(QDropEvent *event, const QModelIndex &index)
         event->acceptProposedAction();
 }
 
-void ChatTransfers::rosterMenu(QMenu *menu, const QModelIndex &index)
+void ChatTransfersWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
-    if (!client->isConnected())
+    if (!chatWindow->client()->isConnected())
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
@@ -479,12 +458,12 @@ void ChatTransfers::rosterMenu(QMenu *menu, const QModelIndex &index)
     }
 }
 
-void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
+void ChatTransfersWatcher::sendFile(const QString &fullJid, const QString &filePath)
 {
     // check file size
     if (QFileInfo(filePath).size() > fileSizeLimit)
     {
-        QMessageBox::warning(this,
+        QMessageBox::warning(chatWindow,
             tr("Send a file"),
             tr("Sorry, but you cannot send files bigger than %1.")
                 .arg(sizeToString(fileSizeLimit)));
@@ -492,25 +471,25 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     }
 
     // send file
-    QXmppTransferJob *job = client->transferManager().sendFile(fullJid, filePath);
+    QXmppTransferJob *job = chatWindow->client()->transferManager().sendFile(fullJid, filePath);
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
     addJob(job);
 }
 
-void ChatTransfers::sendFileAccepted(const QString &filePath)
+void ChatTransfersWatcher::sendFileAccepted(const QString &filePath)
 {
     QString fullJid = sender()->objectName();
     sendFile(fullJid, filePath);
 }
 
-void ChatTransfers::sendFilePrompt()
+void ChatTransfersWatcher::sendFilePrompt()
 {
     QAction *action = qobject_cast<QAction*>(sender());
     if (!action)
         return;
     QString fullJid = action->data().toString();
 
-    QFileDialog *dialog = new QFileDialog(this, tr("Send a file"));
+    QFileDialog *dialog = new QFileDialog(chatWindow, tr("Send a file"));
     dialog->setFileMode(QFileDialog::ExistingFile);
     dialog->setObjectName(fullJid);
     connect(dialog, SIGNAL(finished(int)), dialog, SLOT(deleteLater()));
@@ -528,19 +507,13 @@ public:
 bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatTransfers *transfers = new ChatTransfers(chat, chat->client());
-    transfers->setObjectName(TRANSFERS_ROSTER_ID);
-    chat->addPanel(transfers);
+    ChatTransfersWatcher *transfers = new ChatTransfersWatcher(chat);
 
     /* add roster hooks */
     connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
             transfers, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
             transfers, SLOT(rosterMenu(QMenu*, QModelIndex)));
-
-    /* register shortcut */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_T), chat);
-    connect(shortcut, SIGNAL(activated()), transfers, SIGNAL(showPanel()));
     return true;
 }
 

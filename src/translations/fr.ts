@@ -587,25 +587,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatTransfers</name>
-    <message>
-        <source>Send a file</source>
-        <translation>Envoyer un fichier</translation>
-    </message>
-    <message>
-        <source>Sorry, but you cannot send files bigger than %1.</source>
-        <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
-    </message>
-    <message>
-        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
-        <source>My transfers</source>
-        <translation>Mes transferts</translation>
-    </message>
-</context>
-<context>
     <name>ChatTransfersView</name>
     <message>
         <source>File name</source>
@@ -626,6 +607,25 @@ Acceptez-vous?</translation>
     <message>
         <source>Uploading at %1</source>
         <translation>Téléchargement à %1</translation>
+    </message>
+</context>
+<context>
+    <name>ChatTransfersWatcher</name>
+    <message>
+        <source>My transfers</source>
+        <translation type="obsolete">Mes transferts</translation>
+    </message>
+    <message>
+        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>Send a file</source>
+        <translation>Envoyer un fichier</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot send files bigger than %1.</source>
+        <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
     </message>
 </context>
 <context>
