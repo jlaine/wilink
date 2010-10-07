@@ -275,10 +275,20 @@ QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
 QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRosterModel::Feature feature) const
 {
     QStringList jids;
-    const QString sought = bareJid + "/";
-    foreach (const QString &key, d->clientFeatures.keys())
-        if (key.startsWith(sought) && (d->clientFeatures.value(key) & feature))
-            jids << key;
+
+    ChatRosterItem *item = d->rootItem->find(bareJid);
+    if (item && (item->type() == ChatRosterItem::Room))
+        return jids;
+
+    if (jidToResource(bareJid).isEmpty())
+    {
+        const QString sought = bareJid + "/";
+        foreach (const QString &key, d->clientFeatures.keys())
+            if (key.startsWith(sought) && (d->clientFeatures.value(key) & feature))
+                jids << key;
+    } else if (d->clientFeatures.value(bareJid) & feature) {
+        jids << bareJid;
+    }
     return jids;
 }
 
@@ -469,8 +479,7 @@ void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
                              d->index(item, SortingColumn));
         }
     }
-    if (d->clientFeatures.contains(disco.from()))
-        d->clientFeatures.insert(disco.from(), features);
+    d->clientFeatures.insert(disco.from(), features);
 }
 
 void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
@@ -577,11 +586,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         if (presence.type() == QXmppPresence::Unavailable)
             d->clientFeatures.remove(jid);
         else if (presence.type() == QXmppPresence::Available && !d->clientFeatures.contains(jid))
-        {
-            // discover remote party features
-            d->clientFeatures.insert(jid, 0);
             d->fetchInfo(jid);
-        }
     }
 
     // handle chat rooms

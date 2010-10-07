@@ -318,22 +318,14 @@ void CallWatcher::callReceived(QXmppCall *call)
 
 void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
-    if (!m_client->isConnected())
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    const QStringList fullJids = m_window->rosterModel()->contactFeaturing(jid, ChatRosterModel::VoiceFeature);
+    if (!m_client->isConnected() || fullJids.isEmpty())
         return;
 
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-
-    if (type == ChatRosterItem::Contact)
-    {
-        QStringList fullJids = m_window->rosterModel()->contactFeaturing(jid, ChatRosterModel::VoiceFeature);
-        if (fullJids.isEmpty())
-            return;
-
-        QAction *action = menu->addAction(QIcon(":/call.png"), tr("Call"));
-        action->setData(fullJids.first());
-        connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
-    }
+    QAction *action = menu->addAction(QIcon(":/call.png"), tr("Call"));
+    action->setData(fullJids.first());
+    connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
 }
 
 // PLUGIN
