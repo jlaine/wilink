@@ -399,7 +399,9 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::Room) {
-            if (role == Qt::DecorationRole && index.column() == ContactColumn) {
+            if (role == Qt::DisplayRole && index.column() == ContactColumn && item->size() > 0) {
+                return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->size()));
+            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 QPixmap icon(":/chat.png");
                 if (messages)
                     paintMessages(icon, messages);
@@ -637,6 +639,8 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         roomItem->remove(memberItem);
         endRemoveRows();
     }
+    emit dataChanged(d->index(roomItem, ContactColumn),
+                     d->index(roomItem, SortingColumn));
 }
 
 void ChatRosterModel::rosterChanged(const QString &jid)
