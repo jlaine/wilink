@@ -20,14 +20,13 @@
 #ifndef __WILINK_CALLS_H__
 #define __WILINK_CALLS_H__
 
-#include <QObject>
 #include <QAudioInput>
+#include <QObject>
+#include <QWidget>
 
 #include "QXmppCallManager.h"
-#include "chat_panel.h"
 
 class Chat;
-class ChatClient;
 class ChatRosterModel;
 class QAbstractButton;
 class QAudioFormat;

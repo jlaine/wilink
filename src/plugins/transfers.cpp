@@ -38,6 +38,7 @@
 #include "QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "systeminfo.h"

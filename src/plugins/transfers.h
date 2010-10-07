@@ -25,12 +25,9 @@
 
 #include "QXmppTransferManager.h"
 
-#include "chat_panel.h"
-
 class QModelIndex;
 class QProgressBar;
 class QPushButton;
-class QVBoxLayout;
 class Chat;
 
 class ChatTransferPrompt : public QMessageBox
@@ -119,8 +116,6 @@ private slots:
 
 private:
     Chat *chatWindow;
-    QVBoxLayout *tableLayout;
-//    QXmppClient *client;
 };
 
 #endif
