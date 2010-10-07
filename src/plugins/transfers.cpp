@@ -410,20 +410,31 @@ void ChatTransfersWatcher::fileReceived(QXmppTransferJob *job)
     dlg->show();
 }
 
+static QString findJid(ChatRosterModel *rosterModel, const QModelIndex &index)
+{
+    int type = index.data(ChatRosterModel::TypeRole).toInt();
+    if (type == ChatRosterItem::Contact || type == ChatRosterItem::RoomMember)
+    {
+        const QString jid = index.data(ChatRosterModel::IdRole).toString();
+        QString fullJid = jid;
+        if (jidToResource(fullJid).isEmpty())
+        {
+            QStringList fullJids = rosterModel->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+            if (!fullJids.isEmpty())
+                return fullJids.first();
+        }
+    }
+    return QString();
+}
+
 /** Handle file drag & drop on roster entries.
  */
 void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
 {
-    if (!chatWindow->client()->isConnected())
-        return;
-
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type != ChatRosterItem::Contact || !event->mimeData()->hasUrls())
-        return;
-
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-    if (fullJids.isEmpty())
+    const QString fullJid = findJid(chatWindow->rosterModel(), index);
+    if (!chatWindow->client()->isConnected() ||
+        !event->mimeData()->hasUrls() ||
+        fullJid.isEmpty())
         return;
 
     int found = 0;
@@ -432,7 +443,7 @@ void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &inde
         if (url.scheme() != "file")
             continue;
         if (event->type() == QEvent::Drop)
-            sendFile(fullJids.first(), url.toLocalFile());
+            sendFile(fullJid, url.toLocalFile());
         found++;
     }
     if (found)
@@ -441,22 +452,14 @@ void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &inde
 
 void ChatTransfersWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
-    if (!chatWindow->client()->isConnected())
+    const QString fullJid = findJid(chatWindow->rosterModel(), index);
+    if (!chatWindow->client()->isConnected() ||
+        fullJid.isEmpty())
         return;
 
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-
-    if (type == ChatRosterItem::Contact)
-    {
-        QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-        if (fullJids.isEmpty())
-            return;
-
-        QAction *action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
-        action->setData(fullJids.first());
-        connect(action, SIGNAL(triggered()), this, SLOT(sendFilePrompt()));
-    }
+    QAction *action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
+    action->setData(fullJid);
+    connect(action, SIGNAL(triggered()), this, SLOT(sendFilePrompt()));
 }
 
 void ChatTransfersWatcher::sendFile(const QString &fullJid, const QString &filePath)
