@@ -117,14 +117,60 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
     m_job(job)
 {
     QHBoxLayout *layout = new QHBoxLayout;
+    m_icon = new QLabel;
+    if (m_job->direction() == QXmppTransferJob::IncomingDirection)
+        m_icon->setPixmap(QPixmap(":/download.png"));
+    else
+        m_icon->setPixmap(QPixmap(":/upload.png"));
+    layout->addWidget(m_icon);
+
+    layout->addWidget(new QLabel(QString("%1 (%2)").arg(
+        m_job->fileName(),
+        sizeToString(job->fileSize()))));
+
     m_progress = new QProgressBar;
     layout->addWidget(m_progress);
+
+    m_cancelButton = new QPushButton;
+    m_cancelButton->setIcon(QIcon(":/close.png"));
+    m_cancelButton->setFlat(true);
+    m_cancelButton->setMaximumWidth(32);
+    layout->addWidget(m_cancelButton);
+
     setLayout(layout);
+
+    // connect signals
+    connect(m_cancelButton, SIGNAL(clicked()),
+            this, SLOT(slotCancel()));
+    connect(m_job, SIGNAL(destroyed(QObject*)),
+            this, SLOT(slotDestroyed(QObject*)));
+    connect(m_job, SIGNAL(progress(qint64, qint64)),
+            this, SLOT(slotProgress(qint64, qint64)));
+    connect(m_job, SIGNAL(stateChanged(QXmppTransferJob::State)),
+            this, SLOT(slotStateChanged(QXmppTransferJob::State)));
+}
+
+void ChatTransferWidget::slotCancel()
+{
+    if (!m_job)
+        return;
+
+    if (m_job->state() == QXmppTransferJob::FinishedState)
+        m_job->deleteLater();
+    else
+        m_job->abort();
+}
+
+void ChatTransferWidget::slotDestroyed(QObject *object)
+{
+    Q_UNUSED(object);
+    m_job = 0;
+    m_cancelButton->hide();
 }
 
 void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
 {
-    if (total > 0)
+    if (m_job && total > 0)
     {
         m_progress->setValue((100 * done) / total);
         qint64 speed = m_job->speed();
@@ -132,6 +178,19 @@ void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
             m_progress->setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
         else
             m_progress->setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
+    }
+}
+
+void ChatTransferWidget::slotStateChanged(QXmppTransferJob::State state)
+{
+    if (state == QXmppTransferJob::FinishedState)
+    {
+        m_cancelButton->setIcon(QIcon(":/remove.png"));
+        m_progress->hide();
+        if (m_job->error() == QXmppTransferJob::NoError)
+            m_icon->setPixmap(QPixmap(":/contact-available.png"));
+        else
+            m_icon->setPixmap(QPixmap(":/contact-busy.png"));
     }
 }
 
@@ -298,13 +357,16 @@ ChatTransfers::ChatTransfers(QXmppClient *xmppClient, ChatRosterModel *chatRoste
     QVBoxLayout *layout = new QVBoxLayout;
 
     /* status bar */
-    layout->addItem(headerLayout());
+    layout->addLayout(headerLayout());
 
     /* transfers list */
     tableWidget = new ChatTransfersView;
     connect(tableWidget, SIGNAL(updateButtons()), this, SLOT(updateButtons()));
     connect(tableWidget, SIGNAL(currentCellChanged(int,int,int,int)), this, SLOT(updateButtons()));
     layout->addWidget(tableWidget);
+
+    tableLayout = new QVBoxLayout;
+    layout->addLayout(tableLayout);
 
     /* buttons */
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
@@ -408,6 +470,10 @@ void ChatTransfers::sendFile(const QString &fullJid, const QString &filePath)
     QXmppTransferJob *job = client->transferManager().sendFile(fullJid, filePath);
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
     tableWidget->addJob(job);
+
+    ChatTransferWidget *widget = new ChatTransferWidget(job);
+    tableLayout->addWidget(widget);
+
     emit registerPanel();
 }
 

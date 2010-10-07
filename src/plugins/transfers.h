@@ -30,6 +30,7 @@
 class QModelIndex;
 class QProgressBar;
 class QPushButton;
+class QVBoxLayout;
 class ChatRosterModel;
 
 class ChatTransferPrompt : public QMessageBox
@@ -57,10 +58,15 @@ public:
     ChatTransferWidget(QXmppTransferJob *job, QWidget *parent = 0);
 
 private slots:
+    void slotCancel();
+    void slotDestroyed(QObject *object);
     void slotProgress(qint64, qint64);
+    void slotStateChanged(QXmppTransferJob::State state);
 
 private:
+    QLabel *m_icon;
     QProgressBar *m_progress;
+    QPushButton *m_cancelButton;
     QXmppTransferJob *m_job;
 };
 
@@ -115,6 +121,7 @@ private slots:
 private:
     QPushButton *removeButton;
     ChatTransfersView *tableWidget;
+    QVBoxLayout *tableLayout;
     QXmppClient *client;
     ChatRosterModel *rosterModel;
 };
