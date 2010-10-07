@@ -111,6 +111,7 @@ QSize ChatEdit::minimumSizeHint() const
 
 void ChatEdit::onTextChanged()
 {
+    // update geometry
     static int oldHeight = 0;
     int myHeight = document()->size().toSize().height() + (width() - viewport()->width());
     if (myHeight != oldHeight)

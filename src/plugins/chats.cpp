@@ -31,6 +31,7 @@
 #include "QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_edit.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
@@ -60,7 +61,7 @@ ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel
     setWindowExtra(rosterModel->contactExtra(jid));
 
     bool check;
-    check = connect(this, SIGNAL(localStateChanged(QXmppMessage::State)),
+    check = connect(chatInput, SIGNAL(stateChanged(QXmppMessage::State)),
                     this, SLOT(chatStateChanged(QXmppMessage::State)));
     Q_ASSERT(check);
 
@@ -160,7 +161,7 @@ void ChatDialog::join()
     {
         QXmppMessage message;
         message.setTo(fullJid);
-        message.setState(localState());
+        message.setState(chatInput->state());
         client->sendPacket(message);
     }
 

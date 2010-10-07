@@ -114,11 +114,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     setRemoteState(QXmppMessage::None);
 }
 
-QXmppMessage::State ChatConversation::localState() const
-{
-    return chatInput->state();
-}
-
 void ChatConversation::setRemoteState(QXmppMessage::State state)
 {
     QString stateName;

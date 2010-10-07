@@ -27,10 +27,7 @@
 class ChatEdit;
 class ChatHistory;
 class ChatSearchBar;
-class QLabel;
 class QSpacerItem;
-class QLineEdit;
-class QXmppVCard;
 
 class ChatConversation : public ChatPanel
 {
@@ -39,14 +36,9 @@ class ChatConversation : public ChatPanel
 public:
     ChatConversation(QWidget *parent = NULL);
 
-    QXmppMessage::State localState() const;
-
 protected slots:
     void slotSend();
     void slotSearchDisplayed(bool visible);
-
-signals:
-    void localStateChanged(QXmppMessage::State state);
 
 protected:
     virtual bool sendMessage(const QString &body) = 0;
