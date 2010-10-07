@@ -13,37 +13,6 @@
     </message>
 </context>
 <context>
-    <name>CallPanel</name>
-    <message>
-        <source>Hang up</source>
-        <translation>Raccrocher</translation>
-    </message>
-    <message>
-        <source>Call finished.</source>
-        <translation>Appel terminé.</translation>
-    </message>
-    <message>
-        <source>Ringing..</source>
-        <translation>Sonne..</translation>
-    </message>
-    <message>
-        <source>Connecting..</source>
-        <translation>Connexion..</translation>
-    </message>
-    <message>
-        <source>Call connected.</source>
-        <translation>Appel connecté.</translation>
-    </message>
-    <message>
-        <source>Call with %1</source>
-        <translation>Appel avec %1</translation>
-    </message>
-    <message>
-        <source>Disconnecting..</source>
-        <translation>Déconnexion..</translation>
-    </message>
-</context>
-<context>
     <name>CallWatcher</name>
     <message>
         <source>Call</source>
@@ -60,6 +29,33 @@ Do you accept?</source>
         <translation>%1 souhaite vous parler.
 
 Acceptez-vous?</translation>
+    </message>
+</context>
+<context>
+    <name>CallWidget</name>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
+    <message>
+        <source>Hang up</source>
+        <translation>Raccrocher</translation>
+    </message>
+    <message>
+        <source>Call connected.</source>
+        <translation>Appel connecté.</translation>
+    </message>
+    <message>
+        <source>Disconnecting..</source>
+        <translation>Déconnexion..</translation>
+    </message>
+    <message>
+        <source>Call finished.</source>
+        <translation>Appel terminé.</translation>
+    </message>
+    <message>
+        <source>Ringing..</source>
+        <translation>Sonne..</translation>
     </message>
 </context>
 <context>
@@ -611,10 +607,6 @@ Acceptez-vous?</translation>
 </context>
 <context>
     <name>ChatTransfersWatcher</name>
-    <message>
-        <source>My transfers</source>
-        <translation type="obsolete">Mes transferts</translation>
-    </message>
     <message>
         <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>

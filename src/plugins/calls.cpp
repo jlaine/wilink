@@ -172,8 +172,8 @@ void CallHandler::callStateChanged(QXmppCall::State state)
     }
 }
 
-CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
-    : ChatPanel(parent),
+CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
+    : QWidget(parent),
     m_call(call)
 {
     // CALL THREAD
@@ -184,70 +184,39 @@ CallPanel::CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *par
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
-    const QString bareJid = jidToBareJid(call->jid());
-    const QString contactName = rosterModel->contactName(bareJid);
-
-    setObjectName(QString("call/%1").arg(call->sid()));
-    setWindowIcon(QIcon(":/call.png"));
-    setWindowTitle(tr("Call with %1").arg(contactName));
-    setWindowExtra(rosterModel->contactExtra(bareJid));
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-
-    // HEADER
-
-    layout->addLayout(headerLayout());
-
-    // STATUS
-
-    layout->addStretch();
     QHBoxLayout *box = new QHBoxLayout;
 
     m_imageLabel = new QLabel;
-    m_imageLabel->setPixmap(QPixmap(":/peer-128.png"));
+    m_imageLabel->setPixmap(QPixmap(":/call.png"));
     box->addWidget(m_imageLabel);
 
     m_statusLabel = new QLabel;
     m_statusLabel->setText(tr("Connecting.."));
     box->addWidget(m_statusLabel);
 
-    layout->addLayout(box);
-    layout->addStretch();
-
-    // BUTTONS
-
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addStretch();
     m_hangupButton = new QPushButton(tr("Hang up"));
     m_hangupButton->setIcon(QIcon(":/hangup.png"));
     connect(m_hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
-    hbox->addWidget(m_hangupButton);
+    box->addWidget(m_hangupButton);
 
-    layout->addItem(hbox);
+    setLayout(box);
 
-    setLayout(layout);
-
-    connect(this, SIGNAL(hidePanel()), call, SLOT(hangup()));
-    connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     connect(call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
-
-    QTimer::singleShot(0, this, SIGNAL(showPanel()));
 }
 
 /** When the call thread finishes, perform cleanup.
  */
-void CallPanel::callFinished()
+void CallWidget::callFinished()
 {
     m_call->deleteLater();
     m_callHandler->deleteLater();
     m_callThread->deleteLater();
-    emit hidePanel();
+    deleteLater();
 }
 
-void CallPanel::callStateChanged(QXmppCall::State state)
+void CallWidget::callStateChanged(QXmppCall::State state)
 {
     // update status
     switch (state)
@@ -270,13 +239,7 @@ void CallPanel::callStateChanged(QXmppCall::State state)
     }
 }
 
-void CallPanel::leave()
-{
-    emit unregisterPanel();
-    deleteLater();
-}
-
-void CallPanel::ringing()
+void CallWidget::ringing()
 {
     m_statusLabel->setText(tr("Ringing.."));
 }
@@ -285,10 +248,22 @@ CallWatcher::CallWatcher(Chat *chatWindow)
     : QObject(chatWindow), m_window(chatWindow)
 {
     m_client = chatWindow->client();
-    m_roster = chatWindow->rosterModel();
 
     connect(&m_client->callManager(), SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
+}
+
+void CallWatcher::addCall(QXmppCall *call)
+{
+    CallWidget *widget = new CallWidget(call, m_window->rosterModel());
+    const QString bareJid = jidToBareJid(call->jid());
+    QModelIndex index = m_window->rosterModel()->findItem(bareJid);
+    if (index.isValid())
+        QMetaObject::invokeMethod(m_window, "rosterClicked", Q_ARG(QModelIndex, index));
+
+    ChatPanel *panel = m_window->panel(bareJid);
+    if (panel)
+        panel->addWidget(widget);
 }
 
 void CallWatcher::callClicked(QAbstractButton * button)
@@ -301,8 +276,7 @@ void CallWatcher::callClicked(QAbstractButton * button)
     if (box->standardButton(button) == QMessageBox::Yes)
     {
         disconnect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
-        CallPanel *panel = new CallPanel(call, m_roster, m_window);
-        m_window->addPanel(panel);
+        addCall(call);
         call->accept();
     } else {
         call->hangup();
@@ -318,14 +292,13 @@ void CallWatcher::callContact()
     QString fullJid = action->data().toString();
 
     QXmppCall *call = m_client->callManager().call(fullJid);
-    CallPanel *panel = new CallPanel(call, m_roster, m_window);
-    m_window->addPanel(panel);
+    addCall(call);
 }
 
 void CallWatcher::callReceived(QXmppCall *call)
 {
     const QString bareJid = jidToBareJid(call->jid());
-    const QString contactName = m_roster->contactName(bareJid);
+    const QString contactName = m_window->rosterModel()->contactName(bareJid);
 
     QMessageBox *box = new QMessageBox(QMessageBox::Question,
         tr("Call from %1").arg(contactName),
@@ -352,7 +325,7 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 
     if (type == ChatRosterItem::Contact)
     {
-        QStringList fullJids = m_roster->contactFeaturing(jid, ChatRosterModel::VoiceFeature);
+        QStringList fullJids = m_window->rosterModel()->contactFeaturing(jid, ChatRosterModel::VoiceFeature);
         if (fullJids.isEmpty())
             return;
 

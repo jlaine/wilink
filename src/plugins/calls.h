@@ -88,17 +88,16 @@ private:
     QThread *m_mainThread;
 };
 
-class CallPanel : public ChatPanel
+class CallWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    CallPanel(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent = 0);
+    CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent = 0);
 
 private slots:
     void callFinished();
     void callStateChanged(QXmppCall::State state);
-    void leave();
     void ringing();
 
 private:
@@ -124,8 +123,9 @@ private slots:
     void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private:
+    void addCall(QXmppCall *call);
+
     QXmppClient *m_client;
-    ChatRosterModel *m_roster;
     Chat *m_window;
 };
 
