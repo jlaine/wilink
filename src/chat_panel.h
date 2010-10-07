@@ -20,11 +20,13 @@
 #ifndef __WILINK_CHAT_PANEL_H__
 #define __WILINK_CHAT_PANEL_H__
 
+#include <QFrame>
 #include <QWidget>
 #include "chat_roster_item.h"
 
 class QHBoxLayout;
 class ChatPanelPrivate;
+class ChatPanelWidget;
 
 /** ChatPanel is the base class for all the panels displayed in the right-hand
  *  part of the user interface, such as conversations.
@@ -43,7 +45,7 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
-    void addWidget(QWidget *widget);
+    void addWidget(ChatPanelWidget *widget);
     virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
@@ -75,6 +77,17 @@ private slots:
 
 private:
     ChatPanelPrivate * const d;
+};
+
+/** ChatPanelWidget is the base class for "task" widgets displayed inside
+ *  a ChatPanel.
+ */
+class ChatPanelWidget : public QFrame
+{
+    Q_OBJECT
+
+public:
+    ChatPanelWidget(QWidget *parent = 0);
 };
 
 #endif

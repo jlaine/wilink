@@ -174,7 +174,7 @@ void CallHandler::callStateChanged(QXmppCall::State state)
 }
 
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
-    : QWidget(parent),
+    : ChatPanelWidget(parent),
     m_call(call)
 {
     // CALL THREAD
@@ -195,8 +195,11 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
     m_statusLabel->setText(tr("Connecting.."));
     box->addWidget(m_statusLabel);
 
-    m_hangupButton = new QPushButton(tr("Hang up"));
+    m_hangupButton = new QPushButton;
+    m_hangupButton->setFlat(true);
     m_hangupButton->setIcon(QIcon(":/hangup.png"));
+    m_hangupButton->setMaximumWidth(32);
+    m_hangupButton->setToolTip(tr("Hang up"));
     connect(m_hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
     box->addWidget(m_hangupButton);
 

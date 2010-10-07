@@ -32,6 +32,7 @@ public:
 
     QVBoxLayout *header;
     QHBoxLayout *hbox;
+    QHBoxLayout *widgets;
     QPushButton *attachButton;
     QPushButton *closeButton;
     QLabel *helpLabel;
@@ -97,7 +98,18 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->helpLabel->hide();
     d->header->addWidget(d->helpLabel);
 
+    d->widgets = new QHBoxLayout;
+    d->widgets->addStretch();
+    d->header->addLayout(d->widgets);
+
     setMinimumWidth(300);
+    setStyleSheet("ChatPanelWidget { \
+        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \
+            stop: 0 #E0E0E0, \
+            stop: 0.75 #FFFFFF, \
+            stop: 1 #E0E0E0); \
+        border: 1px solid gray; \
+        border-radius: 5px; }");
 }
 
 ChatPanel::~ChatPanel()
@@ -105,9 +117,9 @@ ChatPanel::~ChatPanel()
     delete d;
 }
 
-void ChatPanel::addWidget(QWidget *widget)
+void ChatPanel::addWidget(ChatPanelWidget *widget)
 {
-    d->header->addWidget(widget);
+    d->widgets->insertWidget(d->widgets->count() - 1, widget);
 }
 
 /** Return the type of entry to add to the roster.
@@ -243,3 +255,7 @@ void ChatPanel::sendNotifications()
     }
 }
 
+ChatPanelWidget::ChatPanelWidget(QWidget *parent)
+    : QFrame(parent)
+{
+}

@@ -26,6 +26,8 @@
 
 #include "QXmppCallManager.h"
 
+#include "chat_panel.h"
+
 class Chat;
 class ChatRosterModel;
 class QAbstractButton;
@@ -87,7 +89,7 @@ private:
     QThread *m_mainThread;
 };
 
-class CallWidget : public QWidget
+class CallWidget : public ChatPanelWidget
 {
     Q_OBJECT
 

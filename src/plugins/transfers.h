@@ -25,6 +25,8 @@
 
 #include "QXmppTransferManager.h"
 
+#include "chat_panel.h"
+
 class QModelIndex;
 class QProgressBar;
 class QPushButton;
@@ -47,7 +49,7 @@ private:
     QXmppTransferJob *m_job;
 };
 
-class ChatTransferWidget : public QWidget
+class ChatTransferWidget : public ChatPanelWidget
 {
     Q_OBJECT
 
@@ -64,6 +66,7 @@ private slots:
     void slotStateChanged(QXmppTransferJob::State state);
 
 private:
+    bool m_deleteOnFinished;
     QLabel *m_icon;
     QProgressBar *m_progress;
     QPushButton *m_cancelButton;

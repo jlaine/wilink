@@ -38,7 +38,6 @@
 #include "QXmppUtils.h"
 
 #include "chat.h"
-#include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "systeminfo.h"
@@ -114,23 +113,31 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 }
 
 ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
-    : QWidget(parent),
+    : ChatPanelWidget(parent),
     m_job(job)
 {
     QHBoxLayout *layout = new QHBoxLayout;
+    layout->setMargin(0);
+
     m_icon = new QLabel;
     if (m_job->direction() == QXmppTransferJob::IncomingDirection)
+    {
         m_icon->setPixmap(QPixmap(":/download.png"));
-    else
+        m_deleteOnFinished = false;
+    } else {
         m_icon->setPixmap(QPixmap(":/upload.png"));
+        m_deleteOnFinished = true;
+    }
     layout->addWidget(m_icon);
 
-    layout->addWidget(new QLabel(QString("%1 (%2)").arg(
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(new QLabel(QString("%1 (%2)").arg(
         m_job->fileName(),
         sizeToString(job->fileSize()))));
 
     m_progress = new QProgressBar;
-    layout->addWidget(m_progress);
+    vbox->addWidget(m_progress);
+    layout->addLayout(vbox);
 
     m_cancelButton = new QPushButton;
     m_cancelButton->setIcon(QIcon(":/close.png"));
@@ -172,6 +179,7 @@ void ChatTransferWidget::slotCancel()
     // cancel job
     if (m_job && m_job->state() != QXmppTransferJob::FinishedState)
     {
+        m_deleteOnFinished = true;
         m_job->abort();
         return;
     }
@@ -206,12 +214,17 @@ void ChatTransferWidget::slotStateChanged(QXmppTransferJob::State state)
 {
     if (state == QXmppTransferJob::FinishedState)
     {
-        m_cancelButton->setIcon(QIcon(":/remove.png"));
         m_progress->hide();
         if (m_job->error() == QXmppTransferJob::NoError)
             m_icon->setPixmap(QPixmap(":/contact-available.png"));
         else
             m_icon->setPixmap(QPixmap(":/contact-busy.png"));
+
+        if (m_deleteOnFinished)
+        {
+            m_job->deleteLater();
+            deleteLater();
+        }
     }
 }
 
