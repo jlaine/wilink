@@ -324,14 +324,16 @@ QString ChatRosterModel::contactExtra(const QString &bareJid) const
  *  If the user has set a name for the roster entry, it will be used,
  *  otherwise we fall back to information from the vCard.
  *
- * @param bareJid
+ * @param jid
  */
-QString ChatRosterModel::contactName(const QString &bareJid) const
+QString ChatRosterModel::contactName(const QString &jid) const
 {
-    ChatRosterItem *item = d->rootItem->find(bareJid);
+    ChatRosterItem *item = d->rootItem->find(jid);
+    if (!item)
+        item = d->rootItem->find(jidToBareJid(jid));
     if (item)
         return item->data(Qt::DisplayRole).toString();
-    return jidToUser(bareJid);
+    return jidToUser(jid);
 }
 
 static QString contactStatus(const QModelIndex &index)
