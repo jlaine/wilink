@@ -83,10 +83,6 @@ ChatConversation::ChatConversation(QWidget *parent)
                     this, SLOT(slotSend()));
     Q_ASSERT(check);
 
-    check = connect(chatInput, SIGNAL(stateChanged(QXmppMessage::State)),
-                    this, SIGNAL(localStateChanged(QXmppMessage::State)));
-    Q_ASSERT(check);
-
 #ifdef WILINK_EMBEDDED
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(chatInput);
