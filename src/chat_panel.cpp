@@ -96,6 +96,8 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->helpLabel->setOpenExternalLinks(true);
     d->helpLabel->hide();
     d->header->addWidget(d->helpLabel);
+
+    setMinimumWidth(300);
 }
 
 ChatPanel::~ChatPanel()

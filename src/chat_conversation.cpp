@@ -96,7 +96,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     setFocusProxy(chatInput);
     setLayout(layout);
-    setMinimumWidth(300);
 
     /* shortcuts */
     connect(this, SIGNAL(findPanel()), chatSearch, SLOT(activate()));
