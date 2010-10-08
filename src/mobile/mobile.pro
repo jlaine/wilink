@@ -30,6 +30,7 @@ SOURCES += \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/rooms.cpp \
+    ../plugins/transfers.cpp \
     main.cpp
 
 HEADERS += \
@@ -53,7 +54,8 @@ HEADERS += \
     ../plugins/calls.h \
     ../plugins/chats.h \
     ../plugins/console.h \
-    ../plugins/rooms.h
+    ../plugins/rooms.h \
+    ../plugins/transfers.h
 
 mac {
     SOURCES += ../application_mac.mm

@@ -95,7 +95,7 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 
     // determine file location
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
-    const QString filePath = QXmppShareExtension::availableFilePath(downloadsDir.path(), m_job->fileName());
+    const QString filePath = availableFilePath(downloadsDir.path(), m_job->fileName());
 
     // open file
     QFile *file = new QFile(filePath, m_job);
