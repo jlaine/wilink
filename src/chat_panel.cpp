@@ -20,6 +20,7 @@
 #include <QDropEvent>
 #include <QLabel>
 #include <QLayout>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QTimer>
 
@@ -268,5 +269,12 @@ ChatPanelWidget::ChatPanelWidget(QWidget *parent)
  */
 void ChatPanelWidget::disappear()
 {
-    deleteLater();
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
+    animation->setDuration(250);
+    QRect rect = geometry();
+    animation->setStartValue(rect);
+    rect.setWidth(0);
+    animation->setEndValue(rect);
+    connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
