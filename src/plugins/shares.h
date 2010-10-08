@@ -20,6 +20,8 @@
 #ifndef __WILINK_SHARES_H__
 #define __WILINK_SHARES_H__
 
+#include <QTextDocument>
+
 #include "QXmppLogger.h"
 #include "QXmppShareIq.h"
 #include "QXmppTransferManager.h"
@@ -69,7 +71,7 @@ private slots:
     void transferProgress(qint64, qint64);
     void transferRemoved();
     void transferStarted(QXmppTransferJob *job);
-    void findRemoteFiles();
+    void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
     void downloadItem();
     void itemContextMenu(const QModelIndex &index, const QPoint &globalPos);
     void itemDoubleClicked(const QModelIndex &index);
@@ -77,7 +79,6 @@ private slots:
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void registerWithServer();
-    void queryStringChanged();
     void shareFolder();
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
@@ -99,7 +100,6 @@ private:
     ChatSharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 
-    QLineEdit *lineEdit;
     QTabWidget *tabWidget;
 
     ChatSharesView *sharesView;
@@ -118,7 +118,6 @@ private:
     QPushButton *removeButton;
     QStatusBar *statusBar;
     QTimer *registerTimer;
-    QTimer *searchTimer;
 
     QAction *menuAction;
 };

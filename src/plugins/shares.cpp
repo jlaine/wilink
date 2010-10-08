@@ -92,24 +92,10 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     ChatSearchBar *searchBar = new ChatSearchBar;
     searchBar->setControlsVisible(false);
     searchBar->setText(tr("Enter the name of the file you are looking for."));
+    check = connect(searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
+                    this, SLOT(find(QString, QTextDocument::FindFlags, bool)));
+    Q_ASSERT(check);
     layout->addWidget(searchBar);
-
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->setSpacing(6);
-
-    QLabel *findIcon = new QLabel;
-    findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
-    hbox->addWidget(findIcon);
-    lineEdit = new QLineEdit;
-    check = connect(lineEdit, SIGNAL(returnPressed()),
-                    this, SLOT(findRemoteFiles()));
-    Q_ASSERT(check);
-    check = connect(lineEdit, SIGNAL(textChanged(const QString&)),
-                    this, SLOT(queryStringChanged()));
-    Q_ASSERT(check);
-    hbox->addWidget(lineEdit);
-
-    layout->addLayout(hbox);
     layout->addSpacing(4);
 
     // MAIN
@@ -206,13 +192,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
                     this, SLOT(registerWithServer()));
     Q_ASSERT(check);
 
-    searchTimer = new QTimer(this);
-    searchTimer->setInterval(300);
-    searchTimer->setSingleShot(true);
-    check = connect(searchTimer, SIGNAL(timeout()),
-                    this, SLOT(findRemoteFiles()));
-    Q_ASSERT(check);
-
     check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
                     baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
@@ -224,10 +203,10 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     setClient(baseClient);
 
     check = connect(this, SIGNAL(findPanel()),
-                    lineEdit, SLOT(setFocus()));
+                    searchBar, SLOT(activate()));
     Q_ASSERT(check);
 
-    setFocusProxy(lineEdit);
+    //setFocusProxy(lineEdit);
 
     /* database signals */
     check = connect(db, SIGNAL(directoryChanged(QString)),
@@ -402,14 +381,12 @@ void ChatShares::transferRemoved()
     }
 }
 
-void ChatShares::findRemoteFiles()
+void ChatShares::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
-    sharesFilter = lineEdit->text();
-    qobject_cast<ChatSharesModel*>(sharesView->model())->clear();
-
     // search for files
+    tabWidget->setCurrentWidget(sharesWidget);
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
-    const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, sharesFilter);
+    const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, needle);
     if (!requestId.isEmpty())
     {
         searches.insert(requestId, sharesView);
@@ -688,16 +665,6 @@ void ChatShares::processDownloadQueue()
 
         activeDownloads++;
     }
-}
-
-/** When the user changes the query string, switch to the appropriate tab.
- */
-void ChatShares::queryStringChanged()
-{
-    tabWidget->setCurrentWidget(sharesWidget);
-    const QString queryString  = lineEdit->text();
-    if (queryString.isEmpty() || queryString.size() >= 3)
-        searchTimer->start();
 }
 
 void ChatShares::registerWithServer()
