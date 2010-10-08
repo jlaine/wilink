@@ -271,8 +271,12 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     m_database(database)
 {
     QVBoxLayout *layout = new QVBoxLayout;
-    QGroupBox *sharesBox = new QGroupBox(tr("Shared folders"));
+    QGroupBox *sharesGroup = new QGroupBox(tr("Shared folders"));
     QVBoxLayout *vbox = new QVBoxLayout;
+
+    QLabel *sharesLabel = new QLabel(tr("Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence."));
+    sharesLabel->setWordWrap(true);
+    vbox->addWidget(sharesLabel);
 
     // full view
     m_fsModel = new FoldersModel(this);
@@ -308,13 +312,19 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     toggleBox->addWidget(m_fewerButton);
     vbox->addLayout(toggleBox);
 
-    sharesBox->setLayout(vbox);
-    layout->addWidget(sharesBox);
+    sharesGroup->setLayout(vbox);
+    layout->addWidget(sharesGroup);
 
     // downloads folder
-    QGroupBox *downloadsBox = new QGroupBox(tr("Downloads folder"));
+    QGroupBox *downloadsGroup = new QGroupBox(tr("Downloads folder"));
+    vbox = new QVBoxLayout;
+
+    QLabel *downloadsLabel = new QLabel(tr("Select the folder in which received files will be stored."));
+    downloadsLabel->setWordWrap(true);
+    vbox->addWidget(downloadsLabel);
 
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setMargin(0);
     m_directoryEdit = new QLineEdit;
     m_directoryEdit->setText(m_database->directory());
     m_directoryEdit->setEnabled(false);
@@ -323,9 +333,10 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     directoryButton->setIcon(QIcon(":/album.png"));
     connect(directoryButton, SIGNAL(clicked()), this, SLOT(browse()));
     hbox->addWidget(directoryButton);
+    vbox->addLayout(hbox);
 
-    downloadsBox->setLayout(hbox);
-    layout->addWidget(downloadsBox);
+    downloadsGroup->setLayout(vbox);
+    layout->addWidget(downloadsGroup);
 
     // buttons
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -335,7 +346,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
 
     setLayout(layout);
     setWindowTitle(tr("Shares options"));
-    resize(QSize(400, 400).expandedTo(minimumSizeHint()));
+    resize(QSize(500, 500).expandedTo(minimumSizeHint()));
 }
 
 void ChatSharesOptions::browse()
