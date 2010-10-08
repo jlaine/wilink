@@ -86,8 +86,6 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     // HEADER
 
     layout->addLayout(headerLayout());
-    layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
-    layout->addSpacing(4);
 
     ChatSearchBar *searchBar = new ChatSearchBar;
     searchBar->setControlsVisible(false);
@@ -204,6 +202,10 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     check = connect(this, SIGNAL(findPanel()),
                     searchBar, SLOT(activate()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(findFinished(bool)),
+                    searchBar, SLOT(findFinished(bool)));
     Q_ASSERT(check);
 
     //setFocusProxy(lineEdit);
@@ -383,10 +385,17 @@ void ChatShares::transferRemoved()
 
 void ChatShares::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
+    sharesFilter = needle;
+    if (!needle.isEmpty() && needle.size() < 3)
+    {
+        emit findFinished(true);
+        return;
+    }
+
     // search for files
     tabWidget->setCurrentWidget(sharesWidget);
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
-    const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, needle);
+    const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, sharesFilter);
     if (!requestId.isEmpty())
     {
         searches.insert(requestId, sharesView);
@@ -774,6 +783,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         return;
     }
 
+    bool found = false;
     if (shareIq.type() == QXmppIq::Error)
     {
         if ((shareIq.error().condition() == QXmppStanza::Error::ItemNotFound) && oldItem)
@@ -782,6 +792,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         QModelIndex index = model->updateItem(oldItem, newItem);
         if (newItem->size())
         {
+            found = true;
             statusBar->clearMessage();
             view->setExpanded(index, true);
         }
@@ -790,6 +801,8 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
             statusBar->showMessage(tr("No files found"), 3000);
         }
     }
+    if (!oldItem && !sharesFilter.isEmpty())
+       emit findFinished(found);
 
     // if we retrieved the contents of a download queue item, process queue
     if (view == downloadsView)

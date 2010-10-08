@@ -59,6 +59,7 @@ public:
     void setTransfers(ChatTransfers *transfers);
 
 signals:
+    void findFinished(bool found);
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
