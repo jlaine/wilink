@@ -179,7 +179,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
 {
     // CALL THREAD
     m_callThread = new QThread;
-    m_callHandler = new CallHandler(call, QThread::currentThread());
+    m_callHandler = new CallHandler(m_call, QThread::currentThread());
     connect(m_callHandler, SIGNAL(finished()), m_callThread, SLOT(quit()));
     connect(m_callThread, SIGNAL(finished()), this, SLOT(callFinished()));
     m_callHandler->moveToThread(m_callThread);
@@ -200,14 +200,14 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
     m_hangupButton->setIcon(QIcon(":/hangup.png"));
     m_hangupButton->setMaximumWidth(32);
     m_hangupButton->setToolTip(tr("Hang up"));
-    connect(m_hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
+    connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
     box->addWidget(m_hangupButton);
 
     setLayout(box);
 
-    connect(call, SIGNAL(ringing()), this, SLOT(ringing()));
-    connect(call, SIGNAL(stateChanged(QXmppCall::State)),
-        this, SLOT(callStateChanged(QXmppCall::State)));
+    connect(m_call, SIGNAL(ringing()), this, SLOT(ringing()));
+    connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
+        this, SLOT(m_callStateChanged(QXmppCall::State)));
 }
 
 /** When the call thread finishes, perform cleanup.
@@ -217,7 +217,9 @@ void CallWidget::callFinished()
     m_call->deleteLater();
     m_callHandler->deleteLater();
     m_callThread->deleteLater();
-    deleteLater();
+
+    // make widget disappear
+    disappear();
 }
 
 void CallWidget::callStateChanged(QXmppCall::State state)

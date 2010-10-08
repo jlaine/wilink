@@ -88,6 +88,9 @@ class ChatPanelWidget : public QFrame
 
 public:
     ChatPanelWidget(QWidget *parent = 0);
+
+public slots:
+    void disappear();
 };
 
 #endif

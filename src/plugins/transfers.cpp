@@ -123,10 +123,10 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
     if (m_job->direction() == QXmppTransferJob::IncomingDirection)
     {
         m_icon->setPixmap(QPixmap(":/download.png"));
-        m_deleteOnFinished = false;
+        m_disappearWhenFinished = false;
     } else {
         m_icon->setPixmap(QPixmap(":/upload.png"));
-        m_deleteOnFinished = true;
+        m_disappearWhenFinished = true;
     }
     layout->addWidget(m_icon);
 
@@ -174,16 +174,16 @@ void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ChatTransferWidget::slotCancel()
 {
-    // cancel job
     if (m_job && m_job->state() != QXmppTransferJob::FinishedState)
     {
-        m_deleteOnFinished = true;
+        // cancel job
+        m_disappearWhenFinished = true;
         m_job->abort();
         return;
+    } else {
+        // make widget disappear
+        disappear();
     }
-
-    // make widget disappear
-    deleteLater();
 }
 
 void ChatTransferWidget::slotDestroyed(QObject *object)
@@ -221,8 +221,8 @@ void ChatTransferWidget::slotFinished()
     m_job->deleteLater();
 
     // make widget disappear
-    if (m_deleteOnFinished)
-        deleteLater();
+    if (m_disappearWhenFinished)
+        disappear();
 }
 
 ChatTransfersView::ChatTransfersView(QWidget *parent)

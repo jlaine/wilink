@@ -49,6 +49,9 @@ private:
     QXmppTransferJob *m_job;
 };
 
+/** The ChatTransferWidget class represents a widget for displaying
+ *  the progress of a file transfer.
+ */
 class ChatTransferWidget : public ChatPanelWidget
 {
     Q_OBJECT
@@ -66,7 +69,7 @@ private slots:
     void slotProgress(qint64, qint64);
 
 private:
-    bool m_deleteOnFinished;
+    bool m_disappearWhenFinished;
     QLabel *m_icon;
     QProgressBar *m_progress;
     QPushButton *m_cancelButton;

@@ -255,7 +255,18 @@ void ChatPanel::sendNotifications()
     }
 }
 
+/** Creates a new ChatPanelWidget instance.
+ *
+ * @param parent
+ */
 ChatPanelWidget::ChatPanelWidget(QWidget *parent)
     : QFrame(parent)
 {
+}
+
+/** Makes the widget disappear then deletes it.
+ */
+void ChatPanelWidget::disappear()
+{
+    deleteLater();
 }
