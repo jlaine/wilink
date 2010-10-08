@@ -219,6 +219,7 @@ void CallWidget::callFinished()
     m_callThread->deleteLater();
 
     // make widget disappear
+    m_hangupButton->setEnabled(false);
     disappear();
 }
 

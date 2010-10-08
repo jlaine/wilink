@@ -182,6 +182,7 @@ void ChatTransferWidget::slotCancel()
         return;
     } else {
         // make widget disappear
+        m_cancelButton->setEnabled(false);
         disappear();
     }
 }
@@ -222,7 +223,10 @@ void ChatTransferWidget::slotFinished()
 
     // make widget disappear
     if (m_disappearWhenFinished)
+    {
+        m_cancelButton->setEnabled(false);
         disappear();
+    }
 }
 
 ChatTransfersView::ChatTransfersView(QWidget *parent)
