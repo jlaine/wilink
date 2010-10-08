@@ -397,11 +397,9 @@ void ChatShares::find(const QString &needle, QTextDocument::FindFlags flags, boo
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
     const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, sharesFilter);
     if (!requestId.isEmpty())
-    {
         searches.insert(requestId, sharesView);
-        if (!sharesFilter.isEmpty())
-            statusBar->showMessage(tr("Searching for \"%1\"").arg(sharesFilter), STATUS_TIMEOUT);
-    }
+    else
+        emit findFinished(false);
 }
 
 void ChatShares::transferStarted(QXmppTransferJob *job)
@@ -783,7 +781,6 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         return;
     }
 
-    bool found = false;
     if (shareIq.type() == QXmppIq::Error)
     {
         if ((shareIq.error().condition() == QXmppStanza::Error::ItemNotFound) && oldItem)
@@ -791,18 +788,12 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     } else {
         QModelIndex index = model->updateItem(oldItem, newItem);
         if (newItem->size())
-        {
-            found = true;
-            statusBar->clearMessage();
             view->setExpanded(index, true);
-        }
-        else
-        {
-            statusBar->showMessage(tr("No files found"), 3000);
-        }
     }
+
+    // send search feedback
     if (!oldItem && !sharesFilter.isEmpty())
-       emit findFinished(found);
+       emit findFinished(newItem->size() > 0);
 
     // if we retrieved the contents of a download queue item, process queue
     if (view == downloadsView)

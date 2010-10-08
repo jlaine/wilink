@@ -463,14 +463,6 @@ Acceptez-vous?</translation>
         <translation>Indexation des fichiers</translation>
     </message>
     <message>
-        <source>No files found</source>
-        <translation>Aucun fichier trouvé</translation>
-    </message>
-    <message>
-        <source>Searching for &quot;%1&quot;</source>
-        <translation>Recherche de &quot;%1&quot;</translation>
-    </message>
-    <message>
         <source>Shares options</source>
         <translation>Options de partages</translation>
     </message>
