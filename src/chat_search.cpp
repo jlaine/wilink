@@ -22,6 +22,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QTimer>
 #include <QVariant>
 
 #include "chat_search.h"
@@ -39,6 +40,11 @@
 ChatSearchBar::ChatSearchBar(QWidget *parent)
     : QWidget(parent)
 {
+    findTimer = new QTimer(this);
+    findTimer->setSingleShot(true);
+    findTimer->setInterval(500);
+    connect(findTimer, SIGNAL(timeout()), this, SLOT(slotSearchDelayed()));
+
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setMargin(0);
     hbox->setSpacing(SPACING);
@@ -167,7 +173,11 @@ void ChatSearchBar::setText(const QString &text)
 void ChatSearchBar::slotSearchChanged()
 {
     findBox->setPalette(normalPalette);
+    findTimer->start();
+}
 
+void ChatSearchBar::slotSearchDelayed()
+{
     QTextDocument::FindFlags flags;
     if (m_findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;

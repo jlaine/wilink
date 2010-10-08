@@ -27,6 +27,7 @@ class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QTimer;
 
 class ChatSearchBar : public QWidget
 {
@@ -50,9 +51,11 @@ public slots:
     void findPrevious();
 
 private slots:
+    void slotSearchDelayed();
     void slotSearchChanged();
 
 private:
+    QTimer *findTimer;
     QLabel *findPrompt;
     QLineEdit *findBox;
     QCheckBox *m_findCase;
