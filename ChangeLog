@@ -3,16 +3,23 @@ wiLink 0.9.9b (UNRELEASED)
    - Display room subject and make it possible to change it.
    - When sending messages to a chat room, do not set "from".
    - Display image and profile links for room members.
-   - Make it possible to send files and make calls to room members.
+   - Fix chat room bookmark management.
+ * Calls:
+   - Make it possible to make calls to room members.
+   - Display call information inside relevant chat window.
+   - Move call data processing to a thread to avoid buffer underruns.
  * Shares:
    - Make it possible to select additional folders to share.
+ * Transfers:
+   - Make it possible to send files to room members.
+   - Display transfer progress inside relevant chat window.
  * Menu:
     - Fix parsing of the menu refresh interval.
     - Add support for links to chat rooms.
+ * Diagnostics:
+    - Report which standards WiFi interfaces support.
  * Miscellaneous:
     - Add caching on vCards to reduce network traffic at connect.
-    - Report which standards WiFi interfaces support.
-    - Display file transfers and calls inside chat window.
 
 wiLink 0.9.9a (2010-09-16)
  * Do not join bookmarked rooms until we receive our nickname.
