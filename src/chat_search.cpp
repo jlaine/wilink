@@ -41,15 +41,16 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 {
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setMargin(0);
-    hbox->setSpacing(0);
-
+    hbox->setSpacing(SPACING);
     hbox->addSpacing(MARGIN);
 
     QLabel *findIcon = new QLabel;
     findIcon->setPixmap(QPixmap(":/search.png").scaled(16, 16));
     hbox->addWidget(findIcon);
 
-    hbox->addSpacing(SPACING);
+    findPrompt = new QLabel;
+    findPrompt->hide();
+    hbox->addWidget(findPrompt);
 
     findBox = new QLineEdit;
     normalPalette = findBox->palette();
@@ -57,44 +58,43 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
     failedPalette.setColor(QPalette::Active, QPalette::Base, QColor(255, 0, 0, 127));
     connect(findBox, SIGNAL(returnPressed()), this, SLOT(findNext()));
     connect(findBox, SIGNAL(textChanged(QString)), this, SLOT(slotSearchChanged()));
-    hbox->addWidget(findBox);
+    hbox->addWidget(findBox, 1);
 
-    hbox->addSpacing(SPACING + BUTTON_MARGIN);
+    //hbox->addSpacing(BUTTON_MARGIN);
 
-    QPushButton *prev = new QPushButton;
-    prev->setIcon(QIcon(":/back.png"));
-    prev->setMaximumHeight(BUTTON_SIZE);
-    prev->setMaximumWidth(BUTTON_SIZE);
-    connect(prev, SIGNAL(clicked()), this, SLOT(findPrevious()));
-    hbox->addWidget(prev);
+    m_findPrevious = new QPushButton;
+    m_findPrevious->setIcon(QIcon(":/back.png"));
+    m_findPrevious->setMaximumHeight(BUTTON_SIZE);
+    m_findPrevious->setMaximumWidth(BUTTON_SIZE);
+    connect(m_findPrevious, SIGNAL(clicked()), this, SLOT(findPrevious()));
+    hbox->addWidget(m_findPrevious);
 
-    hbox->addSpacing(SPACING + 2 * BUTTON_MARGIN);
+    //hbox->addSpacing(2 * BUTTON_MARGIN);
 
-    QPushButton *next = new QPushButton;
-    next->setIcon(QIcon(":/forward.png"));
-    next->setMaximumHeight(BUTTON_SIZE);
-    next->setMaximumWidth(BUTTON_SIZE);
-    connect(next, SIGNAL(clicked()), this, SLOT(findNext()));
-    hbox->addWidget(next);
+    m_findNext = new QPushButton;
+    m_findNext->setIcon(QIcon(":/forward.png"));
+    m_findNext->setMaximumHeight(BUTTON_SIZE);
+    m_findNext->setMaximumWidth(BUTTON_SIZE);
+    connect(m_findNext, SIGNAL(clicked()), this, SLOT(findNext()));
+    hbox->addWidget(m_findNext);
 
-    hbox->addSpacing(SPACING + BUTTON_MARGIN);
+    //hbox->addSpacing(BUTTON_MARGIN);
 
-    findCase = new QCheckBox(tr("Match case"));
-    connect(findCase, SIGNAL(stateChanged(int)), this, SLOT(slotSearchChanged()));
-    hbox->addWidget(findCase);
+    m_findCase = new QCheckBox(tr("Match case"));
+    connect(m_findCase, SIGNAL(stateChanged(int)), this, SLOT(slotSearchChanged()));
+    hbox->addWidget(m_findCase);
 
     hbox->addStretch();
 
-    QPushButton *close = new QPushButton;
-    close->setFlat(true);
-    close->setMaximumHeight(BUTTON_SIZE);
-    close->setMaximumWidth(BUTTON_SIZE);
-    close->setIcon(QIcon(":/close.png"));
-    connect(close, SIGNAL(clicked()), this, SLOT(deactivate()));
-    hbox->addWidget(close);
+    m_findClose = new QPushButton;
+    m_findClose->setFlat(true);
+    m_findClose->setMaximumHeight(BUTTON_SIZE);
+    m_findClose->setMaximumWidth(BUTTON_SIZE);
+    m_findClose->setIcon(QIcon(":/close.png"));
+    connect(m_findClose, SIGNAL(clicked()), this, SLOT(deactivate()));
+    hbox->addWidget(m_findClose);
 
     hbox->addSpacing(MARGIN);
-
     setLayout(hbox);
     setFocusProxy(findBox);
 }
@@ -129,7 +129,7 @@ void ChatSearchBar::findFinished(bool found)
 void ChatSearchBar::findNext()
 {
     QTextDocument::FindFlags flags;
-    if (findCase->checkState() == Qt::Checked)
+    if (m_findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;
     emit find(findBox->text(), flags, false);
 }
@@ -137,9 +137,31 @@ void ChatSearchBar::findNext()
 void ChatSearchBar::findPrevious()
 {
     QTextDocument::FindFlags flags = QTextDocument::FindBackward;
-    if (findCase->checkState() == Qt::Checked)
+    if (m_findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;
     emit find(findBox->text(), flags, false);
+}
+
+void ChatSearchBar::setControlsVisible(bool visible)
+{
+    if (visible)
+    {
+        m_findCase->show();
+        m_findNext->show();
+        m_findPrevious->show();
+        m_findClose->show();
+    } else {
+        m_findCase->hide();
+        m_findNext->hide();
+        m_findPrevious->hide();
+        m_findClose->hide();
+    }
+}
+
+void ChatSearchBar::setText(const QString &text)
+{
+    findPrompt->setText(text);
+    findPrompt->show();
 }
 
 void ChatSearchBar::slotSearchChanged()
@@ -147,7 +169,7 @@ void ChatSearchBar::slotSearchChanged()
     findBox->setPalette(normalPalette);
 
     QTextDocument::FindFlags flags;
-    if (findCase->checkState() == Qt::Checked)
+    if (m_findCase->checkState() == Qt::Checked)
         flags |= QTextDocument::FindCaseSensitively;
     emit find(findBox->text(), flags, true);
 }

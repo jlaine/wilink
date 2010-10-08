@@ -24,7 +24,9 @@
 #include <QWidget>
 
 class QCheckBox;
+class QLabel;
 class QLineEdit;
+class QPushButton;
 
 class ChatSearchBar : public QWidget
 {
@@ -32,6 +34,8 @@ class ChatSearchBar : public QWidget
 
 public:
     ChatSearchBar(QWidget *parent = 0);
+    void setControlsVisible(bool visible);
+    void setText(const QString &text);
 
 signals:
     void find(const QString &search, QTextDocument::FindFlags flags, bool changed);
@@ -49,8 +53,12 @@ private slots:
     void slotSearchChanged();
 
 private:
+    QLabel *findPrompt;
     QLineEdit *findBox;
-    QCheckBox *findCase;
+    QCheckBox *m_findCase;
+    QPushButton *m_findPrevious;
+    QPushButton *m_findNext;
+    QPushButton *m_findClose;
     QPalette normalPalette;
     QPalette failedPalette;
 };

@@ -47,6 +47,7 @@
 #include "chat_client.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
+#include "chat_search.h"
 #include "transfers.h"
 #include "shares.h"
 #include "shares/model.h"
@@ -87,6 +88,11 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->addLayout(headerLayout());
     layout->addWidget(new QLabel(tr("Enter the name of the file you are looking for.")));
     layout->addSpacing(4);
+
+    ChatSearchBar *searchBar = new ChatSearchBar;
+    searchBar->setControlsVisible(false);
+    searchBar->setText(tr("Enter the name of the file you are looking for."));
+    layout->addWidget(searchBar);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setSpacing(6);
