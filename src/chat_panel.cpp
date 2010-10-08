@@ -18,6 +18,7 @@
  */
 
 #include <QDropEvent>
+#include <QGraphicsOpacityEffect>
 #include <QLabel>
 #include <QLayout>
 #include <QPropertyAnimation>
@@ -121,6 +122,7 @@ ChatPanel::~ChatPanel()
 void ChatPanel::addWidget(ChatPanelWidget *widget)
 {
     d->widgets->insertWidget(d->widgets->count() - 1, widget);
+    widget->appear();
 }
 
 /** Return the type of entry to add to the roster.
@@ -263,18 +265,33 @@ void ChatPanel::sendNotifications()
 ChatPanelWidget::ChatPanelWidget(QWidget *parent)
     : QFrame(parent)
 {
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
+    effect->setOpacity(0.0);
+    setGraphicsEffect(effect);
+}
+
+/** Makes the widget appear.
+ */
+void ChatPanelWidget::appear()
+{
+    QPropertyAnimation *animation = new QPropertyAnimation(graphicsEffect(), "opacity");
+    animation->setDuration(500);
+    animation->setEasingCurve(QEasingCurve::OutQuad);
+    animation->setStartValue(0.0);
+    animation->setEndValue(1.0);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 /** Makes the widget disappear then deletes it.
  */
 void ChatPanelWidget::disappear()
 {
-    QPropertyAnimation *animation = new QPropertyAnimation(this, "geometry");
-    animation->setDuration(250);
-    QRect rect = geometry();
-    animation->setStartValue(rect);
-    rect.setWidth(0);
-    animation->setEndValue(rect);
+    QPropertyAnimation *animation = new QPropertyAnimation(graphicsEffect(), "opacity");
+    animation->setDuration(500);
+    animation->setEasingCurve(QEasingCurve::InQuad);
+    animation->setStartValue(1.0);
+    animation->setEndValue(0.0);
+    animation->start();
     connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }

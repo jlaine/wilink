@@ -90,6 +90,7 @@ public:
     ChatPanelWidget(QWidget *parent = 0);
 
 public slots:
+    void appear();
     void disappear();
 };
 

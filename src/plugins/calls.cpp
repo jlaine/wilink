@@ -207,7 +207,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
 
     connect(m_call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
-        this, SLOT(m_callStateChanged(QXmppCall::State)));
+        this, SLOT(callStateChanged(QXmppCall::State)));
 }
 
 /** When the call thread finishes, perform cleanup.
@@ -220,7 +220,7 @@ void CallWidget::callFinished()
 
     // make widget disappear
     m_hangupButton->setEnabled(false);
-    disappear();
+    QTimer::singleShot(1000, this, SLOT(disappear()));
 }
 
 void CallWidget::callStateChanged(QXmppCall::State state)

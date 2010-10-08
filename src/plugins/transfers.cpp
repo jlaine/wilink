@@ -31,6 +31,7 @@
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QTimer>
 #include <QUrl>
 
 #include "QXmppClient.h"
@@ -225,7 +226,7 @@ void ChatTransferWidget::slotFinished()
     if (m_disappearWhenFinished)
     {
         m_cancelButton->setEnabled(false);
-        disappear();
+        QTimer::singleShot(1000, this, SLOT(disappear()));
     }
 }
 
