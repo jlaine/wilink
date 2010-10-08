@@ -62,8 +62,8 @@ protected:
 private slots:
     void slotCancel();
     void slotDestroyed(QObject *object);
+    void slotFinished();
     void slotProgress(qint64, qint64);
-    void slotStateChanged(QXmppTransferJob::State state);
 
 private:
     bool m_deleteOnFinished;
@@ -71,6 +71,7 @@ private:
     QProgressBar *m_progress;
     QPushButton *m_cancelButton;
     QXmppTransferJob *m_job;
+    QString m_localPath;
 };
 
 class ChatTransfersView : public QTableWidget

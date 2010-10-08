@@ -148,30 +148,28 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
     setLayout(layout);
 
     // connect signals
-    connect(m_cancelButton, SIGNAL(clicked()),
-            this, SLOT(slotCancel()));
-    connect(m_job, SIGNAL(destroyed(QObject*)),
-            this, SLOT(slotDestroyed(QObject*)));
-    connect(m_job, SIGNAL(progress(qint64, qint64)),
-            this, SLOT(slotProgress(qint64, qint64)));
-    connect(m_job, SIGNAL(stateChanged(QXmppTransferJob::State)),
-            this, SLOT(slotStateChanged(QXmppTransferJob::State)));
+    bool check;
+    check = connect(m_cancelButton, SIGNAL(clicked()),
+                    this, SLOT(slotCancel()));
+    Q_ASSERT(check);
+
+    check = connect(m_job, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(slotDestroyed(QObject*)));
+    Q_ASSERT(check);
+
+    check = connect(m_job, SIGNAL(finished()),
+                    this, SLOT(slotFinished()));
+    Q_ASSERT(check);
+
+    check = connect(m_job, SIGNAL(progress(qint64, qint64)),
+                    this, SLOT(slotProgress(qint64, qint64)));
+    Q_ASSERT(check);
 }
 
 void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (!m_job)
-        return;
-
-    const QString localFilePath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
-    if (localFilePath.isEmpty())
-        return;
-    if (m_job->direction() == QXmppTransferJob::IncomingDirection &&
-        (m_job->state() != QXmppTransferJob::FinishedState ||
-         m_job->error() != QXmppTransferJob::NoError))
-        return;
-
-    QDesktopServices::openUrl(QUrl::fromLocalFile(localFilePath));
+    if (!m_localPath.isEmpty())
+        QDesktopServices::openUrl(QUrl::fromLocalFile(m_localPath));
 }
 
 void ChatTransferWidget::slotCancel()
@@ -184,9 +182,7 @@ void ChatTransferWidget::slotCancel()
         return;
     }
 
-    // delete job and widget
-    if (m_job)
-        m_job->deleteLater();
+    // make widget disappear
     deleteLater();
 }
 
@@ -194,7 +190,6 @@ void ChatTransferWidget::slotDestroyed(QObject *object)
 {
     Q_UNUSED(object);
     m_job = 0;
-    m_cancelButton->hide();
 }
 
 void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
@@ -210,22 +205,24 @@ void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
     }
 }
 
-void ChatTransferWidget::slotStateChanged(QXmppTransferJob::State state)
+void ChatTransferWidget::slotFinished()
 {
-    if (state == QXmppTransferJob::FinishedState)
+    // update UI
+    m_progress->hide();
+    if (m_job->error() == QXmppTransferJob::NoError)
     {
-        m_progress->hide();
-        if (m_job->error() == QXmppTransferJob::NoError)
-            m_icon->setPixmap(QPixmap(":/contact-available.png"));
-        else
-            m_icon->setPixmap(QPixmap(":/contact-busy.png"));
-
-        if (m_deleteOnFinished)
-        {
-            m_job->deleteLater();
-            deleteLater();
-        }
+        m_icon->setPixmap(QPixmap(":/contact-available.png"));
+        m_localPath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
     }
+    else
+        m_icon->setPixmap(QPixmap(":/contact-busy.png"));
+
+    // delete job
+    m_job->deleteLater();
+
+    // make widget disappear
+    if (m_deleteOnFinished)
+        deleteLater();
 }
 
 ChatTransfersView::ChatTransfersView(QWidget *parent)
