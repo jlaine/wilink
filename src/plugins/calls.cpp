@@ -167,8 +167,7 @@ void CallHandler::callStateChanged(QXmppCall::State state)
     // handle completion
     if (state == QXmppCall::FinishedState)
     {
-        m_call->setParent(0);
-        m_call->moveToThread(m_mainThread);
+        moveToThread(m_mainThread);
         emit finished();
     }
 }
@@ -182,6 +181,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
     m_callHandler = new CallHandler(m_call, QThread::currentThread());
     connect(m_callHandler, SIGNAL(finished()), m_callThread, SLOT(quit()));
     connect(m_callThread, SIGNAL(finished()), this, SLOT(callFinished()));
+    connect(m_callThread, SIGNAL(finished()), m_callThread, SLOT(deleteLater()));
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
@@ -214,7 +214,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
  */
 void CallWidget::callFinished()
 {
-    m_call->deleteLater();
     m_callHandler->deleteLater();
     m_callThread->deleteLater();
 
