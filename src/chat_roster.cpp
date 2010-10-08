@@ -47,7 +47,10 @@
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 
-//#define FLAT_VIEW
+#ifdef WILINK_EMBEDDED
+#define FLAT_CONTACTS
+#endif
+#define FLAT_ROOMS
 
 static const QChar sortSeparator('\0');
 
@@ -193,7 +196,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->nickNameReceived = false;
     d->ownItem = new ChatRosterItem(ChatRosterItem::Contact);
     d->rootItem = new ChatRosterItem(ChatRosterItem::Root);
-#ifdef FLAT_VIEW
+#ifdef FLAT_CONTACTS
     d->contactsItem = d->rootItem;
 #else
     d->contactsItem = new ChatRosterItem(ChatRosterItem::Other);
@@ -836,7 +839,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
     ChatRosterItem *parentItem;
     if (reqParent.isValid())
         parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
-#if 0
+#ifndef FLAT_ROOMS
     else if (type == ChatRosterItem::Room)
     {
         if (!d->roomsItem)
@@ -945,7 +948,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setHeaderHidden(true);
     setIconSize(QSize(32, 32));
     setMinimumHeight(400);
-#ifdef FLAT_VIEW
+#ifdef FLAT_CONTACTS
     setMinimumWidth(200);
     setRootIsDecorated(false);
 #else
@@ -1034,7 +1037,7 @@ QSize ChatRosterView::sizeHint () const
 
     QSize hint(minimumWidth(), minimumHeight());
     int rowCount = sortedModel->rowCount();
-#ifndef FLAT_VIEW
+#ifndef FLAT_CONTACTS
     rowCount += sortedModel->rowCount(sortedModel->mapFromSource(rosterModel->contactsItem()));
 #endif
     int rowHeight = rowCount * sizeHintForRow(0);
