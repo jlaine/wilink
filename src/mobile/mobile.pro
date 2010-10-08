@@ -30,6 +30,10 @@ SOURCES += \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/rooms.cpp \
+    ../plugins/shares.cpp \
+    ../plugins/shares/options.cpp \
+    ../plugins/shares/model.cpp \
+    ../plugins/shares/view.cpp \
     ../plugins/transfers.cpp \
     main.cpp
 
@@ -55,6 +59,10 @@ HEADERS += \
     ../plugins/chats.h \
     ../plugins/console.h \
     ../plugins/rooms.h \
+    ../plugins/shares.h \
+    ../plugins/shares/model.h \
+    ../plugins/shares/options.h \
+    ../plugins/shares/view.h \
     ../plugins/transfers.h
 
 mac {
