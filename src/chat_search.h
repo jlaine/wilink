@@ -36,6 +36,7 @@ class ChatSearchBar : public QWidget
 public:
     ChatSearchBar(QWidget *parent = 0);
     void setControlsVisible(bool visible);
+    void setDelay(int msecs);
     void setText(const QString &text);
 
 signals:

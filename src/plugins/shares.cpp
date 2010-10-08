@@ -89,6 +89,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     ChatSearchBar *searchBar = new ChatSearchBar;
     searchBar->setControlsVisible(false);
+    searchBar->setDelay(500);
     searchBar->setText(tr("Enter the name of the file you are looking for."));
     check = connect(searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
                     this, SLOT(find(QString, QTextDocument::FindFlags, bool)));

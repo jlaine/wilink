@@ -42,7 +42,7 @@ ChatSearchBar::ChatSearchBar(QWidget *parent)
 {
     findTimer = new QTimer(this);
     findTimer->setSingleShot(true);
-    findTimer->setInterval(500);
+    findTimer->setInterval(100);
     connect(findTimer, SIGNAL(timeout()), this, SLOT(slotSearchDelayed()));
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -162,6 +162,11 @@ void ChatSearchBar::setControlsVisible(bool visible)
         m_findPrevious->hide();
         m_findClose->hide();
     }
+}
+
+void ChatSearchBar::setDelay(int msecs)
+{
+    findTimer->setInterval(msecs);
 }
 
 void ChatSearchBar::setText(const QString &text)
