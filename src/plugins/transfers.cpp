@@ -272,25 +272,6 @@ void ChatTransfersView::addJob(QXmppTransferJob *job)
     connect(job, SIGNAL(stateChanged(QXmppTransferJob::State)), this, SLOT(slotStateChanged(QXmppTransferJob::State)));
 }
 
-QXmppTransferJob *ChatTransfersView::currentJob()
-{
-    int jobRow = currentRow();
-    if (jobRow < 0 || jobRow >= jobs.size())
-        return 0;
-    return jobs.at(jobRow);
-}
-
-void ChatTransfersView::removeCurrentJob()
-{
-    QXmppTransferJob *job = currentJob();
-    if (!job)
-        return;
-    if (job->state() == QXmppTransferJob::FinishedState)
-        job->deleteLater();
-    else
-        job->abort();
-}
-
 void ChatTransfersView::slotDestroyed(QObject *obj)
 {
     int jobRow = jobs.indexOf(static_cast<QXmppTransferJob*>(obj));
@@ -299,7 +280,6 @@ void ChatTransfersView::slotDestroyed(QObject *obj)
 
     jobs.removeAt(jobRow);
     removeRow(jobRow);
-    emit updateButtons();
 }
 
 void ChatTransfersView::slotDoubleClicked(int row, int column)
@@ -371,7 +351,6 @@ void ChatTransfersView::slotStateChanged(QXmppTransferJob::State state)
         return;
 
     item(jobRow, NameColumn)->setIcon(jobIcon(job));
-    emit updateButtons();
 }
 
 ChatTransfersWatcher::ChatTransfersWatcher(Chat *window)

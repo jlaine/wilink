@@ -79,14 +79,9 @@ class ChatTransfersView : public QTableWidget
 
 public:
     ChatTransfersView(QWidget *parent = 0);
-    QXmppTransferJob *currentJob();
 
 public slots:
     void addJob(QXmppTransferJob *job);
-    void removeCurrentJob();
-
-signals:
-    void updateButtons();
 
 private slots:
     void slotDestroyed(QObject *object);
