@@ -259,7 +259,7 @@ void ChatRosterModel::connected()
     d->nickNameReceived = false;
     d->ownItem->setId(d->client->configuration().jidBare());
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
-    d->fetchVCard(d->ownItem->id());
+    d->client->vCardManager().requestVCard(d->ownItem->id());
 }
 
 QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
