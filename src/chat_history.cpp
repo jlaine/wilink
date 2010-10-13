@@ -54,6 +54,60 @@
 #define DATE_FONT 10
 #endif
 
+enum MessageRole
+{
+    ArchivedRole,
+    BodyRole,
+    DateRole,
+    FromRole,
+    FromJidRole,
+    ReceivedRole,
+};
+
+ChatHistoryModel::ChatHistoryModel(QObject *parent)
+    : QAbstractListModel(parent)
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames[ArchivedRole] = "archived";
+    roleNames[BodyRole] = "body";
+    roleNames[DateRole] = "date";
+    roleNames[FromRole] = "from";
+    roleNames[FromJidRole] = "fromJid";
+    roleNames[ReceivedRole] = "received";
+    setRoleNames(roleNames);
+}
+
+int ChatHistoryModel::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent)
+    return m_messages.size();
+}
+
+QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
+{
+    const int row = index.row();
+    if (row < 0 || row >= m_messages.size())
+        return QVariant();
+
+    switch (role)
+    {
+    case ArchivedRole:
+        return m_messages[row].archived;
+    case BodyRole:
+        return m_messages[row].body;
+    case DateRole:
+        return m_messages[row].date;
+    case FromRole:
+        return m_messages[row].from;
+    case FromJidRole:
+        return m_messages[row].fromJid;
+    case ReceivedRole:
+        return m_messages[row].received;
+    default:
+        return QVariant();
+    };
+}
+
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!lastAnchor.isEmpty())

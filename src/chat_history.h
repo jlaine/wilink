@@ -21,6 +21,7 @@
 #define __WILINK_CHAT_HISTORY_H__
 
 #include <QDateTime>
+#include <QAbstractListModel>
 #include <QGraphicsView>
 #include <QGraphicsWidget>
 #include <QTextCursor>
@@ -31,6 +32,8 @@ class QUrl;
 
 typedef QPair<QRectF, QTextCursor> RectCursor;
 
+/** The ChatHistoryMessage class represents the data for a single chat history message.
+ */
 class ChatHistoryMessage
 {
 public:
@@ -42,6 +45,19 @@ public:
     QString from;
     QString fromJid;
     bool received;
+};
+
+/** The ChatHistoryModel class represents a collection of chat history messages.
+ */
+class ChatHistoryModel : public QAbstractListModel
+{
+public:
+    ChatHistoryModel(QObject *parent = 0);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+private:
+    QList<ChatHistoryMessage> m_messages;
 };
 
 class ChatSearchBubble : public QObject, public QGraphicsItemGroup
