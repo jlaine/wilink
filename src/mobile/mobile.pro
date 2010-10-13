@@ -90,5 +90,5 @@ symbian {
 
     ICON = ../data/wiLink.svg
 
-    TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData"
+    TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData UserEnvironment"
 }
