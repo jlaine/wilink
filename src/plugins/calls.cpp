@@ -181,7 +181,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
     m_callHandler = new CallHandler(m_call, QThread::currentThread());
     connect(m_callHandler, SIGNAL(finished()), m_callThread, SLOT(quit()));
     connect(m_callThread, SIGNAL(finished()), this, SLOT(callFinished()));
-    connect(m_callThread, SIGNAL(finished()), m_callThread, SLOT(deleteLater()));
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
@@ -215,7 +214,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
 void CallWidget::callFinished()
 {
     m_callHandler->deleteLater();
-    m_callThread->deleteLater();
+    m_callThread->wait();
+    delete m_callThread;
 
     // make widget disappear
     m_hangupButton->setEnabled(false);
