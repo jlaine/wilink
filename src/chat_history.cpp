@@ -77,10 +77,19 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     setRoleNames(roleNames);
 }
 
-int ChatHistoryModel::rowCount(const QModelIndex &parent) const
+void ChatHistoryModel::addMessage(const ChatHistoryMessage &message)
 {
-    Q_UNUSED(parent)
-    return m_messages.size();
+    int pos = 0;
+    foreach (const ChatHistoryMessage &current, m_messages)
+    {
+        if (message.date >= current.date)
+            pos++;
+        else
+            break;
+    }
+    beginInsertRows(QModelIndex(), pos, pos);
+    m_messages.insert(pos, message);
+    endInsertRows();
 }
 
 QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
@@ -105,14 +114,20 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         return m_messages[row].received;
     default:
         return QVariant();
-    };
+    }
+}
+
+int ChatHistoryModel::rowCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent)
+    return m_messages.size();
 }
 
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!lastAnchor.isEmpty())
     {
-        emit linkHoverChanged("");
+        setCursor(Qt::ArrowCursor);
         lastAnchor = "";
     }
     QGraphicsTextItem::hoverMoveEvent(event);
@@ -123,7 +138,7 @@ void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     QString anchor = document()->documentLayout()->anchorAt(event->pos());
     if (anchor != lastAnchor)
     {
-        emit linkHoverChanged(anchor);
+        setCursor(anchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
         lastAnchor = anchor;
     }
     QGraphicsTextItem::hoverMoveEvent(event);
@@ -193,7 +208,6 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    connect(bodyText, SIGNAL(linkHoverChanged(QString)), this, SIGNAL(linkHoverChanged(QString)));
     connect(fromText, SIGNAL(clicked()), this, SLOT(slotTextClicked()));
 }
 
@@ -862,11 +876,6 @@ void ChatHistory::selectAll()
     QPainterPath path;
     path.addRect(m_scene->sceneRect());
     m_scene->setSelectionArea(path);
-}
-
-void ChatHistory::slotLinkHoverChanged(const QString &link)
-{
-    setCursor(link.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
 }
 
 void ChatHistory::slotSelectionChanged()

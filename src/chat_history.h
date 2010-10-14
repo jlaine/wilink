@@ -53,6 +53,7 @@ class ChatHistoryModel : public QAbstractListModel
 {
 public:
     ChatHistoryModel(QObject *parent = 0);
+    void addMessage(const ChatHistoryMessage &message);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
@@ -86,7 +87,6 @@ class ChatTextItem : public QGraphicsTextItem
 
 signals:
     void clicked();
-    void linkHoverChanged(const QString &link);
 
 protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
@@ -118,7 +118,6 @@ public:
 
 signals:
     void messageClicked(const ChatHistoryMessage &message);
-    void linkHoverChanged(const QString &link);
 
 private slots:
     void slotTextClicked();
@@ -169,7 +168,6 @@ signals:
     void messageClicked(const ChatHistoryMessage &message);
 
 private slots:
-    void slotLinkHoverChanged(const QString &link);
     void slotSelectionChanged();
 
 protected:
