@@ -123,39 +123,6 @@ int ChatHistoryModel::rowCount(const QModelIndex &parent) const
     return m_messages.size();
 }
 
-ChatTextItem::ChatTextItem(QGraphicsItem *parent)
-    : QGraphicsTextItem(parent)
-{
-}
-
-void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    if (!lastAnchor.isEmpty())
-    {
-        setCursor(Qt::ArrowCursor);
-        lastAnchor = "";
-    }
-    QGraphicsTextItem::hoverMoveEvent(event);
-}
-
-void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-{
-    QString anchor = document()->documentLayout()->anchorAt(event->pos());
-    if (anchor != lastAnchor)
-    {
-        setCursor(anchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
-        lastAnchor = anchor;
-    }
-    QGraphicsTextItem::hoverMoveEvent(event);
-}
-
-void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    if (!lastAnchor.isEmpty())
-        QDesktopServices::openUrl(lastAnchor);
-    QGraphicsTextItem::mousePressEvent(event);
-}
-
 ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
@@ -187,11 +154,12 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     messageShadow->setZValue(-2);
  
     // create text objects
-    bodyText = new ChatTextItem(this);
+    bodyText = new QGraphicsTextItem(this);
     bodyText->setDefaultTextColor(Qt::black);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
+    bodyText->installSceneEventFilter(this);
 
     dateText = new QGraphicsTextItem(this);
     font = dateText->font();
@@ -259,11 +227,32 @@ ChatHistoryMessage ChatMessageWidget::message() const
     return msg;
 }
 
+/** Filters events on the "from" and "body" labels.
+ */
 bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
     if (item == fromText && event->type() == QEvent::GraphicsSceneMousePress)
     {
         emit messageClicked(msg);
+    }
+    else if (item == bodyText)
+    {
+        if (event->type() == QEvent::GraphicsSceneHoverLeave)
+        {
+            bodyAnchor = QString();
+            bodyText->setCursor(Qt::ArrowCursor);
+        }
+        else if (event->type() == QEvent::GraphicsSceneHoverMove)
+        {
+            QGraphicsSceneHoverEvent *hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            bodyAnchor = bodyText->document()->documentLayout()->anchorAt(hoverEvent->pos());
+            bodyText->setCursor(bodyAnchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
+        }
+        else if (event->type() == QEvent::GraphicsSceneMousePress)
+        {
+            if (!bodyAnchor.isEmpty())
+                QDesktopServices::openUrl(bodyAnchor);
+        }
     }
     return false;
 }

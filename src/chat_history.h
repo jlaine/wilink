@@ -81,25 +81,9 @@ private:
     RectCursor m_selection;
 };
 
-/** The ChatTextItem class represents a text item which displays a "pointing hand"
- *  cursor when a link is hovered.
+/** The ChatMessageWidget class represents a widget for displaying a single
+ *  chat message.
  */
-class ChatTextItem : public QGraphicsTextItem
-{
-    Q_OBJECT
-
-public:
-    ChatTextItem(QGraphicsItem *parent = 0);
-
-protected:
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-
-private:
-    QString lastAnchor;
-};
-
 class ChatMessageWidget : public QGraphicsWidget
 {
     Q_OBJECT
@@ -140,6 +124,7 @@ private:
     bool show_sender;
 
     // Text
+    QString bodyAnchor;
     QGraphicsTextItem *bodyText;
     QGraphicsTextItem *dateText;
     QGraphicsTextItem *fromText;
