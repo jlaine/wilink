@@ -80,7 +80,10 @@ private:
     const int m_radius;
     RectCursor m_selection;
 };
- 
+
+/** The ChatTextItem class represents a text item which displays a "pointing hand"
+ *  cursor when a link is hovered.
+ */
 class ChatTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
@@ -137,7 +140,7 @@ private:
     bool show_sender;
 
     // Text
-    ChatTextItem *bodyText;
+    QGraphicsTextItem *bodyText;
     QGraphicsTextItem *dateText;
     QGraphicsTextItem *fromText;
 

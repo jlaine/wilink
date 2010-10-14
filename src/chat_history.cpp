@@ -601,7 +601,6 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     }
 
     /* insert new message */
-    connect(msg, SIGNAL(linkHoverChanged(QString)), this, SLOT(slotLinkHoverChanged(QString)));
     connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)), this, SIGNAL(messageClicked(ChatHistoryMessage)));
     m_layout->insertItem(pos, msg);
     adjustSize();
