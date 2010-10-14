@@ -54,75 +54,11 @@
 #define DATE_FONT 10
 #endif
 
-enum MessageRole
-{
-    ArchivedRole,
-    BodyRole,
-    DateRole,
-    FromRole,
-    FromJidRole,
-    ReceivedRole,
-};
-
-ChatHistoryModel::ChatHistoryModel(QObject *parent)
-    : QAbstractListModel(parent)
-{
-    QHash<int, QByteArray> roleNames;
-    roleNames[ArchivedRole] = "archived";
-    roleNames[BodyRole] = "body";
-    roleNames[DateRole] = "date";
-    roleNames[FromRole] = "from";
-    roleNames[FromJidRole] = "fromJid";
-    roleNames[ReceivedRole] = "received";
-    setRoleNames(roleNames);
-}
-
-void ChatHistoryModel::addMessage(const ChatHistoryMessage &message)
-{
-    int pos = 0;
-    foreach (const ChatHistoryMessage &current, m_messages)
-    {
-        if (message.date >= current.date)
-            pos++;
-        else
-            break;
-    }
-    beginInsertRows(QModelIndex(), pos, pos);
-    m_messages.insert(pos, message);
-    endInsertRows();
-}
-
-QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
-{
-    const int row = index.row();
-    if (row < 0 || row >= m_messages.size())
-        return QVariant();
-
-    switch (role)
-    {
-    case ArchivedRole:
-        return m_messages[row].archived;
-    case BodyRole:
-        return m_messages[row].body;
-    case DateRole:
-        return m_messages[row].date;
-    case FromRole:
-        return m_messages[row].from;
-    case FromJidRole:
-        return m_messages[row].fromJid;
-    case ReceivedRole:
-        return m_messages[row].received;
-    default:
-        return QVariant();
-    }
-}
-
-int ChatHistoryModel::rowCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent)
-    return m_messages.size();
-}
-
+/** Constructs a new ChatMesageWidget.
+ *
+ * @param received
+ * @param parent
+ */
 ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
@@ -222,11 +158,6 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
-ChatHistoryMessage ChatMessageWidget::message() const
-{
-    return msg;
-}
-
 /** Filters events on the "from" and "body" labels.
  */
 bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
@@ -309,6 +240,15 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
     updateGeometry();
 }
 
+/** Returns the message which this widget displays.
+ */
+ChatHistoryMessage ChatMessageWidget::message() const
+{
+    return msg;
+}
+
+/** Sets the message which this widget displays.
+ */
 void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
 {
     msg = message;
@@ -423,7 +363,7 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
         updateGeometry();
     }
     // check whether anything changed in footer
-    if(previous && previous->showFooter() != showPreviousFooter)
+    if(previous && previous->show_footer != showPreviousFooter)
     {
         // update values if changed
         previous->setShowFooter(showPreviousFooter);
@@ -440,11 +380,6 @@ void ChatMessageWidget::setShowDate(bool show)
         dateText->hide();
     }
     show_date = show;
-}
-
-bool ChatMessageWidget::showFooter()
-{
-    return show_footer;
 }
 
 void ChatMessageWidget::setShowFooter(bool show)

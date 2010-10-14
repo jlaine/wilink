@@ -47,20 +47,6 @@ public:
     bool received;
 };
 
-/** The ChatHistoryModel class represents a collection of chat history messages.
- */
-class ChatHistoryModel : public QAbstractListModel
-{
-public:
-    ChatHistoryModel(QObject *parent = 0);
-    void addMessage(const ChatHistoryMessage &message);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
-private:
-    QList<ChatHistoryMessage> m_messages;
-};
-
 class ChatSearchBubble : public QObject, public QGraphicsItemGroup
 {
     Q_OBJECT
@@ -113,7 +99,6 @@ private:
     QPainterPath bodyPath(qreal width, qreal height, bool close);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
     void setShowDate(bool show);
-    bool showFooter();
     void setShowFooter(bool show);
     void setShowSender(bool show);
 
