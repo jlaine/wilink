@@ -88,8 +88,8 @@ class ChatTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
 
-signals:
-    void clicked();
+public:
+    ChatTextItem(QGraphicsItem *parent = 0);
 
 protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
@@ -122,8 +122,8 @@ public:
 signals:
     void messageClicked(const ChatHistoryMessage &message);
 
-private slots:
-    void slotTextClicked();
+protected:
+    bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
 
 private:
     QPainterPath bodyPath(qreal width, qreal height, bool close);

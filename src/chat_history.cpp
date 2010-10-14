@@ -123,6 +123,11 @@ int ChatHistoryModel::rowCount(const QModelIndex &parent) const
     return m_messages.size();
 }
 
+ChatTextItem::ChatTextItem(QGraphicsItem *parent)
+    : QGraphicsTextItem(parent)
+{
+}
+
 void ChatTextItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     if (!lastAnchor.isEmpty())
@@ -144,12 +149,10 @@ void ChatTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsTextItem::hoverMoveEvent(event);
 }
 
-void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
+void ChatTextItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!lastAnchor.isEmpty())
         QDesktopServices::openUrl(lastAnchor);
-    else
-        emit clicked();
     QGraphicsTextItem::mousePressEvent(event);
 }
 
@@ -184,31 +187,26 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     messageShadow->setZValue(-2);
  
     // create text objects
-    bodyText = new ChatTextItem;
-    scene()->addItem(bodyText);
-    bodyText->setParentItem(this);
+    bodyText = new ChatTextItem(this);
     bodyText->setDefaultTextColor(Qt::black);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
 
-    dateText = scene()->addText("");
+    dateText = new QGraphicsTextItem(this);
     font = dateText->font();
     font.setPixelSize(DATE_FONT);
     dateText->setFont(font);
-    dateText->setParentItem(this);
     dateText->setTextWidth(90);
 
-    fromText = new ChatTextItem;
-    scene()->addItem(fromText);
+    fromText = new QGraphicsTextItem(this);
     fromText->setFont(font);
-    fromText->setParentItem(this);
     fromText->setDefaultTextColor(baseColor);
+    fromText->installSceneEventFilter(this);
 
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    connect(fromText, SIGNAL(clicked()), this, SLOT(slotTextClicked()));
 }
 
 /** Returns the QPainterPath used to draw the chat bubble.
@@ -259,6 +257,15 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
 ChatHistoryMessage ChatMessageWidget::message() const
 {
     return msg;
+}
+
+bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
+{
+    if (item == fromText && event->type() == QEvent::GraphicsSceneMousePress)
+    {
+        emit messageClicked(msg);
+    }
+    return false;
 }
 
 void ChatMessageWidget::setGeometry(const QRectF &baseRect)
@@ -493,11 +500,6 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
         default:
             return constraint;
     }
-}
-
-void ChatMessageWidget::slotTextClicked()
-{
-    emit messageClicked(msg);
 }
 
 QTextDocument *ChatMessageWidget::document() const
