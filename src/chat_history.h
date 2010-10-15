@@ -169,7 +169,6 @@ private slots:
     void historyChanged();
 
 private:
-    QGraphicsScene *m_scene;
     ChatHistoryWidget *m_obj;
     bool m_followEnd;
 };

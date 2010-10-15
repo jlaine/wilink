@@ -821,8 +821,8 @@ ChatHistory::ChatHistory(QWidget *parent)
     m_followEnd(true)
 {
     bool check;
-    m_scene = new QGraphicsScene(this);
-    setScene(m_scene);
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    setScene(scene);
     setDragMode(QGraphicsView::RubberBandDrag);
     setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
 #ifdef WILINK_EMBEDDED
@@ -834,7 +834,7 @@ ChatHistory::ChatHistory(QWidget *parent)
 #endif
 
     m_obj = new ChatHistoryWidget;
-    m_scene->addItem(m_obj);
+    scene->addItem(m_obj);
 
     check = connect(m_obj, SIGNAL(geometryChanged()),
                     this, SLOT(historyChanged()));
@@ -844,7 +844,7 @@ ChatHistory::ChatHistory(QWidget *parent)
                     this, SIGNAL(messageClicked(ChatMessage)));
     Q_ASSERT(check);
 
-    check = connect(m_scene, SIGNAL(selectionChanged()),
+    check = connect(scene, SIGNAL(selectionChanged()),
                     m_obj, SLOT(slotSelectionChanged()));
     Q_ASSERT(check);
 
@@ -913,7 +913,7 @@ void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 
     if (e->buttons() == Qt::LeftButton && !m_obj->m_selectedMessages.isEmpty())
     {
-        QRectF rect = m_scene->selectionArea().boundingRect();
+        QRectF rect = scene()->selectionArea().boundingRect();
         foreach (ChatMessageWidget *child, m_obj->m_selectedMessages)
             child->setSelection(rect);
 
