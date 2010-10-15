@@ -163,7 +163,7 @@ private:
 
     ChatMessageWidget *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
-    QList<ChatMessageWidget*> m_lastSelection;
+    QList<ChatMessageWidget*> m_selectedMessages;
 };
 
 #endif

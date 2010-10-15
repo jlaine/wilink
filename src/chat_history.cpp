@@ -594,11 +594,11 @@ QString ChatHistory::copyText()
 
     // gather the message senders
     QSet<QString> senders;
-    foreach (ChatMessageWidget *child, m_lastSelection)
+    foreach (ChatMessageWidget *child, m_selectedMessages)
         senders.insert(child->message().from);
 
     // copy selected messages
-    foreach (ChatMessageWidget *child, m_lastSelection)
+    foreach (ChatMessageWidget *child, m_selectedMessages)
     {
         ChatHistoryMessage message = child->message();
 
@@ -756,15 +756,15 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
 void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
-    if (e->buttons() == Qt::LeftButton && !m_lastSelection.isEmpty())
+    if (e->buttons() == Qt::LeftButton && !m_selectedMessages.isEmpty())
     {
         QRectF rect = m_scene->selectionArea().boundingRect();
-        foreach (ChatMessageWidget *child, m_lastSelection)
+        foreach (ChatMessageWidget *child, m_selectedMessages)
             child->setSelection(rect);
     }
 
     // for X11, copy the selected text to the selection buffer
-    if (!m_lastSelection.isEmpty())
+    if (!m_selectedMessages.isEmpty())
         QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
 }
 
@@ -825,13 +825,13 @@ void ChatHistory::selectAll()
 void ChatHistory::slotMessageSelected()
 {
     ChatMessageWidget *selected = qobject_cast<ChatMessageWidget*>(sender());
-    foreach (ChatMessageWidget *child, m_lastSelection)
+    foreach (ChatMessageWidget *child, m_selectedMessages)
     {
         if (child != selected)
             child->setSelection(QRectF());
     }
-    m_lastSelection.clear();
-    m_lastSelection << selected;
+    m_selectedMessages.clear();
+    m_selectedMessages << selected;
 
     // for X11, copy the selected text to the selection buffer
     QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
@@ -853,14 +853,14 @@ void ChatHistory::slotSelectionChanged()
         {
             newSelection << child;
             child->setSelection(rect);
-        } else if (m_lastSelection.contains(child)) {
+        } else if (m_selectedMessages.contains(child)) {
             child->setSelection(QRectF());
         }
     }
-    m_lastSelection = newSelection;
+    m_selectedMessages = newSelection;
 
     // for X11, copy the selected text to the selection buffer
-    if (!m_lastSelection.isEmpty())
+    if (!m_selectedMessages.isEmpty())
         QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
 }
 
