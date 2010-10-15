@@ -817,7 +817,8 @@ void ChatHistoryWidget::slotSelectionChanged()
 }
 
 ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent)
+    : QGraphicsView(parent),
+    m_followEnd(true)
 {
     bool check;
     m_scene = new QGraphicsScene(this);
@@ -859,24 +860,6 @@ ChatHistory::ChatHistory(QWidget *parent)
     Q_ASSERT(check);
 }
 
-/** Add a message to the chat history and scroll to end
- *  if we were previously at end.
- *
- * @param message
- */
-void ChatHistory::addMessage(const ChatMessage &message)
-{
-    QScrollBar *scrollBar = verticalScrollBar();
-    bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
-    if (m_obj->addMessage(message) && atEnd)
-        scrollBar->setSliderPosition(scrollBar->maximum());
-}
-
-void ChatHistory::clear()
-{
-    m_obj->clear();
-}
-
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu;
@@ -910,6 +893,11 @@ void ChatHistory::historyChanged()
     QRectF rect = m_obj->boundingRect();
     rect.setHeight(rect.height() - 10);
     setSceneRect(rect);
+    if (m_followEnd)
+    {
+        QScrollBar *scrollBar = verticalScrollBar();
+        scrollBar->setSliderPosition(scrollBar->maximum());
+    }
 }
 
 ChatHistoryWidget *ChatHistory::historyWidget()
@@ -946,23 +934,15 @@ void ChatHistory::mousePressEvent(QMouseEvent *e)
 
 void ChatHistory::resizeEvent(QResizeEvent *e)
 {
-    QScrollBar *scrollBar = verticalScrollBar();
-    bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
-
     // calculate available width
     qreal leftMargin = 0;
     qreal rightMargin = 0;
     m_obj->layout()->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
     // FIXME : why do we need the extra 8 pixels?
     const qreal w = width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
-
-    // resize widgets
     m_obj->setMaximumWidth(w);
-    QGraphicsView::resizeEvent(e);
 
-    // scroll to end if we were previous at end
-    if (atEnd)
-        scrollBar->setSliderPosition(scrollBar->maximum());
+    QGraphicsView::resizeEvent(e);
 }
 
 ChatSearchBubble::ChatSearchBubble()

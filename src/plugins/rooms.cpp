@@ -573,7 +573,7 @@ void ChatRoom::join()
         return;
 
     // clear history
-    chatHistory->clear();
+    chatHistory->historyWidget()->clear();
 
     // send join request
     client->mucManager().joinRoom(chatRemoteJid, nickName);
@@ -640,7 +640,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         message.date = msg.stamp();
         if (!message.date.isValid())
             message.date = QDateTime::currentDateTime();
-        chatHistory->addMessage(message);
+        chatHistory->historyWidget()->addMessage(message);
 
         // notify user
         if (notifyMessages || message.body.contains("@" + nickName))

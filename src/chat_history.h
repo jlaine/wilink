@@ -152,11 +152,7 @@ class ChatHistory : public QGraphicsView
 
 public:
     ChatHistory(QWidget *parent = NULL);
-    void addMessage(const ChatMessage &message);
     ChatHistoryWidget *historyWidget();
-
-public slots:
-    void clear();
 
 signals:
     void focused();
@@ -175,11 +171,7 @@ private slots:
 private:
     QGraphicsScene *m_scene;
     ChatHistoryWidget *m_obj;
-/*
-    QList<ChatSearchBubble*> m_glassItems;
-    ChatMessageWidget *m_lastFindWidget;
-    QTextCursor m_lastFindCursor;
-    */
+    bool m_followEnd;
 };
 
 class ChatSearchBubble : public QObject, public QGraphicsItemGroup
