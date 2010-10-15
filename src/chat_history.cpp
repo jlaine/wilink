@@ -537,7 +537,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     ChatMessageWidget *msg = new ChatMessageWidget(message.received, this);
     msg->setMessage(message);
     msg->setPrevious(previous);
-    //msg->setMaximumWidth(availableWidth());
+    msg->setMaximumWidth(m_maximumWidth);
 
     /* adjust next message */
     if (pos < m_layout->count())
@@ -611,6 +611,23 @@ QString ChatHistoryWidget::selectedText() const
 #else
     return copyText;
 #endif
+}
+
+/** Sets the maximum width for the history.
+ *
+ * @param width
+ */
+void ChatHistoryWidget::setMaximumWidth(qreal width)
+{
+    // store maximum width
+    m_maximumWidth = width;
+
+    // resize widgets
+    for (int i = 0; i < m_layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+        child->setMaximumWidth(width);
+    }
 }
 
 /** Handles a single message selection, i.e. one triggered by a double
@@ -697,7 +714,6 @@ void ChatHistory::addMessage(const ChatMessage &message)
     if (!widget)
         return;
 
-    widget->setMaximumWidth(availableWidth());
     connect(widget, SIGNAL(messageClicked(ChatMessage)),
             this, SIGNAL(messageClicked(ChatMessage)));
     adjustSize();
@@ -713,16 +729,6 @@ void ChatHistory::adjustSize()
     QRectF rect = m_obj->boundingRect();
     rect.setHeight(rect.height() - 10);
     setSceneRect(rect);
-}
-
-qreal ChatHistory::availableWidth() const
-{
-    qreal leftMargin = 0;
-    qreal rightMargin = 0;
-    m_layout->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
-
-    // FIXME : why do we need the extra 8 pixels?
-    return width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
 }
 
 void ChatHistory::clear()
@@ -895,13 +901,15 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() >= (scrollBar->maximum() - 10);
 
+    // calculate available width
+    qreal leftMargin = 0;
+    qreal rightMargin = 0;
+    m_obj->layout()->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
+    // FIXME : why do we need the extra 8 pixels?
+    const qreal w = width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
+
     // resize widgets
-    const qreal w = availableWidth();
-    for (int i = 0; i < m_layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-        child->setMaximumWidth(w);
-    }
+    m_obj->setMaximumWidth(w);
     adjustSize();
     QGraphicsView::resizeEvent(e);
 

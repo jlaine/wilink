@@ -115,6 +115,7 @@ public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
     ChatMessageWidget *addMessage(const ChatMessage &message);
     QString selectedText() const;
+    void setMaximumWidth(qreal width);
 
 public slots:
     void clear();
@@ -128,6 +129,9 @@ private slots:
 public:
     QGraphicsLinearLayout *m_layout;
     QList<ChatMessageWidget*> m_selectedMessages;
+
+private:
+    qreal m_maximumWidth;
 };
 
 class ChatHistory : public QGraphicsView
@@ -150,7 +154,6 @@ signals:
 
 protected:
     void adjustSize();
-    qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
     void focusInEvent(QFocusEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
