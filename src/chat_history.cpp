@@ -179,9 +179,25 @@ bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
             bodyAnchor = bodyText->document()->documentLayout()->anchorAt(hoverEvent->pos());
             bodyText->setCursor(bodyAnchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
         }
+        else if (event->type() == QEvent::GraphicsSceneMouseDoubleClick)
+        {
+            // on double click, select the word under the cursor
+            QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            QAbstractTextDocumentLayout *layout = bodyText->document()->documentLayout();
+            int cursorPos = layout->hitTest(mouseEvent->pos(), Qt::FuzzyHit);
+            if (mouseEvent->button() == Qt::LeftButton && cursorPos != -1)
+            {
+                QTextCursor cursor(bodyText->document());
+                cursor.setPosition(cursorPos);
+                cursor.select(QTextCursor::WordUnderCursor);
+                bodyText->setTextCursor(cursor);
+                emit messageSelected();
+            }
+        }
         else if (event->type() == QEvent::GraphicsSceneMousePress)
         {
-            if (!bodyAnchor.isEmpty())
+            QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::LeftButton && !bodyAnchor.isEmpty())
                 QDesktopServices::openUrl(bodyAnchor);
         }
     }
@@ -527,7 +543,10 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     }
 
     /* insert new message */
-    connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)), this, SIGNAL(messageClicked(ChatHistoryMessage)));
+    connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)),
+            this, SIGNAL(messageClicked(ChatHistoryMessage)));
+    connect(msg, SIGNAL(messageSelected()),
+            this, SLOT(slotMessageSelected()));
     m_layout->insertItem(pos, msg);
     adjustSize();
 
@@ -572,34 +591,25 @@ void ChatHistory::copy()
 QString ChatHistory::copyText()
 {
     QString copyText;
-    QList<QGraphicsItem*> selection = m_scene->selectedItems();
 
     // gather the message senders
     QSet<QString> senders;
-    for (int i = 0; i < m_layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-        if (selection.contains(child))
-            senders.insert(child->message().from);
-    }
+    foreach (ChatMessageWidget *child, m_lastSelection)
+        senders.insert(child->message().from);
 
     // copy selected messages
-    for (int i = 0; i < m_layout->count(); i++)
+    foreach (ChatMessageWidget *child, m_lastSelection)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-        if (selection.contains(child))
-        {
-            ChatHistoryMessage message = child->message();
+        ChatHistoryMessage message = child->message();
 
-            if (!copyText.isEmpty())
-                copyText += "\n";
+        if (!copyText.isEmpty())
+            copyText += "\n";
 
-            // if this is a conversation, prefix the message with its sender
-            if (senders.size() > 1)
-                copyText += message.from + "> ";
+        // if this is a conversation, prefix the message with its sender
+        if (senders.size() > 1)
+            copyText += message.from + "> ";
 
-            copyText += child->textCursor().selectedText().replace("\r\n", "\n");
-        }
+        copyText += child->textCursor().selectedText().replace("\r\n", "\n");
     }
 
 #ifdef Q_OS_WIN
@@ -741,6 +751,8 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
     emit focused();
 }
 
+/** Updates the selected messages portion during a mouse drag.
+ */
 void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
@@ -750,6 +762,10 @@ void ChatHistory::mouseMoveEvent(QMouseEvent *e)
         foreach (ChatMessageWidget *child, m_lastSelection)
             child->setSelection(rect);
     }
+
+    // for X11, copy the selected text to the selection buffer
+    if (!m_lastSelection.isEmpty())
+        QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
 }
 
 void ChatHistory::mousePressEvent(QMouseEvent *e)
@@ -803,11 +819,31 @@ void ChatHistory::selectAll()
     m_scene->setSelectionArea(path);
 }
 
+/** Handles a single message selection, i.e. one triggered by a double
+ *  or tripple click.
+ */
+void ChatHistory::slotMessageSelected()
+{
+    ChatMessageWidget *selected = qobject_cast<ChatMessageWidget*>(sender());
+    foreach (ChatMessageWidget *child, m_lastSelection)
+    {
+        if (child != selected)
+            child->setSelection(QRectF());
+    }
+    m_lastSelection.clear();
+    m_lastSelection << selected;
+
+    // for X11, copy the selected text to the selection buffer
+    QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
+}
+
+/** Handles a rubberband selection.
+ */
 void ChatHistory::slotSelectionChanged()
 {
     QRectF rect = m_scene->selectionArea().boundingRect();
 
-    // highlight the selected items
+    // update the selected items
     QList<QGraphicsItem*> selection = m_scene->selectedItems();
     QList<ChatMessageWidget*> newSelection;
     for (int i = 0; i < m_layout->count(); i++)
@@ -821,15 +857,11 @@ void ChatHistory::slotSelectionChanged()
             child->setSelection(QRectF());
         }
     }
+    m_lastSelection = newSelection;
 
     // for X11, copy the selected text to the selection buffer
-    if (!selection.isEmpty())
-    {
-        QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(copyText(), QClipboard::Selection);
-    }
-
-    m_lastSelection = newSelection;
+    if (!m_lastSelection.isEmpty())
+        QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
 }
 
 ChatHistoryMessage::ChatHistoryMessage()

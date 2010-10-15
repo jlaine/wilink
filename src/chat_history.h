@@ -91,6 +91,7 @@ public:
 
 signals:
     void messageClicked(const ChatHistoryMessage &message);
+    void messageSelected();
 
 protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
@@ -141,6 +142,7 @@ signals:
     void messageClicked(const ChatHistoryMessage &message);
 
 private slots:
+    void slotMessageSelected();
     void slotSelectionChanged();
 
 protected:
