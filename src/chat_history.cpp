@@ -489,12 +489,19 @@ void ChatMessageWidget::setTextCursor(const QTextCursor &cursor)
  * @param parent
  */
 ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
+    : QGraphicsWidget(parent),
+    m_lastFindWidget(0)
 {
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(5, 0, 5, 0);
     m_layout->setSpacing(0);
     setLayout(m_layout);
+
+    bool check;
+    check = connect(this, SIGNAL(geometryChanged()),
+                    this, SLOT(slotGeometryChanged()));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
@@ -580,6 +587,113 @@ void ChatHistoryWidget::copy()
     clipboard->setText(selectedText(), QClipboard::Clipboard);
 }
 
+/** Find and highlight the given text.
+ *
+ * @param needle
+ * @param flags
+ * @param changed
+ */
+void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
+{
+    // clear search bubbles
+    findClear();
+
+    // handle empty search
+    if (needle.isEmpty())
+    {
+        emit findFinished(true);
+        return;
+    }
+
+    // retrieve previous cursor
+    QTextCursor cursor;
+    int startIndex = (flags && QTextDocument::FindBackward) ? m_layout->count() -1 : 0;
+    if (m_lastFindWidget)
+    {
+        for (int i = 0; i < m_layout->count(); ++i)
+        {
+            if (m_layout->itemAt(i) == m_lastFindWidget)
+            {
+                startIndex = i;
+                cursor = m_lastFindCursor;
+                break;
+            }
+        }
+    }
+    if (changed)
+        cursor.setPosition(cursor.anchor());
+
+    // perform search
+    bool looped = false;
+    int i = startIndex;
+    while (i >= 0 && i < m_layout->count())
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+
+        // position cursor
+        if (cursor.isNull())
+        {
+            cursor = QTextCursor(child->document());
+            if (flags && QTextDocument::FindBackward)
+                cursor.movePosition(QTextCursor::End);
+        }
+
+        cursor = child->document()->find(needle, cursor, flags);
+        if (!cursor.isNull())
+        {
+            // build new glass
+            QRectF boundingRect;
+            foreach (const RectCursor &textRect, child->chunkSelection(cursor))
+            {
+                ChatSearchBubble *glass = new ChatSearchBubble;
+                glass->setSelection(textRect);
+                glass->bounce();
+                scene()->addItem(glass);
+                m_glassItems << glass;
+
+                if (boundingRect.isEmpty())
+                    boundingRect = glass->boundingRect();
+                else
+                    boundingRect = boundingRect.united(glass->boundingRect());
+            }
+            ensureVisible(boundingRect);
+
+            m_lastFindCursor = cursor;
+            m_lastFindWidget = child;
+            emit findFinished(true);
+            return;
+        } else {
+            if (looped)
+                break;
+            if (flags && QTextDocument::FindBackward) {
+                if (--i < 0)
+                    i = m_layout->count() - 1;
+            } else {
+                if (++i >= m_layout->count())
+                    i = 0;
+            }
+            if (i == startIndex)
+                looped = true;
+        }
+    }
+
+    m_lastFindWidget = 0;
+    m_lastFindCursor = QTextCursor();
+    emit findFinished(false);
+}
+
+/** Clear all the search bubbles.
+ */
+void ChatHistoryWidget::findClear()
+{
+    foreach (ChatSearchBubble *item, m_glassItems)
+    {
+        scene()->removeItem(item);
+        delete item;
+    }
+    m_glassItems.clear();
+}
+
 /** Selects all the messages.
  */
 void ChatHistoryWidget::selectAll()
@@ -640,6 +754,23 @@ void ChatHistoryWidget::setMaximumWidth(qreal width)
     adjustSize();
 }
 
+/** When the history geometry changes, reposition search bubbles.
+ */
+void ChatHistoryWidget::slotGeometryChanged()
+{
+    if (!m_glassItems.isEmpty() && m_lastFindWidget)
+    {
+        findClear();
+        foreach (const RectCursor &textRect, m_lastFindWidget->chunkSelection(m_lastFindCursor))
+        {
+            ChatSearchBubble *glass = new ChatSearchBubble;
+            glass->setSelection(textRect);
+            scene()->addItem(glass);
+            m_glassItems << glass;
+        }
+    }
+}
+
 /** Handles a single message selection, i.e. one triggered by a double
  *  or tripple click.
  */
@@ -686,8 +817,7 @@ void ChatHistoryWidget::slotSelectionChanged()
 }
 
 ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent),
-    m_lastFindWidget(0)
+    : QGraphicsView(parent)
 {
     bool check;
     m_scene = new QGraphicsScene(this);
@@ -703,8 +833,11 @@ ChatHistory::ChatHistory(QWidget *parent)
 #endif
 
     m_obj = new ChatHistoryWidget;
-    m_layout = m_obj->m_layout;
     m_scene->addItem(m_obj);
+
+    check = connect(m_obj, SIGNAL(findFinished(bool)),
+                    this, SIGNAL(findFinished(bool)));
+    Q_ASSERT(check);
 
     check = connect(m_obj, SIGNAL(geometryChanged()),
                     this, SLOT(historyChanged()));
@@ -775,103 +908,14 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
  */
 void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
-    // clear search bubbles
-    findClear();
-
-    // handle empty search
-    if (needle.isEmpty())
-    {
-        emit findFinished(true);
-        return;
-    }
-
-    // retrieve previous cursor
-    QTextCursor cursor;
-    int startIndex = (flags && QTextDocument::FindBackward) ? m_layout->count() -1 : 0;
-    if (m_lastFindWidget)
-    {
-        for (int i = 0; i < m_layout->count(); ++i)
-        {
-            if (m_layout->itemAt(i) == m_lastFindWidget)
-            {
-                startIndex = i;
-                cursor = m_lastFindCursor;
-                break;
-            }
-        }
-    }
-    if (changed)
-        cursor.setPosition(cursor.anchor());
-
-    // perform search
-    bool looped = false;
-    int i = startIndex;
-    while (i >= 0 && i < m_layout->count())
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-
-        // position cursor
-        if (cursor.isNull())
-        {
-            cursor = QTextCursor(child->document());
-            if (flags && QTextDocument::FindBackward)
-                cursor.movePosition(QTextCursor::End);
-        }
-
-        cursor = child->document()->find(needle, cursor, flags);
-        if (!cursor.isNull())
-        {
-            // build new glass
-            QRectF boundingRect;
-            foreach (const RectCursor &textRect, child->chunkSelection(cursor))
-            {
-                ChatSearchBubble *glass = new ChatSearchBubble;
-                glass->setSelection(textRect);
-                glass->bounce();
-                m_scene->addItem(glass);
-                m_glassItems << glass;
-
-                if (boundingRect.isEmpty())
-                    boundingRect = glass->boundingRect();
-                else
-                    boundingRect = boundingRect.united(glass->boundingRect());
-            }
-            ensureVisible(boundingRect);
-
-            m_lastFindCursor = cursor;
-            m_lastFindWidget = child;
-            emit findFinished(true);
-            return;
-        } else {
-            if (looped)
-                break;
-            if (flags && QTextDocument::FindBackward) {
-                if (--i < 0)
-                    i = m_layout->count() - 1;
-            } else {
-                if (++i >= m_layout->count())
-                    i = 0;
-            }
-            if (i == startIndex)
-                looped = true;
-        }
-    }
-
-    m_lastFindWidget = 0;
-    m_lastFindCursor = QTextCursor();
-    emit findFinished(false);
+    m_obj->find(needle, flags, changed);
 }
 
 /** Clear all the search bubbles.
  */
 void ChatHistory::findClear()
 {
-    foreach (ChatSearchBubble *item, m_glassItems)
-    {
-        m_scene->removeItem(item);
-        delete item;
-    }
-    m_glassItems.clear();
+    m_obj->findClear();
 }
 
 void ChatHistory::focusInEvent(QFocusEvent *e)
@@ -932,20 +976,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     // resize widgets
     m_obj->setMaximumWidth(w);
     QGraphicsView::resizeEvent(e);
-
-    // reposition search bubbles
-    const bool hadBubbles = m_glassItems.size() > 0;
-    findClear();
-    if (hadBubbles && m_lastFindWidget)
-    {
-        foreach (const RectCursor &textRect, m_lastFindWidget->chunkSelection(m_lastFindCursor))
-        {
-            ChatSearchBubble *glass = new ChatSearchBubble;
-            glass->setSelection(textRect);
-            m_scene->addItem(glass);
-            m_glassItems << glass;
-        }
-    }
 
     // scroll to end if we were previous at end
     if (atEnd)

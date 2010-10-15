@@ -118,23 +118,32 @@ public:
     void setMaximumWidth(qreal width);
 
 signals:
+    void findFinished(bool found);
     void messageClicked(const ChatMessage &message);
 
 public slots:
     void clear();
     void copy();
+    void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
+    void findClear();
     void selectAll();
 
 private slots:
+    void slotGeometryChanged();
     void slotMessageSelected();
     void slotSelectionChanged();
 
 public:
-    QGraphicsLinearLayout *m_layout;
+    // FIXME : this should be private
     QList<ChatMessageWidget*> m_selectedMessages;
 
 private:
+    QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
+
+    QList<ChatSearchBubble*> m_glassItems;
+    ChatMessageWidget *m_lastFindWidget;
+    QTextCursor m_lastFindCursor;
 };
 
 class ChatHistory : public QGraphicsView
@@ -167,12 +176,12 @@ private slots:
 
 private:
     QGraphicsScene *m_scene;
-    QList<ChatSearchBubble*> m_glassItems;
     ChatHistoryWidget *m_obj;
-    QGraphicsLinearLayout *m_layout;
-
+/*
+    QList<ChatSearchBubble*> m_glassItems;
     ChatMessageWidget *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
+    */
 };
 
 class ChatSearchBubble : public QObject, public QGraphicsItemGroup
