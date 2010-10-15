@@ -709,7 +709,7 @@ void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
     {
         QPainterPath path;
         path.addRect(QRectF(m_selectionStart, e->pos()));
-        scene()->setSelectionArea(path);
+        scene()->setSelectionArea(path, Qt::IntersectsItemBoundingRect);
         slotSelectionChanged();
         e->accept();
     }
