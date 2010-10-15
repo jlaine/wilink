@@ -512,7 +512,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(chatHistory->historyWidget(), SIGNAL(messageClicked(ChatMessage)),
+    check = connect(historyWidget(), SIGNAL(messageClicked(ChatMessage)),
                     this, SLOT(messageClicked(ChatMessage)));
     Q_ASSERT(check);
 
@@ -574,7 +574,7 @@ void ChatRoom::join()
         return;
 
     // clear history
-    chatHistory->historyWidget()->clear();
+    historyWidget()->clear();
 
     // send join request
     client->mucManager().joinRoom(chatRemoteJid, nickName);
@@ -641,7 +641,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         message.date = msg.stamp();
         if (!message.date.isValid())
             message.date = QDateTime::currentDateTime();
-        chatHistory->historyWidget()->addMessage(message);
+        historyWidget()->addMessage(message);
 
         // notify user
         if (notifyMessages || message.body.contains("@" + nickName))

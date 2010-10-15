@@ -110,7 +110,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.from = msg.isReceived() ? rosterModel->contactName(chatRemoteJid) : rosterModel->ownName();
         message.fromJid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
         message.received = msg.isReceived();
-        chatHistory->historyWidget()->addMessage(message);
+        historyWidget()->addMessage(message);
     }
 }
 
@@ -207,7 +207,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.from = rosterModel->contactName(chatRemoteJid);
     message.fromJid = chatRemoteJid;
     message.received = true;
-    chatHistory->historyWidget()->addMessage(message);
+    historyWidget()->addMessage(message);
 
     // queue notification
     queueNotification(message.body);
@@ -245,7 +245,7 @@ void ChatDialog::returnPressed()
     message.date = QDateTime::currentDateTime();
     message.from = rosterModel->ownName();
     message.received = false;
-    chatHistory->historyWidget()->addMessage(message);
+    historyWidget()->addMessage(message);
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages

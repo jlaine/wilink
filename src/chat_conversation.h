@@ -26,6 +26,7 @@
 
 class ChatEdit;
 class ChatHistory;
+class ChatHistoryWidget;
 class ChatSearchBar;
 class QSpacerItem;
 
@@ -40,11 +41,14 @@ protected slots:
     void slotSearchDisplayed(bool visible);
 
 protected:
-    ChatHistory *chatHistory;
+    ChatHistoryWidget *historyWidget();
+
+    // FIXME: this should be private
     ChatEdit *chatInput;
-    ChatSearchBar *chatSearch;
 
 private:
+    ChatHistory *chatHistory;
+    ChatSearchBar *chatSearch;
     QSpacerItem *spacerItem;
 };
 

@@ -102,6 +102,11 @@ ChatConversation::ChatConversation(QWidget *parent)
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 }
 
+ChatHistoryWidget *ChatConversation::historyWidget()
+{
+    return chatHistory->historyWidget();
+}
+
 void ChatConversation::slotSearchDisplayed(bool visible)
 {
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
