@@ -133,7 +133,12 @@ class ChatHistoryWidget : public QGraphicsWidget
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
     void addMessage(const ChatHistoryMessage &message);
-    QString selectedText();
+    QString selectedText() const;
+
+public slots:
+    void clear();
+    void copy();
+    void selectAll();
 
 private slots:
     void slotMessageSelected();
@@ -154,10 +159,8 @@ public:
 
 public slots:
     void clear();
-    void copy();
     void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
     void findClear();
-    void selectAll();
 
 signals:
     void findFinished(bool found);

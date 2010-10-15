@@ -490,9 +490,35 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     setLayout(m_layout);
 }
 
-/** Retrieve the text for the highlighted messages.
-  */
-QString ChatHistoryWidget::selectedText()
+/** Clears all messages.
+ */
+void ChatHistoryWidget::clear()
+{
+    m_selectedMessages.clear();
+    for (int i = m_layout->count() - 1; i >= 0; i--)
+        delete m_layout->itemAt(i);
+}
+
+/** Copies the selected text to the clipboard.
+ */
+void ChatHistoryWidget::copy()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(selectedText(), QClipboard::Clipboard);
+}
+
+/** Selects all the messages.
+ */
+void ChatHistoryWidget::selectAll()
+{
+    QPainterPath path;
+    path.addRect(scene()->sceneRect());
+    scene()->setSelectionArea(path);
+}
+
+/** Retrieves the selected text.
+ */
+QString ChatHistoryWidget::selectedText() const
 {
     QString copyText;
 
@@ -592,10 +618,10 @@ ChatHistory::ChatHistory(QWidget *parent)
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(copy()));
+    connect(shortcut, SIGNAL(activated()), m_obj, SLOT(copy()));
 
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(selectAll()));
+    connect(shortcut, SIGNAL(activated()), m_obj, SLOT(selectAll()));
 }
 
 void ChatHistory::addMessage(const ChatHistoryMessage &message)
@@ -683,15 +709,8 @@ qreal ChatHistory::availableWidth() const
 
 void ChatHistory::clear()
 {
-    for (int i = m_layout->count() - 1; i >= 0; i--)
-        delete m_layout->itemAt(i);
+    m_obj->clear();
     adjustSize();
-}
-
-void ChatHistory::copy()
-{
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(m_obj->selectedText(), QClipboard::Clipboard);
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
@@ -700,11 +719,11 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *action = menu->addAction(tr("&Copy"));
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(copy()));
+    connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(copy()));
 
     action = menu->addAction(tr("Select &All"));
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(selectAll()));
+    connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(selectAll()));
 
     action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
     connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
@@ -885,13 +904,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     // scroll to end if we were previous at end
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
-}
-
-void ChatHistory::selectAll()
-{
-    QPainterPath path;
-    path.addRect(m_scene->sceneRect());
-    m_scene->setSelectionArea(path);
 }
 
 ChatHistoryMessage::ChatHistoryMessage()
