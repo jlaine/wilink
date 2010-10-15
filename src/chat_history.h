@@ -153,12 +153,14 @@ signals:
     void messageClicked(const ChatMessage &message);
 
 protected:
-    void adjustSize();
     void contextMenuEvent(QContextMenuEvent *event);
     void focusInEvent(QFocusEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
+
+private slots:
+    void historyChanged();
 
 private:
     QGraphicsScene *m_scene;

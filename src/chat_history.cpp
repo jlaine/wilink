@@ -550,6 +550,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     connect(msg, SIGNAL(messageSelected()),
             this, SLOT(slotMessageSelected()));
     m_layout->insertItem(pos, msg);
+    adjustSize();
 
     return msg;
 }
@@ -561,6 +562,7 @@ void ChatHistoryWidget::clear()
     m_selectedMessages.clear();
     for (int i = m_layout->count() - 1; i >= 0; i--)
         delete m_layout->itemAt(i);
+    adjustSize();
 }
 
 /** Copies the selected text to the clipboard.
@@ -628,6 +630,7 @@ void ChatHistoryWidget::setMaximumWidth(qreal width)
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
         child->setMaximumWidth(width);
     }
+    adjustSize();
 }
 
 /** Handles a single message selection, i.e. one triggered by a double
@@ -679,6 +682,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     : QGraphicsView(parent),
     m_lastFindWidget(0)
 {
+    bool check;
     m_scene = new QGraphicsScene(this);
     setScene(m_scene);
     setDragMode(QGraphicsView::RubberBandDrag);
@@ -695,14 +699,23 @@ ChatHistory::ChatHistory(QWidget *parent)
     m_layout = m_obj->m_layout;
     m_scene->addItem(m_obj);
 
-    connect(m_scene, SIGNAL(selectionChanged()), m_obj, SLOT(slotSelectionChanged()));
+    check = connect(m_obj, SIGNAL(geometryChanged()),
+                    this, SLOT(historyChanged()));
+    Q_ASSERT(check);
+    check = connect(m_scene, SIGNAL(selectionChanged()),
+                    m_obj, SLOT(slotSelectionChanged()));
+    Q_ASSERT(check);
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
-    connect(shortcut, SIGNAL(activated()), m_obj, SLOT(copy()));
+    check = connect(shortcut, SIGNAL(activated()),
+                    m_obj, SLOT(copy()));
+    Q_ASSERT(check);
 
     shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A), this);
-    connect(shortcut, SIGNAL(activated()), m_obj, SLOT(selectAll()));
+    check = connect(shortcut, SIGNAL(activated()),
+                    m_obj, SLOT(selectAll()));
+    Q_ASSERT(check);
 }
 
 void ChatHistory::addMessage(const ChatMessage &message)
@@ -716,25 +729,15 @@ void ChatHistory::addMessage(const ChatMessage &message)
 
     connect(widget, SIGNAL(messageClicked(ChatMessage)),
             this, SIGNAL(messageClicked(ChatMessage)));
-    adjustSize();
 
     /* scroll to end if we were previous at end */
     if (atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-void ChatHistory::adjustSize()
-{
-    m_obj->adjustSize();
-    QRectF rect = m_obj->boundingRect();
-    rect.setHeight(rect.height() - 10);
-    setSceneRect(rect);
-}
-
 void ChatHistory::clear()
 {
     m_obj->clear();
-    adjustSize();
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
@@ -869,6 +872,16 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
     emit focused();
 }
 
+/** When the ChatHistoryWidget changes geometry, adjust the
+ *  view's scene rectangle.
+ */
+void ChatHistory::historyChanged()
+{
+    QRectF rect = m_obj->boundingRect();
+    rect.setHeight(rect.height() - 10);
+    setSceneRect(rect);
+}
+
 /** Updates the selected messages portion during a mouse drag.
  */
 void ChatHistory::mouseMoveEvent(QMouseEvent *e)
@@ -910,7 +923,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
 
     // resize widgets
     m_obj->setMaximumWidth(w);
-    adjustSize();
     QGraphicsView::resizeEvent(e);
 
     // reposition search bubbles
