@@ -835,10 +835,6 @@ ChatHistory::ChatHistory(QWidget *parent)
     m_obj = new ChatHistoryWidget;
     m_scene->addItem(m_obj);
 
-    check = connect(m_obj, SIGNAL(findFinished(bool)),
-                    this, SIGNAL(findFinished(bool)));
-    Q_ASSERT(check);
-
     check = connect(m_obj, SIGNAL(geometryChanged()),
                     this, SLOT(historyChanged()));
     Q_ASSERT(check);
@@ -900,24 +896,6 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-/** Find and highlight the given text.
- *
- * @param needle
- * @param flags
- * @param changed
- */
-void ChatHistory::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
-{
-    m_obj->find(needle, flags, changed);
-}
-
-/** Clear all the search bubbles.
- */
-void ChatHistory::findClear()
-{
-    m_obj->findClear();
-}
-
 void ChatHistory::focusInEvent(QFocusEvent *e)
 {
     QGraphicsView::focusInEvent(e);
@@ -932,6 +910,11 @@ void ChatHistory::historyChanged()
     QRectF rect = m_obj->boundingRect();
     rect.setHeight(rect.height() - 10);
     setSceneRect(rect);
+}
+
+ChatHistoryWidget *ChatHistory::historyWidget()
+{
+    return m_obj;
 }
 
 /** Updates the selected messages portion during a mouse drag.
@@ -954,7 +937,7 @@ void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 void ChatHistory::mousePressEvent(QMouseEvent *e)
 {
     // clear search bubbles
-    findClear();
+    m_obj->findClear();
 
     // do not propagate right clicks, in order to preserve the selected text
     if (e->button() != Qt::RightButton)

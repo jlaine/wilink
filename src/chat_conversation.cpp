@@ -63,14 +63,14 @@ ChatConversation::ChatConversation(QWidget *parent)
     Q_ASSERT(check);
 
     check = connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
-                    chatHistory, SLOT(find(QString, QTextDocument::FindFlags, bool)));
+                    chatHistory->historyWidget(), SLOT(find(QString, QTextDocument::FindFlags, bool)));
     Q_ASSERT(check);
 
     check = connect(chatSearch, SIGNAL(findClear()),
-                    chatHistory, SLOT(findClear()));
+                    chatHistory->historyWidget(), SLOT(findClear()));
     Q_ASSERT(check);
 
-    check = connect(chatHistory, SIGNAL(findFinished(bool)),
+    check = connect(chatHistory->historyWidget(), SIGNAL(findFinished(bool)),
                     chatSearch, SLOT(findFinished(bool)));
     Q_ASSERT(check);
 
@@ -108,7 +108,7 @@ void ChatConversation::slotSearchDisplayed(bool visible)
     if (visible)
         spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
     else {
-        chatHistory->findClear();
+        chatHistory->historyWidget()->findClear();
         spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
     vbox->invalidate();

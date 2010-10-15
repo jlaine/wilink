@@ -153,14 +153,12 @@ class ChatHistory : public QGraphicsView
 public:
     ChatHistory(QWidget *parent = NULL);
     void addMessage(const ChatMessage &message);
+    ChatHistoryWidget *historyWidget();
 
 public slots:
     void clear();
-    void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
-    void findClear();
 
 signals:
-    void findFinished(bool found);
     void focused();
     void messageClicked(const ChatMessage &message);
 
