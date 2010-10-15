@@ -55,6 +55,13 @@
 #define DATE_FONT 10
 #endif
 
+/** Constructs a new ChatMessage.
+ */
+ChatMessage::ChatMessage()
+    : archived(false), received(true)
+{
+}
+
 /** Constructs a new ChatMesageWidget.
  *
  * @param received
@@ -906,10 +913,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-ChatMessage::ChatMessage()
-    : archived(false), received(true)
-{
-}
 
 ChatSearchBubble::ChatSearchBubble()
     : m_margin(3), m_radius(4)

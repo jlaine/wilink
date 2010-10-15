@@ -47,26 +47,6 @@ public:
     bool received;
 };
 
-class ChatSearchBubble : public QObject, public QGraphicsItemGroup
-{
-    Q_OBJECT
-    Q_PROPERTY(qreal scale READ scale WRITE setScale)
- 
-public:
-    ChatSearchBubble();
-    void bounce();
-    QRectF boundingRect() const;
-    void setSelection(const RectCursor &selection);
-
-private:
-    QGraphicsPathItem *bubble;
-    QGraphicsPathItem *shadow;
-    QGraphicsTextItem *text;
-    const int m_margin;
-    const int m_radius;
-    RectCursor m_selection;
-};
-
 /** The ChatMessageWidget class represents a widget for displaying a single
  *  chat message.
  */
@@ -184,6 +164,26 @@ private:
 
     ChatMessageWidget *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
+};
+
+class ChatSearchBubble : public QObject, public QGraphicsItemGroup
+{
+    Q_OBJECT
+    Q_PROPERTY(qreal scale READ scale WRITE setScale)
+
+public:
+    ChatSearchBubble();
+    void bounce();
+    QRectF boundingRect() const;
+    void setSelection(const RectCursor &selection);
+
+private:
+    QGraphicsPathItem *bubble;
+    QGraphicsPathItem *shadow;
+    QGraphicsTextItem *text;
+    const int m_margin;
+    const int m_radius;
+    RectCursor m_selection;
 };
 
 #endif
