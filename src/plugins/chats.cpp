@@ -103,7 +103,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
 
     foreach (const QXmppArchiveMessage &msg, chat.messages())
     {
-        ChatHistoryMessage message;
+        ChatMessage message;
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
@@ -199,7 +199,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     if (msg.body().isEmpty())
         return;
 
-    ChatHistoryMessage message;
+    ChatMessage message;
     message.body = msg.body();
     message.date = msg.stamp();
     if (!message.date.isValid())
@@ -240,7 +240,7 @@ void ChatDialog::returnPressed()
     chatInput->clear();
 
     // add message to history
-    ChatHistoryMessage message;
+    ChatMessage message;
     message.body = text;
     message.date = QDateTime::currentDateTime();
     message.from = rosterModel->ownName();

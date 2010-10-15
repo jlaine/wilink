@@ -278,14 +278,14 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 
 /** Returns the message which this widget displays.
  */
-ChatHistoryMessage ChatMessageWidget::message() const
+ChatMessage ChatMessageWidget::message() const
 {
     return msg;
 }
 
 /** Sets the message which this widget displays.
  */
-void ChatMessageWidget::setMessage(const ChatHistoryMessage &message)
+void ChatMessageWidget::setMessage(const ChatMessage &message)
 {
     msg = message;
 
@@ -530,7 +530,7 @@ QString ChatHistoryWidget::selectedText() const
     // copy selected messages
     foreach (ChatMessageWidget *child, m_selectedMessages)
     {
-        ChatHistoryMessage message = child->message();
+        ChatMessage message = child->message();
 
         if (!copyText.isEmpty())
             copyText += "\n";
@@ -624,7 +624,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     connect(shortcut, SIGNAL(activated()), m_obj, SLOT(selectAll()));
 }
 
-void ChatHistory::addMessage(const ChatHistoryMessage &message)
+void ChatHistory::addMessage(const ChatMessage &message)
 {
     if (message.body.isEmpty())
         return;
@@ -677,8 +677,8 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     }
 
     /* insert new message */
-    connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)),
-            this, SIGNAL(messageClicked(ChatHistoryMessage)));
+    connect(msg, SIGNAL(messageClicked(ChatMessage)),
+            this, SIGNAL(messageClicked(ChatMessage)));
     connect(msg, SIGNAL(messageSelected()),
             m_obj, SLOT(slotMessageSelected()));
     m_layout->insertItem(pos, msg);
@@ -906,7 +906,7 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-ChatHistoryMessage::ChatHistoryMessage()
+ChatMessage::ChatMessage()
     : archived(false), received(true)
 {
 }

@@ -512,7 +512,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(chatHistory, SIGNAL(messageClicked(ChatHistoryMessage)), this, SLOT(messageClicked(ChatHistoryMessage)));
+    check = connect(chatHistory, SIGNAL(messageClicked(ChatMessage)), this, SLOT(messageClicked(ChatMessage)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
@@ -604,7 +604,7 @@ void ChatRoom::leave()
     deleteLater();
 }
 
-void ChatRoom::messageClicked(const ChatHistoryMessage &msg)
+void ChatRoom::messageClicked(const ChatMessage &msg)
 {
     QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
@@ -632,7 +632,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     // handle message body
     if (!msg.body().isEmpty())
     {
-        ChatHistoryMessage message;
+        ChatMessage message;
         message.body = msg.body();
         message.from = from;
         message.fromJid = msg.from();

@@ -32,12 +32,12 @@ class QUrl;
 
 typedef QPair<QRectF, QTextCursor> RectCursor;
 
-/** The ChatHistoryMessage class represents the data for a single chat history message.
+/** The ChatMessage class represents the data for a single chat history message.
  */
-class ChatHistoryMessage
+class ChatMessage
 {
 public:
-    ChatHistoryMessage();
+    ChatMessage();
 
     bool archived;
     QString body;
@@ -77,11 +77,11 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
-    ChatHistoryMessage message() const;
+    ChatMessage message() const;
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    void setMessage(const ChatHistoryMessage &message);
+    void setMessage(const ChatMessage &message);
     void setPrevious(ChatMessageWidget *previous);
     QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
@@ -90,7 +90,7 @@ public:
     void setTextCursor(const QTextCursor &cursor);
 
 signals:
-    void messageClicked(const ChatHistoryMessage &message);
+    void messageClicked(const ChatMessage &message);
     void messageSelected();
 
 protected:
@@ -104,7 +104,7 @@ private:
     void setShowSender(bool show);
 
     int maxWidth;
-    ChatHistoryMessage msg;
+    ChatMessage msg;
     bool show_date;
     bool show_footer;
     bool show_sender;
@@ -132,7 +132,7 @@ class ChatHistoryWidget : public QGraphicsWidget
     Q_OBJECT
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
-    void addMessage(const ChatHistoryMessage &message);
+    void addMessage(const ChatMessage &message);
     QString selectedText() const;
 
 public slots:
@@ -155,7 +155,7 @@ class ChatHistory : public QGraphicsView
 
 public:
     ChatHistory(QWidget *parent = NULL);
-    void addMessage(const ChatHistoryMessage &message);
+    void addMessage(const ChatMessage &message);
 
 public slots:
     void clear();
@@ -165,7 +165,7 @@ public slots:
 signals:
     void findFinished(bool found);
     void focused();
-    void messageClicked(const ChatHistoryMessage &message);
+    void messageClicked(const ChatMessage &message);
 
 protected:
     void adjustSize();
