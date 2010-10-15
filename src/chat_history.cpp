@@ -277,6 +277,10 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
 {
+    if (width == maxWidth)
+        return;
+
+    // FIXME : do we actually need to pass the width to the base class?
     QGraphicsWidget::setMaximumWidth(width);
     maxWidth = width;
     bodyText->document()->setTextWidth(width - DATE_WIDTH - BODY_OFFSET);
@@ -742,10 +746,10 @@ QString ChatHistoryWidget::selectedText() const
  */
 void ChatHistoryWidget::setMaximumWidth(qreal width)
 {
-    // store maximum width
-    m_maximumWidth = width;
+    if (width == m_maximumWidth)
+        return;
 
-    // resize widgets
+    m_maximumWidth = width;
     for (int i = 0; i < m_layout->count(); i++)
     {
         ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
@@ -934,7 +938,10 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
     m_obj->layout()->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
     // FIXME : why do we need the extra 8 pixels?
     const qreal w = width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
+
+    // update history widget
     m_obj->setMaximumWidth(w);
+    historyChanged();
 
     QGraphicsView::resizeEvent(e);
 }
