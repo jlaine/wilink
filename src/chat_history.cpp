@@ -547,8 +547,15 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     }
 
     /* insert new message */
-    connect(msg, SIGNAL(messageSelected()),
-            this, SLOT(slotMessageSelected()));
+    bool check;
+    check = connect(msg, SIGNAL(messageClicked(ChatMessage)),
+                    this, SIGNAL(messageClicked(ChatMessage)));
+    Q_ASSERT(check);
+
+    check = connect(msg, SIGNAL(messageSelected()),
+                    this, SLOT(slotMessageSelected()));
+    Q_ASSERT(check);
+
     m_layout->insertItem(pos, msg);
     adjustSize();
 
@@ -702,6 +709,11 @@ ChatHistory::ChatHistory(QWidget *parent)
     check = connect(m_obj, SIGNAL(geometryChanged()),
                     this, SLOT(historyChanged()));
     Q_ASSERT(check);
+
+    check = connect(m_obj, SIGNAL(messageClicked(ChatMessage)),
+                    this, SIGNAL(messageClicked(ChatMessage)));
+    Q_ASSERT(check);
+
     check = connect(m_scene, SIGNAL(selectionChanged()),
                     m_obj, SLOT(slotSelectionChanged()));
     Q_ASSERT(check);
@@ -718,20 +730,16 @@ ChatHistory::ChatHistory(QWidget *parent)
     Q_ASSERT(check);
 }
 
+/** Add a message to the chat history and scroll to end
+ *  if we were previously at end.
+ *
+ * @param message
+ */
 void ChatHistory::addMessage(const ChatMessage &message)
 {
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
-
-    ChatMessageWidget *widget = m_obj->addMessage(message);
-    if (!widget)
-        return;
-
-    connect(widget, SIGNAL(messageClicked(ChatMessage)),
-            this, SIGNAL(messageClicked(ChatMessage)));
-
-    /* scroll to end if we were previous at end */
-    if (atEnd)
+    if (m_obj->addMessage(message) && atEnd)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
@@ -753,7 +761,7 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(selectAll()));
 
     action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(clear()));
+    connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(clear()));
 
     menu->exec(event->globalPos());
     delete menu;

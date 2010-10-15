@@ -117,6 +117,9 @@ public:
     QString selectedText() const;
     void setMaximumWidth(qreal width);
 
+signals:
+    void messageClicked(const ChatMessage &message);
+
 public slots:
     void clear();
     void copy();
