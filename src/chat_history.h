@@ -67,12 +67,10 @@ public:
     QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
     QTextDocument *document() const;
-    QTextCursor textCursor() const;
-    void setTextCursor(const QTextCursor &cursor);
+    QGraphicsTextItem *textItem();
 
 signals:
     void messageClicked(const ChatMessage &message);
-    void messageSelected();
 
 protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
@@ -100,9 +98,6 @@ private:
     QGraphicsPathItem *messageBackground;
     QGraphicsPathItem *messageFrame;
     QGraphicsRectItem *messageShadow;
-
-    // Tripple-click support
-    QTimer *m_trippleClickTimer;
 };
 
 /** The ChatHistoryWidget class represents a widget containing a list
@@ -130,16 +125,25 @@ public slots:
 
 private slots:
     void slotGeometryChanged();
-    void slotMessageSelected();
     void slotSelectionChanged();
 
 public:
     // FIXME : this should be private
     QList<ChatMessageWidget*> m_selectedMessages;
 
+protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
 private:
+    ChatMessageWidget *messageWidgetAt(const QPointF &pos) const;
+
     QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
+    QRectF m_selectionRectangle;
+    QPointF m_selectionStart;
+    QTimer *m_trippleClickTimer;
 
     QList<ChatSearchBubble*> m_glassItems;
     ChatMessageWidget *m_lastFindWidget;
@@ -160,7 +164,6 @@ signals:
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void focusInEvent(QFocusEvent *e);
-    void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
 
