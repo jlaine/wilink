@@ -857,8 +857,6 @@ ChatHistory::ChatHistory(QWidget *parent)
     bool check;
     QGraphicsScene *scene = new QGraphicsScene(this);
     setScene(scene);
-    setDragMode(QGraphicsView::RubberBandDrag);
-    setRubberBandSelectionMode(Qt::IntersectsItemBoundingRect);
 #ifdef WILINK_EMBEDDED
     FlickCharm *charm = new FlickCharm(this);
     charm->activateOn(this);
