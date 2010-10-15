@@ -158,12 +158,8 @@ public:
     ChatHistory(QWidget *parent = NULL);
     ChatHistoryWidget *historyWidget();
 
-signals:
-    void focused();
-
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
-    void focusInEvent(QFocusEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
 

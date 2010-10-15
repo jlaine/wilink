@@ -909,12 +909,6 @@ void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-void ChatHistory::focusInEvent(QFocusEvent *e)
-{
-    QGraphicsView::focusInEvent(e);
-    emit focused();
-}
-
 /** When the ChatHistoryWidget changes geometry, adjust the
  *  view's scene rectangle.
  */
