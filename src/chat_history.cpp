@@ -840,10 +840,6 @@ ChatHistory::ChatHistory(QWidget *parent)
                     this, SLOT(historyChanged()));
     Q_ASSERT(check);
 
-    check = connect(m_obj, SIGNAL(messageClicked(ChatMessage)),
-                    this, SIGNAL(messageClicked(ChatMessage)));
-    Q_ASSERT(check);
-
     check = connect(scene, SIGNAL(selectionChanged()),
                     m_obj, SLOT(slotSelectionChanged()));
     Q_ASSERT(check);
@@ -922,12 +918,10 @@ void ChatHistory::mouseMoveEvent(QMouseEvent *e)
     }
 }
 
+/** Block right clicks to preserve the selected text.
+ */
 void ChatHistory::mousePressEvent(QMouseEvent *e)
 {
-    // clear search bubbles
-    m_obj->findClear();
-
-    // do not propagate right clicks, in order to preserve the selected text
     if (e->button() != Qt::RightButton)
         QGraphicsView::mousePressEvent(e);
 }

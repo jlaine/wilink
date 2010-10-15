@@ -512,7 +512,8 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(chatHistory, SIGNAL(messageClicked(ChatMessage)), this, SLOT(messageClicked(ChatMessage)));
+    check = connect(chatHistory->historyWidget(), SIGNAL(messageClicked(ChatMessage)),
+                    this, SLOT(messageClicked(ChatMessage)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));

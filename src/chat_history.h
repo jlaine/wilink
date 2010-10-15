@@ -156,7 +156,6 @@ public:
 
 signals:
     void focused();
-    void messageClicked(const ChatMessage &message);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
