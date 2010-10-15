@@ -127,10 +127,6 @@ private slots:
     void slotGeometryChanged();
     void slotSelectionChanged();
 
-public:
-    // FIXME : this should be private
-    QList<ChatMessageWidget*> m_selectedMessages;
-
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -139,12 +135,17 @@ protected:
 private:
     ChatMessageWidget *messageWidgetAt(const QPointF &pos) const;
 
+    // layout
     QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
+
+    // selection
+    QList<ChatMessageWidget*> m_selectedMessages;
     QRectF m_selectionRectangle;
     QPointF m_selectionStart;
     QTimer *m_trippleClickTimer;
 
+    // search
     QList<ChatSearchBubble*> m_glassItems;
     ChatMessageWidget *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
@@ -160,7 +161,6 @@ public:
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
-    void mousePressEvent(QMouseEvent *e);
     void resizeEvent(QResizeEvent *e);
 
 private slots:

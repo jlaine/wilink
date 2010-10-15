@@ -927,14 +927,6 @@ ChatHistoryWidget *ChatHistory::historyWidget()
     return m_obj;
 }
 
-/** Block right clicks to preserve the selected text.
- */
-void ChatHistory::mousePressEvent(QMouseEvent *e)
-{
-    if (e->button() != Qt::RightButton)
-        QGraphicsView::mousePressEvent(e);
-}
-
 void ChatHistory::resizeEvent(QResizeEvent *e)
 {
     // calculate available width
