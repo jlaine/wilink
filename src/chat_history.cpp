@@ -33,6 +33,7 @@
 #include <QShortcut>
 #include <QTextBlock>
 #include <QTextDocument>
+#include <QTimer>
 #include <QUrl>
 
 #ifdef WILINK_EMBEDDED
@@ -66,6 +67,10 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     show_footer(true),
     show_sender(true)
 {
+    m_trippleClickTimer = new QTimer(this);
+    m_trippleClickTimer->setSingleShot(true);
+    m_trippleClickTimer->setInterval(QApplication::doubleClickInterval());
+
     // set colors
     QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
     QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
@@ -191,14 +196,29 @@ bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
                 cursor.setPosition(cursorPos);
                 cursor.select(QTextCursor::WordUnderCursor);
                 bodyText->setTextCursor(cursor);
+
+                m_trippleClickTimer->start();
                 emit messageSelected();
             }
         }
         else if (event->type() == QEvent::GraphicsSceneMousePress)
         {
             QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton && !bodyAnchor.isEmpty())
-                QDesktopServices::openUrl(bodyAnchor);
+            if (mouseEvent->button() == Qt::LeftButton)
+            {
+                if (!bodyAnchor.isEmpty())
+                    QDesktopServices::openUrl(bodyAnchor);
+                else if (m_trippleClickTimer->isActive())
+                {
+                    QTextCursor cursor = bodyText->textCursor();
+                    cursor.movePosition(QTextCursor::StartOfBlock);
+                    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+                    cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+                    bodyText->setTextCursor(cursor);
+
+                    emit messageSelected();
+                }
+            }
         }
     }
     return false;
@@ -756,16 +776,16 @@ void ChatHistory::focusInEvent(QFocusEvent *e)
 void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
+
     if (e->buttons() == Qt::LeftButton && !m_selectedMessages.isEmpty())
     {
         QRectF rect = m_scene->selectionArea().boundingRect();
         foreach (ChatMessageWidget *child, m_selectedMessages)
             child->setSelection(rect);
-    }
 
-    // for X11, copy the selected text to the selection buffer
-    if (!m_selectedMessages.isEmpty())
+        // for X11, copy the selected text to the selection buffer
         QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
+    }
 }
 
 void ChatHistory::mousePressEvent(QMouseEvent *e)

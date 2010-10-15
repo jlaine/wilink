@@ -119,6 +119,9 @@ private:
     QGraphicsPathItem *messageBackground;
     QGraphicsPathItem *messageFrame;
     QGraphicsRectItem *messageShadow;
+
+    // Tripple-click support
+    QTimer *m_trippleClickTimer;
 };
 
 class ChatHistory : public QGraphicsView
