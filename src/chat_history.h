@@ -30,6 +30,7 @@
 class QGraphicsLinearLayout;
 class QUrl;
 
+class ChatSearchBubble;
 typedef QPair<QRectF, QTextCursor> RectCursor;
 
 /** The ChatMessage class represents the data for a single chat history message.
@@ -112,7 +113,7 @@ class ChatHistoryWidget : public QGraphicsWidget
     Q_OBJECT
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
-    void addMessage(const ChatMessage &message);
+    ChatMessageWidget *addMessage(const ChatMessage &message);
     QString selectedText() const;
 
 public slots:

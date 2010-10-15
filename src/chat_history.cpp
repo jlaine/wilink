@@ -497,6 +497,63 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     setLayout(m_layout);
 }
 
+ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
+{
+    if (message.body.isEmpty())
+        return 0;
+
+    // check we hit the message limit and this message is too old
+    if (m_layout->count() >= MESSAGE_MAX)
+    {
+        ChatMessageWidget *oldest = static_cast<ChatMessageWidget*>(m_layout->itemAt(0));
+        if (message.date < oldest->message().date)
+            return 0;
+    }
+
+    /* position cursor */
+    ChatMessageWidget *previous = NULL;
+    int pos = 0;
+    for (int i = 0; i < m_layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+
+        // check for collision
+        if (message.archived != child->message().archived &&
+            message.fromJid == child->message().fromJid &&
+            message.body == child->message().body &&
+            qAbs(message.date.secsTo(child->message().date)) < 10)
+            return 0;
+
+        // we use greater or equal comparison (and not strictly greater) dates
+        // because messages are usually received in chronological order
+        if (message.date >= child->message().date)
+        {
+            previous = child;
+            pos++;
+        }
+    }
+
+    /* prepare message */
+    ChatMessageWidget *msg = new ChatMessageWidget(message.received, this);
+    msg->setMessage(message);
+    msg->setPrevious(previous);
+    //msg->setMaximumWidth(availableWidth());
+
+    /* adjust next message */
+    if (pos < m_layout->count())
+    {
+        ChatMessageWidget *next = static_cast<ChatMessageWidget*>(m_layout->itemAt(pos));
+        next->setPrevious(msg);
+    }
+
+    /* insert new message */
+    connect(msg, SIGNAL(messageSelected()),
+            this, SLOT(slotMessageSelected()));
+    m_layout->insertItem(pos, msg);
+
+    return msg;
+}
+
 /** Clears all messages.
  */
 void ChatHistoryWidget::clear()
@@ -633,62 +690,16 @@ ChatHistory::ChatHistory(QWidget *parent)
 
 void ChatHistory::addMessage(const ChatMessage &message)
 {
-    if (message.body.isEmpty())
-        return;
-
-    // check we hit the message limit and this message is too old
-    if (m_layout->count() >= MESSAGE_MAX)
-    {
-        ChatMessageWidget *oldest = static_cast<ChatMessageWidget*>(m_layout->itemAt(0));
-        if (message.date < oldest->message().date)
-            return;
-    }
-
     QScrollBar *scrollBar = verticalScrollBar();
     bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
 
-    /* position cursor */
-    ChatMessageWidget *previous = NULL;
-    int pos = 0;
-    for (int i = 0; i < m_layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+    ChatMessageWidget *widget = m_obj->addMessage(message);
+    if (!widget)
+        return;
 
-        // check for collision
-        if (message.archived != child->message().archived &&
-            message.fromJid == child->message().fromJid &&
-            message.body == child->message().body &&
-            qAbs(message.date.secsTo(child->message().date)) < 10)
-            return;
-
-        // we use greater or equal comparison (and not strictly greater) dates
-        // because messages are usually received in chronological order
-        if (message.date >= child->message().date)
-        {
-            previous = child;
-            pos++;
-        }
-    }
-
-    /* prepare message */
-    ChatMessageWidget *msg = new ChatMessageWidget(message.received, m_obj);
-    msg->setMessage(message);
-    msg->setPrevious(previous);
-    msg->setMaximumWidth(availableWidth());
-
-    /* adjust next message */
-    if (pos < m_layout->count())
-    {
-        ChatMessageWidget *next = static_cast<ChatMessageWidget*>(m_layout->itemAt(pos));
-        next->setPrevious(msg);
-    }
-
-    /* insert new message */
-    connect(msg, SIGNAL(messageClicked(ChatMessage)),
+    widget->setMaximumWidth(availableWidth());
+    connect(widget, SIGNAL(messageClicked(ChatMessage)),
             this, SIGNAL(messageClicked(ChatMessage)));
-    connect(msg, SIGNAL(messageSelected()),
-            m_obj, SLOT(slotMessageSelected()));
-    m_layout->insertItem(pos, msg);
     adjustSize();
 
     /* scroll to end if we were previous at end */
@@ -913,7 +924,6 @@ void ChatHistory::resizeEvent(QResizeEvent *e)
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-
 ChatSearchBubble::ChatSearchBubble()
     : m_margin(3), m_radius(4)
 {
@@ -996,4 +1006,3 @@ void ChatSearchBubble::setSelection(const RectCursor &selection)
     shadowPath.addRoundedRect(glassRect, m_radius, m_radius);
     shadow->setPath(shadowPath);
 }
-
