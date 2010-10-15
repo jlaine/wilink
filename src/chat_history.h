@@ -124,6 +124,26 @@ private:
     QTimer *m_trippleClickTimer;
 };
 
+/** The ChatHistoryWidget class represents a widget containing a list
+ *  of ChatMessageWidget.
+ */
+class ChatHistoryWidget : public QGraphicsWidget
+{
+    Q_OBJECT
+public:
+    ChatHistoryWidget(QGraphicsItem *parent = 0);
+    void addMessage(const ChatHistoryMessage &message);
+    QString selectedText();
+
+private slots:
+    void slotMessageSelected();
+    void slotSelectionChanged();
+
+public:
+    QGraphicsLinearLayout *m_layout;
+    QList<ChatMessageWidget*> m_selectedMessages;
+};
+
 class ChatHistory : public QGraphicsView
 {
     Q_OBJECT
@@ -144,15 +164,10 @@ signals:
     void focused();
     void messageClicked(const ChatHistoryMessage &message);
 
-private slots:
-    void slotMessageSelected();
-    void slotSelectionChanged();
-
 protected:
     void adjustSize();
     qreal availableWidth() const;
     void contextMenuEvent(QContextMenuEvent *event);
-    QString copyText();
     void focusInEvent(QFocusEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
@@ -161,12 +176,11 @@ protected:
 private:
     QGraphicsScene *m_scene;
     QList<ChatSearchBubble*> m_glassItems;
-    QGraphicsWidget *m_obj;
+    ChatHistoryWidget *m_obj;
     QGraphicsLinearLayout *m_layout;
 
     ChatMessageWidget *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
-    QList<ChatMessageWidget*> m_selectedMessages;
 };
 
 #endif

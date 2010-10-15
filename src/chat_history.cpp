@@ -477,6 +477,97 @@ void ChatMessageWidget::setTextCursor(const QTextCursor &cursor)
     bodyText->setTextCursor(cursor);
 }
 
+/** Constructs a new ChatHistoryWidget.
+ *
+ * @param parent
+ */
+ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
+{
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_layout->setContentsMargins(5, 0, 5, 0);
+    m_layout->setSpacing(0);
+    setLayout(m_layout);
+}
+
+/** Retrieve the text for the highlighted messages.
+  */
+QString ChatHistoryWidget::selectedText()
+{
+    QString copyText;
+
+    // gather the message senders
+    QSet<QString> senders;
+    foreach (ChatMessageWidget *child, m_selectedMessages)
+        senders.insert(child->message().from);
+
+    // copy selected messages
+    foreach (ChatMessageWidget *child, m_selectedMessages)
+    {
+        ChatHistoryMessage message = child->message();
+
+        if (!copyText.isEmpty())
+            copyText += "\n";
+
+        // if this is a conversation, prefix the message with its sender
+        if (senders.size() > 1)
+            copyText += message.from + "> ";
+
+        copyText += child->textCursor().selectedText().replace("\r\n", "\n");
+    }
+
+#ifdef Q_OS_WIN
+    return copyText.replace("\n", "\r\n");
+#else
+    return copyText;
+#endif
+}
+
+/** Handles a single message selection, i.e. one triggered by a double
+ *  or tripple click.
+ */
+void ChatHistoryWidget::slotMessageSelected()
+{
+    ChatMessageWidget *selected = qobject_cast<ChatMessageWidget*>(sender());
+    foreach (ChatMessageWidget *child, m_selectedMessages)
+    {
+        if (child != selected)
+            child->setSelection(QRectF());
+    }
+    m_selectedMessages.clear();
+    m_selectedMessages << selected;
+
+    // for X11, copy the selected text to the selection buffer
+    QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
+}
+
+/** Handles a rubberband selection.
+ */
+void ChatHistoryWidget::slotSelectionChanged()
+{
+    const QRectF rect = scene()->selectionArea().boundingRect();
+    const QList<QGraphicsItem*> selection = scene()->selectedItems();
+
+    // update the selected items
+    QList<ChatMessageWidget*> newSelection;
+    for (int i = 0; i < m_layout->count(); i++)
+    {
+        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+        if (selection.contains(child))
+        {
+            newSelection << child;
+            child->setSelection(rect);
+        } else if (m_selectedMessages.contains(child)) {
+            child->setSelection(QRectF());
+        }
+    }
+    m_selectedMessages = newSelection;
+
+    // for X11, copy the selected text to the selection buffer
+    if (!m_selectedMessages.isEmpty())
+        QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
+}
+
 ChatHistory::ChatHistory(QWidget *parent)
     : QGraphicsView(parent),
     m_lastFindWidget(0)
@@ -493,14 +584,11 @@ ChatHistory::ChatHistory(QWidget *parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 #endif
 
-    m_obj = new QGraphicsWidget;
-    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_layout->setContentsMargins(5, 0, 5, 0);
-    m_layout->setSpacing(0);
-    m_obj->setLayout(m_layout);
+    m_obj = new ChatHistoryWidget;
+    m_layout = m_obj->m_layout;
     m_scene->addItem(m_obj);
 
-    connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(slotSelectionChanged()));
+    connect(m_scene, SIGNAL(selectionChanged()), m_obj, SLOT(slotSelectionChanged()));
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
@@ -566,7 +654,7 @@ void ChatHistory::addMessage(const ChatHistoryMessage &message)
     connect(msg, SIGNAL(messageClicked(ChatHistoryMessage)),
             this, SIGNAL(messageClicked(ChatHistoryMessage)));
     connect(msg, SIGNAL(messageSelected()),
-            this, SLOT(slotMessageSelected()));
+            m_obj, SLOT(slotMessageSelected()));
     m_layout->insertItem(pos, msg);
     adjustSize();
 
@@ -603,40 +691,7 @@ void ChatHistory::clear()
 void ChatHistory::copy()
 {
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(copyText(), QClipboard::Clipboard);
-}
-
-/** Retrieve the text for the highlighted messages.
-  */
-QString ChatHistory::copyText()
-{
-    QString copyText;
-
-    // gather the message senders
-    QSet<QString> senders;
-    foreach (ChatMessageWidget *child, m_selectedMessages)
-        senders.insert(child->message().from);
-
-    // copy selected messages
-    foreach (ChatMessageWidget *child, m_selectedMessages)
-    {
-        ChatHistoryMessage message = child->message();
-
-        if (!copyText.isEmpty())
-            copyText += "\n";
-
-        // if this is a conversation, prefix the message with its sender
-        if (senders.size() > 1)
-            copyText += message.from + "> ";
-
-        copyText += child->textCursor().selectedText().replace("\r\n", "\n");
-    }
-
-#ifdef Q_OS_WIN
-    return copyText.replace("\n", "\r\n");
-#else
-    return copyText;
-#endif
+    clipboard->setText(m_obj->selectedText(), QClipboard::Clipboard);
 }
 
 void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
@@ -777,14 +832,14 @@ void ChatHistory::mouseMoveEvent(QMouseEvent *e)
 {
     QGraphicsView::mouseMoveEvent(e);
 
-    if (e->buttons() == Qt::LeftButton && !m_selectedMessages.isEmpty())
+    if (e->buttons() == Qt::LeftButton && !m_obj->m_selectedMessages.isEmpty())
     {
         QRectF rect = m_scene->selectionArea().boundingRect();
-        foreach (ChatMessageWidget *child, m_selectedMessages)
+        foreach (ChatMessageWidget *child, m_obj->m_selectedMessages)
             child->setSelection(rect);
 
         // for X11, copy the selected text to the selection buffer
-        QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
+        QApplication::clipboard()->setText(m_obj->selectedText(), QClipboard::Selection);
     }
 }
 
@@ -837,51 +892,6 @@ void ChatHistory::selectAll()
     QPainterPath path;
     path.addRect(m_scene->sceneRect());
     m_scene->setSelectionArea(path);
-}
-
-/** Handles a single message selection, i.e. one triggered by a double
- *  or tripple click.
- */
-void ChatHistory::slotMessageSelected()
-{
-    ChatMessageWidget *selected = qobject_cast<ChatMessageWidget*>(sender());
-    foreach (ChatMessageWidget *child, m_selectedMessages)
-    {
-        if (child != selected)
-            child->setSelection(QRectF());
-    }
-    m_selectedMessages.clear();
-    m_selectedMessages << selected;
-
-    // for X11, copy the selected text to the selection buffer
-    QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
-}
-
-/** Handles a rubberband selection.
- */
-void ChatHistory::slotSelectionChanged()
-{
-    QRectF rect = m_scene->selectionArea().boundingRect();
-
-    // update the selected items
-    QList<QGraphicsItem*> selection = m_scene->selectedItems();
-    QList<ChatMessageWidget*> newSelection;
-    for (int i = 0; i < m_layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-        if (selection.contains(child))
-        {
-            newSelection << child;
-            child->setSelection(rect);
-        } else if (m_selectedMessages.contains(child)) {
-            child->setSelection(QRectF());
-        }
-    }
-    m_selectedMessages = newSelection;
-
-    // for X11, copy the selected text to the selection buffer
-    if (!m_selectedMessages.isEmpty())
-        QApplication::clipboard()->setText(copyText(), QClipboard::Selection);
 }
 
 ChatHistoryMessage::ChatHistoryMessage()
