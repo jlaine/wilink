@@ -107,7 +107,6 @@ private:
     QGraphicsView *m_view;
 };
 
-
 /** ChatPanelWidget is the base class for "task" widgets displayed inside
  *  a ChatPanel.
  */
@@ -118,7 +117,9 @@ class ChatPanelWidget : public QGraphicsWidget
 public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
     virtual void setGeometry(const QRectF &rect);
-    void setPixmap(const QPixmap &pixmap);
+    void setButtonPixmap(const QPixmap &pixmap);
+    void setButtonToolTip(const QString &toolTip);
+    void setIconPixmap(const QPixmap &pixmap);
 
 public slots:
     void appear();
@@ -127,6 +128,7 @@ public slots:
 private:
     QGraphicsPathItem *m_border;
     QGraphicsPixmapItem *m_icon;
+    QGraphicsPixmapItem *m_button;
 };
 
 #endif

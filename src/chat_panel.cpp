@@ -31,6 +31,8 @@
 
 #include "chat_panel.h"
 
+#define WIDGET_MARGIN 5
+
 class ChatPanelPrivate
 {
 public:
@@ -328,6 +330,7 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     m_border->setBrush(gradient);
     m_border->setPen(QPen(darkGray, 1));
 
+    m_button = new QGraphicsPixmapItem(this);
     m_icon = new QGraphicsPixmapItem(this);
 
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
@@ -366,16 +369,34 @@ void ChatPanelWidget::disappear()
 void ChatPanelWidget::setGeometry(const QRectF &rect)
 {
     QPainterPath path;
-    path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), 5, 5);
+    path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), WIDGET_MARGIN, WIDGET_MARGIN);
     m_border->setPath(path);
 
-    m_icon->setOffset(0, (rect.height() - m_icon->pixmap().height()) / 2);
+    m_icon->setPos(WIDGET_MARGIN,
+                   (rect.height() - m_icon->pixmap().height()) / 2);
+
+    m_button->setPos(rect.width() - m_icon->pixmap().width() - WIDGET_MARGIN,
+                     (rect.height() - m_icon->pixmap().height()) / 2);
     QGraphicsWidget::setGeometry(rect);
 }
 
-/** Sets the widget's pixmap.
+/** Sets the widget's button pixmap.
  */
-void ChatPanelWidget::setPixmap(const QPixmap &pixmap)
+void ChatPanelWidget::setButtonPixmap(const QPixmap &pixmap)
+{
+    m_button->setPixmap(pixmap);
+}
+
+/** Sets the widget's button tooltip.
+ */
+void ChatPanelWidget::setButtonToolTip(const QString &toolTip)
+{
+    m_button->setToolTip(toolTip);
+}
+
+/** Sets the widget's icon pixmap.
+ */
+void ChatPanelWidget::setIconPixmap(const QPixmap &pixmap)
 {
     m_icon->setPixmap(pixmap);
 }

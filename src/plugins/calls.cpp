@@ -186,7 +186,9 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
-    setPixmap(QPixmap(":/call.png"));
+    setIconPixmap(QPixmap(":/call.png"));
+    setButtonPixmap(QPixmap(":/hangup.png"));
+    setButtonToolTip(tr("Hang up"));
 
     m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
     m_statusLabel->setPos(32, 0);
