@@ -19,6 +19,7 @@
 
 #include <QDropEvent>
 #include <QGraphicsOpacityEffect>
+#include <QGraphicsView>
 #include <QLabel>
 #include <QLayout>
 #include <QPropertyAnimation>
@@ -256,6 +257,58 @@ void ChatPanel::sendNotifications()
         QPair<QString, int> entry = d->notificationQueue.takeFirst();
         emit notifyPanel(entry.first, entry.second);
     }
+}
+
+/** Creates a new ChatPanelBar instance.
+ *
+ * @param view
+ */
+ChatPanelBar::ChatPanelBar(QGraphicsView *view)
+    : m_view(view)
+{
+    m_rect = new QGraphicsRectItem(this);
+    m_rect->setBrush(Qt::black);
+    m_view->viewport()->installEventFilter(this);
+
+    m_delay = new QTimer(this);
+    m_delay->setInterval(100);
+    m_delay->setSingleShot(true);
+
+    m_animation = new QPropertyAnimation(this, "rect");
+    m_animation->setEasingCurve(QEasingCurve::OutElastic);
+
+    connect(m_delay, SIGNAL(timeout()), this, SLOT(trackView()));
+}
+
+bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_view->viewport() && event->type() == QEvent::Resize)
+    {
+        m_delay->start();
+    }
+    return false;
+}
+
+QRectF ChatPanelBar::rect() const
+{
+    return m_rect->rect();
+}
+
+void ChatPanelBar::setRect(const QRectF &rect)
+{
+    m_rect->setRect(rect);
+}
+
+void ChatPanelBar::trackView()
+{
+    QRectF newRect;
+    newRect.setTopLeft(m_view->mapToScene(QPoint(0, 0)));
+    newRect.setHeight(50);
+    newRect.setWidth(m_view->viewport()->width() - 1);
+    m_animation->setDuration(500);
+    m_animation->setStartValue(rect());
+    m_animation->setEndValue(newRect);
+    m_animation->start();
 }
 
 /** Creates a new ChatPanelWidget instance.

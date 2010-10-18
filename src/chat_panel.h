@@ -20,11 +20,15 @@
 #ifndef __WILINK_CHAT_PANEL_H__
 #define __WILINK_CHAT_PANEL_H__
 
+#include <QGraphicsWidget>
 #include <QFrame>
 #include <QWidget>
 #include "chat_roster_item.h"
 
+class QGraphicsView;
 class QHBoxLayout;
+class QPropertyAnimation;
+class QTimer;
 class ChatPanelPrivate;
 class ChatPanelWidget;
 
@@ -78,6 +82,34 @@ private slots:
 private:
     ChatPanelPrivate * const d;
 };
+
+/** The ChatPanelBar class is used to display a set of "task" widgets.
+ */
+class ChatPanelBar : public QGraphicsWidget
+{
+    Q_OBJECT
+    Q_PROPERTY(QRectF rect READ rect WRITE setRect)
+
+public:
+    ChatPanelBar(QGraphicsView *view);
+    QRectF rect() const;
+    void setRect(const QRectF &rect);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *Event);
+
+private slots:
+    void trackView();
+
+private:
+    QPropertyAnimation *m_animation;
+    QTimer *m_delay;
+    QRectF nextRect;
+
+    QGraphicsRectItem *m_rect;
+    QGraphicsView *m_view;
+};
+
 
 /** ChatPanelWidget is the base class for "task" widgets displayed inside
  *  a ChatPanel.
