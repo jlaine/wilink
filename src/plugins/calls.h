@@ -38,7 +38,6 @@ class QFile;
 class QLabel;
 class QMenu;
 class QModelIndex;
-class QPushButton;
 class QThread;
 class QTimer;
 class QXmppCall;

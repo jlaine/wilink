@@ -31,7 +31,6 @@
 #include <QLayout>
 #include <QMenu>
 #include <QProgressBar>
-#include <QPushButton>
 #include <QShortcut>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -140,17 +139,11 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     vbox->addWidget(m_progress);
     //layout->addLayout(vbox);
 
-    m_cancelButton = new QPushButton;
-    m_cancelButton->setIcon(QIcon(":/close.png"));
-    m_cancelButton->setFlat(true);
-    m_cancelButton->setMaximumWidth(32);
-    //layout->addWidget(m_cancelButton);
-
     //setLayout(layout);
 
     // connect signals
     bool check;
-    check = connect(m_cancelButton, SIGNAL(clicked()),
+    check = connect(this, SIGNAL(buttonClicked()),
                     this, SLOT(slotCancel()));
     Q_ASSERT(check);
 
@@ -183,7 +176,7 @@ void ChatTransferWidget::slotCancel()
         return;
     } else {
         // make widget disappear
-        m_cancelButton->setEnabled(false);
+        setButtonEnabled(false);
         disappear();
     }
 }
@@ -225,7 +218,7 @@ void ChatTransferWidget::slotFinished()
     // make widget disappear
     if (m_disappearWhenFinished)
     {
-        m_cancelButton->setEnabled(false);
+        setButtonEnabled(false);
         QTimer::singleShot(1000, this, SLOT(disappear()));
     }
 }

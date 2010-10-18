@@ -29,7 +29,6 @@
 
 class QModelIndex;
 class QProgressBar;
-class QPushButton;
 class Chat;
 
 class ChatTransferPrompt : public QMessageBox
@@ -72,7 +71,6 @@ private:
     bool m_disappearWhenFinished;
     QGraphicsSimpleTextItem *m_label;
     QProgressBar *m_progress;
-    QPushButton *m_cancelButton;
     QXmppTransferJob *m_job;
     QString m_localPath;
 };
