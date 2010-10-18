@@ -46,6 +46,7 @@
 #define BODY_OFFSET 5
 #define FOOTER_HEIGHT 5
 #define MESSAGE_MAX 100
+#define HISTORY_MARGIN 5
 
 #ifdef WILINK_EMBEDDED
 #define BODY_FONT 14
@@ -461,7 +462,7 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_lastFindWidget(0)
 {
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_layout->setContentsMargins(5, 0, 5, 0);
+    m_layout->setContentsMargins(HISTORY_MARGIN, 0, HISTORY_MARGIN, 0);
     m_layout->setSpacing(0);
     setLayout(m_layout);
 
@@ -794,6 +795,7 @@ QString ChatHistoryWidget::selectedText() const
  */
 void ChatHistoryWidget::setMaximumWidth(qreal width)
 {
+    width -= 2 * HISTORY_MARGIN;
     if (width == m_maximumWidth)
         return;
 
@@ -927,20 +929,15 @@ ChatHistoryWidget *ChatHistory::historyWidget()
     return m_obj;
 }
 
-void ChatHistory::resizeEvent(QResizeEvent *e)
+/** When the viewport is resized, adjust the history widget's width.
+ *
+ * @param event
+ */
+void ChatHistory::resizeEvent(QResizeEvent *event)
 {
-    // calculate available width
-    qreal leftMargin = 0;
-    qreal rightMargin = 0;
-    m_obj->layout()->getContentsMargins(&leftMargin, 0, &rightMargin, 0);
-    // FIXME : why do we need the extra 8 pixels?
-    const qreal w = width() - verticalScrollBar()->sizeHint().width() - leftMargin - rightMargin - 8;
-
-    // update history widget
-    m_obj->setMaximumWidth(w);
+    m_obj->setMaximumWidth(viewport()->width());
     historyChanged();
-
-    QGraphicsView::resizeEvent(e);
+    QGraphicsView::resizeEvent(event);
 }
 
 ChatSearchBubble::ChatSearchBubble()
