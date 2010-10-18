@@ -70,7 +70,6 @@ private slots:
 
 private:
     bool m_disappearWhenFinished;
-    QGraphicsPixmapItem *m_icon;
     QGraphicsSimpleTextItem *m_label;
     QProgressBar *m_progress;
     QPushButton *m_cancelButton;

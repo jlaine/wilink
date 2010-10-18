@@ -186,7 +186,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
-    m_imageLabel = new QGraphicsPixmapItem(QPixmap(":/call.png"), this);
+    setPixmap(QPixmap(":/call.png"));
 
     m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
     m_statusLabel->setPos(32, 0);
@@ -253,6 +253,12 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
     connect(&m_client->callManager(), SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
+}
+
+void CallWidget::setGeometry(const QRectF &rect)
+{
+    m_statusLabel->setPos(32, (rect.height() - m_statusLabel->boundingRect().height()) / 2);
+    ChatPanelWidget::setGeometry(rect);
 }
 
 void CallWatcher::addCall(QXmppCall *call)

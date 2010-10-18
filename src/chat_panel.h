@@ -117,10 +117,16 @@ class ChatPanelWidget : public QGraphicsWidget
 
 public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
+    virtual void setGeometry(const QRectF &rect);
+    void setPixmap(const QPixmap &pixmap);
 
 public slots:
     void appear();
     void disappear();
+
+private:
+    QGraphicsRectItem *m_border;
+    QGraphicsPixmapItem *m_icon;
 };
 
 #endif

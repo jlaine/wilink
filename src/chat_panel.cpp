@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
 #include <QDropEvent>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsOpacityEffect>
@@ -124,8 +125,7 @@ ChatPanel::~ChatPanel()
 
 void ChatPanel::addWidget(ChatPanelWidget *widget)
 {
-    //d->widgets->insertWidget(d->widgets->count() - 1, widget);
-    widget->appear();
+    Q_UNUSED(widget);
 }
 
 /** Return the type of entry to add to the roster.
@@ -324,6 +324,9 @@ void ChatPanelBar::trackView()
 ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
+    m_border = new QGraphicsRectItem(this);
+    m_icon = new QGraphicsPixmapItem(this);
+
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
     effect->setOpacity(0.0);
     setGraphicsEffect(effect);
@@ -353,4 +356,20 @@ void ChatPanelWidget::disappear()
     animation->start();
     connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
     animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+/** Updates the widget geometry.
+ */
+void ChatPanelWidget::setGeometry(const QRectF &rect)
+{
+    m_border->setRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1));
+    m_icon->setOffset(0, (rect.height() - m_icon->pixmap().height()) / 2);
+    QGraphicsWidget::setGeometry(rect);
+}
+
+/** Sets the widget's pixmap.
+ */
+void ChatPanelWidget::setPixmap(const QPixmap &pixmap)
+{
+    m_icon->setPixmap(pixmap);
 }

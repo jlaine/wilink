@@ -95,6 +95,7 @@ class CallWidget : public ChatPanelWidget
 
 public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
+    virtual void setGeometry(const QRectF &rect);
 
 private slots:
     void callFinished();
@@ -106,7 +107,6 @@ private:
     CallHandler *m_callHandler;
     QThread *m_callThread;
     QPushButton *m_hangupButton;
-    QGraphicsPixmapItem *m_imageLabel;
     QGraphicsSimpleTextItem *m_statusLabel;
 };
 
