@@ -61,7 +61,11 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     chatHistoryWidget = new ChatHistoryWidget;
     chatHistory->scene()->addItem(chatHistoryWidget);
-    chatHistoryWidget->setView(chatHistory);;
+    chatHistoryWidget->setView(chatHistory);
+
+    ChatPanelBar *bar = new ChatPanelBar(chatHistory);
+    bar->setZValue(10);
+    chatHistory->scene()->addItem(bar);
 
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
