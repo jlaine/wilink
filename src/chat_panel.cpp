@@ -24,6 +24,7 @@
 #include <QLayout>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QTimer>
 
 #include "chat_panel.h"
@@ -275,9 +276,16 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_delay->setSingleShot(true);
 
     m_animation = new QPropertyAnimation(this, "rect");
-    m_animation->setEasingCurve(QEasingCurve::OutElastic);
+    m_animation->setEasingCurve(QEasingCurve::OutQuad);
 
-    connect(m_delay, SIGNAL(timeout()), this, SLOT(trackView()));
+    bool check;
+    check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
+                    m_delay, SLOT(start()));
+    Q_ASSERT(check);
+
+    check = connect(m_delay, SIGNAL(timeout()),
+                    this, SLOT(trackView()));
+    Q_ASSERT(check);
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
