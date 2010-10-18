@@ -217,7 +217,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatHistory</name>
+    <name>ChatHistoryWidget</name>
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>

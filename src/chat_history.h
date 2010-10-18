@@ -111,6 +111,7 @@ public:
     ChatMessageWidget *addMessage(const ChatMessage &message);
     QString selectedText() const;
     void setMaximumWidth(qreal width);
+    void setView(QGraphicsView *view);
 
 signals:
     void findFinished(bool found);
@@ -128,15 +129,21 @@ public slots:
 
 private slots:
     void slotGeometryChanged();
+    void slotScrollChanged();
     void slotSelectionChanged();
 
 protected:
+    bool eventFilter(QObject *watched, QEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     ChatMessageWidget *messageWidgetAt(const QPointF &pos) const;
+
+    // viewport
+    bool m_followEnd;
+    QGraphicsView *m_view;
 
     // layout
     QGraphicsLinearLayout *m_layout;
@@ -162,16 +169,8 @@ public:
     ChatHistory(QWidget *parent = NULL);
     ChatHistoryWidget *historyWidget();
 
-protected:
-    void resizeEvent(QResizeEvent *e);
-
-private slots:
-    void historyChanged();
-    void scrollChanged();
-
 private:
     ChatHistoryWidget *m_obj;
-    bool m_followEnd;
 };
 
 class ChatSearchBubble : public QObject, public QGraphicsItemGroup

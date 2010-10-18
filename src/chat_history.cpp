@@ -459,7 +459,9 @@ QGraphicsTextItem *ChatMessageWidget::textItem()
  */
 ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    m_lastFindWidget(0)
+    m_lastFindWidget(0),
+    m_followEnd(true),
+    m_view(0)
 {
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(HISTORY_MARGIN, 0, HISTORY_MARGIN, 0);
@@ -557,6 +559,27 @@ void ChatHistoryWidget::copy()
 {
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(selectedText(), QClipboard::Clipboard);
+}
+
+/** When the viewport is resized, adjust the history widget's width.
+ *
+ * @param watched
+ * @param event
+ */
+bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_view && event->type() == QEvent::Resize)
+    {
+        m_maximumWidth = m_view->viewport()->width() - 2 * HISTORY_MARGIN;
+        for (int i = 0; i < m_layout->count(); i++)
+        {
+            ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+            child->setMaximumWidth(m_maximumWidth);
+        }
+        adjustSize();
+        slotGeometryChanged();
+    }
+    return false;
 }
 
 /** Find and highlight the given text.
@@ -813,10 +836,50 @@ void ChatHistoryWidget::setMaximumWidth(qreal width)
 #endif
 }
 
+void ChatHistoryWidget::setView(QGraphicsView *view)
+{
+    bool check;
+    m_view = view;
+
+    /* set up hooks */
+    m_view->installEventFilter(this);
+
+    check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
+                    this, SLOT(slotScrollChanged()));
+    Q_ASSERT(check);
+
+    check = connect(view->scene(), SIGNAL(selectionChanged()),
+                    this, SLOT(slotSelectionChanged()));
+    Q_ASSERT(check);
+
+    /* set up keyboard shortcuts */
+    QAction *action = new QAction(tr("&Copy"), this);
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
+    check = connect(action, SIGNAL(triggered(bool)),
+                    this, SLOT(copy()));
+    Q_ASSERT(check);
+    m_view->addAction(action);
+
+    action = new QAction(tr("Select &All"), this);
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
+    check = connect(action, SIGNAL(triggered(bool)),
+                    this, SLOT(selectAll()));
+    Q_ASSERT(check);
+    m_view->addAction(action);
+
+    action = new QAction(tr("Clear"), this);
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X));
+    check = connect(action, SIGNAL(triggered(bool)),
+                    this, SLOT(clear()));
+    Q_ASSERT(check);
+    m_view->addAction(action);
+}
+
 /** When the history geometry changes, reposition search bubbles.
  */
 void ChatHistoryWidget::slotGeometryChanged()
 {
+    // reposition search bubbles
     if (!m_glassItems.isEmpty() && m_lastFindWidget)
     {
         findClear();
@@ -828,6 +891,25 @@ void ChatHistoryWidget::slotGeometryChanged()
             m_glassItems << glass;
         }
     }
+
+    // adjust viewed rectangle
+    QRectF rect = boundingRect();
+    rect.setHeight(rect.height() - 10);
+    m_view->setSceneRect(rect);
+
+    // scroll to end
+    QScrollBar *scrollBar = m_view->verticalScrollBar();
+    if (m_followEnd && scrollBar->value() < scrollBar->maximum())
+        scrollBar->setSliderPosition(scrollBar->maximum());
+}
+
+/** When the scroll value changes, remember whether we were at the end
+ *  of the view.
+ */
+void ChatHistoryWidget::slotScrollChanged()
+{
+    QScrollBar *scrollBar = m_view->verticalScrollBar();
+    m_followEnd = scrollBar->value() >= scrollBar->maximum() - 16;
 }
 
 /** Handles a rubberband selection.
@@ -858,10 +940,8 @@ void ChatHistoryWidget::slotSelectionChanged()
 }
 
 ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent),
-    m_followEnd(true)
+    : QGraphicsView(parent)
 {
-    bool check;
     QGraphicsScene *scene = new QGraphicsScene(this);
     setScene(scene);
 #ifdef WILINK_EMBEDDED
@@ -875,80 +955,12 @@ ChatHistory::ChatHistory(QWidget *parent)
 
     m_obj = new ChatHistoryWidget;
     scene->addItem(m_obj);
-
-    check = connect(m_obj, SIGNAL(geometryChanged()),
-                    this, SLOT(historyChanged()));
-    Q_ASSERT(check);
-
-    check = connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
-                    this, SLOT(scrollChanged()));
-    Q_ASSERT(check);
-
-    check = connect(scene, SIGNAL(selectionChanged()),
-                    m_obj, SLOT(slotSelectionChanged()));
-    Q_ASSERT(check);
-
-    /* set up keyboard shortcuts */
-    QAction *action = new QAction(tr("&Copy"), this);
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
-    check = connect(action, SIGNAL(triggered(bool)),
-                    m_obj, SLOT(copy()));
-    Q_ASSERT(check);
-    addAction(action);
-
-    action = new QAction(tr("Select &All"), this);
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
-    check = connect(action, SIGNAL(triggered(bool)),
-                    m_obj, SLOT(selectAll()));
-    Q_ASSERT(check);
-    addAction(action);
-
-    action = new QAction(tr("Clear"), this);
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X));
-    check = connect(action, SIGNAL(triggered(bool)),
-                    m_obj, SLOT(clear()));
-    Q_ASSERT(check);
-    addAction(action);
-}
-
-/** When the ChatHistoryWidget changes geometry, adjust the
- *  view's scene rectangle.
- */
-void ChatHistory::historyChanged()
-{
-    QRectF rect = m_obj->boundingRect();
-    rect.setHeight(rect.height() - 10);
-    setSceneRect(rect);
-
-    // scroll to end
-    QScrollBar *scrollBar = verticalScrollBar();
-    if (m_followEnd && scrollBar->value() < scrollBar->maximum())
-        scrollBar->setSliderPosition(scrollBar->maximum());
-}
-
-/** When the scroll value changes, remember whether we were at the end
- *  of the view.
- */
-void ChatHistory::scrollChanged()
-{
-    QScrollBar *scrollBar = verticalScrollBar();
-    m_followEnd = scrollBar->value() >= scrollBar->maximum() - 16;
+    m_obj->setView(this);
 }
 
 ChatHistoryWidget *ChatHistory::historyWidget()
 {
     return m_obj;
-}
-
-/** When the viewport is resized, adjust the history widget's width.
- *
- * @param event
- */
-void ChatHistory::resizeEvent(QResizeEvent *event)
-{
-    m_obj->setMaximumWidth(viewport()->width());
-    historyChanged();
-    QGraphicsView::resizeEvent(event);
 }
 
 ChatSearchBubble::ChatSearchBubble()
