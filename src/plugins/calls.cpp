@@ -193,15 +193,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
     m_statusLabel->setPos(32, 0);
 
-    m_hangupButton = new QPushButton;
-    m_hangupButton->setFlat(true);
-    m_hangupButton->setIcon(QIcon(":/hangup.png"));
-    m_hangupButton->setMaximumWidth(32);
-    m_hangupButton->setToolTip(tr("Hang up"));
-    connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
-
-    //box->addWidget(m_hangupButton);
-
+    connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
     connect(m_call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
@@ -216,7 +208,7 @@ void CallWidget::callFinished()
     delete m_callThread;
 
     // make widget disappear
-    m_hangupButton->setEnabled(false);
+    setButtonEnabled(false);
     QTimer::singleShot(1000, this, SLOT(disappear()));
 }
 
@@ -234,11 +226,11 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         break;
     case QXmppCall::DisconnectingState:
         m_statusLabel->setText(tr("Disconnecting.."));
-        m_hangupButton->setEnabled(false);
+        setButtonEnabled(false);
         break;
     case QXmppCall::FinishedState:
         m_statusLabel->setText(tr("Call finished."));
-        m_hangupButton->setEnabled(false);
+        setButtonEnabled(false);
         break;
     }
 }

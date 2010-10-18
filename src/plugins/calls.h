@@ -106,7 +106,6 @@ private:
     QXmppCall *m_call;
     CallHandler *m_callHandler;
     QThread *m_callThread;
-    QPushButton *m_hangupButton;
     QGraphicsSimpleTextItem *m_statusLabel;
 };
 

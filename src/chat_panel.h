@@ -117,18 +117,30 @@ class ChatPanelWidget : public QGraphicsWidget
 public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
     virtual void setGeometry(const QRectF &rect);
+    void setButtonEnabled(bool enabled);
     void setButtonPixmap(const QPixmap &pixmap);
     void setButtonToolTip(const QString &toolTip);
     void setIconPixmap(const QPixmap &pixmap);
+
+signals:
+    void buttonClicked();
 
 public slots:
     void appear();
     void disappear();
 
+protected:
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
 private:
     QGraphicsPathItem *m_border;
     QGraphicsPixmapItem *m_icon;
-    QGraphicsPixmapItem *m_button;
+    bool m_buttonDown;
+    bool m_buttonEnabled;
+    QGraphicsPathItem *m_buttonPath;
+    QGraphicsPixmapItem *m_buttonPixmap;
 };
 
 #endif
