@@ -865,6 +865,7 @@ ChatHistory::ChatHistory(QWidget *parent)
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 #endif
+    setContextMenuPolicy(Qt::ActionsContextMenu);
 
     m_obj = new ChatHistoryWidget;
     scene->addItem(m_obj);
@@ -878,34 +879,26 @@ ChatHistory::ChatHistory(QWidget *parent)
     Q_ASSERT(check);
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C), this);
-    check = connect(shortcut, SIGNAL(activated()),
+    QAction *action = new QAction(tr("&Copy"), this);
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
+    check = connect(action, SIGNAL(triggered(bool)),
                     m_obj, SLOT(copy()));
     Q_ASSERT(check);
+    addAction(action);
 
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A), this);
-    check = connect(shortcut, SIGNAL(activated()),
+    action = new QAction(tr("Select &All"), this);
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
+    check = connect(action, SIGNAL(triggered(bool)),
                     m_obj, SLOT(selectAll()));
     Q_ASSERT(check);
-}
+    addAction(action);
 
-void ChatHistory::contextMenuEvent(QContextMenuEvent *event)
-{
-    QMenu *menu = new QMenu;
-
-    QAction *action = menu->addAction(tr("&Copy"));
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
-    connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(copy()));
-
-    action = menu->addAction(tr("Select &All"));
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
-    connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(selectAll()));
-
-    action = menu->addAction(QIcon(":/remove.png"), tr("Clear"));
-    connect(action, SIGNAL(triggered(bool)), m_obj, SLOT(clear()));
-
-    menu->exec(event->globalPos());
-    delete menu;
+    action = new QAction(tr("Clear"), this);
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X));
+    check = connect(action, SIGNAL(triggered(bool)),
+                    m_obj, SLOT(clear()));
+    Q_ASSERT(check);
+    addAction(action);
 }
 
 /** When the ChatHistoryWidget changes geometry, adjust the

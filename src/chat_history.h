@@ -160,7 +160,6 @@ public:
     ChatHistoryWidget *historyWidget();
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event);
     void resizeEvent(QResizeEvent *e);
 
 private slots:
