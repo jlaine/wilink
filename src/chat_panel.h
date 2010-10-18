@@ -125,7 +125,7 @@ public slots:
     void disappear();
 
 private:
-    QGraphicsRectItem *m_border;
+    QGraphicsPathItem *m_border;
     QGraphicsPixmapItem *m_icon;
 };
 

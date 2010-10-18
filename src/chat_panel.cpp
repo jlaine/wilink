@@ -324,7 +324,13 @@ void ChatPanelBar::trackView()
 ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
-    m_border = new QGraphicsRectItem(this);
+    m_border = new QGraphicsPathItem(this);
+    QLinearGradient gradient(0, 0, 0, 32);
+    gradient.setColorAt(0, QColor(0xE0, 0xE0, 0xE0));
+    gradient.setColorAt(0.6, QColor(0xFF, 0xFF, 0xFF));
+    gradient.setColorAt(1, QColor(0xE0, 0xE0, 0xE0));
+    m_border->setBrush(gradient);
+
     m_icon = new QGraphicsPixmapItem(this);
 
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
@@ -362,7 +368,10 @@ void ChatPanelWidget::disappear()
  */
 void ChatPanelWidget::setGeometry(const QRectF &rect)
 {
-    m_border->setRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1));
+    QPainterPath path;
+    path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), 5, 5);
+    m_border->setPath(path);
+
     m_icon->setOffset(0, (rect.height() - m_icon->pixmap().height()) / 2);
     QGraphicsWidget::setGeometry(rect);
 }
