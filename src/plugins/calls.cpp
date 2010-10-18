@@ -186,12 +186,11 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
+    // setup GUI
     setIconPixmap(QPixmap(":/call.png"));
     setButtonPixmap(QPixmap(":/hangup.png"));
     setButtonToolTip(tr("Hang up"));
-
-    m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
-    m_statusLabel->setPos(32, 0);
+    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
 
     connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
     connect(m_call, SIGNAL(ringing()), this, SLOT(ringing()));
@@ -219,17 +218,17 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     {
     case QXmppCall::OfferState:
     case QXmppCall::ConnectingState:
-        m_statusLabel->setText(tr("Connecting.."));
+        m_label->setText(tr("Connecting.."));
         break;
     case QXmppCall::ActiveState:
-        m_statusLabel->setText(tr("Call connected."));
+        m_label->setText(tr("Call connected."));
         break;
     case QXmppCall::DisconnectingState:
-        m_statusLabel->setText(tr("Disconnecting.."));
+        m_label->setText(tr("Disconnecting.."));
         setButtonEnabled(false);
         break;
     case QXmppCall::FinishedState:
-        m_statusLabel->setText(tr("Call finished."));
+        m_label->setText(tr("Call finished."));
         setButtonEnabled(false);
         break;
     }
@@ -237,7 +236,7 @@ void CallWidget::callStateChanged(QXmppCall::State state)
 
 void CallWidget::ringing()
 {
-    m_statusLabel->setText(tr("Ringing.."));
+    m_label->setText(tr("Ringing.."));
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)
@@ -251,7 +250,8 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
 void CallWidget::setGeometry(const QRectF &rect)
 {
-    m_statusLabel->setPos(32, (rect.height() - m_statusLabel->boundingRect().height()) / 2);
+    m_label->setPos(32,
+        (rect.height() - m_label->boundingRect().height()) / 2);
     ChatPanelWidget::setGeometry(rect);
 }
 

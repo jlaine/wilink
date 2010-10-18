@@ -57,6 +57,7 @@ class ChatTransferWidget : public ChatPanelWidget
 
 public:
     ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent = 0);
+    void setGeometry(const QRectF &rect);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent * event);

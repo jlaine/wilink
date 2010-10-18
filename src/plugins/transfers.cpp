@@ -166,6 +166,13 @@ void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
         QDesktopServices::openUrl(QUrl::fromLocalFile(m_localPath));
 }
 
+void ChatTransferWidget::setGeometry(const QRectF &rect)
+{
+    m_label->setPos(32,
+        (rect.height() - m_label->boundingRect().height()) / 2);
+    ChatPanelWidget::setGeometry(rect);
+}
+
 void ChatTransferWidget::slotCancel()
 {
     if (m_job && m_job->state() != QXmppTransferJob::FinishedState)

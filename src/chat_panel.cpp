@@ -422,7 +422,7 @@ void ChatPanelWidget::setGeometry(const QRectF &rect)
 
     const QSizeF pixmapSize = m_buttonPixmap->pixmap().size();
     m_buttonPixmap->setPos(
-        rect.width() - pixmapSize.width() - WIDGET_MARGIN,
+        rect.width() - 36,
         (rect.height() - pixmapSize.height()) / 2);
     QGraphicsWidget::setGeometry(rect);
 }
@@ -440,7 +440,7 @@ void ChatPanelWidget::setButtonEnabled(bool enabled)
  */
 void ChatPanelWidget::setButtonPixmap(const QPixmap &pixmap)
 {
-    m_buttonPixmap->setPixmap(pixmap);
+    m_buttonPixmap->setPixmap(pixmap.scaledToWidth(24, Qt::SmoothTransformation));
 }
 
 /** Sets the widget's button tooltip.
