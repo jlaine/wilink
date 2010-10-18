@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
 #include <QDebug>
 #include <QDropEvent>
 #include <QGraphicsLinearLayout>
@@ -320,15 +321,14 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
     m_border = new QGraphicsPathItem(this);
-    const QColor darkGray(0xe0, 0xe0, 0xe0);
-    const QColor lightGray(0xf0, 0xf0, 0xf0);
+    const QPalette palette = QApplication::palette();
 
     QLinearGradient gradient(0, 0, 0, 32);
-    gradient.setColorAt(0, darkGray);
-    gradient.setColorAt(0.6, lightGray);
-    gradient.setColorAt(1, darkGray);
+    gradient.setColorAt(0, palette.color(QPalette::Light));
+    gradient.setColorAt(0.6, palette.color(QPalette::Button));
+    gradient.setColorAt(1, palette.color(QPalette::Dark));
     m_border->setBrush(gradient);
-    m_border->setPen(QPen(darkGray, 1));
+    m_border->setPen(QPen(palette.color(QPalette::Shadow), 1));
 
     m_button = new QGraphicsPixmapItem(this);
     m_icon = new QGraphicsPixmapItem(this);
