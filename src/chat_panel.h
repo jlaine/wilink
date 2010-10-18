@@ -137,7 +137,6 @@ protected:
 private:
     QGraphicsPathItem *m_border;
     QGraphicsPixmapItem *m_icon;
-    bool m_buttonDown;
     bool m_buttonEnabled;
     QGraphicsPathItem *m_buttonPath;
     QGraphicsPixmapItem *m_buttonPixmap;

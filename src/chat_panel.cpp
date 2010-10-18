@@ -320,7 +320,6 @@ void ChatPanelBar::trackView()
  */
 ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    m_buttonDown(false),
     m_buttonEnabled(true)
 {
     const QPalette palette = QApplication::palette();
@@ -389,18 +388,16 @@ void ChatPanelWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
     gradient.setColorAt(0, palette.color(QPalette::Button));
     gradient.setColorAt(0.6, palette.color(QPalette::Mid));
     gradient.setColorAt(1, palette.color(QPalette::Dark));
-    m_buttonDown = true;
     m_buttonPath->setBrush(gradient);
-    m_buttonPath->setPen(QPen(palette.color(QPalette::Shadow), 2));
+    m_buttonPixmap->setOffset(0, 2);
     event->accept();
 }
 
 void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     const QPalette palette = QApplication::palette();
-    m_buttonDown = false;
     m_buttonPath->setBrush(Qt::NoBrush);
-    m_buttonPath->setPen(QPen(palette.color(QPalette::Shadow), 1));
+    m_buttonPixmap->setOffset(0, 0);
     if (m_buttonEnabled &&
         m_buttonPath->path().contains(event->pos()))
         emit buttonClicked();
