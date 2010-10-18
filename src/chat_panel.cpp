@@ -109,13 +109,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->header->addLayout(d->widgets);
 
     setMinimumWidth(300);
-    setStyleSheet("ChatPanelWidget { \
-        background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, \
-            stop: 0 #E0E0E0, \
-            stop: 0.6 #FFFFFF, \
-            stop: 1 #E0E0E0); \
-        border: 1px solid gray; \
-        border-radius: 5px; }");
 }
 
 ChatPanel::~ChatPanel()
@@ -325,11 +318,15 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
     m_border = new QGraphicsPathItem(this);
+    const QColor darkGray(0xe0, 0xe0, 0xe0);
+    const QColor lightGray(0xf0, 0xf0, 0xf0);
+
     QLinearGradient gradient(0, 0, 0, 32);
-    gradient.setColorAt(0, QColor(0xE0, 0xE0, 0xE0));
-    gradient.setColorAt(0.6, QColor(0xFF, 0xFF, 0xFF));
-    gradient.setColorAt(1, QColor(0xE0, 0xE0, 0xE0));
+    gradient.setColorAt(0, darkGray);
+    gradient.setColorAt(0.6, lightGray);
+    gradient.setColorAt(1, darkGray);
     m_border->setBrush(gradient);
+    m_border->setPen(QPen(darkGray, 1));
 
     m_icon = new QGraphicsPixmapItem(this);
 
