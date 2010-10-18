@@ -716,7 +716,6 @@ void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
     }
 }
 
-
 void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
 {
     if (e->buttons() != Qt::LeftButton)
@@ -987,7 +986,7 @@ void ChatSearchBubble::bounce()
     animation->setKeyValueAt(0.5, 1.5);
     animation->setEndValue(1);
     animation->setEasingCurve(QEasingCurve::InOutQuad);
-    animation->start();
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 QRectF ChatSearchBubble::boundingRect() const
