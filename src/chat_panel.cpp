@@ -21,7 +21,7 @@
 #include <QDebug>
 #include <QDropEvent>
 #include <QGraphicsLinearLayout>
-#include <QGraphicsOpacityEffect>
+#include <QGraphicsDropShadowEffect>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QLabel>
@@ -35,7 +35,7 @@
 
 #define ICON_WIDTH 48
 #define BUTTON_WIDTH 48
-#define WIDGET_MARGIN 5
+#define BORDER_RADIUS 8
 
 class ChatPanelPrivate
 {
@@ -267,6 +267,10 @@ void ChatPanel::sendNotifications()
 ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     : m_view(view)
 {
+    QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
+    effect->setOffset(5, 5);
+    effect->setBlurRadius(10);
+    setGraphicsEffect(effect);
     m_view->viewport()->installEventFilter(this);
 
     m_delay = new QTimer(this);
@@ -277,7 +281,9 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_animation->setEasingCurve(QEasingCurve::OutQuad);
 
     m_layout = new QGraphicsLinearLayout;
+    m_layout->setContentsMargins(16, 8, 16, 8);
     setLayout(m_layout);
+    setOpacity(0.9);
 
     bool check;
     check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -316,7 +322,7 @@ void ChatPanelBar::trackView()
 {
     QSizeF newSize;
     newSize.setWidth(m_view->viewport()->width() - 1);
-    newSize.setHeight(50);
+    newSize.setHeight(48);
     m_animation->setDuration(500);
     m_animation->setStartValue(size());
     m_animation->setEndValue(newSize);
@@ -346,17 +352,13 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     m_buttonPixmap = new QGraphicsPixmapItem(this);
 
     m_icon = new QGraphicsPixmapItem(this);
-
-    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
-    effect->setOpacity(0.0);
-    setGraphicsEffect(effect);
 }
 
 /** Makes the widget appear.
  */
 void ChatPanelWidget::appear()
 {
-    QPropertyAnimation *animation = new QPropertyAnimation(graphicsEffect(), "opacity");
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
     animation->setDuration(500);
     animation->setEasingCurve(QEasingCurve::OutQuad);
     animation->setStartValue(0.0);
@@ -366,8 +368,8 @@ void ChatPanelWidget::appear()
 
 QRectF ChatPanelWidget::contentRect() const
 {
-    QRectF rect = geometry().adjusted(0, 0, -BUTTON_WIDTH, 0);
-    rect.setLeft(ICON_WIDTH);
+    QRectF rect = geometry().adjusted(0, 0, -BUTTON_WIDTH - ICON_WIDTH, 0);
+    rect.moveLeft(ICON_WIDTH);
     return rect;
 }
 
@@ -375,7 +377,7 @@ QRectF ChatPanelWidget::contentRect() const
  */
 void ChatPanelWidget::disappear()
 {
-    QPropertyAnimation *animation = new QPropertyAnimation(graphicsEffect(), "opacity");
+    QPropertyAnimation *animation = new QPropertyAnimation(this, "opacity");
     animation->setDuration(500);
     animation->setEasingCurve(QEasingCurve::InQuad);
     animation->setStartValue(1.0);
@@ -383,11 +385,6 @@ void ChatPanelWidget::disappear()
     animation->start();
     connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
     animation->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-void ChatPanelWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "move" << event->pos();
 }
 
 void ChatPanelWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -425,7 +422,7 @@ void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void ChatPanelWidget::setGeometry(const QRectF &rect)
 {
     QPainterPath path;
-    path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), WIDGET_MARGIN, WIDGET_MARGIN);
+    path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
     QSizeF pixmapSize = m_icon->pixmap().size();
@@ -434,7 +431,7 @@ void ChatPanelWidget::setGeometry(const QRectF &rect)
 
     QPainterPath buttonPath;
     buttonPath.addRoundedRect(QRectF(rect.width() - BUTTON_WIDTH, 0,
-        BUTTON_WIDTH - 1, rect.height() - 1), WIDGET_MARGIN, WIDGET_MARGIN);
+        BUTTON_WIDTH - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_buttonPath->setPath(buttonPath);
 
     pixmapSize = m_buttonPixmap->pixmap().size();
