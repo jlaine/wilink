@@ -21,13 +21,12 @@
 #define __WILINK_CHAT_HISTORY_H__
 
 #include <QDateTime>
-#include <QAbstractListModel>
-#include <QGraphicsView>
 #include <QGraphicsWidget>
 #include <QTextCursor>
 #include <QTextDocument>
 
 class QGraphicsLinearLayout;
+class QGraphicsView;
 class QUrl;
 
 class ChatSearchBubble;
@@ -109,15 +108,11 @@ class ChatHistoryWidget : public QGraphicsWidget
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
     ChatMessageWidget *addMessage(const ChatMessage &message);
-    QString selectedText() const;
-    void setMaximumWidth(qreal width);
+    void adjustSize();
     void setView(QGraphicsView *view);
 
 signals:
     void findFinished(bool found);
-#if QT_VERSION < 0x040700
-    void geometryChanged();
-#endif
     void messageClicked(const ChatMessage &message);
 
 public slots:
@@ -128,7 +123,6 @@ public slots:
     void selectAll();
 
 private slots:
-    void slotGeometryChanged();
     void slotScrollChanged();
     void slotSelectionChanged();
 
@@ -140,6 +134,7 @@ protected:
 
 private:
     ChatMessageWidget *messageWidgetAt(const QPointF &pos) const;
+    QString selectedText() const;
 
     // viewport
     bool m_followEnd;
@@ -159,18 +154,6 @@ private:
     QList<ChatSearchBubble*> m_glassItems;
     ChatMessageWidget *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
-};
-
-class ChatHistory : public QGraphicsView
-{
-    Q_OBJECT
-
-public:
-    ChatHistory(QWidget *parent = NULL);
-    ChatHistoryWidget *historyWidget();
-
-private:
-    ChatHistoryWidget *m_obj;
 };
 
 class ChatSearchBubble : public QObject, public QGraphicsItemGroup

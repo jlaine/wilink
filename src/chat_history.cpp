@@ -22,11 +22,11 @@
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsSceneHoverEvent>
+#include <QGraphicsView>
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QScrollBar>
@@ -471,12 +471,6 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_trippleClickTimer = new QTimer(this);
     m_trippleClickTimer->setSingleShot(true);
     m_trippleClickTimer->setInterval(QApplication::doubleClickInterval());
-
-    bool check;
-    check = connect(this, SIGNAL(geometryChanged()),
-                    this, SLOT(slotGeometryChanged()));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
@@ -536,11 +530,38 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
 
     m_layout->insertItem(pos, msg);
     adjustSize();
-#if QT_VERSION < 0x040700
-    emit geometryChanged();
-#endif
 
     return msg;
+}
+
+/** Resizes the ChatHistoryWidget to its preferred size hint.
+ */
+void ChatHistoryWidget::adjustSize()
+{
+    QGraphicsWidget::adjustSize();
+
+    // reposition search bubbles
+    if (!m_glassItems.isEmpty() && m_lastFindWidget)
+    {
+        findClear();
+        foreach (const RectCursor &textRect, m_lastFindWidget->chunkSelection(m_lastFindCursor))
+        {
+            ChatSearchBubble *glass = new ChatSearchBubble;
+            glass->setSelection(textRect);
+            scene()->addItem(glass);
+            m_glassItems << glass;
+        }
+    }
+
+    // adjust viewed rectangle
+    QRectF rect = boundingRect();
+    rect.setHeight(rect.height() - 10);
+    m_view->setSceneRect(rect);
+
+    // scroll to end
+    QScrollBar *scrollBar = m_view->verticalScrollBar();
+    if (m_followEnd && scrollBar->value() < scrollBar->maximum())
+        scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
 /** Clears all messages.
@@ -568,7 +589,7 @@ void ChatHistoryWidget::copy()
  */
 bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == m_view && event->type() == QEvent::Resize)
+    if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
         m_maximumWidth = m_view->viewport()->width() - 2 * HISTORY_MARGIN;
         for (int i = 0; i < m_layout->count(); i++)
@@ -577,7 +598,6 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
             child->setMaximumWidth(m_maximumWidth);
         }
         adjustSize();
-        slotGeometryChanged();
     }
     return false;
 }
@@ -814,35 +834,13 @@ QString ChatHistoryWidget::selectedText() const
 #endif
 }
 
-/** Sets the maximum width for the history.
- *
- * @param width
- */
-void ChatHistoryWidget::setMaximumWidth(qreal width)
-{
-    width -= 2 * HISTORY_MARGIN;
-    if (width == m_maximumWidth)
-        return;
-
-    m_maximumWidth = width;
-    for (int i = 0; i < m_layout->count(); i++)
-    {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-        child->setMaximumWidth(width);
-    }
-    adjustSize();
-#if QT_VERSION < 0x040700
-    emit geometryChanged();
-#endif
-}
-
 void ChatHistoryWidget::setView(QGraphicsView *view)
 {
     bool check;
     m_view = view;
 
     /* set up hooks */
-    m_view->installEventFilter(this);
+    m_view->viewport()->installEventFilter(this);
 
     check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
                     this, SLOT(slotScrollChanged()));
@@ -873,34 +871,6 @@ void ChatHistoryWidget::setView(QGraphicsView *view)
                     this, SLOT(clear()));
     Q_ASSERT(check);
     m_view->addAction(action);
-}
-
-/** When the history geometry changes, reposition search bubbles.
- */
-void ChatHistoryWidget::slotGeometryChanged()
-{
-    // reposition search bubbles
-    if (!m_glassItems.isEmpty() && m_lastFindWidget)
-    {
-        findClear();
-        foreach (const RectCursor &textRect, m_lastFindWidget->chunkSelection(m_lastFindCursor))
-        {
-            ChatSearchBubble *glass = new ChatSearchBubble;
-            glass->setSelection(textRect);
-            scene()->addItem(glass);
-            m_glassItems << glass;
-        }
-    }
-
-    // adjust viewed rectangle
-    QRectF rect = boundingRect();
-    rect.setHeight(rect.height() - 10);
-    m_view->setSceneRect(rect);
-
-    // scroll to end
-    QScrollBar *scrollBar = m_view->verticalScrollBar();
-    if (m_followEnd && scrollBar->value() < scrollBar->maximum())
-        scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
 /** When the scroll value changes, remember whether we were at the end
@@ -937,30 +907,6 @@ void ChatHistoryWidget::slotSelectionChanged()
     // for X11, copy the selected text to the selection buffer
     if (!m_selectedMessages.isEmpty())
         QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
-}
-
-ChatHistory::ChatHistory(QWidget *parent)
-    : QGraphicsView(parent)
-{
-    QGraphicsScene *scene = new QGraphicsScene(this);
-    setScene(scene);
-#ifdef WILINK_EMBEDDED
-    FlickCharm *charm = new FlickCharm(this);
-    charm->activateOn(this);
-#else
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-#endif
-    setContextMenuPolicy(Qt::ActionsContextMenu);
-
-    m_obj = new ChatHistoryWidget;
-    scene->addItem(m_obj);
-    m_obj->setView(this);
-}
-
-ChatHistoryWidget *ChatHistory::historyWidget()
-{
-    return m_obj;
 }
 
 ChatSearchBubble::ChatSearchBubble()

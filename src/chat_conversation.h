@@ -25,9 +25,9 @@
 #include "chat_panel.h"
 
 class ChatEdit;
-class ChatHistory;
 class ChatHistoryWidget;
 class ChatSearchBar;
+class QGraphicsView;
 class QSpacerItem;
 
 class ChatConversation : public ChatPanel
@@ -47,7 +47,8 @@ protected:
     ChatEdit *chatInput;
 
 private:
-    ChatHistory *chatHistory;
+    QGraphicsView *chatHistory;
+    ChatHistoryWidget *chatHistoryWidget;
     ChatSearchBar *chatSearch;
     QSpacerItem *spacerItem;
 };
