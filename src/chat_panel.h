@@ -98,6 +98,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *Event);
 
 private slots:
+    void scrollChanged();
     void trackView();
 
 private:
@@ -116,6 +117,7 @@ class ChatPanelWidget : public QGraphicsWidget
 
 public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
+    QRectF contentRect() const;
     virtual void setGeometry(const QRectF &rect);
     void setButtonEnabled(bool enabled);
     void setButtonPixmap(const QPixmap &pixmap);

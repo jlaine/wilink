@@ -33,6 +33,8 @@
 
 #include "chat_panel.h"
 
+#define ICON_WIDTH 48
+#define BUTTON_WIDTH 48
 #define WIDGET_MARGIN 5
 
 class ChatPanelPrivate
@@ -271,7 +273,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_delay->setInterval(100);
     m_delay->setSingleShot(true);
 
-    m_animation = new QPropertyAnimation(this, "geometry");
+    m_animation = new QPropertyAnimation(this, "size");
     m_animation->setEasingCurve(QEasingCurve::OutQuad);
 
     m_layout = new QGraphicsLinearLayout;
@@ -279,7 +281,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 
     bool check;
     check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
-                    m_delay, SLOT(start()));
+                    this, SLOT(scrollChanged()));
     Q_ASSERT(check);
 
     check = connect(m_delay, SIGNAL(timeout()),
@@ -297,20 +299,27 @@ bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
-        m_delay->start();
+        if (m_animation->state() == QAbstractAnimation::Running)
+            trackView();
+        else
+            m_delay->start();
     }
     return false;
 }
 
+void ChatPanelBar::scrollChanged()
+{
+    setPos(m_view->mapToScene(QPoint(0, 0)));
+}
+
 void ChatPanelBar::trackView()
 {
-    QRectF newRect;
-    newRect.setTopLeft(m_view->mapToScene(QPoint(0, 0)));
-    newRect.setHeight(50);
-    newRect.setWidth(m_view->viewport()->width() - 1);
+    QSizeF newSize;
+    newSize.setWidth(m_view->viewport()->width() - 1);
+    newSize.setHeight(50);
     m_animation->setDuration(500);
-    m_animation->setStartValue(geometry());
-    m_animation->setEndValue(newRect);
+    m_animation->setStartValue(size());
+    m_animation->setEndValue(newSize);
     m_animation->start();
 }
 
@@ -353,6 +362,13 @@ void ChatPanelWidget::appear()
     animation->setStartValue(0.0);
     animation->setEndValue(1.0);
     animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+QRectF ChatPanelWidget::contentRect() const
+{
+    QRectF rect = geometry().adjusted(0, 0, -BUTTON_WIDTH, 0);
+    rect.setLeft(ICON_WIDTH);
+    return rect;
 }
 
 /** Makes the widget disappear then deletes it.
@@ -412,17 +428,18 @@ void ChatPanelWidget::setGeometry(const QRectF &rect)
     path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), WIDGET_MARGIN, WIDGET_MARGIN);
     m_border->setPath(path);
 
-    m_icon->setPos(
-        WIDGET_MARGIN,
-        (rect.height() - m_icon->pixmap().height()) / 2);
+    QSizeF pixmapSize = m_icon->pixmap().size();
+    m_icon->setPos((ICON_WIDTH - pixmapSize.width()) / 2,
+        (rect.height() - pixmapSize.height()) / 2);
 
     QPainterPath buttonPath;
-    buttonPath.addRoundedRect(QRectF(rect.width() - 48, 0, 48 - 1, rect.height() - 1), WIDGET_MARGIN, WIDGET_MARGIN);
+    buttonPath.addRoundedRect(QRectF(rect.width() - BUTTON_WIDTH, 0,
+        BUTTON_WIDTH - 1, rect.height() - 1), WIDGET_MARGIN, WIDGET_MARGIN);
     m_buttonPath->setPath(buttonPath);
 
-    const QSizeF pixmapSize = m_buttonPixmap->pixmap().size();
+    pixmapSize = m_buttonPixmap->pixmap().size();
     m_buttonPixmap->setPos(
-        rect.width() - 36,
+        rect.width() - (BUTTON_WIDTH + pixmapSize.width()) / 2,
         (rect.height() - pixmapSize.height()) / 2);
     QGraphicsWidget::setGeometry(rect);
 }
@@ -440,7 +457,7 @@ void ChatPanelWidget::setButtonEnabled(bool enabled)
  */
 void ChatPanelWidget::setButtonPixmap(const QPixmap &pixmap)
 {
-    m_buttonPixmap->setPixmap(pixmap.scaledToWidth(24, Qt::SmoothTransformation));
+    m_buttonPixmap->setPixmap(pixmap.scaledToWidth(BUTTON_WIDTH/2, Qt::SmoothTransformation));
 }
 
 /** Sets the widget's button tooltip.

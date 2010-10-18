@@ -554,9 +554,14 @@ void ChatHistoryWidget::adjustSize()
     }
 
     // adjust viewed rectangle
-    QRectF rect = boundingRect();
-    rect.setHeight(rect.height() - 10);
-    m_view->setSceneRect(rect);
+    if (!m_layout->count())
+        m_view->setSceneRect(0, 0, m_maximumWidth, 50);
+    else
+    {
+        QRectF rect = boundingRect();
+        rect.setHeight(rect.height() - 10);
+        m_view->setSceneRect(rect);
+    }
 
     // scroll to end
     QScrollBar *scrollBar = m_view->verticalScrollBar();
@@ -871,6 +876,9 @@ void ChatHistoryWidget::setView(QGraphicsView *view)
                     this, SLOT(clear()));
     Q_ASSERT(check);
     m_view->addAction(action);
+
+    // initialise size
+    adjustSize();
 }
 
 /** When the scroll value changes, remember whether we were at the end

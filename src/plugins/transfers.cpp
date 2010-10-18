@@ -22,8 +22,8 @@
 #include <QDropEvent>
 #include <QDir>
 #include <QFileDialog>
-#include <QGraphicsLinearLayout>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsProxyWidget>
 #include <QGraphicsSimpleTextItem>
 #include <QLabel>
 #include <QHeaderView>
@@ -130,16 +130,13 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     }
     setButtonPixmap(QPixmap(":/close.png"));
 
-    QVBoxLayout *vbox = new QVBoxLayout;
     m_label = new QGraphicsSimpleTextItem(QString("%1 (%2)").arg(
         m_job->fileName(),
         sizeToString(job->fileSize())), this);
 
     m_progress = new QProgressBar;
-    vbox->addWidget(m_progress);
-    //layout->addLayout(vbox);
-
-    //setLayout(layout);
+    m_progressProxy = new QGraphicsProxyWidget(this);
+    m_progressProxy->setWidget(m_progress);
 
     // connect signals
     bool check;
@@ -168,9 +165,17 @@ void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 void ChatTransferWidget::setGeometry(const QRectF &rect)
 {
-    m_label->setPos(32,
-        (rect.height() - m_label->boundingRect().height()) / 2);
     ChatPanelWidget::setGeometry(rect);
+    QRectF progressRect = contentRect();
+    if (m_progressProxy->isVisible())
+    {
+        progressRect.setHeight(16);
+        m_progressProxy->setGeometry(progressRect);
+    } else {
+        progressRect.setHeight(0);
+    }
+    m_label->setPos(progressRect.left(),
+        ((rect.height() - progressRect.height()) - m_label->boundingRect().height()) / 2);
 }
 
 void ChatTransferWidget::slotCancel()
@@ -201,16 +206,16 @@ void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
         m_progress->setValue((100 * done) / total);
         qint64 speed = m_job->speed();
         if (m_job->direction() == QXmppTransferJob::IncomingDirection)
-            m_progress->setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
+            setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
         else
-            m_progress->setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
+            setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
     }
 }
 
 void ChatTransferWidget::slotFinished()
 {
     // update UI
-    m_progress->hide();
+    m_progressProxy->hide();
     if (m_job->error() == QXmppTransferJob::NoError)
     {
         setIconPixmap(QPixmap(":/contact-available.png"));

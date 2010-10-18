@@ -72,6 +72,7 @@ private:
     bool m_disappearWhenFinished;
     QGraphicsSimpleTextItem *m_label;
     QProgressBar *m_progress;
+    QGraphicsProxyWidget *m_progressProxy;
     QXmppTransferJob *m_job;
     QString m_localPath;
 };
