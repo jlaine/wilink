@@ -534,6 +534,9 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
 
     m_layout->insertItem(pos, msg);
     adjustSize();
+#if QT_VERSION < 0x040700
+    emit geometryChanged();
+#endif
 
     return msg;
 }
@@ -805,6 +808,9 @@ void ChatHistoryWidget::setMaximumWidth(qreal width)
         child->setMaximumWidth(width);
     }
     adjustSize();
+#if QT_VERSION < 0x040700
+    emit geometryChanged();
+#endif
 }
 
 /** When the history geometry changes, reposition search bubbles.

@@ -114,6 +114,9 @@ public:
 
 signals:
     void findFinished(bool found);
+#if QT_VERSION < 0x040700
+    void geometryChanged();
+#endif
     void messageClicked(const ChatMessage &message);
 
 public slots:
