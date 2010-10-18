@@ -839,6 +839,10 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
     ChatRosterItem *parentItem;
     if (reqParent.isValid())
         parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
+#ifndef FLAT_CONTACTS
+    else if (type == ChatRosterItem::Contact)
+        parentItem = d->contactsItem;
+#endif
 #ifndef FLAT_ROOMS
     else if (type == ChatRosterItem::Room)
     {
