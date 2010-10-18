@@ -36,6 +36,7 @@ class ChatConversation : public ChatPanel
 
 public:
     ChatConversation(QWidget *parent = NULL);
+    void addWidget(ChatPanelWidget *widget);
 
 protected slots:
     void slotSearchDisplayed(bool visible);
@@ -50,6 +51,7 @@ private:
     QGraphicsView *chatHistory;
     ChatHistoryWidget *chatHistoryWidget;
     ChatSearchBar *chatSearch;
+    ChatPanelBar *panelBar;
     QSpacerItem *spacerItem;
 };
 

@@ -21,6 +21,8 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QFile>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsSimpleTextItem>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -172,7 +174,7 @@ void CallHandler::callStateChanged(QXmppCall::State state)
     }
 }
 
-CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent)
+CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
     : ChatPanelWidget(parent),
     m_call(call)
 {
@@ -184,15 +186,10 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
     m_callHandler->moveToThread(m_callThread);
     m_callThread->start();
 
-    QHBoxLayout *box = new QHBoxLayout;
+    m_imageLabel = new QGraphicsPixmapItem(QPixmap(":/call.png"), this);
 
-    m_imageLabel = new QLabel;
-    m_imageLabel->setPixmap(QPixmap(":/call.png"));
-    box->addWidget(m_imageLabel);
-
-    m_statusLabel = new QLabel;
-    m_statusLabel->setText(tr("Connecting.."));
-    box->addWidget(m_statusLabel);
+    m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
+    m_statusLabel->setPos(32, 0);
 
     m_hangupButton = new QPushButton;
     m_hangupButton->setFlat(true);
@@ -200,9 +197,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *p
     m_hangupButton->setMaximumWidth(32);
     m_hangupButton->setToolTip(tr("Hang up"));
     connect(m_hangupButton, SIGNAL(clicked()), m_call, SLOT(hangup()));
-    box->addWidget(m_hangupButton);
 
-    setLayout(box);
+    //box->addWidget(m_hangupButton);
 
     connect(m_call, SIGNAL(ringing()), this, SLOT(ringing()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),

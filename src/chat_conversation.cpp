@@ -63,9 +63,9 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistory->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(chatHistory);
 
-    ChatPanelBar *bar = new ChatPanelBar(chatHistory);
-    bar->setZValue(10);
-    chatHistory->scene()->addItem(bar);
+    panelBar = new ChatPanelBar(chatHistory);
+    panelBar->setZValue(10);
+    chatHistory->scene()->addItem(panelBar);
 
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());
@@ -119,6 +119,11 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* shortcuts */
     connect(this, SIGNAL(findPanel()), chatSearch, SLOT(activate()));
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
+}
+
+void ChatConversation::addWidget(ChatPanelWidget *widget)
+{
+    panelBar->addWidget(widget);
 }
 
 ChatHistoryWidget *ChatConversation::historyWidget()

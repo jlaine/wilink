@@ -22,6 +22,10 @@
 #include <QDropEvent>
 #include <QDir>
 #include <QFileDialog>
+#include <QGraphicsLinearLayout>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsSimpleTextItem>
+#include <QLabel>
 #include <QHeaderView>
 #include <QLabel>
 #include <QLayout>
@@ -113,14 +117,14 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
     emit fileAccepted(m_job);
 }
 
-ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
+ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent)
     : ChatPanelWidget(parent),
     m_job(job)
 {
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    //QHBoxLayout *layout = new QHBoxLayout;
+    //layout->setMargin(0);
 
-    m_icon = new QLabel;
+    m_icon = new QGraphicsPixmapItem(this);
     if (m_job->direction() == QXmppTransferJob::IncomingDirection)
     {
         m_icon->setPixmap(QPixmap(":/download.png"));
@@ -129,24 +133,24 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QWidget *parent)
         m_icon->setPixmap(QPixmap(":/upload.png"));
         m_disappearWhenFinished = true;
     }
-    layout->addWidget(m_icon);
+    //layout->addWidget(m_icon);
 
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(new QLabel(QString("%1 (%2)").arg(
+    m_label = new QGraphicsSimpleTextItem(QString("%1 (%2)").arg(
         m_job->fileName(),
-        sizeToString(job->fileSize()))));
+        sizeToString(job->fileSize())), this);
 
     m_progress = new QProgressBar;
     vbox->addWidget(m_progress);
-    layout->addLayout(vbox);
+    //layout->addLayout(vbox);
 
     m_cancelButton = new QPushButton;
     m_cancelButton->setIcon(QIcon(":/close.png"));
     m_cancelButton->setFlat(true);
     m_cancelButton->setMaximumWidth(32);
-    layout->addWidget(m_cancelButton);
+    //layout->addWidget(m_cancelButton);
 
-    setLayout(layout);
+    //setLayout(layout);
 
     // connect signals
     bool check;

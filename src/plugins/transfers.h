@@ -57,7 +57,7 @@ class ChatTransferWidget : public ChatPanelWidget
     Q_OBJECT
 
 public:
-    ChatTransferWidget(QXmppTransferJob *job, QWidget *parent = 0);
+    ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent = 0);
 
 protected:
     void mouseDoubleClickEvent(QMouseEvent * event);
@@ -70,7 +70,8 @@ private slots:
 
 private:
     bool m_disappearWhenFinished;
-    QLabel *m_icon;
+    QGraphicsPixmapItem *m_icon;
+    QGraphicsSimpleTextItem *m_label;
     QProgressBar *m_progress;
     QPushButton *m_cancelButton;
     QXmppTransferJob *m_job;

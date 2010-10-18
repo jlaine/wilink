@@ -18,6 +18,7 @@
  */
 
 #include <QDropEvent>
+#include <QGraphicsLinearLayout>
 #include <QGraphicsOpacityEffect>
 #include <QGraphicsView>
 #include <QLabel>
@@ -123,7 +124,7 @@ ChatPanel::~ChatPanel()
 
 void ChatPanel::addWidget(ChatPanelWidget *widget)
 {
-    d->widgets->insertWidget(d->widgets->count() - 1, widget);
+    //d->widgets->insertWidget(d->widgets->count() - 1, widget);
     widget->appear();
 }
 
@@ -267,16 +268,17 @@ void ChatPanel::sendNotifications()
 ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     : m_view(view)
 {
-    m_rect = new QGraphicsRectItem(this);
-    m_rect->setBrush(Qt::black);
     m_view->viewport()->installEventFilter(this);
 
     m_delay = new QTimer(this);
     m_delay->setInterval(100);
     m_delay->setSingleShot(true);
 
-    m_animation = new QPropertyAnimation(this, "rect");
+    m_animation = new QPropertyAnimation(this, "geometry");
     m_animation->setEasingCurve(QEasingCurve::OutQuad);
+
+    m_layout = new QGraphicsLinearLayout;
+    setLayout(m_layout);
 
     bool check;
     check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -288,6 +290,12 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     Q_ASSERT(check);
 }
 
+void ChatPanelBar::addWidget(ChatPanelWidget *widget)
+{
+    m_layout->addItem(widget);
+    widget->appear();
+}
+
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
@@ -297,16 +305,6 @@ bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-QRectF ChatPanelBar::rect() const
-{
-    return m_rect->rect();
-}
-
-void ChatPanelBar::setRect(const QRectF &rect)
-{
-    m_rect->setRect(rect);
-}
-
 void ChatPanelBar::trackView()
 {
     QRectF newRect;
@@ -314,7 +312,7 @@ void ChatPanelBar::trackView()
     newRect.setHeight(50);
     newRect.setWidth(m_view->viewport()->width() - 1);
     m_animation->setDuration(500);
-    m_animation->setStartValue(rect());
+    m_animation->setStartValue(geometry());
     m_animation->setEndValue(newRect);
     m_animation->start();
 }
@@ -323,8 +321,8 @@ void ChatPanelBar::trackView()
  *
  * @param parent
  */
-ChatPanelWidget::ChatPanelWidget(QWidget *parent)
-    : QFrame(parent)
+ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
 {
     QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect;
     effect->setOpacity(0.0);

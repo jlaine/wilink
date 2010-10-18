@@ -25,6 +25,7 @@
 #include <QWidget>
 #include "chat_roster_item.h"
 
+class QGraphicsLinearLayout;
 class QGraphicsView;
 class QHBoxLayout;
 class QPropertyAnimation;
@@ -49,7 +50,7 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
-    void addWidget(ChatPanelWidget *widget);
+    virtual void addWidget(ChatPanelWidget *widget);
     virtual ChatRosterItem::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
@@ -88,12 +89,10 @@ private:
 class ChatPanelBar : public QGraphicsWidget
 {
     Q_OBJECT
-    Q_PROPERTY(QRectF rect READ rect WRITE setRect)
 
 public:
     ChatPanelBar(QGraphicsView *view);
-    QRectF rect() const;
-    void setRect(const QRectF &rect);
+    void addWidget(ChatPanelWidget *widget);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *Event);
@@ -104,9 +103,7 @@ private slots:
 private:
     QPropertyAnimation *m_animation;
     QTimer *m_delay;
-    QRectF nextRect;
-
-    QGraphicsRectItem *m_rect;
+    QGraphicsLinearLayout *m_layout;
     QGraphicsView *m_view;
 };
 
@@ -114,12 +111,12 @@ private:
 /** ChatPanelWidget is the base class for "task" widgets displayed inside
  *  a ChatPanel.
  */
-class ChatPanelWidget : public QFrame
+class ChatPanelWidget : public QGraphicsWidget
 {
     Q_OBJECT
 
 public:
-    ChatPanelWidget(QWidget *parent = 0);
+    ChatPanelWidget(QGraphicsItem *parent = 0);
 
 public slots:
     void appear();

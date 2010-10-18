@@ -94,7 +94,7 @@ class CallWidget : public ChatPanelWidget
     Q_OBJECT
 
 public:
-    CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QWidget *parent = 0);
+    CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
 
 private slots:
     void callFinished();
@@ -106,8 +106,8 @@ private:
     CallHandler *m_callHandler;
     QThread *m_callThread;
     QPushButton *m_hangupButton;
-    QLabel *m_imageLabel;
-    QLabel *m_statusLabel;
+    QGraphicsPixmapItem *m_imageLabel;
+    QGraphicsSimpleTextItem *m_statusLabel;
 };
 
 class CallWatcher : public QObject
