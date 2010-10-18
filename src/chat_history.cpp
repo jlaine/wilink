@@ -874,6 +874,10 @@ ChatHistory::ChatHistory(QWidget *parent)
                     this, SLOT(historyChanged()));
     Q_ASSERT(check);
 
+    check = connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
+                    this, SLOT(scrollChanged()));
+    Q_ASSERT(check);
+
     check = connect(scene, SIGNAL(selectionChanged()),
                     m_obj, SLOT(slotSelectionChanged()));
     Q_ASSERT(check);
@@ -909,11 +913,20 @@ void ChatHistory::historyChanged()
     QRectF rect = m_obj->boundingRect();
     rect.setHeight(rect.height() - 10);
     setSceneRect(rect);
-    if (m_followEnd)
-    {
-        QScrollBar *scrollBar = verticalScrollBar();
+
+    // scroll to end
+    QScrollBar *scrollBar = verticalScrollBar();
+    if (m_followEnd && scrollBar->value() < scrollBar->maximum())
         scrollBar->setSliderPosition(scrollBar->maximum());
-    }
+}
+
+/** When the scroll value changes, remember whether we were at the end
+ *  of the view.
+ */
+void ChatHistory::scrollChanged()
+{
+    QScrollBar *scrollBar = verticalScrollBar();
+    m_followEnd = scrollBar->value() >= scrollBar->maximum() - 16;
 }
 
 ChatHistoryWidget *ChatHistory::historyWidget()

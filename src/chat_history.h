@@ -164,6 +164,7 @@ protected:
 
 private slots:
     void historyChanged();
+    void scrollChanged();
 
 private:
     ChatHistoryWidget *m_obj;
