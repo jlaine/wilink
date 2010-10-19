@@ -395,7 +395,7 @@ void ChatShares::find(const QString &needle, QTextDocument::FindFlags flags, boo
 
     // search for files
     tabWidget->setCurrentWidget(sharesWidget);
-    QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+    QXmppShareExtension *extension = client->findExtension<QXmppShareExtension>();
     const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, sharesFilter);
     if (!requestId.isEmpty())
         searches.insert(requestId, sharesView);
@@ -483,7 +483,7 @@ void ChatShares::queueItem(QXmppShareItem *item)
         const QXmppShareLocation location = queueItem->locations().first();
 
         // retrieve full tree
-        QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+        QXmppShareExtension *extension = client->findExtension<QXmppShareExtension>();
         const QString requestId = extension->search(location, 0, sharesFilter);
         if (!requestId.isEmpty())
             searches.insert(requestId, downloadsView);
@@ -563,7 +563,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
     const QXmppShareLocation location = item->locations().first();
 
     // browse files
-    QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+    QXmppShareExtension *extension = client->findExtension<QXmppShareExtension>();
     const QString requestId = extension->search(location, 1, sharesFilter);
     if (!requestId.isEmpty())
         searches.insert(requestId, view);
@@ -661,7 +661,7 @@ void ChatShares::processDownloadQueue()
             return;
 
         // request file
-        QXmppShareExtension *extension = client->findExtension<QXmppShareExtension*>();
+        QXmppShareExtension *extension = client->findExtension<QXmppShareExtension>();
         const QString id = extension->get(*file);
         if (id.isEmpty())
         {

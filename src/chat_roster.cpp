@@ -164,7 +164,7 @@ void ChatRosterModelPrivate::fetchInfo(const QString &jid)
     if (readIq(QString("xmpp:%1?disco;type=get;request=info").arg(jid), disco))
         q->discoveryInfoFound(disco);
     else
-        client->discoveryManager().requestInfo(jid);
+        client->findExtension<QXmppDiscoveryManager>()->requestInfo(jid);
 }
 
 /** Check whether the vCard for the given roster item is cached, otherwise
@@ -216,7 +216,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
                     this, SLOT(disconnected()));
     Q_ASSERT(check);
 
-    check = connect(&d->client->discoveryManager(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
+    check = connect(d->client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 

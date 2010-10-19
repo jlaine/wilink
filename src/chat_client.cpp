@@ -27,7 +27,7 @@
 ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent)
 {
-    discoManager = findExtension<QXmppDiscoveryManager*>();
+    discoManager = findExtension<QXmppDiscoveryManager>();
 
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
     connect(discoManager, SIGNAL(infoReceived(const QXmppDiscoveryIq&)),

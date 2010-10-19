@@ -502,7 +502,7 @@ ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, co
     check = connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
     Q_ASSERT(check);
 
-    check = connect(&client->discoveryManager(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
+    check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
@@ -580,7 +580,7 @@ void ChatRoom::join()
     client->mucManager().joinRoom(chatRemoteJid, nickName);
 
     // request room information
-    client->discoveryManager().requestInfo(chatRemoteJid);
+    client->findExtension<QXmppDiscoveryManager>()->requestInfo(chatRemoteJid);
 
     joined = true;
 }
@@ -818,11 +818,14 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     setWindowTitle(tr("Join or create a chat room"));
 
     // get rooms
+    QXmppDiscoveryManager *discoveryManager = client->findExtension<QXmppDiscoveryManager>();
+    Q_ASSERT(discoveryManager);
+
     bool check;
-    check = connect(&client->discoveryManager(), SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
+    check = connect(discoveryManager, SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
                     this, SLOT(discoveryItemsReceived(const QXmppDiscoveryIq&)));
     Q_ASSERT(check);
-    client->discoveryManager().requestItems(chatRoomServer);
+    discoveryManager->requestItems(chatRoomServer);
 }
 
 void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)

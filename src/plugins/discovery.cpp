@@ -61,7 +61,7 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
 {
     bool check;
 
-    m_manager = client->findExtension<QXmppDiscoveryManager*>();
+    m_manager = client->findExtension<QXmppDiscoveryManager>();
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
