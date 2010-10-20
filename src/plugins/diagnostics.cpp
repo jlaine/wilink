@@ -155,11 +155,14 @@ void NetworkThread::run()
     }
     emit pingResults(pings);
     emit progress(++done, total);
+    iq.setPings(pings);
 
     /* run traceroute */
-    QList<Ping> traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
-    emit tracerouteResults(traceroute);
+    QList<Traceroute> traceroutes;
+    traceroutes << NetworkInfo::traceroute(serverAddress, 3, 4);
+    emit tracerouteResults(traceroutes);
     emit progress(++done, total);
+    iq.setTraceroutes(traceroutes);
 
     emit results(iq);
 }
@@ -324,9 +327,9 @@ void Diagnostics::refresh()
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
-    connect(networkThread, SIGNAL(pingResults(const QList<Ping> &)), this, SLOT(showPing(const QList<Ping> &)));
+    connect(networkThread, SIGNAL(pingResults(QList<Ping>)), this, SLOT(showPing(QList<Ping>)));
     connect(networkThread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-    connect(networkThread, SIGNAL(tracerouteResults(Traceroute)), this, SLOT(showTraceroute(Traceroute)));
+    connect(networkThread, SIGNAL(tracerouteResults(QList<Traceroute>)), this, SLOT(showTraceroute(QList<Traceroute>)));
     connect(networkThread, SIGNAL(wirelessResult(const WirelessResult &)), this, SLOT(showWireless(const WirelessResult &)));
     networkThread->start();
 }
@@ -405,9 +408,10 @@ void Diagnostics::showProgress(int done, int total)
     progressBar->setValue(done);
 }
 
-void Diagnostics::showTraceroute(const Traceroute &results)
+void Diagnostics::showTraceroute(const QList<Traceroute> &results)
 {
-    addItem("Traceroute", dumpPings(results));
+    foreach (const Traceroute &traceroute, results)
+        addItem("Traceroute", dumpPings(traceroute));
 }
 
 void Diagnostics::showWireless(const WirelessResult &result)
@@ -523,6 +527,26 @@ void WirelessResult::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+QList<Ping> DiagnosticsIq::pings() const
+{
+    return m_pings;
+}
+
+void DiagnosticsIq::setPings(const QList<Ping> &pings)
+{
+    m_pings = pings;
+}
+
+QList<Traceroute> DiagnosticsIq::traceroutes() const
+{
+    return m_traceroutes;
+}
+
+void DiagnosticsIq::setTraceroutes(const QList<Traceroute> &traceroutes)
+{
+    m_traceroutes = traceroutes;
+}
+
 QList<WirelessResult> DiagnosticsIq::wirelessResults() const
 {
     return m_wirelessResults;
@@ -541,13 +565,28 @@ bool DiagnosticsIq::isDiagnosticsIq(const QDomElement &element)
 
 void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement resultElement = element.firstChildElement("wirelessInterface");
-    while (!resultElement.isNull())
+    QDomElement child = element.firstChildElement();
+    while (!child.isNull())
     {
-        WirelessResult result;
-        result.parse(resultElement);
-        m_wirelessResults << result;
-        resultElement = resultElement.nextSiblingElement("wirelessInterface");
+        if (child.tagName() == QLatin1String("ping"))
+        {
+            Ping ping;
+            ping.parse(child);
+            m_pings << ping;
+        }
+        else if (child.tagName() == QLatin1String("traceroute"))
+        {
+            Traceroute traceroute;
+            traceroute.parse(child);
+            m_pings << traceroute;
+        }
+        else if (child.tagName() == QLatin1String("wirelessInterface"))
+        {
+            WirelessResult result;
+            result.parse(child);
+            m_wirelessResults << result;
+        }
+        child = child.nextSiblingElement();
     }
 }
 
@@ -555,6 +594,10 @@ void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     helperToXmlAddAttribute(writer, "xmlns", ns_diagnostics);
+    foreach (const Ping &ping, m_pings)
+        ping.toXml(writer);
+    foreach (const Traceroute &traceroute, m_traceroutes)
+        traceroute.toXml(writer);
     foreach (const WirelessResult &result, m_wirelessResults)
         result.toXml(writer);
     writer->writeEndElement();

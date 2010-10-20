@@ -57,6 +57,12 @@ public:
     QList<WirelessResult> wirelessResults() const;
     void setWirelessResults(QList<WirelessResult> &wirelessResults);
 
+    QList<Ping> pings() const;
+    void setPings(const QList<Ping> &pings);
+
+    QList<Traceroute> traceroutes() const;
+    void setTraceroutes(const QList<Traceroute> &traceroutes);
+
     static bool isDiagnosticsIq(const QDomElement &element);
 
 protected:
@@ -64,6 +70,8 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
+    QList<Ping> m_pings;
+    QList<Traceroute> m_traceroutes;
     QList<WirelessResult> m_wirelessResults;
 };
 
@@ -81,7 +89,7 @@ signals:
 
     void dnsResults(const QList<QHostInfo> &results);
     void pingResults(const QList<Ping> &results);
-    void tracerouteResults(const QList<Ping> &results);
+    void tracerouteResults(const QList<Traceroute> &results);
     void wirelessResult(const WirelessResult &result);
 };
 
@@ -105,7 +113,7 @@ protected slots:
     void showDns(const QList<QHostInfo> &results);
     void showPing(const QList<Ping> &results);
     void showProgress(int done, int total);
-    void showTraceroute(const Traceroute &results);
+    void showTraceroute(const QList<Traceroute> &results);
     void showWireless(const WirelessResult &result);
     void networkFinished();
 
