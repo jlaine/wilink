@@ -71,6 +71,7 @@ static QString interfaceName(const QNetworkInterface &interface)
 
 void NetworkThread::run()
 {
+    DiagnosticsIq iq;
     QList<QHostAddress> gateways;
     QList<QHostInfo> lookups;
     int done = 0;
@@ -79,6 +80,7 @@ void NetworkThread::run()
     emit progress(done, total);
 
     /* run wireless */
+    QList<WirelessResult> wirelessResults;
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (interface.flags() & QNetworkInterface::IsLoopBack)
@@ -93,9 +95,11 @@ void NetworkThread::run()
         result.availableNetworks = wireless.availableNetworks();
         result.currentNetwork = wireless.currentNetwork();
         result.supportedStandards = wireless.supportedStandards();
+        wirelessResults << result;
         emit wirelessResult(result);
         emit progress(++done, ++total);
     }
+    iq.setWirelessResults(wirelessResults);
 
     /* try to detemine gateways */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -156,6 +160,8 @@ void NetworkThread::run()
     QList<Ping> traceroute = NetworkInfo::traceroute(serverAddress, 3, 4);
     emit tracerouteResults(traceroute);
     emit progress(++done, total);
+
+    emit results(iq);
 }
 
 /* GUI */
@@ -327,6 +333,7 @@ void Diagnostics::refresh()
 
 void Diagnostics::networkFinished()
 {
+    networkThread->wait();
     delete networkThread;
     networkThread = NULL;
 
@@ -450,6 +457,24 @@ void Diagnostics::showWireless(const WirelessResult &result)
     addItem("Available networks", table.render());
 }
 
+// EXTENSION
+
+DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
+{
+    NetworkThread *networkThread = new NetworkThread(this);
+    connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
+    connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
+}
+
+bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
+{
+    if (stanza.tagName() == "iq" && DiagnosticsIq::isDiagnosticsIq(stanza))
+    {
+        return true;
+    }
+    return false;
+}
+
 // SERIALISATION
 
 static WirelessNetwork networkFromXml(const QDomElement &element)
@@ -497,6 +522,22 @@ void WirelessResult::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+QList<WirelessResult> DiagnosticsIq::wirelessResults() const
+{
+    return m_wirelessResults;
+}
+
+void DiagnosticsIq::setWirelessResults(QList<WirelessResult> &wirelessResults)
+{
+    m_wirelessResults = wirelessResults;
+}
+
+bool DiagnosticsIq::isDiagnosticsIq(const QDomElement &element)
+{
+    QDomElement queryElement = element.firstChildElement("query");
+    return (queryElement.namespaceURI() == ns_diagnostics);
+}
+
 void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement resultElement = element.firstChildElement("wirelessInterface");
@@ -528,6 +569,10 @@ public:
 
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
+    /* add diagnostics extension */
+    DiagnosticsExtension *extension = new DiagnosticsExtension(chat->client());
+    chat->client()->addExtension(extension);
+
     /* register panel */
     Diagnostics *diagnostics = new Diagnostics;
     diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);

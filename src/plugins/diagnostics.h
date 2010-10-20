@@ -25,6 +25,7 @@
 #include <QThread>
 #include <QUrl>
 
+#include "QXmppClientExtension.h"
 #include "QXmppIq.h"
 
 #include "chat_panel.h"
@@ -50,6 +51,22 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
 };
 
+class DiagnosticsIq : public QXmppIq
+{
+public:
+    QList<WirelessResult> wirelessResults() const;
+    void setWirelessResults(QList<WirelessResult> &wirelessResults);
+
+    static bool isDiagnosticsIq(const QDomElement &element);
+
+protected:
+    void parseElementFromChild(const QDomElement &element);
+    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
+
+private:
+    QList<WirelessResult> m_wirelessResults;
+};
+
 class NetworkThread : public QThread
 {
     Q_OBJECT
@@ -60,21 +77,12 @@ public:
 
 signals:
     void progress(int done, int total);
+    void results(const DiagnosticsIq &results);
 
     void dnsResults(const QList<QHostInfo> &results);
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Ping> &results);
     void wirelessResult(const WirelessResult &result);
-};
-
-class DiagnosticsIq : public QXmppIq
-{
-public:
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-
-private:
-    QList<WirelessResult> m_wirelessResults;
 };
 
 class Diagnostics : public ChatPanel
@@ -111,6 +119,13 @@ private:
     QNetworkAccessManager *network;
 
     NetworkThread *networkThread;
+};
+
+class DiagnosticsExtension : public QXmppClientExtension
+{
+public:
+    DiagnosticsExtension(QXmppClient *client);
+    bool handleStanza(const QDomElement &stanza);
 };
 
 #endif
