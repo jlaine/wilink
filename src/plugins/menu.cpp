@@ -199,7 +199,7 @@ public:
 
 bool MenuPlugin::initialize(Chat *chat)
 {
-    QString domain = chat->client()->configuration().domain();
+    const QString domain = chat->client()->configuration().domain();
     if (domain != "wifirst.net")
         return false;
 

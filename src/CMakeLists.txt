@@ -54,6 +54,7 @@ set(wiLink_SOURCES
     plugins/contacts.cpp
     plugins/diagnostics.cpp
     plugins/diagnostics/networkinfo.cpp
+    plugins/diagnostics/wireless.cpp
     plugins/discovery.cpp
     plugins/menu.cpp
     plugins/photos.cpp

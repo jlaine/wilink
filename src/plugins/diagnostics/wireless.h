@@ -17,28 +17,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+class QDomElement;
+
 #include <QList>
 #include <QString>
 #include <QNetworkInterface>
+#include <QXmlStreamWriter>
 
 class WirelessNetwork
 {
 public:
-    WirelessNetwork() : w_cinr(0), w_rssi(0) {};
+    WirelessNetwork() : w_isCurrent(false), w_cinr(0), w_rssi(0) {};
     bool isValid() const { return !w_ssid.isEmpty(); };
 
-    int cinr() const { return w_cinr; };
-    int rssi() const { return w_rssi; };
-    QString ssid() const { return w_ssid; };
+    bool isCurrent() const { return w_isCurrent; };
+    void setCurrent(bool isCurrent) { w_isCurrent = isCurrent; };
 
+    int cinr() const { return w_cinr; };
     void setCinr(int cinr) { w_cinr = cinr; };
+
+    int rssi() const { return w_rssi; };
     void setRssi(int rssi) { w_rssi = rssi; };
+
+    QString ssid() const { return w_ssid; };
     void setSsid(const QString &ssid) { w_ssid = ssid; };
+
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
 
     bool operator==(const WirelessNetwork &other) const { return w_ssid == other.w_ssid; };
     bool operator!=(const WirelessNetwork &other) const { return w_ssid != other.w_ssid; };
 
 private:
+    bool w_isCurrent;
     int w_cinr;
     int w_rssi;
     QString w_ssid;

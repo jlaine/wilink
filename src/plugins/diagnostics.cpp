@@ -461,9 +461,19 @@ void Diagnostics::showWireless(const WirelessResult &result)
 
 DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
 {
+    qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
+
     NetworkThread *networkThread = new NetworkThread(this);
-    connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
-    connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
+    connect(networkThread, SIGNAL(results(DiagnosticsIq)), this, SLOT(handleResults(DiagnosticsIq)));
+    connect(networkThread, SIGNAL(finished()), networkThread, SLOT(deleteLater()));
+    qDebug() << "diagnostics started";
+    networkThread->start();
+}
+
+void DiagnosticsExtension::handleResults(const DiagnosticsIq &results)
+{
+    qDebug() << "diagnostics finished";
+    client()->sendPacket(results);
 }
 
 bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
@@ -486,27 +496,18 @@ static WirelessNetwork networkFromXml(const QDomElement &element)
     return network;
 }
 
-static void networkToXml(const WirelessNetwork &network, bool current, QXmlStreamWriter *writer)
-{
-    writer->writeStartElement("network");
-    if (current)
-        helperToXmlAddAttribute(writer, "current", "1");
-    helperToXmlAddAttribute(writer, "cinr", QString::number(network.cinr()));
-    helperToXmlAddAttribute(writer, "rssi", QString::number(network.rssi()));
-    helperToXmlAddAttribute(writer, "ssid", network.ssid());
-    writer->writeEndElement();
-}
-
 void WirelessResult::parse(const QDomElement &element)
 {
     interface = QNetworkInterface::interfaceFromName(element.attribute("name"));
     QDomElement networkElement = element.firstChildElement("network");
     while (!networkElement.isNull())
     {
-        if (networkElement.attribute("current") == QLatin1String("1"))
-            currentNetwork = networkFromXml(networkElement);
+        WirelessNetwork network;
+        network.parse(networkElement);
+        if (network.isCurrent())
+            currentNetwork = network;
         else
-            availableNetworks << networkFromXml(networkElement);
+            availableNetworks << network;
         networkElement = networkElement.nextSiblingElement("network");
     }
 }
@@ -516,9 +517,9 @@ void WirelessResult::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement("wirelessInterface");
     helperToXmlAddAttribute(writer, "name", interface.name());
     if (currentNetwork.isValid())
-        networkToXml(currentNetwork, true, writer);
+        currentNetwork.toXml(writer);
     foreach (const WirelessNetwork &network, availableNetworks)
-        networkToXml(network, false, writer);
+        network.toXml(writer);
     writer->writeEndElement();
 }
 
@@ -570,8 +571,12 @@ public:
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
     /* add diagnostics extension */
-    DiagnosticsExtension *extension = new DiagnosticsExtension(chat->client());
-    chat->client()->addExtension(extension);
+    const QString domain = chat->client()->configuration().domain();
+    if (domain == "wifirst.net")
+    {
+        DiagnosticsExtension *extension = new DiagnosticsExtension(chat->client());
+        chat->client()->addExtension(extension);
+    }
 
     /* register panel */
     Diagnostics *diagnostics = new Diagnostics;

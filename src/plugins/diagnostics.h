@@ -123,9 +123,14 @@ private:
 
 class DiagnosticsExtension : public QXmppClientExtension
 {
+    Q_OBJECT
+
 public:
     DiagnosticsExtension(QXmppClient *client);
     bool handleStanza(const QDomElement &stanza);
+
+private slots:
+    void handleResults(const DiagnosticsIq &results);
 };
 
 #endif
