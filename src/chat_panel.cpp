@@ -368,8 +368,9 @@ void ChatPanelWidget::appear()
 
 QRectF ChatPanelWidget::contentRect() const
 {
-    QRectF rect = geometry().adjusted(0, 0, -BUTTON_WIDTH - ICON_WIDTH, 0);
+    QRectF rect = geometry().adjusted(0, 1, -BUTTON_WIDTH - ICON_WIDTH, -2);
     rect.moveLeft(ICON_WIDTH);
+    rect.moveTop(0);
     return rect;
 }
 

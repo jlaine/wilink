@@ -49,6 +49,7 @@
 #include "chat_utils.h"
 
 #define TRANSFERS_ROSTER_ID    "0_transfers"
+#define PROGRESS_HEIGHT 12
 
 static qint64 fileSizeLimit = 50000000; // 50 MB
 
@@ -135,6 +136,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
         sizeToString(job->fileSize())), this);
 
     m_progress = new QProgressBar;
+    m_progress->setMaximumHeight(PROGRESS_HEIGHT);
     m_progressProxy = new QGraphicsProxyWidget(this);
     m_progressProxy->setWidget(m_progress);
 
@@ -166,16 +168,19 @@ void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
 void ChatTransferWidget::setGeometry(const QRectF &rect)
 {
     ChatPanelWidget::setGeometry(rect);
-    QRectF progressRect = contentRect();
+    QRectF contents = contentRect();
     if (m_progressProxy->isVisible())
     {
-        progressRect.setHeight(16);
-        m_progressProxy->setGeometry(progressRect);
-    } else {
-        progressRect.setHeight(0);
+        QPointF progressTop;
+        QRectF progress(contents);
+        progress.setTop(contents.bottom() - PROGRESS_HEIGHT);
+        progress.setHeight(PROGRESS_HEIGHT);
+        m_progressProxy->setGeometry(progress);
+
+        contents.setBottom(progress.top());
     }
-    m_label->setPos(progressRect.left(),
-        ((rect.height() - progressRect.height()) - m_label->boundingRect().height()) / 2);
+    m_label->setPos(contents.left(), contents.top() +
+        (contents.height() - m_label->boundingRect().height()) / 2);
 }
 
 void ChatTransferWidget::slotCancel()
@@ -223,6 +228,7 @@ void ChatTransferWidget::slotFinished()
     }
     else
         setIconPixmap(QPixmap(":/contact-busy.png"));
+    setGeometry(geometry());
 
     // delete job
     m_job->deleteLater();

@@ -251,8 +251,10 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 void CallWidget::setGeometry(const QRectF &rect)
 {
     ChatPanelWidget::setGeometry(rect);
-    m_label->setPos(contentRect().left(),
-        (rect.height() - m_label->boundingRect().height()) / 2);
+
+    QRectF contents = contentRect();
+    m_label->setPos(contents.left(), contents.top() +
+        (contents.height() - m_label->boundingRect().height()) / 2);
 }
 
 void CallWatcher::addCall(QXmppCall *call)
