@@ -105,7 +105,7 @@ protected slots:
     void showDns(const QList<QHostInfo> &results);
     void showPing(const QList<Ping> &results);
     void showProgress(int done, int total);
-    void showTraceroute(const QList<Ping> &results);
+    void showTraceroute(const Traceroute &results);
     void showWireless(const WirelessResult &result);
     void networkFinished();
 

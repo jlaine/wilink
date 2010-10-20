@@ -326,7 +326,7 @@ void Diagnostics::refresh()
     connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
     connect(networkThread, SIGNAL(pingResults(const QList<Ping> &)), this, SLOT(showPing(const QList<Ping> &)));
     connect(networkThread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-    connect(networkThread, SIGNAL(tracerouteResults(const QList<Ping> &)), this, SLOT(showTraceroute(const QList<Ping> &)));
+    connect(networkThread, SIGNAL(tracerouteResults(Traceroute)), this, SLOT(showTraceroute(Traceroute)));
     connect(networkThread, SIGNAL(wirelessResult(const WirelessResult &)), this, SLOT(showWireless(const WirelessResult &)));
     networkThread->start();
 }
@@ -405,7 +405,7 @@ void Diagnostics::showProgress(int done, int total)
     progressBar->setValue(done);
 }
 
-void Diagnostics::showTraceroute(const QList<Ping> &results)
+void Diagnostics::showTraceroute(const Traceroute &results)
 {
     addItem("Traceroute", dumpPings(results));
 }
