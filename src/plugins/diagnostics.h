@@ -46,6 +46,7 @@ public:
     WirelessNetwork currentNetwork;
     WirelessStandards supportedStandards;
 
+    void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
 };
 
@@ -69,6 +70,7 @@ signals:
 class DiagnosticsIq : public QXmppIq
 {
 public:
+    void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:

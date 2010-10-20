@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDomElement>
 #include <QLayout>
 #include <QMenu>
 #include <QNetworkAccessManager>
@@ -451,13 +452,38 @@ void Diagnostics::showWireless(const WirelessResult &result)
 
 // SERIALISATION
 
-static void networkToXml(const WirelessNetwork &network, QXmlStreamWriter *writer)
+static WirelessNetwork networkFromXml(const QDomElement &element)
+{
+    WirelessNetwork network;
+    network.setCinr(element.attribute("cinr").toInt());
+    network.setRssi(element.attribute("rssi").toInt());
+    network.setSsid(element.attribute("ssid"));
+    return network;
+}
+
+static void networkToXml(const WirelessNetwork &network, bool current, QXmlStreamWriter *writer)
 {
     writer->writeStartElement("network");
+    if (current)
+        helperToXmlAddAttribute(writer, "current", "1");
     helperToXmlAddAttribute(writer, "cinr", QString::number(network.cinr()));
     helperToXmlAddAttribute(writer, "rssi", QString::number(network.rssi()));
     helperToXmlAddAttribute(writer, "ssid", network.ssid());
     writer->writeEndElement();
+}
+
+void WirelessResult::parse(const QDomElement &element)
+{
+    interface = QNetworkInterface::interfaceFromName(element.attribute("name"));
+    QDomElement networkElement = element.firstChildElement("network");
+    while (!networkElement.isNull())
+    {
+        if (networkElement.attribute("current") == QLatin1String("1"))
+            currentNetwork = networkFromXml(networkElement);
+        else
+            availableNetworks << networkFromXml(networkElement);
+        networkElement = networkElement.nextSiblingElement("network");
+    }
 }
 
 void WirelessResult::toXml(QXmlStreamWriter *writer) const
@@ -465,10 +491,22 @@ void WirelessResult::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement("wirelessInterface");
     helperToXmlAddAttribute(writer, "name", interface.name());
     if (currentNetwork.isValid())
-        networkToXml(currentNetwork, writer);
+        networkToXml(currentNetwork, true, writer);
     foreach (const WirelessNetwork &network, availableNetworks)
-        networkToXml(network, writer);
+        networkToXml(network, false, writer);
     writer->writeEndElement();
+}
+
+void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement resultElement = element.firstChildElement("wirelessInterface");
+    while (!resultElement.isNull())
+    {
+        WirelessResult result;
+        result.parse(resultElement);
+        m_wirelessResults << result;
+        resultElement = resultElement.nextSiblingElement("wirelessInterface");
+    }
 }
 
 void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
