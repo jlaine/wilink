@@ -74,6 +74,10 @@ static QString interfaceName(const QNetworkInterface &interface)
 void NetworkThread::run()
 {
     DiagnosticsIq iq;
+    iq.setId(m_id);
+    iq.setTo(m_to);
+    iq.setType(QXmppIq::Result);
+
     QList<QHostAddress> gateways;
     QList<QHostInfo> lookups;
     int done = 0;
@@ -466,19 +470,22 @@ void Diagnostics::showWireless(const WirelessResult &result)
 // EXTENSION
 
 DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
+    : m_thread(0)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
+}
 
-    NetworkThread *networkThread = new NetworkThread(this);
-    connect(networkThread, SIGNAL(results(DiagnosticsIq)), this, SLOT(handleResults(DiagnosticsIq)));
-    connect(networkThread, SIGNAL(finished()), networkThread, SLOT(deleteLater()));
-    qDebug() << "diagnostics started";
-    networkThread->start();
+DiagnosticsExtension::~DiagnosticsExtension()
+{
+    if (m_thread)
+    {
+        m_thread->wait();
+        delete m_thread;
+    }
 }
 
 void DiagnosticsExtension::handleResults(const DiagnosticsIq &results)
 {
-    qDebug() << "diagnostics finished";
     client()->sendPacket(results);
 }
 
@@ -486,6 +493,29 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
 {
     if (stanza.tagName() == "iq" && DiagnosticsIq::isDiagnosticsIq(stanza))
     {
+        DiagnosticsIq iq;
+        iq.parse(stanza);
+
+        if (iq.type() == QXmppIq::Get)
+        {
+            // only allow one request at a time
+            if (m_thread && m_thread->isRunning())
+            {
+                DiagnosticsIq response;
+                response.setType(QXmppIq::Error);
+                response.setId(iq.id());
+                response.setTo(iq.from());
+                client()->sendPacket(response);
+                return true;
+            } else if (!m_thread) {
+                m_thread = new NetworkThread(this);
+                connect(m_thread, SIGNAL(results(DiagnosticsIq)),
+                        this, SLOT(handleResults(DiagnosticsIq)));
+            }
+            m_thread->setId(iq.id());
+            m_thread->setTo(iq.from());
+            m_thread->start();
+        }
         return true;
     }
     return false;

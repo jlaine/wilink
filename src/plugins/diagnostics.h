@@ -80,8 +80,10 @@ class NetworkThread : public QThread
     Q_OBJECT
 
 public:
-    NetworkThread(QObject *parent) : QThread(parent) {};
+    NetworkThread(QObject *parent) : QThread(parent) {};   
     void run();
+    void setId(const QString &id) { m_id = id; };
+    void setTo(const QString &to) { m_to = to; };
 
 signals:
     void progress(int done, int total);
@@ -91,6 +93,10 @@ signals:
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Traceroute> &results);
     void wirelessResult(const WirelessResult &result);
+
+private:
+    QString m_id;
+    QString m_to;
 };
 
 class Diagnostics : public ChatPanel
@@ -135,10 +141,15 @@ class DiagnosticsExtension : public QXmppClientExtension
 
 public:
     DiagnosticsExtension(QXmppClient *client);
+    ~DiagnosticsExtension();
+
     bool handleStanza(const QDomElement &stanza);
 
 private slots:
     void handleResults(const DiagnosticsIq &results);
+
+private:
+    NetworkThread *m_thread;
 };
 
 #endif
