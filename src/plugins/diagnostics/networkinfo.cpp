@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDomElement>
 #include <QProcess>
 
 #include "networkinfo.h"
@@ -25,6 +26,54 @@ Ping::Ping()
     : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
     sentPackets(0), receivedPackets(0)
 {
+}
+
+void Ping::parse(const QDomElement &element)
+{
+    hostAddress = QHostAddress(element.attribute("hostAddress"));
+
+    minimumTime = element.attribute("minimumTime").toFloat();
+    maximumTime = element.attribute("maximumTime").toFloat();
+    averageTime = element.attribute("averageTime").toFloat();
+
+    sentPackets = element.attribute("sentPacket").toInt();
+    receivedPackets = element.attribute("receivedPacket").toInt();
+}
+
+void Ping::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("ping");
+    writer->writeAttribute("hostAddress", hostAddress.toString());
+
+    writer->writeAttribute("minimumTime", QString::number(minimumTime));
+    writer->writeAttribute("maximumTime", QString::number(maximumTime));
+    writer->writeAttribute("averageTime", QString::number(averageTime));
+
+    writer->writeAttribute("sentPackets", QString::number(sentPackets));
+    writer->writeAttribute("receivedPackets", QString::number(receivedPackets));
+    writer->writeEndElement();
+}
+
+void Traceroute::parse(const QDomElement &element)
+{
+    m_hostAddress = QHostAddress(element.attribute("hostAddress"));
+    QDomElement pingElement = element.firstChildElement("ping");
+    while (!pingElement.isNull())
+    {
+        Ping ping;
+        ping.parse(pingElement);
+        append(ping);
+        pingElement = pingElement.nextSiblingElement("ping");
+    }
+}
+
+void Traceroute::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement("ping");
+    writer->writeAttribute("hostAddress", m_hostAddress.toString());
+    for (int i = 0; i < size(); ++i)
+        at(i).toXml(writer);
+    writer->writeEndElement();
 }
 
 Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
@@ -86,9 +135,11 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
     return info;
 }
 
-QList<Ping> NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, int maxHops)
+Traceroute NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, int maxHops)
 {
-    QList<Ping> hops;
+    Traceroute hops;
+    hops.setHostAddress(host);
+
     QString program;
     QStringList arguments;
 

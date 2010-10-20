@@ -19,6 +19,9 @@
 
 #include <QHostAddress>
 #include <QList>
+#include <QXmlStreamWriter>
+
+class QDomElement;
 
 class Ping
 {
@@ -34,12 +37,28 @@ public:
 
     int sentPackets;
     int receivedPackets;
+
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+};
+
+class Traceroute : public QList<Ping>
+{
+public:
+    QHostAddress hostAddress() const { return m_hostAddress; }
+    void setHostAddress(const QHostAddress &hostAddress) { m_hostAddress = hostAddress; };
+
+    void parse(const QDomElement &element);
+    void toXml(QXmlStreamWriter *writer) const;
+
+private:
+    QHostAddress m_hostAddress;
 };
 
 class NetworkInfo
 {
 public:
     static Ping ping(const QHostAddress &host, int maxPackets = 1);
-    static QList<Ping> traceroute(const QHostAddress &host, int maxPackets = 1, int maxHops = 0);
+    static Traceroute traceroute(const QHostAddress &host, int maxPackets = 1, int maxHops = 0);
 };
 
