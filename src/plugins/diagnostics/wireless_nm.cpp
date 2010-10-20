@@ -119,6 +119,7 @@ WirelessNetwork WirelessInterface::currentNetwork()
     if (!interface.isValid())
         return WirelessNetwork();
     QDBusObjectPath activeAP = interface.property("ActiveAccessPoint").value<QDBusObjectPath>();
+    activeAP.setCurrent(true);
     return WirelessInterfacePrivate::getFromDbusObject(activeAP.path());
 }
 

@@ -69,7 +69,7 @@ void Traceroute::parse(const QDomElement &element)
 
 void Traceroute::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("ping");
+    writer->writeStartElement("traceroute");
     writer->writeAttribute("hostAddress", m_hostAddress.toString());
     for (int i = 0; i < size(); ++i)
         at(i).toXml(writer);

@@ -52,11 +52,13 @@ static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
 Q_DECLARE_METATYPE(QList<Ping>)
+Q_DECLARE_METATYPE(QList<Traceroute>)
 Q_DECLARE_METATYPE(WirelessResult)
 
 static int id1 = qRegisterMetaType< QList<QHostInfo> >();
 static int id2 = qRegisterMetaType< QList<Ping> >();
-static int id3 = qRegisterMetaType< WirelessResult >();
+static int id3 = qRegisterMetaType< QList<Traceroute> >();
+static int id4 = qRegisterMetaType< WirelessResult >();
 
 static QString interfaceName(const QNetworkInterface &interface)
 {

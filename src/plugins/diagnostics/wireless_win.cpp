@@ -466,6 +466,7 @@ WirelessNetwork WirelessInterface::currentNetwork()
     }
 
     const WLAN_ASSOCIATION_ATTRIBUTES &wlanAttributes = connectionAttributes->wlanAssociationAttributes;
+    network.setCurrent(true);
     network.setRssi(-100 + 0.5 * wlanAttributes.wlanSignalQuality);
     network.setSsid(QString::fromAscii(QByteArray(
         (const char*)&wlanAttributes.dot11Ssid.ucSSID[0],

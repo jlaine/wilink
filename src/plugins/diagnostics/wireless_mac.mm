@@ -120,6 +120,7 @@ WirelessNetwork WirelessInterface::currentNetwork()
     NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
 
     CWInterface *currentInterface = [CWInterface interfaceWithName:qstringToNSString(d->interfaceName)];
+    network.setCurrent(true);
     network.setCinr(nsnumberToInt([currentInterface noise]));
     network.setRssi(nsnumberToInt([currentInterface rssi]));
     network.setSsid(nsstringToQString([currentInterface ssid]));
