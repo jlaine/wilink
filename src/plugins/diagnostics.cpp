@@ -438,6 +438,7 @@ void Diagnostics::showInterface(const Interface &result)
         titles << "SSID" << "RSSI";
         if (showCinr)
             titles << "CINR";
+        titles << "";
         table << titles;
         foreach (const WirelessNetwork &network, result.wirelessNetworks())
         {
@@ -446,6 +447,7 @@ void Diagnostics::showInterface(const Interface &result)
             row << QString::number(network.rssi()) + " dBm";
             if (showCinr)
                 row << (network.cinr() ? QString::number(network.cinr()) : QString());
+            row << (network.isCurrent() ? "<b>*</b>" : "");
             table << row;
         }
         addItem("Wireless networks", table.render());
