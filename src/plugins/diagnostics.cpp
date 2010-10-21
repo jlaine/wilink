@@ -162,7 +162,7 @@ void DiagnosticsThread::run()
     {
         const Ping &ping = NetworkInfo::ping(gateway, 3);
         pings.append(ping);
-        if (longPing.contains(gateway) && ping.sentPackets != ping.receivedPackets)
+        if (longPing.contains(gateway) && ping.sentPackets() != ping.receivedPackets())
             pings.append(NetworkInfo::ping(gateway, 30));
     }
     emit pingResults(pings);
@@ -232,14 +232,14 @@ static QString dumpPings(const QList<Ping> &pings)
     foreach (const Ping &report, pings)
     {
         TextRow row;
-        row.setColor(report.receivedPackets == report.sentPackets ? "green" : "red");
-        row << (report.hostAddress.isNull() ? "-" : report.hostAddress.toString());
-        row << QString("%1 / %2").arg(report.receivedPackets).arg(report.sentPackets);
-        if (report.receivedPackets)
+        row.setColor(report.receivedPackets() == report.sentPackets() ? "green" : "red");
+        row << (report.hostAddress().isNull() ? "-" : report.hostAddress().toString());
+        row << QString("%1 / %2").arg(QString::number(report.receivedPackets()), QString::number(report.sentPackets()));
+        if (report.receivedPackets())
         {
-            row << QString("%1 ms").arg(report.minimumTime);
-            row << QString("%1 ms").arg(report.maximumTime);
-            row << QString("%1 ms").arg(report.averageTime);
+            row << QString("%1 ms").arg(report.minimumTime());
+            row << QString("%1 ms").arg(report.maximumTime());
+            row << QString("%1 ms").arg(report.averageTime());
         } else {
             row << "-" << "-" << "-";
         }

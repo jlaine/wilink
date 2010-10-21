@@ -27,24 +27,42 @@
 class QDomElement;
 
 /** The Ping class represents an ICMP ping result.
+ *
+ *  All times are expressed in milliseconds.
  */
 class Ping
 {
 public:
     Ping();
 
-    QHostAddress hostAddress;
+    QHostAddress hostAddress() const;
+    void setHostAddress(const QHostAddress &hostAddress);
 
-    // in milliseconds
-    float minimumTime;
-    float maximumTime;
-    float averageTime;
+    float minimumTime() const;
+    void setMinimumTime(float minimumTime);
 
-    int sentPackets;
-    int receivedPackets;
+    float maximumTime() const;
+    void setMaximumTime(float maximumTime);
+
+    float averageTime() const;
+    void setAverageTime(float averageTime);
+
+    int sentPackets() const;
+    void setSentPackets(int sentPackets);
+
+    int receivedPackets() const;
+    void setReceivedPackets(int receivedPackets);
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+
+private:
+    QHostAddress m_hostAddress;
+    float m_minimumTime;
+    float m_maximumTime;
+    float m_averageTime;
+    int m_sentPackets;
+    int m_receivedPackets;
 };
 
 /** The Traceroute class represents a traceroute result.
@@ -52,8 +70,8 @@ public:
 class Traceroute : public QList<Ping>
 {
 public:
-    QHostAddress hostAddress() const { return m_hostAddress; }
-    void setHostAddress(const QHostAddress &hostAddress) { m_hostAddress = hostAddress; };
+    QHostAddress hostAddress() const;
+    void setHostAddress(const QHostAddress &hostAddress);
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;

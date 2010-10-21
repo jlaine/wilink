@@ -23,35 +23,108 @@
 #include "ping.h"
 
 Ping::Ping()
-    : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),
-    sentPackets(0), receivedPackets(0)
+    : m_minimumTime(0.0),
+    m_maximumTime(0.0),
+    m_averageTime(0.0),
+    m_sentPackets(0),
+    m_receivedPackets(0)
 {
+}
+
+QHostAddress Ping::hostAddress() const
+{
+    return m_hostAddress;
+}
+
+void Ping::setHostAddress(const QHostAddress &hostAddress)
+{
+    m_hostAddress = hostAddress;
+}
+
+float Ping::minimumTime() const
+{
+    return m_minimumTime;
+}
+
+void Ping::setMinimumTime(float minimumTime)
+{
+    m_minimumTime = minimumTime;
+}
+
+float Ping::maximumTime() const
+{
+    return m_maximumTime;
+}
+
+void Ping::setMaximumTime(float maximumTime)
+{
+    m_maximumTime = maximumTime;
+}
+
+float Ping::averageTime() const
+{
+    return m_averageTime;
+}
+
+void Ping::setAverageTime(float averageTime)
+{
+    m_averageTime = averageTime;
+}
+
+int Ping::sentPackets() const
+{
+    return m_sentPackets;
+}
+
+void Ping::setSentPackets(int sentPackets)
+{
+    m_sentPackets = sentPackets;
+}
+
+int Ping::receivedPackets() const
+{
+    return m_receivedPackets;
+}
+
+void Ping::setReceivedPackets(int receivedPackets)
+{
+    m_receivedPackets = receivedPackets;
 }
 
 void Ping::parse(const QDomElement &element)
 {
-    hostAddress = QHostAddress(element.attribute("hostAddress"));
+    m_hostAddress = QHostAddress(element.attribute("hostAddress"));
 
-    minimumTime = element.attribute("minimumTime").toFloat();
-    maximumTime = element.attribute("maximumTime").toFloat();
-    averageTime = element.attribute("averageTime").toFloat();
+    m_minimumTime = element.attribute("minimumTime").toFloat();
+    m_maximumTime = element.attribute("maximumTime").toFloat();
+    m_averageTime = element.attribute("averageTime").toFloat();
 
-    sentPackets = element.attribute("sentPacket").toInt();
-    receivedPackets = element.attribute("receivedPacket").toInt();
+    m_sentPackets = element.attribute("sentPacket").toInt();
+    m_receivedPackets = element.attribute("receivedPacket").toInt();
 }
 
 void Ping::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("ping");
-    writer->writeAttribute("hostAddress", hostAddress.toString());
+    writer->writeAttribute("hostAddress", m_hostAddress.toString());
 
-    writer->writeAttribute("minimumTime", QString::number(minimumTime));
-    writer->writeAttribute("maximumTime", QString::number(maximumTime));
-    writer->writeAttribute("averageTime", QString::number(averageTime));
+    writer->writeAttribute("minimumTime", QString::number(m_minimumTime));
+    writer->writeAttribute("maximumTime", QString::number(m_maximumTime));
+    writer->writeAttribute("averageTime", QString::number(m_averageTime));
 
-    writer->writeAttribute("sentPackets", QString::number(sentPackets));
-    writer->writeAttribute("receivedPackets", QString::number(receivedPackets));
+    writer->writeAttribute("sentPackets", QString::number(m_sentPackets));
+    writer->writeAttribute("receivedPackets", QString::number(m_receivedPackets));
     writer->writeEndElement();
+}
+
+QHostAddress Traceroute::hostAddress() const
+{
+    return m_hostAddress;
+}
+
+void Traceroute::setHostAddress(const QHostAddress &hostAddress)
+{
+    m_hostAddress = hostAddress;
 }
 
 void Traceroute::parse(const QDomElement &element)
@@ -79,7 +152,7 @@ void Traceroute::toXml(QXmlStreamWriter *writer) const
 Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
 {
     Ping info;
-    info.hostAddress = host;
+    info.setHostAddress(host);
 
     QString program;
     if (host.protocol() == QAbstractSocket::IPv4Protocol)
@@ -109,9 +182,9 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
     QRegExp timeRegex(" = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms, [^ ]+ = ([0-9]+)ms");
     if (timeRegex.indexIn(result))
     {
-        info.minimumTime = timeRegex.cap(1).toInt();
-        info.maximumTime = timeRegex.cap(2).toInt();
-        info.averageTime = timeRegex.cap(3).toInt();
+        info.setMinimumTime(timeRegex.cap(1).toInt());
+        info.setMaximumTime(timeRegex.cap(2).toInt());
+        info.setAverageTime(timeRegex.cap(3).toInt());
     }
     QRegExp packetRegex(" = ([0-9]+), [^ ]+ = ([0-9]+),");
 #else
@@ -119,9 +192,9 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
     QRegExp timeRegex(" = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms");
     if (timeRegex.indexIn(result))
     {
-        info.minimumTime = timeRegex.cap(1).toFloat();
-        info.averageTime = timeRegex.cap(2).toFloat();
-        info.maximumTime = timeRegex.cap(3).toFloat();
+        info.setMinimumTime(timeRegex.cap(1).toFloat());
+        info.setAverageTime(timeRegex.cap(2).toFloat());
+        info.setMaximumTime(timeRegex.cap(3).toFloat());
     }
     /* Linux  : 2 packets transmitted, 2 received, 0% packet loss, time 1001ms */
     /* Mac OS : 2 packets transmitted, 1 packets received, 50.0% packet loss */
@@ -129,8 +202,8 @@ Ping NetworkInfo::ping(const QHostAddress &host, int maxPackets)
 #endif
     if (packetRegex.indexIn(result))
     {
-        info.sentPackets = packetRegex.cap(1).toInt();
-        info.receivedPackets = packetRegex.cap(2).toInt();
+        info.setSentPackets(packetRegex.cap(1).toInt());
+        info.setReceivedPackets(packetRegex.cap(2).toInt());
     }
     return info;
 }
@@ -193,23 +266,23 @@ Traceroute NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, int
             foreach (const QString &bit, hopRegex.cap(1).split(QRegExp("\\s+")))
             {
                 if (ipRegex.exactMatch(bit))
-                    hop.hostAddress = QHostAddress(bit);
+                    hop.setHostAddress(QHostAddress(bit));
                 else if (bit == "*")
-                    hop.sentPackets++;
+                    hop.setSentPackets(hop.sentPackets() + 1);
                 else if (timeRegex.exactMatch(bit))
                 {
                     float hopTime = (bit == "<1") ? 0 : bit.toFloat();
-                    hop.sentPackets += 1;
-                    hop.receivedPackets += 1;
-                    if (hopTime > hop.maximumTime)
-                        hop.maximumTime = hopTime;
-                    if (!hop.minimumTime || hopTime < hop.minimumTime)
-                        hop.minimumTime = hopTime;
+                    hop.setSentPackets(hop.sentPackets() + 1);
+                    hop.setReceivedPackets(hop.receivedPackets() + 1);
+                    if (hopTime > hop.maximumTime())
+                        hop.setMaximumTime(hopTime);
+                    if (!hop.minimumTime() || hopTime < hop.minimumTime())
+                        hop.setMinimumTime(hopTime);
                     totalTime += hopTime;
                 }
             }
-            if (hop.receivedPackets)
-                hop.averageTime = totalTime / static_cast<float>(hop.receivedPackets);
+            if (hop.receivedPackets())
+                hop.setAverageTime(totalTime / static_cast<float>(hop.receivedPackets()));
             hops.append(hop);
         }
     }
