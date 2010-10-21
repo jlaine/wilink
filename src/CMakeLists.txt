@@ -56,6 +56,7 @@ set(wiLink_SOURCES
     plugins/diagnostics/interface.cpp
     plugins/diagnostics/iq.cpp
     plugins/diagnostics/ping.cpp
+    plugins/diagnostics/software.cpp
     plugins/diagnostics/wireless.cpp
     plugins/discovery.cpp
     plugins/menu.cpp
@@ -168,6 +169,7 @@ add_executable(tests
     plugins/diagnostics/interface.cpp
     plugins/diagnostics/iq.cpp
     plugins/diagnostics/ping.cpp
+    plugins/diagnostics/software.cpp
     plugins/diagnostics/wireless.cpp
     systeminfo.cpp
     tests.cpp

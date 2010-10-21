@@ -26,6 +26,7 @@
 
 #include "interface.h"
 #include "ping.h"
+#include "software.h"
 #include "wireless.h"
 
 extern const char* ns_diagnostics;
@@ -42,6 +43,9 @@ public:
     QList<Ping> pings() const;
     void setPings(const QList<Ping> &pings);
 
+    QList<Software> softwares() const;
+    void setSoftwares(const QList<Software> &softwares);
+
     QList<Traceroute> traceroutes() const;
     void setTraceroutes(const QList<Traceroute> &traceroutes);
 
@@ -55,6 +59,7 @@ private:
     QList<Interface> m_interfaces;
     QList<QHostInfo> m_lookups;
     QList<Ping> m_pings;
+    QList<Software> m_softwares;
     QList<Traceroute> m_traceroutes;
 };
 

@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDomElement>
+#include <QLineEdit>
 #include <QLayout>
 #include <QMenu>
 #include <QNetworkInterface>
@@ -68,6 +69,21 @@ void DiagnosticsThread::run()
 
     emit progress(done, total);
 
+    /* software versions */
+    QList<Software> softwares;
+    Software os;
+    os.setType("os");
+    os.setName(SystemInfo::osName());
+    os.setVersion(SystemInfo::osVersion());
+    softwares << os;
+
+    Software app;
+    app.setType("application");
+    app.setName(qApp->applicationName());
+    app.setVersion(qApp->applicationVersion());
+    softwares << app;
+    iq.setSoftwares(softwares);
+
     /* discover interfaces */
     QList<Interface> interfaceResults;
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -101,7 +117,6 @@ void DiagnosticsThread::run()
             result.setWirelessStandards(wireless.supportedStandards());
         }
         interfaceResults << result;
-        emit interfaceResult(result);
         emit progress(++done, ++total);
     }
     iq.setInterfaces(interfaceResults);
@@ -146,7 +161,6 @@ void DiagnosticsThread::run()
             }
         }
     }
-    emit lookupResults(lookups);
     emit progress(++done, total);
     iq.setLookups(lookups);
 
@@ -159,14 +173,12 @@ void DiagnosticsThread::run()
         if (longPing.contains(gateway) && ping.sentPackets() != ping.receivedPackets())
             pings.append(NetworkInfo::ping(gateway, 30));
     }
-    emit pingResults(pings);
     emit progress(++done, total);
     iq.setPings(pings);
 
     /* run traceroute */
     QList<Traceroute> traceroutes;
     traceroutes << NetworkInfo::traceroute(serverAddress, 3, 4);
-    emit tracerouteResults(traceroutes);
     emit progress(++done, total);
     iq.setTraceroutes(traceroutes);
 
@@ -242,8 +254,11 @@ static QString dumpPings(const QList<Ping> &pings)
     return table.render();
 }
 
-Diagnostics::Diagnostics(QWidget *parent)
-    : ChatPanel(parent), displayed(false), m_thread(NULL)
+Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
+    : ChatPanel(parent),
+    m_client(client),
+    m_displayed(false),
+    m_thread(0)
 {
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -252,6 +267,9 @@ Diagnostics::Diagnostics(QWidget *parent)
     layout->addWidget(text);
 
     QHBoxLayout *hbox = new QHBoxLayout;
+
+    hostEdit = new QLineEdit;
+    hbox->addWidget(hostEdit);
 
     progressBar = new QProgressBar;
     hbox->addWidget(progressBar);
@@ -287,9 +305,18 @@ void Diagnostics::refresh()
         return;
 
     refreshButton->setEnabled(false);
+    text->setText("<h2>System information</h2>");
+
+    DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
+    if (extension)
+    {
+        connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
+                this, SLOT(showResults(DiagnosticsIq)));
+        extension->requestDiagnostics(m_client->configuration().jid());
+        return;
+    }
 
     /* show system info */
-    text->setText("<h2>System information</h2>");
     TextList list;
     list << QString("Operating system: %1 %2").arg(SystemInfo::osName(), SystemInfo::osVersion());
     list << QString("%1: %2").arg(qApp->applicationName(), qApp->applicationVersion());
@@ -299,11 +326,8 @@ void Diagnostics::refresh()
     /* run network tests */
     m_thread = new DiagnosticsThread(this);
     connect(m_thread, SIGNAL(finished()), this, SLOT(networkFinished()));
-    connect(m_thread, SIGNAL(interfaceResult(Interface)),this, SLOT(showInterface(Interface)));
-    connect(m_thread, SIGNAL(lookupResults(QList<QHostInfo>)), this, SLOT(showLookup(QList<QHostInfo>)));
-    connect(m_thread, SIGNAL(pingResults(QList<Ping>)), this, SLOT(showPing(QList<Ping>)));
     connect(m_thread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-    connect(m_thread, SIGNAL(tracerouteResults(QList<Traceroute>)), this, SLOT(showTraceroute(QList<Traceroute>)));
+    connect(m_thread, SIGNAL(results(DiagnosticsIq)), this, SLOT(showResults(DiagnosticsIq)));
     m_thread->start();
 }
 
@@ -319,16 +343,14 @@ void Diagnostics::networkFinished()
 
 void Diagnostics::slotShow()
 {
-    if (displayed)
+    if (m_displayed)
         return;
     refresh();
-    displayed = true;
+    m_displayed = true;
 }
 
 void Diagnostics::showLookup(const QList<QHostInfo> &results)
 {
-    addSection("Tests");
-
     TextTable table;
     TextRow titles(true);
     titles << "Host name" << "Host address";
@@ -352,20 +374,23 @@ void Diagnostics::showLookup(const QList<QHostInfo> &results)
     addItem("DNS", table.render());
 }
 
-void Diagnostics::showPing(const QList<Ping> &results)
-{
-    addItem("Ping", dumpPings(results));
-}
-
 void Diagnostics::showProgress(int done, int total)
 {
     progressBar->setMaximum(total);
     progressBar->setValue(done);
 }
 
-void Diagnostics::showTraceroute(const QList<Traceroute> &results)
+void Diagnostics::showResults(const DiagnosticsIq &iq)
 {
-    foreach (const Traceroute &traceroute, results)
+    // show interfaces
+    foreach (const Interface &interface, iq.interfaces())
+        showInterface(interface);
+
+    // show tests
+    addSection("Tests");
+    showLookup(iq.lookups());
+    addItem("Ping", dumpPings(iq.pings()));
+    foreach (const Traceroute &traceroute, iq.traceroutes())
         addItem("Traceroute", dumpPings(traceroute));
 }
 
@@ -424,11 +449,6 @@ DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
     : m_thread(0)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
-
-    m_thread = new DiagnosticsThread(this);
-    connect(m_thread, SIGNAL(results(DiagnosticsIq)),
-            this, SLOT(handleResults(DiagnosticsIq)));
-    m_thread->start();
 }
 
 DiagnosticsExtension::~DiagnosticsExtension()
@@ -511,7 +531,7 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     }
 
     /* register panel */
-    Diagnostics *diagnostics = new Diagnostics;
+    Diagnostics *diagnostics = new Diagnostics(chat->client());
     diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
     chat->addPanel(diagnostics);
 

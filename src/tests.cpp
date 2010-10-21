@@ -53,6 +53,7 @@ void TestDiagnostics::testPacket()
     const QByteArray xml(
     "<iq type=\"result\">"
         "<query xmlns=\"http://wifirst.net/protocol/diagnostics\">"
+            "<software type=\"os\" name=\"Windows\" version=\"XP\"/>"
             "<interface name=\"en1\">"
                 "<address broadcast=\"\" ip=\"FE80:0:0:0:226:8FF:FEE1:A96B\" netmask=\"FFFF:FFFF:FFFF:FFFF:0:0:0:0\"/>"
                 "<address broadcast=\"192.168.99.255\" ip=\"192.168.99.179\" netmask=\"255.255.255.0\"/>"

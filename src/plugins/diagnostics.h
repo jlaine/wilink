@@ -21,7 +21,6 @@
 #define __WILINK_DIAGNOSTICS_H__
 
 #include <QDialog>
-#include <QHostInfo>
 #include <QThread>
 
 #include "QXmppClientExtension.h"
@@ -29,6 +28,7 @@
 #include "chat_panel.h"
 #include "diagnostics/iq.h"
 
+class QLineEdit;
 class QPushButton;
 class QProgressBar;
 class QTextBrowser;
@@ -40,29 +40,30 @@ class Diagnostics : public ChatPanel
     Q_OBJECT
 
 public:
-    Diagnostics(QWidget *parent=0);
+    Diagnostics(QXmppClient *client, QWidget *parent=0);
 
 public slots:
     void slotShow();
 
-protected slots:
-    void addItem(const QString &title, const QString &value);
-    void addSection(const QString &title);
+private slots:
     void refresh();
-
-    void showInterface(const Interface &result);
-    void showLookup(const QList<QHostInfo> &results);
-    void showPing(const QList<Ping> &results);
     void showProgress(int done, int total);
-    void showTraceroute(const QList<Traceroute> &results);
+    void showResults(const DiagnosticsIq &iq);
     void networkFinished();
 
 private:
-    bool displayed;
+    void addItem(const QString &title, const QString &value);
+    void addSection(const QString &title);
+    void showInterface(const Interface &result);
+    void showLookup(const QList<QHostInfo> &results);
+
+    QLineEdit *hostEdit;
     QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
 
+    QXmppClient *m_client;
+    bool m_displayed;
     DiagnosticsThread *m_thread;
 };
 
@@ -104,11 +105,6 @@ public:
 signals:
     void progress(int done, int total);
     void results(const DiagnosticsIq &results);
-
-    void interfaceResult(const Interface &result);
-    void lookupResults(const QList<QHostInfo> &results);
-    void pingResults(const QList<Ping> &results);
-    void tracerouteResults(const QList<Traceroute> &results);
 
 private:
     QString m_id;

@@ -46,6 +46,16 @@ void DiagnosticsIq::setPings(const QList<Ping> &pings)
     m_pings = pings;
 }
 
+QList<Software> DiagnosticsIq::softwares() const
+{
+    return m_softwares;
+}
+
+void DiagnosticsIq::setSoftwares(const QList<Software> &softwares)
+{
+    m_softwares = softwares;
+}
+
 QList<Traceroute> DiagnosticsIq::traceroutes() const
 {
     return m_traceroutes;
@@ -98,6 +108,12 @@ void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
             ping.parse(child);
             m_pings << ping;
         }
+        else if (child.tagName() == QLatin1String("software"))
+        {
+            Software software;
+            software.parse(child);
+            m_softwares << software;
+        }
         else if (child.tagName() == QLatin1String("traceroute"))
         {
             Traceroute traceroute;
@@ -118,6 +134,8 @@ void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     writer->writeAttribute("xmlns", ns_diagnostics);
+    foreach (const Software &software, m_softwares)
+        software.toXml(writer);
     foreach (const Interface &interface, m_interfaces)
         interface.toXml(writer);
     foreach (const QHostInfo &lookup, m_lookups)
