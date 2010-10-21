@@ -80,7 +80,8 @@ void DiagnosticsThread::run()
     QList<Interface> interfaceResults;
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
-        if (interface.flags() & QNetworkInterface::IsLoopBack)
+        if (!(interface.flags() & QNetworkInterface::IsRunning) ||
+            (interface.flags() & QNetworkInterface::IsLoopBack))
             continue;
 
         Interface result;
