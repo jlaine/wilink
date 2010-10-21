@@ -370,7 +370,7 @@ void Diagnostics::slotShow()
 {
     if (m_displayed)
         return;
-    //refresh();
+    refresh();
     m_displayed = true;
 }
 
