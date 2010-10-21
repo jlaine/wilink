@@ -21,7 +21,6 @@
 #define __WILINK_DIAGNOSTICS_H__
 
 #include <QDialog>
-#include <QThread>
 
 #include "QXmppClientExtension.h"
 
@@ -86,9 +85,6 @@ signals:
 
 private slots:
     void handleResults(const DiagnosticsIq &results);
-
-private:
-    DiagnosticsThread *m_agent;
 };
 
 class DiagnosticsThread : public QObject
@@ -96,6 +92,9 @@ class DiagnosticsThread : public QObject
     Q_OBJECT
 
 public:
+    static void lookup(const DiagnosticsIq &request, QObject *receiver, const char *member);
+
+private:
     DiagnosticsThread(QObject *parent = 0) : QObject(parent) {};
 
 private slots:

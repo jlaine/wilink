@@ -41,7 +41,6 @@
 
 #define DIAGNOSTICS_ROSTER_ID "0_diagnostics"
 
-static DiagnosticsThread *diagnosticsAgent = 0;
 static QThread *diagnosticsThread = 0;
 
 static const QHostAddress serverAddress("213.91.4.201");
@@ -57,6 +56,21 @@ static int id3 = qRegisterMetaType< QList<Traceroute> >();
 static int id4 = qRegisterMetaType< Interface >();
 
 /* NETWORK */
+
+void DiagnosticsThread::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
+{
+    if (!diagnosticsThread)
+    {
+        diagnosticsThread = new QThread;
+        diagnosticsThread->start();
+    }
+
+    DiagnosticsThread *agent = new DiagnosticsThread;
+    agent->moveToThread(diagnosticsThread);
+    connect(agent, SIGNAL(results(DiagnosticsIq)), receiver, member);
+    QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
+        Q_ARG(DiagnosticsIq, request));
+}
 
 void DiagnosticsThread::handle(const DiagnosticsIq &request)
 {
@@ -288,9 +302,7 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
 
-    connect(diagnosticsAgent, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-    connect(diagnosticsAgent, SIGNAL(results(DiagnosticsIq)), this, SLOT(showResults(DiagnosticsIq)));
-
+    //connect(diagnosticsAgent, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
     DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
     connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
             this, SLOT(showResults(DiagnosticsIq)));
@@ -321,7 +333,7 @@ void Diagnostics::refresh()
     if (hostEdit->text().isEmpty())
     {
         DiagnosticsIq req;
-        QMetaObject::invokeMethod(diagnosticsAgent, "handle", Qt::QueuedConnection, Q_ARG(DiagnosticsIq, req)); 
+        DiagnosticsThread::lookup(req, this, SLOT(showResults(DiagnosticsIq)));
         return;
     }
 
@@ -462,8 +474,6 @@ void Diagnostics::showInterface(const Interface &result)
 DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
-    connect(diagnosticsAgent, SIGNAL(results(DiagnosticsIq)),
-            this, SLOT(handleResults(DiagnosticsIq)));
 }
 
 QStringList DiagnosticsExtension::discoveryFeatures() const
@@ -485,7 +495,7 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
 
         if (iq.type() == QXmppIq::Get)
         {
-            QMetaObject::invokeMethod(diagnosticsAgent, "handle", Qt::QueuedConnection, Q_ARG(DiagnosticsIq, iq)); 
+            DiagnosticsThread::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
         } else if (iq.type() == QXmppIq::Result || iq.type() == QXmppIq::Error) {
             emit diagnosticsReceived(iq);
         }
@@ -513,14 +523,6 @@ public:
 
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
-    if (!diagnosticsAgent)
-    {
-        diagnosticsThread = new QThread;
-        diagnosticsAgent = new DiagnosticsThread;
-        diagnosticsAgent->moveToThread(diagnosticsThread);
-        diagnosticsThread->start();
-    }
-
     /* add diagnostics extension */
     const QString domain = chat->client()->configuration().domain();
     if (domain == "wifirst.net")
