@@ -57,9 +57,9 @@ protected:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
 
 private:
+    QList<Interface> m_interfaces;
     QList<Ping> m_pings;
     QList<Traceroute> m_traceroutes;
-    QList<Interface> m_interfaces;
 };
 
 class Diagnostics : public ChatPanel
