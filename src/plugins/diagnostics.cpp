@@ -289,6 +289,15 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
 }
 
+Diagnostics::~Diagnostics()
+{
+    if (m_thread)
+    {
+        m_thread->wait();
+        delete m_thread;
+    }
+}
+
 void Diagnostics::addItem(const QString &title, const QString &value)
 {
     text->append(QString("<h3>%1</h3>%2").arg(title, value));
@@ -307,31 +316,22 @@ void Diagnostics::refresh()
     refreshButton->setEnabled(false);
     text->setText("<h2>System information</h2>");
 
+    if (hostEdit->text().isEmpty())
+    {
+        m_thread = new DiagnosticsThread(this);
+        connect(m_thread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
+        connect(m_thread, SIGNAL(results(DiagnosticsIq)), this, SLOT(showResults(DiagnosticsIq)));
+        m_thread->start();
+        return;
+    }
+
     DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
     if (extension)
     {
         connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
                 this, SLOT(showResults(DiagnosticsIq)));
-        extension->requestDiagnostics(m_client->configuration().jid());
-        return;
+        extension->requestDiagnostics(hostEdit->text());
     }
-
-    /* run network tests */
-    m_thread = new DiagnosticsThread(this);
-    connect(m_thread, SIGNAL(finished()), this, SLOT(networkFinished()));
-    connect(m_thread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-    connect(m_thread, SIGNAL(results(DiagnosticsIq)), this, SLOT(showResults(DiagnosticsIq)));
-    m_thread->start();
-}
-
-void Diagnostics::networkFinished()
-{
-    m_thread->wait();
-    delete m_thread;
-    m_thread = NULL;
-
-    /* enable buttons */
-    refreshButton->setEnabled(true);
 }
 
 void Diagnostics::slotShow()
@@ -400,6 +400,15 @@ void Diagnostics::showResults(const DiagnosticsIq &iq)
     addItem("Ping", dumpPings(iq.pings()));
     foreach (const Traceroute &traceroute, iq.traceroutes())
         addItem("Traceroute", dumpPings(traceroute));
+
+    // enable buttons
+    refreshButton->setEnabled(true);
+    if (m_thread)
+    {
+        m_thread->wait();
+        delete m_thread;
+        m_thread = 0;
+    }
 }
 
 void Diagnostics::showInterface(const Interface &result)

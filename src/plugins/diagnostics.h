@@ -41,6 +41,7 @@ class Diagnostics : public ChatPanel
 
 public:
     Diagnostics(QXmppClient *client, QWidget *parent=0);
+    ~Diagnostics();
 
 public slots:
     void slotShow();
@@ -49,7 +50,6 @@ private slots:
     void refresh();
     void showProgress(int done, int total);
     void showResults(const DiagnosticsIq &iq);
-    void networkFinished();
 
 private:
     void addItem(const QString &title, const QString &value);
