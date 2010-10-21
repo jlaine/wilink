@@ -128,7 +128,7 @@ void DiagnosticsThread::run()
     /* run DNS tests */
     QList<QHostAddress> longPing;
     QStringList hostNames;
-    hostNames << "wireless.wifirst.fr" << "www.wifirst.net" << "www.google.fr";
+    hostNames << "wireless.wifirst.net" << "www.wifirst.net" << "www.google.fr";
     foreach (const QString &hostName, hostNames)
     {
         QHostInfo hostInfo = QHostInfo::fromName(hostName);
@@ -148,8 +148,9 @@ void DiagnosticsThread::run()
             }
         }
     }
-    emit dnsResults(lookups);
+    emit lookupResults(lookups);
     emit progress(++done, total);
+    iq.setLookups(lookups);
 
     /* run ping tests */
     QList<Ping> pings;
@@ -300,8 +301,8 @@ void Diagnostics::refresh()
     /* run network tests */
     m_thread = new DiagnosticsThread(this);
     connect(m_thread, SIGNAL(finished()), this, SLOT(networkFinished()));
-    connect(m_thread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
     connect(m_thread, SIGNAL(interfaceResult(Interface)),this, SLOT(showInterface(Interface)));
+    connect(m_thread, SIGNAL(lookupResults(QList<QHostInfo>)), this, SLOT(showLookup(QList<QHostInfo>)));
     connect(m_thread, SIGNAL(pingResults(QList<Ping>)), this, SLOT(showPing(QList<Ping>)));
     connect(m_thread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
     connect(m_thread, SIGNAL(tracerouteResults(QList<Traceroute>)), this, SLOT(showTraceroute(QList<Traceroute>)));
@@ -326,7 +327,7 @@ void Diagnostics::slotShow()
     displayed = true;
 }
 
-void Diagnostics::showDns(const QList<QHostInfo> &results)
+void Diagnostics::showLookup(const QList<QHostInfo> &results)
 {
     addSection("Tests");
 
@@ -425,6 +426,11 @@ DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
     : m_thread(0)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
+
+    m_thread = new DiagnosticsThread(this);
+    connect(m_thread, SIGNAL(results(DiagnosticsIq)),
+            this, SLOT(handleResults(DiagnosticsIq)));
+    m_thread->start();
 }
 
 DiagnosticsExtension::~DiagnosticsExtension()
@@ -485,6 +491,16 @@ void DiagnosticsExtension::requestDiagnostics(const QString &jid)
 
 // SERIALISATION
 
+QList<QHostInfo> DiagnosticsIq::lookups() const
+{
+    return m_lookups;
+}
+
+void DiagnosticsIq::setLookups(const QList<QHostInfo> &lookups)
+{
+    m_lookups = lookups;
+}
+
 QList<Ping> DiagnosticsIq::pings() const
 {
     return m_pings;
@@ -526,7 +542,21 @@ void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
     QDomElement child = element.firstChildElement();
     while (!child.isNull())
     {
-        if (child.tagName() == QLatin1String("ping"))
+        if (child.tagName() == QLatin1String("lookup"))
+        {
+            QHostInfo lookup;
+            lookup.setHostName(child.attribute("hostName"));
+            QList<QHostAddress> addresses;
+            QDomElement addressElement = child.firstChildElement("address");
+            while (!addressElement.isNull())
+            {
+                addresses.append(QHostAddress(addressElement.text()));
+                addressElement = addressElement.nextSiblingElement("address");
+            }
+            lookup.setAddresses(addresses);
+            m_lookups << lookup;
+        }
+        else if (child.tagName() == QLatin1String("ping"))
         {
             Ping ping;
             ping.parse(child);
@@ -554,6 +584,14 @@ void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     helperToXmlAddAttribute(writer, "xmlns", ns_diagnostics);
     foreach (const Interface &interface, m_interfaces)
         interface.toXml(writer);
+    foreach (const QHostInfo &lookup, m_lookups)
+    {
+        writer->writeStartElement("lookup");
+        writer->writeAttribute("hostName", lookup.hostName());
+        foreach (const QHostAddress &address, lookup.addresses())
+            writer->writeTextElement("address", address.toString());
+        writer->writeEndElement();
+    }
     foreach (const Ping &ping, m_pings)
         ping.toXml(writer);
     foreach (const Traceroute &traceroute, m_traceroutes)

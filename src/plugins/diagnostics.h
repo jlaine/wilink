@@ -44,6 +44,9 @@ public:
     QList<Interface> interfaces() const;
     void setInterfaces(QList<Interface> &interfaces);
 
+    QList<QHostInfo> lookups() const;
+    void setLookups(const QList<QHostInfo> &lookups);
+
     QList<Ping> pings() const;
     void setPings(const QList<Ping> &pings);
 
@@ -58,6 +61,7 @@ protected:
 
 private:
     QList<Interface> m_interfaces;
+    QList<QHostInfo> m_lookups;
     QList<Ping> m_pings;
     QList<Traceroute> m_traceroutes;
 };
@@ -77,8 +81,8 @@ protected slots:
     void addSection(const QString &title);
     void refresh();
 
-    void showDns(const QList<QHostInfo> &results);
     void showInterface(const Interface &result);
+    void showLookup(const QList<QHostInfo> &results);
     void showPing(const QList<Ping> &results);
     void showProgress(int done, int total);
     void showTraceroute(const QList<Traceroute> &results);
@@ -128,8 +132,8 @@ signals:
     void progress(int done, int total);
     void results(const DiagnosticsIq &results);
 
-    void dnsResults(const QList<QHostInfo> &results);
     void interfaceResult(const Interface &result);
+    void lookupResults(const QList<QHostInfo> &results);
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Traceroute> &results);
 
