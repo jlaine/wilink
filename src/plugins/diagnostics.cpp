@@ -324,14 +324,15 @@ void Diagnostics::addSection(const QString &title)
 void Diagnostics::refresh()
 {
     refreshButton->setEnabled(false);
-    text->setText("<h2>System information</h2>");
 
     if (hostEdit->text().isEmpty())
     {
+        text->setText("<h1>Running diagnostics..</h1>");
         DiagnosticsAgent::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
     }
     else
     {
+        text->setText("<h1>Fetching diagnostics..</h1>");
         DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
         extension->requestDiagnostics(hostEdit->text());
     }
