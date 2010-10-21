@@ -78,6 +78,7 @@ void Interface::parse(const QDomElement &element)
 
     // wireless
     QDomElement wirelessElement = element.firstChildElement("wireless");
+    m_wirelessStandards = WirelessStandards::fromString(wirelessElement.attribute("standards"));
     QDomElement networkElement = wirelessElement.firstChildElement("network");
     while (!networkElement.isNull())
     {
@@ -104,10 +105,13 @@ void Interface::toXml(QXmlStreamWriter *writer) const
     }
 
     // wireless
-    writer->writeStartElement("wireless");
-    foreach (const WirelessNetwork &network, m_wirelessNetworks)
-        network.toXml(writer);
-    writer->writeEndElement();
-
+    if (m_wirelessStandards || !m_wirelessNetworks.isEmpty())
+    {
+        writer->writeStartElement("wireless");
+        writer->writeAttribute("standards", m_wirelessStandards.toString());
+        foreach (const WirelessNetwork &network, m_wirelessNetworks)
+            network.toXml(writer);
+        writer->writeEndElement();
+    }
     writer->writeEndElement();
 }

@@ -65,7 +65,14 @@ enum WirelessStandard
     Wireless_80211G = 4,
     Wireless_80211N = 8,
 };
-Q_DECLARE_FLAGS(WirelessStandards, WirelessStandard)
+
+class WirelessStandards : public QFlags<WirelessStandard>
+{
+public:
+    QString toString() const;
+    static WirelessStandards fromString(const QString &str);
+};
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(WirelessStandards)
 
 class WirelessInterfacePrivate;

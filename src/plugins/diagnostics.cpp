@@ -429,18 +429,7 @@ void Diagnostics::showInterface(const Interface &result)
 
     // wireless
     if (result.wirelessStandards())
-    {
-        QStringList supported;
-        if (result.wirelessStandards() & Wireless_80211A)
-            supported << "A";
-        if (result.wirelessStandards() & Wireless_80211B)
-            supported << "B";
-        if (result.wirelessStandards() & Wireless_80211G)
-            supported << "G";
-        if (result.wirelessStandards() & Wireless_80211N)
-            supported << "N";
-        addItem("Wireless standards", supported.join(","));
-    }
+        addItem("Wireless standards", result.wirelessStandards().toString());
 
     if (!result.wirelessNetworks().isEmpty())
     {
@@ -572,7 +561,7 @@ void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
             traceroute.parse(child);
             m_pings << traceroute;
         }
-        else if (child.tagName() == QLatin1String("wirelessInterface"))
+        else if (child.tagName() == QLatin1String("interface"))
         {
             Interface interface;
             interface.parse(child);
@@ -586,12 +575,12 @@ void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("query");
     helperToXmlAddAttribute(writer, "xmlns", ns_diagnostics);
+    foreach (const Interface &interface, m_interfaces)
+        interface.toXml(writer);
     foreach (const Ping &ping, m_pings)
         ping.toXml(writer);
     foreach (const Traceroute &traceroute, m_traceroutes)
         traceroute.toXml(writer);
-    foreach (const Interface &interface, m_interfaces)
-        interface.toXml(writer);
     writer->writeEndElement();
 }
 

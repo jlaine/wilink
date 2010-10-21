@@ -39,3 +39,30 @@ void WirelessNetwork::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+QString WirelessStandards::toString() const
+{
+    QString supported;
+    if (*this & Wireless_80211A)
+        supported += "A";
+    if (*this & Wireless_80211B)
+        supported += "B";
+    if (*this & Wireless_80211G)
+        supported += "G";
+    if (*this & Wireless_80211N)
+        supported += "N";
+    return supported;
+}
+
+WirelessStandards WirelessStandards::fromString(const QString &str)
+{
+    WirelessStandards standards;
+    if (str.contains('A'))
+        standards |= Wireless_80211A;
+    if (str.contains('B'))
+        standards |= Wireless_80211B;
+    if (str.contains('G'))
+        standards |= Wireless_80211G;
+    if (str.contains('N'))
+        standards |= Wireless_80211N;
+    return standards;
+}
