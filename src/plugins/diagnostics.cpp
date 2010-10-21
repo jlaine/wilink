@@ -277,6 +277,11 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     m_client(client),
     m_displayed(false)
 {
+    m_timer = new QTimer(this);
+    m_timer->setSingleShot(true);
+    m_timer->setInterval(60000);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
@@ -286,6 +291,7 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
 
     hostEdit = new QLineEdit;
+    connect(hostEdit, SIGNAL(returnPressed()), this, SLOT(refresh()));
     hbox->addWidget(hostEdit);
 
     refreshButton = new QPushButton(tr("Refresh"));
@@ -323,19 +329,36 @@ void Diagnostics::addSection(const QString &title)
 
 void Diagnostics::refresh()
 {
+    if (m_timer->isActive())
+        return;
     refreshButton->setEnabled(false);
 
-    if (hostEdit->text().isEmpty())
+    QString jid = hostEdit->text();
+    if (jid.isEmpty())
     {
-        text->setText("<h1>Running diagnostics..</h1>");
+        showMessage("Running diagnostics..");
         DiagnosticsAgent::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
     }
     else
     {
-        text->setText("<h1>Fetching diagnostics..</h1>");
+        QString fullJid = jid;
+        if (!fullJid.contains("@"))
+            fullJid += "@" + m_client->configuration().domain();
+        if (!fullJid.contains("/"))
+            fullJid += "/wiLink";
+        if (fullJid != jid)
+            hostEdit->setText(fullJid);
+
+        showMessage(QString("Querying %1..").arg(fullJid));
         DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
-        extension->requestDiagnostics(hostEdit->text());
+        extension->requestDiagnostics(fullJid);
     }
+    m_timer->start();
+}
+
+void Diagnostics::timeout()
+{
+    showMessage("Request timed out.");
 }
 
 void Diagnostics::slotShow()
@@ -371,9 +394,27 @@ void Diagnostics::showLookup(const QList<QHostInfo> &results)
     addItem("DNS", table.render());
 }
 
+void Diagnostics::showMessage(const QString &msg)
+{
+    text->setText(QString("<h2>%1</h2>").arg(msg));
+}
+
 void Diagnostics::showResults(const DiagnosticsIq &iq)
 {
-    text->setText("<h2>System information</h2>");
+    // enable buttons
+    refreshButton->setEnabled(true);
+    m_timer->stop();
+
+    if (iq.type() == QXmppIq::Error)
+    {
+        showMessage("Diagnostics failed");
+        return;
+    }
+
+    if (iq.from().isEmpty())
+        showMessage("System diagnostics");
+    else
+        showMessage(QString("Diagnostics for %1").arg(iq.from()));
 
     // show software
     TextList list;
@@ -401,16 +442,6 @@ void Diagnostics::showResults(const DiagnosticsIq &iq)
     foreach (const Traceroute &traceroute, iq.traceroutes())
         addItem("Traceroute", dumpPings(traceroute));
 
-    // enable buttons
-    refreshButton->setEnabled(true);
-#if 0
-    if (m_thread)
-    {
-        m_thread->wait();
-        delete m_thread;
-        m_thread = 0;
-    }
-#endif
 }
 
 void Diagnostics::showInterface(const Interface &result)

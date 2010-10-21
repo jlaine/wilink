@@ -30,6 +30,7 @@
 class QLineEdit;
 class QPushButton;
 class QTextBrowser;
+class QTimer;
 
 class Diagnostics : public ChatPanel
 {
@@ -45,12 +46,14 @@ public slots:
 private slots:
     void refresh();
     void showResults(const DiagnosticsIq &iq);
+    void timeout();
 
 private:
     void addItem(const QString &title, const QString &value);
     void addSection(const QString &title);
     void showInterface(const Interface &result);
     void showLookup(const QList<QHostInfo> &results);
+    void showMessage(const QString &msg);
 
     QLineEdit *hostEdit;
     QPushButton *refreshButton;
@@ -58,6 +61,7 @@ private:
 
     QXmppClient *m_client;
     bool m_displayed;
+    QTimer *m_timer;
 };
 
 class DiagnosticsExtension : public QXmppClientExtension
