@@ -57,7 +57,7 @@ static int id4 = qRegisterMetaType< Interface >();
 
 /* NETWORK */
 
-void DiagnosticsThread::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
+void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
 {
     if (!diagnosticsThread)
     {
@@ -65,14 +65,14 @@ void DiagnosticsThread::lookup(const DiagnosticsIq &request, QObject *receiver, 
         diagnosticsThread->start();
     }
 
-    DiagnosticsThread *agent = new DiagnosticsThread;
+    DiagnosticsAgent *agent = new DiagnosticsAgent;
     agent->moveToThread(diagnosticsThread);
     connect(agent, SIGNAL(results(DiagnosticsIq)), receiver, member);
     QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
         Q_ARG(DiagnosticsIq, request));
 }
 
-void DiagnosticsThread::handle(const DiagnosticsIq &request)
+void DiagnosticsAgent::handle(const DiagnosticsIq &request)
 {
     DiagnosticsIq iq;
     iq.setId(request.id());
@@ -333,7 +333,7 @@ void Diagnostics::refresh()
     if (hostEdit->text().isEmpty())
     {
         DiagnosticsIq req;
-        DiagnosticsThread::lookup(req, this, SLOT(showResults(DiagnosticsIq)));
+        DiagnosticsAgent::lookup(req, this, SLOT(showResults(DiagnosticsIq)));
         return;
     }
 
@@ -495,7 +495,7 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
 
         if (iq.type() == QXmppIq::Get)
         {
-            DiagnosticsThread::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
+            DiagnosticsAgent::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
         } else if (iq.type() == QXmppIq::Result || iq.type() == QXmppIq::Error) {
             emit diagnosticsReceived(iq);
         }

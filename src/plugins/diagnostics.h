@@ -32,8 +32,6 @@ class QPushButton;
 class QProgressBar;
 class QTextBrowser;
 
-class DiagnosticsThread;
-
 class Diagnostics : public ChatPanel
 {
     Q_OBJECT
@@ -63,7 +61,6 @@ private:
 
     QXmppClient *m_client;
     bool m_displayed;
-    DiagnosticsThread *m_agent;
 };
 
 class DiagnosticsExtension : public QXmppClientExtension
@@ -87,7 +84,7 @@ private slots:
     void handleResults(const DiagnosticsIq &results);
 };
 
-class DiagnosticsThread : public QObject
+class DiagnosticsAgent : public QObject
 {
     Q_OBJECT
 
@@ -95,7 +92,7 @@ public:
     static void lookup(const DiagnosticsIq &request, QObject *receiver, const char *member);
 
 private:
-    DiagnosticsThread(QObject *parent = 0) : QObject(parent) {};
+    DiagnosticsAgent(QObject *parent = 0) : QObject(parent) {};
 
 private slots:
     void handle(const DiagnosticsIq &request);
