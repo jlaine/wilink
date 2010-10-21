@@ -85,33 +85,35 @@ void NetworkThread::run()
 
     emit progress(done, total);
 
-    /* run wireless */
-    QList<Interface> wirelessResults;
+    /* discover interfaces */
+    QList<Interface> interfaceResults;
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (interface.flags() & QNetworkInterface::IsLoopBack)
             continue;
 
-        WirelessInterface wireless(interface);
-        if (!wireless.isValid())
-            continue;
-
         Interface result;
-        result.interfaceName = interfaceName(interface);
-        QList<WirelessNetwork> networks = wireless.availableNetworks();
-        WirelessNetwork current = wireless.currentNetwork();
-        if (current.isValid())
+        result.setAddressEntries(interface.addressEntries());
+        result.setName(interfaceName(interface));
+
+        WirelessInterface wireless(interface);
+        if (wireless.isValid())
         {
-            networks.removeAll(current);
-            networks.prepend(current);
+            QList<WirelessNetwork> networks = wireless.availableNetworks();
+            WirelessNetwork current = wireless.currentNetwork();
+            if (current.isValid())
+            {
+                networks.removeAll(current);
+                networks.prepend(current);
+            }
+            result.setWirelessNetworks(networks);
+            result.setWirelessStandards(wireless.supportedStandards());
         }
-        result.setWirelessNetworks(networks);
-        result.setWirelessStandards(wireless.supportedStandards());
-        wirelessResults << result;
-        emit wirelessResult(result);
+        interfaceResults << result;
+        emit interfaceResult(result);
         emit progress(++done, ++total);
     }
-    iq.setInterfaces(wirelessResults);
+    iq.setInterfaces(interfaceResults);
 
     /* try to detemine gateways */
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -313,36 +315,14 @@ void Diagnostics::refresh()
     list << QString("Date: %1").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss"));
     addItem("Environment", list.render());
 
-    foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
-            continue;
-
-        TextList list;
-        foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
-        {
-            QString protocol;
-            if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
-                protocol = "IPv4";
-            else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
-                protocol = "IPv6";
-            else
-                continue;
-            list << protocol + " address: " + entry.ip().toString();
-            list << protocol + " netmask: " + entry.netmask().toString();
-        }
-        addItem("Interface " + interfaceName(interface),
-            list.size() ? list.render() : "<p>No address</p>");
-    }
-
     /* run network tests */
     networkThread = new NetworkThread(this);
     connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
     connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
+    connect(networkThread, SIGNAL(interfaceResult(Interface)),this, SLOT(showInterface(Interface)));
     connect(networkThread, SIGNAL(pingResults(QList<Ping>)), this, SLOT(showPing(QList<Ping>)));
     connect(networkThread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
     connect(networkThread, SIGNAL(tracerouteResults(QList<Traceroute>)), this, SLOT(showTraceroute(QList<Traceroute>)));
-    connect(networkThread, SIGNAL(wirelessResult(const WirelessResult &)), this, SLOT(showWireless(const WirelessResult &)));
     networkThread->start();
 }
 
@@ -426,38 +406,62 @@ void Diagnostics::showTraceroute(const QList<Traceroute> &results)
         addItem("Traceroute", dumpPings(traceroute));
 }
 
-void Diagnostics::showWireless(const Interface &result)
+void Diagnostics::showInterface(const Interface &result)
 {
     const bool showCinr = false;
-    addSection("Wireless interface " + result.interfaceName);
+    addSection("Network interface " + result.name());
 
-    QStringList supported;
-    if (result.wirelessStandards() & Wireless_80211A)
-        supported << "A";
-    if (result.wirelessStandards() & Wireless_80211B)
-        supported << "B";
-    if (result.wirelessStandards() & Wireless_80211G)
-        supported << "G";
-    if (result.wirelessStandards() & Wireless_80211N)
-        supported << "N";
-    addItem("Wireless standards", supported.join(","));
-
-    TextTable table;
-    TextRow titles(true);
-    titles << "SSID" << "RSSI";
-    if (showCinr)
-        titles << "CINR";
-    table << titles;
-    foreach (const WirelessNetwork &network, result.wirelessNetworks())
+    // addresses
+    TextList list;
+    foreach (const QNetworkAddressEntry &entry, result.addressEntries())
     {
-        TextRow row;
-        row << network.ssid();
-        row << QString::number(network.rssi()) + " dBm";
-        if (showCinr)
-            row << (network.cinr() ? QString::number(network.cinr()) : QString());
-        table << row;
+        QString protocol;
+        if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            protocol = "IPv4";
+        else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
+            protocol = "IPv6";
+        else
+            continue;
+        list << protocol + " address: " + entry.ip().toString();
+        list << protocol + " netmask: " + entry.netmask().toString();
     }
-    addItem("Wireless networks", table.render());
+    addItem("Addresses",
+        list.size() ? list.render() : "<p>No address</p>");
+
+    // wireless
+    if (result.wirelessStandards())
+    {
+        QStringList supported;
+        if (result.wirelessStandards() & Wireless_80211A)
+            supported << "A";
+        if (result.wirelessStandards() & Wireless_80211B)
+            supported << "B";
+        if (result.wirelessStandards() & Wireless_80211G)
+            supported << "G";
+        if (result.wirelessStandards() & Wireless_80211N)
+            supported << "N";
+        addItem("Wireless standards", supported.join(","));
+    }
+
+    if (!result.wirelessNetworks().isEmpty())
+    {
+        TextTable table;
+        TextRow titles(true);
+        titles << "SSID" << "RSSI";
+        if (showCinr)
+            titles << "CINR";
+        table << titles;
+        foreach (const WirelessNetwork &network, result.wirelessNetworks())
+        {
+            TextRow row;
+            row << network.ssid();
+            row << QString::number(network.rssi()) + " dBm";
+            if (showCinr)
+                row << (network.cinr() ? QString::number(network.cinr()) : QString());
+            table << row;
+        }
+        addItem("Wireless networks", table.render());
+    }
 }
 
 // EXTENSION
@@ -515,48 +519,6 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
 }
 
 // SERIALISATION
-
-QList<WirelessNetwork> Interface::wirelessNetworks() const
-{
-    return m_wirelessNetworks;
-}
-
-void Interface::setWirelessNetworks(const QList<WirelessNetwork> &wirelessNetworks)
-{
-    m_wirelessNetworks = wirelessNetworks;
-}
-
-WirelessStandards Interface::wirelessStandards() const
-{
-    return m_wirelessStandards;
-}
-
-void Interface::setWirelessStandards(WirelessStandards wirelessStandards)
-{
-    m_wirelessStandards = wirelessStandards;
-}
-
-void Interface::parse(const QDomElement &element)
-{
-    interfaceName = element.attribute("name");
-    QDomElement networkElement = element.firstChildElement("network");
-    while (!networkElement.isNull())
-    {
-        WirelessNetwork network;
-        network.parse(networkElement);
-        m_wirelessNetworks << network;
-        networkElement = networkElement.nextSiblingElement("network");
-    }
-}
-
-void Interface::toXml(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement("wirelessInterface");
-    helperToXmlAddAttribute(writer, "name", interfaceName);
-    foreach (const WirelessNetwork &network, m_wirelessNetworks)
-        network.toXml(writer);
-    writer->writeEndElement();
-}
 
 QList<Ping> DiagnosticsIq::pings() const
 {

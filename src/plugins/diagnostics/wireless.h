@@ -17,12 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class QDomElement;
+#ifndef __DIAGNOSTICS_WIRELESS_H__
+#define __DIAGNOSTICS_WIRELESS_H__
 
 #include <QList>
 #include <QString>
 #include <QNetworkInterface>
 #include <QXmlStreamWriter>
+
+class QDomElement;
 
 class WirelessNetwork
 {
@@ -82,3 +85,4 @@ private:
     WirelessInterfacePrivate *d;
 };
 
+#endif

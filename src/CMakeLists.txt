@@ -53,7 +53,8 @@ set(wiLink_SOURCES
     plugins/console.cpp
     plugins/contacts.cpp
     plugins/diagnostics.cpp
-    plugins/diagnostics/networkinfo.cpp
+    plugins/diagnostics/interface.cpp
+    plugins/diagnostics/ping.cpp
     plugins/diagnostics/wireless.cpp
     plugins/discovery.cpp
     plugins/menu.cpp

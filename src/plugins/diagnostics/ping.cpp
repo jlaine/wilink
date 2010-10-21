@@ -20,7 +20,7 @@
 #include <QDomElement>
 #include <QProcess>
 
-#include "networkinfo.h"
+#include "ping.h"
 
 Ping::Ping()
     : minimumTime(0.0), maximumTime(0.0), averageTime(0.0),

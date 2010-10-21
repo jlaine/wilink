@@ -17,12 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __DIAGNOSTICS_PING_H__
+#define __DIAGNOSTICS_PING_H__
+
 #include <QHostAddress>
 #include <QList>
 #include <QXmlStreamWriter>
 
 class QDomElement;
 
+/** The Ping class represents an ICMP ping result.
+ */
 class Ping
 {
 public:
@@ -42,6 +47,8 @@ public:
     void toXml(QXmlStreamWriter *writer) const;
 };
 
+/** The Traceroute class represents a traceroute result.
+ */
 class Traceroute : public QList<Ping>
 {
 public:
@@ -62,3 +69,4 @@ public:
     static Traceroute traceroute(const QHostAddress &host, int maxPackets = 1, int maxHops = 0);
 };
 
+#endif

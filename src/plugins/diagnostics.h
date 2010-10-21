@@ -29,7 +29,8 @@
 #include "QXmppIq.h"
 
 #include "chat_panel.h"
-#include "diagnostics/networkinfo.h"
+#include "diagnostics/interface.h"
+#include "diagnostics/ping.h"
 #include "diagnostics/wireless.h"
 
 class QNetworkAccessManager;
@@ -38,26 +39,6 @@ class QProgressBar;
 class QTextBrowser;
 
 class NetworkThread;
-
-class Interface
-{
-public:
-    QString interfaceName;
-    QList<QNetworkAddressEntry> addressEntries;
-
-    QList<WirelessNetwork> wirelessNetworks() const;
-    void setWirelessNetworks(const QList<WirelessNetwork> &wirelessNetworks);
-
-    WirelessStandards wirelessStandards() const;
-    void setWirelessStandards(WirelessStandards wirelessStandards);
-
-    void parse(const QDomElement &element);
-    void toXml(QXmlStreamWriter *writer) const;
-
-private:
-    QList<WirelessNetwork> m_wirelessNetworks;
-    WirelessStandards m_wirelessStandards;
-};
 
 class DiagnosticsIq : public QXmppIq
 {
@@ -98,9 +79,9 @@ signals:
     void results(const DiagnosticsIq &results);
 
     void dnsResults(const QList<QHostInfo> &results);
+    void interfaceResult(const Interface &result);
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Traceroute> &results);
-    void wirelessResult(const Interface &result);
 
 private:
     QString m_id;
@@ -125,10 +106,10 @@ protected slots:
     void send();
 
     void showDns(const QList<QHostInfo> &results);
+    void showInterface(const Interface &result);
     void showPing(const QList<Ping> &results);
     void showProgress(int done, int total);
     void showTraceroute(const QList<Traceroute> &results);
-    void showWireless(const Interface &result);
     void networkFinished();
 
 private:
