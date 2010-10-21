@@ -60,10 +60,7 @@ static int id4 = qRegisterMetaType< Interface >();
 void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
 {
     if (!diagnosticsThread)
-    {
         diagnosticsThread = new QThread;
-        diagnosticsThread->start();
-    }
 
     DiagnosticsAgent *agent = new DiagnosticsAgent;
     agent->moveToThread(diagnosticsThread);
@@ -71,6 +68,9 @@ void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, c
     connect(agent, SIGNAL(finished(DiagnosticsIq)), agent, SLOT(deleteLater()));
     QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
         Q_ARG(DiagnosticsIq, request));
+
+    if (!diagnosticsThread->isRunning())
+        diagnosticsThread->start();
 }
 
 void DiagnosticsAgent::handle(const DiagnosticsIq &request)
@@ -518,19 +518,21 @@ void DiagnosticsExtension::requestDiagnostics(const QString &jid)
 class DiagnosticsPlugin : public ChatPlugin
 {
 public:
+    DiagnosticsPlugin() : m_references(0) {};
     bool initialize(Chat *chat);
     void finalize(Chat *chat);
+
+private:
+    int m_references;
 };
 
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
     /* add diagnostics extension */
     const QString domain = chat->client()->configuration().domain();
-    if (domain == "wifirst.net")
-    {
-        DiagnosticsExtension *extension = new DiagnosticsExtension(chat->client());
-        chat->client()->addExtension(extension);
-    }
+    DiagnosticsExtension *extension = new DiagnosticsExtension(chat->client());
+    chat->client()->addExtension(extension);
+    m_references++;
 
     /* register panel */
     Diagnostics *diagnostics = new Diagnostics(chat->client());
@@ -552,13 +554,14 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
 
 void DiagnosticsPlugin::finalize(Chat *chat)
 {
-#if 0
-    if (m_thread)
+    m_references--;
+    if (!m_references && diagnosticsThread)
     {
-        m_thread->wait();
-        delete m_thread;
+        diagnosticsThread->quit();
+        diagnosticsThread->wait();
+        delete diagnosticsThread;
+        diagnosticsThread = 0;
     }
-#endif
 }
 
 Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)
