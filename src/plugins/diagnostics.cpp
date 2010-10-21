@@ -291,8 +291,13 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
 
     hostEdit = new QLineEdit;
+    hostEdit->hide();
     connect(hostEdit, SIGNAL(returnPressed()), this, SLOT(refresh()));
     hbox->addWidget(hostEdit);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X), this);
+    connect(shortcut, SIGNAL(activated()), hostEdit, SLOT(show()));
+
+    hbox->addStretch();
 
     refreshButton = new QPushButton(tr("Refresh"));
     refreshButton->setIcon(QIcon(":/refresh.png"));
