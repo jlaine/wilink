@@ -60,18 +60,9 @@ static int id2 = qRegisterMetaType< QList<Ping> >();
 static int id3 = qRegisterMetaType< QList<Traceroute> >();
 static int id4 = qRegisterMetaType< Interface >();
 
-static QString interfaceName(const QNetworkInterface &interface)
-{
-#if QT_VERSION >= 0x040500
-    return interface.humanReadableName();
-#else
-    return interface.name();
-#endif
-}
-
 /* NETWORK */
 
-void NetworkThread::run()
+void DiagnosticsThread::run()
 {
     DiagnosticsIq iq;
     iq.setId(m_id);
@@ -93,9 +84,16 @@ void NetworkThread::run()
             continue;
 
         Interface result;
-        result.setAddressEntries(interface.addressEntries());
-        result.setName(interfaceName(interface));
+#if QT_VERSION >= 0x040500
+        result.setName(interface.humanReadableName());
+#else
+        result.setName(interface.name());
+#endif
 
+        // addresses
+        result.setAddressEntries(interface.addressEntries());
+
+        // wireless
         WirelessInterface wireless(interface);
         if (wireless.isValid())
         {
@@ -251,7 +249,7 @@ static QString dumpPings(const QList<Ping> &pings)
 }
 
 Diagnostics::Diagnostics(QWidget *parent)
-    : ChatPanel(parent), displayed(false), networkThread(NULL)
+    : ChatPanel(parent), displayed(false), m_thread(NULL)
 {
     /* prepare network access manager */
     network = new QNetworkAccessManager(this);
@@ -301,7 +299,7 @@ void Diagnostics::addSection(const QString &title)
 
 void Diagnostics::refresh()
 {
-    if (networkThread)
+    if (m_thread)
         return;
 
     sendButton->setEnabled(false);
@@ -316,21 +314,21 @@ void Diagnostics::refresh()
     addItem("Environment", list.render());
 
     /* run network tests */
-    networkThread = new NetworkThread(this);
-    connect(networkThread, SIGNAL(finished()), this, SLOT(networkFinished()));
-    connect(networkThread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
-    connect(networkThread, SIGNAL(interfaceResult(Interface)),this, SLOT(showInterface(Interface)));
-    connect(networkThread, SIGNAL(pingResults(QList<Ping>)), this, SLOT(showPing(QList<Ping>)));
-    connect(networkThread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-    connect(networkThread, SIGNAL(tracerouteResults(QList<Traceroute>)), this, SLOT(showTraceroute(QList<Traceroute>)));
-    networkThread->start();
+    m_thread = new DiagnosticsThread(this);
+    connect(m_thread, SIGNAL(finished()), this, SLOT(networkFinished()));
+    connect(m_thread, SIGNAL(dnsResults(const QList<QHostInfo> &)), this, SLOT(showDns(const QList<QHostInfo> &)));
+    connect(m_thread, SIGNAL(interfaceResult(Interface)),this, SLOT(showInterface(Interface)));
+    connect(m_thread, SIGNAL(pingResults(QList<Ping>)), this, SLOT(showPing(QList<Ping>)));
+    connect(m_thread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
+    connect(m_thread, SIGNAL(tracerouteResults(QList<Traceroute>)), this, SLOT(showTraceroute(QList<Traceroute>)));
+    m_thread->start();
 }
 
 void Diagnostics::networkFinished()
 {
-    networkThread->wait();
-    delete networkThread;
-    networkThread = NULL;
+    m_thread->wait();
+    delete m_thread;
+    m_thread = NULL;
 
     /* enable buttons */
     refreshButton->setEnabled(true);
@@ -505,7 +503,7 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
                 client()->sendPacket(response);
                 return true;
             } else if (!m_thread) {
-                m_thread = new NetworkThread(this);
+                m_thread = new DiagnosticsThread(this);
                 connect(m_thread, SIGNAL(results(DiagnosticsIq)),
                         this, SLOT(handleResults(DiagnosticsIq)));
             }

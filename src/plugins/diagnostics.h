@@ -38,7 +38,7 @@ class QPushButton;
 class QProgressBar;
 class QTextBrowser;
 
-class NetworkThread;
+class DiagnosticsThread;
 
 class DiagnosticsIq : public QXmppIq
 {
@@ -62,30 +62,6 @@ private:
     QList<Ping> m_pings;
     QList<Traceroute> m_traceroutes;
     QList<Interface> m_interfaces;
-};
-
-class NetworkThread : public QThread
-{
-    Q_OBJECT
-
-public:
-    NetworkThread(QObject *parent) : QThread(parent) {};   
-    void run();
-    void setId(const QString &id) { m_id = id; };
-    void setTo(const QString &to) { m_to = to; };
-
-signals:
-    void progress(int done, int total);
-    void results(const DiagnosticsIq &results);
-
-    void dnsResults(const QList<QHostInfo> &results);
-    void interfaceResult(const Interface &result);
-    void pingResults(const QList<Ping> &results);
-    void tracerouteResults(const QList<Traceroute> &results);
-
-private:
-    QString m_id;
-    QString m_to;
 };
 
 class Diagnostics : public ChatPanel
@@ -121,7 +97,7 @@ private:
     QUrl diagnosticsUrl;
     QNetworkAccessManager *network;
 
-    NetworkThread *networkThread;
+    DiagnosticsThread *m_thread;
 };
 
 class DiagnosticsExtension : public QXmppClientExtension
@@ -138,7 +114,31 @@ private slots:
     void handleResults(const DiagnosticsIq &results);
 
 private:
-    NetworkThread *m_thread;
+    DiagnosticsThread *m_thread;
+};
+
+class DiagnosticsThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    DiagnosticsThread(QObject *parent) : QThread(parent) {};
+    void run();
+    void setId(const QString &id) { m_id = id; };
+    void setTo(const QString &to) { m_to = to; };
+
+signals:
+    void progress(int done, int total);
+    void results(const DiagnosticsIq &results);
+
+    void dnsResults(const QList<QHostInfo> &results);
+    void interfaceResult(const Interface &result);
+    void pingResults(const QList<Ping> &results);
+    void tracerouteResults(const QList<Traceroute> &results);
+
+private:
+    QString m_id;
+    QString m_to;
 };
 
 #endif
