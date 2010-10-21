@@ -316,13 +316,6 @@ void Diagnostics::refresh()
         return;
     }
 
-    /* show system info */
-    TextList list;
-    list << QString("Operating system: %1 %2").arg(SystemInfo::osName(), SystemInfo::osVersion());
-    list << QString("%1: %2").arg(qApp->applicationName(), qApp->applicationVersion());
-    list << QString("Date: %1").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss"));
-    addItem("Environment", list.render());
-
     /* run network tests */
     m_thread = new DiagnosticsThread(this);
     connect(m_thread, SIGNAL(finished()), this, SLOT(networkFinished()));
@@ -382,6 +375,21 @@ void Diagnostics::showProgress(int done, int total)
 
 void Diagnostics::showResults(const DiagnosticsIq &iq)
 {
+    // show software
+    TextList list;
+    foreach (const Software &software, iq.softwares())
+    {
+        QString title;
+        if (software.type() == QLatin1String("os"))
+            title = QLatin1String("Operating system");
+        else if (software.type() == QLatin1String("application"))
+            title = QLatin1String("Application");
+        else
+            title = software.type();
+        list << QString("%1: %2 %3").arg(title, software.name(), software.version());
+    }
+    addItem("Software", list.render());
+
     // show interfaces
     foreach (const Interface &interface, iq.interfaces())
         showInterface(interface);
