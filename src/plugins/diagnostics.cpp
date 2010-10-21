@@ -67,7 +67,8 @@ void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, c
 
     DiagnosticsAgent *agent = new DiagnosticsAgent;
     agent->moveToThread(diagnosticsThread);
-    connect(agent, SIGNAL(results(DiagnosticsIq)), receiver, member);
+    connect(agent, SIGNAL(finished(DiagnosticsIq)), receiver, member);
+    connect(agent, SIGNAL(finished(DiagnosticsIq)), agent, SLOT(deleteLater()));
     QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
         Q_ARG(DiagnosticsIq, request));
 }
@@ -200,7 +201,7 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
     emit progress(++done, total);
     iq.setTraceroutes(traceroutes);
 
-    emit results(iq);
+    emit finished(iq);
 }
 
 /* GUI */

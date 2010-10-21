@@ -98,8 +98,8 @@ private slots:
     void handle(const DiagnosticsIq &request);
 
 signals:
+    void finished(const DiagnosticsIq &results);
     void progress(int done, int total);
-    void results(const DiagnosticsIq &results);
 };
 
 #endif
