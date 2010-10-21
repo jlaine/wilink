@@ -677,10 +677,6 @@ Acceptez-vous?</translation>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
-    <message>
-        <source>Send</source>
-        <translation>Envoyer</translation>
-    </message>
 </context>
 <context>
     <name>Discovery</name>

@@ -23,7 +23,6 @@
 #include <QDialog>
 #include <QHostInfo>
 #include <QThread>
-#include <QUrl>
 
 #include "QXmppClientExtension.h"
 #include "QXmppIq.h"
@@ -33,7 +32,6 @@
 #include "diagnostics/ping.h"
 #include "diagnostics/wireless.h"
 
-class QNetworkAccessManager;
 class QPushButton;
 class QProgressBar;
 class QTextBrowser;
@@ -70,7 +68,6 @@ class Diagnostics : public ChatPanel
 
 public:
     Diagnostics(QWidget *parent=0);
-    void setUrl(const QUrl &url);
 
 public slots:
     void slotShow();
@@ -79,7 +76,6 @@ protected slots:
     void addItem(const QString &title, const QString &value);
     void addSection(const QString &title);
     void refresh();
-    void send();
 
     void showDns(const QList<QHostInfo> &results);
     void showInterface(const Interface &result);
@@ -93,9 +89,6 @@ private:
     QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
-    QPushButton *sendButton;
-    QUrl diagnosticsUrl;
-    QNetworkAccessManager *network;
 
     DiagnosticsThread *m_thread;
 };

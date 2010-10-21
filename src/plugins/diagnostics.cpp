@@ -22,19 +22,13 @@
 #include <QDomElement>
 #include <QLayout>
 #include <QMenu>
-#include <QNetworkAccessManager>
 #include <QNetworkInterface>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QPushButton>
 #include <QProgressBar>
 #include <QShortcut>
 #include <QTextBrowser>
 #include <QTimer>
 #include <QThread>
-
-#include "qnetio/mime.h"
-#include "qnetio/wallet.h"
 
 #include "QXmppUtils.h"
 
@@ -252,11 +246,6 @@ static QString dumpPings(const QList<Ping> &pings)
 Diagnostics::Diagnostics(QWidget *parent)
     : ChatPanel(parent), displayed(false), m_thread(NULL)
 {
-    /* prepare network access manager */
-    network = new QNetworkAccessManager(this);
-    connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-        QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
-
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
@@ -267,11 +256,6 @@ Diagnostics::Diagnostics(QWidget *parent)
 
     progressBar = new QProgressBar;
     hbox->addWidget(progressBar);
-
-    sendButton = new QPushButton(tr("Send"));
-    sendButton->hide();
-    connect(sendButton, SIGNAL(clicked()), this, SLOT(send()));
-    hbox->addWidget(sendButton);
 
     refreshButton = new QPushButton(tr("Refresh"));
     refreshButton->setIcon(QIcon(":/refresh.png"));
@@ -303,7 +287,6 @@ void Diagnostics::refresh()
     if (m_thread)
         return;
 
-    sendButton->setEnabled(false);
     refreshButton->setEnabled(false);
 
     /* show system info */
@@ -333,24 +316,6 @@ void Diagnostics::networkFinished()
 
     /* enable buttons */
     refreshButton->setEnabled(true);
-    sendButton->setEnabled(true);
-}
-
-void Diagnostics::send()
-{
-    QNetIO::MimeForm form;
-    form.addString("dump", text->toHtml());
-
-    QNetworkRequest req(diagnosticsUrl.toString());
-    req.setRawHeader("Content-Type", "multipart/form-data; boundary=" + form.boundary);
-    network->post(req, form.render());
-}
-
-void Diagnostics::setUrl(const QUrl &url)
-{
-    diagnosticsUrl = url;
-    if(url.isValid())
-        sendButton->show();
 }
 
 void Diagnostics::slotShow()
