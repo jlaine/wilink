@@ -74,6 +74,7 @@ void TestDiagnostics::testPacket()
 
     DiagnosticsIq iq;
     parsePacket(iq, xml);
+    serializePacket(iq, xml);
 }
 
 void TestIndent::indentCollapsed()
@@ -148,6 +149,9 @@ void TestUpdates::compareVersions()
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
+
+    TestDiagnostics testDiagnostics;
+    QTest::qExec(&testDiagnostics);
 
     TestIndent testIndent;
     QTest::qExec(&testIndent);

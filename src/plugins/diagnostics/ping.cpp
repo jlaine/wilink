@@ -99,8 +99,8 @@ void Ping::parse(const QDomElement &element)
     m_maximumTime = element.attribute("maximumTime").toFloat();
     m_averageTime = element.attribute("averageTime").toFloat();
 
-    m_sentPackets = element.attribute("sentPacket").toInt();
-    m_receivedPackets = element.attribute("receivedPacket").toInt();
+    m_sentPackets = element.attribute("sentPackets").toInt();
+    m_receivedPackets = element.attribute("receivedPackets").toInt();
 }
 
 void Ping::toXml(QXmlStreamWriter *writer) const

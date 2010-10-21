@@ -73,6 +73,7 @@ void Interface::parse(const QDomElement &element)
         entry.setBroadcast(QHostAddress(addressElement.attribute("broadcast")));
         entry.setIp(QHostAddress(addressElement.attribute("ip")));
         entry.setNetmask(QHostAddress(addressElement.attribute("netmask")));
+        m_addressEntries << entry;
         addressElement = addressElement.nextSiblingElement("address");
     }
 

@@ -74,7 +74,8 @@ bool DiagnosticsIq::isDiagnosticsIq(const QDomElement &element)
 
 void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement child = element.firstChildElement();
+    QDomElement queryElement = element.firstChildElement("query");
+    QDomElement child = queryElement.firstChildElement();
     while (!child.isNull())
     {
         if (child.tagName() == QLatin1String("lookup"))
@@ -101,7 +102,7 @@ void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
         {
             Traceroute traceroute;
             traceroute.parse(child);
-            m_pings << traceroute;
+            m_traceroutes << traceroute;
         }
         else if (child.tagName() == QLatin1String("interface"))
         {
