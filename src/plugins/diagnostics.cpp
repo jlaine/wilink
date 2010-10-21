@@ -25,7 +25,6 @@
 #include <QMenu>
 #include <QNetworkInterface>
 #include <QPushButton>
-#include <QProgressBar>
 #include <QShortcut>
 #include <QTextBrowser>
 #include <QTimer>
@@ -289,9 +288,6 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     hostEdit = new QLineEdit;
     hbox->addWidget(hostEdit);
 
-    progressBar = new QProgressBar;
-    hbox->addWidget(progressBar);
-
     refreshButton = new QPushButton(tr("Refresh"));
     refreshButton->setIcon(QIcon(":/refresh.png"));
     connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
@@ -303,7 +299,6 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
 
-    //connect(diagnosticsAgent, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
     DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
     connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
             this, SLOT(showResults(DiagnosticsIq)));
@@ -333,20 +328,20 @@ void Diagnostics::refresh()
 
     if (hostEdit->text().isEmpty())
     {
-        DiagnosticsIq req;
-        DiagnosticsAgent::lookup(req, this, SLOT(showResults(DiagnosticsIq)));
-        return;
+        DiagnosticsAgent::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
     }
-
-    DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
-    extension->requestDiagnostics(hostEdit->text());
+    else
+    {
+        DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
+        extension->requestDiagnostics(hostEdit->text());
+    }
 }
 
 void Diagnostics::slotShow()
 {
     if (m_displayed)
         return;
-    refresh();
+    //refresh();
     m_displayed = true;
 }
 
@@ -375,14 +370,10 @@ void Diagnostics::showLookup(const QList<QHostInfo> &results)
     addItem("DNS", table.render());
 }
 
-void Diagnostics::showProgress(int done, int total)
-{
-    progressBar->setMaximum(total);
-    progressBar->setValue(done);
-}
-
 void Diagnostics::showResults(const DiagnosticsIq &iq)
 {
+    text->setText("<h2>System information</h2>");
+
     // show software
     TextList list;
     foreach (const Software &software, iq.softwares())

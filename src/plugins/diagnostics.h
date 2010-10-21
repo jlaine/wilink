@@ -29,7 +29,6 @@
 
 class QLineEdit;
 class QPushButton;
-class QProgressBar;
 class QTextBrowser;
 
 class Diagnostics : public ChatPanel
@@ -45,7 +44,6 @@ public slots:
 
 private slots:
     void refresh();
-    void showProgress(int done, int total);
     void showResults(const DiagnosticsIq &iq);
 
 private:
@@ -55,7 +53,6 @@ private:
     void showLookup(const QList<QHostInfo> &results);
 
     QLineEdit *hostEdit;
-    QProgressBar *progressBar;
     QPushButton *refreshButton;
     QTextBrowser *text;
 
