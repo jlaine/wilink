@@ -109,6 +109,10 @@ public:
     ~DiagnosticsExtension();
 
     bool handleStanza(const QDomElement &stanza);
+    void requestDiagnostics(const QString &jid);
+
+signals:
+    void diagnosticsReceived(const DiagnosticsIq &diagnostics);
 
 private slots:
     void handleResults(const DiagnosticsIq &results);

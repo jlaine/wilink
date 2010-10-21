@@ -502,10 +502,20 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
             m_thread->setId(iq.id());
             m_thread->setTo(iq.from());
             m_thread->start();
+        } else if (iq.type() == QXmppIq::Result || iq.type() == QXmppIq::Error) {
+            emit diagnosticsReceived(iq);
         }
         return true;
     }
     return false;
+}
+
+void DiagnosticsExtension::requestDiagnostics(const QString &jid)
+{
+    DiagnosticsIq iq;
+    iq.setType(QXmppIq::Get);
+    iq.setTo(jid);
+    client()->sendPacket(iq);
 }
 
 // SERIALISATION
