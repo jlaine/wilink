@@ -19,6 +19,14 @@
 
 #include <QObject>
 
+class TestDiagnostics : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void testPacket();
+};
+
 class TestIndent : public QObject
 {
     Q_OBJECT

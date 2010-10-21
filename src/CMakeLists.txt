@@ -54,6 +54,7 @@ set(wiLink_SOURCES
     plugins/contacts.cpp
     plugins/diagnostics.cpp
     plugins/diagnostics/interface.cpp
+    plugins/diagnostics/iq.cpp
     plugins/diagnostics/ping.cpp
     plugins/diagnostics/wireless.cpp
     plugins/discovery.cpp
@@ -163,8 +164,17 @@ install(TARGETS wiLink DESTINATION bin)
 # tests
 set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests systeminfo.cpp tests.cpp updates.cpp chat_utils.cpp ${tests_MOC_SOURCES})
-target_link_libraries(tests qnetio ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+add_executable(tests
+    plugins/diagnostics/interface.cpp
+    plugins/diagnostics/iq.cpp
+    plugins/diagnostics/ping.cpp
+    plugins/diagnostics/wireless.cpp
+    systeminfo.cpp
+    tests.cpp
+    updates.cpp
+    chat_utils.cpp
+    ${tests_MOC_SOURCES})
+target_link_libraries(tests qnetio qxmpp ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 add_executable(codec codec.cpp)
 target_link_libraries(codec qxmpp ${QT_LIBRARIES})

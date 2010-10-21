@@ -18,11 +18,63 @@
  */
 
 #include <QCoreApplication>
+#include <QDomDocument>
 #include <QtTest/QtTest>
 
+#include "plugins/diagnostics/iq.h"
 #include "updates.h"
 #include "chat_utils.h"
 #include "tests.h"
+
+template <class T>
+static void parsePacket(T &packet, const QByteArray &xml)
+{
+    //qDebug() << "parsing" << xml;
+    QDomDocument doc;
+    QCOMPARE(doc.setContent(xml, true), true);
+    QDomElement element = doc.documentElement();
+    packet.parse(element);
+}
+
+template <class T>
+static void serializePacket(T &packet, const QByteArray &xml)
+{
+    QBuffer buffer;
+    buffer.open(QIODevice::ReadWrite);
+    QXmlStreamWriter writer(&buffer);
+    packet.toXml(&writer);
+    qDebug() << "expect " << xml;
+    qDebug() << "writing" << buffer.data();
+    QCOMPARE(buffer.data(), xml);
+}
+
+void TestDiagnostics::testPacket()
+{
+    const QByteArray xml(
+    "<iq type=\"result\">"
+        "<query xmlns=\"http://wifirst.net/protocol/diagnostics\">"
+            "<interface name=\"en1\">"
+                "<address broadcast=\"\" ip=\"FE80:0:0:0:226:8FF:FEE1:A96B\" netmask=\"FFFF:FFFF:FFFF:FFFF:0:0:0:0\"/>"
+                "<address broadcast=\"192.168.99.255\" ip=\"192.168.99.179\" netmask=\"255.255.255.0\"/>"
+                "<wireless standards=\"ABGN\">"
+                    "<network current=\"1\" cinr=\"-91\" rssi=\"-59\" ssid=\"Maki\"/>"
+                    "<network cinr=\"-92\" rssi=\"-45\" ssid=\"freephonie\"/>"
+                "</wireless>"
+            "</interface>"
+            "<lookup hostName=\"www.google.fr\">"
+                "<address>2A00:1450:4007:800:0:0:0:68</address>"
+                "<address>66.249.92.104</address>"
+            "</lookup>"
+            "<ping hostAddress=\"192.168.99.1\" minimumTime=\"1.657\" maximumTime=\"44.275\" averageTime=\"20.258\" sentPackets=\"3\" receivedPackets=\"3\"/>"
+            "<traceroute hostAddress=\"213.91.4.201\">"
+                "<ping hostAddress=\"192.168.99.1\" minimumTime=\"1.719\" maximumTime=\"4.778\" averageTime=\"3.596\" sentPackets=\"3\" receivedPackets=\"3\"/>"
+            "</traceroute>"
+        "</query>"
+    "</iq>");
+
+    DiagnosticsIq iq;
+    parsePacket(iq, xml);
+}
 
 void TestIndent::indentCollapsed()
 {

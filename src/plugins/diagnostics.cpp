@@ -40,8 +40,6 @@
 
 #define DIAGNOSTICS_ROSTER_ID "0_diagnostics"
 
-const char* ns_diagnostics = "http://wifirst.net/protocol/diagnostics";
-
 static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
@@ -442,6 +440,11 @@ DiagnosticsExtension::~DiagnosticsExtension()
     }
 }
 
+QStringList DiagnosticsExtension::discoveryFeatures() const
+{
+    return QStringList() << ns_diagnostics;
+}
+
 void DiagnosticsExtension::handleResults(const DiagnosticsIq &results)
 {
     client()->sendPacket(results);
@@ -487,116 +490,6 @@ void DiagnosticsExtension::requestDiagnostics(const QString &jid)
     iq.setType(QXmppIq::Get);
     iq.setTo(jid);
     client()->sendPacket(iq);
-}
-
-// SERIALISATION
-
-QList<QHostInfo> DiagnosticsIq::lookups() const
-{
-    return m_lookups;
-}
-
-void DiagnosticsIq::setLookups(const QList<QHostInfo> &lookups)
-{
-    m_lookups = lookups;
-}
-
-QList<Ping> DiagnosticsIq::pings() const
-{
-    return m_pings;
-}
-
-void DiagnosticsIq::setPings(const QList<Ping> &pings)
-{
-    m_pings = pings;
-}
-
-QList<Traceroute> DiagnosticsIq::traceroutes() const
-{
-    return m_traceroutes;
-}
-
-void DiagnosticsIq::setTraceroutes(const QList<Traceroute> &traceroutes)
-{
-    m_traceroutes = traceroutes;
-}
-
-QList<Interface> DiagnosticsIq::interfaces() const
-{
-    return m_interfaces;
-}
-
-void DiagnosticsIq::setInterfaces(QList<Interface> &interfaces)
-{
-    m_interfaces = interfaces;
-}
-
-bool DiagnosticsIq::isDiagnosticsIq(const QDomElement &element)
-{
-    QDomElement queryElement = element.firstChildElement("query");
-    return (queryElement.namespaceURI() == ns_diagnostics);
-}
-
-void DiagnosticsIq::parseElementFromChild(const QDomElement &element)
-{
-    QDomElement child = element.firstChildElement();
-    while (!child.isNull())
-    {
-        if (child.tagName() == QLatin1String("lookup"))
-        {
-            QHostInfo lookup;
-            lookup.setHostName(child.attribute("hostName"));
-            QList<QHostAddress> addresses;
-            QDomElement addressElement = child.firstChildElement("address");
-            while (!addressElement.isNull())
-            {
-                addresses.append(QHostAddress(addressElement.text()));
-                addressElement = addressElement.nextSiblingElement("address");
-            }
-            lookup.setAddresses(addresses);
-            m_lookups << lookup;
-        }
-        else if (child.tagName() == QLatin1String("ping"))
-        {
-            Ping ping;
-            ping.parse(child);
-            m_pings << ping;
-        }
-        else if (child.tagName() == QLatin1String("traceroute"))
-        {
-            Traceroute traceroute;
-            traceroute.parse(child);
-            m_pings << traceroute;
-        }
-        else if (child.tagName() == QLatin1String("interface"))
-        {
-            Interface interface;
-            interface.parse(child);
-            m_interfaces << interface;
-        }
-        child = child.nextSiblingElement();
-    }
-}
-
-void DiagnosticsIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement("query");
-    helperToXmlAddAttribute(writer, "xmlns", ns_diagnostics);
-    foreach (const Interface &interface, m_interfaces)
-        interface.toXml(writer);
-    foreach (const QHostInfo &lookup, m_lookups)
-    {
-        writer->writeStartElement("lookup");
-        writer->writeAttribute("hostName", lookup.hostName());
-        foreach (const QHostAddress &address, lookup.addresses())
-            writer->writeTextElement("address", address.toString());
-        writer->writeEndElement();
-    }
-    foreach (const Ping &ping, m_pings)
-        ping.toXml(writer);
-    foreach (const Traceroute &traceroute, m_traceroutes)
-        traceroute.toXml(writer);
-    writer->writeEndElement();
 }
 
 // PLUGIN

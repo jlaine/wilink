@@ -25,46 +25,15 @@
 #include <QThread>
 
 #include "QXmppClientExtension.h"
-#include "QXmppIq.h"
 
 #include "chat_panel.h"
-#include "diagnostics/interface.h"
-#include "diagnostics/ping.h"
-#include "diagnostics/wireless.h"
+#include "diagnostics/iq.h"
 
 class QPushButton;
 class QProgressBar;
 class QTextBrowser;
 
 class DiagnosticsThread;
-
-class DiagnosticsIq : public QXmppIq
-{
-public:
-    QList<Interface> interfaces() const;
-    void setInterfaces(QList<Interface> &interfaces);
-
-    QList<QHostInfo> lookups() const;
-    void setLookups(const QList<QHostInfo> &lookups);
-
-    QList<Ping> pings() const;
-    void setPings(const QList<Ping> &pings);
-
-    QList<Traceroute> traceroutes() const;
-    void setTraceroutes(const QList<Traceroute> &traceroutes);
-
-    static bool isDiagnosticsIq(const QDomElement &element);
-
-protected:
-    void parseElementFromChild(const QDomElement &element);
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const;
-
-private:
-    QList<Interface> m_interfaces;
-    QList<QHostInfo> m_lookups;
-    QList<Ping> m_pings;
-    QList<Traceroute> m_traceroutes;
-};
 
 class Diagnostics : public ChatPanel
 {
@@ -105,8 +74,12 @@ public:
     DiagnosticsExtension(QXmppClient *client);
     ~DiagnosticsExtension();
 
-    bool handleStanza(const QDomElement &stanza);
     void requestDiagnostics(const QString &jid);
+
+    /// \cond
+    QStringList discoveryFeatures() const;
+    bool handleStanza(const QDomElement &element);
+    /// \endcond
 
 signals:
     void diagnosticsReceived(const DiagnosticsIq &diagnostics);
