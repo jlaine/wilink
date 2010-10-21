@@ -39,23 +39,31 @@ class QTextBrowser;
 
 class NetworkThread;
 
-class WirelessResult
+class Interface
 {
 public:
-    QNetworkInterface interface;
-    QList<WirelessNetwork> availableNetworks;
-    WirelessNetwork currentNetwork;
-    WirelessStandards supportedStandards;
+    QString interfaceName;
+    QList<QNetworkAddressEntry> addressEntries;
+
+    QList<WirelessNetwork> wirelessNetworks() const;
+    void setWirelessNetworks(const QList<WirelessNetwork> &wirelessNetworks);
+
+    WirelessStandards wirelessStandards() const;
+    void setWirelessStandards(WirelessStandards wirelessStandards);
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+
+private:
+    QList<WirelessNetwork> m_wirelessNetworks;
+    WirelessStandards m_wirelessStandards;
 };
 
 class DiagnosticsIq : public QXmppIq
 {
 public:
-    QList<WirelessResult> wirelessResults() const;
-    void setWirelessResults(QList<WirelessResult> &wirelessResults);
+    QList<Interface> interfaces() const;
+    void setInterfaces(QList<Interface> &interfaces);
 
     QList<Ping> pings() const;
     void setPings(const QList<Ping> &pings);
@@ -72,7 +80,7 @@ protected:
 private:
     QList<Ping> m_pings;
     QList<Traceroute> m_traceroutes;
-    QList<WirelessResult> m_wirelessResults;
+    QList<Interface> m_interfaces;
 };
 
 class NetworkThread : public QThread
@@ -92,7 +100,7 @@ signals:
     void dnsResults(const QList<QHostInfo> &results);
     void pingResults(const QList<Ping> &results);
     void tracerouteResults(const QList<Traceroute> &results);
-    void wirelessResult(const WirelessResult &result);
+    void wirelessResult(const Interface &result);
 
 private:
     QString m_id;
@@ -120,7 +128,7 @@ protected slots:
     void showPing(const QList<Ping> &results);
     void showProgress(int done, int total);
     void showTraceroute(const QList<Traceroute> &results);
-    void showWireless(const WirelessResult &result);
+    void showWireless(const Interface &result);
     void networkFinished();
 
 private:
