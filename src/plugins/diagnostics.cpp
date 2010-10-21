@@ -41,6 +41,9 @@
 
 #define DIAGNOSTICS_ROSTER_ID "0_diagnostics"
 
+static DiagnosticsThread *diagnosticsAgent = 0;
+static QThread *diagnosticsThread = 0;
+
 static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
@@ -55,11 +58,12 @@ static int id4 = qRegisterMetaType< Interface >();
 
 /* NETWORK */
 
-void DiagnosticsThread::run()
+void DiagnosticsThread::handle(const DiagnosticsIq &request)
 {
     DiagnosticsIq iq;
-    iq.setId(m_id);
-    iq.setTo(m_to);
+    iq.setId(request.id());
+    iq.setFrom(request.to());
+    iq.setTo(request.from());
     iq.setType(QXmppIq::Result);
 
     QList<QHostAddress> gateways;
@@ -257,8 +261,7 @@ static QString dumpPings(const QList<Ping> &pings)
 Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     : ChatPanel(parent),
     m_client(client),
-    m_displayed(false),
-    m_thread(0)
+    m_displayed(false)
 {
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -285,17 +288,19 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
 
+    connect(diagnosticsAgent, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
+    connect(diagnosticsAgent, SIGNAL(results(DiagnosticsIq)), this, SLOT(showResults(DiagnosticsIq)));
+
+    DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
+    connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
+            this, SLOT(showResults(DiagnosticsIq)));
+
     connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
     connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
 }
 
 Diagnostics::~Diagnostics()
 {
-    if (m_thread)
-    {
-        m_thread->wait();
-        delete m_thread;
-    }
 }
 
 void Diagnostics::addItem(const QString &title, const QString &value)
@@ -310,28 +315,18 @@ void Diagnostics::addSection(const QString &title)
 
 void Diagnostics::refresh()
 {
-    if (m_thread)
-        return;
-
     refreshButton->setEnabled(false);
     text->setText("<h2>System information</h2>");
 
     if (hostEdit->text().isEmpty())
     {
-        m_thread = new DiagnosticsThread(this);
-        connect(m_thread, SIGNAL(progress(int, int)), this, SLOT(showProgress(int, int)));
-        connect(m_thread, SIGNAL(results(DiagnosticsIq)), this, SLOT(showResults(DiagnosticsIq)));
-        m_thread->start();
+        DiagnosticsIq req;
+        QMetaObject::invokeMethod(diagnosticsAgent, "handle", Qt::QueuedConnection, Q_ARG(DiagnosticsIq, req)); 
         return;
     }
 
     DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
-    if (extension)
-    {
-        connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
-                this, SLOT(showResults(DiagnosticsIq)));
-        extension->requestDiagnostics(hostEdit->text());
-    }
+    extension->requestDiagnostics(hostEdit->text());
 }
 
 void Diagnostics::slotShow()
@@ -403,12 +398,14 @@ void Diagnostics::showResults(const DiagnosticsIq &iq)
 
     // enable buttons
     refreshButton->setEnabled(true);
+#if 0
     if (m_thread)
     {
         m_thread->wait();
         delete m_thread;
         m_thread = 0;
     }
+#endif
 }
 
 void Diagnostics::showInterface(const Interface &result)
@@ -463,18 +460,10 @@ void Diagnostics::showInterface(const Interface &result)
 // EXTENSION
 
 DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
-    : m_thread(0)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
-}
-
-DiagnosticsExtension::~DiagnosticsExtension()
-{
-    if (m_thread)
-    {
-        m_thread->wait();
-        delete m_thread;
-    }
+    connect(diagnosticsAgent, SIGNAL(results(DiagnosticsIq)),
+            this, SLOT(handleResults(DiagnosticsIq)));
 }
 
 QStringList DiagnosticsExtension::discoveryFeatures() const
@@ -496,23 +485,7 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
 
         if (iq.type() == QXmppIq::Get)
         {
-            // only allow one request at a time
-            if (m_thread && m_thread->isRunning())
-            {
-                DiagnosticsIq response;
-                response.setType(QXmppIq::Error);
-                response.setId(iq.id());
-                response.setTo(iq.from());
-                client()->sendPacket(response);
-                return true;
-            } else if (!m_thread) {
-                m_thread = new DiagnosticsThread(this);
-                connect(m_thread, SIGNAL(results(DiagnosticsIq)),
-                        this, SLOT(handleResults(DiagnosticsIq)));
-            }
-            m_thread->setId(iq.id());
-            m_thread->setTo(iq.from());
-            m_thread->start();
+            QMetaObject::invokeMethod(diagnosticsAgent, "handle", Qt::QueuedConnection, Q_ARG(DiagnosticsIq, iq)); 
         } else if (iq.type() == QXmppIq::Result || iq.type() == QXmppIq::Error) {
             emit diagnosticsReceived(iq);
         }
@@ -535,10 +508,19 @@ class DiagnosticsPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    void finalize(Chat *chat);
 };
 
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
+    if (!diagnosticsAgent)
+    {
+        diagnosticsThread = new QThread;
+        diagnosticsAgent = new DiagnosticsThread;
+        diagnosticsAgent->moveToThread(diagnosticsThread);
+        diagnosticsThread->start();
+    }
+
     /* add diagnostics extension */
     const QString domain = chat->client()->configuration().domain();
     if (domain == "wifirst.net")
@@ -563,6 +545,17 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
     connect(shortcut, SIGNAL(activated()), diagnostics, SIGNAL(showPanel()));
     return true;
+}
+
+void DiagnosticsPlugin::finalize(Chat *chat)
+{
+#if 0
+    if (m_thread)
+    {
+        m_thread->wait();
+        delete m_thread;
+    }
+#endif
 }
 
 Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)

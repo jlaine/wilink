@@ -64,7 +64,7 @@ private:
 
     QXmppClient *m_client;
     bool m_displayed;
-    DiagnosticsThread *m_thread;
+    DiagnosticsThread *m_agent;
 };
 
 class DiagnosticsExtension : public QXmppClientExtension
@@ -73,7 +73,6 @@ class DiagnosticsExtension : public QXmppClientExtension
 
 public:
     DiagnosticsExtension(QXmppClient *client);
-    ~DiagnosticsExtension();
 
     void requestDiagnostics(const QString &jid);
 
@@ -89,26 +88,22 @@ private slots:
     void handleResults(const DiagnosticsIq &results);
 
 private:
-    DiagnosticsThread *m_thread;
+    DiagnosticsThread *m_agent;
 };
 
-class DiagnosticsThread : public QThread
+class DiagnosticsThread : public QObject
 {
     Q_OBJECT
 
 public:
-    DiagnosticsThread(QObject *parent) : QThread(parent) {};
-    void run();
-    void setId(const QString &id) { m_id = id; };
-    void setTo(const QString &to) { m_to = to; };
+    DiagnosticsThread(QObject *parent = 0) : QObject(parent) {};
+
+private slots:
+    void handle(const DiagnosticsIq &request);
 
 signals:
     void progress(int done, int total);
     void results(const DiagnosticsIq &results);
-
-private:
-    QString m_id;
-    QString m_to;
 };
 
 #endif
