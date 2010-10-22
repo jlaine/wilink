@@ -29,6 +29,7 @@ class QGraphicsLinearLayout;
 class QGraphicsView;
 class QUrl;
 
+class ChatMessageWidget;
 class ChatSearchBubble;
 typedef QPair<QRectF, QTextCursor> RectCursor;
 
@@ -54,13 +55,27 @@ class ChatMessageBubble : public QGraphicsWidget
 {
 public:
     ChatMessageBubble(bool received, QGraphicsItem *parent = 0);
+    int indexOf(ChatMessageWidget *widget) const;
+    void insertAt(int pos, ChatMessageWidget *widget);
+
+    QString from() const;
     void setFrom(const QString &from);
+
     void setGeometry(const QRectF &rect);
+    void setMaximumWidth(qreal width);
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
 private:
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
     QGraphicsRectItem *m_shadow;
+
+    // layout
+    QGraphicsWidget *m_item;
+    QGraphicsLinearLayout *m_layout;
+    qreal m_maximumWidth;
+
+    QList<ChatMessageWidget*> m_messages;
 };
 
 /** The ChatMessageWidget class represents a widget for displaying a single
@@ -74,6 +89,8 @@ public:
     ChatMessageWidget(bool local, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     ChatMessage message() const;
+    ChatMessageBubble *bubble();
+    void setBubble(ChatMessageBubble *bubble);
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
@@ -94,25 +111,17 @@ private:
     QPainterPath bodyPath(qreal width, qreal height, bool close);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
     void setShowDate(bool show);
-    void setShowFooter(bool show);
-    void setShowSender(bool show);
 
     int maxWidth;
     ChatMessage msg;
     bool show_date;
-    bool show_footer;
-    bool show_sender;
+
+    ChatMessageBubble *m_bubble;
 
     // Text
     QString bodyAnchor;
     QGraphicsTextItem *bodyText;
     QGraphicsTextItem *dateText;
-    QGraphicsTextItem *fromText;
-
-    // Graphics
-    QGraphicsPathItem *messageBackground;
-    QGraphicsPathItem *messageFrame;
-    QGraphicsRectItem *messageShadow;
 };
 
 /** The ChatHistoryWidget class represents a widget containing a list
@@ -159,6 +168,7 @@ private:
     // layout
     QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
+    QList<ChatMessageBubble*> m_bubbles;
     QList<ChatMessageWidget*> m_messages;
 
     // selection

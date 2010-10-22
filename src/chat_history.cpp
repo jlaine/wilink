@@ -22,6 +22,7 @@
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QClipboard>
+#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 #include <QGraphicsLinearLayout>
@@ -40,13 +41,13 @@
 #include "flickcharm.h"
 #endif
 
+#define HISTORY_MARGIN 5
+
 #define DATE_WIDTH 80
-#define FROM_HEIGHT 15
-#define HEADER_HEIGHT 10
 #define BODY_OFFSET 5
+#define HEADER_HEIGHT 20
 #define FOOTER_HEIGHT 5
 #define MESSAGE_MAX 100
-#define HISTORY_MARGIN 5
 
 #ifdef WILINK_EMBEDDED
 #define BODY_FONT 14
@@ -99,6 +100,28 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     m_shadow->setPen(QPen(Qt::white));
     m_shadow->setBrush(QBrush(shadowGradient));
     m_shadow->setZValue(-2);
+
+    m_item = new QGraphicsWidget(this);
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_item->setLayout(m_layout);
+}
+
+int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
+{
+    return m_messages.indexOf(widget);
+}
+
+void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
+{
+    widget->setBubble(this);
+    m_messages.insert(pos, widget);
+    m_layout->insertItem(pos, widget);
+    updateGeometry();
+}
+
+QString ChatMessageBubble::from() const
+{
+    return m_from->document()->toPlainText();
 }
 
 void ChatMessageBubble::setFrom(const QString &from)
@@ -113,7 +136,7 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     QRectF rect(baseRect);
     rect.moveLeft(0);
     rect.moveTop(0);
-    rect.adjust(0, FROM_HEIGHT + 5, 0, -FOOTER_HEIGHT);
+    rect.adjust(0, HEADER_HEIGHT, 0, -FOOTER_HEIGHT);
 
     // bubble top
     QPainterPath path;
@@ -131,6 +154,39 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
 
     // shadow
     m_shadow->setRect(rect.left(), rect.bottom(), rect.width(), FOOTER_HEIGHT);
+
+    // messages
+    m_item->setGeometry(rect);
+}
+
+void ChatMessageBubble::setMaximumWidth(qreal width)
+{
+    m_maximumWidth = width;
+    QGraphicsWidget::setMaximumWidth(width);
+    updateGeometry();
+}
+
+QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    switch (which)
+    {
+        case Qt::MinimumSize:
+        {
+            QSizeF hint = m_item->minimumSize();
+            hint.setHeight(hint.height() + HEADER_HEIGHT + FOOTER_HEIGHT);
+            return hint;
+        }
+        case Qt::PreferredSize:
+        {
+            QSizeF hint = m_item->preferredSize();
+            hint.setHeight(hint.height() + HEADER_HEIGHT + FOOTER_HEIGHT);
+            if (hint.width() < m_maximumWidth)
+                hint.setWidth(m_maximumWidth);
+            return hint;
+        }
+        default:
+            return constraint;
+    }
 }
 
 /** Constructs a new ChatMesageWidget.
@@ -142,33 +198,13 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
     show_date(true),
-    show_footer(true),
-    show_sender(true)
+    m_bubble(0)
 {
     // set colors
     QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
     QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
-    // draw body
-    messageBackground = new QGraphicsPathItem(this);
-    messageBackground->setPen(Qt::NoPen);
-    messageBackground->setBrush(backgroundColor);
-    messageBackground->setZValue(-1);
-    messageFrame = scene()->addPath(QPainterPath(), QPen(baseColor), QBrush(Qt::NoBrush));
-    messageFrame->setParentItem(this);
-
-    // draw shadow
-    QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
-    shadowGradient.setColorAt(0, shadowColor);
-    shadowColor.setAlpha(0x00);
-    shadowGradient.setColorAt(1, shadowColor);
-    shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    shadowGradient.setSpread(QGradient::PadSpread);
-    messageShadow = scene()->addRect(QRectF(), QPen(Qt::white), QBrush(shadowGradient));
-    messageShadow->setParentItem(this);
-    messageShadow->setZValue(-2);
- 
     // create text objects
     bodyText = new QGraphicsTextItem(this);
     bodyText->setDefaultTextColor(Qt::black);
@@ -183,54 +219,19 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     dateText->setFont(font);
     dateText->setTextWidth(90);
 
-    fromText = new QGraphicsTextItem(this);
-    fromText->setFont(font);
-    fromText->setDefaultTextColor(baseColor);
-    fromText->installSceneEventFilter(this);
-
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
-/** Returns the QPainterPath used to draw the chat bubble.
- */
-QPainterPath ChatMessageWidget::bodyPath(qreal width, qreal height, bool close)
+ChatMessageBubble *ChatMessageWidget::bubble()
 {
-    QPainterPath path;
-    qreal bodyY = 0;
+    return m_bubble;
+}
 
-    // top
-    if (show_sender)
-    {
-        path.moveTo(0, HEADER_HEIGHT);
-        path.lineTo(0, 5);
-        path.lineTo(20, 5);
-        path.lineTo(17, 0);
-        path.lineTo(27, 5);
-        path.lineTo(width, 5);
-        path.lineTo(width, HEADER_HEIGHT);
-        bodyY += HEADER_HEIGHT;
-    } else {
-        path.moveTo(0, 0);
-        if (close)
-            path.lineTo(width, bodyY);
-        else
-            path.moveTo(width, bodyY);
-    }
-
-    // right
-    path.lineTo(width, bodyY + height);
-
-    // bottom
-    if (close || show_footer)
-        path.lineTo(0, bodyY + height);
-    else
-        path.moveTo(0, bodyY + height);
-
-    // left
-    path.lineTo(0, bodyY);
-    return path;
+void ChatMessageWidget::setBubble(ChatMessageBubble *bubble)
+{
+    m_bubble = bubble;
 }
 
 bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode) const
@@ -242,11 +243,13 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
  */
 bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
+#if 0
     if (item == fromText && event->type() == QEvent::GraphicsSceneMousePress)
     {
         emit messageClicked(msg);
     }
-    else if (item == bodyText)
+#endif
+    if (item == bodyText)
     {
         if (event->type() == QEvent::GraphicsSceneHoverLeave)
         {
@@ -284,36 +287,13 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     qreal bodyHeight = rect.height();
     qreal frameTop = rect.y();
     qreal textY = rect.y() - 1;
-    if (show_sender)
-    {
-        bodyHeight -= (FROM_HEIGHT + HEADER_HEIGHT);
-        frameTop += FROM_HEIGHT;
-        textY += HEADER_HEIGHT + FROM_HEIGHT - 2;
-    }
-    if (show_footer)
-        bodyHeight -= FOOTER_HEIGHT;
-
-    // position sender
-    if (show_sender)
-        fromText->setPos(rect.x(), rect.y());
 
     // position body
     bodyText->setPos(rect.x() + BODY_OFFSET, textY);
-    messageBackground->setPath(bodyPath(rect.width(), bodyHeight, true));
-    messageBackground->setPos(rect.x(), frameTop);
-    messageFrame->setPath(bodyPath(rect.width(), bodyHeight, false));
-    messageFrame->setPos(rect.x(), frameTop);
 
     // position the date
     if (show_date)
         dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, bodyText->y());
-
-    // position the footer shadow
-    if(show_footer)
-    {
-        messageShadow->setRect(0, 0, rect.width(), FOOTER_HEIGHT);
-        messageShadow->setPos(rect.x(), rect.height() - FOOTER_HEIGHT);
-    }
 }
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
@@ -340,9 +320,6 @@ ChatMessage ChatMessageWidget::message() const
 void ChatMessageWidget::setMessage(const ChatMessage &message)
 {
     msg = message;
-
-    /* set from */
-    fromText->setPlainText(message.from);
 
     /* set date */
     QDateTime datetime = message.date.toLocalTime();
@@ -440,22 +417,12 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
         msg.date > previous->message().date.addSecs(120 * 60));
     bool showDate = (showSender ||
         msg.date > previous->message().date.addSecs(60));
-    bool showPreviousFooter = (previous && showSender);
 
     // check whether anything changed in sender or date
-    if(showSender != show_sender || showDate != show_date)
+    if(showDate != show_date)
     {
-        // update values if changed
-        setShowSender(showSender);
         setShowDate(showDate);
         updateGeometry();
-    }
-    // check whether anything changed in footer
-    if(previous && previous->show_footer != showPreviousFooter)
-    {
-        // update values if changed
-        previous->setShowFooter(showPreviousFooter);
-        previous->updateGeometry();
     }
 }
 
@@ -470,28 +437,6 @@ void ChatMessageWidget::setShowDate(bool show)
     show_date = show;
 }
 
-void ChatMessageWidget::setShowFooter(bool show)
-{
-    if (show)
-    {
-        messageShadow->show();
-    } else {
-        messageShadow->hide();
-    }
-    show_footer = show;
-}
-
-void ChatMessageWidget::setShowSender(bool show)
-{
-    if (show)
-    {
-        fromText->show();
-    } else {
-        fromText->hide();
-    }
-    show_sender = show;
-}
-
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which)
@@ -503,10 +448,6 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
             QSizeF hint(bodyText->document()->size());
             if (hint.width() < maxWidth)
                 hint.setWidth(maxWidth);
-            if (show_sender)
-                hint.setHeight(hint.height() + HEADER_HEIGHT + FROM_HEIGHT);
-            if (show_footer)
-                hint.setHeight(hint.height() + FOOTER_HEIGHT);
             return hint;
         }
         default:
@@ -558,7 +499,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     }
 
     /* position cursor */
-    ChatMessageWidget *previous = NULL;
+    ChatMessageWidget *previous = 0;
     int pos = 0;
     foreach (ChatMessageWidget *child, m_messages)
     {
@@ -584,18 +525,38 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     msg->setPrevious(previous);
     msg->setMaximumWidth(m_maximumWidth);
 
+    bool check;
+    check = connect(msg, SIGNAL(messageClicked(ChatMessage)),
+                    this, SIGNAL(messageClicked(ChatMessage)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+
     /* adjust next message */
     if (pos < m_messages.size())
         m_messages[pos]->setPrevious(msg);
 
     /* insert new message */
-    bool check;
-    check = connect(msg, SIGNAL(messageClicked(ChatMessage)),
-                    this, SIGNAL(messageClicked(ChatMessage)));
-    Q_ASSERT(check);
+    if (pos > 0 && m_messages[pos-1]->message().from == message.from)
+    {
+        ChatMessageBubble *bubble = m_messages[pos-1]->bubble();
+        bubble->insertAt(bubble->indexOf(m_messages[pos-1]) + 1, msg);
+    }
+    else if (pos < m_messages.size() &&
+             m_messages[pos]->message().from == message.from)
+    {
+        ChatMessageBubble *bubble = m_messages[pos]->bubble();
+        bubble->insertAt(bubble->indexOf(m_messages[pos]), msg);
+    }
+    else
+    {
+        ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
+        bubble->setFrom(message.from);
+        bubble->insertAt(0, msg);
+        m_layout->insertItem(-1, bubble);
+    }
 
     m_messages.insert(pos, msg);
-    m_layout->insertItem(pos, msg);
+//    m_layout->insertItem(pos, msg);
     adjustSize();
 
     return msg;
@@ -640,6 +601,8 @@ void ChatHistoryWidget::adjustSize()
  */
 void ChatHistoryWidget::clear()
 {
+    m_bubbles.clear();
+
     m_selectedMessages.clear();
     for (int i = m_messages.size() - 1; i >= 0; i--)
         delete m_messages[i];
@@ -665,6 +628,8 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
         m_maximumWidth = m_view->viewport()->width() - 2 * HISTORY_MARGIN;
+        foreach (ChatMessageBubble *bubble, m_bubbles)
+            bubble->setMaximumWidth(m_maximumWidth);
         foreach (ChatMessageWidget *child, m_messages)
             child->setMaximumWidth(m_maximumWidth);
         adjustSize();
