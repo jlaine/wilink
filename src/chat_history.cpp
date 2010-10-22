@@ -204,7 +204,6 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
-    show_date(true),
     m_bubble(0)
 {
     // set colors
@@ -425,20 +424,10 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
         msg.date > previous->message().date.addSecs(60));
 
     // check whether anything changed in sender or date
-    if(showDate != show_date)
-    {
-        setShowDate(showDate);
-        //updateGeometry();
-    }
-}
-
-void ChatMessageWidget::setShowDate(bool show)
-{
-    if (show)
+    if (showDate)
         dateText->show();
     else
         dateText->hide();
-    show_date = show;
 }
 
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const

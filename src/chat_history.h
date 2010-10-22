@@ -105,13 +105,10 @@ protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
 
 private:
-    QPainterPath bodyPath(qreal width, qreal height, bool close);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
-    void setShowDate(bool show);
 
     int maxWidth;
     ChatMessage msg;
-    bool show_date;
 
     ChatMessageBubble *m_bubble;
 
