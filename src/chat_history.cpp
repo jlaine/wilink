@@ -100,10 +100,6 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     m_shadow->setPen(QPen(Qt::white));
     m_shadow->setBrush(QBrush(shadowGradient));
     m_shadow->setZValue(-2);
-
-    m_item = new QGraphicsWidget(this);
-    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_item->setLayout(m_layout);
 }
 
 int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
@@ -114,8 +110,9 @@ int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
     widget->setBubble(this);
+    widget->setParentItem(this);
+    widget->setMaximumWidth(m_maximumWidth);
     m_messages.insert(pos, widget);
-    m_layout->insertItem(pos, widget);
     updateGeometry();
 }
 
@@ -156,13 +153,20 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     m_shadow->setRect(rect.left(), rect.bottom(), rect.width(), FOOTER_HEIGHT);
 
     // messages
-    m_item->setGeometry(rect);
+    int y = rect.top();
+    foreach (ChatMessageWidget *widget, m_messages)
+    {
+        widget->setPos(rect.left(), y);
+        y += widget->geometry().height();
+    }
 }
 
 void ChatMessageBubble::setMaximumWidth(qreal width)
 {
     m_maximumWidth = width;
     QGraphicsWidget::setMaximumWidth(width);
+    foreach (ChatMessageWidget *child, m_messages)
+        child->setMaximumWidth(m_maximumWidth);
     updateGeometry();
 }
 
@@ -172,17 +176,17 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     {
         case Qt::MinimumSize:
         {
-            QSizeF hint = m_item->minimumSize();
-            hint.setHeight(hint.height() + HEADER_HEIGHT + FOOTER_HEIGHT);
-            return hint;
+            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT;
+            foreach (ChatMessageWidget *widget, m_messages)
+                height += widget->minimumHeight();
+            return QSizeF(m_maximumWidth, height);
         }
         case Qt::PreferredSize:
         {
-            QSizeF hint = m_item->preferredSize();
-            hint.setHeight(hint.height() + HEADER_HEIGHT + FOOTER_HEIGHT);
-            if (hint.width() < m_maximumWidth)
-                hint.setWidth(m_maximumWidth);
-            return hint;
+            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT;
+            foreach (ChatMessageWidget *widget, m_messages)
+                height += widget->preferredHeight();
+            return QSizeF(m_maximumWidth, height);
         }
         default:
             return constraint;
@@ -523,7 +527,6 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     ChatMessageWidget *msg = new ChatMessageWidget(message.received, this);
     msg->setMessage(message);
     msg->setPrevious(previous);
-    msg->setMaximumWidth(m_maximumWidth);
 
     bool check;
     check = connect(msg, SIGNAL(messageClicked(ChatMessage)),
@@ -550,13 +553,17 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     else
     {
         ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
+        bubble->setMaximumWidth(m_maximumWidth);
+        int bubblePos = m_bubbles.size();
+        if (pos < m_messages.size())
+            bubblePos = m_bubbles.indexOf(m_messages[pos]->bubble());
         bubble->setFrom(message.from);
         bubble->insertAt(0, msg);
-        m_layout->insertItem(-1, bubble);
+        m_bubbles.insert(bubblePos, bubble);
+        m_layout->insertItem(bubblePos, bubble);
     }
 
     m_messages.insert(pos, msg);
-//    m_layout->insertItem(pos, msg);
     adjustSize();
 
     return msg;
@@ -630,8 +637,6 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
         m_maximumWidth = m_view->viewport()->width() - 2 * HISTORY_MARGIN;
         foreach (ChatMessageBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
-        foreach (ChatMessageWidget *child, m_messages)
-            child->setMaximumWidth(m_maximumWidth);
         adjustSize();
     }
     return false;

@@ -71,10 +71,7 @@ private:
     QGraphicsRectItem *m_shadow;
 
     // layout
-    QGraphicsWidget *m_item;
-    QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
-
     QList<ChatMessageWidget*> m_messages;
 };
 
