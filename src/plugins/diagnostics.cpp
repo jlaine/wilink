@@ -364,6 +364,7 @@ void Diagnostics::refresh()
 void Diagnostics::timeout()
 {
     showMessage("Request timed out.");
+    refreshButton->setEnabled(true);
 }
 
 void Diagnostics::slotShow()

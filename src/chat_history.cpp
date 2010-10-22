@@ -63,6 +63,76 @@ ChatMessage::ChatMessage()
 {
 }
 
+/** Constructs a new ChatMesageBubble.
+ *
+ * @param parent
+ */
+ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
+{
+    QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
+    QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
+    QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
+
+    // from
+    m_from = new QGraphicsTextItem(this);
+    QFont font = m_from->font();
+    font.setPixelSize(DATE_FONT);
+    m_from->setFont(font);
+    m_from->setDefaultTextColor(baseColor);
+    //m_from->installSceneEventFilter(this);
+
+    // bubble frame
+    m_frame = new QGraphicsPathItem(this);
+    m_frame->setPen(baseColor);
+    m_frame->setBrush(backgroundColor);
+    m_frame->setZValue(-1);
+
+    // bubble shadow
+    QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
+    shadowGradient.setColorAt(0, shadowColor);
+    shadowColor.setAlpha(0x00);
+    shadowGradient.setColorAt(1, shadowColor);
+    shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    shadowGradient.setSpread(QGradient::PadSpread);
+    m_shadow = new QGraphicsRectItem(this);
+    m_shadow->setPen(QPen(Qt::white));
+    m_shadow->setBrush(QBrush(shadowGradient));
+    m_shadow->setZValue(-2);
+}
+
+void ChatMessageBubble::setFrom(const QString &from)
+{
+    m_from->setPlainText(from);
+}
+
+void ChatMessageBubble::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    QRectF rect(baseRect);
+    rect.moveLeft(0);
+    rect.moveTop(0);
+    rect.adjust(0, FROM_HEIGHT + 5, 0, -FOOTER_HEIGHT);
+
+    // bubble top
+    QPainterPath path;
+    path.moveTo(rect.left(), rect.top());
+    path.lineTo(rect.left() + 20, rect.top());
+    path.lineTo(rect.left() + 17, rect.top() - 5);
+    path.lineTo(rect.left() + 27, rect.top());
+    path.lineTo(rect.right(), rect.top());
+
+    // bubble right, bottom, left
+    path.lineTo(rect.right(), rect.bottom());
+    path.lineTo(rect.left(), rect.bottom());
+    path.lineTo(rect.left(), rect.top());
+    m_frame->setPath(path);
+
+    // shadow
+    m_shadow->setRect(rect.left(), rect.bottom(), rect.width(), FOOTER_HEIGHT);
+}
+
 /** Constructs a new ChatMesageWidget.
  *
  * @param received
@@ -81,8 +151,9 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
     // draw body
-    messageBackground = scene()->addPath(QPainterPath(), QPen(Qt::NoPen), QBrush(backgroundColor));
-    messageBackground->setParentItem(this);
+    messageBackground = new QGraphicsPathItem(this);
+    messageBackground->setPen(Qt::NoPen);
+    messageBackground->setBrush(backgroundColor);
     messageBackground->setZValue(-1);
     messageFrame = scene()->addPath(QPainterPath(), QPen(baseColor), QBrush(Qt::NoBrush));
     messageFrame->setParentItem(this);
@@ -479,9 +550,9 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
         return 0;
 
     // check we hit the message limit and this message is too old
-    if (m_layout->count() >= MESSAGE_MAX)
+    if (m_messages.size() >= MESSAGE_MAX)
     {
-        ChatMessageWidget *oldest = static_cast<ChatMessageWidget*>(m_layout->itemAt(0));
+        ChatMessageWidget *oldest = m_messages.first();
         if (message.date < oldest->message().date)
             return 0;
     }
@@ -489,10 +560,8 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     /* position cursor */
     ChatMessageWidget *previous = NULL;
     int pos = 0;
-    for (int i = 0; i < m_layout->count(); i++)
+    foreach (ChatMessageWidget *child, m_messages)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
-
         // check for collision
         if (message.archived != child->message().archived &&
             message.fromJid == child->message().fromJid &&
@@ -516,11 +585,8 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     msg->setMaximumWidth(m_maximumWidth);
 
     /* adjust next message */
-    if (pos < m_layout->count())
-    {
-        ChatMessageWidget *next = static_cast<ChatMessageWidget*>(m_layout->itemAt(pos));
-        next->setPrevious(msg);
-    }
+    if (pos < m_messages.size())
+        m_messages[pos]->setPrevious(msg);
 
     /* insert new message */
     bool check;
@@ -528,6 +594,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
                     this, SIGNAL(messageClicked(ChatMessage)));
     Q_ASSERT(check);
 
+    m_messages.insert(pos, msg);
     m_layout->insertItem(pos, msg);
     adjustSize();
 
@@ -554,7 +621,7 @@ void ChatHistoryWidget::adjustSize()
     }
 
     // adjust viewed rectangle
-    if (!m_layout->count())
+    if (m_messages.isEmpty())
         m_view->setSceneRect(0, 0, m_maximumWidth, 50);
     else
     {
@@ -574,8 +641,9 @@ void ChatHistoryWidget::adjustSize()
 void ChatHistoryWidget::clear()
 {
     m_selectedMessages.clear();
-    for (int i = m_layout->count() - 1; i >= 0; i--)
-        delete m_layout->itemAt(i);
+    for (int i = m_messages.size() - 1; i >= 0; i--)
+        delete m_messages[i];
+    m_messages.clear();
     adjustSize();
 }
 
@@ -597,11 +665,8 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
         m_maximumWidth = m_view->viewport()->width() - 2 * HISTORY_MARGIN;
-        for (int i = 0; i < m_layout->count(); i++)
-        {
-            ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+        foreach (ChatMessageWidget *child, m_messages)
             child->setMaximumWidth(m_maximumWidth);
-        }
         adjustSize();
     }
     return false;
@@ -627,12 +692,12 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
 
     // retrieve previous cursor
     QTextCursor cursor;
-    int startIndex = (flags && QTextDocument::FindBackward) ? m_layout->count() -1 : 0;
+    int startIndex = (flags && QTextDocument::FindBackward) ? m_messages.size() -1 : 0;
     if (m_lastFindWidget)
     {
-        for (int i = 0; i < m_layout->count(); ++i)
+        for (int i = 0; i < m_messages.size(); ++i)
         {
-            if (m_layout->itemAt(i) == m_lastFindWidget)
+            if (m_messages[i] == m_lastFindWidget)
             {
                 startIndex = i;
                 cursor = m_lastFindCursor;
@@ -646,9 +711,9 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
     // perform search
     bool looped = false;
     int i = startIndex;
-    while (i >= 0 && i < m_layout->count())
+    while (i >= 0 && i < m_messages.size())
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
+        ChatMessageWidget *child = m_messages[i];
 
         // position cursor
         if (cursor.isNull())
@@ -687,9 +752,9 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
                 break;
             if (flags && QTextDocument::FindBackward) {
                 if (--i < 0)
-                    i = m_layout->count() - 1;
+                    i = m_messages.size() - 1;
             } else {
-                if (++i >= m_layout->count())
+                if (++i >= m_messages.size())
                     i = 0;
             }
             if (i == startIndex)
@@ -899,9 +964,8 @@ void ChatHistoryWidget::slotSelectionChanged()
 
     // update the selected items
     QList<ChatMessageWidget*> newSelection;
-    for (int i = 0; i < m_layout->count(); i++)
+    foreach (ChatMessageWidget *child, m_messages)
     {
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(m_layout->itemAt(i));
         if (selection.contains(child))
         {
             newSelection << child;
