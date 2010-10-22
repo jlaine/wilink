@@ -22,7 +22,6 @@
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QClipboard>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 #include <QGraphicsLinearLayout>
@@ -743,8 +742,9 @@ ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
     QGraphicsItem *hit = scene()->itemAt(pos);
     while (hit)
     {
-        if (hit->parentItem() == this)
-            return static_cast<ChatMessageWidget*>(hit);
+        ChatMessageWidget *widget = static_cast<ChatMessageWidget*>(hit);
+        if (m_messages.contains(widget))
+            return widget;
         hit = hit->parentItem();
     }
     return 0;
