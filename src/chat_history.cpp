@@ -24,6 +24,7 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QFile>
+#include <QGraphicsDropShadowEffect>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsView>
@@ -44,6 +45,7 @@
 
 #define DATE_WIDTH 80
 #define BODY_OFFSET 5
+#define BUBBLE_RADIUS 8
 #define HEADER_HEIGHT 20
 #define FOOTER_HEIGHT 5
 #define MESSAGE_MAX 100
@@ -89,6 +91,12 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     m_frame->setZValue(-1);
 
     // bubble shadow
+#if 0
+    QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
+    effect->setBlurRadius(8);
+    effect->setOffset(QPointF(5, 5));
+    m_frame->setGraphicsEffect(effect);
+#else
     QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
     shadowGradient.setColorAt(0, shadowColor);
     shadowColor.setAlpha(0x00);
@@ -99,6 +107,7 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     m_shadow->setPen(QPen(Qt::white));
     m_shadow->setBrush(QBrush(shadowGradient));
     m_shadow->setZValue(-2);
+#endif
 }
 
 int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
@@ -136,20 +145,30 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     QRectF rect(baseRect);
     rect.moveLeft(0);
     rect.moveTop(0);
-    rect.adjust(0, HEADER_HEIGHT, 0, -FOOTER_HEIGHT);
+    rect.adjust(0.5, HEADER_HEIGHT + 0.5, -0.5, -FOOTER_HEIGHT - 0.5);
+
+    QRectF arc(0, 0, 2 * BUBBLE_RADIUS, 2 * BUBBLE_RADIUS);
 
     // bubble top
     QPainterPath path;
-    path.moveTo(rect.left(), rect.top());
+    path.moveTo(rect.left(), rect.top() + BUBBLE_RADIUS);
+    arc.moveTopLeft(rect.topLeft());
+    path.arcTo(arc, 180, -90);
     path.lineTo(rect.left() + 20, rect.top());
     path.lineTo(rect.left() + 17, rect.top() - 5);
     path.lineTo(rect.left() + 27, rect.top());
-    path.lineTo(rect.right(), rect.top());
+    path.lineTo(rect.right() - BUBBLE_RADIUS, rect.top());
+    arc.moveRight(rect.right());
+    path.arcTo(arc, 90, -90);
 
     // bubble right, bottom, left
-    path.lineTo(rect.right(), rect.bottom());
-    path.lineTo(rect.left(), rect.bottom());
-    path.lineTo(rect.left(), rect.top());
+    path.lineTo(rect.right(), rect.bottom() - BUBBLE_RADIUS);
+    arc.moveBottom(rect.bottom());
+    path.arcTo(arc, 0, -90);
+    path.lineTo(rect.left() + BUBBLE_RADIUS, rect.bottom());
+    arc.moveLeft(rect.left());
+    path.arcTo(arc, -90, -90);
+    path.closeSubpath();
     m_frame->setPath(path);
 
     // shadow
@@ -162,14 +181,14 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
         const QSizeF preferredSize = widget->preferredSize();
         if (widget->size() != preferredSize)
             widget->resize(preferredSize);
-        widget->setPos(rect.left(), y);
+        widget->setPos(int(rect.left()), y);
         y += preferredSize.height();
     }
 }
 
 void ChatMessageBubble::setMaximumWidth(qreal width)
 {
-    m_maximumWidth = width;
+    m_maximumWidth = width - 2;
     QGraphicsWidget::setMaximumWidth(width);
     foreach (ChatMessageWidget *child, m_messages)
         child->setMaximumWidth(m_maximumWidth);

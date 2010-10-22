@@ -18,6 +18,7 @@
  */
 
 #include <QDateTime>
+#include <QDebug>
 #include <QGraphicsView>
 #include <QLabel>
 #include <QLayout>
@@ -49,6 +50,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     /* chat history */
     chatHistory = new QGraphicsView;
+    chatHistory->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     chatHistory->setScene(new QGraphicsScene(chatHistory));
 #ifdef WILINK_EMBEDDED
     FlickCharm *charm = new FlickCharm(chatHistory);
