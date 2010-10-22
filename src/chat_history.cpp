@@ -67,10 +67,11 @@ ChatMessage::ChatMessage()
  *
  * @param parent
  */
-ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
+ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
-    const QColor baseColor(0x26, 0x89, 0xd6);
+    QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
+    QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
     // from
@@ -79,12 +80,13 @@ ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
     font.setPixelSize(DATE_FONT);
     m_from->setFont(font);
     m_from->setDefaultTextColor(baseColor);
-    m_from->setPlainText("Test user");
     //m_from->installSceneEventFilter(this);
 
     // bubble frame
     m_frame = new QGraphicsPathItem(this);
     m_frame->setPen(baseColor);
+    m_frame->setBrush(backgroundColor);
+    m_frame->setZValue(-1);
 
     // bubble shadow
     QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
@@ -97,6 +99,11 @@ ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
     m_shadow->setPen(QPen(Qt::white));
     m_shadow->setBrush(QBrush(shadowGradient));
     m_shadow->setZValue(-2);
+}
+
+void ChatMessageBubble::setFrom(const QString &from)
+{
+    m_from->setPlainText(from);
 }
 
 void ChatMessageBubble::setGeometry(const QRectF &baseRect)

@@ -53,7 +53,8 @@ public:
 class ChatMessageBubble : public QGraphicsWidget
 {
 public:
-    ChatMessageBubble(QGraphicsItem *parent = 0);
+    ChatMessageBubble(bool received, QGraphicsItem *parent = 0);
+    void setFrom(const QString &from);
     void setGeometry(const QRectF &rect);
 
 private:
