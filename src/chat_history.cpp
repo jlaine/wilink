@@ -156,8 +156,11 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     int y = rect.top();
     foreach (ChatMessageWidget *widget, m_messages)
     {
+        const QSizeF preferredSize = widget->preferredSize();
+        if (widget->size() != preferredSize)
+            widget->resize(preferredSize);
         widget->setPos(rect.left(), y);
-        y += widget->geometry().height();
+        y += preferredSize.height();
     }
 }
 
@@ -296,8 +299,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     bodyText->setPos(rect.x() + BODY_OFFSET, textY);
 
     // position the date
-    if (show_date)
-        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, bodyText->y());
+    dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, bodyText->y());
 }
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
@@ -426,18 +428,16 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
     if(showDate != show_date)
     {
         setShowDate(showDate);
-        updateGeometry();
+        //updateGeometry();
     }
 }
 
 void ChatMessageWidget::setShowDate(bool show)
 {
     if (show)
-    {
         dateText->show();
-    } else {
+    else
         dateText->hide();
-    }
     show_date = show;
 }
 
