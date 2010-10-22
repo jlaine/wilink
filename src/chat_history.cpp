@@ -291,16 +291,12 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     rect.moveLeft(0);
     rect.moveTop(0);
 
-    // calculate space available for body
-    qreal bodyHeight = rect.height();
-    qreal frameTop = rect.y();
-    qreal textY = rect.y() - 1;
-
     // position body
-    bodyText->setPos(rect.x() + BODY_OFFSET, textY);
+    bodyText->setPos(rect.x() + BODY_OFFSET, rect.top());
 
     // position the date
-    dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2, bodyText->y());
+    dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
+                     rect.top() + 2);
 }
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
