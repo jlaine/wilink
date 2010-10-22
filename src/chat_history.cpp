@@ -91,23 +91,10 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     m_frame->setZValue(-1);
 
     // bubble shadow
-#if 0
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
     effect->setBlurRadius(8);
-    effect->setOffset(QPointF(5, 5));
+    effect->setOffset(QPointF(2, 2));
     m_frame->setGraphicsEffect(effect);
-#else
-    QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
-    shadowGradient.setColorAt(0, shadowColor);
-    shadowColor.setAlpha(0x00);
-    shadowGradient.setColorAt(1, shadowColor);
-    shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
-    shadowGradient.setSpread(QGradient::PadSpread);
-    m_shadow = new QGraphicsRectItem(this);
-    m_shadow->setPen(QPen(Qt::white));
-    m_shadow->setBrush(QBrush(shadowGradient));
-    m_shadow->setZValue(-2);
-#endif
 }
 
 int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
@@ -170,9 +157,6 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     path.arcTo(arc, -90, -90);
     path.closeSubpath();
     m_frame->setPath(path);
-
-    // shadow
-    m_shadow->setRect(rect.left(), rect.bottom(), rect.width(), FOOTER_HEIGHT);
 
     // messages
     int y = rect.top();
@@ -574,7 +558,12 @@ void ChatHistoryWidget::adjustSize()
     else
     {
         QRectF rect = boundingRect();
-        rect.setHeight(rect.height() - 10);
+        rect.setHeight(rect.height() + HISTORY_MARGIN);
+
+        // FIXME: for some odd reason, we need to shift the view by 15px
+        // when the scrollbar appears!
+        if (rect.height() > m_view->viewport()->height())
+            rect.moveTop(rect.top() - 15);
         m_view->setSceneRect(rect);
     }
 

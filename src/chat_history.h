@@ -73,7 +73,6 @@ protected:
 private:
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
-    QGraphicsRectItem *m_shadow;
 
     // layout
     qreal m_maximumWidth;
