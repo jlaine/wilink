@@ -112,8 +112,7 @@ protected:
 
 private:
     int maxWidth;
-    ChatMessage msg;
-
+    ChatMessage m_message;
     ChatMessageBubble *m_bubble;
 
     // Text

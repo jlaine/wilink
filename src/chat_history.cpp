@@ -217,19 +217,14 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     maxWidth(2 * DATE_WIDTH),
     m_bubble(0)
 {
-    // set colors
-    QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
-    QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
-    QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
-
-    // create text objects
+    // message body
     bodyText = new QGraphicsTextItem(this);
-    bodyText->setDefaultTextColor(Qt::black);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
     bodyText->installSceneEventFilter(this);
 
+    // message date
     dateText = new QGraphicsTextItem(this);
     font = dateText->font();
     font.setPixelSize(DATE_FONT);
@@ -322,14 +317,14 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
  */
 ChatMessage ChatMessageWidget::message() const
 {
-    return msg;
+    return m_message;
 }
 
 /** Sets the message which this widget displays.
  */
 void ChatMessageWidget::setMessage(const ChatMessage &message)
 {
-    msg = message;
+    m_message = message;
 
     /* set date */
     QDateTime datetime = message.date.toLocalTime();
@@ -416,23 +411,19 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
     bodyText->setTextCursor(cursor);
 }
 
-/** Determine whether to show message sender and date depending
+/** Determine whether to show message date depending
  *  on the previous message in the list.
  */
 void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
 {
-    // calculate new values
-    bool showSender = (!previous ||
-        msg.fromJid != previous->message().fromJid ||
-        msg.date > previous->message().date.addSecs(120 * 60));
-    bool showDate = (showSender ||
-        msg.date > previous->message().date.addSecs(60));
-
-    // check whether anything changed in sender or date
-    if (showDate)
+    if (!previous ||
+        m_message.fromJid != previous->message().fromJid ||
+        m_message.date > previous->message().date.addSecs(60))
+    {
         dateText->show();
-    else
+    } else {
         dateText->hide();
+    }
 }
 
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
