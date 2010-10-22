@@ -159,6 +159,7 @@ private:
     // layout
     QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
+    QList<ChatMessageWidget*> m_messages;
 
     // selection
     QList<ChatMessageWidget*> m_selectedMessages;
