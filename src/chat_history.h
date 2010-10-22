@@ -47,6 +47,21 @@ public:
     bool received;
 };
 
+/** The ChatMessageBubble class is a widget for display a set of
+ *  chat messages from a given sender.
+ */
+class ChatMessageBubble : public QGraphicsWidget
+{
+public:
+    ChatMessageBubble(QGraphicsItem *parent = 0);
+    void setGeometry(const QRectF &rect);
+
+private:
+    QGraphicsPathItem *m_frame;
+    QGraphicsTextItem *m_from;
+    QGraphicsRectItem *m_shadow;
+};
+
 /** The ChatMessageWidget class represents a widget for displaying a single
  *  chat message.
  */

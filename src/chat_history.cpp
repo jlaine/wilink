@@ -63,6 +63,69 @@ ChatMessage::ChatMessage()
 {
 }
 
+/** Constructs a new ChatMesageBubble.
+ *
+ * @param parent
+ */
+ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
+{
+    const QColor baseColor(0x26, 0x89, 0xd6);
+    QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
+
+    // from
+    m_from = new QGraphicsTextItem(this);
+    QFont font = m_from->font();
+    font.setPixelSize(DATE_FONT);
+    m_from->setFont(font);
+    m_from->setDefaultTextColor(baseColor);
+    m_from->setPlainText("Test user");
+    //m_from->installSceneEventFilter(this);
+
+    // bubble frame
+    m_frame = new QGraphicsPathItem(this);
+    m_frame->setPen(baseColor);
+
+    // bubble shadow
+    QLinearGradient shadowGradient(QPointF(0, 0), QPointF(0, 1));
+    shadowGradient.setColorAt(0, shadowColor);
+    shadowColor.setAlpha(0x00);
+    shadowGradient.setColorAt(1, shadowColor);
+    shadowGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    shadowGradient.setSpread(QGradient::PadSpread);
+    m_shadow = new QGraphicsRectItem(this);
+    m_shadow->setPen(QPen(Qt::white));
+    m_shadow->setBrush(QBrush(shadowGradient));
+    m_shadow->setZValue(-2);
+}
+
+void ChatMessageBubble::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    QRectF rect(baseRect);
+    rect.moveLeft(0);
+    rect.moveTop(0);
+    rect.adjust(0, FROM_HEIGHT + 5, 0, -FOOTER_HEIGHT);
+
+    // bubble top
+    QPainterPath path;
+    path.moveTo(rect.left(), rect.top());
+    path.lineTo(rect.left() + 20, rect.top());
+    path.lineTo(rect.left() + 17, rect.top() - 5);
+    path.lineTo(rect.left() + 27, rect.top());
+    path.lineTo(rect.right(), rect.top());
+
+    // bubble right, bottom, left
+    path.lineTo(rect.right(), rect.bottom());
+    path.lineTo(rect.left(), rect.bottom());
+    path.lineTo(rect.left(), rect.top());
+    m_frame->setPath(path);
+
+    // shadow
+    m_shadow->setRect(rect.left(), rect.bottom(), rect.width(), FOOTER_HEIGHT);
+}
+
 /** Constructs a new ChatMesageWidget.
  *
  * @param received
@@ -81,8 +144,9 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
 
     // draw body
-    messageBackground = scene()->addPath(QPainterPath(), QPen(Qt::NoPen), QBrush(backgroundColor));
-    messageBackground->setParentItem(this);
+    messageBackground = new QGraphicsPathItem(this);
+    messageBackground->setPen(Qt::NoPen);
+    messageBackground->setBrush(backgroundColor);
     messageBackground->setZValue(-1);
     messageFrame = scene()->addPath(QPainterPath(), QPen(baseColor), QBrush(Qt::NoBrush));
     messageFrame->setParentItem(this);
