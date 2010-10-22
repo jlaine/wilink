@@ -60,9 +60,6 @@ public:
     int indexOf(ChatMessageWidget *widget) const;
     void insertAt(int pos, ChatMessageWidget *widget);
 
-    QString from() const;
-    void setFrom(const QString &from);
-
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
 
@@ -91,7 +88,7 @@ class ChatMessageWidget : public QGraphicsWidget
     Q_OBJECT
 
 public:
-    ChatMessageWidget(bool local, QGraphicsItem *parent);
+    ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     ChatMessage message() const;
     ChatMessageBubble *bubble();
@@ -99,7 +96,6 @@ public:
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    void setMessage(const ChatMessage &message);
     void setPrevious(ChatMessageWidget *previous);
     QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);

@@ -108,21 +108,13 @@ int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
 
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
+    if (m_messages.isEmpty())
+        m_from->setPlainText(widget->message().from);
     widget->setBubble(this);
     widget->setParentItem(this);
     widget->setMaximumWidth(m_maximumWidth);
     m_messages.insert(pos, widget);
     updateGeometry();
-}
-
-QString ChatMessageBubble::from() const
-{
-    return m_from->document()->toPlainText();
-}
-
-void ChatMessageBubble::setFrom(const QString &from)
-{
-    m_from->setPlainText(from);
 }
 
 /** Filters events on the sender label.
@@ -212,10 +204,11 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
  * @param received
  * @param parent
  */
-ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
+ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
-    m_bubble(0)
+    m_bubble(0),
+    m_message(message)
 {
     // message body
     bodyText = new QGraphicsTextItem(this);
@@ -224,12 +217,21 @@ ChatMessageWidget::ChatMessageWidget(bool received, QGraphicsItem *parent)
     bodyText->setFont(font);
     bodyText->installSceneEventFilter(this);
 
+    QString bodyHtml = Qt::escape(message.body);
+    bodyHtml.replace("\n", "<br/>");
+    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
+    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+    bodyText->setHtml(bodyHtml);
+
     // message date
     dateText = new QGraphicsTextItem(this);
     font = dateText->font();
     font.setPixelSize(DATE_FONT);
     dateText->setFont(font);
     dateText->setTextWidth(90);
+
+    QDateTime datetime = message.date.toLocalTime();
+    dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
 
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
@@ -318,24 +320,6 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 ChatMessage ChatMessageWidget::message() const
 {
     return m_message;
-}
-
-/** Sets the message which this widget displays.
- */
-void ChatMessageWidget::setMessage(const ChatMessage &message)
-{
-    m_message = message;
-
-    /* set date */
-    QDateTime datetime = message.date.toLocalTime();
-    dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-
-    /* set body */
-    QString bodyHtml = Qt::escape(message.body);
-    bodyHtml.replace("\n", "<br/>");
-    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
-    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-    bodyText->setHtml(bodyHtml);
 }
 
 /** Break a text selection into a list of rectangles, which one rectangle per line.
@@ -509,11 +493,8 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     }
 
     /* prepare message */
-    ChatMessageWidget *msg = new ChatMessageWidget(message.received, this);
-    msg->setMessage(message);
+    ChatMessageWidget *msg = new ChatMessageWidget(message, this);
     msg->setPrevious(previous);
-
-    /* adjust next message */
     if (pos < m_messages.size())
         m_messages[pos]->setPrevious(msg);
 
@@ -536,7 +517,6 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
         int bubblePos = m_bubbles.size();
         if (pos < m_messages.size())
             bubblePos = m_bubbles.indexOf(m_messages[pos]->bubble());
-        bubble->setFrom(message.from);
         bubble->insertAt(0, msg);
         m_bubbles.insert(bubblePos, bubble);
         m_layout->insertItem(bubblePos, bubble);
