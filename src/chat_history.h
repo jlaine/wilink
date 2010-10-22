@@ -53,6 +53,8 @@ public:
  */
 class ChatMessageBubble : public QGraphicsWidget
 {
+    Q_OBJECT
+
 public:
     ChatMessageBubble(bool received, QGraphicsItem *parent = 0);
     int indexOf(ChatMessageWidget *widget) const;
@@ -63,6 +65,12 @@ public:
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
+
+signals:
+    void messageClicked(const ChatMessage &message);
+
+protected:
+    bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
 private:
@@ -98,15 +106,11 @@ public:
     QTextDocument *document() const;
     QGraphicsTextItem *textItem();
 
-signals:
-    void messageClicked(const ChatMessage &message);
-
 protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
-
-private:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
+private:
     int maxWidth;
     ChatMessage msg;
 

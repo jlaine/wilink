@@ -80,7 +80,7 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     font.setPixelSize(DATE_FONT);
     m_from->setFont(font);
     m_from->setDefaultTextColor(baseColor);
-    //m_from->installSceneEventFilter(this);
+    m_from->installSceneEventFilter(this);
 
     // bubble frame
     m_frame = new QGraphicsPathItem(this);
@@ -123,6 +123,18 @@ QString ChatMessageBubble::from() const
 void ChatMessageBubble::setFrom(const QString &from)
 {
     m_from->setPlainText(from);
+}
+
+/** Filters events on the sender label.
+ */
+bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
+{
+    if (item == m_from && !m_messages.isEmpty() &&
+        event->type() == QEvent::GraphicsSceneMousePress)
+    {
+        emit messageClicked(m_messages[0]->message());
+    }
+    return false;
 }
 
 void ChatMessageBubble::setGeometry(const QRectF &baseRect)
@@ -244,16 +256,10 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
-/** Filters events on the "from" and "body" labels.
+/** Filters events on the body label.
  */
 bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
-#if 0
-    if (item == fromText && event->type() == QEvent::GraphicsSceneMousePress)
-    {
-        emit messageClicked(msg);
-    }
-#endif
     if (item == bodyText)
     {
         if (event->type() == QEvent::GraphicsSceneHoverLeave)
@@ -516,12 +522,6 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     msg->setMessage(message);
     msg->setPrevious(previous);
 
-    bool check;
-    check = connect(msg, SIGNAL(messageClicked(ChatMessage)),
-                    this, SIGNAL(messageClicked(ChatMessage)));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
-
     /* adjust next message */
     if (pos < m_messages.size())
         m_messages[pos]->setPrevious(msg);
@@ -549,6 +549,12 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
         bubble->insertAt(0, msg);
         m_bubbles.insert(bubblePos, bubble);
         m_layout->insertItem(bubblePos, bubble);
+
+        bool check;
+        check = connect(bubble, SIGNAL(messageClicked(ChatMessage)),
+                        this, SIGNAL(messageClicked(ChatMessage)));
+        Q_ASSERT(check);
+        Q_UNUSED(check);
     }
 
     m_messages.insert(pos, msg);
