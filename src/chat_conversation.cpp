@@ -50,6 +50,8 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     /* chat history */
     chatHistory = new QGraphicsView;
+    chatHistory->setOptimizationFlags(QGraphicsView::DontSavePainterState |
+                                      QGraphicsView::DontAdjustForAntialiasing);
     chatHistory->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     chatHistory->setScene(new QGraphicsScene(chatHistory));
 #ifdef WILINK_EMBEDDED
