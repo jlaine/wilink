@@ -41,8 +41,6 @@
 #include "flickcharm.h"
 #endif
 
-#define HISTORY_MARGIN 5
-
 #define DATE_WIDTH 80
 #define BODY_OFFSET 5
 #define BUBBLE_RADIUS 8
@@ -448,7 +446,7 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_view(0)
 {
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_layout->setContentsMargins(HISTORY_MARGIN, 0, HISTORY_MARGIN, 0);
+    m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->setSpacing(0);
     setLayout(m_layout);
 
@@ -556,16 +554,7 @@ void ChatHistoryWidget::adjustSize()
     if (m_messages.isEmpty())
         m_view->setSceneRect(0, 0, m_maximumWidth, 50);
     else
-    {
-        QRectF rect = boundingRect();
-        rect.setHeight(rect.height() + HISTORY_MARGIN);
-
-        // FIXME: for some odd reason, we need to shift the view by 15px
-        // when the scrollbar appears!
-        if (rect.height() > m_view->viewport()->height())
-            rect.moveTop(rect.top() - 15);
-        m_view->setSceneRect(rect);
-    }
+        m_view->setSceneRect(boundingRect());
 
     // scroll to end
     QScrollBar *scrollBar = m_view->verticalScrollBar();
@@ -603,7 +592,9 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
-        m_maximumWidth = m_view->viewport()->width() - 2 * HISTORY_MARGIN;
+        // FIXME : if we reduce this margin, the QGraphicsView seems to
+        // allocate some space for the horizontal scrollbar
+        m_maximumWidth = m_view->viewport()->width() - 15;
         foreach (ChatMessageBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
         adjustSize();
