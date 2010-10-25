@@ -88,11 +88,13 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
     m_frame->setBrush(backgroundColor);
     m_frame->setZValue(-1);
 
+#if 0
     // bubble shadow
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
     effect->setBlurRadius(8);
     effect->setOffset(QPointF(2, 2));
     m_frame->setGraphicsEffect(effect);
+#endif
 }
 
 int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
