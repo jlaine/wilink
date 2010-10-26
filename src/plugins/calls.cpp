@@ -252,7 +252,7 @@ void CallWidget::setGeometry(const QRectF &rect)
 {
     ChatPanelWidget::setGeometry(rect);
 
-    QRectF contents = contentRect();
+    QRectF contents = contentsRect();
     m_label->setPos(contents.left(), contents.top() +
         (contents.height() - m_label->boundingRect().height()) / 2);
 }

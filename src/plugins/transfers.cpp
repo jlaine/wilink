@@ -146,6 +146,10 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
                     this, SLOT(slotCancel()));
     Q_ASSERT(check);
 
+    check = connect(this, SIGNAL(contentsClicked()),
+                    this, SLOT(slotOpen()));
+    Q_ASSERT(check);
+
     check = connect(m_job, SIGNAL(destroyed(QObject*)),
                     this, SLOT(slotDestroyed(QObject*)));
     Q_ASSERT(check);
@@ -159,16 +163,10 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     Q_ASSERT(check);
 }
 
-void ChatTransferWidget::mouseDoubleClickEvent(QMouseEvent *event)
-{
-    if (!m_localPath.isEmpty())
-        QDesktopServices::openUrl(QUrl::fromLocalFile(m_localPath));
-}
-
 void ChatTransferWidget::setGeometry(const QRectF &rect)
 {
     ChatPanelWidget::setGeometry(rect);
-    QRectF contents = contentRect();
+    QRectF contents = contentsRect();
     if (m_progressProxy->isVisible())
     {
         QPointF progressTop;
@@ -204,6 +202,12 @@ void ChatTransferWidget::slotDestroyed(QObject *object)
     m_job = 0;
 }
 
+void ChatTransferWidget::slotOpen()
+{
+    if (!m_localPath.isEmpty())
+        QDesktopServices::openUrl(QUrl::fromLocalFile(m_localPath));
+}
+
 void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
 {
     if (m_job && total > 0)
@@ -221,6 +225,7 @@ void ChatTransferWidget::slotFinished()
 {
     // update UI
     m_progressProxy->hide();
+    setToolTip(QString());
     if (m_job->error() == QXmppTransferJob::NoError)
     {
         setIconPixmap(QPixmap(":/contact-available.png"));
