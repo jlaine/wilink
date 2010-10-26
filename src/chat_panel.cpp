@@ -315,7 +315,8 @@ bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
 
 void ChatPanelBar::scrollChanged()
 {
-    setPos(m_view->mapToScene(QPoint(0, 0)));
+    if (m_layout->count())
+        setPos(m_view->mapToScene(QPoint(0, 0)));
 }
 
 void ChatPanelBar::trackView()
@@ -366,7 +367,9 @@ void ChatPanelWidget::appear()
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-QRectF ChatPanelWidget::contentRect() const
+/** Returns the rectangle holding the widget's contents.
+ */
+QRectF ChatPanelWidget::contentsRect() const
 {
     QRectF rect = geometry().adjusted(0, 1, -BUTTON_WIDTH - ICON_WIDTH, -2);
     rect.moveLeft(ICON_WIDTH);
@@ -390,20 +393,17 @@ void ChatPanelWidget::disappear()
 
 void ChatPanelWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (!m_buttonEnabled ||
-        !m_buttonPath->path().contains(event->pos()))
+    if (m_buttonEnabled &&
+        m_buttonPath->path().contains(event->pos()))
     {
-        event->ignore();
-        return;
+        const QPalette palette = QApplication::palette();
+        QLinearGradient gradient(0, 0, 0, 32);
+        gradient.setColorAt(0, palette.color(QPalette::Button));
+        gradient.setColorAt(0.6, palette.color(QPalette::Mid));
+        gradient.setColorAt(1, palette.color(QPalette::Dark));
+        m_buttonPath->setBrush(gradient);
+        m_buttonPixmap->setOffset(0, 2);
     }
-
-    const QPalette palette = QApplication::palette();
-    QLinearGradient gradient(0, 0, 0, 32);
-    gradient.setColorAt(0, palette.color(QPalette::Button));
-    gradient.setColorAt(0.6, palette.color(QPalette::Mid));
-    gradient.setColorAt(1, palette.color(QPalette::Dark));
-    m_buttonPath->setBrush(gradient);
-    m_buttonPixmap->setOffset(0, 2);
     event->accept();
 }
 
@@ -413,8 +413,12 @@ void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     m_buttonPath->setBrush(Qt::NoBrush);
     m_buttonPixmap->setOffset(0, 0);
     if (m_buttonEnabled &&
-        m_buttonPath->path().contains(event->pos()))
+        m_buttonPath->path().contains(event->pos()) &&
+        m_buttonPath->path().contains(event->buttonDownPos(Qt::LeftButton)))
         emit buttonClicked();
+    else if (contentsRect().contains(event->pos()) &&
+             contentsRect().contains(event->buttonDownPos(Qt::LeftButton)))
+        emit contentsClicked();
     event->accept();
 }
 
