@@ -497,20 +497,22 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     if (pos < m_messages.size())
         m_messages[pos]->setPrevious(msg);
 
-    /* insert new message */
     if (pos > 0 && m_messages[pos-1]->message().from == message.from)
     {
+        /* message belongs to the same bubble as previous message */
         ChatMessageBubble *bubble = m_messages[pos-1]->bubble();
         bubble->insertAt(bubble->indexOf(m_messages[pos-1]) + 1, msg);
     }
     else if (pos < m_messages.size() &&
              m_messages[pos]->message().from == message.from)
     {
+        /* message belongs to the same bubble as next message */
         ChatMessageBubble *bubble = m_messages[pos]->bubble();
         bubble->insertAt(bubble->indexOf(m_messages[pos]), msg);
     }
     else
     {
+        /* message needs its own bubble */
         ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
         bubble->setMaximumWidth(m_maximumWidth);
         int bubblePos = m_bubbles.size();
