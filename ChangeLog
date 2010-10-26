@@ -16,13 +16,13 @@ wiLink 0.9.9b (UNRELEASED)
    - Make it possible to send files to room members.
    - Display transfer progress inside relevant chat window.
  * Menu:
-    - Fix parsing of the menu refresh interval.
-    - Add support for links to chat rooms.
+   - Fix parsing of the menu refresh interval.
+   - Add support for links to chat rooms.
  * Diagnostics:
-    - Report which standards WiFi interfaces support.
+   - Report which standards WiFi interfaces support.
  * Miscellaneous:
-    - Add caching on vCards to reduce network traffic at connect.
-    - Add support for double and tripple click selections in chat history.
+   - Add caching on vCards to reduce network traffic at connect.
+   - Add support for double and tripple click selections in chat history.
 
 wiLink 0.9.9a (2010-09-16)
  * Do not join bookmarked rooms until we receive our nickname.
