@@ -53,11 +53,6 @@ set(wiLink_SOURCES
     plugins/console.cpp
     plugins/contacts.cpp
     plugins/diagnostics.cpp
-    plugins/diagnostics/interface.cpp
-    plugins/diagnostics/iq.cpp
-    plugins/diagnostics/ping.cpp
-    plugins/diagnostics/software.cpp
-    plugins/diagnostics/wireless.cpp
     plugins/discovery.cpp
     plugins/menu.cpp
     plugins/photos.cpp
@@ -112,16 +107,6 @@ set(wiLink_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/data/wiLink.qrc)
 
-if(WIN32)
-    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/diagnostics/wireless_win.cpp)
-elseif(APPLE)
-    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm plugins/diagnostics/wireless_mac.mm)
-elseif(UNIX)
-    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/diagnostics/wireless_nm.cpp)
-else(WIN32)
-    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/diagnostics/wireless_stub.cpp)
-endif(WIN32)
-
 qt4_add_resources(wiLink_RCC_SOURCES ${wiLink_RCCS})
 qt4_wrap_cpp(wiLink_MOC_SOURCES ${wiLink_MOC_HEADERS})
 
@@ -138,7 +123,7 @@ add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURC
 if(APPLE)
     set(wilink_LIBRARIES "-framework AppKit")
 endif(APPLE)
-target_link_libraries(wiLink idle qnetio qxmpp qdjango ${wilink_LIBRARIES} ${QT_LIBRARIES} ${WLAN_LIBRARIES})
+target_link_libraries(wiLink idle qnetio qxmpp qdjango diagnostics ${wilink_LIBRARIES} ${QT_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
@@ -166,17 +151,12 @@ install(TARGETS wiLink DESTINATION bin)
 set(tests_MOC_HEADERS tests.h updates.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 add_executable(tests
-    plugins/diagnostics/interface.cpp
-    plugins/diagnostics/iq.cpp
-    plugins/diagnostics/ping.cpp
-    plugins/diagnostics/software.cpp
-    plugins/diagnostics/wireless.cpp
     systeminfo.cpp
     tests.cpp
     updates.cpp
     chat_utils.cpp
     ${tests_MOC_SOURCES})
-target_link_libraries(tests qnetio qxmpp ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+target_link_libraries(tests qnetio qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 add_executable(codec codec.cpp)
 target_link_libraries(codec qxmpp ${QT_LIBRARIES})
