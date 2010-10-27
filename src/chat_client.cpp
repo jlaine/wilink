@@ -59,6 +59,13 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
             emit logMessage(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
             emit mucServerFound(disco.from());
         }
+        // check if it's a diagnostics server
+        else if (id.category() == "diagnostics" &&
+                 id.type() == "server")
+        {
+            emit logMessage(QXmppLogger::InformationMessage, "Found diagnostics server " + disco.from());
+            emit diagnosticsServerFound(disco.from());
+        }
         // check if it's a publish-subscribe server
         else if (id.category() == "pubsub" &&
                  id.type() == "service")

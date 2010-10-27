@@ -29,6 +29,7 @@ public:
     ChatClient(QObject *parent);
 
 signals:
+    void diagnosticsServerFound(const QString &diagServer);
     void mucServerFound(const QString &mucServer);
     void pubSubServerFound(const QString &pubSubServer);
     void shareServerFound(const QString &shareServer);
