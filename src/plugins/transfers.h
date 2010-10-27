@@ -59,13 +59,11 @@ public:
     ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent = 0);
     void setGeometry(const QRectF &rect);
 
-protected:
-    void mouseDoubleClickEvent(QMouseEvent * event);
-
 private slots:
     void slotCancel();
     void slotDestroyed(QObject *object);
     void slotFinished();
+    void slotOpen();
     void slotProgress(qint64, qint64);
 
 private:

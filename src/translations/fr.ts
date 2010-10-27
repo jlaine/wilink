@@ -530,7 +530,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
-        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partager ne seront visible que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
+        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partager ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
     </message>
     <message>
         <source>Select the folder in which received files will be stored.</source>

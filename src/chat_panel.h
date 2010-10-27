@@ -117,7 +117,7 @@ class ChatPanelWidget : public QGraphicsWidget
 
 public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
-    QRectF contentRect() const;
+    QRectF contentsRect() const;
     virtual void setGeometry(const QRectF &rect);
     void setButtonEnabled(bool enabled);
     void setButtonPixmap(const QPixmap &pixmap);
@@ -126,6 +126,7 @@ public:
 
 signals:
     void buttonClicked();
+    void contentsClicked();
 
 public slots:
     void appear();
