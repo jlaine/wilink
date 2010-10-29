@@ -63,6 +63,10 @@ set(wiLink_SOURCES
     plugins/shares/view.cpp
     plugins/transfers.cpp)
 
+if(APPLE)
+    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
+endif(APPLE)
+
 set(wiLink_MOC_HEADERS
     application.h
     chat.h
