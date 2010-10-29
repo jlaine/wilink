@@ -472,7 +472,7 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
         joinRoom(url.path());
 }
 
-ChatRoom::ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
+ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
     chatRemoteJid(jid),
     client(xmppClient),
@@ -640,7 +640,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         message.received = jidToResource(msg.from()) != nickName;
         message.date = msg.stamp();
         if (!message.date.isValid())
-            message.date = QDateTime::currentDateTime();
+            message.date = client->serverTime();
         historyWidget()->addMessage(message);
 
         // notify user

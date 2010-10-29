@@ -26,6 +26,7 @@
 #include "chat_conversation.h"
 
 class Chat;
+class ChatClient;
 class ChatMessage;
 class ChatRoom;
 class ChatRosterModel;
@@ -89,7 +90,7 @@ class ChatRoom : public ChatConversation
     Q_OBJECT
 
 public:
-    ChatRoom(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     ChatRosterItem::Type objectType() const;
     void invite(const QString &jid);
 
@@ -110,7 +111,7 @@ private:
 
     QString chatLocalJid;
     QString chatRemoteJid;
-    QXmppClient *client;
+    ChatClient *client;
     bool joined;
     QString nickName;
     bool notifyMessages;

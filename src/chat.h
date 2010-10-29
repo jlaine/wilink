@@ -23,7 +23,7 @@
 #include <QWidget>
 #include <QMainWindow>
 
-#include "QXmppClient.h"
+#include "chat_client.h"
 
 class ChatPanel;
 class ChatPlugin;
@@ -45,7 +45,7 @@ public:
     Chat(QWidget *parent = 0);
     ~Chat();
 
-    QXmppClient *client();
+    ChatClient *client();
     ChatRosterModel *rosterModel();
     ChatRosterView *rosterView();
     QMenu *fileMenu();
@@ -109,7 +109,7 @@ private:
     QAction *m_findAction;
     QAction *m_findAgainAction;
 
-    QXmppClient *m_client;
+    ChatClient *m_client;
     QList<ChatPanel*> m_chatPanels;
     ChatRosterModel *m_rosterModel;
     ChatRosterView *m_rosterView;

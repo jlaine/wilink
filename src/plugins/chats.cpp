@@ -44,7 +44,7 @@
 #define HISTORY_DAYS 14
 #endif
 
-ChatDialog::ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
+ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
     chatRemoteJid(jid), 
     client(xmppClient),
@@ -172,7 +172,7 @@ void ChatDialog::join()
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately
     client->archiveManager().listCollections(chatRemoteJid,
-        QDateTime::currentDateTime().addDays(-HISTORY_DAYS));
+        client->serverTime().addDays(-HISTORY_DAYS));
 
     joined = true;
 }
@@ -203,7 +203,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.body = msg.body();
     message.date = msg.stamp();
     if (!message.date.isValid())
-        message.date = QDateTime::currentDateTime();
+        message.date = client->serverTime();
     message.from = rosterModel->contactName(chatRemoteJid);
     message.fromJid = chatRemoteJid;
     message.received = true;
@@ -242,7 +242,7 @@ void ChatDialog::returnPressed()
     // add message to history
     ChatMessage message;
     message.body = text;
-    message.date = QDateTime::currentDateTime();
+    message.date = client->serverTime();
     message.from = rosterModel->ownName();
     message.received = false;
     historyWidget()->addMessage(message);

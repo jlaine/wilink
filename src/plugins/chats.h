@@ -27,17 +27,17 @@
 #include "chat_conversation.h"
 
 class Chat;
+class ChatClient;
 class ChatRosterModel;
 class QModelIndex;
 class QXmppArchiveChat;
-class QXmppClient;
 
 class ChatDialog : public ChatConversation
 {
     Q_OBJECT
 
 public:
-    ChatDialog(QXmppClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     ChatRosterItem::Type objectType() const;
 
 public slots:
@@ -54,7 +54,7 @@ private slots:
 
 private:
     QString chatRemoteJid;
-    QXmppClient *client;
+    ChatClient *client;
     bool joined;
     ChatRosterModel *rosterModel;
     QStringList chatStatesJids;

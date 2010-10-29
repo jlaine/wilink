@@ -25,7 +25,8 @@
 #include "chat_client.h"
 
 ChatClient::ChatClient(QObject *parent)
-    : QXmppClient(parent)
+    : QXmppClient(parent),
+    serverOffset(0)
 {
     discoManager = findExtension<QXmppDiscoveryManager>();
 
@@ -34,6 +35,11 @@ ChatClient::ChatClient(QObject *parent)
         this, SLOT(slotDiscoveryInfoReceived(const QXmppDiscoveryIq&)));
     connect(discoManager, SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
         this, SLOT(slotDiscoveryItemsReceived(const QXmppDiscoveryIq&)));
+}
+
+QDateTime ChatClient::serverTime() const
+{
+    return QDateTime::currentDateTime().addSecs(serverOffset);
 }
 
 void ChatClient::slotConnected()

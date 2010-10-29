@@ -17,8 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __WILINK_CHAT_CLIENT_H__
+#define __WILINK_CHAT_CLIENT_H__
+
 #include "QXmppClient.h"
 
+class QDateTime;
 class QXmppDiscoveryManager;
 
 class ChatClient : public QXmppClient
@@ -27,6 +31,7 @@ class ChatClient : public QXmppClient
 
 public:
     ChatClient(QObject *parent);
+    QDateTime serverTime() const;
 
 signals:
     void diagnosticsServerFound(const QString &diagServer);
@@ -40,8 +45,9 @@ private slots:
     void slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco);
 
 private:
+    int serverOffset;
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
 };
 
-
+#endif
