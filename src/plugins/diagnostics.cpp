@@ -566,6 +566,8 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
             {
                 DiagnosticsIq response;
                 response.setType(QXmppIq::Error);
+                response.setError(
+                    QXmppStanza::Error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden));
                 response.setId(iq.id());
                 response.setTo(iq.from());
                 client()->sendPacket(response);
