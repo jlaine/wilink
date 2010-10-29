@@ -58,13 +58,21 @@ static int id4 = qRegisterMetaType< Interface >();
 
 void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
 {
+    bool check;
+
     if (!diagnosticsThread)
         diagnosticsThread = new QThread;
 
     DiagnosticsAgent *agent = new DiagnosticsAgent;
     agent->moveToThread(diagnosticsThread);
-    connect(agent, SIGNAL(finished(DiagnosticsIq)), receiver, member);
-    connect(agent, SIGNAL(finished(DiagnosticsIq)), agent, SLOT(deleteLater()));
+    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
+                    receiver, member);
+    Q_ASSERT(check);
+
+    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
+                    agent, SLOT(deleteLater()));
+    Q_ASSERT(check);
+    
     QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
         Q_ARG(DiagnosticsIq, request));
 
@@ -277,10 +285,14 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     m_client(client),
     m_displayed(false)
 {
+    bool check;
+
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
     m_timer->setInterval(60000);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
+    check = connect(m_timer, SIGNAL(timeout()),
+                    this, SLOT(timeout()));
+    Q_ASSERT(check);
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -292,16 +304,22 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
 
     hostEdit = new QLineEdit;
     hostEdit->hide();
-    connect(hostEdit, SIGNAL(returnPressed()), this, SLOT(refresh()));
+    check = connect(hostEdit, SIGNAL(returnPressed()),
+                    this, SLOT(refresh()));
+    Q_ASSERT(check);
     hbox->addWidget(hostEdit);
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X), this);
-    connect(shortcut, SIGNAL(activated()), hostEdit, SLOT(show()));
+    check = connect(shortcut, SIGNAL(activated()),
+                    hostEdit, SLOT(show()));
+    Q_ASSERT(check);
 
     hbox->addStretch();
 
     refreshButton = new QPushButton(tr("Refresh"));
     refreshButton->setIcon(QIcon(":/refresh.png"));
-    connect(refreshButton, SIGNAL(clicked()), this, SLOT(refresh()));
+    check = connect(refreshButton, SIGNAL(clicked()),
+                    this, SLOT(refresh()));
+    Q_ASSERT(check);
     hbox->addWidget(refreshButton);
 
     layout->addLayout(hbox);
@@ -311,11 +329,17 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     setWindowTitle(tr("Diagnostics"));
 
     DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
-    connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
-            this, SLOT(showResults(DiagnosticsIq)));
+    check = connect(extension, SIGNAL(diagnosticsReceived(DiagnosticsIq)),
+                    this, SLOT(showResults(DiagnosticsIq)));
+    Q_ASSERT(check);
 
-    connect(this, SIGNAL(showPanel()), this, SLOT(slotShow()));
-    connect(this, SIGNAL(hidePanel()), this, SIGNAL(unregisterPanel()));
+    check = connect(this, SIGNAL(showPanel()),
+                    this, SLOT(slotShow()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(hidePanel()),
+                    this, SIGNAL(unregisterPanel()));
+    Q_ASSERT(check);
 }
 
 Diagnostics::~Diagnostics()
@@ -504,6 +528,17 @@ void Diagnostics::showInterface(const Interface &result)
 DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
+
+    bool check;
+    check = connect(client, SIGNAL(diagnosticsServerFound(QString)),
+                    this, SLOT(diagnosticsServerFound(QString)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+}
+
+void DiagnosticsExtension::diagnosticsServerFound(const QString &diagServer)
+{
+    m_diagnosticsServer = diagServer;
 }
 
 QStringList DiagnosticsExtension::discoveryFeatures() const
@@ -525,7 +560,18 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
 
         if (iq.type() == QXmppIq::Get)
         {
-            DiagnosticsAgent::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
+            if (iq.from() == m_diagnosticsServer)
+                DiagnosticsAgent::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
+            else
+            {
+                DiagnosticsIq response;
+                response.setType(QXmppIq::Error);
+                response.setError(
+                    QXmppStanza::Error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden));
+                response.setId(iq.id());
+                response.setTo(iq.from());
+                client()->sendPacket(response);
+            }
         } else if (iq.type() == QXmppIq::Result || iq.type() == QXmppIq::Error) {
             emit diagnosticsReceived(iq);
         }
@@ -557,6 +603,8 @@ private:
 
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
+    bool check;
+
     /* add diagnostics extension */
     const QString domain = chat->client()->configuration().domain();
     DiagnosticsExtension *extension = new DiagnosticsExtension(chat->client());
@@ -573,11 +621,15 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     QAction *firstAction = actions.isEmpty() ? 0 : actions.first();
     QAction *action = new QAction(QIcon(":/diagnostics.png"), diagnostics->windowTitle(), chat->fileMenu());
     chat->fileMenu()->insertAction(firstAction, action);
-    connect(action, SIGNAL(triggered()), diagnostics, SIGNAL(showPanel()));
+    check = connect(action, SIGNAL(triggered()),
+                    diagnostics, SIGNAL(showPanel()));
+    Q_ASSERT(check);
 
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
-    connect(shortcut, SIGNAL(activated()), diagnostics, SIGNAL(showPanel()));
+    check = connect(shortcut, SIGNAL(activated()),
+                    diagnostics, SIGNAL(showPanel()));
+    Q_ASSERT(check);
     return true;
 }
 

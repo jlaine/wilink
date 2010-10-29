@@ -40,12 +40,10 @@ public:
     Diagnostics(QXmppClient *client, QWidget *parent=0);
     ~Diagnostics();
 
-public slots:
-    void slotShow();
-
 private slots:
     void refresh();
     void showResults(const DiagnosticsIq &iq);
+    void slotShow();
     void timeout();
 
 private:
@@ -82,7 +80,11 @@ signals:
     void diagnosticsReceived(const DiagnosticsIq &diagnostics);
 
 private slots:
+    void diagnosticsServerFound(const QString &diagServer);
     void handleResults(const DiagnosticsIq &results);
+
+private:
+    QString m_diagnosticsServer;
 };
 
 class DiagnosticsAgent : public QObject

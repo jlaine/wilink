@@ -21,7 +21,7 @@
 #include <QDomDocument>
 #include <QtTest/QtTest>
 
-#include "plugins/diagnostics/iq.h"
+#include "diagnostics/iq.h"
 #include "updates.h"
 #include "chat_utils.h"
 #include "tests.h"
