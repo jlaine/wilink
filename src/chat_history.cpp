@@ -31,6 +31,7 @@
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QScrollBar>
+#include <QStyle>
 #include <QShortcut>
 #include <QTextBlock>
 #include <QTextDocument>
@@ -312,7 +313,6 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
     if (width == maxWidth)
         return;
 
-    // FIXME : do we actually need to pass the width to the base class?
     QGraphicsWidget::setMaximumWidth(width);
     maxWidth = width;
     bodyText->document()->setTextWidth(width - DATE_WIDTH - BODY_OFFSET);
@@ -601,9 +601,9 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
-        // FIXME : if we reduce this margin, the QGraphicsView seems to
-        // allocate some space for the horizontal scrollbar
-        m_maximumWidth = m_view->viewport()->width() - 17;
+        // FIXME : this is a workaround for QTBUG-14711
+        int scrollBarExtent = m_view->style()->pixelMetric(QStyle::PM_ScrollBarExtent, 0, m_view);
+        m_maximumWidth = m_view->viewport()->width() - scrollBarExtent;
         foreach (ChatMessageBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
         adjustSize();
