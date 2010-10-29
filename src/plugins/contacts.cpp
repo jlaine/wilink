@@ -34,11 +34,32 @@
 #include "QXmppUtils.h"
 
 #include "chat.h"
+#include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_utils.h"
 
 #include "contacts.h"
+
+class ContactsPanel : public ChatPanel
+{
+public:
+    ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip);
+};
+
+ContactsPanel::ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip)
+    : ChatPanel(chatWindow)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+    layout->addLayout(headerLayout());
+    layout->addWidget(tip, 1);
+    setLayout(layout);
+
+    setObjectName(jid);
+    setWindowTitle(chatWindow->rosterModel()->contactName(jid));
+    setWindowIcon(chatWindow->rosterModel()->contactAvatar(jid));
+}
 
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
@@ -50,6 +71,8 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
             this, SLOT(disconnected()));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
             this, SLOT(presenceReceived(const QXmppPresence&)));
+    connect(chat, SIGNAL(rosterClick(QModelIndex)),
+            this, SLOT(rosterClick(QModelIndex)));
 
     // add button to status bar
     addButton = new QPushButton;
@@ -72,13 +95,7 @@ void ContactsWatcher::addContact()
 
     // tip
     if (domain == "wifirst.net")
-    {
-        QLabel *tip = new QLabel(tr("<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>!").arg("https://www.wifirst.net/w/friends?from=wiLink"));
-        tip->setOpenExternalLinks(true);
-        tip->setWordWrap(true);
-        vbox->addWidget(tip);
-
-    }
+        vbox->addWidget(tipLabel());
 
     // prompt label
     QLabel *label = new QLabel(tr("Enter the address of the contact you want to add."));
@@ -245,6 +262,20 @@ void ContactsWatcher::renameContact()
     }
 }
 
+/** When the user clicks on a contact in his roster, open a conversation.
+ *
+ * @param index The roster entry that was clicked.
+ */
+void ContactsWatcher::rosterClick(const QModelIndex &index)
+{
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    const QString contactsJid = chat->rosterModel()->contactsItem().data(ChatRosterModel::IdRole).toString();
+    const QString domain = chat->client()->configuration().domain();
+
+    if (domain == "wifirst.net" && jid == contactsJid && !chat->panel(jid))
+        chat->addPanel(new ContactsPanel(chat, jid, tipLabel()));
+}
+
 void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
     if (!chat->client()->isConnected())
@@ -288,6 +319,14 @@ void ContactsWatcher::showContactPage()
     QString url = action->data().toString();
     if (!url.isEmpty())
         QDesktopServices::openUrl(url);
+}
+
+QLabel *ContactsWatcher::tipLabel() const
+{
+    QLabel *tip = new QLabel(tr("<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>!").arg("https://www.wifirst.net/w/friends?from=wiLink"));
+    tip->setOpenExternalLinks(true);
+    tip->setWordWrap(true);
+    return tip;
 }
 
 // PLUGIN
