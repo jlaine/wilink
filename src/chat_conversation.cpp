@@ -57,9 +57,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 #ifdef WILINK_EMBEDDED
     FlickCharm *charm = new FlickCharm(chatHistory);
     charm->activateOn(chatHistory);
-#else
-    chatHistory->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    chatHistory->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 #endif
     chatHistory->setContextMenuPolicy(Qt::ActionsContextMenu);
 

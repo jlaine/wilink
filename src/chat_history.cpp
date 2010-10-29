@@ -601,9 +601,7 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
-        // FIXME : this is a workaround for QTBUG-14711
-        int scrollBarExtent = m_view->style()->pixelMetric(QStyle::PM_ScrollBarExtent, 0, m_view);
-        m_maximumWidth = m_view->viewport()->width() - scrollBarExtent;
+        m_maximumWidth = m_view->viewport()->width() - 15;
         foreach (ChatMessageBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
         adjustSize();
