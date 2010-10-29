@@ -603,7 +603,7 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
     {
         // FIXME : if we reduce this margin, the QGraphicsView seems to
         // allocate some space for the horizontal scrollbar
-        m_maximumWidth = m_view->viewport()->width() - 15;
+        m_maximumWidth = m_view->viewport()->width() - 17;
         foreach (ChatMessageBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
         adjustSize();
