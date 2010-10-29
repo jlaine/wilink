@@ -56,6 +56,11 @@ ContactsPanel::ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip)
     layout->addWidget(tip, 1);
     setLayout(layout);
 
+    bool check;
+    check = connect(this, SIGNAL(hidePanel()),
+                    this, SLOT(deleteLater()));
+    Q_ASSERT(check);
+
     setObjectName(jid);
     setWindowTitle(chatWindow->rosterModel()->contactName(jid));
     setWindowIcon(chatWindow->rosterModel()->contactAvatar(jid));
