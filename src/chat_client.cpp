@@ -28,7 +28,7 @@
 
 ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent),
-    serverOffset(0)
+    timeOffset(0)
 {
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
     discoManager = findExtension<QXmppDiscoveryManager>();
@@ -44,7 +44,7 @@ ChatClient::ChatClient(QObject *parent)
 
 QDateTime ChatClient::serverTime() const
 {
-    return QDateTime::currentDateTime().addSecs(serverOffset);
+    return QDateTime::currentDateTime().addSecs(timeOffset);
 }
 
 void ChatClient::slotConnected()
@@ -143,5 +143,7 @@ void ChatClient::slotTimeReceived(const QXmppEntityTimeIq &time)
         return;
     timeQueue = QString();
 
-    qDebug("got TIME");
+    if (time.type() == QXmppIq::Result && time.utc().isValid())
+        timeOffset = QDateTime::currentDateTime().secsTo(time.utc());
 }
+

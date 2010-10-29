@@ -49,9 +49,9 @@ private slots:
     void slotTimeReceived(const QXmppEntityTimeIq &time);
 
 private:
-    int serverOffset;
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
+    int timeOffset;
     QString timeQueue;
     QXmppEntityTimeManager *timeManager;
 };
