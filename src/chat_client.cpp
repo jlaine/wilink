@@ -19,6 +19,8 @@
 
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
+#include "QXmppEntityTimeIq.h"
+#include "QXmppEntityTimeManager.h"
 #include "QXmppLogger.h"
 #include "QXmppTransferManager.h"
 
@@ -28,13 +30,16 @@ ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent),
     serverOffset(0)
 {
-    discoManager = findExtension<QXmppDiscoveryManager>();
-
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(discoManager, SIGNAL(infoReceived(const QXmppDiscoveryIq&)),
-        this, SLOT(slotDiscoveryInfoReceived(const QXmppDiscoveryIq&)));
-    connect(discoManager, SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
-        this, SLOT(slotDiscoveryItemsReceived(const QXmppDiscoveryIq&)));
+    discoManager = findExtension<QXmppDiscoveryManager>();
+    connect(discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+        this, SLOT(slotDiscoveryInfoReceived(QXmppDiscoveryIq)));
+    connect(discoManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+        this, SLOT(slotDiscoveryItemsReceived(QXmppDiscoveryIq)));
+
+    timeManager = findExtension<QXmppEntityTimeManager>();
+    connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
+        this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
 }
 
 QDateTime ChatClient::serverTime() const
@@ -44,8 +49,13 @@ QDateTime ChatClient::serverTime() const
 
 void ChatClient::slotConnected()
 {
+    const QString domain = configuration().domain();
+
+    // get server time
+    timeQueue = timeManager->requestTime(domain);
+
     // get info for root item
-    const QString id = discoManager->requestInfo(configuration().domain());
+    const QString id = discoManager->requestInfo(domain);
     if (!id.isEmpty())
         discoQueue.append(id);
 }
@@ -127,3 +137,11 @@ void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
+void ChatClient::slotTimeReceived(const QXmppEntityTimeIq &time)
+{
+    if (time.id() != timeQueue)
+        return;
+    timeQueue = QString();
+
+    qDebug("got TIME");
+}

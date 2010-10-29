@@ -23,7 +23,10 @@
 #include "QXmppClient.h"
 
 class QDateTime;
+class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
+class QXmppEntityTimeIq;
+class QXmppEntityTimeManager;
 
 class ChatClient : public QXmppClient
 {
@@ -43,11 +46,14 @@ private slots:
     void slotConnected();
     void slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco);
+    void slotTimeReceived(const QXmppEntityTimeIq &time);
 
 private:
     int serverOffset;
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
+    QString timeQueue;
+    QXmppEntityTimeManager *timeManager;
 };
 
 #endif
