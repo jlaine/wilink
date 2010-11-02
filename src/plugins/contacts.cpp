@@ -53,7 +53,10 @@ ContactsPanel::ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
-    layout->addWidget(tip, 1);
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setMargin(16);
+    hbox->addWidget(tip);
+    layout->addLayout(hbox, 1);
     setLayout(layout);
 
     bool check;
