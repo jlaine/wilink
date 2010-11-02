@@ -612,6 +612,10 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             objectName(),
             windowTitle(),
             windowIcon(), rosterModel->findItem(HOME_ROSTER_ID));
+
+        // run one-time configuration
+        if (!QSettings().value("SharesConfigured").toBool())
+            shareFolder();
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
@@ -738,7 +742,8 @@ void ChatShares::setRoster(ChatRosterModel *roster)
 
 void ChatShares::shareFolder()
 {
-    ChatSharesOptions *dialog = new ChatSharesOptions(db);
+    ChatSharesOptions *dialog = new ChatSharesOptions(db, this);
+    dialog->setWindowModality(Qt::WindowModal);
 
     bool check;
     check = connect(dialog, SIGNAL(finished(int)),

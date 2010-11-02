@@ -12,6 +12,7 @@ wiLink 0.9.9b (UNRELEASED)
    - Move call data processing to a thread to avoid buffer underruns.
  * Shares:
    - Make it possible to select additional folders to share.
+   - Show options dialog when first run.
  * Transfers:
    - Make it possible to send files to room members.
    - Display transfer progress inside relevant chat window.
