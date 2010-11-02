@@ -110,8 +110,15 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
     widget->setBubble(this);
     widget->setParentItem(this);
     widget->setMaximumWidth(m_maximumWidth);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, widget);
     updateGeometry();
+}
+
+void ChatMessageBubble::messageDestroyed(QObject *obj)
+{
+    m_messages.removeAll(static_cast<ChatMessageWidget*>(obj));
 }
 
 /** Filters events on the sender label.
@@ -523,6 +530,8 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
         int bubblePos = m_bubbles.size();
         if (pos < m_messages.size())
             bubblePos = m_bubbles.indexOf(m_messages[pos]->bubble());
+        connect(bubble, SIGNAL(destroyed(QObject*)),
+                this, SLOT(bubbleDestroyed(QObject*)));
         bubble->insertAt(0, msg);
         m_bubbles.insert(bubblePos, bubble);
         m_layout->insertItem(bubblePos, bubble);
@@ -534,6 +543,8 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
         Q_UNUSED(check);
     }
 
+    connect(msg, SIGNAL(destroyed(QObject*)),
+            this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, msg);
     adjustSize();
 
@@ -571,16 +582,18 @@ void ChatHistoryWidget::adjustSize()
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
+void ChatHistoryWidget::bubbleDestroyed(QObject *obj)
+{
+    m_bubbles.removeAll(static_cast<ChatMessageBubble*>(obj));
+}
+
 /** Clears all messages.
  */
 void ChatHistoryWidget::clear()
 {
-    m_bubbles.clear();
-
     m_selectedMessages.clear();
-    for (int i = m_messages.size() - 1; i >= 0; i--)
-        delete m_messages[i];
-    m_messages.clear();
+    for (int i = m_bubbles.size() - 1; i >= 0; i--)
+        delete m_bubbles[i];
     adjustSize();
 }
 
@@ -714,6 +727,11 @@ void ChatHistoryWidget::findClear()
         delete item;
     }
     m_glassItems.clear();
+}
+
+void ChatHistoryWidget::messageDestroyed(QObject *obj)
+{
+    m_messages.removeAll(static_cast<ChatMessageWidget*>(obj));
 }
 
 ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const

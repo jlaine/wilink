@@ -70,6 +70,9 @@ protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
+private slots:
+    void messageDestroyed(QObject *obj);
+
 private:
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
@@ -140,6 +143,8 @@ public slots:
     void selectAll();
 
 private slots:
+    void bubbleDestroyed(QObject *obj);
+    void messageDestroyed(QObject *obj);
     void slotScrollChanged();
     void slotSelectionChanged();
 
