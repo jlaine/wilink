@@ -614,8 +614,12 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
             windowIcon(), rosterModel->findItem(HOME_ROSTER_ID));
 
         // run one-time configuration
-        if (!QSettings().value("SharesConfigured").toBool())
+        QSettings settings;
+        if (!settings.value("SharesConfigured").toBool())
+        {
+            settings.setValue("SharesConfigured", true);
             shareFolder();
+        }
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&

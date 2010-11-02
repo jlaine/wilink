@@ -410,7 +410,6 @@ void ChatSharesOptions::validate()
 
     // remember directory
     QSettings settings;
-    settings.setValue("SharesConfigured", true);
     settings.setValue("SharesLocation", path);
     settings.setValue("SharesDirectories", mapped);
 
