@@ -591,7 +591,6 @@ void ChatHistoryWidget::bubbleDestroyed(QObject *obj)
  */
 void ChatHistoryWidget::clear()
 {
-    m_selectedMessages.clear();
     for (int i = m_bubbles.size() - 1; i >= 0; i--)
         delete m_bubbles[i];
     adjustSize();
@@ -731,7 +730,9 @@ void ChatHistoryWidget::findClear()
 
 void ChatHistoryWidget::messageDestroyed(QObject *obj)
 {
-    m_messages.removeAll(static_cast<ChatMessageWidget*>(obj));
+    ChatMessageWidget *widget = static_cast<ChatMessageWidget*>(obj);
+    m_messages.removeAll(widget);
+    m_selectedMessages.removeAll(widget);
 }
 
 ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
