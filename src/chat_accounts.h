@@ -21,7 +21,6 @@
 #define __WILINK_CHAT_ACCOUNTS_H__
 
 #include <QDialog>
-#include <QPalette>
 
 class QDialogButtonBox;
 class QLabel;
