@@ -61,6 +61,13 @@ int main(int argc, char *argv[])
     Application::platformInit();
     Application app(argc, argv);
 
+    /* Adjust palette to make text selection more visible */
+    QPalette palette = QApplication::palette();
+    QColor highlight(51, 153, 255);
+    palette.setColor(QPalette::Highlight, highlight);
+    palette.setColor(QPalette::HighlightedText, Qt::white);
+    QApplication::setPalette(palette);
+
     /* Load translations */
     QString localeName = QLocale::system().name().split("_").first();
 
