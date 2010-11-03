@@ -167,6 +167,7 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     m_frame->setPath(path);
 
     // messages
+    const qreal x = rect.left();
 #ifdef Q_OS_MAC
     qreal y = int(rect.top());
 #else
@@ -175,11 +176,9 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
 
     foreach (ChatMessageWidget *widget, m_messages)
     {
-        const QSizeF preferredSize = widget->preferredSize();
-        if (widget->size() != preferredSize)
-            widget->resize(preferredSize);
-        widget->setPos(rect.left(), y);
-        y += preferredSize.height();
+        const QRectF wRect(QPointF(x, y), widget->preferredSize());
+        widget->setGeometry(wRect);
+        y += wRect.height();
     }
 }
 
