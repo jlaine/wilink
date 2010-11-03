@@ -252,8 +252,8 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     // FIXME : for some reason, if we do not set the cache mode,
     // we get paint artifacts when scrolling on Windows
 #ifdef Q_OS_WIN
-    bodyText->setCacheMode(QGraphicsItem::ItemCoordinateCache);
-    dateText->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    bodyText->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+    dateText->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 #endif
 
     // set controls
