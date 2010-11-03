@@ -227,10 +227,10 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
 {
     // message body
     bodyText = new QGraphicsTextItem(this);
-    bodyText->setPos(BODY_OFFSET, 0);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
+    bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
 
     QString bodyHtml = Qt::escape(message.body);
@@ -248,6 +248,13 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
 
     QDateTime datetime = message.date.toLocalTime();
     dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+
+    // FIXME : for some reason, if we do not set the cache mode,
+    // we get paint artifacts when scrolling on Windows
+#ifdef Q_OS_WIN
+    bodyText->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    dateText->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+#endif
 
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
