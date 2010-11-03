@@ -227,6 +227,7 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
 {
     // message body
     bodyText = new QGraphicsTextItem(this);
+    bodyText->setPos(BODY_OFFSET, 0);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
@@ -305,9 +306,6 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     QRectF rect(baseRect);
     rect.moveLeft(0);
     rect.moveTop(0);
-
-    // position body
-    bodyText->setPos(rect.x() + BODY_OFFSET, rect.top());
 
     // position the date
     dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
@@ -436,11 +434,6 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
         default:
             return constraint;
     }
-}
-
-QTextDocument *ChatMessageWidget::document() const
-{
-    return bodyText->document();
 }
 
 QGraphicsTextItem *ChatMessageWidget::textItem()
@@ -662,16 +655,17 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
     while (i >= 0 && i < m_messages.size())
     {
         ChatMessageWidget *child = m_messages[i];
+        QTextDocument *document = child->textItem()->document();
 
         // position cursor
         if (cursor.isNull())
         {
-            cursor = QTextCursor(child->document());
+            cursor = QTextCursor(document);
             if (flags && QTextDocument::FindBackward)
                 cursor.movePosition(QTextCursor::End);
         }
 
-        cursor = child->document()->find(needle, cursor, flags);
+        cursor = document->find(needle, cursor, flags);
         if (!cursor.isNull())
         {
             // build new glass

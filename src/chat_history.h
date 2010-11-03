@@ -101,7 +101,6 @@ public:
     void setPrevious(ChatMessageWidget *previous);
     QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
-    QTextDocument *document() const;
     QGraphicsTextItem *textItem();
 
 protected:
