@@ -303,13 +303,15 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
 {
     QGraphicsWidget::setGeometry(baseRect);
 
-    QRectF rect(baseRect);
-    rect.moveLeft(0);
-    rect.moveTop(0);
-
     // position the date
-    dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
-                     rect.top() + 2);
+    if (dateText->isVisible())
+    {
+        QRectF rect(baseRect);
+        rect.moveLeft(0);
+        rect.moveTop(0);
+        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
+                         rect.top() + 2);
+    }
 }
 
 void ChatMessageWidget::setMaximumWidth(qreal width)
