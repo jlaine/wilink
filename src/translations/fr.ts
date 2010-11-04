@@ -423,14 +423,6 @@ Acceptez-vous?</translation>
         <translation>Fichiers envoyés</translation>
     </message>
     <message>
-        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
-        <source>To share files with other users, simply place them in your %1 folder.</source>
-        <translation>Pour partager des fichiers avec les autres utilisateurs, placez les dans votre dossier %1.</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Retirer</translation>
     </message>
@@ -465,6 +457,18 @@ Acceptez-vous?</translation>
     <message>
         <source>Shares options</source>
         <translation>Options de partages</translation>
+    </message>
+    <message>
+        <source>downloads folder</source>
+        <translation>dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>You can select the folders you want to share with other users from the shares options.</source>
+        <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
     </message>
 </context>
 <context>
@@ -776,10 +780,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
     </message>
 </context>
 <context>

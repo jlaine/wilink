@@ -27,8 +27,6 @@ QString SystemInfo::displayName(SystemInfo::StorageLocation type)
 {
     if (type == SystemInfo::DownloadsLocation)
         return QObject::tr("Downloads");
-    else if (type == SystemInfo::SharesLocation)
-        return QObject::tr("Shares");
     return QString();
 }
 
@@ -47,10 +45,6 @@ QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
         return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
     #endif
         return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-    }
-    else if (type == SystemInfo::SharesLocation)
-    {
-        return QDir::home().filePath("Public");
     }
     return QString();
 }

@@ -53,7 +53,6 @@
 #include "shares/model.h"
 #include "shares/options.h"
 #include "shares/view.h"
-#include "systeminfo.h"
 
 static int parallelDownloadLimit = 2;
 
@@ -244,11 +243,11 @@ void ChatShares::directoryChanged(const QString &path)
 {
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(path).toString(),
-        SystemInfo::displayName(SystemInfo::SharesLocation));
-    const QString helpText = tr("To share files with other users, simply place them in your %1 folder.").arg(sharesLink);
+        tr("downloads folder"));
+    const QString helpText = tr("You can select the folders you want to share with other users from the shares options.");
 
     sharesWidget->setText(helpText);
-    downloadsWidget->setText(tr("Received files are stored in your %1 folder. Once a file is received, you can double click to open it.").arg(sharesLink));
+    downloadsWidget->setText(tr("Received files are stored in your %1. Once a file is received, you can double click to open it.").arg(sharesLink));
     uploadsWidget->setText(helpText);
 }
 
@@ -916,7 +915,7 @@ bool SharesPlugin::initialize(Chat *chat)
 
         // sanitize settings
         QSettings settings;
-        QString sharesDirectory = settings.value("SharesLocation", SystemInfo::storageLocation(SystemInfo::SharesLocation)).toString();
+        QString sharesDirectory = settings.value("SharesLocation",  QDir::home().filePath("Public")).toString();
         if (sharesDirectory.endsWith("/"))
             sharesDirectory.chop(1);
         QStringList mappedDirectories = settings.value("SharesDirectories").toStringList();

@@ -28,7 +28,6 @@ public:
     enum StorageLocation
     {
         DownloadsLocation,
-        SharesLocation,
     };
 
     static QString displayName(SystemInfo::StorageLocation);
