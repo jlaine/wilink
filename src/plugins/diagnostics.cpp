@@ -201,7 +201,7 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
     /* run download */
     TransferTester *runner = new TransferTester(this);
     connect(runner, SIGNAL(finished(QList<Transfer>)), this, SLOT(transfersFinished(QList<Transfer>)));
-    runner->start(QUrl("http://diagnostics.wifirst.net/speed/"));
+    runner->start(QUrl("http://wireless.wifirst.net:8080/speed/"));
 }
 
 void DiagnosticsAgent::transfersFinished(const QList<Transfer> &transfers)
