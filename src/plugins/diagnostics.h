@@ -99,10 +99,13 @@ private:
 
 private slots:
     void handle(const DiagnosticsIq &request);
+    void transfersFinished(const QList<Transfer> &transfers);
 
 signals:
     void finished(const DiagnosticsIq &results);
-    void progress(int done, int total);
+
+private:
+    DiagnosticsIq iq;
 };
 
 #endif

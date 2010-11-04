@@ -82,7 +82,6 @@ void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, c
 
 void DiagnosticsAgent::handle(const DiagnosticsIq &request)
 {
-    DiagnosticsIq iq;
     iq.setId(request.id());
     iq.setFrom(request.to());
     iq.setTo(request.from());
@@ -90,10 +89,6 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
 
     QList<QHostAddress> gateways;
     QList<QHostInfo> lookups;
-    int done = 0;
-    int total = 3;
-
-    emit progress(done, total);
 
     /* software versions */
     QList<Software> softwares;
@@ -143,7 +138,6 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
             result.setWirelessStandards(wireless.supportedStandards());
         }
         interfaceResults << result;
-        emit progress(++done, ++total);
     }
     iq.setInterfaces(interfaceResults);
 
@@ -187,9 +181,7 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
             }
         }
     }
-    emit progress(++done, total);
     iq.setLookups(lookups);
-
     /* run ping tests */
     QList<Ping> pings;
     foreach (const QHostAddress &gateway, gateways)
@@ -199,15 +191,22 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
         if (longPing.contains(gateway) && ping.sentPackets() != ping.receivedPackets())
             pings.append(NetworkInfo::ping(gateway, 30));
     }
-    emit progress(++done, total);
     iq.setPings(pings);
 
     /* run traceroute */
     QList<Traceroute> traceroutes;
     traceroutes << NetworkInfo::traceroute(serverAddress, 3, 4);
-    emit progress(++done, total);
     iq.setTraceroutes(traceroutes);
 
+    /* run download */
+    TransferTester *runner = new TransferTester(this);
+    connect(runner, SIGNAL(finished(QList<Transfer>)), this, SLOT(transfersFinished(QList<Transfer>)));
+    runner->start(QUrl("https://download.wifirst.net/public/wiLink-0.9.9a911-win32.exe"));
+}
+
+void DiagnosticsAgent::transfersFinished(const QList<Transfer> &transfers)
+{
+    iq.setTransfers(transfers);
     emit finished(iq);
 }
 
