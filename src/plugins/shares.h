@@ -80,7 +80,7 @@ private slots:
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void registerWithServer();
-    void shareFolder();
+    void showOptions();
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
     void indexStarted();
@@ -125,10 +125,15 @@ private:
 
 class ChatSharesTab : public QWidget
 {
+    Q_OBJECT
+
 public:
     ChatSharesTab(QWidget *parent = 0);
     void addWidget(QWidget *widget);
     void setText(const QString &text);
+
+signals:
+    void showOptions();
 
 private:
     QLabel *label;

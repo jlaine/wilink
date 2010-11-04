@@ -121,6 +121,9 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
 
     sharesWidget = new ChatSharesTab;
+    check = connect(sharesWidget, SIGNAL(showOptions()),
+                    this, SLOT(showOptions()));
+    Q_ASSERT(check);
     sharesWidget->addWidget(sharesView);
     tabWidget->addTab(sharesWidget, QIcon(":/share.png"), tr("Shares"));
 
@@ -137,12 +140,18 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
 
     downloadsWidget = new ChatSharesTab;
+    check = connect(downloadsWidget, SIGNAL(showOptions()),
+                    this, SLOT(showOptions()));
+    Q_ASSERT(check);
     downloadsWidget->addWidget(downloadsView);
     tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
 
     /* create uploads tab */
     uploadsView = new ChatTransfersView;
     uploadsWidget = new ChatSharesTab;
+    check = connect(uploadsWidget, SIGNAL(showOptions()),
+                    this, SLOT(showOptions()));
+    Q_ASSERT(check);
     uploadsWidget->addWidget(uploadsView);
     tabWidget->addTab(uploadsWidget, QIcon(":/upload.png"), tr("Uploads"));
 
@@ -601,7 +610,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         {
             menuAction = chatWindow->optionsMenu()->addAction(QIcon(":/share.png"), tr("Shares options"));
             connect(menuAction, SIGNAL(triggered(bool)),
-                    this, SLOT(shareFolder()));
+                    this, SLOT(showOptions()));
         }
 
         // activate the shares view
@@ -618,7 +627,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
         if (!settings.value("SharesConfigured").toBool())
         {
             settings.setValue("SharesConfigured", true);
-            shareFolder();
+            showOptions();
         }
     }
     else if (presence.type() == QXmppPresence::Error &&
@@ -744,9 +753,9 @@ void ChatShares::setRoster(ChatRosterModel *roster)
     rosterModel = roster;
 }
 
-void ChatShares::shareFolder()
+void ChatShares::showOptions()
 {
-    ChatSharesOptions *dialog = new ChatSharesOptions(db, this);
+    ChatSharesOptions *dialog = new ChatSharesOptions(db, chatWindow);
     dialog->setWindowModality(Qt::WindowModal);
 
     bool check;
@@ -840,14 +849,26 @@ void ChatShares::tabChanged(int index)
 ChatSharesTab::ChatSharesTab(QWidget *parent)
     : QWidget(parent)
 {
+    bool check;
+
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->setMargin(5);
 
+    QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->setMargin(0);
     label = new QLabel;
     label->setOpenExternalLinks(true);
     label->setWordWrap(true);
-    vbox->addWidget(label);
+    hbox->addWidget(label, 1);
 
+    QPushButton *button = new QPushButton;
+    button->setIcon(QIcon(":/options.png"));
+    check = connect(button, SIGNAL(clicked()),
+                    this, SIGNAL(showOptions()));
+    Q_ASSERT(check);
+    hbox->addWidget(button);
+
+    vbox->addLayout(hbox);
     setLayout(vbox);
 }
 
