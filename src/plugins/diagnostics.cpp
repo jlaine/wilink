@@ -186,7 +186,7 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
     QList<Ping> pings;
     foreach (const QHostAddress &gateway, gateways)
     {
-        const Ping &ping = NetworkInfo::ping(gateway, 3);
+        const Ping ping = NetworkInfo::ping(gateway, 3);
         pings.append(ping);
         if (longPing.contains(gateway) && ping.sentPackets() != ping.receivedPackets())
             pings.append(NetworkInfo::ping(gateway, 30));
