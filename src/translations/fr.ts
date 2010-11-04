@@ -542,6 +542,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatSharesTab</name>
+    <message>
+        <source>Shares options</source>
+        <translation>Options de partages</translation>
+    </message>
+</context>
+<context>
     <name>ChatStatus</name>
     <message>
         <source>Available</source>

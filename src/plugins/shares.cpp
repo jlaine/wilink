@@ -862,6 +862,7 @@ ChatSharesTab::ChatSharesTab(QWidget *parent)
 
     QPushButton *button = new QPushButton;
     button->setIcon(QIcon(":/options.png"));
+    button->setToolTip(tr("Shares options"));
     check = connect(button, SIGNAL(clicked()),
                     this, SIGNAL(showOptions()));
     Q_ASSERT(check);
