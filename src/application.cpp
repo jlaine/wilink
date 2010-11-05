@@ -83,7 +83,10 @@ public:
 
 void ApplicationStyle::polish(QWidget *widget)
 {
-    if (widget->inherits("QTreeView"))
+    if (widget->inherits("QGraphicsView") ||
+        widget->inherits("QListView") ||
+        widget->inherits("QTextBrowser") ||
+        widget->inherits("QTreeView"))
     {
         QTreeView *tree = qobject_cast<QTreeView*>(widget);
         if (tree)

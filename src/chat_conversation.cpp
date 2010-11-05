@@ -52,10 +52,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistory = new QGraphicsView;
     chatHistory->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     chatHistory->setScene(new QGraphicsScene(chatHistory));
-#ifdef WILINK_EMBEDDED
-    FlickCharm *charm = new FlickCharm(chatHistory);
-    charm->activateOn(chatHistory);
-#endif
     chatHistory->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     chatHistoryWidget = new ChatHistoryWidget;

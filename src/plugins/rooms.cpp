@@ -56,9 +56,6 @@
 #include "chat_roster.h"
 #include "chat_utils.h"
 
-#ifdef WILINK_EMBEDDED
-#include "flickcharm.h"
-#endif
 #include "rooms.h"
 
 enum MembersColumns {
@@ -803,10 +800,6 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     listWidget = new QListWidget;
     listWidget->setIconSize(QSize(32, 32));
     listWidget->setSortingEnabled(true);
-#ifdef WILINK_EMBEDDED
-    FlickCharm *charm = new FlickCharm(this);
-    charm->activateOn(listWidget);
-#endif
     connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
     layout->addWidget(listWidget);
 

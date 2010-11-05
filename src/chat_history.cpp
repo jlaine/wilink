@@ -38,10 +38,6 @@
 #include <QTimer>
 #include <QUrl>
 
-#ifdef WILINK_EMBEDDED
-#include "flickcharm.h"
-#endif
-
 #define DATE_WIDTH 80
 #define BODY_OFFSET 5
 #define BUBBLE_RADIUS 8
