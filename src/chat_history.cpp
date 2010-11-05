@@ -46,8 +46,8 @@
 #define MESSAGE_MAX 100
 
 #ifdef WILINK_EMBEDDED
-#define BODY_FONT 14
-#define DATE_FONT 12
+#define BODY_FONT 18
+#define DATE_FONT 15
 #else
 #define BODY_FONT 12
 #define DATE_FONT 10
@@ -226,6 +226,7 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
+    bodyText->setDefaultTextColor(Qt::black);
     bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
 
