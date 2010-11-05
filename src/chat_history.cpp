@@ -221,12 +221,14 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     m_bubble(0),
     m_message(message)
 {
+    const QColor textColor(Qt::black);
+
     // message body
     bodyText = new QGraphicsTextItem(this);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
-    bodyText->setDefaultTextColor(Qt::black);
+    bodyText->setDefaultTextColor(textColor);
     bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
 
@@ -241,6 +243,7 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     font = dateText->font();
     font.setPixelSize(DATE_FONT);
     dateText->setFont(font);
+    dateText->setDefaultTextColor(textColor);
     dateText->setTextWidth(90);
 
     QDateTime datetime = message.date.toLocalTime();
