@@ -46,12 +46,12 @@
 #ifdef WILINK_EMBEDDED
 #define BODY_FONT 18
 #define DATE_FONT 15
-#define DATE_WIDTH 80
+#define DATE_WIDTH 0
 #define HEADER_HEIGHT 25
 #else
 #define BODY_FONT 12
 #define DATE_FONT 10
-#define DATE_WIDTH 0
+#define DATE_WIDTH 80
 #define HEADER_HEIGHT 20
 #endif
 
