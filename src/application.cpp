@@ -30,10 +30,12 @@
 #include <QMenu>
 #include <QNetworkDiskCache>
 #include <QProcess>
+#include <QProxyStyle>
 #include <QPushButton>
 #include <QSettings>
 #include <QSystemTrayIcon>
 #include <QTimer>
+#include <QTreeView>
 #include <QUrl>
 
 #include "qnetio/wallet.h"
@@ -44,6 +46,7 @@
 #include "chat.h"
 #include "chat_accounts.h"
 #include "chat_utils.h"
+#include "flickcharm.h"
 
 class ApplicationPrivate
 {
@@ -72,6 +75,24 @@ ApplicationPrivate::ApplicationPrivate()
 {
 }
 
+class ApplicationStyle : public QProxyStyle
+{
+public:
+    void polish(QWidget *widget);
+};
+
+void ApplicationStyle::polish(QWidget *widget)
+{
+    if (widget->inherits("QTreeView"))
+    {
+        QTreeView *tree = qobject_cast<QTreeView*>(widget);
+        if (tree)
+            tree->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        FlickCharm *charm = new FlickCharm(widget);
+        charm->activateOn(widget);
+    }
+};
+
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
     d(new ApplicationPrivate)
@@ -99,6 +120,11 @@ Application::Application(int &argc, char **argv)
     d->settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
+
+    /* initialise style */
+#ifdef WILINK_EMBEDDED
+    setStyle(new ApplicationStyle);
+#endif
 }
 
 Application::~Application()

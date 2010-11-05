@@ -55,7 +55,6 @@
 #include "chat_roster_item.h"
 #include "chat_status.h"
 #include "chat_utils.h"
-#include "flickcharm.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -78,11 +77,6 @@ Chat::Chat(QWidget *parent)
 
     /* left panel */
     m_rosterView = new ChatRosterView(m_rosterModel);
-#ifdef WILINK_EMBEDDED
-    m_rosterView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    FlickCharm *charm = new FlickCharm(this);
-    charm->activateOn(m_rosterView);
-#endif
     connect(m_rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(m_rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(m_rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
