@@ -21,7 +21,6 @@
 
 #include <QLocale>
 #include <QSettings>
-#include <QSystemTrayIcon>
 #include <QTimer>
 #include <QTranslator>
 #include <QtPlugin>
