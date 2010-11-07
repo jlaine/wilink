@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAbstractItemView>
 #include <QAuthenticator>
 #include <QDebug>
 #include <QDesktopServices>
@@ -35,7 +36,6 @@
 #include <QSettings>
 #include <QSystemTrayIcon>
 #include <QTimer>
-#include <QTreeView>
 #include <QUrl>
 
 #include "qnetio/wallet.h"
@@ -88,9 +88,9 @@ void ApplicationStyle::polish(QWidget *widget)
         widget->inherits("QTextBrowser") ||
         widget->inherits("QTreeView"))
     {
-        QTreeView *tree = qobject_cast<QTreeView*>(widget);
-        if (tree)
-            tree->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+        QAbstractItemView *view = qobject_cast<QAbstractItemView*>(widget);
+        if (view)
+            view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
         FlickCharm *charm = new FlickCharm(widget);
         charm->activateOn(widget);
     }
