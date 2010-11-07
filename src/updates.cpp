@@ -249,7 +249,11 @@ void Updates::install(const Release &release)
         return;
     }
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_SYMBIAN)
+    // open the download directory in file browser
+    QFileInfo fileInfo(d->cacheFile(release));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
+#elif defined(Q_OS_WIN)
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());
     installDir.cdUp();
@@ -271,20 +275,23 @@ void Updates::install(const Release &release)
                                  0,
                                  &startupInfo, &pinfo);
 
+    // if we cannot run process, fallback to opening the file
     if (success) {
         CloseHandle(pinfo.hThread);
         CloseHandle(pinfo.hProcess);
-
-        // quit application to allow installation
-        qApp->quit();
-        return;
+    } else {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(release)));
     }
-#endif
+
+    // quit application to allow installation
+    qApp->quit();
+#else
     // open the downloaded archive
     QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(release)));
 
     // quit application to allow installation
     qApp->quit();
+#endif
 }
 
 /** Once a release has been downloaded, verify its checksum and write it
