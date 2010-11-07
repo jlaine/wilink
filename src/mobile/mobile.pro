@@ -26,9 +26,12 @@ SOURCES += \
     ../chat_utils.cpp \
     ../flickcharm.cpp \
     ../systeminfo.cpp \
+    ../updates.cpp \
+    ../updatesdialog.cpp \
     ../plugins/calls.cpp \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
+    ../plugins/contacts.cpp \
     ../plugins/rooms.cpp \
     ../plugins/transfers.cpp \
     main.cpp
@@ -51,8 +54,11 @@ HEADERS += \
     ../chat_utils.h \
     ../flickcharm.h \
     ../systeminfo.h \
+    ../updates.h \
+    ../updatesdialog.h \
     ../plugins/calls.h \
     ../plugins/chats.h \
+    ../plugins/contacts.h \
     ../plugins/console.h \
     ../plugins/rooms.h \
     ../plugins/transfers.h
