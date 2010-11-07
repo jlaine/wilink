@@ -21,6 +21,7 @@
 #include <QtPlugin>
 
 #include "application.h"
+#include "updatesdialog.h"
 
 Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(console)
@@ -34,6 +35,10 @@ int main(int argc, char *argv[])
     /* Create application */
     Application::platformInit();
     Application app(argc, argv);
+
+    /* Check for updates */
+    UpdatesDialog updates;
+    app.setUpdatesDialog(&updates);
 
     /* Show chat windows */
     QTimer::singleShot(0, &app, SLOT(resetChats()));
