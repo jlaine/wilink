@@ -32,6 +32,7 @@ SOURCES += \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/contacts.cpp \
+    ../plugins/photos.cpp \
     ../plugins/rooms.cpp \
     ../plugins/transfers.cpp \
     main.cpp
@@ -60,6 +61,7 @@ HEADERS += \
     ../plugins/chats.h \
     ../plugins/contacts.h \
     ../plugins/console.h \
+    ../plugins/photos.h \
     ../plugins/rooms.h \
     ../plugins/transfers.h
 

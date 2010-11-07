@@ -24,6 +24,7 @@
 
 Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(console)
+Q_IMPORT_PLUGIN(photos)
 Q_IMPORT_PLUGIN(rooms)
 Q_IMPORT_PLUGIN(transfers)
 Q_IMPORT_PLUGIN(contacts)
