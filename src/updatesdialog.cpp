@@ -55,9 +55,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
     /* button box */
     buttonBox = new QDialogButtonBox;
-    buttonBox->addButton(QDialogButtonBox::Yes);
-    buttonBox->addButton(QDialogButtonBox::No);
-    buttonBox->hide();
+    buttonBox->addButton(QDialogButtonBox::Ok);
     layout->addWidget(buttonBox);
 
     setLayout(layout);
@@ -95,7 +93,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
 void UpdatesDialog::buttonClicked(QAbstractButton *button)
 {
-    buttonBox->hide();
+    buttonBox->setStandardButtons(QDialogButtonBox::Ok);
     if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
     {
         statusLabel->setText(tr("Installing update.."));
@@ -147,7 +145,7 @@ void UpdatesDialog::downloadFinished(const Release &release)
             .arg(release.changes)
             .arg(tr("%1 will automatically exit to allow you to install the new version.")
                 .arg(release.package)));
-    buttonBox->show();
+    buttonBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
     show();
     buttonBox->button(QDialogButtonBox::Yes)->setFocus();
 }
