@@ -93,13 +93,20 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
 
 void UpdatesDialog::buttonClicked(QAbstractButton *button)
 {
-    buttonBox->setStandardButtons(QDialogButtonBox::Ok);
     if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
     {
+        buttonBox->setStandardButtons(QDialogButtonBox::Ok);
         statusLabel->setText(tr("Installing update.."));
         updates->install(promptRelease);
-    } else {
+    }
+    else if (buttonBox->standardButton(button) == QDialogButtonBox::No)
+    {
+        buttonBox->setStandardButtons(QDialogButtonBox::Ok);
         statusLabel->setText(tr("Not installing update."));
+        hide();
+    }
+    else
+    {
         hide();
     }
 }
