@@ -303,7 +303,6 @@ Photos::Photos(const QString &url, QWidget *parent)
 #endif
 
     setFocusProxy(photosView);
-    resize(QSize(600, 400).expandedTo(minimumSizeHint()));
 
     /* register panel */
     QTimer::singleShot(0, this, SIGNAL(registerPanel()));

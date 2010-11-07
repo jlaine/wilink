@@ -323,7 +323,6 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
 
     layout->addLayout(hbox);
     setLayout(layout);
-    setMinimumSize(QSize(450, 400));
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
 
