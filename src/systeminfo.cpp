@@ -99,7 +99,7 @@ QString SystemInfo::osVersion()
         return QString();
     }
 #elif defined(Q_OS_SYMBIAN)
-    switch (QSysInfo::SymbianVersion)
+    switch (QSysInfo::symbianVersion())
     {
     case QSysInfo::SV_SF_1:
         return QString::fromLatin1("1");
