@@ -152,21 +152,4 @@ endif(WIN32)
 install(TARGETS wiLink DESTINATION bin)
 
 # tests
-set(tests_MOC_HEADERS tests.h updates.h)
-qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
-add_executable(tests
-    systeminfo.cpp
-    tests.cpp
-    updates.cpp
-    chat_utils.cpp
-    ${tests_MOC_SOURCES})
-target_link_libraries(tests qnetio qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
-
-add_executable(codec codec.cpp)
-target_link_libraries(codec qxmpp ${QT_LIBRARIES})
-
-add_executable(stun stun.cpp)
-target_link_libraries(stun qxmpp ${QT_LIBRARIES})
-
-add_executable(hasher hasher.cpp)
-target_link_libraries(hasher qxmpp ${QT_LIBRARIES})
+add_subdirectory(tests)
