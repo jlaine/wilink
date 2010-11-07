@@ -131,8 +131,8 @@ Application::Application(int &argc, char **argv)
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
 
+#if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
     /* initialise style */
-#ifdef WILINK_EMBEDDED
     setStyle(new ApplicationStyle);
 #endif
 }
