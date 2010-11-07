@@ -94,6 +94,13 @@ void ApplicationStyle::polish(QWidget *widget)
         FlickCharm *charm = new FlickCharm(widget);
         charm->activateOn(widget);
     }
+    if (widget->inherits("QDialog") ||
+        widget->inherits("QMainWindow"))
+    {
+#ifndef Q_OS_SYMBIAN
+        widget->setMaximumSize(200, 320);
+#endif
+    }
 };
 
 Application::Application(int &argc, char **argv)
@@ -370,14 +377,9 @@ void Application::resetChats()
         else
             chat->setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
-#ifdef WILINK_EMBEDDED
-        Q_UNUSED(ypos);
 #ifdef Q_OS_SYMBIAN
+        Q_UNUSED(ypos);
         chat->showMaximized();
-#else
-        chat->resize(200, 320);
-        chat->show();
-#endif
 #else
         chat->move(xpos, ypos);
         chat->show();
