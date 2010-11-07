@@ -38,19 +38,21 @@
 #include <QTimer>
 #include <QUrl>
 
-#define DATE_WIDTH 80
 #define BODY_OFFSET 5
 #define BUBBLE_RADIUS 8
-#define HEADER_HEIGHT 20
 #define FOOTER_HEIGHT 5
 #define MESSAGE_MAX 100
 
 #ifdef WILINK_EMBEDDED
-#define BODY_FONT 14
-#define DATE_FONT 12
+#define BODY_FONT 18
+#define DATE_FONT 15
+#define DATE_WIDTH 0
+#define HEADER_HEIGHT 25
 #else
 #define BODY_FONT 12
 #define DATE_FONT 10
+#define DATE_WIDTH 80
+#define HEADER_HEIGHT 20
 #endif
 
 /** Constructs a new ChatMessage.
@@ -221,11 +223,14 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     m_bubble(0),
     m_message(message)
 {
+    const QColor textColor(Qt::black);
+
     // message body
     bodyText = new QGraphicsTextItem(this);
     QFont font = bodyText->font();
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
+    bodyText->setDefaultTextColor(textColor);
     bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
 
@@ -236,14 +241,19 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     bodyText->setHtml(bodyHtml);
 
     // message date
+#ifdef WILINK_EMBEDDED
+    dateText = 0;
+#else
     dateText = new QGraphicsTextItem(this);
     font = dateText->font();
     font.setPixelSize(DATE_FONT);
     dateText->setFont(font);
+    dateText->setDefaultTextColor(textColor);
     dateText->setTextWidth(90);
 
     QDateTime datetime = message.date.toLocalTime();
     dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+#endif
 
     // FIXME : for some reason, if we do not set the cache mode,
     // we get paint artifacts when scrolling on Windows
@@ -307,7 +317,7 @@ void ChatMessageWidget::setGeometry(const QRectF &baseRect)
     QGraphicsWidget::setGeometry(baseRect);
 
     // position the date
-    if (dateText->isVisible())
+    if (dateText && dateText->isVisible())
     {
         QRectF rect(baseRect);
         rect.moveLeft(0);
@@ -413,6 +423,8 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
  */
 void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
 {
+    if (!dateText)
+        return;
     if (!previous ||
         m_message.fromJid != previous->message().fromJid ||
         m_message.date > previous->message().date.addSecs(60))

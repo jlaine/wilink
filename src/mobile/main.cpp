@@ -22,7 +22,6 @@
 
 #include "application.h"
 
-Q_IMPORT_PLUGIN(calls)
 Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(console)
 Q_IMPORT_PLUGIN(transfers)
