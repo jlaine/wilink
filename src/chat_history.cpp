@@ -464,9 +464,9 @@ QGraphicsTextItem *ChatMessageWidget::textItem()
  */
 ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    m_lastFindWidget(0),
     m_followEnd(true),
-    m_view(0)
+    m_view(0),
+    m_lastFindWidget(0)
 {
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);

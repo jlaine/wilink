@@ -109,8 +109,8 @@ protected:
 
 private:
     int maxWidth;
-    ChatMessage m_message;
     ChatMessageBubble *m_bubble;
+    ChatMessage m_message;
 
     // Text
     QString bodyAnchor;
