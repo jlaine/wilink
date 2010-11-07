@@ -51,26 +51,29 @@ QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
 
 QString SystemInfo::osName()
 {
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX)
     return QString::fromLatin1("Linux");
-#endif
-#ifdef Q_OS_MAC
+#elif defined(Q_OS_MAC)
     return QString::fromLatin1("Mac OS");
-#endif
-#ifdef Q_OS_WIN
+#elif defined(Q_OS_SYMBIAN)
+    return QString::fromLatin1("Symbian");
+#elif defined(Q_OS_WIN)
     return QString::fromLatin1("Windows");
-#endif
+#else
     return QString::fromLatin1("Unknown");
+#endif
 }
 
 QString SystemInfo::osType()
 {
-#if defined(Q_OS_WIN)
-    return QString::fromLatin1("win32");
+#if defined(Q_OS_LINUX)
+    return QString::fromLatin1("linux");
 #elif defined(Q_OS_MAC)
     return QString::fromLatin1("mac");
-#elif defined(Q_OS_LINUX)
-    return QString::fromLatin1("linux");
+#elif defined(Q_OS_SYMBIAN)
+    return QString::fromLatin1("symbian");
+#elif defined(Q_OS_WIN)
+    return QString::fromLatin1("win32");
 #else
     return QString();
 #endif
@@ -78,13 +81,12 @@ QString SystemInfo::osType()
 
 QString SystemInfo::osVersion()
 {
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX)
     QProcess process;
     process.start(QString("uname"), QStringList(QString("-r")), QIODevice::ReadOnly);
     process.waitForFinished();
     return QString::fromLocal8Bit(process.readAllStandardOutput());
-#endif
-#ifdef Q_OS_MAC
+#elif defined(Q_OS_MAC)
     switch (QSysInfo::MacintoshVersion)
     {
     case QSysInfo::MV_10_4:
@@ -96,8 +98,21 @@ QString SystemInfo::osVersion()
     default:
         return QString();
     }
-#endif
-#ifdef Q_OS_WIN
+#elif defined(Q_OS_SYMBIAN)
+    switch (QSysInfo::SymbianVersion)
+    {
+    case QSysInfo::SV_SF_1:
+        return QString::fromLatin1("1");
+    case QSysInfo::SV_SF_2:
+        return QString::fromLatin1("2");
+    case QSysInfo::SV_SF_3:
+        return QString::fromLatin1("3");
+    case QSysInfo::SV_SF_4:
+        return QString::fromLatin1("4");
+    default:
+        return QString();
+    }
+#elif defined(Q_OS_WIN)
     switch (QSysInfo::WindowsVersion)
     {
     case QSysInfo::WV_XP:
@@ -111,8 +126,9 @@ QString SystemInfo::osVersion()
     default:
         return QString();
     }
-#endif
+#else
     return QString();
+#endif
 }
 
 
