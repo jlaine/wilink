@@ -40,6 +40,8 @@
 #include "systeminfo.h"
 #include "updates.h"
 
+#define CHUNK_SIZE 16384
+
 /** Returns the running application's release.
  */
 Release Release::applicationRelease()
@@ -80,22 +82,22 @@ QString UpdatesPrivate::cacheFile(const Release &release) const
 
 bool UpdatesPrivate::checkCachedFile(const Release &release) const
 {
-    /* check existing file */
-    QFile downloadFile(cacheFile(release));
-    if (!downloadFile.open(QIODevice::ReadOnly))
-        return false;
-
     /* check file integrity */
-    const QByteArray data = downloadFile.readAll();
-    downloadFile.close();
     foreach (const QString &type, release.hashes.keys())
     {
         if (type == "sha1")
         {
+            QFile downloadFile(cacheFile(release));
+            if (!downloadFile.open(QIODevice::ReadOnly))
+                return false;
+
+            char buffer[CHUNK_SIZE];
+            qint64 length;
             QCryptographicHash hash(QCryptographicHash::Sha1);
-            hash.addData(data);
-            if (hash.result() == release.hashes[type])
-                return true;
+            while ((length = downloadFile.read(buffer, CHUNK_SIZE)) > 0)
+                hash.addData(buffer, length);
+            downloadFile.close();
+            return hash.result() == release.hashes[type];
         }
     }
 
@@ -318,7 +320,10 @@ void Updates::saveUpdate()
         emit error(FileError, "Could not save downloaded file to disk");
         return;
     }
-    downloadFile.write(reply->readAll());
+    char buffer[CHUNK_SIZE];
+    qint64 length;
+    while ((length = reply->read(buffer, CHUNK_SIZE)) > 0)
+        downloadFile.write(buffer, length);
     downloadFile.close();
 
     /* if integrity check fails, delete downloaded file */
