@@ -427,7 +427,7 @@ void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void ChatPanelWidget::setGeometry(const QRectF &rect)
 {
     QPainterPath path;
-    path.addRoundedRect(QRectF(0, 0, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
+    path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
     QSizeF pixmapSize = m_icon->pixmap().size();
@@ -435,7 +435,7 @@ void ChatPanelWidget::setGeometry(const QRectF &rect)
         (rect.height() - pixmapSize.height()) / 2);
 
     QPainterPath buttonPath;
-    buttonPath.addRoundedRect(QRectF(rect.width() - BUTTON_WIDTH, 0,
+    buttonPath.addRoundedRect(QRectF(0.5 + rect.width() - BUTTON_WIDTH, 0.5,
         BUTTON_WIDTH - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_buttonPath->setPath(buttonPath);
 
