@@ -227,11 +227,7 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
     bodyText->setDefaultTextColor(textColor);
-#ifdef Q_OS_MAC
     bodyText->setPos(BODY_OFFSET, 0);
-#else
-    bodyText->setPos(BODY_OFFSET, 0.5);
-#endif
     bodyText->installSceneEventFilter(this);
 
     QString bodyHtml = Qt::escape(message.body);
@@ -433,7 +429,6 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     switch (which)
     {
         case Qt::MinimumSize:
-            return bodyText->document()->size();
         case Qt::PreferredSize:
         {
             QSizeF hint(bodyText->document()->size());
