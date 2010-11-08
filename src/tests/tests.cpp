@@ -131,6 +131,9 @@ void TestUpdates::compareVersions()
     QVERIFY(Updates::compareVersions("1.0.1", "1.0") == 1);
     QVERIFY(Updates::compareVersions("1.0", "1.0.1") == -1);
 
+    QVERIFY(Updates::compareVersions("1.0.1", "1.0.0") == 1);
+    QVERIFY(Updates::compareVersions("1.0.0", "1.1.1") == -1);
+
     QVERIFY(Updates::compareVersions("1.0.0", "0.99.7") == 1);
     QVERIFY(Updates::compareVersions("0.99.7", "1.0.0") == -1);
 
@@ -145,6 +148,9 @@ void TestUpdates::compareVersions()
 
     QVERIFY(Updates::compareVersions("0.9.9a", "0.9.9") == 1);
     QVERIFY(Updates::compareVersions("0.9.9", "0.9.9a") == -1);
+
+    QVERIFY(Updates::compareVersions("1.0.0", "0.9.9a913") == 1);
+    QVERIFY(Updates::compareVersions("0.9.9a913", "1.0.0") == -1);
 }
 
 int main(int argc, char *argv[])
