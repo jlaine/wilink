@@ -107,7 +107,7 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
         m_from->setPlainText(widget->message().from);
     widget->setBubble(this);
     widget->setParentItem(this);
-    widget->setMaximumWidth(m_maximumWidth);
+    widget->setMaximumWidth(m_maximumWidth - 2);
     connect(widget, SIGNAL(destroyed(QObject*)),
             this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, widget);
@@ -165,13 +165,9 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     m_frame->setPath(path);
 
     // messages
+    rect.adjust(0.5, 0.5, -0.5, -0.5);
     const qreal x = rect.left();
-#ifdef Q_OS_MAC
-    qreal y = int(rect.top());
-#else
     qreal y = rect.top();
-#endif
-
     foreach (ChatMessageWidget *widget, m_messages)
     {
         const QRectF wRect(QPointF(x, y), widget->preferredSize());
@@ -182,10 +178,10 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
 
 void ChatMessageBubble::setMaximumWidth(qreal width)
 {
-    m_maximumWidth = width - 2;
+    m_maximumWidth = width;
     QGraphicsWidget::setMaximumWidth(width);
     foreach (ChatMessageWidget *child, m_messages)
-        child->setMaximumWidth(m_maximumWidth);
+        child->setMaximumWidth(m_maximumWidth - 2);
     updateGeometry();
 }
 
@@ -195,14 +191,14 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     {
         case Qt::MinimumSize:
         {
-            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT;
+            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT + 2;
             foreach (ChatMessageWidget *widget, m_messages)
                 height += widget->minimumHeight();
             return QSizeF(m_maximumWidth, height);
         }
         case Qt::PreferredSize:
         {
-            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT;
+            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT + 2;
             foreach (ChatMessageWidget *widget, m_messages)
                 height += widget->preferredHeight();
             return QSizeF(m_maximumWidth, height);
@@ -231,7 +227,11 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     font.setPixelSize(BODY_FONT);
     bodyText->setFont(font);
     bodyText->setDefaultTextColor(textColor);
+#ifdef Q_OS_MAC
     bodyText->setPos(BODY_OFFSET, 0);
+#else
+    bodyText->setPos(BODY_OFFSET, 0.5);
+#endif
     bodyText->installSceneEventFilter(this);
 
     QString bodyHtml = Qt::escape(message.body);
@@ -253,13 +253,6 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
 
     QDateTime datetime = message.date.toLocalTime();
     dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-#endif
-
-    // FIXME : for some reason, if we do not set the cache mode,
-    // we get paint artifacts when scrolling on Windows
-#ifdef Q_OS_WIN
-    bodyText->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
-    dateText->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 #endif
 
     // set controls
