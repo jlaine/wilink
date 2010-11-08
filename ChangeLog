@@ -1,4 +1,8 @@
-wiLink 0.9.9b (UNRELEASED)
+wiLink 1.0.0 (2010-11-08)
+ * Calls:
+   - Make it possible to make calls to room members.
+   - Display call information inside relevant chat window.
+   - Move call data processing to a thread to avoid buffer underruns.
  * Conversations:
    - Add support for double and tripple click selection.
    - Calculate offset between server time and client time.
@@ -8,25 +12,21 @@ wiLink 0.9.9b (UNRELEASED)
    - When sending messages to a chat room, do not set "from".
    - Display image and profile links for room members.
    - Fix chat room bookmark management.
- * Calls:
-   - Make it possible to make calls to room members.
-   - Display call information inside relevant chat window.
-   - Move call data processing to a thread to avoid buffer underruns.
+ * Diagnostics:
+   - Report which standards WiFi interfaces support.
+ * Menu:
+   - Fix parsing of the menu refresh interval.
+   - Add support for links to chat rooms.
+ * Roster:
+   - Put all contacts under a "Contacts" roster entry.
+   - Add caching on vCards to reduce network traffic at connect.
+   - Add a help panel for contacts.
  * Shares:
    - Make it possible to select additional folders to share.
    - Show options dialog when first run.
  * Transfers:
    - Make it possible to send files to room members.
    - Display transfer progress inside relevant chat window.
- * Menu:
-   - Fix parsing of the menu refresh interval.
-   - Add support for links to chat rooms.
- * Diagnostics:
-   - Report which standards WiFi interfaces support.
- * Miscellaneous:
-   - Add caching on vCards to reduce network traffic at connect.
-   - Add support for double and tripple click selections in chat history.
-   - Add a help panel for contacts.
 
 wiLink 0.9.9a (2010-09-16)
  * Do not join bookmarked rooms until we receive our nickname.
