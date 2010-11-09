@@ -10,11 +10,36 @@
 class SipClientPrivate
 {
 public:
+    void sendRegister();
+
     QUdpSocket *socket;
     QByteArray callId;
+    int cseq;
     QHostAddress serverAddress;
     quint16 serverPort;
 };
+
+void SipClientPrivate::sendRegister()
+{
+    const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
+    const QString addr = QString("\"%1\"<%2>").arg(
+        QLatin1String("Foo Bar"), QLatin1String("foo.bar@wifirst.net"));
+    const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
+        socket->localAddress().toString(),
+        QString::number(socket->localPort()),
+        branch);
+
+    SipRequest packet("REGISTER", "sip:sip.wifirst.net");
+    packet.setHeaderField("Via", via.toLatin1());
+    packet.setHeaderField("Max-Forwards", "70");
+    packet.setHeaderField("To", addr.toLatin1());
+    packet.setHeaderField("From", addr.toLatin1() + ";tag=123456");
+    packet.setHeaderField("Call-ID", callId);
+    packet.setHeaderField("CSeq", QString("%1 REGISTER").arg(QString::number(cseq++)).toLatin1());
+    packet.setHeaderField("Expires", "3600");
+    packet.setHeaderField("User-Agent", "wiLink/1.0.0");
+    socket->writeDatagram(packet.toByteArray(), serverAddress, serverPort);
+}
 
 SipClient::SipClient(QObject *parent)
     : QObject(parent),
@@ -36,29 +61,13 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     if (info.addresses().isEmpty())
         return;
     d->callId = generateStanzaHash().toLatin1();
+    d->cseq = 1;
     d->serverAddress = info.addresses().first();
     d->serverPort = port;
 
     d->socket->bind();
-    //d->socket->connectToHost(d->serverAddress, d->serverPort);
-    const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
-    const QString addr = QString("\"%1\"<%2>").arg(
-        QLatin1String("Jeremy Laine"), QLatin1String("jeremy.laine@wifirst.net"));
-    const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
-        d->socket->localAddress().toString(),
-        QString::number(d->socket->localPort()),
-        branch);
 
-    SipRequest packet("REGISTER", "sip:sip.wifirst.net");
-    packet.setHeaderField("Via", via.toLatin1());
-    packet.setHeaderField("Max-Forwards", "70");
-    packet.setHeaderField("To", addr.toLatin1());
-    packet.setHeaderField("From", addr.toLatin1() + ";tag=123456");
-    packet.setHeaderField("Call-ID", d->callId);
-    packet.setHeaderField("CSeq", "1 REGISTER");
-    packet.setHeaderField("Expires", "3600");
-    packet.setHeaderField("User-Agent", "wiLink/1.0.0");
-    d->socket->writeDatagram(packet.toByteArray(), d->serverAddress, d->serverPort);
+    d->sendRegister();
 }
 
 void SipClient::datagramReceived()
@@ -73,7 +82,11 @@ void SipClient::datagramReceived()
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
     SipReply reply(buffer);
-    qDebug() << "repl" << reply.headerField("Via");
+    if (reply.statusCode() == 401 && !reply.headerField("WWW-Authenticate").isEmpty())
+    {
+        QByteArray auth = reply.headerField("WWW-Authenticate");
+        qDebug() << "auth required";
+    }
 }
 
 SipRequest::SipRequest(const QByteArray &method, const QByteArray &uri)
