@@ -83,13 +83,23 @@ SipRequest::SipRequest(const QByteArray &method, const QByteArray &uri)
 }
 
 SipReply::SipReply(const QByteArray &bytes)
+    : m_statusCode(0)
 {
-    // parse status
     const QByteArrayMatcher lf("\n");
     const QByteArrayMatcher colon(":");
+
     int j = lf.indexIn(bytes);
     if (j < 0)
         return;
+
+    // parse status
+    const QByteArray status = bytes.left(j - 1);
+    if (status.size() < 10 ||
+        !status.startsWith("SIP/2.0"))
+        return;
+
+    m_statusCode = status.mid(8, 3).toInt();
+    m_reasonPhrase = status.mid(12);
 
     const QByteArray header = bytes.mid(j+1);
 
@@ -121,6 +131,11 @@ SipReply::SipReply(const QByteArray &bytes)
 
         m_fields.append(qMakePair(field, value));
     }
+}
+
+int SipReply::statusCode() const
+{
+    return m_statusCode;
 }
 
 QByteArray SipPacket::headerField(const QByteArray &name, const QByteArray &defaultValue) const

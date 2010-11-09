@@ -29,6 +29,11 @@ class SipReply : public SipPacket
 {
 public:
     SipReply(const QByteArray &bytes);
+    int statusCode() const;
+
+private:
+    int m_statusCode;
+    QString m_reasonPhrase;
 };
 
 class SipClient : public QObject
