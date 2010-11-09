@@ -1,3 +1,4 @@
+#include <QByteArrayMatcher>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QHostInfo>
@@ -10,6 +11,7 @@ class SipClientPrivate
 {
 public:
     QUdpSocket *socket;
+    QByteArray callId;
     QHostAddress serverAddress;
     quint16 serverPort;
 };
@@ -33,13 +35,13 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     QHostInfo info = QHostInfo::fromName(server);
     if (info.addresses().isEmpty())
         return;
+    d->callId = generateStanzaHash().toLatin1();
     d->serverAddress = info.addresses().first();
     d->serverPort = port;
 
     d->socket->bind();
     //d->socket->connectToHost(d->serverAddress, d->serverPort);
     const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
-    const QByteArray callId = generateStanzaHash().toLatin1();
     const QString addr = QString("\"%1\"<%2>").arg(
         QLatin1String("Jeremy Laine"), QLatin1String("jeremy.laine@wifirst.net"));
     const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
@@ -52,7 +54,7 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     packet.setHeaderField("Max-Forwards", "70");
     packet.setHeaderField("To", addr.toLatin1());
     packet.setHeaderField("From", addr.toLatin1() + ";tag=123456");
-    packet.setHeaderField("Call-ID", callId);
+    packet.setHeaderField("Call-ID", d->callId);
     packet.setHeaderField("CSeq", "1 REGISTER");
     packet.setHeaderField("Expires", "3600");
     packet.setHeaderField("User-Agent", "wiLink/1.0.0");
@@ -61,13 +63,64 @@ void SipClient::connectToServer(const QString &server, quint16 port)
 
 void SipClient::datagramReceived()
 {
+    if (!d->socket->hasPendingDatagrams())
+        return;
 
+    const qint64 size = d->socket->pendingDatagramSize();
+    QByteArray buffer(size, 0);
+    QHostAddress remoteHost;
+    quint16 remotePort;
+    d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+    SipPacket reply(buffer);
+    qDebug() << "repl" << reply.headerField("Via");
 }
 
 SipPacket::SipPacket(const QByteArray &method, const QByteArray &uri)
     : m_method(method),
     m_uri(uri)
 {
+}
+
+SipPacket::SipPacket(const QByteArray &bytes)
+{
+    // parse status
+    const QByteArrayMatcher lf("\n");
+    const QByteArrayMatcher colon(":");
+    int j = lf.indexIn(bytes);
+    if (j < 0)
+        return;
+
+    const QByteArray header = bytes.mid(j+1);
+
+    // see rfc2616, sec 4 for information about HTTP/1.1 headers.
+    // allows relaxed parsing here, accepts both CRLF & LF line endings
+    int i = 0;
+    while (i < header.count()) {
+        int j = colon.indexIn(header, i); // field-name
+        if (j == -1)
+            break;
+        const QByteArray field = header.mid(i, j - i).trimmed();
+        j++;
+        // any number of LWS is allowed before and after the value
+        QByteArray value;
+        do {
+            i = lf.indexIn(header, j);
+            if (i == -1)
+                break;
+            if (!value.isEmpty())
+                value += ' ';
+            // check if we have CRLF or only LF
+            bool hasCR = (i && header[i-1] == '\r');
+            int length = i -(hasCR ? 1: 0) - j;
+            value += header.mid(j, length).trimmed();
+            j = ++i;
+        } while (i < header.count() && (header.at(i) == ' ' || header.at(i) == '\t'));
+        if (i == -1)
+            break; // something is wrong
+
+        m_fields.append(qMakePair(field, value));
+    }
 }
 
 QByteArray SipPacket::headerField(const QByteArray &name, const QByteArray &defaultValue) const

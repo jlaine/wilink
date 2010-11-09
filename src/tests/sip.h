@@ -7,11 +7,13 @@ class SipPacket
 {
 public:
     SipPacket(const QByteArray &method, const QByteArray &uri);
-    QByteArray toByteArray() const;
+    SipPacket(const QByteArray &bytes);
 
     QByteArray headerField(const QByteArray &name, const QByteArray &defaultValue = QByteArray()) const;
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
     void setHeaderField(const QByteArray &name, const QByteArray &data);
+
+    QByteArray toByteArray() const;
 
 private:
     QByteArray m_method;
