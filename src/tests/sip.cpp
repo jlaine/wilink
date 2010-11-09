@@ -49,7 +49,7 @@ void SipClient::connectToServer(const QString &server, quint16 port)
         QString::number(d->socket->localPort()),
         branch);
 
-    SipPacket packet("REGISTER", "sip:sip.wifirst.net");
+    SipRequest packet("REGISTER", "sip:sip.wifirst.net");
     packet.setHeaderField("Via", via.toLatin1());
     packet.setHeaderField("Max-Forwards", "70");
     packet.setHeaderField("To", addr.toLatin1());
@@ -72,17 +72,17 @@ void SipClient::datagramReceived()
     quint16 remotePort;
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
-    SipPacket reply(buffer);
+    SipReply reply(buffer);
     qDebug() << "repl" << reply.headerField("Via");
 }
 
-SipPacket::SipPacket(const QByteArray &method, const QByteArray &uri)
+SipRequest::SipRequest(const QByteArray &method, const QByteArray &uri)
     : m_method(method),
     m_uri(uri)
 {
 }
 
-SipPacket::SipPacket(const QByteArray &bytes)
+SipReply::SipReply(const QByteArray &bytes)
 {
     // parse status
     const QByteArrayMatcher lf("\n");
@@ -164,7 +164,7 @@ void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
     m_fields.append(qMakePair(name, data));
 }
 
-QByteArray SipPacket::toByteArray() const
+QByteArray SipRequest::toByteArray() const
 {
     QByteArray ba;
     ba += m_method;
