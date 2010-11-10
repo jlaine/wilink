@@ -17,8 +17,8 @@ target_link_libraries(tests qnetio qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST
 add_executable(codec codec.cpp)
 target_link_libraries(codec qxmpp ${QT_LIBRARIES})
 
-qt4_wrap_cpp(sip_MOC_SOURCES sip.h)
-add_executable(sip sip.cpp ${sip_MOC_SOURCES})
+qt4_wrap_cpp(sip_MOC_SOURCES rtp.h sip.h)
+add_executable(sip rtp.cpp sip.cpp ${sip_MOC_SOURCES})
 target_link_libraries(sip qxmpp ${QT_LIBRARIES})
 
 add_executable(stun stun.cpp)

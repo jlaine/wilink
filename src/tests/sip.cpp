@@ -8,6 +8,7 @@
 #include "QXmppSaslAuth.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
+#include "rtp.h"
 #include "sip.h"
 
 const int RTP_COMPONENT = 1;
@@ -236,6 +237,8 @@ void SipClient::datagramReceived()
         request.setHeaderField("From", reply.headerField("From"));
         request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
         request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
+        if (!reply.headerField("Record-Route").isEmpty())
+            request.setHeaderField("Route", reply.headerField("Record-Route"));
         if (!d->lastRequest.headerField("Proxy-Authorization").isEmpty())
             request.setHeaderField("Proxy-Authorization", d->lastRequest.headerField("Proxy-Authorization"));
         if (!d->lastRequest.headerField("Authorization").isEmpty())
@@ -407,6 +410,8 @@ SipReply::SipReply(const QByteArray &bytes)
             field = "Content-Type";
         else if (field == "i")
             field = "Call-ID";
+        else if (field == "k")
+            field = "Supported";
         else if (field == "l")
             field = "Content-Length";
         else if (field == "t")
