@@ -1,9 +1,11 @@
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
+#include <QCryptographicHash>
 #include <QDebug>
 #include <QHostInfo>
 #include <QUdpSocket>
 
+#include "QXmppSaslAuth.h"
 #include "QXmppUtils.h"
 #include "sip.h"
 
@@ -15,29 +17,72 @@ public:
     QUdpSocket *socket;
     QByteArray callId;
     int cseq;
+    QByteArray tag;
+
+    // configuration
+    QString displayName;
+    QString username;
+    QString password;
+    QString domain;
+
     QHostAddress serverAddress;
+    QString serverName;
     quint16 serverPort;
+    QMap<QByteArray, QByteArray> saslChallenge;
 };
 
 void SipClientPrivate::sendRegister()
 {
     const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
-    const QString addr = QString("\"%1\"<%2>").arg(
-        QLatin1String("Foo Bar"), QLatin1String("foo.bar@wifirst.net"));
+    const QString addr = QString("\"%1\"<sip:%2@%3>").arg(displayName,
+        username, domain);
     const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
         socket->localAddress().toString(),
         QString::number(socket->localPort()),
         branch);
 
-    SipRequest packet("REGISTER", "sip:sip.wifirst.net");
+    const QByteArray uri = QString("sip:%1").arg(serverName).toUtf8();
+    SipRequest packet("REGISTER", uri);
     packet.setHeaderField("Via", via.toLatin1());
     packet.setHeaderField("Max-Forwards", "70");
-    packet.setHeaderField("To", addr.toLatin1());
-    packet.setHeaderField("From", addr.toLatin1() + ";tag=123456");
+    packet.setHeaderField("Contact", QString("<sip:%1@%2:%3;rinstance=%4>").arg(
+        username, socket->localAddress().toString(),
+        QString::number(socket->localPort()), "changeme").toUtf8());
+    packet.setHeaderField("To", addr.toUtf8());
+    packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
     packet.setHeaderField("Call-ID", callId);
     packet.setHeaderField("CSeq", QString("%1 REGISTER").arg(QString::number(cseq++)).toLatin1());
     packet.setHeaderField("Expires", "3600");
-    packet.setHeaderField("User-Agent", "wiLink/1.0.0");
+    packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
+
+    if (!saslChallenge.isEmpty())
+    {
+        const QByteArray cnonce = "65a59b1a9f43e3b813505afceac07246";
+        const QByteArray nc = "00000001";
+        const QByteArray qop = "auth";
+        const QByteArray nonce = saslChallenge.value("nonce");
+        const QByteArray realm = saslChallenge.value("realm");
+        const QByteArray usernameBa = username.toUtf8();
+        const QByteArray passwordBa = password.toUtf8();
+
+        const QByteArray A1 = usernameBa + ':' + realm + ':' + passwordBa;
+        const QByteArray A2 = packet.method() + ':' + packet.uri();
+        QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
+        QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
+        QByteArray KD = HA1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + HA2;
+
+        QMap<QByteArray, QByteArray> response;
+        response["username"] = usernameBa;
+        response["realm"] = realm;
+        response["nonce"] = nonce;
+        response["uri"] = uri;
+        response["response"] = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+        response["cnonce"] = cnonce;
+        response["qop"] = qop;
+        response["nc"] = nc;
+        response["algorithm"] = "MD5";
+        packet.setHeaderField("Authorization", "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
+    }
     socket->writeDatagram(packet.toByteArray(), serverAddress, serverPort);
 }
 
@@ -61,12 +106,17 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     if (info.addresses().isEmpty())
         return;
     d->callId = generateStanzaHash().toLatin1();
+    d->tag = generateStanzaHash(8).toLatin1();
     d->cseq = 1;
     d->serverAddress = info.addresses().first();
+    d->serverName = server;
     d->serverPort = port;
+    d->domain = "wifirst.net";
+    d->displayName = "Foo Bar";
+    d->username = "foo";
+    d->password = "bar";
 
     d->socket->bind();
-
     d->sendRegister();
 }
 
@@ -82,10 +132,18 @@ void SipClient::datagramReceived()
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
     SipReply reply(buffer);
-    if (reply.statusCode() == 401 && !reply.headerField("WWW-Authenticate").isEmpty())
+    if (reply.statusCode() == 401 && reply.headerField("WWW-Authenticate").startsWith("Digest "))
     {
-        QByteArray auth = reply.headerField("WWW-Authenticate");
-        qDebug() << "auth required";
+        const QByteArray saslData = reply.headerField("WWW-Authenticate").mid(7);
+        d->saslChallenge = QXmppSaslDigestMd5::parseMessage(saslData);
+
+        if (!d->saslChallenge.contains("nonce"))
+        {
+            qWarning("Did not receive a nonce");
+            //disconnectFromHost();
+            return;
+        }
+        d->sendRegister();
     }
 }
 
@@ -93,6 +151,37 @@ SipRequest::SipRequest(const QByteArray &method, const QByteArray &uri)
     : m_method(method),
     m_uri(uri)
 {
+}
+
+QByteArray SipRequest::method() const
+{
+    return m_method;
+}
+
+QByteArray SipRequest::uri() const
+{
+    return m_uri;
+}
+
+QByteArray SipRequest::toByteArray() const
+{
+    QByteArray ba;
+    ba += m_method;
+    ba += ' ';
+    ba += m_uri;
+    ba += " SIP/2.0\r\n";
+
+    QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
+                                                        end = m_fields.constEnd();
+    for ( ; it != end; ++it) {
+        ba += it->first;
+        ba += ": ";
+        ba += it->second;
+        ba += "\r\n";
+    }
+    ba += "Content-Length: 0\r\n";
+    ba += "\r\n";
+    return ba;
 }
 
 SipReply::SipReply(const QByteArray &bytes)
@@ -192,29 +281,11 @@ void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
     m_fields.append(qMakePair(name, data));
 }
 
-QByteArray SipRequest::toByteArray() const
-{
-    QByteArray ba;
-    ba += m_method;
-    ba += ' ';
-    ba += m_uri;
-    ba += " SIP/2.0\r\n";
-
-    for (int i = 0; i < m_fields.size(); ++i) {
-        ba += m_fields[i].first;
-        ba += ": ";
-        ba += m_fields[i].second;
-        ba += "\r\n";
-    }
-    ba += "Content-Length: 0\r\n";
-    ba += "\r\n";
-    return ba;
-}
-
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
-
+    app.setApplicationName("wiLink");
+    app.setApplicationVersion("1.0.0");
     SipClient client;
     client.connectToServer("sip.wifirst.net", 5060);
 
