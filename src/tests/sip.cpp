@@ -9,6 +9,25 @@
 #include "QXmppUtils.h"
 #include "sip.h"
 
+void SdpMessage::addField(char name, const QByteArray &data)
+{
+    m_fields.append(qMakePair(name, data));
+}
+
+QByteArray SdpMessage::toByteArray() const
+{
+    QByteArray ba;
+    QList<QPair<char, QByteArray> >::ConstIterator it = m_fields.constBegin(),
+                                                        end = m_fields.constEnd();
+    for ( ; it != end; ++it) {
+        ba += it->first;
+        ba += "=";
+        ba += it->second;
+        ba += "\r\n";
+    }
+    return ba;
+}
+
 class SipClientPrivate
 {
 public:
@@ -128,8 +147,23 @@ void SipClient::datagramReceived()
         qWarning("No CSeq found in reply");
         return;
     }
+    int commandSeq = cseq.left(i-1).toInt();
     QByteArray command = cseq.mid(i+1);
     qDebug() << "command" << command;
+
+    // send ack
+    if (command == "INVITE" && reply.statusCode() >= 200) {
+        SipRequest request;
+        request.setMethod("ACK");
+        request.setUri(d->lastRequest.uri());
+        request.setHeaderField("Via", d->lastRequest.headerField("Via"));
+        request.setHeaderField("Max-Forwards", d->lastRequest.headerField("Max-Forwards"));
+        request.setHeaderField("To", reply.headerField("From"));
+        request.setHeaderField("From", d->lastRequest.headerField("From"));
+        request.setHeaderField("Call-Id", d->lastRequest.headerField("Call-Id"));
+        request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
+        d->socket->writeDatagram(request.toByteArray(), d->serverAddress, d->serverPort);
+    }
 
     // handle authentication
     if (reply.statusCode() == 401 || reply.statusCode() == 407) {
@@ -173,20 +207,28 @@ void SipClient::datagramReceived()
         return;
     }
 
-    if (command == "REGISTER") {
-        if (reply.statusCode() == 200) {
-            const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-            SipRequest request = d->buildRequest("SUBSCRIBE", uri);
-            request.setHeaderField("Expires", "3600");
-            d->sendRequest(request);
-        }
+    if (command == "REGISTER" && reply.statusCode() == 200) {
+        const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
+        SipRequest request = d->buildRequest("SUBSCRIBE", uri);
+        request.setHeaderField("Expires", "3600");
+        d->sendRequest(request);
     }
-    else if (command == "SUBSCRIBE") {
+    else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
         const QByteArray recipient = QString("sip:%1@%2").arg(d->phoneNumber, d->serverName).toUtf8();
+
+        SdpMessage sdp;
+        sdp.addField('v', "0");
+        sdp.addField('o', "- 1289387706660194 1 IN IP4 192.168.95.75");
+        sdp.addField('s', qApp->applicationName().toUtf8());
+        sdp.addField('c', "IN IP4 82.127.0.79");
+        sdp.addField('t', "0 0");
+        sdp.addField('m', "audio 59144 RTP/AVP 0 8 101");
+        sdp.addField('a', "rtpmap:101 telephone-event/8000");
+
         SipRequest request = d->buildRequest("INVITE", recipient);
         request.setHeaderField("To", "<" + recipient + ">");
         request.setHeaderField("Content-Type", "application/sdp");
-        request.setBody("v=0\r\n");
+        request.setBody(sdp.toByteArray());
         d->sendRequest(request);
     }
 }
@@ -234,7 +276,15 @@ QByteArray SipRequest::toByteArray() const
     ba += ' ';
     ba += m_uri;
     ba += " SIP/2.0\r\n";
-    ba += SipPacket::toByteArray();
+
+    QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
+                                                        end = m_fields.constEnd();
+    for ( ; it != end; ++it) {
+        ba += it->first;
+        ba += ": ";
+        ba += it->second;
+        ba += "\r\n";
+    }
     ba += "\r\n";
     return ba + m_body;
 }
@@ -334,20 +384,6 @@ void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
             ++it;
     }
     m_fields.append(qMakePair(name, data));
-}
-
-QByteArray SipPacket::toByteArray() const
-{
-    QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
-                                                        end = m_fields.constEnd();
-    QByteArray ba;
-    for ( ; it != end; ++it) {
-        ba += it->first;
-        ba += ": ";
-        ba += it->second;
-        ba += "\r\n";
-    }
-    return ba;
 }
 
 int main(int argc, char* argv[])

@@ -3,14 +3,22 @@
 
 class SipClientPrivate;
 
+class SdpMessage
+{
+public:
+    void addField(char name, const QByteArray &data);
+    QByteArray toByteArray() const;
+
+private:
+    QList<QPair<char, QByteArray> > m_fields;
+};
+
 class SipPacket
 {
 public:
     QByteArray headerField(const QByteArray &name, const QByteArray &defaultValue = QByteArray()) const;
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
     void setHeaderField(const QByteArray &name, const QByteArray &data);
-
-    QByteArray toByteArray() const;
 
 protected:
     QList<QPair<QByteArray, QByteArray> > m_fields;
