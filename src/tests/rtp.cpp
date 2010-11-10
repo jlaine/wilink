@@ -7,6 +7,22 @@
 const quint8 RTP_VERSION = 0x02;
 #define SAMPLE_BYTES 2
 
+RtpChannel::RtpChannel(QObject *parent)
+    : QIODevice(parent),
+    m_signalsEmitted(false),
+    m_writtenSinceLastEmit(0),
+    m_codec(0),
+    m_incomingBuffering(true),
+    m_incomingMinimum(0),
+    m_incomingMaximum(0),
+    m_incomingSequence(0),
+    m_incomingStamp(0),
+    m_outgoingMarker(true),
+    m_outgoingSequence(0),
+    m_outgoingStamp(0)
+{
+}
+
 qint64 RtpChannel::readData(char * data, qint64 maxSize)
 {
     // if we are filling the buffer, return empty samples
