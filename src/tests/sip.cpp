@@ -57,7 +57,7 @@ class SipCall
 {
 public:
     QByteArray id;
-    QXmppIceConnection *iceConnection;
+    QUdpSocket *socket;
 };
 
 class SipClientPrivate
@@ -144,22 +144,24 @@ void SipClient::call(const QString &recipient)
     SipCall call;
     call.id = generateStanzaHash().toLatin1();
 
-    call.iceConnection = new QXmppIceConnection(true, this);
-    call.iceConnection->addComponent(RTP_COMPONENT);
-    call.iceConnection->addComponent(RTCP_COMPONENT);
+    call.socket = new QUdpSocket(this);
+    call.socket->bind(d->socket->localAddress(), 0);
 
     SdpMessage sdp;
     sdp.addField('v', "0");
     sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
     sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 82.127.0.79");
+    sdp.addField('c', "IN IP4 " + call.socket->localAddress().toString().toUtf8());
     sdp.addField('t', "0 0");
+#ifdef USE_ICE
     sdp.addField('a', "ice-ufrag:" + call.iceConnection->localUser().toUtf8());
     sdp.addField('a', "ice-pwd:" + call.iceConnection->localPassword().toUtf8());
-    sdp.addField('m', "audio 59144 RTP/AVP 0 8 101");
+#endif
+    sdp.addField('m', "audio " + QByteArray::number(call.socket->localPort()) + " RTP/AVP 0 8 101");
     sdp.addField('a', "rtpmap:101 telephone-event/8000");
     sdp.addField('a', "fmtp:101 0-15");
     sdp.addField('a', "sendrecv");
+#ifdef USE_ICE
     foreach (const QXmppJingleCandidate &candidate, call.iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
         ba += QByteArray::number(candidate.component()) + " ";
@@ -170,6 +172,7 @@ void SipClient::call(const QString &recipient)
         ba += "typ host";
         sdp.addField('a', ba);
     }
+#endif
 
     SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call.id);
     request.setHeaderField("To", "<" + recipient.toUtf8() + ">");
@@ -189,7 +192,7 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     d->serverName = server;
     d->serverPort = port;
 
-    d->socket->bind();
+    d->socket->bind(QHostAddress("192.168.95.75"), 0);
 
     // register
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
@@ -233,6 +236,10 @@ void SipClient::datagramReceived()
         request.setHeaderField("From", d->lastRequest.headerField("From"));
         request.setHeaderField("Call-Id", d->lastRequest.headerField("Call-Id"));
         request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
+        if (!d->lastRequest.headerField("Proxy-Authorization").isEmpty())
+            request.setHeaderField("Proxy-Authorization", d->lastRequest.headerField("Proxy-Authorization"));
+        if (!d->lastRequest.headerField("Authorization").isEmpty())
+            request.setHeaderField("Authorization", d->lastRequest.headerField("Authorization"));
         d->socket->writeDatagram(request.toByteArray(), d->serverAddress, d->serverPort);
     }
 
