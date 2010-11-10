@@ -6,8 +6,12 @@
 #include <QUdpSocket>
 
 #include "QXmppSaslAuth.h"
+#include "QXmppStun.h"
 #include "QXmppUtils.h"
 #include "sip.h"
+
+const int RTP_COMPONENT = 1;
+const int RTCP_COMPONENT = 2;
 
 void SdpMessage::addField(char name, const QByteArray &data)
 {
@@ -28,14 +32,21 @@ QByteArray SdpMessage::toByteArray() const
     return ba;
 }
 
+class SipCall
+{
+public:
+    QByteArray id;
+    QXmppIceConnection *iceConnection;
+};
+
 class SipClientPrivate
 {
 public:
-    SipRequest buildRequest(const QByteArray &method, const QByteArray &uri);
+    SipRequest buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id);
     void sendRequest(const SipRequest &request);
 
     QUdpSocket *socket;
-    QByteArray callId;
+    QByteArray baseId;
     int cseq;
     QByteArray tag;
 
@@ -52,7 +63,7 @@ public:
     SipRequest lastRequest;
 };
 
-SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri)
+SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId)
 {
     const QString addr = QString("\"%1\"<sip:%2@%3>").arg(displayName,
         username, domain);
@@ -107,12 +118,51 @@ SipClient::~SipClient()
     delete d;
 }
 
+void SipClient::call(const QString &recipient)
+{
+    SipCall call;
+    call.id = generateStanzaHash().toLatin1();
+
+    call.iceConnection = new QXmppIceConnection(true, this);
+    call.iceConnection->addComponent(RTP_COMPONENT);
+    call.iceConnection->addComponent(RTCP_COMPONENT);
+
+    SdpMessage sdp;
+    sdp.addField('v', "0");
+    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
+    sdp.addField('s', qApp->applicationName().toUtf8());
+    sdp.addField('c', "IN IP4 82.127.0.79");
+    sdp.addField('t', "0 0");
+    sdp.addField('a', "ice-ufrag:" + call.iceConnection->localUser().toUtf8());
+    sdp.addField('a', "ice-pwd:" + call.iceConnection->localPassword().toUtf8());
+    sdp.addField('m', "audio 59144 RTP/AVP 0 8 101");
+    sdp.addField('a', "rtpmap:101 telephone-event/8000");
+    sdp.addField('a', "fmtp:101 0-15");
+    sdp.addField('a', "sendrecv");
+    foreach (const QXmppJingleCandidate &candidate, call.iceConnection->localCandidates()) {
+        QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
+        ba += QByteArray::number(candidate.component()) + " ";
+        ba += "UDP ";
+        ba += QByteArray::number(candidate.priority()) + " ";
+        ba += candidate.host().toString().toUtf8() + " ";
+        ba += QByteArray::number(candidate.port()) + " ";
+        ba += "typ host";
+        sdp.addField('a', ba);
+    }
+
+    SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call.id);
+    request.setHeaderField("To", "<" + recipient.toUtf8() + ">");
+    request.setHeaderField("Content-Type", "application/sdp");
+    request.setBody(sdp.toByteArray());
+    d->sendRequest(request);
+}
+
 void SipClient::connectToServer(const QString &server, quint16 port)
 {
     QHostInfo info = QHostInfo::fromName(server);
     if (info.addresses().isEmpty())
         return;
-    d->callId = generateStanzaHash().toLatin1();
+    d->baseId = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
     d->serverAddress = info.addresses().first();
     d->serverName = server;
@@ -122,7 +172,7 @@ void SipClient::connectToServer(const QString &server, quint16 port)
 
     // register
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
-    SipRequest request = d->buildRequest("REGISTER", uri);
+    SipRequest request = d->buildRequest("REGISTER", uri, d->baseId);
     request.setHeaderField("Expires", "3600");
     d->sendRequest(request);
 }
@@ -207,31 +257,17 @@ void SipClient::datagramReceived()
         return;
     }
 
-    if (command == "REGISTER" && reply.statusCode() == 200) {
-        const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-        SipRequest request = d->buildRequest("SUBSCRIBE", uri);
-        request.setHeaderField("Expires", "3600");
-        d->sendRequest(request);
-    }
-    else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
-        const QByteArray recipient = QString("sip:%1@%2").arg(d->phoneNumber, d->serverName).toUtf8();
-
-        SdpMessage sdp;
-        sdp.addField('v', "0");
-        sdp.addField('o', "- 1289387706660194 1 IN IP4 192.168.95.75");
-        sdp.addField('s', qApp->applicationName().toUtf8());
-        sdp.addField('c', "IN IP4 82.127.0.79");
-        sdp.addField('t', "0 0");
-        sdp.addField('m', "audio 59144 RTP/AVP 0 8 101");
-        sdp.addField('a', "rtpmap:101 telephone-event/8000");
-        sdp.addField('a', "fmtp:101 0-15");
-        sdp.addField('a', "sendrecv");
-
-        SipRequest request = d->buildRequest("INVITE", recipient);
-        request.setHeaderField("To", "<" + recipient + ">");
-        request.setHeaderField("Content-Type", "application/sdp");
-        request.setBody(sdp.toByteArray());
-        d->sendRequest(request);
+    if (reply.headerField("Call-ID") == d->baseId) {
+        if (command == "REGISTER" && reply.statusCode() == 200) {
+            const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
+            SipRequest request = d->buildRequest("SUBSCRIBE", uri, d->baseId);
+            request.setHeaderField("Expires", "3600");
+            d->sendRequest(request);
+        }
+        else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
+            const QString recipient = QString("sip:%1@%2").arg(d->phoneNumber, d->serverName);
+            call(recipient);
+        }
     }
 }
 

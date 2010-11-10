@@ -65,6 +65,7 @@ public:
     SipClient(QObject *parent = 0);
     ~SipClient();
 
+    void call(const QString &recipient);
     void connectToServer(const QString &server, quint16 port);
 
 private slots:
