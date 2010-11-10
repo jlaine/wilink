@@ -31,6 +31,7 @@ public:
     QHostAddress serverAddress;
     QString serverName;
     quint16 serverPort;
+    SipRequest lastRequest;
     QMap<QByteArray, QByteArray> saslChallenge;
 };
 
@@ -44,7 +45,9 @@ SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
         QString::number(socket->localPort()),
         branch);
 
-    SipRequest packet(method, uri);
+    SipRequest packet;
+    packet.setMethod(method);
+    packet.setUri(uri);
     packet.setHeaderField("Via", via.toLatin1());
     packet.setHeaderField("Max-Forwards", "70");
     packet.setHeaderField("Call-ID", callId);
@@ -96,6 +99,7 @@ void SipClientPrivate::sendRegister()
 
 void SipClientPrivate::sendRequest(const SipRequest &request)
 {
+    lastRequest = request;
     socket->writeDatagram(request.toByteArray(), serverAddress, serverPort);
 }
 
@@ -192,9 +196,7 @@ void SipClient::datagramReceived()
     }
 }
 
-SipRequest::SipRequest(const QByteArray &method, const QByteArray &uri)
-    : m_method(method),
-    m_uri(uri)
+SipRequest::SipRequest()
 {
     setHeaderField("Content-Length", "0");
 }
@@ -215,9 +217,19 @@ QByteArray SipRequest::method() const
     return m_method;
 }
 
+void SipRequest::setMethod(const QByteArray &method)
+{
+    m_method = method;
+}
+
 QByteArray SipRequest::uri() const
 {
     return m_uri;
+}
+
+void SipRequest::setUri(const QByteArray &uri)
+{
+    m_uri = uri;
 }
 
 QByteArray SipRequest::toByteArray() const

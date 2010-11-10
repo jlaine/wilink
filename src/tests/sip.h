@@ -19,13 +19,16 @@ protected:
 class SipRequest : public SipPacket
 {
 public:
-    SipRequest(const QByteArray &method, const QByteArray &uri);
+    SipRequest();
 
     QByteArray body() const;
     void setBody(const QByteArray &body);
 
     QByteArray method() const;
+    void setMethod(const QByteArray &method);
+
     QByteArray uri() const;
+    void setUri(const QByteArray &method);
 
     QByteArray toByteArray() const;
 
