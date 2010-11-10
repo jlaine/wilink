@@ -224,6 +224,8 @@ void SipClient::datagramReceived()
         sdp.addField('t', "0 0");
         sdp.addField('m', "audio 59144 RTP/AVP 0 8 101");
         sdp.addField('a', "rtpmap:101 telephone-event/8000");
+        sdp.addField('a', "fmtp:101 0-15");
+        sdp.addField('a', "sendrecv");
 
         SipRequest request = d->buildRequest("INVITE", recipient);
         request.setHeaderField("To", "<" + recipient + ">");
