@@ -221,9 +221,9 @@ void SipClient::datagramReceived()
         qWarning("No CSeq found in reply");
         return;
     }
-    int commandSeq = cseq.left(i-1).toInt();
+    int commandSeq = cseq.left(i).toInt();
     QByteArray command = cseq.mid(i+1);
-    qDebug() << "command" << command;
+    qDebug() << "command" << command << commandSeq;
 
     // send ack
     if (command == "INVITE" && reply.statusCode() >= 200) {
@@ -232,9 +232,9 @@ void SipClient::datagramReceived()
         request.setUri(d->lastRequest.uri());
         request.setHeaderField("Via", d->lastRequest.headerField("Via"));
         request.setHeaderField("Max-Forwards", d->lastRequest.headerField("Max-Forwards"));
-        request.setHeaderField("To", reply.headerField("From"));
-        request.setHeaderField("From", d->lastRequest.headerField("From"));
-        request.setHeaderField("Call-Id", d->lastRequest.headerField("Call-Id"));
+        request.setHeaderField("To", reply.headerField("To"));
+        request.setHeaderField("From", reply.headerField("From"));
+        request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
         request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
         if (!d->lastRequest.headerField("Proxy-Authorization").isEmpty())
             request.setHeaderField("Proxy-Authorization", d->lastRequest.headerField("Proxy-Authorization"));
@@ -383,7 +383,7 @@ SipReply::SipReply(const QByteArray &bytes)
         int j = colon.indexIn(header, i); // field-name
         if (j == -1)
             break;
-        const QByteArray field = header.mid(i, j - i).trimmed();
+        QByteArray field = header.mid(i, j - i).trimmed();
         j++;
         // any number of LWS is allowed before and after the value
         QByteArray value;
@@ -402,6 +402,17 @@ SipReply::SipReply(const QByteArray &bytes)
         if (i == -1)
             break; // something is wrong
 
+        // expand shortcuts
+        if (field == "c")
+            field = "Content-Type";
+        else if (field == "i")
+            field = "Call-ID";
+        else if (field == "l")
+            field = "Content-Length";
+        else if (field == "t")
+            field = "To";
+        else if (field == "v")
+            field = "Via";
         m_fields.append(qMakePair(field, value));
     }
 }
