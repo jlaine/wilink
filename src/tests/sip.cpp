@@ -59,6 +59,7 @@ class SipCall
 public:
     QByteArray id;
     QUdpSocket *socket;
+    RtpChannel *channel;
 };
 
 class SipClientPrivate
@@ -145,6 +146,7 @@ void SipClient::call(const QString &recipient)
     SipCall call;
     call.id = generateStanzaHash().toLatin1();
 
+    call.channel = new RtpChannel(this);
     call.socket = new QUdpSocket(this);
     call.socket->bind(d->socket->localAddress(), 0);
 
