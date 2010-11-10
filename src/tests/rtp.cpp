@@ -45,7 +45,7 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
         QDataStream stream(&header, QIODevice::WriteOnly);
         quint8 version = RTP_VERSION << 6;
         stream << version;
-        quint8 type = m_payloadType.id();
+        quint8 type = m_payloadId;
         if (m_outgoingMarker)
         {
             type |= 0x80;
@@ -62,9 +62,12 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
         input.setByteOrder(QDataStream::LittleEndian);
         m_outgoingStamp += m_codec->encode(input, stream);
 
+        // FIXME: write data
+#if 0
         if (m_connection->writeDatagram(RTP_COMPONENT, header) < 0)
             emit logMessage(QXmppLogger::WarningMessage,
                 QLatin1String("QXmppCall:writeData could not send audio data"));
+#endif
 #ifdef QXMPP_DEBUG_RTP
         else
             emit logMessage(QXmppLogger::SentMessage,

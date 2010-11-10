@@ -28,6 +28,7 @@ private:
 
     // RTP
     QXmppCodec *m_codec;
+    quint8 m_payloadId;
 
     QByteArray m_incomingBuffer;
     bool m_incomingBuffering;
