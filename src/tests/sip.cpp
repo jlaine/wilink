@@ -11,6 +11,7 @@
 class SipClientPrivate
 {
 public:
+    SipRequest buildRequest(const QByteArray &method, const QByteArray &uri);
     void sendRegister();
 
     QUdpSocket *socket;
@@ -30,29 +31,36 @@ public:
     QMap<QByteArray, QByteArray> saslChallenge;
 };
 
-void SipClientPrivate::sendRegister()
+SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri)
 {
     const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
-    const QString addr = QString("\"%1\"<sip:%2@%3>").arg(displayName,
-        username, domain);
     const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
         socket->localAddress().toString(),
         QString::number(socket->localPort()),
         branch);
 
-    const QByteArray uri = QString("sip:%1").arg(serverName).toUtf8();
-    SipRequest packet("REGISTER", uri);
+    SipRequest packet(method, uri);
     packet.setHeaderField("Via", via.toLatin1());
     packet.setHeaderField("Max-Forwards", "70");
+    packet.setHeaderField("Call-ID", callId);
+    packet.setHeaderField("CSeq", QString::number(cseq++).toLatin1() + ' ' + method);
     packet.setHeaderField("Contact", QString("<sip:%1@%2:%3;rinstance=%4>").arg(
         username, socket->localAddress().toString(),
         QString::number(socket->localPort()), "changeme").toUtf8());
+    packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
+    return packet;
+}
+
+void SipClientPrivate::sendRegister()
+{
+    const QString addr = QString("\"%1\"<sip:%2@%3>").arg(displayName,
+        username, domain);
+
+    const QByteArray uri = QString("sip:%1").arg(serverName).toUtf8();
+    SipRequest packet = buildRequest("REGISTER", uri);
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
-    packet.setHeaderField("Call-ID", callId);
-    packet.setHeaderField("CSeq", QString("%1 REGISTER").arg(QString::number(cseq++)).toLatin1());
     packet.setHeaderField("Expires", "3600");
-    packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
 
     if (!saslChallenge.isEmpty())
     {
