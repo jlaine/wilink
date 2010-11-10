@@ -10,6 +10,8 @@ public:
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
     void setHeaderField(const QByteArray &name, const QByteArray &data);
 
+    QByteArray toByteArray() const;
+
 protected:
     QList<QPair<QByteArray, QByteArray> > m_fields;
 };
@@ -18,11 +20,17 @@ class SipRequest : public SipPacket
 {
 public:
     SipRequest(const QByteArray &method, const QByteArray &uri);
+
+    QByteArray body() const;
+    void setBody(const QByteArray &body);
+
     QByteArray method() const;
     QByteArray uri() const;
+
     QByteArray toByteArray() const;
 
 private:
+    QByteArray m_body;
     QByteArray m_method;
     QByteArray m_uri;
 };
