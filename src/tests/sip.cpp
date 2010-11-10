@@ -13,7 +13,6 @@ class SipClientPrivate
 {
 public:
     SipRequest buildRequest(const QByteArray &method, const QByteArray &uri);
-    void sendRegister();
     void sendRequest(const SipRequest &request);
 
     QUdpSocket *socket;
@@ -32,7 +31,6 @@ public:
     QString serverName;
     quint16 serverPort;
     SipRequest lastRequest;
-    QMap<QByteArray, QByteArray> saslChallenge;
 };
 
 SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri)
@@ -60,41 +58,6 @@ SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO");
     packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return packet;
-}
-
-void SipClientPrivate::sendRegister()
-{
-    const QByteArray uri = QString("sip:%1").arg(serverName).toUtf8();
-    SipRequest packet = buildRequest("REGISTER", uri);
-    packet.setHeaderField("Expires", "3600");
-
-    if (!saslChallenge.isEmpty())
-    {
-        QXmppSaslDigestMd5 digest;
-        digest.setCnonce(digest.generateNonce());
-        digest.setNc("00000001");
-        digest.setNonce(saslChallenge.value("nonce"));
-        digest.setQop(saslChallenge.value("qop"));
-        digest.setRealm(saslChallenge.value("realm"));
-        digest.setUsername(username.toUtf8());
-        digest.setPassword(password.toUtf8());
-
-        const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + password.toUtf8();
-        const QByteArray A2 = packet.method() + ':' + packet.uri();
-
-        QMap<QByteArray, QByteArray> response;
-        response["username"] = digest.username();
-        response["realm"] = digest.realm();
-        response["nonce"] = digest.nonce();
-        response["uri"] = uri;
-        response["response"] = digest.calculateDigest(A1, A2);
-        response["cnonce"] = digest.cnonce();
-        response["qop"] = digest.qop();
-        response["nc"] = digest.nc();
-        response["algorithm"] = "MD5";
-        packet.setHeaderField("Authorization", "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
-    }
-    sendRequest(packet);
 }
 
 void SipClientPrivate::sendRequest(const SipRequest &request)
@@ -137,7 +100,12 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     d->serverPort = port;
 
     d->socket->bind();
-    d->sendRegister();
+
+    // register
+    const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
+    SipRequest request = d->buildRequest("REGISTER", uri);
+    request.setHeaderField("Expires", "3600");
+    d->sendRequest(request);
 }
 
 void SipClient::datagramReceived()
@@ -163,27 +131,54 @@ void SipClient::datagramReceived()
     QByteArray command = cseq.mid(i+1);
     qDebug() << "command" << command;
 
-    // handle reply
+    // handle authentication
+    if (reply.statusCode() == 401 || reply.statusCode() == 407) {
+        SipRequest request = d->lastRequest;
+        request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
+
+        const QByteArray auth = reply.headerField(reply.statusCode() == 407 ? "Proxy-Authenticate" : "WWW-Authenticate");
+        if (!auth.startsWith("Digest ")) {
+            qWarning("Unsupported authentication method");
+            return;
+        }
+
+        QMap<QByteArray, QByteArray> saslChallenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
+
+        QXmppSaslDigestMd5 digest;
+        digest.setCnonce(digest.generateNonce());
+        digest.setNc("00000001");
+        digest.setNonce(saslChallenge.value("nonce"));
+        digest.setQop(saslChallenge.value("qop"));
+        digest.setRealm(saslChallenge.value("realm"));
+        digest.setUsername(d->username.toUtf8());
+        digest.setPassword(d->password.toUtf8());
+
+        const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + d->password.toUtf8();
+        const QByteArray A2 = request.method() + ':' + request.uri();
+
+        QMap<QByteArray, QByteArray> response;
+        response["username"] = digest.username();
+        response["realm"] = digest.realm();
+        response["nonce"] = digest.nonce();
+        response["uri"] = request.uri();
+        response["response"] = digest.calculateDigest(A1, A2);
+        response["cnonce"] = digest.cnonce();
+        response["qop"] = digest.qop();
+        response["nc"] = digest.nc();
+        response["algorithm"] = "MD5";
+        request.setHeaderField(reply.statusCode() == 407 ? "Proxy-Authorization" : "Authorization",
+            "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
+
+        d->sendRequest(request);
+        return;
+    }
+
     if (command == "REGISTER") {
         if (reply.statusCode() == 200) {
             const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
             SipRequest request = d->buildRequest("SUBSCRIBE", uri);
             request.setHeaderField("Expires", "3600");
             d->sendRequest(request);
-        }
-        else if (reply.statusCode() == 401) {
-            const QByteArray auth = reply.headerField("WWW-Authenticate");
-            if (!auth.startsWith("Digest ")) {
-                qWarning("Unsupported authentication method");
-                return;
-            }
-
-            d->saslChallenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
-            if (!d->saslChallenge.contains("nonce")) {
-                qWarning("Did not receive a nonce");
-                return;
-            }
-            d->sendRegister();
         }
     }
     else if (command == "SUBSCRIBE") {
