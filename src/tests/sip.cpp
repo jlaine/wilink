@@ -13,6 +13,27 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
+SdpMessage::SdpMessage(const QByteArray &ba)
+{
+    const QByteArrayMatcher crlf("\r\n");
+
+    int i = 0;
+    while (i < ba.count() - 1) {
+        const char field = ba[i];
+        int j = i + 1;
+        if (ba[j] != '=')
+            break;
+        j++;
+
+        i = crlf.indexIn(ba, j);
+        if (i == -1)
+            break;
+
+        m_fields.append(qMakePair(field, ba.mid(j, i - j)));
+        i += 2;
+    }
+}
+
 void SdpMessage::addField(char name, const QByteArray &data)
 {
     m_fields.append(qMakePair(name, data));

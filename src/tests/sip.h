@@ -6,6 +6,7 @@ class SipClientPrivate;
 class SdpMessage
 {
 public:
+    SdpMessage(const QByteArray &ba = QByteArray());
     void addField(char name, const QByteArray &data);
     QByteArray toByteArray() const;
 
