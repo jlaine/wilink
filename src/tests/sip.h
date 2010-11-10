@@ -18,6 +18,8 @@ class SipRequest : public SipPacket
 {
 public:
     SipRequest(const QByteArray &method, const QByteArray &uri);
+    QByteArray method() const;
+    QByteArray uri() const;
     QByteArray toByteArray() const;
 
 private:
