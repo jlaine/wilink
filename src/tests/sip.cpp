@@ -1,6 +1,5 @@
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
-#include <QCryptographicHash>
 #include <QDebug>
 #include <QHostInfo>
 #include <QUdpSocket>
@@ -57,29 +56,27 @@ void SipClientPrivate::sendRegister()
 
     if (!saslChallenge.isEmpty())
     {
-        const QByteArray cnonce = "65a59b1a9f43e3b813505afceac07246";
-        const QByteArray nc = "00000001";
-        const QByteArray qop = "auth";
-        const QByteArray nonce = saslChallenge.value("nonce");
-        const QByteArray realm = saslChallenge.value("realm");
-        const QByteArray usernameBa = username.toUtf8();
-        const QByteArray passwordBa = password.toUtf8();
+        QXmppSaslDigestMd5 digest;
+        digest.setCnonce(digest.generateNonce());
+        digest.setNc("00000001");
+        digest.setNonce(saslChallenge.value("nonce"));
+        digest.setQop(saslChallenge.value("qop"));
+        digest.setRealm(saslChallenge.value("realm"));
+        digest.setUsername(username.toUtf8());
+        digest.setPassword(password.toUtf8());
 
-        const QByteArray A1 = usernameBa + ':' + realm + ':' + passwordBa;
+        const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + password.toUtf8();
         const QByteArray A2 = packet.method() + ':' + packet.uri();
-        QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
-        QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
-        QByteArray KD = HA1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + HA2;
 
         QMap<QByteArray, QByteArray> response;
-        response["username"] = usernameBa;
-        response["realm"] = realm;
-        response["nonce"] = nonce;
+        response["username"] = digest.username();
+        response["realm"] = digest.realm();
+        response["nonce"] = digest.nonce();
         response["uri"] = uri;
-        response["response"] = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
-        response["cnonce"] = cnonce;
-        response["qop"] = qop;
-        response["nc"] = nc;
+        response["response"] = digest.calculateDigest(A1, A2);
+        response["cnonce"] = digest.cnonce();
+        response["qop"] = digest.qop();
+        response["nc"] = digest.nc();
         response["algorithm"] = "MD5";
         packet.setHeaderField("Authorization", "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
     }
@@ -90,6 +87,7 @@ SipClient::SipClient(QObject *parent)
     : QObject(parent),
     d(new SipClientPrivate)
 {
+    d->cseq = 1;
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
@@ -107,7 +105,6 @@ void SipClient::connectToServer(const QString &server, quint16 port)
         return;
     d->callId = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
-    d->cseq = 1;
     d->serverAddress = info.addresses().first();
     d->serverName = server;
     d->serverPort = port;
