@@ -15,6 +15,9 @@ signals:
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
+private slots:
+    void datagramReceived(const QByteArray &buffer);
+
 protected:
     /// \cond
     qint64 readData(char * data, qint64 maxSize);
