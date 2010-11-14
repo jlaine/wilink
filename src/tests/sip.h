@@ -1,6 +1,9 @@
 #include <QObject>
 #include <QPair>
 
+class QUdpSocket;
+
+class SipCallPrivate;
 class SipClientPrivate;
 
 class SdpMessage
@@ -57,6 +60,26 @@ public:
 private:
     int m_statusCode;
     QString m_reasonPhrase;
+};
+
+class SipCall : public QObject
+{
+    Q_OBJECT
+
+public:
+    ~SipCall();
+
+    QByteArray id() const;
+
+private slots:
+    void readFromSocket();
+    void writeToSocket(const QByteArray &ba);
+
+private:
+    SipCall(QUdpSocket *socket, QObject *parent = 0);
+
+    SipCallPrivate * const d;
+    friend class SipClient;
 };
 
 class SipClient : public QObject

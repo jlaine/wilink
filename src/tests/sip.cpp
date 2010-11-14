@@ -65,22 +65,65 @@ QByteArray SdpMessage::toByteArray() const
     return ba;
 }
 
-class SipCall
+class SipCallPrivate
 {
 public:
-    SipCall();
-
     QByteArray id;
     RtpChannel *channel;
     QAudioInput *audioInput;
     QAudioOutput *audioOutput;
+    QHostAddress remoteHost;
+    quint16 remotePort;
+    QUdpSocket *socket;
 };
 
-SipCall::SipCall()
-    : channel(0),
-    audioInput(0),
-    audioOutput(0)
+SipCall::SipCall(QUdpSocket *socket, QObject *parent)
+    : QObject(parent),
+    d(new SipCallPrivate)
 {
+    d->id = generateStanzaHash().toLatin1();
+    d->channel = new RtpChannel(this);
+    d->audioInput = 0;
+    d->audioOutput = 0;
+    d->remotePort = 0;
+    d->socket = socket;
+    d->socket->setParent(this);
+
+    connect(d->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
+    connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
+               this, SLOT(writeToSocket(QByteArray)));
+
+    connect(d->socket, SIGNAL(readyRead()),
+               this, SLOT(readFromSocket()));
+}
+
+SipCall::~SipCall()
+{
+    delete d;
+}
+
+QByteArray SipCall::id() const
+{
+    return d->id;
+}
+
+void SipCall::readFromSocket()
+{
+    while (d->socket && d->socket->hasPendingDatagrams())
+    {
+        QByteArray ba(d->socket->pendingDatagramSize(), '\0');
+        d->socket->readDatagram(ba.data(), ba.size(), &d->remoteHost, &d->remotePort);
+        d->channel->datagramReceived(ba);
+    }
+}
+
+void SipCall::writeToSocket(const QByteArray &ba)
+{
+    if (!d->socket || d->remoteHost.isNull() || !d->remotePort)
+        return;
+
+    d->socket->writeDatagram(ba, d->remoteHost, d->remotePort);
 }
 
 class SipClientPrivate
@@ -199,7 +242,7 @@ SipClient::~SipClient()
 
 void SipClient::call(const QString &recipient)
 {
-    QUdpSocket *socket = new QUdpSocket(this);
+    QUdpSocket *socket = new QUdpSocket;
     if (!socket->bind(d->socket->localAddress(), 0))
     {
         qWarning("Could not start listening for RTP");
@@ -207,13 +250,8 @@ void SipClient::call(const QString &recipient)
         return;
     }
 
-    SipCall *call = new SipCall;
-    call->id = generateStanzaHash().toLatin1();
-    call->channel = new RtpChannel(this);
-    connect(call->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
-    call->channel->setSocket(socket);
-    socket->setParent(call->channel);
+    SipCall *call = new SipCall(socket, this);
+    RtpChannel *channel = call->d->channel;
 
     // FIXME : negociate codec!
     QXmppJinglePayloadType payload;
@@ -221,7 +259,7 @@ void SipClient::call(const QString &recipient)
     payload.setChannels(1);
     payload.setName("PCMU");
     payload.setClockrate(8000);
-    call->channel->setPayloadType(payload);
+    channel->setPayloadType(payload);
 
     SdpMessage sdp;
     sdp.addField('v', "0");
@@ -255,7 +293,7 @@ void SipClient::call(const QString &recipient)
 #endif
     d->calls << call;
 
-    SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call->id);
+    SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call->id());
     request.setHeaderField("To", "<" + recipient.toUtf8() + ">");
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
@@ -343,7 +381,7 @@ void SipClient::datagramReceived()
     {
         foreach (SipCall *potentialCall, d->calls)
         {
-            if (potentialCall->id == reply.headerField("Call-ID"))
+            if (potentialCall->id() == callId)
             {
                 currentCall = potentialCall;
                 break;
@@ -398,14 +436,14 @@ void SipClient::datagramReceived()
     // "base" call
     if (currentCall)
     {
-        qDebug() << "Call" << currentCall->id << "progress" << reply.statusCode() << reply.reasonPhrase();
+        qDebug() << "Call" << currentCall->id() << "progress" << reply.statusCode() << reply.reasonPhrase();
         if (reply.statusCode() == 200)
         {
-            qDebug() << "Call" << currentCall->id << "established";
+            qDebug() << "Call" << currentCall->id() << "established";
 
-            if (!currentCall->audioOutput)
+            if (!currentCall->d->audioOutput)
             {
-                RtpChannel *channel = currentCall->channel;
+                RtpChannel *channel = currentCall->d->channel;
 
                 // prepare audio format
                 QAudioFormat format;
@@ -419,18 +457,18 @@ void SipClient::datagramReceived()
                 int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
 
                 // initialise audio output
-                currentCall->audioOutput = new QAudioOutput(format, this);
-                currentCall->audioOutput->setBufferSize(2 * packetSize);
-                currentCall->audioOutput->start(channel);
+                currentCall->d->audioOutput = new QAudioOutput(format, this);
+                currentCall->d->audioOutput->setBufferSize(2 * packetSize);
+                currentCall->d->audioOutput->start(channel);
 
                 // initialise audio input
-                currentCall->audioInput = new QAudioInput(format, this);
-                currentCall->audioInput->setBufferSize(2 * packetSize);
-                currentCall->audioInput->start(channel);
+                currentCall->d->audioInput = new QAudioInput(format, this);
+                currentCall->d->audioInput->setBufferSize(2 * packetSize);
+                currentCall->d->audioInput->start(channel);
             }
 
         } else if (reply.statusCode() >= 400) {
-            qDebug() << "Call" << currentCall->id << "failed";
+            qDebug() << "Call" << currentCall->id() << "failed";
             d->calls.removeAll(currentCall);
             delete currentCall;
         }

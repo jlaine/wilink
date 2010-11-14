@@ -1,5 +1,4 @@
 #include <QDataStream>
-#include <QUdpSocket>
 
 #include "QXmppCodec.h"
 #include "QXmppJingleIq.h"
@@ -22,7 +21,6 @@ public:
 
     // RTP
     QXmppCodec *codec;
-    QUdpSocket *socket;
     QHostAddress remoteHost;
     quint16 remotePort;
 
@@ -46,7 +44,6 @@ RtpChannelPrivate::RtpChannelPrivate()
     : signalsEmitted(false),
     writtenSinceLastEmit(0),
     codec(0),
-    socket(0),
     incomingBuffering(true),
     incomingMinimum(0),
     incomingMaximum(0),
@@ -186,26 +183,6 @@ bool RtpChannel::isSequential() const
     return true;
 }
 
-void RtpChannel::readFromSocket()
-{
-    while (d->socket && d->socket->hasPendingDatagrams())
-    {
-        QByteArray ba(d->socket->pendingDatagramSize(), '\0');
-        d->socket->readDatagram(ba.data(), ba.size(), &d->remoteHost, &d->remotePort);
-        datagramReceived(ba);
-    }
-}
-
-void RtpChannel::writeToSocket(const QByteArray &ba)
-{    
-    if (!d->socket || d->remoteHost.isNull() || !d->remotePort)
-        return;
-
-    if (d->socket->writeDatagram(ba, d->remoteHost, d->remotePort) < 0)
-        emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("RtpChannel:writeData could not send audio data"));
-}
-
 qint64 RtpChannel::readData(char * data, qint64 maxSize)
 {
     // if we are filling the buffer, return empty samples
@@ -262,24 +239,6 @@ void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
 
     open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     //updateOpenMode();
-}
-
-
-void RtpChannel::setSocket(QUdpSocket *socket)
-{
-    if (d->socket)
-    {
-        disconnect(d->socket, SIGNAL(readyRead()),
-                   this, SLOT(readFromSocket()));
-        disconnect(this, SIGNAL(sendDatagram(QByteArray)),
-                   this, SLOT(writeToSocket(QByteArray)));
-    }
-
-    d->socket = socket;
-    connect(d->socket, SIGNAL(readyRead()),
-               this, SLOT(readFromSocket()));
-    connect(this, SIGNAL(sendDatagram(QByteArray)),
-            this, SLOT(writeToSocket(QByteArray)));
 }
 
 qint64 RtpChannel::writeData(const char * data, qint64 maxSize)

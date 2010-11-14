@@ -31,8 +31,6 @@ public:
     QXmppJinglePayloadType payloadType() const;
     void setPayloadType(const QXmppJinglePayloadType &payloadType);
 
-    void setSocket(QUdpSocket *socket);
-
     /// \cond
     qint64 bytesAvailable() const;
     bool isSequential() const;
@@ -47,10 +45,6 @@ signals:
 
 public slots:
     void datagramReceived(const QByteArray &ba);
-
-private slots:
-    void readFromSocket();
-    void writeToSocket(const QByteArray &ba);
 
 protected:
     /// \cond
