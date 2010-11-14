@@ -75,7 +75,7 @@ qint64 RtpChannel::bytesAvailable() const
     return d->incomingBuffer.size();
 }
 
-void RtpChannel::datagramReceived(const QByteArray &buffer)
+void RtpChannel::datagramReceived(const QByteArray &ba)
 {
     if (!d->codec)
     {
@@ -84,7 +84,7 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
         return;
     }
 
-    if (buffer.size() < 12 || (quint8(buffer.at(0)) >> 6) != RTP_VERSION)
+    if (ba.size() < 12 || (quint8(ba.at(0)) >> 6) != RTP_VERSION)
     {
         emit logMessage(QXmppLogger::WarningMessage,
             QLatin1String("RtpChannel::datagramReceived got an invalid RTP packet"));
@@ -92,24 +92,28 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
     }
 
     // parse RTP header
-    QDataStream stream(buffer);
-    quint8 version, type;
+    QDataStream stream(ba);
+    quint8 version, marker_type;
     quint32 ssrc;
     quint16 sequence;
     quint32 stamp;
     stream >> version;
-    stream >> type;
+    stream >> marker_type;
     stream >> sequence;
     stream >> stamp;
     stream >> ssrc;
-    const qint64 packetLength = buffer.size() - 12;
+    const bool marker = marker_type & 0x80;
+    const quint8 type = marker_type & 0x7f;
+    const qint64 packetLength = ba.size() - 12;
 
 #ifdef QXMPP_DEBUG_RTP
     emit logMessage(QXmppLogger::ReceivedMessage,
-        QString("RTP packet seq %1 stamp %2 size %3")
-            .arg(QString::number(sequence))
-            .arg(QString::number(stamp))
-            .arg(QString::number(packetLength)));
+        QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+            QString::number(sequence),
+            QString::number(stamp),
+            QString::number(marker),
+            QString::number(type),
+            QString::number(packetLength)));
 #endif
 
     // check type
@@ -123,7 +127,7 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
     }
 
     // check sequence number
-    if (sequence != d->incomingSequence + 1)
+    if (!marker && sequence != d->incomingSequence + 1)
         emit logMessage(QXmppLogger::WarningMessage,
             QString("RTP packet seq %1 is out of order, previous was %2")
                 .arg(QString::number(sequence))
@@ -132,7 +136,7 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
 
     // determine packet's position in the buffer (in bytes)
     qint64 packetOffset = 0;
-    if (!buffer.isEmpty())
+    if (!d->incomingBuffer.isEmpty())
     {
         packetOffset = (stamp - d->incomingStamp) * SAMPLE_BYTES;
         if (packetOffset < 0)
@@ -147,6 +151,7 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
         d->incomingStamp = stamp;
     }
 
+    qDebug() << "packet offset" << packetOffset;
     // allocate space for new packet
     if (packetOffset + packetLength > d->incomingBuffer.size())
         d->incomingBuffer += QByteArray(packetOffset + packetLength - d->incomingBuffer.size(), 0);
@@ -280,13 +285,13 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
         QDataStream stream(&header, QIODevice::WriteOnly);
         quint8 version = RTP_VERSION << 6;
         stream << version;
-        quint8 type = d->payloadType.id();
+        quint8 marker_type = d->payloadType.id();
         if (d->outgoingMarker)
         {
-            type |= 0x80;
+            marker_type |= 0x80;
             d->outgoingMarker= false;
         }
-        stream << type;
+        stream << marker_type;
         stream << ++d->outgoingSequence;
         stream << d->outgoingStamp;
         const quint32 ssrc = 0;
@@ -306,10 +311,11 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
 #ifdef QXMPP_DEBUG_RTP
         //else
             emit logMessage(QXmppLogger::SentMessage,
-                QString("RTP packet seq %1 stamp %2 size %3")
-                    .arg(QString::number(d->outgoingSequence))
-                    .arg(QString::number(d->outgoingStamp))
-                    .arg(QString::number(header.size() - 12)));
+                QString("RTP packet seq %1 stamp %2 marker %3 size %4").arg(
+                    QString::number(d->outgoingSequence),
+                    QString::number(d->outgoingStamp),
+                    QString::number(marker_type & 0x80 != 0),
+                    QString::number(header.size() - 12)));
 #endif
 
         d->outgoingBuffer.remove(0, chunk.size());
