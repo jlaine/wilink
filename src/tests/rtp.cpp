@@ -55,11 +55,18 @@ RtpChannelPrivate::RtpChannelPrivate()
 {
 }
 
+/// Creates a new RTP channel.
+///
+/// \param parent
+
 RtpChannel::RtpChannel(QObject *parent)
     : QIODevice(parent),
     d(new RtpChannelPrivate)
 {
 }
+
+/// Destroys an RTP channel.
+///
 
 RtpChannel::~RtpChannel()
 {
@@ -74,6 +81,9 @@ qint64 RtpChannel::bytesAvailable() const
     return d->incomingBuffer.size();
 }
 
+/// Processes an incoming RTP packet.
+///
+/// \param ba
 void RtpChannel::datagramReceived(const QByteArray &ba)
 {
     if (!d->codec)
@@ -205,10 +215,17 @@ qint64 RtpChannel::readData(char * data, qint64 maxSize)
     return maxSize;
 }
 
+/// Returns the RTP channel's payload type.
+///
+
 QXmppJinglePayloadType RtpChannel::payloadType() const
 {
     return d->payloadType;
 }
+
+/// Sets the RTP channel's payload type.
+///
+/// \param payloadType
 
 void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
 {
@@ -238,7 +255,6 @@ void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
     d->incomingMaximum = d->outgoingChunk * 8;
 
     open(QIODevice::ReadWrite | QIODevice::Unbuffered);
-    //updateOpenMode();
 }
 
 qint64 RtpChannel::writeData(const char * data, qint64 maxSize)

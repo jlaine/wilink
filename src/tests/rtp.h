@@ -2,8 +2,6 @@
 
 #include "QXmppLogger.h"
 
-class QUdpSocket;
-
 class QXmppCodec;
 class QXmppJinglePayloadType;
 class RtpChannelPrivate;
@@ -37,7 +35,7 @@ public:
     /// \endcond
 
 signals:
-    /// This signal is emitted when a datagram needs to be sent
+    /// This signal is emitted when a datagram needs to be sent.
     void sendDatagram(const QByteArray &ba);
 
     /// This signal is emitted to send logging messages.
