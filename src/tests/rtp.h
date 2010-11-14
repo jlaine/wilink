@@ -2,6 +2,8 @@
 
 #include "QXmppLogger.h"
 
+class QUdpSocket;
+
 class QXmppCodec;
 class QXmppJinglePayloadType;
 class RtpChannelPrivate;
@@ -29,7 +31,7 @@ public:
     QXmppJinglePayloadType payloadType() const;
     void setPayloadType(const QXmppJinglePayloadType &payloadType);
 
-    void setSocket(QIODevice *socket);
+    void setSocket(QUdpSocket *socket);
 
     /// \cond
     qint64 bytesAvailable() const;
@@ -37,12 +39,18 @@ public:
     /// \endcond
 
 signals:
+    /// This signal is emitted when a datagram needs to be sent
+    void sendDatagram(const QByteArray &ba);
+
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
+public slots:
+    void datagramReceived(const QByteArray &ba);
+
 private slots:
-    void datagramReceived(const QByteArray &buffer);
     void readFromSocket();
+    void writeToSocket(const QByteArray &ba);
 
 protected:
     /// \cond

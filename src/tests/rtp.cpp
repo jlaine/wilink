@@ -22,7 +22,9 @@ public:
 
     // RTP
     QXmppCodec *codec;
-    QIODevice *socket;
+    QUdpSocket *socket;
+    QHostAddress remoteHost;
+    quint16 remotePort;
 
     QByteArray incomingBuffer;
     bool incomingBuffering;
@@ -151,7 +153,6 @@ void RtpChannel::datagramReceived(const QByteArray &ba)
         d->incomingStamp = stamp;
     }
 
-    qDebug() << "packet offset" << packetOffset;
     // allocate space for new packet
     if (packetOffset + packetLength > d->incomingBuffer.size())
         d->incomingBuffer += QByteArray(packetOffset + packetLength - d->incomingBuffer.size(), 0);
@@ -187,16 +188,22 @@ bool RtpChannel::isSequential() const
 
 void RtpChannel::readFromSocket()
 {
-    QUdpSocket *socket = qobject_cast<QUdpSocket*>(d->socket);
-    if (!socket)
-        return;
-
-    while (socket->hasPendingDatagrams())
+    while (d->socket && d->socket->hasPendingDatagrams())
     {
-        QByteArray ba(socket->pendingDatagramSize(), '\0');
-        socket->readDatagram(ba.data(), ba.size());
+        QByteArray ba(d->socket->pendingDatagramSize(), '\0');
+        d->socket->readDatagram(ba.data(), ba.size(), &d->remoteHost, &d->remotePort);
         datagramReceived(ba);
     }
+}
+
+void RtpChannel::writeToSocket(const QByteArray &ba)
+{    
+    if (!d->socket || d->remoteHost.isNull() || !d->remotePort)
+        return;
+
+    if (d->socket->writeDatagram(ba, d->remoteHost, d->remotePort) < 0)
+        emit logMessage(QXmppLogger::WarningMessage,
+            QLatin1String("RtpChannel:writeData could not send audio data"));
 }
 
 qint64 RtpChannel::readData(char * data, qint64 maxSize)
@@ -258,15 +265,21 @@ void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
 }
 
 
-void RtpChannel::setSocket(QIODevice *socket)
+void RtpChannel::setSocket(QUdpSocket *socket)
 {
     if (d->socket)
+    {
         disconnect(d->socket, SIGNAL(readyRead()),
                    this, SLOT(readFromSocket()));
+        disconnect(this, SIGNAL(sendDatagram(QByteArray)),
+                   this, SLOT(writeToSocket(QByteArray)));
+    }
 
     d->socket = socket;
     connect(d->socket, SIGNAL(readyRead()),
                this, SLOT(readFromSocket()));
+    connect(this, SIGNAL(sendDatagram(QByteArray)),
+            this, SLOT(writeToSocket(QByteArray)));
 }
 
 qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
@@ -303,20 +316,16 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
         d->outgoingStamp += d->codec->encode(input, stream);
 
         // FIXME: write data
-#if 0
-        if (d->connection->writeDatagram(RTP_COMPONENT, header) < 0)
-            emit logMessage(QXmppLogger::WarningMessage,
-                QLatin1String("RtpChannel:writeData could not send audio data"));
-#endif
 #ifdef QXMPP_DEBUG_RTP
-        //else
-            emit logMessage(QXmppLogger::SentMessage,
-                QString("RTP packet seq %1 stamp %2 marker %3 size %4").arg(
-                    QString::number(d->outgoingSequence),
-                    QString::number(d->outgoingStamp),
-                    QString::number(marker_type & 0x80 != 0),
-                    QString::number(header.size() - 12)));
+        emit logMessage(QXmppLogger::SentMessage,
+                        QString("RTP packet seq %1 stamp %2 marker %3 type %4 size %5").arg(
+                                QString::number(d->outgoingSequence),
+                                QString::number(d->outgoingStamp),
+                                QString::number(marker_type & 0x80 != 0),
+                                QString::number(marker_type & 0x7f),
+                                QString::number(header.size() - 12)));
 #endif
+        emit sendDatagram(header);
 
         d->outgoingBuffer.remove(0, chunk.size());
     }
