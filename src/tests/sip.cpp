@@ -417,6 +417,10 @@ void SipClient::datagramReceived()
                 // initialise audio output
                 currentCall->audioOutput = new QAudioOutput(format, this);
                 currentCall->audioOutput->start(currentCall->channel);
+
+                // initialise audio input
+                currentCall->audioInput = new QAudioInput(format, this);
+                currentCall->audioInput->start(currentCall->channel);
             }
 
         } else if (reply.statusCode() >= 400) {
