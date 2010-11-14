@@ -10,10 +10,10 @@
 #include <QSettings>
 #include <QUdpSocket>
 
+#include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
-#include "rtp.h"
 #include "sip.h"
 
 const int RTP_COMPONENT = 1;
@@ -69,7 +69,7 @@ class SipCallPrivate
 {
 public:
     QByteArray id;
-    RtpChannel *channel;
+    QXmppRtpChannel *channel;
     QAudioInput *audioInput;
     QAudioOutput *audioOutput;
     QHostAddress remoteHost;
@@ -82,7 +82,7 @@ SipCall::SipCall(QUdpSocket *socket, QObject *parent)
     d(new SipCallPrivate)
 {
     d->id = generateStanzaHash().toLatin1();
-    d->channel = new RtpChannel(this);
+    d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
     d->audioOutput = 0;
     d->remotePort = 0;
@@ -251,11 +251,11 @@ void SipClient::call(const QString &recipient)
     }
 
     SipCall *call = new SipCall(socket, this);
-    RtpChannel *channel = call->d->channel;
+    QXmppRtpChannel *channel = call->d->channel;
 
     // FIXME : negociate codec!
     QXmppJinglePayloadType payload;
-    payload.setId(RtpChannel::G711u);
+    payload.setId(QXmppRtpChannel::G711u);
     payload.setChannels(1);
     payload.setName("PCMU");
     payload.setClockrate(8000);
@@ -273,7 +273,7 @@ void SipClient::call(const QString &recipient)
 #endif
     QByteArray profiles = "RTP/AVP";
     profiles += " " + QByteArray::number(payload.id());
-    // profiles += " " + QByteArray::number(RtpChannel::G711a);
+    // profiles += " " + QByteArray::number(QXmppRtpChannel::G711a);
     profiles += " 101";
     sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
     sdp.addField('a', "rtpmap:101 telephone-event/8000");
@@ -443,7 +443,7 @@ void SipClient::datagramReceived()
 
             if (!currentCall->d->audioOutput)
             {
-                RtpChannel *channel = currentCall->d->channel;
+                QXmppRtpChannel *channel = currentCall->d->channel;
 
                 // prepare audio format
                 QAudioFormat format;
