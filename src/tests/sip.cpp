@@ -1,7 +1,10 @@
+#include <signal.h>
+
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QHostInfo>
+#include <QNetworkInterface>
 #include <QSettings>
 #include <QUdpSocket>
 
@@ -13,6 +16,12 @@
 
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
+
+struct AuthInfo
+{
+    QMap<QByteArray, QByteArray> challenge;
+    bool proxy;
+};
 
 SdpMessage::SdpMessage(const QByteArray &ba)
 {
@@ -66,7 +75,7 @@ class SipClientPrivate
 {
 public:
     SipRequest buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id);
-    void sendRequest(const SipRequest &request);
+    void sendRequest(SipRequest &request);
 
     QUdpSocket *socket;
     QByteArray baseId;
@@ -80,6 +89,8 @@ public:
     QString domain;
     QString phoneNumber;
 
+    QString rinstance;
+    QMap<QByteArray, AuthInfo> authInfos;
     QHostAddress serverAddress;
     QString serverName;
     quint16 serverPort;
@@ -106,7 +117,7 @@ SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setHeaderField("CSeq", QString::number(cseq++).toLatin1() + ' ' + method);
     packet.setHeaderField("Contact", QString("<sip:%1@%2:%3;rinstance=%4>").arg(
         username, socket->localAddress().toString(),
-        QString::number(socket->localPort()), "changeme").toUtf8());
+        QString::number(socket->localPort()), rinstance).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
     packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO");
@@ -114,8 +125,39 @@ SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     return packet;
 }
 
-void SipClientPrivate::sendRequest(const SipRequest &request)
+void SipClientPrivate::sendRequest(SipRequest &request)
 {
+    if (authInfos.contains(request.uri()))
+    {
+        AuthInfo info = authInfos.value(request.uri());
+
+        QXmppSaslDigestMd5 digest;
+        digest.setCnonce(digest.generateNonce());
+        digest.setNc("00000001");
+        digest.setNonce(info.challenge.value("nonce"));
+        digest.setQop(info.challenge.value("qop"));
+        digest.setRealm(info.challenge.value("realm"));
+        digest.setUsername(username.toUtf8());
+        digest.setPassword(password.toUtf8());
+
+        const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + password.toUtf8();
+        const QByteArray A2 = request.method() + ':' + request.uri();
+
+        QMap<QByteArray, QByteArray> response;
+        response["username"] = digest.username();
+        response["realm"] = digest.realm();
+        response["nonce"] = digest.nonce();
+        response["uri"] = request.uri();
+        response["response"] = digest.calculateDigest(A1, A2);
+        response["cnonce"] = digest.cnonce();
+        response["qop"] = digest.qop();
+        response["nc"] = digest.nc();
+        response["algorithm"] = "MD5";
+
+        request.setHeaderField(info.proxy ? "Proxy-Authorization" : "Authorization",
+                               "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
+    }
+
     lastRequest = request;
     socket->writeDatagram(request.toByteArray(), serverAddress, serverPort);
 }
@@ -125,6 +167,7 @@ SipClient::SipClient(QObject *parent)
     d(new SipClientPrivate)
 {
     d->cseq = 1;
+    d->rinstance = generateStanzaHash(16);
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
@@ -198,13 +241,43 @@ void SipClient::connectToServer(const QString &server, quint16 port)
     d->serverName = server;
     d->serverPort = port;
 
-    d->socket->bind(QHostAddress("192.168.95.75"), 0);
+    QHostAddress bindAddress;
+    foreach (const QHostAddress &ip, QNetworkInterface::allAddresses())
+    {
+        if (ip.protocol() == QAbstractSocket::IPv4Protocol &&
+            ip != QHostAddress::Null &&
+            ip != QHostAddress::LocalHost &&
+            ip != QHostAddress::LocalHostIPv6 &&
+            ip != QHostAddress::Broadcast &&
+            ip != QHostAddress::Any &&
+            ip != QHostAddress::AnyIPv6)
+        {
+            bindAddress = ip;
+            break;
+        }
+    }
+    if (!d->socket->bind(bindAddress, 0))
+    {
+        qWarning("Could not start listening for SIP");
+        return;
+    }
 
     // register
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipRequest request = d->buildRequest("REGISTER", uri, d->baseId);
     request.setHeaderField("Expires", "3600");
     d->sendRequest(request);
+}
+
+void SipClient::disconnectFromServer()
+{
+    // register
+    const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
+    SipRequest request = d->buildRequest("REGISTER", uri, d->baseId);
+    request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
+    d->sendRequest(request);
+    d->socket->flush();
+    d->socket->close();
 }
 
 void SipClient::datagramReceived()
@@ -256,38 +329,15 @@ void SipClient::datagramReceived()
         SipRequest request = d->lastRequest;
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
 
-        const QByteArray auth = reply.headerField(reply.statusCode() == 407 ? "Proxy-Authenticate" : "WWW-Authenticate");
+        AuthInfo info;
+        info.proxy = reply.statusCode() == 407;
+        const QByteArray auth = reply.headerField(info.proxy ? "Proxy-Authenticate" : "WWW-Authenticate");
         if (!auth.startsWith("Digest ")) {
             qWarning("Unsupported authentication method");
             return;
         }
-
-        QMap<QByteArray, QByteArray> saslChallenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
-
-        QXmppSaslDigestMd5 digest;
-        digest.setCnonce(digest.generateNonce());
-        digest.setNc("00000001");
-        digest.setNonce(saslChallenge.value("nonce"));
-        digest.setQop(saslChallenge.value("qop"));
-        digest.setRealm(saslChallenge.value("realm"));
-        digest.setUsername(d->username.toUtf8());
-        digest.setPassword(d->password.toUtf8());
-
-        const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + d->password.toUtf8();
-        const QByteArray A2 = request.method() + ':' + request.uri();
-
-        QMap<QByteArray, QByteArray> response;
-        response["username"] = digest.username();
-        response["realm"] = digest.realm();
-        response["nonce"] = digest.nonce();
-        response["uri"] = request.uri();
-        response["response"] = digest.calculateDigest(A1, A2);
-        response["cnonce"] = digest.cnonce();
-        response["qop"] = digest.qop();
-        response["nc"] = digest.nc();
-        response["algorithm"] = "MD5";
-        request.setHeaderField(reply.statusCode() == 407 ? "Proxy-Authorization" : "Authorization",
-            "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
+        info.challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
+        d->authInfos[request.uri()] = info;
 
         d->sendRequest(request);
         return;
@@ -302,7 +352,7 @@ void SipClient::datagramReceived()
         }
         else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
             const QString recipient = QString("sip:%1@%2").arg(d->phoneNumber, d->serverName);
-            call(recipient);
+            //call(recipient);
         }
     }
 }
@@ -473,15 +523,35 @@ void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
     m_fields.append(qMakePair(name, data));
 }
 
+static int aborted = 0;
+static void signal_handler(int sig)
+{
+    if (aborted)
+        exit(1);
+
+    qApp->quit();
+    aborted = 1;
+}
+
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     app.setApplicationName("wiLink");
     app.setApplicationVersion("1.0.0");
 
+    /* Install signal handler */
+    signal(SIGINT, signal_handler);
+#ifdef SIGKILL
+    signal(SIGKILL, signal_handler);
+#endif
+    signal(SIGTERM, signal_handler);
+
     SipClient client;
     client.connectToServer("sip.wifirst.net", 5060);
 
-    return app.exec();
+    int ret = app.exec();
+    client.disconnectFromServer();
+
+    return ret;
 }
 

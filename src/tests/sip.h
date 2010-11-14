@@ -68,6 +68,7 @@ public:
 
     void call(const QString &recipient);
     void connectToServer(const QString &server, quint16 port);
+    void disconnectFromServer();
 
 private slots:
     void datagramReceived();
