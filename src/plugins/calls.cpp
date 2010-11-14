@@ -35,6 +35,7 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
+#include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
