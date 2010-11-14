@@ -2,11 +2,25 @@
 #include <QUdpSocket>
 
 #include "QXmppCodec.h"
+#include "QXmppJingleIq.h"
 
 #include "rtp.h"
 
-const quint8 RTP_VERSION = 0x02;
 #define SAMPLE_BYTES 2
+
+const quint8 RTP_VERSION = 0x02;
+
+enum CodecId {
+    G711u = 0,
+    GSM = 3,
+    G723 = 4,
+    G711a = 8,
+    G722 = 9,
+    L16Stereo = 10,
+    L16Mono = 11,
+    G728 = 15,
+    G729 = 18,
+};
 
 class RtpChannelPrivate
 {
@@ -202,10 +216,36 @@ qint64 RtpChannel::readData(char * data, qint64 maxSize)
     return maxSize;
 }
 
-void RtpChannel::setCodec(QXmppCodec *codec)
+void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
 {
-    d->codec = codec;
+    //m_payloadType = payloadType;
+    if (payloadType.id() == G711u)
+        d->codec = new QXmppG711uCodec(payloadType.clockrate());
+    else if (payloadType.id() == G711a)
+        d->codec = new QXmppG711aCodec(payloadType.clockrate());
+#ifdef QXMPP_USE_SPEEX
+    else if (payloadType.name().toLower() == "speex")
+        d->codec = new QXmppSpeexCodec(payloadType.clockrate());
+#endif
+    else
+    {
+        emit logMessage(QXmppLogger::WarningMessage,
+            QString("QXmppCall got an unknown codec : %1 (%2)")
+                .arg(QString::number(payloadType.id()))
+                .arg(payloadType.name()));
+        return;
+    }
+
+    // size in bytes of an unencoded packet
+    d->outgoingChunk = SAMPLE_BYTES * payloadType.ptime() * payloadType.clockrate() / 1000;
+
+    // initial number of bytes to buffer
+    d->incomingMinimum = d->outgoingChunk * 5;
+    d->incomingMaximum = d->outgoingChunk * 8;
+
+    //updateOpenMode();
 }
+
 
 void RtpChannel::setSocket(QIODevice *socket)
 {

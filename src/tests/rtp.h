@@ -3,6 +3,7 @@
 #include "QXmppLogger.h"
 
 class QXmppCodec;
+class QXmppJinglePayloadType;
 class RtpChannelPrivate;
 
 class RtpChannel : public QIODevice
@@ -13,7 +14,7 @@ public:
     RtpChannel(QObject *parent = 0);
     ~RtpChannel();
 
-    void setCodec(QXmppCodec *codec);
+    void setPayloadType(const QXmppJinglePayloadType &payloadType);
     void setSocket(QIODevice *socket);
 
     /// \cond
