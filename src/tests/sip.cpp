@@ -1,5 +1,7 @@
 #include <signal.h>
 
+#include <QAudioInput>
+#include <QAudioOutput>
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
 #include <QDebug>
@@ -66,10 +68,20 @@ QByteArray SdpMessage::toByteArray() const
 class SipCall
 {
 public:
+    SipCall();
+
     QByteArray id;
-    //QUdpSocket *socket;
     RtpChannel *channel;
+    QAudioInput *audioInput;
+    QAudioOutput *audioOutput;
 };
+
+SipCall::SipCall()
+    : channel(0),
+    audioInput(0),
+    audioOutput(0)
+{
+}
 
 class SipClientPrivate
 {
@@ -390,6 +402,23 @@ void SipClient::datagramReceived()
         if (reply.statusCode() == 200)
         {
             qDebug() << "Call" << currentCall->id << "established";
+
+            if (!currentCall->audioOutput)
+            {
+                // prepare audio format
+                QAudioFormat format;
+                format.setFrequency(currentCall->channel->payloadType().clockrate());
+                format.setChannels(currentCall->channel->payloadType().channels());
+                format.setSampleSize(16);
+                format.setCodec("audio/pcm");
+                format.setByteOrder(QAudioFormat::LittleEndian);
+                format.setSampleType(QAudioFormat::SignedInt);
+
+                // initialise audio output
+                currentCall->audioOutput = new QAudioOutput(format, this);
+                currentCall->audioOutput->start(currentCall->channel);
+            }
+
         } else if (reply.statusCode() >= 400) {
             qDebug() << "Call" << currentCall->id << "failed";
             d->calls.removeAll(currentCall);

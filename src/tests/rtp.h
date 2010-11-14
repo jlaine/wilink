@@ -26,7 +26,9 @@ public:
     RtpChannel(QObject *parent = 0);
     ~RtpChannel();
 
+    QXmppJinglePayloadType payloadType() const;
     void setPayloadType(const QXmppJinglePayloadType &payloadType);
+
     void setSocket(QIODevice *socket);
 
     /// \cond

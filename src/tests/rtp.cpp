@@ -11,7 +11,6 @@
 
 const quint8 RTP_VERSION = 0x02;
 
-
 class RtpChannelPrivate
 {
 public:
@@ -24,7 +23,6 @@ public:
     // RTP
     QXmppCodec *codec;
     QIODevice *socket;
-    quint8 payloadId;
 
     QByteArray incomingBuffer;
     bool incomingBuffering;
@@ -38,6 +36,8 @@ public:
     bool outgoingMarker;
     quint16 outgoingSequence;
     quint32 outgoingStamp;
+
+    QXmppJinglePayloadType payloadType;
 };
 
 RtpChannelPrivate::RtpChannelPrivate()
@@ -207,9 +207,14 @@ qint64 RtpChannel::readData(char * data, qint64 maxSize)
     return maxSize;
 }
 
+QXmppJinglePayloadType RtpChannel::payloadType() const
+{
+    return d->payloadType;
+}
+
 void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
 {
-    //m_payloadType = payloadType;
+    d->payloadType = payloadType;
     if (payloadType.id() == G711u)
         d->codec = new QXmppG711uCodec(payloadType.clockrate());
     else if (payloadType.id() == G711a)
@@ -266,7 +271,7 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
         QDataStream stream(&header, QIODevice::WriteOnly);
         quint8 version = RTP_VERSION << 6;
         stream << version;
-        quint8 type = d->payloadId;
+        quint8 type = d->payloadType.id();
         if (d->outgoingMarker)
         {
             type |= 0x80;
