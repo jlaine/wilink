@@ -187,11 +187,10 @@ SipClient::~SipClient()
 
 void SipClient::call(const QString &recipient)
 {
-
     QUdpSocket *socket = new QUdpSocket(this);
     if (!socket->bind(d->socket->localAddress(), 0))
     {
-        qWarning("Could not listen for RTP");
+        qWarning("Could not start listening for RTP");
         delete socket;
         return;
     }
@@ -199,6 +198,8 @@ void SipClient::call(const QString &recipient)
     SipCall *call = new SipCall;
     call->id = generateStanzaHash().toLatin1();
     call->channel = new RtpChannel(this);
+    connect(call->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
     call->channel->setSocket(socket);
     socket->setParent(call->channel);
 
@@ -222,11 +223,11 @@ void SipClient::call(const QString &recipient)
 #endif
     QByteArray profiles = "RTP/AVP";
     profiles += " " + QByteArray::number(payload.id());
-   // profiles += " " + QByteArray::number(RtpChannel::G711a);
-    //profiles += " 101";
+    // profiles += " " + QByteArray::number(RtpChannel::G711a);
+    profiles += " 101";
     sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
-    //sdp.addField('a', "rtpmap:101 telephone-event/8000");
-    //sdp.addField('a', "fmtp:101 0-15");
+    sdp.addField('a', "rtpmap:101 telephone-event/8000");
+    sdp.addField('a', "fmtp:101 0-15");
     sdp.addField('a', "sendrecv");
 #ifdef USE_ICE
     foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
@@ -603,6 +604,7 @@ int main(int argc, char* argv[])
 #endif
     signal(SIGTERM, signal_handler);
 
+    QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
     SipClient client;
     client.connectToServer("sip.wifirst.net", 5060);
 

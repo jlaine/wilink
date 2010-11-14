@@ -6,6 +6,7 @@
 
 #include "rtp.h"
 
+#define QXMPP_DEBUG_RTP
 #define SAMPLE_BYTES 2
 
 const quint8 RTP_VERSION = 0x02;
@@ -233,6 +234,7 @@ void RtpChannel::setPayloadType(const QXmppJinglePayloadType &payloadType)
     d->incomingMinimum = d->outgoingChunk * 5;
     d->incomingMaximum = d->outgoingChunk * 8;
 
+    open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     //updateOpenMode();
 }
 
@@ -244,7 +246,7 @@ void RtpChannel::setSocket(QIODevice *socket)
                    this, SLOT(readFromSocket()));
 
     d->socket = socket;
-    disconnect(d->socket, SIGNAL(readyRead()),
+    connect(d->socket, SIGNAL(readyRead()),
                this, SLOT(readFromSocket()));
 }
 
@@ -288,7 +290,7 @@ qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
                 QLatin1String("RtpChannel:writeData could not send audio data"));
 #endif
 #ifdef QXMPP_DEBUG_RTP
-        else
+        //else
             emit logMessage(QXmppLogger::SentMessage,
                 QString("RTP packet seq %1 stamp %2 size %3")
                     .arg(QString::number(d->outgoingSequence))
