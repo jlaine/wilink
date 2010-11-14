@@ -7,35 +7,72 @@
 const quint8 RTP_VERSION = 0x02;
 #define SAMPLE_BYTES 2
 
+class RtpChannelPrivate
+{
+public:
+    RtpChannelPrivate();
+
+    // signals
+    bool signalsEmitted;
+    qint64 writtenSinceLastEmit;
+
+    // RTP
+    QXmppCodec *codec;
+    quint8 payloadId;
+
+    QByteArray incomingBuffer;
+    bool incomingBuffering;
+    int incomingMinimum;
+    int incomingMaximum;
+    quint16 incomingSequence;
+    quint32 incomingStamp;
+
+    quint16 outgoingChunk;
+    QByteArray outgoingBuffer;
+    bool outgoingMarker;
+    quint16 outgoingSequence;
+    quint32 outgoingStamp;
+};
+
+RtpChannelPrivate::RtpChannelPrivate()
+    : signalsEmitted(false),
+    writtenSinceLastEmit(0),
+    codec(0),
+    incomingBuffering(true),
+    incomingMinimum(0),
+    incomingMaximum(0),
+    incomingSequence(0),
+    incomingStamp(0),
+    outgoingMarker(true),
+    outgoingSequence(0),
+    outgoingStamp(0)
+{
+}
+
 RtpChannel::RtpChannel(QObject *parent)
     : QIODevice(parent),
-    m_signalsEmitted(false),
-    m_writtenSinceLastEmit(0),
-    m_codec(0),
-    m_incomingBuffering(true),
-    m_incomingMinimum(0),
-    m_incomingMaximum(0),
-    m_incomingSequence(0),
-    m_incomingStamp(0),
-    m_outgoingMarker(true),
-    m_outgoingSequence(0),
-    m_outgoingStamp(0)
+    d(new RtpChannelPrivate)
 {
+}
+
+RtpChannel::~RtpChannel()
+{
+    delete d;
 }
 
 void RtpChannel::datagramReceived(const QByteArray &buffer)
 {
-    if (!m_codec)
+    if (!d->codec)
     {
         emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppCall:datagramReceived before codec selection"));
+                        QLatin1String("RtpChannel::datagramReceived before codec selection"));
         return;
     }
 
     if (buffer.size() < 12 || (quint8(buffer.at(0)) >> 6) != RTP_VERSION)
     {
         emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppCall::datagramReceived got an invalid RTP packet"));
+            QLatin1String("RtpChannel::datagramReceived got an invalid RTP packet"));
         return;
     }
 
@@ -61,131 +98,131 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
 #endif
 
     // check sequence number
-    if (sequence != m_incomingSequence + 1)
+    if (sequence != d->incomingSequence + 1)
         emit logMessage(QXmppLogger::WarningMessage,
             QString("RTP packet seq %1 is out of order, previous was %2")
                 .arg(QString::number(sequence))
-                .arg(QString::number(m_incomingSequence)));
-    m_incomingSequence = sequence;
+                .arg(QString::number(d->incomingSequence)));
+    d->incomingSequence = sequence;
 
     // determine packet's position in the buffer (in bytes)
     qint64 packetOffset = 0;
     if (!buffer.isEmpty())
     {
-        packetOffset = (stamp - m_incomingStamp) * SAMPLE_BYTES;
+        packetOffset = (stamp - d->incomingStamp) * SAMPLE_BYTES;
         if (packetOffset < 0)
         {
             emit logMessage(QXmppLogger::WarningMessage,
                 QString("RTP packet stamp %1 is too old, buffer start is %2")
                     .arg(QString::number(stamp))
-                    .arg(QString::number(m_incomingStamp)));
+                    .arg(QString::number(d->incomingStamp)));
             return;
         }
     } else {
-        m_incomingStamp = stamp;
+        d->incomingStamp = stamp;
     }
 
     // allocate space for new packet
-    if (packetOffset + packetLength > m_incomingBuffer.size())
-        m_incomingBuffer += QByteArray(packetOffset + packetLength - m_incomingBuffer.size(), 0);
-    QDataStream output(&m_incomingBuffer, QIODevice::WriteOnly);
+    if (packetOffset + packetLength > d->incomingBuffer.size())
+        d->incomingBuffer += QByteArray(packetOffset + packetLength - d->incomingBuffer.size(), 0);
+    QDataStream output(&d->incomingBuffer, QIODevice::WriteOnly);
     output.device()->seek(packetOffset);
     output.setByteOrder(QDataStream::LittleEndian);
-    m_codec->decode(stream, output);
+    d->codec->decode(stream, output);
 
     // check whether we are running late
-    if (m_incomingBuffer.size() > m_incomingMaximum)
+    if (d->incomingBuffer.size() > d->incomingMaximum)
     {
-        const qint64 droppedSize = m_incomingBuffer.size() - m_incomingMinimum;
+        const qint64 droppedSize = d->incomingBuffer.size() - d->incomingMinimum;
         emit logMessage(QXmppLogger::DebugMessage,
             QString("RTP buffer is too full, dropping %1 bytes")
                 .arg(QString::number(droppedSize)));
-        m_incomingBuffer = m_incomingBuffer.right(m_incomingMinimum);
-        m_incomingStamp += droppedSize / SAMPLE_BYTES;
+        d->incomingBuffer = d->incomingBuffer.right(d->incomingMinimum);
+        d->incomingStamp += droppedSize / SAMPLE_BYTES;
     }
     // check whether we have filled the initial buffer
-    if (m_incomingBuffer.size() >= m_incomingMinimum)
-        m_incomingBuffering = false;
-    if (!m_incomingBuffering)
+    if (d->incomingBuffer.size() >= d->incomingMinimum)
+        d->incomingBuffering = false;
+    if (!d->incomingBuffering)
         emit readyRead();
 }
 
 qint64 RtpChannel::readData(char * data, qint64 maxSize)
 {
     // if we are filling the buffer, return empty samples
-    if (m_incomingBuffering)
+    if (d->incomingBuffering)
     {
         memset(data, 0, maxSize);
         return maxSize;
     }
 
-    qint64 readSize = qMin(maxSize, qint64(m_incomingBuffer.size()));
-    memcpy(data, m_incomingBuffer.constData(), readSize);
-    m_incomingBuffer.remove(0, readSize);
+    qint64 readSize = qMin(maxSize, qint64(d->incomingBuffer.size()));
+    memcpy(data, d->incomingBuffer.constData(), readSize);
+    d->incomingBuffer.remove(0, readSize);
     if (readSize < maxSize)
     {
         emit logMessage(QXmppLogger::InformationMessage,
-            QString("QXmppCall::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
+            QString("RtpChannel::readData missing %1 bytes").arg(QString::number(maxSize - readSize)));
         memset(data + readSize, 0, maxSize - readSize);
     }
-    m_incomingStamp += readSize / SAMPLE_BYTES;
+    d->incomingStamp += readSize / SAMPLE_BYTES;
     return maxSize;
 }
 
 qint64 RtpChannel::writeData(const char * data, qint64 maxSize)
 {
-    if (!m_codec)
+    if (!d->codec)
     {
         emit logMessage(QXmppLogger::WarningMessage,
-            QLatin1String("QXmppCall::writeData before codec was set"));
+            QLatin1String("RtpChannel::writeData before codec was set"));
         return -1;
     }
 
-    m_outgoingBuffer += QByteArray::fromRawData(data, maxSize);
-    while (m_outgoingBuffer.size() >= m_outgoingChunk)
+    d->outgoingBuffer += QByteArray::fromRawData(data, maxSize);
+    while (d->outgoingBuffer.size() >= d->outgoingChunk)
     {
         QByteArray header;
         QDataStream stream(&header, QIODevice::WriteOnly);
         quint8 version = RTP_VERSION << 6;
         stream << version;
-        quint8 type = m_payloadId;
-        if (m_outgoingMarker)
+        quint8 type = d->payloadId;
+        if (d->outgoingMarker)
         {
             type |= 0x80;
-            m_outgoingMarker= false;
+            d->outgoingMarker= false;
         }
         stream << type;
-        stream << ++m_outgoingSequence;
-        stream << m_outgoingStamp;
+        stream << ++d->outgoingSequence;
+        stream << d->outgoingStamp;
         const quint32 ssrc = 0;
         stream << ssrc;
 
-        QByteArray chunk = m_outgoingBuffer.left(m_outgoingChunk);
+        QByteArray chunk = d->outgoingBuffer.left(d->outgoingChunk);
         QDataStream input(chunk);
         input.setByteOrder(QDataStream::LittleEndian);
-        m_outgoingStamp += m_codec->encode(input, stream);
+        d->outgoingStamp += d->codec->encode(input, stream);
 
         // FIXME: write data
 #if 0
-        if (m_connection->writeDatagram(RTP_COMPONENT, header) < 0)
+        if (d->connection->writeDatagram(RTP_COMPONENT, header) < 0)
             emit logMessage(QXmppLogger::WarningMessage,
-                QLatin1String("QXmppCall:writeData could not send audio data"));
+                QLatin1String("RtpChannel:writeData could not send audio data"));
 #endif
 #ifdef QXMPP_DEBUG_RTP
         else
             emit logMessage(QXmppLogger::SentMessage,
                 QString("RTP packet seq %1 stamp %2 size %3")
-                    .arg(QString::number(m_outgoingSequence))
-                    .arg(QString::number(m_outgoingStamp))
+                    .arg(QString::number(d->outgoingSequence))
+                    .arg(QString::number(d->outgoingStamp))
                     .arg(QString::number(header.size() - 12)));
 #endif
 
-        m_outgoingBuffer.remove(0, chunk.size());
+        d->outgoingBuffer.remove(0, chunk.size());
     }
 
-    m_writtenSinceLastEmit += maxSize;
-    if (!m_signalsEmitted && !signalsBlocked()) {
-        m_signalsEmitted = true;
+    d->writtenSinceLastEmit += maxSize;
+    if (!d->signalsEmitted && !signalsBlocked()) {
+        d->signalsEmitted = true;
         QMetaObject::invokeMethod(this, "emitSignals", Qt::QueuedConnection);
     }
 
