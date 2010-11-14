@@ -2,8 +2,8 @@
 
 #include "QXmppLogger.h"
 
-class RtpChannelPrivate;
 class QXmppCodec;
+class RtpChannelPrivate;
 
 class RtpChannel : public QIODevice
 {
@@ -13,12 +13,21 @@ public:
     RtpChannel(QObject *parent = 0);
     ~RtpChannel();
 
+    void setCodec(QXmppCodec *codec);
+    void setSocket(QIODevice *socket);
+
+    /// \cond
+    qint64 bytesAvailable() const;
+    bool isSequential() const;
+    /// \endcond
+
 signals:
     /// This signal is emitted to send logging messages.
     void logMessage(QXmppLogger::MessageType type, const QString &msg);
 
 private slots:
     void datagramReceived(const QByteArray &buffer);
+    void readFromSocket();
 
 protected:
     /// \cond

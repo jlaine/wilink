@@ -84,6 +84,7 @@ public:
     QString serverName;
     quint16 serverPort;
     SipRequest lastRequest;
+    QList<SipCall*> calls;
 };
 
 SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId)
@@ -143,29 +144,30 @@ SipClient::~SipClient()
 
 void SipClient::call(const QString &recipient)
 {
-    SipCall call;
-    call.id = generateStanzaHash().toLatin1();
+    SipCall *call = new SipCall;
+    call->id = generateStanzaHash().toLatin1();
 
-    call.channel = new RtpChannel(this);
-    call.socket = new QUdpSocket(this);
-    call.socket->bind(d->socket->localAddress(), 0);
+    call->channel = new RtpChannel(this);
+    call->socket = new QUdpSocket(this);
+    call->socket->bind(d->socket->localAddress(), 0);
+    call->channel->setSocket(d->socket);
 
     SdpMessage sdp;
     sdp.addField('v', "0");
     sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
     sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + call.socket->localAddress().toString().toUtf8());
+    sdp.addField('c', "IN IP4 " + call->socket->localAddress().toString().toUtf8());
     sdp.addField('t', "0 0");
 #ifdef USE_ICE
-    sdp.addField('a', "ice-ufrag:" + call.iceConnection->localUser().toUtf8());
-    sdp.addField('a', "ice-pwd:" + call.iceConnection->localPassword().toUtf8());
+    sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
+    sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
 #endif
-    sdp.addField('m', "audio " + QByteArray::number(call.socket->localPort()) + " RTP/AVP 0 8 101");
+    sdp.addField('m', "audio " + QByteArray::number(call->socket->localPort()) + " RTP/AVP 0 8 101");
     sdp.addField('a', "rtpmap:101 telephone-event/8000");
     sdp.addField('a', "fmtp:101 0-15");
     sdp.addField('a', "sendrecv");
 #ifdef USE_ICE
-    foreach (const QXmppJingleCandidate &candidate, call.iceConnection->localCandidates()) {
+    foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
         ba += QByteArray::number(candidate.component()) + " ";
         ba += "UDP ";
@@ -176,8 +178,9 @@ void SipClient::call(const QString &recipient)
         sdp.addField('a', ba);
     }
 #endif
+    d->calls << call;
 
-    SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call.id);
+    SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call->id);
     request.setHeaderField("To", "<" + recipient.toUtf8() + ">");
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
