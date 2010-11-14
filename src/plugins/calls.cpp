@@ -35,6 +35,7 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
+#include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
 #include "calls.h"
@@ -115,7 +116,7 @@ void CallHandler::audioStateChanged(QAudio::State state)
         if (m_audioInput->error() != QAudio::NoError)
             qWarning() << "audio input state" << state << "error" << m_audioInput->error();
         if (m_audioInput->error() == QAudio::UnderrunError)
-            m_audioInput->start(m_call);
+            m_audioInput->start(m_call->audioChannel());
 #endif
     } else if (audio == m_audioOutput) {
         if (m_audioOutput->error() != QAudio::NoError)
@@ -128,16 +129,18 @@ void CallHandler::callStateChanged(QXmppCall::State state)
     // start or stop capture
     if (state == QXmppCall::ActiveState)
     {
-        QAudioFormat format = formatFor(m_call->payloadType());
+        QXmppRtpChannel *channel = m_call->audioChannel();
+        QAudioFormat format = formatFor(channel->payloadType());
+
         // the size in bytes of the audio samples for a single RTP packet
-        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * m_call->payloadType().ptime() / 1000;
+        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
 
         if (!m_audioOutput)
         {
             m_audioOutput = new QAudioOutput(format, this);
             m_audioOutput->setBufferSize(2 * packetSize);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-            m_audioOutput->start(m_call);
+            m_audioOutput->start(channel);
         }
 
         if (!m_audioInput)
@@ -149,7 +152,7 @@ void CallHandler::callStateChanged(QXmppCall::State state)
             m_audioInput->setBufferSize(2 * packetSize);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
 #endif
-            m_audioInput->start(m_call);
+            m_audioInput->start(channel);
         }
     } else {
         if (m_audioInput)
