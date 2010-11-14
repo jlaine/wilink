@@ -10,17 +10,6 @@
 
 const quint8 RTP_VERSION = 0x02;
 
-enum CodecId {
-    G711u = 0,
-    GSM = 3,
-    G723 = 4,
-    G711a = 8,
-    G722 = 9,
-    L16Stereo = 10,
-    L16Mono = 11,
-    G728 = 15,
-    G729 = 18,
-};
 
 class RtpChannelPrivate
 {
@@ -89,6 +78,7 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
 {
     if (!d->codec)
     {
+        qWarning("datagram received before codec selection");
         emit logMessage(QXmppLogger::WarningMessage,
                         QLatin1String("RtpChannel::datagramReceived before codec selection"));
         return;

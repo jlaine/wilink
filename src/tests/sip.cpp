@@ -67,7 +67,7 @@ class SipCall
 {
 public:
     QByteArray id;
-    QUdpSocket *socket;
+    //QUdpSocket *socket;
     RtpChannel *channel;
 };
 
@@ -187,27 +187,46 @@ SipClient::~SipClient()
 
 void SipClient::call(const QString &recipient)
 {
+
+    QUdpSocket *socket = new QUdpSocket(this);
+    if (!socket->bind(d->socket->localAddress(), 0))
+    {
+        qWarning("Could not listen for RTP");
+        delete socket;
+        return;
+    }
+
     SipCall *call = new SipCall;
     call->id = generateStanzaHash().toLatin1();
-
     call->channel = new RtpChannel(this);
-    call->socket = new QUdpSocket(this);
-    call->socket->bind(d->socket->localAddress(), 0);
-    call->channel->setSocket(d->socket);
+    call->channel->setSocket(socket);
+    socket->setParent(call->channel);
+
+    // FIXME : negociate codec!
+    QXmppJinglePayloadType payload;
+    payload.setId(RtpChannel::G711u);
+    payload.setChannels(1);
+    payload.setName("PCMU");
+    payload.setClockrate(8000);
+    call->channel->setPayloadType(payload);
 
     SdpMessage sdp;
     sdp.addField('v', "0");
     sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
     sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + call->socket->localAddress().toString().toUtf8());
+    sdp.addField('c', "IN IP4 " + socket->localAddress().toString().toUtf8());
     sdp.addField('t', "0 0");
 #ifdef USE_ICE
     sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
     sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
 #endif
-    sdp.addField('m', "audio " + QByteArray::number(call->socket->localPort()) + " RTP/AVP 0 8 101");
-    sdp.addField('a', "rtpmap:101 telephone-event/8000");
-    sdp.addField('a', "fmtp:101 0-15");
+    QByteArray profiles = "RTP/AVP";
+    profiles += " " + QByteArray::number(payload.id());
+   // profiles += " " + QByteArray::number(RtpChannel::G711a);
+    //profiles += " 101";
+    sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
+    //sdp.addField('a', "rtpmap:101 telephone-event/8000");
+    //sdp.addField('a', "fmtp:101 0-15");
     sdp.addField('a', "sendrecv");
 #ifdef USE_ICE
     foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
@@ -302,7 +321,27 @@ void SipClient::datagramReceived()
     }
     int commandSeq = cseq.left(i).toInt();
     QByteArray command = cseq.mid(i+1);
-    qDebug() << "command" << command << commandSeq;
+    qDebug() << "Received reply for command" << command << commandSeq;
+
+    // find corresponding call
+    SipCall *currentCall = 0;
+    const QByteArray callId = reply.headerField("Call-ID");
+    if (callId != d->baseId)
+    {
+        foreach (SipCall *potentialCall, d->calls)
+        {
+            if (potentialCall->id == reply.headerField("Call-ID"))
+            {
+                currentCall = potentialCall;
+                break;
+            }
+        }
+        if (!currentCall)
+        {
+            qWarning("Received a reply for unknown call " + callId);
+            return;
+        }
+    }
 
     // send ack
     if (command == "INVITE" && reply.statusCode() >= 200) {
@@ -343,7 +382,19 @@ void SipClient::datagramReceived()
         return;
     }
 
-    if (reply.headerField("Call-ID") == d->baseId) {
+    // "base" call
+    if (currentCall)
+    {
+        qDebug() << "Call" << currentCall->id << "progress" << reply.statusCode() << reply.reasonPhrase();
+        if (reply.statusCode() == 200)
+        {
+            qDebug() << "Call" << currentCall->id << "established";
+        } else if (reply.statusCode() >= 400) {
+            qDebug() << "Call" << currentCall->id << "failed";
+            d->calls.removeAll(currentCall);
+            delete currentCall;
+        }
+    } else {
         if (command == "REGISTER" && reply.statusCode() == 200) {
             const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
             SipRequest request = d->buildRequest("SUBSCRIBE", uri, d->baseId);
@@ -352,9 +403,10 @@ void SipClient::datagramReceived()
         }
         else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
             const QString recipient = QString("sip:%1@%2").arg(d->phoneNumber, d->serverName);
-            //call(recipient);
+            call(recipient);
         }
     }
+
 }
 
 SipRequest::SipRequest()
@@ -430,7 +482,7 @@ SipReply::SipReply(const QByteArray &bytes)
         return;
 
     m_statusCode = status.mid(8, 3).toInt();
-    m_reasonPhrase = status.mid(12);
+    m_reasonPhrase = QString::fromUtf8(status.mid(12));
 
     const QByteArray header = bytes.mid(j+1);
 
@@ -475,6 +527,11 @@ SipReply::SipReply(const QByteArray &bytes)
             field = "Via";
         m_fields.append(qMakePair(field, value));
     }
+}
+
+QString SipReply::reasonPhrase() const
+{
+    return m_reasonPhrase;
 }
 
 int SipReply::statusCode() const

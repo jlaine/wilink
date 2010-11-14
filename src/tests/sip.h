@@ -51,6 +51,7 @@ class SipReply : public SipPacket
 {
 public:
     SipReply(const QByteArray &bytes);
+    QString reasonPhrase() const;
     int statusCode() const;
 
 private:
