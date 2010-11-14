@@ -405,22 +405,28 @@ void SipClient::datagramReceived()
 
             if (!currentCall->audioOutput)
             {
+                RtpChannel *channel = currentCall->channel;
+
                 // prepare audio format
                 QAudioFormat format;
-                format.setFrequency(currentCall->channel->payloadType().clockrate());
-                format.setChannels(currentCall->channel->payloadType().channels());
+                format.setFrequency(channel->payloadType().clockrate());
+                format.setChannels(channel->payloadType().channels());
                 format.setSampleSize(16);
                 format.setCodec("audio/pcm");
                 format.setByteOrder(QAudioFormat::LittleEndian);
                 format.setSampleType(QAudioFormat::SignedInt);
 
+                int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
+
                 // initialise audio output
                 currentCall->audioOutput = new QAudioOutput(format, this);
-                currentCall->audioOutput->start(currentCall->channel);
+                currentCall->audioOutput->setBufferSize(2 * packetSize);
+                currentCall->audioOutput->start(channel);
 
                 // initialise audio input
                 currentCall->audioInput = new QAudioInput(format, this);
-                currentCall->audioInput->start(currentCall->channel);
+                currentCall->audioInput->setBufferSize(2 * packetSize);
+                currentCall->audioInput->start(channel);
             }
 
         } else if (reply.statusCode() >= 400) {
