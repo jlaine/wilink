@@ -79,7 +79,6 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
 {
     if (!d->codec)
     {
-        qWarning("datagram received before codec selection");
         emit logMessage(QXmppLogger::WarningMessage,
                         QLatin1String("RtpChannel::datagramReceived before codec selection"));
         return;
@@ -112,6 +111,16 @@ void RtpChannel::datagramReceived(const QByteArray &buffer)
             .arg(QString::number(stamp))
             .arg(QString::number(packetLength)));
 #endif
+
+    // check type
+    if (type != d->payloadType.id())
+    {
+        emit logMessage(QXmppLogger::WarningMessage,
+            QString("RTP packet seq %1 has unknown type %2")
+                .arg(QString::number(sequence))
+                .arg(QString::number(type)));
+        return;
+    }
 
     // check sequence number
     if (sequence != d->incomingSequence + 1)
