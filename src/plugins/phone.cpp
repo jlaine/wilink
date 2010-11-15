@@ -58,6 +58,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     connectButton = new QPushButton(tr("Connect"));
     passwordBox->addWidget(connectButton);
     disconnectButton = new QPushButton(tr("Disconnect"));
+    disconnectButton->setEnabled(false);
     passwordBox->addWidget(disconnectButton);
     layout->addLayout(passwordBox);
 
@@ -157,12 +158,14 @@ void PhonePanel::connectToServer()
     QSettings settings;
     settings.setValue("PhonePassword", password);
 
-    const QString jid = client->configuration().jid();
-    sip->setDomain(jidToDomain(jid));
-    sip->setUsername(jidToUser(jid));
-
-    sip->setPassword(password);
-    sip->connectToServer();
+    // connect to server
+    if (!password.isEmpty()) {
+        const QString jid = client->configuration().jid();
+        sip->setDomain(jidToDomain(jid));
+        sip->setUsername(jidToUser(jid));
+        sip->setPassword(password);
+        sip->connectToServer();
+    }
     emit registerPanel();
 }
 

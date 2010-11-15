@@ -39,7 +39,9 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
-#define QXMPP_DEBUG_SIP
+//#define QXMPP_DEBUG_SIP
+#define EXPIRE_SECONDS 300
+#define TIMEOUT_SECONDS 30
 
 QXmppLoggable::QXmppLoggable(QObject *parent)
     : QObject(parent)
@@ -137,6 +139,7 @@ public:
     QByteArray baseId;
     int cseq;
     QByteArray tag;
+    QTimer *registerTimer;
 
     // configuration
     QString displayName;
@@ -187,7 +190,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     connect(d->timer, SIGNAL(timeout()),
             this, SLOT(handleTimeout()));
 
-    d->timer->start(20000);
+    d->timer->start(TIMEOUT_SECONDS * 1000);
 }
 
 SipCall::~SipCall()
@@ -336,6 +339,9 @@ void SipCall::handleTimeout()
 
 void SipCall::hangup()
 {
+    if (d->state != QXmppCall::ActiveState)
+        return;
+
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     setState(QXmppCall::DisconnectingState);
@@ -483,6 +489,10 @@ SipClient::SipClient(QObject *parent)
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
+
+    d->registerTimer = new QTimer(this);
+    connect(d->registerTimer, SIGNAL(timeout()),
+            this, SLOT(connectToServer()));
 }
 
 SipClient::~SipClient()
@@ -624,25 +634,29 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
-    request.setHeaderField("Expires", "300");
+    request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request);
-
     setState(ConnectingState);
+    d->registerTimer->start((EXPIRE_SECONDS - TIMEOUT_SECONDS) * 1000);
 }
 
 void SipClient::disconnectFromServer()
 {
+    d->registerTimer->start(0);
+
     // terminate calls
     foreach (SipCall *call, d->calls)
         call->hangup();
 
     // unregister
-    const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
-    SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
-    request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
-    d->sendRequest(request);
+    if (d->state == SipClient::ConnectedState) {
+        const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
+        SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
+        request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
+        d->sendRequest(request);
 
-    setState(DisconnectingState);
+        setState(DisconnectingState);
+    }
 }
 
 void SipClient::datagramReceived()
@@ -777,7 +791,7 @@ void SipClient::datagramReceived()
                     d->reflexivePort = params.value("rport").toUInt();
                 const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
                 SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId);
-                request.setHeaderField("Expires", "3600");
+                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
                 d->sendRequest(request);
             }
         }
