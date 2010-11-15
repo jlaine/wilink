@@ -116,12 +116,15 @@ public:
     QHostAddress remoteHost;
     quint16 remotePort;
     QUdpSocket *socket;
+
+    SipCall *q;
 };
 
 SipCall::SipCall(QUdpSocket *socket, QObject *parent)
     : QXmppLoggable(parent),
     d(new SipCallPrivate)
 {
+    d->q = this;
     d->id = generateStanzaHash().toLatin1();
     d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
@@ -150,7 +153,11 @@ QByteArray SipCall::id() const
 
 void SipCall::handleReply(const SipReply &reply)
 {
-    if (reply.statusCode() < 200)
+    if (reply.statusCode() == 180)
+    {
+        emit ringing();
+    }
+    else if (reply.statusCode() < 200)
     {
         debug(QString("Call %1 progress %2 %3").arg(
             QString::fromUtf8(d->id),
@@ -221,6 +228,8 @@ void SipCall::handleReply(const SipReply &reply)
             d->audioInput = new QAudioInput(format, this);
             d->audioInput->setBufferSize(2 * packetSize);
             d->audioInput->start(d->channel);
+
+            emit connected();
         }
     } else if (reply.statusCode() >= 300) {
         warning(QString("Call %1 failed").arg(
@@ -559,12 +568,6 @@ void SipClient::datagramReceived()
         request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
         if (!reply.headerField("Record-Route").isEmpty())
             request.setHeaderField("Route", reply.headerField("Record-Route"));
-#if 0
-        if (!d->lastRequest.headerField("Proxy-Authorization").isEmpty())
-            request.setHeaderField("Proxy-Authorization", d->lastRequest.headerField("Proxy-Authorization"));
-        if (!d->lastRequest.headerField("Authorization").isEmpty())
-            request.setHeaderField("Authorization", d->lastRequest.headerField("Authorization"));
-#endif
         d->sendRequest(request);
     }
 

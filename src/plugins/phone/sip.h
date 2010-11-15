@@ -117,7 +117,16 @@ public:
     QByteArray id() const;
 
 signals:
+    /// This signal is emitted when a call is connected.
+    void connected();
+
+    /// This signal is emitted when a call is finished.
+    ///
+    /// Note: Do not delete the call in the slot connected to this signal,
+    /// instead use deleteLater().
     void finished();
+
+    /// This signal is emitted when the remote party is ringing.
     void ringing();
 
 private slots:
