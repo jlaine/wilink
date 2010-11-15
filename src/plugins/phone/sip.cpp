@@ -480,14 +480,21 @@ SipCall *SipClient::call(const QString &recipient)
     sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
     sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
 #endif
+    // RTP profile
     QByteArray profiles = "RTP/AVP";
-    foreach (const QXmppJinglePayloadType &payload, call->d->channel->supportedPayloadTypes())
+    QList<QByteArray> attrs;
+    foreach (const QXmppJinglePayloadType &payload, call->d->channel->supportedPayloadTypes()) {
         profiles += " " + QByteArray::number(payload.id());
+        attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
+    }
     profiles += " 101";
+    attrs << "rtpmap:101 telephone-event/8000";
+    attrs << "fmtp:101 0-15";
+    attrs << "sendrecv";
+
     sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
-    sdp.addField('a', "rtpmap:101 telephone-event/8000");
-    sdp.addField('a', "fmtp:101 0-15");
-    sdp.addField('a', "sendrecv");
+    foreach (const QByteArray &attr, attrs)
+        sdp.addField('a', attr);
 #ifdef USE_ICE
     foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
