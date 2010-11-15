@@ -251,15 +251,6 @@ void SipClient::call(const QString &recipient)
     }
 
     SipCall *call = new SipCall(socket, this);
-    QXmppRtpChannel *channel = call->d->channel;
-
-    // FIXME : negociate codec!
-    QXmppJinglePayloadType payload;
-    payload.setId(QXmppRtpChannel::G711u);
-    payload.setChannels(1);
-    payload.setName("PCMU");
-    payload.setClockrate(8000);
-    channel->setPayloadType(payload);
 
     SdpMessage sdp;
     sdp.addField('v', "0");
@@ -272,8 +263,8 @@ void SipClient::call(const QString &recipient)
     sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
 #endif
     QByteArray profiles = "RTP/AVP";
-    profiles += " " + QByteArray::number(payload.id());
-    // profiles += " " + QByteArray::number(QXmppRtpChannel::G711a);
+    foreach (const QXmppJinglePayloadType &payload, call->d->channel->supportedPayloadTypes())
+        profiles += " " + QByteArray::number(payload.id());
     profiles += " 101";
     sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
     sdp.addField('a', "rtpmap:101 telephone-event/8000");
@@ -433,7 +424,7 @@ void SipClient::datagramReceived()
         return;
     }
 
-    // "base" call
+    // actual VoIP call
     if (currentCall)
     {
         qDebug() << "Call" << currentCall->id() << "progress" << reply.statusCode() << reply.reasonPhrase();
@@ -444,6 +435,14 @@ void SipClient::datagramReceived()
             if (!currentCall->d->audioOutput)
             {
                 QXmppRtpChannel *channel = currentCall->d->channel;
+
+                // FIXME: actually negociate codec!
+                QXmppJinglePayloadType payload;
+                payload.setId(QXmppRtpChannel::G711u);
+                payload.setChannels(1);
+                payload.setName("PCMU");
+                payload.setClockrate(8000);
+                channel->setPayloadType(payload);
 
                 // prepare audio format
                 QAudioFormat format;
@@ -472,6 +471,8 @@ void SipClient::datagramReceived()
             d->calls.removeAll(currentCall);
             delete currentCall;
         }
+
+    // "base" call
     } else {
         if (command == "REGISTER" && reply.statusCode() == 200) {
             const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
