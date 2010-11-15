@@ -116,12 +116,11 @@ SipCall::SipCall(QUdpSocket *socket, QObject *parent)
     d->socket->setParent(this);
 
     connect(d->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
+            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
-               this, SLOT(writeToSocket(QByteArray)));
-
+            this, SLOT(writeToSocket(QByteArray)));
     connect(d->socket, SIGNAL(readyRead()),
-               this, SLOT(readFromSocket()));
+            this, SLOT(readFromSocket()));
 }
 
 SipCall::~SipCall()

@@ -34,6 +34,8 @@ PhoneTester::PhoneTester(QObject *parent)
     m_client->setPassword(settings.value("password").toString());
     m_phoneNumber = settings.value("phoneNumber").toString();
 
+    connect(m_client, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
     connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
     connect(m_client, SIGNAL(disconnected()), this, SIGNAL(finished()));
 }
