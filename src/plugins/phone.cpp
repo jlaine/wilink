@@ -97,6 +97,8 @@ void PhonePanel::callNumber()
             this, SLOT(callConnected()));
     connect(call, SIGNAL(finished()),
             this, SLOT(callFinished()));
+    connect(call, SIGNAL(ringing()),
+            this, SLOT(callRinging()));
 }
 
 void PhonePanel::callRinging()
