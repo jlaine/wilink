@@ -893,10 +893,7 @@ QMap<QByteArray, QByteArray> SipPacket::headerFieldParameters(const QByteArray &
         {
             int i = bit.indexOf('=');
             if (i >= 0)
-            {
-                qDebug() << "param" << bit.left(i) << bit.mid(i+1);
                 params[bit.left(i)] = bit.mid(i+1);
-            }
         }
     }
     return params;
