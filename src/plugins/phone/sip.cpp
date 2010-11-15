@@ -487,6 +487,8 @@ SipClient::SipClient(QObject *parent)
 
 SipClient::~SipClient()
 {
+    if (d->state == ConnectedState)
+        disconnectFromServer();
     delete d;
 }
 
