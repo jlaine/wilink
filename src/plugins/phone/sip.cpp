@@ -725,7 +725,7 @@ SipPacket::SipPacket(const QByteArray &bytes)
 
     // parse status
     const QByteArray status = bytes.left(j);
-    if (status.size() >= 10 && status.startsWith("SIP/2.0")) {
+    if (status.size() >= 10 && status.startsWith("SIP/2.0 ")) {
         m_statusCode = status.mid(8, 3).toInt();
         m_reasonPhrase = QString::fromUtf8(status.mid(12));
     }
@@ -896,6 +896,12 @@ QByteArray SipPacket::toByteArray() const
         ba += ' ';
         ba += m_uri;
         ba += " SIP/2.0\r\n";
+    } else {
+        ba += "SIP/2.0 ";
+        ba += QByteArray::number(m_statusCode);
+        ba += ' ';
+        ba += m_reasonPhrase.toUtf8();
+        ba += "\r\n";
     }
 
     QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
