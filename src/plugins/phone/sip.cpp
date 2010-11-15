@@ -26,6 +26,7 @@
 #include <QNetworkInterface>
 #include <QPair>
 #include <QUdpSocket>
+#include <QTimer>
 
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
@@ -123,6 +124,7 @@ public:
 
     SipCall *q;
     SipClient *client;
+    QTimer *timer;
 };
 
 class SipClientPrivate
@@ -173,6 +175,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->remotePort = 0;
     d->socket = socket;
     d->socket->setParent(this);
+    d->timer = new QTimer(this);
 
     connect(d->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
@@ -180,6 +183,10 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
             this, SLOT(writeToSocket(QByteArray)));
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(readFromSocket()));
+    connect(d->timer, SIGNAL(timeout()),
+            this, SIGNAL(finished()));
+
+    d->timer->start(20000);
 }
 
 SipCall::~SipCall()
@@ -216,6 +223,7 @@ void SipCall::handleReply(const SipPacket &reply)
     else if (reply.statusCode() == 200)
     {
         debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
+        d->timer->stop();
 
         if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
         {
@@ -280,6 +288,7 @@ void SipCall::handleReply(const SipPacket &reply)
     } else if (reply.statusCode() >= 300) {
         warning(QString("Call %1 failed").arg(
             QString::fromUtf8(d->id)));
+        d->timer->stop();
         emit finished();
     }
 }
