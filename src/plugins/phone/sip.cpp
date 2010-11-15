@@ -219,8 +219,6 @@ void SipCall::handleReply(const SipPacket &reply)
 
         if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
         {
-            QXmppRtpChannel *channel = d->channel;
-
             // parse descriptor
             SdpMessage sdp(reply.body());
             QPair<char, QByteArray> field;

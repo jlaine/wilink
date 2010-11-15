@@ -33,6 +33,8 @@ SOURCES += \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
     ../plugins/contacts.cpp \
+    ../plugins/phone.cpp \
+    ../plugins/phone/sip.cpp \
     ../plugins/photos.cpp \
     ../plugins/rooms.cpp \
     ../plugins/transfers.cpp \
@@ -63,6 +65,8 @@ HEADERS += \
     ../plugins/contacts.h \
     ../plugins/console.h \
     ../plugins/photos.h \
+    ../plugins/phone.h \
+    ../plugins/phone/sip.h \
     ../plugins/rooms.h \
     ../plugins/transfers.h
 
