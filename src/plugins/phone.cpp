@@ -206,6 +206,55 @@ void PhonePanel::sipDisconnected()
     callButton->setEnabled(false);
 }
 
+// WIDGET
+
+PhoneWidget::PhoneWidget(SipCall *call, QGraphicsItem *parent)
+    : ChatPanelWidget(parent),
+    m_call(call)
+{
+    // setup GUI
+    setIconPixmap(QPixmap(":/call.png"));
+    setButtonPixmap(QPixmap(":/hangup.png"));
+    setButtonToolTip(tr("Hang up"));
+    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
+
+    connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
+    connect(m_call, SIGNAL(finished()), this, SLOT(callFinished()));
+    connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
+    connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
+        this, SLOT(callStateChanged(QXmppCall::State)));
+}
+
+/** When the call thread finishes, perform cleanup.
+ */
+void PhoneWidget::callFinished()
+{
+    m_call->deleteLater();
+    m_call = 0;
+
+    // make widget disappear
+    setButtonEnabled(false);
+    QTimer::singleShot(1000, this, SLOT(disappear()));
+}
+
+void PhoneWidget::callRinging()
+{
+
+}
+
+void PhoneWidget::callStateChanged(SipClient::State state)
+{
+}
+
+void PhoneWidget::setGeometry(const QRectF &rect)
+{
+    ChatPanelWidget::setGeometry(rect);
+
+    QRectF contents = contentsRect();
+    m_label->setPos(contents.left(), contents.top() +
+        (contents.height() - m_label->boundingRect().height()) / 2);
+}
+
 // PLUGIN
 
 class PhonePlugin : public ChatPlugin

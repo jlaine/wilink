@@ -127,14 +127,6 @@ public:
     QTimer *timer;
 };
 
-enum SipClientState
-{
-    DisconnectedState = 0,
-    ConnectingState = 1,
-    ConnectedState = 2,
-    DisconnectingState = 3,
-};
-
 class SipClientPrivate
 {
 public:
@@ -152,7 +144,7 @@ public:
     QString password;
     QString domain;
 
-    SipClientState state;
+    SipClient::State state;
     QString rinstance;
     QMap<QByteArray, AuthInfo> authInfos;
     QHostAddress serverAddress;

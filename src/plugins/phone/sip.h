@@ -147,6 +147,14 @@ class SipClient : public QXmppLoggable
     Q_OBJECT
 
 public:
+    enum State
+    {
+        DisconnectedState = 0,
+        ConnectingState = 1,
+        ConnectedState = 2,
+        DisconnectingState = 3,
+    };
+
     SipClient(QObject *parent = 0);
     ~SipClient();
 

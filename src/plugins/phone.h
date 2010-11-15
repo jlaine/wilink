@@ -22,11 +22,33 @@
 
 #include "chat_panel.h"
 
+#include "plugins/phone/sip.h"
+
+class QGraphicsSimpleTextItem;
 class QLabel;
 class QLineEdit;
 class QPushButton;
 class ChatClient;
+class SipCall;
 class SipClient;
+
+class PhoneWidget : public ChatPanelWidget
+{
+    Q_OBJECT
+
+public:
+    PhoneWidget(SipCall *call, QGraphicsItem *parent = 0);
+    void setGeometry(const QRectF &rect);
+
+private slots:
+    void callFinished();
+    void callRinging();
+    void callStateChanged(SipClient::State state);
+
+private:
+    SipCall *m_call;
+    QGraphicsSimpleTextItem *m_label;
+};
 
 class PhonePanel : public ChatPanel
 {
