@@ -13,6 +13,7 @@
 
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
+#include "QXmppSrvInfo.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 #include "sip.h"
@@ -299,16 +300,32 @@ void SipClient::call(const QString &recipient)
     d->sendRequest(request);
 }
 
-void SipClient::connectToServer(const QString &server, quint16 port)
+void SipClient::connectToServer()
 {
-    QHostInfo info = QHostInfo::fromName(server);
-    if (info.addresses().isEmpty())
+    qDebug() << "Looking up server for domain" << d->domain;
+    QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
+                                SLOT(connectToServer(QXmppSrvInfo)));
+}
+
+void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
+{
+    if (!serviceInfo.records().isEmpty()) {
+        d->serverName = serviceInfo.records().first().target();
+        d->serverPort = serviceInfo.records().first().port();
+    } else {
+        d->serverName = d->domain;
+        d->serverPort = 5060;
+    }
+
+    qDebug("Connecting to %s:%i", qPrintable(d->serverName), d->serverPort);
+    QHostInfo info = QHostInfo::fromName(d->serverName);
+    if (info.addresses().isEmpty()) {
+        qWarning("Could not lookup %s", qPrintable(d->serverName));
         return;
+    }
+    d->serverAddress = info.addresses().first();
     d->baseId = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
-    d->serverAddress = info.addresses().first();
-    d->serverName = server;
-    d->serverPort = port;
 
     QHostAddress bindAddress;
     foreach (const QHostAddress &ip, QNetworkInterface::allAddresses())
@@ -732,7 +749,7 @@ int main(int argc, char* argv[])
 
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
     SipClient client;
-    client.connectToServer("sip.wifirst.net", 5060);
+    client.connectToServer();
 
     int ret = app.exec();
     client.disconnectFromServer();

@@ -2,6 +2,7 @@
 #include <QPair>
 
 class QUdpSocket;
+class QXmppSrvInfo;
 
 class SipCallPrivate;
 class SipClientPrivate;
@@ -95,10 +96,11 @@ public:
     ~SipClient();
 
     void call(const QString &recipient);
-    void connectToServer(const QString &server, quint16 port);
+    void connectToServer();
     void disconnectFromServer();
 
 private slots:
+    void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
 
 private:
