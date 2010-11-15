@@ -23,6 +23,8 @@
 #include "chat_panel.h"
 
 class QLabel;
+class QLineEdit;
+class QPushButton;
 class ChatClient;
 class SipClient;
 
@@ -34,6 +36,7 @@ public:
     PhonePanel(ChatClient *xmppClient, QWidget *parent = NULL);
 
 private slots:
+    void callNumber();
     void chatConnected();
     void sipConnected();
     void sipDisconnected();
@@ -41,6 +44,9 @@ private slots:
 private:
     ChatClient *client;
     SipClient *sip;
+
+    QPushButton *callButton;
+    QLineEdit *numberEdit;
     QLabel *statusLabel;
 };
 

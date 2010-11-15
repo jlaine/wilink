@@ -19,6 +19,9 @@
 
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QSettings>
 #include <QTimer>
 
 #include "QXmppUtils.h"
@@ -42,6 +45,15 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
     //layout->addSpacing(10);
+
+    QHBoxLayout *hbox = new QHBoxLayout;
+    numberEdit = new QLineEdit;
+    hbox->addWidget(numberEdit);
+    callButton = new QPushButton;
+    callButton->setIcon(QIcon(":/call.png"));
+    hbox->addWidget(callButton);
+    layout->addLayout(hbox);
+
     statusLabel = new QLabel;
     layout->addWidget(statusLabel, 1);
 
@@ -53,9 +65,24 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     connect(client, SIGNAL(connected()), this, SLOT(chatConnected()));
     connect(sip, SIGNAL(connected()), this, SLOT(sipConnected()));
     connect(sip, SIGNAL(disconnected()), this, SLOT(sipDisconnected()));
+    connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+            client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
+    connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
 
     /* register panel */
     QTimer::singleShot(0, this, SIGNAL(registerPanel()));
+}
+
+void PhonePanel::callNumber()
+{
+    QString phoneNumber = numberEdit->text().trimmed();
+    if (phoneNumber.isEmpty())
+        return;
+
+    const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
+    qDebug("Calling %s", qPrintable(recipient));
+    SipCall *call = sip->call(recipient);
 }
 
 void PhonePanel::chatConnected()
@@ -63,6 +90,10 @@ void PhonePanel::chatConnected()
     const QString jid = client->configuration().jid();
     sip->setDomain(jidToDomain(jid));
     sip->setUsername(jidToUser(jid));
+
+    // FIXME : get password
+    QSettings settings("sip.conf", QSettings::IniFormat);
+    sip->setPassword(settings.value("password").toString());
 
     statusLabel->setText(tr("Connecting.."));
     sip->connectToServer();

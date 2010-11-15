@@ -119,7 +119,7 @@ public:
     SipClient(QObject *parent = 0);
     ~SipClient();
 
-    void call(const QString &recipient);
+    SipCall *call(const QString &recipient);
     void connectToServer();
     void disconnectFromServer();
     QString serverName() const;
@@ -141,6 +141,7 @@ private slots:
     void datagramReceived();
 
 private:
+    void debug(const QString &msg);
     void warning(const QString &msg);
     SipClientPrivate *const d;
     friend class SipClientPrivate;

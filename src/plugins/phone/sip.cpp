@@ -274,14 +274,14 @@ SipClient::~SipClient()
     delete d;
 }
 
-void SipClient::call(const QString &recipient)
+SipCall *SipClient::call(const QString &recipient)
 {
     QUdpSocket *socket = new QUdpSocket;
     if (!socket->bind(d->socket->localAddress(), 0))
     {
         warning("Could not start listening for RTP");
         delete socket;
-        return;
+        return 0;
     }
 
     SipCall *call = new SipCall(socket, this);
@@ -323,12 +323,13 @@ void SipClient::call(const QString &recipient)
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
     d->sendRequest(request);
+
+    return call;
 }
 
 void SipClient::connectToServer()
 {
-    emit logMessage(QXmppLogger::DebugMessage,
-        QString("Looking up server for domain %1").arg(d->domain));
+    debug(QString("Looking up server for domain %1").arg(d->domain));
     QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
                                 SLOT(connectToServer(QXmppSrvInfo)));
 }
@@ -343,8 +344,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
         d->serverPort = 5060;
     }
 
-    emit logMessage(QXmppLogger::DebugMessage,
-        QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
+    debug(QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
     QHostInfo info = QHostInfo::fromName(d->serverName);
     if (info.addresses().isEmpty()) {
         warning(QString("Could not lookup SIP server %1").arg(d->serverName));
@@ -494,11 +494,13 @@ void SipClient::datagramReceived()
     {
         if (reply.statusCode() < 200)
         {
-            qDebug() << "Call" << currentCall->id() << "progress" << reply.statusCode() << reply.reasonPhrase();
+            debug(QString("Call %1 progress %2 %3").arg(
+                currentCall->id(),
+                QString::number(reply.statusCode()), reply.reasonPhrase()));
         }
         else if (reply.statusCode() == 200)
         {
-            qDebug() << "Call" << currentCall->id() << "established";
+            debug(QString("Call %1 established").arg(QString::fromUtf8(currentCall->id())));
 
             if (reply.headerField("Content-Type") == "application/sdp" && !currentCall->d->audioOutput)
             {
@@ -513,7 +515,6 @@ void SipClient::datagramReceived()
                         // determine remote host
                         if (field.second.startsWith("IN IP4 ")) {
                             currentCall->d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
-                            qDebug() << "found host" << currentCall->d->remoteHost;
                         }
                     } else if (field.first == 'm') {
                         QList<QByteArray> bits = field.second.split(' ');
@@ -522,7 +523,6 @@ void SipClient::datagramReceived()
 
                         // determine remote port
                         currentCall->d->remotePort = bits[1].toUInt();
-                        qDebug() << "found port" << currentCall->d->remotePort;
 
                         // determine codec
                         for (int i = 3; i < bits.size() && !channel->isOpen(); ++i)
@@ -566,7 +566,8 @@ void SipClient::datagramReceived()
             }
 
         } else if (reply.statusCode() >= 400) {
-            qDebug() << "Call" << currentCall->id() << "failed";
+            warning(QString("Call %1 failed").arg(
+                QString::fromUtf8(currentCall->id())));
             d->calls.removeAll(currentCall);
             delete currentCall;
         }
@@ -614,6 +615,11 @@ void SipClient::setPassword(const QString &password)
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
+}
+
+void SipClient::debug(const QString &msg)
+{
+    emit logMessage(QXmppLogger::DebugMessage, msg);
 }
 
 void SipClient::warning(const QString &msg)
