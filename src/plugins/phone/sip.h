@@ -107,3 +107,7 @@ private:
     SipClientPrivate *const d;
 };
 
+class SipTester : public QObject
+{
+
+};
