@@ -201,7 +201,8 @@ PhoneWidget::PhoneWidget(SipCall *call, QGraphicsItem *parent)
     setIconPixmap(QPixmap(":/call.png"));
     setButtonPixmap(QPixmap(":/hangup.png"));
     setButtonToolTip(tr("Hang up"));
-    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
+    m_nameLabel = new QGraphicsSimpleTextItem(call->recipient(), this);
+    m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
 
     connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
     connect(m_call, SIGNAL(finished()), this, SLOT(callFinished()));
@@ -223,7 +224,7 @@ void PhoneWidget::callFinished()
 
 void PhoneWidget::callRinging()
 {
-    m_label->setText(tr("Ringing.."));
+    m_statusLabel->setText(tr("Ringing.."));
 }
 
 void PhoneWidget::callStateChanged(QXmppCall::State state)
@@ -233,19 +234,19 @@ void PhoneWidget::callStateChanged(QXmppCall::State state)
     {
     case QXmppCall::OfferState:
     case QXmppCall::ConnectingState:
-        m_label->setText(tr("Connecting.."));
+        m_statusLabel->setText(tr("Connecting.."));
         setButtonEnabled(false);
         break;
     case QXmppCall::ActiveState:
-        m_label->setText(tr("Call connected."));
+        m_statusLabel->setText(tr("Call connected."));
         setButtonEnabled(true);
         break;
     case QXmppCall::DisconnectingState:
-        m_label->setText(tr("Disconnecting.."));
+        m_statusLabel->setText(tr("Disconnecting.."));
         setButtonEnabled(false);
         break;
     case QXmppCall::FinishedState:
-        m_label->setText(tr("Call finished."));
+        m_statusLabel->setText(tr("Call finished."));
         setButtonEnabled(false);
         break;
     }
@@ -254,10 +255,13 @@ void PhoneWidget::callStateChanged(QXmppCall::State state)
 void PhoneWidget::setGeometry(const QRectF &rect)
 {
     ChatPanelWidget::setGeometry(rect);
-
     QRectF contents = contentsRect();
-    m_label->setPos(contents.left(), contents.top() +
-        (contents.height() - m_label->boundingRect().height()) / 2);
+
+    m_nameLabel->setPos(contents.topLeft());
+    contents.setTop(m_nameLabel->boundingRect().bottom());
+ 
+    m_statusLabel->setPos(contents.left(), contents.top() +
+        (contents.height() - m_statusLabel->boundingRect().height()) / 2);
 }
 
 // PLUGIN

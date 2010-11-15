@@ -113,6 +113,7 @@ public:
     ~SipCall();
 
     QByteArray id() const;
+    QString recipient() const;
 
 signals:
     /// This signal is emitted when a call is connected.

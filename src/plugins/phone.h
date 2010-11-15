@@ -47,7 +47,8 @@ private slots:
 
 private:
     SipCall *m_call;
-    QGraphicsSimpleTextItem *m_label;
+    QGraphicsSimpleTextItem *m_nameLabel;
+    QGraphicsSimpleTextItem *m_statusLabel;
 };
 
 class PhonePanel : public ChatPanel

@@ -200,6 +200,11 @@ QByteArray SipCall::id() const
     return d->id;
 }
 
+QString SipCall::recipient() const
+{
+    return QString::fromUtf8(d->remoteRecipient);
+}
+
 void SipCall::handleReply(const SipPacket &reply)
 {
     if (d->state == QXmppCall::DisconnectingState)
