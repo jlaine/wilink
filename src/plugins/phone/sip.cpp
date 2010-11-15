@@ -627,7 +627,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 
 void SipClient::disconnectFromServer()
 {
-    d->registerTimer->start(0);
+    d->registerTimer->stop();
 
     // terminate calls
     foreach (SipCall *call, d->calls)
