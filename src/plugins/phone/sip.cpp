@@ -104,6 +104,8 @@ public:
     QHostAddress remoteHost;
     quint16 remotePort;
     QUdpSocket *socket;
+    QByteArray inviteRecipient;
+    QByteArray inviteUri;
     QByteArray remoteRecipient;
     QByteArray remoteRoute;
     QByteArray remoteUri;
@@ -152,6 +154,8 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->client = parent;
     d->q = this;
     d->state = QXmppCall::OfferState;
+    d->inviteRecipient = QString("<%1>").arg(recipient).toUtf8();
+    d->inviteUri = recipient.toUtf8();
     d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
     d->remoteUri = recipient.toUtf8();
 
@@ -185,6 +189,53 @@ SipCall::~SipCall()
 QByteArray SipCall::id() const
 {
     return d->id;
+}
+
+void SipCall::sendInvite()
+{
+    SdpMessage sdp;
+    sdp.addField('v', "0");
+    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
+    sdp.addField('s', qApp->applicationName().toUtf8());
+    sdp.addField('c', "IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
+    sdp.addField('t', "0 0");
+#ifdef USE_ICE
+    sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
+    sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
+#endif
+    // RTP profile
+    QByteArray profiles = "RTP/AVP";
+    QList<QByteArray> attrs;
+    foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
+        profiles += " " + QByteArray::number(payload.id());
+        attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
+    }
+    profiles += " 101";
+    attrs << "rtpmap:101 telephone-event/8000";
+    attrs << "fmtp:101 0-15";
+    attrs << "sendrecv";
+
+    sdp.addField('m', "audio " + QByteArray::number(d->socket->localPort()) + " "  + profiles);
+    foreach (const QByteArray &attr, attrs)
+        sdp.addField('a', attr);
+#ifdef USE_ICE
+    foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
+        QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
+        ba += QByteArray::number(candidate.component()) + " ";
+        ba += "UDP ";
+        ba += QByteArray::number(candidate.priority()) + " ";
+        ba += candidate.host().toString().toUtf8() + " ";
+        ba += QByteArray::number(candidate.port()) + " ";
+        ba += "typ host";
+        sdp.addField('a', ba);
+    }
+#endif
+
+    SipPacket request = d->client->d->buildRequest("INVITE", d->inviteUri, d->id);
+    request.setHeaderField("To", d->inviteRecipient);
+    request.setHeaderField("Content-Type", "application/sdp");
+    request.setBody(sdp.toByteArray());
+    d->client->d->sendRequest(request);
 }
 
 QString SipCall::recipient() const
@@ -323,8 +374,8 @@ void SipCall::handleTimeout()
 
 void SipCall::hangup()
 {
-    if (d->state != QXmppCall::ActiveState)
-        return;
+    //if (d->state != QXmppCall::ActiveState)
+    //    return;
 
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
@@ -349,6 +400,16 @@ void SipCall::hangup()
     request.setHeaderField("To", d->remoteRecipient);
     request.setHeaderField("Route", d->remoteRoute);
     d->client->d->sendRequest(request);
+
+#if 0
+    } else {
+        SipPacket request = d->client->d->buildRequest("CANCEL", d->inviteUri, d->id);
+        request.setHeaderField("To", d->inviteRecipient);
+        QByteArray cseq = d->client->d->lastRequest.headerField("CSeq").split(' ').first();
+        request.setHeaderField("CSeq", cseq + " CANCEL");
+        d->client->d->sendRequest(request);
+    }
+#endif
 }
 
 void SipCall::readFromSocket()
@@ -409,7 +470,8 @@ SipPacket SipClientPrivate::buildRequest(const QByteArray &method, const QByteAr
         QString::number(socket->localPort()), rinstance).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
-    packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO");
+    if (method != "CANCEL")
+        packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO");
     packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return packet;
 }
@@ -447,7 +509,7 @@ void SipClientPrivate::sendRequest(SipPacket &request)
                                "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
     }
 
-    if (request.isRequest() && request.method() != "ACK")
+    if (request.isRequest() && request.method() != "ACK" && request.method() != "CANCEL")
         lastRequest = request;
 
 #ifdef QXMPP_DEBUG_SIP
@@ -504,51 +566,8 @@ SipCall *SipClient::call(const QString &recipient)
     SipCall *call = new SipCall(recipient, socket, this);
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
-
-    SdpMessage sdp;
-    sdp.addField('v', "0");
-    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
-    sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + socket->localAddress().toString().toUtf8());
-    sdp.addField('t', "0 0");
-#ifdef USE_ICE
-    sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
-    sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
-#endif
-    // RTP profile
-    QByteArray profiles = "RTP/AVP";
-    QList<QByteArray> attrs;
-    foreach (const QXmppJinglePayloadType &payload, call->d->channel->supportedPayloadTypes()) {
-        profiles += " " + QByteArray::number(payload.id());
-        attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
-    }
-    profiles += " 101";
-    attrs << "rtpmap:101 telephone-event/8000";
-    attrs << "fmtp:101 0-15";
-    attrs << "sendrecv";
-
-    sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
-    foreach (const QByteArray &attr, attrs)
-        sdp.addField('a', attr);
-#ifdef USE_ICE
-    foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
-        QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
-        ba += QByteArray::number(candidate.component()) + " ";
-        ba += "UDP ";
-        ba += QByteArray::number(candidate.priority()) + " ";
-        ba += candidate.host().toString().toUtf8() + " ";
-        ba += QByteArray::number(candidate.port()) + " ";
-        ba += "typ host";
-        sdp.addField('a', ba);
-    }
-#endif
     d->calls << call;
-
-    SipPacket request = d->buildRequest("INVITE", call->d->remoteUri, call->id());
-    request.setHeaderField("To", call->d->remoteRecipient);
-    request.setHeaderField("Content-Type", "application/sdp");
-    request.setBody(sdp.toByteArray());
-    d->sendRequest(request);
+    call->sendInvite();
 
     return call;
 }
@@ -701,19 +720,8 @@ void SipClient::datagramReceived()
     int commandSeq = cseq.left(i).toInt();
     QByteArray command = cseq.mid(i+1);
 
-    // send ack
-    if (currentCall && command == "INVITE" && reply.statusCode() >= 200) {
-        SipPacket request;
-        request.setMethod("ACK");
-
-        QList<QByteArray> fields;
-        fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization" << "User-Agent";
-        foreach (const QByteArray &field, fields)
-        {
-            if (!d->lastRequest.headerField(field).isEmpty())
-                request.setHeaderField(field, d->lastRequest.headerField(field));
-        }
-
+    if (currentCall) {
+        // store information
         if (!reply.headerField("To").isEmpty())
             currentCall->d->remoteRecipient = reply.headerField("To");
         if (!reply.headerField("Contact").isEmpty())
@@ -721,13 +729,27 @@ void SipClient::datagramReceived()
         if (!reply.headerField("Record-Route").isEmpty())
             currentCall->d->remoteRoute = reply.headerField("Record-Route");
 
-        request.setUri(currentCall->d->remoteUri);
-        request.setHeaderField("Route", currentCall->d->remoteRoute);
-        request.setHeaderField("To", currentCall->d->remoteRecipient);
-        request.setHeaderField("From", reply.headerField("From"));
-        request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
-        request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
-        d->sendRequest(request);
+        // send ack
+        if  (command == "INVITE" && reply.statusCode() >= 200) {
+            SipPacket request;
+            request.setMethod("ACK");
+
+            QList<QByteArray> fields;
+            fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization" << "User-Agent";
+            foreach (const QByteArray &field, fields)
+            {
+                if (!d->lastRequest.headerField(field).isEmpty())
+                    request.setHeaderField(field, d->lastRequest.headerField(field));
+            }
+
+            request.setUri(currentCall->d->remoteUri);
+            request.setHeaderField("Route", currentCall->d->remoteRoute);
+            request.setHeaderField("To", currentCall->d->remoteRecipient);
+            request.setHeaderField("From", reply.headerField("From"));
+            request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
+            request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
+            d->sendRequest(request);
+        }
     }
 
     // handle authentication

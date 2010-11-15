@@ -161,6 +161,7 @@ void PhonePanel::connectToServer()
     // connect to server
     if (!password.isEmpty()) {
         const QString jid = client->configuration().jid();
+        sip->setDisplayName("wiLink");
         sip->setDomain(jidToDomain(jid));
         sip->setUsername(jidToUser(jid));
         sip->setPassword(password);
@@ -250,7 +251,7 @@ void PhoneWidget::callStateChanged(QXmppCall::State state)
     case QXmppCall::OfferState:
     case QXmppCall::ConnectingState:
         m_statusLabel->setText(tr("Connecting.."));
-        setButtonEnabled(false);
+        setButtonEnabled(true);
         break;
     case QXmppCall::ActiveState:
         m_statusLabel->setText(tr("Call connected."));

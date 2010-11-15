@@ -127,6 +127,7 @@ private:
     SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
+    void sendInvite();
     void setState(QXmppCall::State state);
 
     SipCallPrivate * const d;
