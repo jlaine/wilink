@@ -630,6 +630,10 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 
 void SipClient::disconnectFromServer()
 {
+    // terminate calls
+    foreach (SipCall *call, d->calls)
+        call->hangup();
+
     // unregister
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
