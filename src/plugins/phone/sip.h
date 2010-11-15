@@ -53,10 +53,13 @@ public:
     QByteArray body() const;
     void setBody(const QByteArray &body);
 
+    quint32 sequenceNumber() const;
+
     QByteArray headerField(const QByteArray &name, const QByteArray &defaultValue = QByteArray()) const;
     QMap<QByteArray, QByteArray> headerFieldParameters(const QByteArray &name) const;
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
     void addHeaderField(const QByteArray &name, const QByteArray &data);
+    void removeHeaderField(const QByteArray &name);
     void setHeaderField(const QByteArray &name, const QByteArray &data);
 
     bool isReply() const;
@@ -174,6 +177,7 @@ private slots:
     void callDestroyed(QObject *object);
     void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
+    void handleReply(const SipPacket &reply);
 
 private:
     SipClientPrivate *const d;

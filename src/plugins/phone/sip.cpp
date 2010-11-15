@@ -92,7 +92,7 @@ class SipCallContext
 public:
     SipCallContext() : cseq(1) {}
 
-    int cseq;
+    quint32 cseq;
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
     SipPacket lastRequest;
@@ -111,6 +111,7 @@ public:
     QUdpSocket *socket;
     QByteArray inviteRecipient;
     QByteArray inviteUri;
+    SipPacket inviteRequest;
     QByteArray remoteRecipient;
     QByteArray remoteRoute;
     QByteArray remoteUri;
@@ -239,6 +240,7 @@ void SipCall::sendInvite()
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
     d->client->d->sendRequest(request, d);
+    d->inviteRequest = request;
 }
 
 QString SipCall::recipient() const
@@ -248,14 +250,7 @@ QString SipCall::recipient() const
 
 void SipCall::handleReply(const SipPacket &reply)
 {
-    if (d->state == QXmppCall::DisconnectingState)
-    {
-        debug(QString("Call %1 finished").arg(
-            QString::fromUtf8(d->id)));
-
-        setState(QXmppCall::FinishedState);
-        return;
-    }
+    const QByteArray command = reply.headerField("CSeq").split(' ').last();
 
     // store information
     if (!reply.headerField("To").isEmpty())
@@ -266,105 +261,30 @@ void SipCall::handleReply(const SipPacket &reply)
         d->remoteRoute = reply.headerField("Record-Route");
 
     // send ack
-    if  (reply.statusCode() >= 200) {
+    if  (command == "INVITE" && reply.statusCode() >= 200) {
         SipPacket request;
         request.setMethod("ACK");
 
         QList<QByteArray> fields;
-        fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization" << "User-Agent";
+        fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization";
         foreach (const QByteArray &field, fields)
         {
             if (!d->lastRequest.headerField(field).isEmpty())
                 request.setHeaderField(field, d->lastRequest.headerField(field));
         }
-        QByteArray cseq = d->lastRequest.headerField("CSeq").split(' ').first();
+        quint32 cseq = d->lastRequest.sequenceNumber();
 
         request.setUri(d->remoteUri);
         request.setHeaderField("Route", d->remoteRoute);
         request.setHeaderField("To", d->remoteRecipient);
         request.setHeaderField("From", reply.headerField("From"));
         request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
-        request.setHeaderField("CSeq", cseq + " ACK");
+        request.setHeaderField("CSeq", QByteArray::number(cseq) + " ACK");
         d->client->d->sendRequest(request, d);
     }
 
-    if (reply.statusCode() == 180)
-    {
-        emit ringing();
-    }
-    else if (reply.statusCode() < 200)
-    {
-        debug(QString("Call %1 progress %2 %3").arg(
-            QString::fromUtf8(d->id),
-            QString::number(reply.statusCode()), reply.reasonPhrase()));
-    }
-    else if (reply.statusCode() == 200)
-    {
-        debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
-        d->timer->stop();
-
-        if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
-        {
-            // parse descriptor
-            SdpMessage sdp(reply.body());
-            QPair<char, QByteArray> field;
-            foreach (field, sdp.fields()) {
-                if (field.first == 'c') {
-                    // determine remote host
-                    if (field.second.startsWith("IN IP4 ")) {
-                        d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
-                    }
-                } else if (field.first == 'm') {
-                    QList<QByteArray> bits = field.second.split(' ');
-                    if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
-                        continue;
-
-                    // determine remote port
-                    d->remotePort = bits[1].toUInt();
-
-                    // determine codec
-                    for (int i = 3; i < bits.size() && !d->channel->isOpen(); ++i)
-                    {
-                        foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
-                            bool ok = false;
-                            if (payload.id() == bits[i].toInt(&ok) && ok) {
-                                d->channel->setPayloadType(payload);
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            if (!d->channel->isOpen()) {
-                warning("Could not negociate a common codec");
-                return;
-            }
-
-            // prepare audio format
-            QAudioFormat format;
-            format.setFrequency(d->channel->payloadType().clockrate());
-            format.setChannels(d->channel->payloadType().channels());
-            format.setSampleSize(16);
-            format.setCodec("audio/pcm");
-            format.setByteOrder(QAudioFormat::LittleEndian);
-            format.setSampleType(QAudioFormat::SignedInt);
-
-            int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * d->channel->payloadType().ptime() / 1000;
-
-            // initialise audio output
-            d->audioOutput = new QAudioOutput(format, this);
-            d->audioOutput->setBufferSize(2 * packetSize);
-            d->audioOutput->start(d->channel);
-
-            // initialise audio input
-            d->audioInput = new QAudioInput(format, this);
-            d->audioInput->setBufferSize(2 * packetSize);
-            d->audioInput->start(d->channel);
-
-            setState(QXmppCall::ActiveState);
-        }
-
-    } else if (reply.statusCode() == 407) {
+    // handle authentication
+    if (reply.statusCode() == 407) {
 
         const QByteArray auth = reply.headerField("Proxy-Authenticate");
         if (!auth.startsWith("Digest ") || !d->lastRequest.headerField("Proxy-Authorization").isEmpty())  {
@@ -377,12 +297,104 @@ void SipCall::handleReply(const SipPacket &reply)
         SipPacket request = d->lastRequest;
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
         d->client->d->sendRequest(request, d);
+        d->inviteRequest = request;
+        return;
+    }
 
-    } else if (reply.statusCode() >= 300) {
-        warning(QString("Call %1 failed").arg(
+    if (command == "BYE") {
+
+        SipPacket request = d->client->d->buildRequest("CANCEL", d->inviteUri, d->id, d->inviteRequest.sequenceNumber());
+        request.setHeaderField("To", d->inviteRecipient);
+        request.setHeaderField("Via", d->inviteRequest.headerField("Via"));
+        request.removeHeaderField("Contact");
+        d->client->d->sendRequest(request, d);
+
+    } else if (command == "CANCEL") {
+
+        debug(QString("Call %1 finished").arg(
             QString::fromUtf8(d->id)));
-        d->timer->stop();
+
         setState(QXmppCall::FinishedState);
+
+    } else if (command == "INVITE") {
+
+        if (reply.statusCode() == 180)
+        {
+            emit ringing();
+        }
+        else if (reply.statusCode() == 200)
+        {
+            debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
+            d->timer->stop();
+
+            if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
+            {
+                // parse descriptor
+                SdpMessage sdp(reply.body());
+                QPair<char, QByteArray> field;
+                foreach (field, sdp.fields()) {
+                    if (field.first == 'c') {
+                        // determine remote host
+                        if (field.second.startsWith("IN IP4 ")) {
+                            d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
+                        }
+                    } else if (field.first == 'm') {
+                        QList<QByteArray> bits = field.second.split(' ');
+                        if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
+                            continue;
+
+                        // determine remote port
+                        d->remotePort = bits[1].toUInt();
+
+                        // determine codec
+                        for (int i = 3; i < bits.size() && !d->channel->isOpen(); ++i)
+                        {
+                            foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
+                                bool ok = false;
+                                if (payload.id() == bits[i].toInt(&ok) && ok) {
+                                    d->channel->setPayloadType(payload);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!d->channel->isOpen()) {
+                    warning("Could not negociate a common codec");
+                    return;
+                }
+
+                // prepare audio format
+                QAudioFormat format;
+                format.setFrequency(d->channel->payloadType().clockrate());
+                format.setChannels(d->channel->payloadType().channels());
+                format.setSampleSize(16);
+                format.setCodec("audio/pcm");
+                format.setByteOrder(QAudioFormat::LittleEndian);
+                format.setSampleType(QAudioFormat::SignedInt);
+
+                int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * d->channel->payloadType().ptime() / 1000;
+
+                // initialise audio output
+                d->audioOutput = new QAudioOutput(format, this);
+                d->audioOutput->setBufferSize(2 * packetSize);
+                d->audioOutput->start(d->channel);
+
+                // initialise audio input
+                d->audioInput = new QAudioInput(format, this);
+                d->audioInput->setBufferSize(2 * packetSize);
+                d->audioInput->start(d->channel);
+
+                setState(QXmppCall::ActiveState);
+            }
+
+        } else if (reply.statusCode() >= 300) {
+
+            warning(QString("Call %1 failed").arg(
+                QString::fromUtf8(d->id)));
+            d->timer->stop();
+            setState(QXmppCall::FinishedState);
+        }
     }
 }
 
@@ -402,7 +414,6 @@ void SipCall::handleRequest(const SipPacket &request)
     response.setHeaderField("Call-Id", request.headerField("Call-Id"));
     response.setHeaderField("CSeq", request.headerField("CSeq"));
     response.setHeaderField("Record-Route", request.headerField("Record-Route"));
-    response.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     response.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
         d->client->d->username,
         d->client->d->reflexiveAddress.toString(),
@@ -449,16 +460,6 @@ void SipCall::hangup()
     request.setHeaderField("To", d->remoteRecipient);
     request.setHeaderField("Route", d->remoteRoute);
     d->client->d->sendRequest(request, d);
-
-#if 0
-    } else {
-        SipPacket request = d->client->d->buildRequest("CANCEL", d->inviteUri, d->id);
-        request.setHeaderField("To", d->inviteRecipient);
-        QByteArray cseq = d->client->d->lastRequest.headerField("CSeq").split(' ').first();
-        request.setHeaderField("CSeq", cseq + " CANCEL");
-        d->client->d->sendRequest(request);
-    }
-#endif
 }
 
 void SipCall::readFromSocket()
@@ -547,9 +548,8 @@ SipPacket SipClientPrivate::buildRequest(const QByteArray &method, const QByteAr
         QString::number(socket->localPort()), rinstance).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
-    if (method != "CANCEL")
+    if (method != "ACK" && method != "CANCEL")
         packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO");
-    packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return packet;
 }
 
@@ -560,10 +560,11 @@ void SipClientPrivate::sendRequest(SipPacket &request, SipCallContext *ctx)
             request.setHeaderField("Authorization", authorization(request, ctx->challenge));
         if (!ctx->proxyChallenge.isEmpty())
             request.setHeaderField("Proxy-Authorization", authorization(request, ctx->proxyChallenge));
-
-        if (request.method() != "ACK" && request.method() != "CANCEL")
-            ctx->lastRequest = request;
     }
+    request.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
+
+    if (request.isRequest() && request.method() != "ACK" && request.method() != "CANCEL")
+        ctx->lastRequest = request;
 
 #ifdef QXMPP_DEBUG_SIP
     q->logMessage(QXmppLogger::SentMessage,
@@ -755,54 +756,54 @@ void SipClient::datagramReceived()
     if (reply.isRequest()) {
         if (currentCall)
             currentCall->handleRequest(reply);
-        return;
+    } else if (reply.isReply()) {
+        if (currentCall)
+            currentCall->handleReply(reply);
+        else
+            handleReply(reply);
     } else if (!reply.isReply()) {
         warning("SIP packet is neither request nor reply");
-        return;
     }
+}
 
-    if (currentCall)
-    {
-        // actual VoIP call
-        currentCall->handleReply(reply);
-    } else {
-        // "base" call
-        const QByteArray command = reply.headerField("CSeq").split(' ').last();
-        if (reply.statusCode() == 401) {
-            // handle authentication
-            const QByteArray auth = reply.headerField("WWW-Authenticate");
-            if (!auth.startsWith("Digest ") || !d->lastRequest.headerField("Authorization").isEmpty())  {
-                warning("Authentication failed");
-                setState(DisconnectedState);
-                return;
-            }
-            d->challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
+void SipClient::handleReply(const SipPacket &reply)
+{
+    const QByteArray command = reply.headerField("CSeq").split(' ').last();
 
-            SipPacket request = d->lastRequest;
-            request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
+    if (reply.statusCode() == 401) {
+        // handle authentication
+        const QByteArray auth = reply.headerField("WWW-Authenticate");
+        if (!auth.startsWith("Digest ") || !d->lastRequest.headerField("Authorization").isEmpty())  {
+            warning("Authentication failed");
+            setState(DisconnectedState);
+            return;
+        }
+        d->challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
+
+        SipPacket request = d->lastRequest;
+        request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
+        d->sendRequest(request, d);
+    }
+    else if (command == "REGISTER" && reply.statusCode() == 200) {
+        if (d->state == DisconnectingState) {
+            setState(DisconnectedState);
+        } else {
+            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
+            if (params.contains("received"))
+                d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+            if (params.contains("rport"))
+                d->reflexivePort = params.value("rport").toUInt();
+            const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
+            SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
+            request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
             d->sendRequest(request, d);
         }
-        else if (command == "REGISTER" && reply.statusCode() == 200) {
-            if (d->state == DisconnectingState) {
-                setState(DisconnectedState);
-            } else {
-                QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
-                if (params.contains("received"))
-                    d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
-                if (params.contains("rport"))
-                    d->reflexivePort = params.value("rport").toUInt();
-                const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-                SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
-                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-                d->sendRequest(request, d);
-            }
-        }
-        else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
-            setState(ConnectedState);
-        }
     }
-
+    else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
+        setState(ConnectedState);
+    }
 }
+
 
 QString SipClient::serverName() const
 {
@@ -970,7 +971,7 @@ void SipPacket::addHeaderField(const QByteArray &name, const QByteArray &data)
     m_fields.append(qMakePair(name, data));
 }
 
-void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
+void SipPacket::removeHeaderField(const QByteArray &name)
 {
     QList<QPair<QByteArray, QByteArray> >::Iterator it = m_fields.begin();
     while (it != m_fields.end()) {
@@ -979,6 +980,11 @@ void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
         else
             ++it;
     }
+}
+
+void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
+{
+    removeHeaderField(name);
     m_fields.append(qMakePair(name, data));
 }
 
@@ -1030,6 +1036,11 @@ QString SipPacket::reasonPhrase() const
 void SipPacket::setReasonPhrase(const QString &reasonPhrase)
 {
     m_reasonPhrase = reasonPhrase;
+}
+
+quint32 SipPacket::sequenceNumber() const
+{
+    return headerField("CSeq").split(' ').first().toUInt();
 }
 
 int SipPacket::statusCode() const
