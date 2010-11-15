@@ -11,6 +11,7 @@ class SdpMessage
 public:
     SdpMessage(const QByteArray &ba = QByteArray());
     void addField(char name, const QByteArray &data);
+    QList<QPair<char, QByteArray> > fields() const;
     QByteArray toByteArray() const;
 
 private:

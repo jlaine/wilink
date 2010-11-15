@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QHostInfo>
 #include <QNetworkInterface>
+#include <QPair>
 #include <QSettings>
 #include <QUdpSocket>
 
@@ -49,6 +50,11 @@ SdpMessage::SdpMessage(const QByteArray &ba)
 void SdpMessage::addField(char name, const QByteArray &data)
 {
     m_fields.append(qMakePair(name, data));
+}
+
+QList<QPair<char, QByteArray> > SdpMessage::fields() const
+{
+    return m_fields;
 }
 
 QByteArray SdpMessage::toByteArray() const
@@ -113,7 +119,9 @@ void SipCall::readFromSocket()
     while (d->socket && d->socket->hasPendingDatagrams())
     {
         QByteArray ba(d->socket->pendingDatagramSize(), '\0');
-        d->socket->readDatagram(ba.data(), ba.size(), &d->remoteHost, &d->remotePort);
+        QHostAddress remoteHost;
+        quint16 remotePort = 0;
+        d->socket->readDatagram(ba.data(), ba.size(), &remoteHost, &remotePort);
         d->channel->datagramReceived(ba);
     }
 }
@@ -427,25 +435,56 @@ void SipClient::datagramReceived()
     // actual VoIP call
     if (currentCall)
     {
-        qDebug() << "Call" << currentCall->id() << "progress" << reply.statusCode() << reply.reasonPhrase();
-        if (reply.statusCode() == 200)
+        if (reply.statusCode() < 200)
+        {
+            qDebug() << "Call" << currentCall->id() << "progress" << reply.statusCode() << reply.reasonPhrase();
+        }
+        else if (reply.statusCode() == 200)
         {
             qDebug() << "Call" << currentCall->id() << "established";
 
             if (reply.headerField("Content-Type") == "application/sdp" && !currentCall->d->audioOutput)
             {
-                qDebug() << "body" << reply.body();
-                SdpMessage sdp(reply.body());
-
                 QXmppRtpChannel *channel = currentCall->d->channel;
 
-                // FIXME: actually negociate codec!
-                QXmppJinglePayloadType payload;
-                payload.setId(QXmppRtpChannel::G711u);
-                payload.setChannels(1);
-                payload.setName("PCMU");
-                payload.setClockrate(8000);
-                channel->setPayloadType(payload);
+                // parse descriptor
+                SdpMessage sdp(reply.body());
+                QPair<char, QByteArray> field;
+                foreach (field, sdp.fields()) {
+                    //qDebug() << "field" << field.first << field.second;
+                    if (field.first == 'c') {
+                        // determine remote host
+                        if (field.second.startsWith("IN IP4 ")) {
+                            currentCall->d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
+                            qDebug() << "found host" << currentCall->d->remoteHost;
+                        }
+                    } else if (field.first == 'm') {
+                        QList<QByteArray> bits = field.second.split(' ');
+                        if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
+                            continue;
+
+                        // determine remote port
+                        currentCall->d->remotePort = bits[1].toUInt();
+                        qDebug() << "found port" << currentCall->d->remotePort;
+
+                        // determine codec
+                        for (int i = 3; i < bits.size() && !channel->isOpen(); ++i)
+                        {
+                            foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
+                                bool ok = false;
+                                if (payload.id() == bits[i].toInt(&ok) && ok) {
+                                    qDebug() << "found codec" << payload.name();
+                                    channel->setPayloadType(payload);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!channel->isOpen()) {
+                    qWarning("Could not negociate a common codec");
+                    return;
+                }
 
                 // prepare audio format
                 QAudioFormat format;
