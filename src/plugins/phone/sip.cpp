@@ -588,9 +588,10 @@ void SipClient::datagramReceived()
     if (command == "INVITE" && reply.statusCode() >= 200) {
         SipRequest request;
         request.setMethod("ACK");
-        request.setUri(d->lastRequest.uri());
+        request.setUri(reply.headerField("contact").replace("<", "").replace(">", ""));
         request.setHeaderField("Via", d->lastRequest.headerField("Via"));
         request.setHeaderField("Max-Forwards", d->lastRequest.headerField("Max-Forwards"));
+        request.setHeaderField("Contact", d->lastRequest.headerField("Contact"));
         request.setHeaderField("To", reply.headerField("To"));
         request.setHeaderField("From", reply.headerField("From"));
         request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
@@ -784,6 +785,8 @@ SipReply::SipReply(const QByteArray &bytes)
             field = "Supported";
         else if (field == "l")
             field = "Content-Length";
+        else if (field == "m")
+            field = "Contact";
         else if (field == "t")
             field = "To";
         else if (field == "v")
