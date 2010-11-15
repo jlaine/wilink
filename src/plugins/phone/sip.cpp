@@ -176,6 +176,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->socket = socket;
     d->socket->setParent(this);
     d->timer = new QTimer(this);
+    d->timer->setSingleShot(true);
 
     connect(d->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
@@ -327,7 +328,9 @@ void SipCall::handleRequest(const SipPacket &request)
 
 void SipCall::handleTimeout()
 {
-
+    warning(QString("Call %1 timed out").arg(QString::fromUtf8(d->id)));
+    d->state = SipCall::FinishedState;
+    emit finished();
 }
 
 void SipCall::hangup()
