@@ -201,7 +201,12 @@ PhoneWidget::PhoneWidget(SipCall *call, QGraphicsItem *parent)
     setIconPixmap(QPixmap(":/call.png"));
     setButtonPixmap(QPixmap(":/hangup.png"));
     setButtonToolTip(tr("Hang up"));
-    m_nameLabel = new QGraphicsSimpleTextItem(call->recipient(), this);
+
+    QString recipient = call->recipient();
+    QRegExp recipientRx("[^>]*<(sip:)?([^>]+)>");
+    if (recipientRx.exactMatch(recipient))
+        recipient = recipientRx.cap(2).split('@').first();
+    m_nameLabel = new QGraphicsSimpleTextItem(recipient, this);
     m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
 
     connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));

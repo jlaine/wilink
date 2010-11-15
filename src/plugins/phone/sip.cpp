@@ -711,7 +711,7 @@ void SipClient::datagramReceived()
         }
 
         if (!reply.headerField("To").isEmpty())
-            currentCall->d->remoteRecipient =reply.headerField("To");
+            currentCall->d->remoteRecipient = reply.headerField("To");
         if (!reply.headerField("Contact").isEmpty())
             currentCall->d->remoteUri = reply.headerField("Contact").replace("<", "").replace(">", "");
         if (!reply.headerField("Record-Route").isEmpty())
