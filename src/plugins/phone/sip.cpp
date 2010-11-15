@@ -21,7 +21,6 @@
 #include <QAudioOutput>
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QPair>
