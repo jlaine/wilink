@@ -109,7 +109,6 @@ QByteArray SdpMessage::toByteArray() const
 class SipCallPrivate
 {
 public:
-    QString recipient;
     QByteArray id;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
@@ -117,6 +116,9 @@ public:
     QHostAddress remoteHost;
     quint16 remotePort;
     QUdpSocket *socket;
+    QByteArray remoteRecipient;
+    QByteArray remoteRoute;
+    QByteArray remoteUri;
 
     SipCall *q;
     SipClient *client;
@@ -157,7 +159,9 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
 {
     d->client = parent;
     d->q = this;
-    d->recipient = recipient;
+    d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
+    d->remoteUri = recipient.toUtf8();
+
     d->id = generateStanzaHash().toLatin1();
     d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
@@ -291,8 +295,9 @@ void SipCall::hangup()
     }
     d->socket->close();
 
-    SipRequest request = d->client->d->buildRequest("BYE", d->recipient.toUtf8(), d->id);
-    request.setHeaderField("To", "<" + d->recipient.toUtf8() + ">");
+    SipRequest request = d->client->d->buildRequest("BYE", d->remoteUri, d->id);
+    request.setHeaderField("To", d->remoteRecipient);
+    request.setHeaderField("Route", d->remoteRoute);
     d->client->d->sendRequest(request);
 }
 
@@ -318,8 +323,10 @@ void SipCall::writeToSocket(const QByteArray &ba)
 
 SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId)
 {
-    const QString addr = QString("\"%1\"<sip:%2@%3>").arg(displayName,
-        username, domain);
+    QString addr;
+    if (!displayName.isEmpty())
+        addr += QString("\"%1\"").arg(displayName);
+    addr += QString("<sip:%1@%2>").arg(username, domain);
     const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
     const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
         socket->localAddress().toString(),
@@ -456,8 +463,8 @@ SipCall *SipClient::call(const QString &recipient)
 #endif
     d->calls << call;
 
-    SipRequest request = d->buildRequest("INVITE", recipient.toUtf8(), call->id());
-    request.setHeaderField("To", "<" + recipient.toUtf8() + ">");
+    SipRequest request = d->buildRequest("INVITE", call->d->remoteUri, call->id());
+    request.setHeaderField("To", call->d->remoteRecipient);
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
     d->sendRequest(request);
@@ -585,19 +592,31 @@ void SipClient::datagramReceived()
     }
 
     // send ack
-    if (command == "INVITE" && reply.statusCode() >= 200) {
+    if (currentCall && command == "INVITE" && reply.statusCode() >= 200) {
         SipRequest request;
         request.setMethod("ACK");
-        request.setUri(reply.headerField("contact").replace("<", "").replace(">", ""));
-        request.setHeaderField("Via", d->lastRequest.headerField("Via"));
-        request.setHeaderField("Max-Forwards", d->lastRequest.headerField("Max-Forwards"));
-        request.setHeaderField("Contact", d->lastRequest.headerField("Contact"));
-        request.setHeaderField("To", reply.headerField("To"));
+
+        QList<QByteArray> fields;
+        fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization" << "User-Agent";
+        foreach (const QByteArray &field, fields)
+        {
+            if (!d->lastRequest.headerField(field).isEmpty())
+                request.setHeaderField(field, d->lastRequest.headerField(field));
+        }
+
+        if (!reply.headerField("To").isEmpty())
+            currentCall->d->remoteRecipient =reply.headerField("To");
+        if (!reply.headerField("Contact").isEmpty())
+            currentCall->d->remoteUri = reply.headerField("Contact").replace("<", "").replace(">", "");
+        if (!reply.headerField("Record-Route").isEmpty())
+            currentCall->d->remoteRoute = reply.headerField("Record-Route");
+
+        request.setUri(currentCall->d->remoteUri);
+        request.setHeaderField("Route", currentCall->d->remoteRoute);
+        request.setHeaderField("To", currentCall->d->remoteRecipient);
         request.setHeaderField("From", reply.headerField("From"));
         request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
         request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
-        if (!reply.headerField("Record-Route").isEmpty())
-            request.setHeaderField("Route", reply.headerField("Record-Route"));
         d->sendRequest(request);
     }
 
