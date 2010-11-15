@@ -41,6 +41,7 @@ private slots:
     void callNumber();
     void callRinging();
     void chatConnected();
+    void keyPressed();
     void sipConnected();
     void sipDisconnected();
 

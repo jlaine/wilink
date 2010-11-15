@@ -67,6 +67,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     keys << "*" << "0" << "#";
     for (int i = 0; i < keys.size(); ++i) {
         QPushButton *key = new QPushButton(keys[i]);
+        connect(key, SIGNAL(clicked()), this, SLOT(keyPressed()));
         grid->addWidget(key, i / 3, i % 3, 1, 1);
     }
     layout->addLayout(grid);
@@ -149,6 +150,14 @@ void PhonePanel::chatConnected()
 
     statusLabel->setText(tr("Connecting.."));
     sip->connectToServer();
+}
+
+void PhonePanel::keyPressed()
+{
+    QPushButton *key = qobject_cast<QPushButton*>(sender());
+    if (!key)
+        return;
+    numberEdit->insert(key->text());
 }
 
 void PhonePanel::sipConnected()
