@@ -505,8 +505,6 @@ SipCall *SipClient::call(const QString &recipient)
     SipCall *call = new SipCall(recipient, socket, this);
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
-    connect(call, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
 
     SdpMessage sdp;
     sdp.addField('v', "0");
