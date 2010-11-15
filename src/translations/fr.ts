@@ -720,6 +720,64 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhonePanel</name>
+    <message>
+        <source>Phone</source>
+        <translation>Téléphone</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+    <message>
+        <source>Connected.</source>
+        <translation>Connecté.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Disconnected.</source>
+        <translation>Déconnecté.</translation>
+    </message>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
+</context>
+<context>
+    <name>PhoneWidget</name>
+    <message>
+        <source>Hang up</source>
+        <translation>Raccrocher</translation>
+    </message>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
+    <message>
+        <source>Ringing..</source>
+        <translation>Sonne..</translation>
+    </message>
+    <message>
+        <source>Call connected.</source>
+        <translation>Appel connecté.</translation>
+    </message>
+    <message>
+        <source>Disconnecting..</source>
+        <translation>Déconnexion..</translation>
+    </message>
+    <message>
+        <source>Call finished.</source>
+        <translation>Appel terminé.</translation>
+    </message>
+</context>
+<context>
     <name>Photos</name>
     <message>
         <source>Connecting..</source>

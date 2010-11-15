@@ -49,7 +49,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     QSettings settings;
     QHBoxLayout *passwordBox = new QHBoxLayout;
-    passwordBox->addWidget(new QLabel(tr("Password:")));
+    passwordBox->addWidget(new QLabel(tr("Password")));
     passwordEdit = new QLineEdit;
     passwordEdit->setText(settings.value("PhonePassword").toString());
     passwordBox->addWidget(passwordEdit);
@@ -153,8 +153,7 @@ void PhonePanel::chatConnected()
     sip->setDomain(jidToDomain(jid));
     sip->setUsername(jidToUser(jid));
 
-    // FIXME : get password
-    statusLabel->setText(tr("Connecting to server.."));
+    statusLabel->setText(tr("Connecting.."));
     sip->setPassword(passwordEdit->text());
     sip->connectToServer();
     emit registerPanel();
@@ -174,20 +173,20 @@ void PhonePanel::passwordPressed()
 
     QSettings settings;
     settings.setValue("PhonePassword", password);
-    statusLabel->setText(tr("Connecting to server.."));
+    statusLabel->setText(tr("Connecting.."));
     sip->setPassword(password);
     sip->connectToServer();
 }
 
 void PhonePanel::sipConnected()
 {
-    statusLabel->setText(tr("Connected to server."));
+    statusLabel->setText(tr("Connected."));
     callButton->setEnabled(true);
 }
 
 void PhonePanel::sipDisconnected()
 {
-    statusLabel->setText(tr("Disconnected from server."));
+    statusLabel->setText(tr("Disconnected."));
     callButton->setEnabled(false);
 }
 
