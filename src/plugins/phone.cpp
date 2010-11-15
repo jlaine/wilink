@@ -184,13 +184,16 @@ void PhonePanel::stateChanged(SipClient::State state)
     case SipClient::ConnectedState:
         statusLabel->setText(tr("Connected."));
         callButton->setEnabled(true);
+        disconnectButton->setEnabled(true);
         break;
     case SipClient::DisconnectingState:
         statusLabel->setText(tr("Disconnecting.."));
+        disconnectButton->setEnabled(false);
         break;
     case SipClient::DisconnectedState:
         statusLabel->setText(tr("Disconnected."));
         callButton->setEnabled(false);
+        disconnectButton->setEnabled(false);
         break;
     }
 }
