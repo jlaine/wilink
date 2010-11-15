@@ -107,6 +107,7 @@ void PhonePanel::backspacePressed()
 void PhonePanel::callConnected()
 {
     statusLabel->setText(tr("Call active."));
+    hangupButton->show();
 }
 
 void PhonePanel::callFinished()
@@ -128,7 +129,6 @@ void PhonePanel::callNumber()
         return;
 
     callButton->hide();
-    hangupButton->show();
 
     const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
     statusLabel->setText(tr("Calling %1..").arg(phoneNumber));
