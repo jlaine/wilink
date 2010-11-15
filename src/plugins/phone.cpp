@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLabel>
 #include <QLayout>
 #include <QTimer>
 
@@ -40,10 +41,18 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
-    layout->addSpacing(10);
+    //layout->addSpacing(10);
+    statusLabel = new QLabel;
+    layout->addWidget(statusLabel, 1);
+
     setLayout(layout);
 
     sip = new SipClient(this);
+
+    /* connect signals */
+    connect(client, SIGNAL(connected()), this, SLOT(chatConnected()));
+    connect(sip, SIGNAL(connected()), this, SLOT(sipConnected()));
+    connect(sip, SIGNAL(disconnected()), this, SLOT(sipDisconnected()));
 
     /* register panel */
     QTimer::singleShot(0, this, SIGNAL(registerPanel()));
@@ -54,7 +63,19 @@ void PhonePanel::chatConnected()
     const QString jid = client->configuration().jid();
     sip->setDomain(jidToDomain(jid));
     sip->setUsername(jidToUser(jid));
+
+    statusLabel->setText(tr("Connecting.."));
     sip->connectToServer();
+}
+
+void PhonePanel::sipConnected()
+{
+    statusLabel->setText(tr("Connected"));
+}
+
+void PhonePanel::sipDisconnected()
+{
+    statusLabel->setText(tr("Disconnected"));
 }
 
 // PLUGIN

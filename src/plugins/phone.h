@@ -22,6 +22,7 @@
 
 #include "chat_panel.h"
 
+class QLabel;
 class ChatClient;
 class SipClient;
 
@@ -34,10 +35,13 @@ public:
 
 private slots:
     void chatConnected();
+    void sipConnected();
+    void sipDisconnected();
 
 private:
     ChatClient *client;
     SipClient *sip;
+    QLabel *statusLabel;
 };
 
 #endif

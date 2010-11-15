@@ -23,6 +23,8 @@
 #include <QObject>
 #include <QPair>
 
+#include "QXmppLogger.h"
+
 class QUdpSocket;
 class QXmppSrvInfo;
 
@@ -131,12 +133,17 @@ signals:
     void connected();
     void disconnected();
 
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+
 private slots:
     void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
 
 private:
+    void warning(const QString &msg);
     SipClientPrivate *const d;
+    friend class SipClientPrivate;
 };
 
 #endif

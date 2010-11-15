@@ -38,6 +38,8 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
+#define QXMPP_DEBUG_SIP
+
 struct AuthInfo
 {
     QMap<QByteArray, QByteArray> challenge;
@@ -177,6 +179,8 @@ public:
     quint16 serverPort;
     SipRequest lastRequest;
     QList<SipCall*> calls;
+
+    SipClient *q;
 };
 
 SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId)
@@ -239,7 +243,17 @@ void SipClientPrivate::sendRequest(SipRequest &request)
                                "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
     }
 
-    lastRequest = request;
+    if (request.method() != "ACK")
+        lastRequest = request;
+
+#ifdef QXMPP_DEBUG_SIP
+    q->logMessage(QXmppLogger::SentMessage,
+        QString("SIP packet to %1:%2\n%3").arg(
+            serverAddress.toString(),
+            QString::number(serverPort),
+            QString::fromUtf8(request.toByteArray())));
+#endif
+
     socket->writeDatagram(request.toByteArray(), serverAddress, serverPort);
 }
 
@@ -247,6 +261,7 @@ SipClient::SipClient(QObject *parent)
     : QObject(parent),
     d(new SipClientPrivate)
 {
+    d->q = this;
     d->cseq = 1;
     d->disconnecting = false;
     d->rinstance = generateStanzaHash(16);
@@ -265,7 +280,7 @@ void SipClient::call(const QString &recipient)
     QUdpSocket *socket = new QUdpSocket;
     if (!socket->bind(d->socket->localAddress(), 0))
     {
-        qWarning("Could not start listening for RTP");
+        warning("Could not start listening for RTP");
         delete socket;
         return;
     }
@@ -313,7 +328,8 @@ void SipClient::call(const QString &recipient)
 
 void SipClient::connectToServer()
 {
-    qDebug() << "Looking up server for domain" << d->domain;
+    emit logMessage(QXmppLogger::DebugMessage,
+        QString("Looking up server for domain %1").arg(d->domain));
     QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
                                 SLOT(connectToServer(QXmppSrvInfo)));
 }
@@ -328,10 +344,11 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
         d->serverPort = 5060;
     }
 
-    qDebug("Connecting to %s:%i", qPrintable(d->serverName), d->serverPort);
+    emit logMessage(QXmppLogger::DebugMessage,
+        QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
     QHostInfo info = QHostInfo::fromName(d->serverName);
     if (info.addresses().isEmpty()) {
-        qWarning("Could not lookup %s", qPrintable(d->serverName));
+        warning(QString("Could not lookup SIP server %1").arg(d->serverName));
         return;
     }
     d->serverAddress = info.addresses().first();
@@ -355,7 +372,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     }
     if (!d->socket->bind(bindAddress, 0))
     {
-        qWarning("Could not start listening for SIP");
+        warning("Could not start listening for SIP");
         return;
     }
 
@@ -389,12 +406,17 @@ void SipClient::datagramReceived()
     quint16 remotePort;
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
+#ifdef QXMPP_DEBUG_SIP
+    emit logMessage(QXmppLogger::ReceivedMessage,
+        QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
+#endif
+
     // parse packet
     SipReply reply(buffer);
     QByteArray cseq = reply.headerField("CSeq");
     int i = cseq.indexOf(' ');
     if (i < 0) {
-        qWarning("No CSeq found in reply");
+        warning("No CSeq found in reply");
         return;
     }
     int commandSeq = cseq.left(i).toInt();
@@ -416,7 +438,7 @@ void SipClient::datagramReceived()
         }
         if (!currentCall)
         {
-            qWarning("Received a reply for unknown call " + callId);
+            warning("Received a reply for unknown call " + callId);
             return;
         }
     }
@@ -434,11 +456,13 @@ void SipClient::datagramReceived()
         request.setHeaderField("CSeq", QByteArray::number(commandSeq) + " ACK");
         if (!reply.headerField("Record-Route").isEmpty())
             request.setHeaderField("Route", reply.headerField("Record-Route"));
+#if 0
         if (!d->lastRequest.headerField("Proxy-Authorization").isEmpty())
             request.setHeaderField("Proxy-Authorization", d->lastRequest.headerField("Proxy-Authorization"));
         if (!d->lastRequest.headerField("Authorization").isEmpty())
             request.setHeaderField("Authorization", d->lastRequest.headerField("Authorization"));
-        d->socket->writeDatagram(request.toByteArray(), d->serverAddress, d->serverPort);
+#endif
+        d->sendRequest(request);
     }
 
     // handle authentication
@@ -448,14 +472,14 @@ void SipClient::datagramReceived()
         info.proxy = reply.statusCode() == 407;
         const QByteArray auth = reply.headerField(info.proxy ? "Proxy-Authenticate" : "WWW-Authenticate");
         if (!auth.startsWith("Digest ")) {
-            qWarning("Unsupported authentication method");
+            warning("Unsupported authentication method");
             d->socket->close();
             emit disconnected();
         }
 
         SipRequest request = d->lastRequest;
         if (!request.headerField(info.proxy ? "Proxy-Authorization" : "Authorization").isEmpty()) {
-            qWarning("Authentication failed");
+            warning("Authentication failed");
             d->socket->close();
             emit disconnected();
         }
@@ -517,7 +541,7 @@ void SipClient::datagramReceived()
                     }
                 }
                 if (!channel->isOpen()) {
-                    qWarning("Could not negociate a common codec");
+                    warning("Could not negociate a common codec");
                     return;
                 }
 
@@ -592,6 +616,11 @@ void SipClient::setPassword(const QString &password)
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
+}
+
+void SipClient::warning(const QString &msg)
+{
+    emit logMessage(QXmppLogger::WarningMessage, msg);
 }
 
 SipRequest::SipRequest()
