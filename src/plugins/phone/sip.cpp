@@ -150,69 +150,82 @@ QByteArray SipCall::id() const
 
 void SipCall::handleReply(const SipReply &reply)
 {
-    debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
-
-    if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
+    if (reply.statusCode() < 200)
     {
-        QXmppRtpChannel *channel = d->channel;
+        debug(QString("Call %1 progress %2 %3").arg(
+            QString::fromUtf8(d->id),
+            QString::number(reply.statusCode()), reply.reasonPhrase()));
+    }
+    else if (reply.statusCode() == 200)
+    {
+        debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
 
-        // parse descriptor
-        SdpMessage sdp(reply.body());
-        QPair<char, QByteArray> field;
-        foreach (field, sdp.fields()) {
-            //qDebug() << "field" << field.first << field.second;
-            if (field.first == 'c') {
-                // determine remote host
-                if (field.second.startsWith("IN IP4 ")) {
-                    d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
-                }
-            } else if (field.first == 'm') {
-                QList<QByteArray> bits = field.second.split(' ');
-                if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
-                    continue;
+        if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
+        {
+            QXmppRtpChannel *channel = d->channel;
 
-                // determine remote port
-                d->remotePort = bits[1].toUInt();
+            // parse descriptor
+            SdpMessage sdp(reply.body());
+            QPair<char, QByteArray> field;
+            foreach (field, sdp.fields()) {
+                //qDebug() << "field" << field.first << field.second;
+                if (field.first == 'c') {
+                    // determine remote host
+                    if (field.second.startsWith("IN IP4 ")) {
+                        d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
+                    }
+                } else if (field.first == 'm') {
+                    QList<QByteArray> bits = field.second.split(' ');
+                    if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
+                        continue;
 
-                // determine codec
-                for (int i = 3; i < bits.size() && !d->channel->isOpen(); ++i)
-                {
-                    foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
-                        bool ok = false;
-                        if (payload.id() == bits[i].toInt(&ok) && ok) {
-                            qDebug() << "found codec" << payload.name();
-                            d->channel->setPayloadType(payload);
-                            break;
+                    // determine remote port
+                    d->remotePort = bits[1].toUInt();
+
+                    // determine codec
+                    for (int i = 3; i < bits.size() && !d->channel->isOpen(); ++i)
+                    {
+                        foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
+                            bool ok = false;
+                            if (payload.id() == bits[i].toInt(&ok) && ok) {
+                                qDebug() << "found codec" << payload.name();
+                                d->channel->setPayloadType(payload);
+                                break;
+                            }
                         }
                     }
                 }
             }
+            if (!d->channel->isOpen()) {
+                warning("Could not negociate a common codec");
+                return;
+            }
+
+            // prepare audio format
+            QAudioFormat format;
+            format.setFrequency(d->channel->payloadType().clockrate());
+            format.setChannels(d->channel->payloadType().channels());
+            format.setSampleSize(16);
+            format.setCodec("audio/pcm");
+            format.setByteOrder(QAudioFormat::LittleEndian);
+            format.setSampleType(QAudioFormat::SignedInt);
+
+            int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * d->channel->payloadType().ptime() / 1000;
+
+            // initialise audio output
+            d->audioOutput = new QAudioOutput(format, this);
+            d->audioOutput->setBufferSize(2 * packetSize);
+            d->audioOutput->start(d->channel);
+
+            // initialise audio input
+            d->audioInput = new QAudioInput(format, this);
+            d->audioInput->setBufferSize(2 * packetSize);
+            d->audioInput->start(d->channel);
         }
-        if (!d->channel->isOpen()) {
-            warning("Could not negociate a common codec");
-            return;
-        }
-
-        // prepare audio format
-        QAudioFormat format;
-        format.setFrequency(d->channel->payloadType().clockrate());
-        format.setChannels(d->channel->payloadType().channels());
-        format.setSampleSize(16);
-        format.setCodec("audio/pcm");
-        format.setByteOrder(QAudioFormat::LittleEndian);
-        format.setSampleType(QAudioFormat::SignedInt);
-
-        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * d->channel->payloadType().ptime() / 1000;
-
-        // initialise audio output
-        d->audioOutput = new QAudioOutput(format, this);
-        d->audioOutput->setBufferSize(2 * packetSize);
-        d->audioOutput->start(d->channel);
-
-        // initialise audio input
-        d->audioInput = new QAudioInput(format, this);
-        d->audioInput->setBufferSize(2 * packetSize);
-        d->audioInput->start(d->channel);
+    } else if (reply.statusCode() >= 300) {
+        warning(QString("Call %1 failed").arg(
+            QString::fromUtf8(d->id)));
+        emit finished();
     }
 }
 
@@ -368,6 +381,8 @@ SipCall *SipClient::call(const QString &recipient)
     }
 
     SipCall *call = new SipCall(socket, this);
+    connect(call, SIGNAL(destroyed(QObject*)),
+            this, SLOT(callDestroyed(QObject*)));
     connect(call, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
 
@@ -410,6 +425,11 @@ SipCall *SipClient::call(const QString &recipient)
     d->sendRequest(request);
 
     return call;
+}
+
+void SipClient::callDestroyed(QObject *object)
+{
+    d->calls.removeAll(static_cast<SipCall*>(object));
 }
 
 void SipClient::connectToServer()
@@ -574,91 +594,12 @@ void SipClient::datagramReceived()
         return;
     }
 
-    // actual VoIP call
     if (currentCall)
     {
-        if (reply.statusCode() < 200)
-        {
-            debug(QString("Call %1 progress %2 %3").arg(
-                currentCall->id(),
-                QString::number(reply.statusCode()), reply.reasonPhrase()));
-        }
-        else if (reply.statusCode() == 200)
-        {
-            debug(QString("Call %1 established").arg(QString::fromUtf8(currentCall->id())));
-
-            if (reply.headerField("Content-Type") == "application/sdp" && !currentCall->d->audioOutput)
-            {
-                QXmppRtpChannel *channel = currentCall->d->channel;
-
-                // parse descriptor
-                SdpMessage sdp(reply.body());
-                QPair<char, QByteArray> field;
-                foreach (field, sdp.fields()) {
-                    //qDebug() << "field" << field.first << field.second;
-                    if (field.first == 'c') {
-                        // determine remote host
-                        if (field.second.startsWith("IN IP4 ")) {
-                            currentCall->d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
-                        }
-                    } else if (field.first == 'm') {
-                        QList<QByteArray> bits = field.second.split(' ');
-                        if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
-                            continue;
-
-                        // determine remote port
-                        currentCall->d->remotePort = bits[1].toUInt();
-
-                        // determine codec
-                        for (int i = 3; i < bits.size() && !channel->isOpen(); ++i)
-                        {
-                            foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
-                                bool ok = false;
-                                if (payload.id() == bits[i].toInt(&ok) && ok) {
-                                    qDebug() << "found codec" << payload.name();
-                                    channel->setPayloadType(payload);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!channel->isOpen()) {
-                    warning("Could not negociate a common codec");
-                    return;
-                }
-
-                // prepare audio format
-                QAudioFormat format;
-                format.setFrequency(channel->payloadType().clockrate());
-                format.setChannels(channel->payloadType().channels());
-                format.setSampleSize(16);
-                format.setCodec("audio/pcm");
-                format.setByteOrder(QAudioFormat::LittleEndian);
-                format.setSampleType(QAudioFormat::SignedInt);
-
-                int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
-
-                // initialise audio output
-                currentCall->d->audioOutput = new QAudioOutput(format, this);
-                currentCall->d->audioOutput->setBufferSize(2 * packetSize);
-                currentCall->d->audioOutput->start(channel);
-
-                // initialise audio input
-                currentCall->d->audioInput = new QAudioInput(format, this);
-                currentCall->d->audioInput->setBufferSize(2 * packetSize);
-                currentCall->d->audioInput->start(channel);
-            }
-
-        } else if (reply.statusCode() >= 400) {
-            warning(QString("Call %1 failed").arg(
-                QString::fromUtf8(currentCall->id())));
-            d->calls.removeAll(currentCall);
-            delete currentCall;
-        }
-
-    // "base" call
+        // actual VoIP call
+        currentCall->handleReply(reply);
     } else {
+        // "base" call
         if (command == "REGISTER" && reply.statusCode() == 200) {
             if (d->disconnecting) {
                 d->socket->close();

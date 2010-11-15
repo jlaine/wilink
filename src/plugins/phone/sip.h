@@ -117,6 +117,7 @@ public:
     QByteArray id() const;
 
 signals:
+    void finished();
     void ringing();
 
 private slots:
@@ -154,6 +155,7 @@ signals:
     void disconnected();
 
 private slots:
+    void callDestroyed(QObject *object);
     void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
 
