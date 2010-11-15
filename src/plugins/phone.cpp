@@ -218,7 +218,6 @@ void PhoneWidget::callFinished()
     m_call = 0;
 
     // make widget disappear
-    setButtonEnabled(false);
     QTimer::singleShot(1000, this, SLOT(disappear()));
 }
 
@@ -235,9 +234,11 @@ void PhoneWidget::callStateChanged(QXmppCall::State state)
     case QXmppCall::OfferState:
     case QXmppCall::ConnectingState:
         m_label->setText(tr("Connecting.."));
+        setButtonEnabled(false);
         break;
     case QXmppCall::ActiveState:
         m_label->setText(tr("Call connected."));
+        setButtonEnabled(true);
         break;
     case QXmppCall::DisconnectingState:
         m_label->setText(tr("Disconnecting.."));
