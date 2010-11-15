@@ -109,6 +109,7 @@ QByteArray SdpMessage::toByteArray() const
 class SipCallPrivate
 {
 public:
+    bool hangingUp;
     QByteArray id;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
@@ -159,6 +160,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
 {
     d->client = parent;
     d->q = this;
+    d->hangingUp = false;
     d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
     d->remoteUri = recipient.toUtf8();
 
@@ -190,6 +192,15 @@ QByteArray SipCall::id() const
 
 void SipCall::handleReply(const SipReply &reply)
 {
+    if (d->hangingUp)
+    {
+        debug(QString("Call %1 finished").arg(
+            QString::fromUtf8(d->id)));
+
+        emit finished();
+        return;
+    }
+
     if (reply.statusCode() == 180)
     {
         emit ringing();
@@ -279,6 +290,7 @@ void SipCall::hangup()
 {
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
+    d->hangingUp = true;
 
     // stop audio
     if (d->audioInput)
