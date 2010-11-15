@@ -108,7 +108,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     /* connect signals */
     connect(backspaceButton, SIGNAL(clicked()), this, SLOT(backspacePressed()));
-    connect(client, SIGNAL(connected()), sip, SLOT(connectToServer()));
+    connect(client, SIGNAL(connected()), this, SLOT(connectToServer()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
             client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
