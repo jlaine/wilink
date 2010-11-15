@@ -49,6 +49,10 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
     hbox->addWidget(numberEdit);
+    setFocusProxy(numberEdit);
+    QPushButton *backspaceButton = new QPushButton;
+    backspaceButton->setIcon(QIcon(":/back.png"));
+    hbox->addWidget(backspaceButton);
     callButton = new QPushButton(tr("Call"));
     callButton->setIcon(QIcon(":/call.png"));
     callButton->setEnabled(false);
@@ -83,6 +87,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     sip = new SipClient(this);
 
     /* connect signals */
+    connect(backspaceButton, SIGNAL(clicked()), this, SLOT(backspacePressed()));
     connect(client, SIGNAL(connected()), this, SLOT(chatConnected()));
     connect(sip, SIGNAL(connected()), this, SLOT(sipConnected()));
     connect(sip, SIGNAL(disconnected()), this, SLOT(sipDisconnected()));
@@ -92,6 +97,11 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
 
     /* register panel */
+}
+
+void PhonePanel::backspacePressed()
+{
+    numberEdit->backspace();
 }
 
 void PhonePanel::callConnected()
