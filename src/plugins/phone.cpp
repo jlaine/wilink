@@ -232,6 +232,9 @@ void PhoneWidget::callFinished()
     m_call->deleteLater();
     m_call = 0;
 
+    m_label->setText(tr("Call finished."));
+    setButtonEnabled(false);
+
     // make widget disappear
     setButtonEnabled(false);
     QTimer::singleShot(1000, this, SLOT(disappear()));
@@ -244,6 +247,25 @@ void PhoneWidget::callRinging()
 
 void PhoneWidget::callStateChanged(SipClient::State state)
 {
+    // update status
+    switch (state)
+    {
+    case SipCall::OfferState:
+    case SipCall::ConnectingState:
+        m_label->setText(tr("Connecting.."));
+        break;
+    case SipCall::ActiveState:
+        m_label->setText(tr("Call connected."));
+        break;
+    case SipCall::DisconnectingState:
+        m_label->setText(tr("Disconnecting.."));
+        setButtonEnabled(false);
+        break;
+    case SipCall::FinishedState:
+        m_label->setText(tr("Call finished."));
+        setButtonEnabled(false);
+        break;
+    }
 }
 
 void PhoneWidget::setGeometry(const QRectF &rect)

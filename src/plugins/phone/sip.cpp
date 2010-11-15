@@ -110,7 +110,7 @@ QByteArray SdpMessage::toByteArray() const
 class SipCallPrivate
 {
 public:
-    bool hangingUp;
+    SipCall::State state;
     QByteArray id;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
@@ -164,7 +164,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
 {
     d->client = parent;
     d->q = this;
-    d->hangingUp = false;
+    d->state = SipCall::OfferState;
     d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
     d->remoteUri = recipient.toUtf8();
 
@@ -184,7 +184,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(readFromSocket()));
     connect(d->timer, SIGNAL(timeout()),
-            this, SIGNAL(finished()));
+            this, SLOT(handleTimeout()));
 
     d->timer->start(20000);
 }
@@ -201,11 +201,12 @@ QByteArray SipCall::id() const
 
 void SipCall::handleReply(const SipPacket &reply)
 {
-    if (d->hangingUp)
+    if (d->state == SipCall::DisconnectingState)
     {
         debug(QString("Call %1 finished").arg(
             QString::fromUtf8(d->id)));
 
+        d->state = SipCall::FinishedState;
         emit finished();
         return;
     }
@@ -289,6 +290,7 @@ void SipCall::handleReply(const SipPacket &reply)
         warning(QString("Call %1 failed").arg(
             QString::fromUtf8(d->id)));
         d->timer->stop();
+        d->state = SipCall::FinishedState;
         emit finished();
     }
 }
@@ -317,15 +319,22 @@ void SipCall::handleRequest(const SipPacket &request)
 
     d->client->d->sendRequest(response);
 
-    if (request.method() == "BYE")
+    if (request.method() == "BYE") {
+        d->state = SipCall::FinishedState;
         emit finished();
+    }
+}
+
+void SipCall::handleTimeout()
+{
+
 }
 
 void SipCall::hangup()
 {
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
-    d->hangingUp = true;
+    d->state = SipCall::DisconnectingState;
 
     // stop audio
     if (d->audioInput)

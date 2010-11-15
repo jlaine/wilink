@@ -197,7 +197,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
 
     connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
-    connect(m_call, SIGNAL(ringing()), this, SLOT(ringing()));
+    connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
 }
@@ -213,6 +213,11 @@ void CallWidget::callFinished()
     // make widget disappear
     setButtonEnabled(false);
     QTimer::singleShot(1000, this, SLOT(disappear()));
+}
+
+void CallWidget::callRinging()
+{
+    m_label->setText(tr("Ringing.."));
 }
 
 void CallWidget::callStateChanged(QXmppCall::State state)
@@ -236,11 +241,6 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         setButtonEnabled(false);
         break;
     }
-}
-
-void CallWidget::ringing()
-{
-    m_label->setText(tr("Ringing.."));
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)

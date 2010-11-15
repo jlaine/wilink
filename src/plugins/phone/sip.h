@@ -109,6 +109,16 @@ class SipCall : public QXmppLoggable
     Q_OBJECT
 
 public:
+    /// This enum is used to describe the state of a call.
+    enum State
+    {
+        OfferState = 0,         ///< The remote part is being called.
+        ConnectingState = 1,    ///< The call is being connected.
+        ActiveState = 2,        ///< The call is active.
+        DisconnectingState = 3, ///< The call is being disconnected.
+        FinishedState = 4,      ///< The call is finished.
+    };
+
     ~SipCall();
 
     QByteArray id() const;
@@ -130,6 +140,7 @@ public slots:
     void hangup();
 
 private slots:
+    void handleTimeout();
     void readFromSocket();
     void writeToSocket(const QByteArray &ba);
 
@@ -147,6 +158,7 @@ class SipClient : public QXmppLoggable
     Q_OBJECT
 
 public:
+    /// This enum is used to describe the state of a client.
     enum State
     {
         DisconnectedState = 0,

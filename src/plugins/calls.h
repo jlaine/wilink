@@ -98,8 +98,8 @@ public:
 
 private slots:
     void callFinished();
+    void callRinging();
     void callStateChanged(QXmppCall::State state);
-    void ringing();
 
 private:
     QXmppCall *m_call;
