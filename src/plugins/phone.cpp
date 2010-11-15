@@ -124,7 +124,7 @@ void PhonePanel::callFinished()
 void PhonePanel::callNumber()
 {
     QString phoneNumber = numberEdit->text().trimmed();
-    if (phoneNumber.isEmpty())
+    if (!callButton->isEnabled() || phoneNumber.isEmpty())
         return;
 
     callButton->hide();
