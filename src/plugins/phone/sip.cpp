@@ -276,6 +276,21 @@ void SipCall::hangup()
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
 
+    // stop audio
+    if (d->audioInput)
+    {
+        d->audioInput->stop();
+        delete d->audioInput;
+        d->audioInput = 0;
+    }
+    if (d->audioOutput)
+    {
+        d->audioOutput->stop();
+        delete d->audioOutput;
+        d->audioOutput = 0;
+    }
+    d->socket->close();
+
     SipRequest request = d->client->d->buildRequest("BYE", d->recipient.toUtf8(), d->id);
     request.setHeaderField("To", "<" + d->recipient.toUtf8() + ">");
     d->client->d->sendRequest(request);

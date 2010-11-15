@@ -105,7 +105,7 @@ void PhonePanel::callNumber()
     hangupButton->show();
 
     const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
-    statusLabel->setText(tr("Calling %s..").arg(phoneNumber));
+    statusLabel->setText(tr("Calling %1..").arg(phoneNumber));
     SipCall *call = sip->call(recipient);
     connect(call, SIGNAL(connected()),
             this, SLOT(callConnected()));
@@ -113,6 +113,7 @@ void PhonePanel::callNumber()
             this, SLOT(callFinished()));
     connect(call, SIGNAL(ringing()),
             this, SLOT(callRinging()));
+    connect(hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
 }
 
 void PhonePanel::callRinging()
@@ -129,6 +130,7 @@ void PhonePanel::chatConnected()
     // FIXME : get password
     QSettings settings("sip.conf", QSettings::IniFormat);
     sip->setPassword(settings.value("password").toString());
+    numberEdit->setText(settings.value("phoneNumber").toString());
 
     statusLabel->setText(tr("Connecting.."));
     sip->connectToServer();
