@@ -51,6 +51,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QHBoxLayout *passwordBox = new QHBoxLayout;
     passwordBox->addWidget(new QLabel(tr("Password")));
     passwordEdit = new QLineEdit;
+    passwordEdit->setEchoMode(QLineEdit::Password);
     passwordEdit->setText(settings.value("PhonePassword").toString());
     passwordBox->addWidget(passwordEdit);
     QPushButton *passwordButton = new QPushButton(tr("OK"));
@@ -131,8 +132,6 @@ void PhonePanel::callNumber()
     if (!callButton->isEnabled() || phoneNumber.isEmpty())
         return;
 
-    callButton->hide();
-
     const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
 
     SipCall *call = sip->call(recipient);
@@ -140,8 +139,6 @@ void PhonePanel::callNumber()
         return;
 
     addWidget(new PhoneWidget(call));
-    connect(call, SIGNAL(finished()),
-            callButton, SLOT(show()));
 
     // remember number
     QSettings settings;
