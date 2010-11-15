@@ -269,10 +269,10 @@ void SipCall::handleReply(const SipPacket &reply)
         fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization";
         foreach (const QByteArray &field, fields)
         {
-            if (!d->lastRequest.headerField(field).isEmpty())
-                request.setHeaderField(field, d->lastRequest.headerField(field));
+            if (!d->inviteRequest.headerField(field).isEmpty())
+                request.setHeaderField(field, d->inviteRequest.headerField(field));
         }
-        quint32 cseq = d->lastRequest.sequenceNumber();
+        quint32 cseq = d->inviteRequest.sequenceNumber();
 
         request.setUri(d->remoteUri);
         request.setHeaderField("Route", d->remoteRoute);
