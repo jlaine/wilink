@@ -903,7 +903,6 @@ QByteArray SipPacket::body() const
 void SipPacket::setBody(const QByteArray &body)
 {
     m_body = body;
-    setHeaderField("Content-Length", QByteArray::number(m_body.size()));
 }
 
 QByteArray SipPacket::method() const
@@ -963,14 +962,20 @@ QByteArray SipPacket::toByteArray() const
         ba += "\r\n";
     }
 
+    bool hasLength = false;
     QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
                                                         end = m_fields.constEnd();
     for ( ; it != end; ++it) {
+        if (qstricmp("Content-Length", it->first) == 0)
+            hasLength = true;
         ba += it->first;
         ba += ": ";
         ba += it->second;
         ba += "\r\n";
     }
+    if (!hasLength)
+        ba += "Content-Length: " + QByteArray::number(m_body.size()) + "\r\n";
+
     ba += "\r\n";
     return ba + m_body;
 }
