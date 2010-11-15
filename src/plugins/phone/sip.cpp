@@ -295,6 +295,8 @@ void SipCall::handleRequest(const SipPacket &request)
     SipPacket response;
     response.setStatusCode(200);
     response.setReasonPhrase("OK");
+    foreach (const QByteArray &via, request.headerFieldValues("Via"))
+        response.addHeaderField("Via", via);
     response.setHeaderField("From", request.headerField("From"));
     response.setHeaderField("To", request.headerField("To"));
     response.setHeaderField("Call-Id", request.headerField("Call-Id"));
@@ -871,6 +873,11 @@ QMap<QByteArray, QByteArray> SipPacket::headerFieldParameters(const QByteArray &
         }
     }
     return params;
+}
+
+void SipPacket::addHeaderField(const QByteArray &name, const QByteArray &data)
+{
+    m_fields.append(qMakePair(name, data));
 }
 
 void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)

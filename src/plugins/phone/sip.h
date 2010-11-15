@@ -71,6 +71,7 @@ public:
     QByteArray headerField(const QByteArray &name, const QByteArray &defaultValue = QByteArray()) const;
     QMap<QByteArray, QByteArray> headerFieldParameters(const QByteArray &name) const;
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
+    void addHeaderField(const QByteArray &name, const QByteArray &data);
     void setHeaderField(const QByteArray &name, const QByteArray &data);
 
     bool isReply() const;
