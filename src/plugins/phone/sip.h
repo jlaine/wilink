@@ -122,6 +122,7 @@ public:
     void disconnectFromServer();
     QString serverName() const;
 
+    void setDisplayName(const QString &displayName);
     void setDomain(const QString &domain);
     void setPassword(const QString &password);
     void setUsername(const QString &user);

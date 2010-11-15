@@ -29,7 +29,7 @@ PhoneTester::PhoneTester(QObject *parent)
 
     m_client = new SipClient(this);
     m_client->setDomain(settings.value("domain").toString());
-    //client.setDisplayName(settings.value("displayName").toString());
+    m_client->setDisplayName(settings.value("displayName").toString());
     m_client->setUsername(settings.value("username").toString());
     m_client->setPassword(settings.value("password").toString());
     m_phoneNumber = settings.value("phoneNumber").toString();

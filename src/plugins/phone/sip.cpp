@@ -574,6 +574,11 @@ QString SipClient::serverName() const
     return d->serverName;
 }
 
+void SipClient::setDisplayName(const QString &displayName)
+{
+    d->displayName = displayName;
+}
+
 void SipClient::setDomain(const QString &domain)
 {
     d->domain = domain;
