@@ -420,7 +420,6 @@ void SipClient::datagramReceived()
     }
     int commandSeq = cseq.left(i).toInt();
     QByteArray command = cseq.mid(i+1);
-    qDebug() << "Received reply for command" << command << commandSeq;
 
     // find corresponding call
     SipCall *currentCall = 0;
