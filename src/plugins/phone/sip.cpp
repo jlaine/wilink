@@ -151,6 +151,8 @@ public:
     SipRequest lastRequest;
     QList<SipCall*> calls;
 
+    QHostAddress reflexiveAddress;
+    quint16 reflexivePort;
     SipClient *q;
 };
 
@@ -415,6 +417,7 @@ SipClient::SipClient(QObject *parent)
     d->cseq = 1;
     d->disconnecting = false;
     d->rinstance = generateStanzaHash(16);
+    d->reflexivePort = 0;
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
@@ -667,6 +670,11 @@ void SipClient::datagramReceived()
                 d->socket->close();
                 emit disconnected();
             } else {
+                QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
+                if (params.contains("received"))
+                    d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+                if (params.contains("rport"))
+                    d->reflexivePort = params.value("rport").toUInt();
                 const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
                 SipRequest request = d->buildRequest("SUBSCRIBE", uri, d->baseId);
                 request.setHeaderField("Expires", "3600");
@@ -870,6 +878,28 @@ QList<QByteArray> SipPacket::headerFieldValues(const QByteArray &name) const
             result += it->second;
 
     return result;
+}
+
+QMap<QByteArray, QByteArray> SipPacket::headerFieldParameters(const QByteArray &name) const
+{
+    const QByteArray value = headerField(name);
+    QMap<QByteArray, QByteArray> params;
+    // FIXME: this is a very, very naive implementation
+    QList<QByteArray> bits = value.split(';');
+    if (bits.size() > 1)
+    {
+        bits.removeFirst();
+        foreach (const QByteArray &bit, bits)
+        {
+            int i = bit.indexOf('=');
+            if (i >= 0)
+            {
+                qDebug() << "param" << bit.left(i) << bit.mid(i+1);
+                params[bit.left(i)] = bit.mid(i+1);
+            }
+        }
+    }
+    return params;
 }
 
 void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)

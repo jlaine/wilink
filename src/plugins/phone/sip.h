@@ -64,6 +64,7 @@ class SipPacket
 {
 public:
     QByteArray headerField(const QByteArray &name, const QByteArray &defaultValue = QByteArray()) const;
+    QMap<QByteArray, QByteArray> headerFieldParameters(const QByteArray &name) const;
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
     void setHeaderField(const QByteArray &name, const QByteArray &data);
 
