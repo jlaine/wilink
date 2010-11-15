@@ -49,9 +49,13 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
     hbox->addWidget(numberEdit);
-    callButton = new QPushButton;
+    callButton = new QPushButton(tr("Call"));
     callButton->setIcon(QIcon(":/call.png"));
     hbox->addWidget(callButton);
+    hangupButton = new QPushButton(tr("Hang up"));;
+    hangupButton->setIcon(QIcon(":/hangup.png"));
+    hangupButton->hide();
+    hbox->addWidget(hangupButton);
     layout->addLayout(hbox);
 
     statusLabel = new QLabel;
@@ -81,7 +85,14 @@ void PhonePanel::callConnected()
 
 void PhonePanel::callFinished()
 {
+    SipCall *call = qobject_cast<SipCall*>(sender());
+    if (!call)
+        return;
+
     statusLabel->setText(tr("Call finished."));
+    hangupButton->hide();
+    callButton->show();
+    call->deleteLater();
 }
 
 void PhonePanel::callNumber()
@@ -90,8 +101,11 @@ void PhonePanel::callNumber()
     if (phoneNumber.isEmpty())
         return;
 
+    callButton->hide();
+    hangupButton->show();
+
     const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
-    qDebug("Calling %s", qPrintable(recipient));
+    statusLabel->setText(tr("Calling %s..").arg(phoneNumber));
     SipCall *call = sip->call(recipient);
     connect(call, SIGNAL(connected()),
             this, SLOT(callConnected()));

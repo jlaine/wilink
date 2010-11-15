@@ -49,6 +49,7 @@ private:
     SipClient *sip;
 
     QPushButton *callButton;
+    QPushButton *hangupButton;
     QLineEdit *numberEdit;
     QLabel *statusLabel;
 };
