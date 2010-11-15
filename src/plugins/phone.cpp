@@ -58,8 +58,23 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     hbox->addWidget(hangupButton);
     layout->addLayout(hbox);
 
+    // keyboard
+    QGridLayout *grid = new QGridLayout;
+    QStringList keys;
+    keys << "1" << "2" << "3";
+    keys << "4" << "5" << "6";
+    keys << "7" << "8" << "9";
+    keys << "*" << "0" << "#";
+    for (int i = 0; i < keys.size(); ++i) {
+        QPushButton *key = new QPushButton(keys[i]);
+        grid->addWidget(key, i / 3, i % 3, 1, 1);
+    }
+    layout->addLayout(grid);
+
+    layout->addStretch();
+
     statusLabel = new QLabel;
-    layout->addWidget(statusLabel, 1);
+    layout->addWidget(statusLabel);
 
     setLayout(layout);
 
