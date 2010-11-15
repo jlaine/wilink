@@ -432,8 +432,11 @@ void SipClient::datagramReceived()
         {
             qDebug() << "Call" << currentCall->id() << "established";
 
-            if (!currentCall->d->audioOutput)
+            if (reply.headerField("Content-Type") == "application/sdp" && !currentCall->d->audioOutput)
             {
+                qDebug() << "body" << reply.body();
+                SdpMessage sdp(reply.body());
+
                 QXmppRtpChannel *channel = currentCall->d->channel;
 
                 // FIXME: actually negociate codec!
@@ -547,15 +550,15 @@ QByteArray SipRequest::toByteArray() const
 SipReply::SipReply(const QByteArray &bytes)
     : m_statusCode(0)
 {
-    const QByteArrayMatcher lf("\n");
+    const QByteArrayMatcher crlf("\r\n");
     const QByteArrayMatcher colon(":");
 
-    int j = lf.indexIn(bytes);
+    int j = crlf.indexIn(bytes);
     if (j < 0)
         return;
 
     // parse status
-    const QByteArray status = bytes.left(j - 1);
+    const QByteArray status = bytes.left(j);
     if (status.size() < 10 ||
         !status.startsWith("SIP/2.0"))
         return;
@@ -563,33 +566,30 @@ SipReply::SipReply(const QByteArray &bytes)
     m_statusCode = status.mid(8, 3).toInt();
     m_reasonPhrase = QString::fromUtf8(status.mid(12));
 
+    // parse headers
     const QByteArray header = bytes.mid(j+1);
-
-    // see rfc2616, sec 4 for information about HTTP/1.1 headers.
-    // allows relaxed parsing here, accepts both CRLF & LF line endings
     int i = 0;
     while (i < header.count()) {
-        int j = colon.indexIn(header, i); // field-name
+        int n = crlf.indexIn(header, i);
+
+        if (n < 0) {
+            // something is wrong
+            qWarning("Missing end of line in SIP header");
+            return;
+        }
+        else if (n == i) {
+            // end of header
+            i = n + 2;
+            break;
+        }
+
+        // parse header field
+        int j = colon.indexIn(header, i);
         if (j == -1)
             break;
         QByteArray field = header.mid(i, j - i).trimmed();
         j++;
-        // any number of LWS is allowed before and after the value
-        QByteArray value;
-        do {
-            i = lf.indexIn(header, j);
-            if (i == -1)
-                break;
-            if (!value.isEmpty())
-                value += ' ';
-            // check if we have CRLF or only LF
-            bool hasCR = (i && header[i-1] == '\r');
-            int length = i -(hasCR ? 1: 0) - j;
-            value += header.mid(j, length).trimmed();
-            j = ++i;
-        } while (i < header.count() && (header.at(i) == ' ' || header.at(i) == '\t'));
-        if (i == -1)
-            break; // something is wrong
+        QByteArray value = header.mid(j, n - j).trimmed();
 
         // expand shortcuts
         if (field == "c")
@@ -605,7 +605,16 @@ SipReply::SipReply(const QByteArray &bytes)
         else if (field == "v")
             field = "Via";
         m_fields.append(qMakePair(field, value));
+
+        i = n + 2;
     }
+    if (i >= 0)
+        m_body = header.mid(i);
+}
+
+QByteArray SipReply::body() const
+{
+    return m_body;
 }
 
 QString SipReply::reasonPhrase() const
