@@ -25,7 +25,6 @@
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QPair>
-#include <QSettings>
 #include <QUdpSocket>
 
 #include "QXmppRtpChannel.h"
@@ -169,8 +168,8 @@ public:
     QString username;
     QString password;
     QString domain;
-    QString phoneNumber;
 
+    bool disconnecting;
     QString rinstance;
     QMap<QByteArray, AuthInfo> authInfos;
     QHostAddress serverAddress;
@@ -249,17 +248,11 @@ SipClient::SipClient(QObject *parent)
     d(new SipClientPrivate)
 {
     d->cseq = 1;
+    d->disconnecting = false;
     d->rinstance = generateStanzaHash(16);
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
-
-    QSettings settings("sip.conf", QSettings::IniFormat);
-    d->domain = settings.value("domain").toString();
-    d->displayName = settings.value("displayName").toString();
-    d->username = settings.value("username").toString();
-    d->password = settings.value("password").toString();
-    d->phoneNumber = settings.value("phoneNumber").toString();
 }
 
 SipClient::~SipClient()
@@ -375,13 +368,13 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 
 void SipClient::disconnectFromServer()
 {
-    // register
+    d->disconnecting = true;
+
+    // unregister
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipRequest request = d->buildRequest("REGISTER", uri, d->baseId);
     request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
     d->sendRequest(request);
-    d->socket->flush();
-    d->socket->close();
 }
 
 void SipClient::datagramReceived()
@@ -552,17 +545,41 @@ void SipClient::datagramReceived()
     // "base" call
     } else {
         if (command == "REGISTER" && reply.statusCode() == 200) {
-            const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-            SipRequest request = d->buildRequest("SUBSCRIBE", uri, d->baseId);
-            request.setHeaderField("Expires", "3600");
-            d->sendRequest(request);
+            if (d->disconnecting) {
+                d->socket->close();
+                emit disconnected();
+            } else {
+                const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
+                SipRequest request = d->buildRequest("SUBSCRIBE", uri, d->baseId);
+                request.setHeaderField("Expires", "3600");
+                d->sendRequest(request);
+            }
         }
         else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
-            const QString recipient = QString("sip:%1@%2").arg(d->phoneNumber, d->serverName);
-            call(recipient);
+            emit connected();
         }
     }
 
+}
+
+QString SipClient::serverName() const
+{
+    return d->serverName;
+}
+
+void SipClient::setDomain(const QString &domain)
+{
+    d->domain = domain;
+}
+
+void SipClient::setPassword(const QString &password)
+{
+    d->password = password;
+}
+
+void SipClient::setUsername(const QString &username)
+{
+    d->username = username;
 }
 
 SipRequest::SipRequest()

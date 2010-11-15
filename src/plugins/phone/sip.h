@@ -120,6 +120,15 @@ public:
     void call(const QString &recipient);
     void connectToServer();
     void disconnectFromServer();
+    QString serverName() const;
+
+    void setDomain(const QString &domain);
+    void setPassword(const QString &password);
+    void setUsername(const QString &username);
+
+signals:
+    void connected();
+    void disconnected();
 
 private slots:
     void connectToServer(const QXmppSrvInfo &info);
