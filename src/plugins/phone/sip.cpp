@@ -567,6 +567,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
         warning(QString("Could not lookup SIP server %1").arg(d->serverName));
         return;
     }
+    d->authInfos.clear();
     d->serverAddress = info.addresses().first();
     d->baseId = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
