@@ -29,6 +29,7 @@ class QUdpSocket;
 class QXmppSrvInfo;
 
 class SipCallPrivate;
+class SipClient;
 class SipClientPrivate;
 
 class QXmppLoggable : public QObject
@@ -129,12 +130,15 @@ signals:
     /// This signal is emitted when the remote party is ringing.
     void ringing();
 
+public slots:
+    void hangup();
+
 private slots:
     void readFromSocket();
     void writeToSocket(const QByteArray &ba);
 
 private:
-    SipCall(QUdpSocket *socket, QObject *parent = 0);
+    SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
     void handleReply(const SipReply &reply);
 
     SipCallPrivate * const d;
@@ -170,6 +174,7 @@ private slots:
 
 private:
     SipClientPrivate *const d;
+    friend class SipCall;
     friend class SipClientPrivate;
 };
 

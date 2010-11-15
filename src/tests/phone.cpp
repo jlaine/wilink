@@ -44,7 +44,7 @@ void PhoneTester::connected()
 {
     qDebug("connected to server");
     const QString recipient = QString("sip:%1@%2").arg(m_phoneNumber, m_client->serverName());
-    m_client->call(recipient);
+    SipCall *call = m_client->call(recipient);
 }
 
 void PhoneTester::start()

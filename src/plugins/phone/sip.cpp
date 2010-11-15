@@ -109,6 +109,7 @@ QByteArray SdpMessage::toByteArray() const
 class SipCallPrivate
 {
 public:
+    QString recipient;
     QByteArray id;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
@@ -118,13 +119,45 @@ public:
     QUdpSocket *socket;
 
     SipCall *q;
+    SipClient *client;
 };
 
-SipCall::SipCall(QUdpSocket *socket, QObject *parent)
+class SipClientPrivate
+{
+public:
+    SipRequest buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id);
+    void sendRequest(SipRequest &request);
+
+    QUdpSocket *socket;
+    QByteArray baseId;
+    int cseq;
+    QByteArray tag;
+
+    // configuration
+    QString displayName;
+    QString username;
+    QString password;
+    QString domain;
+
+    bool disconnecting;
+    QString rinstance;
+    QMap<QByteArray, AuthInfo> authInfos;
+    QHostAddress serverAddress;
+    QString serverName;
+    quint16 serverPort;
+    SipRequest lastRequest;
+    QList<SipCall*> calls;
+
+    SipClient *q;
+};
+
+SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent)
     : QXmppLoggable(parent),
     d(new SipCallPrivate)
 {
+    d->client = parent;
     d->q = this;
+    d->recipient = recipient;
     d->id = generateStanzaHash().toLatin1();
     d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
@@ -238,6 +271,16 @@ void SipCall::handleReply(const SipReply &reply)
     }
 }
 
+void SipCall::hangup()
+{
+    debug(QString("Call %1 hangup").arg(
+            QString::fromUtf8(d->id)));
+
+    SipRequest request = d->client->d->buildRequest("BYE", d->recipient.toUtf8(), d->id);
+    request.setHeaderField("To", "<" + d->recipient.toUtf8() + ">");
+    d->client->d->sendRequest(request);
+}
+
 void SipCall::readFromSocket()
 {
     while (d->socket && d->socket->hasPendingDatagrams())
@@ -257,35 +300,6 @@ void SipCall::writeToSocket(const QByteArray &ba)
 
     d->socket->writeDatagram(ba, d->remoteHost, d->remotePort);
 }
-
-class SipClientPrivate
-{
-public:
-    SipRequest buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id);
-    void sendRequest(SipRequest &request);
-
-    QUdpSocket *socket;
-    QByteArray baseId;
-    int cseq;
-    QByteArray tag;
-
-    // configuration
-    QString displayName;
-    QString username;
-    QString password;
-    QString domain;
-
-    bool disconnecting;
-    QString rinstance;
-    QMap<QByteArray, AuthInfo> authInfos;
-    QHostAddress serverAddress;
-    QString serverName;
-    quint16 serverPort;
-    SipRequest lastRequest;
-    QList<SipCall*> calls;
-
-    SipClient *q;
-};
 
 SipRequest SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId)
 {
@@ -389,7 +403,7 @@ SipCall *SipClient::call(const QString &recipient)
         return 0;
     }
 
-    SipCall *call = new SipCall(socket, this);
+    SipCall *call = new SipCall(recipient, socket, this);
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
     connect(call, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
