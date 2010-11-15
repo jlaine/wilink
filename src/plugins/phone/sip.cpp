@@ -441,8 +441,9 @@ void SipCall::handleTimeout()
 
 void SipCall::hangup()
 {
-    //if (d->state != QXmppCall::ActiveState)
-    //    return;
+    if (d->state == QXmppCall::DisconnectingState ||
+        d->state == QXmppCall::FinishedState)
+        return;
 
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
