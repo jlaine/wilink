@@ -36,7 +36,10 @@ public:
     PhonePanel(ChatClient *xmppClient, QWidget *parent = NULL);
 
 private slots:
+    void callConnected();
+    void callFinished();
     void callNumber();
+    void callRinging();
     void chatConnected();
     void sipConnected();
     void sipDisconnected();

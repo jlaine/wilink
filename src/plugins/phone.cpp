@@ -74,6 +74,16 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
+void PhonePanel::callConnected()
+{
+    statusLabel->setText(tr("Call active."));
+}
+
+void PhonePanel::callFinished()
+{
+    statusLabel->setText(tr("Call finished."));
+}
+
 void PhonePanel::callNumber()
 {
     QString phoneNumber = numberEdit->text().trimmed();
@@ -83,6 +93,15 @@ void PhonePanel::callNumber()
     const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
     qDebug("Calling %s", qPrintable(recipient));
     SipCall *call = sip->call(recipient);
+    connect(call, SIGNAL(connected()),
+            this, SLOT(callConnected()));
+    connect(call, SIGNAL(finished()),
+            this, SLOT(callFinished()));
+}
+
+void PhonePanel::callRinging()
+{
+    statusLabel->setText(tr("Call ringing.."));
 }
 
 void PhonePanel::chatConnected()
