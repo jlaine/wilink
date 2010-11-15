@@ -124,7 +124,7 @@ public:
 
     void setDomain(const QString &domain);
     void setPassword(const QString &password);
-    void setUsername(const QString &username);
+    void setUsername(const QString &user);
 
 signals:
     void connected();

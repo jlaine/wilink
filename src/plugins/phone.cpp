@@ -17,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLayout>
+#include <QTimer>
+
+#include "QXmppUtils.h"
+
 #include "chat.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
@@ -24,10 +29,32 @@
 #include "phone/sip.h"
 #include "phone.h"
  
+#define PHONE_ROSTER_ID "0_phone"
+
 PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent),
     client(xmppClient)
 {
+    setWindowIcon(QIcon(":/call.png"));
+    setWindowTitle(tr("Phone"));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addLayout(headerLayout());
+    layout->addSpacing(10);
+    setLayout(layout);
+
+    sip = new SipClient(this);
+
+    /* register panel */
+    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
+}
+
+void PhonePanel::chatConnected()
+{
+    const QString jid = client->configuration().jid();
+    sip->setDomain(jidToDomain(jid));
+    sip->setUsername(jidToUser(jid));
+    sip->connectToServer();
 }
 
 // PLUGIN
@@ -44,13 +71,11 @@ bool PhonePlugin::initialize(Chat *chat)
     if (domain != "wifirst.net")
         return false;
 
-#if 0
-    PhoneWatcher *watcher = new PhoneWatcher(chat);
+    /* register panel */
+    PhonePanel *panel = new PhonePanel(chat->client());
+    panel->setObjectName(PHONE_ROSTER_ID);
+    chat->addPanel(panel);
 
-    /* add roster hooks */
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-            watcher, SLOT(rosterMenu(QMenu*, QModelIndex)));
-#endif
     return true;
 }
 

@@ -23,6 +23,7 @@
 #include "chat_panel.h"
 
 class ChatClient;
+class SipClient;
 
 class PhonePanel : public ChatPanel
 {
@@ -31,8 +32,12 @@ class PhonePanel : public ChatPanel
 public:
     PhonePanel(ChatClient *xmppClient, QWidget *parent = NULL);
 
+private slots:
+    void chatConnected();
+
 private:
     ChatClient *client;
+    SipClient *sip;
 };
 
 #endif
