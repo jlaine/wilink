@@ -167,8 +167,6 @@ public:
     ~SipClient();
 
     SipCall *call(const QString &recipient);
-    void connectToServer();
-    void disconnectFromServer();
     QString serverName() const;
 
     void setDisplayName(const QString &displayName);
@@ -180,6 +178,13 @@ signals:
     void connected();
     void disconnected();
 
+    /// This signal is emitted when the call state changes.
+    void stateChanged(SipClient::State state);
+
+public slots:
+    void connectToServer();
+    void disconnectFromServer();
+
 private slots:
     void callDestroyed(QObject *object);
     void connectToServer(const QXmppSrvInfo &info);
@@ -187,6 +192,8 @@ private slots:
 
 private:
     SipClientPrivate *const d;
+    void setState(SipClient::State state);
+
     friend class SipCall;
     friend class SipClientPrivate;
 };

@@ -338,7 +338,7 @@ void SipCall::hangup()
 {
     debug(QString("Call %1 hangup").arg(
             QString::fromUtf8(d->id)));
-    d->state = QXmppCall::DisconnectingState;
+    setState(QXmppCall::DisconnectingState);
 
     // stop audio
     if (d->audioInput)
@@ -619,22 +619,24 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 
     // register
     debug(QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
-    d->state = ConnectingState;
+
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
     request.setHeaderField("Expires", "300");
     d->sendRequest(request);
+
+    setState(ConnectingState);
 }
 
 void SipClient::disconnectFromServer()
 {
-    d->state = DisconnectingState;
-
     // unregister
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
     request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
     d->sendRequest(request);
+
+    setState(DisconnectingState);
 }
 
 void SipClient::datagramReceived()
@@ -734,16 +736,14 @@ void SipClient::datagramReceived()
         const QByteArray auth = reply.headerField(info.proxy ? "Proxy-Authenticate" : "WWW-Authenticate");
         if (!auth.startsWith("Digest ")) {
             warning("Unsupported authentication method");
-            d->state = DisconnectedState;
-            emit disconnected();
+            setState(DisconnectedState);
             return;
         }
 
         SipPacket request = d->lastRequest;
         if (!request.headerField(info.proxy ? "Proxy-Authorization" : "Authorization").isEmpty()) {
             warning("Authentication failed");
-            d->state = DisconnectedState;
-            emit disconnected();
+            setState(DisconnectedState);
             return;
         }
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
@@ -762,8 +762,7 @@ void SipClient::datagramReceived()
         // "base" call
         if (command == "REGISTER" && reply.statusCode() == 200) {
             if (d->state == DisconnectingState) {
-                d->state = DisconnectedState;
-                emit disconnected();
+                setState(DisconnectedState);
             } else {
                 QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
                 if (params.contains("received"))
@@ -777,8 +776,7 @@ void SipClient::datagramReceived()
             }
         }
         else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
-            d->state = ConnectedState;
-            emit connected();
+            setState(ConnectedState);
         }
     }
 
@@ -807,6 +805,20 @@ void SipClient::setPassword(const QString &password)
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
+}
+
+void SipClient::setState(SipClient::State state)
+{
+    if (d->state != state)
+    {
+        d->state = state;
+        emit stateChanged(d->state);
+
+        if (d->state == SipClient::ConnectedState)
+            emit connected();
+        else if (d->state == SipClient::DisconnectedState)
+            emit disconnected();
+    }
 }
 
 SipPacket::SipPacket(const QByteArray &bytes)

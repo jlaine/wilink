@@ -62,11 +62,9 @@ public:
 private slots:
     void backspacePressed();
     void callNumber();
-    void chatConnected();
+    void connectToServer();
     void keyPressed();
-    void passwordPressed();
-    void sipConnected();
-    void sipDisconnected();
+    void stateChanged(SipClient::State state);
 
 private:
     ChatClient *client;
@@ -75,8 +73,11 @@ private:
     QPushButton *callButton;
     ChatPanelBar *callBar;
     QLineEdit *numberEdit;
-    QLineEdit *passwordEdit;
     QLabel *statusLabel;
+
+    QLineEdit *passwordEdit;
+    QPushButton *connectButton;
+    QPushButton *disconnectButton;
 };
 
 #endif

@@ -726,10 +726,6 @@ Acceptez-vous?</translation>
         <translation>Téléphone</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
         <source>Call</source>
         <translation>Appeler</translation>
     </message>
@@ -748,6 +744,18 @@ Acceptez-vous?</translation>
     <message>
         <source>Connecting..</source>
         <translation>Connexion..</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>Connexion</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Déconnexion</translation>
+    </message>
+    <message>
+        <source>Disconnecting..</source>
+        <translation>Déconnexion..</translation>
     </message>
 </context>
 <context>

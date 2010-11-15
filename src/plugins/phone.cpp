@@ -47,6 +47,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
 
+    // connect / disconnect
     QSettings settings;
     QHBoxLayout *passwordBox = new QHBoxLayout;
     passwordBox->addWidget(new QLabel(tr("Password")));
@@ -54,8 +55,10 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     passwordEdit->setEchoMode(QLineEdit::Password);
     passwordEdit->setText(settings.value("PhonePassword").toString());
     passwordBox->addWidget(passwordEdit);
-    QPushButton *passwordButton = new QPushButton(tr("OK"));
-    passwordBox->addWidget(passwordButton);
+    connectButton = new QPushButton(tr("Connect"));
+    passwordBox->addWidget(connectButton);
+    disconnectButton = new QPushButton(tr("Disconnect"));
+    passwordBox->addWidget(disconnectButton);
     layout->addLayout(passwordBox);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -105,15 +108,17 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     /* connect signals */
     connect(backspaceButton, SIGNAL(clicked()), this, SLOT(backspacePressed()));
-    connect(client, SIGNAL(connected()), this, SLOT(chatConnected()));
-    connect(sip, SIGNAL(connected()), this, SLOT(sipConnected()));
-    connect(sip, SIGNAL(disconnected()), this, SLOT(sipDisconnected()));
+    connect(client, SIGNAL(connected()), sip, SLOT(connectToServer()));
+    connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
             client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    connect(sip, SIGNAL(stateChanged(SipClient::State)), this, SLOT(stateChanged(SipClient::State)));
     connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
-    connect(passwordEdit, SIGNAL(returnPressed()), this, SLOT(passwordPressed()));
-    connect(passwordButton, SIGNAL(clicked()), this, SLOT(passwordPressed()));
+
+    connect(passwordEdit, SIGNAL(returnPressed()), this, SLOT(connectToServer()));
+    connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToServer()));
+    connect(disconnectButton, SIGNAL(clicked()), sip, SLOT(disconnectFromServer()));
 }
 
 void PhonePanel::addWidget(ChatPanelWidget *widget)
@@ -145,14 +150,18 @@ void PhonePanel::callNumber()
     settings.setValue("PhoneHistory", phoneNumber);
 }
 
-void PhonePanel::chatConnected()
+void PhonePanel::connectToServer()
 {
+    // remember password
+    const QString password = passwordEdit->text();
+    QSettings settings;
+    settings.setValue("PhonePassword", password);
+
     const QString jid = client->configuration().jid();
     sip->setDomain(jidToDomain(jid));
     sip->setUsername(jidToUser(jid));
 
-    statusLabel->setText(tr("Connecting.."));
-    sip->setPassword(passwordEdit->text());
+    sip->setPassword(password);
     sip->connectToServer();
     emit registerPanel();
 }
@@ -165,27 +174,25 @@ void PhonePanel::keyPressed()
     numberEdit->insert(key->text());
 }
 
-void PhonePanel::passwordPressed()
+void PhonePanel::stateChanged(SipClient::State state)
 {
-    const QString password = passwordEdit->text();
-
-    QSettings settings;
-    settings.setValue("PhonePassword", password);
-    statusLabel->setText(tr("Connecting.."));
-    sip->setPassword(password);
-    sip->connectToServer();
-}
-
-void PhonePanel::sipConnected()
-{
-    statusLabel->setText(tr("Connected."));
-    callButton->setEnabled(true);
-}
-
-void PhonePanel::sipDisconnected()
-{
-    statusLabel->setText(tr("Disconnected."));
-    callButton->setEnabled(false);
+    switch (state)
+    {
+    case SipClient::ConnectingState:
+        statusLabel->setText(tr("Connecting.."));
+        break;
+    case SipClient::ConnectedState:
+        statusLabel->setText(tr("Connected."));
+        callButton->setEnabled(true);
+        break;
+    case SipClient::DisconnectingState:
+        statusLabel->setText(tr("Disconnecting.."));
+        break;
+    case SipClient::DisconnectedState:
+        statusLabel->setText(tr("Disconnected."));
+        callButton->setEnabled(false);
+        break;
+    }
 }
 
 // WIDGET
