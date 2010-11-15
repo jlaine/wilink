@@ -109,6 +109,7 @@ public:
     QHostAddress remoteHost;
     quint16 remotePort;
     QUdpSocket *socket;
+    bool invitePending;
     QByteArray inviteRecipient;
     QByteArray inviteUri;
     SipPacket inviteRequest;
@@ -158,6 +159,7 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->client = parent;
     d->q = this;
     d->state = QXmppCall::OfferState;
+    d->invitePending = false;
     d->inviteRecipient = QString("<%1>").arg(recipient).toUtf8();
     d->inviteUri = recipient.toUtf8();
     d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
@@ -240,6 +242,7 @@ void SipCall::sendInvite()
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
     d->client->d->sendRequest(request, d);
+    d->invitePending = true;
     d->inviteRequest = request;
 }
 
@@ -262,6 +265,8 @@ void SipCall::handleReply(const SipPacket &reply)
 
     // send ack
     if  (command == "INVITE" && reply.statusCode() >= 200) {
+        d->invitePending = false;
+
         SipPacket request;
         request.setMethod("ACK");
 
@@ -297,22 +302,24 @@ void SipCall::handleReply(const SipPacket &reply)
         SipPacket request = d->lastRequest;
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
         d->client->d->sendRequest(request, d);
+        d->invitePending = true;
         d->inviteRequest = request;
         return;
     }
 
     if (command == "BYE") {
 
-        SipPacket request = d->client->d->buildRequest("CANCEL", d->inviteUri, d->id, d->inviteRequest.sequenceNumber());
-        request.setHeaderField("To", d->inviteRecipient);
-        request.setHeaderField("Via", d->inviteRequest.headerField("Via"));
-        request.removeHeaderField("Contact");
-        d->client->d->sendRequest(request, d);
+        if (d->invitePending) {
+            SipPacket request = d->client->d->buildRequest("CANCEL", d->inviteUri, d->id, d->inviteRequest.sequenceNumber());
+            request.setHeaderField("To", d->inviteRecipient);
+            request.setHeaderField("Via", d->inviteRequest.headerField("Via"));
+            request.removeHeaderField("Contact");
+            d->client->d->sendRequest(request, d);
+        } else {
+            setState(QXmppCall::FinishedState);
+        }
 
     } else if (command == "CANCEL") {
-
-        debug(QString("Call %1 finished").arg(
-            QString::fromUtf8(d->id)));
 
         setState(QXmppCall::FinishedState);
 
@@ -484,7 +491,10 @@ void SipCall::setState(QXmppCall::State state)
         if (d->state == QXmppCall::ActiveState)
             emit connected();
         else if (d->state == QXmppCall::FinishedState)
+        {
+            debug(QString("Call %1 finished").arg(QString::fromUtf8(d->id)));
             emit finished();
+        }
     }
 }
 
