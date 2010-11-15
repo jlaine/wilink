@@ -443,16 +443,23 @@ void SipClient::datagramReceived()
 
     // handle authentication
     if (reply.statusCode() == 401 || reply.statusCode() == 407) {
-        SipRequest request = d->lastRequest;
-        request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
 
         AuthInfo info;
         info.proxy = reply.statusCode() == 407;
         const QByteArray auth = reply.headerField(info.proxy ? "Proxy-Authenticate" : "WWW-Authenticate");
         if (!auth.startsWith("Digest ")) {
             qWarning("Unsupported authentication method");
-            return;
+            d->socket->close();
+            emit disconnected();
         }
+
+        SipRequest request = d->lastRequest;
+        if (!request.headerField(info.proxy ? "Proxy-Authorization" : "Authorization").isEmpty()) {
+            qWarning("Authentication failed");
+            d->socket->close();
+            emit disconnected();
+        }
+        request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
         info.challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
         d->authInfos[request.uri()] = info;
 
