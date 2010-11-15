@@ -40,6 +40,21 @@ const int RTCP_COMPONENT = 2;
 
 #define QXMPP_DEBUG_SIP
 
+QXmppLoggable::QXmppLoggable(QObject *parent)
+    : QObject(parent)
+{
+}
+
+void QXmppLoggable::debug(const QString &msg)
+{
+    emit logMessage(QXmppLogger::DebugMessage, msg);
+}
+
+void QXmppLoggable::warning(const QString &msg)
+{
+    emit logMessage(QXmppLogger::WarningMessage, msg);
+}
+
 struct AuthInfo
 {
     QMap<QByteArray, QByteArray> challenge;
@@ -104,7 +119,7 @@ public:
 };
 
 SipCall::SipCall(QUdpSocket *socket, QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     d(new SipCallPrivate)
 {
     d->id = generateStanzaHash().toLatin1();
@@ -131,6 +146,74 @@ SipCall::~SipCall()
 QByteArray SipCall::id() const
 {
     return d->id;
+}
+
+void SipCall::handleReply(const SipReply &reply)
+{
+    debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
+
+    if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
+    {
+        QXmppRtpChannel *channel = d->channel;
+
+        // parse descriptor
+        SdpMessage sdp(reply.body());
+        QPair<char, QByteArray> field;
+        foreach (field, sdp.fields()) {
+            //qDebug() << "field" << field.first << field.second;
+            if (field.first == 'c') {
+                // determine remote host
+                if (field.second.startsWith("IN IP4 ")) {
+                    d->remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
+                }
+            } else if (field.first == 'm') {
+                QList<QByteArray> bits = field.second.split(' ');
+                if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
+                    continue;
+
+                // determine remote port
+                d->remotePort = bits[1].toUInt();
+
+                // determine codec
+                for (int i = 3; i < bits.size() && !d->channel->isOpen(); ++i)
+                {
+                    foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
+                        bool ok = false;
+                        if (payload.id() == bits[i].toInt(&ok) && ok) {
+                            qDebug() << "found codec" << payload.name();
+                            d->channel->setPayloadType(payload);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (!d->channel->isOpen()) {
+            warning("Could not negociate a common codec");
+            return;
+        }
+
+        // prepare audio format
+        QAudioFormat format;
+        format.setFrequency(d->channel->payloadType().clockrate());
+        format.setChannels(d->channel->payloadType().channels());
+        format.setSampleSize(16);
+        format.setCodec("audio/pcm");
+        format.setByteOrder(QAudioFormat::LittleEndian);
+        format.setSampleType(QAudioFormat::SignedInt);
+
+        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * d->channel->payloadType().ptime() / 1000;
+
+        // initialise audio output
+        d->audioOutput = new QAudioOutput(format, this);
+        d->audioOutput->setBufferSize(2 * packetSize);
+        d->audioOutput->start(d->channel);
+
+        // initialise audio input
+        d->audioInput = new QAudioInput(format, this);
+        d->audioInput->setBufferSize(2 * packetSize);
+        d->audioInput->start(d->channel);
+    }
 }
 
 void SipCall::readFromSocket()
@@ -257,7 +340,7 @@ void SipClientPrivate::sendRequest(SipRequest &request)
 }
 
 SipClient::SipClient(QObject *parent)
-    : QObject(parent),
+    : QXmppLoggable(parent),
     d(new SipClientPrivate)
 {
     d->q = this;
@@ -285,6 +368,8 @@ SipCall *SipClient::call(const QString &recipient)
     }
 
     SipCall *call = new SipCall(socket, this);
+    connect(call, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
 
     SdpMessage sdp;
     sdp.addField('v', "0");
@@ -615,16 +700,6 @@ void SipClient::setPassword(const QString &password)
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
-}
-
-void SipClient::debug(const QString &msg)
-{
-    emit logMessage(QXmppLogger::DebugMessage, msg);
-}
-
-void SipClient::warning(const QString &msg)
-{
-    emit logMessage(QXmppLogger::WarningMessage, msg);
 }
 
 SipRequest::SipRequest()

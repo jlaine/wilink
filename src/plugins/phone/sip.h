@@ -31,6 +31,22 @@ class QXmppSrvInfo;
 class SipCallPrivate;
 class SipClientPrivate;
 
+class QXmppLoggable : public QObject
+{
+    Q_OBJECT
+
+public:
+    QXmppLoggable(QObject *parent = 0);
+
+protected:
+    void debug(const QString &msg);
+    void warning(const QString &msg);
+
+signals:
+    /// This signal is emitted to send logging messages.
+    void logMessage(QXmppLogger::MessageType type, const QString &msg);
+};
+
 class SdpMessage
 {
 public:
@@ -91,7 +107,7 @@ private:
     QString m_reasonPhrase;
 };
 
-class SipCall : public QObject
+class SipCall : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -100,18 +116,22 @@ public:
 
     QByteArray id() const;
 
+signals:
+    void ringing();
+
 private slots:
     void readFromSocket();
     void writeToSocket(const QByteArray &ba);
 
 private:
     SipCall(QUdpSocket *socket, QObject *parent = 0);
+    void handleReply(const SipReply &reply);
 
     SipCallPrivate * const d;
     friend class SipClient;
 };
 
-class SipClient : public QObject
+class SipClient : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -133,16 +153,11 @@ signals:
     void connected();
     void disconnected();
 
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-
 private slots:
     void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
 
 private:
-    void debug(const QString &msg);
-    void warning(const QString &msg);
     SipClientPrivate *const d;
     friend class SipClientPrivate;
 };
