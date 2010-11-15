@@ -23,6 +23,7 @@
 #include <QObject>
 #include <QPair>
 
+#include "QXmppCallManager.h"
 #include "QXmppLogger.h"
 
 class QUdpSocket;
@@ -109,16 +110,6 @@ class SipCall : public QXmppLoggable
     Q_OBJECT
 
 public:
-    /// This enum is used to describe the state of a call.
-    enum State
-    {
-        OfferState = 0,         ///< The remote part is being called.
-        ConnectingState = 1,    ///< The call is being connected.
-        ActiveState = 2,        ///< The call is active.
-        DisconnectingState = 3, ///< The call is being disconnected.
-        FinishedState = 4,      ///< The call is finished.
-    };
-
     ~SipCall();
 
     QByteArray id() const;
@@ -136,6 +127,9 @@ signals:
     /// This signal is emitted when the remote party is ringing.
     void ringing();
 
+    /// This signal is emitted when the call state changes.
+    void stateChanged(QXmppCall::State state);
+
 public slots:
     void hangup();
 
@@ -148,6 +142,7 @@ private:
     SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
+    void setState(QXmppCall::State state);
 
     SipCallPrivate * const d;
     friend class SipClient;

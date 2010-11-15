@@ -43,7 +43,7 @@ public:
 private slots:
     void callFinished();
     void callRinging();
-    void callStateChanged(SipClient::State state);
+    void callStateChanged(QXmppCall::State state);
 
 private:
     SipCall *m_call;
@@ -56,13 +56,11 @@ class PhonePanel : public ChatPanel
 
 public:
     PhonePanel(ChatClient *xmppClient, QWidget *parent = NULL);
+    void addWidget(ChatPanelWidget *widget);
 
 private slots:
     void backspacePressed();
-    void callConnected();
-    void callFinished();
     void callNumber();
-    void callRinging();
     void chatConnected();
     void keyPressed();
     void passwordPressed();
@@ -74,7 +72,7 @@ private:
     SipClient *sip;
 
     QPushButton *callButton;
-    QPushButton *hangupButton;
+    ChatPanelBar *callBar;
     QLineEdit *numberEdit;
     QLineEdit *passwordEdit;
     QLabel *statusLabel;

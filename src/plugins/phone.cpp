@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -67,10 +69,6 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     callButton->setIcon(QIcon(":/call.png"));
     callButton->setEnabled(false);
     hbox->addWidget(callButton);
-    hangupButton = new QPushButton(tr("Hang up"));;
-    hangupButton->setIcon(QIcon(":/hangup.png"));
-    hangupButton->hide();
-    hbox->addWidget(hangupButton);
     layout->addLayout(hbox);
 
     // keyboard
@@ -87,8 +85,16 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     }
     layout->addLayout(grid);
 
-    layout->addStretch();
+    // view
+    QGraphicsView *graphicsView = new QGraphicsView;
+    graphicsView->setScene(new QGraphicsScene(graphicsView));
+    layout->addWidget(graphicsView);
 
+    callBar = new ChatPanelBar(graphicsView);
+    callBar->setZValue(10);
+    graphicsView->scene()->addItem(callBar);
+
+    // status
     statusLabel = new QLabel;
     layout->addWidget(statusLabel);
 
@@ -106,31 +112,16 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
     connect(passwordButton, SIGNAL(clicked()), this, SLOT(passwordPressed()));
+}
 
-    /* register panel */
+void PhonePanel::addWidget(ChatPanelWidget *widget)
+{
+    callBar->addWidget(widget);
 }
 
 void PhonePanel::backspacePressed()
 {
     numberEdit->backspace();
-}
-
-void PhonePanel::callConnected()
-{
-    statusLabel->setText(tr("Call active."));
-    hangupButton->show();
-}
-
-void PhonePanel::callFinished()
-{
-    SipCall *call = qobject_cast<SipCall*>(sender());
-    if (!call)
-        return;
-
-    statusLabel->setText(tr("Call finished."));
-    hangupButton->hide();
-    callButton->show();
-    call->deleteLater();
 }
 
 void PhonePanel::callNumber()
@@ -142,24 +133,18 @@ void PhonePanel::callNumber()
     callButton->hide();
 
     const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
-    statusLabel->setText(tr("Calling %1..").arg(phoneNumber));
-
-    QSettings settings;
-    settings.setValue("PhoneHistory", phoneNumber);
 
     SipCall *call = sip->call(recipient);
-    connect(call, SIGNAL(connected()),
-            this, SLOT(callConnected()));
-    connect(call, SIGNAL(finished()),
-            this, SLOT(callFinished()));
-    connect(call, SIGNAL(ringing()),
-            this, SLOT(callRinging()));
-    connect(hangupButton, SIGNAL(clicked()), call, SLOT(hangup()));
-}
+    if (!call)
+        return;
 
-void PhonePanel::callRinging()
-{
-    statusLabel->setText(tr("Call ringing.."));
+    addWidget(new PhoneWidget(call));
+    connect(call, SIGNAL(finished()),
+            callButton, SLOT(show()));
+
+    // remember number
+    QSettings settings;
+    settings.setValue("PhoneHistory", phoneNumber);
 }
 
 void PhonePanel::chatConnected()
@@ -232,9 +217,6 @@ void PhoneWidget::callFinished()
     m_call->deleteLater();
     m_call = 0;
 
-    m_label->setText(tr("Call finished."));
-    setButtonEnabled(false);
-
     // make widget disappear
     setButtonEnabled(false);
     QTimer::singleShot(1000, this, SLOT(disappear()));
@@ -242,26 +224,26 @@ void PhoneWidget::callFinished()
 
 void PhoneWidget::callRinging()
 {
-
+    m_label->setText(tr("Ringing.."));
 }
 
-void PhoneWidget::callStateChanged(SipClient::State state)
+void PhoneWidget::callStateChanged(QXmppCall::State state)
 {
     // update status
     switch (state)
     {
-    case SipCall::OfferState:
-    case SipCall::ConnectingState:
+    case QXmppCall::OfferState:
+    case QXmppCall::ConnectingState:
         m_label->setText(tr("Connecting.."));
         break;
-    case SipCall::ActiveState:
+    case QXmppCall::ActiveState:
         m_label->setText(tr("Call connected."));
         break;
-    case SipCall::DisconnectingState:
+    case QXmppCall::DisconnectingState:
         m_label->setText(tr("Disconnecting.."));
         setButtonEnabled(false);
         break;
-    case SipCall::FinishedState:
+    case QXmppCall::FinishedState:
         m_label->setText(tr("Call finished."));
         setButtonEnabled(false);
         break;
