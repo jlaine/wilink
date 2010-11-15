@@ -43,38 +43,6 @@ const int RTCP_COMPONENT = 2;
 #define EXPIRE_SECONDS 300
 #define TIMEOUT_SECONDS 30
 
-QXmppLoggable::QXmppLoggable(QObject *parent)
-    : QObject(parent)
-{
-}
-
-/// Logs a debugging message.
-///
-/// \param message
-
-void QXmppLoggable::debug(const QString &message)
-{
-    emit logMessage(QXmppLogger::DebugMessage, message);
-}
-
-/// Logs an informational message.
-///
-/// \param message
-
-void QXmppLoggable::info(const QString &message)
-{
-    emit logMessage(QXmppLogger::InformationMessage, message);
-}
-
-/// Logs a warning message.
-///
-/// \param message
-
-void QXmppLoggable::warning(const QString &message)
-{
-    emit logMessage(QXmppLogger::WarningMessage, message);
-}
-
 struct AuthInfo
 {
     QMap<QByteArray, QByteArray> challenge;

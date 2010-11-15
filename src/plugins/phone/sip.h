@@ -33,23 +33,6 @@ class SipCallPrivate;
 class SipClient;
 class SipClientPrivate;
 
-class QXmppLoggable : public QObject
-{
-    Q_OBJECT
-
-public:
-    QXmppLoggable(QObject *parent = 0);
-
-protected:
-    void debug(const QString &msg);
-    void info(const QString &msg);
-    void warning(const QString &msg);
-
-signals:
-    /// This signal is emitted to send logging messages.
-    void logMessage(QXmppLogger::MessageType type, const QString &msg);
-};
-
 class SdpMessage
 {
 public:
