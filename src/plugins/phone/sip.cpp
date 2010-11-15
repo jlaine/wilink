@@ -119,6 +119,7 @@ public:
 class SipClientPrivate
 {
 public:
+    QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
     void sendRequest(SipPacket &request);
 
@@ -448,6 +449,34 @@ void SipCall::writeToSocket(const QByteArray &ba)
     d->socket->writeDatagram(ba, d->remoteHost, d->remotePort);
 }
 
+QByteArray SipClientPrivate::authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const
+{
+    QXmppSaslDigestMd5 digest;
+    digest.setCnonce(digest.generateNonce());
+    digest.setNc("00000001");
+    digest.setNonce(challenge.value("nonce"));
+    digest.setQop(challenge.value("qop"));
+    digest.setRealm(challenge.value("realm"));
+    digest.setUsername(username.toUtf8());
+    digest.setPassword(password.toUtf8());
+
+    const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + password.toUtf8();
+    const QByteArray A2 = request.method() + ':' + request.uri();
+
+    QMap<QByteArray, QByteArray> response;
+    response["username"] = digest.username();
+    response["realm"] = digest.realm();
+    response["nonce"] = digest.nonce();
+    response["uri"] = request.uri();
+    response["response"] = digest.calculateDigest(A1, A2);
+    response["cnonce"] = digest.cnonce();
+    response["qop"] = digest.qop();
+    response["nc"] = digest.nc();
+    response["algorithm"] = "MD5";
+
+    return QByteArray("Digest ") + QXmppSaslDigestMd5::serializeMessage(response);
+}
+
 SipPacket SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId, int seqNum)
 {
     QString addr;
@@ -483,32 +512,8 @@ void SipClientPrivate::sendRequest(SipPacket &request)
     if (request.isRequest() && authInfos.contains(request.uri()))
     {
         AuthInfo info = authInfos.value(request.uri());
-
-        QXmppSaslDigestMd5 digest;
-        digest.setCnonce(digest.generateNonce());
-        digest.setNc("00000001");
-        digest.setNonce(info.challenge.value("nonce"));
-        digest.setQop(info.challenge.value("qop"));
-        digest.setRealm(info.challenge.value("realm"));
-        digest.setUsername(username.toUtf8());
-        digest.setPassword(password.toUtf8());
-
-        const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + password.toUtf8();
-        const QByteArray A2 = request.method() + ':' + request.uri();
-
-        QMap<QByteArray, QByteArray> response;
-        response["username"] = digest.username();
-        response["realm"] = digest.realm();
-        response["nonce"] = digest.nonce();
-        response["uri"] = request.uri();
-        response["response"] = digest.calculateDigest(A1, A2);
-        response["cnonce"] = digest.cnonce();
-        response["qop"] = digest.qop();
-        response["nc"] = digest.nc();
-        response["algorithm"] = "MD5";
-
         request.setHeaderField(info.proxy ? "Proxy-Authorization" : "Authorization",
-                               "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
+                               authorization(request, info.challenge));
     }
 
     if (request.isRequest() && request.method() != "ACK" && request.method() != "CANCEL")
