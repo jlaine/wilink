@@ -51,6 +51,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     hbox->addWidget(numberEdit);
     callButton = new QPushButton(tr("Call"));
     callButton->setIcon(QIcon(":/call.png"));
+    callButton->setEnabled(false);
     hbox->addWidget(callButton);
     hangupButton = new QPushButton(tr("Hang up"));;
     hangupButton->setIcon(QIcon(":/hangup.png"));
@@ -91,7 +92,6 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
 
     /* register panel */
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 void PhonePanel::callConnected()
@@ -148,7 +148,7 @@ void PhonePanel::chatConnected()
     sip->setPassword(settings.value("password").toString());
     numberEdit->setText(settings.value("phoneNumber").toString());
 
-    statusLabel->setText(tr("Connecting.."));
+    statusLabel->setText(tr("Connecting to server.."));
     sip->connectToServer();
 }
 
@@ -162,12 +162,15 @@ void PhonePanel::keyPressed()
 
 void PhonePanel::sipConnected()
 {
-    statusLabel->setText(tr("Connected"));
+    statusLabel->setText(tr("Connected to server."));
+    callButton->setEnabled(true);
+    emit registerPanel();
 }
 
 void PhonePanel::sipDisconnected()
 {
-    statusLabel->setText(tr("Disconnected"));
+    statusLabel->setText(tr("Disconnected from server."));
+    callButton->setEnabled(false);
 }
 
 // PLUGIN
