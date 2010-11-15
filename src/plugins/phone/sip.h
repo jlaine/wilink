@@ -73,6 +73,9 @@ public:
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;
     void setHeaderField(const QByteArray &name, const QByteArray &data);
 
+    bool isReply() const;
+    bool isRequest() const;
+
     // request
     QByteArray method() const;
     void setMethod(const QByteArray &method);
@@ -82,7 +85,10 @@ public:
 
     // response
     QString reasonPhrase() const;
+    void setReasonPhrase(const QString &reasonPhrase);
+
     int statusCode() const;
+    void setStatusCode(int statusCode);
 
     QByteArray toByteArray() const;
 
@@ -129,6 +135,7 @@ private slots:
 private:
     SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
     void handleReply(const SipPacket &reply);
+    void handleRequest(const SipPacket &request);
 
     SipCallPrivate * const d;
     friend class SipClient;

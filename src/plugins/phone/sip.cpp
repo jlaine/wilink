@@ -286,6 +286,32 @@ void SipCall::handleReply(const SipPacket &reply)
     }
 }
 
+void SipCall::handleRequest(const SipPacket &request)
+{
+    debug(QString("Got request %1 %2").arg(
+        QString::fromUtf8(request.method()),
+        QString::fromUtf8(request.uri())));
+
+    SipPacket response;
+    response.setStatusCode(200);
+    response.setReasonPhrase("OK");
+    response.setHeaderField("From", request.headerField("From"));
+    response.setHeaderField("To", request.headerField("To"));
+    response.setHeaderField("Call-Id", request.headerField("Call-Id"));
+    response.setHeaderField("CSeq", request.headerField("CSeq"));
+    response.setHeaderField("Record-Route", request.headerField("Record-Route"));
+    response.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
+    response.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
+        d->client->d->username,
+        d->client->d->reflexiveAddress.toString(),
+        QString::number(d->client->d->reflexivePort)).toUtf8());
+
+    d->client->d->sendRequest(response);
+
+    if (request.method() == "BYE")
+        emit finished();
+}
+
 void SipCall::hangup()
 {
     debug(QString("Call %1 hangup").arg(
@@ -364,7 +390,7 @@ SipPacket SipClientPrivate::buildRequest(const QByteArray &method, const QByteAr
 
 void SipClientPrivate::sendRequest(SipPacket &request)
 {
-    if (authInfos.contains(request.uri()))
+    if (request.isRequest() && authInfos.contains(request.uri()))
     {
         AuthInfo info = authInfos.value(request.uri());
 
@@ -395,7 +421,7 @@ void SipClientPrivate::sendRequest(SipPacket &request)
                                "Digest " + QXmppSaslDigestMd5::serializeMessage(response));
     }
 
-    if (request.method() != "ACK")
+    if (request.isRequest() && request.method() != "ACK")
         lastRequest = request;
 
 #ifdef QXMPP_DEBUG_SIP
@@ -575,14 +601,6 @@ void SipClient::datagramReceived()
 
     // parse packet
     SipPacket reply(buffer);
-    QByteArray cseq = reply.headerField("CSeq");
-    int i = cseq.indexOf(' ');
-    if (i < 0) {
-        warning("No CSeq found in reply");
-        return;
-    }
-    int commandSeq = cseq.left(i).toInt();
-    QByteArray command = cseq.mid(i+1);
 
     // find corresponding call
     SipCall *currentCall = 0;
@@ -603,6 +621,26 @@ void SipClient::datagramReceived()
             return;
         }
     }
+
+    // check whether it's a request or a response
+    if (reply.isRequest()) {
+        if (currentCall)
+            currentCall->handleRequest(reply);
+        return;
+    } else if (!reply.isReply()) {
+        warning("SIP packet is neither request nor reply");
+        return;
+    }
+
+    // check sequence
+    QByteArray cseq = reply.headerField("CSeq");
+    int i = cseq.indexOf(' ');
+    if (i < 0) {
+        warning("No CSeq found in reply");
+        return;
+    }
+    int commandSeq = cseq.left(i).toInt();
+    QByteArray command = cseq.mid(i+1);
 
     // send ack
     if (currentCall && command == "INVITE" && reply.statusCode() >= 200) {
@@ -731,9 +769,8 @@ SipPacket::SipPacket(const QByteArray &bytes)
     }
     else if (status.size() > 10 && status.endsWith(" SIP/2.0")) {
         int n = status.indexOf(' ');
-        m_method = status.mid(0, n);
-        m_uri = status.mid(n, j - n - 8);
-        qDebug() << "GOT" << m_method << m_uri;
+        m_method = status.left(n);
+        m_uri = status.mid(n + 1, j - n - 9);
     } else {
         j = -1;
     }
@@ -846,6 +883,16 @@ void SipPacket::setHeaderField(const QByteArray &name, const QByteArray &data)
     m_fields.append(qMakePair(name, data));
 }
 
+bool SipPacket::isReply() const
+{
+    return m_statusCode != 0;
+}
+
+bool SipPacket::isRequest() const
+{
+    return !m_method.isEmpty() && !m_uri.isEmpty();
+}
+
 QByteArray SipPacket::body() const
 {
     return m_body;
@@ -872,9 +919,19 @@ QByteArray SipPacket::uri() const
     return m_uri;
 }
 
+void SipPacket::setUri(const QByteArray &uri)
+{
+    m_uri = uri;
+}
+
 QString SipPacket::reasonPhrase() const
 {
     return m_reasonPhrase;
+}
+
+void SipPacket::setReasonPhrase(const QString &reasonPhrase)
+{
+    m_reasonPhrase = reasonPhrase;
 }
 
 int SipPacket::statusCode() const
@@ -882,9 +939,9 @@ int SipPacket::statusCode() const
     return m_statusCode;
 }
 
-void SipPacket::setUri(const QByteArray &uri)
+void SipPacket::setStatusCode(int statusCode)
 {
-    m_uri = uri;
+    m_statusCode = statusCode;
 }
 
 QByteArray SipPacket::toByteArray() const
