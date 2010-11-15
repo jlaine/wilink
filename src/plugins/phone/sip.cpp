@@ -39,7 +39,7 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
-//#define QXMPP_DEBUG_SIP
+#define QXMPP_DEBUG_SIP
 #define EXPIRE_SECONDS 300
 #define TIMEOUT_SECONDS 30
 
@@ -48,14 +48,31 @@ QXmppLoggable::QXmppLoggable(QObject *parent)
 {
 }
 
-void QXmppLoggable::debug(const QString &msg)
+/// Logs a debugging message.
+///
+/// \param message
+
+void QXmppLoggable::debug(const QString &message)
 {
-    emit logMessage(QXmppLogger::DebugMessage, msg);
+    emit logMessage(QXmppLogger::DebugMessage, message);
 }
 
-void QXmppLoggable::warning(const QString &msg)
+/// Logs an informational message.
+///
+/// \param message
+
+void QXmppLoggable::info(const QString &message)
 {
-    emit logMessage(QXmppLogger::WarningMessage, msg);
+    emit logMessage(QXmppLogger::InformationMessage, message);
+}
+
+/// Logs a warning message.
+///
+/// \param message
+
+void QXmppLoggable::warning(const QString &message)
+{
+    emit logMessage(QXmppLogger::WarningMessage, message);
 }
 
 struct AuthInfo

@@ -42,6 +42,7 @@ public:
 
 protected:
     void debug(const QString &msg);
+    void info(const QString &msg);
     void warning(const QString &msg);
 
 signals:
