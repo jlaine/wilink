@@ -111,6 +111,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
             client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
+    connect(passwordEdit, SIGNAL(returnPressed()), this, SLOT(passwordPressed()));
     connect(passwordButton, SIGNAL(clicked()), this, SLOT(passwordPressed()));
 }
 

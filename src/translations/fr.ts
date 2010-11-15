@@ -727,7 +727,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Call</source>
