@@ -127,6 +127,14 @@ public:
     QTimer *timer;
 };
 
+enum SipClientState
+{
+    DisconnectedState = 0,
+    ConnectingState = 1,
+    ConnectedState = 2,
+    DisconnectingState = 3,
+};
+
 class SipClientPrivate
 {
 public:
@@ -144,7 +152,7 @@ public:
     QString password;
     QString domain;
 
-    bool disconnecting;
+    SipClientState state;
     QString rinstance;
     QMap<QByteArray, AuthInfo> authInfos;
     QHostAddress serverAddress;
@@ -450,7 +458,7 @@ SipClient::SipClient(QObject *parent)
 {
     d->q = this;
     d->cseq = 1;
-    d->disconnecting = false;
+    d->state = DisconnectedState;
     d->rinstance = generateStanzaHash(16);
     d->reflexivePort = 0;
     d->socket = new QUdpSocket(this);
@@ -465,6 +473,11 @@ SipClient::~SipClient()
 
 SipCall *SipClient::call(const QString &recipient)
 {
+    if (d->state != ConnectedState) {
+        warning("Cannot dial call, not connected to server");
+        return 0;
+    }
+
     QUdpSocket *socket = new QUdpSocket;
     if (!socket->bind(d->socket->localAddress(), 0))
     {
@@ -549,7 +562,6 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
         d->serverPort = 5060;
     }
 
-    debug(QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
     QHostInfo info = QHostInfo::fromName(d->serverName);
     if (info.addresses().isEmpty()) {
         warning(QString("Could not lookup SIP server %1").arg(d->serverName));
@@ -577,16 +589,17 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
             }
         }
 
-        qDebug() << "Listening for SIP on" << bindAddress;
+        debug(QString("Listening for SIP on %1").arg(bindAddress.toString()));
         if(!d->socket->bind(bindAddress, 0))
         {
             warning("Could not start listening for SIP");
-            qWarning("Could not start listening for SIP");
             return;
         }
     }
 
     // register
+    debug(QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
+    d->state = ConnectingState;
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
     request.setHeaderField("Expires", "300");
@@ -595,7 +608,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 
 void SipClient::disconnectFromServer()
 {
-    d->disconnecting = true;
+    d->state = DisconnectingState;
 
     // unregister
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
@@ -701,15 +714,17 @@ void SipClient::datagramReceived()
         const QByteArray auth = reply.headerField(info.proxy ? "Proxy-Authenticate" : "WWW-Authenticate");
         if (!auth.startsWith("Digest ")) {
             warning("Unsupported authentication method");
-            d->socket->close();
+            d->state = DisconnectedState;
             emit disconnected();
+            return;
         }
 
         SipPacket request = d->lastRequest;
         if (!request.headerField(info.proxy ? "Proxy-Authorization" : "Authorization").isEmpty()) {
             warning("Authentication failed");
-            d->socket->close();
+            d->state = DisconnectedState;
             emit disconnected();
+            return;
         }
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
         info.challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
@@ -726,8 +741,8 @@ void SipClient::datagramReceived()
     } else {
         // "base" call
         if (command == "REGISTER" && reply.statusCode() == 200) {
-            if (d->disconnecting) {
-                d->socket->close();
+            if (d->state == DisconnectingState) {
+                d->state = DisconnectedState;
                 emit disconnected();
             } else {
                 QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
@@ -742,6 +757,7 @@ void SipClient::datagramReceived()
             }
         }
         else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
+            d->state = ConnectedState;
             emit connected();
         }
     }
