@@ -72,35 +72,35 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         if (id.category() == "conference" &&
             id.type() == "text")
         {
-            emit logMessage(QXmppLogger::InformationMessage, "Found chat room server " + disco.from());
+            info("Found chat room server " + disco.from());
             emit mucServerFound(disco.from());
         }
         // check if it's a diagnostics server
         else if (id.category() == "diagnostics" &&
                  id.type() == "server")
         {
-            emit logMessage(QXmppLogger::InformationMessage, "Found diagnostics server " + disco.from());
+            info("Found diagnostics server " + disco.from());
             emit diagnosticsServerFound(disco.from());
         }
         // check if it's a publish-subscribe server
         else if (id.category() == "pubsub" &&
                  id.type() == "service")
         {
-            emit logMessage(QXmppLogger::InformationMessage, "Found pubsub server " + disco.from());
+            info("Found pubsub server " + disco.from());
             emit pubSubServerFound(disco.from());
         }
         // check if it's a SOCKS5 proxy server
         else if (id.category() == "proxy" &&
                  id.type() == "bytestreams")
         {
-            emit logMessage(QXmppLogger::InformationMessage, "Found bytestream proxy " + disco.from());
+            info("Found bytestream proxy " + disco.from());
             transferManager().setProxy(disco.from());
         }
         // check if it's a file sharing server
         else if (id.category() == "store" &&
                  id.type() == "file")
         {
-            emit logMessage(QXmppLogger::InformationMessage, "Found share server " + disco.from());
+            info("Found share server " + disco.from());
             emit shareServerFound(disco.from());
         }
     }
