@@ -44,10 +44,20 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
-    //layout->addSpacing(10);
+
+    QSettings settings;
+    QHBoxLayout *passwordBox = new QHBoxLayout;
+    passwordBox->addWidget(new QLabel(tr("Password:")));
+    passwordEdit = new QLineEdit;
+    passwordEdit->setText(settings.value("PhonePassword").toString());
+    passwordBox->addWidget(passwordEdit);
+    QPushButton *passwordButton = new QPushButton(tr("OK"));
+    passwordBox->addWidget(passwordButton);
+    layout->addLayout(passwordBox);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
+    numberEdit->setText(settings.value("PhoneHistory").toString());
     hbox->addWidget(numberEdit);
     setFocusProxy(numberEdit);
     QPushButton *backspaceButton = new QPushButton;
@@ -95,6 +105,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
             client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
+    connect(passwordButton, SIGNAL(clicked()), this, SLOT(passwordPressed()));
 
     /* register panel */
 }
@@ -158,12 +169,10 @@ void PhonePanel::chatConnected()
     sip->setUsername(jidToUser(jid));
 
     // FIXME : get password
-    QSettings settings;
-    sip->setPassword(settings.value("PhonePassword").toString());
-    numberEdit->setText(settings.value("PhoneHistory").toString());
-
     statusLabel->setText(tr("Connecting to server.."));
+    sip->setPassword(passwordEdit->text());
     sip->connectToServer();
+    emit registerPanel();
 }
 
 void PhonePanel::keyPressed()
@@ -174,11 +183,21 @@ void PhonePanel::keyPressed()
     numberEdit->insert(key->text());
 }
 
+void PhonePanel::passwordPressed()
+{
+    const QString password = passwordEdit->text();
+
+    QSettings settings;
+    settings.setValue("PhonePassword", password);
+    statusLabel->setText(tr("Connecting to server.."));
+    sip->setPassword(password);
+    sip->connectToServer();
+}
+
 void PhonePanel::sipConnected()
 {
     statusLabel->setText(tr("Connected to server."));
     callButton->setEnabled(true);
-    emit registerPanel();
 }
 
 void PhonePanel::sipDisconnected()

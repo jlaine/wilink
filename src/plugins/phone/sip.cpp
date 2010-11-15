@@ -559,31 +559,37 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     d->baseId = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
 
-    QHostAddress bindAddress;
-    foreach (const QHostAddress &ip, QNetworkInterface::allAddresses())
-    {
-        if (ip.protocol() == QAbstractSocket::IPv4Protocol &&
-            ip != QHostAddress::Null &&
-            ip != QHostAddress::LocalHost &&
-            ip != QHostAddress::LocalHostIPv6 &&
-            ip != QHostAddress::Broadcast &&
-            ip != QHostAddress::Any &&
-            ip != QHostAddress::AnyIPv6)
+    // bind socket
+    if (d->socket->state() == QAbstractSocket::UnconnectedState) {
+        QHostAddress bindAddress;
+        foreach (const QHostAddress &ip, QNetworkInterface::allAddresses())
         {
-            bindAddress = ip;
-            break;
+            if (ip.protocol() == QAbstractSocket::IPv4Protocol &&
+                ip != QHostAddress::Null &&
+                ip != QHostAddress::LocalHost &&
+                ip != QHostAddress::LocalHostIPv6 &&
+                ip != QHostAddress::Broadcast &&
+                ip != QHostAddress::Any &&
+                ip != QHostAddress::AnyIPv6)
+            {
+                bindAddress = ip;
+                break;
+            }
         }
-    }
-    if (!d->socket->bind(bindAddress, 0))
-    {
-        warning("Could not start listening for SIP");
-        return;
+
+        qDebug() << "Listening for SIP on" << bindAddress;
+        if(!d->socket->bind(bindAddress, 0))
+        {
+            warning("Could not start listening for SIP");
+            qWarning("Could not start listening for SIP");
+            return;
+        }
     }
 
     // register
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId);
-    request.setHeaderField("Expires", "3600");
+    request.setHeaderField("Expires", "300");
     d->sendRequest(request);
 }
 

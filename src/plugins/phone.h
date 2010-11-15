@@ -43,6 +43,7 @@ private slots:
     void callRinging();
     void chatConnected();
     void keyPressed();
+    void passwordPressed();
     void sipConnected();
     void sipDisconnected();
 
@@ -53,6 +54,7 @@ private:
     QPushButton *callButton;
     QPushButton *hangupButton;
     QLineEdit *numberEdit;
+    QLineEdit *passwordEdit;
     QLabel *statusLabel;
 };
 
