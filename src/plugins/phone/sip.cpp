@@ -803,6 +803,8 @@ SipPacket::SipPacket(const QByteArray &bytes)
         // expand shortcuts
         if (field == "c")
             field = "Content-Type";
+        else if (field == "f")
+            field = "From";
         else if (field == "i")
             field = "Call-ID";
         else if (field == "k")
