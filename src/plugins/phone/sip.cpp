@@ -223,7 +223,6 @@ void SipCall::handleReply(const SipReply &reply)
             SdpMessage sdp(reply.body());
             QPair<char, QByteArray> field;
             foreach (field, sdp.fields()) {
-                //qDebug() << "field" << field.first << field.second;
                 if (field.first == 'c') {
                     // determine remote host
                     if (field.second.startsWith("IN IP4 ")) {
@@ -243,7 +242,6 @@ void SipCall::handleReply(const SipReply &reply)
                         foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
                             bool ok = false;
                             if (payload.id() == bits[i].toInt(&ok) && ok) {
-                                qDebug() << "found codec" << payload.name();
                                 d->channel->setPayloadType(payload);
                                 break;
                             }
