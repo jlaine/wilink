@@ -34,8 +34,8 @@ PhoneTester::PhoneTester(QObject *parent)
     m_client->setPassword(settings.value("password").toString());
     m_phoneNumber = settings.value("phoneNumber").toString();
 
-    connect(m_client, SIGNAL(connected()), this, SIGNAL(connected()));
-    connect(m_client, SIGNAL(disconnected()), qApp, SIGNAL(quit()));
+    connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
+    connect(m_client, SIGNAL(disconnected()), this, SIGNAL(finished()));
 }
 
 void PhoneTester::connected()
@@ -69,6 +69,7 @@ int main(int argc, char* argv[])
     signal(SIGTERM, signal_handler);
 
     QXmppLogger::getLogger()->setLoggingType(QXmppLogger::StdoutLogging);
+    QObject::connect(&tester, SIGNAL(finished()), qApp, SLOT(quit()));
     tester.start();
     return app.exec();
 }
