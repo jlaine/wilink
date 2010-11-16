@@ -750,10 +750,6 @@ Acceptez-vous?</translation>
         <translation>Connexion</translation>
     </message>
     <message>
-        <source>Disconnect</source>
-        <translation>Déconnexion</translation>
-    </message>
-    <message>
         <source>Disconnecting..</source>
         <translation>Déconnexion..</translation>
     </message>

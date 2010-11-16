@@ -57,9 +57,6 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     passwordBox->addWidget(passwordEdit);
     connectButton = new QPushButton(tr("Connect"));
     passwordBox->addWidget(connectButton);
-    disconnectButton = new QPushButton(tr("Disconnect"));
-    disconnectButton->setEnabled(false);
-    passwordBox->addWidget(disconnectButton);
     layout->addLayout(passwordBox);
 
     QHBoxLayout *hbox = new QHBoxLayout;
@@ -119,7 +116,6 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     connect(passwordEdit, SIGNAL(returnPressed()), this, SLOT(connectToServer()));
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToServer()));
-    connect(disconnectButton, SIGNAL(clicked()), sip, SLOT(disconnectFromServer()));
 }
 
 void PhonePanel::addWidget(ChatPanelWidget *widget)
@@ -188,16 +184,13 @@ void PhonePanel::stateChanged(SipClient::State state)
     case SipClient::ConnectedState:
         statusLabel->setText(tr("Connected."));
         callButton->setEnabled(true);
-        disconnectButton->setEnabled(true);
         break;
     case SipClient::DisconnectingState:
         statusLabel->setText(tr("Disconnecting.."));
-        disconnectButton->setEnabled(false);
         break;
     case SipClient::DisconnectedState:
         statusLabel->setText(tr("Disconnected."));
         callButton->setEnabled(false);
-        disconnectButton->setEnabled(false);
         break;
     }
 }

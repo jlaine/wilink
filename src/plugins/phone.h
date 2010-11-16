@@ -77,7 +77,6 @@ private:
 
     QLineEdit *passwordEdit;
     QPushButton *connectButton;
-    QPushButton *disconnectButton;
 };
 
 #endif
