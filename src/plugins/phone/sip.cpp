@@ -175,8 +175,6 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->timer = new QTimer(this);
     d->timer->setSingleShot(true);
 
-    connect(d->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
             this, SLOT(writeToSocket(QByteArray)));
     connect(d->socket, SIGNAL(readyRead()),
@@ -584,8 +582,7 @@ void SipClientPrivate::sendRequest(SipPacket &request, SipCallContext *ctx)
     request.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
 
 #ifdef QXMPP_DEBUG_SIP
-    q->logMessage(QXmppLogger::SentMessage,
-        QString("SIP packet to %1:%2\n%3").arg(
+    q->logSent(QString("SIP packet to %1:%2\n%3").arg(
             serverAddress.toString(),
             QString::number(serverPort),
             QString::fromUtf8(request.toByteArray())));
@@ -745,8 +742,7 @@ void SipClient::datagramReceived()
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
 #ifdef QXMPP_DEBUG_SIP
-    emit logMessage(QXmppLogger::ReceivedMessage,
-        QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
+    logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
 #endif
 
     // parse packet
