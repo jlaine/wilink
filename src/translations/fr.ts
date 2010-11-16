@@ -746,12 +746,12 @@ Acceptez-vous?</translation>
         <translation>Connexion..</translation>
     </message>
     <message>
-        <source>Connect</source>
-        <translation>Connexion</translation>
-    </message>
-    <message>
         <source>Disconnecting..</source>
         <translation>Déconnexion..</translation>
+    </message>
+    <message>
+        <source>Phone options</source>
+        <translation>Options du téléphone</translation>
     </message>
 </context>
 <context>

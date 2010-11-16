@@ -64,6 +64,7 @@ private slots:
     void callNumber();
     void connectToServer();
     void keyPressed();
+    void showOptions();
     void stateChanged(SipClient::State state);
 
 private:
@@ -74,9 +75,6 @@ private:
     ChatPanelBar *callBar;
     QLineEdit *numberEdit;
     QLabel *statusLabel;
-
-    QLineEdit *passwordEdit;
-    QPushButton *connectButton;
 };
 
 #endif

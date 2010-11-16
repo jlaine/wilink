@@ -19,6 +19,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -47,20 +48,10 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
 
-    // connect / disconnect
-    QSettings settings;
-    QHBoxLayout *passwordBox = new QHBoxLayout;
-    passwordBox->addWidget(new QLabel(tr("Password")));
-    passwordEdit = new QLineEdit;
-    passwordEdit->setEchoMode(QLineEdit::Password);
-    passwordEdit->setText(settings.value("PhonePassword").toString());
-    passwordBox->addWidget(passwordEdit);
-    connectButton = new QPushButton(tr("Connect"));
-    passwordBox->addWidget(connectButton);
-    layout->addLayout(passwordBox);
-
+    // history
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
+    QSettings settings;
     numberEdit->setText(settings.value("PhoneHistory").toString());
     hbox->addWidget(numberEdit);
     setFocusProxy(numberEdit);
@@ -97,8 +88,13 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     graphicsView->scene()->addItem(callBar);
 
     // status
+    QHBoxLayout *statusBox = new QHBoxLayout;
     statusLabel = new QLabel;
-    layout->addWidget(statusLabel);
+    statusBox->addWidget(statusLabel, 1);
+    QPushButton *statusButton = new QPushButton;
+    statusButton->setIcon(QIcon(":/options.png"));
+    statusBox->addWidget(statusButton);
+    layout->addLayout(statusBox);
 
     setLayout(layout);
 
@@ -106,16 +102,13 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     /* connect signals */
     connect(backspaceButton, SIGNAL(clicked()), this, SLOT(backspacePressed()));
-    connect(client, SIGNAL(connected()), this, SLOT(connectToServer()));
     connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
             client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     connect(sip, SIGNAL(stateChanged(SipClient::State)), this, SLOT(stateChanged(SipClient::State)));
     connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
-
-    connect(passwordEdit, SIGNAL(returnPressed()), this, SLOT(connectToServer()));
-    connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToServer()));
+    connect(statusButton, SIGNAL(clicked()), this, SLOT(showOptions()));
 }
 
 void PhonePanel::addWidget(ChatPanelWidget *widget)
@@ -149,21 +142,19 @@ void PhonePanel::callNumber()
 
 void PhonePanel::connectToServer()
 {
-    // remember password
-    const QString password = passwordEdit->text();
     QSettings settings;
-    settings.setValue("PhonePassword", password);
+    const QString password = settings.value("PhonePassword").toString();
 
     // connect to server
     if (!password.isEmpty()) {
         const QString jid = client->configuration().jid();
-        sip->setDisplayName("wiLink");
         sip->setDomain(jidToDomain(jid));
         sip->setUsername(jidToUser(jid));
         sip->setPassword(password);
         sip->connectToServer();
+    } else {
+        sip->disconnectFromServer();
     }
-    emit registerPanel();
 }
 
 void PhonePanel::keyPressed()
@@ -172,6 +163,19 @@ void PhonePanel::keyPressed()
     if (!key)
         return;
     numberEdit->insert(key->text());
+}
+
+void PhonePanel::showOptions()
+{
+    QSettings settings;
+    bool ok = false;
+    const QString oldPassword = settings.value("PhonePassword").toString();
+    QString password = QInputDialog::getText(this, tr("Phone options"), tr("Password"),
+        QLineEdit::Password, oldPassword, &ok);
+    if (ok && password != oldPassword) {
+        settings.setValue("PhonePassword", password);
+        connectToServer();
+    }
 }
 
 void PhonePanel::stateChanged(SipClient::State state)
