@@ -765,11 +765,6 @@ void SipClient::datagramReceived()
                 break;
             }
         }
-        if (!currentCall)
-        {
-            warning("Received a reply for unknown call " + callId);
-            return;
-        }
     }
 
     // check whether it's a request or a response
@@ -779,10 +774,10 @@ void SipClient::datagramReceived()
     } else if (reply.isReply()) {
         if (currentCall)
             currentCall->handleReply(reply);
-        else
+        else if (callId == d->baseId)
             handleReply(reply);
-    } else if (!reply.isReply()) {
-        warning("SIP packet is neither request nor reply");
+    } else {
+        //warning("SIP packet is neither request nor reply");
     }
 }
 
@@ -822,6 +817,9 @@ void SipClient::handleReply(const SipPacket &reply)
     }
     else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
         setState(ConnectedState);
+    } else if (reply.statusCode() >= 300) {
+        warning("Register or subscribe failed");
+        setState(DisconnectedState);
     }
 }
 
