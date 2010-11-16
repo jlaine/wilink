@@ -38,7 +38,7 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
-#define QXMPP_DEBUG_SIP
+//#define QXMPP_DEBUG_SIP
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 
@@ -334,7 +334,7 @@ void SipCall::handleReply(const SipPacket &reply)
         }
         else if (reply.statusCode() == 200)
         {
-            debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
+            debug(QString("SIP call %1 established").arg(QString::fromUtf8(d->id)));
             d->timer->stop();
 
             if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
@@ -400,7 +400,7 @@ void SipCall::handleReply(const SipPacket &reply)
 
         } else if (reply.statusCode() >= 300) {
 
-            warning(QString("Call %1 failed").arg(
+            warning(QString("SIP call %1 failed").arg(
                 QString::fromUtf8(d->id)));
             d->timer->stop();
             setState(QXmppCall::FinishedState);
@@ -410,10 +410,6 @@ void SipCall::handleReply(const SipPacket &reply)
 
 void SipCall::handleRequest(const SipPacket &request)
 {
-    debug(QString("Got request %1 %2").arg(
-        QString::fromUtf8(request.method()),
-        QString::fromUtf8(request.uri())));
-
     SipPacket response;
     response.setStatusCode(200);
     response.setReasonPhrase("OK");
@@ -438,7 +434,7 @@ void SipCall::handleRequest(const SipPacket &request)
 
 void SipCall::handleTimeout()
 {
-    warning(QString("Call %1 timed out").arg(QString::fromUtf8(d->id)));
+    warning(QString("SIP call %1 timed out").arg(QString::fromUtf8(d->id)));
     setState(QXmppCall::FinishedState);
 }
 
@@ -448,7 +444,7 @@ void SipCall::hangup()
         d->state == QXmppCall::FinishedState)
         return;
 
-    debug(QString("Call %1 hangup").arg(
+    debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     setState(QXmppCall::DisconnectingState);
 
@@ -496,7 +492,7 @@ void SipCall::setState(QXmppCall::State state)
             emit connected();
         else if (d->state == QXmppCall::FinishedState)
         {
-            debug(QString("Call %1 finished").arg(QString::fromUtf8(d->id)));
+            debug(QString("SIP call %1 finished").arg(QString::fromUtf8(d->id)));
             emit finished();
         }
     }
@@ -617,6 +613,8 @@ SipClient::~SipClient()
 
 SipCall *SipClient::call(const QString &recipient)
 {
+    info(QString("SIP call to %1").arg(recipient));
+
     if (d->state != ConnectedState) {
         warning("Cannot dial call, not connected to server");
         return 0;
