@@ -39,7 +39,7 @@ const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
 #define QXMPP_DEBUG_SIP
-#define EXPIRE_SECONDS 300
+#define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 
 SdpMessage::SdpMessage(const QByteArray &ba)
@@ -532,10 +532,14 @@ QByteArray SipClientPrivate::authorization(const SipPacket &request, const QMap<
     response["nonce"] = digest.nonce();
     response["uri"] = request.uri();
     response["response"] = digest.calculateDigest(A1, A2);
-    response["cnonce"] = digest.cnonce();
-    response["qop"] = digest.qop();
-    response["nc"] = digest.nc();
+    if (challenge.contains("qop")) {
+        response["qop"] = digest.qop();
+        response["cnonce"] = digest.cnonce();
+        response["nc"] = digest.nc();
+    }
     response["algorithm"] = "MD5";
+    if (challenge.contains("opaque"))
+        response["opaque"] = challenge.value("opaque");
 
     return QByteArray("Digest ") + QXmppSaslDigestMd5::serializeMessage(response);
 }
