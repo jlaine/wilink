@@ -686,12 +686,14 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
             }
         }
 
-        debug(QString("Listening for SIP on %1").arg(bindAddress.toString()));
         if(!d->socket->bind(bindAddress, 0))
         {
             warning("Could not start listening for SIP");
             return;
         }
+        debug(QString("Listening for SIP on %1:%2").arg(
+            d->socket->localAddress().toString(),
+            QString::number(d->socket->localPort())));
     }
 
     // register
