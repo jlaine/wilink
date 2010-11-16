@@ -801,6 +801,9 @@ void SipClient::handleReply(const SipPacket &reply)
             if (d->state == DisconnectingState) {
                 setState(DisconnectedState);
             } else {
+                setState(ConnectedState);
+
+                // send subscribe
                 QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
                 if (params.contains("received"))
                     d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
@@ -817,11 +820,9 @@ void SipClient::handleReply(const SipPacket &reply)
         }
     }
     else if (command == "SUBSCRIBE") {
-        if (reply.statusCode() == 200) {
-            setState(ConnectedState);
-        } else if (reply.statusCode() >= 300) {
+        if (reply.statusCode() >= 300) {
             warning("Subscribe failed");
-            setState(DisconnectedState);
+            //setState(DisconnectedState);
         }
     }
 }
