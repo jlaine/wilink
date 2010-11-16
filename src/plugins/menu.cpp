@@ -59,7 +59,7 @@ Menu::Menu(Chat *window)
     QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterItem::Other,
         HOME_ROSTER_ID,
         tr("My residence"),
-        QIcon(":/favorite-active.png"));
+        QIcon(":/home.png"));
     ChatRosterView *rosterView = chatWindow->rosterView();
     rosterView->expand(rosterView->mapFromRoster(index));
 

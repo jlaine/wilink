@@ -19,6 +19,7 @@ generate_png(png
     file.svg
     forward.svg
     hangup.svg
+    home.svg
     options.svg
     peer.svg
     photos.svg
