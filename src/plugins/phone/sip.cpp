@@ -796,26 +796,33 @@ void SipClient::handleReply(const SipPacket &reply)
         d->sendRequest(request, d);
         d->registerRequest = request;
     }
-    else if (command == "REGISTER" && reply.statusCode() == 200) {
-        if (d->state == DisconnectingState) {
+    else if (command == "REGISTER") {
+        if (reply.statusCode() == 200) {
+            if (d->state == DisconnectingState) {
+                setState(DisconnectedState);
+            } else {
+                QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
+                if (params.contains("received"))
+                    d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+                if (params.contains("rport"))
+                    d->reflexivePort = params.value("rport").toUInt();
+                const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
+                SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
+                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
+                d->sendRequest(request, d);
+            }
+        } else if (reply.statusCode() >= 300) {
+            warning("Register failed");
             setState(DisconnectedState);
-        } else {
-            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
-            if (params.contains("received"))
-                d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
-            if (params.contains("rport"))
-                d->reflexivePort = params.value("rport").toUInt();
-            const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-            SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
-            request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-            d->sendRequest(request, d);
         }
     }
-    else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
-        setState(ConnectedState);
-    } else if (reply.statusCode() >= 300) {
-        warning("Register or subscribe failed");
-        setState(DisconnectedState);
+    else if (command == "SUBSCRIBE") {
+        if (reply.statusCode() == 200) {
+            setState(ConnectedState);
+        } else if (reply.statusCode() >= 300) {
+            warning("Subscribe failed");
+            setState(DisconnectedState);
+        }
     }
 }
 
