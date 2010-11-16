@@ -251,6 +251,11 @@ QString SipCall::recipient() const
     return QString::fromUtf8(d->remoteRecipient);
 }
 
+QXmppCall::State SipCall::state() const
+{
+    return d->state;
+}
+
 void SipCall::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
@@ -816,10 +821,14 @@ void SipClient::handleReply(const SipPacket &reply)
     }
 }
 
-
 QString SipClient::serverName() const
 {
     return d->serverName;
+}
+
+SipClient::State SipClient::state() const
+{
+    return d->state;
 }
 
 void SipClient::setDisplayName(const QString &displayName)

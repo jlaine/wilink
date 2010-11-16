@@ -101,6 +101,7 @@ public:
 
     QByteArray id() const;
     QString recipient() const;
+    QXmppCall::State state() const;
 
 signals:
     /// This signal is emitted when a call is connected.
@@ -156,6 +157,7 @@ public:
 
     SipCall *call(const QString &recipient);
     QString serverName() const;
+    SipClient::State state() const;
 
     void setDisplayName(const QString &displayName);
     void setDomain(const QString &domain);

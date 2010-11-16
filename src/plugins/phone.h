@@ -62,8 +62,8 @@ public:
 private slots:
     void backspacePressed();
     void callNumber();
-    void connectToServer();
     void keyPressed();
+    void panelShown();
     void showOptions();
     void stateChanged(SipClient::State state);
 

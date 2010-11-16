@@ -109,6 +109,7 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
     connect(statusButton, SIGNAL(clicked()), this, SLOT(showOptions()));
+    connect(this, SIGNAL(showPanel()), this, SLOT(panelShown()));
 }
 
 void PhonePanel::addWidget(ChatPanelWidget *widget)
@@ -140,29 +141,31 @@ void PhonePanel::callNumber()
     settings.setValue("PhoneHistory", phoneNumber);
 }
 
-void PhonePanel::connectToServer()
-{
-    QSettings settings;
-    const QString password = settings.value("PhonePassword").toString();
-
-    // connect to server
-    if (!password.isEmpty()) {
-        const QString jid = client->configuration().jid();
-        sip->setDomain(jidToDomain(jid));
-        sip->setUsername(jidToUser(jid));
-        sip->setPassword(password);
-        sip->connectToServer();
-    } else {
-        sip->disconnectFromServer();
-    }
-}
-
 void PhonePanel::keyPressed()
 {
     QPushButton *key = qobject_cast<QPushButton*>(sender());
     if (!key)
         return;
     numberEdit->insert(key->text());
+}
+
+void PhonePanel::panelShown()
+{
+    if (sip->state() == SipClient::ConnectedState)
+        return;
+
+    const QString jid = client->configuration().jid();
+    sip->setDomain(jidToDomain(jid));
+    sip->setUsername(jidToUser(jid));
+
+    QSettings settings;
+    const QString password = settings.value("PhonePassword").toString();
+    if (password.isEmpty())
+        showOptions();
+    else {
+        sip->setPassword(password);
+        sip->connectToServer();
+    }
 }
 
 void PhonePanel::showOptions()
@@ -172,9 +175,15 @@ void PhonePanel::showOptions()
     const QString oldPassword = settings.value("PhonePassword").toString();
     QString password = QInputDialog::getText(this, tr("Phone options"), tr("Password"),
         QLineEdit::Password, oldPassword, &ok);
-    if (ok && password != oldPassword) {
-        settings.setValue("PhonePassword", password);
-        connectToServer();
+    if (!ok && password == oldPassword)
+        return;
+
+    settings.setValue("PhonePassword", password);
+    if (password.isEmpty()) {
+        sip->disconnectFromServer();
+    } else {
+        sip->setPassword(password);
+        sip->connectToServer();
     }
 }
 
