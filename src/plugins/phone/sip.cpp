@@ -107,6 +107,9 @@ public:
     QAudioOutput *audioOutput;
     QHostAddress remoteHost;
     quint16 remotePort;
+#ifdef USE_ICE
+    QXmppIceConnection *iceConnection;
+#endif
     QUdpSocket *socket;
     bool invitePending;
     QByteArray inviteRecipient;
@@ -199,14 +202,16 @@ void SipCall::sendInvite()
 {
     SdpMessage sdp;
     sdp.addField('v', "0");
-    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
+    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
     sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
+    sdp.addField('c', "IN IP4 " + d->socket->localAddress().toString().toUtf8());
     sdp.addField('t', "0 0");
 #ifdef USE_ICE
-    sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
-    sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
+    // ICE credentials
+    sdp.addField('a', "ice-ufrag:" + d->iceConnection->localUser().toUtf8());
+    sdp.addField('a', "ice-pwd:" + d->iceConnection->localPassword().toUtf8());
 #endif
+
     // RTP profile
     QByteArray profiles = "RTP/AVP";
     QList<QByteArray> attrs;
@@ -222,8 +227,10 @@ void SipCall::sendInvite()
     sdp.addField('m', "audio " + QByteArray::number(d->socket->localPort()) + " "  + profiles);
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
+
 #ifdef USE_ICE
-    foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
+    // ICE candidates
+    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
         ba += QByteArray::number(candidate.component()) + " ";
         ba += "UDP ";
@@ -719,6 +726,7 @@ void SipClient::disconnectFromServer()
 
     // unregister
     if (d->state == SipClient::ConnectedState) {
+        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
         const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
         SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
