@@ -27,6 +27,7 @@
 class QGraphicsSimpleTextItem;
 class QLabel;
 class QLineEdit;
+class QNetworkAccessManager;
 class QPushButton;
 class ChatClient;
 class SipCall;
@@ -62,14 +63,15 @@ public:
 private slots:
     void backspacePressed();
     void callNumber();
+    void getSettings();
+    void handleSettings();
     void keyPressed();
-    void panelShown();
-    void showOptions();
     void stateChanged(SipClient::State state);
 
 private:
     ChatClient *client;
     SipClient *sip;
+    QNetworkAccessManager *network;
 
     QPushButton *callButton;
     ChatPanelBar *callBar;

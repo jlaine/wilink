@@ -17,17 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QPushButton>
 #include <QSettings>
 #include <QTimer>
+#include <QUrl>
 
 #include "QXmppUtils.h"
+
+#include "qnetio/wallet.h"
 
 #include "chat.h"
 #include "chat_plugin.h"
@@ -42,6 +49,8 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     : ChatPanel(parent),
     client(xmppClient)
 {
+    bool check;
+
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Phone"));
 
@@ -88,28 +97,36 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
     graphicsView->scene()->addItem(callBar);
 
     // status
-    QHBoxLayout *statusBox = new QHBoxLayout;
     statusLabel = new QLabel;
-    statusBox->addWidget(statusLabel, 1);
-    QPushButton *statusButton = new QPushButton;
-    statusButton->setIcon(QIcon(":/options.png"));
-    statusBox->addWidget(statusButton);
-    layout->addLayout(statusBox);
+    layout->addWidget(statusLabel);
 
     setLayout(layout);
 
-    sip = new SipClient(this);
+    // http access
+    network = new QNetworkAccessManager(this);
+    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                    QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+    Q_ASSERT(check);
 
-    /* connect signals */
-    connect(backspaceButton, SIGNAL(clicked()), this, SLOT(backspacePressed()));
-    connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
-    connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-            client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    connect(sip, SIGNAL(stateChanged(SipClient::State)), this, SLOT(stateChanged(SipClient::State)));
-    connect(numberEdit, SIGNAL(returnPressed()), this, SLOT(callNumber()));
-    connect(callButton, SIGNAL(clicked()), this, SLOT(callNumber()));
-    connect(statusButton, SIGNAL(clicked()), this, SLOT(showOptions()));
-    connect(this, SIGNAL(showPanel()), this, SLOT(panelShown()));
+    // sip client
+    sip = new SipClient(this);
+    check = connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+                    client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+    Q_ASSERT(check);
+
+    check = connect(sip, SIGNAL(stateChanged(SipClient::State)),
+                    this, SLOT(stateChanged(SipClient::State)));
+    Q_ASSERT(check);
+
+    // connect signals
+    connect(backspaceButton, SIGNAL(clicked()),
+            this, SLOT(backspacePressed()));
+    connect(client, SIGNAL(connected()),
+            this, SLOT(getSettings()));
+    connect(numberEdit, SIGNAL(returnPressed()),
+            this, SLOT(callNumber()));
+    connect(callButton, SIGNAL(clicked()),
+            this, SLOT(callNumber()));
 }
 
 void PhonePanel::addWidget(ChatPanelWidget *widget)
@@ -141,50 +158,54 @@ void PhonePanel::callNumber()
     settings.setValue("PhoneHistory", phoneNumber);
 }
 
+/** Requests VoIP settings from the server.
+ */
+void PhonePanel::getSettings()
+{
+    QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(handleSettings()));
+}
+
+/** Handles VoIP settings received from the server.
+ */
+void PhonePanel::handleSettings()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    QDomDocument doc;
+    doc.setContent(reply);
+    QDomElement settings = doc.documentElement();
+
+    // check service is activated
+    const bool enabled = settings.firstChildElement("enabled").text() == "true";
+    const QString password = settings.firstChildElement("password").text();
+    if (!enabled || password.isEmpty())
+        return;
+
+    // connect to server
+    const QString jid = client->configuration().jid();
+    sip->setDomain(jidToDomain(jid));
+    sip->setUsername(jidToUser(jid));
+    sip->setPassword(password);
+    sip->connectToServer();
+    emit registerPanel();
+}
+
 void PhonePanel::keyPressed()
 {
     QPushButton *key = qobject_cast<QPushButton*>(sender());
     if (!key)
         return;
     numberEdit->insert(key->text());
-}
-
-void PhonePanel::panelShown()
-{
-    if (sip->state() == SipClient::ConnectedState)
-        return;
-
-    const QString jid = client->configuration().jid();
-    sip->setDomain(jidToDomain(jid));
-    sip->setUsername(jidToUser(jid));
-
-    QSettings settings;
-    const QString password = settings.value("PhonePassword").toString();
-    if (password.isEmpty())
-        showOptions();
-    else {
-        sip->setPassword(password);
-        sip->connectToServer();
-    }
-}
-
-void PhonePanel::showOptions()
-{
-    QSettings settings;
-    bool ok = false;
-    const QString oldPassword = settings.value("PhonePassword").toString();
-    QString password = QInputDialog::getText(this, tr("Phone options"), tr("Password"),
-        QLineEdit::Password, oldPassword, &ok);
-    if (!ok && password == oldPassword)
-        return;
-
-    settings.setValue("PhonePassword", password);
-    if (password.isEmpty()) {
-        sip->disconnectFromServer();
-    } else {
-        sip->setPassword(password);
-        sip->connectToServer();
-    }
 }
 
 void PhonePanel::stateChanged(SipClient::State state)
