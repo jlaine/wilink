@@ -128,7 +128,7 @@ class ChatHistoryWidget : public QGraphicsWidget
     Q_OBJECT
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
-    ChatMessageWidget *addMessage(const ChatMessage &message);
+    void addMessage(const ChatMessage &message);
     void adjustSize();
     void setView(QGraphicsView *view);
 

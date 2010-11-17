@@ -98,13 +98,18 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
 }
 
 /** Returns the index of a message within the bubble.
+ *
+ * @param widget
  */
 int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
 {
     return m_messages.indexOf(widget);
 }
 
-/** Inserts a new message in the bubble.
+/** Inserts a message in the bubble at the given position.
+ *
+ * @param pos
+ * @param widget
  */
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
@@ -119,6 +124,10 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
     updateGeometry();
 }
 
+/** When a message is destroyed, update the bubble's internal list.
+ *
+ * @param obj
+ */
 void ChatMessageBubble::messageDestroyed(QObject *obj)
 {
     m_messages.removeAll(static_cast<ChatMessageWidget*>(obj));
@@ -136,6 +145,8 @@ bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
     return false;
 }
 
+/** Sets the bubble's geometry.
+ */
 void ChatMessageBubble::setGeometry(const QRectF &baseRect)
 {
     QGraphicsWidget::setGeometry(baseRect);
@@ -181,6 +192,10 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     }
 }
 
+/** Sets the bubble's maximum width.
+ *
+ * @param widget
+ */
 void ChatMessageBubble::setMaximumWidth(qreal width)
 {
     m_maximumWidth = width;
@@ -190,6 +205,11 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
     updateGeometry();
 }
 
+/** Returns a size hint for the bubble.
+ *
+ * @param which
+ * @param constraint
+ */
 QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which)
@@ -214,6 +234,8 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 }
 
 /** Moves all the messages after the given one to a new bubble.
+ *
+ * @param widget
  */
 ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
 {
@@ -225,15 +247,15 @@ ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
         return 0;
 
     ChatMessageBubble *bubble = new ChatMessageBubble(m_isReceived, parentItem());
-    int j = 0;
-    for (int i = index + 1; i < m_messages.size(); ++i, ++j)
+    for (int i = m_messages.size() - 1; i > index; --i)
     {
         ChatMessageWidget *widget = m_messages[i];
         disconnect(widget, SIGNAL(destroyed(QObject*)),
                    this, SLOT(messageDestroyed(QObject*)));
-        bubble->insertAt(j, widget);
+        bubble->insertAt(0, widget);
+        m_messages.removeAt(i);
     }
-    adjustSize();
+    updateGeometry();
     return bubble;
 }
 
@@ -285,82 +307,11 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
+/** Returns the bubble this message belongs to.
+ */
 ChatMessageBubble *ChatMessageWidget::bubble()
 {
     return m_bubble;
-}
-
-void ChatMessageWidget::setBubble(ChatMessageBubble *bubble)
-{
-    m_bubble = bubble;
-}
-
-bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode) const
-{
-    return bodyText->collidesWithPath(path, mode);
-}
-
-/** Filters events on the body label.
- */
-bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
-{
-    if (item == bodyText)
-    {
-        if (event->type() == QEvent::GraphicsSceneHoverLeave)
-        {
-            bodyAnchor = QString();
-            bodyText->setCursor(Qt::ArrowCursor);
-        }
-        else if (event->type() == QEvent::GraphicsSceneHoverMove)
-        {
-            QGraphicsSceneHoverEvent *hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
-            bodyAnchor = bodyText->document()->documentLayout()->anchorAt(hoverEvent->pos());
-            bodyText->setCursor(bodyAnchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
-        }
-        else if (event->type() == QEvent::GraphicsSceneMousePress)
-        {
-            QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-            {
-                if (!bodyAnchor.isEmpty())
-                    QDesktopServices::openUrl(bodyAnchor);
-            }
-        }
-    }
-    return false;
-}
-
-void ChatMessageWidget::setGeometry(const QRectF &baseRect)
-{
-    QGraphicsWidget::setGeometry(baseRect);
-
-    // position the date
-    if (dateText && dateText->isVisible())
-    {
-        QRectF rect(baseRect);
-        rect.moveLeft(0);
-        rect.moveTop(0);
-        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
-                         rect.top() + 2);
-    }
-}
-
-void ChatMessageWidget::setMaximumWidth(qreal width)
-{
-    if (width == maxWidth)
-        return;
-
-    QGraphicsWidget::setMaximumWidth(width);
-    maxWidth = width;
-    bodyText->document()->setTextWidth(width - DATE_WIDTH - BODY_OFFSET);
-    updateGeometry();
-}
-
-/** Returns the message which this widget displays.
- */
-ChatMessage ChatMessageWidget::message() const
-{
-    return m_message;
 }
 
 /** Break a text selection into a list of rectangles, which one rectangle per line.
@@ -418,7 +369,99 @@ QList<RectCursor> ChatMessageWidget::chunkSelection(const QTextCursor &cursor) c
     return rectangles;
 }
 
-/** Set the text cursor to select the given rectangle.
+/** Returns true if the message's body collides with the given path.
+ *
+ * @param path
+ * @param mode
+ */
+bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode) const
+{
+    return bodyText->collidesWithPath(path, mode);
+}
+
+/** Returns the message which this widget displays.
+ */
+ChatMessage ChatMessageWidget::message() const
+{
+    return m_message;
+}
+
+/** Filters events on the body label.
+ */
+bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
+{
+    if (item == bodyText)
+    {
+        if (event->type() == QEvent::GraphicsSceneHoverLeave)
+        {
+            bodyAnchor = QString();
+            bodyText->setCursor(Qt::ArrowCursor);
+        }
+        else if (event->type() == QEvent::GraphicsSceneHoverMove)
+        {
+            QGraphicsSceneHoverEvent *hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            bodyAnchor = bodyText->document()->documentLayout()->anchorAt(hoverEvent->pos());
+            bodyText->setCursor(bodyAnchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
+        }
+        else if (event->type() == QEvent::GraphicsSceneMousePress)
+        {
+            QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::LeftButton)
+            {
+                if (!bodyAnchor.isEmpty())
+                    QDesktopServices::openUrl(bodyAnchor);
+            }
+        }
+    }
+    return false;
+}
+
+/** Sets the bubble this message belongs to.
+ *
+ * @param bubble
+ */
+void ChatMessageWidget::setBubble(ChatMessageBubble *bubble)
+{
+    m_bubble = bubble;
+}
+
+/** Sets the message's geometry.
+ *
+ * @param baseRect
+ */
+void ChatMessageWidget::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    // position the date
+    if (dateText && dateText->isVisible())
+    {
+        QRectF rect(baseRect);
+        rect.moveLeft(0);
+        rect.moveTop(0);
+        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
+                         rect.top() + 2);
+    }
+}
+
+/** Sets the message's maximum width.
+ *
+ * @param width
+ */
+void ChatMessageWidget::setMaximumWidth(qreal width)
+{
+    if (width == maxWidth)
+        return;
+
+    QGraphicsWidget::setMaximumWidth(width);
+    maxWidth = width;
+    bodyText->document()->setTextWidth(width - DATE_WIDTH - BODY_OFFSET);
+    updateGeometry();
+}
+
+/** Sets the text cursor to select the given rectangle.
+ *
+ * @param rect
  */
 void ChatMessageWidget::setSelection(const QRectF &rect)
 {
@@ -436,7 +479,7 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
     bodyText->setTextCursor(cursor);
 }
 
-/** Determine whether to show message date depending
+/** Determines whether to show message date depending
  *  on the previous message in the list.
  */
 void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
@@ -453,6 +496,11 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
     }
 }
 
+/** Returns the given size hint for the message.
+ *
+ * @param which
+ * @param constraint
+ */
 QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which)
@@ -470,6 +518,8 @@ QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     }
 }
 
+/** Returns the message's text item.
+ */
 QGraphicsTextItem *ChatMessageWidget::textItem()
 {
     return bodyText;
@@ -495,36 +545,20 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_trippleClickTimer->setInterval(QApplication::doubleClickInterval());
 }
 
-void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
-{
-    bubble->setMaximumWidth(m_maximumWidth);
-    m_bubbles.insert(pos, bubble);
-    m_layout->insertItem(pos, bubble);
-
-    bool check;
-    check = connect(bubble, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(bubbleDestroyed(QObject*)));
-    Q_ASSERT(check);
-
-    check = connect(bubble, SIGNAL(messageClicked(ChatMessage)),
-                    this, SIGNAL(messageClicked(ChatMessage)));
-    Q_ASSERT(check);
-}
-
-ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
+void ChatHistoryWidget::addMessage(const ChatMessage &message)
 {
     if (message.body.isEmpty())
-        return 0;
+        return;
 
     // check we hit the message limit and this message is too old
     if (m_messages.size() >= MESSAGE_MAX)
     {
         ChatMessageWidget *oldest = m_messages.first();
         if (message.date < oldest->message().date)
-            return 0;
+            return;
     }
 
-    /* position cursor */
+    // position cursor
     int pos = 0;
     foreach (ChatMessageWidget *child, m_messages)
     {
@@ -533,7 +567,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
             message.fromJid == child->message().fromJid &&
             message.body == child->message().body &&
             qAbs(message.date.secsTo(child->message().date)) < 10)
-            return 0;
+            return;
 
         // we use greater or equal comparison (and not strictly greater) dates
         // because messages are usually received in chronological order
@@ -543,7 +577,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     ChatMessageWidget *prevMsg = (pos > 0) ? m_messages[pos-1] : 0;
     ChatMessageWidget *nextMsg = (pos < m_messages.size()) ? m_messages[pos] : 0;
 
-    /* prepare message */
+    // prepare message
     ChatMessageWidget *msg = new ChatMessageWidget(message, this);
     if (prevMsg)
         msg->setPrevious(prevMsg);
@@ -552,19 +586,19 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
 
     if (prevMsg && prevMsg->message().from == message.from)
     {
-        /* message belongs to the same bubble as previous message */
+        // message belongs to the same bubble as previous message
         ChatMessageBubble *bubble = prevMsg->bubble();
         bubble->insertAt(bubble->indexOf(prevMsg) + 1, msg);
     }
     else if (nextMsg && nextMsg->message().from == message.from)
     {
-        /* message belongs to the same bubble as next message */
+        // message belongs to the same bubble as next message
         ChatMessageBubble *bubble = nextMsg->bubble();
         bubble->insertAt(bubble->indexOf(nextMsg), msg);
     }
     else
     {
-        /* split the previous bubble if needed */
+        // split the previous bubble if needed
         int bubblePos = 0;
         if (prevMsg)
         {
@@ -575,7 +609,7 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
                 insertBubble(bubblePos, nextBubble);
         }
 
-        /* insert the new bubble */
+        // insert the new bubble
         ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
         bubble->insertAt(0, msg);
         insertBubble(bubblePos, bubble);
@@ -585,8 +619,6 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
             this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, msg);
     adjustSize();
-
-    return msg;
 }
 
 /** Resizes the ChatHistoryWidget to its preferred size hint.
@@ -765,6 +797,27 @@ void ChatHistoryWidget::findClear()
         delete item;
     }
     m_glassItems.clear();
+}
+
+/** Inserts a bubble at the given position.
+ *
+ * @param pos
+ * @param bubble
+ */
+void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
+{
+    bubble->setMaximumWidth(m_maximumWidth);
+    m_bubbles.insert(pos, bubble);
+    m_layout->insertItem(pos, bubble);
+
+    bool check;
+    check = connect(bubble, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(bubbleDestroyed(QObject*)));
+    Q_ASSERT(check);
+
+    check = connect(bubble, SIGNAL(messageClicked(ChatMessage)),
+                    this, SIGNAL(messageClicked(ChatMessage)));
+    Q_ASSERT(check);
 }
 
 void ChatHistoryWidget::messageDestroyed(QObject *obj)
