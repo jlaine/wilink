@@ -38,7 +38,7 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
-//#define QXMPP_DEBUG_SIP
+#define QXMPP_DEBUG_SIP
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 
