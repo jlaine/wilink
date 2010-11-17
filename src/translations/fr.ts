@@ -734,10 +734,6 @@ Acceptez-vous?</translation>
         <translation>Connecté.</translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
         <source>Disconnected.</source>
         <translation>Déconnecté.</translation>
     </message>
@@ -748,10 +744,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Disconnecting..</source>
         <translation>Déconnexion..</translation>
-    </message>
-    <message>
-        <source>Phone options</source>
-        <translation>Options du téléphone</translation>
     </message>
 </context>
 <context>
