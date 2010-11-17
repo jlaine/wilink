@@ -789,8 +789,15 @@ void SipClient::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
 
+    // store information
+    QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
+    if (params.contains("received"))
+        d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+    if (params.contains("rport"))
+        d->reflexivePort = params.value("rport").toUInt();
+
+    // handle authentication
     if (reply.statusCode() == 401) {
-        // handle authentication
         const QByteArray auth = reply.headerField("WWW-Authenticate");
         if (!auth.startsWith("Digest ") || !d->registerRequest.headerField("Authorization").isEmpty())  {
             warning("Authentication failed");
@@ -803,8 +810,10 @@ void SipClient::handleReply(const SipPacket &reply)
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
         d->sendRequest(request, d);
         d->registerRequest = request;
+        return;
     }
-    else if (command == "REGISTER") {
+
+    if (command == "REGISTER") {
         if (reply.statusCode() == 200) {
             if (d->state == DisconnectingState) {
                 setState(DisconnectedState);
@@ -812,11 +821,6 @@ void SipClient::handleReply(const SipPacket &reply)
                 setState(ConnectedState);
 
                 // send subscribe
-                QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
-                if (params.contains("received"))
-                    d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
-                if (params.contains("rport"))
-                    d->reflexivePort = params.value("rport").toUInt();
                 const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
                 SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
@@ -830,7 +834,6 @@ void SipClient::handleReply(const SipPacket &reply)
     else if (command == "SUBSCRIBE") {
         if (reply.statusCode() >= 300) {
             warning("Subscribe failed");
-            //setState(DisconnectedState);
         }
     }
 }
