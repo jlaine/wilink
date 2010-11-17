@@ -129,7 +129,7 @@ void Menu::showMenu()
 
     if (reply->error() != QNetworkReply::NoError)
     {
-        qWarning("Failed to retrieve menu");
+        qWarning("Failed to retrieve menu: %s", qPrintable(reply->errorString()));
         QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
         return;
     }
