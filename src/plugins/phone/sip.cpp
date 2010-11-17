@@ -38,7 +38,7 @@
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
-#define QXMPP_DEBUG_SIP
+//#define QXMPP_DEBUG_SIP
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 
@@ -107,6 +107,9 @@ public:
     QAudioOutput *audioOutput;
     QHostAddress remoteHost;
     quint16 remotePort;
+#ifdef USE_ICE
+    QXmppIceConnection *iceConnection;
+#endif
     QUdpSocket *socket;
     bool invitePending;
     QByteArray inviteRecipient;
@@ -175,8 +178,6 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->timer = new QTimer(this);
     d->timer->setSingleShot(true);
 
-    connect(d->channel, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)));
     connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
             this, SLOT(writeToSocket(QByteArray)));
     connect(d->socket, SIGNAL(readyRead()),
@@ -201,14 +202,16 @@ void SipCall::sendInvite()
 {
     SdpMessage sdp;
     sdp.addField('v', "0");
-    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->socket->localAddress().toString().toUtf8());
+    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
     sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
+    sdp.addField('c', "IN IP4 " + d->socket->localAddress().toString().toUtf8());
     sdp.addField('t', "0 0");
 #ifdef USE_ICE
-    sdp.addField('a', "ice-ufrag:" + call->iceConnection->localUser().toUtf8());
-    sdp.addField('a', "ice-pwd:" + call->iceConnection->localPassword().toUtf8());
+    // ICE credentials
+    sdp.addField('a', "ice-ufrag:" + d->iceConnection->localUser().toUtf8());
+    sdp.addField('a', "ice-pwd:" + d->iceConnection->localPassword().toUtf8());
 #endif
+
     // RTP profile
     QByteArray profiles = "RTP/AVP";
     QList<QByteArray> attrs;
@@ -224,8 +227,10 @@ void SipCall::sendInvite()
     sdp.addField('m', "audio " + QByteArray::number(d->socket->localPort()) + " "  + profiles);
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
+
 #ifdef USE_ICE
-    foreach (const QXmppJingleCandidate &candidate, call->iceConnection->localCandidates()) {
+    // ICE candidates
+    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
         ba += QByteArray::number(candidate.component()) + " ";
         ba += "UDP ";
@@ -336,7 +341,7 @@ void SipCall::handleReply(const SipPacket &reply)
         }
         else if (reply.statusCode() == 200)
         {
-            debug(QString("Call %1 established").arg(QString::fromUtf8(d->id)));
+            debug(QString("SIP call %1 established").arg(QString::fromUtf8(d->id)));
             d->timer->stop();
 
             if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
@@ -402,7 +407,7 @@ void SipCall::handleReply(const SipPacket &reply)
 
         } else if (reply.statusCode() >= 300) {
 
-            warning(QString("Call %1 failed").arg(
+            warning(QString("SIP call %1 failed").arg(
                 QString::fromUtf8(d->id)));
             d->timer->stop();
             setState(QXmppCall::FinishedState);
@@ -412,10 +417,6 @@ void SipCall::handleReply(const SipPacket &reply)
 
 void SipCall::handleRequest(const SipPacket &request)
 {
-    debug(QString("Got request %1 %2").arg(
-        QString::fromUtf8(request.method()),
-        QString::fromUtf8(request.uri())));
-
     SipPacket response;
     response.setStatusCode(200);
     response.setReasonPhrase("OK");
@@ -440,7 +441,7 @@ void SipCall::handleRequest(const SipPacket &request)
 
 void SipCall::handleTimeout()
 {
-    warning(QString("Call %1 timed out").arg(QString::fromUtf8(d->id)));
+    warning(QString("SIP call %1 timed out").arg(QString::fromUtf8(d->id)));
     setState(QXmppCall::FinishedState);
 }
 
@@ -450,7 +451,7 @@ void SipCall::hangup()
         d->state == QXmppCall::FinishedState)
         return;
 
-    debug(QString("Call %1 hangup").arg(
+    debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     setState(QXmppCall::DisconnectingState);
 
@@ -498,7 +499,7 @@ void SipCall::setState(QXmppCall::State state)
             emit connected();
         else if (d->state == QXmppCall::FinishedState)
         {
-            debug(QString("Call %1 finished").arg(QString::fromUtf8(d->id)));
+            debug(QString("SIP call %1 finished").arg(QString::fromUtf8(d->id)));
             emit finished();
         }
     }
@@ -584,8 +585,7 @@ void SipClientPrivate::sendRequest(SipPacket &request, SipCallContext *ctx)
     request.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
 
 #ifdef QXMPP_DEBUG_SIP
-    q->logMessage(QXmppLogger::SentMessage,
-        QString("SIP packet to %1:%2\n%3").arg(
+    q->logSent(QString("SIP packet to %1:%2\n%3").arg(
             serverAddress.toString(),
             QString::number(serverPort),
             QString::fromUtf8(request.toByteArray())));
@@ -620,6 +620,8 @@ SipClient::~SipClient()
 
 SipCall *SipClient::call(const QString &recipient)
 {
+    info(QString("SIP call to %1").arg(recipient));
+
     if (d->state != ConnectedState) {
         warning("Cannot dial call, not connected to server");
         return 0;
@@ -691,12 +693,14 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
             }
         }
 
-        debug(QString("Listening for SIP on %1").arg(bindAddress.toString()));
         if(!d->socket->bind(bindAddress, 0))
         {
             warning("Could not start listening for SIP");
             return;
         }
+        debug(QString("Listening for SIP on %1:%2").arg(
+            d->socket->localAddress().toString(),
+            QString::number(d->socket->localPort())));
     }
 
     // register
@@ -722,6 +726,7 @@ void SipClient::disconnectFromServer()
 
     // unregister
     if (d->state == SipClient::ConnectedState) {
+        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
         const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
         SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
@@ -745,8 +750,7 @@ void SipClient::datagramReceived()
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
 #ifdef QXMPP_DEBUG_SIP
-    emit logMessage(QXmppLogger::ReceivedMessage,
-        QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
+    logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
 #endif
 
     // parse packet
@@ -785,8 +789,15 @@ void SipClient::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
 
+    // store information
+    QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
+    if (params.contains("received"))
+        d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+    if (params.contains("rport"))
+        d->reflexivePort = params.value("rport").toUInt();
+
+    // handle authentication
     if (reply.statusCode() == 401) {
-        // handle authentication
         const QByteArray auth = reply.headerField("WWW-Authenticate");
         if (!auth.startsWith("Digest ") || !d->registerRequest.headerField("Authorization").isEmpty())  {
             warning("Authentication failed");
@@ -799,27 +810,31 @@ void SipClient::handleReply(const SipPacket &reply)
         request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
         d->sendRequest(request, d);
         d->registerRequest = request;
+        return;
     }
-    else if (command == "REGISTER" && reply.statusCode() == 200) {
-        if (d->state == DisconnectingState) {
+
+    if (command == "REGISTER") {
+        if (reply.statusCode() == 200) {
+            if (d->state == DisconnectingState) {
+                setState(DisconnectedState);
+            } else {
+                setState(ConnectedState);
+
+                // send subscribe
+                const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
+                SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
+                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
+                d->sendRequest(request, d);
+            }
+        } else if (reply.statusCode() >= 300) {
+            warning("Register failed");
             setState(DisconnectedState);
-        } else {
-            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
-            if (params.contains("received"))
-                d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
-            if (params.contains("rport"))
-                d->reflexivePort = params.value("rport").toUInt();
-            const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-            SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
-            request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-            d->sendRequest(request, d);
         }
     }
-    else if (command == "SUBSCRIBE" && reply.statusCode() == 200) {
-        setState(ConnectedState);
-    } else if (reply.statusCode() >= 300) {
-        warning("Register or subscribe failed");
-        setState(DisconnectedState);
+    else if (command == "SUBSCRIBE") {
+        if (reply.statusCode() >= 300) {
+            warning("Subscribe failed");
+        }
     }
 }
 
