@@ -1,3 +1,9 @@
+wiLink 1.0.1 (UNRELEASED)
+ * Conversations:
+   - Fix chat message ordering regression introduced in 1.0.0
+ * Phone:
+   - Add a plugin for voice calls using SIP.
+
 wiLink 1.0.0 (2010-11-08)
  * Calls:
    - Make it possible to make calls to room members.
