@@ -67,7 +67,8 @@ ChatMessage::ChatMessage()
  * @param parent
  */
 ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
+    : QGraphicsWidget(parent),
+     m_isReceived(received)
 {
     QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
     QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
@@ -96,11 +97,15 @@ ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
 #endif
 }
 
+/** Returns the index of a message within the bubble.
+ */
 int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
 {
     return m_messages.indexOf(widget);
 }
 
+/** Inserts a new message in the bubble.
+ */
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
     if (m_messages.isEmpty())
@@ -206,6 +211,30 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
         default:
             return constraint;
     }
+}
+
+/** Moves all the messages after the given one to a new bubble.
+ */
+ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
+{
+    const int index = m_messages.indexOf(widget);
+    Q_ASSERT(index >= 0);
+
+    // if this is the last message in the bubble, do nothing
+    if (index == m_messages.size() - 1)
+        return 0;
+
+    ChatMessageBubble *bubble = new ChatMessageBubble(m_isReceived, parentItem());
+    int j = 0;
+    for (int i = index + 1; i < m_messages.size(); ++i, ++j)
+    {
+        ChatMessageWidget *widget = m_messages[i];
+        disconnect(widget, SIGNAL(destroyed(QObject*)),
+                   this, SLOT(messageDestroyed(QObject*)));
+        bubble->insertAt(j, widget);
+    }
+    adjustSize();
+    return bubble;
 }
 
 /** Constructs a new ChatMesageWidget.
@@ -466,6 +495,22 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_trippleClickTimer->setInterval(QApplication::doubleClickInterval());
 }
 
+void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
+{
+    bubble->setMaximumWidth(m_maximumWidth);
+    m_bubbles.insert(pos, bubble);
+    m_layout->insertItem(pos, bubble);
+
+    bool check;
+    check = connect(bubble, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(bubbleDestroyed(QObject*)));
+    Q_ASSERT(check);
+
+    check = connect(bubble, SIGNAL(messageClicked(ChatMessage)),
+                    this, SIGNAL(messageClicked(ChatMessage)));
+    Q_ASSERT(check);
+}
+
 ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
 {
     if (message.body.isEmpty())
@@ -521,23 +566,22 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     }
     else
     {
-        /* message needs its own bubble */
-        ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
-        bubble->setMaximumWidth(m_maximumWidth);
-        int bubblePos = m_bubbles.size();
-        if (pos < m_messages.size())
-            bubblePos = m_bubbles.indexOf(m_messages[pos]->bubble());
-        connect(bubble, SIGNAL(destroyed(QObject*)),
-                this, SLOT(bubbleDestroyed(QObject*)));
-        bubble->insertAt(0, msg);
-        m_bubbles.insert(bubblePos, bubble);
-        m_layout->insertItem(bubblePos, bubble);
+        /* do we need to split previous bubble? */
+        int bubblePos = 0;
+        if (pos > 0)
+        {
+            ChatMessageWidget *previousMessage = m_messages[pos-1];
+            ChatMessageBubble *previousBubble = previousMessage->bubble();
+            bubblePos = m_bubbles.indexOf(previousBubble) + 1;
+            ChatMessageBubble *nextBubble = previousBubble->splitAfter(previousMessage);
+            if (nextBubble)
+                insertBubble(bubblePos, nextBubble);
+        }
 
-        bool check;
-        check = connect(bubble, SIGNAL(messageClicked(ChatMessage)),
-                        this, SIGNAL(messageClicked(ChatMessage)));
-        Q_ASSERT(check);
-        Q_UNUSED(check);
+        /* insert the new bubble */
+        ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
+        bubble->insertAt(0, msg);
+        insertBubble(bubblePos, bubble);
     }
 
     connect(msg, SIGNAL(destroyed(QObject*)),

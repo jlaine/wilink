@@ -62,6 +62,7 @@ public:
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
+    ChatMessageBubble *splitAfter(ChatMessageWidget *widget);
 
 signals:
     void messageClicked(const ChatMessage &message);
@@ -74,6 +75,7 @@ private slots:
     void messageDestroyed(QObject *obj);
 
 private:
+    bool m_isReceived;
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
 
@@ -154,6 +156,7 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    void insertBubble(int pos, ChatMessageBubble *bubble);
     ChatMessageWidget *messageWidgetAt(const QPointF &pos) const;
     QString selectedText() const;
 
