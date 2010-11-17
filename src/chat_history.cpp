@@ -525,7 +525,6 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
     }
 
     /* position cursor */
-    ChatMessageWidget *previous = 0;
     int pos = 0;
     foreach (ChatMessageWidget *child, m_messages)
     {
@@ -539,41 +538,39 @@ ChatMessageWidget *ChatHistoryWidget::addMessage(const ChatMessage &message)
         // we use greater or equal comparison (and not strictly greater) dates
         // because messages are usually received in chronological order
         if (message.date >= child->message().date)
-        {
-            previous = child;
             pos++;
-        }
     }
+    ChatMessageWidget *prevMsg = (pos > 0) ? m_messages[pos-1] : 0;
+    ChatMessageWidget *nextMsg = (pos < m_messages.size()) ? m_messages[pos] : 0;
 
     /* prepare message */
     ChatMessageWidget *msg = new ChatMessageWidget(message, this);
-    msg->setPrevious(previous);
-    if (pos < m_messages.size())
-        m_messages[pos]->setPrevious(msg);
+    if (prevMsg)
+        msg->setPrevious(prevMsg);
+    if (nextMsg)
+        nextMsg->setPrevious(msg);
 
-    if (pos > 0 && m_messages[pos-1]->message().from == message.from)
+    if (prevMsg && prevMsg->message().from == message.from)
     {
         /* message belongs to the same bubble as previous message */
-        ChatMessageBubble *bubble = m_messages[pos-1]->bubble();
-        bubble->insertAt(bubble->indexOf(m_messages[pos-1]) + 1, msg);
+        ChatMessageBubble *bubble = prevMsg->bubble();
+        bubble->insertAt(bubble->indexOf(prevMsg) + 1, msg);
     }
-    else if (pos < m_messages.size() &&
-             m_messages[pos]->message().from == message.from)
+    else if (nextMsg && nextMsg->message().from == message.from)
     {
         /* message belongs to the same bubble as next message */
-        ChatMessageBubble *bubble = m_messages[pos]->bubble();
-        bubble->insertAt(bubble->indexOf(m_messages[pos]), msg);
+        ChatMessageBubble *bubble = nextMsg->bubble();
+        bubble->insertAt(bubble->indexOf(nextMsg), msg);
     }
     else
     {
-        /* do we need to split previous bubble? */
+        /* split the previous bubble if needed */
         int bubblePos = 0;
-        if (pos > 0)
+        if (prevMsg)
         {
-            ChatMessageWidget *previousMessage = m_messages[pos-1];
-            ChatMessageBubble *previousBubble = previousMessage->bubble();
-            bubblePos = m_bubbles.indexOf(previousBubble) + 1;
-            ChatMessageBubble *nextBubble = previousBubble->splitAfter(previousMessage);
+            ChatMessageBubble *prevBubble = prevMsg->bubble();
+            bubblePos = m_bubbles.indexOf(prevBubble) + 1;
+            ChatMessageBubble *nextBubble = prevBubble->splitAfter(prevMsg);
             if (nextBubble)
                 insertBubble(bubblePos, nextBubble);
         }
