@@ -344,6 +344,8 @@ void SipCall::handleReply(const SipPacket &reply)
             debug(QString("SIP call %1 established").arg(QString::fromUtf8(d->id)));
             d->timer->stop();
 
+            QXmppJinglePayloadType commonPayload;
+            bool commonPayloadFound = false;
             if (reply.headerField("Content-Type") == "application/sdp" && !d->audioOutput)
             {
                 // parse descriptor
@@ -364,20 +366,42 @@ void SipCall::handleReply(const SipPacket &reply)
                         d->remotePort = bits[1].toUInt();
 
                         // determine codec
-                        for (int i = 3; i < bits.size() && !d->channel->isOpen(); ++i)
+                        for (int i = 3; i < bits.size() && !commonPayloadFound; ++i)
                         {
                             foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
                                 bool ok = false;
                                 if (payload.id() == bits[i].toInt(&ok) && ok) {
-                                    d->channel->setPayloadType(payload);
+                                    debug(QString("Selecting RTP profile %1 (%2)").arg(
+                                        payload.name(),
+                                        QString::number(payload.id())));
+                                    commonPayload = payload;
+                                    commonPayloadFound = true;
                                     break;
                                 }
                             }
                         }
+                    } else if (field.first == 'a') {
+                        // determine packetization time
+                        if (field.second.startsWith("ptime:")) {
+                            bool ok = false;
+                            int ptime = field.second.mid(6).toInt(&ok);
+                            if (ok && ptime > 0) {
+                                debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
+                                commonPayload.setPtime(ptime);
+                            }
+                        }
                     }
                 }
+
+                // set codec
+                if (!commonPayloadFound) {
+                    warning("Could not find a common codec");
+                    hangup();
+                    return;
+                }
+                d->channel->setPayloadType(commonPayload);
                 if (!d->channel->isOpen()) {
-                    warning("Could not negociate a common codec");
+                    warning("Could not assign codec to RTP channel");
                     return;
                 }
 
