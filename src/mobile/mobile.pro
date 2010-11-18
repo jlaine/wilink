@@ -6,7 +6,7 @@ include(../qxmpp/qxmpp.pri)
 QT += multimedia network xml
 
 TARGET = wiLink
-VERSION = 1.0.0
+VERSION = 1.0.1
 
 DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED
 
