@@ -3,6 +3,8 @@ wiLink 1.0.1 (UNRELEASED)
    - Fix chat message ordering regression introduced in 1.0.0
  * Phone:
    - Add a plugin for voice calls using SIP.
+ * Shares:
+   - Fix shares download timeout handling.
 
 wiLink 1.0.0 (2010-11-08)
  * Calls:
