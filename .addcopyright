@@ -2,11 +2,10 @@
 'directories': [
     'src',
     'src/plugins',
-    'src/plugins/calls',
-    'src/plugins/diagnostics',
+    'src/plugins/phone',
     'src/plugins/shares',
 ],
-
+'exclude': 'src/flickcharm',
 'license': """wiLink
 Copyright (C) 2009-2010 Bolloré telecom
 See AUTHORS file for a full list of contributors.
