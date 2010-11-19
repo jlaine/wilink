@@ -29,6 +29,7 @@
 class QUdpSocket;
 class QXmppSrvInfo;
 
+class SipCallContext;
 class SipCallPrivate;
 class SipClient;
 class SipClientPrivate;
@@ -183,6 +184,7 @@ private slots:
 
 private:
     SipClientPrivate *const d;
+    bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
     void setState(SipClient::State state);
 
     friend class SipCall;

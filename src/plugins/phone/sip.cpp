@@ -95,6 +95,7 @@ public:
     quint32 cseq;
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
+    SipPacket lastRequest;
 };
 
 class SipCallPrivate : public SipCallContext
@@ -134,7 +135,6 @@ public:
     QUdpSocket *socket;
     QByteArray baseId;
     QByteArray tag;
-    SipPacket registerRequest;
     QTimer *registerTimer;
 
     // configuration
@@ -529,6 +529,10 @@ void SipCall::setState(QXmppCall::State state)
     }
 }
 
+/** Writes an RTP packet to the socket.
+ *
+ * @param ba
+ */
 void SipCall::writeToSocket(const QByteArray &ba)
 {
     if (!d->socket || d->remoteHost.isNull() || !d->remotePort)
@@ -734,7 +738,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
-    d->registerRequest = request;
+    d->lastRequest = request;
     d->registerTimer->start((EXPIRE_SECONDS - TIMEOUT_SECONDS) * 1000);
 
     setState(ConnectingState);
@@ -755,7 +759,7 @@ void SipClient::disconnectFromServer()
         SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
         d->sendRequest(request, d);
-        d->registerRequest = request;
+        d->lastRequest = request;
 
         setState(DisconnectingState);
     }
@@ -809,6 +813,33 @@ void SipClient::datagramReceived()
     }
 }
 
+bool SipClient::handleAuthentication(const SipPacket &reply, SipCallContext *ctx)
+{
+    bool isProxy = reply.statusCode() == 407;
+
+    const QByteArray auth = reply.headerField(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate");
+    int spacePos = auth.indexOf(' ');
+    if (spacePos < 0 || auth.left(spacePos) != "Digest") {
+        warning("Unsupported authentication method");
+        return false;
+    }
+    QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
+    if (!ctx->lastRequest.headerField(isProxy ? "Proxy-Authorization" : "Authorization").isEmpty()) {
+        warning("Authentication failed");
+        return false;
+    }
+    if (isProxy)
+        ctx->proxyChallenge = challenge;
+    else
+        ctx->challenge = challenge;
+
+    SipPacket request = ctx->lastRequest;
+    request.setHeaderField("CSeq", QString::number(ctx->cseq++).toLatin1() + ' ' + request.method());
+    d->sendRequest(request, ctx);
+    ctx->lastRequest = request;
+    return true;
+}
+
 void SipClient::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
@@ -822,18 +853,8 @@ void SipClient::handleReply(const SipPacket &reply)
 
     // handle authentication
     if (reply.statusCode() == 401) {
-        const QByteArray auth = reply.headerField("WWW-Authenticate");
-        if (!auth.startsWith("Digest ") || !d->registerRequest.headerField("Authorization").isEmpty())  {
-            warning("Authentication failed");
+        if (!handleAuthentication(reply, d))
             setState(DisconnectedState);
-            return;
-        }
-        d->challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
-
-        SipPacket request = d->registerRequest;
-        request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
-        d->sendRequest(request, d);
-        d->registerRequest = request;
         return;
     }
 
@@ -849,6 +870,7 @@ void SipClient::handleReply(const SipPacket &reply)
                 SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
                 d->sendRequest(request, d);
+                d->lastRequest = request;
             }
         } else if (reply.statusCode() >= 300) {
             warning("Register failed");
