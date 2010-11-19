@@ -300,20 +300,14 @@ void SipCall::handleReply(const SipPacket &reply)
 
     // handle authentication
     if (reply.statusCode() == 407) {
-
-        const QByteArray auth = reply.headerField("Proxy-Authenticate");
-        if (!auth.startsWith("Digest ") || !d->inviteRequest.headerField("Proxy-Authorization").isEmpty())  {
-            warning("Proxy authentication failed");
+        if (d->client->handleAuthentication(reply, d)) {
+            if (d->lastRequest.method() == "INVITE") {
+                d->invitePending = true;
+                d->inviteRequest = d->lastRequest;
+            }
+        } else {
             setState(QXmppCall::FinishedState);
-            return;
         }
-        d->proxyChallenge = QXmppSaslDigestMd5::parseMessage(auth.mid(7));
-
-        SipPacket request = d->inviteRequest;
-        request.setHeaderField("CSeq", QString::number(d->cseq++).toLatin1() + ' ' + request.method());
-        d->client->d->sendRequest(request, d);
-        d->invitePending = true;
-        d->inviteRequest = request;
         return;
     }
 
@@ -620,7 +614,7 @@ void SipClientPrivate::sendRequest(SipPacket &request, SipCallContext *ctx)
 #endif
 
     socket->writeDatagram(request.toByteArray(), serverAddress, serverPort);
-    if (request.isRequest())
+    if (request.isRequest() && request.method() != "ACK")
         ctx->lastRequest = request;
 }
 
@@ -816,6 +810,7 @@ void SipClient::datagramReceived()
 bool SipClient::handleAuthentication(const SipPacket &reply, SipCallContext *ctx)
 {
     bool isProxy = reply.statusCode() == 407;
+    QMap<QByteArray, QByteArray> *lastChallenge = isProxy ? &ctx->proxyChallenge : &ctx->challenge;
 
     const QByteArray auth = reply.headerField(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate");
     int spacePos = auth.indexOf(' ');
@@ -824,14 +819,12 @@ bool SipClient::handleAuthentication(const SipPacket &reply, SipCallContext *ctx
         return false;
     }
     QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
-    if (!ctx->lastRequest.headerField(isProxy ? "Proxy-Authorization" : "Authorization").isEmpty()) {
+    if (lastChallenge->value("realm") == challenge.value("realm") &&
+        lastChallenge->value("nonce") == challenge.value("nonce")) {
         warning("Authentication failed");
         return false;
     }
-    if (isProxy)
-        ctx->proxyChallenge = challenge;
-    else
-        ctx->challenge = challenge;
+    *lastChallenge = challenge;
 
     SipPacket request = ctx->lastRequest;
     request.setHeaderField("CSeq", QString::number(ctx->cseq++).toLatin1() + ' ' + request.method());
