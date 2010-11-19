@@ -33,7 +33,7 @@
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
-#include "sip.h"
+#include "sip_p.h"
 
 const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
@@ -86,81 +86,6 @@ QByteArray SdpMessage::toByteArray() const
     }
     return ba;
 }
-
-class SipCallContext
-{
-public:
-    SipCallContext() : cseq(1) {}
-
-    quint32 cseq;
-    QMap<QByteArray, QByteArray> challenge;
-    QMap<QByteArray, QByteArray> proxyChallenge;
-    SipPacket lastRequest;
-};
-
-class SipCallPrivate : public SipCallContext
-{
-public:
-    void handleReply(const SipPacket &reply);
-    void handleRequest(const SipPacket &request);
-    void sendInvite();
-    void setState(QXmppCall::State state);
-
-    QXmppCall::State state;
-    QByteArray id;
-    QXmppRtpChannel *channel;
-    QAudioInput *audioInput;
-    QAudioOutput *audioOutput;
-    QHostAddress remoteHost;
-    quint16 remotePort;
-#ifdef USE_ICE
-    QXmppIceConnection *iceConnection;
-#endif
-    QUdpSocket *socket;
-    bool invitePending;
-    QByteArray inviteRecipient;
-    QByteArray inviteUri;
-    SipPacket inviteRequest;
-    QByteArray remoteRecipient;
-    QByteArray remoteRoute;
-    QByteArray remoteUri;
-
-    SipCall *q;
-    SipClient *client;
-    QTimer *timer;
-};
-
-class SipClientPrivate : public SipCallContext
-{
-public:
-    QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
-    SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
-    void handleReply(const SipPacket &reply);
-    void sendRequest(SipPacket &request, SipCallContext *ctx);
-    void setState(SipClient::State state);
-
-    QUdpSocket *socket;
-    QByteArray baseId;
-    QByteArray tag;
-    QTimer *registerTimer;
-
-    // configuration
-    QString displayName;
-    QString username;
-    QString password;
-    QString domain;
-
-    SipClient::State state;
-    QString rinstance;
-    QHostAddress serverAddress;
-    QString serverName;
-    quint16 serverPort;
-    QList<SipCall*> calls;
-
-    QHostAddress reflexiveAddress;
-    quint16 reflexivePort;
-    SipClient *q;
-};
 
 void SipCallPrivate::handleReply(const SipPacket &reply)
 {
