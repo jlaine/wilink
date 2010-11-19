@@ -130,8 +130,6 @@ private slots:
 
 private:
     SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
-    void handleReply(const SipPacket &reply);
-    void handleRequest(const SipPacket &request);
 
     SipCallPrivate * const d;
     friend class SipCallPrivate;
@@ -183,7 +181,6 @@ private slots:
 private:
     SipClientPrivate *const d;
     bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
-    void handleReply(const SipPacket &reply);
 
     friend class SipCall;
     friend class SipCallPrivate;
