@@ -620,6 +620,8 @@ void SipClientPrivate::sendRequest(SipPacket &request, SipCallContext *ctx)
 #endif
 
     socket->writeDatagram(request.toByteArray(), serverAddress, serverPort);
+    if (request.isRequest())
+        ctx->lastRequest = request;
 }
 
 SipClient::SipClient(QObject *parent)
@@ -738,7 +740,6 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
-    d->lastRequest = request;
     d->registerTimer->start((EXPIRE_SECONDS - TIMEOUT_SECONDS) * 1000);
 
     setState(ConnectingState);
@@ -759,7 +760,6 @@ void SipClient::disconnectFromServer()
         SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
         d->sendRequest(request, d);
-        d->lastRequest = request;
 
         setState(DisconnectingState);
     }
@@ -836,7 +836,6 @@ bool SipClient::handleAuthentication(const SipPacket &reply, SipCallContext *ctx
     SipPacket request = ctx->lastRequest;
     request.setHeaderField("CSeq", QString::number(ctx->cseq++).toLatin1() + ' ' + request.method());
     d->sendRequest(request, ctx);
-    ctx->lastRequest = request;
     return true;
 }
 
@@ -870,7 +869,6 @@ void SipClient::handleReply(const SipPacket &reply)
                 SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
                 d->sendRequest(request, d);
-                d->lastRequest = request;
             }
         } else if (reply.statusCode() >= 300) {
             warning("Register failed");
