@@ -133,6 +133,7 @@ class SipClientPrivate : public SipCallContext
 public:
     QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
+    void handleReply(const SipPacket &reply);
     void sendRequest(SipPacket &request, SipCallContext *ctx);
     void setState(SipClient::State state);
 
@@ -819,7 +820,7 @@ void SipClient::datagramReceived()
         if (currentCall)
             currentCall->handleReply(reply);
         else if (callId == d->baseId)
-            handleReply(reply);
+            d->handleReply(reply);
     } else {
         //warning("SIP packet is neither request nor reply");
     }
@@ -850,45 +851,45 @@ bool SipClient::handleAuthentication(const SipPacket &reply, SipCallContext *ctx
     return true;
 }
 
-void SipClient::handleReply(const SipPacket &reply)
+void SipClientPrivate::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
 
     // store information
     QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
     if (params.contains("received"))
-        d->reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+        reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
     if (params.contains("rport"))
-        d->reflexivePort = params.value("rport").toUInt();
+        reflexivePort = params.value("rport").toUInt();
 
     // handle authentication
     if (reply.statusCode() == 401) {
-        if (!handleAuthentication(reply, d))
-            d->setState(DisconnectedState);
+        if (!q->handleAuthentication(reply, this))
+            setState(SipClient::DisconnectedState);
         return;
     }
 
     if (command == "REGISTER") {
         if (reply.statusCode() == 200) {
-            if (d->state == DisconnectingState) {
-                d->setState(DisconnectedState);
+            if (state == SipClient::DisconnectingState) {
+                setState(SipClient::DisconnectedState);
             } else {
-                d->setState(ConnectedState);
+                setState(SipClient::ConnectedState);
 
                 // send subscribe
-                const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
-                SipPacket request = d->buildRequest("SUBSCRIBE", uri, d->baseId, d->cseq++);
+                const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
+                SipPacket request = buildRequest("SUBSCRIBE", uri, baseId, cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-                d->sendRequest(request, d);
+                sendRequest(request, this);
             }
         } else if (reply.statusCode() >= 300) {
-            warning("Register failed");
-            d->setState(DisconnectedState);
+            q->warning("Register failed");
+            setState(SipClient::DisconnectedState);
         }
     }
     else if (command == "SUBSCRIBE") {
         if (reply.statusCode() >= 300) {
-            warning("Subscribe failed");
+            q->warning("Subscribe failed");
         }
     }
 }

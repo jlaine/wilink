@@ -179,11 +179,11 @@ private slots:
     void callDestroyed(QObject *object);
     void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
-    void handleReply(const SipPacket &reply);
 
 private:
     SipClientPrivate *const d;
     bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
+    void handleReply(const SipPacket &reply);
 
     friend class SipCall;
     friend class SipCallPrivate;
