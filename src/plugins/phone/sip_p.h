@@ -46,6 +46,7 @@ public:
 class SipCallPrivate : public SipCallContext
 {
 public:
+    SipCallPrivate(SipCall *qq);
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
     void sendInvite();
@@ -70,14 +71,17 @@ public:
     QByteArray remoteRoute;
     QByteArray remoteUri;
 
-    SipCall *q;
     SipClient *client;
     QTimer *timer;
+
+private:
+    SipCall *q;
 };
 
 class SipClientPrivate : public SipCallContext
 {
 public:
+    SipClientPrivate(SipClient *qq);
     QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
     void handleReply(const SipPacket &reply);
@@ -104,6 +108,8 @@ public:
 
     QHostAddress reflexiveAddress;
     quint16 reflexivePort;
+
+private:
     SipClient *q;
 };
 

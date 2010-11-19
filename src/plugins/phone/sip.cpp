@@ -87,6 +87,13 @@ QByteArray SdpMessage::toByteArray() const
     return ba;
 }
 
+SipCallPrivate::SipCallPrivate(SipCall *qq)
+    : state(QXmppCall::OfferState),
+    invitePending(false),
+    q(qq)
+{
+}
+
 void SipCallPrivate::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
@@ -355,13 +362,10 @@ void SipCallPrivate::setState(QXmppCall::State newState)
 }
 
 SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent)
-    : QXmppLoggable(parent),
-    d(new SipCallPrivate)
+    : QXmppLoggable(parent)
 {
+    d = new SipCallPrivate(this);
     d->client = parent;
-    d->q = this;
-    d->state = QXmppCall::OfferState;
-    d->invitePending = false;
     d->inviteRecipient = QString("<%1>").arg(recipient).toUtf8();
     d->inviteUri = recipient.toUtf8();
     d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
@@ -466,6 +470,14 @@ void SipCall::writeToSocket(const QByteArray &ba)
         return;
 
     d->socket->writeDatagram(ba, d->remoteHost, d->remotePort);
+}
+
+SipClientPrivate::SipClientPrivate(SipClient *qq)
+    : state(SipClient::DisconnectedState),
+    reflexivePort(0),
+    q(qq)
+{
+    rinstance = generateStanzaHash(16);
 }
 
 QByteArray SipClientPrivate::authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const
@@ -609,13 +621,9 @@ void SipClientPrivate::setState(SipClient::State newState)
 }
 
 SipClient::SipClient(QObject *parent)
-    : QXmppLoggable(parent),
-    d(new SipClientPrivate)
+    : QXmppLoggable(parent)
 {
-    d->q = this;
-    d->state = DisconnectedState;
-    d->rinstance = generateStanzaHash(16);
-    d->reflexivePort = 0;
+    d = new SipClientPrivate(this);
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
