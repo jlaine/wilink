@@ -101,6 +101,8 @@ public:
 class SipCallPrivate : public SipCallContext
 {
 public:
+    void setState(QXmppCall::State state);
+
     QXmppCall::State state;
     QByteArray id;
     QXmppRtpChannel *channel;
@@ -306,7 +308,7 @@ void SipCall::handleReply(const SipPacket &reply)
                 d->inviteRequest = d->lastRequest;
             }
         } else {
-            setState(QXmppCall::FinishedState);
+            d->setState(QXmppCall::FinishedState);
         }
         return;
     }
@@ -320,12 +322,12 @@ void SipCall::handleReply(const SipPacket &reply)
             request.removeHeaderField("Contact");
             d->client->d->sendRequest(request, d);
         } else {
-            setState(QXmppCall::FinishedState);
+            d->setState(QXmppCall::FinishedState);
         }
 
     } else if (command == "CANCEL") {
 
-        setState(QXmppCall::FinishedState);
+        d->setState(QXmppCall::FinishedState);
 
     } else if (command == "INVITE") {
 
@@ -420,7 +422,7 @@ void SipCall::handleReply(const SipPacket &reply)
                 d->audioInput->setBufferSize(2 * packetSize);
                 d->audioInput->start(d->channel);
 
-                setState(QXmppCall::ActiveState);
+                d->setState(QXmppCall::ActiveState);
             }
 
         } else if (reply.statusCode() >= 300) {
@@ -428,7 +430,7 @@ void SipCall::handleReply(const SipPacket &reply)
             warning(QString("SIP call %1 failed").arg(
                 QString::fromUtf8(d->id)));
             d->timer->stop();
-            setState(QXmppCall::FinishedState);
+            d->setState(QXmppCall::FinishedState);
         }
     }
 }
@@ -453,14 +455,14 @@ void SipCall::handleRequest(const SipPacket &request)
     d->client->d->sendRequest(response, d);
 
     if (request.method() == "BYE") {
-        setState(QXmppCall::FinishedState);
+        d->setState(QXmppCall::FinishedState);
     }
 }
 
 void SipCall::handleTimeout()
 {
     warning(QString("SIP call %1 timed out").arg(QString::fromUtf8(d->id)));
-    setState(QXmppCall::FinishedState);
+    d->setState(QXmppCall::FinishedState);
 }
 
 void SipCall::hangup()
@@ -471,7 +473,7 @@ void SipCall::hangup()
 
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
-    setState(QXmppCall::DisconnectingState);
+    d->setState(QXmppCall::DisconnectingState);
 
     // stop audio
     if (d->audioInput)
@@ -506,19 +508,19 @@ void SipCall::readFromSocket()
     }
 }
 
-void SipCall::setState(QXmppCall::State state)
+void SipCallPrivate::setState(QXmppCall::State newState)
 {
-    if (d->state != state)
+    if (state != newState)
     {
-        d->state = state;
-        emit stateChanged(d->state);
+        state = newState;
+        emit q->stateChanged(state);
 
-        if (d->state == QXmppCall::ActiveState)
-            emit connected();
-        else if (d->state == QXmppCall::FinishedState)
+        if (state == QXmppCall::ActiveState)
+            emit q->connected();
+        else if (state == QXmppCall::FinishedState)
         {
-            debug(QString("SIP call %1 finished").arg(QString::fromUtf8(d->id)));
-            emit finished();
+            q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
+            emit q->finished();
         }
     }
 }

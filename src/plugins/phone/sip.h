@@ -133,9 +133,9 @@ private:
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
     void sendInvite();
-    void setState(QXmppCall::State state);
 
     SipCallPrivate * const d;
+    friend class SipCallPrivate;
     friend class SipClient;
 };
 
