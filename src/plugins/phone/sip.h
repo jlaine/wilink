@@ -132,7 +132,6 @@ private:
     SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
-    void sendInvite();
 
     SipCallPrivate * const d;
     friend class SipCallPrivate;
@@ -185,9 +184,9 @@ private slots:
 private:
     SipClientPrivate *const d;
     bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
-    void setState(SipClient::State state);
 
     friend class SipCall;
+    friend class SipCallPrivate;
     friend class SipClientPrivate;
 };
 

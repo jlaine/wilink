@@ -101,6 +101,7 @@ public:
 class SipCallPrivate : public SipCallContext
 {
 public:
+    void sendInvite();
     void setState(QXmppCall::State state);
 
     QXmppCall::State state;
@@ -133,6 +134,7 @@ public:
     QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
     void sendRequest(SipPacket &request, SipCallContext *ctx);
+    void setState(SipClient::State state);
 
     QUdpSocket *socket;
     QByteArray baseId;
@@ -156,6 +158,76 @@ public:
     quint16 reflexivePort;
     SipClient *q;
 };
+
+void SipCallPrivate::sendInvite()
+{
+    SdpMessage sdp;
+    sdp.addField('v', "0");
+    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + client->d->socket->localAddress().toString().toUtf8());
+    sdp.addField('s', qApp->applicationName().toUtf8());
+    sdp.addField('c', "IN IP4 " + socket->localAddress().toString().toUtf8());
+    sdp.addField('t', "0 0");
+#ifdef USE_ICE
+    // ICE credentials
+    sdp.addField('a', "ice-ufrag:" + iceConnection->localUser().toUtf8());
+    sdp.addField('a', "ice-pwd:" + iceConnection->localPassword().toUtf8());
+#endif
+
+    // RTP profile
+    QByteArray profiles = "RTP/AVP";
+    QList<QByteArray> attrs;
+    foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
+        profiles += " " + QByteArray::number(payload.id());
+        attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
+    }
+    profiles += " 101";
+    attrs << "rtpmap:101 telephone-event/8000";
+    attrs << "fmtp:101 0-15";
+    attrs << "sendrecv";
+
+    sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
+    foreach (const QByteArray &attr, attrs)
+        sdp.addField('a', attr);
+
+#ifdef USE_ICE
+    // ICE candidates
+    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
+        QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
+        ba += QByteArray::number(candidate.component()) + " ";
+        ba += "UDP ";
+        ba += QByteArray::number(candidate.priority()) + " ";
+        ba += candidate.host().toString().toUtf8() + " ";
+        ba += QByteArray::number(candidate.port()) + " ";
+        ba += "typ host";
+        sdp.addField('a', ba);
+    }
+#endif
+
+    SipPacket request = client->d->buildRequest("INVITE", inviteUri, id, cseq++);
+    request.setHeaderField("To", inviteRecipient);
+    request.setHeaderField("Content-Type", "application/sdp");
+    request.setBody(sdp.toByteArray());
+    client->d->sendRequest(request, this);
+    invitePending = true;
+    inviteRequest = request;
+}
+
+void SipCallPrivate::setState(QXmppCall::State newState)
+{
+    if (state != newState)
+    {
+        state = newState;
+        emit q->stateChanged(state);
+
+        if (state == QXmppCall::ActiveState)
+            emit q->connected();
+        else if (state == QXmppCall::FinishedState)
+        {
+            q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
+            emit q->finished();
+        }
+    }
+}
 
 SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent)
     : QXmppLoggable(parent),
@@ -198,59 +270,6 @@ SipCall::~SipCall()
 QByteArray SipCall::id() const
 {
     return d->id;
-}
-
-void SipCall::sendInvite()
-{
-    SdpMessage sdp;
-    sdp.addField('v', "0");
-    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
-    sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + d->socket->localAddress().toString().toUtf8());
-    sdp.addField('t', "0 0");
-#ifdef USE_ICE
-    // ICE credentials
-    sdp.addField('a', "ice-ufrag:" + d->iceConnection->localUser().toUtf8());
-    sdp.addField('a', "ice-pwd:" + d->iceConnection->localPassword().toUtf8());
-#endif
-
-    // RTP profile
-    QByteArray profiles = "RTP/AVP";
-    QList<QByteArray> attrs;
-    foreach (const QXmppJinglePayloadType &payload, d->channel->supportedPayloadTypes()) {
-        profiles += " " + QByteArray::number(payload.id());
-        attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
-    }
-    profiles += " 101";
-    attrs << "rtpmap:101 telephone-event/8000";
-    attrs << "fmtp:101 0-15";
-    attrs << "sendrecv";
-
-    sdp.addField('m', "audio " + QByteArray::number(d->socket->localPort()) + " "  + profiles);
-    foreach (const QByteArray &attr, attrs)
-        sdp.addField('a', attr);
-
-#ifdef USE_ICE
-    // ICE candidates
-    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
-        QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
-        ba += QByteArray::number(candidate.component()) + " ";
-        ba += "UDP ";
-        ba += QByteArray::number(candidate.priority()) + " ";
-        ba += candidate.host().toString().toUtf8() + " ";
-        ba += QByteArray::number(candidate.port()) + " ";
-        ba += "typ host";
-        sdp.addField('a', ba);
-    }
-#endif
-
-    SipPacket request = d->client->d->buildRequest("INVITE", d->inviteUri, d->id, d->cseq++);
-    request.setHeaderField("To", d->inviteRecipient);
-    request.setHeaderField("Content-Type", "application/sdp");
-    request.setBody(sdp.toByteArray());
-    d->client->d->sendRequest(request, d);
-    d->invitePending = true;
-    d->inviteRequest = request;
 }
 
 QString SipCall::recipient() const
@@ -508,23 +527,6 @@ void SipCall::readFromSocket()
     }
 }
 
-void SipCallPrivate::setState(QXmppCall::State newState)
-{
-    if (state != newState)
-    {
-        state = newState;
-        emit q->stateChanged(state);
-
-        if (state == QXmppCall::ActiveState)
-            emit q->connected();
-        else if (state == QXmppCall::FinishedState)
-        {
-            q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
-            emit q->finished();
-        }
-    }
-}
-
 /** Writes an RTP packet to the socket.
  *
  * @param ba
@@ -620,6 +622,20 @@ void SipClientPrivate::sendRequest(SipPacket &request, SipCallContext *ctx)
         ctx->lastRequest = request;
 }
 
+void SipClientPrivate::setState(SipClient::State newState)
+{
+    if (state != newState)
+    {
+        state = newState;
+        emit q->stateChanged(state);
+
+        if (state == SipClient::ConnectedState)
+            emit q->connected();
+        else if (state == SipClient::DisconnectedState)
+            emit q->disconnected();
+    }
+}
+
 SipClient::SipClient(QObject *parent)
     : QXmppLoggable(parent),
     d(new SipClientPrivate)
@@ -665,7 +681,7 @@ SipCall *SipClient::call(const QString &recipient)
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
-    call->sendInvite();
+    call->d->sendInvite();
 
     return call;
 }
@@ -738,7 +754,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     d->sendRequest(request, d);
     d->registerTimer->start((EXPIRE_SECONDS - TIMEOUT_SECONDS) * 1000);
 
-    setState(ConnectingState);
+    d->setState(ConnectingState);
 }
 
 void SipClient::disconnectFromServer()
@@ -757,7 +773,7 @@ void SipClient::disconnectFromServer()
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
         d->sendRequest(request, d);
 
-        setState(DisconnectingState);
+        d->setState(DisconnectingState);
     }
 }
 
@@ -848,16 +864,16 @@ void SipClient::handleReply(const SipPacket &reply)
     // handle authentication
     if (reply.statusCode() == 401) {
         if (!handleAuthentication(reply, d))
-            setState(DisconnectedState);
+            d->setState(DisconnectedState);
         return;
     }
 
     if (command == "REGISTER") {
         if (reply.statusCode() == 200) {
             if (d->state == DisconnectingState) {
-                setState(DisconnectedState);
+                d->setState(DisconnectedState);
             } else {
-                setState(ConnectedState);
+                d->setState(ConnectedState);
 
                 // send subscribe
                 const QByteArray uri = QString("sip:%1@%2").arg(d->username, d->domain).toUtf8();
@@ -867,7 +883,7 @@ void SipClient::handleReply(const SipPacket &reply)
             }
         } else if (reply.statusCode() >= 300) {
             warning("Register failed");
-            setState(DisconnectedState);
+            d->setState(DisconnectedState);
         }
     }
     else if (command == "SUBSCRIBE") {
@@ -905,20 +921,6 @@ void SipClient::setPassword(const QString &password)
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
-}
-
-void SipClient::setState(SipClient::State state)
-{
-    if (d->state != state)
-    {
-        d->state = state;
-        emit stateChanged(d->state);
-
-        if (d->state == SipClient::ConnectedState)
-            emit connected();
-        else if (d->state == SipClient::DisconnectedState)
-            emit disconnected();
-    }
 }
 
 SipPacket::SipPacket(const QByteArray &bytes)
