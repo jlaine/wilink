@@ -38,6 +38,7 @@ public:
     SipCallContext() : cseq(1) {}
 
     quint32 cseq;
+    QByteArray id;
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
     SipPacket lastRequest;
@@ -53,7 +54,6 @@ public:
     void setState(QXmppCall::State state);
 
     QXmppCall::State state;
-    QByteArray id;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
     QAudioOutput *audioOutput;
@@ -89,7 +89,6 @@ public:
     void setState(SipClient::State state);
 
     QUdpSocket *socket;
-    QByteArray baseId;
     QByteArray tag;
     QTimer *registerTimer;
 

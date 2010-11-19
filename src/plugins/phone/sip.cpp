@@ -568,7 +568,7 @@ void SipClientPrivate::handleReply(const SipPacket &reply)
 
                 // send subscribe
                 const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
-                SipPacket request = buildRequest("SUBSCRIBE", uri, baseId, cseq++);
+                SipPacket request = buildRequest("SUBSCRIBE", uri, id, cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
                 sendRequest(request, this);
             }
@@ -694,7 +694,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
         return;
     }
     d->serverAddress = info.addresses().first();
-    d->baseId = generateStanzaHash().toLatin1();
+    d->id = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
 
     // bind socket
@@ -729,7 +729,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     debug(QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
 
     const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
-    SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
+    SipPacket request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
     d->registerTimer->start((EXPIRE_SECONDS - TIMEOUT_SECONDS) * 1000);
@@ -749,7 +749,7 @@ void SipClient::disconnectFromServer()
     if (d->state == SipClient::ConnectedState) {
         debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
         const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
-        SipPacket request = d->buildRequest("REGISTER", uri, d->baseId, d->cseq++);
+        SipPacket request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
         d->sendRequest(request, d);
 
@@ -779,7 +779,7 @@ void SipClient::datagramReceived()
     // find corresponding call
     SipCall *currentCall = 0;
     const QByteArray callId = reply.headerField("Call-ID");
-    if (callId != d->baseId)
+    if (callId != d->id)
     {
         foreach (SipCall *potentialCall, d->calls)
         {
@@ -798,7 +798,7 @@ void SipClient::datagramReceived()
     } else if (reply.isReply()) {
         if (currentCall)
             currentCall->d->handleReply(reply);
-        else if (callId == d->baseId)
+        else if (callId == d->id)
             d->handleReply(reply);
     } else {
         //warning("SIP packet is neither request nor reply");
