@@ -133,7 +133,7 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
 
     // handle authentication
     if (reply.statusCode() == 407) {
-        if (client->handleAuthentication(reply, this)) {
+        if (client->d->handleAuthentication(reply, this)) {
             if (lastRequest.method() == "INVITE") {
                 invitePending = true;
                 inviteRequest = lastRequest;
@@ -541,6 +541,31 @@ SipPacket SipClientPrivate::buildRequest(const QByteArray &method, const QByteAr
     return packet;
 }
 
+bool SipClientPrivate::handleAuthentication(const SipPacket &reply, SipCallContext *ctx)
+{
+    bool isProxy = reply.statusCode() == 407;
+    QMap<QByteArray, QByteArray> *lastChallenge = isProxy ? &ctx->proxyChallenge : &ctx->challenge;
+
+    const QByteArray auth = reply.headerField(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate");
+    int spacePos = auth.indexOf(' ');
+    if (spacePos < 0 || auth.left(spacePos) != "Digest") {
+        q->warning("Unsupported authentication method");
+        return false;
+    }
+    QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
+    if (lastChallenge->value("realm") == challenge.value("realm") &&
+        lastChallenge->value("nonce") == challenge.value("nonce")) {
+        q->warning("Authentication failed");
+        return false;
+    }
+    *lastChallenge = challenge;
+
+    SipPacket request = ctx->lastRequest;
+    request.setHeaderField("CSeq", QString::number(ctx->cseq++).toLatin1() + ' ' + request.method());
+    sendRequest(request, ctx);
+    return true;
+}
+
 void SipClientPrivate::handleReply(const SipPacket &reply)
 {
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
@@ -554,7 +579,7 @@ void SipClientPrivate::handleReply(const SipPacket &reply)
 
     // handle authentication
     if (reply.statusCode() == 401) {
-        if (!q->handleAuthentication(reply, this))
+        if (!handleAuthentication(reply, this))
             setState(SipClient::DisconnectedState);
         return;
     }
@@ -803,31 +828,6 @@ void SipClient::datagramReceived()
     } else {
         //warning("SIP packet is neither request nor reply");
     }
-}
-
-bool SipClient::handleAuthentication(const SipPacket &reply, SipCallContext *ctx)
-{
-    bool isProxy = reply.statusCode() == 407;
-    QMap<QByteArray, QByteArray> *lastChallenge = isProxy ? &ctx->proxyChallenge : &ctx->challenge;
-
-    const QByteArray auth = reply.headerField(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate");
-    int spacePos = auth.indexOf(' ');
-    if (spacePos < 0 || auth.left(spacePos) != "Digest") {
-        warning("Unsupported authentication method");
-        return false;
-    }
-    QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
-    if (lastChallenge->value("realm") == challenge.value("realm") &&
-        lastChallenge->value("nonce") == challenge.value("nonce")) {
-        warning("Authentication failed");
-        return false;
-    }
-    *lastChallenge = challenge;
-
-    SipPacket request = ctx->lastRequest;
-    request.setHeaderField("CSeq", QString::number(ctx->cseq++).toLatin1() + ' ' + request.method());
-    d->sendRequest(request, ctx);
-    return true;
 }
 
 QString SipClient::serverName() const

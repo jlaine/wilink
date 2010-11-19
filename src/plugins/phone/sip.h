@@ -180,8 +180,6 @@ private slots:
 
 private:
     SipClientPrivate *d;
-    bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
-
     friend class SipCall;
     friend class SipCallPrivate;
     friend class SipClientPrivate;

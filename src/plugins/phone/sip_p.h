@@ -84,6 +84,7 @@ public:
     SipClientPrivate(SipClient *qq);
     QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
+    bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
     void handleReply(const SipPacket &reply);
     void sendRequest(SipPacket &request, SipCallContext *ctx);
     void setState(SipClient::State state);
