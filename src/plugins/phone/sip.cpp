@@ -948,14 +948,14 @@ void SipClient::datagramReceived()
     }
 }
 
-QString SipClient::serverName() const
-{
-    return d->serverName;
-}
-
 SipClient::State SipClient::state() const
 {
     return d->state;
+}
+
+QString SipClient::displayName() const
+{
+    return d->displayName;
 }
 
 void SipClient::setDisplayName(const QString &displayName)
@@ -963,14 +963,34 @@ void SipClient::setDisplayName(const QString &displayName)
     d->displayName = displayName;
 }
 
+QString SipClient::domain() const
+{
+    return d->domain;
+}
+
 void SipClient::setDomain(const QString &domain)
 {
     d->domain = domain;
 }
 
+QString SipClient::password() const
+{
+    return d->password;
+}
+
 void SipClient::setPassword(const QString &password)
 {
     d->password = password;
+}
+
+QString SipClient::serverName() const
+{
+    return d->serverName;
+}
+
+QString SipClient::username() const
+{
+    return d->username;
 }
 
 void SipClient::setUsername(const QString &username)

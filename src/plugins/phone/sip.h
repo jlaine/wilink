@@ -157,12 +157,20 @@ public:
     ~SipClient();
 
     SipCall *call(const QString &recipient);
-    QString serverName() const;
     SipClient::State state() const;
 
+    QString displayName() const;
     void setDisplayName(const QString &displayName);
+
+    QString domain() const;
     void setDomain(const QString &domain);
+
+    QString password() const;
     void setPassword(const QString &password);
+
+    QString serverName() const;
+
+    QString username() const;
     void setUsername(const QString &user);
 
 signals:
