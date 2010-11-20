@@ -69,8 +69,6 @@ public:
 #endif
     QUdpSocket *socket;
     bool invitePending;
-    QByteArray inviteRecipient;
-    QByteArray inviteUri;
     SipPacket inviteRequest;
     QByteArray remoteRecipient;
     QList<QByteArray> remoteRoute;

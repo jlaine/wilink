@@ -125,25 +125,12 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
     if  (command == "INVITE" && reply.statusCode() >= 200) {
         invitePending = false;
 
-        SipPacket request;
-        request.setMethod("ACK");
-
-        QList<QByteArray> fields;
-        fields << "Via" << "Contact" << "Max-Forwards" << "Proxy-Authorization" << "Authorization";
-        foreach (const QByteArray &field, fields)
-        {
-            if (!inviteRequest.headerField(field).isEmpty())
-                request.setHeaderField(field, inviteRequest.headerField(field));
-        }
-        quint32 cseq = inviteRequest.sequenceNumber();
-
-        request.setUri(remoteUri);
+        SipPacket request = client->d->buildRequest("ACK", inviteRequest.uri(), id, inviteRequest.sequenceNumber());
+        request.setHeaderField("Via", inviteRequest.headerField("Via"));
         for (int i = remoteRoute.size() - 1; i >= 0; --i)
             request.addHeaderField("Route", remoteRoute[i]);
         request.setHeaderField("To", remoteRecipient);
         request.setHeaderField("From", reply.headerField("From"));
-        request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
-        request.setHeaderField("CSeq", QByteArray::number(cseq) + " ACK");
         client->d->sendRequest(request, this);
     }
 
@@ -163,8 +150,8 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
     if (command == "BYE") {
 
         if (invitePending) {
-            SipPacket request = client->d->buildRequest("CANCEL", inviteUri, id, inviteRequest.sequenceNumber());
-            request.setHeaderField("To", inviteRecipient);
+            SipPacket request = client->d->buildRequest("CANCEL", inviteRequest.uri(), id, inviteRequest.sequenceNumber());
+            request.setHeaderField("To", inviteRequest.headerField("To"));
             request.setHeaderField("Via", inviteRequest.headerField("Via"));
             request.removeHeaderField("Contact");
             client->d->sendRequest(request, this);
@@ -369,8 +356,8 @@ void SipCallPrivate::sendInvite()
 {
     const SdpMessage sdp = buildSdp(channel->supportedPayloadTypes());
 
-    SipPacket request = client->d->buildRequest("INVITE", inviteUri, id, cseq++);
-    request.setHeaderField("To", inviteRecipient);
+    SipPacket request = client->d->buildRequest("INVITE", remoteUri, id, cseq++);
+    request.setHeaderField("To", remoteRecipient);
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
     client->d->sendRequest(request, this);
@@ -451,10 +438,8 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d = new SipCallPrivate(this);
     d->client = parent;
     d->direction = direction;
-    d->inviteRecipient = recipient.toUtf8();
-    d->inviteUri = recipientToUri(recipient).toUtf8();
-    d->remoteRecipient = d->inviteRecipient;
-    d->remoteUri = d->inviteUri;
+    d->remoteRecipient = recipient.toUtf8();
+    d->remoteUri = recipientToUri(recipient).toUtf8();
 
     d->id = generateStanzaHash().toLatin1();
     d->channel = new QXmppRtpChannel(this);
@@ -652,7 +637,7 @@ SipPacket SipClientPrivate::buildResponse(const SipPacket &request)
         response.addHeaderField("Via", via);
     response.setHeaderField("From", request.headerField("From"));
     response.setHeaderField("To", request.headerField("To"));
-    response.setHeaderField("Call-Id", request.headerField("Call-Id"));
+    response.setHeaderField("Call-ID", request.headerField("Call-ID"));
     response.setHeaderField("CSeq", request.headerField("CSeq"));
     foreach (const QByteArray &route, request.headerFieldValues("Record-Route"))
         response.addHeaderField("Record-Route", route);
