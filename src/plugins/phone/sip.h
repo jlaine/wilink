@@ -122,6 +122,7 @@ signals:
     void stateChanged(QXmppCall::State state);
 
 public slots:
+    void accept();
     void hangup();
 
 private slots:
