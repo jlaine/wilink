@@ -126,11 +126,11 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
         invitePending = false;
 
         SipPacket request = client->d->buildRequest("ACK", remoteUri, id, inviteRequest.sequenceNumber());
-        request.setHeaderField("Via", inviteRequest.headerField("Via"));
         for (int i = remoteRoute.size() - 1; i >= 0; --i)
             request.addHeaderField("Route", remoteRoute[i]);
         request.setHeaderField("To", remoteRecipient);
-        request.setHeaderField("From", reply.headerField("From"));
+        request.setHeaderField("Via", inviteRequest.headerField("Via"));
+        request.removeHeaderField("Contact");
         client->d->sendRequest(request, this);
     }
 
@@ -261,7 +261,10 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     QList<QByteArray> attrs;
     foreach (const QXmppJinglePayloadType &payload, payloadTypes) {
         profiles += " " + QByteArray::number(payload.id());
-        attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
+        QByteArray rtpmap = QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
+        if (payload.channels() != 1)
+            rtpmap += "/" + QByteArray::number(payload.channels());
+        attrs << "rtpmap:" + rtpmap;
     }
     profiles += " 101";
     attrs << "rtpmap:101 telephone-event/8000";
@@ -307,9 +310,8 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
             remotePort = bits[1].toUInt();
 
             // determine codec
-            for (int i = 3; i < bits.size(); ++i)
-            {
-                foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
+            foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
+                for (int i = 3; i < bits.size(); ++i) {
                     bool ok = false;
                     if (payload.id() == bits[i].toInt(&ok) && ok) {
                         q->debug(QString("Accepting RTP profile %1 (%2)").arg(
