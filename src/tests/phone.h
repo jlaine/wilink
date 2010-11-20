@@ -1,5 +1,6 @@
 #include <QObject>
 
+class SipCall;
 class SipClient;
 
 class PhoneTester : public QObject
@@ -16,6 +17,7 @@ signals:
 
 private slots:
     void connected();
+    void received(SipCall *call);
 
 private:
     SipClient *m_client;

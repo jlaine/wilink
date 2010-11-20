@@ -240,8 +240,6 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
             response.setStatusCode(400);
             response.setReasonPhrase("Bad request");
         }
-
-        QTimer::singleShot(5000, q, SLOT(accept()));
     } else {
         response.setStatusCode(405);
         response.setReasonPhrase("Method not allowed");

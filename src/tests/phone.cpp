@@ -38,6 +38,7 @@ PhoneTester::PhoneTester(QObject *parent)
             QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
     connect(m_client, SIGNAL(connected()), this, SLOT(connected()));
     connect(m_client, SIGNAL(disconnected()), this, SIGNAL(finished()));
+    connect(m_client, SIGNAL(callReceived(SipCall*)), this, SLOT(received(SipCall*)));
 }
 
 void PhoneTester::connected()
@@ -48,6 +49,11 @@ void PhoneTester::connected()
     if (!recipient.contains("@"))
         recipient += "@" + m_client->serverName();
     SipCall *call = m_client->call(recipient);
+}
+
+void PhoneTester::received(SipCall *call)
+{
+    call->accept();
 }
 
 void PhoneTester::start()
