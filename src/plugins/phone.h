@@ -63,6 +63,7 @@ public:
 private slots:
     void backspacePressed();
     void callNumber();
+    void callReceived(SipCall *call);
     void getSettings();
     void handleSettings();
     void keyPressed();

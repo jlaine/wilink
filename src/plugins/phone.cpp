@@ -110,6 +110,10 @@ PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
 
     // sip client
     sip = new SipClient(this);
+    check = connect(sip, SIGNAL(callReceived(SipCall*)),
+                    this, SLOT(callReceived(SipCall*)));
+    Q_ASSERT(check);
+
     check = connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
                     client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
@@ -156,6 +160,11 @@ void PhonePanel::callNumber()
     // remember number
     QSettings settings;
     settings.setValue("PhoneHistory", phoneNumber);
+}
+
+void PhonePanel::callReceived(SipCall *call)
+{
+    addWidget(new PhoneWidget(call));
 }
 
 /** Requests VoIP settings from the server.
