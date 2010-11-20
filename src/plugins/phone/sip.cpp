@@ -171,11 +171,13 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
             q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
             timer->stop();
 
-            if (reply.headerField("Content-Type") == "application/sdp" && !audioOutput)
+            if (reply.headerField("Content-Type") == "application/sdp" &&
+                handleSdp(SdpMessage(reply.body())))
             {
-                // parse descriptor
-                SdpMessage sdp(reply.body());
-                handleSdp(sdp);
+                setState(QXmppCall::ActiveState);
+                startAudio();
+            } else {
+                q->hangup();
             }
 
         } else if (reply.statusCode() >= 300) {
@@ -197,9 +199,16 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
         response.setReasonPhrase("OK");
         setState(QXmppCall::FinishedState);
     } else if (request.method() == "INVITE") {
-        inviteRequest = request;
-        response.setStatusCode(180);
-        response.setReasonPhrase("Ringing");
+
+        if (request.headerField("Content-Type") == "application/sdp" &&
+            handleSdp(SdpMessage(request.body()))) {
+            inviteRequest = request;
+            response.setStatusCode(180);
+            response.setReasonPhrase("Ringing");
+        } else {
+            response.setStatusCode(400);
+            response.setReasonPhrase("Bad request");
+        }
 
         QTimer::singleShot(5000, q, SLOT(accept()));
     } else {
@@ -209,11 +218,8 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
     client->d->sendRequest(response, this);
 }
 
-void SipCallPrivate::handleSdp(const SdpMessage &sdp)
+bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 {
-    QXmppJinglePayloadType commonPayload;
-    bool commonPayloadFound = false;
-
     // parse descriptor
     QPair<char, QByteArray> field;
     foreach (field, sdp.fields()) {
@@ -231,16 +237,15 @@ void SipCallPrivate::handleSdp(const SdpMessage &sdp)
             remotePort = bits[1].toUInt();
 
             // determine codec
-            for (int i = 3; i < bits.size() && !commonPayloadFound; ++i)
+            for (int i = 3; i < bits.size(); ++i)
             {
                 foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
                     bool ok = false;
                     if (payload.id() == bits[i].toInt(&ok) && ok) {
-                        q->debug(QString("Selecting RTP profile %1 (%2)").arg(
+                        q->debug(QString("Accepting RTP profile %1 (%2)").arg(
                             payload.name(),
                             QString::number(payload.id())));
-                        commonPayload = payload;
-                        commonPayloadFound = true;
+                        commonPayloadTypes << payload;
                         break;
                     }
                 }
@@ -252,47 +257,30 @@ void SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 int ptime = field.second.mid(6).toInt(&ok);
                 if (ok && ptime > 0) {
                     q->debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
-                    commonPayload.setPtime(ptime);
+                    for (int i = 0; i < commonPayloadTypes.size(); ++i)
+                        commonPayloadTypes[i].setPtime(ptime);
                 }
             }
         }
     }
 
     // set codec
-    if (!commonPayloadFound) {
+    if (!commonPayloadTypes.size()) {
         q->warning("Could not find a common codec");
-        q->hangup();
-        return;
+        return false;
     }
+    QXmppJinglePayloadType commonPayload = commonPayloadTypes[0];
+    q->debug(QString("Selecting RTP profile %1 (%2), %3 ms").arg(
+        commonPayload.name(),
+        QString::number(commonPayload.id()),
+        QString::number(commonPayload.ptime())));
     channel->setPayloadType(commonPayload);
     if (!channel->isOpen()) {
         q->warning("Could not assign codec to RTP channel");
-        q->hangup();
-        return;
+        return false;
     }
 
-    // prepare audio format
-    QAudioFormat format;
-    format.setFrequency(channel->payloadType().clockrate());
-    format.setChannels(channel->payloadType().channels());
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-
-    int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
-
-    // initialise audio output
-    audioOutput = new QAudioOutput(format, q);
-    audioOutput->setBufferSize(2 * packetSize);
-    audioOutput->start(channel);
-
-    // initialise audio input
-    audioInput = new QAudioInput(format, q);
-    audioInput->setBufferSize(2 * packetSize);
-    audioInput->start(channel);
-
-    setState(QXmppCall::ActiveState);
+    return true;
 }
 
 void SipCallPrivate::sendInvite()
@@ -365,6 +353,34 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     }
 }
 
+void SipCallPrivate::startAudio()
+{
+    // prepare audio format
+    QAudioFormat format;
+    format.setFrequency(channel->payloadType().clockrate());
+    format.setChannels(channel->payloadType().channels());
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+
+    int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
+
+    // initialise audio output
+    if (!audioOutput) {
+        audioOutput = new QAudioOutput(format, q);
+        audioOutput->setBufferSize(2 * packetSize);
+        audioOutput->start(channel);
+    }
+
+    // initialise audio input
+    if (!audioInput) {
+        audioInput = new QAudioInput(format, q);
+        audioInput->setBufferSize(2 * packetSize);
+        audioInput->start(channel);
+    }
+}
+
 SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent)
     : QXmppLoggable(parent)
 {
@@ -409,13 +425,34 @@ void SipCall::accept()
 {
     if (d->direction == QXmppCall::IncomingDirection && d->state == QXmppCall::OfferState)
     {
-        SdpMessage sdpRequest(d->inviteRequest.body());
-
         SdpMessage sdp;
+        sdp.addField('v', "0");
+        sdp.addField('o', "- 1289387706660194 1 IN IP4 " + d->client->d->socket->localAddress().toString().toUtf8());
+        sdp.addField('s', qApp->applicationName().toUtf8());
+        sdp.addField('c', "IN IP4 " + d->socket->localAddress().toString().toUtf8());
+        sdp.addField('t', "0 0");
+
+        // RTP profile
+        QByteArray profiles = "RTP/AVP";
+        QList<QByteArray> attrs;
+        foreach (const QXmppJinglePayloadType &payload, d->commonPayloadTypes) {
+            profiles += " " + QByteArray::number(payload.id());
+            attrs << "rtpmap:" + QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
+        }
+        profiles += " 101";
+        attrs << "rtpmap:101 telephone-event/8000";
+        attrs << "fmtp:101 0-15";
+        attrs << "sendrecv";
+
+        sdp.addField('m', "audio " + QByteArray::number(d->socket->localPort()) + " "  + profiles);
+        foreach (const QByteArray &attr, attrs)
+            sdp.addField('a', attr);
 
         SipPacket response = d->client->d->buildResponse(d->inviteRequest);
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
+        response.setHeaderField("Content-Type", "application/sdp");
+        response.setBody(sdp.toByteArray());
 
         d->client->d->sendRequest(response, d);
         d->setState(QXmppCall::ConnectingState);

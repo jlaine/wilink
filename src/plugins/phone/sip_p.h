@@ -50,12 +50,15 @@ public:
     SipCallPrivate(SipCall *qq);
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
-    void handleSdp(const SdpMessage &sdp);
+    bool handleSdp(const SdpMessage &sdp);
     void sendInvite();
     void setState(QXmppCall::State state);
+    void startAudio();
+    void stopAudio();
 
     QXmppCall::Direction direction;
     QXmppCall::State state;
+    QList<QXmppJinglePayloadType> commonPayloadTypes;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
     QAudioOutput *audioOutput;
