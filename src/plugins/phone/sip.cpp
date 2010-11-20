@@ -42,6 +42,16 @@ const int RTCP_COMPONENT = 2;
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 
+static QString recipientToUri(const QString &recipient)
+{
+    QRegExp recipientRx("(.*)<([^>]+)>(;.+)?");
+    if (!recipientRx.exactMatch(recipient)) {
+        qWarning("Bad recipient %s", qPrintable(recipient));
+        return QString();
+    }
+    return recipientRx.cap(2);
+}
+
 SdpMessage::SdpMessage(const QByteArray &ba)
 {
     const QByteArrayMatcher crlf("\r\n");
@@ -101,8 +111,10 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
     // store information
     if (!reply.headerField("To").isEmpty())
         remoteRecipient = reply.headerField("To");
-    if (!reply.headerField("Contact").isEmpty())
-        remoteUri = reply.headerField("Contact").replace("<", "").replace(">", "");
+    if (!reply.headerField("Contact").isEmpty()) {
+        const QString contact = QString::fromUtf8(reply.headerField("Contact"));
+        remoteUri = recipientToUri(contact).toUtf8();
+    }
     if (!reply.headerField("Record-Route").isEmpty())
         remoteRoute = reply.headerField("Record-Route");
 
@@ -191,8 +203,16 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
 
 void SipCallPrivate::handleRequest(const SipPacket &request)
 {
-    SipPacket response = client->d->buildResponse(request);
+    // store information
+    if (!request.headerField("From").isEmpty())
+        remoteRecipient = request.headerField("From");
+    if (!request.headerField("Contact").isEmpty()) {
+        const QString contact = QString::fromUtf8(request.headerField("Contact"));
+        remoteUri = recipientToUri(contact).toUtf8();
+    }
 
+    // respond
+    SipPacket response = client->d->buildResponse(request);
     if (request.method() == "BYE") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
@@ -415,10 +435,10 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d = new SipCallPrivate(this);
     d->client = parent;
     d->direction = direction;
-    d->inviteRecipient = QString("<%1>").arg(recipient).toUtf8();
-    d->inviteUri = recipient.toUtf8();
-    d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
-    d->remoteUri = recipient.toUtf8();
+    d->inviteRecipient = recipient.toUtf8();
+    d->inviteUri = recipientToUri(recipient).toUtf8();
+    d->remoteRecipient = d->inviteRecipient;
+    d->remoteUri = d->inviteUri;
 
     d->id = generateStanzaHash().toLatin1();
     d->channel = new QXmppRtpChannel(this);
@@ -757,7 +777,7 @@ SipCall *SipClient::call(const QString &recipient)
         return 0;
     }
 
-    SipCall *call = new SipCall(recipient, QXmppCall::OutgoingDirection, this);
+    SipCall *call = new SipCall(QString("<%1>").arg(recipient), QXmppCall::OutgoingDirection, this);
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
@@ -893,15 +913,15 @@ void SipClient::datagramReceived()
 
     // check whether it's a request or a response
     if (reply.isRequest()) {
-        if (currentCall)
-            currentCall->d->handleRequest(reply);
-        else if (reply.method() == "INVITE") {
+        if (!currentCall && reply.method() == "INVITE") {
             QString recipient = reply.headerField("From");
+            info(QString("SIP call from %1").arg(recipient));
             currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
             d->calls << currentCall;
-            currentCall->d->handleRequest(reply);
         }
+        if (currentCall)
+            currentCall->d->handleRequest(reply);
     } else if (reply.isReply()) {
         if (currentCall)
             currentCall->d->handleReply(reply);
