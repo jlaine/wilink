@@ -52,10 +52,9 @@ public:
     void handleReply(const SipPacket &reply);
     void handleRequest(const SipPacket &request);
     bool handleSdp(const SdpMessage &sdp);
+    void onStateChanged();
     void sendInvite();
     void setState(QXmppCall::State state);
-    void startAudio();
-    void stopAudio();
 
     QXmppCall::Direction direction;
     QXmppCall::State state;

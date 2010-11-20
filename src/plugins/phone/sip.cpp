@@ -175,7 +175,6 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
                 handleSdp(SdpMessage(reply.body())))
             {
                 setState(QXmppCall::ActiveState);
-                startAudio();
             } else {
                 q->hangup();
             }
@@ -348,6 +347,7 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     if (state != newState)
     {
         state = newState;
+        onStateChanged();
         emit q->stateChanged(state);
 
         if (state == QXmppCall::ActiveState)
@@ -360,31 +360,50 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     }
 }
 
-void SipCallPrivate::startAudio()
+void SipCallPrivate::onStateChanged()
 {
-    // prepare audio format
-    QAudioFormat format;
-    format.setFrequency(channel->payloadType().clockrate());
-    format.setChannels(channel->payloadType().channels());
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
+    if (state == QXmppCall::ActiveState)
+    {
+        // prepare audio format
+        QAudioFormat format;
+        format.setFrequency(channel->payloadType().clockrate());
+        format.setChannels(channel->payloadType().channels());
+        format.setSampleSize(16);
+        format.setCodec("audio/pcm");
+        format.setByteOrder(QAudioFormat::LittleEndian);
+        format.setSampleType(QAudioFormat::SignedInt);
 
-    int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
+        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
 
-    // initialise audio output
-    if (!audioOutput) {
-        audioOutput = new QAudioOutput(format, q);
-        audioOutput->setBufferSize(2 * packetSize);
-        audioOutput->start(channel);
-    }
+        // initialise audio output
+        if (!audioOutput) {
+            audioOutput = new QAudioOutput(format, q);
+            audioOutput->setBufferSize(2 * packetSize);
+            audioOutput->start(channel);
+        }
 
-    // initialise audio input
-    if (!audioInput) {
-        audioInput = new QAudioInput(format, q);
-        audioInput->setBufferSize(2 * packetSize);
-        audioInput->start(channel);
+        // initialise audio input
+        if (!audioInput) {
+            audioInput = new QAudioInput(format, q);
+            audioInput->setBufferSize(2 * packetSize);
+            audioInput->start(channel);
+        }
+    } else {
+        // stop audio input
+        if (audioInput)
+        {
+            audioInput->stop();
+            delete audioInput;
+            audioInput = 0;
+        }
+
+        // stop audio output
+        if (audioOutput)
+        {
+            audioOutput->stop();
+            delete audioOutput;
+            audioOutput = 0;
+        }
     }
 }
 
@@ -443,7 +462,6 @@ void SipCall::accept()
         d->client->d->sendRequest(response, d);
 
         d->setState(QXmppCall::ActiveState);
-        d->startAudio();
     }
 }
 
@@ -488,20 +506,6 @@ void SipCall::hangup()
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     d->setState(QXmppCall::DisconnectingState);
-
-    // stop audio
-    if (d->audioInput)
-    {
-        d->audioInput->stop();
-        delete d->audioInput;
-        d->audioInput = 0;
-    }
-    if (d->audioOutput)
-    {
-        d->audioOutput->stop();
-        delete d->audioOutput;
-        d->audioOutput = 0;
-    }
     d->socket->close();
 
     SipPacket request = d->client->d->buildRequest("BYE", d->remoteUri, d->id, d->cseq++);
