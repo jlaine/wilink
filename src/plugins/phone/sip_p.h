@@ -73,7 +73,7 @@ public:
     QByteArray inviteUri;
     SipPacket inviteRequest;
     QByteArray remoteRecipient;
-    QByteArray remoteRoute;
+    QList<QByteArray> remoteRoute;
     QByteArray remoteUri;
 
     SipClient *client;

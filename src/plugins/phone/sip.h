@@ -56,6 +56,7 @@ public:
 
     quint32 sequenceNumber() const;
 
+    bool hasHeaderField(const QByteArray &name) const;
     QByteArray headerField(const QByteArray &name, const QByteArray &defaultValue = QByteArray()) const;
     QMap<QByteArray, QByteArray> headerFieldParameters(const QByteArray &name) const;
     QList<QByteArray> headerFieldValues(const QByteArray &name) const;

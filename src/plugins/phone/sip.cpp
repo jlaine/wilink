@@ -115,8 +115,11 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
         const QString contact = QString::fromUtf8(reply.headerField("Contact"));
         remoteUri = recipientToUri(contact).toUtf8();
     }
-    if (!reply.headerField("Record-Route").isEmpty())
-        remoteRoute = reply.headerField("Record-Route");
+    if (reply.hasHeaderField("Record-Route")) {
+        remoteRoute.clear();
+        foreach (const QByteArray &route, reply.headerFieldValues("Record-Route"))
+            remoteRoute << route;
+    }
 
     // send ack
     if  (command == "INVITE" && reply.statusCode() >= 200) {
@@ -135,7 +138,8 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
         quint32 cseq = inviteRequest.sequenceNumber();
 
         request.setUri(remoteUri);
-        request.setHeaderField("Route", remoteRoute);
+        for (int i = remoteRoute.size() - 1; i >= 0; --i)
+            request.addHeaderField("Route", remoteRoute[i]);
         request.setHeaderField("To", remoteRecipient);
         request.setHeaderField("From", reply.headerField("From"));
         request.setHeaderField("Call-Id", reply.headerField("Call-Id"));
@@ -210,8 +214,11 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
         const QString contact = QString::fromUtf8(request.headerField("Contact"));
         remoteUri = recipientToUri(contact).toUtf8();
     }
-    if (!request.headerField("Record-Route").isEmpty())
-        remoteRoute = request.headerField("Record-Route");
+    if (request.hasHeaderField("Record-Route")) {
+        remoteRoute.clear();
+        foreach (const QByteArray &route, request.headerFieldValues("Record-Route"))
+            remoteRoute << route;
+    }
 
     // respond
     SipPacket response = client->d->buildResponse(request);
@@ -532,7 +539,8 @@ void SipCall::hangup()
 
     SipPacket request = d->client->d->buildRequest("BYE", d->remoteUri, d->id, d->cseq++);
     request.setHeaderField("To", d->remoteRecipient);
-    request.setHeaderField("Route", d->remoteRoute);
+    for (int i = d->remoteRoute.size() - 1; i >= 0; --i)
+        request.addHeaderField("Route", d->remoteRoute[i]);
     d->client->d->sendRequest(request, d);
 }
 
@@ -638,7 +646,8 @@ SipPacket SipClientPrivate::buildResponse(const SipPacket &request)
     response.setHeaderField("To", request.headerField("To"));
     response.setHeaderField("Call-Id", request.headerField("Call-Id"));
     response.setHeaderField("CSeq", request.headerField("CSeq"));
-    response.setHeaderField("Record-Route", request.headerField("Record-Route"));
+    foreach (const QByteArray &route, request.headerFieldValues("Record-Route"))
+        response.addHeaderField("Record-Route", route);
     response.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
         username,
         reflexiveAddress.toString(),
@@ -1036,6 +1045,16 @@ SipPacket::SipPacket(const QByteArray &bytes)
     }
     if (i >= 0)
         m_body = header.mid(i);
+}
+
+bool SipPacket::hasHeaderField(const QByteArray &name) const
+{
+    QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
+                                                        end = m_fields.constEnd();
+    for ( ; it != end; ++it)
+        if (qstricmp(name.constData(), it->first) == 0)
+            return true;
+    return false;
 }
 
 QByteArray SipPacket::headerField(const QByteArray &name, const QByteArray &defaultValue) const
