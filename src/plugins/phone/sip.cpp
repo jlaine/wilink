@@ -222,7 +222,9 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
 
     // respond
     SipPacket response = client->d->buildResponse(request);
-    if (request.method() == "BYE") {
+    if (request.method() == "ACK") {
+        return;
+    } else if (request.method() == "BYE") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
         setState(QXmppCall::FinishedState);
