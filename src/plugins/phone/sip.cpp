@@ -807,17 +807,18 @@ void SipClient::connectToServer()
 
 void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
 {
+    QString serverName;
     if (!serviceInfo.records().isEmpty()) {
-        d->serverName = serviceInfo.records().first().target();
+        serverName = serviceInfo.records().first().target();
         d->serverPort = serviceInfo.records().first().port();
     } else {
-        d->serverName = d->domain;
+        serverName = d->domain;
         d->serverPort = 5060;
     }
 
-    QHostInfo info = QHostInfo::fromName(d->serverName);
+    QHostInfo info = QHostInfo::fromName(serverName);
     if (info.addresses().isEmpty()) {
-        warning(QString("Could not lookup SIP server %1").arg(d->serverName));
+        warning(QString("Could not lookup SIP server %1").arg(serverName));
         return;
     }
     d->serverAddress = info.addresses().first();
@@ -853,9 +854,9 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     }
 
     // register
-    debug(QString("Connecting to SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
+    debug(QString("Connecting to SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
 
-    const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
+    const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
     SipPacket request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
@@ -874,8 +875,8 @@ void SipClient::disconnectFromServer()
 
     // unregister
     if (d->state == SipClient::ConnectedState) {
-        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverName, QString::number(d->serverPort)));
-        const QByteArray uri = QString("sip:%1").arg(d->serverName).toUtf8();
+        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
+        const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
         SipPacket request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
         d->sendRequest(request, d);
@@ -977,11 +978,6 @@ QString SipClient::password() const
 void SipClient::setPassword(const QString &password)
 {
     d->password = password;
-}
-
-QString SipClient::serverName() const
-{
-    return d->serverName;
 }
 
 QString SipClient::username() const

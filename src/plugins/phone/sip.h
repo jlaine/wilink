@@ -168,8 +168,6 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
-    QString serverName() const;
-
     QString username() const;
     void setUsername(const QString &user);
 

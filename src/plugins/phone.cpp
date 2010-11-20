@@ -169,7 +169,7 @@ void PhonePanel::callNumber()
     if (!callButton->isEnabled() || phoneNumber.isEmpty())
         return;
 
-    const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->serverName());
+    const QString recipient = QString("sip:%1@%2").arg(phoneNumber, sip->domain());
 
     SipCall *call = sip->call(recipient);
     if (!call)

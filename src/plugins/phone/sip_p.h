@@ -106,7 +106,6 @@ public:
     SipClient::State state;
     QString rinstance;
     QHostAddress serverAddress;
-    QString serverName;
     quint16 serverPort;
     QList<SipCall*> calls;
 
