@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -45,11 +46,12 @@
  
 #define PHONE_ROSTER_ID "0_phone"
 
-PhonePanel::PhonePanel(ChatClient *xmppClient, QWidget *parent)
+PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     : ChatPanel(parent),
-    client(xmppClient)
+    m_window(chatWindow)
 {
     bool check;
+    client = chatWindow->client();
 
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Phone"));
@@ -143,6 +145,24 @@ void PhonePanel::backspacePressed()
     numberEdit->backspace();
 }
 
+void PhonePanel::callClicked(QAbstractButton *button)
+{
+    QMessageBox *box = qobject_cast<QMessageBox*>(sender());
+    SipCall *call = qobject_cast<SipCall*>(box->property("call").value<QObject*>());
+    if (!call)
+        return;
+
+    if (box->standardButton(button) == QMessageBox::Yes)
+    {
+        disconnect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
+        addWidget(new PhoneWidget(call));
+        call->accept();
+    } else {
+        call->hangup();
+    }
+    box->deleteLater();
+}
+
 void PhonePanel::callNumber()
 {
     QString phoneNumber = numberEdit->text().trimmed();
@@ -164,7 +184,21 @@ void PhonePanel::callNumber()
 
 void PhonePanel::callReceived(SipCall *call)
 {
-    addWidget(new PhoneWidget(call));
+    const QString contactName = call->recipient();
+
+    QMessageBox *box = new QMessageBox(QMessageBox::Question,
+        tr("Call from %1").arg(contactName),
+        tr("%1 wants to talk to you.\n\nDo you accept?").arg(contactName),
+        QMessageBox::Yes | QMessageBox::No, m_window);
+    box->setDefaultButton(QMessageBox::NoButton);
+    box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
+
+    /* connect signals */
+    connect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
+    connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
+    connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
+        this, SLOT(callClicked(QAbstractButton*)));
+    box->show();
 }
 
 /** Requests VoIP settings from the server.
@@ -331,7 +365,7 @@ bool PhonePlugin::initialize(Chat *chat)
         return false;
 
     /* register panel */
-    PhonePanel *panel = new PhonePanel(chat->client());
+    PhonePanel *panel = new PhonePanel(chat);
     panel->setObjectName(PHONE_ROSTER_ID);
     chat->addPanel(panel);
 

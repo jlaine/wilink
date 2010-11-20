@@ -24,11 +24,13 @@
 
 #include "plugins/phone/sip.h"
 
+class QAbstractButton;
 class QGraphicsSimpleTextItem;
 class QLabel;
 class QLineEdit;
 class QNetworkAccessManager;
 class QPushButton;
+class Chat;
 class ChatClient;
 class SipCall;
 class SipClient;
@@ -57,11 +59,12 @@ class PhonePanel : public ChatPanel
     Q_OBJECT
 
 public:
-    PhonePanel(ChatClient *xmppClient, QWidget *parent = NULL);
+    PhonePanel(Chat *chatWindow, QWidget *parent = NULL);
     void addWidget(ChatPanelWidget *widget);
 
 private slots:
     void backspacePressed();
+    void callClicked(QAbstractButton *button);
     void callNumber();
     void callReceived(SipCall *call);
     void getSettings();
@@ -71,6 +74,7 @@ private slots:
 
 private:
     ChatClient *client;
+    Chat *m_window;
     SipClient *sip;
     QNetworkAccessManager *network;
 
