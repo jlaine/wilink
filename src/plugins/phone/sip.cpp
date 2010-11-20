@@ -210,6 +210,8 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
         const QString contact = QString::fromUtf8(request.headerField("Contact"));
         remoteUri = recipientToUri(contact).toUtf8();
     }
+    if (!request.headerField("Record-Route").isEmpty())
+        remoteRoute = request.headerField("Record-Route");
 
     // respond
     SipPacket response = client->d->buildResponse(request);
