@@ -899,6 +899,7 @@ void SipClient::datagramReceived()
             QString recipient = reply.headerField("From");
             currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
+            d->calls << currentCall;
             currentCall->d->handleRequest(reply);
         }
     } else if (reply.isReply()) {
