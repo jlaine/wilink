@@ -340,6 +340,8 @@ void SipCallPrivate::sendInvite()
     client->d->sendRequest(request, this);
     invitePending = true;
     inviteRequest = request;
+
+    timer->start(TIMEOUT_SECONDS * 1000);
 }
 
 void SipCallPrivate::setState(QXmppCall::State newState)
@@ -435,8 +437,6 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
             this, SLOT(readFromSocket()));
     connect(d->timer, SIGNAL(timeout()),
             this, SLOT(handleTimeout()));
-
-    d->timer->start(TIMEOUT_SECONDS * 1000);
 }
 
 SipCall::~SipCall()
