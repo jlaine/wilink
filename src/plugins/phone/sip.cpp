@@ -621,22 +621,23 @@ SipPacket SipClientPrivate::buildRequest(const QByteArray &method, const QByteAr
     if (!displayName.isEmpty())
         addr += QString("\"%1\"").arg(displayName);
     addr += QString("<sip:%1@%2>").arg(username, domain);
-    const QByteArray branch = "z9hG4bK-" + generateStanzaHash().toLatin1();
-    const QString via = QString("SIP/2.0/UDP %1:%2;branch=%3;rport").arg(
+
+    const QString branch = "z9hG4bK-" + generateStanzaHash();
+    const QString host = QString("%1:%2").arg(
         socket->localAddress().toString(),
-        QString::number(socket->localPort()),
-        branch);
+        QString::number(socket->localPort()));
+    const QString via = QString("SIP/2.0/UDP %1;branch=%2;rport").arg(
+        host, branch);
 
     SipPacket packet;
     packet.setMethod(method);
     packet.setUri(uri);
-    packet.setHeaderField("Via", via.toLatin1());
+    packet.setHeaderField("Via", via.toUtf8());
     packet.setHeaderField("Max-Forwards", "70");
     packet.setHeaderField("Call-ID", callId);
-    packet.setHeaderField("CSeq", QString::number(seqNum).toLatin1() + ' ' + method);
-    packet.setHeaderField("Contact", QString("<sip:%1@%2:%3;rinstance=%4>").arg(
-        username, socket->localAddress().toString(),
-        QString::number(socket->localPort()), rinstance).toUtf8());
+    packet.setHeaderField("CSeq", QByteArray::number(seqNum) + ' ' + method);
+    packet.setHeaderField("Contact", QString("<sip:%1@%2;rinstance=%3>").arg(
+        username, host, rinstance).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
     if (method != "ACK" && method != "CANCEL")
@@ -682,7 +683,7 @@ bool SipClientPrivate::handleAuthentication(const SipPacket &reply, SipCallConte
     *lastChallenge = challenge;
 
     SipPacket request = ctx->lastRequest;
-    request.setHeaderField("CSeq", QString::number(ctx->cseq++).toLatin1() + ' ' + request.method());
+    request.setHeaderField("CSeq", QByteArray::number(ctx->cseq++) + ' ' + request.method());
     sendRequest(request, ctx);
     return true;
 }
