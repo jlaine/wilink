@@ -270,8 +270,6 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
 void SipCallPrivate::handleRequest(const SipPacket &request)
 {
     SipPacket response;
-    response.setStatusCode(200);
-    response.setReasonPhrase("OK");
     foreach (const QByteArray &via, request.headerFieldValues("Via"))
         response.addHeaderField("Via", via);
     response.setHeaderField("From", request.headerField("From"));
@@ -284,11 +282,16 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
         client->d->reflexiveAddress.toString(),
         QString::number(client->d->reflexivePort)).toUtf8());
 
+    if (request.method() == "BYE") {
+        response.setStatusCode(200);
+        response.setReasonPhrase("OK");
+        setState(QXmppCall::FinishedState);
+    } else if (request.method() == "INVITE") {
+        response.setStatusCode(180);
+        response.setReasonPhrase("Ringing");
+    }
     client->d->sendRequest(response, this);
 
-    if (request.method() == "BYE") {
-        setState(QXmppCall::FinishedState);
-    }
 }
 
 void SipCallPrivate::sendInvite()
@@ -361,11 +364,12 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     }
 }
 
-SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent)
+SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent)
     : QXmppLoggable(parent)
 {
     d = new SipCallPrivate(this);
     d->client = parent;
+    d->direction = direction;
     d->inviteRecipient = QString("<%1>").arg(recipient).toUtf8();
     d->inviteUri = recipient.toUtf8();
     d->remoteRecipient = QString("<%1>").arg(recipient).toUtf8();
@@ -376,8 +380,9 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
     d->audioInput = 0;
     d->audioOutput = 0;
     d->remotePort = 0;
-    d->socket = socket;
-    d->socket->setParent(this);
+    d->socket = new QUdpSocket(this);
+    if (!d->socket->bind(parent->d->socket->localAddress(), 0))
+        warning("Could not start listening for RTP");
     d->timer = new QTimer(this);
     d->timer->setSingleShot(true);
 
@@ -394,6 +399,11 @@ SipCall::SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent
 SipCall::~SipCall()
 {
     delete d;
+}
+
+QXmppCall::Direction SipCall::direction() const
+{
+    return d->direction;
 }
 
 QByteArray SipCall::id() const
@@ -674,15 +684,7 @@ SipCall *SipClient::call(const QString &recipient)
         return 0;
     }
 
-    QUdpSocket *socket = new QUdpSocket;
-    if (!socket->bind(d->socket->localAddress(), 0))
-    {
-        warning("Could not start listening for RTP");
-        delete socket;
-        return 0;
-    }
-
-    SipCall *call = new SipCall(recipient, socket, this);
+    SipCall *call = new SipCall(recipient, QXmppCall::OutgoingDirection, this);
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
@@ -820,6 +822,12 @@ void SipClient::datagramReceived()
     if (reply.isRequest()) {
         if (currentCall)
             currentCall->d->handleRequest(reply);
+        else if (reply.method() == "INVITE") {
+            QString recipient = reply.headerField("From");
+            currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
+            currentCall->d->id = reply.headerField("Call-ID");
+            currentCall->d->handleRequest(reply);
+        }
     } else if (reply.isReply()) {
         if (currentCall)
             currentCall->d->handleReply(reply);

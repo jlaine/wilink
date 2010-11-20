@@ -53,6 +53,7 @@ public:
     void sendInvite();
     void setState(QXmppCall::State state);
 
+    QXmppCall::Direction direction;
     QXmppCall::State state;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;

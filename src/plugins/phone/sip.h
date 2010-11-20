@@ -100,6 +100,7 @@ class SipCall : public QXmppLoggable
 public:
     ~SipCall();
 
+    QXmppCall::Direction direction() const;
     QByteArray id() const;
     QString recipient() const;
     QXmppCall::State state() const;
@@ -129,7 +130,7 @@ private slots:
     void writeToSocket(const QByteArray &ba);
 
 private:
-    SipCall(const QString &recipient, QUdpSocket *socket, SipClient *parent);
+    SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent);
 
     SipCallPrivate *d;
     friend class SipCallPrivate;
