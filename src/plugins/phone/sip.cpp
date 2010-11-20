@@ -125,7 +125,7 @@ void SipCallPrivate::handleReply(const SipPacket &reply)
     if  (command == "INVITE" && reply.statusCode() >= 200) {
         invitePending = false;
 
-        SipPacket request = client->d->buildRequest("ACK", inviteRequest.uri(), id, inviteRequest.sequenceNumber());
+        SipPacket request = client->d->buildRequest("ACK", remoteUri, id, inviteRequest.sequenceNumber());
         request.setHeaderField("Via", inviteRequest.headerField("Via"));
         for (int i = remoteRoute.size() - 1; i >= 0; --i)
             request.addHeaderField("Route", remoteRoute[i]);
@@ -210,6 +210,7 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
     // respond
     SipPacket response = client->d->buildResponse(request);
     if (request.method() == "ACK") {
+        setState(QXmppCall::ActiveState);
         return;
     } else if (request.method() == "BYE") {
         response.setStatusCode(200);
@@ -482,7 +483,7 @@ void SipCall::accept()
 
         d->client->d->sendRequest(response, d);
 
-        d->setState(QXmppCall::ActiveState);
+        d->setState(QXmppCall::ConnectingState);
     }
 }
 
