@@ -926,15 +926,20 @@ void SipClient::datagramReceived()
 
     // check whether it's a request or a response
     if (reply.isRequest()) {
+        bool emitCall = false;
         if (!currentCall && reply.method() == "INVITE") {
             QString recipient = reply.headerField("From");
             info(QString("SIP call from %1").arg(recipient));
             currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
             d->calls << currentCall;
+            emitCall = true;
         }
-        if (currentCall)
+        if (currentCall) {
             currentCall->d->handleRequest(reply);
+            if (emitCall)
+                emit callReceived(currentCall);
+        }
     } else if (reply.isReply()) {
         if (currentCall)
             currentCall->d->handleReply(reply);

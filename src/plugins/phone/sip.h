@@ -169,6 +169,12 @@ signals:
     void connected();
     void disconnected();
 
+    /// This signal is emitted when a new incoming call is received.
+    ///
+    /// To accept the call, invoke the call's SipCall::accept() method.
+    /// To refuse the call, invoke the call's SipCall::hangup() method.
+    void callReceived(SipCall *call);
+
     /// This signal is emitted when the call state changes.
     void stateChanged(SipClient::State state);
 
