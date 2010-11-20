@@ -249,11 +249,18 @@ void SipCallPrivate::handleRequest(const SipPacket &request)
 
 SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const
 {
+    const QString localAddress = QString("IN %1 %2").arg(
+        socket->localAddress().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
+        socket->localAddress().toString());
+
     SdpMessage sdp;
     sdp.addField('v', "0");
-    sdp.addField('o', "- 1289387706660194 1 IN IP4 " + client->d->socket->localAddress().toString().toUtf8());
+    sdp.addField('o', QString("- %1 %2 %3").arg(
+        "1289387706660194",
+        QString::number(1),
+        localAddress).toUtf8());
     sdp.addField('s', qApp->applicationName().toUtf8());
-    sdp.addField('c', "IN IP4 " + socket->localAddress().toString().toUtf8());
+    sdp.addField('c', localAddress.toUtf8());
     sdp.addField('t', "0 0");
 #ifdef USE_ICE
     // ICE credentials
@@ -300,7 +307,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
     foreach (field, sdp.fields()) {
         if (field.first == 'c') {
             // determine remote host
-            if (field.second.startsWith("IN IP4 ")) {
+            if (field.second.startsWith("IN IP4 ") || field.second.startsWith("IN IP6 ")) {
                 remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
             }
         } else if (field.first == 'm') {
