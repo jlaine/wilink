@@ -46,10 +46,10 @@ private:
     QList<QPair<char, QByteArray> > m_fields;
 };
 
-class SipPacket
+class SipMessage
 {
 public:
-    SipPacket(const QByteArray &ba = QByteArray());
+    SipMessage(const QByteArray &ba = QByteArray());
 
     QByteArray body() const;
     void setBody(const QByteArray &body);
