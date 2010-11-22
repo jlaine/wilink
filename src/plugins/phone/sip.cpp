@@ -21,6 +21,7 @@
 #include <QAudioOutput>
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QPair>
@@ -242,11 +243,14 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         socket->localAddress().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
         socket->localAddress().toString());
 
+    static const QDateTime ntpEpoch(QDate(1900, 1, 1));
+    qint64 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
+
     SdpMessage sdp;
     sdp.addField('v', "0");
     sdp.addField('o', QString("- %1 %2 %3").arg(
-        "1289387706660194",
-        QString::number(1),
+        QString::number(ntpSeconds),
+        QString::number(ntpSeconds),
         localAddress).toUtf8());
     sdp.addField('s', "-");
     sdp.addField('c', localAddress.toUtf8());
