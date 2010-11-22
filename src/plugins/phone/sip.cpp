@@ -244,7 +244,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         socket->localAddress().toString());
 
     static const QDateTime ntpEpoch(QDate(1900, 1, 1));
-    qint64 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
+    quint32 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
 
     SdpMessage sdp;
     sdp.addField('v', "0");
