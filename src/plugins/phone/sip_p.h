@@ -41,7 +41,7 @@ public:
     QByteArray id;
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
-    SipPacket lastRequest;
+    SipMessage lastRequest;
 };
 
 class SipCallPrivate : public SipCallContext
@@ -49,8 +49,8 @@ class SipCallPrivate : public SipCallContext
 public:
     SipCallPrivate(SipCall *qq);
     SdpMessage buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const;
-    void handleReply(const SipPacket &reply);
-    void handleRequest(const SipPacket &request);
+    void handleReply(const SipMessage &reply);
+    void handleRequest(const SipMessage &request);
     bool handleSdp(const SdpMessage &sdp);
     void onStateChanged();
     void sendInvite();
@@ -70,7 +70,7 @@ public:
 #endif
     QUdpSocket *socket;
     bool invitePending;
-    SipPacket inviteRequest;
+    SipMessage inviteRequest;
     QByteArray remoteRecipient;
     QList<QByteArray> remoteRoute;
     QByteArray remoteUri;
@@ -86,12 +86,12 @@ class SipClientPrivate : public SipCallContext
 {
 public:
     SipClientPrivate(SipClient *qq);
-    QByteArray authorization(const SipPacket &request, const QMap<QByteArray, QByteArray> &challenge) const;
-    SipPacket buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
-    SipPacket buildResponse(const SipPacket &request);
-    bool handleAuthentication(const SipPacket &reply, SipCallContext *ctx);
-    void handleReply(const SipPacket &reply);
-    void sendRequest(SipPacket &request, SipCallContext *ctx);
+    QByteArray authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const;
+    SipMessage buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
+    SipMessage buildResponse(const SipMessage &request);
+    bool handleAuthentication(const SipMessage &reply, SipCallContext *ctx);
+    void handleReply(const SipMessage &reply);
+    void sendRequest(SipMessage &request, SipCallContext *ctx);
     void setState(SipClient::State state);
 
     QUdpSocket *socket;
@@ -107,7 +107,6 @@ public:
     SipClient::State state;
     QString rinstance;
     QHostAddress serverAddress;
-    QString serverName;
     quint16 serverPort;
     QList<SipCall*> calls;
 

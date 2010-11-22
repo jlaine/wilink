@@ -47,7 +47,7 @@ void PhoneTester::connected()
         return;
     QString recipient = "sip:" + m_phoneNumber;
     if (!recipient.contains("@"))
-        recipient += "@" + m_client->serverName();
+        recipient += "@" + m_client->domain();
     SipCall *call = m_client->call(recipient);
 }
 

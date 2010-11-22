@@ -46,10 +46,10 @@ private:
     QList<QPair<char, QByteArray> > m_fields;
 };
 
-class SipPacket
+class SipMessage
 {
 public:
-    SipPacket(const QByteArray &ba = QByteArray());
+    SipMessage(const QByteArray &ba = QByteArray());
 
     QByteArray body() const;
     void setBody(const QByteArray &body);
@@ -167,8 +167,6 @@ public:
 
     QString password() const;
     void setPassword(const QString &password);
-
-    QString serverName() const;
 
     QString username() const;
     void setUsername(const QString &user);
