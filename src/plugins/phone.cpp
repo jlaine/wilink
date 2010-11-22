@@ -184,7 +184,7 @@ void PhonePanel::callNumber()
 
 void PhonePanel::callReceived(SipCall *call)
 {
-    const QString contactName = call->recipient();
+    const QString contactName = sipAddressToName(call->recipient());
 
     QMessageBox *box = new QMessageBox(QMessageBox::Question,
         tr("Call from %1").arg(contactName),
@@ -231,11 +231,13 @@ void PhonePanel::handleSettings()
     // check service is activated
     const bool enabled = settings.firstChildElement("enabled").text() == "true";
     const QString password = settings.firstChildElement("password").text();
+    const QString number = settings.firstChildElement("number").text();
     if (!enabled || password.isEmpty())
         return;
 
     // connect to server
     const QString jid = client->configuration().jid();
+    sip->setDisplayName(number);
     sip->setDomain(jidToDomain(jid));
     sip->setUsername(jidToUser(jid));
     sip->setPassword(password);
@@ -283,10 +285,7 @@ PhoneWidget::PhoneWidget(SipCall *call, QGraphicsItem *parent)
     setButtonPixmap(QPixmap(":/hangup.png"));
     setButtonToolTip(tr("Hang up"));
 
-    QString recipient = call->recipient();
-    QRegExp recipientRx("[^>]*<(sip:)?([^>]+)>");
-    if (recipientRx.exactMatch(recipient))
-        recipient = recipientRx.cap(2).split('@').first();
+    const QString recipient = sipAddressToName(call->recipient());
     m_nameLabel = new QGraphicsSimpleTextItem(recipient, this);
     m_statusLabel = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
 

@@ -34,6 +34,8 @@ class SipCallPrivate;
 class SipClient;
 class SipClientPrivate;
 
+QString sipAddressToName(const QString &address);
+
 class SdpMessage
 {
 public:

@@ -43,14 +43,29 @@ const int RTCP_COMPONENT = 2;
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 
-static QString recipientToUri(const QString &recipient)
+static const char *addressPattern = "(.*)<([^>]+)>(;.+)?";
+
+QString sipAddressToName(const QString &address)
 {
-    QRegExp recipientRx("(.*)<([^>]+)>(;.+)?");
-    if (!recipientRx.exactMatch(recipient)) {
-        qWarning("Bad recipient %s", qPrintable(recipient));
+    QRegExp rx(addressPattern);
+    if (!rx.exactMatch(address)) {
+        qWarning("Bad address %s", qPrintable(address));
         return QString();
     }
-    return recipientRx.cap(2);
+    QString name = rx.cap(1).trimmed();
+    if (name.startsWith('"') && name.endsWith('"'))
+        name = name.mid(1, name.size() - 2);
+    return name.isEmpty() ? rx.cap(2).split('@').first() : name;
+}
+
+static QString sipAddressToUri(const QString &address)
+{
+    QRegExp rx(addressPattern);
+    if (!rx.exactMatch(address)) {
+        qWarning("Bad address %s", qPrintable(address));
+        return QString();
+    }
+    return rx.cap(2);
 }
 
 SdpMessage::SdpMessage(const QByteArray &ba)
@@ -115,7 +130,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         remoteRecipient = reply.headerField("To");
     if (!reply.headerField("Contact").isEmpty()) {
         const QString contact = QString::fromUtf8(reply.headerField("Contact"));
-        remoteUri = recipientToUri(contact).toUtf8();
+        remoteUri = sipAddressToUri(contact).toUtf8();
     }
     if (reply.hasHeaderField("Record-Route")) {
         remoteRoute.clear();
@@ -201,7 +216,7 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
         remoteRecipient = request.headerField("From");
     if (!request.headerField("Contact").isEmpty()) {
         const QString contact = QString::fromUtf8(request.headerField("Contact"));
-        remoteUri = recipientToUri(contact).toUtf8();
+        remoteUri = sipAddressToUri(contact).toUtf8();
     }
     if (request.hasHeaderField("Record-Route")) {
         remoteRoute.clear();
@@ -453,7 +468,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->client = parent;
     d->direction = direction;
     d->remoteRecipient = recipient.toUtf8();
-    d->remoteUri = recipientToUri(recipient).toUtf8();
+    d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
     d->id = generateStanzaHash().toLatin1();
     d->channel = new QXmppRtpChannel(this);
