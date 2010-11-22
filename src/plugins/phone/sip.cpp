@@ -100,6 +100,7 @@ QByteArray SdpMessage::toByteArray() const
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::OfferState),
     invitePending(false),
+    activeTime("0 0"),
     q(qq)
 {
 }
@@ -247,9 +248,9 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         "1289387706660194",
         QString::number(1),
         localAddress).toUtf8());
-    sdp.addField('s', qApp->applicationName().toUtf8());
+    sdp.addField('s', "-");
     sdp.addField('c', localAddress.toUtf8());
-    sdp.addField('t', "0 0");
+    sdp.addField('t', activeTime);
 #ifdef USE_ICE
     // ICE credentials
     sdp.addField('a', "ice-ufrag:" + iceConnection->localUser().toUtf8());
@@ -331,6 +332,12 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                         commonPayloadTypes[i].setPtime(ptime);
                 }
             }
+        } else if (field.first == 't') {
+            // active time
+            if (direction == QXmppCall::IncomingDirection)
+                activeTime = field.second;
+            else if (field.second != activeTime)
+                q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
         }
     }
 

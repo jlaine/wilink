@@ -59,6 +59,7 @@ public:
     QXmppCall::Direction direction;
     QXmppCall::State state;
     QList<QXmppJinglePayloadType> commonPayloadTypes;
+    QByteArray activeTime;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
     QAudioOutput *audioOutput;
