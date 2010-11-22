@@ -1,9 +1,9 @@
-wiLink 1.0.x (UNRELEASED)
+wiLink 1.0.2 (2010-11-22)
  * Conversations:
    - Fix chat message ordering regression introduced in 1.0.0
    - Fix crash when clearing a conversation history with selected messages.
- * Phone:
-   - Add a plugin for voice calls using SIP.
+ * Roster:
+   - Improve "My residence" icon.
  * Shares:
    - Fix shares download timeout handling.
 
