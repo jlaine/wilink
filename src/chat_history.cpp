@@ -661,8 +661,12 @@ void ChatHistoryWidget::bubbleDestroyed(QObject *obj)
  */
 void ChatHistoryWidget::clear()
 {
-    for (int i = m_bubbles.size() - 1; i >= 0; i--)
-        delete m_bubbles[i];
+    QList<ChatMessageBubble*> bubbles = m_bubbles;
+    m_bubbles.clear();
+    m_messages.clear();
+    m_selectedMessages.clear();
+    for (int i = 0; i < bubbles.size(); ++i)
+        delete bubbles[i];
     adjustSize();
 }
 
