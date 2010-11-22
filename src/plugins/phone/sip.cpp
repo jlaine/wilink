@@ -858,6 +858,8 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
         debug(QString("Listening for SIP on %1:%2").arg(
             d->socket->localAddress().toString(),
             QString::number(d->socket->localPort())));
+        d->reflexiveAddress = d->socket->localAddress();
+        d->reflexivePort = d->socket->localPort();
     }
 
     // register
