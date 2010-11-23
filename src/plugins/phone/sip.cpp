@@ -594,7 +594,6 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
     reflexivePort(0),
     q(qq)
 {
-    rinstance = generateStanzaHash(16);
 }
 
 QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const
@@ -650,8 +649,10 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setHeaderField("Max-Forwards", "70");
     packet.setHeaderField("Call-ID", callId);
     packet.setHeaderField("CSeq", QByteArray::number(seqNum) + ' ' + method);
-    packet.setHeaderField("Contact", QString("<sip:%1@%2;rinstance=%3>").arg(
-        username, host, rinstance).toUtf8());
+    packet.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
+        username,
+        reflexiveAddress.toString(),
+        QString::number(reflexivePort)).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
     if (method != "ACK" && method != "CANCEL")
