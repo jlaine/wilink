@@ -97,19 +97,10 @@ bool ChatMessage::isAction() const
  * @param parent
  */
 ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
+    : QGraphicsWidget(parent),
+    m_frame(0),
+    m_from(0)
 {
-    // from
-    m_from = new QGraphicsTextItem(this);
-    QFont font = m_from->font();
-    font.setPixelSize(DATE_FONT);
-    m_from->setFont(font);
-    m_from->installSceneEventFilter(this);
-
-    // bubble frame
-    m_frame = new QGraphicsPathItem(this);
-    m_frame->setZValue(-1);
-
 #if 0
     // bubble shadow
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
@@ -141,8 +132,19 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
             bool isReceived = widget->message().received;
             QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
             QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
+
+            // from
+            m_from = new QGraphicsTextItem(this);
+            QFont font = m_from->font();
+            font.setPixelSize(DATE_FONT);
+            m_from->setFont(font);
+            m_from->installSceneEventFilter(this);
             m_from->setDefaultTextColor(baseColor);
             m_from->setPlainText(widget->message().from);
+
+            // bubble frame
+            m_frame = new QGraphicsPathItem(this);
+            m_frame->setZValue(-1);
             m_frame->setPen(baseColor);
             m_frame->setBrush(backgroundColor);
         }
@@ -186,31 +188,35 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     QRectF rect(baseRect);
     rect.moveLeft(0);
     rect.moveTop(0);
-    rect.adjust(0.5, HEADER_HEIGHT + 0.5, -0.5, -FOOTER_HEIGHT - 0.5);
+    rect.adjust(0.5, (m_from ? HEADER_HEIGHT : 0) + 0.5, -0.5, (m_frame ? -FOOTER_HEIGHT : 0) - 0.5);
 
     QRectF arc(0, 0, 2 * BUBBLE_RADIUS, 2 * BUBBLE_RADIUS);
 
-    // bubble top
-    QPainterPath path;
-    path.moveTo(rect.left(), rect.top() + BUBBLE_RADIUS);
-    arc.moveTopLeft(rect.topLeft());
-    path.arcTo(arc, 180, -90);
-    path.lineTo(rect.left() + 20, rect.top());
-    path.lineTo(rect.left() + 17, rect.top() - 5);
-    path.lineTo(rect.left() + 27, rect.top());
-    path.lineTo(rect.right() - BUBBLE_RADIUS, rect.top());
-    arc.moveRight(rect.right());
-    path.arcTo(arc, 90, -90);
+    if (m_frame) {
+        // bubble top
+        QPainterPath path;
+        path.moveTo(rect.left(), rect.top() + BUBBLE_RADIUS);
+        arc.moveTopLeft(rect.topLeft());
+        path.arcTo(arc, 180, -90);
+        if (m_from) {
+            path.lineTo(rect.left() + 20, rect.top());
+            path.lineTo(rect.left() + 17, rect.top() - 5);
+            path.lineTo(rect.left() + 27, rect.top());
+        }
+        path.lineTo(rect.right() - BUBBLE_RADIUS, rect.top());
+        arc.moveRight(rect.right());
+        path.arcTo(arc, 90, -90);
 
-    // bubble right, bottom, left
-    path.lineTo(rect.right(), rect.bottom() - BUBBLE_RADIUS);
-    arc.moveBottom(rect.bottom());
-    path.arcTo(arc, 0, -90);
-    path.lineTo(rect.left() + BUBBLE_RADIUS, rect.bottom());
-    arc.moveLeft(rect.left());
-    path.arcTo(arc, -90, -90);
-    path.closeSubpath();
-    m_frame->setPath(path);
+        // bubble right, bottom, left
+        path.lineTo(rect.right(), rect.bottom() - BUBBLE_RADIUS);
+        arc.moveBottom(rect.bottom());
+        path.arcTo(arc, 0, -90);
+        path.lineTo(rect.left() + BUBBLE_RADIUS, rect.bottom());
+        arc.moveLeft(rect.left());
+        path.arcTo(arc, -90, -90);
+        path.closeSubpath();
+        m_frame->setPath(path);
+    }
 
     // messages
     rect.adjust(0.5, 0.5, -0.5, -0.5);
@@ -244,18 +250,18 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
  */
 QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
+    qreal height = (m_from ? HEADER_HEIGHT : 0 ) + (m_frame ? FOOTER_HEIGHT : 0) + 2;
+
     switch (which)
     {
         case Qt::MinimumSize:
         {
-            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT + 2;
             foreach (ChatMessageWidget *widget, m_messages)
                 height += widget->minimumHeight();
             return QSizeF(m_maximumWidth, height);
         }
         case Qt::PreferredSize:
         {
-            qreal height = HEADER_HEIGHT + FOOTER_HEIGHT + 2;
             foreach (ChatMessageWidget *widget, m_messages)
                 height += widget->preferredHeight();
             return QSizeF(m_maximumWidth, height);
