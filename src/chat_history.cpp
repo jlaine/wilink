@@ -66,26 +66,19 @@ ChatMessage::ChatMessage()
  *
  * @param parent
  */
-ChatMessageBubble::ChatMessageBubble(bool received, QGraphicsItem *parent)
+ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-     m_isReceived(received)
+     m_isReceived(false)
 {
-    QColor baseColor = received ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
-    QColor backgroundColor = received ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
-    QColor shadowColor = QColor(0xd4, 0xd4, 0xd4);
-
     // from
     m_from = new QGraphicsTextItem(this);
     QFont font = m_from->font();
     font.setPixelSize(DATE_FONT);
     m_from->setFont(font);
-    m_from->setDefaultTextColor(baseColor);
     m_from->installSceneEventFilter(this);
 
     // bubble frame
     m_frame = new QGraphicsPathItem(this);
-    m_frame->setPen(baseColor);
-    m_frame->setBrush(backgroundColor);
     m_frame->setZValue(-1);
 
 #if 0
@@ -113,8 +106,15 @@ int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
  */
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
-    if (m_messages.isEmpty())
+    if (m_messages.isEmpty()) {
+        m_isReceived = widget->message().received;
+        QColor baseColor = m_isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
+        QColor backgroundColor = m_isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
+        m_from->setDefaultTextColor(baseColor);
         m_from->setPlainText(widget->message().from);
+        m_frame->setPen(baseColor);
+        m_frame->setBrush(backgroundColor);
+    }
     widget->setBubble(this);
     widget->setParentItem(this);
     widget->setMaximumWidth(m_maximumWidth - 2);
@@ -246,7 +246,7 @@ ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
     if (index == m_messages.size() - 1)
         return 0;
 
-    ChatMessageBubble *bubble = new ChatMessageBubble(m_isReceived, parentItem());
+    ChatMessageBubble *bubble = new ChatMessageBubble(parentItem());
     for (int i = m_messages.size() - 1; i > index; --i)
     {
         ChatMessageWidget *widget = m_messages[i];
@@ -610,7 +610,7 @@ void ChatHistoryWidget::addMessage(const ChatMessage &message)
         }
 
         // insert the new bubble
-        ChatMessageBubble *bubble = new ChatMessageBubble(message.received, this);
+        ChatMessageBubble *bubble = new ChatMessageBubble(this);
         bubble->insertAt(0, msg);
         insertBubble(bubblePos, bubble);
     }

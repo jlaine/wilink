@@ -56,7 +56,7 @@ class ChatMessageBubble : public QGraphicsWidget
     Q_OBJECT
 
 public:
-    ChatMessageBubble(bool received, QGraphicsItem *parent = 0);
+    ChatMessageBubble(QGraphicsItem *parent = 0);
     int indexOf(ChatMessageWidget *widget) const;
     void insertAt(int pos, ChatMessageWidget *widget);
 
