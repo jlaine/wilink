@@ -62,13 +62,42 @@ ChatMessage::ChatMessage()
 {
 }
 
+/** Returns true if the two messages should be grouped in the same bubble.
+ *
+ * @param other
+ */
+bool ChatMessage::groupWith(const ChatMessage &other) const
+{
+    return from == other.from && !isAction() && !other.isAction();
+}
+
+/** Returns the HTML for the message body.
+ */
+QString ChatMessage::html() const
+{
+    QString bodyHtml = Qt::escape(body);
+    bodyHtml.replace("\n", "<br/>");
+    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
+    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+    QRegExp meRegex("^/me ");
+    bodyHtml.replace(meRegex, from + " ");
+    return bodyHtml;
+}
+
+/** Returns true if the message is an "action" message, such
+ *  as /me.
+ */
+bool ChatMessage::isAction() const
+{
+    return body.startsWith("/me ");
+}
+
 /** Constructs a new ChatMesageBubble.
  *
  * @param parent
  */
 ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
-    : QGraphicsWidget(parent),
-     m_isReceived(false)
+    : QGraphicsWidget(parent)
 {
     // from
     m_from = new QGraphicsTextItem(this);
@@ -106,14 +135,17 @@ int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
  */
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
+    // initialise style if this is the first message
     if (m_messages.isEmpty()) {
-        m_isReceived = widget->message().received;
-        QColor baseColor = m_isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
-        QColor backgroundColor = m_isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
-        m_from->setDefaultTextColor(baseColor);
-        m_from->setPlainText(widget->message().from);
-        m_frame->setPen(baseColor);
-        m_frame->setBrush(backgroundColor);
+        if (!widget->message().isAction()) {
+            bool isReceived = widget->message().received;
+            QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
+            QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
+            m_from->setDefaultTextColor(baseColor);
+            m_from->setPlainText(widget->message().from);
+            m_frame->setPen(baseColor);
+            m_frame->setBrush(backgroundColor);
+        }
     }
     widget->setBubble(this);
     widget->setParentItem(this);
@@ -261,7 +293,7 @@ ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
 
 /** Constructs a new ChatMesageWidget.
  *
- * @param received
+ * @param message
  * @param parent
  */
 ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent)
@@ -280,12 +312,7 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     bodyText->setDefaultTextColor(textColor);
     bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
-
-    QString bodyHtml = Qt::escape(message.body);
-    bodyHtml.replace("\n", "<br/>");
-    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
-    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-    bodyText->setHtml(bodyHtml);
+    bodyText->setHtml(message.html());
 
     // message date
 #ifdef WILINK_EMBEDDED
@@ -584,13 +611,13 @@ void ChatHistoryWidget::addMessage(const ChatMessage &message)
     if (nextMsg)
         nextMsg->setPrevious(msg);
 
-    if (prevMsg && prevMsg->message().from == message.from)
+    if (prevMsg && prevMsg->message().groupWith(message))
     {
         // message belongs to the same bubble as previous message
         ChatMessageBubble *bubble = prevMsg->bubble();
         bubble->insertAt(bubble->indexOf(prevMsg) + 1, msg);
     }
-    else if (nextMsg && nextMsg->message().from == message.from)
+    else if (nextMsg && nextMsg->message().groupWith(message))
     {
         // message belongs to the same bubble as next message
         ChatMessageBubble *bubble = nextMsg->bubble();

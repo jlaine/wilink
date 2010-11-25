@@ -39,6 +39,9 @@ class ChatMessage
 {
 public:
     ChatMessage();
+    bool groupWith(const ChatMessage &other) const;
+    QString html() const;
+    bool isAction() const;
 
     bool archived;
     QString body;
@@ -75,7 +78,6 @@ private slots:
     void messageDestroyed(QObject *obj);
 
 private:
-    bool m_isReceived;
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
 
