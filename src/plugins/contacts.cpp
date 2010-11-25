@@ -289,8 +289,7 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     if (!chat->client()->isConnected())
         return;
 
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
+    const int type = index.data(ChatRosterModel::TypeRole).toInt();
     
     QAction *action;
     if (type == ChatRosterItem::Contact || type == ChatRosterItem::RoomMember)
@@ -306,6 +305,8 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 
     if (type == ChatRosterItem::Contact)
     {
+        const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
+
         action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
         action->setData(bareJid);
         connect(action, SIGNAL(triggered()), this, SLOT(renameContact()));
