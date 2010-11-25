@@ -63,7 +63,10 @@ void PhoneTester::start()
 
 void PhoneTester::stop()
 {
-    m_client->disconnectFromServer();
+    if (m_client->state() == SipClient::ConnectedState)
+        m_client->disconnectFromServer();
+    else
+        emit finished();
 }
 
 int main(int argc, char* argv[])

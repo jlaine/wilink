@@ -594,8 +594,9 @@ void SipCall::writeToSocket(const QByteArray &ba)
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
     : state(SipClient::DisconnectedState),
-    socketsBound(false),
     reflexivePort(0),
+    socketsBound(false),
+    stunDone(false),
     q(qq)
 {
 }
@@ -800,10 +801,10 @@ SipClient::SipClient(QObject *parent)
     d = new SipClientPrivate(this);
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
-            this, SLOT(sipReceived()));
+            this, SLOT(datagramReceived()));
 
     d->stunSocket = new QUdpSocket(this);
-    connect(d->socket, SIGNAL(readyRead()),
+    connect(d->stunSocket, SIGNAL(readyRead()),
             this, SLOT(stunReceived()));
 
     d->registerTimer = new QTimer(this);
@@ -881,35 +882,20 @@ void SipClient::connectToServer()
 
         d->reflexiveAddress = d->socket->localAddress();
         d->reflexivePort = d->socket->localPort();
-        d->socketsBound = 0;
+        d->socketsBound = true;
     }
 
+    // perform DNS SRV lookups
     debug(QString("Looking up STUN server for domain %1").arg(d->domain));
     QXmppSrvInfo::lookupService("_stun._udp." + d->domain, this,
                                 SLOT(setStunServer(QXmppSrvInfo)));
+
+    debug(QString("Looking up SIP server for domain %1").arg(d->domain));
+    QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
+                                SLOT(setSipServer(QXmppSrvInfo)));
 }
 
-void SipClient::disconnectFromServer()
-{
-    d->registerTimer->stop();
-
-    // terminate calls
-    foreach (SipCall *call, d->calls)
-        call->hangup();
-
-    // unregister
-    if (d->state == SipClient::ConnectedState) {
-        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
-        const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
-        SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
-        request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
-        d->sendRequest(request, d);
-
-        d->setState(DisconnectingState);
-    }
-}
-
-void SipClient::sipReceived()
+void SipClient::datagramReceived()
 {
     if (!d->socket->hasPendingDatagrams())
         return;
@@ -920,6 +906,38 @@ void SipClient::sipReceived()
     QHostAddress remoteHost;
     quint16 remotePort;
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+    // check whether it's a STUN packet
+    QByteArray messageId;
+    quint16 messageType = QXmppStunMessage::peekType(buffer, messageId);
+    if (messageType)
+    {
+        QXmppStunMessage message;
+        if (!message.decode(buffer))
+            return;
+
+#ifdef QXMPP_DEBUG_STUN
+        logReceived(QString("STUN packet from %1 port %2\n%3").arg(
+            remoteHost.toString(),
+            QString::number(remotePort),
+            message.toString()));
+#endif
+
+        // store reflexive address
+        if (!message.xorMappedHost.isNull() && message.xorMappedPort != 0) {
+            d->reflexiveAddress = message.xorMappedHost;
+            d->reflexivePort = message.xorMappedPort;
+        } else if (!message.mappedHost.isNull() && message.mappedPort != 0) {
+            d->reflexiveAddress = message.mappedHost;
+            d->reflexivePort = message.mappedPort;
+        }
+        d->stunDone = true;
+
+        // register with server
+        if (!d->serverAddress.isNull())
+            registerWithServer();
+        return;
+    }
 
 #ifdef QXMPP_DEBUG_SIP
     logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
@@ -969,21 +987,40 @@ void SipClient::sipReceived()
     }
 }
 
-void SipClient::stunReceived()
+void SipClient::disconnectFromServer()
 {
-    if (!d->stunSocket->hasPendingDatagrams())
-        return;
+    d->registerTimer->stop();
 
-    // receive datagram
-    const qint64 size = d->stunSocket->pendingDatagramSize();
-    QByteArray buffer(size, 0);
-    QHostAddress remoteHost;
-    quint16 remotePort;
-    d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+    // terminate calls
+    foreach (SipCall *call, d->calls)
+        call->hangup();
 
-#ifdef QXMPP_DEBUG_STUN
-    logReceived(QString("STUN packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
-#endif
+    // unregister
+    if (d->state == SipClient::ConnectedState) {
+        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
+        const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
+        SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
+        request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
+        d->sendRequest(request, d);
+
+        d->setState(DisconnectingState);
+    }
+}
+
+void SipClient::registerWithServer()
+{
+    // register
+    d->id = generateStanzaHash().toLatin1();
+    d->tag = generateStanzaHash(8).toLatin1();
+    debug(QString("Connecting to SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
+
+    const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
+    SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
+    request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
+    d->sendRequest(request, d);
+    d->registerTimer->start(TIMEOUT_SECONDS * 1000);
+
+    d->setState(ConnectingState);
 }
 
 void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
@@ -1003,36 +1040,36 @@ void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
         return;
     }
     d->serverAddress = info.addresses().first();
-    d->id = generateStanzaHash().toLatin1();
-    d->tag = generateStanzaHash(8).toLatin1();
 
-    // register
-    debug(QString("Connecting to SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
-
-    const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
-    SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
-    request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-    d->sendRequest(request, d);
-    d->registerTimer->start(TIMEOUT_SECONDS * 1000);
-
-    d->setState(ConnectingState);
+    if (d->stunDone)
+        registerWithServer();
 }
 
 void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
 {
-    QString stunName;
-    quint16 stunPort;
+    QString serverName = "stun." + d->domain;
+    quint16 serverPort = 5060;
     if (!serviceInfo.records().isEmpty()) {
-        stunName = serviceInfo.records().first().target();
-        stunPort = serviceInfo.records().first().port();
-    } else {
-        stunName = d->domain;
-        stunPort = 5060;
+        serverName = serviceInfo.records().first().target();
+        serverPort = serviceInfo.records().first().port();
     }
 
-    debug(QString("Looking up SIP server for domain %1").arg(d->domain));
-    QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
-                                SLOT(setSipServer(QXmppSrvInfo)));
+    QHostInfo info = QHostInfo::fromName(serverName);
+    if (info.addresses().isEmpty()) {
+        warning(QString("Could not lookup STUN server %1").arg(serverName));
+        return;
+    }
+    const QHostAddress serverAddress = info.addresses().first();
+
+    // send STUN binding request
+    QXmppStunMessage request;
+    request.setId(generateRandomBytes(12));
+    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+#ifdef QXMPP_DEBUG_STUN
+    logSent(QString("STUN packet to %1 port %2\n%3").arg(serverAddress.toString(),
+            QString::number(serverPort), request.toString()));
+#endif
+    d->socket->writeDatagram(request.encode(), serverAddress, serverPort);
 }
 
 SipClient::State SipClient::state() const

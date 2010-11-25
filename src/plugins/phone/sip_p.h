@@ -109,11 +109,12 @@ public:
     QList<SipCall*> calls;
 
     // sockets
+    QHostAddress reflexiveAddress;
+    quint16 reflexivePort;
     QUdpSocket *socket;
     QUdpSocket *stunSocket;
     bool socketsBound;
-    QHostAddress reflexiveAddress;
-    quint16 reflexivePort;
+    bool stunDone;
 
 private:
     SipClient *q;

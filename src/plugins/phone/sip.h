@@ -192,8 +192,8 @@ public slots:
 
 private slots:
     void callDestroyed(QObject *object);
-    void sipReceived();
-    void stunReceived();
+    void datagramReceived();
+    void registerWithServer();
     void setSipServer(const QXmppSrvInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
 
