@@ -56,7 +56,7 @@
 #endif
 
 static const QRegExp linkRegex = QRegExp("((ftp|http|https)://[^ ]+)");
-static const QRegExp meRegex = QRegExp("^/me( [^ ]+)");
+static const QRegExp meRegex = QRegExp("^/me( .*)");
 
 /** Constructs a new ChatMessage.
  */
@@ -81,7 +81,7 @@ QString ChatMessage::html() const
     QString bodyHtml = Qt::escape(body);
     bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-    bodyHtml.replace(meRegex, from + "\\1");
+    bodyHtml.replace(meRegex, "<b>" + from + "\\1</b>");
     return bodyHtml;
 }
 
