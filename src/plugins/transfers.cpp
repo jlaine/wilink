@@ -444,6 +444,10 @@ void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &inde
 
 void ChatTransfersWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
+    const int type = index.data(ChatRosterModel::TypeRole).toInt();
+    if (type != ChatRosterItem::Contact)
+        return;
+
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
     const QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
     if (!chatWindow->client()->isConnected() ||
