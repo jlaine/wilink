@@ -827,9 +827,9 @@ void SipClient::callDestroyed(QObject *object)
 
 void SipClient::connectToServer()
 {
-    debug(QString("Looking up server for domain %1").arg(d->domain));
-    QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
-                                SLOT(connectToServer(QXmppSrvInfo)));
+    debug(QString("Looking up STUN server for domain %1").arg(d->domain));
+    QXmppSrvInfo::lookupService("_stun._udp." + d->domain, this,
+                                SLOT(setStunServer(QXmppSrvInfo)));
 }
 
 void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
@@ -972,6 +972,23 @@ void SipClient::datagramReceived()
     } else {
         //warning("SIP packet is neither request nor reply");
     }
+}
+
+void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
+{
+    QString stunName;
+    quint16 stunPort;
+    if (!serviceInfo.records().isEmpty()) {
+        stunName = serviceInfo.records().first().target();
+        stunPort = serviceInfo.records().first().port();
+    } else {
+        stunName = d->domain;
+        stunPort = 5060;
+    }
+
+    debug(QString("Looking up SIP server for domain %1").arg(d->domain));
+    QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
+                                SLOT(connectToServer(QXmppSrvInfo)));
 }
 
 SipClient::State SipClient::state() const

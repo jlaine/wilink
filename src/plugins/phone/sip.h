@@ -194,6 +194,7 @@ private slots:
     void callDestroyed(QObject *object);
     void connectToServer(const QXmppSrvInfo &info);
     void datagramReceived();
+    void setStunServer(const QXmppSrvInfo &info);
 
 private:
     SipClientPrivate *d;
