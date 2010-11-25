@@ -42,6 +42,7 @@ const int RTCP_COMPONENT = 2;
 #define QXMPP_DEBUG_SIP
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
+#define MARGIN_SECONDS 10
 
 static const char *addressPattern = "(.*)<([^>]+)>(;.+)?";
 
@@ -728,6 +729,14 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
             } else {
                 setState(SipClient::ConnectedState);
 
+                // schedule next register
+                QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Contact");
+                int registerSeconds = params.value("expires").toInt();
+                if (registerSeconds > MARGIN_SECONDS) {
+                    q->debug(QString("Re-registering in %1 seconds").arg(registerSeconds - MARGIN_SECONDS));
+                    registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
+                }
+
                 // send subscribe
                 const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
                 SipMessage request = buildRequest("SUBSCRIBE", uri, id, cseq++);
@@ -889,7 +898,7 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
-    d->registerTimer->start((EXPIRE_SECONDS - TIMEOUT_SECONDS) * 1000);
+    d->registerTimer->start(TIMEOUT_SECONDS * 1000);
 
     d->setState(ConnectingState);
 }
