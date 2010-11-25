@@ -55,6 +55,9 @@
 #define HEADER_HEIGHT 20
 #endif
 
+static const QRegExp linkRegex = QRegExp("((ftp|http|https)://[^ ]+)");
+static const QRegExp meRegex = QRegExp("^/me( [^ ]+)");
+
 /** Constructs a new ChatMessage.
  */
 ChatMessage::ChatMessage()
@@ -77,10 +80,8 @@ QString ChatMessage::html() const
 {
     QString bodyHtml = Qt::escape(body);
     bodyHtml.replace("\n", "<br/>");
-    QRegExp linkRegex("((ftp|http|https)://[^ ]+)");
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-    QRegExp meRegex("^/me ");
-    bodyHtml.replace(meRegex, from + " ");
+    bodyHtml.replace(meRegex, from + "\\1");
     return bodyHtml;
 }
 
@@ -89,7 +90,7 @@ QString ChatMessage::html() const
  */
 bool ChatMessage::isAction() const
 {
-    return body.startsWith("/me ");
+    return body.indexOf(meRegex) >= 0;
 }
 
 /** Constructs a new ChatMesageBubble.
