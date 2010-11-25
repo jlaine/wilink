@@ -40,6 +40,8 @@ const int RTP_COMPONENT = 1;
 const int RTCP_COMPONENT = 2;
 
 #define QXMPP_DEBUG_SIP
+#define QXMPP_DEBUG_STUN
+
 #define EXPIRE_SECONDS 1800
 #define TIMEOUT_SECONDS 30
 #define MARGIN_SECONDS 10
@@ -592,6 +594,7 @@ void SipCall::writeToSocket(const QByteArray &ba)
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
     : state(SipClient::DisconnectedState),
+    socketsBound(false),
     reflexivePort(0),
     q(qq)
 {
@@ -840,6 +843,47 @@ void SipClient::callDestroyed(QObject *object)
 
 void SipClient::connectToServer()
 {
+    // bind sockets
+    if (!d->socketsBound) {
+        QHostAddress bindAddress;
+        foreach (const QHostAddress &ip, QNetworkInterface::allAddresses()) {
+            if (ip.protocol() == QAbstractSocket::IPv4Protocol &&
+                    ip != QHostAddress::Null &&
+                    ip != QHostAddress::LocalHost &&
+                    ip != QHostAddress::LocalHostIPv6 &&
+                    ip != QHostAddress::Broadcast &&
+                    ip != QHostAddress::Any &&
+                    ip != QHostAddress::AnyIPv6) {
+                bindAddress = ip;
+                break;
+            }
+        }
+
+        // listen for STUN
+        if (!d->stunSocket->bind(bindAddress, 0))
+        {
+            warning("Could not start listening for STUN");
+            return;
+        }
+        debug(QString("Listening for STUN on %1:%2").arg(
+            d->stunSocket->localAddress().toString(),
+            QString::number(d->stunSocket->localPort())));
+
+        // listen for SIP
+        if (!d->socket->bind(bindAddress, 0))
+        {
+            warning("Could not start listening for SIP");
+            return;
+        }
+        debug(QString("Listening for SIP on %1:%2").arg(
+            d->socket->localAddress().toString(),
+            QString::number(d->socket->localPort())));
+
+        d->reflexiveAddress = d->socket->localAddress();
+        d->reflexivePort = d->socket->localPort();
+        d->socketsBound = 0;
+    }
+
     debug(QString("Looking up STUN server for domain %1").arg(d->domain));
     QXmppSrvInfo::lookupService("_stun._udp." + d->domain, this,
                                 SLOT(setStunServer(QXmppSrvInfo)));
@@ -927,7 +971,19 @@ void SipClient::sipReceived()
 
 void SipClient::stunReceived()
 {
+    if (!d->stunSocket->hasPendingDatagrams())
+        return;
 
+    // receive datagram
+    const qint64 size = d->stunSocket->pendingDatagramSize();
+    QByteArray buffer(size, 0);
+    QHostAddress remoteHost;
+    quint16 remotePort;
+    d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+#ifdef QXMPP_DEBUG_STUN
+    logReceived(QString("STUN packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
+#endif
 }
 
 void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
@@ -949,36 +1005,6 @@ void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
     d->serverAddress = info.addresses().first();
     d->id = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
-
-    // bind socket
-    if (d->socket->state() == QAbstractSocket::UnconnectedState) {
-        QHostAddress bindAddress;
-        foreach (const QHostAddress &ip, QNetworkInterface::allAddresses())
-        {
-            if (ip.protocol() == QAbstractSocket::IPv4Protocol &&
-                ip != QHostAddress::Null &&
-                ip != QHostAddress::LocalHost &&
-                ip != QHostAddress::LocalHostIPv6 &&
-                ip != QHostAddress::Broadcast &&
-                ip != QHostAddress::Any &&
-                ip != QHostAddress::AnyIPv6)
-            {
-                bindAddress = ip;
-                break;
-            }
-        }
-
-        if(!d->socket->bind(bindAddress, 0))
-        {
-            warning("Could not start listening for SIP");
-            return;
-        }
-        debug(QString("Listening for SIP on %1:%2").arg(
-            d->socket->localAddress().toString(),
-            QString::number(d->socket->localPort())));
-        d->reflexiveAddress = d->socket->localAddress();
-        d->reflexivePort = d->socket->localPort();
-    }
 
     // register
     debug(QString("Connecting to SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));

@@ -94,8 +94,6 @@ public:
     void sendRequest(SipMessage &request, SipCallContext *ctx);
     void setState(SipClient::State state);
 
-    QUdpSocket *socket;
-    QUdpSocket *stunSocket;
     QByteArray tag;
     QTimer *registerTimer;
 
@@ -110,6 +108,10 @@ public:
     quint16 serverPort;
     QList<SipCall*> calls;
 
+    // sockets
+    QUdpSocket *socket;
+    QUdpSocket *stunSocket;
+    bool socketsBound;
     QHostAddress reflexiveAddress;
     quint16 reflexivePort;
 
