@@ -95,6 +95,7 @@ public:
     void setState(SipClient::State state);
 
     QUdpSocket *socket;
+    QUdpSocket *stunSocket;
     QByteArray tag;
     QTimer *registerTimer;
 

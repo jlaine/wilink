@@ -192,8 +192,9 @@ public slots:
 
 private slots:
     void callDestroyed(QObject *object);
-    void connectToServer(const QXmppSrvInfo &info);
-    void datagramReceived();
+    void sipReceived();
+    void stunReceived();
+    void setSipServer(const QXmppSrvInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
 
 private:

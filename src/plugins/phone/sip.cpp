@@ -797,7 +797,11 @@ SipClient::SipClient(QObject *parent)
     d = new SipClientPrivate(this);
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
-            this, SLOT(datagramReceived()));
+            this, SLOT(sipReceived()));
+
+    d->stunSocket = new QUdpSocket(this);
+    connect(d->socket, SIGNAL(readyRead()),
+            this, SLOT(stunReceived()));
 
     d->registerTimer = new QTimer(this);
     connect(d->registerTimer, SIGNAL(timeout()),
@@ -841,7 +845,92 @@ void SipClient::connectToServer()
                                 SLOT(setStunServer(QXmppSrvInfo)));
 }
 
-void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
+void SipClient::disconnectFromServer()
+{
+    d->registerTimer->stop();
+
+    // terminate calls
+    foreach (SipCall *call, d->calls)
+        call->hangup();
+
+    // unregister
+    if (d->state == SipClient::ConnectedState) {
+        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
+        const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
+        SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
+        request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
+        d->sendRequest(request, d);
+
+        d->setState(DisconnectingState);
+    }
+}
+
+void SipClient::sipReceived()
+{
+    if (!d->socket->hasPendingDatagrams())
+        return;
+
+    // receive datagram
+    const qint64 size = d->socket->pendingDatagramSize();
+    QByteArray buffer(size, 0);
+    QHostAddress remoteHost;
+    quint16 remotePort;
+    d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+#ifdef QXMPP_DEBUG_SIP
+    logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
+#endif
+
+    // parse packet
+    SipMessage reply(buffer);
+
+    // find corresponding call
+    SipCall *currentCall = 0;
+    const QByteArray callId = reply.headerField("Call-ID");
+    if (callId != d->id)
+    {
+        foreach (SipCall *potentialCall, d->calls)
+        {
+            if (potentialCall->id() == callId)
+            {
+                currentCall = potentialCall;
+                break;
+            }
+        }
+    }
+
+    // check whether it's a request or a response
+    if (reply.isRequest()) {
+        bool emitCall = false;
+        if (!currentCall && reply.method() == "INVITE") {
+            QString recipient = reply.headerField("From");
+            info(QString("SIP call from %1").arg(recipient));
+            currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
+            currentCall->d->id = reply.headerField("Call-ID");
+            d->calls << currentCall;
+            emitCall = true;
+        }
+        if (currentCall) {
+            currentCall->d->handleRequest(reply);
+            if (emitCall)
+                emit callReceived(currentCall);
+        }
+    } else if (reply.isReply()) {
+        if (currentCall)
+            currentCall->d->handleReply(reply);
+        else if (callId == d->id)
+            d->handleReply(reply);
+    } else {
+        //warning("SIP packet is neither request nor reply");
+    }
+}
+
+void SipClient::stunReceived()
+{
+
+}
+
+void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName;
     if (!serviceInfo.records().isEmpty()) {
@@ -903,86 +992,6 @@ void SipClient::connectToServer(const QXmppSrvInfo &serviceInfo)
     d->setState(ConnectingState);
 }
 
-void SipClient::disconnectFromServer()
-{
-    d->registerTimer->stop();
-
-    // terminate calls
-    foreach (SipCall *call, d->calls)
-        call->hangup();
-
-    // unregister
-    if (d->state == SipClient::ConnectedState) {
-        debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
-        const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
-        SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
-        request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
-        d->sendRequest(request, d);
-
-        d->setState(DisconnectingState);
-    }
-}
-
-void SipClient::datagramReceived()
-{
-    if (!d->socket->hasPendingDatagrams())
-        return;
-
-    // receive datagram
-    const qint64 size = d->socket->pendingDatagramSize();
-    QByteArray buffer(size, 0);
-    QHostAddress remoteHost;
-    quint16 remotePort;
-    d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
-
-#ifdef QXMPP_DEBUG_SIP
-    logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
-#endif
-
-    // parse packet
-    SipMessage reply(buffer);
-
-    // find corresponding call
-    SipCall *currentCall = 0;
-    const QByteArray callId = reply.headerField("Call-ID");
-    if (callId != d->id)
-    {
-        foreach (SipCall *potentialCall, d->calls)
-        {
-            if (potentialCall->id() == callId)
-            {
-                currentCall = potentialCall;
-                break;
-            }
-        }
-    }
-
-    // check whether it's a request or a response
-    if (reply.isRequest()) {
-        bool emitCall = false;
-        if (!currentCall && reply.method() == "INVITE") {
-            QString recipient = reply.headerField("From");
-            info(QString("SIP call from %1").arg(recipient));
-            currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
-            currentCall->d->id = reply.headerField("Call-ID");
-            d->calls << currentCall;
-            emitCall = true;
-        }
-        if (currentCall) {
-            currentCall->d->handleRequest(reply);
-            if (emitCall)
-                emit callReceived(currentCall);
-        }
-    } else if (reply.isReply()) {
-        if (currentCall)
-            currentCall->d->handleReply(reply);
-        else if (callId == d->id)
-            d->handleReply(reply);
-    } else {
-        //warning("SIP packet is neither request nor reply");
-    }
-}
-
 void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
 {
     QString stunName;
@@ -997,7 +1006,7 @@ void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
 
     debug(QString("Looking up SIP server for domain %1").arg(d->domain));
     QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
-                                SLOT(connectToServer(QXmppSrvInfo)));
+                                SLOT(setSipServer(QXmppSrvInfo)));
 }
 
 SipClient::State SipClient::state() const
