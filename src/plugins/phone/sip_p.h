@@ -116,14 +116,9 @@ public:
 
     // STUN
     bool stunDone;
-    QHostAddress stunChangedAddress;
-    quint16 stunChangedPort;
+    StunTester *stunTester;
     QHostAddress stunServerAddress;
     quint16 stunServerPort;
-    int stunRetries;
-    QUdpSocket *stunSocket;
-    int stunStep;
-    QTimer *stunTimer;
 
 private:
     SipClient *q;

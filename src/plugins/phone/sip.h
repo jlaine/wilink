@@ -20,6 +20,7 @@
 #ifndef __WILINK_PHONE_SIP_H__
 #define __WILINK_PHONE_SIP_H__
 
+#include <QHostAddress>
 #include <QObject>
 #include <QPair>
 
@@ -27,6 +28,7 @@
 #include "QXmppLogger.h"
 
 class QUdpSocket;
+class QTimer;
 class QXmppSrvInfo;
 
 class SipCallContext;
@@ -196,15 +198,44 @@ private slots:
     void registerWithServer();
     void setSipServer(const QXmppSrvInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
-    void stunReceived();
-    void stunSend();
-    void stunTimeout();
+    void stunFinished();
 
 private:
     SipClientPrivate *d;
     friend class SipCall;
     friend class SipCallPrivate;
     friend class SipClientPrivate;
+};
+
+class StunTester : public QXmppLoggable
+{
+    Q_OBJECT
+
+public:
+    StunTester(QObject *parent = 0);
+    void setServer(const QHostAddress &server, quint16 port);
+
+signals:
+    void finished();
+
+public slots:
+    void start();
+
+private slots:
+    void readyRead();
+    void timeout();
+
+private:
+    void sendRequest();
+
+    QHostAddress changedAddress;
+    quint16 changedPort;
+    QHostAddress serverAddress;
+    quint16 serverPort;
+    int retries;
+    int step;
+    QUdpSocket *socket;
+    QTimer *timer;
 };
 
 #endif
