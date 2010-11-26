@@ -112,9 +112,18 @@ public:
     QHostAddress reflexiveAddress;
     quint16 reflexivePort;
     QUdpSocket *socket;
-    QUdpSocket *stunSocket;
     bool socketsBound;
+
+    // STUN
     bool stunDone;
+    QHostAddress stunChangedAddress;
+    quint16 stunChangedPort;
+    QHostAddress stunServerAddress;
+    quint16 stunServerPort;
+    int stunRetries;
+    QUdpSocket *stunSocket;
+    int stunStep;
+    QTimer *stunTimer;
 
 private:
     SipClient *q;

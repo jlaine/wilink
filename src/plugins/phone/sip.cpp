@@ -48,6 +48,13 @@ const int RTCP_COMPONENT = 2;
 
 static const char *addressPattern = "(.*)<([^>]+)>(;.+)?";
 
+enum StunStep {
+    StunConnectivity = 0,
+    StunChangeServer,
+    StunChangePort,
+    StunChangeSocket,
+};
+
 QString sipAddressToName(const QString &address)
 {
     QRegExp rx(addressPattern);
@@ -597,6 +604,9 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
     reflexivePort(0),
     socketsBound(false),
     stunDone(false),
+    stunChangedPort(0),
+    stunServerPort(0),
+    stunStep(StunConnectivity),
     q(qq)
 {
 }
@@ -806,6 +816,11 @@ SipClient::SipClient(QObject *parent)
     d->stunSocket = new QUdpSocket(this);
     connect(d->stunSocket, SIGNAL(readyRead()),
             this, SLOT(stunReceived()));
+
+    d->stunTimer = new QTimer(this);
+    d->stunTimer->setInterval(500);
+    connect(d->stunTimer, SIGNAL(timeout()),
+            this, SLOT(stunTimeout()));
 
     d->registerTimer = new QTimer(this);
     connect(d->registerTimer, SIGNAL(timeout()),
@@ -1048,10 +1063,10 @@ void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
 void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName = "stun." + d->domain;
-    quint16 serverPort = 5060;
+    d->stunServerPort = 5060;
     if (!serviceInfo.records().isEmpty()) {
         serverName = serviceInfo.records().first().target();
-        serverPort = serviceInfo.records().first().port();
+        d->stunServerPort = serviceInfo.records().first().port();
     }
 
     QHostInfo info = QHostInfo::fromName(serverName);
@@ -1059,22 +1074,111 @@ void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
         warning(QString("Could not lookup STUN server %1").arg(serverName));
         return;
     }
-    const QHostAddress serverAddress = info.addresses().first();
+    d->stunServerAddress = info.addresses().first();
 
-    // send STUN binding request
-    QXmppStunMessage request;
-    request.setId(generateRandomBytes(12));
-    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-#ifdef QXMPP_DEBUG_STUN
-    logSent(QString("STUN packet to %1 port %2\n%3").arg(serverAddress.toString(),
-            QString::number(serverPort), request.toString()));
-#endif
-    d->socket->writeDatagram(request.encode(), serverAddress, serverPort);
+    // start STUN tests
+    d->stunRetries = 0;
+    d->stunStep = StunConnectivity;
+    stunSend();
 }
 
 SipClient::State SipClient::state() const
 {
     return d->state;
+}
+
+void SipClient::stunReceived()
+{
+    if (!d->stunSocket->hasPendingDatagrams())
+        return;
+
+    // receive datagram
+    const qint64 size = d->stunSocket->pendingDatagramSize();
+    QByteArray buffer(size, 0);
+    QHostAddress remoteHost;
+    quint16 remotePort;
+    d->stunSocket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+    // decode STUN
+    QXmppStunMessage message;
+    if (!message.decode(buffer))
+        return;
+
+#ifdef QXMPP_DEBUG_STUN
+    logReceived(QString("STUN packet from %1 port %2\n%3").arg(
+        remoteHost.toString(),
+        QString::number(remotePort),
+        message.toString()));
+#endif
+
+    // determine next step
+    d->stunTimer->stop();
+    switch (d->stunStep)
+    {
+    case StunConnectivity:
+        if (!message.changedHost.isNull() && message.changedPort) {
+            d->stunChangedAddress = message.changedHost;
+            d->stunChangedPort = message.changedPort;
+            d->stunRetries = 0;
+            d->stunStep = StunChangeServer;
+            stunSend();
+        }
+        break;
+    case StunChangeServer:
+        d->stunRetries = 0;
+        d->stunStep = StunChangePort;
+        stunSend();
+        break;
+    }
+}
+
+void SipClient::stunSend()
+{
+    // send STUN binding request
+    QXmppStunMessage request;
+    request.setId(generateRandomBytes(12));
+    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+
+    QUdpSocket *socket = d->stunSocket;
+    QHostAddress serverAddress = d->stunServerAddress;
+    quint16 serverPort = d->stunServerPort;
+
+    switch (d->stunStep)
+    {
+    case StunConnectivity:
+        break;
+    case StunChangeServer:
+        serverAddress = d->stunChangedAddress;
+        serverPort = d->stunChangedPort;
+        break;
+    case StunChangePort:
+        request.setChangeRequest(1);
+        break;
+    case StunChangeSocket:
+        socket = d->socket;
+        break;
+    default:
+        warning("Unknown STUN step");
+        return;
+    }
+
+#ifdef QXMPP_DEBUG_STUN
+    logSent(QString("STUN packet to %1 port %2\n%3").arg(serverAddress.toString(),
+            QString::number(serverPort), request.toString()));
+#endif
+    socket->writeDatagram(request.encode(), serverAddress, serverPort);
+    d->stunTimer->start();
+}
+
+void SipClient::stunTimeout()
+{
+    if (d->stunRetries > 4) {
+        warning("STUN test failed");
+        return;
+    }
+
+    d->stunRetries++;
+    stunSend();
 }
 
 QString SipClient::displayName() const
@@ -1370,5 +1474,3 @@ QByteArray SipMessage::toByteArray() const
     ba += "\r\n";
     return ba + m_body;
 }
-
-
