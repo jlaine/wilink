@@ -437,18 +437,6 @@ void SipCallPrivate::onStateChanged()
 
         const int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
 
-        // initialise audio input
-        if (!audioInput) {
-            QTime tm;
-            tm.start();
-            audioInput = new QAudioInput(format, q);
-            QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
-                             q, SLOT(audioStateChanged()));
-            audioInput->setBufferSize(2 * packetSize);
-            audioInput->start(channel);
-            q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
-        }
-
         // initialise audio output
         if (!audioOutput) {
             QTime tm;
@@ -459,6 +447,18 @@ void SipCallPrivate::onStateChanged()
             audioOutput->setBufferSize(2 * packetSize);
             audioOutput->start(channel);
             q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
+        }
+
+        // initialise audio input
+        if (!audioInput) {
+            QTime tm;
+            tm.start();
+            audioInput = new QAudioInput(format, q);
+            QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
+                             q, SLOT(audioStateChanged()));
+            audioInput->setBufferSize(2 * packetSize);
+            audioInput->start(channel);
+            q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
         }
 
     } else {
