@@ -866,6 +866,9 @@ void SipClient::connectToServer()
             }
         }
 
+        // listen for STUN
+        d->stunTester->bind(bindAddress);
+
         // listen for SIP
         if (!d->socket->bind(bindAddress, 0))
         {
@@ -1391,6 +1394,11 @@ StunTester::StunTester(QObject *parent)
             this, SLOT(timeout()));
 }
 
+bool StunTester::bind(const QHostAddress &address)
+{
+    return socket->bind(address, 0);
+}
+
 void StunTester::readyRead()
 {
     if (!socket->hasPendingDatagrams())
@@ -1420,9 +1428,14 @@ void StunTester::readyRead()
     switch (step)
     {
     case StunConnectivity:
+        if ((response.xorMappedHost == socket->localAddress() && response.xorMappedPort == socket->localPort()) ||
+            (response.mappedHost == socket->localAddress() && response.mappedPort == socket->localPort())) {
+            emit finished(DirectConnection);
+            return;
+        }
         if (response.changedHost.isNull() || !response.changedPort) {
             warning("STUN response is missing changed address or port");
-            emit finished();
+            emit finished(UnknownConnection);
             return;
         }
         changedAddress = response.changedHost;
@@ -1483,12 +1496,7 @@ void StunTester::start()
 {
     if (serverAddress.isNull() || !serverPort) {
         warning("STUN tester is missing server address or port");
-        emit finished();
-        return;
-    }
-    if (!socket->bind()) {
-        warning("Could not start listening for STUN");
-        emit finished();
+        emit finished(UnknownConnection);
         return;
     }
     retries = 0;
@@ -1499,12 +1507,20 @@ void StunTester::start()
 void StunTester::timeout()
 {
     timer->stop();
-    if (retries > 4) {
-        warning("STUN timeout");
-        emit finished();
+    if (retries <= 4) {
+        retries++;
+        sendRequest();
         return;
     }
 
-    retries++;
-    sendRequest();
+    warning("STUN timeout");
+    switch (step)
+    {
+    case StunConnectivity:
+        emit finished(NoConnection);
+        break;
+    default:
+        emit finished(UnknownConnection);
+        return;
+    }
 }

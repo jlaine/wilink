@@ -212,11 +212,19 @@ class StunTester : public QXmppLoggable
     Q_OBJECT
 
 public:
+    enum StunResult
+    {
+        NoConnection = 0,
+        DirectConnection,
+        UnknownConnection,
+    };
+
     StunTester(QObject *parent = 0);
+    bool bind(const QHostAddress &address);
     void setServer(const QHostAddress &server, quint16 port);
 
 signals:
-    void finished();
+    void finished(StunResult result);
 
 public slots:
     void start();
