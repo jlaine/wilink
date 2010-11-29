@@ -1,4 +1,5 @@
 #include <QObject>
+#include <QStringList>
 
 class SipCall;
 class SipClient;
@@ -21,6 +22,6 @@ private slots:
 
 private:
     SipClient *m_client;
-    QString m_phoneNumber;
+    QStringList m_phoneQueue;
 };
 

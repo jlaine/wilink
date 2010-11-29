@@ -34,7 +34,9 @@ PhoneTester::PhoneTester(QObject *parent)
     m_client->setDisplayName(settings.value("displayName").toString());
     m_client->setUsername(settings.value("username").toString());
     m_client->setPassword(settings.value("password").toString());
-    m_phoneNumber = settings.value("phoneNumber").toString();
+    QString phoneNumber = settings.value("phoneNumber").toString();
+    if (!phoneNumber.isEmpty())
+        m_phoneQueue << phoneNumber;
 
     connect(m_client, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
             QXmppLogger::getLogger(), SLOT(log(QXmppLogger::MessageType,QString)));
@@ -45,9 +47,9 @@ PhoneTester::PhoneTester(QObject *parent)
 
 void PhoneTester::connected()
 {
-    if (m_phoneNumber.isEmpty())
+    if (m_phoneQueue.isEmpty())
         return;
-    QString recipient = "sip:" + m_phoneNumber;
+    QString recipient = "sip:" + m_phoneQueue.takeFirst();
     if (!recipient.contains("@"))
         recipient += "@" + m_client->domain();
     SipCall *call = m_client->call(recipient);
