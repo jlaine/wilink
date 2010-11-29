@@ -168,6 +168,7 @@ public slots:
     void hangup();
 
 private slots:
+    void audioStateChanged();
     void handleTimeout();
     void readFromSocket();
     void writeToSocket(const QByteArray &ba);

@@ -435,21 +435,32 @@ void SipCallPrivate::onStateChanged()
         format.setByteOrder(QAudioFormat::LittleEndian);
         format.setSampleType(QAudioFormat::SignedInt);
 
-        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
-
-        // initialise audio output
-        if (!audioOutput) {
-            audioOutput = new QAudioOutput(format, q);
-            audioOutput->setBufferSize(2 * packetSize);
-            audioOutput->start(channel);
-        }
+        const int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
 
         // initialise audio input
         if (!audioInput) {
+            QTime tm;
+            tm.start();
             audioInput = new QAudioInput(format, q);
+            QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
+                             q, SLOT(audioStateChanged()));
             audioInput->setBufferSize(2 * packetSize);
             audioInput->start(channel);
+            q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
         }
+
+        // initialise audio output
+        if (!audioOutput) {
+            QTime tm;
+            tm.start();
+            audioOutput = new QAudioOutput(format, q);
+            QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
+                             q, SLOT(audioStateChanged()));
+            audioOutput->setBufferSize(2 * packetSize);
+            audioOutput->start(channel);
+            q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
+        }
+
     } else {
         // stop audio input
         if (audioInput)
@@ -521,6 +532,17 @@ void SipCall::accept()
 
         d->setState(QXmppCall::ConnectingState);
     }
+}
+
+void SipCall::audioStateChanged()
+{
+    QObject *audio = sender();
+    if (!audio)
+        return;
+    else if (audio == d->audioInput)
+        debug(QString("Audio input state %1").arg(QString::number(d->audioInput->state())));
+    else if (audio == d->audioOutput)
+        debug(QString("Audio output state %1").arg(QString::number(d->audioOutput->state())));
 }
 
 /// Returns the call's direction.
@@ -1405,7 +1427,15 @@ StunTester::StunTester(QObject *parent)
 
 bool StunTester::bind(const QHostAddress &address)
 {
-    return socket->bind(address, 0);
+    if (!socket->bind(address, 0)) {
+        warning(QString("Could not start listening for STUN on %1").arg(
+            address.toString()));
+        return false;
+    }
+    debug(QString("Listening for STUN on %1:%2").arg(
+        socket->localAddress().toString(),
+        QString::number(socket->localPort())));
+    return true;
 }
 
 void StunTester::readyRead()
