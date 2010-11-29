@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QSettings>
+#include <QTime>
 
 #include "QXmppLogger.h"
 
@@ -75,6 +76,8 @@ int main(int argc, char* argv[])
     QCoreApplication app(argc, argv);
     app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
+
+    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
 
     /* Install signal handler */
     signal(SIGINT, signal_handler);
