@@ -810,6 +810,8 @@ SipClient::SipClient(QObject *parent)
             this, SLOT(datagramReceived()));
 
     d->stunTester = new StunTester(this);
+    connect(d->stunTester, SIGNAL(finished(StunTester::ConnectionType)),
+            this, SLOT(stunFinished(StunTester::ConnectionType)));
 
     d->registerTimer = new QTimer(this);
     connect(d->registerTimer, SIGNAL(timeout()),
@@ -931,8 +933,7 @@ void SipClient::datagramReceived()
         d->stunDone = true;
 
         // register with server
-        if (!d->serverAddress.isNull())
-            registerWithServer();
+        registerWithServer();
         return;
     }
 
@@ -1006,6 +1007,9 @@ void SipClient::disconnectFromServer()
 
 void SipClient::registerWithServer()
 {
+    if (d->serverAddress.isNull() || !d->serverPort)
+        return;
+
     // register
     d->id = generateStanzaHash().toLatin1();
     d->tag = generateStanzaHash(8).toLatin1();
@@ -1068,8 +1072,16 @@ SipClient::State SipClient::state() const
     return d->state;
 }
 
-void SipClient::stunFinished()
+void SipClient::stunFinished(StunTester::ConnectionType result)
 {
+    if (result == StunTester::DirectConnection) {
+        d->stunDone = true;
+
+        // register with server
+        registerWithServer();
+        return;
+    }
+
     // send STUN binding request
     QXmppStunMessage request;
     request.setId(generateRandomBytes(12));
