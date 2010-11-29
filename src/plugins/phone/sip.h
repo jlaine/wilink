@@ -216,7 +216,7 @@ public:
     {
         NoConnection = 0,
         DirectConnection,
-        UnknownConnection,
+        NattedConnection,
     };
 
     StunTester(QObject *parent = 0);
@@ -236,12 +236,10 @@ private slots:
 private:
     void sendRequest();
 
-    QHostAddress changedAddress;
-    quint16 changedPort;
     QHostAddress serverAddress;
     quint16 serverPort;
+    QByteArray requestId;
     int retries;
-    int step;
     QUdpSocket *socket;
     QTimer *timer;
 };
