@@ -8,6 +8,7 @@
 
 #include "../plugins/phone/sip.h"
 
+#include "config.h"
 #include "phone.h"
 
 static PhoneTester tester;
@@ -73,7 +74,7 @@ int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
     app.setApplicationName("wiLink");
-    app.setApplicationVersion("1.0.0");
+    app.setApplicationVersion(WILINK_VERSION);
 
     /* Install signal handler */
     signal(SIGINT, signal_handler);
