@@ -120,6 +120,7 @@ public:
     StunTester *stunTester;
     QHostAddress stunServerAddress;
     quint16 stunServerPort;
+    QTimer *stunTimer;
 
 private:
     SipClient *q;

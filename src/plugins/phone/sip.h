@@ -234,6 +234,7 @@ private slots:
     void callDestroyed(QObject *object);
     void datagramReceived();
     void registerWithServer();
+    void sendStun();
     void setSipServer(const QXmppSrvInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
     void stunFinished(StunTester::ConnectionType type);

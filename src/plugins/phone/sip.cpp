@@ -46,6 +46,9 @@ const int RTCP_COMPONENT = 2;
 #define TIMEOUT_SECONDS 30
 #define MARGIN_SECONDS 10
 
+#define STUN_RETRY_MS   500
+#define STUN_EXPIRE_MS  30000
+
 static const char *addressPattern = "(.*)<([^>]+)>(;.+)?";
 
 enum StunStep {
@@ -848,6 +851,11 @@ SipClient::SipClient(QObject *parent)
     d->registerTimer = new QTimer(this);
     connect(d->registerTimer, SIGNAL(timeout()),
             this, SLOT(connectToServer()));
+
+    d->stunTimer = new QTimer(this);
+    d->stunTimer->setSingleShot(true);
+    connect(d->stunTimer, SIGNAL(timeout()),
+            this, SLOT(sendStun()));
 }
 
 SipClient::~SipClient()
@@ -962,10 +970,14 @@ void SipClient::datagramReceived()
             d->reflexiveAddress = message.mappedHost;
             d->reflexivePort = message.mappedPort;
         }
-        d->stunDone = true;
 
         // register with server
-        registerWithServer();
+        if (!d->stunDone) {
+            d->stunDone = true;
+            registerWithServer();
+        }
+
+        d->stunTimer->start(STUN_EXPIRE_MS);
         return;
     }
 
@@ -1020,6 +1032,7 @@ void SipClient::datagramReceived()
 void SipClient::disconnectFromServer()
 {
     d->registerTimer->stop();
+    d->stunTimer->stop();
 
     // terminate calls
     foreach (SipCall *call, d->calls)
@@ -1054,6 +1067,22 @@ void SipClient::registerWithServer()
     d->registerTimer->start(TIMEOUT_SECONDS * 1000);
 
     d->setState(ConnectingState);
+}
+
+/** Send a STUN binding request.
+ */
+void SipClient::sendStun()
+{
+    QXmppStunMessage request;
+    request.setId(generateRandomBytes(12));
+    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+
+#ifdef QXMPP_DEBUG_STUN
+    logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunServerAddress.toString(),
+            QString::number(d->stunServerPort), request.toString()));
+#endif
+    d->socket->writeDatagram(request.encode(), d->stunServerAddress, d->stunServerPort);
+    d->stunTimer->start(STUN_RETRY_MS);
 }
 
 void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
@@ -1115,15 +1144,7 @@ void SipClient::stunFinished(StunTester::ConnectionType result)
     }
 
     // send STUN binding request
-    QXmppStunMessage request;
-    request.setId(generateRandomBytes(12));
-    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-
-#ifdef QXMPP_DEBUG_STUN
-    logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunServerAddress.toString(),
-            QString::number(d->stunServerPort), request.toString()));
-#endif
-    d->socket->writeDatagram(request.encode(), d->stunServerAddress, d->stunServerPort);
+    sendStun();
 }
 
 QString SipClient::displayName() const
@@ -1430,7 +1451,7 @@ StunTester::StunTester(QObject *parent)
             this, SLOT(readyRead()));
 
     timer = new QTimer(this);
-    timer->setInterval(500);
+    timer->setInterval(STUN_RETRY_MS);
     connect(timer, SIGNAL(timeout()),
             this, SLOT(timeout()));
 }
