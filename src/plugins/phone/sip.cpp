@@ -1074,14 +1074,16 @@ void SipClient::registerWithServer()
 void SipClient::sendStun()
 {
     QXmppStunMessage request;
+    request.setCookie(qrand());
     request.setId(generateRandomBytes(12));
     request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+    request.setChangeRequest(0);
 
 #ifdef QXMPP_DEBUG_STUN
     logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunServerAddress.toString(),
             QString::number(d->stunServerPort), request.toString()));
 #endif
-    d->socket->writeDatagram(request.encode(), d->stunServerAddress, d->stunServerPort);
+    d->socket->writeDatagram(request.encode(QString(), false), d->stunServerAddress, d->stunServerPort);
     d->stunTimer->start(STUN_RETRY_MS);
 }
 
@@ -1444,6 +1446,7 @@ QByteArray SipMessage::toByteArray() const
 StunTester::StunTester(QObject *parent)
     : QXmppLoggable(parent),
     retries(0),
+    step(0),
     serverPort(0)
 {
     socket = new QUdpSocket(this);
@@ -1483,7 +1486,7 @@ void StunTester::readyRead()
 
     // decode STUN
     QXmppStunMessage response;
-    if (!response.decode(buffer) || response.id() != requestId)
+    if (!response.decode(buffer) || response.id() != request.id())
         return;
 
 #ifdef QXMPP_DEBUG_STUN
@@ -1495,27 +1498,41 @@ void StunTester::readyRead()
 
     // examine result
     timer->stop();
-    if ((response.xorMappedHost == socket->localAddress() && response.xorMappedPort == socket->localPort()) ||
-            (response.mappedHost == socket->localAddress() && response.mappedPort == socket->localPort())) {
-        emit finished(DirectConnection);
-        return;
+    if (step == 0) {
+        if ((response.xorMappedHost == socket->localAddress() && response.xorMappedPort == socket->localPort()) ||
+                (response.mappedHost == socket->localAddress() && response.mappedPort == socket->localPort())) {
+            emit finished(DirectConnection);
+            return;
+        }
+        if (response.changedHost.isNull() || !response.changedPort) {
+            emit finished(NattedConnection);
+            return;
+        }
+
+        step++;
+
+        // send next request
+        request = QXmppStunMessage();
+        request.setCookie(qrand());
+        request.setId(generateRandomBytes(12));
+        request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+
+        requestAddress = response.changedHost;
+        requestPort = response.changedPort;
+
+        sendRequest();
+    } else {
+        emit finished(NattedConnection);
     }
-    emit finished(NattedConnection);
 }
 
 void StunTester::sendRequest()
 {
-    // send STUN binding request
-    QXmppStunMessage request;
-    request.setId(generateRandomBytes(12));
-    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-
 #ifdef QXMPP_DEBUG_STUN
-    logSent(QString("STUN packet to %1 port %2\n%3").arg(serverAddress.toString(),
-            QString::number(serverPort), request.toString()));
+    logSent(QString("STUN packet to %1 port %2\n%3").arg(requestAddress.toString(),
+            QString::number(requestPort), request.toString()));
 #endif
-    requestId = request.id();
-    socket->writeDatagram(request.encode(), serverAddress, serverPort);
+    socket->writeDatagram(request.encode(QString(), 0), requestAddress, requestPort);
     timer->start();
 }
 
@@ -1533,6 +1550,17 @@ void StunTester::start()
         return;
     }
     retries = 0;
+    step = 0;
+
+    // initial binding request
+    request = QXmppStunMessage();
+    request.setCookie(qrand());
+    request.setId(generateRandomBytes(12));
+    request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+
+    requestAddress = serverAddress;
+    requestPort = serverPort;
+
     sendRequest();
 }
 
@@ -1546,5 +1574,8 @@ void StunTester::timeout()
     }
 
     warning("STUN timeout");
-    emit finished(NoConnection);
+    if (step == 0)
+        emit finished(NoConnection);
+    else
+        emit finished(NattedConnection);
 }

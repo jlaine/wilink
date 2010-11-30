@@ -26,6 +26,7 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppLogger.h"
+#include "QXmppStun.h"
 
 class QUdpSocket;
 class QTimer;
@@ -69,8 +70,11 @@ private:
 
     QHostAddress serverAddress;
     quint16 serverPort;
-    QByteArray requestId;
+    QXmppStunMessage request;
+    QHostAddress requestAddress;
+    quint16 requestPort;
     int retries;
+    int step;
     QUdpSocket *socket;
     QTimer *timer;
 };
