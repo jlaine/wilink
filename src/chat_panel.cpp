@@ -297,6 +297,8 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 
 void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
+    if (!m_layout->count())
+        setPos(m_view->mapToScene(QPoint(0, 0)));
     m_layout->addItem(widget);
     widget->appear();
 }
