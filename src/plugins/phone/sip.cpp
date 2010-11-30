@@ -532,11 +532,35 @@ void SipCall::accept()
 {
     if (d->direction == QXmppCall::IncomingDirection && d->state == QXmppCall::OfferState)
     {
+#if 0
+        QByteArray rtcp;
+        QDataStream stream(&rtcp, QIODevice::WriteOnly);
+
+        // receiver report
+        stream << quint8(0x80);
+        stream << quint8(0xc9); // receiver report
+        stream << quint16(1);   // length
+        stream << d->channel->synchronizationSource();
+
+        // source description
+        stream << quint8(0x81);
+        stream << quint8(0xca); // source description
+        stream << quint16(2);   // length
+        stream << d->channel->synchronizationSource();
+        stream << quint8(1); // cname
+        stream << quint8(0);
+        stream << quint8(0); // end
+        stream << quint8(0);
+        d->rtcpSocket->writeDatagram(rtcp, d->remoteHost, d->remotePort+1);
+#endif
+
         const SdpMessage sdp = d->buildSdp(d->commonPayloadTypes);
 
         SipMessage response = d->client->d->buildResponse(d->inviteRequest);
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
+        response.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
+        response.setHeaderField("Supported", "replaces");
         response.setHeaderField("Content-Type", "application/sdp");
         response.setBody(sdp.toByteArray());
 
@@ -702,7 +726,7 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
     if (method != "ACK" && method != "CANCEL")
-        packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, SUBSCRIBE, INFO");
+        packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
     return packet;
 }
 
@@ -782,11 +806,13 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
                     registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
                 }
 
+#if 0
                 // send subscribe
                 const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
                 SipMessage request = buildRequest("SUBSCRIBE", uri, id, cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
                 sendRequest(request, this);
+#endif
             }
         } else if (reply.statusCode() >= 300) {
             q->warning("Register failed");
@@ -1007,7 +1033,14 @@ void SipClient::datagramReceived()
     if (reply.isRequest()) {
         bool emitCall = false;
         if (!currentCall && reply.method() == "INVITE") {
-            QString recipient = reply.headerField("From");
+            // if there is no tag in the "To" field, add one
+            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("To");
+            if (!params.contains("tag")) {
+                const QByteArray tag = generateStanzaHash(8).toLatin1();
+                reply.setHeaderField("To", reply.headerField("To") + ";tag=" + tag);
+            }
+
+            const QString recipient = reply.headerField("From");
             info(QString("SIP call from %1").arg(recipient));
             currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
