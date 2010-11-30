@@ -263,8 +263,8 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
 SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const
 {
     const QString localAddress = QString("IN %1 %2").arg(
-        socket->localAddress().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
-        socket->localAddress().toString());
+        rtpSocket->localAddress().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
+        rtpSocket->localAddress().toString());
 
     static const QDateTime ntpEpoch(QDate(1900, 1, 1));
     quint32 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
@@ -299,7 +299,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     attrs << "fmtp:101 0-15";
     attrs << "sendrecv";
 
-    sdp.addField('m', "audio " + QByteArray::number(socket->localPort()) + " "  + profiles);
+    sdp.addField('m', "audio " + QByteArray::number(rtpSocket->localPort()) + " "  + profiles);
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
 
@@ -494,15 +494,24 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->audioInput = 0;
     d->audioOutput = 0;
     d->remotePort = 0;
-    d->socket = new QUdpSocket(this);
-    if (!d->socket->bind(parent->d->socket->localAddress(), 0))
+
+    // bind sockets
+    QList<QUdpSocket*> sockets = QXmppStunSocket::reservePorts(
+        QList<QHostAddress>() << parent->d->socket->localAddress(), 2, this);
+    if (sockets.isEmpty()) {
         warning("Could not start listening for RTP");
+        d->rtpSocket = 0;
+        d->rtcpSocket = 0;
+        return;
+    }
+    d->rtpSocket = sockets[0];
+    d->rtcpSocket = sockets[1];
     d->timer = new QTimer(this);
     d->timer->setSingleShot(true);
 
     connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
             this, SLOT(writeToSocket(QByteArray)));
-    connect(d->socket, SIGNAL(readyRead()),
+    connect(d->rtpSocket, SIGNAL(readyRead()),
             this, SLOT(readFromSocket()));
     connect(d->timer, SIGNAL(timeout()),
             this, SLOT(handleTimeout()));
@@ -586,7 +595,8 @@ void SipCall::hangup()
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     d->setState(QXmppCall::DisconnectingState);
-    d->socket->close();
+    d->rtpSocket->close();
+    d->rtcpSocket->close();
 
     SipMessage request = d->client->d->buildRequest("BYE", d->remoteUri, d->id, d->cseq++);
     request.setHeaderField("To", d->remoteRecipient);
@@ -597,12 +607,12 @@ void SipCall::hangup()
 
 void SipCall::readFromSocket()
 {
-    while (d->socket && d->socket->hasPendingDatagrams())
+    while (d->rtpSocket && d->rtpSocket->hasPendingDatagrams())
     {
-        QByteArray ba(d->socket->pendingDatagramSize(), '\0');
+        QByteArray ba(d->rtpSocket->pendingDatagramSize(), '\0');
         QHostAddress remoteHost;
         quint16 remotePort = 0;
-        d->socket->readDatagram(ba.data(), ba.size(), &remoteHost, &remotePort);
+        d->rtpSocket->readDatagram(ba.data(), ba.size(), &remoteHost, &remotePort);
         d->channel->datagramReceived(ba);
     }
 }
@@ -613,10 +623,10 @@ void SipCall::readFromSocket()
  */
 void SipCall::writeToSocket(const QByteArray &ba)
 {
-    if (!d->socket || d->remoteHost.isNull() || !d->remotePort)
+    if (!d->rtpSocket || d->remoteHost.isNull() || !d->remotePort)
         return;
 
-    d->socket->writeDatagram(ba, d->remoteHost, d->remotePort);
+    d->rtpSocket->writeDatagram(ba, d->remoteHost, d->remotePort);
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)

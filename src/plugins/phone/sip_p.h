@@ -68,7 +68,8 @@ public:
 #ifdef USE_ICE
     QXmppIceConnection *iceConnection;
 #endif
-    QUdpSocket *socket;
+    QUdpSocket *rtpSocket;
+    QUdpSocket *rtcpSocket;
     bool invitePending;
     SipMessage inviteRequest;
     QByteArray remoteRecipient;
