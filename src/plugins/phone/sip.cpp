@@ -153,7 +153,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     if  (command == "INVITE" && reply.statusCode() >= 200) {
         invitePending = false;
 
-        SipMessage request = client->d->buildRequest("ACK", remoteUri, id, inviteRequest.sequenceNumber());
+        SipMessage request = client->d->buildRequest("ACK", remoteUri, this, inviteRequest.sequenceNumber());
         for (int i = remoteRoute.size() - 1; i >= 0; --i)
             request.addHeaderField("Route", remoteRoute[i]);
         request.setHeaderField("To", remoteRecipient);
@@ -178,7 +178,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     if (command == "BYE") {
 
         if (invitePending) {
-            SipMessage request = client->d->buildRequest("CANCEL", inviteRequest.uri(), id, inviteRequest.sequenceNumber());
+            SipMessage request = client->d->buildRequest("CANCEL", inviteRequest.uri(), this, inviteRequest.sequenceNumber());
             request.setHeaderField("To", inviteRequest.headerField("To"));
             request.setHeaderField("Via", inviteRequest.headerField("Via"));
             request.removeHeaderField("Contact");
@@ -396,7 +396,7 @@ void SipCallPrivate::sendInvite()
 {
     const SdpMessage sdp = buildSdp(channel->supportedPayloadTypes());
 
-    SipMessage request = client->d->buildRequest("INVITE", remoteUri, id, cseq++);
+    SipMessage request = client->d->buildRequest("INVITE", remoteUri, this, cseq++);
     request.setHeaderField("To", remoteRecipient);
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
@@ -493,6 +493,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
     d->id = generateStanzaHash().toLatin1();
+    d->tag = generateStanzaHash(8).toLatin1();
     d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
     d->audioOutput = 0;
@@ -625,7 +626,7 @@ void SipCall::hangup()
     d->rtpSocket->close();
     d->rtcpSocket->close();
 
-    SipMessage request = d->client->d->buildRequest("BYE", d->remoteUri, d->id, d->cseq++);
+    SipMessage request = d->client->d->buildRequest("BYE", d->remoteUri, d, d->cseq++);
     request.setHeaderField("To", d->remoteRecipient);
     for (int i = d->remoteRoute.size() - 1; i >= 0; --i)
         request.addHeaderField("Route", d->remoteRoute[i]);
@@ -698,7 +699,7 @@ QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap
     return QByteArray("Digest ") + QXmppSaslDigestMd5::serializeMessage(response);
 }
 
-SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &callId, int seqNum)
+SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, SipCallContext *ctx, int seqNum)
 {
     QString addr;
     if (!displayName.isEmpty())
@@ -717,14 +718,14 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setUri(uri);
     packet.setHeaderField("Via", via.toUtf8());
     packet.setHeaderField("Max-Forwards", "70");
-    packet.setHeaderField("Call-ID", callId);
+    packet.setHeaderField("Call-ID", ctx->id);
     packet.setHeaderField("CSeq", QByteArray::number(seqNum) + ' ' + method);
     packet.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
         username,
         reflexiveAddress.toString(),
         QString::number(reflexivePort)).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
-    packet.setHeaderField("From", addr.toUtf8() + ";tag=" + tag);
+    packet.setHeaderField("From", addr.toUtf8() + ";tag=" + ctx->tag);
     if (method != "ACK" && method != "CANCEL")
         packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
     return packet;
@@ -809,7 +810,7 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
 #if 0
                 // send subscribe
                 const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
-                SipMessage request = buildRequest("SUBSCRIBE", uri, id, cseq++);
+                SipMessage request = buildRequest("SUBSCRIBE", uri, this, cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
                 sendRequest(request, this);
 #endif
@@ -1033,17 +1034,18 @@ void SipClient::datagramReceived()
     if (reply.isRequest()) {
         bool emitCall = false;
         if (!currentCall && reply.method() == "INVITE") {
-            // if there is no tag in the "To" field, add one
-            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("To");
-            if (!params.contains("tag")) {
-                const QByteArray tag = generateStanzaHash(8).toLatin1();
-                reply.setHeaderField("To", reply.headerField("To") + ";tag=" + tag);
-            }
-
             const QString recipient = reply.headerField("From");
             info(QString("SIP call from %1").arg(recipient));
             currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
+            // if there is no tag in the "To" field, add one
+            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("To");
+            if (params.contains("tag")) {
+                currentCall->d->tag = params.value("tag");
+            } else {
+                reply.setHeaderField("To", reply.headerField("To") + ";tag=" + currentCall->d->tag);
+            }
+
             d->calls << currentCall;
             emitCall = true;
         }
@@ -1075,7 +1077,7 @@ void SipClient::disconnectFromServer()
     if (d->state == SipClient::ConnectedState) {
         debug(QString("Disconnecting from SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
         const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
-        SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
+        SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
         d->sendRequest(request, d);
 
@@ -1094,7 +1096,7 @@ void SipClient::registerWithServer()
     debug(QString("Connecting to SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
 
     const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
-    SipMessage request = d->buildRequest("REGISTER", uri, d->id, d->cseq++);
+    SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
     d->registerTimer->start(TIMEOUT_SECONDS * 1000);

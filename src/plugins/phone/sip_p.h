@@ -41,6 +41,7 @@ public:
     QByteArray id;
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
+    QByteArray tag;
     SipMessage lastRequest;
 };
 
@@ -88,14 +89,13 @@ class SipClientPrivate : public SipCallContext
 public:
     SipClientPrivate(SipClient *qq);
     QByteArray authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const;
-    SipMessage buildRequest(const QByteArray &method, const QByteArray &uri, const QByteArray &id, int seq);
+    SipMessage buildRequest(const QByteArray &method, const QByteArray &uri, SipCallContext *ctx, int seq);
     SipMessage buildResponse(const SipMessage &request);
     bool handleAuthentication(const SipMessage &reply, SipCallContext *ctx);
     void handleReply(const SipMessage &reply);
     void sendRequest(SipMessage &request, SipCallContext *ctx);
     void setState(SipClient::State state);
 
-    QByteArray tag;
     QTimer *registerTimer;
 
     // configuration
