@@ -32,16 +32,19 @@ class QUdpSocket;
 class QTimer;
 class QXmppRtpChannel;
 
+/** The SipCallContext class represents a SIP dialog.
+ */
 class SipCallContext
 {
 public:
-    SipCallContext() : cseq(1) {}
+    SipCallContext();
 
     quint32 cseq;
     QByteArray id;
+    QByteArray tag;
+
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
-    QByteArray tag;
     SipMessage lastRequest;
 };
 

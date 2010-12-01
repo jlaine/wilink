@@ -42,9 +42,9 @@ const int RTCP_COMPONENT = 2;
 #define QXMPP_DEBUG_SIP
 #define QXMPP_DEBUG_STUN
 
-#define EXPIRE_SECONDS 1800
-#define TIMEOUT_SECONDS 30
+#define EXPIRE_SECONDS 3600
 #define MARGIN_SECONDS 10
+#define SIP_TIMEOUT_MS  30000
 
 #define STUN_RETRY_MS   500
 #define STUN_EXPIRE_MS  30000
@@ -122,6 +122,13 @@ QByteArray SdpMessage::toByteArray() const
         ba += "\r\n";
     }
     return ba;
+}
+
+SipCallContext::SipCallContext()
+    : cseq(1)
+{
+    id = generateStanzaHash().toLatin1();
+    tag = generateStanzaHash(8).toLatin1();
 }
 
 SipCallPrivate::SipCallPrivate(SipCall *qq)
@@ -410,7 +417,7 @@ void SipCallPrivate::sendInvite()
     invitePending = true;
     inviteRequest = request;
 
-    timer->start(TIMEOUT_SECONDS * 1000);
+    timer->start(SIP_TIMEOUT_MS);
 }
 
 void SipCallPrivate::setState(QXmppCall::State newState)
@@ -498,8 +505,6 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->remoteRecipient = recipient.toUtf8();
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
-    d->id = generateStanzaHash().toLatin1();
-    d->tag = generateStanzaHash(8).toLatin1();
     d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
     d->audioOutput = 0;
@@ -1097,15 +1102,13 @@ void SipClient::registerWithServer()
         return;
 
     // register
-    d->id = generateStanzaHash().toLatin1();
-    d->tag = generateStanzaHash(8).toLatin1();
     debug(QString("Connecting to SIP server %1:%2").arg(d->serverAddress.toString(), QString::number(d->serverPort)));
 
     const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
     SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->sendRequest(request, d);
-    d->registerTimer->start(TIMEOUT_SECONDS * 1000);
+    d->registerTimer->start(SIP_TIMEOUT_MS);
 
     d->setState(ConnectingState);
 }
