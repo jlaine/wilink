@@ -50,6 +50,12 @@ PhoneCallsModel::~PhoneCallsModel()
 
 QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
 {
+    const int row = index.row();
+    if (row > m_items.size())
+        return QVariant();
+
+    if (role == Qt::DisplayRole)
+        return m_items[row]->address;
     return QVariant();
 }
 
