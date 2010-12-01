@@ -150,11 +150,9 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         const QString contact = QString::fromUtf8(reply.headerField("Contact"));
         remoteUri = sipAddressToUri(contact).toUtf8();
     }
-    if (reply.hasHeaderField("Record-Route")) {
-        remoteRoute.clear();
-        foreach (const QByteArray &route, reply.headerFieldValues("Record-Route"))
-            remoteRoute << route;
-    }
+    const QList<QByteArray> recordRoutes = reply.headerFieldValues("Record-Route");
+    if (!recordRoutes.isEmpty())
+        remoteRoute = recordRoutes;
 
     // send ack
     if  (command == "INVITE" && reply.statusCode() >= 200) {
@@ -236,11 +234,9 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
         const QString contact = QString::fromUtf8(request.headerField("Contact"));
         remoteUri = sipAddressToUri(contact).toUtf8();
     }
-    if (request.hasHeaderField("Record-Route")) {
-        remoteRoute.clear();
-        foreach (const QByteArray &route, request.headerFieldValues("Record-Route"))
-            remoteRoute << route;
-    }
+    const QList<QByteArray> recordRoutes = request.headerFieldValues("Record-Route");
+    if (!recordRoutes.isEmpty())
+        remoteRoute = recordRoutes;
 
     // respond
     SipMessage response = client->d->buildResponse(request);
@@ -790,11 +786,14 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
     const QByteArray command = reply.headerField("CSeq").split(' ').last();
 
     // store information
-    QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Via");
-    if (params.contains("received"))
-        reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
-    if (params.contains("rport"))
-        reflexivePort = params.value("rport").toUInt();
+    const QList<QByteArray> vias = reply.headerFieldValues("Via");
+    if (!vias.isEmpty()) {
+        QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(vias.first());
+        if (params.contains("received"))
+            reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+        if (params.contains("rport"))
+            reflexivePort = params.value("rport").toUInt();
+    }
 
     // handle authentication
     if (reply.statusCode() == 401) {
@@ -811,12 +810,19 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
                 connectTimer->stop();
                 setState(SipClient::ConnectedState);
 
-                // schedule next register
-                QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("Contact");
-                int registerSeconds = params.value("expires").toInt();
-                if (registerSeconds > MARGIN_SECONDS) {
-                    q->debug(QString("Re-registering in %1 seconds").arg(registerSeconds - MARGIN_SECONDS));
-                    registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
+                QList<QByteArray> contacts = reply.headerFieldValues("Contact");
+                const QByteArray expectedContact = lastRequest.headerField("Contact");
+                foreach (const QByteArray &contact, contacts) {
+                    if (contact.startsWith(expectedContact)) {
+                        // schedule next register
+                        QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(contact);
+                        int registerSeconds = params.value("expires").toInt();
+                        if (registerSeconds > MARGIN_SECONDS) {
+                            q->debug(QString("Re-registering in %1 seconds").arg(registerSeconds - MARGIN_SECONDS));
+                            registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
+                        }
+                        break;
+                    }
                 }
 
 #if 0
@@ -1060,17 +1066,19 @@ void SipClient::datagramReceived()
     if (reply.isRequest()) {
         bool emitCall = false;
         if (!currentCall && reply.method() == "INVITE") {
-            const QString recipient = reply.headerField("From");
-            info(QString("SIP call from %1").arg(recipient));
+            const QByteArray from = reply.headerField("From");
+            const QByteArray to = reply.headerField("To");
+            info(QString("SIP call from %1").arg(QString::fromUtf8(from)));
 
             // construct call
-            currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
+            currentCall = new SipCall(from, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
-            QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("To");
+
+            QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(to);
             if (params.contains("tag")) {
                 currentCall->d->tag = params.value("tag");
             } else {
-                reply.setHeaderField("To", reply.headerField("To") + ";tag=" + currentCall->d->tag);
+                reply.setHeaderField("To", to + ";tag=" + currentCall->d->tag);
             }
 
             // register call
@@ -1332,21 +1340,13 @@ SipMessage::SipMessage(const QByteArray &bytes)
         m_body = header.mid(i);
 }
 
-bool SipMessage::hasHeaderField(const QByteArray &name) const
-{
-    QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
-                                                        end = m_fields.constEnd();
-    for ( ; it != end; ++it)
-        if (qstricmp(name.constData(), it->first) == 0)
-            return true;
-    return false;
-}
-
-QByteArray SipMessage::headerField(const QByteArray &name, const QByteArray &defaultValue) const
+/** Returns the concatenated values for a header.
+ *
+ * @param name
+ */
+QByteArray SipMessage::headerField(const QByteArray &name) const
 {
     QList<QByteArray> allValues = headerFieldValues(name);
-    if (allValues.isEmpty())
-        return defaultValue;
 
     QByteArray result;
     bool first = true;
@@ -1359,21 +1359,32 @@ QByteArray SipMessage::headerField(const QByteArray &name, const QByteArray &def
     return result;
 }
 
+/** Returns the values for a header.
+ *
+ * @param name
+ */
 QList<QByteArray> SipMessage::headerFieldValues(const QByteArray &name) const
 {
     QList<QByteArray> result;
     QList<QPair<QByteArray, QByteArray> >::ConstIterator it = m_fields.constBegin(),
                                                         end = m_fields.constEnd();
-    for ( ; it != end; ++it)
-        if (qstricmp(name.constData(), it->first) == 0)
-            result += it->second;
+    for ( ; it != end; ++it) {
+        if (qstricmp(name.constData(), it->first) == 0) {
+            QList<QByteArray> bits = it->second.split(',');
+            foreach (const QByteArray &bit, bits)
+                result += bit.trimmed();
+        }
+    }
 
     return result;
 }
 
-QMap<QByteArray, QByteArray> SipMessage::headerFieldParameters(const QByteArray &name) const
+/** Returns the parameters for a field value.
+ *
+ * @param value
+ */
+QMap<QByteArray, QByteArray> SipMessage::valueParameters(const QByteArray &value)
 {
-    const QByteArray value = headerField(name);
     QMap<QByteArray, QByteArray> params;
     // FIXME: this is a very, very naive implementation
     QList<QByteArray> bits = value.split(';');
