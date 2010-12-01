@@ -239,10 +239,15 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
     SipMessage response = client->d->buildResponse(request);
     if (request.method() == "ACK") {
         setState(QXmppCall::ActiveState);
-        return;
-    } else if (request.method() == "BYE") {
+     } else if (request.method() == "BYE") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
+        client->d->sendRequest(response, this);
+        setState(QXmppCall::FinishedState);
+    } else if (request.method() == "CANCEL") {
+        response.setStatusCode(200);
+        response.setReasonPhrase("OK");
+        client->d->sendRequest(response, this);
         setState(QXmppCall::FinishedState);
     } else if (request.method() == "INVITE") {
 
@@ -256,11 +261,12 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
             response.setStatusCode(400);
             response.setReasonPhrase("Bad request");
         }
+        client->d->sendRequest(response, this);
     } else {
         response.setStatusCode(405);
         response.setReasonPhrase("Method not allowed");
+        client->d->sendRequest(response, this);
     }
-    client->d->sendRequest(response, this);
 }
 
 SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const

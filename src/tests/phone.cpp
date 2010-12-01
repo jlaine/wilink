@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include <QTime>
+#include <QTimer>
 
 #include "QXmppLogger.h"
 
@@ -57,7 +58,7 @@ void PhoneTester::connected()
 
 void PhoneTester::received(SipCall *call)
 {
-    call->accept();
+    QTimer::singleShot(3000, call, SLOT(accept()));
 }
 
 void PhoneTester::start()
