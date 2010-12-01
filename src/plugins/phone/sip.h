@@ -26,7 +26,7 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppLogger.h"
-#include "QXmppStun.h"
+#include "stun.h"
 
 class QUdpSocket;
 class QTimer;
@@ -38,46 +38,6 @@ class SipClient;
 class SipClientPrivate;
 
 QString sipAddressToName(const QString &address);
-
-class StunTester : public QXmppLoggable
-{
-    Q_OBJECT
-
-public:
-    enum ConnectionType
-    {
-        NoConnection = 0,
-        DirectConnection,
-        NattedConnection,
-    };
-
-    StunTester(QObject *parent = 0);
-    bool bind(const QHostAddress &address);
-    void setServer(const QHostAddress &server, quint16 port);
-
-signals:
-    void finished(StunTester::ConnectionType result);
-
-public slots:
-    void start();
-
-private slots:
-    void readyRead();
-    void timeout();
-
-private:
-    void sendRequest();
-
-    QHostAddress serverAddress;
-    quint16 serverPort;
-    QXmppStunMessage request;
-    QHostAddress requestAddress;
-    quint16 requestPort;
-    int retries;
-    int step;
-    QUdpSocket *socket;
-    QTimer *timer;
-};
 
 class SdpMessage
 {

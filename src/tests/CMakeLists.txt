@@ -17,8 +17,15 @@ target_link_libraries(tests qnetio qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST
 add_executable(codec codec.cpp)
 target_link_libraries(codec qxmpp ${QT_LIBRARIES})
 
-qt4_wrap_cpp(phone_MOC_SOURCES phone.h ../plugins/phone/sip.h)
-add_executable(phone phone.cpp ../plugins/phone/sip.cpp ${phone_MOC_SOURCES})
+qt4_wrap_cpp(phone_MOC_SOURCES
+    phone.h
+    ../plugins/phone/sip.h
+    ../plugins/phone/stun.h)
+add_executable(phone
+    phone.cpp
+    ../plugins/phone/sip.cpp
+    ../plugins/phone/stun.cpp
+    ${phone_MOC_SOURCES})
 target_link_libraries(phone qxmpp ${QT_LIBRARIES})
 
 add_executable(stun stun.cpp)
