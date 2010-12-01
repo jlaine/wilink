@@ -49,7 +49,7 @@ const int RTCP_COMPONENT = 2;
 #define STUN_RETRY_MS   500
 #define STUN_EXPIRE_MS  30000
 
-static const char *addressPattern = "(.*)<([^>]+)>(;.+)?";
+static const char *addressPattern = "(.*)<(sip:([^>]+))>(;.+)?";
 
 enum StunStep {
     StunConnectivity = 0,
@@ -66,7 +66,7 @@ QString sipAddressToName(const QString &address)
     QString name = rx.cap(1).trimmed();
     if (name.startsWith('"') && name.endsWith('"'))
         name = name.mid(1, name.size() - 2);
-    return name.isEmpty() ? rx.cap(2).split('@').first() : name;
+    return name.isEmpty() ? rx.cap(3).split('@').first() : name;
 }
 
 static QString sipAddressToUri(const QString &address)
