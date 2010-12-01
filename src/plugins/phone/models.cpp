@@ -18,16 +18,34 @@
  */
 
 #include <QCoreApplication>
+#include <QDomDocument>
+#include <QDomElement>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
 #include "models.h"
 
+class PhoneCallsItem
+{
+public:
+    int id;
+    QString address;
+    QDateTime date;
+    int duration;
+    int flags;
+};
+
 PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent)
     : QAbstractListModel(parent),
     m_network(network)
 {
+}
+
+PhoneCallsModel::~PhoneCallsModel()
+{
+    foreach (PhoneCallsItem *item, m_items)
+        delete item;
 }
 
 QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
@@ -40,17 +58,34 @@ void PhoneCallsModel::handleList()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     Q_ASSERT(reply);
 
-    if (reply->error() != QNetworkReply::NoError) {
+    QDomDocument doc;
+    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
         qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
         return;
     }
 
-    qDebug("Got calls: %s", reply->readAll().constData());
+    QDomElement callElement = doc.documentElement().firstChildElement("call");
+    while (!callElement.isNull()) {
+        const int id = callElement.attribute("id").toInt();
+        if (id > 0) {
+            qDebug("got call %i", id);
+            PhoneCallsItem *item = new PhoneCallsItem;
+            item->id = id;
+            item->address = callElement.attribute("address");
+            item->duration = callElement.attribute("duration").toInt();
+            item->flags = callElement.attribute("flags").toInt();
+
+            beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+            m_items.append(item);
+            endInsertRows();
+        }
+        callElement = callElement.nextSiblingElement("call");
+    }
 }
 
 int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 {
-    return m_calls.size();
+    return m_items.size();
 }
 
 void PhoneCallsModel::setUrl(const QUrl &url)

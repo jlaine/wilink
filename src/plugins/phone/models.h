@@ -33,6 +33,8 @@ class PhoneCallsModel : public QAbstractListModel
 
 public:
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
+    ~PhoneCallsModel();
+
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void setUrl(const QUrl &url);
@@ -41,15 +43,7 @@ private slots:
     void handleList();
 
 private:
-    class PhoneCallsItem
-    {
-    public:
-        QString address;
-        QDateTime date;
-        int duration;
-    };
-
-    QList<PhoneCallsItem*> m_calls;
+    QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
 };
 
