@@ -808,6 +808,7 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
             if (state == SipClient::DisconnectingState) {
                 setState(SipClient::DisconnectedState);
             } else {
+                connectTimer->stop();
                 setState(SipClient::ConnectedState);
 
                 // schedule next register
@@ -886,9 +887,13 @@ SipClient::SipClient(QObject *parent)
     connect(d->stunTester, SIGNAL(finished(StunTester::ConnectionType)),
             this, SLOT(stunFinished(StunTester::ConnectionType)));
 
+    d->connectTimer = new QTimer(this);
+    connect(d->connectTimer, SIGNAL(timeout()),
+            this, SLOT(connectToServer()));
+
     d->registerTimer = new QTimer(this);
     connect(d->registerTimer, SIGNAL(timeout()),
-            this, SLOT(connectToServer()));
+            this, SLOT(registerWithServer()));
 
     d->stunTimer = new QTimer(this);
     d->stunTimer->setSingleShot(true);
@@ -928,6 +933,9 @@ void SipClient::callDestroyed(QObject *object)
 
 void SipClient::connectToServer()
 {
+    // schedule retry
+    d->connectTimer->start(10000);
+
     // bind sockets
     if (!d->socketsBound) {
         QHostAddress bindAddress;
@@ -943,13 +951,17 @@ void SipClient::connectToServer()
                 break;
             }
         }
+        if (bindAddress.isNull()) {
+            warning("Could not find an address to bind to");
+            return;
+        }
 
         // listen for STUN
-        d->stunTester->bind(bindAddress);
+        if (!d->stunTester->bind(bindAddress))
+            return;
 
         // listen for SIP
-        if (!d->socket->bind(bindAddress, 0))
-        {
+        if (!d->socket->bind(bindAddress, 0)) {
             warning("Could not start listening for SIP");
             return;
         }
@@ -1077,8 +1089,11 @@ void SipClient::datagramReceived()
 
 void SipClient::disconnectFromServer()
 {
+    // stop timers
+    d->connectTimer->stop();
     d->registerTimer->stop();
     d->stunTimer->stop();
+    d->stunDone = false;
 
     // terminate calls
     foreach (SipCall *call, d->calls)
@@ -1093,7 +1108,10 @@ void SipClient::disconnectFromServer()
         d->sendRequest(request, d);
 
         d->setState(DisconnectingState);
+    } else {
+        d->setState(DisconnectedState);
     }
+
 }
 
 void SipClient::registerWithServer()

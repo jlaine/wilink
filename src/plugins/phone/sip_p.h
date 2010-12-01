@@ -99,7 +99,10 @@ public:
     void sendRequest(SipMessage &request, SipCallContext *ctx);
     void setState(SipClient::State state);
 
+    // timers
+    QTimer *connectTimer;
     QTimer *registerTimer;
+    QTimer *stunTimer;
 
     // configuration
     QString displayName;
@@ -123,7 +126,6 @@ public:
     StunTester *stunTester;
     QHostAddress stunServerAddress;
     quint16 stunServerPort;
-    QTimer *stunTimer;
 
 private:
     SipClient *q;
