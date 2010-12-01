@@ -25,10 +25,12 @@
 #include "plugins/phone/sip.h"
 
 class QAbstractButton;
+class QAuthenticator;
 class QGraphicsSimpleTextItem;
 class QLabel;
 class QLineEdit;
 class QNetworkAccessManager;
+class QNetworkReply;
 class QPushButton;
 class Chat;
 class ChatClient;
@@ -63,6 +65,7 @@ public:
     void addWidget(ChatPanelWidget *widget);
 
 private slots:
+    void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void backspacePressed();
     void callClicked(QAbstractButton *button);
     void callNumber();

@@ -107,7 +107,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     // http access
     network = new QNetworkAccessManager(this);
     check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                    QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+                    this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
     Q_ASSERT(check);
 
     // sip client
@@ -138,6 +138,11 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 void PhonePanel::addWidget(ChatPanelWidget *widget)
 {
     callBar->addWidget(widget);
+}
+
+void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
+{
+    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", authenticator);
 }
 
 void PhonePanel::backspacePressed()
