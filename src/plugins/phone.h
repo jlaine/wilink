@@ -71,9 +71,7 @@ private slots:
     void callClicked(QAbstractButton *button);
     void callNumber();
     void callReceived(SipCall *call);
-    void getCalls();
     void getSettings();
-    void handleCalls();
     void handleSettings();
     void keyPressed();
     void stateChanged(SipClient::State state);

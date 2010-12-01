@@ -24,17 +24,24 @@
 #include <QDateTime>
 #include <QList>
 
+class QNetworkAccessManager;
+class PhoneCallsItem;
+
 class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    PhoneCallsModel(QObject *parent = 0);
+    PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    void setUrl(const QUrl &url);
+
+private slots:
+    void handleList();
 
 private:
-    class Call
+    class PhoneCallsItem
     {
     public:
         QString address;
@@ -42,7 +49,8 @@ private:
         int duration;
     };
 
-    QList<Call*> m_calls;
+    QList<PhoneCallsItem*> m_calls;
+    QNetworkAccessManager *m_network;
 };
 
 #endif

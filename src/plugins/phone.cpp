@@ -57,11 +57,17 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Phone"));
 
+    // http access
+    network = new QNetworkAccessManager(this);
+    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                    this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
+    Q_ASSERT(check);
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
 
     // history
-    callsModel = new PhoneCallsModel(this);
+    callsModel = new PhoneCallsModel(network, this);
 
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
@@ -106,12 +112,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addWidget(statusLabel);
 
     setLayout(layout);
-
-    // http access
-    network = new QNetworkAccessManager(this);
-    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                    this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
-    Q_ASSERT(check);
 
     // sip client
     sip = new SipClient(this);
@@ -209,17 +209,6 @@ void PhonePanel::callReceived(SipCall *call)
     box->show();
 }
 
-/** Requests VoIP calls from the server.
- */
-void PhonePanel::getCalls()
-{
-    QNetworkRequest req(QUrl("http://phone.wifirst.net/calls/"));
-    req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
-    QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(handleCalls()));
-}
-
 /** Requests VoIP settings from the server.
  */
 void PhonePanel::getSettings()
@@ -231,21 +220,6 @@ void PhonePanel::getSettings()
     connect(reply, SIGNAL(finished()), this, SLOT(handleSettings()));
 }
 
-/** Handles VoIP settings received from the server.
- */
-void PhonePanel::handleCalls()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
-        return;
-    }
-
-    qDebug("Got calls: %s", reply->readAll().constData());
-}
- 
 /** Handles VoIP settings received from the server.
  */
 void PhonePanel::handleSettings()
@@ -278,7 +252,7 @@ void PhonePanel::handleSettings()
     sip->connectToServer();
 
     // retrieve call history
-    getCalls();
+    callsModel->setUrl(QUrl("http://phone.wifirst.net/calls/"));
 
     emit registerPanel();
 }

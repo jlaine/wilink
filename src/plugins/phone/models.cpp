@@ -17,10 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+
 #include "models.h"
 
-PhoneCallsModel::PhoneCallsModel(QObject *parent)
-    : QAbstractListModel(parent)
+PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent)
+    : QAbstractListModel(parent),
+    m_network(network)
 {
 }
 
@@ -29,7 +35,30 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void PhoneCallsModel::handleList()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    qDebug("Got calls: %s", reply->readAll().constData());
+}
+
 int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 {
     return m_calls.size();
 }
+
+void PhoneCallsModel::setUrl(const QUrl &url)
+{
+    QNetworkRequest req(url);
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    QNetworkReply *reply = m_network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
+}
+
