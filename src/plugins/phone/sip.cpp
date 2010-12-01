@@ -917,7 +917,10 @@ SipCall *SipClient::call(const QString &recipient)
         return 0;
     }
 
+    // construct call
     SipCall *call = new SipCall(QString("<%1>").arg(recipient), QXmppCall::OutgoingDirection, this);
+
+    // register call
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
@@ -1059,9 +1062,10 @@ void SipClient::datagramReceived()
         if (!currentCall && reply.method() == "INVITE") {
             const QString recipient = reply.headerField("From");
             info(QString("SIP call from %1").arg(recipient));
+
+            // construct call
             currentCall = new SipCall(recipient, QXmppCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
-            // if there is no tag in the "To" field, add one
             QMap<QByteArray, QByteArray> params = reply.headerFieldParameters("To");
             if (params.contains("tag")) {
                 currentCall->d->tag = params.value("tag");
@@ -1069,6 +1073,9 @@ void SipClient::datagramReceived()
                 reply.setHeaderField("To", reply.headerField("To") + ";tag=" + currentCall->d->tag);
             }
 
+            // register call
+            connect(currentCall, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(callDestroyed(QObject*)));
             d->calls << currentCall;
             emitCall = true;
         }
