@@ -34,6 +34,7 @@ class QNetworkReply;
 class QPushButton;
 class Chat;
 class ChatClient;
+class PhoneCallsModel;
 class SipCall;
 class SipClient;
 
@@ -70,7 +71,9 @@ private slots:
     void callClicked(QAbstractButton *button);
     void callNumber();
     void callReceived(SipCall *call);
+    void getCalls();
     void getSettings();
+    void handleCalls();
     void handleSettings();
     void keyPressed();
     void stateChanged(SipClient::State state);
@@ -80,6 +83,8 @@ private:
     Chat *m_window;
     SipClient *sip;
     QNetworkAccessManager *network;
+
+    PhoneCallsModel *callsModel;
 
     QPushButton *callButton;
     ChatPanelBar *callBar;

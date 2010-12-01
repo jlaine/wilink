@@ -41,6 +41,7 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
+#include "phone/models.h"
 #include "phone/sip.h"
 #include "phone.h"
  
@@ -60,6 +61,8 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addLayout(headerLayout());
 
     // history
+    callsModel = new PhoneCallsModel(this);
+
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
     QSettings settings;
@@ -206,6 +209,17 @@ void PhonePanel::callReceived(SipCall *call)
     box->show();
 }
 
+/** Requests VoIP calls from the server.
+ */
+void PhonePanel::getCalls()
+{
+    QNetworkRequest req(QUrl("http://phone.wifirst.net/calls/"));
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    QNetworkReply *reply = network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(handleCalls()));
+}
+
 /** Requests VoIP settings from the server.
  */
 void PhonePanel::getSettings()
@@ -217,6 +231,21 @@ void PhonePanel::getSettings()
     connect(reply, SIGNAL(finished()), this, SLOT(handleSettings()));
 }
 
+/** Handles VoIP settings received from the server.
+ */
+void PhonePanel::handleCalls()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    qDebug("Got calls: %s", reply->readAll().constData());
+}
+ 
 /** Handles VoIP settings received from the server.
  */
 void PhonePanel::handleSettings()
@@ -247,6 +276,10 @@ void PhonePanel::handleSettings()
     sip->setUsername(jidToUser(jid));
     sip->setPassword(password);
     sip->connectToServer();
+
+    // retrieve call history
+    getCalls();
+
     emit registerPanel();
 }
 

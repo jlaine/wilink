@@ -57,6 +57,7 @@ set(wiLink_SOURCES
     plugins/menu.cpp
     plugins/photos.cpp
     plugins/phone.cpp
+    plugins/phone/models.cpp
     plugins/phone/sip.cpp
     plugins/phone/stun.cpp
     plugins/rooms.cpp
@@ -96,6 +97,7 @@ set(wiLink_MOC_HEADERS
     plugins/menu.h
     plugins/photos.h
     plugins/phone.h
+    plugins/phone/models.h
     plugins/phone/sip.h
     plugins/phone/stun.h
     plugins/rooms.h
