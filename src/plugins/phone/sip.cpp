@@ -943,7 +943,7 @@ SipCall *SipClient::call(const QString &recipient)
     }
 
     // construct call
-    SipCall *call = new SipCall(QString("<%1>").arg(recipient), QXmppCall::OutgoingDirection, this);
+    SipCall *call = new SipCall(recipient, QXmppCall::OutgoingDirection, this);
 
     // register call
     connect(call, SIGNAL(destroyed(QObject*)),
