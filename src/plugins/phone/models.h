@@ -21,10 +21,11 @@
 #define __WILINK_PHONE_MODELS_H__
 
 #include <QAbstractListModel>
-#include <QDateTime>
 #include <QList>
+#include <QUrl>
 
 class QNetworkAccessManager;
+class QNetworkRequest;
 class PhoneCallsItem;
 
 class PhoneCallsModel : public QAbstractListModel
@@ -35,16 +36,21 @@ public:
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
 
+    void addCall(const QString &address);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void setUrl(const QUrl &url);
 
 private slots:
+    void handleCreate();
     void handleList();
 
 private:
+    QNetworkRequest buildRequest(const QUrl &url) const;
+
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
+    QUrl m_url;
 };
 
 #endif

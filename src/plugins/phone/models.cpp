@@ -18,6 +18,7 @@
  */
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QNetworkAccessManager>
@@ -29,12 +30,23 @@
 class PhoneCallsItem
 {
 public:
+    void parse(const QDomElement &callElement);
+
     int id;
     QString address;
     QDateTime date;
     int duration;
     int flags;
 };
+
+void PhoneCallsItem::parse(const QDomElement &callElement)
+{
+    id = callElement.attribute("id").toInt();
+    address = callElement.attribute("address");
+    date = QDateTime::fromString(callElement.attribute("date"), Qt::ISODate);
+    duration = callElement.attribute("duration").toInt();
+    flags = callElement.attribute("flags").toInt();
+}
 
 PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent)
     : QAbstractListModel(parent),
@@ -48,6 +60,25 @@ PhoneCallsModel::~PhoneCallsModel()
         delete item;
 }
 
+void PhoneCallsModel::addCall(const QString &address)
+{
+    QNetworkRequest req = buildRequest(m_url);
+    QUrl data;
+    data.addQueryItem("address", address);
+    data.addQueryItem("duration", "0");
+    data.addQueryItem("flags", "0");
+    QNetworkReply *reply = m_network->post(req, data.encodedQuery());
+    connect(reply, SIGNAL(finished()), this, SLOT(handleCreate()));
+}
+
+QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
+{
+    QNetworkRequest req(url);
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    return req;
+}
+
 QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();
@@ -57,6 +88,25 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole)
         return m_items[row]->address;
     return QVariant();
+}
+
+void PhoneCallsModel::handleCreate()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    QDomDocument doc;
+    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
+        qWarning("Failed to create phone call: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    PhoneCallsItem *item = new PhoneCallsItem;
+    item->parse(doc.documentElement());
+
+    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+    m_items.append(item);
+    endInsertRows();
 }
 
 void PhoneCallsModel::handleList()
@@ -75,11 +125,7 @@ void PhoneCallsModel::handleList()
         const int id = callElement.attribute("id").toInt();
         if (id > 0) {
             PhoneCallsItem *item = new PhoneCallsItem;
-            item->id = id;
-            item->address = callElement.attribute("address");
-            item->date = QDateTime::fromString(callElement.attribute("date"), Qt::ISODate);
-            item->duration = callElement.attribute("duration").toInt();
-            item->flags = callElement.attribute("flags").toInt();
+            item->parse(callElement);
 
             beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
             m_items.append(item);
@@ -96,10 +142,9 @@ int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 
 void PhoneCallsModel::setUrl(const QUrl &url)
 {
-    QNetworkRequest req(url);
-    req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
-    QNetworkReply *reply = m_network->get(req);
+    m_url = url;
+
+    QNetworkReply *reply = m_network->get(buildRequest(m_url));
     connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
 }
 

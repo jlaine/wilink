@@ -189,6 +189,7 @@ void PhonePanel::callNumber()
     if (!call)
         return;
 
+    callsModel->addCall(recipient);
     addWidget(new PhoneWidget(call));
 
     // remember number
