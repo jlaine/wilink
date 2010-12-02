@@ -43,6 +43,11 @@ enum CallsColumns {
     MaxColumn,
 };
 
+static QString formatDuration(int secs)
+{
+    return QString::number(secs) + "s";
+}
+
 class PhoneCallsItem
 {
 public:
@@ -105,9 +110,11 @@ void PhoneCallsModel::addCall(SipCall *call)
     item->address = call->recipient();
     item->flags = call->direction();
     item->call = call;
-    connect(item->call, SIGNAL(finished()), this, SLOT(handleFinished()));
+    connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
+            this, SLOT(callStateChanged(QXmppCall::State)));
     item->reply = m_network->post(buildRequest(m_url), item->data());
-    connect(item->reply, SIGNAL(finished()), this, SLOT(handleCreate()));
+    connect(item->reply, SIGNAL(finished()),
+            this, SLOT(handleCreate()));
 
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
     m_items.append(item);
@@ -120,6 +127,37 @@ QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
     req.setRawHeader("Accept", "application/xml");
     req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     return req;
+}
+
+void PhoneCallsModel::callStateChanged(QXmppCall::State state)
+{
+    SipCall *call = qobject_cast<SipCall*>(sender());
+    Q_ASSERT(call);
+
+    // find the call
+    int row = -1;
+    for (int i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->call == call) {
+            row = i;
+            break;
+        }
+    }
+    if (row < 0)
+        return;
+
+    // update the item
+    if (state == QXmppCall::FinishedState) {
+        PhoneCallsItem *item = m_items[row];
+        item->call = 0;
+        item->duration = call->duration();
+        QUrl url = m_url;
+        url.setPath(url.path() + QString::number(item->id) + "/");
+        m_network->post(buildRequest(url), item->data());
+
+        call->deleteLater();
+    }
+    emit dataChanged(createIndex(row, NameColumn),
+                     createIndex(row, SortingColumn));
 }
 
 int PhoneCallsModel::columnCount(const QModelIndex &parent) const
@@ -153,9 +191,24 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
     } else if (index.column() == DateColumn) {
         if (role == Qt::DisplayRole)
             return item->date.toString(Qt::SystemLocaleShortDate);
-    } else if (index.column() == DurationColumn) {
-        if (role == Qt::DisplayRole && item->duration > 0)
-            return QString::number(item->duration) + "s";
+    } else if (index.column() == DurationColumn && role == Qt::DisplayRole) {
+
+        if (item->call) {
+            switch (item->call->state())
+            {
+            case QXmppCall::OfferState:
+            case QXmppCall::ConnectingState:
+                return tr("Connecting..");
+            case QXmppCall::ActiveState:
+                return formatDuration(item->call->duration());
+            case QXmppCall::DisconnectingState:
+                return tr("Disconnecting..");
+            default:
+                break;
+            }
+        }
+        return QString::number(item->duration) + "s";
+
     } else if (index.column() == SortingColumn) {
         if (role == Qt::DisplayRole)
             return QString::number(item->date.toTime_t());
@@ -190,34 +243,6 @@ void PhoneCallsModel::handleCreate()
         return;
     }
     item->parse(doc.documentElement());
-    emit dataChanged(createIndex(row, NameColumn),
-                     createIndex(row, SortingColumn));
-}
-
-void PhoneCallsModel::handleFinished()
-{
-    SipCall *call = qobject_cast<SipCall*>(sender());
-    Q_ASSERT(call);
-
-    // find the item
-    PhoneCallsItem *item = 0;
-    int row = -1;
-    for (int i = 0; i < m_items.size(); ++i) {
-        if (m_items[i]->call == call) {
-            item = m_items[i];
-            item->call = 0;
-            row = i;
-            break;
-        }
-    }
-    if (!item)
-        return;
-
-    // update the item
-    item->duration = call->duration();
-    QUrl url = m_url;
-    url.setPath(url.path() + QString::number(item->id) + "/");
-    item->reply = m_network->post(buildRequest(url), item->data());
     emit dataChanged(createIndex(row, NameColumn),
                      createIndex(row, SortingColumn));
 }

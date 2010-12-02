@@ -168,13 +168,9 @@ void PhonePanel::callClicked(QAbstractButton *button)
         return;
 
     if (box->standardButton(button) == QMessageBox::Yes)
-    {
-        disconnect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
-        addWidget(new PhoneWidget(call));
         call->accept();
-    } else {
+    else
         call->hangup();
-    }
     box->deleteLater();
 }
 
@@ -185,10 +181,8 @@ void PhonePanel::callDoubleClicked(const QModelIndex &index)
         return;
 
     SipCall *call = sip->call(recipient);
-    if (call) {
+    if (call)
         callsModel->addCall(call);
-        addWidget(new PhoneWidget(call));
-    }
 }
 
 void PhonePanel::callNumber()
@@ -200,10 +194,8 @@ void PhonePanel::callNumber()
     const QString recipient = QString("\"%1\" <sip:%2@%3>").arg(phoneNumber, phoneNumber, sip->domain());
 
     SipCall *call = sip->call(recipient);
-    if (call) {
+    if (call)
         callsModel->addCall(call);
-        addWidget(new PhoneWidget(call));
-    }
 }
 
 void PhonePanel::callReceived(SipCall *call)
@@ -219,7 +211,6 @@ void PhonePanel::callReceived(SipCall *call)
     box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
 
     /* connect signals */
-    connect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
     connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callClicked(QAbstractButton*)));

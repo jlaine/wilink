@@ -25,6 +25,8 @@
 #include <QUrl>
 #include <QTableView>
 
+#include "QXmppCallManager.h"
+
 class QNetworkAccessManager;
 class QNetworkRequest;
 class QSortFilterProxyModel;
@@ -50,8 +52,8 @@ public:
     void setUrl(const QUrl &url);
 
 private slots:
+    void callStateChanged(QXmppCall::State state);
     void handleCreate();
-    void handleFinished();
     void handleList();
 
 private:

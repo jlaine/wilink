@@ -720,6 +720,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhoneCallsModel</name>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
+    <message>
+        <source>Disconnecting..</source>
+        <translation>Déconnexion..</translation>
+    </message>
+</context>
+<context>
     <name>PhonePanel</name>
     <message>
         <source>Phone</source>
