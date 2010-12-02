@@ -24,7 +24,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListView>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -109,8 +108,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     graphicsView->scene()->addItem(callBar);
 
     // history
-    QListView *callsView = new QListView(this);
-    callsView->setModel(callsModel);
+    callsView = new PhoneCallsView(callsModel, this);
     layout->addWidget(callsView);
 
     // status

@@ -21,13 +21,25 @@
 #include <QDateTime>
 #include <QDomDocument>
 #include <QDomElement>
+#include <QHeaderView>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPixmap>
+#include <QResizeEvent>
 
 #include "models.h"
 #include "sip.h"
+
+#define DATE_WIDTH 150
+#define DURATION_WIDTH 60
+
+enum CallsColumns {
+    NameColumn = 0,
+    DateColumn,
+    DurationColumn,
+    MaxColumn,
+};
 
 class PhoneCallsItem
 {
@@ -106,7 +118,8 @@ QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
 
 int PhoneCallsModel::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+    Q_UNUSED(parent);
+    return MaxColumn;
 }
 
 QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
@@ -116,7 +129,7 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         return QVariant();
     PhoneCallsItem *item = m_items[row];
 
-    if (index.column() == 0) {
+    if (index.column() == NameColumn) {
         if (role == Qt::DisplayRole)
             return sipAddressToName(item->address);
         else if (role == Qt::DecorationRole) {
@@ -125,9 +138,12 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
             else
                 return QPixmap(":/download.png");
         }
-    } else if (index.column() == 1) {
+    } else if (index.column() == DateColumn) {
         if (role == Qt::DisplayRole)
-            return QString::number(item->duration);
+            return item->date.toString(Qt::SystemLocaleShortDate);
+    } else if (index.column() == DurationColumn) {
+        if (role == Qt::DisplayRole)
+            return QString::number(item->duration) + "s";
     }
 
     return QVariant();
@@ -226,5 +242,24 @@ void PhoneCallsModel::setUrl(const QUrl &url)
 
     QNetworkReply *reply = m_network->get(buildRequest(m_url));
     connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
+}
+
+PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
+    : QTableView(parent)
+{
+    setModel(model);
+
+    setAlternatingRowColors(true);
+    setColumnWidth(DateColumn, DATE_WIDTH);
+    setColumnWidth(DurationColumn, DURATION_WIDTH);
+    setShowGrid(false);
+    horizontalHeader()->setVisible(false);
+    verticalHeader()->setVisible(false);
+}
+
+void PhoneCallsView::resizeEvent(QResizeEvent *e)
+{
+    QTableView::resizeEvent(e);
+    setColumnWidth(NameColumn, e->size().width() - DATE_WIDTH - DURATION_WIDTH);
 }
 

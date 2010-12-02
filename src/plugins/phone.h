@@ -35,6 +35,7 @@ class QPushButton;
 class Chat;
 class ChatClient;
 class PhoneCallsModel;
+class PhoneCallsView;
 class SipCall;
 class SipClient;
 
@@ -83,6 +84,7 @@ private:
     QNetworkAccessManager *network;
 
     PhoneCallsModel *callsModel;
+    PhoneCallsView *callsView;
 
     QPushButton *callButton;
     ChatPanelBar *callBar;

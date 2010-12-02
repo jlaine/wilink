@@ -23,6 +23,7 @@
 #include <QAbstractListModel>
 #include <QList>
 #include <QUrl>
+#include <QTableView>
 
 class QNetworkAccessManager;
 class QNetworkRequest;
@@ -55,6 +56,17 @@ private:
     QNetworkAccessManager *m_network;
     QList<PhoneCallsItem*> m_pending;
     QUrl m_url;
+};
+
+class PhoneCallsView : public QTableView
+{
+    Q_OBJECT
+
+public:
+    PhoneCallsView(PhoneCallsModel *model, QWidget *parent = 0);
+
+protected:
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif
