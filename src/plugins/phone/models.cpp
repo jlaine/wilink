@@ -27,6 +27,7 @@
 #include <QNetworkRequest>
 #include <QPixmap>
 #include <QResizeEvent>
+#include <QSortFilterProxyModel>
 
 #include "models.h"
 #include "sip.h"
@@ -38,6 +39,7 @@ enum CallsColumns {
     NameColumn = 0,
     DateColumn,
     DurationColumn,
+    SortingColumn,
     MaxColumn,
 };
 
@@ -148,8 +150,11 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
             return item->date.toString(Qt::SystemLocaleShortDate);
     } else if (index.column() == DurationColumn) {
-        if (role == Qt::DisplayRole)
+        if (role == Qt::DisplayRole && item->duration > 0)
             return QString::number(item->duration) + "s";
+    } else if (index.column() == SortingColumn) {
+        if (role == Qt::DisplayRole)
+            return QString::number(item->date.toTime_t());
     }
 
     return QVariant();
@@ -251,16 +256,24 @@ void PhoneCallsModel::setUrl(const QUrl &url)
 }
 
 PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
-    : QTableView(parent)
+    : QTableView(parent),
+    m_callsModel(model)
 {
-    setModel(model);
+    m_sortedModel = new QSortFilterProxyModel(this);
+    m_sortedModel->setSourceModel(model);
+    m_sortedModel->setDynamicSortFilter(true);
+    m_sortedModel->setFilterKeyColumn(SortingColumn);
+    setModel(m_sortedModel);
 
     setAlternatingRowColors(true);
+    setColumnHidden(SortingColumn, true);
     setColumnWidth(DateColumn, DATE_WIDTH);
     setColumnWidth(DurationColumn, DURATION_WIDTH);
     setShowGrid(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::SingleSelection);
+    setSortingEnabled(true);
+    sortByColumn(SortingColumn, Qt::DescendingOrder);
     verticalHeader()->setVisible(false);
 }
 

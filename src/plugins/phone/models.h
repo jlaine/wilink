@@ -27,6 +27,7 @@
 
 class QNetworkAccessManager;
 class QNetworkRequest;
+class QSortFilterProxyModel;
 class PhoneCallsItem;
 class SipCall;
 
@@ -71,6 +72,10 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *e);
+
+private:
+    PhoneCallsModel *m_callsModel;
+    QSortFilterProxyModel *m_sortedModel;
 };
 
 #endif
