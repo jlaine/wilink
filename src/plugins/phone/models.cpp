@@ -171,10 +171,12 @@ void PhoneCallsModel::handleCreate()
 
     // find the item
     PhoneCallsItem *item = 0;
+    int row = -1;
     for (int i = 0; i < m_items.size(); ++i) {
         if (m_items[i]->reply == reply) {
             item = m_items[i];
             item->reply = 0;
+            row = i;
             break;
         }
     }
@@ -188,6 +190,8 @@ void PhoneCallsModel::handleCreate()
         return;
     }
     item->parse(doc.documentElement());
+    emit dataChanged(createIndex(row, NameColumn),
+                     createIndex(row, SortingColumn));
 }
 
 void PhoneCallsModel::handleFinished()
@@ -197,10 +201,12 @@ void PhoneCallsModel::handleFinished()
 
     // find the item
     PhoneCallsItem *item = 0;
+    int row = -1;
     for (int i = 0; i < m_items.size(); ++i) {
         if (m_items[i]->call == call) {
             item = m_items[i];
             item->call = 0;
+            row = i;
             break;
         }
     }
@@ -212,6 +218,8 @@ void PhoneCallsModel::handleFinished()
     QUrl url = m_url;
     url.setPath(url.path() + QString::number(item->id) + "/");
     item->reply = m_network->post(buildRequest(url), item->data());
+    emit dataChanged(createIndex(row, NameColumn),
+                     createIndex(row, SortingColumn));
 }
 
 void PhoneCallsModel::handleList()
