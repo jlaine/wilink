@@ -38,6 +38,7 @@ public:
     ~PhoneCallsModel();
 
     void addCall(SipCall *call);
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void setUrl(const QUrl &url);

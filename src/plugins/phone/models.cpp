@@ -24,6 +24,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPixmap>
 
 #include "models.h"
 #include "sip.h"
@@ -103,14 +104,32 @@ QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
     return req;
 }
 
+int PhoneCallsModel::columnCount(const QModelIndex &parent) const
+{
+    return 2;
+}
+
 QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();
     if (row > m_items.size())
         return QVariant();
+    PhoneCallsItem *item = m_items[row];
 
-    if (role == Qt::DisplayRole)
-        return m_items[row]->address;
+    if (index.column() == 0) {
+        if (role == Qt::DisplayRole)
+            return sipAddressToName(item->address);
+        else if (role == Qt::DecorationRole) {
+            if ((item->flags & 0x1) == QXmppCall::OutgoingDirection)
+                return QPixmap(":/upload.png");
+            else
+                return QPixmap(":/download.png");
+        }
+    } else if (index.column() == 1) {
+        if (role == Qt::DisplayRole)
+            return QString::number(item->duration);
+    }
+
     return QVariant();
 }
 
