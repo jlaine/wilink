@@ -74,10 +74,10 @@ void PhoneCallsModel::handleList()
     while (!callElement.isNull()) {
         const int id = callElement.attribute("id").toInt();
         if (id > 0) {
-            qDebug("got call %i", id);
             PhoneCallsItem *item = new PhoneCallsItem;
             item->id = id;
             item->address = callElement.attribute("address");
+            item->date = QDateTime::fromString(callElement.attribute("date"), Qt::ISODate);
             item->duration = callElement.attribute("duration").toInt();
             item->flags = callElement.attribute("flags").toInt();
 
