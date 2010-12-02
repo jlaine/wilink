@@ -29,6 +29,7 @@ class QAuthenticator;
 class QGraphicsSimpleTextItem;
 class QLabel;
 class QLineEdit;
+class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QPushButton;
@@ -70,6 +71,7 @@ private slots:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void backspacePressed();
     void callClicked(QAbstractButton *button);
+    void callDoubleClicked(const QModelIndex &index);
     void callNumber();
     void callReceived(SipCall *call);
     void getSettings();

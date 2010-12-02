@@ -29,7 +29,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPushButton>
-#include <QSettings>
 #include <QTimer>
 #include <QUrl>
 
@@ -71,8 +70,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
-    QSettings settings;
-    numberEdit->setText(settings.value("PhoneHistory").toString());
     hbox->addWidget(numberEdit);
     setFocusProxy(numberEdit);
     QPushButton *backspaceButton = new QPushButton;
@@ -109,6 +106,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // history
     callsView = new PhoneCallsView(callsModel, this);
+    check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
+                    this, SLOT(callDoubleClicked(QModelIndex)));
+    Q_ASSERT(check);
     layout->addWidget(callsView);
 
     // status
@@ -175,6 +175,19 @@ void PhonePanel::callClicked(QAbstractButton *button)
     box->deleteLater();
 }
 
+void PhonePanel::callDoubleClicked(const QModelIndex &index)
+{
+    const QString recipient = index.data(PhoneCallsModel::AddressRole).toString();
+    if (!callButton->isEnabled() || recipient.isEmpty())
+        return;
+
+    SipCall *call = sip->call(recipient);
+    if (call) {
+        callsModel->addCall(call);
+        addWidget(new PhoneWidget(call));
+    }
+}
+
 void PhonePanel::callNumber()
 {
     QString phoneNumber = numberEdit->text().trimmed();
@@ -184,15 +197,10 @@ void PhonePanel::callNumber()
     const QString recipient = QString("\"%1\" <sip:%2@%3>").arg(phoneNumber, phoneNumber, sip->domain());
 
     SipCall *call = sip->call(recipient);
-    if (!call)
-        return;
-
-    callsModel->addCall(call);
-    addWidget(new PhoneWidget(call));
-
-    // remember number
-    QSettings settings;
-    settings.setValue("PhoneHistory", phoneNumber);
+    if (call) {
+        callsModel->addCall(call);
+        addWidget(new PhoneWidget(call));
+    }
 }
 
 void PhonePanel::callReceived(SipCall *call)

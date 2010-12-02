@@ -129,6 +129,12 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         return QVariant();
     PhoneCallsItem *item = m_items[row];
 
+    if (role == Qt::ToolTipRole) {
+        return item->address;
+    } else if (role == AddressRole) {
+        return item->address;
+    }
+
     if (index.column() == NameColumn) {
         if (role == Qt::DisplayRole)
             return sipAddressToName(item->address);
@@ -253,7 +259,8 @@ PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
     setColumnWidth(DateColumn, DATE_WIDTH);
     setColumnWidth(DurationColumn, DURATION_WIDTH);
     setShowGrid(false);
-    horizontalHeader()->setVisible(false);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
     verticalHeader()->setVisible(false);
 }
 
