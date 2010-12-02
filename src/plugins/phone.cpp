@@ -97,6 +97,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // view
     QGraphicsView *graphicsView = new QGraphicsView;
+    graphicsView->setMaximumHeight(50);
+    graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     graphicsView->setScene(new QGraphicsScene(graphicsView));
     layout->addWidget(graphicsView);
 

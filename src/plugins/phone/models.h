@@ -59,7 +59,6 @@ private:
 
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
-    QList<PhoneCallsItem*> m_pending;
     QUrl m_url;
 };
 

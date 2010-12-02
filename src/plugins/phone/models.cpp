@@ -105,9 +105,13 @@ void PhoneCallsModel::addCall(SipCall *call)
     item->address = call->recipient();
     item->flags = call->direction();
     item->call = call;
+    connect(item->call, SIGNAL(finished()), this, SLOT(handleFinished()));
     item->reply = m_network->post(buildRequest(m_url), item->data());
     connect(item->reply, SIGNAL(finished()), this, SLOT(handleCreate()));
-    m_pending << item;
+
+    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+    m_items.append(item);
+    endInsertRows();
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
@@ -165,31 +169,25 @@ void PhoneCallsModel::handleCreate()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     Q_ASSERT(reply);
 
-    // find the pending item
+    // find the item
     PhoneCallsItem *item = 0;
-    for (int i = 0; i < m_pending.size(); ++i) {
-        if (m_pending[i]->reply == reply) {
-            item = m_pending[i];
+    for (int i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->reply == reply) {
+            item = m_items[i];
             item->reply = 0;
-            m_pending.removeAt(i);
             break;
         }
     }
     if (!item)
         return;
 
-    // parse reply
+    // update the item
     QDomDocument doc;
     if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
         qWarning("Failed to create phone call: %s", qPrintable(reply->errorString()));
         return;
     }
     item->parse(doc.documentElement());
-    connect(item->call, SIGNAL(finished()), this, SLOT(handleFinished()));
-
-    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-    m_items.append(item);
-    endInsertRows();
 }
 
 void PhoneCallsModel::handleFinished()
@@ -274,6 +272,7 @@ PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
     setSelectionMode(QAbstractItemView::SingleSelection);
     setSortingEnabled(true);
     sortByColumn(SortingColumn, Qt::DescendingOrder);
+    horizontalHeader()->setVisible(false);
     verticalHeader()->setVisible(false);
 }
 
