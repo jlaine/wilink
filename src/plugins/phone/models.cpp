@@ -126,8 +126,10 @@ void PhoneCallsModel::addCall(SipCall *call)
     endInsertRows();
 
     // schedule periodic refresh
-    if (!m_ticker->isActive())
+    if (!m_ticker->isActive()) {
         m_ticker->start();
+        emit stateChanged(true);
+    }
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
@@ -179,8 +181,10 @@ void PhoneCallsModel::callTick()
                              createIndex(row, DurationColumn));
         }
     }
-    if (!active)
+    if (!active) {
         m_ticker->stop();
+        emit stateChanged(false);
+    }
 }
 
 int PhoneCallsModel::columnCount(const QModelIndex &parent) const

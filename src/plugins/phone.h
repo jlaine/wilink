@@ -73,10 +73,11 @@ private slots:
     void callDoubleClicked(const QModelIndex &index);
     void callNumber();
     void callReceived(SipCall *call);
+    void callStateChanged(bool haveCalls);
     void getSettings();
     void handleSettings();
     void keyPressed();
-    void stateChanged(SipClient::State state);
+    void sipStateChanged(SipClient::State state);
 
 private:
     ChatClient *client;
@@ -88,6 +89,7 @@ private:
     PhoneCallsView *callsView;
 
     QPushButton *callButton;
+    QPushButton *hangupButton;
     QLineEdit *numberEdit;
     QLabel *statusLabel;
 };

@@ -188,7 +188,7 @@ signals:
     /// To refuse the call, invoke the call's SipCall::hangup() method.
     void callReceived(SipCall *call);
 
-    /// This signal is emitted when the call state changes.
+    /// This signal is emitted when the client state changes.
     void stateChanged(SipClient::State state);
 
 public slots:

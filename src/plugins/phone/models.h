@@ -52,6 +52,9 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void setUrl(const QUrl &url);
 
+signals:
+    void stateChanged(bool haveCalls);
+
 private slots:
     void callStateChanged(QXmppCall::State state);
     void callTick();

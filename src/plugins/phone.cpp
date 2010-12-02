@@ -63,9 +63,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
 
-    // history
-    callsModel = new PhoneCallsModel(network, this);
-
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
     hbox->addWidget(numberEdit);
@@ -77,6 +74,10 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     callButton->setIcon(QIcon(":/call.png"));
     callButton->setEnabled(false);
     hbox->addWidget(callButton);
+    hangupButton = new QPushButton(tr("Hangup"));
+    hangupButton->setIcon(QIcon(":/hangup.png"));
+    hangupButton->hide();
+    hbox->addWidget(hangupButton);
     layout->addLayout(hbox);
 
     // keyboard
@@ -94,6 +95,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addLayout(grid);
 
     // history
+    callsModel = new PhoneCallsModel(network, this);
+    check = connect(callsModel, SIGNAL(stateChanged(bool)),
+                    this, SLOT(callStateChanged(bool)));
     callsView = new PhoneCallsView(callsModel, this);
     check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(callDoubleClicked(QModelIndex)));
@@ -117,7 +121,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
 
     check = connect(sip, SIGNAL(stateChanged(SipClient::State)),
-                    this, SLOT(stateChanged(SipClient::State)));
+                    this, SLOT(sipStateChanged(SipClient::State)));
     Q_ASSERT(check);
 
     // connect signals
@@ -198,6 +202,17 @@ void PhonePanel::callReceived(SipCall *call)
     box->show();
 }
 
+void PhonePanel::callStateChanged(bool haveCalls)
+{
+    if (haveCalls) {
+        callButton->hide();
+        hangupButton->show();
+    } else {
+        hangupButton->hide();
+        callButton->show();
+    }
+}
+
 /** Requests VoIP settings from the server.
  */
 void PhonePanel::getSettings()
@@ -254,7 +269,7 @@ void PhonePanel::keyPressed()
     numberEdit->insert(key->text());
 }
 
-void PhonePanel::stateChanged(SipClient::State state)
+void PhonePanel::sipStateChanged(SipClient::State state)
 {
     switch (state)
     {

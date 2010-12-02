@@ -768,6 +768,10 @@ Do you accept?</source>
 
 Acceptez-vous?</translation>
     </message>
+    <message>
+        <source>Hangup</source>
+        <translation>Raccrocher</translation>
+    </message>
 </context>
 <context>
     <name>PhoneWidget</name>
