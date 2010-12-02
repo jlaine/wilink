@@ -306,6 +306,15 @@ void PhoneCallsModel::handleList()
     }
 }
 
+/** Hang up all active calls.
+ */
+void PhoneCallsModel::hangup()
+{
+    for (int i = m_items.size() - 1; i >= 0; --i)
+        if (m_items[i]->call)
+            m_items[i]->call->hangup();
+}
+
 int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 {
     return m_items.size();

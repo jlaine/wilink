@@ -55,6 +55,9 @@ public:
 signals:
     void stateChanged(bool haveCalls);
 
+public slots:
+    void hangup();
+
 private slots:
     void callStateChanged(QXmppCall::State state);
     void callTick();

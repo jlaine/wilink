@@ -133,6 +133,8 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
             this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()),
             this, SLOT(callNumber()));
+    connect(hangupButton, SIGNAL(clicked()),
+            callsModel, SLOT(hangup()));
 }
 
 void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
