@@ -30,6 +30,7 @@
 class QNetworkAccessManager;
 class QNetworkRequest;
 class QSortFilterProxyModel;
+class QTimer;
 class PhoneCallsItem;
 class SipCall;
 
@@ -53,6 +54,7 @@ public:
 
 private slots:
     void callStateChanged(QXmppCall::State state);
+    void callTick();
     void handleCreate();
     void handleList();
 
@@ -61,6 +63,7 @@ private:
 
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
+    QTimer *m_ticker;
     QUrl m_url;
 };
 

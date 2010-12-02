@@ -18,8 +18,6 @@
  */
 
 #include <QCoreApplication>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -95,18 +93,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     }
     layout->addLayout(grid);
 
-    // view
-    QGraphicsView *graphicsView = new QGraphicsView;
-    graphicsView->setMaximumHeight(50);
-    graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    graphicsView->setScene(new QGraphicsScene(graphicsView));
-    layout->addWidget(graphicsView);
-
-    callBar = new ChatPanelBar(graphicsView);
-    callBar->setZValue(10);
-    graphicsView->scene()->addItem(callBar);
-
     // history
     callsView = new PhoneCallsView(callsModel, this);
     check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
@@ -143,11 +129,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
             this, SLOT(callNumber()));
     connect(callButton, SIGNAL(clicked()),
             this, SLOT(callNumber()));
-}
-
-void PhonePanel::addWidget(ChatPanelWidget *widget)
-{
-    callBar->addWidget(widget);
 }
 
 void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)

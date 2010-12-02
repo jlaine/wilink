@@ -28,12 +28,13 @@
 #include <QPixmap>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
+#include <QTimer>
 
 #include "models.h"
 #include "sip.h"
 
 #define DATE_WIDTH 150
-#define DURATION_WIDTH 60
+#define DURATION_WIDTH 100
 
 enum CallsColumns {
     NameColumn = 0,
@@ -96,6 +97,10 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
+    m_ticker = new QTimer(this);
+    m_ticker->setInterval(1000);
+    connect(m_ticker, SIGNAL(timeout()),
+            this, SLOT(callTick()));
 }
 
 PhoneCallsModel::~PhoneCallsModel()
@@ -119,6 +124,10 @@ void PhoneCallsModel::addCall(SipCall *call)
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
     m_items.append(item);
     endInsertRows();
+
+    // schedule periodic refresh
+    if (!m_ticker->isActive())
+        m_ticker->start();
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
@@ -160,6 +169,20 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
                      createIndex(row, SortingColumn));
 }
 
+void PhoneCallsModel::callTick()
+{
+    bool active = false;
+    for (int row = 0; row < m_items.size(); ++row) {
+        if (m_items[row]->call) {
+            active = true;
+            emit dataChanged(createIndex(row, DurationColumn),
+                             createIndex(row, DurationColumn));
+        }
+    }
+    if (!active)
+        m_ticker->stop();
+}
+
 int PhoneCallsModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
@@ -187,6 +210,12 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
                 return QPixmap(":/upload.png");
             else
                 return QPixmap(":/download.png");
+        } else if(role == Qt::BackgroundRole && item->call) {
+            QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
+            grad.setColorAt(0, QColor(255, 0, 0, 144));
+            grad.setColorAt(1, Qt::transparent);
+            grad.setCoordinateMode(QGradient::ObjectBoundingMode);
+            return QBrush(grad);
         }
     } else if (index.column() == DateColumn) {
         if (role == Qt::DisplayRole)

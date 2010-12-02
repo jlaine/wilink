@@ -65,7 +65,6 @@ class PhonePanel : public ChatPanel
 
 public:
     PhonePanel(Chat *chatWindow, QWidget *parent = NULL);
-    void addWidget(ChatPanelWidget *widget);
 
 private slots:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
@@ -89,7 +88,6 @@ private:
     PhoneCallsView *callsView;
 
     QPushButton *callButton;
-    ChatPanelBar *callBar;
     QLineEdit *numberEdit;
     QLabel *statusLabel;
 };
