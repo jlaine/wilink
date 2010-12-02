@@ -189,7 +189,7 @@ void PhonePanel::callNumber()
     if (!call)
         return;
 
-    callsModel->addCall(recipient);
+    callsModel->addCall(call);
     addWidget(new PhoneWidget(call));
 
     // remember number
@@ -199,6 +199,7 @@ void PhonePanel::callNumber()
 
 void PhonePanel::callReceived(SipCall *call)
 {
+    callsModel->addCall(call);
     const QString contactName = sipAddressToName(call->recipient());
 
     QMessageBox *box = new QMessageBox(QMessageBox::Question,

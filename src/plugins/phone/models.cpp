@@ -26,10 +26,13 @@
 #include <QNetworkRequest>
 
 #include "models.h"
+#include "sip.h"
 
 class PhoneCallsItem
 {
 public:
+    PhoneCallsItem();
+    QByteArray data() const;
     void parse(const QDomElement &callElement);
 
     int id;
@@ -37,15 +40,36 @@ public:
     QDateTime date;
     int duration;
     int flags;
+
+    SipCall *call;
+    QNetworkReply *reply;
 };
+
+PhoneCallsItem::PhoneCallsItem()
+    : id(0),
+    duration(0),
+    flags(0),
+    call(0),
+    reply(0)
+{
+}
+
+QByteArray PhoneCallsItem::data() const
+{
+    QUrl data;
+    data.addQueryItem("address", address);
+    data.addQueryItem("duration", QString::number(duration));
+    data.addQueryItem("flags", QString::number(flags));
+    return data.encodedQuery();
+}
 
 void PhoneCallsItem::parse(const QDomElement &callElement)
 {
-    id = callElement.attribute("id").toInt();
-    address = callElement.attribute("address");
-    date = QDateTime::fromString(callElement.attribute("date"), Qt::ISODate);
-    duration = callElement.attribute("duration").toInt();
-    flags = callElement.attribute("flags").toInt();
+    id = callElement.firstChildElement("id").text().toInt();
+    address = callElement.firstChildElement("address").text();
+    date = QDateTime::fromString(callElement.firstChildElement("date").text(), Qt::ISODate);
+    duration = callElement.firstChildElement("duration").text().toInt();
+    flags = callElement.firstChildElement("flags").text().toInt();
 }
 
 PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent)
@@ -60,15 +84,15 @@ PhoneCallsModel::~PhoneCallsModel()
         delete item;
 }
 
-void PhoneCallsModel::addCall(const QString &address)
+void PhoneCallsModel::addCall(SipCall *call)
 {
-    QNetworkRequest req = buildRequest(m_url);
-    QUrl data;
-    data.addQueryItem("address", address);
-    data.addQueryItem("duration", "0");
-    data.addQueryItem("flags", "0");
-    QNetworkReply *reply = m_network->post(req, data.encodedQuery());
-    connect(reply, SIGNAL(finished()), this, SLOT(handleCreate()));
+    PhoneCallsItem *item = new PhoneCallsItem;
+    item->address = call->recipient();
+    item->flags = call->direction();
+    item->call = call;
+    item->reply = m_network->post(buildRequest(m_url), item->data());
+    connect(item->reply, SIGNAL(finished()), this, SLOT(handleCreate()));
+    m_pending << item;
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
@@ -95,18 +119,55 @@ void PhoneCallsModel::handleCreate()
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     Q_ASSERT(reply);
 
+    // find the pending item
+    PhoneCallsItem *item = 0;
+    for (int i = 0; i < m_pending.size(); ++i) {
+        if (m_pending[i]->reply == reply) {
+            item = m_pending[i];
+            item->reply = 0;
+            m_pending.removeAt(i);
+            break;
+        }
+    }
+    if (!item)
+        return;
+
+    // parse reply
     QDomDocument doc;
     if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
         qWarning("Failed to create phone call: %s", qPrintable(reply->errorString()));
         return;
     }
-
-    PhoneCallsItem *item = new PhoneCallsItem;
     item->parse(doc.documentElement());
+    connect(item->call, SIGNAL(finished()), this, SLOT(handleFinished()));
 
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
     m_items.append(item);
     endInsertRows();
+}
+
+void PhoneCallsModel::handleFinished()
+{
+    SipCall *call = qobject_cast<SipCall*>(sender());
+    Q_ASSERT(call);
+
+    // find the item
+    PhoneCallsItem *item = 0;
+    for (int i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->call == call) {
+            item = m_items[i];
+            item->call = 0;
+            break;
+        }
+    }
+    if (!item)
+        return;
+
+    // update the item
+    item->duration = call->duration();
+    QUrl url = m_url;
+    url.setPath(url.path() + QString::number(item->id) + "/");
+    item->reply = m_network->post(buildRequest(url), item->data());
 }
 
 void PhoneCallsModel::handleList()
@@ -122,7 +183,7 @@ void PhoneCallsModel::handleList()
 
     QDomElement callElement = doc.documentElement().firstChildElement("call");
     while (!callElement.isNull()) {
-        const int id = callElement.attribute("id").toInt();
+        const int id = callElement.firstChildElement("id").text().toInt();
         if (id > 0) {
             PhoneCallsItem *item = new PhoneCallsItem;
             item->parse(callElement);

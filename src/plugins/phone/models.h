@@ -27,6 +27,7 @@
 class QNetworkAccessManager;
 class QNetworkRequest;
 class PhoneCallsItem;
+class SipCall;
 
 class PhoneCallsModel : public QAbstractListModel
 {
@@ -36,13 +37,14 @@ public:
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
 
-    void addCall(const QString &address);
+    void addCall(SipCall *call);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void setUrl(const QUrl &url);
 
 private slots:
     void handleCreate();
+    void handleFinished();
     void handleList();
 
 private:
@@ -50,6 +52,7 @@ private:
 
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
+    QList<PhoneCallsItem*> m_pending;
     QUrl m_url;
 };
 

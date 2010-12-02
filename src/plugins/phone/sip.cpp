@@ -438,6 +438,8 @@ void SipCallPrivate::onStateChanged()
 {
     if (state == QXmppCall::ActiveState)
     {
+        startTime.start();
+
         // prepare audio format
         QAudioFormat format;
         format.setFrequency(channel->payloadType().clockrate());
@@ -474,6 +476,9 @@ void SipCallPrivate::onStateChanged()
         }
 
     } else {
+        if (startTime.isValid() && !stopTime.isValid())
+            stopTime.start();
+
         // stop audio input
         if (audioInput)
         {
@@ -595,6 +600,20 @@ void SipCall::audioStateChanged()
 QXmppCall::Direction SipCall::direction() const
 {
     return d->direction;
+}
+
+/// Return's the call's duration in seconds.
+///
+
+int SipCall::duration() const
+{
+    if (d->startTime.isValid()) {
+        if (d->stopTime.isValid())
+            return d->startTime.secsTo(d->stopTime);
+        else
+            return d->startTime.secsTo(QTime::currentTime());
+    }
+    return 0;
 }
 
 QByteArray SipCall::id() const

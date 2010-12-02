@@ -61,6 +61,8 @@ public:
     void setState(QXmppCall::State state);
 
     QXmppCall::Direction direction;
+    QTime startTime;
+    QTime stopTime;
     QXmppCall::State state;
     QList<QXmppJinglePayloadType> commonPayloadTypes;
     QByteArray activeTime;

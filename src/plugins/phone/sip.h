@@ -107,6 +107,7 @@ public:
     ~SipCall();
 
     QXmppCall::Direction direction() const;
+    int duration() const;
     QByteArray id() const;
     QString recipient() const;
     QXmppCall::State state() const;
