@@ -333,6 +333,8 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
 
 bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 {
+    QMap<int, QXmppJinglePayloadType> payloads;
+
     // parse descriptor
     QPair<char, QByteArray> field;
     foreach (field, sdp.fields()) {
@@ -349,6 +351,17 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
             // determine remote port
             remotePort = bits[1].toUInt();
 
+            // parse payload types
+            for (int i = 3; i < bits.size(); ++i) {
+                bool ok = false;
+                int id = bits[i].toInt(&ok);
+                if (!ok)
+                    continue;
+                QXmppJinglePayloadType payload;
+                payload.setId(id);
+                payloads[id] = payload;
+            }
+
             // determine codec
             foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
                 for (int i = 3; i < bits.size(); ++i) {
@@ -363,15 +376,33 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 }
             }
         } else if (field.first == 'a') {
-            // determine packetization time
             if (field.second.startsWith("ptime:")) {
+                // packetization time
                 bool ok = false;
                 int ptime = field.second.mid(6).toInt(&ok);
                 if (ok && ptime > 0) {
                     q->debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
                     for (int i = 0; i < commonPayloadTypes.size(); ++i)
                         commonPayloadTypes[i].setPtime(ptime);
+                    foreach (int id, payloads.keys())
+                        payloads[id].setPtime(ptime);
                 }
+            } else if (field.second.startsWith("rtpmap:")) {
+                // payload type map
+                const QList<QByteArray> bits = field.second.mid(7).split(' ');
+                if (bits.size() != 2)
+                    continue;
+                bool ok = false;
+                const int id = bits[0].toInt(&ok);
+                if (!ok)
+                    continue;
+
+                const QList<QByteArray> args = bits[1].split('/');
+                payloads[id].setName(args[0]);
+                if (args.size() > 1) {
+                    payloads[id].setClockrate(args[1].toInt());
+                }
+                qDebug() << "bits" << bits;
             }
         } else if (field.first == 't') {
             // active time
