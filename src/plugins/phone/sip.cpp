@@ -302,13 +302,11 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     foreach (const QXmppJinglePayloadType &payload, payloadTypes) {
         profiles += " " + QByteArray::number(payload.id());
         QByteArray rtpmap = QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
-        if (payload.channels() != 1)
+        if (payload.channels() > 1)
             rtpmap += "/" + QByteArray::number(payload.channels());
         attrs << "rtpmap:" + rtpmap;
     }
-    profiles += " 101";
-    attrs << "rtpmap:101 telephone-event/8000";
-    attrs << "fmtp:101 0-15";
+    //attrs << "fmtp:101 0-15";
     attrs << "sendrecv";
 
     sdp.addField('m', "audio " + QByteArray::number(rtpSocket->localPort()) + " "  + profiles);
