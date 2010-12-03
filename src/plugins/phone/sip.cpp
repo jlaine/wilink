@@ -411,7 +411,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 
 void SipCallPrivate::sendInvite()
 {
-    const SdpMessage sdp = buildSdp(channel->supportedPayloadTypes());
+    const SdpMessage sdp = buildSdp(channel->localPayloadTypes());
 
     SipMessage request = client->d->buildRequest("INVITE", remoteUri, this, cseq++);
     request.setHeaderField("To", remoteRecipient);
