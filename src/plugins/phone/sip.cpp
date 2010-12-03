@@ -361,20 +361,6 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 payload.setId(id);
                 payloads[id] = payload;
             }
-
-            // determine codec
-            foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
-                for (int i = 3; i < bits.size(); ++i) {
-                    bool ok = false;
-                    if (payload.id() == bits[i].toInt(&ok) && ok) {
-                        q->debug(QString("Accepting RTP profile %1 (%2)").arg(
-                            payload.name(),
-                            QString::number(payload.id())));
-                        commonPayloadTypes << payload;
-                        break;
-                    }
-                }
-            }
         } else if (field.first == 'a') {
             if (field.second.startsWith("ptime:")) {
                 // packetization time
@@ -382,8 +368,6 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 int ptime = field.second.mid(6).toInt(&ok);
                 if (ok && ptime > 0) {
                     q->debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
-                    for (int i = 0; i < commonPayloadTypes.size(); ++i)
-                        commonPayloadTypes[i].setPtime(ptime);
                     foreach (int id, payloads.keys())
                         payloads[id].setPtime(ptime);
                 }
@@ -402,7 +386,6 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 if (args.size() > 1) {
                     payloads[id].setClockrate(args[1].toInt());
                 }
-                qDebug() << "bits" << bits;
             }
         } else if (field.first == 't') {
             // active time
@@ -410,6 +393,20 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 activeTime = field.second;
             else if (field.second != activeTime)
                 q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
+        }
+    }
+
+    // determine common payloads
+    commonPayloadTypes.clear();
+    foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
+        foreach (const QXmppJinglePayloadType &remotePayload, payloads) {
+            if (payload.id() == remotePayload.id()) {
+                q->debug(QString("Accepting RTP profile %1 (%2)").arg(
+                    payload.name(),
+                    QString::number(payload.id())));
+                commonPayloadTypes << payload;
+                break;
+            }
         }
     }
 
