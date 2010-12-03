@@ -149,6 +149,7 @@ PhonePanel::~PhonePanel()
 {
     sipThread->quit();
     sipThread->wait();
+    delete sip;
 }
 
 void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
