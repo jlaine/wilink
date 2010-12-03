@@ -299,11 +299,10 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     sdp.addField('s', "-");
     sdp.addField('c', localAddress.toUtf8());
     sdp.addField('t', activeTime);
-#ifdef USE_ICE
+
     // ICE credentials
     sdp.addField('a', "ice-ufrag:" + iceConnection->localUser().toUtf8());
     sdp.addField('a', "ice-pwd:" + iceConnection->localPassword().toUtf8());
-#endif
 
     // RTP profile
     QByteArray profiles = "RTP/AVP";
@@ -322,9 +321,8 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
 
-#ifdef USE_ICE
     // ICE candidates
-    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
+    foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
         ba += QByteArray::number(candidate.component()) + " ";
         ba += "UDP ";
@@ -334,7 +332,6 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         ba += "typ host";
         sdp.addField('a', ba);
     }
-#endif
     return sdp;
 }
 
@@ -373,18 +370,30 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 payloads << payload;
             }
         } else if (field.first == 'a') {
-            if (field.second.startsWith("ptime:")) {
+            const int pos = field.second.indexOf(':');
+            if (pos < 0)
+                continue;
+            const QByteArray attrName = field.second.left(pos);
+            const QByteArray attrValue = field.second.mid(pos+1);
+
+            if (attrName == "ice-ufrag") {
+                // ICE user
+                iceConnection->setRemoteUser(QString::fromUtf8(attrValue));
+            } else if (attrName == "ice-pwd") {
+                // ICE password
+                iceConnection->setRemotePassword(QString::fromUtf8(attrValue));
+            } else if (attrName == "ptime") {
                 // packetization time
                 bool ok = false;
-                int ptime = field.second.mid(6).toInt(&ok);
+                int ptime = attrValue.toInt(&ok);
                 if (ok && ptime > 0) {
                     q->debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
                     for (int i = 0; i < payloads.size(); ++i)
                         payloads[i].setPtime(ptime);
                 }
-            } else if (field.second.startsWith("rtpmap:")) {
+            } else if (attrName == "rtpmap") {
                 // payload type map
-                const QList<QByteArray> bits = field.second.mid(7).split(' ');
+                const QList<QByteArray> bits = attrValue.split(' ');
                 if (bits.size() != 2)
                     continue;
                 bool ok = false;
