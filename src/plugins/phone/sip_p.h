@@ -71,8 +71,6 @@ public:
     QHostAddress remoteHost;
     quint16 remotePort;
     QXmppIceConnection *iceConnection;
-    QUdpSocket *rtpSocket;
-    QUdpSocket *rtcpSocket;
     bool invitePending;
     SipMessage inviteRequest;
     QByteArray remoteRecipient;

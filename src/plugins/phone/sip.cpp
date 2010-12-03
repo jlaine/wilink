@@ -274,9 +274,18 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
 
 SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const
 {
+    QXmppJingleCandidate localCandidate;
+    foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
+        if (candidate.component() == RTP_COMPONENT &&
+            candidate.type() == QXmppJingleCandidate::HostType) {
+            localCandidate = candidate;
+            break;
+        }
+    }
+
     const QString localAddress = QString("IN %1 %2").arg(
-        rtpSocket->localAddress().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
-        rtpSocket->localAddress().toString());
+        localCandidate.host().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
+        localCandidate.host().toString());
 
     static const QDateTime ntpEpoch(QDate(1900, 1, 1));
     quint32 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
@@ -309,7 +318,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     //attrs << "fmtp:101 0-15";
     attrs << "sendrecv";
 
-    sdp.addField('m', "audio " + QByteArray::number(rtpSocket->localPort()) + " "  + profiles);
+    sdp.addField('m', "audio " + QByteArray::number(localCandidate.port()) + " "  + profiles);
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
 
@@ -524,6 +533,8 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->iceConnection = new QXmppIceConnection(iceControlling, this);
     d->iceConnection->addComponent(RTP_COMPONENT);
     d->iceConnection->addComponent(RTCP_COMPONENT);
+    d->iceConnection->setStunServer(d->client->d->stunServerAddress.toString(),
+                                    d->client->d->stunServerPort);
     if (!d->iceConnection->bind(QList<QHostAddress>() << parent->d->socket->localAddress()))
         warning("Could not start listening for RTP");
 
@@ -531,23 +542,11 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
         this, SLOT(datagramReceived(int,QByteArray)));
     Q_ASSERT(check);
 
-    QList<QUdpSocket*> sockets = QXmppStunSocket::reservePorts(
-        QList<QHostAddress>() << parent->d->socket->localAddress(), 2, this);
-    if (sockets.isEmpty()) {
-        warning("Could not start listening for RTP");
-        d->rtpSocket = 0;
-        d->rtcpSocket = 0;
-        return;
-    }
-    d->rtpSocket = sockets[0];
-    d->rtcpSocket = sockets[1];
     d->timer = new QTimer(this);
     d->timer->setSingleShot(true);
 
     connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
-            this, SLOT(writeToSocket(QByteArray)));
-    connect(d->rtpSocket, SIGNAL(readyRead()),
-            this, SLOT(readFromSocket()));
+            this, SLOT(sendDatagram(QByteArray)));
     connect(d->timer, SIGNAL(timeout()),
             this, SLOT(handleTimeout()));
 }
@@ -674,8 +673,7 @@ void SipCall::hangup()
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     d->setState(QXmppCall::DisconnectingState);
-    d->rtpSocket->close();
-    d->rtcpSocket->close();
+    d->iceConnection->close();
 
     SipMessage request = d->client->d->buildRequest("BYE", d->remoteUri, d, d->cseq++);
     request.setHeaderField("To", d->remoteRecipient);
@@ -684,28 +682,13 @@ void SipCall::hangup()
     d->client->d->sendRequest(request, d);
 }
 
-void SipCall::readFromSocket()
-{
-    while (d->rtpSocket && d->rtpSocket->hasPendingDatagrams())
-    {
-        QByteArray ba(d->rtpSocket->pendingDatagramSize(), '\0');
-        QHostAddress remoteHost;
-        quint16 remotePort = 0;
-        d->rtpSocket->readDatagram(ba.data(), ba.size(), &remoteHost, &remotePort);
-        d->channel->datagramReceived(ba);
-    }
-}
-
 /** Writes an RTP packet to the socket.
  *
- * @param ba
+ * @param datagram
  */
-void SipCall::writeToSocket(const QByteArray &ba)
+void SipCall::sendDatagram(const QByteArray &datagram)
 {
-    if (!d->rtpSocket || d->remoteHost.isNull() || !d->remotePort)
-        return;
-
-    d->rtpSocket->writeDatagram(ba, d->remoteHost, d->remotePort);
+    d->iceConnection->writeDatagram(RTP_COMPONENT, datagram);
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
