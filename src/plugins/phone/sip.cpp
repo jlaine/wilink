@@ -333,7 +333,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
 
 bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 {
-    QMap<int, QXmppJinglePayloadType> payloads;
+    QList<QXmppJinglePayloadType> payloads;
 
     // parse descriptor
     QPair<char, QByteArray> field;
@@ -359,7 +359,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                     continue;
                 QXmppJinglePayloadType payload;
                 payload.setId(id);
-                payloads[id] = payload;
+                payloads << payload;
             }
         } else if (field.first == 'a') {
             if (field.second.startsWith("ptime:")) {
@@ -368,8 +368,8 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 int ptime = field.second.mid(6).toInt(&ok);
                 if (ok && ptime > 0) {
                     q->debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
-                    foreach (int id, payloads.keys())
-                        payloads[id].setPtime(ptime);
+                    for (int i = 0; i < payloads.size(); ++i)
+                        payloads[i].setPtime(ptime);
                 }
             } else if (field.second.startsWith("rtpmap:")) {
                 // payload type map
@@ -382,9 +382,12 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                     continue;
 
                 const QList<QByteArray> args = bits[1].split('/');
-                payloads[id].setName(args[0]);
-                if (args.size() > 1) {
-                    payloads[id].setClockrate(args[1].toInt());
+                for (int i = 0; i < payloads.size(); ++i) {
+                    if (payloads[i].id() == id) {
+                        payloads[i].setName(args[0]);
+                        if (args.size() > 1)
+                            payloads[i].setClockrate(args[1].toInt());
+                    }
                 }
             }
         } else if (field.first == 't') {
@@ -395,6 +398,8 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
         }
     }
+
+    channel->setRemotePayloadTypes(payloads);
 
     // determine common payloads
     commonPayloadTypes.clear();
