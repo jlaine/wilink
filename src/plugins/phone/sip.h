@@ -134,6 +134,7 @@ public slots:
 
 private slots:
     void audioStateChanged();
+    void datagramReceived(int component, const QByteArray &datagram);
     void handleTimeout();
     void readFromSocket();
     void writeToSocket(const QByteArray &ba);

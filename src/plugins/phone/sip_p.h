@@ -70,9 +70,7 @@ public:
     QAudioOutput *audioOutput;
     QHostAddress remoteHost;
     quint16 remotePort;
-#ifdef USE_ICE
     QXmppIceConnection *iceConnection;
-#endif
     QUdpSocket *rtpSocket;
     QUdpSocket *rtcpSocket;
     bool invitePending;

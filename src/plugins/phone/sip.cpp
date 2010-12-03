@@ -506,6 +506,8 @@ void SipCallPrivate::onStateChanged()
 SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent)
     : QXmppLoggable(parent)
 {
+    bool check;
+
     d = new SipCallPrivate(this);
     d->client = parent;
     d->direction = direction;
@@ -518,6 +520,17 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->remotePort = 0;
 
     // bind sockets
+    bool iceControlling = (d->direction == QXmppCall::OutgoingDirection);
+    d->iceConnection = new QXmppIceConnection(iceControlling, this);
+    d->iceConnection->addComponent(RTP_COMPONENT);
+    d->iceConnection->addComponent(RTCP_COMPONENT);
+    if (!d->iceConnection->bind(QList<QHostAddress>() << parent->d->socket->localAddress()))
+        warning("Could not start listening for RTP");
+
+    check = connect(d->iceConnection, SIGNAL(datagramReceived(int,QByteArray)),
+        this, SLOT(datagramReceived(int,QByteArray)));
+    Q_ASSERT(check);
+
     QList<QUdpSocket*> sockets = QXmppStunSocket::reservePorts(
         QList<QHostAddress>() << parent->d->socket->localAddress(), 2, this);
     if (sockets.isEmpty()) {
@@ -598,6 +611,12 @@ void SipCall::audioStateChanged()
         debug(QString("Audio input state %1").arg(QString::number(d->audioInput->state())));
     else if (audio == d->audioOutput)
         debug(QString("Audio output state %1").arg(QString::number(d->audioOutput->state())));
+}
+
+void SipCall::datagramReceived(int component, const QByteArray &datagram)
+{
+    if (component == RTP_COMPONENT)
+        d->channel->datagramReceived(datagram);
 }
 
 /// Returns the call's direction.
