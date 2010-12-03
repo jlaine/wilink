@@ -68,8 +68,6 @@ public:
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
     QAudioOutput *audioOutput;
-    QHostAddress remoteHost;
-    quint16 remotePort;
     QXmppIceConnection *iceConnection;
     bool invitePending;
     SipMessage inviteRequest;

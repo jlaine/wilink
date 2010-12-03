@@ -341,6 +341,10 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
 bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 {
     QList<QXmppJinglePayloadType> payloads;
+    QXmppJingleCandidate remoteCandidate;
+    remoteCandidate.setComponent(RTP_COMPONENT);
+    remoteCandidate.setProtocol("udp");
+    remoteCandidate.setType(QXmppJingleCandidate::HostType);
 
     // parse descriptor
     QPair<char, QByteArray> field;
@@ -348,7 +352,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
         if (field.first == 'c') {
             // determine remote host
             if (field.second.startsWith("IN IP4 ") || field.second.startsWith("IN IP6 ")) {
-                remoteHost = QHostAddress(QString::fromUtf8(field.second.mid(7)));
+                remoteCandidate.setHost(QHostAddress(QString::fromUtf8(field.second.mid(7))));
             }
         } else if (field.first == 'm') {
             QList<QByteArray> bits = field.second.split(' ');
@@ -356,7 +360,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 continue;
 
             // determine remote port
-            remotePort = bits[1].toUInt();
+            remoteCandidate.setPort(bits[1].toUInt());
 
             // parse payload types
             for (int i = 3; i < bits.size(); ++i) {
@@ -405,6 +409,12 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
         }
     }
+
+    // add remote candidate
+    iceConnection->addRemoteCandidate(remoteCandidate);
+    remoteCandidate.setComponent(RTCP_COMPONENT);
+    remoteCandidate.setPort(remoteCandidate.port() + 1);
+    iceConnection->addRemoteCandidate(remoteCandidate);
 
     // assign remote payload types
     channel->setRemotePayloadTypes(payloads);
@@ -526,7 +536,6 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->channel = new QXmppRtpChannel(this);
     d->audioInput = 0;
     d->audioOutput = 0;
-    d->remotePort = 0;
 
     // bind sockets
     bool iceControlling = (d->direction == QXmppCall::OutgoingDirection);
@@ -537,6 +546,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
                                     d->client->d->stunServerPort);
     if (!d->iceConnection->bind(QList<QHostAddress>() << parent->d->socket->localAddress()))
         warning("Could not start listening for RTP");
+    d->iceConnection->connectToHost();
 
     check = connect(d->iceConnection, SIGNAL(datagramReceived(int,QByteArray)),
         this, SLOT(datagramReceived(int,QByteArray)));
