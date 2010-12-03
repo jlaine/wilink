@@ -28,8 +28,9 @@ int main(int argc, char* argv[])
     QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     connection.addComponent(1);
+    connection.addComponent(2);
 
-    connection.bind();
+    connection.bind(QXmppStunSocket::discoverAddresses());
     connection.connectToHost();
     return app.exec();
 }
