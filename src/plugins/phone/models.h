@@ -46,7 +46,6 @@ public:
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
 
-    void addCall(SipCall *call);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
@@ -57,6 +56,7 @@ signals:
     void stateChanged(bool haveCalls);
 
 public slots:
+    void addCall(SipCall *call);
     void hangup();
 
 private slots:

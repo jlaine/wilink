@@ -33,6 +33,7 @@ class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QPushButton;
+class QThread;
 class Chat;
 class ChatClient;
 class PhoneCallsModel;
@@ -65,6 +66,7 @@ class PhonePanel : public ChatPanel
 
 public:
     PhonePanel(Chat *chatWindow, QWidget *parent = NULL);
+    ~PhonePanel();
 
 private slots:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
@@ -83,6 +85,7 @@ private:
     ChatClient *client;
     Chat *m_window;
     SipClient *sip;
+    QThread *sipThread;
     QNetworkAccessManager *network;
 
     PhoneCallsModel *callsModel;

@@ -909,6 +909,8 @@ void SipClientPrivate::setState(SipClient::State newState)
 SipClient::SipClient(QObject *parent)
     : QXmppLoggable(parent)
 {
+    qRegisterMetaType<SipClient::State>("SipClient::State");
+
     d = new SipClientPrivate(this);
     d->socket = new QUdpSocket(this);
     connect(d->socket, SIGNAL(readyRead()),
@@ -957,6 +959,7 @@ SipCall *SipClient::call(const QString &recipient)
     d->calls << call;
     call->d->sendInvite();
 
+    emit callDialled(call);
     return call;
 }
 

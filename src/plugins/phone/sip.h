@@ -163,7 +163,6 @@ public:
     SipClient(QObject *parent = 0);
     ~SipClient();
 
-    SipCall *call(const QString &recipient);
     SipClient::State state() const;
 
     QString displayName() const;
@@ -182,6 +181,9 @@ signals:
     void connected();
     void disconnected();
 
+    /// This signal is emitted when a new outgoing call is dialled.
+    void callDialled(SipCall *call);
+
     /// This signal is emitted when a new incoming call is received.
     ///
     /// To accept the call, invoke the call's SipCall::accept() method.
@@ -192,6 +194,7 @@ signals:
     void stateChanged(SipClient::State state);
 
 public slots:
+    SipCall *call(const QString &recipient);
     void connectToServer();
     void disconnectFromServer();
 

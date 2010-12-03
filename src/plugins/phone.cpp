@@ -27,6 +27,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPushButton>
+#include <QThread>
 #include <QTimer>
 #include <QUrl>
 
@@ -111,7 +112,14 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setLayout(layout);
 
     // sip client
-    sip = new SipClient(this);
+    sipThread = new QThread(this);
+    sip = new SipClient;
+    sip->moveToThread(sipThread);
+    sipThread->start();
+
+    check = connect(sip, SIGNAL(callDialled(SipCall*)),
+                    callsModel, SLOT(addCall(SipCall*)));
+
     check = connect(sip, SIGNAL(callReceived(SipCall*)),
                     this, SLOT(callReceived(SipCall*)));
     Q_ASSERT(check);
@@ -135,6 +143,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
             this, SLOT(callNumber()));
     connect(hangupButton, SIGNAL(clicked()),
             callsModel, SLOT(hangup()));
+}
+
+PhonePanel::~PhonePanel()
+{
+    sipThread->quit();
+    sipThread->wait();
 }
 
 void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
@@ -167,9 +181,7 @@ void PhonePanel::callDoubleClicked(const QModelIndex &index)
     if (!callButton->isEnabled() || recipient.isEmpty())
         return;
 
-    SipCall *call = sip->call(recipient);
-    if (call)
-        callsModel->addCall(call);
+    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
 }
 
 void PhonePanel::callNumber()
@@ -180,9 +192,7 @@ void PhonePanel::callNumber()
 
     const QString recipient = QString("\"%1\" <sip:%2@%3>").arg(phoneNumber, phoneNumber, sip->domain());
 
-    SipCall *call = sip->call(recipient);
-    if (call)
-        callsModel->addCall(call);
+    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
 }
 
 void PhonePanel::callReceived(SipCall *call)
@@ -255,7 +265,7 @@ void PhonePanel::handleSettings()
     sip->setDomain(jidToDomain(jid));
     sip->setUsername(jidToUser(jid));
     sip->setPassword(password);
-    sip->connectToServer();
+    QMetaObject::invokeMethod(sip, "connectToServer");
 
     // retrieve call history
     callsModel->setUrl(QUrl("http://phone.wifirst.net/calls/"));
