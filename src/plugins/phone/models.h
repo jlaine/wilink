@@ -49,6 +49,7 @@ public:
     void addCall(SipCall *call);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     void setUrl(const QUrl &url);
 
@@ -81,6 +82,7 @@ public:
     PhoneCallsView(PhoneCallsModel *model, QWidget *parent = 0);
 
 protected:
+    void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *e);
 
 private:

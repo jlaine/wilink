@@ -93,6 +93,11 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
     flags = callElement.firstChildElement("flags").text().toInt();
 }
 
+/** Constructs a new model representing the call history.
+ *
+ * @param network
+ * @param parent
+ */
 PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent)
     : QAbstractListModel(parent),
     m_network(network)
@@ -187,6 +192,10 @@ void PhoneCallsModel::callTick()
     }
 }
 
+/** Returns the number of columns under the given \a parent.
+ *
+ * @param parent
+ */
 int PhoneCallsModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
@@ -306,7 +315,7 @@ void PhoneCallsModel::handleList()
     }
 }
 
-/** Hang up all active calls.
+/** Hangs up all active calls.
  */
 void PhoneCallsModel::hangup()
 {
@@ -315,11 +324,43 @@ void PhoneCallsModel::hangup()
             m_items[i]->call->hangup();
 }
 
+/** Removes \a count rows starting at the given \a row under the given \a parent.
+ *
+ * @param row
+ * @param count
+ * @param parent
+ */
+bool PhoneCallsModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    int last = row + count - 1;
+    if (parent.isValid() || row < 0 || count < 0 || last >= m_items.size())
+        return false;
+
+    beginRemoveRows(parent, row, last);
+    for (int i = last; i >= row; --i) {
+        PhoneCallsItem *item = m_items[i];
+        QUrl url = m_url;
+        url.setPath(url.path() + QString::number(item->id) + "/");
+        m_network->deleteResource(buildRequest(url));
+        delete item;
+        m_items.removeAt(i);
+    }
+    endRemoveRows();
+}
+
+/** Returns the number of rows under the given \a parent.
+ *
+ * @param parent
+ */
 int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 {
     return m_items.size();
 }
 
+/** Sets the base URL for the call history.
+ *
+ * @param url
+ */
 void PhoneCallsModel::setUrl(const QUrl &url)
 {
     m_url = url;
@@ -349,6 +390,15 @@ PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
     sortByColumn(SortingColumn, Qt::DescendingOrder);
     horizontalHeader()->setVisible(false);
     verticalHeader()->setVisible(false);
+}
+
+void PhoneCallsView::keyPressEvent(QKeyEvent *event)
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid() &&
+        (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace))
+        m_sortedModel->removeRow(index.row());
+    QTableView::keyPressEvent(event);
 }
 
 void PhoneCallsView::resizeEvent(QResizeEvent *e)
