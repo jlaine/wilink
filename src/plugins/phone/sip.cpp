@@ -399,33 +399,8 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
         }
     }
 
+    // assign remote payload types
     channel->setRemotePayloadTypes(payloads);
-
-    // determine common payloads
-    commonPayloadTypes.clear();
-    foreach (const QXmppJinglePayloadType &payload, channel->supportedPayloadTypes()) {
-        foreach (const QXmppJinglePayloadType &remotePayload, payloads) {
-            if (payload.id() == remotePayload.id()) {
-                q->debug(QString("Accepting RTP profile %1 (%2)").arg(
-                    payload.name(),
-                    QString::number(payload.id())));
-                commonPayloadTypes << payload;
-                break;
-            }
-        }
-    }
-
-    // set codec
-    if (!commonPayloadTypes.size()) {
-        q->warning("Could not find a common codec");
-        return false;
-    }
-    QXmppJinglePayloadType commonPayload = commonPayloadTypes[0];
-    q->debug(QString("Selecting RTP profile %1 (%2), %3 ms").arg(
-        commonPayload.name(),
-        QString::number(commonPayload.id()),
-        QString::number(commonPayload.ptime())));
-    channel->setPayloadType(commonPayload);
     if (!channel->isOpen()) {
         q->warning("Could not assign codec to RTP channel");
         return false;
@@ -600,7 +575,7 @@ void SipCall::accept()
         d->rtcpSocket->writeDatagram(rtcp, d->remoteHost, d->remotePort+1);
 #endif
 
-        const SdpMessage sdp = d->buildSdp(d->commonPayloadTypes);
+        const SdpMessage sdp = d->buildSdp(d->channel->localPayloadTypes());
 
         SipMessage response = d->client->d->buildResponse(d->inviteRequest);
         response.setStatusCode(200);

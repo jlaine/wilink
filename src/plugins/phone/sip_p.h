@@ -64,7 +64,6 @@ public:
     QTime startTime;
     QTime stopTime;
     QXmppCall::State state;
-    QList<QXmppJinglePayloadType> commonPayloadTypes;
     QByteArray activeTime;
     QXmppRtpChannel *channel;
     QAudioInput *audioInput;
