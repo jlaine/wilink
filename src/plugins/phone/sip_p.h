@@ -70,6 +70,7 @@ public:
     QAudioOutput *audioOutput;
     QXmppIceConnection *iceConnection;
     bool invitePending;
+    bool inviteQueued;
     SipMessage inviteRequest;
     QByteArray remoteRecipient;
     QList<QByteArray> remoteRoute;

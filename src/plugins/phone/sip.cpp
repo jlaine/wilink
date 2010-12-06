@@ -134,6 +134,7 @@ SipCallContext::SipCallContext()
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::OfferState),
     invitePending(false),
+    inviteQueued(false),
     activeTime("0 0"),
     q(qq)
 {
@@ -554,6 +555,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d = new SipCallPrivate(this);
     d->client = parent;
     d->direction = direction;
+    d->inviteQueued = (direction == QXmppCall::OutgoingDirection);
     d->remoteRecipient = recipient.toUtf8();
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
@@ -568,9 +570,9 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->iceConnection->addComponent(RTCP_COMPONENT);
     d->iceConnection->setStunServer(d->client->d->stunServerAddress.toString(),
                                     d->client->d->stunServerPort);
-    if (!d->iceConnection->bind(QList<QHostAddress>() << parent->d->socket->localAddress()))
-        warning("Could not start listening for RTP");
-    d->iceConnection->connectToHost();
+    check = connect(d->iceConnection, SIGNAL(localCandidatesChanged()),
+                    this, SLOT(localCandidatesChanged()));
+    Q_ASSERT(check);
 
     // setup RTP transport
     QXmppIceComponent *rtpComponent = d->iceConnection->component(RTP_COMPONENT);
@@ -588,6 +590,12 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     check = connect(d->timer, SIGNAL(timeout()),
                     this, SLOT(handleTimeout()));
     Q_ASSERT(check);
+
+    // start ICE
+    if (!d->iceConnection->bind(QList<QHostAddress>() << parent->d->socket->localAddress()))
+        warning("Could not start listening for RTP");
+    d->iceConnection->connectToHost();
+
 }
 
 SipCall::~SipCall()
@@ -681,6 +689,30 @@ int SipCall::duration() const
 QByteArray SipCall::id() const
 {
     return d->id;
+}
+
+void SipCall::localCandidatesChanged()
+{
+    qDebug("checking local candidates");
+
+    // check whether we have server-reflexive candidates for all components
+    bool foundRtp = false;
+    bool foundRtcp = false;
+    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
+        if (candidate.type() == QXmppJingleCandidate::ServerReflexiveType) {
+            if (candidate.component() == RTP_COMPONENT)
+                foundRtp = true;
+            else if (candidate.component() == RTCP_COMPONENT)
+                foundRtcp = true;
+        }
+    }
+
+    // send INVITE if required
+    if (d->inviteQueued && foundRtp && foundRtcp) {
+        qDebug("ready");
+        d->sendInvite();
+        d->inviteQueued = false;
+    }
 }
 
 QString SipCall::recipient() const
@@ -989,7 +1021,6 @@ SipCall *SipClient::call(const QString &recipient)
     connect(call, SIGNAL(destroyed(QObject*)),
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
-    call->d->sendInvite();
 
     emit callDialled(call);
     return call;

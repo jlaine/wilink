@@ -138,6 +138,7 @@ public slots:
 private slots:
     void audioStateChanged();
     void handleTimeout();
+    void localCandidatesChanged();
 
 private:
     SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent);
