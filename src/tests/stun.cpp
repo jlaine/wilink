@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     connection.addComponent(1);
     connection.addComponent(2);
 
-    connection.bind(QXmppStunSocket::discoverAddresses());
+    connection.bind(QXmppIceComponent::discoverAddresses());
     connection.connectToHost();
     return app.exec();
 }
