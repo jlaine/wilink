@@ -71,14 +71,13 @@ public:
 private slots:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void backspacePressed();
-    void callClicked(QAbstractButton *button);
+    void callButtonClicked(QAbstractButton *button);
     void callDoubleClicked(const QModelIndex &index);
     void callNumber();
     void callReceived(SipCall *call);
     void callStateChanged(bool haveCalls);
     void getSettings();
     void handleSettings();
-    void keyClicked();
     void keyPressed();
     void keyReleased();
     void sipStateChanged(SipClient::State state);

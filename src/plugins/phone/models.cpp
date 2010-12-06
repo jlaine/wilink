@@ -114,6 +114,15 @@ PhoneCallsModel::~PhoneCallsModel()
         delete item;
 }
 
+QList<SipCall*> PhoneCallsModel::activeCalls() const
+{
+    QList<SipCall*> calls;
+    for (int i = m_items.size() - 1; i >= 0; --i)
+        if (m_items[i]->call)
+            calls << m_items[i]->call;
+    return calls;
+}
+
 void PhoneCallsModel::addCall(SipCall *call)
 {
     PhoneCallsItem *item = new PhoneCallsItem;

@@ -31,6 +31,7 @@
 #include <QTimer>
 #include <QUrl>
 
+#include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
 #include "qnetio/wallet.h"
@@ -90,7 +91,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     keys << "*" << "0" << "#";
     for (int i = 0; i < keys.size(); ++i) {
         QPushButton *key = new QPushButton(keys[i]);
-        connect(key, SIGNAL(clicked()), this, SLOT(keyClicked()));
         connect(key, SIGNAL(pressed()), this, SLOT(keyPressed()));
         connect(key, SIGNAL(released()), this, SLOT(keyReleased()));
         grid->addWidget(key, i / 3, i % 3, 1, 1);
@@ -164,7 +164,7 @@ void PhonePanel::backspacePressed()
     numberEdit->backspace();
 }
 
-void PhonePanel::callClicked(QAbstractButton *button)
+void PhonePanel::callButtonClicked(QAbstractButton *button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
     SipCall *call = qobject_cast<SipCall*>(box->property("call").value<QObject*>());
@@ -213,7 +213,7 @@ void PhonePanel::callReceived(SipCall *call)
     /* connect signals */
     connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
-        this, SLOT(callClicked(QAbstractButton*)));
+        this, SLOT(callButtonClicked(QAbstractButton*)));
     box->show();
 }
 
@@ -276,20 +276,48 @@ void PhonePanel::handleSettings()
     emit registerPanel();
 }
 
-void PhonePanel::keyClicked()
+static QXmppRtpChannel::Tone keyTone(QPushButton *key)
 {
-    QPushButton *key = qobject_cast<QPushButton*>(sender());
-    if (!key)
-        return;
-    numberEdit->insert(key->text());
+    char c = key->text()[0].toLatin1();
+    if (c >= '0' && c <= '9')
+        return QXmppRtpChannel::Tone(c - '0');
+    else if (c == '*')
+        return QXmppRtpChannel::Tone_Star;
+    else if (c == '#')
+        return QXmppRtpChannel::Tone_Pound;
+    else
+        return QXmppRtpChannel::Tone(-1);
 }
 
 void PhonePanel::keyPressed()
 {
+    QPushButton *key = qobject_cast<QPushButton*>(sender());
+    if (!key)
+        return;
+
+    QList<SipCall*> calls = callsModel->activeCalls();
+    QXmppRtpChannel::Tone tone = keyTone(key);
+    foreach (SipCall *call, calls)
+        call->audioChannel()->startTone(tone);
 }
 
 void PhonePanel::keyReleased()
 {
+    QPushButton *key = qobject_cast<QPushButton*>(sender());
+    if (!key)
+        return;
+    QList<SipCall*> calls = callsModel->activeCalls();
+
+    // add digit
+    if (calls.isEmpty()) {
+        numberEdit->insert(key->text());
+        return;
+    }
+
+    // send DTMF
+    QXmppRtpChannel::Tone tone = keyTone(key);
+    foreach (SipCall *call, calls)
+        call->audioChannel()->stopTone(tone);
 }
 
 void PhonePanel::sipStateChanged(SipClient::State state)
