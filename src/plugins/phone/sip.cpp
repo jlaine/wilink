@@ -441,8 +441,8 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
     iceConnection->addRemoteCandidate(remoteCandidate);
 
     // assign remote payload types
-    channel->setRemotePayloadTypes(payloads);
-    if (!channel->isOpen()) {
+    audioChannel->setRemotePayloadTypes(payloads);
+    if (!audioChannel->isOpen()) {
         q->warning("Could not assign codec to RTP channel");
         return false;
     }
@@ -452,7 +452,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 
 void SipCallPrivate::sendInvite()
 {
-    const SdpMessage sdp = buildSdp(channel->localPayloadTypes());
+    const SdpMessage sdp = buildSdp(audioChannel->localPayloadTypes());
 
     SipMessage request = client->d->buildRequest("INVITE", remoteUri, this, cseq++);
     request.setHeaderField("To", remoteRecipient);
@@ -491,14 +491,14 @@ void SipCallPrivate::onStateChanged()
 
         // prepare audio format
         QAudioFormat format;
-        format.setFrequency(channel->payloadType().clockrate());
-        format.setChannels(channel->payloadType().channels());
+        format.setFrequency(audioChannel->payloadType().clockrate());
+        format.setChannels(audioChannel->payloadType().channels());
         format.setSampleSize(16);
         format.setCodec("audio/pcm");
         format.setByteOrder(QAudioFormat::LittleEndian);
         format.setSampleType(QAudioFormat::SignedInt);
 
-        const int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
+        const int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * audioChannel->payloadType().ptime() / 1000;
 
         // initialise audio output
         if (!audioOutput) {
@@ -508,7 +508,7 @@ void SipCallPrivate::onStateChanged()
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioOutput->setBufferSize(2 * packetSize);
-            audioOutput->start(channel);
+            audioOutput->start(audioChannel);
             q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
         }
 
@@ -520,7 +520,7 @@ void SipCallPrivate::onStateChanged()
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioInput->setBufferSize(2 * packetSize);
-            audioInput->start(channel);
+            audioInput->start(audioChannel);
             q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
         }
 
@@ -557,7 +557,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->remoteRecipient = recipient.toUtf8();
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
-    d->channel = new QXmppRtpChannel(this);
+    d->audioChannel = new QXmppRtpChannel(this);
     d->audioInput = 0;
     d->audioOutput = 0;
 
@@ -575,10 +575,10 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     // setup RTP transport
     QXmppIceComponent *rtpComponent = d->iceConnection->component(RTP_COMPONENT);
     check = connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
-                    d->channel, SLOT(datagramReceived(QByteArray)));
+                    d->audioChannel, SLOT(datagramReceived(QByteArray)));
     Q_ASSERT(check);
 
-    check = connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
+    check = connect(d->audioChannel, SIGNAL(sendDatagram(QByteArray)),
                     rtpComponent, SLOT(sendDatagram(QByteArray)));
     Q_ASSERT(check);
 
@@ -610,13 +610,13 @@ void SipCall::accept()
         stream << quint8(0x80);
         stream << quint8(0xc9); // receiver report
         stream << quint16(1);   // length
-        stream << d->channel->synchronizationSource();
+        stream << d->audioChannel->synchronizationSource();
 
         // source description
         stream << quint8(0x81);
         stream << quint8(0xca); // source description
         stream << quint16(2);   // length
-        stream << d->channel->synchronizationSource();
+        stream << d->audioChannel->synchronizationSource();
         stream << quint8(1); // cname
         stream << quint8(0);
         stream << quint8(0); // end
@@ -624,7 +624,7 @@ void SipCall::accept()
         d->rtcpSocket->writeDatagram(rtcp, d->remoteHost, d->remotePort+1);
 #endif
 
-        const SdpMessage sdp = d->buildSdp(d->channel->localPayloadTypes());
+        const SdpMessage sdp = d->buildSdp(d->audioChannel->localPayloadTypes());
 
         SipMessage response = d->client->d->buildResponse(d->inviteRequest);
         response.setStatusCode(200);
@@ -638,6 +638,11 @@ void SipCall::accept()
 
         d->setState(QXmppCall::ConnectingState);
     }
+}
+
+QXmppRtpChannel *SipCall::audioChannel() const
+{
+    return d->audioChannel;
 }
 
 void SipCall::audioStateChanged()

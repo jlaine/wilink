@@ -30,6 +30,7 @@
 
 class QUdpSocket;
 class QTimer;
+class QXmppRtpChannel;
 class QXmppSrvInfo;
 
 class SipCallContext;
@@ -111,6 +112,8 @@ public:
     QByteArray id() const;
     QString recipient() const;
     QXmppCall::State state() const;
+
+    QXmppRtpChannel *audioChannel() const;
 
 signals:
     /// This signal is emitted when a call is connected.
