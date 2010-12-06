@@ -273,20 +273,23 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
     }
 }
 
+static QString addressToSdp(const QHostAddress &host)
+{
+    return QString("IN %1 %2").arg(
+        host.protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
+        host.toString());
+}
+
 SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const
 {
     QXmppJingleCandidate localCandidate;
     foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
         if (candidate.component() == RTP_COMPONENT &&
-            candidate.type() == QXmppJingleCandidate::HostType) {
+            candidate.type() == QXmppJingleCandidate::ServerReflexiveType) {
             localCandidate = candidate;
             break;
         }
     }
-
-    const QString localAddress = QString("IN %1 %2").arg(
-        localCandidate.host().protocol() == QAbstractSocket::IPv6Protocol ? "IP6" : "IP4",
-        localCandidate.host().toString());
 
     static const QDateTime ntpEpoch(QDate(1900, 1, 1));
     quint32 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
@@ -296,9 +299,9 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     sdp.addField('o', QString("- %1 %2 %3").arg(
         QString::number(ntpSeconds),
         QString::number(ntpSeconds),
-        localAddress).toUtf8());
+        addressToSdp(client->d->socket->localAddress())).toUtf8());
     sdp.addField('s', "-");
-    sdp.addField('c', localAddress.toUtf8());
+    sdp.addField('c', addressToSdp(localCandidate.host()).toUtf8());
     sdp.addField('t', activeTime);
 
     // ICE credentials
@@ -693,8 +696,6 @@ QByteArray SipCall::id() const
 
 void SipCall::localCandidatesChanged()
 {
-    qDebug("checking local candidates");
-
     // check whether we have server-reflexive candidates for all components
     bool foundRtp = false;
     bool foundRtcp = false;
@@ -709,7 +710,6 @@ void SipCall::localCandidatesChanged()
 
     // send INVITE if required
     if (d->inviteQueued && foundRtp && foundRtcp) {
-        qDebug("ready");
         d->sendInvite();
         d->inviteQueued = false;
     }
