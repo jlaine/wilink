@@ -118,9 +118,11 @@ public:
 
     // STUN
     bool stunDone;
-    StunTester *stunTester;
+    quint32 stunCookie;
+    QByteArray stunId;
     QHostAddress stunServerAddress;
     quint16 stunServerPort;
+    StunTester *stunTester;
 
 private:
     SipClient *q;

@@ -39,8 +39,6 @@
 static const int RTP_COMPONENT = 1;
 static const int RTCP_COMPONENT = 2;
 
-static const quint32 STUN_MAGIC = 0x2112A442;
-
 #define QXMPP_DEBUG_SIP
 #define QXMPP_DEBUG_STUN
 
@@ -708,6 +706,7 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
     : state(SipClient::DisconnectedState),
     reflexivePort(0),
     socketsBound(false),
+    stunCookie(0),
     stunDone(false),
     stunServerPort(0),
     q(qq)
@@ -1052,7 +1051,7 @@ void SipClient::datagramReceived()
     quint32 messageCookie;
     QByteArray messageId;
     quint16 messageType = QXmppStunMessage::peekType(buffer, messageCookie, messageId);
-    if (messageType)
+    if (messageType && messageCookie == d->stunCookie && messageId == d->stunId)
     {
         QXmppStunMessage message;
         if (!message.decode(buffer))
@@ -1194,9 +1193,12 @@ void SipClient::registerWithServer()
  */
 void SipClient::sendStun()
 {
+    d->stunCookie = qrand();
+    d->stunId = generateRandomBytes(12);
+
     QXmppStunMessage request;
-    request.setCookie(qrand());
-    request.setId(generateRandomBytes(12));
+    request.setCookie(d->stunCookie);
+    request.setId(d->stunId);
     request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
     request.setChangeRequest(0);
 
