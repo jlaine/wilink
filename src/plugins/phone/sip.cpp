@@ -36,8 +36,10 @@
 
 #include "sip_p.h"
 
-const int RTP_COMPONENT = 1;
-const int RTCP_COMPONENT = 2;
+static const int RTP_COMPONENT = 1;
+static const int RTCP_COMPONENT = 2;
+
+static const quint32 STUN_MAGIC = 0x2112A442;
 
 #define QXMPP_DEBUG_SIP
 #define QXMPP_DEBUG_STUN
@@ -1047,9 +1049,10 @@ void SipClient::datagramReceived()
     d->socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
 
     // check whether it's a STUN packet
+    quint32 messageCookie;
     QByteArray messageId;
-    quint16 messageType = QXmppStunMessage::peekType(buffer, messageId);
-    if (messageType)
+    quint16 messageType = QXmppStunMessage::peekType(buffer, messageCookie, messageId);
+    if (messageType && messageCookie == STUN_MAGIC)
     {
         QXmppStunMessage message;
         if (!message.decode(buffer))
