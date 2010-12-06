@@ -383,7 +383,20 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 // ICE password
                 iceConnection->setRemotePassword(QString::fromUtf8(attrValue));
             } else if (attrName == "candidate") {
-                // TODO : parse ICE candidate
+                // ICE candidate
+                QList<QByteArray> bits = attrValue.split(' ');
+                QXmppJingleCandidate candidate;
+                if (bits.size() == 8 && bits[6] == "typ") {
+                    candidate.setFoundation(bits[0].toInt());
+                    candidate.setComponent(bits[1].toInt());
+                    candidate.setProtocol(QString::fromAscii(bits[2]).toLower());
+                    candidate.setPriority(bits[3].toInt());
+                    candidate.setHost(QHostAddress(QString::fromAscii(bits[4])));
+                    candidate.setPort(bits[5].toInt());
+                    candidate.setType(QXmppJingleCandidate::typeFromString(QString::fromAscii(bits[7])));
+
+                    iceConnection->addRemoteCandidate(candidate);
+                }
             } else if (attrName == "ptime") {
                 // packetization time
                 bool ok = false;
