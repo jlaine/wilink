@@ -302,7 +302,13 @@ void PhoneCallsModel::handleList()
 
     QDomElement callElement = doc.documentElement().firstChildElement("call");
     while (!callElement.isNull()) {
-        const int id = callElement.firstChildElement("id").text().toInt();
+        int id = callElement.firstChildElement("id").text().toInt();
+        foreach (PhoneCallsItem *item, m_items) {
+            if (item->id == id) {
+                id = 0;
+                break;
+            }
+        }
         if (id > 0) {
             PhoneCallsItem *item = new PhoneCallsItem;
             item->parse(callElement);
