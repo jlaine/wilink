@@ -90,7 +90,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     keys << "*" << "0" << "#";
     for (int i = 0; i < keys.size(); ++i) {
         QPushButton *key = new QPushButton(keys[i]);
-        connect(key, SIGNAL(clicked()), this, SLOT(keyPressed()));
+        connect(key, SIGNAL(clicked()), this, SLOT(keyClicked()));
+        connect(key, SIGNAL(pressed()), this, SLOT(keyPressed()));
+        connect(key, SIGNAL(released()), this, SLOT(keyReleased()));
         grid->addWidget(key, i / 3, i % 3, 1, 1);
     }
     layout->addLayout(grid);
@@ -274,12 +276,20 @@ void PhonePanel::handleSettings()
     emit registerPanel();
 }
 
-void PhonePanel::keyPressed()
+void PhonePanel::keyClicked()
 {
     QPushButton *key = qobject_cast<QPushButton*>(sender());
     if (!key)
         return;
     numberEdit->insert(key->text());
+}
+
+void PhonePanel::keyPressed()
+{
+}
+
+void PhonePanel::keyReleased()
+{
 }
 
 void PhonePanel::sipStateChanged(SipClient::State state)

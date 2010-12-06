@@ -78,7 +78,9 @@ private slots:
     void callStateChanged(bool haveCalls);
     void getSettings();
     void handleSettings();
+    void keyClicked();
     void keyPressed();
+    void keyReleased();
     void sipStateChanged(SipClient::State state);
 
 private:
