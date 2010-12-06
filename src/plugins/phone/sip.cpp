@@ -1052,7 +1052,7 @@ void SipClient::datagramReceived()
     quint32 messageCookie;
     QByteArray messageId;
     quint16 messageType = QXmppStunMessage::peekType(buffer, messageCookie, messageId);
-    if (messageType && messageCookie == STUN_MAGIC)
+    if (messageType)
     {
         QXmppStunMessage message;
         if (!message.decode(buffer))
