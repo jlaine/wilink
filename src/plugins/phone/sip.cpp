@@ -382,6 +382,8 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
             } else if (attrName == "ice-pwd") {
                 // ICE password
                 iceConnection->setRemotePassword(QString::fromUtf8(attrValue));
+            } else if (attrName == "candidate") {
+                // TODO : parse ICE candidate
             } else if (attrName == "ptime") {
                 // packetization time
                 bool ok = false;
@@ -557,17 +559,22 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
         warning("Could not start listening for RTP");
     d->iceConnection->connectToHost();
 
-    check = connect(d->iceConnection, SIGNAL(datagramReceived(int,QByteArray)),
-        this, SLOT(datagramReceived(int,QByteArray)));
+    // setup RTP transport
+    QXmppIceComponent *rtpComponent = d->iceConnection->component(RTP_COMPONENT);
+    check = connect(rtpComponent, SIGNAL(datagramReceived(QByteArray)),
+                    d->channel, SLOT(datagramReceived(QByteArray)));
     Q_ASSERT(check);
 
+    check = connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
+                    rtpComponent, SLOT(sendDatagram(QByteArray)));
+    Q_ASSERT(check);
+
+    // setup timers
     d->timer = new QTimer(this);
     d->timer->setSingleShot(true);
-
-    connect(d->channel, SIGNAL(sendDatagram(QByteArray)),
-            this, SLOT(sendDatagram(QByteArray)));
-    connect(d->timer, SIGNAL(timeout()),
-            this, SLOT(handleTimeout()));
+    check = connect(d->timer, SIGNAL(timeout()),
+                    this, SLOT(handleTimeout()));
+    Q_ASSERT(check);
 }
 
 SipCall::~SipCall()
@@ -629,12 +636,6 @@ void SipCall::audioStateChanged()
         debug(QString("Audio input state %1").arg(QString::number(d->audioInput->state())));
     else if (audio == d->audioOutput)
         debug(QString("Audio output state %1").arg(QString::number(d->audioOutput->state())));
-}
-
-void SipCall::datagramReceived(int component, const QByteArray &datagram)
-{
-    if (component == RTP_COMPONENT)
-        d->channel->datagramReceived(datagram);
 }
 
 /// Returns the call's direction.
@@ -699,15 +700,6 @@ void SipCall::hangup()
     for (int i = d->remoteRoute.size() - 1; i >= 0; --i)
         request.addHeaderField("Route", d->remoteRoute[i]);
     d->client->d->sendRequest(request, d);
-}
-
-/** Writes an RTP packet to the socket.
- *
- * @param datagram
- */
-void SipCall::sendDatagram(const QByteArray &datagram)
-{
-    d->iceConnection->writeDatagram(RTP_COMPONENT, datagram);
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
