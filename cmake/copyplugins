@@ -6,6 +6,10 @@ bundle=$1
 mkdir -p $bundle/Contents/Resources
 ( echo "[Paths]"; echo "Plugins = PlugIns" ) > $bundle/Contents/Resources/qt.conf
 
+# copy resources
+QT_INSTALL_LIBS=`qmake -query QT_INSTALL_LIBS`
+cp -a $QT_INSTALL_LIBS/Resources/qt_menu.nib $bundle/Contents/Resources/
+
 started=''
 for input in "$@"; do
     if [ -z "$started" ]; then
