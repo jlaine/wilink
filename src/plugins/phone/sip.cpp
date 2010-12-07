@@ -1264,13 +1264,11 @@ void SipClient::sendStun()
 
 void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
 {
-    QString serverName;
+    QString serverName = "sip." + d->domain;
+    d->serverPort = 5060;
     if (!serviceInfo.records().isEmpty()) {
         serverName = serviceInfo.records().first().target();
         d->serverPort = serviceInfo.records().first().port();
-    } else {
-        serverName = d->domain;
-        d->serverPort = 5060;
     }
 
     QHostInfo info = QHostInfo::fromName(serverName);
