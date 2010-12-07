@@ -248,7 +248,9 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 {
     m_client = chatWindow->client();
 
-    connect(&m_client->callManager(), SIGNAL(callReceived(QXmppCall*)),
+    m_callManager = new QXmppCallManager(m_client);
+    m_client->addExtension(m_callManager);
+    connect(m_callManager, SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
 }
 
@@ -299,7 +301,7 @@ void CallWatcher::callContact()
         return;
     QString fullJid = action->data().toString();
 
-    QXmppCall *call = m_client->callManager().call(fullJid);
+    QXmppCall *call = m_callManager->call(fullJid);
     addCall(call);
 }
 

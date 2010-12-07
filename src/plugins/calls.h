@@ -41,6 +41,7 @@ class QModelIndex;
 class QThread;
 class QTimer;
 class QXmppCall;
+class QXmppCallManager;
 
 //#define FAKE_AUDIO_INPUT
 
@@ -124,6 +125,7 @@ private slots:
 private:
     void addCall(QXmppCall *call);
 
+    QXmppCallManager *m_callManager;
     QXmppClient *m_client;
     Chat *m_window;
 };

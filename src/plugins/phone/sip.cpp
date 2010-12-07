@@ -317,8 +317,11 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         if (payload.channels() > 1)
             rtpmap += "/" + QByteArray::number(payload.channels());
         attrs << "rtpmap:" + rtpmap;
+
+        // FIXME: make this generic
+        if (payload.name() == "telephone-event")
+            attrs << "fmtp:" + QByteArray::number(payload.id()) + " 0-15";
     }
-    //attrs << "fmtp:101 0-15";
     attrs << "sendrecv";
 
     sdp.addField('m', "audio " + QByteArray::number(localCandidate.port()) + " "  + profiles);
