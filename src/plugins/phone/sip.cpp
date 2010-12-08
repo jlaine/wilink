@@ -600,8 +600,6 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     // start ICE
     if (!d->iceConnection->bind(QList<QHostAddress>() << d->client->d->localAddress))
         warning("Could not start listening for RTP");
-    d->iceConnection->connectToHost();
-
 }
 
 SipCall::~SipCall()
