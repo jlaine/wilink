@@ -1041,23 +1041,12 @@ void SipClient::connectToServer()
 
     // bind sockets
     if (!d->socketsBound) {
-        QHostAddress bindAddress;
-        foreach (const QHostAddress &ip, QNetworkInterface::allAddresses()) {
-            if (ip.protocol() == QAbstractSocket::IPv4Protocol &&
-                    ip != QHostAddress::Null &&
-                    ip != QHostAddress::LocalHost &&
-                    ip != QHostAddress::LocalHostIPv6 &&
-                    ip != QHostAddress::Broadcast &&
-                    ip != QHostAddress::Any &&
-                    ip != QHostAddress::AnyIPv6) {
-                bindAddress = ip;
-                break;
-            }
-        }
-        if (bindAddress.isNull()) {
+        const QList<QHostAddress> addresses = QXmppIceComponent::discoverAddresses();
+        if (addresses.isEmpty()) {
             warning("Could not find an address to bind to");
             return;
         }
+        const QHostAddress bindAddress = addresses.first();
 
         // listen for STUN
         if (!d->stunTester->bind(bindAddress))
