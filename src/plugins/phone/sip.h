@@ -207,7 +207,6 @@ private slots:
     void sendStun();
     void setSipServer(const QXmppSrvInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
-    void stunFinished(StunTester::ConnectionType type);
 
 private:
     SipClientPrivate *d;

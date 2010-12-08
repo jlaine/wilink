@@ -124,7 +124,6 @@ public:
     QByteArray stunId;
     QHostAddress stunServerAddress;
     quint16 stunServerPort;
-    StunTester *stunTester;
 
 private:
     SipClient *q;

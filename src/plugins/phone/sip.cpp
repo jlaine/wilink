@@ -983,10 +983,6 @@ SipClient::SipClient(QObject *parent)
     connect(d->socket, SIGNAL(readyRead()),
             this, SLOT(datagramReceived()));
 
-    d->stunTester = new StunTester(this);
-    connect(d->stunTester, SIGNAL(finished(StunTester::ConnectionType)),
-            this, SLOT(stunFinished(StunTester::ConnectionType)));
-
     d->connectTimer = new QTimer(this);
     connect(d->connectTimer, SIGNAL(timeout()),
             this, SLOT(connectToServer()));
@@ -1047,10 +1043,6 @@ void SipClient::connectToServer()
             return;
         }
         d->localAddress = addresses.first();
-
-        // listen for STUN
-        if (!d->stunTester->bind(d->localAddress))
-            return;
 
         // listen for SIP
         if (!d->socket->bind()) {
@@ -1286,28 +1278,13 @@ void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
     }
     d->stunServerAddress = info.addresses().first();
 
-    // start STUN tests
-    d->stunTester->setServer(d->stunServerAddress, d->stunServerPort);
-    d->stunTester->start();
+    // send STUN binding request
+    sendStun();
 }
 
 SipClient::State SipClient::state() const
 {
     return d->state;
-}
-
-void SipClient::stunFinished(StunTester::ConnectionType result)
-{
-    if (result == StunTester::DirectConnection) {
-        d->stunDone = true;
-
-        // register with server
-        registerWithServer();
-        return;
-    }
-
-    // send STUN binding request
-    sendStun();
 }
 
 QString SipClient::displayName() const
