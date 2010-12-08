@@ -112,6 +112,7 @@ public:
     QList<SipCall*> calls;
 
     // sockets
+    QHostAddress localAddress;
     QHostAddress reflexiveAddress;
     quint16 reflexivePort;
     QUdpSocket *socket;

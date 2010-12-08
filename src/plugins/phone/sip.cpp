@@ -299,7 +299,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     sdp.addField('o', QString("- %1 %2 %3").arg(
         QString::number(ntpSeconds),
         QString::number(ntpSeconds),
-        addressToSdp(client->d->socket->localAddress())).toUtf8());
+        addressToSdp(client->d->localAddress)).toUtf8());
     sdp.addField('s', "-");
     sdp.addField('c', addressToSdp(localCandidate.host()).toUtf8());
     sdp.addField('t', activeTime);
@@ -598,7 +598,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     Q_ASSERT(check);
 
     // start ICE
-    if (!d->iceConnection->bind(QList<QHostAddress>() << parent->d->socket->localAddress()))
+    if (!d->iceConnection->bind(QList<QHostAddress>() << d->client->d->localAddress))
         warning("Could not start listening for RTP");
     d->iceConnection->connectToHost();
 
@@ -807,7 +807,7 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
 
     const QString branch = "z9hG4bK-" + generateStanzaHash();
     const QString host = QString("%1:%2").arg(
-        socket->localAddress().toString(),
+        localAddress.toString(),
         QString::number(socket->localPort()));
     const QString via = QString("SIP/2.0/UDP %1;branch=%2;rport").arg(
         host, branch);
@@ -1046,22 +1046,21 @@ void SipClient::connectToServer()
             warning("Could not find an address to bind to");
             return;
         }
-        const QHostAddress bindAddress = addresses.first();
+        d->localAddress = addresses.first();
 
         // listen for STUN
-        if (!d->stunTester->bind(bindAddress))
+        if (!d->stunTester->bind(d->localAddress))
             return;
 
         // listen for SIP
-        if (!d->socket->bind(bindAddress, 0)) {
+        if (!d->socket->bind()) {
             warning("Could not start listening for SIP");
             return;
         }
-        debug(QString("Listening for SIP on %1:%2").arg(
-            d->socket->localAddress().toString(),
+        debug(QString("Listening for SIP on port %1").arg(
             QString::number(d->socket->localPort())));
 
-        d->reflexiveAddress = d->socket->localAddress();
+        d->reflexiveAddress = d->localAddress;
         d->reflexivePort = d->socket->localPort();
         d->socketsBound = true;
     }
