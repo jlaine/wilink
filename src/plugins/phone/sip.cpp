@@ -757,10 +757,11 @@ void SipCall::hangup()
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
     : state(SipClient::DisconnectedState),
-    reflexivePort(0),
+    contactPort(0),
     socketsBound(false),
     stunCookie(0),
     stunDone(false),
+    stunReflexivePort(0),
     stunServerPort(0),
     q(qq)
 {
@@ -821,8 +822,8 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setHeaderField("CSeq", QByteArray::number(seqNum) + ' ' + method);
     packet.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
         username,
-        reflexiveAddress.toString(),
-        QString::number(reflexivePort)).toUtf8());
+        contactAddress.toString(),
+        QString::number(contactPort)).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + ctx->tag);
     if (method != "ACK" && method != "CANCEL")
@@ -843,8 +844,8 @@ SipMessage SipClientPrivate::buildResponse(const SipMessage &request)
         response.addHeaderField("Record-Route", route);
     response.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
         username,
-        reflexiveAddress.toString(),
-        QString::number(reflexivePort)).toUtf8());
+        contactAddress.toString(),
+        QString::number(contactPort)).toUtf8());
     return response;
 }
 
@@ -882,9 +883,9 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
     if (!vias.isEmpty()) {
         QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(vias.first());
         if (params.contains("received"))
-            reflexiveAddress = QHostAddress(QString::fromLatin1(params.value("received")));
+            contactAddress = QHostAddress(QString::fromLatin1(params.value("received")));
         if (params.contains("rport"))
-            reflexivePort = params.value("rport").toUInt();
+            contactPort = params.value("rport").toUInt();
     }
 
     // handle authentication
@@ -1052,8 +1053,8 @@ void SipClient::connectToServer()
         debug(QString("Listening for SIP on port %1").arg(
             QString::number(d->socket->localPort())));
 
-        d->reflexiveAddress = d->localAddress;
-        d->reflexivePort = d->socket->localPort();
+        d->contactAddress = d->localAddress;
+        d->contactPort = d->socket->localPort();
         d->socketsBound = true;
     }
 
@@ -1096,20 +1097,38 @@ void SipClient::datagramReceived()
             message.toString()));
 #endif
 
+        const QHostAddress oldReflexiveAddress = d->stunReflexiveAddress;
+        const quint16 oldReflexivePort = d->stunReflexivePort;
+
         // store reflexive address
         if (!message.xorMappedHost.isNull() && message.xorMappedPort != 0) {
-            d->reflexiveAddress = message.xorMappedHost;
-            d->reflexivePort = message.xorMappedPort;
+            d->stunReflexiveAddress = message.xorMappedHost;
+            d->stunReflexivePort = message.xorMappedPort;
         } else if (!message.mappedHost.isNull() && message.mappedPort != 0) {
-            d->reflexiveAddress = message.mappedHost;
-            d->reflexivePort = message.mappedPort;
+            d->stunReflexiveAddress = message.mappedHost;
+            d->stunReflexivePort = message.mappedPort;
         }
 
-        // register with server
-        if (!d->stunDone) {
-            d->stunDone = true;
-            registerWithServer();
+        // check whether the reflexive address has changed
+        bool doRegister = false;
+        if (d->stunReflexiveAddress != oldReflexiveAddress || d->stunReflexivePort != oldReflexivePort) {
+            qDebug("STUN reflexive address changed to %s port %u", qPrintable(d->stunReflexiveAddress.toString()), d->stunReflexivePort);
+
+            // update contact address
+            d->contactAddress = d->stunReflexiveAddress;
+            d->contactPort = d->stunReflexivePort;
+
+            // update local address
+            const QList<QHostAddress> addresses = QXmppIceComponent::discoverAddresses();
+            if (!addresses.isEmpty())
+                d->localAddress = addresses.first();
+
+            doRegister = true;
         }
+        d->stunDone = true;
+
+        if (doRegister)
+            registerWithServer();
 
         d->stunTimer->start(STUN_EXPIRE_MS);
         return;
@@ -1225,14 +1244,11 @@ void SipClient::registerWithServer()
  */
 void SipClient::sendStun()
 {
-    d->stunCookie = qrand();
-    d->stunId = generateRandomBytes(12);
-
     QXmppStunMessage request;
-    request.setCookie(d->stunCookie);
-    request.setId(d->stunId);
     request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
-    request.setChangeRequest(0);
+
+    d->stunCookie = request.cookie();
+    d->stunId = request.id();
 
 #ifdef QXMPP_DEBUG_STUN
     logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunServerAddress.toString(),

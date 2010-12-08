@@ -113,8 +113,8 @@ public:
 
     // sockets
     QHostAddress localAddress;
-    QHostAddress reflexiveAddress;
-    quint16 reflexivePort;
+    QHostAddress contactAddress;
+    quint16 contactPort;
     QUdpSocket *socket;
     bool socketsBound;
 
@@ -122,6 +122,8 @@ public:
     bool stunDone;
     quint32 stunCookie;
     QByteArray stunId;
+    QHostAddress stunReflexiveAddress;
+    quint16 stunReflexivePort;
     QHostAddress stunServerAddress;
     quint16 stunServerPort;
 
