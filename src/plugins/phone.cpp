@@ -264,11 +264,19 @@ void PhonePanel::handleSettings()
 
     // connect to server
     const QString jid = client->configuration().jid();
-    sip->setDisplayName(number);
-    sip->setDomain(jidToDomain(jid));
-    sip->setUsername(jidToUser(jid));
-    sip->setPassword(password);
-    QMetaObject::invokeMethod(sip, "connectToServer");
+    const QString domain = jidToDomain(jid);
+    const QString username = jidToUser(jid);
+    if (sip->displayName() != number ||
+        sip->domain() != domain ||
+        sip->username() != username ||
+        sip->password() != password)
+    {
+        sip->setDisplayName(number);
+        sip->setDomain(domain);
+        sip->setUsername(username);
+        sip->setPassword(password);
+        QMetaObject::invokeMethod(sip, "connectToServer");
+    }
 
     // retrieve call history
     callsModel->setUrl(QUrl("http://phone.wifirst.net/calls/"));
