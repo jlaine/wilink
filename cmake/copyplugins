@@ -9,7 +9,7 @@ mkdir -p $bundle/Contents/Resources
 
 # copy resources
 QT_INSTALL_LIBS=`$QMAKE -query QT_INSTALL_LIBS`
-cp -a $QT_INSTALL_LIBS/Resources/qt_menu.nib $bundle/Contents/Resources/
+cp -R $QT_INSTALL_LIBS/Resources/qt_menu.nib $bundle/Contents/Resources/
 
 skipped="0"
 for input in "$@"; do
