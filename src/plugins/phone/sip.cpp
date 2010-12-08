@@ -870,6 +870,10 @@ bool SipClientPrivate::handleAuthentication(const SipMessage &reply, SipCallCont
 
     SipMessage request = ctx->lastRequest;
     request.setHeaderField("CSeq", QByteArray::number(ctx->cseq++) + ' ' + request.method());
+    request.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
+        username,
+        contactAddress.toString(),
+        QString::number(contactPort)).toUtf8());
     sendRequest(request, ctx);
     return true;
 }
@@ -1124,6 +1128,10 @@ void SipClient::datagramReceived()
             const QList<QHostAddress> addresses = QXmppIceComponent::discoverAddresses();
             if (!addresses.isEmpty())
                 d->localAddress = addresses.first();
+
+            // clear credentials
+            d->challenge.clear();
+            d->proxyChallenge.clear();
 
             doRegister = true;
         }
