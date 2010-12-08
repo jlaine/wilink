@@ -1112,7 +1112,9 @@ void SipClient::datagramReceived()
         // check whether the reflexive address has changed
         bool doRegister = false;
         if (d->stunReflexiveAddress != oldReflexiveAddress || d->stunReflexivePort != oldReflexivePort) {
-            qDebug("STUN reflexive address changed to %s port %u", qPrintable(d->stunReflexiveAddress.toString()), d->stunReflexivePort);
+            debug(QString("STUN reflexive address changed to %1 port %2").arg(
+                d->stunReflexiveAddress.toString(),
+                QString::number(d->stunReflexivePort)));
 
             // update contact address
             d->contactAddress = d->stunReflexiveAddress;
