@@ -1,6 +1,8 @@
 wiLink 1.0.3 (UNRELEASED)
  * Conversations:
   - Recognise /me command.
+ * Shares:
+   - Fix display of shared drives on Windows.
  * Transfers:
    - Disable sending files to room members, it doesn't work.
 
