@@ -22,6 +22,7 @@
 
 #include <QApplication>
 #include <QString>
+#include <QUrl>
 
 #ifdef USE_SYSTRAY
 #include <QSystemTrayIcon>
@@ -61,6 +62,7 @@ signals:
     void showOfflineContactsChanged(bool show);
 
 public slots:
+    void openUrl(const QUrl &url);
     void setOpenAtLogin(bool run);
     void setShowOfflineContacts(bool show);
 

@@ -102,10 +102,7 @@ void Menu::openUrl()
         return;
 
     const QUrl linkUrl = action->data().toUrl();
-    if (linkUrl.scheme() == "xmpp")
-        chatWindow->openUrl(linkUrl);
-    else
-        QDesktopServices::openUrl(linkUrl);
+    QDesktopServices::openUrl(linkUrl);
 }
 
 void Menu::showIcon()
@@ -172,7 +169,12 @@ void Menu::showMenu()
                 model->setData(index, true, ChatRosterModel::PersistentRole);
             }
             action = servicesMenu->addAction(text);
-            action->setData(baseUrl.resolved(link));
+
+            /* build full URL */
+            QUrl url = baseUrl.resolved(link);
+            if (url.scheme() == "xmpp" && url.authority().isEmpty())
+                url.setAuthority(chatWindow->client()->configuration().jidBare());
+            action->setData(url);
             connect(action, SIGNAL(triggered(bool)), this, SLOT(openUrl()));
 
             /* request icon */

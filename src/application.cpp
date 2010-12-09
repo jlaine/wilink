@@ -135,6 +135,9 @@ Application::Application(int &argc, char **argv)
     /* initialise style */
     setStyle(new ApplicationStyle);
 #endif
+
+    /* register URL handler */
+    QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
 }
 
 Application::~Application()
@@ -341,6 +344,22 @@ void Application::setOpenAtLogin(bool run)
     {
         d->settings->setValue("OpenAtLogin", run);
         emit openAtLoginChanged(run);
+    }
+}
+
+/** Open an XMPP URI using the appropriate account.
+ *
+ * @param url
+ */
+void Application::openUrl(const QUrl &url)
+{
+    foreach (Chat *chat, d->chats)
+    {
+        if (chat->client()->configuration().jidBare() == url.authority()) {
+            QUrl simpleUrl = url;
+            simpleUrl.setAuthority(QString());
+            chat->openUrl(url);
+        }
     }
 }
 
