@@ -55,7 +55,10 @@
 #define HEADER_HEIGHT 20
 #endif
 
-static const QRegExp linkRegex = QRegExp("((ftp|http|https)://[^ ]+)");
+typedef QPair<QRegExp, QString> TextTransform;
+static QList<TextTransform> textTransforms;
+
+static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^ ]+)\\b");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
 /** Constructs a new ChatMessage.
@@ -63,6 +66,16 @@ static const QRegExp meRegex = QRegExp("^/me( .*)");
 ChatMessage::ChatMessage()
     : archived(false), received(true)
 {
+}
+
+/** Adds a transformation to be applied to message bodies.
+ *
+ * @param match
+ * @param replacement
+ */
+void ChatMessage::addTransform(const QRegExp &match, const QString &replacement)
+{
+    textTransforms.append(qMakePair(match, replacement));
 }
 
 /** Returns true if the two messages should be grouped in the same bubble.
@@ -82,6 +95,8 @@ QString ChatMessage::html() const
     bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
     bodyHtml.replace(meRegex, "<b>" + from + "\\1</b>");
+    foreach (const TextTransform &transform, textTransforms)
+        bodyHtml.replace(transform.first, transform.second);
     return bodyHtml;
 }
 

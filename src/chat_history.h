@@ -43,6 +43,8 @@ public:
     QString html() const;
     bool isAction() const;
 
+    static void addTransform(const QRegExp &match, const QString &replacement);
+
     bool archived;
     QString body;
     QDateTime date;
