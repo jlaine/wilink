@@ -80,6 +80,7 @@ private slots:
     void handleSettings();
     void keyPressed();
     void keyReleased();
+    void openUrl(const QUrl &url);
     void sipStateChanged(SipClient::State state);
 
 private:
@@ -96,6 +97,8 @@ private:
     QPushButton *hangupButton;
     QLineEdit *numberEdit;
     QLabel *statusLabel;
+
+    bool m_registeredHandler;
 };
 
 #endif

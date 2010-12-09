@@ -18,6 +18,7 @@
  */
 
 #include <QCoreApplication>
+#include <QDesktopServices>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -37,6 +38,7 @@
 #include "qnetio/wallet.h"
 
 #include "chat.h"
+#include "chat_history.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
@@ -48,7 +50,8 @@
 
 PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     : ChatPanel(parent),
-    m_window(chatWindow)
+    m_window(chatWindow),
+    m_registeredHandler(false)
 {
     bool check;
     client = chatWindow->client();
@@ -135,16 +138,21 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
 
     // connect signals
-    connect(backspaceButton, SIGNAL(clicked()),
-            this, SLOT(backspacePressed()));
-    connect(client, SIGNAL(connected()),
-            this, SLOT(getSettings()));
-    connect(numberEdit, SIGNAL(returnPressed()),
-            this, SLOT(callNumber()));
-    connect(callButton, SIGNAL(clicked()),
-            this, SLOT(callNumber()));
-    connect(hangupButton, SIGNAL(clicked()),
-            callsModel, SLOT(hangup()));
+    check = connect(backspaceButton, SIGNAL(clicked()),
+                    this, SLOT(backspacePressed()));
+    Q_ASSERT(check);
+    check = connect(client, SIGNAL(connected()),
+                    this, SLOT(getSettings()));
+    Q_ASSERT(check);
+    check = connect(numberEdit, SIGNAL(returnPressed()),
+                    this, SLOT(callNumber()));
+    Q_ASSERT(check);
+    check = connect(callButton, SIGNAL(clicked()),
+                    this, SLOT(callNumber()));
+    Q_ASSERT(check);
+    check = connect(hangupButton, SIGNAL(clicked()),
+                    callsModel, SLOT(hangup()));
+    Q_ASSERT(check);
 }
 
 PhonePanel::~PhonePanel()
@@ -278,6 +286,13 @@ void PhonePanel::handleSettings()
         QMetaObject::invokeMethod(sip, "connectToServer");
     }
 
+    // register URL handler
+    if (!m_registeredHandler) {
+        ChatMessage::addTransform(QRegExp("\\b(\\+?[0-9]{4,})\\b"),
+            QString("<a href=\"sip:\\1@%1\">\\1</a>").arg(domain));
+        QDesktopServices::setUrlHandler("sip", this, "openUrl");
+    }
+
     // retrieve call history
     callsModel->setUrl(QUrl("http://phone.wifirst.net/calls/"));
 
@@ -326,6 +341,19 @@ void PhonePanel::keyReleased()
     QXmppRtpChannel::Tone tone = keyTone(key);
     foreach (SipCall *call, calls)
         call->audioChannel()->stopTone(tone);
+}
+
+/** Open a SIP URI.
+ */
+void PhonePanel::openUrl(const QUrl &url)
+{
+    if (!callButton->isEnabled() || url.scheme() != "sip")
+        return;
+
+    const QString phoneNumber = url.path().split('@').first();
+    const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
+    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
+    emit showPanel();
 }
 
 void PhonePanel::sipStateChanged(SipClient::State state)
