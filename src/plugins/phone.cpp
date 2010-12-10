@@ -288,8 +288,8 @@ void PhonePanel::handleSettings()
 
     // register URL handler
     if (!m_registeredHandler) {
-        ChatMessage::addTransform(QRegExp("\\b(\\+?[0-9]{4,})\\b"),
-            QString("<a href=\"sip:\\1@%1\">\\1</a>").arg(domain));
+        ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
+            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(domain));
         QDesktopServices::setUrlHandler("sip", this, "openUrl");
     }
 
