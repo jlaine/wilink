@@ -202,7 +202,6 @@ bool WavePlayer::open(QIODevice::OpenMode mode)
         qWarning("Bad data subchunk");
         return false;
     }
-    qDebug("chunkSize: %u", chunkSize);
     m_beginPos = m_file->pos();
     m_endPos = m_beginPos + chunkSize;
 
@@ -220,11 +219,9 @@ bool WavePlayer::open(QIODevice::OpenMode mode)
 qint64 WavePlayer::readData(char * data, qint64 maxSize)
 {
     char *start = data;
-    qint64 done = 0;
-    qDebug("read %lli", maxSize);
     while (maxSize) {
         qint64 chunk = qMin(m_endPos - m_file->pos(), maxSize);
-        if (m_file->read(data, maxSize) < 0)
+        if (m_file->read(data, chunk) < 0)
             return -1;
         data += chunk;
         maxSize -= chunk;
@@ -253,12 +250,11 @@ int main(int argc, char *argv[])
 
     QAudioOutput *output = new QAudioOutput(player.format());
     output->start(&player);
-    return app.exec();
-#endif
-
+#else
     ToneGui gui;
     gui.show();
     gui.raise();
+#endif
 
     return app.exec();
 }
