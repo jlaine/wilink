@@ -22,9 +22,10 @@
 
 #include <QAudioOutput>
 #include <QIODevice>
-#include <QWidget>
+#include <QMap>
 
 class QFile;
+class ChatSoundReader;
 
 class ChatSoundPlayer : public QObject
 {
@@ -33,12 +34,15 @@ class ChatSoundPlayer : public QObject
 public:
     ChatSoundPlayer(QObject *parent = 0);
     int play(const QString &name, int repeat = 1);
+    void stop(int id);
 
 private slots:
     void readerFinished();
 
 private:
     QAudioOutput *m_output;
+    int m_readerId;
+    QMap<int, ChatSoundReader*> m_readers;
 };
 
 class ChatSoundReader : public QIODevice
@@ -64,6 +68,8 @@ private:
     qint64 m_endPos;
     int m_repeatCount;
     int m_repeatLeft;
+
+    friend class ChatSoundPlayer;
 };
 
 #endif

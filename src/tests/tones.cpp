@@ -2,7 +2,6 @@
 
 #include <QApplication>
 #include <QAudioOutput>
-#include <QFile>
 #include <QLayout>
 #include <QMap>
 #include <QPair>
@@ -85,6 +84,7 @@ qint64 ToneGenerator::writeData(const char * data, qint64 maxSize)
 }
 
 ToneGui::ToneGui()
+    : soundId(0)
 {
     // keyboard
     QGridLayout *grid = new QGridLayout;
@@ -99,8 +99,19 @@ ToneGui::ToneGui()
         connect(key, SIGNAL(released()), this, SLOT(keyReleased()));
         grid->addWidget(key, i / 3, i % 3, 1, 1);
     }
+
+    // buttons
+    QHBoxLayout *hbox = new QHBoxLayout;
+    QPushButton *startKey = new QPushButton("Start tone");
+    connect(startKey, SIGNAL(pressed()), this, SLOT(startSound()));
+    hbox->addWidget(startKey);
+    QPushButton *stopKey = new QPushButton("Stop tone");
+    connect(stopKey, SIGNAL(pressed()), this, SLOT(stopSound()));
+    hbox->addWidget(stopKey);
+    grid->addLayout(hbox, 4, 0, 1, 3);
     setLayout(grid);
 
+    // generator
     generator = new ToneGenerator(this);
     generator->open(QIODevice::Unbuffered | QIODevice::ReadOnly);
 
@@ -115,6 +126,9 @@ ToneGui::ToneGui()
     QAudioOutput *output = new QAudioOutput(format, this);
     output->setBufferSize(4096);
     output->start(generator);
+
+    // player
+    player = new ChatSoundPlayer(this);
 }
 
 static QXmppRtpChannel::Tone keyTone(QPushButton *key)
@@ -140,22 +154,23 @@ void ToneGui::keyReleased()
     generator->stopTone(keyTone(key));
 }
 
+void ToneGui::startSound()
+{
+    soundId = player->play("question.wav", 0);
+}
+
+void ToneGui::stopSound()
+{
+    player->stop(soundId);
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-#if 1
-    if (argc < 2)
-        return EXIT_FAILURE;
-
-    ChatSoundPlayer player;
-    player.play(QString::fromLocal8Bit(argv[1]), 2);
-
-#else
     ToneGui gui;
     gui.show();
     gui.raise();
-#endif
 
     return app.exec();
 }

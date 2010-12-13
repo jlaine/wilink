@@ -24,7 +24,8 @@
 
 ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
     : QObject(parent),
-    m_output(0)
+    m_output(0),
+    m_readerId(0)
 {
 }
 
@@ -36,11 +37,20 @@ int ChatSoundPlayer::play(const QString &name, int repeat)
         return -1;
     }
     connect(reader, SIGNAL(finished()), this, SLOT(readerFinished()));
+    m_readerId++;
+    m_readers[m_readerId] = reader;
 
     m_output = new QAudioOutput(reader->format());
     m_output->start(reader);
 
-    return 0;
+    return m_readerId;
+}
+
+void ChatSoundPlayer::stop(int id)
+{
+    ChatSoundReader *reader = m_readers.value(id);
+    if (reader)
+        emit reader->finished();
 }
 
 void ChatSoundPlayer::readerFinished()
@@ -49,7 +59,12 @@ void ChatSoundPlayer::readerFinished()
     if (!reader)
         return;
 
-    m_output->stop();
+    int id = m_readers.key(reader);
+    if (id == m_readerId) {
+        m_output->stop();
+        m_readerId = 0;
+    }
+    m_readers.take(id);
     reader->deleteLater();
 }
 
