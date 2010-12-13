@@ -26,15 +26,29 @@
 
 class QFile;
 
-class WavePlayer : public QIODevice
+class ChatSoundPlayer : public QObject
 {
     Q_OBJECT
 
 public:
-    WavePlayer(const QString &name, QObject *parent = 0);
+    ChatSoundPlayer(QObject *parent = 0);
+    int play(const QString &name, int repeat = 1);
+
+private slots:
+    void readerFinished();
+
+private:
+    QAudioOutput *m_output;
+};
+
+class ChatSoundReader : public QIODevice
+{
+    Q_OBJECT
+
+public:
+    ChatSoundReader(const QString &name, int repeat, QObject *parent = 0);
     QAudioFormat format() const;
     bool open(QIODevice::OpenMode mode);
-    void setPlayCount(int count);
 
 signals:
     void finished();

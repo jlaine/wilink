@@ -148,14 +148,9 @@ int main(int argc, char *argv[])
     if (argc < 2)
         return EXIT_FAILURE;
 
-    WavePlayer player(QString::fromLocal8Bit(argv[1]));
-    if (!player.open(QIODevice::Unbuffered | QIODevice::ReadOnly))
-        return EXIT_FAILURE;
-    player.setPlayCount(2);
-    QObject::connect(&player, SIGNAL(finished()), &app, SLOT(quit()));
+    ChatSoundPlayer player;
+    player.play(QString::fromLocal8Bit(argv[1]), 2);
 
-    QAudioOutput *output = new QAudioOutput(player.format());
-    output->start(&player);
 #else
     ToneGui gui;
     gui.show();

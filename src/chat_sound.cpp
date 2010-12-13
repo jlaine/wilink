@@ -22,20 +22,51 @@
 
 #include "chat_sound.h"
 
-WavePlayer::WavePlayer(const QString &name, QObject *parent)
+ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
+    : QObject(parent),
+    m_output(0)
+{
+}
+
+int ChatSoundPlayer::play(const QString &name, int repeat)
+{
+    ChatSoundReader *reader = new ChatSoundReader(name, repeat, this);
+    if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
+        delete reader;
+        return -1;
+    }
+    connect(reader, SIGNAL(finished()), this, SLOT(readerFinished()));
+
+    m_output = new QAudioOutput(reader->format());
+    m_output->start(reader);
+
+    return 0;
+}
+
+void ChatSoundPlayer::readerFinished()
+{
+    ChatSoundReader *reader = qobject_cast<ChatSoundReader*>(sender());
+    if (!reader)
+        return;
+
+    m_output->stop();
+    reader->deleteLater();
+}
+
+ChatSoundReader::ChatSoundReader(const QString &name, int repeat, QObject *parent)
     : QIODevice(parent),
-    m_repeatCount(1),
-    m_repeatLeft(1)
+    m_repeatCount(repeat),
+    m_repeatLeft(repeat)
 {
     m_file = new QFile(name, this);
 }
 
-QAudioFormat WavePlayer::format() const
+QAudioFormat ChatSoundReader::format() const
 {
     return m_format;
 }
 
-bool WavePlayer::open(QIODevice::OpenMode mode)
+bool ChatSoundReader::open(QIODevice::OpenMode mode)
 {
     if (!m_file->open(QIODevice::ReadOnly)) {
         qWarning("Could not read %s", qPrintable(m_file->fileName()));
@@ -77,7 +108,7 @@ bool WavePlayer::open(QIODevice::OpenMode mode)
     stream >> blockAlign;
     stream >> sampleSize;
 
-    qDebug("channelCount: %u, sampleRate: %u, sampleSize: %u", channelCount, sampleRate, sampleSize);
+    //qDebug("channelCount: %u, sampleRate: %u, sampleSize: %u", channelCount, sampleRate, sampleSize);
 
     // data subchunk
     stream.setByteOrder(QDataStream::BigEndian);
@@ -102,7 +133,7 @@ bool WavePlayer::open(QIODevice::OpenMode mode)
     return QIODevice::open(mode);
 }
 
-qint64 WavePlayer::readData(char * data, qint64 maxSize)
+qint64 ChatSoundReader::readData(char * data, qint64 maxSize)
 {
     char *start = data;
 
@@ -121,7 +152,6 @@ qint64 WavePlayer::readData(char * data, qint64 maxSize)
         maxSize -= bytes;
 
         if (maxSize) {
-            qDebug("repeat total %i left %i", m_repeatCount, m_repeatLeft);
             if (m_repeatCount && !--m_repeatLeft) {
                 memset(data, 0, maxSize);
                 QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
@@ -133,13 +163,7 @@ qint64 WavePlayer::readData(char * data, qint64 maxSize)
     return data - start;
 }
 
-void WavePlayer::setPlayCount(int count)
-{
-    m_repeatCount = count;
-    m_repeatLeft = count;
-}
-
-qint64 WavePlayer::writeData(const char * data, qint64 maxSize)
+qint64 ChatSoundReader::writeData(const char * data, qint64 maxSize)
 {
     return -1;
 }
