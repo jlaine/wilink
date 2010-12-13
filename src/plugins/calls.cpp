@@ -248,7 +248,7 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 {
     m_client = chatWindow->client();
 
-    m_callManager = new QXmppCallManager(m_client);
+    m_callManager = new QXmppCallManager;
     m_client->addExtension(m_callManager);
     connect(m_callManager, SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));

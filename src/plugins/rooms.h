@@ -46,6 +46,7 @@ class QXmppDiscoveryIq;
 class QXmppIq;
 class QXmppMessage;
 class QXmppMucAdminIq;
+class QXmppMucManager;
 class QXmppPresence;
 
 class ChatRoomWatcher : public QObject
@@ -80,6 +81,7 @@ private:
 
     Chat *chat;
     QXmppBookmarkManager *bookmarkManager;
+    QXmppMucManager *mucManager;
     QString chatRoomServer;
     QPushButton *roomButton;
     QStringList invitations;
@@ -107,8 +109,6 @@ private slots:
     void tabPressed();
 
 private:
-    QXmppBookmarkManager *bookmarkManager();
-
     QString chatLocalJid;
     QString chatRemoteJid;
     ChatClient *client;
