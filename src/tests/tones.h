@@ -42,23 +42,3 @@ private:
     ToneGenerator *generator;
 };
 
-class WavePlayer : public QIODevice
-{
-    Q_OBJECT
-
-public:
-    WavePlayer(const QString &name, QObject *parent = 0);
-    QAudioFormat format() const;
-    bool open(QIODevice::OpenMode mode);
-
-protected:
-    qint64 readData(char * data, qint64 maxSize);
-    qint64 writeData(const char * data, qint64 maxSize);
-
-private:
-    QFile *m_file;
-    QAudioFormat m_format;
-    qint64 m_beginPos;
-    qint64 m_endPos;
-};
-

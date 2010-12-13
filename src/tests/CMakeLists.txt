@@ -31,8 +31,8 @@ target_link_libraries(phone qxmpp ${QT_LIBRARIES})
 add_executable(stun stun.cpp)
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})
 
-qt4_wrap_cpp(tones_MOC_SOURCES tones.h)
-add_executable(tones tones.cpp ${tones_MOC_SOURCES})
+qt4_wrap_cpp(tones_MOC_SOURCES tones.h ../chat_sound.h)
+add_executable(tones tones.cpp ../chat_sound.cpp ${tones_MOC_SOURCES})
 target_link_libraries(tones ${QT_LIBRARIES})
 
 add_executable(hasher hasher.cpp)
