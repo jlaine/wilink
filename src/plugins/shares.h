@@ -48,12 +48,12 @@ class QXmppShareDatabase;
 
 /** The shares panel.
  */
-class ChatShares : public ChatPanel
+class SharesPanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
+    SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
     void setClient(QXmppClient *client);
     void setRoster(ChatRosterModel *model);
     void setTransfers(ChatTransfers *transfers);

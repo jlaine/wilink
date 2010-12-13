@@ -71,8 +71,14 @@ static int parallelDownloadLimit = 2;
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
      Q(PacketId, Q::Equals, job->data(QXmppShareExtension::TransactionRole)))
 
-ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent)
-    : ChatPanel(parent), chatWindow(chat), client(0), db(sharesDb), rosterModel(0),
+/** Constructs a SharesPanel.
+ */
+SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent)
+    : ChatPanel(parent),
+    chatWindow(chat),
+    client(0),
+    db(sharesDb),
+    rosterModel(0),
     menuAction(0)
 {
     bool check;
@@ -239,7 +245,7 @@ ChatShares::ChatShares(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     directoryChanged(db->directory());
 }
 
-void ChatShares::directoryChanged(const QString &path)
+void SharesPanel::directoryChanged(const QString &path)
 {
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(path).toString(),
@@ -254,7 +260,7 @@ void ChatShares::directoryChanged(const QString &path)
 /** When the main XMPP stream is disconnected, disconnect the shares-specific
  *  stream too.
  */
-void ChatShares::disconnected()
+void SharesPanel::disconnected()
 {
     QXmppClient *baseClient = chatWindow->client();
     if (client && client != baseClient && QObject::sender() == baseClient)
@@ -269,7 +275,7 @@ void ChatShares::disconnected()
 
 /** When a file get fails, updated the associated download queue item.
  */
-void ChatShares::getFailed(const QString &packetId)
+void SharesPanel::getFailed(const QString &packetId)
 {
     QXmppShareItem *queueItem = queueModel->get(
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) &&
@@ -288,7 +294,7 @@ void ChatShares::getFailed(const QString &packetId)
 
 /** Recursively cancel any transfer jobs associated with a download queue item.
  */
-void ChatShares::transferAbort(QXmppShareItem *item)
+void SharesPanel::transferAbort(QXmppShareItem *item)
 {
     const QVariant packetId = item->data(PacketId);
     foreach (QXmppTransferJob *job, downloadJobs)
@@ -306,7 +312,7 @@ void ChatShares::transferAbort(QXmppShareItem *item)
 /** When a transfer job is destroyed, remove it from our list
  *  an process the download queue.
  */
-void ChatShares::transferDestroyed(QObject *obj)
+void SharesPanel::transferDestroyed(QObject *obj)
 {
     downloadJobs.removeAll(static_cast<QXmppTransferJob*>(obj));
     processDownloadQueue();
@@ -315,7 +321,7 @@ void ChatShares::transferDestroyed(QObject *obj)
 /** When the user double clicks an item in the download queue,
  *  open it if it is fully retrieved.
  */
-void ChatShares::transferDoubleClicked(const QModelIndex &index)
+void SharesPanel::transferDoubleClicked(const QModelIndex &index)
 {
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -330,7 +336,7 @@ void ChatShares::transferDoubleClicked(const QModelIndex &index)
  *
  * @param job
  */
-void ChatShares::transferFinished(QXmppTransferJob *job)
+void SharesPanel::transferFinished(QXmppTransferJob *job)
 {
     QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
     if (!queueItem)
@@ -355,7 +361,7 @@ void ChatShares::transferFinished(QXmppTransferJob *job)
 
 /** Update the progress bar for a transfer job.
  */
-void ChatShares::transferProgress(qint64 done, qint64 total)
+void SharesPanel::transferProgress(qint64 done, qint64 total)
 {
     QXmppTransferJob *job = qobject_cast<QXmppTransferJob*>(sender());
     if (!job)
@@ -379,7 +385,7 @@ void ChatShares::transferProgress(qint64 done, qint64 total)
 /** When the user removes items from the download queue, cancel any jobs
  *  associated with them.
  */
-void ChatShares::transferRemoved()
+void SharesPanel::transferRemoved()
 {
     foreach (const QModelIndex &index, downloadsView->selectionModel()->selectedRows())
     {
@@ -392,7 +398,7 @@ void ChatShares::transferRemoved()
     }
 }
 
-void ChatShares::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
+void SharesPanel::find(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
     sharesFilter = needle;
     if (!needle.isEmpty() && needle.size() < 3)
@@ -411,7 +417,7 @@ void ChatShares::find(const QString &needle, QTextDocument::FindFlags flags, boo
         emit findFinished(false);
 }
 
-void ChatShares::transferStarted(QXmppTransferJob *job)
+void SharesPanel::transferStarted(QXmppTransferJob *job)
 {
     if (job->direction() == QXmppTransferJob::OutgoingDirection)
         uploadsView->addJob(job);
@@ -438,13 +444,13 @@ void ChatShares::transferStarted(QXmppTransferJob *job)
     }
 }
 
-void ChatShares::indexFinished(double elapsed, int updated, int removed)
+void SharesPanel::indexFinished(double elapsed, int updated, int removed)
 {
     statusBar->showMessage(tr("Indexed %1 files in %2s").arg(updated).arg(elapsed), STATUS_TIMEOUT);
     indexButton->setEnabled(true);
 }
 
-void ChatShares::indexStarted()
+void SharesPanel::indexStarted()
 {
     statusBar->showMessage(tr("Indexing files"), STATUS_TIMEOUT);
     indexButton->setEnabled(false);
@@ -452,7 +458,7 @@ void ChatShares::indexStarted()
 
 /** Add the selected items to the download queue.
  */
-void ChatShares::downloadItem()
+void SharesPanel::downloadItem()
 {
     // determine current view
     if (tabWidget->currentWidget() != sharesWidget)
@@ -466,7 +472,7 @@ void ChatShares::downloadItem()
     }
 }
 
-void ChatShares::queueItem(QXmppShareItem *item)
+void SharesPanel::queueItem(QXmppShareItem *item)
 {
     // check item is not already in the queue
     if (queueModel->get(Q_FIND_LOCATIONS(item->locations())))
@@ -501,7 +507,7 @@ void ChatShares::queueItem(QXmppShareItem *item)
     processDownloadQueue();
 }
 
-void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalPos)
+void SharesPanel::itemContextMenu(const QModelIndex &index, const QPoint &globalPos)
 {
     QMenu *menu = new QMenu(this);
 
@@ -521,7 +527,7 @@ void ChatShares::itemContextMenu(const QModelIndex &index, const QPoint &globalP
  *
  * @param index
  */
-void ChatShares::itemDoubleClicked(const QModelIndex &index)
+void SharesPanel::itemDoubleClicked(const QModelIndex &index)
 {
     ChatSharesView *view = qobject_cast<ChatSharesView*>(sender());
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
@@ -546,7 +552,7 @@ void ChatShares::itemDoubleClicked(const QModelIndex &index)
  *
  * @param index
  */
-void ChatShares::itemExpandRequested(const QModelIndex &index)
+void SharesPanel::itemExpandRequested(const QModelIndex &index)
 {
     ChatSharesView *view = qobject_cast<ChatSharesView*>(sender());
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
@@ -577,7 +583,7 @@ void ChatShares::itemExpandRequested(const QModelIndex &index)
         searches.insert(requestId, view);
 }
 
-void ChatShares::presenceReceived(const QXmppPresence &presence)
+void SharesPanel::presenceReceived(const QXmppPresence &presence)
 {
     if (presence.from() != shareServer)
         return;
@@ -657,7 +663,7 @@ void ChatShares::presenceReceived(const QXmppPresence &presence)
     }
 }
 
-void ChatShares::processDownloadQueue()
+void SharesPanel::processDownloadQueue()
 {
     // check how many downloads are active
     QList<QXmppShareItem *> active = queueModel->filter(
@@ -691,7 +697,7 @@ void ChatShares::processDownloadQueue()
     }
 }
 
-void ChatShares::registerWithServer()
+void SharesPanel::registerWithServer()
 {
     // register with server
     QXmppElement x;
@@ -710,7 +716,7 @@ void ChatShares::registerWithServer()
     client->sendPacket(presence);
 }
 
-void ChatShares::setClient(QXmppClient *newClient)
+void SharesPanel::setClient(QXmppClient *newClient)
 {
     client = newClient;
     bool check = connect(client, SIGNAL(disconnected()),
@@ -747,12 +753,12 @@ void ChatShares::setClient(QXmppClient *newClient)
     Q_ASSERT(check);
 }
 
-void ChatShares::setRoster(ChatRosterModel *roster)
+void SharesPanel::setRoster(ChatRosterModel *roster)
 {
     rosterModel = roster;
 }
 
-void ChatShares::showOptions()
+void SharesPanel::showOptions()
 {
     ChatSharesOptions *dialog = new ChatSharesOptions(db, chatWindow);
     dialog->setWindowModality(Qt::WindowModal);
@@ -770,7 +776,7 @@ void ChatShares::showOptions()
 #endif
 }
 
-void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
+void SharesPanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
 {
     if (shareIq.type() == QXmppIq::Get)
         return;
@@ -818,7 +824,7 @@ void ChatShares::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         processDownloadQueue();
 }
 
-void ChatShares::shareServerFound(const QString &server)
+void SharesPanel::shareServerFound(const QString &server)
 {
     // register with server
     shareServer = server;
@@ -826,7 +832,7 @@ void ChatShares::shareServerFound(const QString &server)
     registerTimer->start();
 }
 
-void ChatShares::tabChanged(int index)
+void SharesPanel::tabChanged(int index)
 {
     QWidget *tab = tabWidget->widget(index);
     if (tab == sharesWidget)
@@ -929,7 +935,7 @@ bool SharesPlugin::initialize(Chat *chat)
     chats << chat;
 
     /* register panel */
-    ChatShares *shares = new ChatShares(chat, db);
+    SharesPanel *shares = new SharesPanel(chat, db);
     shares->setObjectName("shares");
     shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);
