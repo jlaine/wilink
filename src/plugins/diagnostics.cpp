@@ -279,7 +279,9 @@ static QString dumpPings(const QList<Ping> &pings)
     return table.render();
 }
 
-Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
+/** Constructs a DiagnosticsPanel.
+ */
+DiagnosticsPanel::DiagnosticsPanel(QXmppClient *client, QWidget *parent)
     : ChatPanel(parent),
     m_client(client),
     m_displayed(false)
@@ -340,21 +342,23 @@ Diagnostics::Diagnostics(QXmppClient *client, QWidget *parent)
     Q_ASSERT(check);
 }
 
-Diagnostics::~Diagnostics()
+/** Destroys a DiagnosticsPanel.
+ */
+DiagnosticsPanel::~DiagnosticsPanel()
 {
 }
 
-void Diagnostics::addItem(const QString &title, const QString &value)
+void DiagnosticsPanel::addItem(const QString &title, const QString &value)
 {
     text->append(QString("<h3>%1</h3>%2").arg(title, value));
 }
 
-void Diagnostics::addSection(const QString &title)
+void DiagnosticsPanel::addSection(const QString &title)
 {
     text->append(QString("<h2>%1</h2>").arg(title));
 }
 
-void Diagnostics::refresh()
+void DiagnosticsPanel::refresh()
 {
     if (m_timer->isActive())
         return;
@@ -383,13 +387,13 @@ void Diagnostics::refresh()
     m_timer->start();
 }
 
-void Diagnostics::timeout()
+void DiagnosticsPanel::timeout()
 {
     showMessage("Request timed out.");
     refreshButton->setEnabled(true);
 }
 
-void Diagnostics::slotShow()
+void DiagnosticsPanel::slotShow()
 {
     if (m_displayed)
         return;
@@ -397,7 +401,7 @@ void Diagnostics::slotShow()
     m_displayed = true;
 }
 
-void Diagnostics::showLookup(const QList<QHostInfo> &results)
+void DiagnosticsPanel::showLookup(const QList<QHostInfo> &results)
 {
     TextTable table;
     TextRow titles(true);
@@ -422,12 +426,12 @@ void Diagnostics::showLookup(const QList<QHostInfo> &results)
     addItem("DNS", table.render());
 }
 
-void Diagnostics::showMessage(const QString &msg)
+void DiagnosticsPanel::showMessage(const QString &msg)
 {
     text->setText(QString("<h2>%1</h2>").arg(msg));
 }
 
-void Diagnostics::showResults(const DiagnosticsIq &iq)
+void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
 {
     // enable buttons
     refreshButton->setEnabled(true);
@@ -472,7 +476,7 @@ void Diagnostics::showResults(const DiagnosticsIq &iq)
 
 }
 
-void Diagnostics::showInterface(const Interface &result)
+void DiagnosticsPanel::showInterface(const Interface &result)
 {
     const bool showCinr = false;
     addSection("Network interface " + result.name());
@@ -610,7 +614,7 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     m_references++;
 
     /* register panel */
-    Diagnostics *diagnostics = new Diagnostics(chat->client());
+    DiagnosticsPanel *diagnostics = new DiagnosticsPanel(chat->client());
     diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
     chat->addPanel(diagnostics);
 

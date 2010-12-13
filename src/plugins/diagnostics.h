@@ -32,13 +32,15 @@ class QPushButton;
 class QTextBrowser;
 class QTimer;
 
-class Diagnostics : public ChatPanel
+/** The DiagnosticsPanel represents panel for displaying diagnostics results.
+ */
+class DiagnosticsPanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    Diagnostics(QXmppClient *client, QWidget *parent=0);
-    ~Diagnostics();
+    DiagnosticsPanel(QXmppClient *client, QWidget *parent=0);
+    ~DiagnosticsPanel();
 
 private slots:
     void refresh();

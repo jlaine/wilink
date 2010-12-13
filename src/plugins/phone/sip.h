@@ -100,6 +100,8 @@ private:
     QString m_reasonPhrase;
 };
 
+/// The SipCall class represents a SIP Voice-Over-IP call.
+
 class SipCall : public QXmppLoggable
 {
     Q_OBJECT
@@ -147,6 +149,9 @@ private:
     friend class SipCallPrivate;
     friend class SipClient;
 };
+
+/// The SipClient class represents a SIP client capable of making and
+/// receiving Voice-Over-IP calls.
 
 class SipClient : public QXmppLoggable
 {
