@@ -214,7 +214,12 @@ QUrl PhotosList::url()
     return baseUrl;
 }
 
-Photos::Photos(const QString &url, QWidget *parent)
+/** Constructs a PhotosPanel.
+ *
+ * @param url    The base URL for the photo sharing service.
+ * @param parent The parent widget of the panel.
+ */
+PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     : ChatPanel(parent),
     baseUrl(url),
     downloadDevice(0),
@@ -314,7 +319,7 @@ Photos::Photos(const QString &url, QWidget *parent)
  * @param error
  * @param results
  */
-void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
+void PhotosPanel::commandFinished(int cmd, bool error, const FileInfoList &results)
 {
     if (error)
         qWarning() << fs->commandName(cmd) << "command failed";
@@ -400,7 +405,7 @@ void Photos::commandFinished(int cmd, bool error, const FileInfoList &results)
     }
 }
 
-void Photos::abortUpload()
+void PhotosPanel::abortUpload()
 {
     showMessage(tr("Cancelling upload.."));
     uploadQueue.clear();
@@ -409,7 +414,7 @@ void Photos::abortUpload()
 
 /** Prompt the user for a new folder name and create it.
  */
-void Photos::createFolder()
+void PhotosPanel::createFolder()
 {
      bool ok;
      QString text = QInputDialog::getText(this, tr("Create an album"),
@@ -424,7 +429,7 @@ void Photos::createFolder()
     }
 }
 
-void Photos::deleteFile()
+void PhotosPanel::deleteFile()
 {
     PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
     if (!listView)
@@ -439,7 +444,7 @@ void Photos::deleteFile()
         }
 }
 
-void Photos::fileNext()
+void PhotosPanel::fileNext()
 {
     QLabel *label = qobject_cast<QLabel*>(photosView->currentWidget());
     if (!label)
@@ -461,7 +466,7 @@ void Photos::fileNext()
  *
  * @param url
  */
-void Photos::fileOpened(const QUrl &url)
+void PhotosPanel::fileOpened(const QUrl &url)
 {
     if (!isImage(url.toString()))
         return;
@@ -503,7 +508,7 @@ void Photos::fileOpened(const QUrl &url)
  * @param files
  * @param destination
  */
-void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
+void PhotosPanel::filesDropped(const QList<QUrl> &files, const QUrl &destination)
 {
     QString base = destination.toString();
     while (base.endsWith("/"))
@@ -524,7 +529,7 @@ void Photos::filesDropped(const QList<QUrl> &files, const QUrl &destination)
  *
  * @param url
  */
-void Photos::folderOpened(const QUrl &url)
+void PhotosPanel::folderOpened(const QUrl &url)
 {
     PhotosList *listView = new PhotosList(url);
     pushView(listView);
@@ -540,7 +545,7 @@ void Photos::folderOpened(const QUrl &url)
 
 /** Go back to the previous folder.
  */
-void Photos::goBack()
+void PhotosPanel::goBack()
 {
     if (photosView->count() < 2 || !backButton->isEnabled())
         return;
@@ -568,7 +573,7 @@ void Photos::goBack()
 
 /** Open filesystem.
  */
-void Photos::open()
+void PhotosPanel::open()
 {
     showMessage(tr("Connecting.."));
     fs->open(baseUrl);
@@ -576,7 +581,7 @@ void Photos::open()
 
 /** If the download queue is not empty, process the next item.
  */
-void Photos::processDownloadQueue()
+void PhotosPanel::processDownloadQueue()
 {
     if (downloadQueue.empty() || !downloadJob.isEmpty())
         return;
@@ -587,7 +592,7 @@ void Photos::processDownloadQueue()
 
 /** If the upload queue is not empty, process the next item.
  */
-void Photos::processUploadQueue()
+void PhotosPanel::processUploadQueue()
 {
     if (uploadDevice)
         return;
@@ -632,7 +637,7 @@ void Photos::processUploadQueue()
     fs->put(uploadDevice, item.second.toString());
 }
 
-void Photos::pushView(QWidget *widget)
+void PhotosPanel::pushView(QWidget *widget)
 {
     static int counter = 0;
     widget->setObjectName(QString::number(counter++));
@@ -641,7 +646,7 @@ void Photos::pushView(QWidget *widget)
 
 /** Update the progress bar for the current upload.
  */
-void Photos::putProgress(int done, int total)
+void PhotosPanel::putProgress(int done, int total)
 {
     if (!total)
         return;
@@ -650,7 +655,7 @@ void Photos::putProgress(int done, int total)
 
 /** Refresh the contents of the current folder.
  */
-void Photos::refresh()
+void PhotosPanel::refresh()
 {
     PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
     if (!listView)
@@ -661,7 +666,7 @@ void Photos::refresh()
     fs->list(listView->url());
 }
 
-void Photos::showMessage(const QString &message)
+void PhotosPanel::showMessage(const QString &message)
 {
     if (message.isEmpty())
         statusLabel->hide();
@@ -691,7 +696,7 @@ bool PhotosPlugin::initialize(Chat *chat)
         return false;
 
     /* register panel */
-    Photos *photos = new Photos(url);
+    PhotosPanel *photos = new PhotosPanel(url);
     photos->setObjectName(PHOTOS_ROSTER_ID);
     chat->addPanel(photos);
     connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));

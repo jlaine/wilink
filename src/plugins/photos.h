@@ -68,9 +68,9 @@ private:
     FileInfoList fileList;
 };
 
-/** Main window for photos application
+/** The PhotosPanel class represents a panel for displaying photos.
  */
-class Photos : public ChatPanel
+class PhotosPanel : public ChatPanel
 {
     Q_OBJECT
 
@@ -88,7 +88,7 @@ class Photos : public ChatPanel
     };
 
 public:
-    Photos(const QString &url, QWidget *parent = NULL);
+    PhotosPanel(const QString &url, QWidget *parent = NULL);
 
 protected:
     void processDownloadQueue();

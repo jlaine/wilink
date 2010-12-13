@@ -34,12 +34,15 @@ class Highlighter;
 class QPushButton;
 class QTextBrowser;
 
-class ChatConsole : public ChatPanel
+/** The ConsolePanel class represents a panel for display debugging
+ *  information.
+ */
+class ConsolePanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    ChatConsole(QXmppLogger *logger, QWidget *parent = 0);
+    ConsolePanel(QXmppLogger *logger, QWidget *parent = 0);
 
 signals:
     void findFinished(bool found);

@@ -35,7 +35,9 @@
 
 #define CONSOLE_ROSTER_ID "0_console"
 
-ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
+/** Constructs a ConsolePanel.
+ */
+ConsolePanel::ConsolePanel(QXmppLogger *logger, QWidget *parent)
     : ChatPanel(parent), connected(false), currentLogger(logger)
 {
     setWindowIcon(QIcon(":/options.png"));
@@ -86,7 +88,7 @@ ChatConsole::ChatConsole(QXmppLogger *logger, QWidget *parent)
     connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
 }
 
-void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
+void ConsolePanel::message(QXmppLogger::MessageType type, const QString &msg)
 {
     QColor color;
     QString message;
@@ -124,7 +126,7 @@ void ChatConsole::message(QXmppLogger::MessageType type, const QString &msg)
  * @param flags
  * @param changed
  */
-void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags, bool changed)
+void ConsolePanel::slotFind(const QString &needle, QTextDocument::FindFlags flags, bool changed)
 {
     // handle empty search
     if (needle.isEmpty())
@@ -159,7 +161,7 @@ void ChatConsole::slotFind(const QString &needle, QTextDocument::FindFlags flags
     }
 }
 
-void ChatConsole::slotStop()
+void ConsolePanel::slotStop()
 {
     if (!connected)
         return;
@@ -169,7 +171,7 @@ void ChatConsole::slotStop()
     startButton->show();
 }
 
-void ChatConsole::slotStart()
+void ConsolePanel::slotStart()
 {
     if (connected)
         return;
@@ -229,7 +231,7 @@ public:
 bool ConsolePlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatConsole *console = new ChatConsole(chat->client()->logger());
+    ConsolePanel *console = new ConsolePanel(chat->client()->logger());
     console->setObjectName(CONSOLE_ROSTER_ID);
     chat->addPanel(console);
 
