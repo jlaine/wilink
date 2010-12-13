@@ -28,21 +28,21 @@
 #include "QXmppTransferManager.h"
 
 class ChatRosterModel;
-class ChatSharesModel;
+class SharesModel;
 
-class ChatSharesDelegate : public QStyledItemDelegate
+class SharesDelegate : public QStyledItemDelegate
 {
 public:
-    ChatSharesDelegate(QObject *parent);
+    SharesDelegate(QObject *parent);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
-class ChatSharesSelectionModel : public QItemSelectionModel
+class SharesSelectionModel : public QItemSelectionModel
 {
     Q_OBJECT
 
 public:
-    ChatSharesSelectionModel(QAbstractItemModel *model, QObject *parent = 0);
+    SharesSelectionModel(QAbstractItemModel *model, QObject *parent = 0);
 
 public slots:
     void select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command);
@@ -50,12 +50,12 @@ public slots:
 
 /** View for displaying a tree of share items.
  */
-class ChatSharesView : public QTreeView
+class SharesView : public QTreeView
 {
     Q_OBJECT
 
 public:
-    ChatSharesView(QWidget *parent = 0);
+    SharesView(QWidget *parent = 0);
     void setModel(QAbstractItemModel *model);
 
 signals:

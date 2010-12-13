@@ -21,7 +21,7 @@
 #include "chat_utils.h"
 
 // common queries
-#define Q ChatSharesModelQuery
+#define Q SharesModelQuery
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
 
 /** Update collection timestamps.
@@ -36,7 +36,7 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
     }
 }
 
-ChatSharesModel::ChatSharesModel(QObject *parent)
+SharesModel::SharesModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
     rootItem = new QXmppShareItem(QXmppShareItem::CollectionItem);
@@ -47,12 +47,12 @@ ChatSharesModel::ChatSharesModel(QObject *parent)
     peerIcon = QIcon(":/peer.png");
 }
 
-ChatSharesModel::~ChatSharesModel()
+SharesModel::~SharesModel()
 {
     delete rootItem;
 }
 
-QXmppShareItem *ChatSharesModel::addItem(const QXmppShareItem &item)
+QXmppShareItem *SharesModel::addItem(const QXmppShareItem &item)
 {
    beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
    QXmppShareItem *child = rootItem->appendChild(item);
@@ -60,19 +60,19 @@ QXmppShareItem *ChatSharesModel::addItem(const QXmppShareItem &item)
    return child;
 }
 
-void ChatSharesModel::clear()
+void SharesModel::clear()
 {
     rootItem->clearChildren();
     reset();
 }
 
-int ChatSharesModel::columnCount(const QModelIndex &parent) const
+int SharesModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return MaxColumn;
 }
 
-QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
+QVariant SharesModel::data(const QModelIndex &index, int role) const
 {
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -127,7 +127,7 @@ QVariant ChatSharesModel::data(const QModelIndex &index, int role) const
     return item->data(role);
 }
 
-QList<QXmppShareItem *> ChatSharesModel::filter(const ChatSharesModelQuery &query, const ChatSharesModel::QueryOptions &options, QXmppShareItem *parent, int limit)
+QList<QXmppShareItem *> SharesModel::filter(const SharesModelQuery &query, const SharesModel::QueryOptions &options, QXmppShareItem *parent, int limit)
 {
     if (!parent)
         parent = rootItem;
@@ -171,7 +171,7 @@ QList<QXmppShareItem *> ChatSharesModel::filter(const ChatSharesModelQuery &quer
     return matches;
 }
 
-QXmppShareItem *ChatSharesModel::get(const ChatSharesModelQuery &query, const ChatSharesModel::QueryOptions &options, QXmppShareItem *parent)
+QXmppShareItem *SharesModel::get(const SharesModelQuery &query, const SharesModel::QueryOptions &options, QXmppShareItem *parent)
 {
     QList<QXmppShareItem*> match = filter(query, options, parent, 1);
     if (match.size())
@@ -181,7 +181,7 @@ QXmppShareItem *ChatSharesModel::get(const ChatSharesModelQuery &query, const Ch
 
 /** Return the title for the given column.
  */
-QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant SharesModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole)
     {
@@ -195,7 +195,7 @@ QVariant ChatSharesModel::headerData(int section, Qt::Orientation orientation, i
     return QVariant();
 }
 
-QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex SharesModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
         return QModelIndex();
@@ -213,7 +213,7 @@ QModelIndex ChatSharesModel::index(int row, int column, const QModelIndex &paren
         return QModelIndex();
 }
 
-QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
+QModelIndex SharesModel::parent(const QModelIndex &index) const
 {
     if (!index.isValid())
         return QModelIndex();
@@ -227,12 +227,12 @@ QModelIndex ChatSharesModel::parent(const QModelIndex &index) const
     return createIndex(parentItem->row(), 0, parentItem);
 }
 
-void ChatSharesModel::refreshItem(QXmppShareItem *item)
+void SharesModel::refreshItem(QXmppShareItem *item)
 {
     emit dataChanged(createIndex(item->row(), ProgressColumn, item), createIndex(item->row(), ProgressColumn, item));
 }
 
-void ChatSharesModel::removeItem(QXmppShareItem *item)
+void SharesModel::removeItem(QXmppShareItem *item)
 {
     if (!item || item == rootItem)
         return;
@@ -250,7 +250,7 @@ void ChatSharesModel::removeItem(QXmppShareItem *item)
     }
 }
 
-int ChatSharesModel::rowCount(const QModelIndex &parent) const
+int SharesModel::rowCount(const QModelIndex &parent) const
 {
     QXmppShareItem *parentItem;
     if (!parent.isValid())
@@ -260,7 +260,7 @@ int ChatSharesModel::rowCount(const QModelIndex &parent) const
     return parentItem->size();
 }
 
-QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
+QModelIndex SharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
 {
     QDateTime stamp = QDateTime::currentDateTime();
 
@@ -339,17 +339,17 @@ QModelIndex ChatSharesModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem 
     return oldIndex;
 }
 
-ChatSharesModelQuery::ChatSharesModelQuery()
+SharesModelQuery::SharesModelQuery()
     :  m_role(0), m_operation(None), m_combine(NoCombine)
 {
 }
 
-ChatSharesModelQuery::ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data)
+SharesModelQuery::SharesModelQuery(int role, SharesModelQuery::Operation operation, QVariant data)
     :  m_role(role), m_operation(operation), m_data(data), m_combine(NoCombine)
 {
 }
 
-bool ChatSharesModelQuery::match(QXmppShareItem *item) const
+bool SharesModelQuery::match(QXmppShareItem *item) const
 {
     if (m_operation == Equals)
     {
@@ -365,14 +365,14 @@ bool ChatSharesModelQuery::match(QXmppShareItem *item) const
     }
     else if (m_combine == AndCombine)
     {
-        foreach (const ChatSharesModelQuery &child, m_children)
+        foreach (const SharesModelQuery &child, m_children)
             if (!child.match(item))
                 return false;
         return true;
     }
     else if (m_combine == OrCombine)
     {
-        foreach (const ChatSharesModelQuery &child, m_children)
+        foreach (const SharesModelQuery &child, m_children)
             if (child.match(item))
                 return true;
         return false;
@@ -381,23 +381,23 @@ bool ChatSharesModelQuery::match(QXmppShareItem *item) const
     return true;
 }
 
-ChatSharesModelQuery ChatSharesModelQuery::operator&&(const ChatSharesModelQuery &other) const
+SharesModelQuery SharesModelQuery::operator&&(const SharesModelQuery &other) const
 {
-    ChatSharesModelQuery result;
+    SharesModelQuery result;
     result.m_combine = AndCombine;
     result.m_children << *this << other;
     return result;
 }
 
-ChatSharesModelQuery ChatSharesModelQuery::operator||(const ChatSharesModelQuery &other) const
+SharesModelQuery SharesModelQuery::operator||(const SharesModelQuery &other) const
 {
-    ChatSharesModelQuery result;
+    SharesModelQuery result;
     result.m_combine = OrCombine;
     result.m_children << *this << other;
     return result;
 }
 
-ChatSharesModel::QueryOptions::QueryOptions(Recurse recurse_)
+SharesModel::QueryOptions::QueryOptions(Recurse recurse_)
     : recurse(recurse_)
 {
 }

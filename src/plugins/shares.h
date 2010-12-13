@@ -30,9 +30,9 @@
 
 class Chat;
 class ChatRosterModel;
-class ChatSharesModel;
-class ChatSharesTab;
-class ChatSharesView;
+class SharesModel;
+class SharesTab;
+class SharesView;
 class ChatTransfers;
 class ChatTransfersView;
 class QLabel;
@@ -98,21 +98,21 @@ private:
     QXmppClient *client;
     QXmppShareDatabase *db;
     ChatRosterModel *rosterModel;
-    ChatSharesModel *queueModel;
+    SharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 
     QTabWidget *tabWidget;
 
-    ChatSharesView *sharesView;
-    ChatSharesTab *sharesWidget;
+    SharesView *sharesView;
+    SharesTab *sharesWidget;
     QString sharesFilter;
 
-    ChatSharesView *downloadsView;
-    ChatSharesTab *downloadsWidget;
+    SharesView *downloadsView;
+    SharesTab *downloadsWidget;
     QList<QXmppTransferJob*> downloadJobs;
 
     ChatTransfersView *uploadsView;
-    ChatSharesTab *uploadsWidget;
+    SharesTab *uploadsWidget;
 
     QPushButton *downloadButton;
     QPushButton *indexButton;
@@ -123,12 +123,12 @@ private:
     QAction *menuAction;
 };
 
-class ChatSharesTab : public QWidget
+class SharesTab : public QWidget
 {
     Q_OBJECT
 
 public:
-    ChatSharesTab(QWidget *parent = 0);
+    SharesTab(QWidget *parent = 0);
     void addWidget(QWidget *widget);
     void setText(const QString &text);
 

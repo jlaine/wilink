@@ -25,7 +25,7 @@
 
 #include "QXmppShareIq.h"
 
-enum ChatSharesColumns
+enum SharesColumns
 {
     NameColumn,
     ProgressColumn,
@@ -33,7 +33,7 @@ enum ChatSharesColumns
     MaxColumn,
 };
 
-enum ChatSharesDataRoles {
+enum SharesDataRoles {
     PacketId = QXmppShareItem::MaxRole,
     TransferDone,
     TransferPainted,
@@ -45,7 +45,7 @@ enum ChatSharesDataRoles {
 };
 
 
-class ChatSharesModelQuery
+class SharesModelQuery
 {
 public:
     enum Operation
@@ -56,13 +56,13 @@ public:
         // Contains,
     };
 
-    ChatSharesModelQuery();
-    ChatSharesModelQuery(int role, ChatSharesModelQuery::Operation operation, QVariant data);
+    SharesModelQuery();
+    SharesModelQuery(int role, SharesModelQuery::Operation operation, QVariant data);
 
     bool match(QXmppShareItem *item) const;
 
-    ChatSharesModelQuery operator&&(const ChatSharesModelQuery &other) const;
-    ChatSharesModelQuery operator||(const ChatSharesModelQuery &other) const;
+    SharesModelQuery operator&&(const SharesModelQuery &other) const;
+    SharesModelQuery operator||(const SharesModelQuery &other) const;
 
 private:
     enum Combine
@@ -73,16 +73,16 @@ private:
     };
 
     int m_role;
-    ChatSharesModelQuery::Operation m_operation;
+    SharesModelQuery::Operation m_operation;
     QVariant m_data;
 
-    QList<ChatSharesModelQuery> m_children;
-    ChatSharesModelQuery::Combine m_combine;
+    QList<SharesModelQuery> m_children;
+    SharesModelQuery::Combine m_combine;
 };
 
 /** Model representing a tree of share items (collections and files).
  */
-class ChatSharesModel : public QAbstractItemModel
+class SharesModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -101,8 +101,8 @@ public:
         Recurse recurse;
     };
 
-    ChatSharesModel(QObject *parent = 0);
-    ~ChatSharesModel();
+    SharesModel(QObject *parent = 0);
+    ~SharesModel();
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -112,8 +112,8 @@ public:
 
     void clear();
     QXmppShareItem *addItem(const QXmppShareItem &item);
-    QList<QXmppShareItem*> filter(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
-    QXmppShareItem *get(const ChatSharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
+    QList<QXmppShareItem*> filter(const SharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
+    QXmppShareItem *get(const SharesModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
     void refreshItem(QXmppShareItem *item);
     void removeItem(QXmppShareItem *item);
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);

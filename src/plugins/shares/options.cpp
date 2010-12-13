@@ -266,7 +266,7 @@ void PlacesModel::setSourceModel(QFileSystemModel *sourceModel)
     QAbstractProxyModel::setSourceModel(sourceModel);
 }
 
-ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *parent)
+SharesOptions::SharesOptions(QXmppShareDatabase *database, QWidget *parent)
     : QDialog(parent),
     m_database(database)
 {
@@ -349,7 +349,7 @@ ChatSharesOptions::ChatSharesOptions(QXmppShareDatabase *database, QWidget *pare
     resize(QSize(500, 500).expandedTo(minimumSizeHint()));
 }
 
-void ChatSharesOptions::browse()
+void SharesOptions::browse()
 {
     QFileDialog *dialog = new QFileDialog(this);
     dialog->setDirectory(m_directoryEdit->text());
@@ -367,13 +367,13 @@ void ChatSharesOptions::browse()
     Q_ASSERT(check);
 }
 
-void ChatSharesOptions::directorySelected(const QString &path)
+void SharesOptions::directorySelected(const QString &path)
 {
     m_directoryEdit->setText(path);
     m_fsModel->setForcedFolder(path);
 }
 
-void ChatSharesOptions::fewerFolders()
+void SharesOptions::fewerFolders()
 {
     m_fsView->hide();
     m_placesView->show();
@@ -381,7 +381,7 @@ void ChatSharesOptions::fewerFolders()
     m_moreButton->show();
 }
 
-void ChatSharesOptions::moreFolders()
+void SharesOptions::moreFolders()
 {
     m_placesView->hide();
     m_fsView->show();
@@ -389,7 +389,7 @@ void ChatSharesOptions::moreFolders()
     m_fewerButton->show();
 }
 
-void ChatSharesOptions::scrollToHome()
+void SharesOptions::scrollToHome()
 {
     // scroll to home
     QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
@@ -397,13 +397,13 @@ void ChatSharesOptions::scrollToHome()
     m_fsView->scrollTo(homeIndex, QAbstractItemView::PositionAtTop);
 }
 
-void ChatSharesOptions::show()
+void SharesOptions::show()
 {
     QDialog::show();
     QTimer::singleShot(0, this, SLOT(scrollToHome()));
 }
 
-void ChatSharesOptions::validate()
+void SharesOptions::validate()
 {
     const QString path = m_directoryEdit->text();
     const QStringList mapped = m_fsModel->selectedFolders();

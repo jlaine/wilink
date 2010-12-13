@@ -54,12 +54,12 @@ private:
 
 /** View for displaying a tree of share items.
  */
-class ChatSharesOptions : public QDialog
+class SharesOptions : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatSharesOptions(QXmppShareDatabase *database, QWidget *parent = 0);
+    SharesOptions(QXmppShareDatabase *database, QWidget *parent = 0);
 
 public slots:
     void show();

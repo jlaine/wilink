@@ -28,12 +28,12 @@
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 100
 
-ChatSharesDelegate::ChatSharesDelegate(QObject *parent)
+SharesDelegate::SharesDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
 {
 }
 
-void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void SharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     int error = index.data(TransferError).toInt();
     qint64 done = index.data(TransferDone).toLongLong();
@@ -59,14 +59,14 @@ void ChatSharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     }
 }
 
-ChatSharesSelectionModel::ChatSharesSelectionModel(QAbstractItemModel *model, QObject *parent)
+SharesSelectionModel::SharesSelectionModel(QAbstractItemModel *model, QObject *parent)
     : QItemSelectionModel(model, parent)
 {
 }
 
 /** Reimplemented to never select both an item and one of its children.
  */
-void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
+void SharesSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
 {
     if (command & QItemSelectionModel::Select)
     {
@@ -120,16 +120,16 @@ void ChatSharesSelectionModel::select(const QItemSelection &selection, QItemSele
     }
 }
 
-ChatSharesView::ChatSharesView(QWidget *parent)
+SharesView::SharesView(QWidget *parent)
     : QTreeView(parent)
 {
-    setItemDelegate(new ChatSharesDelegate(this));
+    setItemDelegate(new SharesDelegate(this));
     setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
-void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
+void SharesView::contextMenuEvent(QContextMenuEvent *event)
 {
     const QModelIndex &index = currentIndex();
     if (!index.isValid())
@@ -138,7 +138,7 @@ void ChatSharesView::contextMenuEvent(QContextMenuEvent *event)
     emit contextMenu(index, event->globalPos());
 }
 
-void ChatSharesView::keyPressEvent(QKeyEvent *event)
+void SharesView::keyPressEvent(QKeyEvent *event)
 {
     QModelIndex current = currentIndex();
     if (current.isValid())
@@ -161,7 +161,7 @@ void ChatSharesView::keyPressEvent(QKeyEvent *event)
 /** When the view is resized, adjust the width of the
  *  "name" column to take all the available space.
  */
-void ChatSharesView::resizeEvent(QResizeEvent *e)
+void SharesView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
     int nameWidth =  e->size().width();
@@ -172,11 +172,11 @@ void ChatSharesView::resizeEvent(QResizeEvent *e)
     setColumnWidth(NameColumn, nameWidth);
 }
 
-void ChatSharesView::setModel(QAbstractItemModel *model)
+void SharesView::setModel(QAbstractItemModel *model)
 {
     QTreeView::setModel(model);
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
     setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
-    setSelectionModel(new ChatSharesSelectionModel(model, this));
+    setSelectionModel(new SharesSelectionModel(model, this));
 }
 

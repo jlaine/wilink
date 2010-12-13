@@ -65,7 +65,7 @@ static int parallelDownloadLimit = 2;
 #define REGISTER_INTERVAL 60
 
 // common queries
-#define Q ChatSharesModelQuery
+#define Q SharesModelQuery
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
 #define Q_FIND_TRANSFER(job) \
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
@@ -108,8 +108,8 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     layout->addWidget(tabWidget);
 
     /* create main tab */
-    ChatSharesModel *sharesModel = new ChatSharesModel(this);
-    sharesView = new ChatSharesView;
+    SharesModel *sharesModel = new SharesModel(this);
+    sharesView = new SharesView;
     sharesView->setExpandsOnDoubleClick(false);
     sharesView->setModel(sharesModel);
     sharesView->hideColumn(ProgressColumn);
@@ -125,7 +125,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
                     this, SLOT(itemExpandRequested(QModelIndex)));
     Q_ASSERT(check);
 
-    sharesWidget = new ChatSharesTab;
+    sharesWidget = new SharesTab;
     check = connect(sharesWidget, SIGNAL(showOptions()),
                     this, SLOT(showOptions()));
     Q_ASSERT(check);
@@ -133,8 +133,8 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     tabWidget->addTab(sharesWidget, QIcon(":/share.png"), tr("Shares"));
 
     /* create queue tab */
-    queueModel = new ChatSharesModel(this);
-    downloadsView = new ChatSharesView;
+    queueModel = new SharesModel(this);
+    downloadsView = new SharesView;
     downloadsView->setModel(queueModel);
     check = connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)),
                     this, SLOT(transferDoubleClicked(const QModelIndex&)));
@@ -144,7 +144,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
                     downloadsView, SLOT(expand(QModelIndex)));
     Q_ASSERT(check);
 
-    downloadsWidget = new ChatSharesTab;
+    downloadsWidget = new SharesTab;
     check = connect(downloadsWidget, SIGNAL(showOptions()),
                     this, SLOT(showOptions()));
     Q_ASSERT(check);
@@ -153,7 +153,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
 
     /* create uploads tab */
     uploadsView = new ChatTransfersView;
-    uploadsWidget = new ChatSharesTab;
+    uploadsWidget = new SharesTab;
     check = connect(uploadsWidget, SIGNAL(showOptions()),
                     this, SLOT(showOptions()));
     Q_ASSERT(check);
@@ -486,7 +486,7 @@ void SharesPanel::queueItem(QXmppShareItem *item)
     QXmppShareItem *emptyChild = queueModel->get(
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::CollectionItem) &&
             Q(QXmppShareItem::SizeRole, Q::Equals, 0),
-            ChatSharesModel::QueryOptions(), queueItem);
+            SharesModel::QueryOptions(), queueItem);
     if (queueItem->type() == QXmppShareItem::CollectionItem && (!queueItem->size() || emptyChild))
     {
         if (queueItem->locations().isEmpty())
@@ -529,7 +529,7 @@ void SharesPanel::itemContextMenu(const QModelIndex &index, const QPoint &global
  */
 void SharesPanel::itemDoubleClicked(const QModelIndex &index)
 {
-    ChatSharesView *view = qobject_cast<ChatSharesView*>(sender());
+    SharesView *view = qobject_cast<SharesView*>(sender());
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!view || !index.isValid() || !item)
         return;
@@ -554,7 +554,7 @@ void SharesPanel::itemDoubleClicked(const QModelIndex &index)
  */
 void SharesPanel::itemExpandRequested(const QModelIndex &index)
 {
-    ChatSharesView *view = qobject_cast<ChatSharesView*>(sender());
+    SharesView *view = qobject_cast<SharesView*>(sender());
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!view || !index.isValid() || !item || !item->type() == QXmppShareItem::CollectionItem)
         return;
@@ -760,7 +760,7 @@ void SharesPanel::setRoster(ChatRosterModel *roster)
 
 void SharesPanel::showOptions()
 {
-    ChatSharesOptions *dialog = new ChatSharesOptions(db, chatWindow);
+    SharesOptions *dialog = new SharesOptions(db, chatWindow);
     dialog->setWindowModality(Qt::WindowModal);
 
     bool check;
@@ -782,10 +782,10 @@ void SharesPanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         return;
 
     // find target view(s)
-    ChatSharesView *view = 0;
+    SharesView *view = 0;
     const QString requestId = shareIq.id();
     if ((shareIq.type() == QXmppIq::Result || shareIq.type() == QXmppIq::Error) && searches.contains(requestId))
-        view = qobject_cast<ChatSharesView*>(searches.take(requestId));
+        view = qobject_cast<SharesView*>(searches.take(requestId));
     else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer && sharesFilter.isEmpty())
         view = sharesView;
     else
@@ -795,9 +795,9 @@ void SharesPanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
 
     // update all concerned views
-    ChatSharesModel *model = qobject_cast<ChatSharesModel*>(view->model());
+    SharesModel *model = qobject_cast<SharesModel*>(view->model());
     QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
-                                         ChatSharesModel::QueryOptions(ChatSharesModel::PostRecurse));
+                                         SharesModel::QueryOptions(SharesModel::PostRecurse));
 
     if (!oldItem && shareIq.from() != shareServer)
     {
@@ -851,7 +851,7 @@ void SharesPanel::tabChanged(int index)
         indexButton->hide();
 }
 
-ChatSharesTab::ChatSharesTab(QWidget *parent)
+SharesTab::SharesTab(QWidget *parent)
     : QWidget(parent)
 {
     bool check;
@@ -878,12 +878,12 @@ ChatSharesTab::ChatSharesTab(QWidget *parent)
     setLayout(vbox);
 }
 
-void ChatSharesTab::addWidget(QWidget *widget)
+void SharesTab::addWidget(QWidget *widget)
 {
     layout()->addWidget(widget);
 }
 
-void ChatSharesTab::setText(const QString &text)
+void SharesTab::setText(const QString &text)
 {
     label->setText(text);
 }
