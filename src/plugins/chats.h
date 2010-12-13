@@ -31,6 +31,7 @@ class ChatClient;
 class ChatRosterModel;
 class QModelIndex;
 class QXmppArchiveChat;
+class QXmppArchiveManager;
 
 class ChatDialog : public ChatConversation
 {
@@ -53,6 +54,7 @@ private slots:
     void returnPressed();
 
 private:
+    QXmppArchiveManager *archiveManager;
     QString chatRemoteJid;
     ChatClient *client;
     bool joined;

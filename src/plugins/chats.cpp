@@ -60,6 +60,14 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
 #endif
     setWindowExtra(rosterModel->contactExtra(jid));
 
+    // load archive manager
+    archiveManager = client->findExtension<QXmppArchiveManager>();
+    if (!archiveManager) {
+        archiveManager = new QXmppArchiveManager;
+        client->addExtension(archiveManager);
+    }
+
+    // connect signals
     bool check;
     check = connect(chatInput, SIGNAL(returnPressed()),
                     this, SLOT(returnPressed()));
@@ -73,16 +81,16 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
                     this, SLOT(join()));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(messageReceived(const QXmppMessage&)),
-                    this, SLOT(messageReceived(const QXmppMessage&)));
+    check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
+                    this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
-    check = connect(&client->archiveManager(), SIGNAL(archiveChatReceived(const QXmppArchiveChat &)),
-                    this, SLOT(archiveChatReceived(const QXmppArchiveChat &)));
+    check = connect(archiveManager, SIGNAL(archiveChatReceived(QXmppArchiveChat)),
+                    this, SLOT(archiveChatReceived(QXmppArchiveChat)));
     Q_ASSERT(check);
 
-    check = connect(&client->archiveManager(), SIGNAL(archiveListReceived(const QList<QXmppArchiveChat> &)),
-                    this, SLOT(archiveListReceived(const QList<QXmppArchiveChat> &)));
+    check = connect(archiveManager, SIGNAL(archiveListReceived(QList<QXmppArchiveChat>)),
+                    this, SLOT(archiveListReceived(QList<QXmppArchiveChat>)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()),
@@ -118,7 +126,7 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
         if (jidToBareJid(chats[i].with()) == chatRemoteJid)
-            client->archiveManager().retrieveCollection(chats[i].with(), chats[i].start());
+            archiveManager->retrieveCollection(chats[i].with(), chats[i].start());
 }
 
 /** When the chat state changes, notify the remote party.
@@ -171,7 +179,7 @@ void ChatDialog::join()
 
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately
-    client->archiveManager().listCollections(chatRemoteJid,
+    archiveManager->listCollections(chatRemoteJid,
         client->serverTime().addDays(-HISTORY_DAYS));
 
     joined = true;
