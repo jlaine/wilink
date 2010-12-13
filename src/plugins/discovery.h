@@ -31,12 +31,15 @@ class QXmppDiscoveryManager;
 
 #include "chat_panel.h"
 
-class Discovery : public ChatPanel
+/** The DiscoveryPanel class represents a panel for displaying service
+ *  discovery results.
+ */
+class DiscoveryPanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    Discovery(QXmppClient *client, QWidget *parent);
+    DiscoveryPanel(QXmppClient *client, QWidget *parent);
 
 private slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);

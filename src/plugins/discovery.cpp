@@ -55,7 +55,12 @@ static QString itemText(QListWidgetItem *item)
     return text;
 }
 
-Discovery::Discovery(QXmppClient *client, QWidget *parent)
+/** Constructs a DiscoveryPanel.
+ *
+ * @param client The XMPP client.
+ * @param parent The parent widget of the panel.
+ */
+DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
     : ChatPanel(parent),
     m_client(client)
 {
@@ -133,7 +138,7 @@ Discovery::Discovery(QXmppClient *client, QWidget *parent)
     Q_ASSERT(check);
 }
 
-void Discovery::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
+void DiscoveryPanel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
         return;
@@ -155,7 +160,7 @@ void Discovery::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-void Discovery::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
+void DiscoveryPanel::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
 {
     if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
         return;
@@ -185,7 +190,7 @@ void Discovery::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-void Discovery::explore(const QXmppDiscoveryIq::Item &item)
+void DiscoveryPanel::explore(const QXmppDiscoveryIq::Item &item)
 {
     // update window title
     QString extra = item.jid();
@@ -210,7 +215,7 @@ void Discovery::explore(const QXmppDiscoveryIq::Item &item)
         m_requests.append(id);
 }
 
-void Discovery::goBack()
+void DiscoveryPanel::goBack()
 {
     if (m_trail.size() < 2)
         return;
@@ -220,7 +225,7 @@ void Discovery::goBack()
     explore(m_trail.last());
 }
 
-void Discovery::goForward(QListWidgetItem *wdgItem)
+void DiscoveryPanel::goForward(QListWidgetItem *wdgItem)
 {
     QXmppDiscoveryIq::Item item;
     item.setJid(wdgItem->data(JidRole).toString());
@@ -229,7 +234,7 @@ void Discovery::goForward(QListWidgetItem *wdgItem)
     explore(item);
 }
 
-void Discovery::goTo()
+void DiscoveryPanel::goTo()
 {
     const QString newJid = m_locationJid->text();
     const QString newNode = m_locationNode->text();
@@ -252,7 +257,7 @@ void Discovery::goTo()
     }
 }
 
-void Discovery::slotShow()
+void DiscoveryPanel::slotShow()
 {
     if (!m_trail.isEmpty())
         return;
@@ -274,7 +279,7 @@ public:
 bool DiscoveryPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    Discovery *discovery = new Discovery(chat->client(), chat);
+    DiscoveryPanel *discovery = new DiscoveryPanel(chat->client(), chat);
     discovery->setObjectName(DISCOVERY_ROSTER_ID);
     chat->addPanel(discovery);
 
