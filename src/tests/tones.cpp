@@ -115,8 +115,8 @@ ToneGui::ToneGui()
     generator->open(QIODevice::Unbuffered | QIODevice::ReadOnly);
 
     QAudioFormat format;
-    format.setChannelCount(1);
-    format.setSampleRate(generator->clockrate());
+    format.setChannels(1);
+    format.setFrequency(generator->clockrate());
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);

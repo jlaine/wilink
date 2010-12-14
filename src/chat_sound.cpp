@@ -143,8 +143,8 @@ bool ChatSoundReader::open(QIODevice::OpenMode mode)
     m_endPos = m_beginPos + chunkSize;
 
     // prepare format
-    m_format.setChannelCount(channelCount);
-    m_format.setSampleRate(sampleRate);
+    m_format.setChannels(channelCount);
+    m_format.setFrequency(sampleRate);
     m_format.setSampleSize(sampleSize);
     m_format.setCodec("audio/pcm");
     m_format.setByteOrder(QAudioFormat::LittleEndian);
