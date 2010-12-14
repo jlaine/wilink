@@ -267,6 +267,7 @@ void PhonePanel::handleSettings()
     const bool enabled = settings.firstChildElement("enabled").text() == "true";
     const QString password = settings.firstChildElement("password").text();
     const QString number = settings.firstChildElement("number").text();
+    const QString callsUrl = settings.firstChildElement("calls-url").text();
     if (!enabled || password.isEmpty())
         return;
 
@@ -294,7 +295,8 @@ void PhonePanel::handleSettings()
     }
 
     // retrieve call history
-    callsModel->setUrl(QUrl("http://phone.wifirst.net/calls/"));
+    if (!callsUrl.isEmpty())
+        callsModel->setUrl(QUrl(callsUrl));
 
     emit registerPanel();
 }
