@@ -58,7 +58,6 @@ void ChatSoundPlayer::readerFinished()
     if (!reader)
         return;
 
-    qDebug("reader finished");
     int id = m_readers.key(reader);
     m_readers.take(id);
     reader->deleteLater();
