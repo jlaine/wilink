@@ -35,5 +35,7 @@
     <file>wiLink.png</file>
     <file>wiLink-black.png</file>
     <file>wiLink-64.png</file>
+    <file>incoming.wav</file>
+    <file>outgoing.wav</file>
 </qresource>
 </RCC>

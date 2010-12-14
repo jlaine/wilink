@@ -33,6 +33,7 @@ class QSortFilterProxyModel;
 class QTimer;
 class PhoneCallsItem;
 class SipCall;
+class ChatSoundPlayer;
 
 class PhoneCallsModel : public QAbstractListModel
 {
@@ -61,6 +62,7 @@ public slots:
     void hangup();
 
 private slots:
+    void callRinging();
     void callStateChanged(QXmppCall::State state);
     void callTick();
     void handleCreate();
@@ -73,6 +75,7 @@ private:
     QNetworkAccessManager *m_network;
     QTimer *m_ticker;
     QUrl m_url;
+    ChatSoundPlayer *m_soundPlayer;
 };
 
 class PhoneCallsView : public QTableView

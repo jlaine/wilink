@@ -30,6 +30,7 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
+#include "chat_sound.h"
 #include "models.h"
 #include "sip.h"
 
@@ -62,6 +63,7 @@ public:
     int duration;
     int flags;
 
+    int soundId;
     SipCall *call;
     QNetworkReply *reply;
 };
@@ -71,7 +73,8 @@ PhoneCallsItem::PhoneCallsItem()
     duration(0),
     flags(0),
     call(0),
-    reply(0)
+    reply(0),
+    soundId(0)
 {
 }
 
@@ -102,6 +105,8 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
+    m_soundPlayer = new ChatSoundPlayer(this);
+
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);
     connect(m_ticker, SIGNAL(timeout()),
@@ -131,6 +136,10 @@ void PhoneCallsModel::addCall(SipCall *call)
     item->call = call;
     connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
+    if (item->call->direction() == QXmppCall::IncomingDirection)
+        item->soundId = m_soundPlayer->play(":/incoming.wav", 0);
+    else
+        connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
     item->reply = m_network->post(buildRequest(m_url), item->data());
     connect(item->reply, SIGNAL(finished()),
             this, SLOT(handleCreate()));
@@ -154,6 +163,21 @@ QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
     return req;
 }
 
+void PhoneCallsModel::callRinging()
+{
+    SipCall *call = qobject_cast<SipCall*>(sender());
+    Q_ASSERT(call);
+
+    // find the call
+    int row = -1;
+    foreach (PhoneCallsItem *item, m_items) {
+        if (item->call == call) {
+            item->soundId = m_soundPlayer->play(":/outgoing.wav", 0);
+            break;
+        }
+    }
+}
+
 void PhoneCallsModel::callStateChanged(QXmppCall::State state)
 {
     SipCall *call = qobject_cast<SipCall*>(sender());
@@ -170,9 +194,15 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
     if (row < 0)
         return;
 
+    PhoneCallsItem *item = m_items[row];
+
+    if (item->soundId && state != QXmppCall::OfferState) {
+        m_soundPlayer->stop(item->soundId);
+        item->soundId = 0;
+    }
+
     // update the item
     if (state == QXmppCall::FinishedState) {
-        PhoneCallsItem *item = m_items[row];
         item->call = 0;
         item->duration = call->duration();
         QUrl url = m_url;
