@@ -24,7 +24,6 @@
 
 ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
     : QObject(parent),
-    m_output(0),
     m_readerId(0)
 {
 }
@@ -40,8 +39,8 @@ int ChatSoundPlayer::play(const QString &name, int repeat)
     m_readerId++;
     m_readers[m_readerId] = reader;
 
-    m_output = new QAudioOutput(reader->format());
-    m_output->start(reader);
+    QAudioOutput *output = new QAudioOutput(reader->format(), reader);
+    output->start(reader);
 
     return m_readerId;
 }
@@ -50,7 +49,7 @@ void ChatSoundPlayer::stop(int id)
 {
     ChatSoundReader *reader = m_readers.value(id);
     if (reader)
-        emit reader->finished();
+        reader->close();
 }
 
 void ChatSoundPlayer::readerFinished()
@@ -59,11 +58,8 @@ void ChatSoundPlayer::readerFinished()
     if (!reader)
         return;
 
+    qDebug("reader finished");
     int id = m_readers.key(reader);
-    if (id == m_readerId) {
-        m_output->stop();
-        m_readerId = 0;
-    }
     m_readers.take(id);
     reader->deleteLater();
 }
@@ -74,6 +70,16 @@ ChatSoundReader::ChatSoundReader(const QString &name, int repeat, QObject *paren
     m_repeatLeft(repeat)
 {
     m_file = new QFile(name, this);
+}
+
+void ChatSoundReader::close()
+{
+    if (!isOpen())
+        return;
+
+    QIODevice::close();
+    m_file->close();
+    QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
 }
 
 QAudioFormat ChatSoundReader::format() const
@@ -169,7 +175,8 @@ qint64 ChatSoundReader::readData(char * data, qint64 maxSize)
         if (maxSize) {
             if (m_repeatCount && !--m_repeatLeft) {
                 memset(data, 0, maxSize);
-                QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+                close();
+                //QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
                 break;
             }
             m_file->seek(m_beginPos);

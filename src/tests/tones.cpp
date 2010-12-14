@@ -84,7 +84,6 @@ qint64 ToneGenerator::writeData(const char * data, qint64 maxSize)
 }
 
 ToneGui::ToneGui()
-    : soundId(0)
 {
     // keyboard
     QGridLayout *grid = new QGridLayout;
@@ -156,12 +155,15 @@ void ToneGui::keyReleased()
 
 void ToneGui::startSound()
 {
-    soundId = player->play("question.wav", 0);
+    int soundId = player->play("question.wav", 0);
+    if (soundId >= 0)
+        soundIds << soundId;
 }
 
 void ToneGui::stopSound()
 {
-    player->stop(soundId);
+    if (!soundIds.isEmpty())
+        player->stop(soundIds.takeFirst());
 }
 
 int main(int argc, char *argv[])

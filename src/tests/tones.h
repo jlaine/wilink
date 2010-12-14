@@ -43,6 +43,6 @@ private slots:
 private:
     ToneGenerator *generator;
     ChatSoundPlayer *player;
-    int soundId;
+    QList<int> soundIds;
 };
 

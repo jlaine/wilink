@@ -40,7 +40,6 @@ private slots:
     void readerFinished();
 
 private:
-    QAudioOutput *m_output;
     int m_readerId;
     QMap<int, ChatSoundReader*> m_readers;
 };
@@ -51,6 +50,7 @@ class ChatSoundReader : public QIODevice
 
 public:
     ChatSoundReader(const QString &name, int repeat, QObject *parent = 0);
+    void close();
     QAudioFormat format() const;
     bool open(QIODevice::OpenMode mode);
 
