@@ -155,7 +155,7 @@ void ToneGui::keyReleased()
 
 void ToneGui::startSound()
 {
-    int soundId = player->play("tones.wav", true);
+    int soundId = player->play(":/tones.wav", true);
     if (soundId >= 0)
         soundIds << soundId;
 }
@@ -170,14 +170,14 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    ChatSoundReader input("tones.wav");
+    ChatSoundFile input(":/tones.wav");
     if (!input.open(QIODevice::ReadOnly)) {
         qWarning("Could not read input");
         return 1;
     }
     const QByteArray data = input.readAll();
 
-    ChatSoundReader output("output.wav");
+    ChatSoundFile output("output.wav");
     output.setFormat(input.format());
     if (!output.open(QIODevice::WriteOnly)) {
         qWarning("Could not read output");

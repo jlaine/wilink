@@ -25,7 +25,7 @@
 #include <QMap>
 
 class QFile;
-class ChatSoundReader;
+class ChatSoundFile;
 
 class ChatSoundPlayer : public QObject
 {
@@ -41,15 +41,17 @@ private slots:
 
 private:
     int m_readerId;
-    QMap<int, ChatSoundReader*> m_readers;
+    QMap<int, ChatSoundFile*> m_readers;
 };
 
-class ChatSoundReader : public QIODevice
+/** The ChatSoundFile class represents a WAV-format file.
+ */
+class ChatSoundFile : public QIODevice
 {
     Q_OBJECT
 
 public:
-    ChatSoundReader(const QString &name, QObject *parent = 0);
+    ChatSoundFile(const QString &name, QObject *parent = 0);
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
