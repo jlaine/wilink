@@ -175,14 +175,14 @@ bool ChatSoundFile::readHeader()
     char chunkId[5];
     chunkId[4] = '\0';
     quint32 chunkSize;
+    char chunkFormat[5];
+    chunkFormat[4] = '\0';
 
     // RIFF header
     if (stream.readRawData(chunkId, 4) != 4)
         return false;
     stream >> chunkSize;
 
-    char chunkFormat[5];
-    chunkFormat[4] = '\0';
     stream.readRawData(chunkFormat, 4);
     if (qstrcmp(chunkId, "RIFF") || chunkSize != m_file->size() - 8 || qstrcmp(chunkFormat, "WAVE")) {
         qWarning("Bad RIFF header");
@@ -225,7 +225,23 @@ bool ChatSoundFile::readHeader()
             m_endPos = m_beginPos + chunkSize;
             break;
         } else if (!qstrcmp(chunkId, "LIST")) {
-            stream.skipRawData(chunkSize);
+            stream.readRawData(chunkFormat, 4);
+            chunkSize -= 4;
+            if (!qstrcmp(chunkFormat, "INFO")) {
+                char key[5];
+                key[4] = '\0';
+                quint32 length;
+                while (chunkSize) {
+                    stream.readRawData(key, 4);
+                    qDebug("key: %s", key);
+                    stream >> length;
+                    stream.skipRawData(length);
+                    chunkSize -= (8 + length);
+                }
+            } else {
+                qDebug("unknown LIST type %s", chunkFormat);
+                stream.skipRawData(chunkSize);
+            }
         } else {
             // skip unknown subchunk
             qDebug("unknown subchunk %s", chunkId);
