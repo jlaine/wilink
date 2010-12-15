@@ -55,6 +55,8 @@ public:
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
+    QMap<QByteArray, QByteArray> info() const;
+    void setInfo(const QMap<QByteArray, QByteArray> &info);
     bool open(QIODevice::OpenMode mode);
     bool repeat() const;
     void setRepeat(bool repeat);
@@ -70,13 +72,13 @@ private:
     bool readHeader();
     bool writeHeader();
 
-    QFile *m_file;
     QAudioFormat m_format;
+    QMap<QByteArray, QByteArray> m_info;
+
+    QFile *m_file;
     qint64 m_beginPos;
     qint64 m_endPos;
     bool m_repeat;
-    int m_repeatCount;
-    int m_repeatLeft;
 
     friend class ChatSoundPlayer;
 };

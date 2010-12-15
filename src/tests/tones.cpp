@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
 
     ChatSoundFile output("output.wav");
     output.setFormat(input.format());
+    output.setInfo(input.info());
     if (!output.open(QIODevice::WriteOnly)) {
         qWarning("Could not read output");
         return 1;

@@ -18,6 +18,7 @@
  */
 
 #include <QAudioOutput>
+#include <QBuffer>
 #include <QFile>
 
 #include "chat_sound.h"
@@ -104,6 +105,22 @@ QAudioFormat ChatSoundFile::format() const
 void ChatSoundFile::setFormat(const QAudioFormat &format)
 {
     m_format = format;
+}
+
+/** Returns the sound file meta-data.
+ */
+QMap<QByteArray, QByteArray> ChatSoundFile::info() const
+{
+    return m_info;
+}
+
+/** Sets the sound file meta-data.
+ *
+ * @param info
+ */
+void ChatSoundFile::setInfo(const QMap<QByteArray, QByteArray> &info)
+{
+    m_info = info;
 }
 
 bool ChatSoundFile::open(QIODevice::OpenMode mode)
@@ -228,14 +245,16 @@ bool ChatSoundFile::readHeader()
             stream.readRawData(chunkFormat, 4);
             chunkSize -= 4;
             if (!qstrcmp(chunkFormat, "INFO")) {
-                char key[5];
-                key[4] = '\0';
+                QByteArray key(4, '\0');
+                QByteArray value;
                 quint32 length;
                 while (chunkSize) {
-                    stream.readRawData(key, 4);
-                    qDebug("key: %s", key);
+                    stream.readRawData(key.data(), key.size());
                     stream >> length;
-                    stream.skipRawData(length);
+                    value.resize(length);
+                    stream.readRawData(value.data(), value.size());
+                    m_info[key] = value;
+                    qDebug("key: %s, val: %s", key.constData(), value.constData());
                     chunkSize -= (8 + length);
                 }
             } else {
@@ -295,6 +314,24 @@ bool ChatSoundFile::writeHeader()
     stream << quint16((m_format.channels() * m_format.sampleSize()) / 8);
     stream << quint16(m_format.sampleSize());
 
+    // LIST subchunk
+    if (!m_info.isEmpty()) {
+        QBuffer buffer;
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream tmp(&buffer);
+        tmp.setByteOrder(QDataStream::LittleEndian);
+        foreach (const QByteArray &key, m_info.keys()) {
+            const QByteArray value = m_info[key];
+            tmp.writeRawData(key.constData(), key.size());
+            tmp << quint32(value.size());
+            tmp.writeRawData(value.constData(), value.size());
+        }
+        const QByteArray data = buffer.data();
+        stream.writeRawData("LIST", 4);
+        stream << quint32(4 + data.size());
+        stream.writeRawData("INFO", 4);
+        stream.writeRawData(data.constData(), data.size());
+    }
     // data subchunk
     stream.writeRawData("data", 4);
     stream << quint32(m_endPos - m_beginPos);
