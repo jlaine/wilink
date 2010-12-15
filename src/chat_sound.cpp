@@ -37,9 +37,10 @@ ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
 {
 }
 
-int ChatSoundPlayer::play(const QString &name, int repeat)
+int ChatSoundPlayer::play(const QString &name, bool repeat)
 {
-    ChatSoundReader *reader = new ChatSoundReader(name, repeat, this);
+    ChatSoundReader *reader = new ChatSoundReader(name, this);
+    reader->setRepeat(repeat);
     if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         delete reader;
         return -1;
@@ -72,10 +73,9 @@ void ChatSoundPlayer::readerFinished()
     reader->deleteLater();
 }
 
-ChatSoundReader::ChatSoundReader(const QString &name, int repeat, QObject *parent)
+ChatSoundReader::ChatSoundReader(const QString &name, QObject *parent)
     : QIODevice(parent),
-    m_repeatCount(repeat),
-    m_repeatLeft(repeat)
+    m_repeat(false)
 {
     m_file = new QFile(name, this);
 }
@@ -140,12 +140,6 @@ qint64 ChatSoundReader::readData(char * data, qint64 maxSize)
 {
     char *start = data;
 
-    // if we have finished playing, return empty samples
-    if (m_repeatCount && !m_repeatLeft) {
-        memset(data, 0, maxSize);
-        return maxSize;
-    }
-
     while (maxSize) {
         qint64 chunk = qMin(m_endPos - m_file->pos(), maxSize);
         qint64 bytes = m_file->read(data, chunk);
@@ -155,10 +149,10 @@ qint64 ChatSoundReader::readData(char * data, qint64 maxSize)
         maxSize -= bytes;
 
         if (maxSize) {
-            if (m_repeatCount && !--m_repeatLeft) {
+            // stop here unless we should repeat
+            if (!m_repeat) {
                 memset(data, 0, maxSize);
                 close();
-                //QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
                 break;
             }
             m_file->seek(m_beginPos);
@@ -225,6 +219,16 @@ bool ChatSoundReader::readHeader()
     m_format.setSampleType(QAudioFormat::SignedInt);
 
     return true;
+}
+
+bool ChatSoundReader::repeat() const
+{
+    return m_repeat;
+}
+
+void ChatSoundReader::setRepeat(bool repeat)
+{
+    m_repeat = repeat;
 }
 
 qint64 ChatSoundReader::writeData(const char * data, qint64 maxSize)

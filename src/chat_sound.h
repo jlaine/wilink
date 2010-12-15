@@ -33,7 +33,7 @@ class ChatSoundPlayer : public QObject
 
 public:
     ChatSoundPlayer(QObject *parent = 0);
-    int play(const QString &name, int repeat = 1);
+    int play(const QString &name, bool repeat = false);
     void stop(int id);
 
 private slots:
@@ -49,11 +49,13 @@ class ChatSoundReader : public QIODevice
     Q_OBJECT
 
 public:
-    ChatSoundReader(const QString &name, int repeat = 1, QObject *parent = 0);
+    ChatSoundReader(const QString &name, QObject *parent = 0);
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
     bool open(QIODevice::OpenMode mode);
+    bool repeat() const;
+    void setRepeat(bool repeat);
 
 signals:
     void finished();
@@ -70,6 +72,7 @@ private:
     QAudioFormat m_format;
     qint64 m_beginPos;
     qint64 m_endPos;
+    bool m_repeat;
     int m_repeatCount;
     int m_repeatLeft;
 
