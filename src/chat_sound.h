@@ -49,7 +49,7 @@ class ChatSoundReader : public QIODevice
     Q_OBJECT
 
 public:
-    ChatSoundReader(const QString &name, int repeat, QObject *parent = 0);
+    ChatSoundReader(const QString &name, int repeat = 1, QObject *parent = 0);
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);

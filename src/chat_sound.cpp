@@ -85,8 +85,12 @@ void ChatSoundReader::close()
     if (!isOpen())
         return;
 
-    QIODevice::close();
+    if (openMode() & QIODevice::WriteOnly) {
+        m_file->seek(0);
+        writeHeader();
+    }
     m_file->close();
+    QIODevice::close();
     QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
 }
 
@@ -122,6 +126,7 @@ bool ChatSoundReader::open(QIODevice::OpenMode mode)
     } 
     else if (mode & QIODevice::WriteOnly) {
         // write header
+        m_beginPos = m_endPos = 44;
         if (!writeHeader()) {
             m_file->close();
             return false;
@@ -224,7 +229,10 @@ bool ChatSoundReader::readHeader()
 
 qint64 ChatSoundReader::writeData(const char * data, qint64 maxSize)
 {
-    return -1;
+    qint64 bytes = m_file->write(data, maxSize);
+    if (bytes > 0)
+        m_endPos += bytes;
+    return bytes;
 }
 
 bool ChatSoundReader::writeHeader()
@@ -235,7 +243,7 @@ bool ChatSoundReader::writeHeader()
     stream.setByteOrder(QDataStream::BigEndian);
     stream << RIFF_ID;
     stream.setByteOrder(QDataStream::LittleEndian);
-    stream << quint32(m_file->size() - 8);
+    stream << quint32(m_endPos - 8);
     stream.setByteOrder(QDataStream::BigEndian);
     stream << RIFF_FORMAT;
 
@@ -247,8 +255,8 @@ bool ChatSoundReader::writeHeader()
     stream << FMT_FORMAT;
     stream << quint16(m_format.channels());
     stream << quint32(m_format.frequency());
-    stream << quint32((m_format.sampleSize() * m_format.frequency()) / 8);
-    stream << quint16(0); //blockAlign;
+    stream << quint32((m_format.channels() * m_format.sampleSize() * m_format.frequency()) / 8);
+    stream << quint16((m_format.channels() * m_format.sampleSize()) / 8);
     stream << quint16(m_format.sampleSize());
 
     // data subchunk
