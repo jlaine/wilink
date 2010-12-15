@@ -22,6 +22,15 @@
 
 #include "chat_sound.h"
 
+static const quint32 RIFF_ID = 0x52494646;     // "RIFF"
+static const quint32 RIFF_FORMAT = 0x57415645; // "WAVE"
+
+static const quint32 FMT_ID = 0x666d7420; // "fmt "
+static const quint32 FMT_SIZE = 16;
+static const quint16 FMT_FORMAT = 1;      // linear PCM
+
+static const quint32 DATA_ID = 0x64617461;
+
 ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
     : QObject(parent),
     m_readerId(0)
@@ -88,67 +97,31 @@ QAudioFormat ChatSoundReader::format() const
 
 bool ChatSoundReader::open(QIODevice::OpenMode mode)
 {
-    if (!m_file->open(QIODevice::ReadOnly)) {
-        qWarning("Could not read %s", qPrintable(m_file->fileName()));
+    if ((mode & QIODevice::ReadWrite) == QIODevice::ReadWrite) {
+        qWarning("Cannot open in read/write mode");
         return false;
     }
 
-    QDataStream stream(m_file);
-
-    // RIFF header
-    quint32 chunkId, chunkSize, chunkFormat;
-    stream.setByteOrder(QDataStream::BigEndian);
-    stream >> chunkId;
-    stream.setByteOrder(QDataStream::LittleEndian);
-    stream >> chunkSize;
-    stream.setByteOrder(QDataStream::BigEndian);
-    stream >> chunkFormat;
-    if (chunkId != 0x52494646 || chunkSize != m_file->size() - 8 || chunkFormat != 0x57415645) {
-        qWarning("Bad RIFF header");
-        m_file->close();
+    // open file
+    if (!m_file->open(mode)) {
+        qWarning("Could not open %s", qPrintable(m_file->fileName()));
         return false;
     }
 
-    // fmt subchunk
-    quint16 audioFormat, channelCount, blockAlign, sampleSize;
-    quint32 sampleRate, byteRate;
-    stream.setByteOrder(QDataStream::BigEndian);
-    stream >> chunkId;
-    stream.setByteOrder(QDataStream::LittleEndian);
-    stream >> chunkSize;
-    stream >> audioFormat;
-    if (chunkId != 0x666d7420 || chunkSize != 16 || audioFormat != 1) {
-        qWarning("Bad fmt subchunk");
-        m_file->close();
-        return false;
+    if (mode & QIODevice::ReadOnly) {
+        // read header
+        if (!readHeader()) {
+            m_file->close();
+            return false;
+        }
+    } 
+    else if (mode & QIODevice::WriteOnly) {
+        // write header
+        if (!writeHeader()) {
+            m_file->close();
+            return false;
+        }
     }
-    stream >> channelCount;
-    stream >> sampleRate;
-    stream >> byteRate;
-    stream >> blockAlign;
-    stream >> sampleSize;
-
-    //qDebug("channelCount: %u, sampleRate: %u, sampleSize: %u", channelCount, sampleRate, sampleSize);
-
-    // data subchunk
-    stream.setByteOrder(QDataStream::BigEndian);
-    stream >> chunkId;
-    stream.setByteOrder(QDataStream::LittleEndian);
-    stream >> chunkSize;
-    if (chunkId != 0x64617461) {
-        qWarning("Bad data subchunk");
-        return false;
-    }
-    m_beginPos = m_file->pos();
-    m_endPos = m_beginPos + chunkSize;
-
-    // prepare format
-    m_format.setChannels(channelCount);
-    m_format.setFrequency(sampleRate);
-    m_format.setSampleSize(sampleSize);
-    m_format.setCodec("audio/pcm");
-    m_format.setByteOrder(QAudioFormat::LittleEndian);
-    m_format.setSampleType(QAudioFormat::SignedInt);
 
     return QIODevice::open(mode);
 }
@@ -184,8 +157,100 @@ qint64 ChatSoundReader::readData(char * data, qint64 maxSize)
     return data - start;
 }
 
+bool ChatSoundReader::readHeader()
+{
+    QDataStream stream(m_file);
+
+    // RIFF header
+    quint32 chunkId, chunkSize, chunkFormat;
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream >> chunkId;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream >> chunkSize;
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream >> chunkFormat;
+    if (chunkId != RIFF_ID || chunkSize != m_file->size() - 8 || chunkFormat != RIFF_FORMAT) {
+        qWarning("Bad RIFF header");
+        return false;
+    }
+
+    // fmt subchunk
+    quint16 audioFormat, channelCount, blockAlign, sampleSize;
+    quint32 sampleRate, byteRate;
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream >> chunkId;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream >> chunkSize;
+    stream >> audioFormat;
+    if (chunkId != FMT_ID || chunkSize != FMT_SIZE || audioFormat != FMT_FORMAT) {
+        qWarning("Bad fmt subchunk");
+        return false;
+    }
+    stream >> channelCount;
+    stream >> sampleRate;
+    stream >> byteRate;
+    stream >> blockAlign;
+    stream >> sampleSize;
+
+    //qDebug("channelCount: %u, sampleRate: %u, sampleSize: %u", channelCount, sampleRate, sampleSize);
+
+    // data subchunk
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream >> chunkId;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream >> chunkSize;
+    if (chunkId != DATA_ID) {
+        qWarning("Bad data subchunk");
+        return false;
+    }
+    m_beginPos = m_file->pos();
+    m_endPos = m_beginPos + chunkSize;
+
+    // prepare format
+    m_format.setChannels(channelCount);
+    m_format.setFrequency(sampleRate);
+    m_format.setSampleSize(sampleSize);
+    m_format.setCodec("audio/pcm");
+    m_format.setByteOrder(QAudioFormat::LittleEndian);
+    m_format.setSampleType(QAudioFormat::SignedInt);
+
+    return true;
+}
+
 qint64 ChatSoundReader::writeData(const char * data, qint64 maxSize)
 {
     return -1;
 }
 
+bool ChatSoundReader::writeHeader()
+{
+    QDataStream stream(m_file);
+
+    // RIFF header
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream << RIFF_ID;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream << quint32(m_file->size() - 8);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream << RIFF_FORMAT;
+
+    // fmt subchunk
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream << FMT_ID;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream << FMT_SIZE;
+    stream << FMT_FORMAT;
+    stream << quint16(m_format.channels());
+    stream << quint32(m_format.frequency());
+    stream << quint32((m_format.sampleSize() * m_format.frequency()) / 8);
+    stream << quint16(0); //blockAlign;
+    stream << quint16(m_format.sampleSize());
+
+    // data subchunk
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream << DATA_ID;
+    stream.setByteOrder(QDataStream::LittleEndian);
+    stream << quint32(m_endPos - m_beginPos);
+
+    return true;
+}
