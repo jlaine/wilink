@@ -143,18 +143,22 @@ qint64 ChatSoundReader::readData(char * data, qint64 maxSize)
     while (maxSize) {
         qint64 chunk = qMin(m_endPos - m_file->pos(), maxSize);
         qint64 bytes = m_file->read(data, chunk);
-        if (bytes < 0)
+        if (bytes < 0) {
+            // abort
+            QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
             return -1;
+        }
         data += bytes;
         maxSize -= bytes;
 
         if (maxSize) {
-            // stop here unless we should repeat
             if (!m_repeat) {
+                // stop, we have reached end of file and don't want to repeat
                 memset(data, 0, maxSize);
-                close();
+                QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
                 break;
             }
+            // rewind file to repeat
             m_file->seek(m_beginPos);
         }
     }
