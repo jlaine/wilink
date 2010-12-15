@@ -22,8 +22,6 @@
 
 #include "chat_sound.h"
 
-static const quint32 RIFF_FORMAT = 0x57415645; // "WAVE"
-
 static const quint32 FMT_SIZE = 16;
 static const quint16 FMT_FORMAT = 1;      // linear PCM
 
@@ -176,14 +174,17 @@ bool ChatSoundFile::readHeader()
 
     char chunkId[5];
     chunkId[4] = '\0';
+    quint32 chunkSize;
 
     // RIFF header
-    quint32 chunkSize, chunkFormat;
-    stream.readRawData(chunkId, 4);
+    if (stream.readRawData(chunkId, 4) != 4)
+        return false;
     stream >> chunkSize;
-    stream.setByteOrder(QDataStream::BigEndian);
-    stream >> chunkFormat;
-    if (qstrcmp(chunkId, "RIFF") || chunkSize != m_file->size() - 8 || chunkFormat != RIFF_FORMAT) {
+
+    char chunkFormat[5];
+    chunkFormat[4] = '\0';
+    stream.readRawData(chunkFormat, 4);
+    if (qstrcmp(chunkId, "RIFF") || chunkSize != m_file->size() - 8 || qstrcmp(chunkFormat, "WAVE")) {
         qWarning("Bad RIFF header");
         return false;
     }
