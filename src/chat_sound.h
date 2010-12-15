@@ -52,6 +52,7 @@ public:
     ChatSoundReader(const QString &name, int repeat, QObject *parent = 0);
     void close();
     QAudioFormat format() const;
+    void setFormat(const QAudioFormat &format);
     bool open(QIODevice::OpenMode mode);
 
 signals:
@@ -62,6 +63,9 @@ protected:
     qint64 writeData(const char * data, qint64 maxSize);
 
 private:
+    bool readHeader();
+    bool writeHeader();
+
     QFile *m_file;
     QAudioFormat m_format;
     qint64 m_beginPos;

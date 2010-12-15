@@ -95,6 +95,11 @@ QAudioFormat ChatSoundReader::format() const
     return m_format;
 }
 
+void ChatSoundReader::setFormat(const QAudioFormat &format)
+{
+    m_format = format;
+}
+
 bool ChatSoundReader::open(QIODevice::OpenMode mode)
 {
     if ((mode & QIODevice::ReadWrite) == QIODevice::ReadWrite) {

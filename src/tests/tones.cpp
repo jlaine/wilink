@@ -155,7 +155,7 @@ void ToneGui::keyReleased()
 
 void ToneGui::startSound()
 {
-    int soundId = player->play("question.wav", 0);
+    int soundId = player->play("tones.wav", 0);
     if (soundId >= 0)
         soundIds << soundId;
 }
