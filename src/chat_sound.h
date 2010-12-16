@@ -56,8 +56,8 @@ public:
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
-    QList<QPair<QByteArray, QByteArray> > info() const;
-    void setInfo(const QList<QPair<QByteArray, QByteArray> > &info);
+    QList<QPair<QByteArray, QString> > info() const;
+    void setInfo(const QList<QPair<QByteArray, QString> > &info);
     bool open(QIODevice::OpenMode mode);
     bool repeat() const;
     void setRepeat(bool repeat);
@@ -74,7 +74,7 @@ private:
     bool writeHeader();
 
     QAudioFormat m_format;
-    QList<QPair<QByteArray, QByteArray> > m_info;
+    QList<QPair<QByteArray, QString> > m_info;
 
     QFile *m_file;
     qint64 m_beginPos;
