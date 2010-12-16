@@ -147,6 +147,7 @@ void TestSound::copyWav()
     QFile outputFile(outputPath);
     QCOMPARE(outputFile.open(QIODevice::ReadOnly), true);
     QCOMPARE(inputFile.readAll(), outputFile.readAll());
+    outputFile.remove();
 }
 
 void TestUpdates::compareVersions()
