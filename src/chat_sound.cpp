@@ -255,6 +255,9 @@ bool ChatSoundFile::readHeader()
                     stream >> length;
                     value.resize(length);
                     stream.readRawData(value.data(), value.size());
+                    int pos = value.indexOf('\0');
+                    if (pos >= 0)
+                        value = value.left(pos);
                     m_info << qMakePair(key, value);
                     chunkSize -= (8 + length);
                 }
@@ -324,8 +327,11 @@ bool ChatSoundFile::writeHeader()
         QPair<QByteArray, QByteArray> info;
         foreach (info, m_info) {
             tmp.writeRawData(info.first.constData(), info.first.size());
-            tmp << quint32(info.second.size());
-            tmp.writeRawData(info.second.constData(), info.second.size());
+            QByteArray value = info.second + '\0';
+            if (value.size() % 2)
+                value += '\0';
+            tmp << quint32(value.size());
+            tmp.writeRawData(value.constData(), value.size());
         }
         const QByteArray data = buffer.data();
         stream.writeRawData("LIST", 4);
