@@ -23,6 +23,7 @@
 #include <QAudioOutput>
 #include <QIODevice>
 #include <QMap>
+#include <QPair>
 
 class QFile;
 class ChatSoundFile;
@@ -55,8 +56,8 @@ public:
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
-    QMap<QByteArray, QByteArray> info() const;
-    void setInfo(const QMap<QByteArray, QByteArray> &info);
+    QList<QPair<QByteArray, QByteArray> > info() const;
+    void setInfo(const QList<QPair<QByteArray, QByteArray> > &info);
     bool open(QIODevice::OpenMode mode);
     bool repeat() const;
     void setRepeat(bool repeat);
@@ -73,7 +74,7 @@ private:
     bool writeHeader();
 
     QAudioFormat m_format;
-    QMap<QByteArray, QByteArray> m_info;
+    QList<QPair<QByteArray, QByteArray> > m_info;
 
     QFile *m_file;
     qint64 m_beginPos;

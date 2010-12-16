@@ -109,7 +109,7 @@ void ChatSoundFile::setFormat(const QAudioFormat &format)
 
 /** Returns the sound file meta-data.
  */
-QMap<QByteArray, QByteArray> ChatSoundFile::info() const
+QList<QPair<QByteArray, QByteArray> > ChatSoundFile::info() const
 {
     return m_info;
 }
@@ -118,7 +118,7 @@ QMap<QByteArray, QByteArray> ChatSoundFile::info() const
  *
  * @param info
  */
-void ChatSoundFile::setInfo(const QMap<QByteArray, QByteArray> &info)
+void ChatSoundFile::setInfo(const QList<QPair<QByteArray, QByteArray> > &info)
 {
     m_info = info;
 }
@@ -253,7 +253,7 @@ bool ChatSoundFile::readHeader()
                     stream >> length;
                     value.resize(length);
                     stream.readRawData(value.data(), value.size());
-                    m_info[key] = value;
+                    m_info << qMakePair(key, value);
                     qDebug("key: %s, val: %s", key.constData(), value.constData());
                     chunkSize -= (8 + length);
                 }
@@ -320,11 +320,11 @@ bool ChatSoundFile::writeHeader()
         buffer.open(QIODevice::WriteOnly);
         QDataStream tmp(&buffer);
         tmp.setByteOrder(QDataStream::LittleEndian);
-        foreach (const QByteArray &key, m_info.keys()) {
-            const QByteArray value = m_info[key];
-            tmp.writeRawData(key.constData(), key.size());
-            tmp << quint32(value.size());
-            tmp.writeRawData(value.constData(), value.size());
+        QPair<QByteArray, QByteArray> info;
+        foreach (info, m_info) {
+            tmp.writeRawData(info.first.constData(), info.first.size());
+            tmp << quint32(info.second.size());
+            tmp.writeRawData(info.second.constData(), info.second.size());
         }
         const QByteArray data = buffer.data();
         stream.writeRawData("LIST", 4);
