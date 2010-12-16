@@ -208,12 +208,13 @@ bool ChatSoundFile::readHeader()
     }
 
     // read subchunks
+    m_info.clear();
     while (true) {
         if (stream.readRawData(chunkId, 4) != 4)
             break;
         stream >> chunkSize;
 
-        qDebug("subchunk %s (%u bytes)", chunkId, chunkSize);
+        //qDebug("subchunk %s (%u bytes)", chunkId, chunkSize);
         if (!qstrcmp(chunkId, "fmt ")) {
             // fmt subchunk
             quint16 audioFormat, channelCount, blockAlign, sampleSize;
@@ -255,16 +256,15 @@ bool ChatSoundFile::readHeader()
                     value.resize(length);
                     stream.readRawData(value.data(), value.size());
                     m_info << qMakePair(key, value);
-                    qDebug("key: %s, val: %s", key.constData(), value.constData());
                     chunkSize -= (8 + length);
                 }
             } else {
-                qDebug("unknown LIST type %s", chunkFormat);
+                qWarning("WAV file contains an unknown LIST format %s", chunkFormat);
                 stream.skipRawData(chunkSize);
             }
         } else {
             // skip unknown subchunk
-            qDebug("unknown subchunk %s", chunkId);
+            qWarning("WAV file contains unknown subchunk %s", chunkId);
             stream.skipRawData(chunkSize);
         }
     }
