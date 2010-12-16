@@ -28,6 +28,7 @@
 #include "QXmppLogger.h"
 #include "stun.h"
 
+class QHostInfo;
 class QUdpSocket;
 class QTimer;
 class QXmppRtpChannel;
@@ -210,7 +211,9 @@ private slots:
     void datagramReceived();
     void registerWithServer();
     void sendStun();
+    void setSipServer(const QHostInfo &info);
     void setSipServer(const QXmppSrvInfo &info);
+    void setStunServer(const QHostInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
 
 private:

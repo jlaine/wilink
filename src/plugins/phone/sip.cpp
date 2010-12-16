@@ -1257,6 +1257,18 @@ void SipClient::sendStun()
     d->stunTimer->start(STUN_RETRY_MS);
 }
 
+void SipClient::setSipServer(const QHostInfo &hostInfo)
+{
+    if (hostInfo.addresses().isEmpty()) {
+        warning(QString("Could not lookup SIP server %1").arg(hostInfo.hostName()));
+        return;
+    }
+    d->serverAddress = hostInfo.addresses().first();
+
+    if (d->stunDone)
+        registerWithServer();
+}
+
 void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName = "sip." + d->domain;
@@ -1266,15 +1278,20 @@ void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
         d->serverPort = serviceInfo.records().first().port();
     }
 
-    QHostInfo info = QHostInfo::fromName(serverName);
-    if (info.addresses().isEmpty()) {
-        warning(QString("Could not lookup SIP server %1").arg(serverName));
+    // lookup SIP host name
+    QHostInfo::lookupHost(serverName, this, SLOT(setSipServer(QHostInfo)));
+}
+
+void SipClient::setStunServer(const QHostInfo &hostInfo)
+{
+    if (hostInfo.addresses().isEmpty()) {
+        warning(QString("Could not lookup STUN server %1").arg(hostInfo.hostName()));
         return;
     }
-    d->serverAddress = info.addresses().first();
+    d->stunServerAddress = hostInfo.addresses().first();
 
-    if (d->stunDone)
-        registerWithServer();
+    // send STUN binding request
+    sendStun();
 }
 
 void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
@@ -1286,15 +1303,8 @@ void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
         d->stunServerPort = serviceInfo.records().first().port();
     }
 
-    QHostInfo info = QHostInfo::fromName(serverName);
-    if (info.addresses().isEmpty()) {
-        warning(QString("Could not lookup STUN server %1").arg(serverName));
-        return;
-    }
-    d->stunServerAddress = info.addresses().first();
-
-    // send STUN binding request
-    sendStun();
+    // lookup STUN host name
+    QHostInfo::lookupHost(serverName, this, SLOT(setStunServer(QHostInfo)));
 }
 
 SipClient::State SipClient::state() const
