@@ -37,6 +37,14 @@ private slots:
     void indentElement();
 };
 
+class TestSound : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    void copyWav();
+};
+
 class TestUpdates : public QObject
 {
     Q_OBJECT

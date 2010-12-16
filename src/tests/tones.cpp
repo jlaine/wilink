@@ -170,23 +170,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    ChatSoundFile input(":/tones.wav");
-    if (!input.open(QIODevice::ReadOnly)) {
-        qWarning("Could not read input");
-        return 1;
-    }
-    const QByteArray data = input.readAll();
-
-    ChatSoundFile output("output.wav");
-    output.setFormat(input.format());
-    output.setInfo(input.info());
-    if (!output.open(QIODevice::WriteOnly)) {
-        qWarning("Could not read output");
-        return 1;
-    }
-    output.write(data);
-    output.close();
-
     ToneGui gui;
     gui.show();
     gui.raise();

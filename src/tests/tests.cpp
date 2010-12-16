@@ -23,6 +23,7 @@
 
 #include "diagnostics/iq.h"
 #include "updates.h"
+#include "chat_sound.h"
 #include "chat_utils.h"
 #include "tests.h"
 
@@ -121,6 +122,33 @@ void TestIndent::checkJid()
     QCOMPARE(isFullJid("foo/wiz"), false);
 }
 
+void TestSound::copyWav()
+{
+    const QString inputPath(":/tones.wav");
+    const QString outputPath("output.wav");
+
+    // read input
+    ChatSoundFile input(inputPath);
+    QCOMPARE(input.open(QIODevice::ReadOnly), true);
+    const QByteArray data = input.readAll();
+    input.close();
+
+    // write output
+    ChatSoundFile output(outputPath);
+    output.setFormat(input.format());
+    output.setInfo(input.info());
+    QCOMPARE(output.open(QIODevice::WriteOnly), true);
+    output.write(data);
+    output.close();
+
+    // compare
+    QFile inputFile(inputPath);
+    QCOMPARE(inputFile.open(QIODevice::ReadOnly), true);
+    QFile outputFile(outputPath);
+    QCOMPARE(outputFile.open(QIODevice::ReadOnly), true);
+    QCOMPARE(inputFile.readAll(), outputFile.readAll());
+}
+
 void TestUpdates::compareVersions()
 {
     QVERIFY(Updates::compareVersions("1.0", "1.0") == 0);
@@ -157,13 +185,23 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
+    int errors = 0;
+
     TestDiagnostics testDiagnostics;
-    QTest::qExec(&testDiagnostics);
+    errors += QTest::qExec(&testDiagnostics);
 
     TestIndent testIndent;
-    QTest::qExec(&testIndent);
+    errors += QTest::qExec(&testIndent);
+
+    TestSound testSound;
+    errors += QTest::qExec(&testSound);
 
     TestUpdates testUpdates;
-    QTest::qExec(&testUpdates);
+    errors += QTest::qExec(&testUpdates);
+
+    if (errors) {
+        qWarning("Total failed tests: %i", errors);
+        return EXIT_FAILURE;
+    }
 }
 

@@ -4,14 +4,20 @@ set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
 # tests
-set(tests_MOC_HEADERS ../updates.h tests.h)
+set(tests_MOC_HEADERS
+    ../chat_sound.h
+    ../updates.h
+    tests.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
+qt4_add_resources(tests_RCC_SOURCES tones.qrc)
 add_executable(tests
+    ../chat_sound.cpp
     ../chat_utils.cpp
     ../systeminfo.cpp
     ../updates.cpp
     tests.cpp
-    ${tests_MOC_SOURCES})
+    ${tests_MOC_SOURCES}
+    ${tests_RCC_SOURCES})
 target_link_libraries(tests qnetio qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 add_executable(codec codec.cpp)
