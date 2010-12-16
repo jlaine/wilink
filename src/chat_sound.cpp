@@ -72,6 +72,8 @@ void ChatSoundPlayer::readerFinished()
  */
 ChatSoundFile::ChatSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent),
+    m_beginPos(0),
+    m_endPos(0),
     m_repeat(false)
 {
     m_file = new QFile(name, this);
@@ -145,7 +147,6 @@ bool ChatSoundFile::open(QIODevice::OpenMode mode)
     } 
     else if (mode & QIODevice::WriteOnly) {
         // write header
-        m_beginPos = m_endPos = 44;
         if (!writeHeader()) {
             m_file->close();
             return false;
@@ -334,6 +335,8 @@ bool ChatSoundFile::writeHeader()
     }
     // data subchunk
     stream.writeRawData("data", 4);
+    if (m_beginPos != m_file->pos() + 4)
+        m_beginPos = m_endPos = m_file->pos() + 4;
     stream << quint32(m_endPos - m_beginPos);
 
     return true;
