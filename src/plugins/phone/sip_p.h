@@ -116,7 +116,6 @@ public:
     QHostAddress contactAddress;
     quint16 contactPort;
     QUdpSocket *socket;
-    bool socketsBound;
 
     // STUN
     bool stunDone;

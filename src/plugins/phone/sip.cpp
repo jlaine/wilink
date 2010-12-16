@@ -756,7 +756,6 @@ void SipCall::hangup()
 SipClientPrivate::SipClientPrivate(SipClient *qq)
     : state(SipClient::DisconnectedState),
     contactPort(0),
-    socketsBound(false),
     stunCookie(0),
     stunDone(false),
     stunReflexivePort(0),
@@ -1038,26 +1037,14 @@ void SipClient::connectToServer()
     // schedule retry
     d->connectTimer->start(10000);
 
-    // bind sockets
-    if (!d->socketsBound) {
-        const QList<QHostAddress> addresses = QXmppIceComponent::discoverAddresses();
-        if (addresses.isEmpty()) {
-            warning("Could not find an address to bind to");
-            return;
-        }
-        d->localAddress = addresses.first();
-
-        // listen for SIP
+    // listen for SIP
+    if (!d->socket->isOpen()) {
         if (!d->socket->bind()) {
             warning("Could not start listening for SIP");
             return;
         }
         debug(QString("Listening for SIP on port %1").arg(
             QString::number(d->socket->localPort())));
-
-        d->contactAddress = d->localAddress;
-        d->contactPort = d->socket->localPort();
-        d->socketsBound = true;
     }
 
     // perform DNS SRV lookups
@@ -1124,8 +1111,12 @@ void SipClient::datagramReceived()
 
             // update local address
             const QList<QHostAddress> addresses = QXmppIceComponent::discoverAddresses();
-            if (!addresses.isEmpty())
-                d->localAddress = addresses.first();
+            foreach (const QHostAddress &address, addresses) {
+                if (address.protocol() == QAbstractSocket::IPv4Protocol) {
+                    d->localAddress = address;
+                    break;
+                }
+            }
 
             // clear credentials
             d->challenge.clear();
