@@ -43,6 +43,7 @@ class TestSound : public QObject
 
 private slots:
     void copyWav();
+    void readWav();
 };
 
 class TestUpdates : public QObject

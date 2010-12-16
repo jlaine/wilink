@@ -150,6 +150,29 @@ void TestSound::copyWav()
     outputFile.remove();
 }
 
+void TestSound::readWav()
+{
+    // read input
+    ChatSoundFile input(":/tones.wav");
+    QCOMPARE(input.open(QIODevice::ReadOnly), true);
+
+    // check format
+    QCOMPARE(input.format().channels(), 1);
+    QCOMPARE(input.format().frequency(), 44100);
+    QCOMPARE(input.format().sampleSize(), 16);
+
+    // check info
+    const QList<QPair<QByteArray, QByteArray> > info = input.info();
+    QCOMPARE(info.size(), 4);
+    QCOMPARE(info[0].first, QByteArray("INAM"));
+    QCOMPARE(info[1].first, QByteArray("IART"));
+    QCOMPARE(info[2].first, QByteArray("ICMT"));
+    QCOMPARE(info[3].first, QByteArray("ICRD"));
+
+    const QByteArray data = input.readAll();
+    input.close();
+}
+
 void TestUpdates::compareVersions()
 {
     QVERIFY(Updates::compareVersions("1.0", "1.0") == 0);
