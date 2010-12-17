@@ -288,12 +288,12 @@ void Chat::notifyPanel(const QString &message, int options)
     Application *wApp = qobject_cast<Application*>(qApp);
     QWidget *panel = qobject_cast<QWidget*>(sender());
     QWidget *window = panel->isVisible() ? panel->window() : this;
-    wApp->soundPlayer()->play(":/message-incoming.ogg");
 
     // add pending message
     bool showMessage = (options & ChatPanel::ForceNotification);
     if (!window->isActiveWindow() || (window == this && m_conversationPanel->currentWidget() != panel))
     {
+        wApp->soundPlayer()->play(":/message-incoming.ogg");
         m_rosterModel->addPendingMessage(panel->objectName());
         showMessage = true;
     }
