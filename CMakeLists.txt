@@ -31,7 +31,10 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libgcc_s_dw2-1.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/libogg-0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libspeex-1.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/libvorbis-0.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/libvorbisfile-3.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll)
     set(WILINK_IMAGE_PLUGINS

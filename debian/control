@@ -3,7 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
 Standards-Version: 3.8.1
-Build-Depends: cdbs, debhelper (>= 5), cmake, libqt4-dev, libspeex-dev, libxss-dev
+Build-Depends: cdbs, debhelper (>= 5), cmake, libqt4-dev, libspeex-dev, libvorbis-dev, libxss-dev
 
 Package: wilink
 Architecture: any
