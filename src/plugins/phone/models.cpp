@@ -30,7 +30,7 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
-#include "sound/player.h"
+#include "qsound/player.h"
 #include "models.h"
 #include "sip.h"
 

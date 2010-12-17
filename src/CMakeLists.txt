@@ -1,8 +1,8 @@
 add_subdirectory(data)
 add_subdirectory(idle)
-add_subdirectory(sound)
 add_subdirectory(qdjango)
 add_subdirectory(qnetio)
+add_subdirectory(qsound)
 add_subdirectory(qxmpp)
 
 set(QT_USE_QTNETWORK 1)
