@@ -137,7 +137,7 @@ void PhoneCallsModel::addCall(SipCall *call)
     connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
     if (item->call->direction() == QXmppCall::IncomingDirection)
-        item->soundId = m_soundPlayer->play(":/incoming.wav", true);
+        item->soundId = m_soundPlayer->play(":/call-incoming.ogg", true);
     else
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
     item->reply = m_network->post(buildRequest(m_url), item->data());
@@ -172,7 +172,7 @@ void PhoneCallsModel::callRinging()
     int row = -1;
     foreach (PhoneCallsItem *item, m_items) {
         if (item->call == call) {
-            item->soundId = m_soundPlayer->play(":/outgoing.wav", true);
+            item->soundId = m_soundPlayer->play(":/call-outgoing.ogg", true);
             break;
         }
     }
