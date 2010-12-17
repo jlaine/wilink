@@ -93,6 +93,20 @@ static const quint32 crc_lookup[256]={
   0xafb010b1,0xab710d06,0xa6322bdf,0xa2f33668,
   0xbcb4666d,0xb8757bda,0xb5365d03,0xb1f740b4};
 
+void dumpSpeexHeader(const SpeexHeader &h)
+{
+    qDebug("Speex %s (%x)", h.speex_version, h.speex_version_id);
+    qDebug(" header_size: %u", h.header_size);
+    qDebug(" rate: %u", h.rate);
+    qDebug(" mode: %u", h.mode);
+    qDebug(" mode_bitstream_version: %u", h.mode_bitstream_version);
+    qDebug(" frame_size: %u", h.frame_size);
+    qDebug(" bitrate: %u", h.bitrate);
+    qDebug(" vbr: %u", h.vbr);
+    qDebug(" frames_per_packet: %u", h.frames_per_packet);
+    qDebug(" extra_headers: %u", h.extra_headers);
+}
+
 ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
     : QObject(parent),
     m_readerId(0)
@@ -138,6 +152,7 @@ void ChatSoundPlayer::readerFinished()
 class ChatSoundFilePrivate {
 public:
     ChatSoundFilePrivate();
+    virtual void close() = 0;
     virtual bool readHeader() = 0;
     virtual bool writeHeader() = 0;
     
@@ -159,12 +174,19 @@ ChatSoundFilePrivate::ChatSoundFilePrivate()
 
 class ChatSoundFileOgg : public ChatSoundFilePrivate {
 public:
+    ChatSoundFileOgg();
+    void close();
     bool readHeader();
     bool writeHeader();
+
+private:
+    quint32 bitstream_sn;
+    quint32 page_sn;
 };
 
 class OggPage {
 public:
+    OggPage();
     quint32 checksum() const;
     void dump();
     bool read(QDataStream &stream);
@@ -176,10 +198,17 @@ public:
     quint32 bitstream_sn;
     quint32 page_sn;
     QByteArray data;
-
-private:
     QList<quint8> segments;
 };
+
+OggPage::OggPage()
+    : version(0),
+    type(2),
+    position(0),
+    bitstream_sn(0),
+    page_sn(0)
+{
+}
 
 void OggPage::dump()
 {
@@ -279,7 +308,34 @@ bool OggPage::read(QDataStream &stream)
 
 bool OggPage::write(QDataStream &stream) const
 {
+    stream.writeRawData("OggS", 4);
+    stream << version;
+    stream << type;
+    stream << position;
+    stream << bitstream_sn;
+    stream << page_sn;
+    stream << checksum();
+    stream << quint8(segments.size());
+
+    // write segment table
+    for (int i = 0; i < segments.size(); ++i)
+        stream << segments[i];
+
+    // write segments
+    stream.writeRawData(data.constData(), data.size());
+
     return false;
+}
+
+ChatSoundFileOgg::ChatSoundFileOgg()
+    : bitstream_sn(3346508309),
+    page_sn(0)
+{
+}
+
+void ChatSoundFileOgg::close()
+{
+    m_file->close();
 }
 
 bool ChatSoundFileOgg::readHeader()
@@ -312,10 +368,11 @@ bool ChatSoundFileOgg::readHeader()
         data >> h.vbr;
         data >> h.frames_per_packet;
         data >> h.extra_headers;
-        data.skipRawData(8);
+        data >> h.reserved1;
+        data >> h.reserved2;
         buffer.close();
 
-        qDebug("found speex %s", h.speex_version);
+        dumpSpeexHeader(h);
         m_format.setChannels(h.nb_channels);
         m_format.setFrequency(h.rate);
         m_format.setCodec("audio/pcm");
@@ -327,7 +384,6 @@ bool ChatSoundFileOgg::readHeader()
             return false;
 
         page.dump();
-        qDebug("truc: ", page.data.left(8).constData());
     } else {
         qWarning("Unsupported OGG payload");
         return false;
@@ -338,14 +394,93 @@ bool ChatSoundFileOgg::readHeader()
 
 bool ChatSoundFileOgg::writeHeader()
 {
-    return false;
+    QDataStream stream(m_file);
+
+    // prepare speex header
+    SpeexHeader h;
+    memset(&h, 0, sizeof(h));
+    strcpy(h.speex_string, "Speex   ");
+    strcpy(h.speex_version, "1.0beta1");
+    h.speex_version_id = 0xffffffff;
+    h.header_size = 80;
+    h.rate = m_format.frequency();
+    h.mode = 0;
+    h.mode_bitstream_version = 4;
+    h.nb_channels = m_format.channels();
+    h.bitrate = 4294967295;
+    h.frame_size = 160;
+    h.vbr = 0;
+    h.frames_per_packet = 1;
+    h.extra_headers = 0;
+    h.reserved1 = 0;
+    h.reserved2 = 0;
+
+    // write speex header
+    OggPage page;
+    page.type = 2;
+    page.bitstream_sn = bitstream_sn;
+    page.page_sn = page_sn;
+
+    QBuffer buffer(&page.data);
+    buffer.open(QIODevice::WriteOnly);
+    QDataStream data(&buffer);
+    data.setByteOrder(QDataStream::LittleEndian);
+
+    data.writeRawData(h.speex_string, sizeof(h.speex_string));
+    data.writeRawData(h.speex_version, sizeof(h.speex_version));
+    data << h.speex_version_id;
+    data << h.header_size;
+    data << h.rate;
+    data << h.mode;
+    data << h.mode_bitstream_version;
+    data << h.nb_channels;
+    data << h.bitrate;
+    data << h.frame_size;
+    data << h.vbr;
+    data << h.frames_per_packet;
+    data << h.extra_headers;
+    data << h.reserved1;
+    data << h.reserved2;
+
+    page.segments << page.data.size();
+    page.write(stream);
+
+    // next
+    page.type = 0;
+    page.page_sn = ++page_sn;
+    page.data.clear();
+    page.data += QByteArray(53, '\0');
+    page.segments.clear();
+    page.segments << page.data.size();
+
+    page.write(stream);
+    return true;
 }
 
 class ChatSoundFileWav : public ChatSoundFilePrivate {
 public:
+    ChatSoundFileWav(ChatSoundFile *qq);
+    void close();
     bool readHeader();
     bool writeHeader();
+
+private:
+    ChatSoundFile *q;
 };
+
+ChatSoundFileWav::ChatSoundFileWav(ChatSoundFile *qq)
+    : q(qq)
+{
+}
+
+void ChatSoundFileWav::close()
+{
+    if (q->openMode() & QIODevice::WriteOnly) {
+        m_file->seek(0);
+        writeHeader();
+    }
+    m_file->close();
+}
 
 bool ChatSoundFileWav::readHeader()
 {
@@ -494,7 +629,7 @@ ChatSoundFile::ChatSoundFile(const QString &name, QObject *parent)
     if (name.endsWith(".ogg"))
         d = new ChatSoundFileOgg;
     else
-        d = new ChatSoundFileWav;
+        d = new ChatSoundFileWav(this);
     d->m_file = new QFile(name, this);
 }
 
@@ -508,11 +643,7 @@ void ChatSoundFile::close()
     if (!isOpen())
         return;
 
-    if (openMode() & QIODevice::WriteOnly) {
-        d->m_file->seek(0);
-        d->writeHeader();
-    }
-    d->m_file->close();
+    d->close();
     QIODevice::close();
     QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
 }
