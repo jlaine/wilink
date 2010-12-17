@@ -1,5 +1,6 @@
 add_subdirectory(data)
 add_subdirectory(idle)
+add_subdirectory(sound)
 add_subdirectory(qdjango)
 add_subdirectory(qnetio)
 add_subdirectory(qxmpp)
@@ -41,7 +42,6 @@ set(wiLink_SOURCES
     chat_roster.cpp
     chat_roster_item.cpp
     chat_search.cpp
-    chat_sound.cpp
     chat_status.cpp
     chat_utils.cpp
     flickcharm.cpp
@@ -85,7 +85,6 @@ set(wiLink_MOC_HEADERS
     chat_plugin.h
     chat_roster.h
     chat_search.h
-    chat_sound.h
     chat_status.h
     flickcharm.h
     updates.h
@@ -137,7 +136,8 @@ add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURC
 if(APPLE)
     set(wilink_LIBRARIES "-framework AppKit")
 endif(APPLE)
-target_link_libraries(wiLink idle qnetio qxmpp qdjango diagnostics ${wilink_LIBRARIES} ${QT_LIBRARIES})
+
+target_link_libraries(wiLink idle qnetio qxmpp qdjango qsound diagnostics ${wilink_LIBRARIES} ${QT_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)

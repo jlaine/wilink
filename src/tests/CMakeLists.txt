@@ -5,20 +5,18 @@ include(${QT_USE_FILE})
 
 # tests
 set(tests_MOC_HEADERS
-    ../chat_sound.h
     ../updates.h
     tests.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 qt4_add_resources(tests_RCC_SOURCES tones.qrc)
 add_executable(tests
-    ../chat_sound.cpp
     ../chat_utils.cpp
     ../systeminfo.cpp
     ../updates.cpp
     tests.cpp
     ${tests_MOC_SOURCES}
     ${tests_RCC_SOURCES})
-target_link_libraries(tests qnetio qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
+target_link_libraries(tests qnetio qsound qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 add_executable(codec codec.cpp)
 target_link_libraries(codec qxmpp ${QT_LIBRARIES})
@@ -38,9 +36,9 @@ add_executable(stun stun.cpp)
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})
 
 qt4_add_resources(tones_RCC_SOURCES tones.qrc)
-qt4_wrap_cpp(tones_MOC_SOURCES tones.h ../chat_sound.h)
-add_executable(tones tones.cpp ../chat_sound.cpp ${tones_MOC_SOURCES} ${tones_RCC_SOURCES})
-target_link_libraries(tones ${QT_LIBRARIES})
+qt4_wrap_cpp(tones_MOC_SOURCES tones.h)
+add_executable(tones tones.cpp ${tones_MOC_SOURCES} ${tones_RCC_SOURCES})
+target_link_libraries(tones qsound ${QT_LIBRARIES})
 
 add_executable(hasher hasher.cpp)
 target_link_libraries(hasher qxmpp ${QT_LIBRARIES})

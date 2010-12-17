@@ -9,7 +9,7 @@
 
 #include "QXmppRtpChannel.h"
 
-#include "chat_sound.h"
+#include "sound/player.h"
 #include "tones.h"
 
 typedef QPair<int,int> ToneFreq;

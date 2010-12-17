@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_CHAT_SOUND_H__
-#define __WILINK_CHAT_SOUND_H__
+#ifndef __WILINK_SOUND_PLAYER_H__
+#define __WILINK_SOUND_PLAYER_H__
 
 #include <QAudioOutput>
 #include <QIODevice>

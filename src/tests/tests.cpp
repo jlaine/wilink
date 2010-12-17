@@ -23,7 +23,7 @@
 
 #include "diagnostics/iq.h"
 #include "updates.h"
-#include "chat_sound.h"
+#include "sound/player.h"
 #include "chat_utils.h"
 #include "tests.h"
 
