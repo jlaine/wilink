@@ -51,6 +51,36 @@ QSoundFilePrivate::QSoundFilePrivate()
 }
 
 #ifdef USE_VORBISFILE
+static size_t qfile_read_callback(void *ptr, size_t size, size_t nmemb, void *datasource)
+{
+    QFile *file = static_cast<QFile*>(datasource);
+    return file->read((char*)ptr, size * nmemb);
+}
+
+static int qfile_seek_callback(void *datasource, ogg_int64_t offset, int whence)
+{
+    QFile *file = static_cast<QFile*>(datasource);
+    qint64 pos = offset;
+    if (whence == SEEK_CUR)
+        pos += file->pos();
+    else if (whence == SEEK_END)
+        pos += file->size();
+    return file->seek(pos) ? 0 : -1;
+}
+
+static int qfile_close_callback(void *datasource)
+{
+    QFile *file = static_cast<QFile*>(datasource);
+    file->close();
+    return 0;
+}
+
+static long qfile_tell_callback(void *datasource)
+{
+    QFile *file = static_cast<QFile*>(datasource);
+    return file->pos();
+}
+
 class QSoundFileOgg : public QSoundFilePrivate
 {
 public:
@@ -63,6 +93,7 @@ public:
 
 private:
     QSoundFile *q;
+    QFile *m_file;
     QString m_name;
     int m_section;
     OggVorbis_File m_vf;
@@ -73,6 +104,7 @@ QSoundFileOgg::QSoundFileOgg(const QString &name, QSoundFile *qq)
     m_name(name),
     m_section(0)
 {
+    m_file = new QFile(name, q);
 }
 
 void QSoundFileOgg::close()
@@ -87,7 +119,17 @@ bool QSoundFileOgg::open(QIODevice::OpenMode mode)
         return false;
     }
 
-    if (ov_fopen(m_name.toLocal8Bit().data(), &m_vf) < 0) {
+    if (!m_file->open(mode)) {
+        qWarning("Could not open %s", qPrintable(m_file->fileName()));
+        return false;
+    }
+
+    ov_callbacks callbacks;
+    callbacks.read_func = qfile_read_callback;
+    callbacks.seek_func = qfile_seek_callback;
+    callbacks.close_func = qfile_close_callback;
+    callbacks.tell_func = qfile_tell_callback;
+    if (ov_open_callbacks(m_file, &m_vf, 0, 0, callbacks) < 0) {
         qWarning("Input does not appear to be an Ogg bitstream");
         return false;
     }
