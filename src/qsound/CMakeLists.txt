@@ -1,0 +1,20 @@
+set(QT_USE_QTMULTIMEDIA 1)
+include(${QT_USE_FILE})
+
+set(qsound_LIBRARIES)
+
+# vorbisfile support
+find_library(VORBISFILE_LIBRARY vorbisfile)
+if(VORBISFILE_LIBRARY)
+  check_include_files(vorbis/vorbisfile.h HAVE_VORBISFILE_H)
+  if(HAVE_VORBISFILE_H)
+    message(STATUS "Found vorbisfile library")
+    add_definitions(-DUSE_VORBISFILE)
+    set(qsound_LIBRARIES ${qsound_LIBRARIES} ${VORBISFILE_LIBRARY})
+  endif()
+endif()
+
+SET(qsound_SOURCES QSoundFile.cpp QSoundPlayer.cpp)
+qt4_wrap_cpp(qsound_MOC_SOURCES QSoundFile.h QSoundPlayer.h)
+add_library(qsound STATIC ${qsound_SOURCES} ${qsound_MOC_SOURCES})
+target_link_libraries(qsound ${QT_LIBRARIES} ${qsound_LIBRARIES})
