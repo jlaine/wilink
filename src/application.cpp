@@ -47,6 +47,7 @@
 #include "chat_accounts.h"
 #include "chat_utils.h"
 #include "flickcharm.h"
+#include "qsound/QSoundPlayer.h"
 
 class ApplicationPrivate
 {
@@ -56,6 +57,7 @@ public:
     QList<Chat*> chats;
     QNetworkDiskCache *networkCache;
     QSettings *settings;
+    QSoundPlayer *soundPlayer;
 #ifdef USE_SYSTRAY
     QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
@@ -138,6 +140,9 @@ Application::Application(int &argc, char **argv)
 
     /* register URL handler */
     QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
+
+    /* initialise sound player */
+    d->soundPlayer = new QSoundPlayer(this);
 }
 
 Application::~Application()
@@ -422,6 +427,11 @@ void Application::showChats()
         chat->raise();
         chat->activateWindow();
     }
+}
+
+QSoundPlayer *Application::soundPlayer()
+{
+    return d->soundPlayer;
 }
 
 void Application::messageClicked()

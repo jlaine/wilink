@@ -33,6 +33,7 @@
 class UpdatesDialog;
 class QAuthenticator;
 class QAbstractNetworkCache;
+class QSoundPlayer;
 
 class ApplicationPrivate;
 
@@ -48,6 +49,7 @@ public:
     static void platformInit();
     void createSystemTrayIcon();
     QAbstractNetworkCache *networkCache();
+    QSoundPlayer *soundPlayer();
     UpdatesDialog *updatesDialog();
     void setUpdatesDialog(UpdatesDialog *updatesDialog);
 

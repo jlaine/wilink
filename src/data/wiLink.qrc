@@ -37,5 +37,6 @@
     <file>wiLink-64.png</file>
     <file>call-incoming.ogg</file>
     <file>call-outgoing.ogg</file>
+    <file>message-incoming.ogg</file>
 </qresource>
 </RCC>
