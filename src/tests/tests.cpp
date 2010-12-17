@@ -23,7 +23,7 @@
 
 #include "diagnostics/iq.h"
 #include "updates.h"
-#include "qsound/QSoundPlayer.h"
+#include "qsound/QSoundFile.h"
 #include "chat_utils.h"
 #include "tests.h"
 
