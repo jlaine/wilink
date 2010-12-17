@@ -27,6 +27,7 @@
 
 class QFile;
 class ChatSoundFile;
+class ChatSoundFilePrivate;
 
 class ChatSoundPlayer : public QObject
 {
@@ -53,6 +54,7 @@ class ChatSoundFile : public QIODevice
 
 public:
     ChatSoundFile(const QString &name, QObject *parent = 0);
+    ~ChatSoundFile();
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
@@ -70,18 +72,7 @@ protected:
     qint64 writeData(const char * data, qint64 maxSize);
 
 private:
-    bool readHeader();
-    bool writeHeader();
-
-    QAudioFormat m_format;
-    QList<QPair<QByteArray, QString> > m_info;
-
-    QFile *m_file;
-    qint64 m_beginPos;
-    qint64 m_endPos;
-    bool m_repeat;
-
-    friend class ChatSoundPlayer;
+    ChatSoundFilePrivate *d;
 };
 
 #endif

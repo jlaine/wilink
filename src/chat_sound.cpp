@@ -68,124 +68,35 @@ void ChatSoundPlayer::readerFinished()
     reader->deleteLater();
 }
 
-/** Constructs a ChatSoundFile.
- */
-ChatSoundFile::ChatSoundFile(const QString &name, QObject *parent)
-    : QIODevice(parent),
-    m_beginPos(0),
+class ChatSoundFilePrivate {
+public:
+    ChatSoundFilePrivate();
+    virtual bool readHeader() = 0;
+    virtual bool writeHeader() = 0;
+    
+    QAudioFormat m_format;
+    QList<QPair<QByteArray, QString> > m_info;
+
+    QFile *m_file;
+    qint64 m_beginPos;
+    qint64 m_endPos;
+    bool m_repeat;
+};
+
+ChatSoundFilePrivate::ChatSoundFilePrivate()
+    : m_beginPos(0),
     m_endPos(0),
     m_repeat(false)
 {
-    m_file = new QFile(name, this);
 }
 
-void ChatSoundFile::close()
-{
-    if (!isOpen())
-        return;
+class ChatSoundFileWav : public ChatSoundFilePrivate {
+public:
+    bool readHeader();
+    bool writeHeader();
+};
 
-    if (openMode() & QIODevice::WriteOnly) {
-        m_file->seek(0);
-        writeHeader();
-    }
-    m_file->close();
-    QIODevice::close();
-    QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
-}
-
-/** Returns the sound file format.
- */
-QAudioFormat ChatSoundFile::format() const
-{
-    return m_format;
-}
-
-/** Sets the sound file format.
- *
- * @param format
- */
-void ChatSoundFile::setFormat(const QAudioFormat &format)
-{
-    m_format = format;
-}
-
-/** Returns the sound file meta-data.
- */
-QList<QPair<QByteArray, QString> > ChatSoundFile::info() const
-{
-    return m_info;
-}
-
-/** Sets the sound file meta-data.
- *
- * @param info
- */
-void ChatSoundFile::setInfo(const QList<QPair<QByteArray, QString> > &info)
-{
-    m_info = info;
-}
-
-bool ChatSoundFile::open(QIODevice::OpenMode mode)
-{
-    if ((mode & QIODevice::ReadWrite) == QIODevice::ReadWrite) {
-        qWarning("Cannot open in read/write mode");
-        return false;
-    }
-
-    // open file
-    if (!m_file->open(mode)) {
-        qWarning("Could not open %s", qPrintable(m_file->fileName()));
-        return false;
-    }
-
-    if (mode & QIODevice::ReadOnly) {
-        // read header
-        if (!readHeader()) {
-            m_file->close();
-            return false;
-        }
-    } 
-    else if (mode & QIODevice::WriteOnly) {
-        // write header
-        if (!writeHeader()) {
-            m_file->close();
-            return false;
-        }
-    }
-
-    return QIODevice::open(mode);
-}
-
-qint64 ChatSoundFile::readData(char * data, qint64 maxSize)
-{
-    char *start = data;
-
-    while (maxSize) {
-        qint64 chunk = qMin(m_endPos - m_file->pos(), maxSize);
-        qint64 bytes = m_file->read(data, chunk);
-        if (bytes < 0) {
-            // abort
-            QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
-            return -1;
-        }
-        data += bytes;
-        maxSize -= bytes;
-
-        if (maxSize) {
-            if (!m_repeat) {
-                // stop, we have reached end of file and don't want to repeat
-                memset(data, 0, maxSize);
-                QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
-                break;
-            }
-            // rewind file to repeat
-            m_file->seek(m_beginPos);
-        }
-    }
-    return data - start;
-}
-
-bool ChatSoundFile::readHeader()
+bool ChatSoundFileWav::readHeader()
 {
     QDataStream stream(m_file);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -274,31 +185,7 @@ bool ChatSoundFile::readHeader()
     return true;
 }
 
-/** Returns true if the file should be read repeatedly.
- */
-bool ChatSoundFile::repeat() const
-{
-    return m_repeat;
-}
-
-/** Set to true if the file should be read repeatedly.
- *
- * @param repeat
- */
-void ChatSoundFile::setRepeat(bool repeat)
-{
-    m_repeat = repeat;
-}
-
-qint64 ChatSoundFile::writeData(const char * data, qint64 maxSize)
-{
-    qint64 bytes = m_file->write(data, maxSize);
-    if (bytes > 0)
-        m_endPos += bytes;
-    return bytes;
-}
-
-bool ChatSoundFile::writeHeader()
+bool ChatSoundFileWav::writeHeader()
 {
     QDataStream stream(m_file);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -347,3 +234,149 @@ bool ChatSoundFile::writeHeader()
 
     return true;
 }
+
+/** Constructs a ChatSoundFile.
+ */
+ChatSoundFile::ChatSoundFile(const QString &name, QObject *parent)
+    : QIODevice(parent)
+{
+    d = new ChatSoundFileWav;
+    d->m_file = new QFile(name, this);
+}
+
+ChatSoundFile::~ChatSoundFile()
+{
+    delete d;
+}
+
+void ChatSoundFile::close()
+{
+    if (!isOpen())
+        return;
+
+    if (openMode() & QIODevice::WriteOnly) {
+        d->m_file->seek(0);
+        d->writeHeader();
+    }
+    d->m_file->close();
+    QIODevice::close();
+    QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+}
+
+/** Returns the sound file format.
+ */
+QAudioFormat ChatSoundFile::format() const
+{
+    return d->m_format;
+}
+
+/** Sets the sound file format.
+ *
+ * @param format
+ */
+void ChatSoundFile::setFormat(const QAudioFormat &format)
+{
+    d->m_format = format;
+}
+
+/** Returns the sound file meta-data.
+ */
+QList<QPair<QByteArray, QString> > ChatSoundFile::info() const
+{
+    return d->m_info;
+}
+
+/** Sets the sound file meta-data.
+ *
+ * @param info
+ */
+void ChatSoundFile::setInfo(const QList<QPair<QByteArray, QString> > &info)
+{
+    d->m_info = info;
+}
+
+bool ChatSoundFile::open(QIODevice::OpenMode mode)
+{
+    if ((mode & QIODevice::ReadWrite) == QIODevice::ReadWrite) {
+        qWarning("Cannot open in read/write mode");
+        return false;
+    }
+
+    // open file
+    if (!d->m_file->open(mode)) {
+        qWarning("Could not open %s", qPrintable(d->m_file->fileName()));
+        return false;
+    }
+
+    if (mode & QIODevice::ReadOnly) {
+        // read header
+        if (!d->readHeader()) {
+            d->m_file->close();
+            return false;
+        }
+    } 
+    else if (mode & QIODevice::WriteOnly) {
+        // write header
+        if (!d->writeHeader()) {
+            d->m_file->close();
+            return false;
+        }
+    }
+
+    return QIODevice::open(mode);
+}
+
+qint64 ChatSoundFile::readData(char * data, qint64 maxSize)
+{
+    char *start = data;
+
+    while (maxSize) {
+        qint64 chunk = qMin(d->m_endPos - d->m_file->pos(), maxSize);
+        qint64 bytes = d->m_file->read(data, chunk);
+        if (bytes < 0) {
+            // abort
+            QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+            return -1;
+        }
+        data += bytes;
+        maxSize -= bytes;
+
+        if (maxSize) {
+            if (!d->m_repeat) {
+                // stop, we have reached end of file and don't want to repeat
+                memset(data, 0, maxSize);
+                QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+                break;
+            }
+            // rewind file to repeat
+            d->m_file->seek(d->m_beginPos);
+        }
+    }
+    return data - start;
+}
+
+/** Returns true if the file should be read repeatedly.
+ */
+bool ChatSoundFile::repeat() const
+{
+    return d->m_repeat;
+}
+
+/** Set to true if the file should be read repeatedly.
+ *
+ * @param repeat
+ */
+void ChatSoundFile::setRepeat(bool repeat)
+{
+    d->m_repeat = repeat;
+}
+
+qint64 ChatSoundFile::writeData(const char * data, qint64 maxSize)
+{
+    qint64 bytes = d->m_file->write(data, maxSize);
+    if (bytes > 0)
+        d->m_endPos += bytes;
+    return bytes;
+}
+
+
