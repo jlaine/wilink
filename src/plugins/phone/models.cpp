@@ -105,7 +105,7 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
-    m_soundPlayer = new ChatSoundPlayer(this);
+    m_soundPlayer = new QSoundPlayer(this);
 
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);

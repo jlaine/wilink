@@ -127,7 +127,7 @@ ToneGui::ToneGui()
     output->start(generator);
 
     // player
-    player = new ChatSoundPlayer(this);
+    player = new QSoundPlayer(this);
 }
 
 static QXmppRtpChannel::Tone keyTone(QPushButton *key)

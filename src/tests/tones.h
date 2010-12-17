@@ -2,7 +2,7 @@
 #include <QIODevice>
 #include <QWidget>
 
-class ChatSoundPlayer;
+class QSoundPlayer;
 
 class ToneGenerator : public QIODevice
 {
@@ -42,7 +42,7 @@ private slots:
 
 private:
     ToneGenerator *generator;
-    ChatSoundPlayer *player;
+    QSoundPlayer *player;
     QList<int> soundIds;
 };
 

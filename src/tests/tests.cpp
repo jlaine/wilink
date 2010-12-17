@@ -128,13 +128,13 @@ void TestSound::copyWav()
     const QString outputPath("output.wav");
 
     // read input
-    ChatSoundFile input(inputPath);
+    QSoundFile input(inputPath);
     QCOMPARE(input.open(QIODevice::ReadOnly), true);
     const QByteArray data = input.readAll();
     input.close();
 
     // write output
-    ChatSoundFile output(outputPath);
+    QSoundFile output(outputPath);
     output.setFormat(input.format());
     output.setInfo(input.info());
     QCOMPARE(output.open(QIODevice::WriteOnly), true);
@@ -153,7 +153,7 @@ void TestSound::copyWav()
 void TestSound::readWav()
 {
     // read input
-    ChatSoundFile input(":/tones.wav");
+    QSoundFile input(":/tones.wav");
     QCOMPARE(input.open(QIODevice::ReadOnly), true);
 
     // check format

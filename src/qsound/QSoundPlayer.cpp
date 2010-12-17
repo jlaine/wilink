@@ -31,15 +31,15 @@
 static const quint32 FMT_SIZE = 16;
 static const quint16 FMT_FORMAT = 1;      // linear PCM
 
-ChatSoundPlayer::ChatSoundPlayer(QObject *parent)
+QSoundPlayer::QSoundPlayer(QObject *parent)
     : QObject(parent),
     m_readerId(0)
 {
 }
 
-int ChatSoundPlayer::play(const QString &name, bool repeat)
+int QSoundPlayer::play(const QString &name, bool repeat)
 {
-    ChatSoundFile *reader = new ChatSoundFile(name, this);
+    QSoundFile *reader = new QSoundFile(name, this);
     reader->setRepeat(repeat);
     if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         delete reader;
@@ -55,16 +55,16 @@ int ChatSoundPlayer::play(const QString &name, bool repeat)
     return m_readerId;
 }
 
-void ChatSoundPlayer::stop(int id)
+void QSoundPlayer::stop(int id)
 {
-    ChatSoundFile *reader = m_readers.value(id);
+    QSoundFile *reader = m_readers.value(id);
     if (reader)
         reader->close();
 }
 
-void ChatSoundPlayer::readerFinished()
+void QSoundPlayer::readerFinished()
 {
-    ChatSoundFile *reader = qobject_cast<ChatSoundFile*>(sender());
+    QSoundFile *reader = qobject_cast<QSoundFile*>(sender());
     if (!reader)
         return;
 
@@ -73,9 +73,9 @@ void ChatSoundPlayer::readerFinished()
     reader->deleteLater();
 }
 
-class ChatSoundFilePrivate {
+class QSoundFilePrivate {
 public:
-    ChatSoundFilePrivate();
+    QSoundFilePrivate();
     virtual void close() = 0;
     virtual bool open(QIODevice::OpenMode mode) = 0;
     virtual void rewind() = 0;
@@ -88,16 +88,16 @@ public:
     bool m_repeat;
 };
 
-ChatSoundFilePrivate::ChatSoundFilePrivate()
+QSoundFilePrivate::QSoundFilePrivate()
     : m_repeat(false)
 {
 }
 
 #ifdef USE_VORBISFILE
-class ChatSoundFileOgg : public ChatSoundFilePrivate
+class QSoundFileOgg : public QSoundFilePrivate
 {
 public:
-    ChatSoundFileOgg(const QString &name, ChatSoundFile *qq);
+    QSoundFileOgg(const QString &name, QSoundFile *qq);
     void close();
     bool open(QIODevice::OpenMode mode);
     void rewind();
@@ -105,25 +105,25 @@ public:
     qint64 writeData(const char *data, qint64 maxSize);
 
 private:
-    ChatSoundFile *q;
+    QSoundFile *q;
     QString m_name;
     int m_section;
     OggVorbis_File m_vf;
 };
 
-ChatSoundFileOgg::ChatSoundFileOgg(const QString &name, ChatSoundFile *qq)
+QSoundFileOgg::QSoundFileOgg(const QString &name, QSoundFile *qq)
     : q(qq),
     m_name(name),
     m_section(0)
 {
 }
 
-void ChatSoundFileOgg::close()
+void QSoundFileOgg::close()
 {
     ov_clear(&m_vf);
 }
 
-bool ChatSoundFileOgg::open(QIODevice::OpenMode mode)
+bool QSoundFileOgg::open(QIODevice::OpenMode mode)
 {
     if (mode & QIODevice::WriteOnly) {
         qWarning("Writing to OGG is not supported");
@@ -146,7 +146,7 @@ bool ChatSoundFileOgg::open(QIODevice::OpenMode mode)
     return true;
 }
 
-qint64 ChatSoundFileOgg::readData(char * data, qint64 maxSize)
+qint64 QSoundFileOgg::readData(char * data, qint64 maxSize)
 {
     char *ptr = data;
     while (maxSize) {
@@ -161,21 +161,21 @@ qint64 ChatSoundFileOgg::readData(char * data, qint64 maxSize)
     return ptr - data;
 }
 
-void ChatSoundFileOgg::rewind()
+void QSoundFileOgg::rewind()
 {
     ov_raw_seek(&m_vf, 0);
 }
 
-qint64 ChatSoundFileOgg::writeData(const char * data, qint64 maxSize)
+qint64 QSoundFileOgg::writeData(const char * data, qint64 maxSize)
 {
     return -1;
 }
 #endif
 
-class ChatSoundFileWav : public ChatSoundFilePrivate
+class QSoundFileWav : public QSoundFilePrivate
 {
 public:
-    ChatSoundFileWav(const QString &name, ChatSoundFile *qq);
+    QSoundFileWav(const QString &name, QSoundFile *qq);
     void close();
     bool open(QIODevice::OpenMode mode);
     void rewind();
@@ -186,13 +186,13 @@ private:
     bool readHeader();
     bool writeHeader();
 
-    ChatSoundFile *q;
+    QSoundFile *q;
     QFile *m_file;
     qint64 m_beginPos;
     qint64 m_endPos;
 };
 
-ChatSoundFileWav::ChatSoundFileWav(const QString &name, ChatSoundFile *qq)
+QSoundFileWav::QSoundFileWav(const QString &name, QSoundFile *qq)
     : q(qq),
     m_beginPos(0),
     m_endPos(0)
@@ -200,7 +200,7 @@ ChatSoundFileWav::ChatSoundFileWav(const QString &name, ChatSoundFile *qq)
     m_file = new QFile(name, q);
 }
 
-bool ChatSoundFileWav::open(QIODevice::OpenMode mode)
+bool QSoundFileWav::open(QIODevice::OpenMode mode)
 {
     // open file
     if (!m_file->open(mode)) {
@@ -225,7 +225,7 @@ bool ChatSoundFileWav::open(QIODevice::OpenMode mode)
     return true;
 }
 
-void ChatSoundFileWav::close()
+void QSoundFileWav::close()
 {
     if (q->openMode() & QIODevice::WriteOnly) {
         m_file->seek(0);
@@ -234,12 +234,12 @@ void ChatSoundFileWav::close()
     m_file->close();
 }
 
-qint64 ChatSoundFileWav::readData(char * data, qint64 maxSize)
+qint64 QSoundFileWav::readData(char * data, qint64 maxSize)
 {
     return m_file->read(data, maxSize);
 }
 
-bool ChatSoundFileWav::readHeader()
+bool QSoundFileWav::readHeader()
 {
     QDataStream stream(m_file);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -328,12 +328,12 @@ bool ChatSoundFileWav::readHeader()
     return true;
 }
 
-void ChatSoundFileWav::rewind()
+void QSoundFileWav::rewind()
 {
     m_file->seek(m_beginPos);
 }
 
-qint64 ChatSoundFileWav::writeData(const char * data, qint64 maxSize)
+qint64 QSoundFileWav::writeData(const char * data, qint64 maxSize)
 {
     qint64 bytes = m_file->write(data, maxSize);
     if (bytes > 0)
@@ -341,7 +341,7 @@ qint64 ChatSoundFileWav::writeData(const char * data, qint64 maxSize)
     return bytes;
 }
 
-bool ChatSoundFileWav::writeHeader()
+bool QSoundFileWav::writeHeader()
 {
     QDataStream stream(m_file);
     stream.setByteOrder(QDataStream::LittleEndian);
@@ -391,27 +391,27 @@ bool ChatSoundFileWav::writeHeader()
     return true;
 }
 
-/** Constructs a ChatSoundFile.
+/** Constructs a QSoundFile.
  */
-ChatSoundFile::ChatSoundFile(const QString &name, QObject *parent)
+QSoundFile::QSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
     if (name.endsWith(".wav"))
-        d = new ChatSoundFileWav(name, this);
+        d = new QSoundFileWav(name, this);
 #ifdef USE_VORBISFILE
     else if (name.endsWith(".ogg"))
-        d = new ChatSoundFileOgg(name, this);
+        d = new QSoundFileOgg(name, this);
 #endif
     else
         d = 0;
 }
 
-ChatSoundFile::~ChatSoundFile()
+QSoundFile::~QSoundFile()
 {
     delete d;
 }
 
-void ChatSoundFile::close()
+void QSoundFile::close()
 {
     if (!isOpen())
         return;
@@ -423,7 +423,7 @@ void ChatSoundFile::close()
 
 /** Returns the sound file format.
  */
-QAudioFormat ChatSoundFile::format() const
+QAudioFormat QSoundFile::format() const
 {
     return d->m_format;
 }
@@ -432,14 +432,14 @@ QAudioFormat ChatSoundFile::format() const
  *
  * @param format
  */
-void ChatSoundFile::setFormat(const QAudioFormat &format)
+void QSoundFile::setFormat(const QAudioFormat &format)
 {
     d->m_format = format;
 }
 
 /** Returns the sound file meta-data.
  */
-QList<QPair<QByteArray, QString> > ChatSoundFile::info() const
+QList<QPair<QByteArray, QString> > QSoundFile::info() const
 {
     return d->m_info;
 }
@@ -448,12 +448,12 @@ QList<QPair<QByteArray, QString> > ChatSoundFile::info() const
  *
  * @param info
  */
-void ChatSoundFile::setInfo(const QList<QPair<QByteArray, QString> > &info)
+void QSoundFile::setInfo(const QList<QPair<QByteArray, QString> > &info)
 {
     d->m_info = info;
 }
 
-bool ChatSoundFile::open(QIODevice::OpenMode mode)
+bool QSoundFile::open(QIODevice::OpenMode mode)
 {
     if ((mode & QIODevice::ReadWrite) == QIODevice::ReadWrite) {
         qWarning("Cannot open in read/write mode");
@@ -467,7 +467,7 @@ bool ChatSoundFile::open(QIODevice::OpenMode mode)
     return QIODevice::open(mode);
 }
 
-qint64 ChatSoundFile::readData(char * data, qint64 maxSize)
+qint64 QSoundFile::readData(char * data, qint64 maxSize)
 {
     char *start = data;
 
@@ -497,7 +497,7 @@ qint64 ChatSoundFile::readData(char * data, qint64 maxSize)
 
 /** Returns true if the file should be read repeatedly.
  */
-bool ChatSoundFile::repeat() const
+bool QSoundFile::repeat() const
 {
     return d->m_repeat;
 }
@@ -506,12 +506,12 @@ bool ChatSoundFile::repeat() const
  *
  * @param repeat
  */
-void ChatSoundFile::setRepeat(bool repeat)
+void QSoundFile::setRepeat(bool repeat)
 {
     d->m_repeat = repeat;
 }
 
-qint64 ChatSoundFile::writeData(const char * data, qint64 maxSize)
+qint64 QSoundFile::writeData(const char * data, qint64 maxSize)
 {
     return d->writeData(data, maxSize);
 }

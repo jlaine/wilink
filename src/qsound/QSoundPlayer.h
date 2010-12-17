@@ -26,15 +26,15 @@
 #include <QPair>
 
 class QFile;
-class ChatSoundFile;
-class ChatSoundFilePrivate;
+class QSoundFile;
+class QSoundFilePrivate;
 
-class ChatSoundPlayer : public QObject
+class QSoundPlayer : public QObject
 {
     Q_OBJECT
 
 public:
-    ChatSoundPlayer(QObject *parent = 0);
+    QSoundPlayer(QObject *parent = 0);
     int play(const QString &name, bool repeat = false);
     void stop(int id);
 
@@ -43,7 +43,7 @@ private slots:
 
 private:
     int m_readerId;
-    QMap<int, ChatSoundFile*> m_readers;
+    QMap<int, QSoundFile*> m_readers;
 };
 
 #endif

@@ -24,17 +24,17 @@
 #include <QIODevice>
 #include <QPair>
 
-class ChatSoundFilePrivate;
+class QSoundFilePrivate;
 
-/** The ChatSoundFile class represents a WAV-format file.
+/** The QSoundFile class represents a WAV-format file.
  */
-class ChatSoundFile : public QIODevice
+class QSoundFile : public QIODevice
 {
     Q_OBJECT
 
 public:
-    ChatSoundFile(const QString &name, QObject *parent = 0);
-    ~ChatSoundFile();
+    QSoundFile(const QString &name, QObject *parent = 0);
+    ~QSoundFile();
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
@@ -52,7 +52,7 @@ protected:
     qint64 writeData(const char * data, qint64 maxSize);
 
 private:
-    ChatSoundFilePrivate *d;
+    QSoundFilePrivate *d;
 };
 
 #endif
