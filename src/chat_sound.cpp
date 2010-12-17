@@ -153,36 +153,21 @@ class ChatSoundFilePrivate {
 public:
     ChatSoundFilePrivate();
     virtual void close() = 0;
-    virtual bool readHeader() = 0;
-    virtual bool writeHeader() = 0;
+    virtual bool open(QIODevice::OpenMode mode) = 0;
+    virtual void rewind() = 0;
+    virtual qint64 readData(char * data, qint64 maxSize) = 0;
+    virtual qint64 writeData(const char *data, qint64 maxSize) = 0;
     
     QAudioFormat m_format;
     QList<QPair<QByteArray, QString> > m_info;
 
-    QFile *m_file;
-    qint64 m_beginPos;
-    qint64 m_endPos;
     bool m_repeat;
 };
 
 ChatSoundFilePrivate::ChatSoundFilePrivate()
-    : m_beginPos(0),
-    m_endPos(0),
-    m_repeat(false)
+    : m_repeat(false)
 {
 }
-
-class ChatSoundFileOgg : public ChatSoundFilePrivate {
-public:
-    ChatSoundFileOgg();
-    void close();
-    bool readHeader();
-    bool writeHeader();
-
-private:
-    quint32 bitstream_sn;
-    quint32 page_sn;
-};
 
 class OggPage {
 public:
@@ -203,7 +188,7 @@ public:
 
 OggPage::OggPage()
     : version(0),
-    type(2),
+    type(0),
     position(0),
     bitstream_sn(0),
     page_sn(0)
@@ -230,6 +215,7 @@ quint32 OggPage::checksum() const
     QBuffer buffer;
     buffer.open(QIODevice::WriteOnly);
     QDataStream stream(&buffer);
+    stream.setByteOrder(QDataStream::LittleEndian);
     stream.writeRawData("OggS", 4);
     stream << version;
     stream << type;
@@ -253,9 +239,7 @@ quint32 OggPage::checksum() const
       quint8 entry = (crc_reg >> 24) ^ bytes[i];
       crc_reg = (crc_reg << 8) ^ crc_lookup[entry];
     }
-
-    quint8 *reg = (quint8*)(&crc_reg);
-    return (reg[0] << 24) | (reg[1] << 16) | (reg[2] << 8) | reg[3];
+    return crc_reg;
 }
 
 bool OggPage::read(QDataStream &stream)
@@ -300,7 +284,7 @@ bool OggPage::read(QDataStream &stream)
     // verify checksum
     quint32 calc_checksum = checksum();
     if (calc_checksum != page_checksum) {
-        qWarning("Bad OGG page checksum");
+        qWarning("Bad OGG page checksum %x vs %x", calc_checksum, page_checksum);
         return false;
     }
     return true;
@@ -327,10 +311,32 @@ bool OggPage::write(QDataStream &stream) const
     return false;
 }
 
-ChatSoundFileOgg::ChatSoundFileOgg()
-    : bitstream_sn(3346508309),
+class ChatSoundFileOgg : public ChatSoundFilePrivate
+{
+public:
+    ChatSoundFileOgg(const QString &name, ChatSoundFile *qq);
+    void close();
+    bool open(QIODevice::OpenMode mode);
+    void rewind();
+    qint64 readData(char * data, qint64 maxSize);
+    qint64 writeData(const char *data, qint64 maxSize);
+
+private:
+    bool readHeader();
+    bool writeHeader();
+
+    ChatSoundFile *q;
+    QFile *m_file;
+    quint32 bitstream_sn;
+    quint32 page_sn;
+};
+
+ChatSoundFileOgg::ChatSoundFileOgg(const QString &name, ChatSoundFile *qq)
+    : q(qq),
+    bitstream_sn(363493319),
     page_sn(0)
 {
+    m_file = new QFile(name, q);
 }
 
 void ChatSoundFileOgg::close()
@@ -338,9 +344,40 @@ void ChatSoundFileOgg::close()
     m_file->close();
 }
 
+bool ChatSoundFileOgg::open(QIODevice::OpenMode mode)
+{
+    // open file
+    if (!m_file->open(mode)) {
+        qWarning("Could not open %s", qPrintable(m_file->fileName()));
+        return false;
+    }
+
+    if (mode & QIODevice::ReadOnly) {
+        // read header
+        if (!readHeader()) {
+            m_file->close();
+            return false;
+        }
+    }
+    else if (mode & QIODevice::WriteOnly) {
+        // write header
+        if (!writeHeader()) {
+            m_file->close();
+            return false;
+        }
+    }
+    return true;
+}
+
+qint64 ChatSoundFileOgg::readData(char * data, qint64 maxSize)
+{
+    return -1;
+}
+
 bool ChatSoundFileOgg::readHeader()
 {
     QDataStream stream(m_file);
+    stream.setByteOrder(QDataStream::LittleEndian);
 
     OggPage page;
     if (!page.read(stream))
@@ -382,8 +419,10 @@ bool ChatSoundFileOgg::readHeader()
 
         if (!page.read(stream))
             return false;
-
         page.dump();
+
+        while (page.read(stream))
+            page.dump();
     } else {
         qWarning("Unsupported OGG payload");
         return false;
@@ -392,9 +431,19 @@ bool ChatSoundFileOgg::readHeader()
     return true;
 }
 
+void ChatSoundFileOgg::rewind()
+{
+}
+
+qint64 ChatSoundFileOgg::writeData(const char * data, qint64 maxSize)
+{
+    return -1;
+}
+
 bool ChatSoundFileOgg::writeHeader()
 {
     QDataStream stream(m_file);
+    stream.setByteOrder(QDataStream::LittleEndian);
 
     // prepare speex header
     SpeexHeader h;
@@ -441,6 +490,7 @@ bool ChatSoundFileOgg::writeHeader()
     data << h.extra_headers;
     data << h.reserved1;
     data << h.reserved2;
+    buffer.close();
 
     page.segments << page.data.size();
     page.write(stream);
@@ -449,7 +499,11 @@ bool ChatSoundFileOgg::writeHeader()
     page.type = 0;
     page.page_sn = ++page_sn;
     page.data.clear();
-    page.data += QByteArray(53, '\0');
+    QByteArray vendorString("Encoded with Sweep 0.5.8-spx1 (metadecks.org)");
+    buffer.open(QIODevice::WriteOnly);
+    data << quint32(vendorString.length());
+    data.writeRawData(vendorString.constData(), vendorString.size());
+    data << quint32(0);
     page.segments.clear();
     page.segments << page.data.size();
 
@@ -457,20 +511,57 @@ bool ChatSoundFileOgg::writeHeader()
     return true;
 }
 
-class ChatSoundFileWav : public ChatSoundFilePrivate {
+class ChatSoundFileWav : public ChatSoundFilePrivate
+{
 public:
-    ChatSoundFileWav(ChatSoundFile *qq);
+    ChatSoundFileWav(const QString &name, ChatSoundFile *qq);
     void close();
+    bool open(QIODevice::OpenMode mode);
+    void rewind();
+    qint64 readData(char * data, qint64 maxSize);
+    qint64 writeData(const char *data, qint64 maxSize);
+
+private:
     bool readHeader();
     bool writeHeader();
 
-private:
     ChatSoundFile *q;
+    QFile *m_file;
+    qint64 m_beginPos;
+    qint64 m_endPos;
 };
 
-ChatSoundFileWav::ChatSoundFileWav(ChatSoundFile *qq)
-    : q(qq)
+ChatSoundFileWav::ChatSoundFileWav(const QString &name, ChatSoundFile *qq)
+    : q(qq),
+    m_beginPos(0),
+    m_endPos(0)
 {
+    m_file = new QFile(name, q);
+}
+
+bool ChatSoundFileWav::open(QIODevice::OpenMode mode)
+{
+    // open file
+    if (!m_file->open(mode)) {
+        qWarning("Could not open %s", qPrintable(m_file->fileName()));
+        return false;
+    }
+
+    if (mode & QIODevice::ReadOnly) {
+        // read header
+        if (!readHeader()) {
+            m_file->close();
+            return false;
+        }
+    }
+    else if (mode & QIODevice::WriteOnly) {
+        // write header
+        if (!writeHeader()) {
+            m_file->close();
+            return false;
+        }
+    }
+    return true;
 }
 
 void ChatSoundFileWav::close()
@@ -480,6 +571,11 @@ void ChatSoundFileWav::close()
         writeHeader();
     }
     m_file->close();
+}
+
+qint64 ChatSoundFileWav::readData(char * data, qint64 maxSize)
+{
+    return m_file->read(data, maxSize);
 }
 
 bool ChatSoundFileWav::readHeader()
@@ -571,6 +667,19 @@ bool ChatSoundFileWav::readHeader()
     return true;
 }
 
+void ChatSoundFileWav::rewind()
+{
+    m_file->seek(m_beginPos);
+}
+
+qint64 ChatSoundFileWav::writeData(const char * data, qint64 maxSize)
+{
+    qint64 bytes = m_file->write(data, maxSize);
+    if (bytes > 0)
+        m_endPos += bytes;
+    return bytes;
+}
+
 bool ChatSoundFileWav::writeHeader()
 {
     QDataStream stream(m_file);
@@ -627,10 +736,9 @@ ChatSoundFile::ChatSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
     if (name.endsWith(".ogg"))
-        d = new ChatSoundFileOgg;
+        d = new ChatSoundFileOgg(name, this);
     else
-        d = new ChatSoundFileWav(this);
-    d->m_file = new QFile(name, this);
+        d = new ChatSoundFileWav(name, this);
 }
 
 ChatSoundFile::~ChatSoundFile()
@@ -688,25 +796,8 @@ bool ChatSoundFile::open(QIODevice::OpenMode mode)
     }
 
     // open file
-    if (!d->m_file->open(mode)) {
-        qWarning("Could not open %s", qPrintable(d->m_file->fileName()));
+    if (!d->open(mode))
         return false;
-    }
-
-    if (mode & QIODevice::ReadOnly) {
-        // read header
-        if (!d->readHeader()) {
-            d->m_file->close();
-            return false;
-        }
-    } 
-    else if (mode & QIODevice::WriteOnly) {
-        // write header
-        if (!d->writeHeader()) {
-            d->m_file->close();
-            return false;
-        }
-    }
 
     return QIODevice::open(mode);
 }
@@ -716,8 +807,7 @@ qint64 ChatSoundFile::readData(char * data, qint64 maxSize)
     char *start = data;
 
     while (maxSize) {
-        qint64 chunk = qMin(d->m_endPos - d->m_file->pos(), maxSize);
-        qint64 bytes = d->m_file->read(data, chunk);
+        qint64 bytes = d->readData(data, maxSize);
         if (bytes < 0) {
             // abort
             QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
@@ -734,7 +824,7 @@ qint64 ChatSoundFile::readData(char * data, qint64 maxSize)
                 break;
             }
             // rewind file to repeat
-            d->m_file->seek(d->m_beginPos);
+            d->rewind();
         }
     }
     return data - start;
@@ -758,10 +848,7 @@ void ChatSoundFile::setRepeat(bool repeat)
 
 qint64 ChatSoundFile::writeData(const char * data, qint64 maxSize)
 {
-    qint64 bytes = d->m_file->write(data, maxSize);
-    if (bytes > 0)
-        d->m_endPos += bytes;
-    return bytes;
+    return d->writeData(data, maxSize);
 }
 
 
