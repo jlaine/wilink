@@ -31,6 +31,7 @@
 #include <QTimer>
 
 #include "qsound/QSoundPlayer.h"
+#include "application.h"
 #include "models.h"
 #include "sip.h"
 
@@ -105,7 +106,9 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
-    m_soundPlayer = new QSoundPlayer(this);
+    /* get handle to application */
+    Application *wApp = qobject_cast<Application*>(qApp);
+    m_soundPlayer = wApp->soundPlayer();
 
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);

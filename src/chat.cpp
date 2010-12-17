@@ -57,6 +57,7 @@
 #include "chat_utils.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
+#include "qsound/QSoundPlayer.h"
 
 Chat::Chat(QWidget *parent)
     : QMainWindow(parent)
@@ -287,6 +288,7 @@ void Chat::notifyPanel(const QString &message, int options)
     Application *wApp = qobject_cast<Application*>(qApp);
     QWidget *panel = qobject_cast<QWidget*>(sender());
     QWidget *window = panel->isVisible() ? panel->window() : this;
+    wApp->soundPlayer()->play(":/message-incoming.ogg");
 
     // add pending message
     bool showMessage = (options & ChatPanel::ForceNotification);
