@@ -21,7 +21,8 @@
 #include <QBuffer>
 #include <QFile>
 
-#include "player.h"
+#include "QSoundFile.h"
+#include "QSoundPlayer.h"
 #ifdef USE_VORBISFILE
 #include "vorbis/codec.h"
 #include "vorbis/vorbisfile.h"

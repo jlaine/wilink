@@ -17,34 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_SOUND_PLAYER_H__
-#define __WILINK_SOUND_PLAYER_H__
+#ifndef __WILINK_SOUND_FILE_H_
+#define __WILINK_SOUND_FILE_H__
 
 #include <QAudioOutput>
 #include <QIODevice>
-#include <QMap>
 #include <QPair>
 
-class QFile;
-class ChatSoundFile;
 class ChatSoundFilePrivate;
-
-class ChatSoundPlayer : public QObject
-{
-    Q_OBJECT
-
-public:
-    ChatSoundPlayer(QObject *parent = 0);
-    int play(const QString &name, bool repeat = false);
-    void stop(int id);
-
-private slots:
-    void readerFinished();
-
-private:
-    int m_readerId;
-    QMap<int, ChatSoundFile*> m_readers;
-};
 
 /** The ChatSoundFile class represents a WAV-format file.
  */
