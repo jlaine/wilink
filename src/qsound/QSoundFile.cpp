@@ -69,20 +69,19 @@ public:
 private:
     QSoundFile *q;
 
-    int run_sync();
+    bool decodeFrame();
 
-    QByteArray m_buffer;
-    QFile *m_file;
+    QString m_fileName;
     bool m_headerFound;
-    char *m_outputPtr;
-    qint64 m_outputSize;
+    QByteArray m_inputBuffer;
+    QByteArray m_outputBuffer;
 
     mad_stream m_stream;
     mad_frame m_frame;
     mad_synth m_synth;
 };
 
-static inline int mad_scale(mad_fixed_t sample)
+static inline qint16 mad_scale(mad_fixed_t sample)
 {
   /* round */
   sample += (1L << (MAD_F_FRACBITS - 16));
@@ -99,11 +98,9 @@ static inline int mad_scale(mad_fixed_t sample)
 
 QSoundFileMp3::QSoundFileMp3(const QString &name, QSoundFile *qq)
     : q(qq),
-    m_headerFound(false),
-    m_outputPtr(0),
-    m_outputSize(0)
+    m_fileName(name),
+    m_headerFound(false)
 {
-    m_file = new QFile(name, q);
 }
 
 void QSoundFileMp3::close()
@@ -111,109 +108,89 @@ void QSoundFileMp3::close()
     mad_synth_finish(&m_synth);
     mad_frame_finish(&m_frame);
     mad_stream_finish(&m_stream);
-    m_file->close();
+}
+
+bool QSoundFileMp3::decodeFrame()
+{
+    if (mad_header_decode(&m_frame.header, &m_stream) == -1) {
+        if (!MAD_RECOVERABLE(m_stream.error))
+            return false;
+
+        qWarning("Got an error while decoding MP3 header: 0x%04x (%s)\n", m_stream.error, mad_stream_errorstr(&m_stream));
+        return true;
+    }
+
+    // process header
+    if (!m_headerFound) {
+        m_format.setChannels(MAD_NCHANNELS(&m_frame.header));
+        m_format.setFrequency(m_frame.header.samplerate);
+        m_format.setCodec("audio/pcm");
+        m_format.setByteOrder(QAudioFormat::LittleEndian);
+        m_format.setSampleSize(16);
+        m_format.setSampleType(QAudioFormat::SignedInt);
+        m_headerFound = true;
+    }
+
+    // process frame
+    if (mad_frame_decode(&m_frame, &m_stream) == -1) {
+        if (!MAD_RECOVERABLE(m_stream.error))
+            return false;
+
+        qWarning("Got an error while decoding MP3 frame: 0x%04x (%s)\n", m_stream.error, mad_stream_errorstr(&m_stream));
+        return true;
+    }
+    mad_synth_frame(&m_synth, &m_frame);
+
+    // write PCM
+    QDataStream output(&m_outputBuffer, QIODevice::WriteOnly);
+    output.device()->seek(m_outputBuffer.size());
+    output.setByteOrder(QDataStream::LittleEndian);
+
+    unsigned int nchannels, nsamples;
+    mad_fixed_t const *left_ch, *right_ch;
+
+    /* pcm->samplerate contains the sampling frequency */
+    struct mad_pcm *pcm = &m_synth.pcm;
+    nchannels = pcm->channels;
+    nsamples  = pcm->length;
+    left_ch   = pcm->samples[0];
+    right_ch  = pcm->samples[1];
+
+    while (nsamples--) {
+        output << mad_scale(*left_ch++);
+        if (nchannels == 2)
+            output << mad_scale(*right_ch++);
+    }
+
+    return true;
 }
 
 bool QSoundFileMp3::open(QIODevice::OpenMode mode)
 {
     if (mode & QIODevice::WriteOnly) {
-        qWarning("Writing to OGG is not supported");
+        qWarning("Writing to MP3 is not supported");
         return false;
     }
 
-    if (!m_file->open(mode)) {
-        qWarning("Could not open %s", qPrintable(m_file->fileName()));
+    // read file contents
+    QFile file(m_fileName);
+    if (!file.open(mode)) {
+        qWarning("Could not open %s", qPrintable(m_fileName));
         return false;
     }
+    m_inputBuffer = file.readAll();
 
+    // initialise decoder
     mad_stream_init(&m_stream);
     mad_frame_init(&m_frame);
     mad_synth_init(&m_synth);
+    mad_stream_buffer(&m_stream, (unsigned char*)m_inputBuffer.data(), m_inputBuffer.size());
 
-    m_buffer = m_file->readAll();
-    mad_stream_buffer(&m_stream, (unsigned char*)m_buffer.data(), m_buffer.size());
-
-    if (run_sync() < 0 || !m_headerFound)
+    // get first frame header
+    if (!decodeFrame() || !m_headerFound)
         return false;
 
     return true;
-}
-
-int QSoundFileMp3::run_sync()
-{
-    bool stop = false;
-    int result = 0;
-
-    while (!stop) {
-        if (mad_header_decode(&m_frame.header, &m_stream) == -1) {
-            if (!MAD_RECOVERABLE(m_stream.error))
-                break;
-
-            qWarning("Got an error while decoding MP3 header: 0x%04x (%s)\n", m_stream.error, mad_stream_errorstr(&m_stream));
-            continue;
-        }
-
-        // process header
-        qDebug("GOT HEADER (%i samples)", MAD_NSBSAMPLES(&m_frame.header));
-        if (!m_headerFound) {
-            m_format.setChannels(MAD_NCHANNELS(&m_frame.header));
-            m_format.setFrequency(m_frame.header.samplerate);
-            m_format.setCodec("audio/pcm");
-            m_format.setByteOrder(QAudioFormat::LittleEndian);
-            m_format.setSampleSize(16);
-            m_format.setSampleType(QAudioFormat::SignedInt);
-
-            m_headerFound = true;
-        }
-
-        if (mad_frame_decode(&m_frame, &m_stream) == -1) {
-            if (!MAD_RECOVERABLE(m_stream.error))
-                break;
-
-            qWarning("Got an error while decoding MP3 frame: 0x%04x (%s)\n", m_stream.error, mad_stream_errorstr(&m_stream));
-            continue;
-        }
-        qDebug("GOT FRAME");
-        mad_synth_frame(&m_synth, &m_frame);
-
-        if (m_outputPtr && m_outputSize > 0) {
-            qDebug("got output");
-
-            unsigned int nchannels, nsamples;
-            mad_fixed_t const *left_ch, *right_ch;
-
-            /* pcm->samplerate contains the sampling frequency */
-            struct mad_pcm *pcm = &m_synth.pcm;
-            nchannels = pcm->channels;
-            nsamples  = pcm->length;
-            left_ch   = pcm->samples[0];
-            right_ch  = pcm->samples[1];
-
-            while (nsamples-- && m_outputSize > 0) {
-                signed int sample;
-
-                /* output sample(s) in 16-bit signed little-endian PCM */
-
-                sample = mad_scale(*left_ch++);
-                *(m_outputPtr++) = (sample >> 0) & 0xff;
-                *(m_outputPtr++) = (sample >> 8) & 0xff;
-                m_outputSize -= 2;
-
-                if (nchannels == 2) {
-                    sample = mad_scale(*right_ch++);
-                    *(m_outputPtr++) = (sample >> 0) & 0xff;
-                    *(m_outputPtr++) = (sample >> 8) & 0xff;
-                    m_outputSize -= 2;
-                }
-            }
-            if (m_outputSize <= 0)
-                return 0;
-        } else {
-            return 0;
-        }
-    }
-
-    return result;
 }
 
 void QSoundFileMp3::rewind()
@@ -222,11 +199,20 @@ void QSoundFileMp3::rewind()
 
 qint64 QSoundFileMp3::readData(char * data, qint64 maxSize)
 {
-    qDebug("READ %i", maxSize);
-    m_outputPtr = data;
-    m_outputSize = maxSize;
-    run_sync();
-    return maxSize - m_outputSize;
+    // decode frames
+    while (m_outputBuffer.size() < maxSize) {
+        if (!decodeFrame())
+            break;
+    }
+
+    // copy output data
+    qint64 bytes = qMin(maxSize, (qint64)m_outputBuffer.size());
+    if (bytes > 0) {
+        memcpy(data, m_outputBuffer.constData(), bytes);
+        m_outputBuffer = m_outputBuffer.mid(bytes);
+    }
+
+    return bytes;
 }
 
 qint64 QSoundFileMp3::writeData(const char *data, qint64 maxSize)
