@@ -195,6 +195,7 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
 
 void QSoundFileMp3::rewind()
 {
+    mad_stream_buffer(&m_stream, (unsigned char*)m_inputBuffer.data(), m_inputBuffer.size());
 }
 
 qint64 QSoundFileMp3::readData(char * data, qint64 maxSize)
