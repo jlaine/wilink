@@ -407,7 +407,8 @@ QSoundFile::QSoundFile(const QString &name, QObject *parent)
 
 QSoundFile::~QSoundFile()
 {
-    delete d;
+    if (d)
+        delete d;
 }
 
 void QSoundFile::close()
@@ -424,7 +425,10 @@ void QSoundFile::close()
  */
 QAudioFormat QSoundFile::format() const
 {
-    return d->m_format;
+    if (d)
+        return d->m_format;
+    else
+        return QAudioFormat();
 }
 
 /** Sets the sound file format.
@@ -433,14 +437,18 @@ QAudioFormat QSoundFile::format() const
  */
 void QSoundFile::setFormat(const QAudioFormat &format)
 {
-    d->m_format = format;
+    if (d)
+        d->m_format = format;
 }
 
 /** Returns the sound file meta-data.
  */
 QList<QPair<QByteArray, QString> > QSoundFile::info() const
 {
-    return d->m_info;
+    if (d)
+        return d->m_info;
+    else
+        return QList<QPair<QByteArray, QString> >();
 }
 
 /** Sets the sound file meta-data.
@@ -449,11 +457,17 @@ QList<QPair<QByteArray, QString> > QSoundFile::info() const
  */
 void QSoundFile::setInfo(const QList<QPair<QByteArray, QString> > &info)
 {
-    d->m_info = info;
+    if (d)
+        d->m_info = info;
 }
 
 bool QSoundFile::open(QIODevice::OpenMode mode)
 {
+    if (!d) {
+        qWarning("Unsupported file type");
+        return false;
+    }
+
     if ((mode & QIODevice::ReadWrite) == QIODevice::ReadWrite) {
         qWarning("Cannot open in read/write mode");
         return false;
@@ -498,7 +512,10 @@ qint64 QSoundFile::readData(char * data, qint64 maxSize)
  */
 bool QSoundFile::repeat() const
 {
-    return d->m_repeat;
+    if (d)
+        return d->m_repeat;
+    else
+        return false;
 }
 
 /** Set to true if the file should be read repeatedly.
@@ -507,7 +524,8 @@ bool QSoundFile::repeat() const
  */
 void QSoundFile::setRepeat(bool repeat)
 {
-    d->m_repeat = repeat;
+    if (d)
+        d->m_repeat = repeat;
 }
 
 qint64 QSoundFile::writeData(const char * data, qint64 maxSize)
