@@ -101,6 +101,7 @@ QSoundFileMp3::QSoundFileMp3(const QString &name, QSoundFile *qq)
     m_fileName(name),
     m_headerFound(false)
 {
+    qDebug("Opening MP3 file %s", qPrintable(name));
 }
 
 void QSoundFileMp3::close()
@@ -277,6 +278,7 @@ QSoundFileOgg::QSoundFileOgg(const QString &name, QSoundFile *qq)
     m_name(name),
     m_section(0)
 {
+    qDebug("Opening OGG file %s", qPrintable(name));
     m_file = new QFile(name, q);
 }
 
@@ -369,6 +371,7 @@ QSoundFileWav::QSoundFileWav(const QString &name, QSoundFile *qq)
     m_beginPos(0),
     m_endPos(0)
 {
+    qDebug("Opening WAV file %s", qPrintable(name));
     m_file = new QFile(name, q);
 }
 

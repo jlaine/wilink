@@ -2,6 +2,7 @@
 #include <QIODevice>
 #include <QWidget>
 
+class QComboBox;
 class QSoundPlayer;
 
 class ToneGenerator : public QIODevice
@@ -44,5 +45,6 @@ private:
     ToneGenerator *generator;
     QSoundPlayer *player;
     QList<int> soundIds;
+    QComboBox *soundCombo;
 };
 

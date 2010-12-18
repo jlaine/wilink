@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QAudioOutput>
+#include <QComboBox>
 #include <QLayout>
 #include <QMap>
 #include <QPair>
@@ -50,14 +51,12 @@ int ToneGenerator::clockrate() const
 
 void ToneGenerator::startTone(int tone)
 {
-    qDebug("start %i", tone);
     m_tone = tone;
     m_tonetick = m_clocktick;
 }
 
 void ToneGenerator::stopTone(int tone)
 {
-    qDebug("stop %i", tone);
     m_tone = -1;
 }
 
@@ -101,10 +100,15 @@ ToneGui::ToneGui()
 
     // buttons
     QHBoxLayout *hbox = new QHBoxLayout;
-    QPushButton *startKey = new QPushButton("Start tone");
+    soundCombo = new QComboBox;
+    soundCombo->addItem(":/tones.mp3");
+    soundCombo->addItem(":/tones.ogg");
+    soundCombo->addItem(":/tones.wav");
+    hbox->addWidget(soundCombo);
+    QPushButton *startKey = new QPushButton("Start");
     connect(startKey, SIGNAL(pressed()), this, SLOT(startSound()));
     hbox->addWidget(startKey);
-    QPushButton *stopKey = new QPushButton("Stop tone");
+    QPushButton *stopKey = new QPushButton("Stop");
     connect(stopKey, SIGNAL(pressed()), this, SLOT(stopSound()));
     hbox->addWidget(stopKey);
     grid->addLayout(hbox, 4, 0, 1, 3);
@@ -155,7 +159,7 @@ void ToneGui::keyReleased()
 
 void ToneGui::startSound()
 {
-    int soundId = player->play(":/tones.ogg", true);
+    int soundId = player->play(soundCombo->currentText(), true);
     if (soundId >= 0)
         soundIds << soundId;
 }
