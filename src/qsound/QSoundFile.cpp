@@ -50,6 +50,51 @@ QSoundFilePrivate::QSoundFilePrivate()
 {
 }
 
+#ifdef USE_MAD
+class QSoundFileMp3 : public QSoundFilePrivate
+{
+public:
+    QSoundFileMp3(const QString &name, QSoundFile *qq);
+    void close();
+    bool open(QIODevice::OpenMode mode);
+    void rewind();
+    qint64 readData(char * data, qint64 maxSize);
+    qint64 writeData(const char *data, qint64 maxSize);
+
+private:
+    QSoundFile *q;
+};
+
+QSoundFileMp3::QSoundFileMp3(const QString &name, QSoundFile *qq)
+    : q(qq)
+{
+}
+
+void QSoundFileMp3::close()
+{
+}
+
+bool QSoundFileMp3::open(QIODevice::OpenMode mode)
+{
+    return false;
+}
+
+void QSoundFileMp3::rewind()
+{
+}
+
+qint64 QSoundFileMp3::readData(char * data, qint64 maxSize)
+{
+    return -1;
+}
+
+qint64 QSoundFileMp3::writeData(const char *data, qint64 maxSize)
+{
+    return -1;
+}
+
+#endif
+
 #ifdef USE_VORBISFILE
 static size_t qfile_read_callback(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
@@ -397,6 +442,10 @@ QSoundFile::QSoundFile(const QString &name, QObject *parent)
 {
     if (name.endsWith(".wav"))
         d = new QSoundFileWav(name, this);
+#ifdef USE_MAD
+    else if (name.endsWith(".mp3"))
+        d = new QSoundFileMp3(name, this);
+#endif
 #ifdef USE_VORBISFILE
     else if (name.endsWith(".ogg"))
         d = new QSoundFileOgg(name, this);
