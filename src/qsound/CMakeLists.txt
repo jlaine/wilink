@@ -3,6 +3,17 @@ include(${QT_USE_FILE})
 
 set(qsound_LIBRARIES)
 
+# mad support
+find_library(MAD_LIBRARY mad)
+if(MAD_LIBRARY)
+  check_include_files(mad.h HAVE_MAD_H)
+  if(HAVE_MAD_H)
+    message(STATUS "Found MAD library")
+    add_definitions(-DUSE_MAD)
+    set(qsound_LIBRARIES ${qsound_LIBRARIES} ${MAD_LIBRARY})
+  endif()
+endif()
+
 # vorbisfile support
 find_library(VORBISFILE_LIBRARY vorbisfile)
 if(VORBISFILE_LIBRARY)
