@@ -22,9 +22,12 @@
 #include <QFile>
 
 #include "QSoundFile.h"
+#ifdef USE_MAD
+#include <mad.h>
+#endif
 #ifdef USE_VORBISFILE
-#include "vorbis/codec.h"
-#include "vorbis/vorbisfile.h"
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 #endif
 
 static const quint32 FMT_SIZE = 16;
