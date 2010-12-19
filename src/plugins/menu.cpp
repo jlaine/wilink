@@ -113,7 +113,7 @@ void Menu::showIcon()
 
     QAction *action = icons.take(reply);
     QPixmap pixmap;
-    QByteArray data = reply->readAll();
+    const QByteArray data = reply->readAll();
     if (!pixmap.loadFromData(data, 0))
         return;
     action->setIcon(QIcon(pixmap));
