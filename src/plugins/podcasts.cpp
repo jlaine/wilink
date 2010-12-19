@@ -22,6 +22,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QPixmapCache>
 #include <QTimer>
 #include <QTreeView>
 #include <QUrl>
@@ -99,8 +100,11 @@ QVariant PodcastsModel::data(const QModelIndex &index, int role) const
     if (index.column() == MainColumn) {
         if (role == Qt::DisplayRole)
             return item->title;
-        else if (role == Qt::DecorationRole)
-            return QIcon(m_pixmap);
+        else if (role == Qt::DecorationRole) {
+            QPixmap pixmap;
+            if (QPixmapCache::find(item->imageUrl.toString(), &pixmap))
+                return QIcon(pixmap);
+        }
     } else if (index.column() == ImageColumn) {
         if (role == Qt::DisplayRole)
             return item->audioUrl.toString();
@@ -114,7 +118,7 @@ QModelIndex PodcastsModel::index(int row, int column, const QModelIndex &parent)
         return QModelIndex();
 
     Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
-    return createIndex(row, column, parentItem->children[row]);
+    return createIndex(parentItem->children[row], column);
 }
 
 QModelIndex PodcastsModel::parent(const QModelIndex &index) const
@@ -123,10 +127,7 @@ QModelIndex PodcastsModel::parent(const QModelIndex &index) const
         return QModelIndex();
 
     Item *item = static_cast<Item*>(index.internalPointer());
-    if (!item->parent || item->parent == m_rootItem)
-        return QModelIndex();
-
-    return createIndex(item->parent->row(), MainColumn, item->parent);
+    return createIndex(item->parent, MainColumn);
 }
 
 int PodcastsModel::rowCount(const QModelIndex &parent) const
@@ -138,33 +139,40 @@ int PodcastsModel::rowCount(const QModelIndex &parent) const
 void PodcastsModel::imageReceived()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply || reply->error() != QNetworkReply::NoError) {
+    if (!reply)
+        return;
+    reply->deleteLater();
+    if (reply->error() != QNetworkReply::NoError) {
         qWarning("Request for image failed");
         return;
     }
 
+    // store result
+    const QUrl imageUrl = reply->url();
     const QByteArray data = reply->readAll();
-    if (!m_pixmap.loadFromData(data, 0)) {
+    QPixmap pixmap;
+    if (!pixmap.loadFromData(data, 0)) {
         qWarning("Received invalid image");
         return;
     }
+    QPixmapCache::insert(imageUrl.toString(), pixmap);
 
-#if 0
-    if (m_items.size())
-        emit dataChanged(index(0, 0, QModelIndex()), index(m_items.size() - 1, 0, QModelIndex()));
-#endif
-#if 0
-    QIcon icon(m_pixmap);
-    for (int i = 0; i < m_listWidget->count(); ++i)
-        m_listWidget->item(i)->setIcon(icon);
-    setWindowIcon(icon);
-#endif
+    // update affected items
+    foreach (Item *item, m_rootItem->children) {
+        if (item->imageUrl == imageUrl) {
+            emit dataChanged(createIndex(item, MainColumn), createIndex(item, MainColumn));
+        }
+    }
 }
 
 void PodcastsModel::xmlReceived()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply || reply->error() != QNetworkReply::NoError) {
+    if (!reply)
+        return;
+    reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
         qWarning("Request for XML failed");
         return;
     }
@@ -193,9 +201,11 @@ void PodcastsModel::xmlReceived()
     channel->title = channelElement.firstChildElement("title").text();
     QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
     if (!imageUrlElement.isNull()) {
-        QNetworkReply *reply = m_network->get(QNetworkRequest(QUrl(imageUrlElement.text())));
+        channel->imageUrl = QUrl(imageUrlElement.text());
+        QNetworkReply *reply = m_network->get(QNetworkRequest(channel->imageUrl));
         connect(reply, SIGNAL(finished()), this, SLOT(imageReceived()));
     }
+    emit dataChanged(createIndex(channel, MainColumn), createIndex(channel, MainColumn));
 
     // parse items
     QDomElement itemElement = channelElement.firstChildElement("item");
@@ -215,9 +225,10 @@ void PodcastsModel::xmlReceived()
 
         Item *item = new Item;
         item->audioUrl = audioUrl;
+        item->imageUrl = channel->imageUrl;
         item->title = title;
         item->parent = channel;
-        beginInsertRows(createIndex(channel->row(), MainColumn, channel), channel->children.size(), channel->children.size());
+        beginInsertRows(createIndex(channel, MainColumn), channel->children.size(), channel->children.size());
         channel->children.append(item);
         endInsertRows();
         itemElement = itemElement.nextSiblingElement("item");

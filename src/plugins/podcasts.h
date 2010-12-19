@@ -21,7 +21,6 @@
 #define __WILINK_PODCASTS_H___
 
 #include <QAbstractItemModel>
-#include <QPixmap>
 #include <QUrl>
 
 #include "chat_panel.h"
@@ -58,6 +57,7 @@ private:
         int row() const;
 
         QUrl audioUrl;
+        QUrl imageUrl;
         QString title;
         QUrl url;
 
@@ -65,9 +65,16 @@ private:
         QList<Item*> children;
     };
 
+    QModelIndex createIndex(Item *item, int column) const
+    {
+        if (item && item != m_rootItem)
+            return QAbstractItemModel::createIndex(item->row(), column, item);
+        else
+            return QModelIndex();
+    }
+
     QNetworkAccessManager *m_network;
     Item *m_rootItem;
-    QPixmap m_pixmap;
 };
 
 /** The PodcastsPanel class represents a panel for displaying podcasts.
