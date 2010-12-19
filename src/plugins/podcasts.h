@@ -36,7 +36,9 @@ class PodcastsModel : public QAbstractItemModel
 
 public:
     PodcastsModel(QObject *parent);
+    ~PodcastsModel();
 
+    void addChannel(const QUrl &url);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -50,12 +52,21 @@ private slots:
 private:
     class Item {
     public:
+        Item();
+        ~Item();
+
+        int row() const;
+
         QUrl audioUrl;
         QString title;
+        QUrl url;
+
+        Item *parent;
+        QList<Item*> children;
     };
 
-    QList<Item> m_items;
     QNetworkAccessManager *m_network;
+    Item *m_rootItem;
     QPixmap m_pixmap;
 };
 

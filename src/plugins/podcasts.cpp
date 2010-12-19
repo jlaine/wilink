@@ -31,6 +31,30 @@
 #include "chat_plugin.h"
 #include "podcasts.h"
 
+enum PodcastsColumns {
+    MainColumn = 0,
+    ImageColumn,
+    MaxColumn
+};
+
+PodcastsModel::Item::Item()
+    : parent(0)
+{
+}
+
+PodcastsModel::Item::~Item()
+{
+    foreach (PodcastsModel::Item *item, children)
+        delete item;
+}
+
+int PodcastsModel::Item::row() const
+{
+    if (!parent)
+        return -1;
+    return parent->children.indexOf((PodcastsModel::Item*)this);
+}
+
 PodcastsModel::PodcastsModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
@@ -38,48 +62,77 @@ PodcastsModel::PodcastsModel(QObject *parent)
     m_network = new QNetworkAccessManager(this);
     m_network->setCache(wApp->networkCache());
 
-    QNetworkReply *reply = m_network->get(QNetworkRequest(QUrl("http://radiofrance-podcast.net/podcast09/rss_11529.xml")));
+    m_rootItem = new Item;
+
+    addChannel(QUrl("http://radiofrance-podcast.net/podcast09/rss_11529.xml"));
+}
+
+PodcastsModel::~PodcastsModel()
+{
+    delete m_rootItem;
+}
+
+void PodcastsModel::addChannel(const QUrl &url)
+{
+    Item *channel = new Item;
+    channel->parent = m_rootItem;
+    channel->url = url;
+    beginInsertRows(QModelIndex(), m_rootItem->children.size(), m_rootItem->children.size());
+    m_rootItem->children << channel;
+    endInsertRows();
+
+    QNetworkReply *reply = m_network->get(QNetworkRequest(channel->url));
     connect(reply, SIGNAL(finished()), this, SLOT(xmlReceived()));
 }
 
 int PodcastsModel::columnCount(const QModelIndex &parent) const
 {
-    return 2;
+    return MaxColumn;
 }
 
 QVariant PodcastsModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() >= m_items.size())
+    Item *item = static_cast<Item*>(index.internalPointer());
+    if (!index.isValid() || !item)
         return QVariant();
 
-    if (index.column() == 0) {
+    if (index.column() == MainColumn) {
         if (role == Qt::DisplayRole)
-            return m_items[index.row()].title;
+            return item->title;
         else if (role == Qt::DecorationRole)
             return QIcon(m_pixmap);
-    } else if (index.column() == 0) {
+    } else if (index.column() == ImageColumn) {
         if (role == Qt::DisplayRole)
-            return m_items[index.row()].audioUrl;
+            return item->audioUrl.toString();
     }
     return QVariant();
 }
 
 QModelIndex PodcastsModel::index(int row, int column, const QModelIndex &parent) const
 {
-    return createIndex(row, column);
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+    return createIndex(row, column, parentItem->children[row]);
 }
 
-QModelIndex PodcastsModel::parent(const QModelIndex & index) const
+QModelIndex PodcastsModel::parent(const QModelIndex &index) const
 {
-    return QModelIndex();
+    if (!index.isValid())
+        return QModelIndex();
+
+    Item *item = static_cast<Item*>(index.internalPointer());
+    if (!item->parent || item->parent == m_rootItem)
+        return QModelIndex();
+
+    return createIndex(item->parent->row(), MainColumn, item->parent);
 }
 
 int PodcastsModel::rowCount(const QModelIndex &parent) const
 {
-    if (!parent.isValid())
-        return m_items.size();
-    else
-        return 0;
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+    return parentItem->children.size();
 }
 
 void PodcastsModel::imageReceived()
@@ -96,8 +149,10 @@ void PodcastsModel::imageReceived()
         return;
     }
 
+#if 0
     if (m_items.size())
         emit dataChanged(index(0, 0, QModelIndex()), index(m_items.size() - 1, 0, QModelIndex()));
+#endif
 #if 0
     QIcon icon(m_pixmap);
     for (int i = 0; i < m_listWidget->count(); ++i)
@@ -114,6 +169,18 @@ void PodcastsModel::xmlReceived()
         return;
     }
 
+    // find channel
+    Item *channel = 0;
+    foreach (Item *item, m_rootItem->children) {
+        if (item->url == reply->url()) {
+            channel = item;
+            break;
+        }
+    }
+    if (!channel)
+        return;
+
+    // parse document
     QDomDocument doc;
     if (!doc.setContent(reply)) {
         qWarning("Received invalid XML");
@@ -123,7 +190,7 @@ void PodcastsModel::xmlReceived()
     QDomElement channelElement = doc.documentElement().firstChildElement("channel");
 
     // parse channel
-    //setWindowExtra(channelElement.firstChildElement("title").text());
+    channel->title = channelElement.firstChildElement("title").text();
     QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
     if (!imageUrlElement.isNull()) {
         QNetworkReply *reply = m_network->get(QNetworkRequest(QUrl(imageUrlElement.text())));
@@ -145,11 +212,13 @@ void PodcastsModel::xmlReceived()
         if (audioUrl.isValid()) {
             qDebug("got audio %s", qPrintable(audioUrl.toString()));
         }
-        Item item;
-        item.audioUrl = audioUrl;
-        item.title = title;
-        beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-        m_items.append(item);
+
+        Item *item = new Item;
+        item->audioUrl = audioUrl;
+        item->title = title;
+        item->parent = channel;
+        beginInsertRows(createIndex(channel->row(), MainColumn, channel), channel->children.size(), channel->children.size());
+        channel->children.append(item);
         endInsertRows();
         itemElement = itemElement.nextSiblingElement("item");
     }
@@ -173,7 +242,7 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
     m_view = new QTreeView;
     m_view->setModel(m_model);
     m_view->setIconSize(QSize(32, 32));
-    m_view->setRootIsDecorated(false);
+    //m_view->setRootIsDecorated(false);
 
     layout->addWidget(m_view);
     setLayout(layout);
