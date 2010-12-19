@@ -20,11 +20,44 @@
 #ifndef __WILINK_PODCASTS_H___
 #define __WILINK_PODCASTS_H___
 
+#include <QAbstractItemModel>
+#include <QPixmap>
+#include <QUrl>
+
 #include "chat_panel.h"
 
 class Chat;
-class QListWidget;
 class QNetworkAccessManager;
+class QTreeView;
+
+class PodcastsModel : public QAbstractItemModel
+{
+    Q_OBJECT
+
+public:
+    PodcastsModel(QObject *parent);
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex parent(const QModelIndex & index) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+private slots:
+    void imageReceived();
+    void xmlReceived();
+
+private:
+    class Item {
+    public:
+        QUrl audioUrl;
+        QString title;
+    };
+
+    QList<Item> m_items;
+    QNetworkAccessManager *m_network;
+    QPixmap m_pixmap;
+};
 
 /** The PodcastsPanel class represents a panel for displaying podcasts.
  */
@@ -36,13 +69,11 @@ public:
     PodcastsPanel(Chat *chatWindow);
 
 private slots:
-    void imageReceived();
-    void xmlReceived();
 
 private:
     Chat *m_chat;
-    QListWidget *m_listWidget;
-    QNetworkAccessManager *m_network;
+    PodcastsModel *m_model;
+    QTreeView *m_view;
 };
 
 #endif

@@ -19,11 +19,11 @@
 
 #include <QDomDocument>
 #include <QLayout>
-#include <QListWidget>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QTimer>
+#include <QTreeView>
 #include <QUrl>
 
 #include "application.h"
@@ -31,37 +31,58 @@
 #include "chat_plugin.h"
 #include "podcasts.h"
 
-PodcastsPanel::PodcastsPanel(Chat *chatWindow)
-    : ChatPanel(chatWindow),
-    m_chat(chatWindow)
+PodcastsModel::PodcastsModel(QObject *parent)
+    : QAbstractItemModel(parent)
 {
     Application *wApp = qobject_cast<Application*>(qApp);
     m_network = new QNetworkAccessManager(this);
     m_network->setCache(wApp->networkCache());
 
-    setObjectName("z_2_podcasts");
-    setWindowIcon(QIcon(":/photos.png"));
-    setWindowTitle(tr("My podcasts"));
-
-    // build layout
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->addLayout(headerLayout());
-    layout->addSpacing(10);
-
-    m_listWidget = new QListWidget;
-    layout->addWidget(m_listWidget);
-    setLayout(layout);
-
-    /* register panel */
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
-    
-    // load XML 
     QNetworkReply *reply = m_network->get(QNetworkRequest(QUrl("http://radiofrance-podcast.net/podcast09/rss_11529.xml")));
     connect(reply, SIGNAL(finished()), this, SLOT(xmlReceived()));
 }
 
-void PodcastsPanel::imageReceived()
+int PodcastsModel::columnCount(const QModelIndex &parent) const
+{
+    return 2;
+}
+
+QVariant PodcastsModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_items.size())
+        return QVariant();
+
+    if (index.column() == 0) {
+        if (role == Qt::DisplayRole)
+            return m_items[index.row()].title;
+        else if (role == Qt::DecorationRole)
+            return QIcon(m_pixmap);
+    } else if (index.column() == 0) {
+        if (role == Qt::DisplayRole)
+            return m_items[index.row()].audioUrl;
+    }
+    return QVariant();
+}
+
+QModelIndex PodcastsModel::index(int row, int column, const QModelIndex &parent) const
+{
+    return createIndex(row, column);
+}
+
+QModelIndex PodcastsModel::parent(const QModelIndex & index) const
+{
+    return QModelIndex();
+}
+
+int PodcastsModel::rowCount(const QModelIndex &parent) const
+{
+    if (!parent.isValid())
+        return m_items.size();
+    else
+        return 0;
+}
+
+void PodcastsModel::imageReceived()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply || reply->error() != QNetworkReply::NoError) {
@@ -70,16 +91,22 @@ void PodcastsPanel::imageReceived()
     }
 
     const QByteArray data = reply->readAll();
-    QPixmap pixmap;
-    if (!pixmap.loadFromData(data, 0)) {
+    if (!m_pixmap.loadFromData(data, 0)) {
         qWarning("Received invalid image");
         return;
     }
 
-    setWindowIcon(pixmap);
+    if (m_items.size())
+        emit dataChanged(index(0, 0, QModelIndex()), index(m_items.size() - 1, 0, QModelIndex()));
+#if 0
+    QIcon icon(m_pixmap);
+    for (int i = 0; i < m_listWidget->count(); ++i)
+        m_listWidget->item(i)->setIcon(icon);
+    setWindowIcon(icon);
+#endif
 }
 
-void PodcastsPanel::xmlReceived()
+void PodcastsModel::xmlReceived()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply || reply->error() != QNetworkReply::NoError) {
@@ -96,7 +123,7 @@ void PodcastsPanel::xmlReceived()
     QDomElement channelElement = doc.documentElement().firstChildElement("channel");
 
     // parse channel
-    setWindowExtra(channelElement.firstChildElement("title").text());
+    //setWindowExtra(channelElement.firstChildElement("title").text());
     QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
     if (!imageUrlElement.isNull()) {
         QNetworkReply *reply = m_network->get(QNetworkRequest(QUrl(imageUrlElement.text())));
@@ -104,13 +131,55 @@ void PodcastsPanel::xmlReceived()
     }
 
     // parse items
-    m_listWidget->clear();
     QDomElement itemElement = channelElement.firstChildElement("item");
     while (!itemElement.isNull()) {
         const QString title = itemElement.firstChildElement("title").text();
-        m_listWidget->addItem(new QListWidgetItem(title));
+        QUrl audioUrl;
+        QDomElement enclosureElement = itemElement.firstChildElement("enclosure");
+        while (!enclosureElement.isNull() && !audioUrl.isValid()) {
+            if (enclosureElement.attribute("type") == "audio/mpeg")
+                audioUrl = QUrl(enclosureElement.attribute("url"));
+            enclosureElement = enclosureElement.nextSiblingElement("enclosure");
+        }
+
+        if (audioUrl.isValid()) {
+            qDebug("got audio %s", qPrintable(audioUrl.toString()));
+        }
+        Item item;
+        item.audioUrl = audioUrl;
+        item.title = title;
+        beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+        m_items.append(item);
+        endInsertRows();
         itemElement = itemElement.nextSiblingElement("item");
     }
+}
+
+PodcastsPanel::PodcastsPanel(Chat *chatWindow)
+    : ChatPanel(chatWindow),
+    m_chat(chatWindow)
+{
+    setObjectName("z_2_podcasts");
+    setWindowIcon(QIcon(":/photos.png"));
+    setWindowTitle(tr("My podcasts"));
+
+    // build layout
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+    layout->addLayout(headerLayout());
+    layout->addSpacing(10);
+
+    m_model = new PodcastsModel(this);
+    m_view = new QTreeView;
+    m_view->setModel(m_model);
+    m_view->setIconSize(QSize(32, 32));
+    m_view->setRootIsDecorated(false);
+
+    layout->addWidget(m_view);
+    setLayout(layout);
+
+    /* register panel */
+    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
 }
 
 // PLUGIN
