@@ -19,6 +19,7 @@
 
 #include <QAbstractNetworkCache>
 #include <QDomDocument>
+#include <QFile>
 #include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -32,6 +33,7 @@
 #include "chat.h"
 #include "chat_plugin.h"
 #include "podcasts.h"
+#include "qsound/QSoundFile.h"
 
 enum PodcastsColumns {
     MainColumn = 0,
@@ -68,6 +70,7 @@ PodcastsModel::PodcastsModel(QObject *parent)
     m_rootItem = new Item;
 
     addChannel(QUrl("http://radiofrance-podcast.net/podcast09/rss_11529.xml"));
+    addChannel(QUrl("http://downloads.bbc.co.uk/podcasts/worldservice/wbnews/rss.xml"));
 }
 
 PodcastsModel::~PodcastsModel()
@@ -99,6 +102,9 @@ QVariant PodcastsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
+    if (role == Qt::UserRole && item->audioUrl.isValid() && m_audioCache.contains(item->audioUrl))
+        return m_audioCache.value(item->audioUrl);
+
     if (index.column() == MainColumn) {
         if (role == Qt::DisplayRole)
             return item->title;
@@ -113,8 +119,6 @@ QVariant PodcastsModel::data(const QModelIndex &index, int role) const
                 return "Available";
             else if (m_audioReply && m_audioReply->property("_request_url").toUrl() == item->audioUrl)
                 return "Downloading..";
-            else
-                return "Queued";
         }
     }
     return QVariant();
@@ -295,7 +299,8 @@ void PodcastsModel::processQueue()
                 m_audioReply->setProperty("_request_url", item->audioUrl);
                 connect(m_audioReply, SIGNAL(finished()), this, SLOT(audioReceived()));
                 return;
-            }            
+            }
+            break;
         }
     }
 }
@@ -330,7 +335,23 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
 
 void PodcastsPanel::doubleClicked(const QModelIndex &index)
 {
-
+    QUrl audioUrl = index.data(Qt::UserRole).toUrl();
+    if (audioUrl.isValid()) {
+        Application *wApp = qobject_cast<Application*>(qApp);
+        QIODevice *device = wApp->networkCache()->data(audioUrl);
+        if (device) {
+            qDebug("double clicked %s");
+            QSoundFile *reader = new QSoundFile(device, audioUrl.toString(), this);
+            if (reader->open(QIODevice::ReadOnly))
+            {
+                connect(reader, SIGNAL(finished()), reader, SLOT(deleteLater()));
+                QAudioOutput *output = new QAudioOutput(reader->format(), reader);
+                output->start(reader);
+            } else {
+                delete reader;
+            }
+        }
+    }
 }
 
 // PLUGIN
