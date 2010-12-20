@@ -180,6 +180,13 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
     m_inputBuffer = m_file->readAll();
     m_file->close();
 
+    // skip ID3 and stuff
+    int startPos = m_inputBuffer.indexOf("\xff\xfb");
+    if (startPos > 0) {
+        qDebug("Skipping %i non-MP3 bytes", startPos);
+        m_inputBuffer = m_inputBuffer.mid(startPos);
+    }
+
     // initialise decoder
     mad_stream_init(&m_stream);
     mad_frame_init(&m_frame);
@@ -561,6 +568,27 @@ bool QSoundFileWav::writeHeader()
 
 /** Constructs a QSoundFile.
  */
+QSoundFile::QSoundFile(QIODevice *file, const QString &name, QObject *parent)
+    : QIODevice(parent)
+{
+    file->setParent(this);
+    if (name.endsWith(".wav"))
+        d = new QSoundFileWav(file, this);
+#ifdef USE_MAD
+    else if (name.endsWith(".mp3"))
+        d = new QSoundFileMp3(file, this);
+#endif
+#ifdef USE_VORBISFILE
+    else if (name.endsWith(".ogg"))
+        d = new QSoundFileOgg(file, this);
+#endif
+    else
+        d = 0;
+
+    if (d)
+        d->m_name = name;
+}
+
 QSoundFile::QSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
