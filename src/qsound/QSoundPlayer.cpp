@@ -32,6 +32,11 @@ int QSoundPlayer::play(const QString &name, bool repeat)
 {
     QSoundFile *reader = new QSoundFile(name, this);
     reader->setRepeat(repeat);
+    return play(reader);
+}
+
+int QSoundPlayer::play(QSoundFile *reader)
+{
     if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         delete reader;
         return -1;

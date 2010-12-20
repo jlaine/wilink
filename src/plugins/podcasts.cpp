@@ -34,6 +34,7 @@
 #include "chat_plugin.h"
 #include "podcasts.h"
 #include "qsound/QSoundFile.h"
+#include "qsound/QSoundPlayer.h"
 
 enum PodcastsColumns {
     MainColumn = 0,
@@ -340,16 +341,8 @@ void PodcastsPanel::doubleClicked(const QModelIndex &index)
         Application *wApp = qobject_cast<Application*>(qApp);
         QIODevice *device = wApp->networkCache()->data(audioUrl);
         if (device) {
-            qDebug("double clicked %s");
-            QSoundFile *reader = new QSoundFile(device, audioUrl.toString(), this);
-            if (reader->open(QIODevice::ReadOnly))
-            {
-                connect(reader, SIGNAL(finished()), reader, SLOT(deleteLater()));
-                QAudioOutput *output = new QAudioOutput(reader->format(), reader);
-                output->start(reader);
-            } else {
-                delete reader;
-            }
+            QSoundFile *reader = new QSoundFile(device, QSoundFile::Mp3File, this);
+            wApp->soundPlayer()->play(reader);
         }
     }
 }

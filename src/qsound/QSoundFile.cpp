@@ -566,46 +566,50 @@ bool QSoundFileWav::writeHeader()
     return true;
 }
 
+static QSoundFilePrivate *factory(QIODevice *file, QSoundFile::FileType type, QSoundFile *parent)
+{
+    switch (type) {
+    case QSoundFile::WavFile:
+        return new QSoundFileWav(file, parent);
+#ifdef USE_MAD
+    case QSoundFile::Mp3File:
+        return new QSoundFileMp3(file, parent);
+#endif
+#ifdef USE_VORBISFILE
+    case QSoundFile::OggFile:
+        return new QSoundFileOgg(file, parent);
+#endif
+    default:
+        return 0;
+    }
+}
+
+static QSoundFile::FileType guessMime(const QString &name)
+{
+    if (name.endsWith(".wav"))
+        return QSoundFile::WavFile;
+    else if (name.endsWith(".mp3"))
+        return QSoundFile::Mp3File;
+    else if (name.endsWith(".ogg"))
+        return QSoundFile::OggFile;
+    else
+        return QSoundFile::UnknownFile;
+}
+
 /** Constructs a QSoundFile.
  */
-QSoundFile::QSoundFile(QIODevice *file, const QString &name, QObject *parent)
+QSoundFile::QSoundFile(QIODevice *file, FileType type, QObject *parent)
     : QIODevice(parent)
 {
     file->setParent(this);
-    if (name.endsWith(".wav"))
-        d = new QSoundFileWav(file, this);
-#ifdef USE_MAD
-    else if (name.endsWith(".mp3"))
-        d = new QSoundFileMp3(file, this);
-#endif
-#ifdef USE_VORBISFILE
-    else if (name.endsWith(".ogg"))
-        d = new QSoundFileOgg(file, this);
-#endif
-    else
-        d = 0;
-
-    if (d)
-        d->m_name = name;
+    d = factory(file, type, this);
 }
 
 QSoundFile::QSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
     QFile *file = new QFile(name, this);
-    if (name.endsWith(".wav"))
-        d = new QSoundFileWav(file, this);
-#ifdef USE_MAD
-    else if (name.endsWith(".mp3"))
-        d = new QSoundFileMp3(file, this);
-#endif
-#ifdef USE_VORBISFILE
-    else if (name.endsWith(".ogg"))
-        d = new QSoundFileOgg(file, this);
-#endif
-    else
-        d = 0;
-
+    d = factory(file, guessMime(name), this);
     if (d)
         d->m_name = name;
 }

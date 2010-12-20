@@ -33,7 +33,14 @@ class QSoundFile : public QIODevice
     Q_OBJECT
 
 public:
-    QSoundFile(QIODevice *file, const QString &name, QObject *parent = 0);
+    enum FileType {
+        UnknownFile = 0,
+        OggFile,
+        Mp3File,
+        WavFile,
+    };
+
+    QSoundFile(QIODevice *file, FileType type, QObject *parent = 0);
     QSoundFile(const QString &name, QObject *parent = 0);
     ~QSoundFile();
     void close();
