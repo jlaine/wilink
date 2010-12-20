@@ -43,6 +43,7 @@ public:
     virtual qint64 readData(char * data, qint64 maxSize) = 0;
     virtual qint64 writeData(const char *data, qint64 maxSize) = 0;
     
+    QString m_name;
     QAudioFormat m_format;
     QList<QPair<QByteArray, QString> > m_info;
 
@@ -58,7 +59,7 @@ QSoundFilePrivate::QSoundFilePrivate()
 class QSoundFileMp3 : public QSoundFilePrivate
 {
 public:
-    QSoundFileMp3(const QString &name, QSoundFile *qq);
+    QSoundFileMp3(QIODevice *device, QSoundFile *qq);
     void close();
     bool open(QIODevice::OpenMode mode);
     void rewind();
@@ -71,7 +72,7 @@ private:
 
     bool decodeFrame();
 
-    QString m_fileName;
+    QIODevice *m_file;
     bool m_headerFound;
     QByteArray m_inputBuffer;
     QByteArray m_outputBuffer;
@@ -96,12 +97,12 @@ static inline qint16 mad_scale(mad_fixed_t sample)
   return sample >> (MAD_F_FRACBITS + 1 - 16);
 }
 
-QSoundFileMp3::QSoundFileMp3(const QString &name, QSoundFile *qq)
+QSoundFileMp3::QSoundFileMp3(QIODevice *device, QSoundFile *qq)
     : q(qq),
-    m_fileName(name),
+    m_file(device),
     m_headerFound(false)
 {
-    qDebug("Opening MP3 file %s", qPrintable(name));
+    qDebug("Opening MP3 file");
 }
 
 void QSoundFileMp3::close()
@@ -174,12 +175,10 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
     }
 
     // read file contents
-    QFile file(m_fileName);
-    if (!file.open(mode)) {
-        qWarning("Could not open %s", qPrintable(m_fileName));
+    if (!m_file->open(mode))
         return false;
-    }
-    m_inputBuffer = file.readAll();
+    m_inputBuffer = m_file->readAll();
+    m_file->close();
 
     // initialise decoder
     mad_stream_init(&m_stream);
@@ -258,7 +257,7 @@ static long qfile_tell_callback(void *datasource)
 class QSoundFileOgg : public QSoundFilePrivate
 {
 public:
-    QSoundFileOgg(const QString &name, QSoundFile *qq);
+    QSoundFileOgg(QIODevice *device, QSoundFile *qq);
     void close();
     bool open(QIODevice::OpenMode mode);
     void rewind();
@@ -267,19 +266,17 @@ public:
 
 private:
     QSoundFile *q;
-    QFile *m_file;
-    QString m_name;
+    QIODevice *m_file;
     int m_section;
     OggVorbis_File m_vf;
 };
 
-QSoundFileOgg::QSoundFileOgg(const QString &name, QSoundFile *qq)
+QSoundFileOgg::QSoundFileOgg(QIODevice *device, QSoundFile *qq)
     : q(qq),
-    m_name(name),
+    m_file(device),
     m_section(0)
 {
-    qDebug("Opening OGG file %s", qPrintable(name));
-    m_file = new QFile(name, q);
+    qDebug("Opening OGG file");
 }
 
 void QSoundFileOgg::close()
@@ -294,10 +291,8 @@ bool QSoundFileOgg::open(QIODevice::OpenMode mode)
         return false;
     }
 
-    if (!m_file->open(mode)) {
-        qWarning("Could not open %s", qPrintable(m_file->fileName()));
+    if (!m_file->open(mode))
         return false;
-    }
 
     ov_callbacks callbacks;
     callbacks.read_func = qfile_read_callback;
@@ -349,7 +344,7 @@ qint64 QSoundFileOgg::writeData(const char * data, qint64 maxSize)
 class QSoundFileWav : public QSoundFilePrivate
 {
 public:
-    QSoundFileWav(const QString &name, QSoundFile *qq);
+    QSoundFileWav(QIODevice *device, QSoundFile *qq);
     void close();
     bool open(QIODevice::OpenMode mode);
     void rewind();
@@ -361,27 +356,25 @@ private:
     bool writeHeader();
 
     QSoundFile *q;
-    QFile *m_file;
+    QIODevice *m_file;
     qint64 m_beginPos;
     qint64 m_endPos;
 };
 
-QSoundFileWav::QSoundFileWav(const QString &name, QSoundFile *qq)
+QSoundFileWav::QSoundFileWav(QIODevice *device, QSoundFile *qq)
     : q(qq),
+    m_file(device),
     m_beginPos(0),
     m_endPos(0)
 {
-    qDebug("Opening WAV file %s", qPrintable(name));
-    m_file = new QFile(name, q);
+    qDebug("Opening WAV file");
 }
 
 bool QSoundFileWav::open(QIODevice::OpenMode mode)
 {
     // open file
-    if (!m_file->open(mode)) {
-        qWarning("Could not open %s", qPrintable(m_file->fileName()));
+    if (!m_file->open(mode))
         return false;
-    }
 
     if (mode & QIODevice::ReadOnly) {
         // read header
@@ -571,18 +564,22 @@ bool QSoundFileWav::writeHeader()
 QSoundFile::QSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
+    QFile *file = new QFile(name, this);
     if (name.endsWith(".wav"))
-        d = new QSoundFileWav(name, this);
+        d = new QSoundFileWav(file, this);
 #ifdef USE_MAD
     else if (name.endsWith(".mp3"))
-        d = new QSoundFileMp3(name, this);
+        d = new QSoundFileMp3(file, this);
 #endif
 #ifdef USE_VORBISFILE
     else if (name.endsWith(".ogg"))
-        d = new QSoundFileOgg(name, this);
+        d = new QSoundFileOgg(file, this);
 #endif
     else
         d = 0;
+
+    if (d)
+        d->m_name = name;
 }
 
 QSoundFile::~QSoundFile()
@@ -654,8 +651,10 @@ bool QSoundFile::open(QIODevice::OpenMode mode)
     }
 
     // open file
-    if (!d->open(mode))
+    if (!d->open(mode)) {
+        qWarning("Could not open file %s", qPrintable(d->m_name));
         return false;
+    }
 
     return QIODevice::open(mode);
 }
