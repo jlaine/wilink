@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAbstractNetworkCache>
 #include <QDomDocument>
 #include <QLayout>
 #include <QNetworkAccessManager>
@@ -57,7 +58,8 @@ int PodcastsModel::Item::row() const
 }
 
 PodcastsModel::PodcastsModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : QAbstractItemModel(parent),
+    m_audioReply(0)
 {
     Application *wApp = qobject_cast<Application*>(qApp);
     m_network = new QNetworkAccessManager(this);
@@ -106,8 +108,14 @@ QVariant PodcastsModel::data(const QModelIndex &index, int role) const
                 return QIcon(pixmap);
         }
     } else if (index.column() == ImageColumn) {
-        if (role == Qt::DisplayRole)
-            return item->audioUrl.toString();
+        if (role == Qt::DisplayRole && item->audioUrl.isValid()) {
+            if (m_audioCache.contains(item->audioUrl))
+                return "Available";
+            else if (m_audioReply && m_audioReply->property("_request_url").toUrl() == item->audioUrl)
+                return "Downloading..";
+            else
+                return "Queued";
+        }
     }
     return QVariant();
 }
@@ -134,6 +142,44 @@ int PodcastsModel::rowCount(const QModelIndex &parent) const
 {
     Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
     return parentItem->children.size();
+}
+
+void PodcastsModel::audioReceived()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply)
+        return;
+    reply->deleteLater();
+    const QUrl audioUrl = reply->property("_request_url").toUrl();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Request for audio failed");
+        return;
+    }
+
+    // follow redirect
+    QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+    if (redirectUrl.isValid()) {
+        redirectUrl = reply->url().resolved(redirectUrl);
+
+        qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
+        m_audioReply = m_network->get(QNetworkRequest(redirectUrl));
+        m_audioReply->setProperty("_request_url", audioUrl);
+        connect(m_audioReply, SIGNAL(finished()), this, SLOT(audioReceived()));
+        return;
+    }
+
+    qDebug("Received audio %s", qPrintable(audioUrl.toString()));
+    m_audioCache[audioUrl] = reply->url();
+    m_audioReply = 0;
+    foreach (Item *channel, m_rootItem->children) {
+        foreach (Item *item, channel->children) {
+            if (item->audioUrl == audioUrl) {
+                emit dataChanged(createIndex(item, MainColumn), createIndex(item, ImageColumn));
+            }
+        }
+    }
+    processQueue();
 }
 
 void PodcastsModel::imageReceived()
@@ -219,10 +265,6 @@ void PodcastsModel::xmlReceived()
             enclosureElement = enclosureElement.nextSiblingElement("enclosure");
         }
 
-        if (audioUrl.isValid()) {
-            qDebug("got audio %s", qPrintable(audioUrl.toString()));
-        }
-
         Item *item = new Item;
         item->audioUrl = audioUrl;
         item->imageUrl = channel->imageUrl;
@@ -232,6 +274,29 @@ void PodcastsModel::xmlReceived()
         channel->children.append(item);
         endInsertRows();
         itemElement = itemElement.nextSiblingElement("item");
+    }
+
+    processQueue();
+}
+
+void PodcastsModel::processQueue()
+{
+    if (m_audioReply)
+        return;
+
+    foreach (Item *channel, m_rootItem->children) {
+        foreach (Item *item, channel->children) {
+            if (!item->audioUrl.isValid())
+                continue;
+
+            if (!m_audioCache.contains(item->audioUrl)) {
+                qDebug("Requesting audio %s", qPrintable(item->audioUrl.toString()));
+                m_audioReply = m_network->get(QNetworkRequest(item->audioUrl));
+                m_audioReply->setProperty("_request_url", item->audioUrl);
+                connect(m_audioReply, SIGNAL(finished()), this, SLOT(audioReceived()));
+                return;
+            }            
+        }
     }
 }
 
@@ -253,6 +318,7 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
     m_view = new QTreeView;
     m_view->setModel(m_model);
     m_view->setIconSize(QSize(32, 32));
+    connect(m_view, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(doubleClicked(QModelIndex)));
     //m_view->setRootIsDecorated(false);
 
     layout->addWidget(m_view);
@@ -260,6 +326,11 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
 
     /* register panel */
     QTimer::singleShot(0, this, SIGNAL(registerPanel()));
+}
+
+void PodcastsPanel::doubleClicked(const QModelIndex &index)
+{
+
 }
 
 // PLUGIN

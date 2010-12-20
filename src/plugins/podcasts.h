@@ -27,6 +27,7 @@
 
 class Chat;
 class QNetworkAccessManager;
+class QNetworkReply;
 class QTreeView;
 
 class PodcastsModel : public QAbstractItemModel
@@ -45,8 +46,10 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 private slots:
+    void audioReceived();
     void imageReceived();
     void xmlReceived();
+    void processQueue();
 
 private:
     class Item {
@@ -74,6 +77,9 @@ private:
     }
 
     QNetworkAccessManager *m_network;
+    QMap<QUrl, QUrl> m_audioCache;
+    QNetworkReply *m_audioReply;
+
     Item *m_rootItem;
 };
 
@@ -87,6 +93,7 @@ public:
     PodcastsPanel(Chat *chatWindow);
 
 private slots:
+    void doubleClicked(const QModelIndex &index);
 
 private:
     Chat *m_chat;
