@@ -3,6 +3,12 @@ include(${QT_USE_FILE})
 
 set(qsound_LIBRARIES)
 
+# check macports on OS X
+if(APPLE)
+  set(CMAKE_REQUIRED_INCLUDES /opt/local/include)
+  include_directories(/opt/local/include)
+endif(APPLE)
+
 # mad support
 find_library(MAD_LIBRARY mad)
 if(MAD_LIBRARY)
