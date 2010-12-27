@@ -180,7 +180,30 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
     m_inputBuffer = m_file->readAll();
     m_file->close();
 
-    // skip ID3 and stuff
+    // handle ID3 tag
+    qint64 pos = 0;
+    if (m_inputBuffer.startsWith("ID3")) {
+        // identifier + version
+        pos += 5;
+
+        // flags
+        quint8 flags = (quint8)m_inputBuffer.at(pos++);
+        //qDebug("flags %x", flags);
+
+        // size
+        quint32 size = 0;
+        size |= m_inputBuffer.at(pos++) << 21;
+        size |= m_inputBuffer.at(pos++) << 14;
+        size |= m_inputBuffer.at(pos++) << 7;
+        size |= m_inputBuffer.at(pos++);
+        //qDebug("ID3 size %x (%u)", size, size);
+
+        // contents
+        pos += size;
+        m_inputBuffer = m_inputBuffer.mid(pos);
+    }
+
+    // skip any data preceding MP3 data
     int startPos = m_inputBuffer.indexOf("\xff\xfb");
     if (startPos > 0) {
         qDebug("Skipping %i non-MP3 bytes", startPos);
@@ -597,6 +620,10 @@ static QSoundFile::FileType guessMime(const QString &name)
 }
 
 /** Constructs a QSoundFile.
+ *
+ * @param file
+ * @param type
+ * @param parent
  */
 QSoundFile::QSoundFile(QIODevice *file, FileType type, QObject *parent)
     : QIODevice(parent)
@@ -605,6 +632,11 @@ QSoundFile::QSoundFile(QIODevice *file, FileType type, QObject *parent)
     d = factory(file, type, this);
 }
 
+/** Constructs a QSoundFile to represent the sound file with the given name.
+ *
+ * @param name
+ * @param parent
+ */
 QSoundFile::QSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
@@ -614,12 +646,16 @@ QSoundFile::QSoundFile(const QString &name, QObject *parent)
         d->m_name = name;
 }
 
+/** Destroys the sound file object.
+ */
 QSoundFile::~QSoundFile()
 {
     if (d)
         delete d;
 }
 
+/** Closes the sound file.
+ */
 void QSoundFile::close()
 {
     if (!isOpen())
