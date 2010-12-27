@@ -37,6 +37,7 @@ int QSoundPlayer::play(const QString &name, bool repeat)
 
 int QSoundPlayer::play(QSoundFile *reader)
 {
+    reader->setParent(this);
     if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         delete reader;
         return -1;
