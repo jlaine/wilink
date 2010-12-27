@@ -26,12 +26,12 @@ wiLink requires cmake >= 2.8.2 and Qt >= 4.6 to build.
 On Debian/Ubuntu
 ----------------
 
-$ sudo aptitude install cmake libgnome-keyring-dev libqt4-dev libqt4-sql-sqlite libspeex-dev libvorbis-dev
+$ sudo aptitude install cmake libgnome-keyring-dev libmad0-dev libqt4-dev libqt4-sql-sqlite libspeex-dev libvorbis-dev
 
 On Mac OS X
 -----------
 
-$ sudo port install cmake qt4-mac speex vorbis
+$ sudo port install cmake libmad qt4-mac speex vorbis
 
 Building wiLink
 ===============
