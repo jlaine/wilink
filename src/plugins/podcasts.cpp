@@ -308,7 +308,8 @@ void PodcastsModel::processQueue()
 
 PodcastsPanel::PodcastsPanel(Chat *chatWindow)
     : ChatPanel(chatWindow),
-    m_chat(chatWindow)
+    m_chat(chatWindow),
+    m_playId(-1)
 {
     setObjectName("z_2_podcasts");
     setWindowIcon(QIcon(":/photos.png"));
@@ -336,15 +337,22 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
 
 void PodcastsPanel::doubleClicked(const QModelIndex &index)
 {
+    Application *wApp = qobject_cast<Application*>(qApp);
     QUrl audioUrl = index.data(Qt::UserRole).toUrl();
-    if (audioUrl.isValid()) {
-        Application *wApp = qobject_cast<Application*>(qApp);
+    if (m_playId >= 0)
+        wApp->soundPlayer()->stop(m_playId);
+
+    if (audioUrl.isValid() && audioUrl != m_playUrl) {
         QIODevice *device = wApp->networkCache()->data(audioUrl);
         if (device) {
-            QSoundFile *reader = new QSoundFile(device, QSoundFile::Mp3File, this);
-            wApp->soundPlayer()->play(reader);
+            m_playId = wApp->soundPlayer()->play(new QSoundFile(device, QSoundFile::Mp3File));
+            m_playUrl = audioUrl;
+            return;
         }
     }
+
+    m_playId = -1;
+    m_playUrl = QUrl();
 }
 
 // PLUGIN

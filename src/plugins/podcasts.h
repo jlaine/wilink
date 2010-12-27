@@ -98,6 +98,8 @@ private slots:
 private:
     Chat *m_chat;
     PodcastsModel *m_model;
+    QUrl m_playUrl;
+    int m_playId;
     QTreeView *m_view;
 };
 
