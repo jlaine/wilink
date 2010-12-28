@@ -31,7 +31,7 @@ $ sudo aptitude install cmake libgnome-keyring-dev libmad0-dev libqt4-dev libqt4
 On Mac OS X
 -----------
 
-$ sudo port install cmake libmad qt4-mac speex vorbis
+$ sudo port install cmake libmad qt4-mac speex libvorbis
 
 Building wiLink
 ===============

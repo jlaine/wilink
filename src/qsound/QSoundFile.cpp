@@ -38,7 +38,7 @@ class QSoundFilePrivate {
 public:
     QSoundFilePrivate();
     virtual void close() = 0;
-    virtual qint64 duration() const { return 0; };
+    virtual qint64 duration() const = 0;
     virtual bool open(QIODevice::OpenMode mode) = 0;
     virtual void rewind() = 0;
     virtual qint64 readData(char * data, qint64 maxSize) = 0;
@@ -106,7 +106,6 @@ QSoundFileMp3::QSoundFileMp3(QIODevice *device, QSoundFile *qq)
     m_file(device),
     m_headerFound(false)
 {
-    qDebug("Opening MP3 file");
 }
 
 void QSoundFileMp3::close()
@@ -272,8 +271,6 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
                 m_info << qMakePair(QSoundFile::TracknumberMetaData, value);
             else if (frameId == "COMM")
                 m_info << qMakePair(QSoundFile::DescriptionMetaData, value);
-            else
-                qDebug("ID3 frame %s", frameId.constData());
         }
         pos += size;
         m_inputBuffer = m_inputBuffer.mid(pos);
@@ -281,10 +278,8 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
 
     // skip any data preceding MP3 data
     int startPos = m_inputBuffer.indexOf("\xff\xfb");
-    if (startPos > 0) {
-        qDebug("Skipping %i non-MP3 bytes", startPos);
+    if (startPos > 0)
         m_inputBuffer = m_inputBuffer.mid(startPos);
-    }
 
     // initialise decoder
     mad_stream_init(&m_stream);
@@ -375,6 +370,7 @@ class QSoundFileOgg : public QSoundFilePrivate
 public:
     QSoundFileOgg(QIODevice *device, QSoundFile *qq);
     void close();
+        qint64 duration() const;
     bool open(QIODevice::OpenMode mode);
     void rewind();
     qint64 readData(char * data, qint64 maxSize);
@@ -392,12 +388,16 @@ QSoundFileOgg::QSoundFileOgg(QIODevice *device, QSoundFile *qq)
     m_file(device),
     m_section(0)
 {
-    qDebug("Opening OGG file");
 }
 
 void QSoundFileOgg::close()
 {
     ov_clear(&m_vf);
+}
+
+qint64 QSoundFileOgg::duration() const
+{
+    return 0;
 }
 
 bool QSoundFileOgg::open(QIODevice::OpenMode mode)
@@ -484,7 +484,6 @@ QSoundFileWav::QSoundFileWav(QIODevice *device, QSoundFile *qq)
     m_beginPos(0),
     m_endPos(0)
 {
-    qDebug("Opening WAV file");
 }
 
 bool QSoundFileWav::open(QIODevice::OpenMode mode)
