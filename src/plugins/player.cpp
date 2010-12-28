@@ -23,6 +23,46 @@
 #include "chat_plugin.h"
 #include "player.h"
 
+PlayerModel::PlayerModel(QObject *parent)
+    : QAbstractListModel(parent)
+{
+    m_rootItem = new Item;
+}
+
+PlayerModel::~PlayerModel()
+{
+    delete m_rootItem;
+}
+
+void PlayerModel::addFile(const QUrl &url)
+{
+    Item *item = new Item;
+    item->url = url;
+    beginInsertRows(QModelIndex(), m_rootItem->children.size(), m_rootItem->children.size());
+    m_rootItem->children.append(item);
+    endInsertRows();
+}
+
+QVariant PlayerModel::data(const QModelIndex &index, int role) const
+{
+    Item *item = static_cast<Item*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == Qt::DisplayRole)
+        return item->title;
+    else if (role == Qt::DecorationRole) {
+        return QIcon(":/play.png");
+    }
+    return QVariant();
+}
+
+int PlayerModel::rowCount(const QModelIndex &parent) const
+{
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+    return parentItem->children.size();
+}
+
 PlayerPanel::PlayerPanel(Chat *chatWindow)
     : ChatPanel(chatWindow),
     m_chat(chatWindow),
@@ -32,11 +72,18 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     setWindowIcon(QIcon(":/start.png"));
     setWindowTitle(tr("Media player"));
 
+    m_model = new PlayerModel(this);
+
     // build layout
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
     layout->addSpacing(10);
+
+    m_view = new PlayerView;
+    m_view->setModel(m_model);
+    m_view->setIconSize(QSize(32, 32));
+    layout->addWidget(m_view);
 
     setLayout(layout);
 
@@ -47,6 +94,11 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
 void PlayerPanel::doubleClicked(const QModelIndex &index)
 {
 
+}
+
+PlayerView::PlayerView(QWidget *parent)
+    : QTreeView(parent)
+{
 }
 
 // PLUGIN

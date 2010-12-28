@@ -20,12 +20,61 @@
 #ifndef __WILINK_PLAYER_H__
 #define __WILINK_PLAYER_H__
 
+#include <QAbstractListModel>
 #include <QUrl>
+#include <QTreeView>
 
 #include "chat_panel.h"
 
 class Chat;
-class QModelIndex;
+
+class PlayerModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    PlayerModel(QObject *parent = 0);
+    ~PlayerModel();
+
+    void addFile(const QUrl &url);
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+
+private:
+    class Item {
+    public:
+        Item() : parent(0)
+        {
+        }
+        ~Item()
+        {
+            foreach (Item *item, children)
+                delete item;
+        }
+        int row() const
+        {
+            if (!parent)
+                return -1;
+            return parent->children.indexOf((Item*)this);
+        }
+
+        QString title;
+        QUrl url;
+
+        Item *parent;
+        QList<Item*> children;
+    };
+
+    QModelIndex createIndex(Item *item, int column) const
+    {
+        if (item && item != m_rootItem)
+            return QAbstractItemModel::createIndex(item->row(), column, item);
+        else
+            return QModelIndex();
+    }
+
+    Item *m_rootItem;
+};
 
 /** The PlayerPanel class represents a panel for playing media.
  */
@@ -41,8 +90,18 @@ private slots:
 
 private:
     Chat *m_chat;
+    PlayerModel *m_model;
     QUrl m_playUrl;
     int m_playId;
+    QTreeView *m_view;
+};
+
+class PlayerView : public QTreeView
+{
+    Q_OBJECT
+
+public:
+    PlayerView(QWidget *parent = 0);
 };
 
 #endif
