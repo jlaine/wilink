@@ -71,5 +71,6 @@ void QSoundPlayer::readerFinished()
     int id = m_readers.key(reader);
     m_readers.take(id);
     reader->deleteLater();
+    emit finished(id);
 }
 

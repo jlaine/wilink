@@ -38,6 +38,7 @@ class QSoundFilePrivate {
 public:
     QSoundFilePrivate();
     virtual void close() = 0;
+    virtual qint64 duration() const { return 0; };
     virtual bool open(QIODevice::OpenMode mode) = 0;
     virtual void rewind() = 0;
     virtual qint64 readData(char * data, qint64 maxSize) = 0;
@@ -61,6 +62,7 @@ class QSoundFileMp3 : public QSoundFilePrivate
 public:
     QSoundFileMp3(QIODevice *device, QSoundFile *qq);
     void close();
+    qint64 duration() const;
     bool open(QIODevice::OpenMode mode);
     void rewind();
     qint64 readData(char * data, qint64 maxSize);
@@ -72,6 +74,7 @@ private:
 
     bool decodeFrame();
 
+    qint64 m_duration;
     QIODevice *m_file;
     bool m_headerFound;
     QByteArray m_inputBuffer;
@@ -99,6 +102,7 @@ static inline qint16 mad_scale(mad_fixed_t sample)
 
 QSoundFileMp3::QSoundFileMp3(QIODevice *device, QSoundFile *qq)
     : q(qq),
+    m_duration(0),
     m_file(device),
     m_headerFound(false)
 {
@@ -166,6 +170,11 @@ bool QSoundFileMp3::decodeFrame()
     }
 
     return true;
+}
+
+qint64 QSoundFileMp3::duration() const
+{
+    return m_duration;
 }
 
 static quint32 read_syncsafe_int(const QByteArray &ba)
@@ -263,6 +272,8 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
                 m_info << qMakePair(QSoundFile::TracknumberMetaData, value);
             else if (frameId == "COMM")
                 m_info << qMakePair(QSoundFile::DescriptionMetaData, value);
+            else
+                qDebug("ID3 frame %s", frameId.constData());
         }
         pos += size;
         m_inputBuffer = m_inputBuffer.mid(pos);
@@ -281,9 +292,19 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
     mad_synth_init(&m_synth);
     mad_stream_buffer(&m_stream, (unsigned char*)m_inputBuffer.data(), m_inputBuffer.size());
 
+    // count samples
+    qint64 samples = 0;
+    if (!m_file->isSequential()) {
+        while (mad_header_decode(&m_frame.header, &m_stream) != -1)
+            samples += 32 * MAD_NSBSAMPLES(&m_frame.header);
+        rewind();
+    }
+
     // get first frame header
     if (!decodeFrame() || !m_headerFound)
         return false;
+
+    m_duration = (1000 * samples) / m_format.frequency();
 
     return true;
 }
@@ -441,6 +462,7 @@ class QSoundFileWav : public QSoundFilePrivate
 public:
     QSoundFileWav(QIODevice *device, QSoundFile *qq);
     void close();
+    qint64 duration() const;
     bool open(QIODevice::OpenMode mode);
     void rewind();
     qint64 readData(char * data, qint64 maxSize);
@@ -495,6 +517,11 @@ void QSoundFileWav::close()
         writeHeader();
     }
     m_file->close();
+}
+
+qint64 QSoundFileWav::duration() const
+{
+    return (8000 * (m_endPos - m_beginPos)) / (m_format.sampleSize() * m_format.channelCount()  * m_format.frequency());
 }
 
 qint64 QSoundFileWav::readData(char * data, qint64 maxSize)
@@ -759,6 +786,16 @@ void QSoundFile::close()
     d->close();
     QIODevice::close();
     QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+}
+
+/** Returns the duration of the sound file in milliseconds.
+ */
+qint64 QSoundFile::duration() const
+{
+    if (d)
+        return d->duration();
+    else
+        return 0;
 }
 
 /** Returns the sound file format.

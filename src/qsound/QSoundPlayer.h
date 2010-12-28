@@ -39,6 +39,9 @@ public:
     int play(QSoundFile *reader);
     void stop(int id);
 
+signals:
+    void finished(int id);
+
 private slots:
     void readerFinished();
 

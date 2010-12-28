@@ -28,6 +28,7 @@
 
 class Chat;
 class QPushButton;
+class QSoundPlayer;
 
 class PlayerModel : public QAbstractItemModel
 {
@@ -42,6 +43,7 @@ public:
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent) const;
@@ -54,6 +56,7 @@ private:
         int row() const;
 
         QString artist;
+        qint64 duration;
         QString title;
         QUrl url;
 
@@ -83,6 +86,7 @@ public:
 
 private slots:
     void doubleClicked(const QModelIndex &index);
+    void finished(int id);
     void play();
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
     void stop();
@@ -90,8 +94,10 @@ private slots:
 private:
     Chat *m_chat;
     PlayerModel *m_model;
+    QSoundPlayer *m_player;
     QUrl m_playUrl;
     int m_playId;
+    QPersistentModelIndex m_playIndex;
     QTreeView *m_view;
 
     QPushButton *m_playButton;

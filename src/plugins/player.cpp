@@ -17,9 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QFileInfo>
 #include <QLayout>
 #include <QPushButton>
 #include <QSettings>
+#include <QShortcut>
 
 #include "application.h"
 #include "chat.h"
@@ -30,14 +32,18 @@
 #include "qsound/QSoundPlayer.h"
 #include "player.h"
 
+#define PLAYER_ROSTER_ID "0_player"
+
 enum PlayerColumns {
     ArtistColumn = 0,
     TitleColumn,
+    DurationColumn,
     MaxColumn
 };
 
 PlayerModel::Item::Item()
-    : parent(0)
+    : duration(0),
+    parent(0)
 {
 }
 
@@ -80,12 +86,13 @@ bool PlayerModel::addUrl(const QUrl &url)
     Item *item = new Item;
     item->parent = m_rootItem;
     item->url = url;
+    item->duration = file.duration();
 
     QStringList values = file.metaData(QSoundFile::TitleMetaData);
     if (!values.isEmpty())
         item->title = values.first();
     else
-        item->title = url.toLocalFile();
+        item->title = QFileInfo(url.toLocalFile()).baseName();
 
     values = file.metaData(QSoundFile::ArtistMetaData);
     if (!values.isEmpty())
@@ -116,10 +123,27 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
             return item->artist;
         else if (role == Qt::DecorationRole)
-            return QIcon(":/play.png");
+            return QPixmap(":/start.png");
     } else if (index.column() == TitleColumn) {
         if (role == Qt::DisplayRole)
             return item->title;
+    } else if (index.column() == DurationColumn) {
+        if (role == Qt::DisplayRole) {
+            return QTime().addMSecs(item->duration).toString("m:ss");
+        }
+    }
+    return QVariant();
+}
+
+QVariant PlayerModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        if (section == ArtistColumn)
+            return tr("Artist");
+        else if (section == TitleColumn)
+            return tr("Title");
+        else if (section == DurationColumn)
+            return tr("Duration");
     }
     return QVariant();
 }
@@ -164,17 +188,22 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
 {
     bool check;
 
-    setObjectName("z_2_player");
+    setObjectName(PLAYER_ROSTER_ID);
     setWindowIcon(QIcon(":/start.png"));
     setWindowTitle(tr("Media player"));
 
     m_model = new PlayerModel(this);
+    Application *wApp = qobject_cast<Application*>(qApp);
+    m_player = wApp->soundPlayer();
+    check = connect(m_player, SIGNAL(finished(int)),
+                    this, SLOT(finished(int)));
+    Q_ASSERT(check);
 
     // build layout
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
-    layout->addSpacing(10);
+    layout->addSpacing(5);
 
     // controls
     QHBoxLayout *controls = new QHBoxLayout;
@@ -195,11 +224,13 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
 
     controls->addStretch();
     layout->addLayout(controls);
+    layout->addSpacing(10);
 
     // playlist
     m_view = new PlayerView;
     m_view->setModel(m_model);
     m_view->setIconSize(QSize(32, 32));
+    m_view->setSelectionMode(QAbstractItemView::SingleSelection);
     check = connect(m_view, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(doubleClicked(QModelIndex)));
     Q_ASSERT(check);
@@ -214,34 +245,56 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
                     this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     Q_ASSERT(check);
 
-    QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M), m_chat);
+    check = connect(shortcut, SIGNAL(activated()),
+                    this, SIGNAL(showPanel()));
+    Q_ASSERT(check);
 }
 
 void PlayerPanel::doubleClicked(const QModelIndex &index)
 {
-    Application *wApp = qobject_cast<Application*>(qApp);
     if (m_playId >= 0)
-        wApp->soundPlayer()->stop(m_playId);
+        m_player->stop(m_playId);
 
     QUrl audioUrl = index.data(Qt::UserRole).toUrl();
-    if (audioUrl.isValid() && audioUrl != m_playUrl) {
-        m_playId = wApp->soundPlayer()->play(audioUrl.toLocalFile());
+    if (audioUrl.isValid()) {
+        m_playId = m_player->play(audioUrl.toLocalFile());
+        m_playIndex = QPersistentModelIndex(index);
         m_playUrl = audioUrl;
         m_playButton->hide();
         m_stopButton->show();
-        return;
+    } else {
+        m_playId = -1;
+        m_playIndex = QPersistentModelIndex();
+        m_playUrl = QUrl();
+        m_stopButton->hide();
+        m_playButton->show();
     }
+}
 
-    m_playId = -1;
-    m_playUrl = QUrl();
-    m_stopButton->hide();
-    m_playButton->show();
+void PlayerPanel::finished(int id)
+{
+    if (id != m_playId)
+        return;
+
+    if (m_playIndex.isValid()) {
+        doubleClicked(m_playIndex.sibling(m_playIndex.row() + 1, m_playIndex.column()));
+    } else {
+        m_playId = -1;
+        m_playUrl = QUrl();
+        m_playIndex = QPersistentModelIndex();
+        m_stopButton->hide();
+        m_playButton->show();
+    }
 }
 
 void PlayerPanel::play()
 {
-    QModelIndex index = m_model->index(0, 0, QModelIndex());
-    doubleClicked(index);
+    QList<QModelIndex> selected = m_view->selectionModel()->selectedIndexes();
+    if (!selected.isEmpty())
+        doubleClicked(selected.first());
+    else if (m_model->rowCount(QModelIndex()))
+        doubleClicked(m_model->index(0, 0, QModelIndex()));
 }
 
 /** Handle a drop event on a roster entry.
@@ -270,9 +323,8 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
 
 void PlayerPanel::stop()
 {
-    Application *wApp = qobject_cast<Application*>(qApp);
     if (m_playId >= 0)
-        wApp->soundPlayer()->stop(m_playId);
+        m_player->stop(m_playId);
     m_playId = -1;
     m_playUrl = QUrl();
     m_stopButton->hide();

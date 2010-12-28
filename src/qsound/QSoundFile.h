@@ -54,6 +54,7 @@ public:
     QSoundFile(const QString &name, QObject *parent = 0);
     ~QSoundFile();
     void close();
+    qint64 duration() const;
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
     QStringList metaData(MetaData key) const;
