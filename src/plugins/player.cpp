@@ -178,6 +178,8 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     setLayout(layout);
 
     // register panel
+    filterDrops(m_view);
+
     check = connect(m_chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
                     this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     Q_ASSERT(check);
