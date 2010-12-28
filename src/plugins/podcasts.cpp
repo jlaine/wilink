@@ -25,7 +25,6 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPixmapCache>
-#include <QTimer>
 #include <QTreeView>
 #include <QUrl>
 
@@ -332,7 +331,7 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
     setLayout(layout);
 
     /* register panel */
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
+    QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 
 void PodcastsPanel::doubleClicked(const QModelIndex &index)
