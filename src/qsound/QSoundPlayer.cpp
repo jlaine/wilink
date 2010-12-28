@@ -46,7 +46,10 @@ int QSoundPlayer::play(QSoundFile *reader)
     m_readerId++;
     m_readers[m_readerId] = reader;
 
-    QAudioOutput *output = new QAudioOutput(reader->format(), reader);
+    const QAudioFormat format = reader->format();
+    QAudioOutput *output = new QAudioOutput(format, reader);
+    // buffer one second of audio
+    output->setBufferSize(format.channelCount() * format.sampleSize() * format.frequency() / 8);
     output->start(reader);
 
     return m_readerId;

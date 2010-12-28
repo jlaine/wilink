@@ -18,13 +18,16 @@
  */
 
 #include <QLayout>
+#include <QPushButton>
 #include <QSettings>
 
+#include "application.h"
 #include "chat.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
 #include "qsound/QSoundFile.h"
+#include "qsound/QSoundPlayer.h"
 #include "player.h"
 
 enum PlayerColumns {
@@ -106,6 +109,9 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
+    if (role == Qt::UserRole)
+        return item->url;
+
     if (index.column() == ArtistColumn) {
         if (role == Qt::DisplayRole)
             return item->artist;
@@ -170,9 +176,33 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     layout->addLayout(headerLayout());
     layout->addSpacing(10);
 
+    // controls
+    QHBoxLayout *controls = new QHBoxLayout;
+    controls->addStretch();
+
+    m_playButton = new QPushButton(QIcon(":/start.png"), tr("Play"));
+    check = connect(m_playButton, SIGNAL(clicked()),
+                    this, SLOT(play()));
+    Q_ASSERT(check);
+    controls->addWidget(m_playButton);
+
+    m_stopButton = new QPushButton(QIcon(":/stop.png"), tr("Stop"));
+    m_stopButton->hide();
+    check = connect(m_stopButton, SIGNAL(clicked()),
+                    this, SLOT(stop()));
+    Q_ASSERT(check);
+    controls->addWidget(m_stopButton);
+
+    controls->addStretch();
+    layout->addLayout(controls);
+
+    // playlist
     m_view = new PlayerView;
     m_view->setModel(m_model);
     m_view->setIconSize(QSize(32, 32));
+    check = connect(m_view, SIGNAL(doubleClicked(QModelIndex)),
+                    this, SLOT(doubleClicked(QModelIndex)));
+    Q_ASSERT(check);
     layout->addWidget(m_view);
 
     setLayout(layout);
@@ -189,7 +219,29 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
 
 void PlayerPanel::doubleClicked(const QModelIndex &index)
 {
+    Application *wApp = qobject_cast<Application*>(qApp);
+    if (m_playId >= 0)
+        wApp->soundPlayer()->stop(m_playId);
 
+    QUrl audioUrl = index.data(Qt::UserRole).toUrl();
+    if (audioUrl.isValid() && audioUrl != m_playUrl) {
+        m_playId = wApp->soundPlayer()->play(audioUrl.toLocalFile());
+        m_playUrl = audioUrl;
+        m_playButton->hide();
+        m_stopButton->show();
+        return;
+    }
+
+    m_playId = -1;
+    m_playUrl = QUrl();
+    m_stopButton->hide();
+    m_playButton->show();
+}
+
+void PlayerPanel::play()
+{
+    QModelIndex index = m_model->index(0, 0, QModelIndex());
+    doubleClicked(index);
 }
 
 /** Handle a drop event on a roster entry.
@@ -216,6 +268,16 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
         m_model->save();
 }
 
+void PlayerPanel::stop()
+{
+    Application *wApp = qobject_cast<Application*>(qApp);
+    if (m_playId >= 0)
+        wApp->soundPlayer()->stop(m_playId);
+    m_playId = -1;
+    m_playUrl = QUrl();
+    m_stopButton->hide();
+    m_playButton->show();
+}
 
 PlayerView::PlayerView(QWidget *parent)
     : QTreeView(parent)

@@ -27,6 +27,7 @@
 #include "chat_panel.h"
 
 class Chat;
+class QPushButton;
 
 class PlayerModel : public QAbstractItemModel
 {
@@ -82,7 +83,9 @@ public:
 
 private slots:
     void doubleClicked(const QModelIndex &index);
+    void play();
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
+    void stop();
 
 private:
     Chat *m_chat;
@@ -90,6 +93,9 @@ private:
     QUrl m_playUrl;
     int m_playId;
     QTreeView *m_view;
+
+    QPushButton *m_playButton;
+    QPushButton *m_stopButton;
 };
 
 class PlayerView : public QTreeView
