@@ -56,6 +56,7 @@ public:
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
+    QStringList metaData(MetaData key) const;
     QList<QPair<MetaData, QString> > metaData() const;
     void setMetaData(const QList<QPair<MetaData, QString> > &info);
     bool open(QIODevice::OpenMode mode);

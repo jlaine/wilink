@@ -20,7 +20,7 @@
 #ifndef __WILINK_PLAYER_H__
 #define __WILINK_PLAYER_H__
 
-#include <QAbstractListModel>
+#include <QAbstractItemModel>
 #include <QUrl>
 #include <QTreeView>
 
@@ -28,7 +28,7 @@
 
 class Chat;
 
-class PlayerModel : public QAbstractListModel
+class PlayerModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -36,28 +36,23 @@ public:
     PlayerModel(QObject *parent = 0);
     ~PlayerModel();
 
-    void addFile(const QUrl &url);
+    bool addUrl(const QUrl &url);
+    void save();
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
 
 private:
     class Item {
     public:
-        Item() : parent(0)
-        {
-        }
-        ~Item()
-        {
-            foreach (Item *item, children)
-                delete item;
-        }
-        int row() const
-        {
-            if (!parent)
-                return -1;
-            return parent->children.indexOf((Item*)this);
-        }
+        Item();
+        ~Item();
+        int row() const;
 
+        QString artist;
         QString title;
         QUrl url;
 
@@ -65,7 +60,7 @@ private:
         QList<Item*> children;
     };
 
-    QModelIndex createIndex(Item *item, int column) const
+    QModelIndex createIndex(Item *item, int column = 0) const
     {
         if (item && item != m_rootItem)
             return QAbstractItemModel::createIndex(item->row(), column, item);
@@ -87,6 +82,7 @@ public:
 
 private slots:
     void doubleClicked(const QModelIndex &index);
+    void rosterDrop(QDropEvent *event, const QModelIndex &index);
 
 private:
     Chat *m_chat;

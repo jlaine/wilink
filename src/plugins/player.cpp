@@ -18,15 +18,49 @@
  */
 
 #include <QLayout>
+#include <QSettings>
 
 #include "chat.h"
 #include "chat_plugin.h"
+#include "chat_roster.h"
+
+#include "qsound/QSoundFile.h"
 #include "player.h"
 
+enum PlayerColumns {
+    ArtistColumn = 0,
+    TitleColumn,
+    MaxColumn
+};
+
+PlayerModel::Item::Item()
+    : parent(0)
+{
+}
+
+PlayerModel::Item::~Item()
+{
+    foreach (Item *item, children)
+        delete item;
+}
+
+int PlayerModel::Item::row() const
+{
+    if (!parent)
+        return -1;
+    return parent->children.indexOf((Item*)this);
+}
+
 PlayerModel::PlayerModel(QObject *parent)
-    : QAbstractListModel(parent)
+    : QAbstractItemModel(parent)
 {
     m_rootItem = new Item;
+
+    // load saved playlist
+    QSettings settings;
+    QStringList values = settings.value("PlayerUrls").toStringList();
+    foreach (const QString &value, values)
+        addUrl(QUrl(value));
 }
 
 PlayerModel::~PlayerModel()
@@ -34,13 +68,36 @@ PlayerModel::~PlayerModel()
     delete m_rootItem;
 }
 
-void PlayerModel::addFile(const QUrl &url)
+bool PlayerModel::addUrl(const QUrl &url)
 {
+    QSoundFile file(url.toLocalFile());
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
     Item *item = new Item;
+    item->parent = m_rootItem;
     item->url = url;
-    beginInsertRows(QModelIndex(), m_rootItem->children.size(), m_rootItem->children.size());
+
+    QStringList values = file.metaData(QSoundFile::TitleMetaData);
+    if (!values.isEmpty())
+        item->title = values.first();
+    else
+        item->title = url.toLocalFile();
+
+    values = file.metaData(QSoundFile::ArtistMetaData);
+    if (!values.isEmpty())
+        item->artist = values.first();
+
+    beginInsertRows(createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
     m_rootItem->children.append(item);
     endInsertRows();
+
+    return true;
+}
+
+int PlayerModel::columnCount(const QModelIndex &parent) const
+{
+    return MaxColumn;
 }
 
 QVariant PlayerModel::data(const QModelIndex &index, int role) const
@@ -49,12 +106,34 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == Qt::DisplayRole)
-        return item->title;
-    else if (role == Qt::DecorationRole) {
-        return QIcon(":/play.png");
+    if (index.column() == ArtistColumn) {
+        if (role == Qt::DisplayRole)
+            return item->artist;
+        else if (role == Qt::DecorationRole)
+            return QIcon(":/play.png");
+    } else if (index.column() == TitleColumn) {
+        if (role == Qt::DisplayRole)
+            return item->title;
     }
     return QVariant();
+}
+
+QModelIndex PlayerModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+    return createIndex(parentItem->children[row], column);
+}
+
+QModelIndex PlayerModel::parent(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return QModelIndex();
+
+    Item *item = static_cast<Item*>(index.internalPointer());
+    return createIndex(item->parent);
 }
 
 int PlayerModel::rowCount(const QModelIndex &parent) const
@@ -63,11 +142,22 @@ int PlayerModel::rowCount(const QModelIndex &parent) const
     return parentItem->children.size();
 }
 
+void PlayerModel::save()
+{
+    QSettings settings;
+    QStringList values;
+    foreach (Item *item, m_rootItem->children)
+        values << item->url.toString();
+    settings.setValue("PlayerUrls", values);
+}
+
 PlayerPanel::PlayerPanel(Chat *chatWindow)
     : ChatPanel(chatWindow),
     m_chat(chatWindow),
     m_playId(-1)
 {
+    bool check;
+
     setObjectName("z_2_player");
     setWindowIcon(QIcon(":/start.png"));
     setWindowTitle(tr("Media player"));
@@ -88,6 +178,10 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     setLayout(layout);
 
     // register panel
+    check = connect(m_chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
+                    this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
+    Q_ASSERT(check);
+
     QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 
@@ -95,6 +189,31 @@ void PlayerPanel::doubleClicked(const QModelIndex &index)
 {
 
 }
+
+/** Handle a drop event on a roster entry.
+ */
+void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
+{
+    if (index.data(ChatRosterModel::IdRole).toString() != objectName())
+        return;
+
+    int added = 0;
+    int found = 0;
+    foreach (const QUrl &url, event->mimeData()->urls())
+    {
+        if (url.scheme() != "file")
+            continue;
+        if (event->type() == QEvent::Drop)
+            if (m_model->addUrl(url))
+                added++;
+        found++;
+    }
+    if (found)
+        event->acceptProposedAction();
+    if (added)
+        m_model->save();
+}
+
 
 PlayerView::PlayerView(QWidget *parent)
     : QTreeView(parent)

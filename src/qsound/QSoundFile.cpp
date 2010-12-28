@@ -781,6 +781,18 @@ void QSoundFile::setFormat(const QAudioFormat &format)
         d->m_format = format;
 }
 
+QStringList QSoundFile::metaData(MetaData key) const
+{
+    QStringList values;
+    if (d) {
+        for (int i = 0; i < d->m_info.size(); ++i) {
+            if (d->m_info[i].first == key)
+                values << d->m_info[i].second;
+        }
+    }
+    return values;
+}
+
 /** Returns the sound file meta-data.
  */
 QList<QPair<QSoundFile::MetaData, QString> > QSoundFile::metaData() const
