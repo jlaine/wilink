@@ -330,7 +330,7 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
     layout->addWidget(m_view);
     setLayout(layout);
 
-    /* register panel */
+    // register panel
     QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 

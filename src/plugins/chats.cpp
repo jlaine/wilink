@@ -21,7 +21,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
-#include <QTimer>
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
@@ -101,7 +100,8 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
                     this, SLOT(join()));
     Q_ASSERT(check);
 
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
+    // register panel
+    QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)

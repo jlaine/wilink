@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QLayout>
+
 #include "chat.h"
 #include "chat_plugin.h"
 #include "player.h"
@@ -30,7 +32,15 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     setWindowIcon(QIcon(":/start.png"));
     setWindowTitle(tr("Media player"));
 
-    /* register panel */
+    // build layout
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
+    layout->addLayout(headerLayout());
+    layout->addSpacing(10);
+
+    setLayout(layout);
+
+    // register panel
     QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 

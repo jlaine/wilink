@@ -36,7 +36,6 @@
 #include <QShortcut>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
-#include <QTimer>
 #include <QUrl>
 
 #include "QXmppClient.h"
@@ -310,7 +309,7 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     setFocusProxy(photosView);
 
     /* register panel */
-    QTimer::singleShot(0, this, SIGNAL(registerPanel()));
+    QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 
 /** When a command finishes, process its results.
