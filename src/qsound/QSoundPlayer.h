@@ -43,7 +43,7 @@ signals:
     void finished(int id);
 
 private slots:
-    void readerFinished();
+    void stateChanged(QAudio::State state);
 
 private:
     int m_readerId;

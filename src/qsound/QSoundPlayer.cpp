@@ -18,6 +18,7 @@
  */
 
 #include <QAudioOutput>
+#include <QVariant>
 
 #include "QSoundFile.h"
 #include "QSoundPlayer.h"
@@ -42,12 +43,13 @@ int QSoundPlayer::play(QSoundFile *reader)
         delete reader;
         return -1;
     }
-    connect(reader, SIGNAL(finished()), this, SLOT(readerFinished()));
     m_readerId++;
     m_readers[m_readerId] = reader;
 
     const QAudioFormat format = reader->format();
     QAudioOutput *output = new QAudioOutput(format, reader);
+    output->setProperty("_play_id", m_readerId);
+    connect(output, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
     // buffer one second of audio
     output->setBufferSize(format.channelCount() * format.sampleSize() * format.frequency() / 8);
     output->start(reader);
@@ -62,15 +64,17 @@ void QSoundPlayer::stop(int id)
         reader->close();
 }
 
-void QSoundPlayer::readerFinished()
+void QSoundPlayer::stateChanged(QAudio::State state)
 {
-    QSoundFile *reader = qobject_cast<QSoundFile*>(sender());
-    if (!reader)
+    QAudioOutput *output = qobject_cast<QAudioOutput*>(sender());
+    if (!output || state != QAudio::IdleState)
         return;
 
-    int id = m_readers.key(reader);
-    m_readers.take(id);
-    reader->deleteLater();
-    emit finished(id);
+    int id = output->property("_play_id").toInt();
+    QSoundFile *reader = m_readers.take(id);
+    if (reader) {
+        reader->deleteLater();
+        emit finished(id);
+    }
 }
 
