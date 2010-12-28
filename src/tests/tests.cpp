@@ -136,7 +136,7 @@ void TestSound::copyWav()
     // write output
     QSoundFile output(outputPath);
     output.setFormat(input.format());
-    output.setInfo(input.info());
+    output.setMetaData(input.metaData());
     QCOMPARE(output.open(QIODevice::WriteOnly), true);
     output.write(data);
     output.close();
@@ -162,15 +162,15 @@ void TestSound::readWav()
     QCOMPARE(input.format().sampleSize(), 16);
 
     // check info
-    const QList<QPair<QByteArray, QString> > info = input.info();
+    const QList<QPair<QSoundFile::MetaData, QString> > info = input.metaData();
     QCOMPARE(info.size(), 4);
-    QCOMPARE(info[0].first, QByteArray("INAM"));
+    QCOMPARE(info[0].first, QSoundFile::TitleMetaData);
     QCOMPARE(info[0].second, QLatin1String("Track"));
-    QCOMPARE(info[1].first, QByteArray("IART"));
+    QCOMPARE(info[1].first, QSoundFile::ArtistMetaData);
     QCOMPARE(info[1].second, QLatin1String("Artist"));
-    QCOMPARE(info[2].first, QByteArray("ICMT"));
+    QCOMPARE(info[2].first, QSoundFile::DescriptionMetaData);
     QCOMPARE(info[2].second, QLatin1String("Comments"));
-    QCOMPARE(info[3].first, QByteArray("ICRD"));
+    QCOMPARE(info[3].first, QSoundFile::DateMetaData);
     QCOMPARE(info[3].second, QLatin1String("Year"));
 
     const QByteArray data = input.readAll();

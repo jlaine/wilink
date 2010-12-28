@@ -40,14 +40,24 @@ public:
         WavFile,
     };
 
+    enum MetaData {
+        ArtistMetaData = 0,
+        AlbumMetaData,
+        TitleMetaData,
+        DateMetaData,
+        GenreMetaData,
+        TracknumberMetaData,
+        DescriptionMetaData,
+    };
+
     QSoundFile(QIODevice *file, FileType type, QObject *parent = 0);
     QSoundFile(const QString &name, QObject *parent = 0);
     ~QSoundFile();
     void close();
     QAudioFormat format() const;
     void setFormat(const QAudioFormat &format);
-    QList<QPair<QByteArray, QString> > info() const;
-    void setInfo(const QList<QPair<QByteArray, QString> > &info);
+    QList<QPair<MetaData, QString> > metaData() const;
+    void setMetaData(const QList<QPair<MetaData, QString> > &info);
     bool open(QIODevice::OpenMode mode);
     bool repeat() const;
     void setRepeat(bool repeat);

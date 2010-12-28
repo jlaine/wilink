@@ -45,7 +45,7 @@ public:
     
     QString m_name;
     QAudioFormat m_format;
-    QList<QPair<QByteArray, QString> > m_info;
+    QList<QPair<QSoundFile::MetaData, QString> > m_info;
 
     bool m_repeat;
 };
@@ -110,6 +110,7 @@ void QSoundFileMp3::close()
     mad_synth_finish(&m_synth);
     mad_frame_finish(&m_frame);
     mad_stream_finish(&m_stream);
+    m_inputBuffer.clear();
 }
 
 bool QSoundFileMp3::decodeFrame()
@@ -167,6 +168,16 @@ bool QSoundFileMp3::decodeFrame()
     return true;
 }
 
+static quint32 read_syncsafe_int(const QByteArray &ba)
+{
+    quint32 size = 0;
+    size |= ba.at(0) << 21;
+    size |= ba.at(1) << 14;
+    size |= ba.at(2) << 7;
+    size |= ba.at(3);
+    return size;
+}
+
 bool QSoundFileMp3::open(QIODevice::OpenMode mode)
 {
     if (mode & QIODevice::WriteOnly) {
@@ -180,25 +191,45 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
     m_inputBuffer = m_file->readAll();
     m_file->close();
 
-    // handle ID3 tag
+    // handle ID3 header
     qint64 pos = 0;
     if (m_inputBuffer.startsWith("ID3")) {
         // identifier + version
         pos += 5;
 
         // flags
-        quint8 flags = (quint8)m_inputBuffer.at(pos++);
-        //qDebug("flags %x", flags);
+        const quint8 flags = (quint8)(m_inputBuffer.at(pos));
+        qDebug("flags %x", flags);
+        if (flags & 0x80) {
+            qDebug("unsynchronisation");
+        }
+        if (flags & 0x40) {
+            qDebug("extended header");
+        }
+        if (flags & 0x10) {
+            qDebug("footer present");
+        }
+        pos++;
 
         // size
-        quint32 size = 0;
-        size |= m_inputBuffer.at(pos++) << 21;
-        size |= m_inputBuffer.at(pos++) << 14;
-        size |= m_inputBuffer.at(pos++) << 7;
-        size |= m_inputBuffer.at(pos++);
-        //qDebug("ID3 size %x (%u)", size, size);
+        const quint32 size = read_syncsafe_int(m_inputBuffer.mid(pos, 4));
+        pos += 4;
 
         // contents
+        QByteArray contents = m_inputBuffer.mid(pos, size);
+        qint64 ptr = 0;
+        while (ptr < contents.size()) {
+            const QByteArray frameId = contents.mid(ptr, 4);
+            ptr += 4;
+            const quint32 frameSize = read_syncsafe_int(contents.mid(ptr, 4));
+            ptr += 4;
+            // const quint16 flags = ..
+            ptr += 2;
+            if (!frameSize)
+                break;
+            qDebug("frame %s %u", frameId.constData(), frameSize);
+            ptr += frameSize;
+        }
         pos += size;
         m_inputBuffer = m_inputBuffer.mid(pos);
     }
@@ -510,7 +541,17 @@ bool QSoundFileWav::readHeader()
                     int pos = value.indexOf('\0');
                     if (pos >= 0)
                         value = value.left(pos);
-                    m_info << qMakePair(key, QString::fromUtf8(value));
+
+                    if (key == "IART")
+                        m_info << qMakePair(QSoundFile::ArtistMetaData, QString::fromUtf8(value));
+                    else if (key == "INAM")
+                        m_info << qMakePair(QSoundFile::TitleMetaData, QString::fromUtf8(value));
+                    else if (key == "ICRD")
+                        m_info << qMakePair(QSoundFile::DateMetaData, QString::fromUtf8(value));
+                    else if (key == "IGNR")
+                        m_info << qMakePair(QSoundFile::GenreMetaData, QString::fromUtf8(value));
+                    else if (key == "ICMT")
+                        m_info << qMakePair(QSoundFile::DescriptionMetaData, QString::fromUtf8(value));
                     chunkSize -= (8 + length);
                 }
             } else {
@@ -565,9 +606,29 @@ bool QSoundFileWav::writeHeader()
         buffer.open(QIODevice::WriteOnly);
         QDataStream tmp(&buffer);
         tmp.setByteOrder(QDataStream::LittleEndian);
-        QPair<QByteArray, QString> info;
+        QPair<QSoundFile::MetaData, QString> info;
         foreach (info, m_info) {
-            tmp.writeRawData(info.first.constData(), info.first.size());
+            QByteArray key;
+            switch (info.first) {
+            case QSoundFile::ArtistMetaData:
+                key = "IART";
+                break;
+            case QSoundFile::TitleMetaData:
+                key = "INAM";
+                break;
+            case QSoundFile::DateMetaData:
+                key = "ICRD";
+                break;
+            case QSoundFile::GenreMetaData:
+                key = "IGNR";
+                break;
+            case QSoundFile::DescriptionMetaData:
+                key = "ICMT";
+                break;
+            default:
+                continue;
+            }
+            tmp.writeRawData(key.constData(), key.size());
             QByteArray value = info.second.toUtf8() + '\0';
             if (value.size() % 2)
                 value += '\0';
@@ -688,19 +749,19 @@ void QSoundFile::setFormat(const QAudioFormat &format)
 
 /** Returns the sound file meta-data.
  */
-QList<QPair<QByteArray, QString> > QSoundFile::info() const
+QList<QPair<QSoundFile::MetaData, QString> > QSoundFile::metaData() const
 {
     if (d)
         return d->m_info;
     else
-        return QList<QPair<QByteArray, QString> >();
+        return QList<QPair<QSoundFile::MetaData, QString> >();
 }
 
 /** Sets the sound file meta-data.
  *
  * @param info
  */
-void QSoundFile::setInfo(const QList<QPair<QByteArray, QString> > &info)
+void QSoundFile::setMetaData(const QList<QPair<QSoundFile::MetaData, QString> > &info)
 {
     if (d)
         d->m_info = info;
