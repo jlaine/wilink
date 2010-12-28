@@ -199,6 +199,7 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
 
         // flags
         const quint8 flags = (quint8)(m_inputBuffer.at(pos));
+#if 0
         qDebug("flags %x", flags);
         if (flags & 0x80) {
             qDebug("unsynchronisation");
@@ -209,6 +210,7 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
         if (flags & 0x10) {
             qDebug("footer present");
         }
+#endif
         pos++;
 
         // size
@@ -219,6 +221,7 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
         QByteArray contents = m_inputBuffer.mid(pos, size);
         qint64 ptr = 0;
         while (ptr < contents.size()) {
+            // frame header
             const QByteArray frameId = contents.mid(ptr, 4);
             ptr += 4;
             const quint32 frameSize = read_syncsafe_int(contents.mid(ptr, 4));
@@ -227,8 +230,39 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
             ptr += 2;
             if (!frameSize)
                 break;
-            qDebug("frame %s %u", frameId.constData(), frameSize);
+
+            // frame content
+            char enc = contents.at(ptr);
+            const QByteArray ba = contents.mid(ptr+1, frameSize - 1);
             ptr += frameSize;
+
+            QString value;
+            switch (enc) {
+            case 0:
+                value = QString::fromLatin1(ba);
+                break;
+            case 3:
+                value = QString::fromUtf8(ba);
+                break;
+            default:
+                continue;
+            }
+            //qDebug("frame %s %s", frameId.constData(), qPrintable(value));
+
+            if (frameId == "TPE1")
+                m_info << qMakePair(QSoundFile::ArtistMetaData, value);
+            else if (frameId == "TALB")
+                m_info << qMakePair(QSoundFile::AlbumMetaData, value);
+            else if (frameId == "TIT2")
+                m_info << qMakePair(QSoundFile::TitleMetaData, value);
+            else if (frameId == "TYER")
+                m_info << qMakePair(QSoundFile::DateMetaData, value);
+            else if (frameId == "TCON")
+                m_info << qMakePair(QSoundFile::GenreMetaData, value);
+            else if (frameId == "TRCK")
+                m_info << qMakePair(QSoundFile::TracknumberMetaData, value);
+            else if (frameId == "COMM")
+                m_info << qMakePair(QSoundFile::DescriptionMetaData, value);
         }
         pos += size;
         m_inputBuffer = m_inputBuffer.mid(pos);
