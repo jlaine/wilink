@@ -877,6 +877,8 @@ qint64 QSoundFile::readData(char * data, qint64 maxSize)
         qint64 bytes = d->readData(data, maxSize);
         if (bytes < 0)
             return -1;
+        else if (!bytes && !pos())
+            break;
         data += bytes;
         maxSize -= bytes;
 
