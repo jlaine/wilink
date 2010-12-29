@@ -61,7 +61,8 @@ int PlayerModel::Item::row() const
 }
 
 PlayerModel::PlayerModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : QAbstractItemModel(parent),
+    m_cursorItem(0)
 {
     m_rootItem = new Item;
 
@@ -110,6 +111,25 @@ int PlayerModel::columnCount(const QModelIndex &parent) const
     return MaxColumn;
 }
 
+QModelIndex PlayerModel::cursor() const
+{
+    return createIndex(m_cursorItem);
+}
+
+void PlayerModel::setCursor(const QModelIndex &index)
+{
+    Item *item = static_cast<Item*>(index.internalPointer());
+    if (item != m_cursorItem) {
+        Item *oldItem = m_cursorItem;
+        m_cursorItem = item;
+        if (oldItem)
+            emit dataChanged(createIndex(oldItem, 0), createIndex(oldItem, MaxColumn));
+        if (item)
+            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
+        emit cursorChanged(index);
+    }
+}
+
 QVariant PlayerModel::data(const QModelIndex &index, int role) const
 {
     Item *item = static_cast<Item*>(index.internalPointer());
@@ -122,7 +142,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (index.column() == ArtistColumn) {
         if (role == Qt::DisplayRole)
             return item->artist;
-        else if (role == Qt::DecorationRole)
+        else if (role == Qt::DecorationRole && item == m_cursorItem)
             return QPixmap(":/start.png");
     } else if (index.column() == TitleColumn) {
         if (role == Qt::DisplayRole)
@@ -193,6 +213,10 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     setWindowTitle(tr("Media player"));
 
     m_model = new PlayerModel(this);
+    check = connect(m_model, SIGNAL(cursorChanged(QModelIndex)),
+                    this, SLOT(cursorChanged(QModelIndex)));
+    Q_ASSERT(check);
+
     Application *wApp = qobject_cast<Application*>(qApp);
     m_player = wApp->soundPlayer();
     check = connect(m_player, SIGNAL(finished(int)),
@@ -251,6 +275,17 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     Q_ASSERT(check);
 }
 
+void PlayerPanel::cursorChanged(const QModelIndex &index)
+{
+    if (index.isValid()) {
+        m_playButton->hide();
+        m_stopButton->show();
+    } else {
+        m_stopButton->hide();
+        m_playButton->show();
+    }
+}
+
 void PlayerPanel::doubleClicked(const QModelIndex &index)
 {
     if (m_playId >= 0)
@@ -258,34 +293,25 @@ void PlayerPanel::doubleClicked(const QModelIndex &index)
 
     QUrl audioUrl = index.data(Qt::UserRole).toUrl();
     if (audioUrl.isValid()) {
+        m_model->setCursor(index);
         m_playId = m_player->play(audioUrl.toLocalFile());
         m_playIndex = QPersistentModelIndex(index);
-        m_playUrl = audioUrl;
-        m_playButton->hide();
-        m_stopButton->show();
     } else {
+        m_model->setCursor(QModelIndex());
         m_playId = -1;
         m_playIndex = QPersistentModelIndex();
-        m_playUrl = QUrl();
-        m_stopButton->hide();
-        m_playButton->show();
     }
 }
 
 void PlayerPanel::finished(int id)
 {
+    qDebug("track finished %i", id);
+
     if (id != m_playId)
         return;
 
-    if (m_playIndex.isValid()) {
-        doubleClicked(m_playIndex.sibling(m_playIndex.row() + 1, m_playIndex.column()));
-    } else {
-        m_playId = -1;
-        m_playUrl = QUrl();
-        m_playIndex = QPersistentModelIndex();
-        m_stopButton->hide();
-        m_playButton->show();
-    }
+    QModelIndex nextIndex = m_playIndex.sibling(m_playIndex.row() + 1, m_playIndex.column());
+    doubleClicked(nextIndex);
 }
 
 void PlayerPanel::play()
@@ -323,12 +349,10 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
 
 void PlayerPanel::stop()
 {
-    if (m_playId >= 0)
+    if (m_playId >= 0) {
         m_player->stop(m_playId);
-    m_playId = -1;
-    m_playUrl = QUrl();
-    m_stopButton->hide();
-    m_playButton->show();
+        m_playId = -1;
+    }
 }
 
 PlayerView::PlayerView(QWidget *parent)

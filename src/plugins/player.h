@@ -41,12 +41,18 @@ public:
     bool addUrl(const QUrl &url);
     void save();
 
+    QModelIndex cursor() const;
+    void setCursor(const QModelIndex &index);
+
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex & index) const;
     int rowCount(const QModelIndex &parent) const;
+
+signals:
+    void cursorChanged(const QModelIndex &index);
 
 private:
     class Item {
@@ -72,6 +78,7 @@ private:
             return QModelIndex();
     }
 
+    Item *m_cursorItem;
     Item *m_rootItem;
 };
 
@@ -85,6 +92,7 @@ public:
     PlayerPanel(Chat *chatWindow);
 
 private slots:
+    void cursorChanged(const QModelIndex &index);
     void doubleClicked(const QModelIndex &index);
     void finished(int id);
     void play();
@@ -95,7 +103,6 @@ private:
     Chat *m_chat;
     PlayerModel *m_model;
     QSoundPlayer *m_player;
-    QUrl m_playUrl;
     int m_playId;
     QPersistentModelIndex m_playIndex;
     QTreeView *m_view;
