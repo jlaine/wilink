@@ -64,9 +64,6 @@ public:
     bool repeat() const;
     void setRepeat(bool repeat);
 
-signals:
-    void finished();
-
 protected:
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char * data, qint64 maxSize);

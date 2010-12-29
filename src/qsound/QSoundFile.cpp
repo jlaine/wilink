@@ -784,7 +784,6 @@ void QSoundFile::close()
 
     d->close();
     QIODevice::close();
-    QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
 }
 
 /** Returns the duration of the sound file in milliseconds.
@@ -876,22 +875,14 @@ qint64 QSoundFile::readData(char * data, qint64 maxSize)
 
     while (maxSize) {
         qint64 bytes = d->readData(data, maxSize);
-        if (bytes < 0) {
-            // abort
-            QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+        if (bytes < 0)
             return -1;
-        }
         data += bytes;
         maxSize -= bytes;
 
         if (maxSize) {
-            if (!d->m_repeat) {
-                // stop, we have reached end of file and don't want to repeat
-                memset(data, 0, maxSize);
-                QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+            if (!d->m_repeat)
                 break;
-            }
-            // rewind file to repeat
             d->rewind();
         }
     }
