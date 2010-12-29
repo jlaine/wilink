@@ -915,5 +915,3 @@ qint64 QSoundFile::writeData(const char * data, qint64 maxSize)
 {
     return d->writeData(data, maxSize);
 }
-
-

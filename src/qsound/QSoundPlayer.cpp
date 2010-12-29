@@ -67,7 +67,7 @@ void QSoundPlayer::stop(int id)
 void QSoundPlayer::stateChanged(QAudio::State state)
 {
     QAudioOutput *output = qobject_cast<QAudioOutput*>(sender());
-    if (!output || state != QAudio::IdleState)
+    if (!output || state == QAudio::ActiveState)
         return;
 
     int id = output->property("_play_id").toInt();
