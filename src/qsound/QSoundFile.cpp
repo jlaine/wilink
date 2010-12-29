@@ -520,7 +520,7 @@ void QSoundFileWav::close()
 
 qint64 QSoundFileWav::duration() const
 {
-    return (8000 * (m_endPos - m_beginPos)) / (m_format.sampleSize() * m_format.channelCount()  * m_format.frequency());
+    return (8000 * (m_endPos - m_beginPos)) / (m_format.sampleSize() * m_format.channels()  * m_format.frequency());
 }
 
 qint64 QSoundFileWav::readData(char * data, qint64 maxSize)
