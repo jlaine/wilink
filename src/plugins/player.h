@@ -104,7 +104,6 @@ private:
     PlayerModel *m_model;
     QSoundPlayer *m_player;
     int m_playId;
-    QPersistentModelIndex m_playIndex;
     QTreeView *m_view;
 
     QPushButton *m_playButton;

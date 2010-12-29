@@ -295,22 +295,20 @@ void PlayerPanel::doubleClicked(const QModelIndex &index)
     if (audioUrl.isValid()) {
         m_model->setCursor(index);
         m_playId = m_player->play(audioUrl.toLocalFile());
-        m_playIndex = QPersistentModelIndex(index);
     } else {
         m_model->setCursor(QModelIndex());
         m_playId = -1;
-        m_playIndex = QPersistentModelIndex();
     }
 }
 
 void PlayerPanel::finished(int id)
 {
-    qDebug("track finished %i", id);
-
     if (id != m_playId)
         return;
+    m_playId = -1;
 
-    QModelIndex nextIndex = m_playIndex.sibling(m_playIndex.row() + 1, m_playIndex.column());
+    const QModelIndex cursor = m_model->cursor();
+    QModelIndex nextIndex = cursor.sibling(cursor.row() + 1, cursor.column());
     doubleClicked(nextIndex);
 }
 
@@ -352,6 +350,7 @@ void PlayerPanel::stop()
     if (m_playId >= 0) {
         m_player->stop(m_playId);
         m_playId = -1;
+        m_model->setCursor(QModelIndex());
     }
 }
 
