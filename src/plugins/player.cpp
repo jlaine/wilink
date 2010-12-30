@@ -18,6 +18,7 @@
  */
 
 #include <QFileInfo>
+#include <QHeaderView>
 #include <QLayout>
 #include <QPushButton>
 #include <QSettings>
@@ -32,6 +33,7 @@
 #include "qsound/QSoundPlayer.h"
 #include "player.h"
 
+#define DURATION_WIDTH 60
 #define PLAYER_ROSTER_ID "0_player"
 
 enum PlayerColumns {
@@ -204,7 +206,8 @@ void PlayerModel::save()
 PlayerPanel::PlayerPanel(Chat *chatWindow)
     : ChatPanel(chatWindow),
     m_chat(chatWindow),
-    m_playId(-1)
+    m_playId(-1),
+    m_playStop(false)
 {
     bool check;
 
@@ -306,10 +309,15 @@ void PlayerPanel::finished(int id)
     if (id != m_playId)
         return;
     m_playId = -1;
-
-    const QModelIndex cursor = m_model->cursor();
-    QModelIndex nextIndex = cursor.sibling(cursor.row() + 1, cursor.column());
-    doubleClicked(nextIndex);
+    if (m_playStop) {
+        m_model->setCursor(QModelIndex());
+        m_stopButton->setEnabled(true);
+        m_playStop = false;
+    } else {
+        const QModelIndex cursor = m_model->cursor();
+        QModelIndex nextIndex = cursor.sibling(cursor.row() + 1, cursor.column());
+        doubleClicked(nextIndex);
+    }
 }
 
 void PlayerPanel::play()
@@ -349,14 +357,30 @@ void PlayerPanel::stop()
 {
     if (m_playId >= 0) {
         m_player->stop(m_playId);
-        m_playId = -1;
-        m_model->setCursor(QModelIndex());
+        m_playStop = true;
+        m_stopButton->setEnabled(false);
     }
 }
 
 PlayerView::PlayerView(QWidget *parent)
     : QTreeView(parent)
 {
+    header()->setResizeMode(QHeaderView::Fixed);
+}
+
+void PlayerView::setModel(PlayerModel *model)
+{
+    QTreeView::setModel(model);
+    setColumnWidth(DurationColumn, 40);
+}
+
+void PlayerView::resizeEvent(QResizeEvent *e)
+{
+    QTreeView::resizeEvent(e);
+
+    const int available = e->size().width() - DURATION_WIDTH;
+    setColumnWidth(ArtistColumn, available/2);
+    setColumnWidth(TitleColumn, available/2);
 }
 
 // PLUGIN

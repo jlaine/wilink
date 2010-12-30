@@ -104,6 +104,7 @@ private:
     PlayerModel *m_model;
     QSoundPlayer *m_player;
     int m_playId;
+    bool m_playStop;
     QTreeView *m_view;
 
     QPushButton *m_playButton;
@@ -116,6 +117,10 @@ class PlayerView : public QTreeView
 
 public:
     PlayerView(QWidget *parent = 0);
+    void setModel(PlayerModel *model);
+
+protected:
+    void resizeEvent(QResizeEvent *e);
 };
 
 #endif
