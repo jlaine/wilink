@@ -105,6 +105,8 @@ bool PlayerModel::addUrl(const QUrl &url)
     m_rootItem->children.append(item);
     endInsertRows();
 
+    // save playlist
+    save();
     return true;
 }
 
@@ -186,6 +188,22 @@ QModelIndex PlayerModel::parent(const QModelIndex &index) const
 
     Item *item = static_cast<Item*>(index.internalPointer());
     return createIndex(item->parent);
+}
+
+bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+
+    const int minIndex = qMax(0, row);
+    const int maxIndex = qMin(row + count, parentItem->children.size()) - 1;
+    beginRemoveRows(parent, minIndex, maxIndex);
+    for (int i = maxIndex; i >= minIndex; --i)
+        parentItem->children.removeAt(i);
+    endRemoveRows();
+
+    // save playlist
+    save();
+    return true;
 }
 
 int PlayerModel::rowCount(const QModelIndex &parent) const
@@ -336,21 +354,17 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
     if (index.data(ChatRosterModel::IdRole).toString() != objectName())
         return;
 
-    int added = 0;
     int found = 0;
     foreach (const QUrl &url, event->mimeData()->urls())
     {
         if (url.scheme() != "file")
             continue;
         if (event->type() == QEvent::Drop)
-            if (m_model->addUrl(url))
-                added++;
+            m_model->addUrl(url);
         found++;
     }
     if (found)
         event->acceptProposedAction();
-    if (added)
-        m_model->save();
 }
 
 void PlayerPanel::stop()
@@ -372,6 +386,26 @@ void PlayerView::setModel(PlayerModel *model)
 {
     QTreeView::setModel(model);
     setColumnWidth(DurationColumn, 40);
+}
+
+void PlayerView::keyPressEvent(QKeyEvent *event)
+{
+    const QModelIndex &index = currentIndex();
+    if (index.isValid()) {
+        switch (event->key())
+        {
+        case Qt::Key_Delete:
+        case Qt::Key_Backspace:
+            model()->removeRow(index.row());
+            break;
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            emit doubleClicked(index);
+            break;
+        }
+    }
+
+    QTreeView::keyPressEvent(event);
 }
 
 void PlayerView::resizeEvent(QResizeEvent *e)

@@ -39,8 +39,6 @@ public:
     ~PlayerModel();
 
     bool addUrl(const QUrl &url);
-    void save();
-
     QModelIndex cursor() const;
     void setCursor(const QModelIndex &index);
 
@@ -49,6 +47,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex & index) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent) const;
 
 signals:
@@ -77,6 +76,8 @@ private:
         else
             return QModelIndex();
     }
+
+    void save();
 
     Item *m_cursorItem;
     Item *m_rootItem;
@@ -120,6 +121,7 @@ public:
     void setModel(PlayerModel *model);
 
 protected:
+    void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *e);
 };
 
