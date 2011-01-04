@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QGroupBox>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
@@ -98,7 +99,14 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
         connect(key, SIGNAL(released()), this, SLOT(keyReleased()));
         grid->addWidget(key, i / 3, i % 3, 1, 1);
     }
-    layout->addLayout(grid);
+    QGroupBox *groupBox = new QGroupBox;
+    groupBox->setLayout(grid);
+
+    hbox = new QHBoxLayout;
+    hbox->addStretch();
+    hbox->addWidget(groupBox);
+    hbox->addStretch();
+    layout->addLayout(hbox);
 
     // history
     callsModel = new PhoneCallsModel(network, this);
