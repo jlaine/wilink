@@ -909,10 +909,10 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     connect(mucManager, SIGNAL(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)),
             this, SLOT(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)));
 
-    affiliations[QXmppMucAdminIq::Item::Member] = tr("member");
-    affiliations[QXmppMucAdminIq::Item::Admin] = tr("administrator");
-    affiliations[QXmppMucAdminIq::Item::Owner] = tr("owner");
-    affiliations[QXmppMucAdminIq::Item::Outcast] = tr("banned");
+    affiliations[QXmppMucAdminIq::Item::MemberAffiliation] = tr("member");
+    affiliations[QXmppMucAdminIq::Item::AdminAffiliation] = tr("administrator");
+    affiliations[QXmppMucAdminIq::Item::OwnerAffiliation] = tr("owner");
+    affiliations[QXmppMucAdminIq::Item::OutcastAffiliation] = tr("banned");
     mucManager->requestRoomPermissions(chatRoomJid);
 }
 
@@ -983,7 +983,7 @@ void ChatRoomMembers::addMember()
                   tr("Enter the address of the user you want to add."),
                   QLineEdit::Normal, jid, &ok).toLower();
     if (ok)
-        addEntry(jid, QXmppMucAdminIq::Item::Member);
+        addEntry(jid, QXmppMucAdminIq::Item::MemberAffiliation);
 }
 
 void ChatRoomMembers::addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation)
