@@ -132,13 +132,13 @@ protected slots:
     void submit();
 
 private:
-    void addEntry(const QString &jid, const QString &affiliation);
+    void addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation);
     QString chatRoomJid;
     QXmppClient *client;
     QXmppElement form;
     QTableWidget *tableWidget;
-    QMap<QString, QString> initialMembers;
-    QMap<QString, QString> affiliations;
+    QMap<QString, QXmppMucAdminIq::Item::Affiliation> initialMembers;
+    QMap<QXmppMucAdminIq::Item::Affiliation, QString> affiliations;
 };
 
 class ChatRoomPrompt : public QDialog

@@ -909,10 +909,10 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     connect(mucManager, SIGNAL(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)),
             this, SLOT(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)));
 
-    affiliations["member"] = tr("member");
-    affiliations["admin"] = tr("administrator");
-    affiliations["owner"] = tr("owner");
-    affiliations["outcast"] = tr("banned");
+    affiliations[QXmppMucAdminIq::Item::Member] = tr("member");
+    affiliations[QXmppMucAdminIq::Item::Admin] = tr("administrator");
+    affiliations[QXmppMucAdminIq::Item::Owner] = tr("owner");
+    affiliations[QXmppMucAdminIq::Item::Outcast] = tr("banned");
     mucManager->requestRoomPermissions(chatRoomJid);
 }
 
@@ -923,7 +923,7 @@ void ChatRoomMembers::roomPermissionsReceived(const QString &roomJid, const QLis
     foreach (const QXmppMucAdminIq::Item &item, permissions)
     {
         const QString jid = item.jid();
-        const QString affiliation = item.affiliation();
+        QXmppMucAdminIq::Item::Affiliation affiliation = item.affiliation();
         if (!initialMembers.contains(jid))
         {
             addEntry(jid, affiliation);
@@ -944,7 +944,7 @@ void ChatRoomMembers::submit()
         Q_ASSERT(tableWidget->item(i, JidColumn) && combo);
 
         const QString currentJid = tableWidget->item(i, JidColumn)->text();
-        const QString currentAffiliation = combo->itemData(combo->currentIndex()).toString();
+        QXmppMucAdminIq::Item::Affiliation currentAffiliation = static_cast<QXmppMucAdminIq::Item::Affiliation>(combo->itemData(combo->currentIndex()).toInt());
         if (initialMembers.value(currentJid) != currentAffiliation)
         {
             QXmppMucAdminIq::Item item;
@@ -959,7 +959,7 @@ void ChatRoomMembers::submit()
     foreach(const QString &entry, initialMembers.keys())
     {
         QXmppMucAdminIq::Item item;
-        item.setAffiliation("none");
+        item.setAffiliation(QXmppMucAdminIq::Item::None);
         item.setJid(entry);
         items.append(item);
     }
@@ -983,13 +983,13 @@ void ChatRoomMembers::addMember()
                   tr("Enter the address of the user you want to add."),
                   QLineEdit::Normal, jid, &ok).toLower();
     if (ok)
-        addEntry(jid, "member");
+        addEntry(jid, QXmppMucAdminIq::Item::Member);
 }
 
-void ChatRoomMembers::addEntry(const QString &jid, const QString &affiliation)
+void ChatRoomMembers::addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation)
 {
     QComboBox *combo = new QComboBox;
-    foreach (const QString &key, affiliations.keys())
+    foreach (QXmppMucAdminIq::Item::Affiliation key, affiliations.keys())
         combo->addItem(affiliations[key], key);
     combo->setEditable(false);
     combo->setCurrentIndex(combo->findData(affiliation));
