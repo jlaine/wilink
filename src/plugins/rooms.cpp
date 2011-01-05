@@ -250,7 +250,7 @@ void ChatRoomWatcher::kickUser()
 
     QXmppMucAdminIq::Item item;
     item.setNick(jidToResource(jid));
-    item.setRole("none");
+    item.setRole(QXmppMucAdminIq::Item::NoRole);
     item.setReason(reason);
 
     QXmppMucAdminIq iq;
@@ -959,7 +959,7 @@ void ChatRoomMembers::submit()
     foreach(const QString &entry, initialMembers.keys())
     {
         QXmppMucAdminIq::Item item;
-        item.setAffiliation(QXmppMucAdminIq::Item::None);
+        item.setAffiliation(QXmppMucAdminIq::Item::NoAffiliation);
         item.setJid(entry);
         items.append(item);
     }
