@@ -53,6 +53,7 @@ static int id1 = qRegisterMetaType< QList<QHostInfo> >();
 static int id2 = qRegisterMetaType< QList<Ping> >();
 static int id3 = qRegisterMetaType< QList<Traceroute> >();
 static int id4 = qRegisterMetaType< Interface >();
+static int id5 = qRegisterMetaType< QXmppLogger::MessageType >("QXmppLogger::MessageType");
 
 /* NETWORK */
 
