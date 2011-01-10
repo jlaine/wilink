@@ -30,7 +30,9 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
+#include "QXmppUtils.h"
 #include "qsound/QSoundPlayer.h"
+
 #include "application.h"
 #include "models.h"
 #include "sip.h"
@@ -92,7 +94,7 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
 {
     id = callElement.firstChildElement("id").text().toInt();
     address = callElement.firstChildElement("address").text();
-    date = QDateTime::fromString(callElement.firstChildElement("date").text(), Qt::ISODate);
+    date = datetimeFromString(callElement.firstChildElement("date").text());
     duration = callElement.firstChildElement("duration").text().toInt();
     flags = callElement.firstChildElement("flags").text().toInt();
 }
@@ -143,7 +145,10 @@ void PhoneCallsModel::addCall(SipCall *call)
         item->soundId = m_soundPlayer->play(":/call-incoming.ogg", true);
     else
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
-    item->reply = m_network->post(buildRequest(m_url), item->data());
+    QNetworkRequest request = buildRequest(m_url);
+    request.setRawHeader("Connection", "close");
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    item->reply = m_network->post(request, item->data());
     connect(item->reply, SIGNAL(finished()),
             this, SLOT(handleCreate()));
 
@@ -210,7 +215,9 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
         item->duration = call->duration();
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
-        m_network->post(buildRequest(url), item->data());
+        QNetworkRequest request = buildRequest(url);
+        request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+        m_network->put(request, item->data());
 
         call->deleteLater();
     }
@@ -274,7 +281,7 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         }
     } else if (index.column() == DateColumn) {
         if (role == Qt::DisplayRole)
-            return item->date.toString(Qt::SystemLocaleShortDate);
+            return item->date.toLocalTime().toString(Qt::SystemLocaleShortDate);
     } else if (index.column() == DurationColumn && role == Qt::DisplayRole) {
 
         if (item->call) {
