@@ -708,17 +708,19 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
         {
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc_user)
             {
-                int statusCode = extension.firstChildElement("status").attribute("code").toInt();
-                if (statusCode == 307)
-                {
-                    QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
-                    QMessageBox::warning(window(),
-                        tr("Chat room error"),
-                        tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
-                            .arg(chatRemoteJid)
-                            .arg(reason.value()));
+                QXmppElement status = extension.firstChildElement("status");
+                while (!status.isNull()) {
+                    if (status.attribute("code").toInt() == 307) {
+                        QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
+                        QMessageBox::warning(window(),
+                            tr("Chat room error"),
+                            tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
+                                .arg(chatRemoteJid)
+                                .arg(reason.value()));
+                        break;
+                    }
+                    status = status.nextSiblingElement("status");
                 }
-                break;
             }
         }
         break;

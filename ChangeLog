@@ -1,6 +1,8 @@
 wiLink 1.0.3 (UNRELEASED)
  * Conversations:
   - Recognise /me command.
+ * Rooms:
+   - Correctly parse multiple "status" elements in presences.
  * Shares:
    - Fix display of shared drives on Windows.
  * Transfers:
