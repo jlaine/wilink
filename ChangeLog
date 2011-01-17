@@ -5,6 +5,7 @@ wiLink 1.0.3 (UNRELEASED)
    - Correctly parse multiple "status" elements in presences.
  * Shares:
    - Fix display of shared drives on Windows.
+   - Do not re-send registration every minute.
  * Transfers:
    - Disable sending files to room members, it doesn't work.
 

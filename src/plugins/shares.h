@@ -79,7 +79,6 @@ private slots:
     void itemExpandRequested(const QModelIndex &index);
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
-    void registerWithServer();
     void showOptions();
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
@@ -118,7 +117,6 @@ private:
     QPushButton *indexButton;
     QPushButton *removeButton;
     QStatusBar *statusBar;
-    QTimer *registerTimer;
 
     QAction *menuAction;
 };

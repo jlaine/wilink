@@ -199,12 +199,6 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
 
     /* connect signals */
     QXmppClient *baseClient = chatWindow->client();
-    registerTimer = new QTimer(this);
-    registerTimer->setInterval(REGISTER_INTERVAL * 1000);
-    check = connect(registerTimer, SIGNAL(timeout()),
-                    this, SLOT(registerWithServer()));
-    Q_ASSERT(check);
-
     check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
                     baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
@@ -645,8 +639,6 @@ void SharesPanel::presenceReceived(const QXmppPresence &presence)
         logMessage(QXmppLogger::InformationMessage, "Redirecting to " + domain + "," + server);
 
         // reconnect to another server
-        registerTimer->stop();
-
         QXmppClient *baseClient = chatWindow->client();
         QXmppConfiguration config = baseClient->configuration();
         config.setDomain(domain);
@@ -695,25 +687,6 @@ void SharesPanel::processDownloadQueue()
 
         activeDownloads++;
     }
-}
-
-void SharesPanel::registerWithServer()
-{
-    // register with server
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_shares);
-
-    QXmppElement nickName;
-    nickName.setTagName("nickName");
-    nickName.setValue(rosterModel->ownName());
-    x.appendChild(nickName);
-
-    QXmppPresence presence;
-    presence.setTo(shareServer);
-    presence.setExtensions(x);
-    presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
-    client->sendPacket(presence);
 }
 
 void SharesPanel::setClient(QXmppClient *newClient)
@@ -828,8 +801,21 @@ void SharesPanel::shareServerFound(const QString &server)
 {
     // register with server
     shareServer = server;
-    registerWithServer();
-    registerTimer->start();
+
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_shares);
+
+    QXmppElement nickName;
+    nickName.setTagName("nickName");
+    nickName.setValue(rosterModel->ownName());
+    x.appendChild(nickName);
+
+    QXmppPresence presence;
+    presence.setTo(shareServer);
+    presence.setExtensions(x);
+    presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
+    client->sendPacket(presence);
 }
 
 void SharesPanel::tabChanged(int index)
