@@ -306,13 +306,14 @@ void Chat::notifyPanel(const QString &message, int options)
     bool showMessage = (options & ChatPanel::ForceNotification);
     if (!window->isActiveWindow() || (window == this && d->conversationPanel->currentWidget() != panel))
     {
-        if (wApp->playSoundNotifications())
-            wApp->soundPlayer()->play(":/message-incoming.ogg");
         d->rosterModel->addPendingMessage(panel->objectName());
         showMessage = true;
     }
-    if (showMessage)
+    if (showMessage) {
+        if (wApp->playSoundNotifications())
+            wApp->soundPlayer()->play(":/message-incoming.ogg");
         wApp->showMessage(panel, panel->windowTitle(), message);
+    }
 
     // show the chat window
     if (!window->isVisible())
@@ -754,13 +755,13 @@ ChatOptions::ChatOptions()
         openAtLogin = 0;
     }
 
-    playSoundNotifications = new QCheckBox(tr("Play sound notifications"));
-    playSoundNotifications->setChecked(wApp->playSoundNotifications());
-    vbox->addWidget(playSoundNotifications);
-
     showOfflineContacts = new QCheckBox(tr("Show offline contacts"));
     showOfflineContacts->setChecked(wApp->showOfflineContacts());
     vbox->addWidget(showOfflineContacts);
+
+    playSoundNotifications = new QCheckBox(tr("Play sound notifications"));
+    playSoundNotifications->setChecked(wApp->playSoundNotifications());
+    vbox->addWidget(playSoundNotifications);
 
     group->setLayout(vbox);
     layout->addWidget(group);
@@ -774,7 +775,7 @@ bool ChatOptions::save()
 {
     if (openAtLogin)
         wApp->setOpenAtLogin(openAtLogin->isChecked());
-    wApp->setPlaySoundNotifications(playSoundNotifications->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
+    wApp->setPlaySoundNotifications(playSoundNotifications->isChecked());
     return true;
 }
