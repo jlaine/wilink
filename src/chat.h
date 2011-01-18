@@ -20,20 +20,15 @@
 #ifndef __WILINK_CHAT_H__
 #define __WILINK_CHAT_H__
 
-#include <QWidget>
 #include <QMainWindow>
 
 #include "chat_client.h"
 
 class ChatPanel;
-class ChatPlugin;
+class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
-class QLabel;
 class QModelIndex;
-class QPushButton;
-class QSplitter;
-class QStackedWidget;
 
 /** Chat represents the user interface's main window.
  */
@@ -103,21 +98,7 @@ private:
     void changeEvent(QEvent *event);
 
 private:
-    QMenu *m_fileMenu;
-    QMenu *m_helpMenu;
-    QMenu *m_optionsMenu;
-    QAction *m_findAction;
-    QAction *m_findAgainAction;
-
-    ChatClient *m_client;
-    QList<ChatPanel*> m_chatPanels;
-    ChatRosterModel *m_rosterModel;
-    ChatRosterView *m_rosterView;
-    QString m_windowTitle;
-
-    QStackedWidget *m_conversationPanel;
-
-    QList<ChatPlugin*> m_plugins;
+    ChatPrivate * const d;
 };
 
 #endif

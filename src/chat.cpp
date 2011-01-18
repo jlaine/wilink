@@ -59,36 +59,56 @@
 #include "updatesdialog.h"
 #include "qsound/QSoundPlayer.h"
 
-Chat::Chat(QWidget *parent)
-    : QMainWindow(parent)
+class ChatPrivate
 {
-    m_client = new ChatClient(this);
-    m_rosterModel =  new ChatRosterModel(m_client, this);
-    connect(m_rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
-    connect(m_rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
+public:
+    QMenu *fileMenu;
+    QMenu *optionsMenu;
+    QAction *findAction;
+    QAction *findAgainAction;
+
+    ChatClient *client;
+    QList<ChatPanel*> chatPanels;
+    ChatRosterModel *rosterModel;
+    ChatRosterView *rosterView;
+    QString windowTitle;
+
+    QStackedWidget *conversationPanel;
+
+    QList<ChatPlugin*> plugins;
+};
+
+Chat::Chat(QWidget *parent)
+    : QMainWindow(parent),
+    d(new ChatPrivate)
+{
+    d->client = new ChatClient(this);
+    d->rosterModel =  new ChatRosterModel(d->client, this);
+    connect(d->rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
+    connect(d->rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
     /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
     logger->setLoggingType(QXmppLogger::SignalLogging);
-    m_client->setLogger(logger);
+    d->client->setLogger(logger);
 
     /* build splitter */
     QSplitter *splitter = new QSplitter;
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
-    m_rosterView = new ChatRosterView(m_rosterModel);
-    connect(m_rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
-    connect(m_rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
-    connect(m_rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
-    splitter->addWidget(m_rosterView);
+    d->rosterView = new ChatRosterView(d->rosterModel);
+    connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
+    connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
+    connect(d->rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
+    splitter->addWidget(d->rosterView);
     splitter->setStretchFactor(0, 0);
 
     /* right panel */
-    m_conversationPanel = new QStackedWidget;
-    m_conversationPanel->hide();
-    connect(m_conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
-    splitter->addWidget(m_conversationPanel);
+    d->conversationPanel = new QStackedWidget;
+    d->conversationPanel->hide();
+    connect(d->conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
+    splitter->addWidget(d->conversationPanel);
     splitter->setStretchFactor(1, 1);
     setCentralWidget(splitter);
 
@@ -97,30 +117,30 @@ Chat::Chat(QWidget *parent)
     // avoid border around widgets on OS X
     statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
 
-    statusBar()->addPermanentWidget(new ChatStatus(m_client));
+    statusBar()->addPermanentWidget(new ChatStatus(d->client));
 
     /* get handle to application */
     Application *wApp = qobject_cast<Application*>(qApp);
     Q_ASSERT(wApp);
 
     /* create menu */
-    m_fileMenu = menuBar()->addMenu(tr("&File"));
-    m_optionsMenu = m_fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
-    m_optionsMenu->menuAction()->setMenuRole(QAction::PreferencesRole);
+    d->fileMenu = menuBar()->addMenu(tr("&File"));
+    d->optionsMenu = d->fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
+    d->optionsMenu->menuAction()->setMenuRole(QAction::PreferencesRole);
 
-    QAction *action = m_optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
+    QAction *action = d->optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
-    action = m_optionsMenu->addAction(QIcon(":/contact-offline.png"), tr("Show offline contacts"));
+    action = d->optionsMenu->addAction(QIcon(":/contact-offline.png"), tr("Show offline contacts"));
     action->setCheckable(true);
     action->setChecked(wApp->showOfflineContacts());
-    m_rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
+    d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
     connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setShowOfflineContacts(bool)));
-    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), m_rosterView, SLOT(setShowOfflineContacts(bool)));
+    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
 
     if (wApp->isInstalled())
     {
-        action = m_optionsMenu->addAction(QIcon(":/favorite-active.png"), tr("Open at login"));
+        action = d->optionsMenu->addAction(QIcon(":/favorite-active.png"), tr("Open at login"));
         action->setCheckable(true);
         action->setChecked(wApp->openAtLogin());
         connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
@@ -131,28 +151,28 @@ Chat::Chat(QWidget *parent)
 
     if (wApp->updatesDialog())
     {
-        action = m_fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
+        action = d->fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
         connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
     }
 
-    action = m_fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    action = d->fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     action->setMenuRole(QAction::QuitRole);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
     /* "Edit" menu */
-    QMenu *m_editMenu = menuBar()->addMenu(tr("&Edit"));
+    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
 
-    m_findAction = m_editMenu->addAction(QIcon(":/search.png"), tr("&Find"));
-    m_findAction->setEnabled(false);
-    m_findAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F));
+    d->findAction = editMenu->addAction(QIcon(":/search.png"), tr("&Find"));
+    d->findAction->setEnabled(false);
+    d->findAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F));
 
-    m_findAgainAction = m_editMenu->addAction(tr("Find a&gain"));
-    m_findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
-    m_findAgainAction->setEnabled(false);
+    d->findAgainAction = editMenu->addAction(tr("Find a&gain"));
+    d->findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
+    d->findAgainAction->setEnabled(false);
 
     /* set up client */
-    connect(m_client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
+    connect(d->client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_N), this);
@@ -165,16 +185,18 @@ Chat::Chat(QWidget *parent)
 
 Chat::~Chat()
 {
-    foreach (ChatPanel *panel, m_chatPanels)
+    foreach (ChatPanel *panel, d->chatPanels)
         if (!panel->parent())
             delete panel;
 
     // disconnect
-    m_client->disconnectFromServer();
+    d->client->disconnectFromServer();
 
     // unload plugins
-    for (int i = m_plugins.size() - 1; i >= 0; i--)
-        m_plugins[i]->finalize(this);
+    for (int i = d->plugins.size() - 1; i >= 0; i--)
+        d->plugins[i]->finalize(this);
+
+    delete d;
 }
 
 /** Connect signals for the given panel.
@@ -183,7 +205,7 @@ Chat::~Chat()
  */
 void Chat::addPanel(ChatPanel *panel)
 {
-    if (m_chatPanels.contains(panel))
+    if (d->chatPanels.contains(panel))
         return;
     connect(panel, SIGNAL(attachPanel()), this, SLOT(attachPanel()));
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
@@ -193,7 +215,7 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
-    m_chatPanels << panel;
+    d->chatPanels << panel;
 }
 
 void Chat::attachPanel()
@@ -203,17 +225,17 @@ void Chat::attachPanel()
         return;
 
     // add panel
-    if (m_conversationPanel->indexOf(panel) < 0)
+    if (d->conversationPanel->indexOf(panel) < 0)
     {
-        m_conversationPanel->addWidget(panel);
+        d->conversationPanel->addWidget(panel);
 #ifdef WILINK_EMBEDDED
-        m_rosterView->hide();
+        d->rosterView->hide();
 #endif
-        m_conversationPanel->show();
-        if (m_conversationPanel->count() == 1)
+        d->conversationPanel->show();
+        if (d->conversationPanel->count() == 1)
             resizeContacts();
     }
-    m_conversationPanel->setCurrentWidget(panel);
+    d->conversationPanel->setCurrentWidget(panel);
 }
 
 /** When a panel is destroyed, from it from our list of panels.
@@ -222,25 +244,25 @@ void Chat::attachPanel()
  */
 void Chat::destroyPanel(QObject *obj)
 {
-    m_chatPanels.removeAll(static_cast<ChatPanel*>(obj));
+    d->chatPanels.removeAll(static_cast<ChatPanel*>(obj));
 }
 
 /** Detach the current panel as a window.
  */
 void Chat::detachPanel()
 {
-    ChatPanel *panel = qobject_cast<ChatPanel*>(m_conversationPanel->currentWidget());
+    ChatPanel *panel = qobject_cast<ChatPanel*>(d->conversationPanel->currentWidget());
     if (!panel)
         return;
 
-    QPoint oldPos = m_conversationPanel->mapToGlobal(panel->pos());
+    QPoint oldPos = d->conversationPanel->mapToGlobal(panel->pos());
     oldPos.setY(oldPos.y() - 20);
-    if (m_conversationPanel->count() == 1)
+    if (d->conversationPanel->count() == 1)
     {
-        m_conversationPanel->hide();
+        d->conversationPanel->hide();
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
-    m_conversationPanel->removeWidget(panel);
+    d->conversationPanel->removeWidget(panel);
     panel->setParent(0, Qt::Window);
     panel->move(oldPos);
     panel->show();
@@ -253,7 +275,7 @@ void Chat::dropPanel(QDropEvent *event)
         return;
 
     // notify plugins
-    QModelIndex index = m_rosterModel->findItem(panel->objectName());
+    QModelIndex index = d->rosterModel->findItem(panel->objectName());
     if (index.isValid())
         emit rosterDrop(event, index);
 }
@@ -263,22 +285,22 @@ void Chat::dropPanel(QDropEvent *event)
 void Chat::hidePanel()
 {
     QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (m_conversationPanel->indexOf(panel) < 0)
+    if (d->conversationPanel->indexOf(panel) < 0)
     {
         panel->hide();
         return;
     }
 
     // close view
-    if (m_conversationPanel->count() == 1)
+    if (d->conversationPanel->count() == 1)
     {
-        m_conversationPanel->hide();
+        d->conversationPanel->hide();
 #ifdef WILINK_EMBEDDED
-        m_rosterView->show();
+        d->rosterView->show();
 #endif
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
-    m_conversationPanel->removeWidget(panel);
+    d->conversationPanel->removeWidget(panel);
 }
 
 /** Notify the user of activity on a panel.
@@ -291,10 +313,10 @@ void Chat::notifyPanel(const QString &message, int options)
 
     // add pending message
     bool showMessage = (options & ChatPanel::ForceNotification);
-    if (!window->isActiveWindow() || (window == this && m_conversationPanel->currentWidget() != panel))
+    if (!window->isActiveWindow() || (window == this && d->conversationPanel->currentWidget() != panel))
     {
         wApp->soundPlayer()->play(":/message-incoming.ogg");
-        m_rosterModel->addPendingMessage(panel->objectName());
+        d->rosterModel->addPendingMessage(panel->objectName());
         showMessage = true;
     }
     if (showMessage)
@@ -326,7 +348,7 @@ void Chat::registerPanel()
     if (!panel)
         return;
 
-    m_rosterModel->addItem(panel->objectType(),
+    d->rosterModel->addItem(panel->objectType(),
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -341,7 +363,7 @@ void Chat::showPanel()
         return;
 
     // register panel
-    m_rosterModel->addItem(panel->objectType(),
+    d->rosterModel->addItem(panel->objectType(),
         panel->objectName(),
         panel->windowTitle(),
         panel->windowIcon());
@@ -356,14 +378,14 @@ void Chat::showPanel()
     }
 
     // add panel
-    if (m_conversationPanel->indexOf(panel) < 0)
+    if (d->conversationPanel->indexOf(panel) < 0)
     {
-        m_conversationPanel->addWidget(panel);
+        d->conversationPanel->addWidget(panel);
 #ifdef WILINK_EMBEDDED
-        m_rosterView->hide();
+        d->rosterView->hide();
 #endif
-        m_conversationPanel->show();
-        if (m_conversationPanel->count() == 1)
+        d->conversationPanel->show();
+        if (d->conversationPanel->count() == 1)
             resizeContacts();
     }
 
@@ -375,7 +397,7 @@ void Chat::showPanel()
         raise();
         activateWindow();
     }
-    m_conversationPanel->setCurrentWidget(panel);
+    d->conversationPanel->setCurrentWidget(panel);
 }
 
 /** Handle switching between panels.
@@ -384,33 +406,33 @@ void Chat::showPanel()
  */
 void Chat::panelChanged(int index)
 {
-    disconnect(m_findAction, SIGNAL(triggered(bool)));
-    disconnect(m_findAgainAction, SIGNAL(triggered(bool)));
+    disconnect(d->findAction, SIGNAL(triggered(bool)));
+    disconnect(d->findAgainAction, SIGNAL(triggered(bool)));
 
-    QWidget *widget = m_conversationPanel->widget(index);
+    QWidget *widget = d->conversationPanel->widget(index);
     if (!widget)
     {
-        m_findAction->setEnabled(false);
-        m_findAgainAction->setEnabled(false);
+        d->findAction->setEnabled(false);
+        d->findAgainAction->setEnabled(false);
         return;
     }
 
     // connect find actions
-    connect(m_findAction, SIGNAL(triggered(bool)), widget, SIGNAL(findPanel()));
-    connect(m_findAgainAction, SIGNAL(triggered(bool)), widget, SIGNAL(findAgainPanel()));
-    m_findAction->setEnabled(true);
-    m_findAgainAction->setEnabled(true);
+    connect(d->findAction, SIGNAL(triggered(bool)), widget, SIGNAL(findPanel()));
+    connect(d->findAgainAction, SIGNAL(triggered(bool)), widget, SIGNAL(findAgainPanel()));
+    d->findAction->setEnabled(true);
+    d->findAgainAction->setEnabled(true);
 
-    m_rosterModel->clearPendingMessages(widget->objectName());
+    d->rosterModel->clearPendingMessages(widget->objectName());
 
     // select the corresponding roster entry
-    QModelIndex newIndex = m_rosterView->mapFromRoster(
-        m_rosterModel->findItem(widget->objectName()));
-    QModelIndex currentIndex = m_rosterView->currentIndex();
+    QModelIndex newIndex = d->rosterView->mapFromRoster(
+        d->rosterModel->findItem(widget->objectName()));
+    QModelIndex currentIndex = d->rosterView->currentIndex();
     while (currentIndex.isValid() && currentIndex != newIndex)
         currentIndex = currentIndex.parent();
     if (currentIndex != newIndex)
-        m_rosterView->setCurrentIndex(newIndex);
+        d->rosterView->setCurrentIndex(newIndex);
 
     widget->setFocus();
 }
@@ -424,7 +446,7 @@ void Chat::changeEvent(QEvent *event)
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange && isActiveWindow())
     {
-        int index = m_conversationPanel->currentIndex();
+        int index = d->conversationPanel->currentIndex();
         if (index >= 0)
             panelChanged(index);
     }
@@ -438,13 +460,13 @@ void Chat::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError)
     {
-        if (m_client->xmppStreamError() == QXmppStanza::Error::Conflict)
+        if (d->client->xmppStreamError() == QXmppStanza::Error::Conflict)
         {
             // if we received a resource conflict, exit
             qWarning("Received a resource conflict from chat server");
             qApp->quit();
         }
-        else if (m_client->xmppStreamError() == QXmppStanza::Error::NotAuthorized)
+        else if (d->client->xmppStreamError() == QXmppStanza::Error::NotAuthorized)
         {
             // prompt user for credentials at the next main loop execution
             QTimer::singleShot(0, this, SLOT(promptCredentials()));
@@ -456,7 +478,7 @@ void Chat::error(QXmppClient::Error error)
  */
 void Chat::pendingMessages(int messages)
 {
-    QString title = m_windowTitle;
+    QString title = d->windowTitle;
     if (messages)
         title += " - " + tr("%n message(s)", "", messages);
     QWidget::setWindowTitle(title);
@@ -466,13 +488,13 @@ void Chat::pendingMessages(int messages)
  */
 void Chat::promptCredentials()
 {
-    QXmppConfiguration config = m_client->configuration();
+    QXmppConfiguration config = d->client->configuration();
     QString password = config.password();
     if (ChatAccounts::getPassword(config.jidBare(), password, this) &&
         password != config.password())
     {
         config.setPassword(password);
-        m_client->connectToServer(config);
+        d->client->connectToServer(config);
     }
 }
 
@@ -480,21 +502,21 @@ void Chat::promptCredentials()
  */
 ChatClient *Chat::client()
 {
-    return m_client;
+    return d->client;
 }
 
 /** Return this window's chat roster model.
  */
 ChatRosterModel *Chat::rosterModel()
 {
-    return m_rosterModel;
+    return d->rosterModel;
 }
 
 /** Return this window's chat roster view.
  */
 ChatRosterView *Chat::rosterView()
 {
-    return m_rosterView;
+    return d->rosterView;
 }
 
 /** Open the connection to the chat server.
@@ -536,7 +558,7 @@ bool Chat::open(const QString &jid)
     config.setKeepAliveTimeout(15);
 
     /* connect to server */
-    m_client->connectToServer(config);
+    d->client->connectToServer(config);
 
     /* load plugins */
     QObjectList plugins = QPluginLoader::staticInstances();
@@ -546,14 +568,14 @@ bool Chat::open(const QString &jid)
         if (plugin)
         {
             plugin->initialize(this);
-            m_plugins << plugin;
+            d->plugins << plugin;
         }
     }
 
     /* Create "Help" menu here, so that it remains last */
-    m_helpMenu = menuBar()->addMenu(tr("&Help"));
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
-    QAction *action = m_helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
+    QAction *action = helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
 #ifdef Q_OS_MAC
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
 #else
@@ -561,7 +583,7 @@ bool Chat::open(const QString &jid)
 #endif
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showHelp()));
 
-    action = m_helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
+    action = helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
     action->setMenuRole(QAction::AboutRole);
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
 
@@ -579,7 +601,7 @@ void Chat::openUrl(const QUrl &url)
  */
 QMenu *Chat::fileMenu()
 {
-    return m_fileMenu;
+    return d->fileMenu;
 }
 
 /** Handle a click on a system tray message.
@@ -587,7 +609,7 @@ QMenu *Chat::fileMenu()
 void Chat::messageClicked(QWidget *context)
 {
     ChatPanel *panel = qobject_cast<ChatPanel*>(context);
-    if (panel && m_chatPanels.contains(panel))
+    if (panel && d->chatPanels.contains(panel))
         QTimer::singleShot(0, panel, SIGNAL(showPanel()));
 }
 
@@ -595,7 +617,7 @@ void Chat::messageClicked(QWidget *context)
  */
 QMenu *Chat::optionsMenu()
 {
-    return m_optionsMenu;
+    return d->optionsMenu;
 }
 
 /** Find a panel by its object name.
@@ -604,7 +626,7 @@ QMenu *Chat::optionsMenu()
  */
 ChatPanel *Chat::panel(const QString &objectName)
 {
-    foreach (ChatPanel *panel, m_chatPanels)
+    foreach (ChatPanel *panel, d->chatPanels)
         if (panel->objectName() == objectName)
             return panel;
     return 0;
@@ -615,17 +637,17 @@ ChatPanel *Chat::panel(const QString &objectName)
 void Chat::resizeContacts()
 {
 #ifndef WILINK_EMBEDDED
-    QSize hint = m_rosterView->sizeHint();
-    hint.setHeight(hint.height() + m_rosterView->sizeHintForRow(0) + 4);
+    QSize hint = d->rosterView->sizeHint();
+    hint.setHeight(hint.height() + d->rosterView->sizeHintForRow(0) + 4);
     QSize barHint = statusBar()->sizeHint();
     hint.setHeight(hint.height() + barHint.height());
     if (barHint.width() > hint.width())
         hint.setWidth(barHint.width());
-    if (m_conversationPanel->isVisible())
+    if (d->conversationPanel->isVisible())
         hint.setWidth(hint.width() + 500);
 
     // respect current size
-    if (m_conversationPanel->isVisible() && hint.width() < size().width())
+    if (d->conversationPanel->isVisible() && hint.width() < size().width())
         hint.setWidth(size().width());
     if (hint.height() < size().height())
         hint.setHeight(size().height());
@@ -660,7 +682,7 @@ void Chat::rosterClicked(const QModelIndex &index)
 
 void Chat::setWindowTitle(const QString &title)
 {
-    m_windowTitle = title;
+    d->windowTitle = title;
     QWidget::setWindowTitle(title);
 }
 
@@ -704,7 +726,7 @@ void Chat::unregisterPanel()
     if (!panel)
         return;
 
-    QModelIndex index = m_rosterModel->findItem(panel->objectName());
-    m_rosterModel->removeRow(index.row(), index.parent());
+    QModelIndex index = d->rosterModel->findItem(panel->objectName());
+    d->rosterModel->removeRow(index.row(), index.parent());
 }
 
