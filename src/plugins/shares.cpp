@@ -724,23 +724,8 @@ void SharesPanel::setRoster(ChatRosterModel *roster)
 
 void SharesPanel::showOptions()
 {
-    // FIXME : restore options!
-#if 0
-    SharesOptions *dialog = new SharesOptions(db, chatWindow);
-    dialog->setWindowModality(Qt::WindowModal);
-
-    bool check;
-    check = connect(dialog, SIGNAL(finished(int)),
-                    dialog, SLOT(deleteLater()));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
-
-#ifdef WILINK_EMBEDDED
-    dialog->showMaximized();
-#else
-    dialog->show();
-#endif
-#endif
+    // FIXME : actually show the "shares" tab
+    QMetaObject::invokeMethod(chatWindow, "showPreferences");
 }
 
 void SharesPanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
