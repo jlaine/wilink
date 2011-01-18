@@ -77,7 +77,6 @@ class ChatPrivate
 {
 public:
     QMenu *fileMenu;
-    QMenu *optionsMenu;
     QAction *findAction;
     QAction *findAgainAction;
 
@@ -150,10 +149,7 @@ Chat::Chat(QWidget *parent)
     action->setMenuRole(QAction::PreferencesRole);
     connect(action, SIGNAL(triggered()), this, SLOT(showPreferences()));
 
-    d->optionsMenu = d->fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
-    d->optionsMenu->menuAction()->setMenuRole(QAction::PreferencesRole);
-
-    action = d->optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
+    action = d->fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
     if (wApp->updatesDialog())

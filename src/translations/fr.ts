@@ -65,16 +65,8 @@ Acceptez-vous?</translation>
         <translation>Comptes de chat</translation>
     </message>
     <message>
-        <source>&amp;Options</source>
-        <translation>&amp;Options</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
-    </message>
-    <message>
-        <source>Open at login</source>
-        <translation>Ouvrir au démarrage</translation>
     </message>
     <message>
         <source>Check for &amp;updates</source>
@@ -104,10 +96,6 @@ Acceptez-vous?</translation>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <source>Show offline contacts</source>
-        <translation>Afficher les contacts déconnectés</translation>
-    </message>
-    <message>
         <source>&amp;Help</source>
         <translation>&amp;Aide</translation>
     </message>
@@ -122,6 +110,10 @@ Acceptez-vous?</translation>
     <message>
         <source>%1 FAQ</source>
         <translation>FAQ %1</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences</source>
+        <translation>&amp;Préférences</translation>
     </message>
 </context>
 <context>
@@ -187,25 +179,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatConsole</name>
-    <message>
-        <source>Debugging console</source>
-        <translation>Console de débogage</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation>Démarrer</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Arrêter</translation>
-    </message>
-</context>
-<context>
     <name>ChatDialog</name>
     <message>
         <source>is composing a message</source>
@@ -232,6 +205,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatOptions</name>
+    <message>
+        <source>Open at login</source>
+        <translation>Ouvrir au démarrage</translation>
+    </message>
+    <message>
+        <source>Show offline contacts</source>
+        <translation>Afficher les contacts déconnectés</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation>Général</translation>
+    </message>
+</context>
+<context>
     <name>ChatPasswordPrompt</name>
     <message>
         <source>Password</source>
@@ -252,6 +240,13 @@ Acceptez-vous?</translation>
     <message>
         <source>Password required</source>
         <translation>Mot de passe requis</translation>
+    </message>
+</context>
+<context>
+    <name>ChatPreferences</name>
+    <message>
+        <source>Preferences</source>
+        <translation>Préférences</translation>
     </message>
 </context>
 <context>
@@ -401,154 +396,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatShares</name>
-    <message>
-        <source>Enter the name of the file you are looking for.</source>
-        <translation>Saisissez le nom du fichier que vous cherchez.</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation>Télécharger</translation>
-    </message>
-    <message>
-        <source>Downloads</source>
-        <translation>Fichiers reçus</translation>
-    </message>
-    <message>
-        <source>Uploads</source>
-        <translation>Fichiers envoyés</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Retirer</translation>
-    </message>
-    <message>
-        <source>Transfer</source>
-        <translation>Transfert</translation>
-    </message>
-    <message>
-        <source>Downloaded</source>
-        <translation>Téléchargé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation>Echoué</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation>En attente</translation>
-    </message>
-    <message>
-        <source>Indexed %1 files in %2s</source>
-        <translation>%1 fichiers indexés en %2s</translation>
-    </message>
-    <message>
-        <source>Refresh my shares</source>
-        <translation>Rafraîchir mes partages</translation>
-    </message>
-    <message>
-        <source>Indexing files</source>
-        <translation>Indexation des fichiers</translation>
-    </message>
-    <message>
-        <source>Shares options</source>
-        <translation>Options de partages</translation>
-    </message>
-    <message>
-        <source>downloads folder</source>
-        <translation>dossier de téléchargement</translation>
-    </message>
-    <message>
-        <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
-        <source>You can select the folders you want to share with other users from the shares options.</source>
-        <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
-    </message>
-</context>
-<context>
-    <name>ChatSharesModel</name>
-    <message>
-        <source>Name</source>
-        <translation>Nom</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Taille</translation>
-    </message>
-    <message>
-        <source>Progress</source>
-        <translation>Progrès</translation>
-    </message>
-    <message>
-        <source>Downloaded</source>
-        <translation>Téléchargé</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation>En attente</translation>
-    </message>
-    <message>
-        <source>Requested</source>
-        <translation>Demandé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation>Echoué</translation>
-    </message>
-    <message>
-        <source>Downloading at %1</source>
-        <translation>Téléchargement à %1</translation>
-    </message>
-</context>
-<context>
-    <name>ChatSharesOptions</name>
-    <message>
-        <source>Shares folder</source>
-        <translation>Dossier de partages</translation>
-    </message>
-    <message>
-        <source>Shares options</source>
-        <translation>Options de partages</translation>
-    </message>
-    <message>
-        <source>Downloads folder</source>
-        <translation>Dossier de téléchargement</translation>
-    </message>
-    <message>
-        <source>Shared folders</source>
-        <translation>Dossier partagés</translation>
-    </message>
-    <message>
-        <source>More folders..</source>
-        <translation>Plus de dossiers..</translation>
-    </message>
-    <message>
-        <source>Fewer folders..</source>
-        <translation>Moins de dossiers..</translation>
-    </message>
-    <message>
-        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
-        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
-    </message>
-    <message>
-        <source>Select the folder in which received files will be stored.</source>
-        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
-    </message>
-</context>
-<context>
-    <name>ChatSharesTab</name>
-    <message>
-        <source>Shares options</source>
-        <translation>Options de partages</translation>
-    </message>
-</context>
-<context>
     <name>ChatStatus</name>
     <message>
         <source>Available</source>
@@ -632,6 +479,25 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ConsolePanel</name>
+    <message>
+        <source>Debugging console</source>
+        <translation>Console de débogage</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation>Démarrer</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Arrêter</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
+</context>
+<context>
     <name>ContactsWatcher</name>
     <message>
         <source>Show profile</source>
@@ -679,7 +545,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>Diagnostics</name>
+    <name>DiagnosticsPanel</name>
     <message>
         <source>Refresh</source>
         <translation>Rafraîchir</translation>
@@ -690,7 +556,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>Discovery</name>
+    <name>DiscoveryPanel</name>
     <message>
         <source>Go back</source>
         <translation>Retour</translation>
@@ -801,18 +667,58 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>Photos</name>
+    <name>PhotosPanel</name>
     <message>
-        <source>Connecting..</source>
-        <translation>Connexion..</translation>
+        <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
+        <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
+    </message>
+    <message>
+        <source>Go back</source>
+        <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Create an album</source>
         <translation>Créer un album</translation>
     </message>
     <message>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>My photos</source>
+        <translation>Mes photos</translation>
+    </message>
+    <message>
+        <source>Cancelling upload..</source>
+        <translation>Annulation du transfert..</translation>
+    </message>
+    <message>
+        <source>Album name:</source>
+        <translation>Nom de l&apos;album :</translation>
+    </message>
+    <message>
+        <source>Deleting %1</source>
+        <translation>Suppression de %1</translation>
+    </message>
+    <message>
+        <source>Loading image..</source>
+        <translation>Chargement de l&apos;image..</translation>
+    </message>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
+    <message>
         <source>Photos upload complete.</source>
         <translation>Envoi de photos terminé.</translation>
+    </message>
+    <message>
+        <source>Your photos have been uploaded.</source>
+        <translation>Vos photos ont été envoyées.</translation>
     </message>
     <message>
         <source>Uploading %1</source>
@@ -822,45 +728,42 @@ Acceptez-vous?</translation>
         <source>Loading your albums..</source>
         <translation>Chargement de vos albums..</translation>
     </message>
+</context>
+<context>
+    <name>PlayerModel</name>
     <message>
-        <source>Your photos have been uploaded.</source>
-        <translation>Vos photos ont été envoyées.</translation>
+        <source>Artist</source>
+        <translation>Artiste</translation>
     </message>
     <message>
-        <source>Go back</source>
-        <translation>Retour</translation>
+        <source>Title</source>
+        <translation>Titre</translation>
     </message>
     <message>
-        <source>Album name:</source>
-        <translation>Nom de l&apos;album :</translation>
+        <source>Duration</source>
+        <translation>Durée</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerPanel</name>
+    <message>
+        <source>Media player</source>
+        <translation>Lecteur média</translation>
     </message>
     <message>
-        <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
-        <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
+        <source>Play</source>
+        <translation>Lecture</translation>
     </message>
     <message>
-        <source>Loading image..</source>
-        <translation>Chargement de l&apos;image..</translation>
+        <source>Stop</source>
+        <translation>Arrêt</translation>
     </message>
+</context>
+<context>
+    <name>PodcastsPanel</name>
     <message>
-        <source>Delete</source>
-        <translation>Supprimer</translation>
-    </message>
-    <message>
-        <source>Deleting %1</source>
-        <translation>Suppression de %1</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Cancelling upload..</source>
-        <translation>Annulation du transfert..</translation>
-    </message>
-    <message>
-        <source>My photos</source>
-        <translation>Mes photos</translation>
+        <source>My podcasts</source>
+        <translation>Mes podcasts</translation>
     </message>
 </context>
 <context>
@@ -868,6 +771,150 @@ Acceptez-vous?</translation>
     <message>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
+    </message>
+</context>
+<context>
+    <name>SharesModel</name>
+    <message>
+        <source>Downloaded</source>
+        <translation>Téléchargé</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Demandé</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>En attente</translation>
+    </message>
+    <message>
+        <source>Downloading at %1</source>
+        <translation>Téléchargement à %1</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Progrès</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Taille</translation>
+    </message>
+</context>
+<context>
+    <name>SharesOptions</name>
+    <message>
+        <source>Shared folders</source>
+        <translation>Dossier partagés</translation>
+    </message>
+    <message>
+        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
+        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
+    </message>
+    <message>
+        <source>More folders..</source>
+        <translation>Plus de dossiers..</translation>
+    </message>
+    <message>
+        <source>Fewer folders..</source>
+        <translation>Moins de dossiers..</translation>
+    </message>
+    <message>
+        <source>Downloads folder</source>
+        <translation>Dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>Select the folder in which received files will be stored.</source>
+        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
+    </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+    <message>
+        <source>Shares folder</source>
+        <translation>Dossier de partages</translation>
+    </message>
+</context>
+<context>
+    <name>SharesPanel</name>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+    <message>
+        <source>Enter the name of the file you are looking for.</source>
+        <translation>Saisissez le nom du fichier que vous cherchez.</translation>
+    </message>
+    <message>
+        <source>Downloads</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Uploads</source>
+        <translation>Fichiers envoyés</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>Télécharger</translation>
+    </message>
+    <message>
+        <source>Refresh my shares</source>
+        <translation>Rafraîchir mes partages</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+    <message>
+        <source>downloads folder</source>
+        <translation>dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>You can select the folders you want to share with other users from the shares options.</source>
+        <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
+    </message>
+    <message>
+        <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>Downloaded</source>
+        <translation>Téléchargé</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
+    <message>
+        <source>Transfer</source>
+        <translation>Transfert</translation>
+    </message>
+    <message>
+        <source>Indexed %1 files in %2s</source>
+        <translation>%1 fichiers indexés en %2s</translation>
+    </message>
+    <message>
+        <source>Indexing files</source>
+        <translation>Indexation des fichiers</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>En attente</translation>
+    </message>
+</context>
+<context>
+    <name>SharesTab</name>
+    <message>
+        <source>Shares options</source>
+        <translation>Options de partages</translation>
     </message>
 </context>
 <context>
