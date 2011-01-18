@@ -72,6 +72,7 @@ private slots:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void backspacePressed();
     void callButtonClicked(QAbstractButton *button);
+    void callClicked(const QModelIndex &index);
     void callDoubleClicked(const QModelIndex &index);
     void callNumber();
     void callReceived(SipCall *call);

@@ -113,6 +113,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     check = connect(callsModel, SIGNAL(stateChanged(bool)),
                     this, SLOT(callStateChanged(bool)));
     callsView = new PhoneCallsView(callsModel, this);
+    check = connect(callsView, SIGNAL(clicked(QModelIndex)),
+                    this, SLOT(callClicked(QModelIndex)));
+    Q_ASSERT(check);
     check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(callDoubleClicked(QModelIndex)));
     Q_ASSERT(check);
@@ -194,6 +197,21 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
     box->deleteLater();
 }
 
+void PhonePanel::callClicked(const QModelIndex &index)
+{
+    QString recipient = index.data(PhoneCallsModel::AddressRole).toString();
+    QRegExp rx(sipAddressPattern);
+    if (!rx.exactMatch(recipient))
+        return;
+    recipient = rx.cap(2).mid(4);
+
+    QStringList bits = recipient.split("@");
+    if (bits.last() == sip->domain())
+        numberEdit->setText(bits.first());
+    else
+        numberEdit->setText(recipient);
+}
+
 void PhonePanel::callDoubleClicked(const QModelIndex &index)
 {
     const QString recipient = index.data(PhoneCallsModel::AddressRole).toString();
@@ -205,11 +223,18 @@ void PhonePanel::callDoubleClicked(const QModelIndex &index)
 
 void PhonePanel::callNumber()
 {
-    QString phoneNumber = numberEdit->text().trimmed();
-    if (!callButton->isEnabled() || !callButton->isVisible() || phoneNumber.isEmpty())
+    QString phoneAddress = numberEdit->text().trimmed();
+    if (!callButton->isEnabled() || !callButton->isVisible() || phoneAddress.isEmpty())
         return;
 
-    const QString recipient = QString("\"%1\" <sip:%2@%3>").arg(phoneNumber, phoneNumber, sip->domain());
+    QString phoneName;
+    if (phoneAddress.contains("@")) {
+        phoneName = phoneAddress.split("@").first();
+    } else {
+        phoneName = phoneAddress;
+        phoneAddress += "@" + sip->domain();
+    }
+    const QString recipient = QString("\"%1\" <sip:%2>").arg(phoneName, phoneAddress);
 
     QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
 }

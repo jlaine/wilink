@@ -49,7 +49,7 @@ static const int RTCP_COMPONENT = 2;
 #define STUN_RETRY_MS   500
 #define STUN_EXPIRE_MS  30000
 
-static const char *addressPattern = "(.*)<(sip:([^>]+))>(;.+)?";
+const char *sipAddressPattern = "(.*)<(sip:([^>]+))>(;.+)?";
 
 enum StunStep {
     StunConnectivity = 0,
@@ -58,7 +58,7 @@ enum StunStep {
 
 QString sipAddressToName(const QString &address)
 {
-    QRegExp rx(addressPattern);
+    QRegExp rx(sipAddressPattern);
     if (!rx.exactMatch(address)) {
         qWarning("Bad address %s", qPrintable(address));
         return QString();
@@ -71,7 +71,7 @@ QString sipAddressToName(const QString &address)
 
 static QString sipAddressToUri(const QString &address)
 {
-    QRegExp rx(addressPattern);
+    QRegExp rx(sipAddressPattern);
     if (!rx.exactMatch(address)) {
         qWarning("Bad address %s", qPrintable(address));
         return QString();
