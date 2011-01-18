@@ -55,8 +55,10 @@ public:
 
     bool isInstalled();
     bool openAtLogin() const;
+    void setOpenAtLogin(bool run);
     void showMessage(QWidget *context, const QString &title, const QString &message);
     bool showOfflineContacts() const;
+    void setShowOfflineContacts(bool show);
 
 signals:
     void messageClicked(QWidget *context);
@@ -65,8 +67,6 @@ signals:
 
 public slots:
     void openUrl(const QUrl &url);
-    void setOpenAtLogin(bool run);
-    void setShowOfflineContacts(bool show);
 
 private slots:
     void messageClicked();

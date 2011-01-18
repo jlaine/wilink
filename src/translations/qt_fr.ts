@@ -16,4 +16,11 @@
         <translation>Annuler</translation>
     </message>
 </context>
+<context>
+    <name>QFileSystemModel</name>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+</context>
 </TS>

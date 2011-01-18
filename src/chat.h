@@ -23,11 +23,14 @@
 #include <QMainWindow>
 
 #include "chat_client.h"
+#include "chat_preferences.h"
 
+class Application;
 class ChatPanel;
 class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
+class QCheckBox;
 class QModelIndex;
 
 /** Chat represents the user interface's main window.
@@ -99,6 +102,20 @@ private:
 
 private:
     ChatPrivate * const d;
+};
+
+class ChatOptions : public ChatPreferencesTab
+{
+    Q_OBJECT
+
+public:
+    ChatOptions();
+    bool save();
+
+private:
+    QCheckBox *openAtLogin;
+    QCheckBox *showOfflineContacts;
+    Application *wApp;
 };
 
 #endif

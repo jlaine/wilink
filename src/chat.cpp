@@ -52,7 +52,6 @@
 #include "chat_client.h"
 #include "chat_panel.h"
 #include "chat_plugin.h"
-#include "chat_preferences.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 #include "chat_status.h"
@@ -60,18 +59,6 @@
 #include "systeminfo.h"
 #include "updatesdialog.h"
 #include "qsound/QSoundPlayer.h"
-
-class ChatOptions : public ChatPreferencesTab
-{
-public:
-    ChatOptions();
-    bool save();
-
-private:
-    QCheckBox *openAtLogin;
-    QCheckBox *showOfflineContacts;
-    Application *wApp;
-};
 
 class ChatPrivate
 {
