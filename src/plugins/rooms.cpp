@@ -779,7 +779,15 @@ void ChatRoom::returnPressed()
 void ChatRoom::tabPressed()
 {
     QTextCursor cursor = chatInput->textCursor();
-    cursor.select(QTextCursor::WordUnderCursor);
+    cursor.movePosition(QTextCursor::StartOfWord);
+    // FIXME : for some reason on OS X, a leading '@' sign is not considered
+    // part of a word
+    if (cursor.position() &&
+        cursor.document()->characterAt(cursor.position() - 1) == QChar('@')) {
+        cursor.setPosition(cursor.position() - 1);
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+    }
+    cursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
     QString prefix = cursor.selectedText().toLower();
     if (prefix.startsWith("@"))
         prefix = prefix.mid(1);

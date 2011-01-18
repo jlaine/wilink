@@ -3,6 +3,7 @@ wiLink 1.0.3 (UNRELEASED)
   - Recognise /me command.
  * Rooms:
    - Correctly parse multiple "status" elements in presences.
+   - Fix tab completion with a leading "@" sign on OS X.
  * Shares:
    - Fix display of shared drives on Windows.
    - Do not re-send registration every minute.
