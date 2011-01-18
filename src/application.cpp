@@ -368,6 +368,16 @@ void Application::openUrl(const QUrl &url)
     }
 }
 
+bool Application::playSoundNotifications() const
+{
+    return d->settings->value("PlaySoundNotifications", false).toBool();
+}
+
+void Application::setPlaySoundNotifications(bool play)
+{
+    d->settings->setValue("PlaySoundNotifications", play);
+}
+
 void Application::showAccounts()
 {
     ChatAccounts dlg;

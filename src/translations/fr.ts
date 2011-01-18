@@ -218,6 +218,14 @@ Acceptez-vous?</translation>
         <source>General</source>
         <translation>Général</translation>
     </message>
+    <message>
+        <source>General options</source>
+        <translation>Options générales</translation>
+    </message>
+    <message>
+        <source>Play sound notifications</source>
+        <translation>Jouer les notifications sonores</translation>
+    </message>
 </context>
 <context>
     <name>ChatPasswordPrompt</name>

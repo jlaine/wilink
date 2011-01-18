@@ -25,6 +25,7 @@
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QDialogButtonBox>
+#include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
 #include <QList>
@@ -305,7 +306,8 @@ void Chat::notifyPanel(const QString &message, int options)
     bool showMessage = (options & ChatPanel::ForceNotification);
     if (!window->isActiveWindow() || (window == this && d->conversationPanel->currentWidget() != panel))
     {
-        wApp->soundPlayer()->play(":/message-incoming.ogg");
+        if (wApp->playSoundNotifications())
+            wApp->soundPlayer()->play(":/message-incoming.ogg");
         d->rosterModel->addPendingMessage(panel->objectName());
         showMessage = true;
     }
@@ -740,19 +742,28 @@ ChatOptions::ChatOptions()
     Q_ASSERT(wApp);
 
     QLayout *layout = new QVBoxLayout;
+    QGroupBox *group = new QGroupBox(tr("General options"));
+    QVBoxLayout *vbox = new QVBoxLayout;
 
     if (wApp->isInstalled())
     {
         openAtLogin = new QCheckBox(tr("Open at login"));
         openAtLogin->setChecked(wApp->openAtLogin());
-        layout->addWidget(openAtLogin);
+        vbox->addWidget(openAtLogin);
     } else {
         openAtLogin = 0;
     }
 
+    playSoundNotifications = new QCheckBox(tr("Play sound notifications"));
+    playSoundNotifications->setChecked(wApp->playSoundNotifications());
+    vbox->addWidget(playSoundNotifications);
+
     showOfflineContacts = new QCheckBox(tr("Show offline contacts"));
     showOfflineContacts->setChecked(wApp->showOfflineContacts());
-    layout->addWidget(showOfflineContacts);
+    vbox->addWidget(showOfflineContacts);
+
+    group->setLayout(vbox);
+    layout->addWidget(group);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/options.png"));
@@ -763,6 +774,7 @@ bool ChatOptions::save()
 {
     if (openAtLogin)
         wApp->setOpenAtLogin(openAtLogin->isChecked());
+    wApp->setPlaySoundNotifications(playSoundNotifications->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
     return true;
 }

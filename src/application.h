@@ -54,9 +54,13 @@ public:
     void setUpdatesDialog(UpdatesDialog *updatesDialog);
 
     bool isInstalled();
+    void showMessage(QWidget *context, const QString &title, const QString &message);
+
+    // preferences
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
-    void showMessage(QWidget *context, const QString &title, const QString &message);
+    bool playSoundNotifications() const;
+    void setPlaySoundNotifications(bool play);
     bool showOfflineContacts() const;
     void setShowOfflineContacts(bool show);
 

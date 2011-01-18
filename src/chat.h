@@ -114,6 +114,7 @@ public:
 
 private:
     QCheckBox *openAtLogin;
+    QCheckBox *playSoundNotifications;
     QCheckBox *showOfflineContacts;
     Application *wApp;
 };
