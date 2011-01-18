@@ -83,6 +83,7 @@ private slots:
     void rosterClicked(const QModelIndex &index);
     void showAbout();
     void showHelp();
+    void showPreferences();
 
     void attachPanel();
     void detachPanel();

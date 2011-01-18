@@ -23,6 +23,7 @@
 #include <QDialog>
 
 class ChatPreferencesPrivate;
+class ChatPreferencesTab;
 
 /** ChatPreferences is the base class for all settings tabs.
  */
@@ -33,6 +34,8 @@ class ChatPreferences : public QDialog
 public:
     ChatPreferences(QWidget *parent = 0);
     ~ChatPreferences();
+
+    void addTab(ChatPreferencesTab *tab);
 
 private slots:
     void validate();
@@ -47,7 +50,7 @@ class ChatPreferencesTab : public QWidget
 
 public:
     ChatPreferencesTab();
+    virtual bool save() { return true; };
 };
-
 
 #endif

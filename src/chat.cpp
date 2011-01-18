@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QAuthenticator>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QDesktopServices>
@@ -51,6 +52,7 @@
 #include "chat_client.h"
 #include "chat_panel.h"
 #include "chat_plugin.h"
+#include "chat_preferences.h"
 #include "chat_roster.h"
 #include "chat_roster_item.h"
 #include "chat_status.h"
@@ -58,6 +60,17 @@
 #include "systeminfo.h"
 #include "updatesdialog.h"
 #include "qsound/QSoundPlayer.h"
+
+class ChatOptions : public ChatPreferencesTab
+{
+public:
+    ChatOptions();
+    bool save();
+
+private:
+    QCheckBox *showOfflineContacts;
+    Application *wApp;
+};
 
 class ChatPrivate
 {
@@ -82,6 +95,10 @@ Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
     d(new ChatPrivate)
 {
+    /* get handle to application */
+    Application *wApp = qobject_cast<Application*>(qApp);
+    Q_ASSERT(wApp);
+
     d->client = new ChatClient(this);
     d->rosterModel =  new ChatRosterModel(d->client, this);
     connect(d->rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
@@ -98,6 +115,8 @@ Chat::Chat(QWidget *parent)
 
     /* left panel */
     d->rosterView = new ChatRosterView(d->rosterModel);
+    d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
+    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
     connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(d->rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
@@ -119,24 +138,18 @@ Chat::Chat(QWidget *parent)
 
     statusBar()->addPermanentWidget(new ChatStatus(d->client));
 
-    /* get handle to application */
-    Application *wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
-
-    /* create menu */
+   /* create menu */
     d->fileMenu = menuBar()->addMenu(tr("&File"));
+
+    QAction *action = d->fileMenu->addAction(QIcon(":/options.png"), tr("&Options"));
+    action->setMenuRole(QAction::PreferencesRole);
+    connect(action, SIGNAL(triggered()), this, SLOT(showPreferences()));
+
     d->optionsMenu = d->fileMenu->addMenu(QIcon(":/options.png"), tr("&Options"));
     d->optionsMenu->menuAction()->setMenuRole(QAction::PreferencesRole);
 
-    QAction *action = d->optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
+    action = d->optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
-
-    action = d->optionsMenu->addAction(QIcon(":/contact-offline.png"), tr("Show offline contacts"));
-    action->setCheckable(true);
-    action->setChecked(wApp->showOfflineContacts());
-    d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
-    connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setShowOfflineContacts(bool)));
-    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
 
     if (wApp->isInstalled())
     {
@@ -718,6 +731,15 @@ void Chat::showHelp()
     QDesktopServices::openUrl(QUrl(HELP_URL));
 }
 
+/** Display the preferenes dialog.
+ */
+void Chat::showPreferences()
+{
+    ChatPreferences prefs(this);
+    prefs.addTab(new ChatOptions);
+    prefs.exec();
+}
+
 /** Unregister a panel from the roster list.
  */
 void Chat::unregisterPanel()
@@ -730,3 +752,22 @@ void Chat::unregisterPanel()
     d->rosterModel->removeRow(index.row(), index.parent());
 }
 
+ChatOptions::ChatOptions()
+{
+    wApp = qobject_cast<Application*>(qApp);
+    Q_ASSERT(wApp);
+
+    QLayout *layout = new QVBoxLayout;
+
+    showOfflineContacts = new QCheckBox(tr("Show offline contacts"));
+    showOfflineContacts->setChecked(wApp->showOfflineContacts());
+    layout->addWidget(showOfflineContacts);
+
+    setLayout(layout);
+}
+
+bool ChatOptions::save()
+{
+    wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
+    return true;
+}

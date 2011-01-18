@@ -72,10 +72,19 @@ ChatPreferences::~ChatPreferences()
     delete d;
 }
 
+void ChatPreferences::addTab(ChatPreferencesTab *tab)
+{
+    d->tabStack->addWidget(tab);
+}
+
 /** Validates and applies the new preferences.
  */
 void ChatPreferences::validate()
 {
+    for (int i = 0; i < d->tabStack->count(); ++i) {
+        ChatPreferencesTab *tab = qobject_cast<ChatPreferencesTab*>(d->tabStack->widget(i));
+        tab->save();
+    }
     accept();
 }
 
