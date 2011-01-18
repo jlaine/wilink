@@ -731,6 +731,8 @@ void Chat::showPreferences()
 {
     ChatPreferences prefs(this);
     prefs.addTab(new ChatOptions);
+    foreach (ChatPlugin *plugin, d->plugins)
+        plugin->preferences(&prefs);
     prefs.exec();
 }
 
@@ -767,6 +769,8 @@ ChatOptions::ChatOptions()
     layout->addWidget(showOfflineContacts);
 
     setLayout(layout);
+    setWindowIcon(QIcon(":/options.png"));
+    setWindowTitle(tr("General"));
 }
 
 bool ChatOptions::save()

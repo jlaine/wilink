@@ -24,6 +24,7 @@
 
 class Chat;
 class ChatPanel;
+class ChatPreferences;
 
 /** Interface for all plugins.
  */
@@ -32,6 +33,7 @@ class ChatPluginInterface
 public:
     virtual bool initialize(Chat *chat) = 0;
     virtual void finalize(Chat *) {};
+    virtual void preferences(ChatPreferences *prefs) {};
 };
 
 Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")

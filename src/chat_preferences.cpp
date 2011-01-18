@@ -74,6 +74,8 @@ ChatPreferences::~ChatPreferences()
 
 void ChatPreferences::addTab(ChatPreferencesTab *tab)
 {
+    QListWidgetItem *item = new QListWidgetItem(tab->windowIcon(), tab->windowTitle());
+    d->tabList->addItem(item);
     d->tabStack->addWidget(tab);
 }
 
