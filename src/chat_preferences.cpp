@@ -53,6 +53,7 @@ ChatPreferences::ChatPreferences(QWidget *parent)
     splitter->addWidget(d->tabStack);
     splitter->setStretchFactor(1, 1);
 
+    connect(d->tabList, SIGNAL(currentRowChanged(int)), d->tabStack, SLOT(setCurrentIndex(int)));
     layout->addWidget(splitter);
 
     // buttons
