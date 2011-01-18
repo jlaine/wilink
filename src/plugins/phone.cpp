@@ -197,7 +197,7 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
 void PhonePanel::callDoubleClicked(const QModelIndex &index)
 {
     const QString recipient = index.data(PhoneCallsModel::AddressRole).toString();
-    if (!callButton->isEnabled() || recipient.isEmpty())
+    if (!callButton->isEnabled() || !callButton->isVisible() || recipient.isEmpty())
         return;
 
     QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
@@ -206,7 +206,7 @@ void PhonePanel::callDoubleClicked(const QModelIndex &index)
 void PhonePanel::callNumber()
 {
     QString phoneNumber = numberEdit->text().trimmed();
-    if (!callButton->isEnabled() || phoneNumber.isEmpty())
+    if (!callButton->isEnabled() || !callButton->isVisible() || phoneNumber.isEmpty())
         return;
 
     const QString recipient = QString("\"%1\" <sip:%2@%3>").arg(phoneNumber, phoneNumber, sip->domain());
@@ -357,7 +357,7 @@ void PhonePanel::keyReleased()
  */
 void PhonePanel::openUrl(const QUrl &url)
 {
-    if (!callButton->isEnabled() || url.scheme() != "sip")
+    if (!callButton->isEnabled() || !callButton->isVisible() || url.scheme() != "sip")
         return;
 
     const QString phoneNumber = url.path().split('@').first();
