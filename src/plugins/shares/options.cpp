@@ -337,6 +337,7 @@ SharesOptions::SharesOptions(QXmppShareDatabase *database)
     layout->addWidget(downloadsGroup);
 
     setLayout(layout);
+    setObjectName("shares");
     setWindowIcon(QIcon(":/share.png"));
     setWindowTitle(tr("Shares"));
 }

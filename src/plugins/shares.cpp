@@ -724,8 +724,7 @@ void SharesPanel::setRoster(ChatRosterModel *roster)
 
 void SharesPanel::showOptions()
 {
-    // FIXME : actually show the "shares" tab
-    QMetaObject::invokeMethod(chatWindow, "showPreferences");
+    chatWindow->showPreferences("shares");
 }
 
 void SharesPanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)

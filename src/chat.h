@@ -74,6 +74,7 @@ signals:
 
 public slots:
     void openUrl(const QUrl &url);
+    void showPreferences(const QString &focusTab = QString());
 
 private slots:
     void error(QXmppClient::Error error);
@@ -85,7 +86,6 @@ private slots:
     void rosterClicked(const QModelIndex &index);
     void showAbout();
     void showHelp();
-    void showPreferences();
 
     void attachPanel();
     void detachPanel();

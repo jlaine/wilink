@@ -97,6 +97,16 @@ void ChatPreferences::addTab(ChatPreferencesTab *tab)
     d->tabStack->addWidget(tab);
 }
 
+void ChatPreferences::setCurrentTab(const QString &tabName)
+{
+    for (int i = 0; i < d->tabStack->count(); ++i) {
+        if (d->tabStack->widget(i)->objectName() == tabName) {
+            d->tabList->setCurrentRow(i);
+            break;
+        }
+    }
+}
+
 /** Validates and applies the new preferences.
  */
 void ChatPreferences::validate()

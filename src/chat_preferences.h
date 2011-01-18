@@ -36,6 +36,7 @@ public:
     ~ChatPreferences();
 
     void addTab(ChatPreferencesTab *tab);
+    void setCurrentTab(const QString &name);
 
 private slots:
     void validate();

@@ -706,7 +706,7 @@ void Chat::showHelp()
 
 /** Display the preferenes dialog.
  */
-void Chat::showPreferences()
+void Chat::showPreferences(const QString &focusTab)
 {
     ChatPreferences *dialog = new ChatPreferences(this);
     dialog->setWindowModality(Qt::WindowModal);
@@ -718,6 +718,7 @@ void Chat::showPreferences()
     foreach (ChatPlugin *plugin, d->plugins)
         plugin->preferences(dialog);
 
+    dialog->setCurrentTab(focusTab);
 #ifdef WILINK_EMBEDDED
     dialog->showMaximized();
 #else
