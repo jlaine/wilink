@@ -68,6 +68,7 @@ public:
     bool save();
 
 private:
+    QCheckBox *openAtLogin;
     QCheckBox *showOfflineContacts;
     Application *wApp;
 };
@@ -95,9 +96,13 @@ Chat::Chat(QWidget *parent)
     : QMainWindow(parent),
     d(new ChatPrivate)
 {
+    bool check;
+
     /* get handle to application */
     Application *wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
+    check = connect(wApp, SIGNAL(messageClicked(QWidget*)),
+                    this, SLOT(messageClicked(QWidget*)));
+    Q_ASSERT(check);
 
     d->client = new ChatClient(this);
     d->rosterModel =  new ChatRosterModel(d->client, this);
@@ -141,7 +146,7 @@ Chat::Chat(QWidget *parent)
    /* create menu */
     d->fileMenu = menuBar()->addMenu(tr("&File"));
 
-    QAction *action = d->fileMenu->addAction(QIcon(":/options.png"), tr("&Options"));
+    QAction *action = d->fileMenu->addAction(QIcon(":/options.png"), tr("&Preferences"));
     action->setMenuRole(QAction::PreferencesRole);
     connect(action, SIGNAL(triggered()), this, SLOT(showPreferences()));
 
@@ -150,17 +155,6 @@ Chat::Chat(QWidget *parent)
 
     action = d->optionsMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
-
-    if (wApp->isInstalled())
-    {
-        action = d->optionsMenu->addAction(QIcon(":/favorite-active.png"), tr("Open at login"));
-        action->setCheckable(true);
-        action->setChecked(wApp->openAtLogin());
-        connect(action, SIGNAL(toggled(bool)), wApp, SLOT(setOpenAtLogin(bool)));
-        connect(wApp, SIGNAL(openAtLoginChanged(bool)), action, SLOT(setChecked(bool)));
-    }
-    QObject::connect(wApp, SIGNAL(messageClicked(QWidget*)),
-        this, SLOT(messageClicked(QWidget*)));
 
     if (wApp->updatesDialog())
     {
@@ -759,6 +753,15 @@ ChatOptions::ChatOptions()
 
     QLayout *layout = new QVBoxLayout;
 
+    if (wApp->isInstalled())
+    {
+        openAtLogin = new QCheckBox(tr("Open at login"));
+        openAtLogin->setChecked(wApp->openAtLogin());
+        layout->addWidget(openAtLogin);
+    } else {
+        openAtLogin = 0;
+    }
+
     showOfflineContacts = new QCheckBox(tr("Show offline contacts"));
     showOfflineContacts->setChecked(wApp->showOfflineContacts());
     layout->addWidget(showOfflineContacts);
@@ -768,6 +771,8 @@ ChatOptions::ChatOptions()
 
 bool ChatOptions::save()
 {
+    if (openAtLogin)
+        wApp->setOpenAtLogin(openAtLogin->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
     return true;
 }
