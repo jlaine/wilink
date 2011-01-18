@@ -23,6 +23,8 @@
 #include <QAbstractProxyModel>
 #include <QDialog>
 
+#include "chat_preferences.h"
+
 class FoldersModel;
 class QFileSystemModel;
 class QLineEdit;
@@ -54,15 +56,16 @@ private:
 
 /** View for displaying a tree of share items.
  */
-class SharesOptions : public QDialog
+class SharesOptions : public ChatPreferencesTab
 {
     Q_OBJECT
 
 public:
-    SharesOptions(QXmppShareDatabase *database, QWidget *parent = 0);
+    SharesOptions(QXmppShareDatabase *database);
+    bool save();
 
-public slots:
-    void show();
+protected:
+    void showEvent(QShowEvent *event);
 
 private slots:
     void browse();
@@ -70,7 +73,6 @@ private slots:
     void fewerFolders();
     void moreFolders();
     void scrollToHome();
-    void validate();
 
 private:
     QPushButton *m_moreButton;

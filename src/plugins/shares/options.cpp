@@ -20,7 +20,6 @@
 #include <QAbstractProxyModel>
 #include <QDebug>
 #include <QDesktopServices>
-#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFileSystemModel>
 #include <QGroupBox>
@@ -266,9 +265,8 @@ void PlacesModel::setSourceModel(QFileSystemModel *sourceModel)
     QAbstractProxyModel::setSourceModel(sourceModel);
 }
 
-SharesOptions::SharesOptions(QXmppShareDatabase *database, QWidget *parent)
-    : QDialog(parent),
-    m_database(database)
+SharesOptions::SharesOptions(QXmppShareDatabase *database)
+    : m_database(database)
 {
     QVBoxLayout *layout = new QVBoxLayout;
     QGroupBox *sharesGroup = new QGroupBox(tr("Shared folders"));
@@ -338,15 +336,9 @@ SharesOptions::SharesOptions(QXmppShareDatabase *database, QWidget *parent)
     downloadsGroup->setLayout(vbox);
     layout->addWidget(downloadsGroup);
 
-    // buttons
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    layout->addWidget(buttonBox);
-
     setLayout(layout);
-    setWindowTitle(tr("Shares options"));
-    resize(QSize(500, 500).expandedTo(minimumSizeHint()));
+    setWindowIcon(QIcon(":/share.png"));
+    setWindowTitle(tr("Shares"));
 }
 
 void SharesOptions::browse()
@@ -389,21 +381,7 @@ void SharesOptions::moreFolders()
     m_fewerButton->show();
 }
 
-void SharesOptions::scrollToHome()
-{
-    // scroll to home
-    QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
-    m_fsView->setExpanded(homeIndex, true);
-    m_fsView->scrollTo(homeIndex, QAbstractItemView::PositionAtTop);
-}
-
-void SharesOptions::show()
-{
-    QDialog::show();
-    QTimer::singleShot(0, this, SLOT(scrollToHome()));
-}
-
-void SharesOptions::validate()
+bool SharesOptions::save()
 {
     const QString path = m_directoryEdit->text();
     const QStringList mapped = m_fsModel->selectedFolders();
@@ -415,6 +393,20 @@ void SharesOptions::validate()
 
     m_database->setDirectory(path);
     m_database->setMappedDirectories(mapped);
-    accept();
+    return true;
+}
+
+void SharesOptions::scrollToHome()
+{
+    // scroll to home
+    QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
+    m_fsView->setExpanded(homeIndex, true);
+    m_fsView->scrollTo(homeIndex, QAbstractItemView::PositionAtTop);
+}
+
+void SharesOptions::showEvent(QShowEvent *event)
+{
+    ChatPreferencesTab::showEvent(event);
+    QTimer::singleShot(0, this, SLOT(scrollToHome()));
 }
 

@@ -44,7 +44,6 @@ public:
     ChatRosterModel *rosterModel();
     ChatRosterView *rosterView();
     QMenu *fileMenu();
-    QMenu *optionsMenu();
     bool open(const QString &jid);
     void addPanel(ChatPanel *panel);
     ChatPanel *panel(const QString &objectName);

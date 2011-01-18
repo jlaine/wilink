@@ -117,8 +117,6 @@ private:
     QPushButton *indexButton;
     QPushButton *removeButton;
     QStatusBar *statusBar;
-
-    QAction *menuAction;
 };
 
 class SharesTab : public QWidget

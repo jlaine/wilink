@@ -25,6 +25,22 @@
 
 #include "chat_preferences.h"
 
+class ChatPreferencesList : public QListWidget
+{
+public:
+    QSize sizeHint() const;
+};
+
+QSize ChatPreferencesList::sizeHint() const
+{
+    QSize hint(150, minimumHeight());
+    int rowCount = model()->rowCount();
+    int rowHeight = rowCount * sizeHintForRow(0);
+    if (rowHeight > hint.height())
+        hint.setHeight(rowHeight);
+    return hint;
+}
+
 class ChatPreferencesPrivate
 {
 public:
@@ -45,7 +61,8 @@ ChatPreferences::ChatPreferences(QWidget *parent)
     // splitter
     QSplitter *splitter = new QSplitter;
     
-    d->tabList = new QListWidget;
+    d->tabList = new ChatPreferencesList;
+    d->tabList->setIconSize(QSize(32, 32));
     splitter->addWidget(d->tabList);
     splitter->setStretchFactor(0, 0);
 

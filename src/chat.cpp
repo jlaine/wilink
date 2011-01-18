@@ -620,13 +620,6 @@ void Chat::messageClicked(QWidget *context)
         QTimer::singleShot(0, panel, SIGNAL(showPanel()));
 }
 
-/** Return this window's "Options" menu.
- */
-QMenu *Chat::optionsMenu()
-{
-    return d->optionsMenu;
-}
-
 /** Find a panel by its object name.
  *
  * @param objectName
@@ -729,11 +722,21 @@ void Chat::showHelp()
  */
 void Chat::showPreferences()
 {
-    ChatPreferences prefs(this);
-    prefs.addTab(new ChatOptions);
+    ChatPreferences *dialog = new ChatPreferences(this);
+    dialog->setWindowModality(Qt::WindowModal);
+
+    connect(dialog, SIGNAL(finished(int)),
+            dialog, SLOT(deleteLater()));
+
+    dialog->addTab(new ChatOptions);
     foreach (ChatPlugin *plugin, d->plugins)
-        plugin->preferences(&prefs);
-    prefs.exec();
+        plugin->preferences(dialog);
+
+#ifdef WILINK_EMBEDDED
+    dialog->showMaximized();
+#else
+    dialog->show();
+#endif
 }
 
 /** Unregister a panel from the roster list.

@@ -78,8 +78,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     chatWindow(chat),
     client(0),
     db(sharesDb),
-    rosterModel(0),
-    menuAction(0)
+    rosterModel(0)
 {
     bool check;
     setWindowIcon(QIcon(":/share.png"));
@@ -604,14 +603,6 @@ void SharesPanel::presenceReceived(const QXmppPresence &presence)
             client->transferManager().setProxyOnly(true);
         }
 
-        // add entries to options menu
-        if (!menuAction)
-        {
-            menuAction = chatWindow->optionsMenu()->addAction(QIcon(":/share.png"), tr("Shares options"));
-            connect(menuAction, SIGNAL(triggered(bool)),
-                    this, SLOT(showOptions()));
-        }
-
         // activate the shares view
         sharesView->setEnabled(true);
 
@@ -733,6 +724,8 @@ void SharesPanel::setRoster(ChatRosterModel *roster)
 
 void SharesPanel::showOptions()
 {
+    // FIXME : restore options!
+#if 0
     SharesOptions *dialog = new SharesOptions(db, chatWindow);
     dialog->setWindowModality(Qt::WindowModal);
 
@@ -746,6 +739,7 @@ void SharesPanel::showOptions()
     dialog->showMaximized();
 #else
     dialog->show();
+#endif
 #endif
 }
 
@@ -882,6 +876,7 @@ public:
     SharesPlugin();
     bool initialize(Chat *chat);
     void finalize(Chat *chat);
+    void preferences(ChatPreferences *prefs);
 
 private:
     QXmppShareDatabase *db;
@@ -942,6 +937,12 @@ void SharesPlugin::finalize(Chat *chat)
         delete db;
         db = 0;
     }
+}
+
+void SharesPlugin::preferences(ChatPreferences *prefs)
+{
+    if (db)
+        prefs->addTab(new SharesOptions(db));
 }
 
 Q_EXPORT_STATIC_PLUGIN2(shares, SharesPlugin)
