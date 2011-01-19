@@ -118,8 +118,8 @@ public:
     QUdpSocket *socket;
 
     // STUN
-    bool stunDone;
     quint32 stunCookie;
+    bool stunDone;
     QByteArray stunId;
     QHostAddress stunReflexiveAddress;
     quint16 stunReflexivePort;
