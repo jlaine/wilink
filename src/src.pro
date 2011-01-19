@@ -4,6 +4,7 @@ SUBDIRS = \
     idle \
     qdjango \
     qnetio \
+    qsound \
     qxmpp \
     mobile
 

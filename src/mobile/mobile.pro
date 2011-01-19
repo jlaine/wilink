@@ -1,6 +1,7 @@
 include(../src.pri)
 include(../idle/idle.pri)
 include(../qnetio/qnetio.pri)
+include(../qsound/qsound.pri)
 include(../qxmpp/qxmpp.pri)
 
 QT += multimedia network xml
@@ -20,6 +21,7 @@ SOURCES += \
     ../chat_form.cpp \
     ../chat_history.cpp \
     ../chat_panel.cpp \
+    ../chat_preferences.cpp \
     ../chat_roster.cpp \
     ../chat_roster_item.cpp \
     ../chat_search.cpp \
@@ -34,6 +36,7 @@ SOURCES += \
     ../plugins/console.cpp \
     ../plugins/contacts.cpp \
     ../plugins/phone.cpp \
+    ../plugins/phone/models.cpp \
     ../plugins/phone/sip.cpp \
     ../plugins/photos.cpp \
     ../plugins/rooms.cpp \
@@ -51,6 +54,7 @@ HEADERS += \
     ../chat_history.h \
     ../chat_panel.h \
     ../chat_plugin.h \
+    ../chat_preferences.h \
     ../chat_roster.h \
     ../chat_roster_item.h \
     ../chat_search.h \
@@ -66,6 +70,7 @@ HEADERS += \
     ../plugins/console.h \
     ../plugins/photos.h \
     ../plugins/phone.h \
+    ../plugins/phone/models.h \
     ../plugins/phone/sip.h \
     ../plugins/rooms.h \
     ../plugins/transfers.h
@@ -81,10 +86,12 @@ INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
     $$IDLE_INCLUDE_DIR \
     $$QNETIO_INCLUDE_DIR \
+    $$QSOUND_INCLUDE_DIR \
     $$QXMPP_INCLUDE_DIR
 LIBS += \
     $$IDLE_LIBS \
     $$QNETIO_LIBS \
+    $$QSOUND_LIBS \
     $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
