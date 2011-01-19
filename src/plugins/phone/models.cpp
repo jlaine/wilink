@@ -66,9 +66,9 @@ public:
     int duration;
     int flags;
 
-    int soundId;
     SipCall *call;
     QNetworkReply *reply;
+    int soundId;
 };
 
 PhoneCallsItem::PhoneCallsItem()
@@ -177,7 +177,6 @@ void PhoneCallsModel::callRinging()
     Q_ASSERT(call);
 
     // find the call
-    int row = -1;
     foreach (PhoneCallsItem *item, m_items) {
         if (item->call == call) {
             item->soundId = m_soundPlayer->play(":/call-outgoing.ogg", true);
@@ -401,6 +400,7 @@ bool PhoneCallsModel::removeRows(int row, int count, const QModelIndex &parent)
         m_items.removeAt(i);
     }
     endRemoveRows();
+    return true;
 }
 
 /** Returns the number of rows under the given \a parent.
@@ -409,6 +409,7 @@ bool PhoneCallsModel::removeRows(int row, int count, const QModelIndex &parent)
  */
 int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent);
     return m_items.size();
 }
 
