@@ -236,13 +236,7 @@ void ContactsWatcher::removeContact()
         tr("Do you want to remove %1 from your contact list?").arg(contactName),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
     {
-        QXmppRosterIq::Item item;
-        item.setBareJid(bareJid);
-        item.setSubscriptionType(QXmppRosterIq::Item::Remove);
-        QXmppRosterIq packet;
-        packet.setType(QXmppIq::Set);
-        packet.addItem(item);
-        chat->client()->sendPacket(packet);
+        chat->client()->rosterManager().removeRosterEntry(bareJid);
     }
 }
 
