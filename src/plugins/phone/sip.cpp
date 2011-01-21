@@ -1038,7 +1038,7 @@ void SipClient::connectToServer()
     d->connectTimer->start(10000);
 
     // listen for SIP
-    if (!d->socket->isOpen()) {
+    if (d->socket->state() == QAbstractSocket::UnconnectedState) {
         if (!d->socket->bind()) {
             warning("Could not start listening for SIP");
             return;
