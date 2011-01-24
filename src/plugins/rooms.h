@@ -55,6 +55,7 @@ class ChatRoomWatcher : public QObject
 
 public:
     ChatRoomWatcher(Chat *chatWindow);
+    ChatRoom *joinRoom(const QString &jid, bool focus);
 
 private slots:
     void bookmarksReceived();
@@ -75,7 +76,6 @@ private slots:
     void urlClick(const QUrl &url);
 
 private:
-    ChatRoom *joinRoom(const QString &jid, bool focus);
     bool bookmarkRoom(const QString &jid);
     bool unbookmarkRoom(const QString &jid);
 

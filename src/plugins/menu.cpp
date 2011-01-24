@@ -37,6 +37,7 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "menu.h"
+#include "rooms.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/1");
 
@@ -156,16 +157,17 @@ void Menu::showMenu()
             {
                 /* add or move chat room entry */
                 ChatRosterModel *model = chatWindow->rosterModel();
+                ChatRoomWatcher *roomWatcher = chatWindow->findChild<ChatRoomWatcher*>();
                 QModelIndex homeIndex = model->findItem(HOME_ROSTER_ID);
                 QModelIndex index = model->findItem(linkUrl.path());
                 if (index.isValid())
                     model->reparentItem(index, homeIndex);
-                else
+                else if (roomWatcher)
                 {
                     index = model->addItem(ChatRosterItem::Room,
                         linkUrl.path(), tr("Chat room"), QIcon(":/chat.png"),
                         homeIndex);
-                    QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
+                    roomWatcher->joinRoom(linkUrl.path(), false);
                 }
                 model->setData(index, true, ChatRosterModel::PersistentRole);
             }
