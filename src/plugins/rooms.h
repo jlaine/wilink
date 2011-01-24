@@ -111,7 +111,6 @@ private slots:
     void tabPressed();
 
 private:
-    QString chatLocalJid;
     QString chatRemoteJid;
     ChatClient *client;
     bool joined;

@@ -490,7 +490,6 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     rosterModel(chatRosterModel)
 {
     nickName = rosterModel->ownName();
-    chatLocalJid = jid + "/" + nickName;
     setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
@@ -667,7 +666,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     if (presence.from() == client->configuration().jid())
     {
         QXmppPresence packet;
-        packet.setTo(chatLocalJid);
+        packet.setTo(chatRemoteJid + "/" + nickName);
         packet.setType(presence.type());
         packet.setStatus(presence.status());
         client->sendPacket(packet);
