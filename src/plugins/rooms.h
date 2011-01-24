@@ -75,7 +75,7 @@ private slots:
     void urlClick(const QUrl &url);
 
 private:
-    ChatRoom *joinRoom(const QString &jid);
+    ChatRoom *joinRoom(const QString &jid, bool focus);
     bool bookmarkRoom(const QString &jid);
     bool unbookmarkRoom(const QString &jid);
 
@@ -96,10 +96,12 @@ public:
     ChatRosterItem::Type objectType() const;
     void invite(const QString &jid);
 
-private slots:
-    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
+public slots:
     void join();
     void leave();
+
+private slots:
+    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void disconnected();
     void messageClicked(const ChatMessage &msg);
     void messageReceived(const QXmppMessage &msg);

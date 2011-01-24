@@ -186,7 +186,7 @@ void ChatRoomWatcher::bookmarksReceived()
         if (conference.autoJoin())
         {
             // if autojoin is enabled, join room
-            joinRoom(conference.jid());
+            joinRoom(conference.jid(), false);
         }
         else
         {
@@ -204,7 +204,7 @@ void ChatRoomWatcher::disconnected()
     roomButton->setEnabled(false);
 }
 
-ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
+ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
     if (!room)
@@ -223,8 +223,11 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid)
         Q_ASSERT(check);
 
         chat->addPanel(room);
+        QMetaObject::invokeMethod(room, "registerPanel");
     }
-    QTimer::singleShot(0, room, SIGNAL(showPanel()));
+    room->join();
+    if (focus)
+        QTimer::singleShot(0, room, SIGNAL(showPanel()));
     return room;
 }
 
@@ -267,7 +270,7 @@ void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
     if (box && box->standardButton(button) == QMessageBox::Yes)
     {
         const QString roomJid = box->objectName();
-        joinRoom(roomJid);
+        joinRoom(roomJid, true);
         invitations.removeAll(roomJid);
     }
 }
@@ -321,7 +324,7 @@ void ChatRoomWatcher::roomPrompt()
         return;
 
     // join room and bookmark it
-    joinRoom(roomJid);
+    joinRoom(roomJid, true);
     bookmarkRoom(roomJid);
 }
 
@@ -393,7 +396,7 @@ void ChatRoomWatcher::rosterClick(const QModelIndex &index)
         return;
 
     const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
-    joinRoom(roomJid);
+    joinRoom(roomJid, true);
 }
 
 /** Handle a drop event on a roster entry.
@@ -416,7 +419,7 @@ void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
             continue;
         if (event->type() == QEvent::Drop)
         {
-            ChatRoom *room = joinRoom(roomJid);
+            ChatRoom *room = joinRoom(roomJid, true);
             room->invite(jid);
         }
         found++;
@@ -474,7 +477,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 void ChatRoomWatcher::urlClick(const QUrl &url)
 {
     if (url.scheme() == "xmpp" && url.hasQueryItem("join"))
-        joinRoom(url.path());
+        joinRoom(url.path(), true);
 }
 
 ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
@@ -526,7 +529,6 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
 
     check = connect(this, SIGNAL(showPanel()), this, SLOT(join()));
     Q_ASSERT(check);
-
 
     /* keyboard shortcut */
     connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
