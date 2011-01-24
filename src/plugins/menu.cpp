@@ -71,7 +71,8 @@ Menu::Menu(Chat *window)
                     QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     Q_ASSERT(check);
 
-    check = connect(chatWindow->client(), SIGNAL(connected()),
+    /* wait until we receive our own vCard then fetch menu */
+    check = connect(chatWindow->rosterModel(), SIGNAL(ownNameReceived()),
                     this, SLOT(fetchMenu()));
     Q_ASSERT(check);
 }

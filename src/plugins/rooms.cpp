@@ -222,6 +222,7 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
                         room, SLOT(rosterClick(QModelIndex)));
         Q_ASSERT(check);
 
+        // add panel
         chat->addPanel(room);
         QMetaObject::invokeMethod(room, "registerPanel");
     }
@@ -502,9 +503,6 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(connected()), this, SLOT(join()));
-    Q_ASSERT(check);
-
-    check = connect(client, SIGNAL(connected()), this, SIGNAL(registerPanel()));
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
