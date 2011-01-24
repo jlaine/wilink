@@ -87,10 +87,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
                     this, SLOT(bookmarksReceived()));
     Q_ASSERT(check);
 
-    check = connect(chat->rosterModel(), SIGNAL(ownNameReceived()),
-                    this, SLOT(bookmarksReceived()));
-    Q_ASSERT(check);
-
     check = connect(mucManager, SIGNAL(invitationReceived(QString,QString,QString)),
                     this, SLOT(invitationReceived(QString,QString,QString)));
     Q_ASSERT(check);
@@ -175,11 +171,6 @@ bool ChatRoomWatcher::unbookmarkRoom(const QString &roomJid)
 
 void ChatRoomWatcher::bookmarksReceived()
 {
-    // if we are missing our bookmarks or nickname, don't do anything yet
-    if (!chat->rosterModel()->isOwnNameReceived() ||
-        !bookmarkManager->areBookmarksReceived())
-        return;
-
     const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
     foreach (const QXmppBookmarkConference &conference, bookmarks.conferences())
     {
@@ -187,14 +178,6 @@ void ChatRoomWatcher::bookmarksReceived()
         {
             // if autojoin is enabled, join room
             joinRoom(conference.jid(), false);
-        }
-        else
-        {
-            // otherwise, just add an entry in the roster
-            chat->rosterModel()->addItem(ChatRosterItem::Room,
-                conference.jid(),
-                jidToUser(conference.jid()),
-                QIcon(":/room.png"));
         }
     }
 }
@@ -226,7 +209,6 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
         chat->addPanel(room);
         QMetaObject::invokeMethod(room, "registerPanel");
     }
-    room->join();
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));
     return room;
@@ -489,7 +471,6 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     roomJid(jid),
     rosterModel(chatRosterModel)
 {
-    nickName = rosterModel->ownName();
     setObjectName(jid);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
@@ -501,7 +482,7 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
                     this, SLOT(returnPressed()));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(connected()), this, SLOT(join()));
+    check = connect(rosterModel, SIGNAL(ownNameReceived()), this, SLOT(join()));
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -524,11 +505,12 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(showPanel()), this, SLOT(join()));
-    Q_ASSERT(check);
-
     /* keyboard shortcut */
     connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
+
+    /* if nickname is received, join now */
+    if (rosterModel->isOwnNameReceived())
+        join();
 }
 
 /** Handle disconnection from server.
@@ -576,6 +558,8 @@ void ChatRoom::join()
 {
     if (joined)
         return;
+
+    nickName = rosterModel->ownName();
 
     // clear history
     historyWidget()->clear();
@@ -663,7 +647,7 @@ ChatRosterItem::Type ChatRoom::objectType() const
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {
     // if our own presence changes, reflect it in the chat room
-    if (presence.from() == client->configuration().jid())
+    if (joined && presence.from() == client->configuration().jid())
     {
         QXmppPresence packet;
         packet.setTo(roomJid + "/" + nickName);

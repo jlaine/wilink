@@ -96,13 +96,11 @@ public:
     ChatRosterItem::Type objectType() const;
     void invite(const QString &jid);
 
-public slots:
-    void join();
-    void leave();
-
 private slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void disconnected();
+    void join();
+    void leave();
     void messageClicked(const ChatMessage &msg);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
