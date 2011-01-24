@@ -483,7 +483,7 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
 
 ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
-    chatRemoteJid(jid),
+    roomJid(jid),
     client(xmppClient),
     joined(false),
     notifyMessages(false),
@@ -538,14 +538,14 @@ void ChatRoom::disconnected()
     joined = false;
 
     // clear chat room participants
-    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    QModelIndex roomIndex = rosterModel->findItem(roomJid);
     if (roomIndex.isValid())
         rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
 }
 
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.from() != chatRemoteJid || disco.type() != QXmppIq::Result)
+    if (disco.from() != roomJid || disco.type() != QXmppIq::Result)
         return;
 
     // notify user of received messages if the room is not publicly listed
@@ -553,20 +553,20 @@ void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
         notifyMessages = true;
 
     // update window title
-    setWindowTitle(rosterModel->contactName(chatRemoteJid));
+    setWindowTitle(rosterModel->contactName(roomJid));
 }
 
 /** Invite a user to the chat room.
  */
 void ChatRoom::invite(const QString &jid)
 {
-    if (!client->findExtension<QXmppMucManager>()->sendInvitation(chatRemoteJid, jid, "Let's talk"))
+    if (!client->findExtension<QXmppMucManager>()->sendInvitation(roomJid, jid, "Let's talk"))
         return;
 
     // notify user
     queueNotification(tr("%1 has been invited to %2")
         .arg(rosterModel->contactName(jid))
-        .arg(rosterModel->contactName(chatRemoteJid)),
+        .arg(rosterModel->contactName(roomJid)),
         ForceNotification);
 }
 
@@ -581,10 +581,10 @@ void ChatRoom::join()
     historyWidget()->clear();
 
     // send join request
-    client->findExtension<QXmppMucManager>()->joinRoom(chatRemoteJid, nickName);
+    client->findExtension<QXmppMucManager>()->joinRoom(roomJid, nickName);
 
     // request room information
-    client->findExtension<QXmppDiscoveryManager>()->requestInfo(chatRemoteJid);
+    client->findExtension<QXmppDiscoveryManager>()->requestInfo(roomJid);
 
     joined = true;
 }
@@ -595,12 +595,12 @@ void ChatRoom::leave()
 {
     if (joined)
     {
-        client->findExtension<QXmppMucManager>()->leaveRoom(chatRemoteJid);
+        client->findExtension<QXmppMucManager>()->leaveRoom(roomJid);
         joined = false;
     }
 
     /* remove room from roster */
-    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    QModelIndex roomIndex = rosterModel->findItem(roomJid);
     if (roomIndex.data(ChatRosterModel::PersistentRole).toBool())
         rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
     else
@@ -611,7 +611,7 @@ void ChatRoom::leave()
 
 void ChatRoom::messageClicked(const ChatMessage &msg)
 {
-    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    QModelIndex roomIndex = rosterModel->findItem(roomJid);
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
     {
         QModelIndex index = roomIndex.child(i, 0);
@@ -626,7 +626,7 @@ void ChatRoom::messageClicked(const ChatMessage &msg)
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
     const QString from = jidToResource(msg.from());
-    if (jidToBareJid(msg.from()) != chatRemoteJid ||
+    if (jidToBareJid(msg.from()) != roomJid ||
         msg.type() != QXmppMessage::GroupChat)
         return;
 
@@ -666,13 +666,13 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     if (presence.from() == client->configuration().jid())
     {
         QXmppPresence packet;
-        packet.setTo(chatRemoteJid + "/" + nickName);
+        packet.setTo(roomJid + "/" + nickName);
         packet.setType(presence.type());
         packet.setStatus(presence.status());
         client->sendPacket(packet);
     }
 
-    if (jidToBareJid(presence.from()) != chatRemoteJid)
+    if (jidToBareJid(presence.from()) != roomJid)
         return;
 
     switch (presence.type())
@@ -690,7 +690,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
                 QMessageBox::warning(window(),
                     tr("Chat room error"),
                     tr("Sorry, but you cannot join chat room '%1'.\n\n%2")
-                        .arg(chatRemoteJid)
+                        .arg(roomJid)
                         .arg(error.text()));
                 break;
             }
@@ -714,7 +714,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
                         QMessageBox::warning(window(),
                             tr("Chat room error"),
                             tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
-                                .arg(chatRemoteJid)
+                                .arg(roomJid)
                                 .arg(reason.value()));
                         break;
                     }
@@ -737,7 +737,7 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
     // talk "at" somebody
-    if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == chatRemoteJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
+    if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == roomJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
     {
         const QString newAt = "@" + jidToResource(jid);
         QTextCursor cursor = chatInput->textCursor();
@@ -771,7 +771,7 @@ void ChatRoom::returnPressed()
     if (text.isEmpty())
         return;
 
-    if (client->findExtension<QXmppMucManager>()->sendMessage(chatRemoteJid, text))
+    if (client->findExtension<QXmppMucManager>()->sendMessage(roomJid, text))
         chatInput->clear();
 }
 
@@ -793,7 +793,7 @@ void ChatRoom::tabPressed()
 
     /* find matching room members */
     QStringList matches;
-    QModelIndex roomIndex = rosterModel->findItem(chatRemoteJid);
+    QModelIndex roomIndex = rosterModel->findItem(roomJid);
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
     {
         QString member = roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
