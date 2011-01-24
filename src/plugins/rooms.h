@@ -111,11 +111,11 @@ private slots:
     void tabPressed();
 
 private:
-    QString roomJid;
     ChatClient *client;
     bool joined;
     QString nickName;
     bool notifyMessages;
+    QString roomJid;
     ChatRosterModel *rosterModel;
 };
 

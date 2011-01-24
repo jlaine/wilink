@@ -483,10 +483,10 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
 
 ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
-    roomJid(jid),
     client(xmppClient),
     joined(false),
     notifyMessages(false),
+    roomJid(jid),
     rosterModel(chatRosterModel)
 {
     nickName = rosterModel->ownName();
