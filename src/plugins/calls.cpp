@@ -139,7 +139,7 @@ void CallHandler::callStateChanged(QXmppCall::State state)
         if (!m_audioOutput)
         {
             m_audioOutput = new QAudioOutput(format, this);
-            m_audioOutput->setBufferSize(2 * packetSize);
+            m_audioOutput->setBufferSize(4 * packetSize);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
             m_audioOutput->start(channel);
         }
