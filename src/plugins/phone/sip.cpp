@@ -517,6 +517,7 @@ void SipCallPrivate::onStateChanged()
             audioOutput->setBufferSize(2 * packetSize);
             audioOutput->start(audioChannel);
             q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
+            q->debug(QString("Audio output buffer size %1 (asked for %2)").arg(QString::number(audioOutput->bufferSize()), QString::number(2 * packetSize)));
         }
 
         // initialise audio input
@@ -529,6 +530,7 @@ void SipCallPrivate::onStateChanged()
             audioInput->setBufferSize(2 * packetSize);
             audioInput->start(audioChannel);
             q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
+            q->debug(QString("Audio input buffer size %1 (asked for %2)").arg(QString::number(audioInput->bufferSize()), QString::number(2 * packetSize)));
         }
 
     } else {
