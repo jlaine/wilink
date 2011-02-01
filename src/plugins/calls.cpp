@@ -114,14 +114,30 @@ void CallHandler::audioStateChanged(QAudio::State state)
     if (audio == m_audioInput)
     {
 #ifndef FAKE_AUDIO_INPUT
-        if (m_audioInput->error() != QAudio::NoError)
-            qWarning() << "audio input state" << state << "error" << m_audioInput->error();
-        if (m_audioInput->error() == QAudio::UnderrunError)
+        warning(QString("Audio input state %1 error %2").arg(
+            QString::number(m_audioInput->state()),
+            QString::number(m_audioInput->error())));
+
+        // restart audio input if we get an underrun
+        if (m_audioInput->state() == QAudio::StoppedState &&
+            m_audioInput->error() == QAudio::UnderrunError)
+        {
+            warning("Audio input needs restart due to buffer underrun");
             m_audioInput->start(m_call->audioChannel());
+        }
 #endif
     } else if (audio == m_audioOutput) {
-        if (m_audioOutput->error() != QAudio::NoError)
-            qWarning() << "audio output state" << state << "error" << m_audioOutput->error();
+        debug(QString("Audio output state %1 error %2").arg(
+            QString::number(m_audioOutput->state()),
+            QString::number(m_audioOutput->error())));
+
+        // restart audio output if we get an underrun
+        if (m_audioOutput->state() == QAudio::StoppedState &&
+            m_audioOutput->error() == QAudio::UnderrunError)
+        {
+            warning("Audio output needs restart due to buffer underrun");
+            m_audioOutput->start(m_call->audioChannel());
+        }
     }
 }
 

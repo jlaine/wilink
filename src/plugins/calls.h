@@ -64,7 +64,7 @@ private:
     QIODevice *m_output;
 };
 
-class CallHandler : public QObject
+class CallHandler : public QXmppLoggable
 {
     Q_OBJECT
 
