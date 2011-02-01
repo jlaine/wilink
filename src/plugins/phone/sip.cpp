@@ -673,16 +673,20 @@ void SipCall::audioStateChanged()
             QString::number(d->audioInput->state()),
             QString::number(d->audioInput->error())));
         // restart audio input if we get an underrun
-        if (d->audioInput->error() == QAudio::UnderrunError)
+        if (d->audioInput->error() == QAudio::UnderrunError) {
+            warning("Audio input needs restart");
             d->audioInput->start(d->audioChannel);
+        }
     }
     else if (audio == d->audioOutput) {
         debug(QString("Audio output state %1 error %2").arg(
             QString::number(d->audioOutput->state()),
             QString::number(d->audioOutput->error())));
         // restart audio output if we get an underrun
-        if (d->audioOutput->error() == QAudio::UnderrunError)
+        if (d->audioOutput->error() == QAudio::UnderrunError) {
+            warning("Audio output needs restart");
             d->audioOutput->start(d->audioChannel);
+        }
     }
 }
 
