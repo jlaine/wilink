@@ -509,28 +509,32 @@ void SipCallPrivate::onStateChanged()
 
         // initialise audio output
         if (!audioOutput) {
+            const int bufferSize = 4 * packetSize;
+
             QTime tm;
             tm.start();
             audioOutput = new QAudioOutput(format, q);
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
-            audioOutput->setBufferSize(2 * packetSize);
+            audioOutput->setBufferSize(bufferSize);
             audioOutput->start(audioChannel);
             q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
-            q->debug(QString("Audio output buffer size %1 (asked for %2)").arg(QString::number(audioOutput->bufferSize()), QString::number(2 * packetSize)));
+            q->debug(QString("Audio output buffer size %1 (asked for %2)").arg(QString::number(audioOutput->bufferSize()), QString::number(bufferSize)));
         }
 
         // initialise audio input
         if (!audioInput) {
+            const int bufferSize = 2 * packetSize;
+
             QTime tm;
             tm.start();
             audioInput = new QAudioInput(format, q);
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
-            audioInput->setBufferSize(2 * packetSize);
+            audioInput->setBufferSize(bufferSize);
             audioInput->start(audioChannel);
             q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
-            q->debug(QString("Audio input buffer size %1 (asked for %2)").arg(QString::number(audioInput->bufferSize()), QString::number(2 * packetSize)));
+            q->debug(QString("Audio input buffer size %1 (asked for %2)").arg(QString::number(audioInput->bufferSize()), QString::number(bufferSize)));
         }
 
     } else {
