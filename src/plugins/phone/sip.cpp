@@ -668,10 +668,22 @@ void SipCall::audioStateChanged()
     QObject *audio = sender();
     if (!audio)
         return;
-    else if (audio == d->audioInput)
-        debug(QString("Audio input state %1").arg(QString::number(d->audioInput->state())));
-    else if (audio == d->audioOutput)
-        debug(QString("Audio output state %1").arg(QString::number(d->audioOutput->state())));
+    else if (audio == d->audioInput) {
+        debug(QString("Audio input state %1 error %2").arg(
+            QString::number(d->audioInput->state()),
+            QString::number(d->audioInput->error())));
+        // restart audio input if we get an underrun
+        if (d->audioInput->error() == QAudio::UnderrunError)
+            d->audioInput->start(d->audioChannel);
+    }
+    else if (audio == d->audioOutput) {
+        debug(QString("Audio output state %1 error %2").arg(
+            QString::number(d->audioOutput->state()),
+            QString::number(d->audioOutput->error())));
+        // restart audio output if we get an underrun
+        if (d->audioOutput->error() == QAudio::UnderrunError)
+            d->audioOutput->start(d->audioChannel);
+    }
 }
 
 /// Returns the call's direction.
