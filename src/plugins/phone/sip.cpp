@@ -1034,6 +1034,7 @@ SipClient::SipClient(QObject *parent)
     : QXmppLoggable(parent)
 {
     qRegisterMetaType<SipClient::State>("SipClient::State");
+    qRegisterMetaType<SipMessage>("SipMessage");
 
     d = new SipClientPrivate(this);
     d->socket = new QUdpSocket(this);
