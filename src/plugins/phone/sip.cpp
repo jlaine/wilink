@@ -1377,11 +1377,13 @@ void SipClient::transactionFinished()
             }
         } else {
             warning("Register failed");
+            if (d->state != SipClient::DisconnectingState)
+                d->connectTimer->start();
             d->setState(SipClient::DisconnectedState);
         }
     }
     else if (method == "SUBSCRIBE") {
-        if (reply.statusCode() >= 300) {
+        if (reply.statusCode() != 200) {
             warning("Subscribe failed");
         }
     }
@@ -1701,21 +1703,22 @@ SipTransaction::SipTransaction(const SipMessage &request, SipClient *client, QOb
 
     // Timer F
     m_timeoutTimer = new QTimer(this);
-    m_timeoutTimer->setInterval(64 * SIP_T1_TIMER);
     m_timeoutTimer->setSingleShot(true);
     check = connect(m_timeoutTimer, SIGNAL(timeout()),
                     this, SLOT(timeout()));
     Q_ASSERT(check);
-    m_timeoutTimer->start();
+    m_timeoutTimer->start(64 * SIP_T1_TIMER);
 
     // Timer E
     m_retryTimer = new QTimer(this);
-    m_retryTimer->setInterval(0);
     m_retryTimer->setSingleShot(true);
     check = connect(m_retryTimer, SIGNAL(timeout()),
                     this, SLOT(retry()));
     Q_ASSERT(check);
-    m_retryTimer->start();
+
+    // Send packet immediately
+    client->sendMessage(m_request);
+    m_retryTimer->start(SIP_T1_TIMER);
 }
 
 QByteArray SipTransaction::branch() const
@@ -1759,15 +1762,12 @@ void SipTransaction::retry()
     emit sendMessage(m_request);
 
     // schedule next retry
-    if (m_retryTimer->interval() < SIP_T1_TIMER)
-        m_retryTimer->start(SIP_T1_TIMER);
-    else
-        m_retryTimer->start(qMin(2 * m_retryTimer->interval(), SIP_T2_TIMER));
+    m_retryTimer->start(qMin(2 * m_retryTimer->interval(), SIP_T2_TIMER));
 }
 
 void SipTransaction::timeout()
 {
-    warning("Transaction timed out");
+    warning(QString("%1 transaction timed out").arg(QString::fromUtf8(m_request.method())));
     m_retryTimer->stop();
     m_state = Terminated;
     emit finished();
