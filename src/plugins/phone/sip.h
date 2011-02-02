@@ -116,6 +116,10 @@ public:
     };
 
     SipTransaction(const SipMessage &request, QObject *parent = 0);
+    QByteArray branch() const;
+    SipMessage request() const;
+    SipMessage response() const;
+    State state() const;
 
 signals:
     void finished();
@@ -130,6 +134,7 @@ private slots:
 
 private:
     SipMessage m_request;
+    SipMessage m_response;
     State m_state;
     QTimer *m_retryTimer;
     QTimer *m_timeoutTimer;
@@ -176,6 +181,7 @@ private slots:
     void audioStateChanged();
     void handleTimeout();
     void localCandidatesChanged();
+    void transactionFinished();
 
 private:
     SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent);

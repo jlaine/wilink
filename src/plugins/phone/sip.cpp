@@ -158,6 +158,14 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     if (!recordRoutes.isEmpty())
         remoteRoute = recordRoutes;
 
+    const QMap<QByteArray, QByteArray> viaParams = SipMessage::valueParameters(reply.headerField("Via"));
+    foreach (SipTransaction *transaction, transactions) {
+        if (transaction->branch() == viaParams.value("branch")) {
+            transaction->messageReceived(reply);
+            return;
+        }
+    }
+
     // send ack
     if  (command == "INVITE" && reply.statusCode() >= 200) {
         invitePending = false;
@@ -184,23 +192,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         return;
     }
 
-    if (command == "BYE") {
-
-        if (invitePending) {
-            SipMessage request = client->d->buildRequest("CANCEL", inviteRequest.uri(), this, inviteRequest.sequenceNumber());
-            request.setHeaderField("To", inviteRequest.headerField("To"));
-            request.setHeaderField("Via", inviteRequest.headerField("Via"));
-            request.removeHeaderField("Contact");
-            client->d->sendRequest(request, this);
-        } else {
-            setState(QXmppCall::FinishedState);
-        }
-
-    } else if (command == "CANCEL") {
-
-        setState(QXmppCall::FinishedState);
-
-    } else if (command == "INVITE") {
+    if (command == "INVITE") {
 
         if (reply.statusCode() == 180)
         {
@@ -757,6 +749,29 @@ QXmppCall::State SipCall::state() const
     return d->state;
 }
 
+void SipCall::transactionFinished()
+{
+    SipTransaction *transaction = qobject_cast<SipTransaction*>(sender());
+    if (!transaction || !d->transactions.contains(transaction))
+        return;
+
+    const QByteArray method = transaction->request().method();
+    if (method == "BYE") {
+        if (d->invitePending) {
+            SipMessage request = d->client->d->buildRequest("CANCEL", d->inviteRequest.uri(), d, d->inviteRequest.sequenceNumber());
+            request.setHeaderField("To", d->inviteRequest.headerField("To"));
+            request.setHeaderField("Via", d->inviteRequest.headerField("Via"));
+            request.removeHeaderField("Contact");
+            d->transactions << d->client->d->startTransaction(request, this);
+        } else {
+            d->setState(QXmppCall::FinishedState);
+        }
+    }
+    else if (method == "CANCEL") {
+        d->setState(QXmppCall::FinishedState);
+    }
+}
+
 void SipCall::handleTimeout()
 {
     warning(QString("SIP call %1 timed out").arg(QString::fromUtf8(d->id)));
@@ -768,6 +783,8 @@ void SipCall::handleTimeout()
 
 void SipCall::hangup()
 {
+    bool check;
+
     if (d->state == QXmppCall::DisconnectingState ||
         d->state == QXmppCall::FinishedState)
         return;
@@ -781,13 +798,7 @@ void SipCall::hangup()
     request.setHeaderField("To", d->remoteRecipient);
     for (int i = d->remoteRoute.size() - 1; i >= 0; --i)
         request.addHeaderField("Route", d->remoteRoute[i]);
-    d->client->d->sendRequest(request, d);
-
-#if 0
-    SipTransaction *transaction = new SipTransaction(request, this);
-    connect(transaction, SIGNAL(sendMessage(SipMessage)),
-            d->client, SLOT(sendMessage(SipMessage)));
-#endif
+    d->transactions << d->client->d->startTransaction(request, this);
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
@@ -1003,6 +1014,20 @@ void SipClientPrivate::setState(SipClient::State newState)
         else if (state == SipClient::DisconnectedState)
             emit q->disconnected();
     }
+}
+
+SipTransaction *SipClientPrivate::startTransaction(const SipMessage &request, QObject *receiver)
+{
+    bool check;
+
+    SipTransaction *transaction = new SipTransaction(request, receiver);
+    check = q->connect(transaction, SIGNAL(sendMessage(SipMessage)),
+                    q, SLOT(sendMessage(SipMessage)));
+    Q_ASSERT(check);
+    check = q->connect(transaction, SIGNAL(finished()),
+                    receiver, SLOT(transactionFinished()));
+    Q_ASSERT(check);
+    return transaction;
 }
 
 SipClient::SipClient(QObject *parent)
@@ -1680,9 +1705,40 @@ SipTransaction::SipTransaction(const SipMessage &request, QObject *parent)
     m_retryTimer->start();
 }
 
+QByteArray SipTransaction::branch() const
+{
+    const QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(m_request.headerField("Via"));
+    return params.value("branch");
+}
+
 void SipTransaction::messageReceived(const SipMessage &message)
 {
+    if (message.statusCode() < 200) {
+        m_retryTimer->setInterval(SIP_T2_TIMER);
+        m_retryTimer->start();
+        m_state = Proceeding;
+    } else {
+        m_retryTimer->stop();
+        m_timeoutTimer->stop();
+        m_response = message;
+        m_state = Completed;
+        emit finished();
+    }
+}
 
+SipMessage SipTransaction::request() const
+{
+    return m_request;
+}
+
+SipMessage SipTransaction::response() const
+{
+    return m_response;
+}
+
+SipTransaction::State SipTransaction::state() const
+{
+    return m_state;
 }
 
 void SipTransaction::retry()

@@ -46,6 +46,7 @@ public:
     QMap<QByteArray, QByteArray> challenge;
     QMap<QByteArray, QByteArray> proxyChallenge;
     SipMessage lastRequest;
+    QList<SipTransaction*> transactions;
 };
 
 class SipCallPrivate : public SipCallContext
@@ -94,6 +95,7 @@ public:
     void handleReply(const SipMessage &reply);
     void sendRequest(SipMessage &request, SipCallContext *ctx);
     void setState(SipClient::State state);
+    SipTransaction *startTransaction(const SipMessage &request, QObject *receiver);
 
     // timers
     QTimer *connectTimer;
