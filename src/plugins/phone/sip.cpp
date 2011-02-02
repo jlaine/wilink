@@ -209,10 +209,14 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         if (handleAuthentication(reply)) {
             SipMessage request = inviteRequest;
             request.setHeaderField("CSeq", QByteArray::number(cseq++) + ' ' + request.method());
+            if (!challenge.isEmpty())
+                request.setHeaderField("Authorization", client->d->authorization(request, challenge));
+            if (!proxyChallenge.isEmpty())
+                request.setHeaderField("Proxy-Authorization", client->d->authorization(request, proxyChallenge));
             client->d->setContact(request);
-            client->d->sendRequest(request, this);
+            client->sendMessage(request);
             invitePending = true;
-            inviteRequest = lastRequest;
+            inviteRequest = request;
         } else {
             setState(QXmppCall::FinishedState);
         }
@@ -485,7 +489,7 @@ void SipCallPrivate::sendInvite()
     request.setHeaderField("To", remoteRecipient);
     request.setHeaderField("Content-Type", "application/sdp");
     request.setBody(sdp.toByteArray());
-    client->d->sendRequest(request, this);
+    client->sendMessage(request);
     invitePending = true;
     inviteRequest = request;
 
@@ -935,19 +939,6 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
             return;
         }
     }
-}
-
-void SipClientPrivate::sendRequest(SipMessage &request, SipCallContext *ctx)
-{
-    if (request.isRequest()) {
-        if (!ctx->challenge.isEmpty())
-            request.setHeaderField("Authorization", authorization(request, ctx->challenge));
-        if (!ctx->proxyChallenge.isEmpty())
-            request.setHeaderField("Proxy-Authorization", authorization(request, ctx->proxyChallenge));
-    }
-    q->sendMessage(request);
-    if (request.isRequest() && request.method() != "ACK")
-        ctx->lastRequest = request;
 }
 
 void SipClientPrivate::setContact(SipMessage &request)
