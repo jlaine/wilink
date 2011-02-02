@@ -207,13 +207,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     // handle authentication
     if (reply.statusCode() == 407) {
         if (handleAuthentication(reply)) {
-            SipMessage request = inviteRequest;
-            request.setHeaderField("CSeq", QByteArray::number(cseq++) + ' ' + request.method());
-            if (!challenge.isEmpty())
-                request.setHeaderField("Authorization", client->d->authorization(request, challenge));
-            if (!proxyChallenge.isEmpty())
-                request.setHeaderField("Proxy-Authorization", client->d->authorization(request, proxyChallenge));
-            client->d->setContact(request);
+            SipMessage request = client->d->buildRetry(inviteRequest, this);
             client->sendMessage(request);
             invitePending = true;
             inviteRequest = request;
@@ -898,6 +892,13 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     setContact(packet);
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + ctx->tag);
+
+    // authentication
+    if (!ctx->challenge.isEmpty())
+        packet.setHeaderField("Authorization", authorization(packet, ctx->challenge));
+    if (!ctx->proxyChallenge.isEmpty())
+        packet.setHeaderField("Proxy-Authorization", authorization(packet, ctx->proxyChallenge));
+
     packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     if (method != "ACK" && method != "CANCEL")
         packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
@@ -918,6 +919,20 @@ SipMessage SipClientPrivate::buildResponse(const SipMessage &request)
     setContact(response);
     response.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return response;
+}
+
+SipMessage SipClientPrivate::buildRetry(const SipMessage &original, SipCallContext *ctx)
+{
+    SipMessage request = original;
+
+    request.setHeaderField("CSeq", QByteArray::number(ctx->cseq++) + ' ' + request.method());
+    if (!ctx->challenge.isEmpty())
+        request.setHeaderField("Authorization", authorization(request, ctx->challenge));
+    if (!ctx->proxyChallenge.isEmpty())
+        request.setHeaderField("Proxy-Authorization", authorization(request, ctx->proxyChallenge));
+    setContact(request);
+
+    return request;
 }
 
 void SipClientPrivate::handleReply(const SipMessage &reply)
@@ -1329,13 +1344,7 @@ void SipClient::transactionFinished()
     if (reply.statusCode() == 401 &&
         d->handleAuthentication(reply))
     {
-        SipMessage request = transaction->request();
-        request.setHeaderField("CSeq", QByteArray::number(d->cseq++) + ' ' + request.method());
-        if (!d->challenge.isEmpty())
-            request.setHeaderField("Authorization", d->authorization(request, d->challenge));
-        if (!d->proxyChallenge.isEmpty())
-            request.setHeaderField("Proxy-Authorization", d->authorization(request, d->proxyChallenge));
-        d->setContact(request);
+        SipMessage request = d->buildRetry(transaction->request(), d);
         d->transactions << new SipTransaction(request, this, this);
         return;
     }

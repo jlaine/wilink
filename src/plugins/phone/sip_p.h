@@ -88,11 +88,10 @@ class SipClientPrivate : public SipCallContext
 {
 public:
     SipClientPrivate(SipClient *qq);
-    QByteArray authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipMessage buildRequest(const QByteArray &method, const QByteArray &uri, SipCallContext *ctx, int seq);
     SipMessage buildResponse(const SipMessage &request);
+    SipMessage buildRetry(const SipMessage &original, SipCallContext *ctx);
     void handleReply(const SipMessage &reply);
-    void setContact(SipMessage &request);
     void setState(SipClient::State state);
 
     // timers
@@ -127,6 +126,8 @@ public:
     quint16 stunServerPort;
 
 private:
+    QByteArray authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const;
+    void setContact(SipMessage &request);
     SipClient *q;
 };
 
