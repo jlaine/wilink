@@ -375,7 +375,7 @@ void PhoneCallsModel::hangup()
 {
     for (int i = m_items.size() - 1; i >= 0; --i)
         if (m_items[i]->call)
-            m_items[i]->call->hangup();
+            QMetaObject::invokeMethod(m_items[i]->call, "hangup");
 }
 
 /** Removes \a count rows starting at the given \a row under the given \a parent.
