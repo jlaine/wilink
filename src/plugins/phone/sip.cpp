@@ -822,6 +822,7 @@ void SipCall::hangup()
             QString::fromUtf8(d->id)));
     d->setState(QXmppCall::DisconnectingState);
     d->iceConnection->close();
+    d->timer->stop();
 
     SipMessage request = d->client->d->buildRequest("BYE", d->remoteUri, d, d->cseq++);
     request.setHeaderField("To", d->remoteRecipient);
@@ -1756,10 +1757,9 @@ void SipTransaction::retry()
 
     // schedule next retry
     if (m_retryTimer->interval() < SIP_T1_TIMER)
-        m_retryTimer->setInterval(SIP_T1_TIMER);
-    else if (m_retryTimer->interval() < SIP_T2_TIMER)
-        m_retryTimer->setInterval(2 * m_retryTimer->interval());
-    m_retryTimer->start();
+        m_retryTimer->start(SIP_T1_TIMER);
+    else
+        m_retryTimer->start(qMin(2 * m_retryTimer->interval(), SIP_T2_TIMER));
 }
 
 void SipTransaction::timeout()
