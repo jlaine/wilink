@@ -752,7 +752,7 @@ QXmppCall::State SipCall::state() const
 void SipCall::transactionFinished()
 {
     SipTransaction *transaction = qobject_cast<SipTransaction*>(sender());
-    if (!transaction || !d->transactions.contains(transaction))
+    if (!transaction || !d->transactions.removeAll(transaction))
         return;
 
     const QByteArray method = transaction->request().method();
@@ -770,6 +770,7 @@ void SipCall::transactionFinished()
     else if (method == "CANCEL") {
         d->setState(QXmppCall::FinishedState);
     }
+    transaction->deleteLater();
 }
 
 void SipCall::handleTimeout()
