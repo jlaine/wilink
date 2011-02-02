@@ -102,8 +102,10 @@ private:
     QString m_reasonPhrase;
 };
 
-class SipTransaction : public QObject
+class SipTransaction : public QXmppLoggable
 {
+    Q_OBJECT
+
 public:
     enum State
     {
@@ -113,12 +115,24 @@ public:
         Terminated,
     };
 
-    SipTransaction(SipCallContext *ctx, const SipMessage &request, QObject *parent = 0);
+    SipTransaction(const SipMessage &request, QObject *parent = 0);
+
+signals:
+    void finished();
+    void sendMessage(const SipMessage &message);
+
+public slots:
+    void messageReceived(const SipMessage &message);
+
+private slots:
+    void retry();
+    void timeout();
 
 private:
-    SipCallContext *m_context;
     SipMessage m_request;
     State m_state;
+    QTimer *m_retryTimer;
+    QTimer *m_timeoutTimer;
 };
 
 /// The SipCall class represents a SIP Voice-Over-IP call.

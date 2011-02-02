@@ -49,6 +49,9 @@ static const int RTCP_COMPONENT = 2;
 #define STUN_RETRY_MS   500
 #define STUN_EXPIRE_MS  30000
 
+#define SIP_T1_TIMER 500
+#define SIP_T2_TIMER 4000
+
 const char *sipAddressPattern = "(.*)<(sip:([^>]+))>(;.+)?";
 
 enum StunStep {
@@ -779,6 +782,12 @@ void SipCall::hangup()
     for (int i = d->remoteRoute.size() - 1; i >= 0; --i)
         request.addHeaderField("Route", d->remoteRoute[i]);
     d->client->d->sendRequest(request, d);
+
+#if 0
+    SipTransaction *transaction = new SipTransaction(request, this);
+    connect(transaction, SIGNAL(sendMessage(SipMessage)),
+            d->client, SLOT(sendMessage(SipMessage)));
+#endif
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
@@ -1645,11 +1654,53 @@ QByteArray SipMessage::toByteArray() const
     return ba + m_body;
 }
 
-SipTransaction::SipTransaction(SipCallContext *context, const SipMessage &request, QObject *parent)
-    : QObject(parent),
-    m_context(context),
+SipTransaction::SipTransaction(const SipMessage &request, QObject *parent)
+    : QXmppLoggable(parent),
     m_request(request),
     m_state(Trying)
 {
+    bool check;
+
+    // Timer F
+    m_timeoutTimer = new QTimer(this);
+    m_timeoutTimer->setInterval(64 * SIP_T1_TIMER);
+    m_timeoutTimer->setSingleShot(true);
+    check = connect(m_timeoutTimer, SIGNAL(timeout()),
+                    this, SLOT(timeout()));
+    Q_ASSERT(check);
+    m_timeoutTimer->start();
+
+    // Timer E
+    m_retryTimer = new QTimer(this);
+    m_retryTimer->setInterval(0);
+    m_retryTimer->setSingleShot(true);
+    check = connect(m_retryTimer, SIGNAL(timeout()),
+                    this, SLOT(retry()));
+    Q_ASSERT(check);
+    m_retryTimer->start();
 }
 
+void SipTransaction::messageReceived(const SipMessage &message)
+{
+
+}
+
+void SipTransaction::retry()
+{
+    emit sendMessage(m_request);
+
+    // schedule next retry
+    if (m_retryTimer->interval() < SIP_T1_TIMER)
+        m_retryTimer->setInterval(SIP_T1_TIMER);
+    else if (m_retryTimer->interval() < SIP_T2_TIMER)
+        m_retryTimer->setInterval(2 * m_retryTimer->interval());
+    m_retryTimer->start();
+}
+
+void SipTransaction::timeout()
+{
+    warning("Transaction timed out");
+    m_retryTimer->stop();
+    m_state = Terminated;
+    emit finished();
+}
