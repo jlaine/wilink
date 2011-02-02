@@ -43,7 +43,6 @@ static const int RTCP_COMPONENT = 2;
 #define QXMPP_DEBUG_STUN
 
 #define EXPIRE_SECONDS 3600
-#define SIP_TIMEOUT_MS  30000
 
 #define STUN_RETRY_MS   500
 #define STUN_EXPIRE_MS  30000
@@ -224,7 +223,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     else if (reply.statusCode() == 200)
     {
         q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
-        timer->stop();
+        timeoutTimer->stop();
 
         if (reply.headerField("Content-Type") == "application/sdp" &&
             handleSdp(SdpMessage(reply.body())))
@@ -238,7 +237,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
 
         q->warning(QString("SIP call %1 failed").arg(
             QString::fromUtf8(id)));
-        timer->stop();
+        timeoutTimer->stop();
         setState(QXmppCall::FinishedState);
     }
 }
@@ -486,7 +485,7 @@ void SipCallPrivate::sendInvite()
     invitePending = true;
     inviteRequest = request;
 
-    timer->start(SIP_TIMEOUT_MS);
+    timeoutTimer->start(64 * SIP_T1_TIMER);
 }
 
 void SipCallPrivate::setState(QXmppCall::State newState)
@@ -613,10 +612,10 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
                     rtpComponent, SLOT(sendDatagram(QByteArray)));
     Q_ASSERT(check);
 
-    // setup timers
-    d->timer = new QTimer(this);
-    d->timer->setSingleShot(true);
-    check = connect(d->timer, SIGNAL(timeout()),
+    // Timer B
+    d->timeoutTimer = new QTimer(this);
+    d->timeoutTimer->setSingleShot(true);
+    check = connect(d->timeoutTimer, SIGNAL(timeout()),
                     this, SLOT(handleTimeout()));
     Q_ASSERT(check);
 
@@ -815,7 +814,7 @@ void SipCall::hangup()
             QString::fromUtf8(d->id)));
     d->setState(QXmppCall::DisconnectingState);
     d->iceConnection->close();
-    d->timer->stop();
+    d->timeoutTimer->stop();
 
     SipMessage request = d->client->d->buildRequest("BYE", d->remoteUri, d, d->cseq++);
     request.setHeaderField("To", d->remoteRecipient);
