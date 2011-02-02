@@ -791,7 +791,7 @@ void SipCall::transactionFinished()
             request.setHeaderField("To", d->inviteRequest.headerField("To"));
             request.setHeaderField("Via", d->inviteRequest.headerField("Via"));
             request.removeHeaderField("Contact");
-            d->transactions << d->client->d->startTransaction(request, this);
+            d->transactions << new SipTransaction(request, d->client, this);
         } else {
             d->setState(QXmppCall::FinishedState);
         }
@@ -827,7 +827,7 @@ void SipCall::hangup()
     request.setHeaderField("To", d->remoteRecipient);
     for (int i = d->remoteRoute.size() - 1; i >= 0; --i)
         request.addHeaderField("Route", d->remoteRoute[i]);
-    d->transactions << d->client->d->startTransaction(request, this);
+    d->transactions << new SipTransaction(request, d->client, this);
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
@@ -961,20 +961,6 @@ void SipClientPrivate::setState(SipClient::State newState)
         else if (state == SipClient::DisconnectedState)
             emit q->disconnected();
     }
-}
-
-SipTransaction *SipClientPrivate::startTransaction(const SipMessage &request, QObject *receiver)
-{
-    bool check;
-
-    SipTransaction *transaction = new SipTransaction(request, receiver);
-    check = q->connect(transaction, SIGNAL(sendMessage(SipMessage)),
-                    q, SLOT(sendMessage(SipMessage)));
-    Q_ASSERT(check);
-    check = q->connect(transaction, SIGNAL(finished()),
-                    receiver, SLOT(transactionFinished()));
-    Q_ASSERT(check);
-    return transaction;
 }
 
 SipClient::SipClient(QObject *parent)
@@ -1216,7 +1202,7 @@ void SipClient::disconnectFromServer()
         const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
         SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
-        d->transactions << d->startTransaction(request, this);
+        d->transactions << new SipTransaction(request, this, this);
 
         d->setState(DisconnectingState);
     } else {
@@ -1236,7 +1222,7 @@ void SipClient::registerWithServer()
     const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
     SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-    d->transactions << d->startTransaction(request, this);
+    d->transactions << new SipTransaction(request, this, this);
     //d->registerTimer->start(SIP_TIMEOUT_MS);
 
     d->setState(ConnectingState);
@@ -1349,7 +1335,7 @@ void SipClient::transactionFinished()
         if (!d->proxyChallenge.isEmpty())
             request.setHeaderField("Proxy-Authorization", d->authorization(request, d->proxyChallenge));
         d->setContact(request);
-        d->transactions << d->startTransaction(request, this);
+        d->transactions << new SipTransaction(request, this, this);
         return;
     }
 
@@ -1382,7 +1368,7 @@ void SipClient::transactionFinished()
                 const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
                 SipMessage request = buildRequest("SUBSCRIBE", uri, this, cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-                d->transactions << d->startTransaction(request, this);
+                d->transactions << new SipTransaction(request, this, this);
 #endif
             }
         } else if (reply.statusCode() >= 300) {
@@ -1694,12 +1680,20 @@ QByteArray SipMessage::toByteArray() const
     return ba + m_body;
 }
 
-SipTransaction::SipTransaction(const SipMessage &request, QObject *parent)
+SipTransaction::SipTransaction(const SipMessage &request, SipClient *client, QObject *parent)
     : QXmppLoggable(parent),
     m_request(request),
     m_state(Trying)
 {
     bool check;
+
+    check = connect(this, SIGNAL(sendMessage(SipMessage)),
+                    client, SLOT(sendMessage(SipMessage)));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(finished()),
+                    parent, SLOT(transactionFinished()));
+    Q_ASSERT(check);
 
     // Timer F
     m_timeoutTimer = new QTimer(this);

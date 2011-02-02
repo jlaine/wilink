@@ -115,7 +115,7 @@ public:
         Terminated,
     };
 
-    SipTransaction(const SipMessage &request, QObject *parent = 0);
+    SipTransaction(const SipMessage &request, SipClient *client, QObject *parent);
     QByteArray branch() const;
     SipMessage request() const;
     SipMessage response() const;

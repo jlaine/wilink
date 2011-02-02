@@ -94,7 +94,6 @@ public:
     void handleReply(const SipMessage &reply);
     void setContact(SipMessage &request);
     void setState(SipClient::State state);
-    SipTransaction *startTransaction(const SipMessage &request, QObject *receiver);
 
     // timers
     QTimer *connectTimer;
