@@ -38,6 +38,7 @@ class SipCallContext
 {
 public:
     SipCallContext();
+    bool handleAuthentication(const SipMessage &reply);
 
     quint32 cseq;
     QByteArray id;

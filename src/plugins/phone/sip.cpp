@@ -134,6 +134,27 @@ SipCallContext::SipCallContext()
     tag = generateStanzaHash(8).toLatin1();
 }
 
+bool SipCallContext::handleAuthentication(const SipMessage &reply)
+{
+    bool isProxy = reply.statusCode() == 407;
+    QMap<QByteArray, QByteArray> *lastChallenge = isProxy ? &proxyChallenge : &challenge;
+
+    const QByteArray auth = reply.headerField(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate");
+    int spacePos = auth.indexOf(' ');
+    if (spacePos < 0 || auth.left(spacePos) != "Digest") {
+        qWarning("Unsupported authentication method");
+        return false;
+    }
+    QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
+    if (lastChallenge->value("realm") == challenge.value("realm") &&
+        lastChallenge->value("nonce") == challenge.value("nonce")) {
+        qWarning("Authentication failed");
+        return false;
+    }
+    *lastChallenge = challenge;
+    return true;
+}
+
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::OfferState),
     invitePending(false),
@@ -899,22 +920,10 @@ SipMessage SipClientPrivate::buildResponse(const SipMessage &request)
 
 bool SipClientPrivate::handleAuthentication(const SipMessage &reply, SipCallContext *ctx)
 {
-    bool isProxy = reply.statusCode() == 407;
-    QMap<QByteArray, QByteArray> *lastChallenge = isProxy ? &ctx->proxyChallenge : &ctx->challenge;
-
-    const QByteArray auth = reply.headerField(isProxy ? "Proxy-Authenticate" : "WWW-Authenticate");
-    int spacePos = auth.indexOf(' ');
-    if (spacePos < 0 || auth.left(spacePos) != "Digest") {
-        q->warning("Unsupported authentication method");
-        return false;
-    }
-    QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
-    if (lastChallenge->value("realm") == challenge.value("realm") &&
-        lastChallenge->value("nonce") == challenge.value("nonce")) {
+    if (!ctx->handleAuthentication(reply)) {
         q->warning("Authentication failed");
         return false;
     }
-    *lastChallenge = challenge;
 
     SipMessage request = ctx->lastRequest;
     request.setHeaderField("CSeq", QByteArray::number(ctx->cseq++) + ' ' + request.method());
