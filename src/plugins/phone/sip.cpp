@@ -263,12 +263,12 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
      } else if (request.method() == "BYE") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
-        client->d->sendRequest(response, this);
+        client->sendMessage(response);
         setState(QXmppCall::FinishedState);
     } else if (request.method() == "CANCEL") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
-        client->d->sendRequest(response, this);
+        client->sendMessage(response);
         setState(QXmppCall::FinishedState);
     } else if (request.method() == "INVITE") {
 
@@ -282,11 +282,11 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
             response.setStatusCode(400);
             response.setReasonPhrase("Bad request");
         }
-        client->d->sendRequest(response, this);
+        client->sendMessage(response);
     } else {
         response.setStatusCode(405);
         response.setReasonPhrase("Method not allowed");
-        client->d->sendRequest(response, this);
+        client->sendMessage(response);
     }
 }
 
@@ -668,8 +668,7 @@ void SipCall::accept()
         response.setHeaderField("Supported", "replaces");
         response.setHeaderField("Content-Type", "application/sdp");
         response.setBody(sdp.toByteArray());
-
-        d->client->d->sendRequest(response, d);
+        d->client->sendMessage(response);
 
         d->setState(QXmppCall::ConnectingState);
     }
@@ -1403,7 +1402,7 @@ void SipClient::transactionFinished()
                 const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
                 SipMessage request = buildRequest("SUBSCRIBE", uri, this, cseq++);
                 request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-                sendRequest(request, this);
+                d->transactions << d->startTransaction(request, this);
 #endif
             }
         } else if (reply.statusCode() >= 300) {
