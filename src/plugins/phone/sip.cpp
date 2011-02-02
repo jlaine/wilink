@@ -43,7 +43,6 @@ static const int RTCP_COMPONENT = 2;
 #define QXMPP_DEBUG_STUN
 
 #define EXPIRE_SECONDS 3600
-#define MARGIN_SECONDS 10
 #define SIP_TIMEOUT_MS  30000
 
 #define STUN_RETRY_MS   500
@@ -994,10 +993,6 @@ SipClient::SipClient(QObject *parent)
     connect(d->connectTimer, SIGNAL(timeout()),
             this, SLOT(connectToServer()));
 
-    d->registerTimer = new QTimer(this);
-    connect(d->registerTimer, SIGNAL(timeout()),
-            this, SLOT(registerWithServer()));
-
     d->stunTimer = new QTimer(this);
     d->stunTimer->setSingleShot(true);
     connect(d->stunTimer, SIGNAL(timeout()),
@@ -1040,7 +1035,7 @@ void SipClient::callDestroyed(QObject *object)
 void SipClient::connectToServer()
 {
     // schedule retry
-    d->connectTimer->start(10000);
+    d->connectTimer->start(60000);
 
     // listen for SIP
     if (d->socket->state() == QAbstractSocket::UnconnectedState) {
@@ -1204,7 +1199,6 @@ void SipClient::disconnectFromServer()
 {
     // stop timers
     d->connectTimer->stop();
-    d->registerTimer->stop();
     d->stunTimer->stop();
     d->stunDone = false;
 
@@ -1239,7 +1233,6 @@ void SipClient::registerWithServer()
     SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
     d->transactions << new SipTransaction(request, this, this);
-    //d->registerTimer->start(SIP_TIMEOUT_MS);
 
     d->setState(ConnectingState);
 }
@@ -1364,10 +1357,11 @@ void SipClient::transactionFinished()
                     if (contact.startsWith(expectedContact)) {
                         // schedule next register
                         QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(contact);
-                        int registerSeconds = params.value("expires").toInt();
-                        if (registerSeconds > MARGIN_SECONDS) {
-                            debug(QString("Re-registering in %1 seconds").arg(registerSeconds - MARGIN_SECONDS));
-                            d->registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
+                        const int marginSeconds = 10;
+                        const int registerSeconds = params.value("expires").toInt();
+                        if (registerSeconds > marginSeconds) {
+                            debug(QString("Re-registering in %1 seconds").arg(registerSeconds - marginSeconds));
+                            QTimer::singleShot((registerSeconds - marginSeconds) * 1000, this, SLOT(registerWithServer()));
                         }
                         break;
                     }
@@ -1381,7 +1375,7 @@ void SipClient::transactionFinished()
                 d->transactions << new SipTransaction(request, this, this);
 #endif
             }
-        } else if (reply.statusCode() >= 300) {
+        } else {
             warning("Register failed");
             d->setState(SipClient::DisconnectedState);
         }

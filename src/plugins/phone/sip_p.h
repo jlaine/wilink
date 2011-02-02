@@ -96,7 +96,6 @@ public:
 
     // timers
     QTimer *connectTimer;
-    QTimer *registerTimer;
     QTimer *stunTimer;
 
     // configuration
