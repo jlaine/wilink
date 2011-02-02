@@ -92,7 +92,6 @@ public:
     QByteArray authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const;
     SipMessage buildRequest(const QByteArray &method, const QByteArray &uri, SipCallContext *ctx, int seq);
     SipMessage buildResponse(const SipMessage &request);
-    bool handleAuthenticationOld(const SipMessage &reply, SipCallContext *ctx);
     void handleReply(const SipMessage &reply);
     void sendRequest(SipMessage &request, SipCallContext *ctx);
     void setContact(SipMessage &request);

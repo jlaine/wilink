@@ -166,8 +166,6 @@ SipCallPrivate::SipCallPrivate(SipCall *qq)
 
 void SipCallPrivate::handleReply(const SipMessage &reply)
 {
-    const QByteArray command = reply.headerField("CSeq").split(' ').last();
-
     // store information
     if (!reply.headerField("To").isEmpty())
         remoteRecipient = reply.headerField("To");
@@ -188,8 +186,13 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         }
     }
 
-    // send ack
-    if  (command == "INVITE" && reply.statusCode() >= 200) {
+    // if the command was not an INVITE, stop here
+    const QByteArray command = reply.headerField("CSeq").split(' ').last();
+    if (command != "INVITE")
+        return;
+
+    // send ack for final responses
+    if  (reply.statusCode() >= 200) {
         invitePending = false;
 
         SipMessage request = client->d->buildRequest("ACK", remoteUri, this, inviteRequest.sequenceNumber());
@@ -198,48 +201,48 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         request.setHeaderField("To", remoteRecipient);
         request.setHeaderField("Via", inviteRequest.headerField("Via"));
         request.removeHeaderField("Contact");
-        client->d->sendRequest(request, this);
+        client->sendMessage(request);
     }
 
     // handle authentication
     if (reply.statusCode() == 407) {
-        if (client->d->handleAuthenticationOld(reply, this)) {
-            if (lastRequest.method() == "INVITE") {
-                invitePending = true;
-                inviteRequest = lastRequest;
-            }
+        if (handleAuthentication(reply)) {
+            SipMessage request = inviteRequest;
+            request.setHeaderField("CSeq", QByteArray::number(cseq++) + ' ' + request.method());
+            client->d->setContact(request);
+            client->d->sendRequest(request, this);
+            invitePending = true;
+            inviteRequest = lastRequest;
         } else {
             setState(QXmppCall::FinishedState);
         }
         return;
     }
 
-    if (command == "INVITE") {
+    // handle invite status
+    if (reply.statusCode() == 180)
+    {
+        emit q->ringing();
+    }
+    else if (reply.statusCode() == 200)
+    {
+        q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
+        timer->stop();
 
-        if (reply.statusCode() == 180)
+        if (reply.headerField("Content-Type") == "application/sdp" &&
+            handleSdp(SdpMessage(reply.body())))
         {
-            emit q->ringing();
+            setState(QXmppCall::ActiveState);
+        } else {
+            q->hangup();
         }
-        else if (reply.statusCode() == 200)
-        {
-            q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
-            timer->stop();
 
-            if (reply.headerField("Content-Type") == "application/sdp" &&
-                handleSdp(SdpMessage(reply.body())))
-            {
-                setState(QXmppCall::ActiveState);
-            } else {
-                q->hangup();
-            }
+    } else if (reply.statusCode() >= 300) {
 
-        } else if (reply.statusCode() >= 300) {
-
-            q->warning(QString("SIP call %1 failed").arg(
-                QString::fromUtf8(id)));
-            timer->stop();
-            setState(QXmppCall::FinishedState);
-        }
+        q->warning(QString("SIP call %1 failed").arg(
+            QString::fromUtf8(id)));
+        timer->stop();
+        setState(QXmppCall::FinishedState);
     }
 }
 
@@ -910,20 +913,6 @@ SipMessage SipClientPrivate::buildResponse(const SipMessage &request)
     setContact(response);
     response.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return response;
-}
-
-bool SipClientPrivate::handleAuthenticationOld(const SipMessage &reply, SipCallContext *ctx)
-{
-    if (!ctx->handleAuthentication(reply)) {
-        q->warning("Authentication failed");
-        return false;
-    }
-
-    SipMessage request = ctx->lastRequest;
-    request.setHeaderField("CSeq", QByteArray::number(ctx->cseq++) + ' ' + request.method());
-    setContact(request);
-    sendRequest(request, ctx);
-    return true;
 }
 
 void SipClientPrivate::handleReply(const SipMessage &reply)
