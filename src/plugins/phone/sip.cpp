@@ -1237,7 +1237,7 @@ void SipClient::disconnectFromServer()
         const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
         SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
         request.setHeaderField("Contact", request.headerField("Contact") + ";expires=0");
-        d->sendRequest(request, d);
+        d->transactions << d->startTransaction(request, this);
 
         d->setState(DisconnectingState);
     } else {
