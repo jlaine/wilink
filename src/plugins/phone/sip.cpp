@@ -851,6 +851,7 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
         QString::number(contactPort)).toUtf8());
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + ctx->tag);
+    packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     if (method != "ACK" && method != "CANCEL")
         packet.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
     return packet;
@@ -871,6 +872,7 @@ SipMessage SipClientPrivate::buildResponse(const SipMessage &request)
         username,
         contactAddress.toString(),
         QString::number(contactPort)).toUtf8());
+    response.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return response;
 }
 
@@ -975,16 +977,7 @@ void SipClientPrivate::sendRequest(SipMessage &request, SipCallContext *ctx)
         if (!ctx->proxyChallenge.isEmpty())
             request.setHeaderField("Proxy-Authorization", authorization(request, ctx->proxyChallenge));
     }
-    request.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
-
-#ifdef QXMPP_DEBUG_SIP
-    q->logSent(QString("SIP packet to %1:%2\n%3").arg(
-            serverAddress.toString(),
-            QString::number(serverPort),
-            QString::fromUtf8(request.toByteArray())));
-#endif
-
-    socket->writeDatagram(request.toByteArray(), serverAddress, serverPort);
+    q->sendMessage(request);
     if (request.isRequest() && request.method() != "ACK")
         ctx->lastRequest = request;
 }
@@ -1265,6 +1258,21 @@ void SipClient::registerWithServer()
     d->registerTimer->start(SIP_TIMEOUT_MS);
 
     d->setState(ConnectingState);
+}
+
+/** Send a SIP message.
+ *
+ * @param message
+ */
+void SipClient::sendMessage(const SipMessage &message)
+{
+#ifdef QXMPP_DEBUG_SIP
+    logSent(QString("SIP packet to %1:%2\n%3").arg(
+            d->serverAddress.toString(),
+            QString::number(d->serverPort),
+            QString::fromUtf8(message.toByteArray())));
+#endif
+    d->socket->writeDatagram(message.toByteArray(), d->serverAddress, d->serverPort);
 }
 
 /** Send a STUN binding request.
@@ -1635,5 +1643,13 @@ QByteArray SipMessage::toByteArray() const
 
     ba += "\r\n";
     return ba + m_body;
+}
+
+SipTransaction::SipTransaction(SipCallContext *context, const SipMessage &request, QObject *parent)
+    : QObject(parent),
+    m_context(context),
+    m_request(request),
+    m_state(Trying)
+{
 }
 

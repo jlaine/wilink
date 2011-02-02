@@ -102,6 +102,25 @@ private:
     QString m_reasonPhrase;
 };
 
+class SipTransaction : public QObject
+{
+public:
+    enum State
+    {
+        Trying,
+        Proceeding,
+        Completed,
+        Terminated,
+    };
+
+    SipTransaction(SipCallContext *ctx, const SipMessage &request, QObject *parent = 0);
+
+private:
+    SipCallContext *m_context;
+    SipMessage m_request;
+    State m_state;
+};
+
 /// The SipCall class represents a SIP Voice-Over-IP call.
 
 class SipCall : public QXmppLoggable
@@ -206,6 +225,7 @@ public slots:
     SipCall *call(const QString &recipient);
     void connectToServer();
     void disconnectFromServer();
+    void sendMessage(const SipMessage &message);
 
 private slots:
     void callDestroyed(QObject *object);
