@@ -256,6 +256,7 @@ private slots:
     void setSipServer(const QXmppSrvInfo &info);
     void setStunServer(const QHostInfo &info);
     void setStunServer(const QXmppSrvInfo &info);
+    void transactionFinished();
 
 private:
     SipClientPrivate *d;

@@ -179,6 +179,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     if (!recordRoutes.isEmpty())
         remoteRoute = recordRoutes;
 
+    // find transaction
     const QMap<QByteArray, QByteArray> viaParams = SipMessage::valueParameters(reply.headerField("Via"));
     foreach (SipTransaction *transaction, transactions) {
         if (transaction->branch() == viaParams.value("branch")) {
@@ -202,7 +203,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
 
     // handle authentication
     if (reply.statusCode() == 407) {
-        if (client->d->handleAuthentication(reply, this)) {
+        if (client->d->handleAuthenticationOld(reply, this)) {
             if (lastRequest.method() == "INVITE") {
                 invitePending = true;
                 inviteRequest = lastRequest;
@@ -775,6 +776,7 @@ void SipCall::transactionFinished()
     SipTransaction *transaction = qobject_cast<SipTransaction*>(sender());
     if (!transaction || !d->transactions.removeAll(transaction))
         return;
+    transaction->deleteLater();
 
     const QByteArray method = transaction->request().method();
     if (method == "BYE") {
@@ -791,7 +793,6 @@ void SipCall::transactionFinished()
     else if (method == "CANCEL") {
         d->setState(QXmppCall::FinishedState);
     }
-    transaction->deleteLater();
 }
 
 void SipCall::handleTimeout()
@@ -887,10 +888,7 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
     packet.setHeaderField("Max-Forwards", "70");
     packet.setHeaderField("Call-ID", ctx->id);
     packet.setHeaderField("CSeq", QByteArray::number(seqNum) + ' ' + method);
-    packet.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
-        username,
-        contactAddress.toString(),
-        QString::number(contactPort)).toUtf8());
+    setContact(packet);
     packet.setHeaderField("To", addr.toUtf8());
     packet.setHeaderField("From", addr.toUtf8() + ";tag=" + ctx->tag);
     packet.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
@@ -910,15 +908,12 @@ SipMessage SipClientPrivate::buildResponse(const SipMessage &request)
     response.setHeaderField("CSeq", request.headerField("CSeq"));
     foreach (const QByteArray &route, request.headerFieldValues("Record-Route"))
         response.addHeaderField("Record-Route", route);
-    response.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
-        username,
-        contactAddress.toString(),
-        QString::number(contactPort)).toUtf8());
+    setContact(response);
     response.setHeaderField("User-Agent", QString("%1/%2").arg(qApp->applicationName(), qApp->applicationVersion()).toUtf8());
     return response;
 }
 
-bool SipClientPrivate::handleAuthentication(const SipMessage &reply, SipCallContext *ctx)
+bool SipClientPrivate::handleAuthenticationOld(const SipMessage &reply, SipCallContext *ctx)
 {
     if (!ctx->handleAuthentication(reply)) {
         q->warning("Authentication failed");
@@ -927,18 +922,13 @@ bool SipClientPrivate::handleAuthentication(const SipMessage &reply, SipCallCont
 
     SipMessage request = ctx->lastRequest;
     request.setHeaderField("CSeq", QByteArray::number(ctx->cseq++) + ' ' + request.method());
-    request.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
-        username,
-        contactAddress.toString(),
-        QString::number(contactPort)).toUtf8());
+    setContact(request);
     sendRequest(request, ctx);
     return true;
 }
 
 void SipClientPrivate::handleReply(const SipMessage &reply)
 {
-    const QByteArray command = reply.headerField("CSeq").split(' ').last();
-
     // store information
     const QList<QByteArray> vias = reply.headerFieldValues("Via");
     if (!vias.isEmpty()) {
@@ -949,52 +939,12 @@ void SipClientPrivate::handleReply(const SipMessage &reply)
             contactPort = params.value("rport").toUInt();
     }
 
-    // handle authentication
-    if (reply.statusCode() == 401) {
-        if (!handleAuthentication(reply, this))
-            setState(SipClient::DisconnectedState);
-        return;
-    }
-
-    if (command == "REGISTER") {
-        if (reply.statusCode() == 200) {
-            if (state == SipClient::DisconnectingState) {
-                setState(SipClient::DisconnectedState);
-            } else {
-                connectTimer->stop();
-                setState(SipClient::ConnectedState);
-
-                QList<QByteArray> contacts = reply.headerFieldValues("Contact");
-                const QByteArray expectedContact = lastRequest.headerField("Contact");
-                foreach (const QByteArray &contact, contacts) {
-                    if (contact.startsWith(expectedContact)) {
-                        // schedule next register
-                        QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(contact);
-                        int registerSeconds = params.value("expires").toInt();
-                        if (registerSeconds > MARGIN_SECONDS) {
-                            q->debug(QString("Re-registering in %1 seconds").arg(registerSeconds - MARGIN_SECONDS));
-                            registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
-                        }
-                        break;
-                    }
-                }
-
-#if 0
-                // send subscribe
-                const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
-                SipMessage request = buildRequest("SUBSCRIBE", uri, this, cseq++);
-                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-                sendRequest(request, this);
-#endif
-            }
-        } else if (reply.statusCode() >= 300) {
-            q->warning("Register failed");
-            setState(SipClient::DisconnectedState);
-        }
-    }
-    else if (command == "SUBSCRIBE") {
-        if (reply.statusCode() >= 300) {
-            q->warning("Subscribe failed");
+    // find transaction
+    const QMap<QByteArray, QByteArray> viaParams = SipMessage::valueParameters(reply.headerField("Via"));
+    foreach (SipTransaction *transaction, transactions) {
+        if (transaction->branch() == viaParams.value("branch")) {
+            transaction->messageReceived(reply);
+            return;
         }
     }
 }
@@ -1010,6 +960,14 @@ void SipClientPrivate::sendRequest(SipMessage &request, SipCallContext *ctx)
     q->sendMessage(request);
     if (request.isRequest() && request.method() != "ACK")
         ctx->lastRequest = request;
+}
+
+void SipClientPrivate::setContact(SipMessage &request)
+{
+    request.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
+        username,
+        contactAddress.toString(),
+        QString::number(contactPort)).toUtf8());
 }
 
 void SipClientPrivate::setState(SipClient::State newState)
@@ -1299,8 +1257,8 @@ void SipClient::registerWithServer()
     const QByteArray uri = QString("sip:%1").arg(d->domain).toUtf8();
     SipMessage request = d->buildRequest("REGISTER", uri, d, d->cseq++);
     request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-    d->sendRequest(request, d);
-    d->registerTimer->start(SIP_TIMEOUT_MS);
+    d->transactions << d->startTransaction(request, this);
+    //d->registerTimer->start(SIP_TIMEOUT_MS);
 
     d->setState(ConnectingState);
 }
@@ -1391,6 +1349,73 @@ void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
 SipClient::State SipClient::state() const
 {
     return d->state;
+}
+
+void SipClient::transactionFinished()
+{
+    SipTransaction *transaction = qobject_cast<SipTransaction*>(sender());
+    if (!transaction || !d->transactions.removeAll(transaction))
+        return;
+    transaction->deleteLater();
+
+    // handle authentication
+    const SipMessage reply = transaction->response();
+    if (reply.statusCode() == 401 &&
+        d->handleAuthentication(reply))
+    {
+        SipMessage request = transaction->request();
+        request.setHeaderField("CSeq", QByteArray::number(d->cseq++) + ' ' + request.method());
+        if (!d->challenge.isEmpty())
+            request.setHeaderField("Authorization", d->authorization(request, d->challenge));
+        if (!d->proxyChallenge.isEmpty())
+            request.setHeaderField("Proxy-Authorization", d->authorization(request, d->proxyChallenge));
+        d->setContact(request);
+        d->transactions << d->startTransaction(request, this);
+        return;
+    }
+
+    const QByteArray method = transaction->request().method();
+    if (method == "REGISTER") {
+        if (reply.statusCode() == 200) {
+            if (d->state == SipClient::DisconnectingState) {
+                d->setState(SipClient::DisconnectedState);
+            } else {
+                d->connectTimer->stop();
+                d->setState(SipClient::ConnectedState);
+
+                QList<QByteArray> contacts = reply.headerFieldValues("Contact");
+                const QByteArray expectedContact = transaction->request().headerField("Contact");
+                foreach (const QByteArray &contact, contacts) {
+                    if (contact.startsWith(expectedContact)) {
+                        // schedule next register
+                        QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(contact);
+                        int registerSeconds = params.value("expires").toInt();
+                        if (registerSeconds > MARGIN_SECONDS) {
+                            debug(QString("Re-registering in %1 seconds").arg(registerSeconds - MARGIN_SECONDS));
+                            d->registerTimer->start((registerSeconds - MARGIN_SECONDS) * 1000);
+                        }
+                        break;
+                    }
+                }
+
+#if 0
+                // send subscribe
+                const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
+                SipMessage request = buildRequest("SUBSCRIBE", uri, this, cseq++);
+                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
+                sendRequest(request, this);
+#endif
+            }
+        } else if (reply.statusCode() >= 300) {
+            warning("Register failed");
+            d->setState(SipClient::DisconnectedState);
+        }
+    }
+    else if (method == "SUBSCRIBE") {
+        if (reply.statusCode() >= 300) {
+            warning("Subscribe failed");
+        }
+    }
 }
 
 QString SipClient::displayName() const
