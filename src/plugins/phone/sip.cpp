@@ -540,7 +540,7 @@ void SipCallPrivate::onStateChanged()
 
         // initialise audio input
         if (!audioInput) {
-            const int bufferSize = 2 * packetSize;
+            const int bufferSize = 4 * packetSize;
 
             QTime tm;
             tm.start();
@@ -1727,15 +1727,18 @@ QByteArray SipTransaction::branch() const
 void SipTransaction::messageReceived(const SipMessage &message)
 {
     if (message.statusCode() < 200) {
-        m_retryTimer->setInterval(SIP_T2_TIMER);
-        m_retryTimer->start();
-        m_state = Proceeding;
+        if (m_state == Trying) {
+            m_retryTimer->start(SIP_T2_TIMER);
+            m_state = Proceeding;
+        }
     } else {
-        m_retryTimer->stop();
-        m_timeoutTimer->stop();
-        m_response = message;
-        m_state = Completed;
-        emit finished();
+        if (m_state == Trying || m_state == Proceeding) {
+            m_retryTimer->stop();
+            m_timeoutTimer->stop();
+            m_response = message;
+            m_state = Completed;
+            emit finished();
+        }
     }
 }
 
