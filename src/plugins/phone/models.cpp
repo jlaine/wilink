@@ -178,7 +178,7 @@ void PhoneCallsModel::callRinging()
 
     // find the call
     foreach (PhoneCallsItem *item, m_items) {
-        if (item->call == call) {
+        if (item->call == call && !item->soundId) {
             item->soundId = m_soundPlayer->play(":/call-outgoing.ogg", true);
             break;
         }
