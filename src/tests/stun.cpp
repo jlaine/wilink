@@ -21,8 +21,26 @@ int main(int argc, char* argv[])
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
+    // lookup STUN server
+    const QString hostName = QString::fromLocal8Bit(argv[1]);
+    QHostAddress host;
+    QHostInfo hostInfo = QHostInfo::fromName(hostName);
+    foreach (const QHostAddress &address, hostInfo.addresses())
+    {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol)
+        {
+            host = address;
+            break;
+        }
+    }
+    if (host.isNull())
+    {
+        fprintf(stderr, "Could not lookup STUN server %s", argv[1]);
+        return EXIT_FAILURE;
+    }
+
     QXmppIceConnection connection(true);
-    connection.setStunServer(QString::fromLocal8Bit(argv[1]));
+    connection.setStunServer(host);
     QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
         &app, SLOT(quit()));
     QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),

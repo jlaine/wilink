@@ -596,7 +596,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->iceConnection = new QXmppIceConnection(iceControlling, this);
     d->iceConnection->addComponent(RTP_COMPONENT);
     d->iceConnection->addComponent(RTCP_COMPONENT);
-    d->iceConnection->setStunServer(d->client->d->stunServerAddress.toString(),
+    d->iceConnection->setStunServer(d->client->d->stunServerAddress,
                                     d->client->d->stunServerPort);
     check = connect(d->iceConnection, SIGNAL(localCandidatesChanged()),
                     this, SLOT(localCandidatesChanged()));
