@@ -41,25 +41,6 @@ class PhoneCallsView;
 class SipCall;
 class SipClient;
 
-class PhoneWidget : public ChatPanelWidget
-{
-    Q_OBJECT
-
-public:
-    PhoneWidget(SipCall *call, QGraphicsItem *parent = 0);
-    void setGeometry(const QRectF &rect);
-
-private slots:
-    void callFinished();
-    void callRinging();
-    void callStateChanged(QXmppCall::State state);
-
-private:
-    SipCall *m_call;
-    QGraphicsSimpleTextItem *m_nameLabel;
-    QGraphicsSimpleTextItem *m_statusLabel;
-};
-
 class PhonePanel : public ChatPanel
 {
     Q_OBJECT
