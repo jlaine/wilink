@@ -804,8 +804,6 @@ void SipCall::handleTimeout()
 
 void SipCall::hangup()
 {
-    bool check;
-
     if (d->state == QXmppCall::DisconnectingState ||
         d->state == QXmppCall::FinishedState)
         return;

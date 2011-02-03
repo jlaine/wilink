@@ -135,6 +135,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     check = connect(sip, SIGNAL(callDialled(SipCall*)),
                     callsModel, SLOT(addCall(SipCall*)));
+    Q_ASSERT(check);
 
     check = connect(sip, SIGNAL(callReceived(SipCall*)),
                     this, SLOT(callReceived(SipCall*)));
@@ -168,6 +169,14 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
 PhonePanel::~PhonePanel()
 {
+    // give SIP client 5s to exit cleanly
+    if (sip->state() == SipClient::ConnectedState) {
+        QEventLoop loop;
+        QTimer::singleShot(5000, &loop, SLOT(quit()));
+        connect(sip, SIGNAL(disconnected()), &loop, SLOT(quit()));
+        QMetaObject::invokeMethod(sip, "disconnectFromServer");
+        loop.exec();
+    }
     sipThread->quit();
     sipThread->wait();
     delete sip;
