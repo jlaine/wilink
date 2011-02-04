@@ -521,16 +521,16 @@ void SipCallPrivate::onStateChanged()
         format.setByteOrder(QAudioFormat::LittleEndian);
         format.setSampleType(QAudioFormat::SignedInt);
 
+#ifdef Q_OS_MAC
         // 128ms at 8kHz
         const int bufferSize = 2048 * format.channels();
+#else
+        // 160ms at 8kHz
+        const int bufferSize = 2560 * format.channels();
+#endif
 
         // initialise audio output
         if (!audioOutput) {
-#ifdef Q_OS_WIN
-            // 160ms at 8kHz
-            int bufferSize = 2560 * format.channels();
-#endif
-
             QTime tm;
             tm.start();
             audioOutput = new QAudioOutput(format, q);
