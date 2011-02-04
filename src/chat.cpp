@@ -542,9 +542,7 @@ bool Chat::open(const QString &jid)
     if (config.domain() == QLatin1String("wifirst.net"))
     {
         config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
-#ifndef Q_OS_SYMBIAN
         config.setIgnoreSslErrors(false);
-#endif
     }
 
     /* set keep alive */
