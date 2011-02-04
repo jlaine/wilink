@@ -149,13 +149,13 @@ void CallHandler::callStateChanged(QXmppCall::State state)
         QXmppRtpChannel *channel = m_call->audioChannel();
         QAudioFormat format = formatFor(channel->payloadType());
 
-        // the size in bytes of the audio samples for a single RTP packet
-        int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * channel->payloadType().ptime() / 1000;
+        // 128ms at 8kHz
+        const int bufferSize = 2048 * format.channels();
 
         if (!m_audioOutput)
         {
             m_audioOutput = new QAudioOutput(format, this);
-            m_audioOutput->setBufferSize(4 * packetSize);
+            m_audioOutput->setBufferSize(bufferSize);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
             m_audioOutput->start(channel);
         }
@@ -166,7 +166,7 @@ void CallHandler::callStateChanged(QXmppCall::State state)
             m_audioInput = new Reader(format, this);
 #else
             m_audioInput = new QAudioInput(format, this);
-            m_audioInput->setBufferSize(2 * packetSize);
+            m_audioInput->setBufferSize(bufferSize);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
 #endif
             m_audioInput->start(channel);

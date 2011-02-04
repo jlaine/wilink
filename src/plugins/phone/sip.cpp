@@ -521,12 +521,11 @@ void SipCallPrivate::onStateChanged()
         format.setByteOrder(QAudioFormat::LittleEndian);
         format.setSampleType(QAudioFormat::SignedInt);
 
-        const int packetSize = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * audioChannel->payloadType().ptime() / 1000;
+        // 128ms at 8kHz
+        const int bufferSize = 2048 * format.channels();
 
         // initialise audio output
         if (!audioOutput) {
-            const int bufferSize = 4 * packetSize;
-
             QTime tm;
             tm.start();
             audioOutput = new QAudioOutput(format, q);
@@ -540,8 +539,6 @@ void SipCallPrivate::onStateChanged()
 
         // initialise audio input
         if (!audioInput) {
-            const int bufferSize = 4 * packetSize;
-
             QTime tm;
             tm.start();
             audioInput = new QAudioInput(format, q);
