@@ -149,8 +149,13 @@ void CallHandler::callStateChanged(QXmppCall::State state)
         QXmppRtpChannel *channel = m_call->audioChannel();
         QAudioFormat format = formatFor(channel->payloadType());
 
+#ifdef Q_OS_MAC
         // 128ms at 8kHz
         const int bufferSize = 2048 * format.channels();
+#else
+        // 160ms at 8kHz
+        const int bufferSize = 2560 * format.channels();
+#endif
 
         if (!m_audioOutput)
         {
