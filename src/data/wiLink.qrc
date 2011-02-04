@@ -38,5 +38,6 @@
     <file>call-incoming.ogg</file>
     <file>call-outgoing.ogg</file>
     <file>message-incoming.ogg</file>
+    <file>UTN_USERFirst_Hardware_Root_CA.pem</file>
 </qresource>
 </RCC>

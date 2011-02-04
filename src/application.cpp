@@ -34,6 +34,7 @@
 #include <QProxyStyle>
 #include <QPushButton>
 #include <QSettings>
+#include <QSslSocket>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QUrl>
@@ -143,6 +144,9 @@ Application::Application(int &argc, char **argv)
 
     /* initialise sound player */
     d->soundPlayer = new QSoundPlayer(this);
+
+    /* add SSL root CA for wifirst.net and download.wifirst.net */
+    QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
 }
 
 Application::~Application()
