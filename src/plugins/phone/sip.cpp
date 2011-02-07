@@ -155,9 +155,9 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::OfferState),
+    activeTime("0 0"),
     invitePending(false),
     inviteQueued(false),
-    activeTime("0 0"),
     q(qq)
 {
 }
