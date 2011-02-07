@@ -209,10 +209,8 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
             client->sendMessage(request);
             invitePending = true;
             inviteRequest = request;
-        } else {
-            setState(QXmppCall::FinishedState);
+            return;
         }
-        return;
     }
 
     // handle invite status
