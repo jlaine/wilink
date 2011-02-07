@@ -220,19 +220,19 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     }
     else if (reply.statusCode() == 200)
     {
-        q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
         timeoutTimer->stop();
-
         if (reply.headerField("Content-Type") == "application/sdp" &&
             handleSdp(SdpMessage(reply.body())))
         {
+            q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
             setState(QXmppCall::ActiveState);
         } else {
+            q->warning(QString("SIP call %1 does not have a valid SDP descriptor").arg(QString::fromUtf8(id)));
             q->hangup();
         }
-
-    } else if (reply.statusCode() >= 300) {
-
+    }
+    else if (reply.statusCode() >= 300)
+    {
         q->warning(QString("SIP call %1 failed").arg(
             QString::fromUtf8(id)));
         timeoutTimer->stop();
