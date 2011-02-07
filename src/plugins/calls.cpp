@@ -95,18 +95,25 @@ void Reader::tick()
         qWarning() << "Reader could not read from" << m_input->fileName();
 }
 
-CallHandler::CallHandler(QXmppCall *call, QThread *mainThread)
-    : m_call(call),
+CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
+    : ChatPanelWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
-    m_mainThread(mainThread)
+    m_call(call)
 {
-    m_call->setParent(this);
+    // setup GUI
+    setIconPixmap(QPixmap(":/call.png"));
+    setButtonPixmap(QPixmap(":/hangup.png"));
+    setButtonToolTip(tr("Hang up"));
+    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
+
+    connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
+    connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
 }
 
-void CallHandler::audioStateChanged(QAudio::State state)
+void CallWidget::audioStateChanged(QAudio::State state)
 {
     QObject *audio = sender();
     if (!audio)
@@ -141,7 +148,12 @@ void CallHandler::audioStateChanged(QAudio::State state)
     }
 }
 
-void CallHandler::callStateChanged(QXmppCall::State state)
+void CallWidget::callRinging()
+{
+    m_label->setText(tr("Ringing.."));
+}
+
+void CallWidget::callStateChanged(QXmppCall::State state)
 {
     // start or stop capture
     if (state == QXmppCall::ActiveState)
@@ -191,58 +203,6 @@ void CallHandler::callStateChanged(QXmppCall::State state)
         }
     }
 
-    // handle completion
-    if (state == QXmppCall::FinishedState)
-    {
-        moveToThread(m_mainThread);
-        emit finished();
-    }
-}
-
-CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
-    : ChatPanelWidget(parent),
-    m_call(call)
-{
-    // CALL THREAD
-    m_callThread = new QThread;
-    m_callHandler = new CallHandler(m_call, QThread::currentThread());
-    connect(m_callHandler, SIGNAL(finished()), m_callThread, SLOT(quit()));
-    connect(m_callThread, SIGNAL(finished()), this, SLOT(callFinished()));
-    m_callHandler->moveToThread(m_callThread);
-    m_callThread->start();
-
-    // setup GUI
-    setIconPixmap(QPixmap(":/call.png"));
-    setButtonPixmap(QPixmap(":/hangup.png"));
-    setButtonToolTip(tr("Hang up"));
-    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
-
-    connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
-    connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
-    connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
-        this, SLOT(callStateChanged(QXmppCall::State)));
-}
-
-/** When the call thread finishes, perform cleanup.
- */
-void CallWidget::callFinished()
-{
-    m_callHandler->deleteLater();
-    m_callThread->wait();
-    delete m_callThread;
-
-    // make widget disappear
-    setButtonEnabled(false);
-    QTimer::singleShot(1000, this, SLOT(disappear()));
-}
-
-void CallWidget::callRinging()
-{
-    m_label->setText(tr("Ringing.."));
-}
-
-void CallWidget::callStateChanged(QXmppCall::State state)
-{
     // update status
     switch (state)
     {
@@ -262,6 +222,14 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         setButtonEnabled(false);
         break;
     }
+
+    // handle completion
+    if (state == QXmppCall::FinishedState)
+    {
+        // make widget disappear
+        setButtonEnabled(false);
+        QTimer::singleShot(1000, this, SLOT(disappear()));
+    }
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)
@@ -269,10 +237,19 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 {
     m_client = chatWindow->client();
 
+    m_callThread = new QThread(this);
+    m_callThread->start();
+
     m_callManager = new QXmppCallManager;
     m_client->addExtension(m_callManager);
     connect(m_callManager, SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
+}
+
+CallWatcher::~CallWatcher()
+{
+    m_callThread->quit();
+    m_callThread->wait();
 }
 
 void CallWidget::setGeometry(const QRectF &rect)

@@ -64,31 +64,6 @@ private:
     QIODevice *m_output;
 };
 
-class CallHandler : public QXmppLoggable
-{
-    Q_OBJECT
-
-public:
-    CallHandler(QXmppCall *call, QThread *mainThread);
-
-signals:
-    void finished();
-
-private slots:
-    void audioStateChanged(QAudio::State state);
-    void callStateChanged(QXmppCall::State state);
-
-private:
-    QXmppCall *m_call;
-#ifdef FAKE_AUDIO_INPUT
-    Reader *m_audioInput;
-#else
-    QAudioInput *m_audioInput;
-#endif
-    QAudioOutput *m_audioOutput;
-    QThread *m_mainThread;
-};
-
 class CallWidget : public ChatPanelWidget
 {
     Q_OBJECT
@@ -98,14 +73,21 @@ public:
     void setGeometry(const QRectF &rect);
 
 private slots:
-    void callFinished();
+    void audioStateChanged(QAudio::State state);
     void callRinging();
     void callStateChanged(QXmppCall::State state);
 
 private:
+    void debug(const QString&) {};
+    void warning(const QString&) {};
+#ifdef FAKE_AUDIO_INPUT
+    Reader *m_audioInput;
+#else
+    QAudioInput *m_audioInput;
+#endif
+    QAudioOutput *m_audioOutput;
+
     QXmppCall *m_call;
-    CallHandler *m_callHandler;
-    QThread *m_callThread;
     QGraphicsSimpleTextItem *m_label;
 };
 
@@ -115,6 +97,7 @@ class CallWatcher : public QObject
 
 public:
     CallWatcher(Chat *chatWindow);
+    ~CallWatcher();
 
 private slots:
     void callClicked(QAbstractButton * button);
@@ -126,6 +109,7 @@ private:
     void addCall(QXmppCall *call);
 
     QXmppCallManager *m_callManager;
+    QThread *m_callThread;
     QXmppClient *m_client;
     Chat *m_window;
 };
