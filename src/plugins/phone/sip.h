@@ -54,6 +54,8 @@ private:
     QList<QPair<char, QByteArray> > m_fields;
 };
 
+/** The SipMessage class represents a SIP request or response.
+ */
 class SipMessage
 {
 public:
@@ -102,6 +104,8 @@ private:
     QString m_reasonPhrase;
 };
 
+/** The SipTransaction class represents a non-INVITE SIP transaction.
+ */
 class SipTransaction : public QXmppLoggable
 {
     Q_OBJECT
