@@ -603,6 +603,10 @@ Acceptez-vous?</translation>
         <source>Disconnecting..</source>
         <translation>Déconnexion..</translation>
     </message>
+    <message>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
 </context>
 <context>
     <name>PhonePanel</name>
@@ -652,11 +656,11 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Call failed</source>
-        <translation>L'appel a échoué</translation>
+        <translation>L&apos;appel a échoué</translation>
     </message>
     <message>
         <source>Sorry, but the call could not be completed.</source>
-        <translation>Désolé, mais l'appel n'a pas pu être établi.</translation>
+        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
     </message>
 </context>
 <context>

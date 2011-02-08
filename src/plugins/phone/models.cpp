@@ -275,9 +275,9 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
             return sipAddressToName(item->address);
         else if (role == Qt::DecorationRole) {
             if ((item->flags & FLAGS_DIRECTION) == QXmppCall::OutgoingDirection)
-                return QPixmap(":/upload.png");
+                return QPixmap(":/call-outgoing.png");
             else
-                return QPixmap(":/download.png");
+                return QPixmap(":/call-incoming.png");
         } else if(role == Qt::BackgroundRole && item->call) {
             QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
             grad.setColorAt(0, QColor(255, 0, 0, 144));
@@ -304,6 +304,8 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
                 break;
             }
         }
+        if (item->flags & FLAGS_ERROR)
+            return tr("Failed");
         return QString::number(item->duration) + "s";
 
     } else if (index.column() == SortingColumn) {
