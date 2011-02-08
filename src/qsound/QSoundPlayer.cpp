@@ -41,7 +41,7 @@ int QSoundPlayer::play(QSoundFile *reader)
     reader->setParent(this);
     if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         delete reader;
-        return -1;
+        return 0;
     }
     m_readerId++;
     m_readers[m_readerId] = reader;
