@@ -646,32 +646,9 @@ Acceptez-vous?</translation>
         <source>Hangup</source>
         <translation>Raccrocher</translation>
     </message>
-</context>
-<context>
-    <name>PhoneWidget</name>
     <message>
-        <source>Hang up</source>
-        <translation>Raccrocher</translation>
-    </message>
-    <message>
-        <source>Connecting..</source>
-        <translation>Connexion..</translation>
-    </message>
-    <message>
-        <source>Ringing..</source>
-        <translation>Sonne..</translation>
-    </message>
-    <message>
-        <source>Call connected.</source>
-        <translation>Appel connecté.</translation>
-    </message>
-    <message>
-        <source>Disconnecting..</source>
-        <translation>Déconnexion..</translation>
-    </message>
-    <message>
-        <source>Call finished.</source>
-        <translation>Appel terminé.</translation>
+        <source>Your number is %1</source>
+        <translation>Votre numéro est %1</translation>
     </message>
 </context>
 <context>

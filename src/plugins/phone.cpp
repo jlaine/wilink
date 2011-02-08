@@ -317,6 +317,9 @@ void PhonePanel::handleSettings()
     if (!enabled || password.isEmpty())
         return;
 
+    if (!number.isEmpty())
+        setWindowExtra(tr("Your number is %1").arg(number));
+
     // connect to server
     const QString jid = client->configuration().jid();
     const QString domain = jidToDomain(jid);
