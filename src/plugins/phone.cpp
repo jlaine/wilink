@@ -200,9 +200,9 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
         return;
 
     if (box->standardButton(button) == QMessageBox::Yes)
-        call->accept();
+        QMetaObject::invokeMethod(call, "accept");
     else
-        call->hangup();
+        QMetaObject::invokeMethod(call, "hangup");
     box->deleteLater();
 }
 
