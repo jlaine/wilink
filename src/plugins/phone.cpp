@@ -49,6 +49,35 @@
  
 #define PHONE_ROSTER_ID "0_phone"
 
+// Builds a full SIP address from a short recipient
+static QString buildAddress(const QString &recipient, const QString &sipDomain)
+{
+    QString address, name;
+    if (recipient.contains("@")) {
+        name = recipient.split("@").first();
+        address = recipient;
+    } else {
+        name = recipient;
+        address = recipient + "@" + sipDomain;
+    }
+    return QString("\"%1\" <sip:%2>").arg(name, address);
+}
+
+// Extracts the shortest possible recipient from a full SIP address.
+static QString parseAddress(const QString &sipAddress, const QString &sipDomain)
+{
+    QRegExp rx(sipAddressPattern);
+    if (!rx.exactMatch(sipAddress))
+        return QString();
+    const QString recipient = rx.cap(2).mid(4);
+
+    QStringList bits = recipient.split("@");
+    if (bits.last() == sipDomain || QRegExp("[0-9]+").exactMatch(bits.first()))
+        return bits.first();
+    else
+        return recipient;
+}
+
 PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     : ChatPanel(parent),
     m_window(chatWindow),
@@ -212,48 +241,34 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
 
 void PhonePanel::callClicked(const QModelIndex &index)
 {
-    QString recipient = index.data(PhoneCallsModel::AddressRole).toString();
-    QRegExp rx(sipAddressPattern);
-    if (!rx.exactMatch(recipient))
+    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
+    if (recipient.isEmpty())
         return;
-    recipient = rx.cap(2).mid(4);
-
-    QStringList bits = recipient.split("@");
-    if (bits.last() == sip->domain())
-        numberEdit->setText(bits.first());
-    else
-        numberEdit->setText(recipient);
+    numberEdit->setText(recipient);
 }
 
 void PhonePanel::callDoubleClicked(const QModelIndex &index)
 {
-    const QString recipient = index.data(PhoneCallsModel::AddressRole).toString();
+    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
     if (sip->state() != SipClient::ConnectedState ||
         !callsModel->activeCalls().isEmpty() ||
         recipient.isEmpty())
         return;
 
-    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
+    const QString address = buildAddress(recipient, sip->domain());
+    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
 
 void PhonePanel::callNumber()
 {
-    QString phoneAddress = numberEdit->text().trimmed();
+    const QString recipient = numberEdit->text().trimmed();
     if (sip->state() != SipClient::ConnectedState ||
         !callsModel->activeCalls().isEmpty() ||
-        phoneAddress.isEmpty())
+        recipient.isEmpty())
         return;
 
-    QString phoneName;
-    if (phoneAddress.contains("@")) {
-        phoneName = phoneAddress.split("@").first();
-    } else {
-        phoneName = phoneAddress;
-        phoneAddress += "@" + sip->domain();
-    }
-    const QString recipient = QString("\"%1\" <sip:%2>").arg(phoneName, phoneAddress);
-
-    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
+    const QString address = buildAddress(recipient, sip->domain());
+    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
 
 void PhonePanel::callReceived(SipCall *call)
