@@ -62,6 +62,7 @@ public:
     void setState(QXmppCall::State state);
 
     QXmppCall::Direction direction;
+    QString error;
     QTime startTime;
     QTime stopTime;
     QXmppCall::State state;

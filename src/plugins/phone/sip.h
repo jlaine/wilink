@@ -155,6 +155,7 @@ public:
 
     QXmppCall::Direction direction() const;
     int duration() const;
+    QString error() const;
     QByteArray id() const;
     QString recipient() const;
     QXmppCall::State state() const;
