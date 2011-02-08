@@ -40,6 +40,9 @@
 #define DATE_WIDTH 150
 #define DURATION_WIDTH 100
 
+#define FLAGS_DIRECTION 0x1
+#define FLAGS_ERROR 0x2
+
 enum CallsColumns {
     NameColumn = 0,
     DateColumn,
@@ -212,6 +215,10 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
     if (state == QXmppCall::FinishedState) {
         item->call = 0;
         item->duration = call->duration();
+        if (!call->error().isEmpty()) {
+            item->flags |= FLAGS_ERROR;
+            emit error(call->error());
+        }
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
         QNetworkRequest request = buildRequest(url);
@@ -267,7 +274,7 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
             return sipAddressToName(item->address);
         else if (role == Qt::DecorationRole) {
-            if ((item->flags & 0x1) == QXmppCall::OutgoingDirection)
+            if ((item->flags & FLAGS_DIRECTION) == QXmppCall::OutgoingDirection)
                 return QPixmap(":/upload.png");
             else
                 return QPixmap(":/download.png");

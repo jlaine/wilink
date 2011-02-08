@@ -650,6 +650,14 @@ Acceptez-vous?</translation>
         <source>Your number is %1</source>
         <translation>Votre numéro est %1</translation>
     </message>
+    <message>
+        <source>Call failed</source>
+        <translation>L'appel a échoué</translation>
+    </message>
+    <message>
+        <source>Sorry, but the call could not be completed.</source>
+        <translation>Désolé, mais l'appel n'a pas pu être établi.</translation>
+    </message>
 </context>
 <context>
     <name>PhotosPanel</name>

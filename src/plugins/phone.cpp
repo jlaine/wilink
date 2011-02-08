@@ -110,8 +110,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // history
     callsModel = new PhoneCallsModel(network, this);
+    check = connect(callsModel, SIGNAL(error(QString)),
+                    this, SLOT(error(QString)));
+    Q_ASSERT(check);
     check = connect(callsModel, SIGNAL(stateChanged(bool)),
                     this, SLOT(callStateChanged(bool)));
+    Q_ASSERT(check);
     callsView = new PhoneCallsView(callsModel, this);
     check = connect(callsView, SIGNAL(clicked(QModelIndex)),
                     this, SLOT(callClicked(QModelIndex)));
@@ -280,6 +284,11 @@ void PhonePanel::callStateChanged(bool haveCalls)
         hangupButton->hide();
         callButton->show();
     }
+}
+
+void PhonePanel::error(const QString &error)
+{
+    QMessageBox::warning(this, tr("Call failed"), tr("Sorry, but the call could not be completed.") + "\n\n" + error);
 }
 
 /** Requests VoIP settings from the server.

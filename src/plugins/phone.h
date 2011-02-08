@@ -58,6 +58,7 @@ private slots:
     void callNumber();
     void callReceived(SipCall *call);
     void callStateChanged(bool haveCalls);
+    void error(const QString &error);
     void getSettings();
     void handleSettings();
     void keyPressed();

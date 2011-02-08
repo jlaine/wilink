@@ -55,6 +55,7 @@ public:
     void setUrl(const QUrl &url);
 
 signals:
+    void error(const QString &error);
     void stateChanged(bool haveCalls);
 
 public slots:
