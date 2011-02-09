@@ -92,12 +92,15 @@ SdpMessage::SdpMessage(const QByteArray &ba)
             break;
         j++;
 
-        i = crlf.indexIn(ba, j);
+        i = ba.indexOf('\n', j);
         if (i == -1)
             break;
+        int length = i - j;
+        if (length > 0 && ba[i-1] == '\r')
+            length--;
 
-        m_fields.append(qMakePair(field, ba.mid(j, i - j)));
-        i += 2;
+        m_fields.append(qMakePair(field, ba.mid(j, length)));
+        i++;
     }
 }
 
@@ -258,7 +261,10 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
     // respond
     SipMessage response = client->d->buildResponse(request);
     if (request.method() == "ACK") {
-        setState(QXmppCall::ActiveState);
+        if (audioChannel->isOpen())
+            setState(QXmppCall::ActiveState);
+        else
+            setState(QXmppCall::FinishedState);
      } else if (request.method() == "BYE") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
@@ -1145,7 +1151,7 @@ void SipClient::datagramReceived()
     logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
 #endif
 
-    // parse packet
+    // parse SIP message
     SipMessage reply(buffer);
 
     // find corresponding call
@@ -1189,9 +1195,9 @@ void SipClient::datagramReceived()
             emitCall = true;
         }
         if (currentCall) {
-            currentCall->d->handleRequest(reply);
             if (emitCall)
                 emit callReceived(currentCall);
+            currentCall->d->handleRequest(reply);
         }
     } else if (reply.isReply()) {
         if (currentCall)
