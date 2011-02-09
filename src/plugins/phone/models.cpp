@@ -22,6 +22,7 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QHeaderView>
+#include <QMenu>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -457,6 +458,37 @@ PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
     verticalHeader()->setVisible(false);
 }
 
+void PhoneCallsView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QModelIndex index = indexAt(event->pos());
+    if (index.isValid()) {
+        QAction *action;
+        bool check;
+        QMenu *menu = new QMenu(this);
+
+        action = menu->addAction(QIcon(":/call.png"), tr("Call"));
+        if (!m_callsModel->activeCalls().isEmpty())
+            action->setEnabled(false);
+        check = connect(action, SIGNAL(triggered()),
+                        this, SLOT(callSelected()));
+        Q_ASSERT(check);
+
+        action = menu->addAction(QIcon(":/remove.png"), tr("Remove"));
+        check = connect(action, SIGNAL(triggered()),
+                        this, SLOT(removeSelected()));
+        Q_ASSERT(check);
+
+        menu->popup(event->globalPos());
+    }
+}
+
+void PhoneCallsView::callSelected()
+{
+    QModelIndexList indexes = selectedIndexes();
+    if (!indexes.isEmpty())
+        emit doubleClicked(indexes.first());
+}
+
 void PhoneCallsView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     QTableView::currentChanged(current, previous);
@@ -474,6 +506,13 @@ void PhoneCallsView::keyPressEvent(QKeyEvent *event)
             emit doubleClicked(index);
     }
     QTableView::keyPressEvent(event);
+}
+
+void PhoneCallsView::removeSelected()
+{
+    QModelIndexList indexes = selectedIndexes();
+    if (!indexes.isEmpty())
+        m_sortedModel->removeRow(indexes.first().row());
 }
 
 void PhoneCallsView::resizeEvent(QResizeEvent *e)

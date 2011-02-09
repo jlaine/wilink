@@ -87,11 +87,16 @@ public:
     PhoneCallsView(PhoneCallsModel *model, QWidget *parent = 0);
 
 protected:
+    void contextMenuEvent(QContextMenuEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *e);
 
 protected slots:
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
+
+private slots:
+    void callSelected();
+    void removeSelected();
 
 private:
     PhoneCallsModel *m_callsModel;

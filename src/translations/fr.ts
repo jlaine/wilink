@@ -609,6 +609,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhoneCallsView</name>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+</context>
+<context>
     <name>PhonePanel</name>
     <message>
         <source>Phone</source>
