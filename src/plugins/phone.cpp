@@ -147,10 +147,10 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
     callsView = new PhoneCallsView(callsModel, this);
     check = connect(callsView, SIGNAL(clicked(QModelIndex)),
-                    this, SLOT(callClicked(QModelIndex)));
+                    this, SLOT(historyClicked(QModelIndex)));
     Q_ASSERT(check);
     check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
-                    this, SLOT(callDoubleClicked(QModelIndex)));
+                    this, SLOT(historyDoubleClicked(QModelIndex)));
     Q_ASSERT(check);
     layout->addWidget(callsView);
 
@@ -237,26 +237,6 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
     else
         QMetaObject::invokeMethod(call, "hangup");
     box->deleteLater();
-}
-
-void PhonePanel::callClicked(const QModelIndex &index)
-{
-    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
-    if (recipient.isEmpty())
-        return;
-    numberEdit->setText(recipient);
-}
-
-void PhonePanel::callDoubleClicked(const QModelIndex &index)
-{
-    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
-    if (sip->state() != SipClient::ConnectedState ||
-        !callsModel->activeCalls().isEmpty() ||
-        recipient.isEmpty())
-        return;
-
-    const QString address = buildAddress(recipient, sip->domain());
-    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
 
 void PhonePanel::callNumber()
@@ -372,6 +352,26 @@ void PhonePanel::handleSettings()
         callsModel->setUrl(QUrl(callsUrl));
 
     emit registerPanel();
+}
+
+void PhonePanel::historyClicked(const QModelIndex &index)
+{
+    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
+    if (recipient.isEmpty())
+        return;
+    numberEdit->setText(recipient);
+}
+
+void PhonePanel::historyDoubleClicked(const QModelIndex &index)
+{
+    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
+    if (sip->state() != SipClient::ConnectedState ||
+        !callsModel->activeCalls().isEmpty() ||
+        recipient.isEmpty())
+        return;
+
+    const QString address = buildAddress(recipient, sip->domain());
+    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
 
 static QXmppRtpChannel::Tone keyTone(QPushButton *key)
