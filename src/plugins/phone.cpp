@@ -284,7 +284,7 @@ void PhonePanel::callReceived(SipCall *call)
     box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
 
     /* connect signals */
-    connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
+    connect(call, SIGNAL(destroyed(QObject*)), box, SLOT(deleteLater()));
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callButtonClicked(QAbstractButton*)));
     box->show();
