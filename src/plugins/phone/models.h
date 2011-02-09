@@ -42,6 +42,7 @@ class PhoneCallsModel : public QAbstractListModel
 public:
     enum Role {
         AddressRole = Qt::UserRole,
+        ActiveRole,
     };
 
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);

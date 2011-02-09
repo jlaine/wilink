@@ -269,6 +269,8 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         return item->address;
     } else if (role == AddressRole) {
         return item->address;
+    } else if (role == ActiveRole) {
+        return item->call != 0;
     }
 
     if (index.column() == NameColumn) {
@@ -474,6 +476,8 @@ void PhoneCallsView::contextMenuEvent(QContextMenuEvent *event)
         Q_ASSERT(check);
 
         action = menu->addAction(QIcon(":/remove.png"), tr("Remove"));
+        if (index.data(PhoneCallsModel::ActiveRole).toBool())
+            action->setEnabled(false);
         check = connect(action, SIGNAL(triggered()),
                         this, SLOT(removeSelected()));
         Q_ASSERT(check);
@@ -501,7 +505,10 @@ void PhoneCallsView::keyPressEvent(QKeyEvent *event)
     const QModelIndex &index = currentIndex();
     if (index.isValid()) {
         if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
-            m_sortedModel->removeRow(index.row());
+        {
+            if (!index.data(PhoneCallsModel::ActiveRole).toBool())
+                m_sortedModel->removeRow(index.row());
+        }
         else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
             emit doubleClicked(index);
     }
@@ -511,8 +518,11 @@ void PhoneCallsView::keyPressEvent(QKeyEvent *event)
 void PhoneCallsView::removeSelected()
 {
     QModelIndexList indexes = selectedIndexes();
-    if (!indexes.isEmpty())
-        m_sortedModel->removeRow(indexes.first().row());
+    if (!indexes.isEmpty()) {
+        QModelIndex index = indexes.first();
+        if (!index.data(PhoneCallsModel::ActiveRole).toBool())
+            m_sortedModel->removeRow(indexes.first().row());
+    }
 }
 
 void PhoneCallsView::resizeEvent(QResizeEvent *e)
