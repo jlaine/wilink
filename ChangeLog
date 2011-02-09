@@ -1,13 +1,18 @@
-wiLink 1.0.3 (UNRELEASED)
+wiLink 1.1.0 (UNRELEASED)
  * Conversations:
   - Recognise /me command.
+  - Add optional sound notifications for incoming messages.
  * Rooms:
    - Correctly parse multiple "status" elements in presences.
    - Fix tab completion with a leading "@" sign on OS X.
    - Do not steal focus when auto-joining rooms.
+ * Preferences:
+   - Move all options to a "preferences" dialog.
  * Shares:
    - Fix display of shared drives on Windows.
    - Do not re-send registration every minute.
+ * Telephone:
+   - Add support for SIP voice-over-IP calls.
  * Transfers:
    - Disable sending files to room members, it doesn't work.
 
