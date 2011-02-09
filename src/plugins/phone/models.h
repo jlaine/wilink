@@ -90,6 +90,9 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void resizeEvent(QResizeEvent *e);
 
+protected slots:
+    void currentChanged(const QModelIndex &current, const QModelIndex &previous);
+
 private:
     PhoneCallsModel *m_callsModel;
     QSortFilterProxyModel *m_sortedModel;

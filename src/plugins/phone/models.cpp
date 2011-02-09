@@ -457,12 +457,22 @@ PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
     verticalHeader()->setVisible(false);
 }
 
+void PhoneCallsView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
+{
+    QTableView::currentChanged(current, previous);
+    if (current.isValid())
+        emit clicked(current);
+}
+
 void PhoneCallsView::keyPressEvent(QKeyEvent *event)
 {
     const QModelIndex &index = currentIndex();
-    if (index.isValid() &&
-        (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace))
-        m_sortedModel->removeRow(index.row());
+    if (index.isValid()) {
+        if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
+            m_sortedModel->removeRow(index.row());
+        else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+            emit doubleClicked(index);
+    }
     QTableView::keyPressEvent(event);
 }
 
