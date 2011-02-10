@@ -20,6 +20,7 @@
 #ifndef __WILINK_PHONE_SIP_P_H__
 #define __WILINK_PHONE_SIP_P_H__
 
+#include <QAudioDeviceInfo>
 #include <QHostAddress>
 #include <QMap>
 #include <QObject>
@@ -94,6 +95,10 @@ public:
     SipMessage buildRetry(const SipMessage &original, SipCallContext *ctx);
     void handleReply(const SipMessage &reply);
     void setState(SipClient::State state);
+
+    // audio
+    QAudioDeviceInfo inputDevice;
+    QAudioDeviceInfo outputDevice;
 
     // timers
     QTimer *connectTimer;

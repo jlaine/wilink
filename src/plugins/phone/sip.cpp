@@ -539,7 +539,7 @@ void SipCallPrivate::onStateChanged()
         if (!audioOutput) {
             QTime tm;
             tm.start();
-            audioOutput = new QAudioOutput(format, q);
+            audioOutput = new QAudioOutput(client->d->outputDevice, format, q);
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioOutput->setBufferSize(bufferSize);
@@ -552,7 +552,7 @@ void SipCallPrivate::onStateChanged()
         if (!audioInput) {
             QTime tm;
             tm.start();
-            audioInput = new QAudioInput(format, q);
+            audioInput = new QAudioInput(client->d->inputDevice, format, q);
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioInput->setBufferSize(bufferSize);
@@ -847,6 +847,8 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
     stunServerPort(0),
     q(qq)
 {
+    inputDevice = QAudioDeviceInfo::defaultInputDevice();
+    outputDevice = QAudioDeviceInfo::defaultOutputDevice();
 }
 
 QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const
@@ -1441,6 +1443,16 @@ QString SipClient::username() const
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
+}
+
+void SipClient::setInputDevice(const QAudioDeviceInfo &device)
+{
+    d->inputDevice = device;
+}
+
+void SipClient::setOutputDevice(const QAudioDeviceInfo &device)
+{
+    d->outputDevice = device;
 }
 
 SipMessage::SipMessage(const QByteArray &bytes)

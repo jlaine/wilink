@@ -27,6 +27,7 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
     : QObject(parent),
     m_readerId(0)
 {
+    m_audioDevice = QAudioDeviceInfo::defaultOutputDevice();
 }
 
 int QSoundPlayer::play(const QString &name, bool repeat)
@@ -47,7 +48,7 @@ int QSoundPlayer::play(QSoundFile *reader)
     m_readers[m_readerId] = reader;
 
     const QAudioFormat format = reader->format();
-    QAudioOutput *output = new QAudioOutput(format, reader);
+    QAudioOutput *output = new QAudioOutput(m_audioDevice, format, reader);
     output->setProperty("_play_id", m_readerId);
     connect(output, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
     // buffer one second of audio

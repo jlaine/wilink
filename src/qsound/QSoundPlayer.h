@@ -20,6 +20,7 @@
 #ifndef __WILINK_SOUND_PLAYER_H__
 #define __WILINK_SOUND_PLAYER_H__
 
+#include <QAudioDeviceInfo>
 #include <QAudioOutput>
 #include <QIODevice>
 #include <QMap>
@@ -38,6 +39,7 @@ public:
     int play(const QString &name, bool repeat = false);
     int play(QSoundFile *reader);
     void stop(int id);
+    void setAudioDevice(const QAudioDeviceInfo &audioDevice);
 
 signals:
     void finished(int id);
@@ -46,6 +48,7 @@ private slots:
     void stateChanged(QAudio::State state);
 
 private:
+    QAudioDeviceInfo m_audioDevice;
     int m_readerId;
     QMap<int, QSoundFile*> m_readers;
 };

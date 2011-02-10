@@ -28,6 +28,7 @@
 #include "QXmppLogger.h"
 #include "stun.h"
 
+class QAudioDeviceInfo;
 class QHostInfo;
 class QUdpSocket;
 class QTimer;
@@ -229,6 +230,9 @@ public:
 
     QString username() const;
     void setUsername(const QString &user);
+
+    void setInputDevice(const QAudioDeviceInfo &device);
+    void setOutputDevice(const QAudioDeviceInfo &device);
 
 signals:
     void connected();
