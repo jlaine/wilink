@@ -778,8 +778,9 @@ bool ChatOptions::save()
 
 SoundOptions::SoundOptions()
 {
-    QLayout *layout = new QVBoxLayout;
+    QGridLayout *layout = new QGridLayout;
 
+    layout->addWidget(new QLabel(tr("Audio playback device")), 0, 0);
     outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
     outputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, outputDevices) {
@@ -787,8 +788,9 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioOutputDevice().deviceName())
             outputCombo->setCurrentIndex(outputCombo->count() - 1);
     }
-    layout->addWidget(outputCombo);
+    layout->addWidget(outputCombo, 0, 1);
 
+    layout->addWidget(new QLabel(tr("Audio capture device")), 1, 0);
     inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
     inputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, inputDevices) {
@@ -796,7 +798,7 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioInputDevice().deviceName())
             inputCombo->setCurrentIndex(inputCombo->count() - 1);
     }
-    layout->addWidget(inputCombo);
+    layout->addWidget(inputCombo, 1, 1);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/options.png"));

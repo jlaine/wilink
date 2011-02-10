@@ -167,6 +167,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     sip->setAudioInputDevice(wApp->audioInputDevice());
     sip->setAudioOutputDevice(wApp->audioOutputDevice());
     sip->moveToThread(sipThread);
+    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
+                    sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
+    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
+                    sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
     sipThread->start();
 
     check = connect(sip, SIGNAL(callDialled(SipCall*)),

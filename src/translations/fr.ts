@@ -931,6 +931,14 @@ Acceptez-vous?</translation>
         <source>Sound</source>
         <translation>Son</translation>
     </message>
+    <message>
+        <source>Audio playback device</source>
+        <translation>Périphérique de sortie son</translation>
+    </message>
+    <message>
+        <source>Audio capture device</source>
+        <translation>Périphérique d&apos;entrée son</translation>
+    </message>
 </context>
 <context>
     <name>UpdatesDialog</name>
