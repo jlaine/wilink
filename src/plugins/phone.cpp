@@ -38,6 +38,7 @@
 
 #include "qnetio/wallet.h"
 
+#include "application.h"
 #include "chat.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
@@ -85,6 +86,8 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 {
     bool check;
     client = chatWindow->client();
+
+    Application *wApp = qobject_cast<Application*>(qApp);
 
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Phone"));
@@ -163,6 +166,8 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     // sip client
     sipThread = new QThread(this);
     sip = new SipClient;
+    sip->setAudioInputDevice(wApp->audioInputDevice());
+    sip->setAudioOutputDevice(wApp->audioOutputDevice());
     sip->moveToThread(sipThread);
     sipThread->start();
 

@@ -783,21 +783,38 @@ bool ChatOptions::save()
 
 SoundOptions::SoundOptions()
 {
+    wApp = qobject_cast<Application*>(qApp);
+    Q_ASSERT(wApp);
+
     QLayout *layout = new QVBoxLayout;
 
-    QList<QAudioDeviceInfo> outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
+    outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
     outputCombo = new QComboBox;
-    foreach (const QAudioDeviceInfo &info, outputDevices)
+    foreach (const QAudioDeviceInfo &info, outputDevices) {
         outputCombo->addItem(info.deviceName());
+        if (info.deviceName() == wApp->audioOutputDevice().deviceName())
+            outputCombo->setCurrentIndex(outputCombo->count() - 1);
+    }
     layout->addWidget(outputCombo);
 
-    QList<QAudioDeviceInfo> inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+    inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
     inputCombo = new QComboBox;
-    foreach (const QAudioDeviceInfo &info, inputDevices)
+    foreach (const QAudioDeviceInfo &info, inputDevices) {
         inputCombo->addItem(info.deviceName());
+        if (info.deviceName() == wApp->audioInputDevice().deviceName())
+            inputCombo->setCurrentIndex(inputCombo->count() - 1);
+    }
     layout->addWidget(inputCombo);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Sound"));
 }
+
+bool SoundOptions::save()
+{
+    wApp->setAudioInputDevice(inputDevices[inputCombo->currentIndex()]);
+    wApp->setAudioOutputDevice(outputDevices[outputCombo->currentIndex()]);
+    return true;
+}
+

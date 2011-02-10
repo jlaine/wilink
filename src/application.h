@@ -21,6 +21,7 @@
 #define __APPLICATION_H__
 
 #include <QApplication>
+#include <QAudioDeviceInfo>
 #include <QString>
 #include <QUrl>
 
@@ -63,6 +64,10 @@ public:
     void setPlaySoundNotifications(bool play);
     bool showOfflineContacts() const;
     void setShowOfflineContacts(bool show);
+    QAudioDeviceInfo audioInputDevice() const;
+    void setAudioInputDevice(const QAudioDeviceInfo &device);
+    QAudioDeviceInfo audioOutputDevice() const;
+    void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
 signals:
     void messageClicked(QWidget *context);

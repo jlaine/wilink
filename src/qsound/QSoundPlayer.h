@@ -39,7 +39,7 @@ public:
     int play(const QString &name, bool repeat = false);
     int play(QSoundFile *reader);
     void stop(int id);
-    void setAudioDevice(const QAudioDeviceInfo &audioDevice);
+    void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
 
 signals:
     void finished(int id);

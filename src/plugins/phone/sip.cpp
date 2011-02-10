@@ -1445,12 +1445,12 @@ void SipClient::setUsername(const QString &username)
     d->username = username;
 }
 
-void SipClient::setInputDevice(const QAudioDeviceInfo &device)
+void SipClient::setAudioInputDevice(const QAudioDeviceInfo &device)
 {
     d->inputDevice = device;
 }
 
-void SipClient::setOutputDevice(const QAudioDeviceInfo &device)
+void SipClient::setAudioOutputDevice(const QAudioDeviceInfo &device)
 {
     d->outputDevice = device;
 }

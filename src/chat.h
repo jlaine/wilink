@@ -20,6 +20,7 @@
 #ifndef __WILINK_CHAT_H__
 #define __WILINK_CHAT_H__
 
+#include <QAudioDeviceInfo>
 #include <QMainWindow>
 
 #include "chat_client.h"
@@ -126,10 +127,14 @@ class SoundOptions : public ChatPreferencesTab
 
 public:
     SoundOptions();
+    bool save();
 
 private:
     QComboBox *inputCombo;
+    QList<QAudioDeviceInfo> inputDevices;
     QComboBox *outputCombo;
+    QList<QAudioDeviceInfo> outputDevices;
+    Application *wApp;
 };
 
 #endif

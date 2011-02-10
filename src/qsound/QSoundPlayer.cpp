@@ -58,6 +58,11 @@ int QSoundPlayer::play(QSoundFile *reader)
     return m_readerId;
 }
 
+void QSoundPlayer::setAudioOutputDevice(const QAudioDeviceInfo &device)
+{
+    m_audioDevice = device;
+}
+
 void QSoundPlayer::stop(int id)
 {
     QSoundFile *reader = m_readers.value(id);

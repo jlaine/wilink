@@ -59,6 +59,8 @@ public:
     QNetworkDiskCache *networkCache;
     QSettings *settings;
     QSoundPlayer *soundPlayer;
+    QAudioDeviceInfo audioInputDevice;
+    QAudioDeviceInfo audioOutputDevice;
 #ifdef USE_SYSTRAY
     QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
@@ -133,6 +135,8 @@ Application::Application(int &argc, char **argv)
     d->settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
+    d->audioInputDevice = QAudioDeviceInfo::defaultInputDevice();
+    d->audioOutputDevice = QAudioDeviceInfo::defaultOutputDevice();
 
 #if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
     /* initialise style */
@@ -144,6 +148,7 @@ Application::Application(int &argc, char **argv)
 
     /* initialise sound player */
     d->soundPlayer = new QSoundPlayer(this);
+    d->soundPlayer->setAudioOutputDevice(d->audioOutputDevice);
 
     /* add SSL root CA for wifirst.net and download.wifirst.net */
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
@@ -446,6 +451,26 @@ void Application::showChats()
 QSoundPlayer *Application::soundPlayer()
 {
     return d->soundPlayer;
+}
+
+QAudioDeviceInfo Application::audioInputDevice() const
+{
+    return d->audioInputDevice;
+}
+
+void Application::setAudioInputDevice(const QAudioDeviceInfo &device)
+{
+    d->audioInputDevice = device;
+}
+
+QAudioDeviceInfo Application::audioOutputDevice() const
+{
+    return d->audioOutputDevice;
+}
+
+void Application::setAudioOutputDevice(const QAudioDeviceInfo &device)
+{
+    d->audioOutputDevice = device;
 }
 
 void Application::messageClicked()

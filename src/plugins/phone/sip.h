@@ -231,8 +231,8 @@ public:
     QString username() const;
     void setUsername(const QString &user);
 
-    void setInputDevice(const QAudioDeviceInfo &device);
-    void setOutputDevice(const QAudioDeviceInfo &device);
+    void setAudioInputDevice(const QAudioDeviceInfo &device);
+    void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
 signals:
     void connected();
