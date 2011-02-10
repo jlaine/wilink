@@ -33,7 +33,6 @@ class QSortFilterProxyModel;
 class QTimer;
 class PhoneCallsItem;
 class SipCall;
-class QSoundPlayer;
 
 class PhoneCallsModel : public QAbstractListModel
 {
@@ -77,7 +76,6 @@ private:
     QNetworkAccessManager *m_network;
     QTimer *m_ticker;
     QUrl m_url;
-    QSoundPlayer *m_soundPlayer;
 };
 
 class PhoneCallsView : public QTableView

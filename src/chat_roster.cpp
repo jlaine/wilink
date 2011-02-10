@@ -188,8 +188,6 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->q = this;
 
     /* get cache */
-    Application *wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
     d->cache = wApp->networkCache();
 
     d->client = xmppClient;

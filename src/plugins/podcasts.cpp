@@ -63,7 +63,6 @@ PodcastsModel::PodcastsModel(QObject *parent)
     : QAbstractItemModel(parent),
     m_audioReply(0)
 {
-    Application *wApp = qobject_cast<Application*>(qApp);
     m_network = new QNetworkAccessManager(this);
     m_network->setCache(wApp->networkCache());
 
@@ -336,7 +335,6 @@ PodcastsPanel::PodcastsPanel(Chat *chatWindow)
 
 void PodcastsPanel::doubleClicked(const QModelIndex &index)
 {
-    Application *wApp = qobject_cast<Application*>(qApp);
     QUrl audioUrl = index.data(Qt::UserRole).toUrl();
     if (m_playId >= 0)
         wApp->soundPlayer()->stop(m_playId);

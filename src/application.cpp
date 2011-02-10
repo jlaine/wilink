@@ -50,6 +50,8 @@
 #include "flickcharm.h"
 #include "qsound/QSoundPlayer.h"
 
+Application *wApp = 0;
+
 class ApplicationPrivate
 {
 public:
@@ -112,6 +114,8 @@ Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
     d(new ApplicationPrivate)
 {
+    wApp = this;
+
     /* set application properties */
     setApplicationName("wiLink");
     setApplicationVersion(WILINK_VERSION);

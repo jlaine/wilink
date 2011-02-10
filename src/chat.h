@@ -118,7 +118,6 @@ private:
     QCheckBox *openAtLogin;
     QCheckBox *playSoundNotifications;
     QCheckBox *showOfflineContacts;
-    Application *wApp;
 };
 
 class SoundOptions : public ChatPreferencesTab
@@ -134,7 +133,6 @@ private:
     QList<QAudioDeviceInfo> inputDevices;
     QComboBox *outputCombo;
     QList<QAudioDeviceInfo> outputDevices;
-    Application *wApp;
 };
 
 #endif

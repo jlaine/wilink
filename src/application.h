@@ -93,4 +93,6 @@ private:
     ApplicationPrivate * const d;
 };
 
+extern Application *wApp;
+
 #endif

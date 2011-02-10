@@ -65,8 +65,6 @@ Menu::Menu(Chat *window)
     rosterView->expand(rosterView->mapFromRoster(index));
 
     /* prepare network manager */
-    Application *wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
     network = new QNetworkAccessManager(this);
     check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
                     QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));

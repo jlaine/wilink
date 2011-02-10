@@ -87,8 +87,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     bool check;
     client = chatWindow->client();
 
-    Application *wApp = qobject_cast<Application*>(qApp);
-
     setWindowIcon(QIcon(":/call.png"));
     setWindowTitle(tr("Phone"));
 

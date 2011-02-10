@@ -112,8 +112,6 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
-    /* get handle to application */
-    Application *wApp = qobject_cast<Application*>(qApp);
     m_soundPlayer = wApp->soundPlayer();
 
     m_ticker = new QTimer(this);
@@ -146,7 +144,7 @@ void PhoneCallsModel::addCall(SipCall *call)
     connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
     if (item->call->direction() == QXmppCall::IncomingDirection)
-        item->soundId = m_soundPlayer->play(":/call-incoming.ogg", true);
+        item->soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
     else
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
     QNetworkRequest request = buildRequest(m_url);
@@ -183,7 +181,7 @@ void PhoneCallsModel::callRinging()
     // find the call
     foreach (PhoneCallsItem *item, m_items) {
         if (item->call == call && !item->soundId) {
-            item->soundId = m_soundPlayer->play(":/call-outgoing.ogg", true);
+            item->soundId = wApp->soundPlayer()->play(":/call-outgoing.ogg", true);
             break;
         }
     }
@@ -208,7 +206,7 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
     PhoneCallsItem *item = m_items[row];
 
     if (item->soundId && state != QXmppCall::OfferState) {
-        m_soundPlayer->stop(item->soundId);
+        wApp->soundPlayer()->stop(item->soundId);
         item->soundId = 0;
     }
 

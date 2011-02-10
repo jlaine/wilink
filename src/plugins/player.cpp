@@ -238,7 +238,6 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
                     this, SLOT(cursorChanged(QModelIndex)));
     Q_ASSERT(check);
 
-    Application *wApp = qobject_cast<Application*>(qApp);
     m_player = wApp->soundPlayer();
     check = connect(m_player, SIGNAL(finished(int)),
                     this, SLOT(finished(int)));

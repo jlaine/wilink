@@ -41,6 +41,7 @@
 
 #include "calls.h"
 
+#include "application.h"
 #include "chat.h"
 #include "chat_panel.h"
 #include "chat_plugin.h"
@@ -171,7 +172,7 @@ void CallWidget::callStateChanged(QXmppCall::State state)
 
         if (!m_audioOutput)
         {
-            m_audioOutput = new QAudioOutput(format, this);
+            m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
             m_audioOutput->setBufferSize(bufferSize);
             connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
             m_audioOutput->start(channel);
@@ -182,7 +183,7 @@ void CallWidget::callStateChanged(QXmppCall::State state)
 #ifdef FAKE_AUDIO_INPUT
             m_audioInput = new Reader(format, this);
 #else
-            m_audioInput = new QAudioInput(format, this);
+            m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
             m_audioInput->setBufferSize(bufferSize);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
 #endif

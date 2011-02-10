@@ -87,7 +87,6 @@ Chat::Chat(QWidget *parent)
     bool check;
 
     /* get handle to application */
-    Application *wApp = qobject_cast<Application*>(qApp);
     check = connect(wApp, SIGNAL(messageClicked(QWidget*)),
                     this, SLOT(messageClicked(QWidget*)));
     Q_ASSERT(check);
@@ -299,7 +298,6 @@ void Chat::hidePanel()
  */
 void Chat::notifyPanel(const QString &message, int options)
 {
-    Application *wApp = qobject_cast<Application*>(qApp);
     QWidget *panel = qobject_cast<QWidget*>(sender());
     QWidget *window = panel->isVisible() ? panel->window() : this;
 
@@ -740,9 +738,6 @@ void Chat::unregisterPanel()
 
 ChatOptions::ChatOptions()
 {
-    wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
-
     QLayout *layout = new QVBoxLayout;
     QGroupBox *group = new QGroupBox(tr("General options"));
     QVBoxLayout *vbox = new QVBoxLayout;
@@ -783,9 +778,6 @@ bool ChatOptions::save()
 
 SoundOptions::SoundOptions()
 {
-    wApp = qobject_cast<Application*>(qApp);
-    Q_ASSERT(wApp);
-
     QLayout *layout = new QVBoxLayout;
 
     outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
