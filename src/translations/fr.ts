@@ -926,6 +926,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>SoundOptions</name>
+    <message>
+        <source>Sound</source>
+        <translation>Son</translation>
+    </message>
+</context>
+<context>
     <name>UpdatesDialog</name>
     <message>
         <source>Changes:</source>

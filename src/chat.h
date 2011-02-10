@@ -31,6 +31,7 @@ class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
 class QCheckBox;
+class QComboBox;
 class QModelIndex;
 
 /** Chat represents the user interface's main window.
@@ -117,6 +118,18 @@ private:
     QCheckBox *playSoundNotifications;
     QCheckBox *showOfflineContacts;
     Application *wApp;
+};
+
+class SoundOptions : public ChatPreferencesTab
+{
+    Q_OBJECT
+
+public:
+    SoundOptions();
+
+private:
+    QComboBox *inputCombo;
+    QComboBox *outputCombo;
 };
 
 #endif

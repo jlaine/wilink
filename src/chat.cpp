@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QAudioDeviceInfo>
 #include <QAuthenticator>
 #include <QCheckBox>
 #include <QComboBox>
@@ -713,6 +714,7 @@ void Chat::showPreferences(const QString &focusTab)
             dialog, SLOT(deleteLater()));
 
     dialog->addTab(new ChatOptions);
+    dialog->addTab(new SoundOptions);
     foreach (ChatPlugin *plugin, d->plugins)
         plugin->preferences(dialog);
 
@@ -777,4 +779,25 @@ bool ChatOptions::save()
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
     wApp->setPlaySoundNotifications(playSoundNotifications->isChecked());
     return true;
+}
+
+SoundOptions::SoundOptions()
+{
+    QLayout *layout = new QVBoxLayout;
+
+    QList<QAudioDeviceInfo> outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
+    outputCombo = new QComboBox;
+    foreach (const QAudioDeviceInfo &info, outputDevices)
+        outputCombo->addItem(info.deviceName());
+    layout->addWidget(outputCombo);
+
+    QList<QAudioDeviceInfo> inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+    inputCombo = new QComboBox;
+    foreach (const QAudioDeviceInfo &info, inputDevices)
+        inputCombo->addItem(info.deviceName());
+    layout->addWidget(inputCombo);
+
+    setLayout(layout);
+    setWindowIcon(QIcon(":/options.png"));
+    setWindowTitle(tr("Sound"));
 }
