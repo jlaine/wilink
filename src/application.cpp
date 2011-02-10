@@ -140,7 +140,19 @@ Application::Application(int &argc, char **argv)
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
     d->audioInputDevice = QAudioDeviceInfo::defaultInputDevice();
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+        if (info.deviceName() == d->settings->value("AudioInputDevice").toString()) {
+            d->audioInputDevice = info;
+            break;
+        }
+    }
     d->audioOutputDevice = QAudioDeviceInfo::defaultOutputDevice();
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
+        if (info.deviceName() == d->settings->value("AudioOutputDevice").toString()) {
+            d->audioOutputDevice = info;
+            break;
+        }
+    }
 
 #if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
     /* initialise style */
@@ -464,7 +476,9 @@ QAudioDeviceInfo Application::audioInputDevice() const
 
 void Application::setAudioInputDevice(const QAudioDeviceInfo &device)
 {
+    d->settings->setValue("AudioInputDevice", device.deviceName());
     d->audioInputDevice = device;
+    emit audioInputDeviceChanged(device);
 }
 
 QAudioDeviceInfo Application::audioOutputDevice() const
@@ -474,7 +488,9 @@ QAudioDeviceInfo Application::audioOutputDevice() const
 
 void Application::setAudioOutputDevice(const QAudioDeviceInfo &device)
 {
+    d->settings->setValue("AudioOutputDevice", device.deviceName());
     d->audioOutputDevice = device;
+    emit audioOutputDeviceChanged(device);
 }
 
 void Application::messageClicked()

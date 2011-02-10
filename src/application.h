@@ -70,6 +70,8 @@ public:
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
 signals:
+    void audioInputDeviceChanged(const QAudioDeviceInfo &device);
+    void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
     void messageClicked(QWidget *context);
     void openAtLoginChanged(bool run);
     void showOfflineContactsChanged(bool show);

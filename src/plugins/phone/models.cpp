@@ -112,8 +112,6 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
-    m_soundPlayer = wApp->soundPlayer();
-
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);
     connect(m_ticker, SIGNAL(timeout()),
