@@ -123,3 +123,9 @@ qint64 QSoundMeter::writeData(const char *data, qint64 maxSize)
     return length;
 }
 
+QSoundMeterBar::QSoundMeterBar(QWidget *parent)
+    : QProgressBar(parent)
+{
+    setMaximum(QSoundMeter::maximum());
+    setTextVisible(false);
+}

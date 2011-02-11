@@ -28,7 +28,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QProgressBar>
 #include <QPushButton>
 #include <QThread>
 #include <QTimer>
@@ -140,34 +139,17 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     hbox->addWidget(groupBox);
 
     // input volume bar
-    const QString barSheet(
-        "QProgressBar:vertical {"
-        "border: 1px solid gray;"
-        "border-radius: 3px;"
-        "background: white;"
-        "padding: 1px;"
-        "width: 32px;"
-        "}"
-        "QProgressBar::chunk {"
-        "background: #46a;"
-        "}");
     QGridLayout *barBox = new QGridLayout;
-    QProgressBar *inputBar = new QProgressBar;
+    QSoundMeterBar *inputBar = new QSoundMeterBar;
     inputBar->setOrientation(Qt::Vertical);
-    inputBar->setMaximum(QSoundMeter::maximum());
-    inputBar->setStyleSheet(barSheet);
-    inputBar->setTextVisible(false);
     barBox->addWidget(inputBar, 0, 0);
     QLabel *inputLabel = new QLabel;
     inputLabel->setPixmap(QPixmap(":/audio-input.png"));
     barBox->addWidget(inputLabel, 1, 0);
 
     // output volume bar
-    QProgressBar *outputBar = new QProgressBar;
+    QSoundMeterBar *outputBar = new QSoundMeterBar;
     outputBar->setOrientation(Qt::Vertical);
-    outputBar->setMaximum(QSoundMeter::maximum());
-    outputBar->setStyleSheet(barSheet);
-    outputBar->setTextVisible(false);
     barBox->addWidget(outputBar, 0, 1);
     QLabel *outputLabel = new QLabel;
     outputLabel->setPixmap(QPixmap(":/audio-output.png"));

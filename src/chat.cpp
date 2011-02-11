@@ -35,7 +35,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
-#include <QProgressBar>
 #include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
@@ -131,9 +130,6 @@ Chat::Chat(QWidget *parent)
 
     /* build status bar */
     statusBar()->setSizeGripEnabled(false);
-    // avoid border around widgets on OS X
-    statusBar()->setStyleSheet("QStatusBar::item { border: none; }");
-
     statusBar()->addPermanentWidget(new ChatStatus(d->client));
 
    /* create menu */
@@ -802,7 +798,7 @@ SoundOptions::SoundOptions()
             outputCombo->setCurrentIndex(outputCombo->count() - 1);
     }
     layout->addWidget(outputCombo, 0, 2);
-    outputBar = new QProgressBar;
+    outputBar = new QSoundMeterBar;
     layout->addWidget(outputBar, 1, 1, 1, 2);
 
     label = new QLabel;
@@ -817,7 +813,7 @@ SoundOptions::SoundOptions()
             inputCombo->setCurrentIndex(inputCombo->count() - 1);
     }
     layout->addWidget(inputCombo, 2, 2);
-    inputBar = new QProgressBar;
+    inputBar = new QSoundMeterBar;
     layout->addWidget(inputBar, 3, 1, 1, 2);
 
     testLabel = new QLabel;
@@ -864,7 +860,6 @@ void SoundOptions::startInput()
     testBuffer->open(QIODevice::WriteOnly);
     testBuffer->reset();
     QSoundMeter *inputMeter = new QSoundMeter(testInput->format(), testBuffer, testInput);
-    inputBar->setMaximum(inputMeter->maximum());
     connect(inputMeter, SIGNAL(valueChanged(int)), inputBar, SLOT(setValue(int)));
     testInput->start(inputMeter);
     QTimer::singleShot(SOUND_TEST_SECONDS * 1000, this, SLOT(startOutput()));
@@ -880,7 +875,6 @@ void SoundOptions::startOutput()
     testBuffer->open(QIODevice::ReadOnly);
     testBuffer->reset();
     QSoundMeter *outputMeter = new QSoundMeter(testOutput->format(), testBuffer, testOutput);
-    outputBar->setMaximum(outputMeter->maximum());
     connect(outputMeter, SIGNAL(valueChanged(int)), outputBar, SLOT(setValue(int)));
     testOutput->start(outputMeter);
     QTimer::singleShot(SOUND_TEST_SECONDS * 1000, this, SLOT(stopOutput()));

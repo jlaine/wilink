@@ -155,10 +155,13 @@ Application::Application(int &argc, char **argv)
         }
     }
 
-#if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
     /* initialise style */
+#if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
     setStyle(new ApplicationStyle);
 #endif
+    QFile css(":/wiLink.css");
+    if (css.open(QIODevice::ReadOnly))
+       setStyleSheet(QString::fromUtf8(css.readAll()));
 
     /* register URL handler */
     QDesktopServices::setUrlHandler("xmpp", this, "openUrl");

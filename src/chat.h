@@ -38,7 +38,7 @@ class QCheckBox;
 class QComboBox;
 class QLabel;
 class QModelIndex;
-class QProgressBar;
+class QSoundMeterBar;
 
 /** Chat represents the user interface's main window.
  */
@@ -139,10 +139,10 @@ private slots:
     void stopOutput();
 
 private:
-    QProgressBar *inputBar;
+    QSoundMeterBar *inputBar;
     QComboBox *inputCombo;
     QList<QAudioDeviceInfo> inputDevices;
-    QProgressBar *outputBar;
+    QSoundMeterBar *outputBar;
     QComboBox *outputCombo;
     QList<QAudioDeviceInfo> outputDevices;
     // test

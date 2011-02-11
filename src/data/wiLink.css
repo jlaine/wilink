@@ -1,0 +1,17 @@
+/* avoid border around widgets on OS X */
+QStatusBar::item {
+    border: none;
+}
+
+QSoundMeterBar {
+    border: 1px solid gray;
+    border-radius: 3px;
+    background: white;
+    padding: 1px;
+    width: 32px;
+}
+
+QSoundMeterBar::chunk {
+   background: #46a;
+}
+
