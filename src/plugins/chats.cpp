@@ -22,6 +22,8 @@
 #include <QLayout>
 #include <QPushButton>
 
+#include "QSoundPlayer.h"
+
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 #include "QXmppClient.h"
@@ -29,6 +31,7 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
+#include "application.h"
 #include "chat.h"
 #include "chat_edit.h"
 #include "chat_history.h"
@@ -236,7 +239,7 @@ void ChatDialog::returnPressed()
     if (text.isEmpty())
         return;
 
-    // send message
+    // try to send message
     QXmppMessage msg;
     msg.setBody(text);
     msg.setTo(chatRemoteJid);
@@ -254,6 +257,10 @@ void ChatDialog::returnPressed()
     message.from = rosterModel->ownName();
     message.received = false;
     historyWidget()->addMessage(message);
+
+    // play sound
+    if (wApp->playSoundNotifications())
+        wApp->soundPlayer()->play(":/message-outgoing.ogg");
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages

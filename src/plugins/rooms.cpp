@@ -36,6 +36,8 @@
 #include <QTimer>
 #include <QUrl>
 
+#include "QSoundPlayer.h"
+
 #include "QXmppBookmarkManager.h"
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
@@ -48,6 +50,7 @@
 #include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 
+#include "application.h"
 #include "chat.h"
 #include "chat_edit.h"
 #include "chat_form.h"
@@ -755,8 +758,16 @@ void ChatRoom::returnPressed()
     if (text.isEmpty())
         return;
 
-    if (client->findExtension<QXmppMucManager>()->sendMessage(roomJid, text))
-        chatInput->clear();
+    // try to send message
+    if (!client->findExtension<QXmppMucManager>()->sendMessage(roomJid, text))
+        return;
+
+    // clear input
+    chatInput->clear();
+
+    // play sound
+    if (wApp->playSoundNotifications())
+        wApp->soundPlayer()->play(":/message-outgoing.ogg");
 }
 
 void ChatRoom::tabPressed()
