@@ -10,7 +10,9 @@ DESTDIR = $$QSOUND_LIBRARY_DIR
 
 HEADERS += \
     QSoundFile.h \
+    QSoundMeter.h \
     QSoundPlayer.h
 SOURCES += \
     QSoundFile.cpp \
+    QSoundMeter.cpp \
     QSoundPlayer.cpp
