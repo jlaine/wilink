@@ -546,9 +546,11 @@ void SipCallPrivate::onStateChanged()
             QTime tm;
             tm.start();
             audioOutput = new QAudioOutput(client->d->outputDevice, format, q);
-            audioOutputMeter = new QSoundMeter(format, audioChannel, q);
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
+            audioOutputMeter = new QSoundMeter(format, audioChannel, q);
+            QObject::connect(audioOutputMeter, SIGNAL(valueChanged(int)),
+                             q, SIGNAL(outputVolumeChanged(int)));
             audioOutput->setBufferSize(bufferSize);
             audioOutput->start(audioOutputMeter);
             q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
@@ -560,9 +562,11 @@ void SipCallPrivate::onStateChanged()
             QTime tm;
             tm.start();
             audioInput = new QAudioInput(client->d->inputDevice, format, q);
-            audioInputMeter = new QSoundMeter(format, audioChannel, q);
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
+            audioInputMeter = new QSoundMeter(format, audioChannel, q);
+            QObject::connect(audioInputMeter, SIGNAL(valueChanged(int)),
+                             q, SIGNAL(inputVolumeChanged(int)));
             audioInput->setBufferSize(bufferSize);
             audioInput->start(audioInputMeter);
             q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
@@ -779,6 +783,13 @@ void SipCall::localCandidatesChanged()
         d->sendInvite();
         d->inviteQueued = false;
     }
+}
+
+int SipCall::maximumVolume() const
+{
+    if (d->audioInputMeter)
+        return d->audioInputMeter->maximum();
+    return 0;
 }
 
 QString SipCall::recipient() const

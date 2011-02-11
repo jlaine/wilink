@@ -65,7 +65,7 @@ QSoundMeter::QSoundMeter(const QAudioFormat &format, QIODevice *device, QObject 
         open(device->openMode() | QIODevice::Unbuffered);
 }
 
-int QSoundMeter::maximum() const
+int QSoundMeter::maximum()
 {
     // use the RMS of a full sine wave as the maximum
     return 10.0 * log(32767.0 / sqrt(2.0));

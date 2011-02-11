@@ -209,7 +209,16 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
     }
 
     // update the item
-    if (state == QXmppCall::FinishedState) {
+    if (state == QXmppCall::ActiveState) {
+        connect(call, SIGNAL(inputVolumeChanged(int)),
+                this, SIGNAL(inputVolumeChanged(int)));
+        connect(call, SIGNAL(outputVolumeChanged(int)),
+                this, SIGNAL(outputVolumeChanged(int)));
+    }
+    else if (state == QXmppCall::FinishedState) {
+        emit inputVolumeChanged(0);
+        emit outputVolumeChanged(0);
+
         item->call = 0;
         item->duration = call->duration();
         if (!call->error().isEmpty()) {

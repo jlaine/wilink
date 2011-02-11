@@ -56,6 +56,8 @@ public:
 
 signals:
     void error(const QString &error);
+    void inputVolumeChanged(int);
+    void outputVolumeChanged(int);
     void stateChanged(bool haveCalls);
 
 public slots:

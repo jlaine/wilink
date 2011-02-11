@@ -28,10 +28,13 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QThread>
 #include <QTimer>
 #include <QUrl>
+
+#include "QSoundMeter.h"
 
 #include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
@@ -135,6 +138,16 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     hbox = new QHBoxLayout;
     hbox->addStretch();
     hbox->addWidget(groupBox);
+
+    QVBoxLayout *barBox = new QVBoxLayout;
+    QProgressBar *inputBar = new QProgressBar;
+    inputBar->setOrientation(Qt::Vertical);
+    inputBar->setMaximum(QSoundMeter::maximum());
+    barBox->addWidget(inputBar);
+    QLabel *inputLabel = new QLabel;
+    inputLabel->setPixmap(QPixmap(":/audio-input.png"));
+    barBox->addWidget(inputLabel);
+    hbox->addLayout(barBox);
     hbox->addStretch();
     layout->addLayout(hbox);
 
@@ -145,6 +158,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
     check = connect(callsModel, SIGNAL(stateChanged(bool)),
                     this, SLOT(callStateChanged(bool)));
+    Q_ASSERT(check);
+    check = connect(callsModel, SIGNAL(inputVolumeChanged(int)),
+                    inputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
     callsView = new PhoneCallsView(callsModel, this);
     check = connect(callsView, SIGNAL(clicked(QModelIndex)),
