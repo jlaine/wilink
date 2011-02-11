@@ -944,12 +944,12 @@ Acceptez-vous?</translation>
         <translation>Tester</translation>
     </message>
     <message>
-        <source>Capturing %1s of audio..</source>
-        <translation>Capture de %1s d&apos;audio..</translation>
+        <source>You should now hear the sound you recorded.</source>
+        <translation>Vous devriez maintenant entendre le son que vous avez enregistré.</translation>
     </message>
     <message>
-        <source>Playing %1s of audio..</source>
-        <translation>Lecture de %1s d&apos;audio..</translation>
+        <source>Speak into the microphone for %1 seconds and check the sound level.</source>
+        <translation>Parlez dans le microphone pendant %1 secondes et vérifiez le niveau sonore.</translation>
     </message>
 </context>
 <context>

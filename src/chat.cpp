@@ -778,7 +778,7 @@ bool ChatOptions::save()
     return true;
 }
 
-#define SOUND_TEST_SECONDS 5
+#define SOUND_TEST_SECONDS 8
 
 SoundOptions::SoundOptions()
 {
@@ -786,6 +786,7 @@ SoundOptions::SoundOptions()
     QGridLayout *layout = new QGridLayout;
     layout->setColumnStretch(2, 1);
 
+    // output
     QLabel *label = new QLabel;
     label->setPixmap(QPixmap(":/audio-output.png"));
     layout->addWidget(label, 0, 0);
@@ -798,13 +799,12 @@ SoundOptions::SoundOptions()
             outputCombo->setCurrentIndex(outputCombo->count() - 1);
     }
     layout->addWidget(outputCombo, 0, 2);
-    outputBar = new QSoundMeterBar;
-    layout->addWidget(outputBar, 1, 1, 1, 2);
 
+    // input
     label = new QLabel;
     label->setPixmap(QPixmap(":/audio-input.png"));
-    layout->addWidget(label, 2, 0);
-    layout->addWidget(new QLabel(tr("Audio capture device")), 2, 1);
+    layout->addWidget(label, 1, 0);
+    layout->addWidget(new QLabel(tr("Audio capture device")), 1, 1);
     inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
     inputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, inputDevices) {
@@ -812,15 +812,18 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioInputDevice().deviceName())
             inputCombo->setCurrentIndex(inputCombo->count() - 1);
     }
-    layout->addWidget(inputCombo, 2, 2);
-    inputBar = new QSoundMeterBar;
-    layout->addWidget(inputBar, 3, 1, 1, 2);
+    layout->addWidget(inputCombo, 1, 2);
 
+    // test
+    testBar = new QSoundMeterBar;
+    testBar->hide();
+    layout->addWidget(testBar, 2, 0, 1, 3);
     testLabel = new QLabel;
-    layout->addWidget(testLabel, 4, 1);
+    testLabel->setWordWrap(true);
+    layout->addWidget(testLabel, 3, 0, 1, 2);
     testButton = new QPushButton(tr("Test"));
     connect(testButton, SIGNAL(clicked()), this, SLOT(startInput()));
-    layout->addWidget(testButton, 4, 2);
+    layout->addWidget(testButton, 3, 2);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/audio-output.png"));
@@ -856,11 +859,12 @@ void SoundOptions::startInput()
     testOutput = new QAudioOutput(outputDevices[outputCombo->currentIndex()], format, this);
 
     // start input
-    testLabel->setText(tr("Capturing %1s of audio..").arg(QString::number(SOUND_TEST_SECONDS)));
+    testBar->show();
+    testLabel->setText(tr("Speak into the microphone for %1 seconds and check the sound level.").arg(QString::number(SOUND_TEST_SECONDS)));
     testBuffer->open(QIODevice::WriteOnly);
     testBuffer->reset();
     QSoundMeter *inputMeter = new QSoundMeter(testInput->format(), testBuffer, testInput);
-    connect(inputMeter, SIGNAL(valueChanged(int)), inputBar, SLOT(setValue(int)));
+    connect(inputMeter, SIGNAL(valueChanged(int)), testBar, SLOT(setValue(int)));
     testInput->start(inputMeter);
     QTimer::singleShot(SOUND_TEST_SECONDS * 1000, this, SLOT(startOutput()));
 }
@@ -868,14 +872,14 @@ void SoundOptions::startInput()
 void SoundOptions::startOutput()
 {
     testInput->stop();
-    inputBar->setValue(0);
+    testBar->setValue(0);
 
     // start output
-    testLabel->setText(tr("Playing %1s of audio..").arg(QString::number(SOUND_TEST_SECONDS)));
+    testLabel->setText(tr("You should now hear the sound you recorded."));
     testBuffer->open(QIODevice::ReadOnly);
     testBuffer->reset();
     QSoundMeter *outputMeter = new QSoundMeter(testOutput->format(), testBuffer, testOutput);
-    connect(outputMeter, SIGNAL(valueChanged(int)), outputBar, SLOT(setValue(int)));
+    connect(outputMeter, SIGNAL(valueChanged(int)), testBar, SLOT(setValue(int)));
     testOutput->start(outputMeter);
     QTimer::singleShot(SOUND_TEST_SECONDS * 1000, this, SLOT(stopOutput()));
 }
@@ -883,7 +887,8 @@ void SoundOptions::startOutput()
 void SoundOptions::stopOutput()
 {
     testOutput->stop();
-    outputBar->setValue(0);
+    testBar->setValue(0);
+    testBar->hide();
 
     // cleanup
     delete testInput;

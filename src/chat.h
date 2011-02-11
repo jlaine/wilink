@@ -139,13 +139,12 @@ private slots:
     void stopOutput();
 
 private:
-    QSoundMeterBar *inputBar;
     QComboBox *inputCombo;
     QList<QAudioDeviceInfo> inputDevices;
-    QSoundMeterBar *outputBar;
     QComboBox *outputCombo;
     QList<QAudioDeviceInfo> outputDevices;
     // test
+    QSoundMeterBar *testBar;
     QBuffer *testBuffer;
     QPushButton *testButton;
     QLabel *testLabel;
