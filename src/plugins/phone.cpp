@@ -140,26 +140,39 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     hbox->addWidget(groupBox);
 
     // input volume bar
-    QVBoxLayout *inputBox = new QVBoxLayout;
+    const QString barSheet(
+        "QProgressBar:vertical {"
+        "border: 1px solid gray;"
+        "border-radius: 3px;"
+        "background: white;"
+        "padding: 1px;"
+        "width: 32px;"
+        "}"
+        "QProgressBar::chunk {"
+        "background: #46a;"
+        "}");
+    QGridLayout *barBox = new QGridLayout;
     QProgressBar *inputBar = new QProgressBar;
     inputBar->setOrientation(Qt::Vertical);
     inputBar->setMaximum(QSoundMeter::maximum());
-    inputBox->addWidget(inputBar);
+    inputBar->setStyleSheet(barSheet);
+    inputBar->setTextVisible(false);
+    barBox->addWidget(inputBar, 0, 0);
     QLabel *inputLabel = new QLabel;
     inputLabel->setPixmap(QPixmap(":/audio-input.png"));
-    inputBox->addWidget(inputLabel);
-    hbox->addLayout(inputBox);
+    barBox->addWidget(inputLabel, 1, 0);
 
     // output volume bar
-    QVBoxLayout *outputBox = new QVBoxLayout;
     QProgressBar *outputBar = new QProgressBar;
     outputBar->setOrientation(Qt::Vertical);
     outputBar->setMaximum(QSoundMeter::maximum());
-    outputBox->addWidget(outputBar);
+    outputBar->setStyleSheet(barSheet);
+    outputBar->setTextVisible(false);
+    barBox->addWidget(outputBar, 0, 1);
     QLabel *outputLabel = new QLabel;
     outputLabel->setPixmap(QPixmap(":/audio-output.png"));
-    outputBox->addWidget(outputLabel);
-    hbox->addLayout(outputBox);
+    barBox->addWidget(outputLabel, 1, 1);
+    hbox->addLayout(barBox);
 
     hbox->addStretch();
     layout->addLayout(hbox);
@@ -185,7 +198,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(historyDoubleClicked(QModelIndex)));
     Q_ASSERT(check);
-    layout->addWidget(callsView);
+    layout->addWidget(callsView, 1);
 
     // status
     statusLabel = new QLabel;
