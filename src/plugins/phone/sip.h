@@ -162,7 +162,6 @@ public:
     QXmppCall::State state() const;
 
     QXmppRtpChannel *audioChannel() const;
-    int maximumVolume() const;
 
 signals:
     /// This signal is emitted when a call is connected.

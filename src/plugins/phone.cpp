@@ -139,15 +139,28 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     hbox->addStretch();
     hbox->addWidget(groupBox);
 
-    QVBoxLayout *barBox = new QVBoxLayout;
+    // input volume bar
+    QVBoxLayout *inputBox = new QVBoxLayout;
     QProgressBar *inputBar = new QProgressBar;
     inputBar->setOrientation(Qt::Vertical);
     inputBar->setMaximum(QSoundMeter::maximum());
-    barBox->addWidget(inputBar);
+    inputBox->addWidget(inputBar);
     QLabel *inputLabel = new QLabel;
     inputLabel->setPixmap(QPixmap(":/audio-input.png"));
-    barBox->addWidget(inputLabel);
-    hbox->addLayout(barBox);
+    inputBox->addWidget(inputLabel);
+    hbox->addLayout(inputBox);
+
+    // output volume bar
+    QVBoxLayout *outputBox = new QVBoxLayout;
+    QProgressBar *outputBar = new QProgressBar;
+    outputBar->setOrientation(Qt::Vertical);
+    outputBar->setMaximum(QSoundMeter::maximum());
+    outputBox->addWidget(outputBar);
+    QLabel *outputLabel = new QLabel;
+    outputLabel->setPixmap(QPixmap(":/audio-output.png"));
+    outputBox->addWidget(outputLabel);
+    hbox->addLayout(outputBox);
+
     hbox->addStretch();
     layout->addLayout(hbox);
 
@@ -161,6 +174,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
     check = connect(callsModel, SIGNAL(inputVolumeChanged(int)),
                     inputBar, SLOT(setValue(int)));
+    Q_ASSERT(check);
+    check = connect(callsModel, SIGNAL(outputVolumeChanged(int)),
+                    outputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
     callsView = new PhoneCallsView(callsModel, this);
     check = connect(callsView, SIGNAL(clicked(QModelIndex)),

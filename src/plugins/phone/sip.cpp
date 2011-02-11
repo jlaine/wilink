@@ -785,13 +785,6 @@ void SipCall::localCandidatesChanged()
     }
 }
 
-int SipCall::maximumVolume() const
-{
-    if (d->audioInputMeter)
-        return d->audioInputMeter->maximum();
-    return 0;
-}
-
 QString SipCall::recipient() const
 {
     return QString::fromUtf8(d->remoteRecipient);
