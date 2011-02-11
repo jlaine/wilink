@@ -30,7 +30,7 @@ add_executable(phone
     ../plugins/phone/sip.cpp
     ../plugins/phone/stun.cpp
     ${phone_MOC_SOURCES})
-target_link_libraries(phone qxmpp ${QT_LIBRARIES})
+target_link_libraries(phone qsound qxmpp ${QT_LIBRARIES})
 
 add_executable(stun stun.cpp)
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})

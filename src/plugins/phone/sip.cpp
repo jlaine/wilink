@@ -28,6 +28,8 @@
 #include <QUdpSocket>
 #include <QTimer>
 
+#include "QSoundMeter.h"
+
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
 #include "QXmppSrvInfo.h"
@@ -159,6 +161,10 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::OfferState),
     activeTime("0 0"),
+    audioInput(0),
+    audioInputMeter(0),
+    audioOutput(0),
+    audioOutputMeter(0),
     invitePending(false),
     inviteQueued(false),
     q(qq)
@@ -540,10 +546,11 @@ void SipCallPrivate::onStateChanged()
             QTime tm;
             tm.start();
             audioOutput = new QAudioOutput(client->d->outputDevice, format, q);
+            audioOutputMeter = new QSoundMeter(format, audioChannel, q);
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioOutput->setBufferSize(bufferSize);
-            audioOutput->start(audioChannel);
+            audioOutput->start(audioOutputMeter);
             q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
             q->debug(QString("Audio output buffer size %1 (asked for %2)").arg(QString::number(audioOutput->bufferSize()), QString::number(bufferSize)));
         }
@@ -553,10 +560,11 @@ void SipCallPrivate::onStateChanged()
             QTime tm;
             tm.start();
             audioInput = new QAudioInput(client->d->inputDevice, format, q);
+            audioInputMeter = new QSoundMeter(format, audioChannel, q);
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioInput->setBufferSize(bufferSize);
-            audioInput->start(audioChannel);
+            audioInput->start(audioInputMeter);
             q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
             q->debug(QString("Audio input buffer size %1 (asked for %2)").arg(QString::number(audioInput->bufferSize()), QString::number(bufferSize)));
         }
@@ -596,8 +604,6 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
     d->audioChannel = new QXmppRtpChannel(this);
-    d->audioInput = 0;
-    d->audioOutput = 0;
 
     // bind sockets
     bool iceControlling = (d->direction == QXmppCall::OutgoingDirection);
