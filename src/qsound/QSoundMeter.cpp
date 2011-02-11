@@ -42,12 +42,14 @@ static int loudness(const char *data, qint64 length, qint64 offset, int sampleSi
         sum += (sample * sample);
         count++;
     }
-    return sqrt(sum/count);
+    return 5.0 * log((float)sum/(float)count);
 }
 
-QSoundMeter::QSoundMeter(const QAudioFormat &format, QObject *parent)
+QSoundMeter::QSoundMeter(const QAudioFormat &format, QIODevice *device, QObject *parent)
     : QIODevice(parent),
     m_device(0),
+    m_pos(0),
+    m_sampleSize(0),
     m_value(0)
 {
     if (format.byteOrder() != int(QSysInfo::ByteOrder) ||
@@ -57,15 +59,16 @@ QSoundMeter::QSoundMeter(const QAudioFormat &format, QObject *parent)
         qWarning("QSoundMeter only supports 16-bit host-endian PCM data");
         return;
     }
-    m_device = new QBuffer(this);
-    m_device->open(QIODevice::ReadWrite);
+    m_device = device;
     m_sampleSize = format.sampleSize() / 8;
-    open(QIODevice::Unbuffered | QIODevice::ReadWrite);
+    if (m_device)
+        open(device->openMode() | QIODevice::Unbuffered);
 }
 
 int QSoundMeter::maximum() const
 {
-    return 32767;
+    // use the RMS of a full sine wave as the maximum
+    return 10.0 * log(32767.0 / sqrt(2.0));
 }
 
 qint64 QSoundMeter::pos() const
@@ -81,21 +84,21 @@ qint64 QSoundMeter::readData(char *data, qint64 maxSize)
         return -1;
     qint64 length = m_device->read(data, maxSize);
     if (length > 0) {
-        const int newValue = loudness(data, length, m_readPos, m_sampleSize);
+        const int newValue = loudness(data, length, m_pos, m_sampleSize);
         if (newValue != m_value) {
             m_value = newValue;
             emit valueChanged(m_value);
         }
-        m_readPos += length;
+        m_pos += length;
     }
     return length;
 }
 
 bool QSoundMeter::seek(qint64 pos)
 {
-    if (!m_device)
+    if (!m_device || !m_device->seek(pos))
         return false;
-    return m_device->seek(pos);
+    m_pos = pos;
 }
 
 int QSoundMeter::value() const
@@ -109,12 +112,12 @@ qint64 QSoundMeter::writeData(const char *data, qint64 maxSize)
         return -1;
     qint64 length = m_device->write(data, maxSize);
     if (length > 0) {
-        const int newValue = loudness(data, length, m_writePos, m_sampleSize);
+        const int newValue = loudness(data, length, m_pos, m_sampleSize);
         if (newValue != m_value) {
             m_value = newValue;
             emit valueChanged(m_value);
         }
-        m_writePos += length;
+        m_pos += length;
     }
     return length;
 }

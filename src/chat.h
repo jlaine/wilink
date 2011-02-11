@@ -31,9 +31,14 @@ class ChatPanel;
 class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
+class QAudioInput;
+class QAudioOutput;
+class QBuffer;
 class QCheckBox;
 class QComboBox;
+class QLabel;
 class QModelIndex;
+class QProgressBar;
 
 /** Chat represents the user interface's main window.
  */
@@ -128,11 +133,24 @@ public:
     SoundOptions();
     bool save();
 
+private slots:
+    void startInput();
+    void startOutput();
+    void stopOutput();
+
 private:
+    QProgressBar *inputBar;
     QComboBox *inputCombo;
     QList<QAudioDeviceInfo> inputDevices;
+    QProgressBar *outputBar;
     QComboBox *outputCombo;
     QList<QAudioDeviceInfo> outputDevices;
+    // test
+    QBuffer *testBuffer;
+    QPushButton *testButton;
+    QLabel *testLabel;
+    QAudioInput *testInput;
+    QAudioOutput *testOutput;
 };
 
 #endif

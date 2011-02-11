@@ -19,7 +19,9 @@
 
 #include <QApplication>
 #include <QAudioDeviceInfo>
+#include <QAudioInput>
 #include <QAuthenticator>
+#include <QBuffer>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
@@ -33,6 +35,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPluginLoader>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QShortcut>
 #include <QSplitter>
 #include <QStackedWidget>
@@ -40,6 +44,7 @@
 #include <QStringList>
 #include <QTimer>
 
+#include "QSoundMeter.h"
 #include "QSoundPlayer.h"
 
 #include "QXmppConfiguration.h"
@@ -777,8 +782,11 @@ bool ChatOptions::save()
     return true;
 }
 
+#define SOUND_TEST_SECONDS 5
+
 SoundOptions::SoundOptions()
 {
+    testBuffer = new QBuffer(this);
     QGridLayout *layout = new QGridLayout;
     layout->setColumnStretch(2, 1);
 
@@ -794,11 +802,13 @@ SoundOptions::SoundOptions()
             outputCombo->setCurrentIndex(outputCombo->count() - 1);
     }
     layout->addWidget(outputCombo, 0, 2);
+    outputBar = new QProgressBar;
+    layout->addWidget(outputBar, 1, 1, 1, 2);
 
     label = new QLabel;
     label->setPixmap(QPixmap(":/audio-input.png"));
-    layout->addWidget(label, 1, 0);
-    layout->addWidget(new QLabel(tr("Audio capture device")), 1, 1);
+    layout->addWidget(label, 2, 0);
+    layout->addWidget(new QLabel(tr("Audio capture device")), 2, 1);
     inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
     inputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, inputDevices) {
@@ -806,7 +816,15 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioInputDevice().deviceName())
             inputCombo->setCurrentIndex(inputCombo->count() - 1);
     }
-    layout->addWidget(inputCombo, 1, 2);
+    layout->addWidget(inputCombo, 2, 2);
+    inputBar = new QProgressBar;
+    layout->addWidget(inputBar, 3, 1, 1, 2);
+
+    testLabel = new QLabel;
+    layout->addWidget(testLabel, 4, 1);
+    testButton = new QPushButton(tr("Test"));
+    connect(testButton, SIGNAL(clicked()), this, SLOT(startInput()));
+    layout->addWidget(testButton, 4, 2);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/audio-output.png"));
@@ -815,8 +833,68 @@ SoundOptions::SoundOptions()
 
 bool SoundOptions::save()
 {
-    wApp->setAudioInputDevice(inputDevices[inputCombo->currentIndex()]);
-    wApp->setAudioOutputDevice(outputDevices[outputCombo->currentIndex()]);
+    if (!inputDevices.isEmpty())
+        wApp->setAudioInputDevice(inputDevices[inputCombo->currentIndex()]);
+
+    if (!outputDevices.isEmpty())
+        wApp->setAudioOutputDevice(outputDevices[outputCombo->currentIndex()]);
     return true;
+}
+
+void SoundOptions::startInput()
+{
+    if (inputDevices.isEmpty() || outputDevices.isEmpty())
+        return;
+    testButton->setEnabled(false);
+
+    QAudioFormat format;
+    format.setFrequency(8000);
+    format.setChannels(1);
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+
+    // create audio input and output
+    testInput = new QAudioInput(inputDevices[inputCombo->currentIndex()], format, this);
+    testOutput = new QAudioOutput(outputDevices[outputCombo->currentIndex()], format, this);
+
+    // start input
+    testLabel->setText(tr("Capturing %1s of audio..").arg(QString::number(SOUND_TEST_SECONDS)));
+    testBuffer->open(QIODevice::WriteOnly);
+    testBuffer->reset();
+    QSoundMeter *inputMeter = new QSoundMeter(testInput->format(), testBuffer, testInput);
+    inputBar->setMaximum(inputMeter->maximum());
+    connect(inputMeter, SIGNAL(valueChanged(int)), inputBar, SLOT(setValue(int)));
+    testInput->start(inputMeter);
+    QTimer::singleShot(SOUND_TEST_SECONDS * 1000, this, SLOT(startOutput()));
+}
+
+void SoundOptions::startOutput()
+{
+    testInput->stop();
+    inputBar->setValue(0);
+
+    // start output
+    testLabel->setText(tr("Playing %1s of audio..").arg(QString::number(SOUND_TEST_SECONDS)));
+    testBuffer->open(QIODevice::ReadOnly);
+    testBuffer->reset();
+    QSoundMeter *outputMeter = new QSoundMeter(testOutput->format(), testBuffer, testOutput);
+    outputBar->setMaximum(outputMeter->maximum());
+    connect(outputMeter, SIGNAL(valueChanged(int)), outputBar, SLOT(setValue(int)));
+    testOutput->start(outputMeter);
+    QTimer::singleShot(SOUND_TEST_SECONDS * 1000, this, SLOT(stopOutput()));
+}
+
+void SoundOptions::stopOutput()
+{
+    testOutput->stop();
+    outputBar->setValue(0);
+
+    // cleanup
+    delete testInput;
+    delete testOutput;
+    testLabel->setText(QString());
+    testButton->setEnabled(true);
 }
 

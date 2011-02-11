@@ -939,6 +939,18 @@ Acceptez-vous?</translation>
         <source>Audio capture device</source>
         <translation>Périphérique d&apos;entrée son</translation>
     </message>
+    <message>
+        <source>Test</source>
+        <translation>Tester</translation>
+    </message>
+    <message>
+        <source>Capturing %1s of audio..</source>
+        <translation>Capture de %1s d'audio..</translation>
+    </message>
+    <message>
+        <source>Playing %1s of audio..</source>
+        <translation>Lecture de %1s d'audio..</translation>
+    </message>
 </context>
 <context>
     <name>UpdatesDialog</name>
