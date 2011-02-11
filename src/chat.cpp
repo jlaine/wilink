@@ -40,6 +40,8 @@
 #include <QStringList>
 #include <QTimer>
 
+#include "QSoundPlayer.h"
+
 #include "QXmppConfiguration.h"
 #include "QXmppConstants.h"
 #include "QXmppLogger.h"
@@ -60,7 +62,6 @@
 #include "chat_utils.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
-#include "qsound/QSoundPlayer.h"
 
 class ChatPrivate
 {

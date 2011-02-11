@@ -24,13 +24,13 @@
 #include <QSettings>
 #include <QShortcut>
 
+#include "QSoundFile.h"
+#include "QSoundPlayer.h"
+
 #include "application.h"
 #include "chat.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
-
-#include "qsound/QSoundFile.h"
-#include "qsound/QSoundPlayer.h"
 #include "player.h"
 
 #define DURATION_WIDTH 60

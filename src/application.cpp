@@ -40,6 +40,7 @@
 #include <QUrl>
 
 #include "qnetio/wallet.h"
+#include "QSoundPlayer.h"
 #include "QXmppUtils.h"
 
 #include "application.h"
@@ -48,7 +49,6 @@
 #include "chat_accounts.h"
 #include "chat_utils.h"
 #include "flickcharm.h"
-#include "qsound/QSoundPlayer.h"
 
 Application *wApp = 0;
 

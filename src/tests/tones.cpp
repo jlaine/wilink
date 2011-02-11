@@ -8,9 +8,9 @@
 #include <QPair>
 #include <QPushButton>
 
+#include "QSoundPlayer.h"
 #include "QXmppRtpChannel.h"
 
-#include "qsound/QSoundPlayer.h"
 #include "tones.h"
 
 typedef QPair<int,int> ToneFreq;

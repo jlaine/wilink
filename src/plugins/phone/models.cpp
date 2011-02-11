@@ -31,8 +31,8 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
+#include "QSoundPlayer.h"
 #include "QXmppUtils.h"
-#include "qsound/QSoundPlayer.h"
 
 #include "application.h"
 #include "models.h"

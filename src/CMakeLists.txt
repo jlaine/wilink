@@ -20,6 +20,7 @@ endif()
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qdjango/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qsound)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp/src)
 
 # wiLink

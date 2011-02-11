@@ -21,11 +21,12 @@
 #include <QDomDocument>
 #include <QtTest/QtTest>
 
+#include "QSoundFile.h"
+
 #include "diagnostics/iq.h"
-#include "updates.h"
-#include "qsound/QSoundFile.h"
 #include "chat_utils.h"
 #include "tests.h"
+#include "updates.h"
 
 template <class T>
 static void parsePacket(T &packet, const QByteArray &xml)

@@ -28,12 +28,13 @@
 #include <QTreeView>
 #include <QUrl>
 
+#include "QSoundFile.h"
+#include "QSoundPlayer.h"
+
 #include "application.h"
 #include "chat.h"
 #include "chat_plugin.h"
 #include "podcasts.h"
-#include "qsound/QSoundFile.h"
-#include "qsound/QSoundPlayer.h"
 
 enum PodcastsColumns {
     MainColumn = 0,
