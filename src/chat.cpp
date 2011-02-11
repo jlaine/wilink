@@ -780,8 +780,12 @@ bool ChatOptions::save()
 SoundOptions::SoundOptions()
 {
     QGridLayout *layout = new QGridLayout;
+    layout->setColumnStretch(2, 1);
 
-    layout->addWidget(new QLabel(tr("Audio playback device")), 0, 0);
+    QLabel *label = new QLabel;
+    label->setPixmap(QPixmap(":/audio-output.png"));
+    layout->addWidget(label, 0, 0);
+    layout->addWidget(new QLabel(tr("Audio playback device")), 0, 1);
     outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
     outputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, outputDevices) {
@@ -789,9 +793,12 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioOutputDevice().deviceName())
             outputCombo->setCurrentIndex(outputCombo->count() - 1);
     }
-    layout->addWidget(outputCombo, 0, 1);
+    layout->addWidget(outputCombo, 0, 2);
 
-    layout->addWidget(new QLabel(tr("Audio capture device")), 1, 0);
+    label = new QLabel;
+    label->setPixmap(QPixmap(":/audio-input.png"));
+    layout->addWidget(label, 1, 0);
+    layout->addWidget(new QLabel(tr("Audio capture device")), 1, 1);
     inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
     inputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, inputDevices) {
@@ -799,10 +806,10 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioInputDevice().deviceName())
             inputCombo->setCurrentIndex(inputCombo->count() - 1);
     }
-    layout->addWidget(inputCombo, 1, 1);
+    layout->addWidget(inputCombo, 1, 2);
 
     setLayout(layout);
-    setWindowIcon(QIcon(":/options.png"));
+    setWindowIcon(QIcon(":/audio-output.png"));
     setWindowTitle(tr("Sound"));
 }
 
