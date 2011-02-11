@@ -99,6 +99,7 @@ bool QSoundMeter::seek(qint64 pos)
     if (!m_device || !m_device->seek(pos))
         return false;
     m_pos = pos;
+    return true;
 }
 
 int QSoundMeter::value() const

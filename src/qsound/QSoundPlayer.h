@@ -39,10 +39,12 @@ public:
     int play(const QString &name, bool repeat = false);
     int play(QSoundFile *reader);
     void stop(int id);
-    void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
 
 signals:
     void finished(int id);
+
+public slots:
+    void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
 
 private slots:
     void stateChanged(QAudio::State state);

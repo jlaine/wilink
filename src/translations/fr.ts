@@ -945,11 +945,11 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Capturing %1s of audio..</source>
-        <translation>Capture de %1s d'audio..</translation>
+        <translation>Capture de %1s d&apos;audio..</translation>
     </message>
     <message>
         <source>Playing %1s of audio..</source>
-        <translation>Lecture de %1s d'audio..</translation>
+        <translation>Lecture de %1s d&apos;audio..</translation>
     </message>
 </context>
 <context>

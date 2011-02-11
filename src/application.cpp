@@ -166,6 +166,8 @@ Application::Application(int &argc, char **argv)
     /* initialise sound player */
     d->soundPlayer = new QSoundPlayer(this);
     d->soundPlayer->setAudioOutputDevice(d->audioOutputDevice);
+    connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
+            d->soundPlayer, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
 
     /* add SSL root CA for wifirst.net and download.wifirst.net */
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
