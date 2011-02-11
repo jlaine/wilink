@@ -33,8 +33,13 @@ class QSoundMeter : public QIODevice
 
 public:
     QSoundMeter(const QAudioFormat &format, QObject *parent = 0);
+    int maximum() const;
     qint64 pos() const;
     bool seek(qint64 pos);
+    int value() const;
+
+signals:
+    void valueChanged(int value);
 
 protected:
     qint64 readData(char *data, qint64 maxSize);
@@ -42,6 +47,10 @@ protected:
 
 private:
     QIODevice *m_device;
+    int m_sampleSize;
+    int m_value;
+    qint64 m_readPos;
+    qint64 m_writePos;
 };
 
 #endif
