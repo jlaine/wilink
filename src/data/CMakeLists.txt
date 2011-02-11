@@ -4,6 +4,8 @@ generate_ico(ico wiLink.svg)
 generate_png(png
     add.svg
     album.svg
+    audio-input.svg
+    audio-output.svg
     back.svg
     call.svg
     call-incoming.svg
