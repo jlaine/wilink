@@ -115,6 +115,7 @@ Application::Application(int &argc, char **argv)
     d(new ApplicationPrivate)
 {
     wApp = this;
+    qRegisterMetaType<QAudioDeviceInfo>();
 
     /* set application properties */
     setApplicationName("wiLink");
