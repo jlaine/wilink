@@ -9,6 +9,28 @@
 
 #define ETHER_TYPE_IP (0x0800)
 
+struct rtp {
+#if BYTE_ORDER == LITTLE_ENDIAN
+    u_char rtp_cc:4,
+        rtp_extension:1,
+        rtp_padding:1,
+        rtp_version:2;
+    u_char rtp_ptype:7,
+        rtp_marker:1;
+#endif
+#if BYTE_ORDER == BIG_ENDIAN
+    u_char rtp_version:2,
+        rtp_padding:1,
+        rtp_extension:1,
+        rtp_cc:4;
+    u_char rtp_marker:1,
+        rtp_ptype:7;
+#endif
+    u_short rtp_sequence;
+    u_int32_t rtp_timestamp;
+    u_int32_t rtp_ssrc;
+};
+
 int main(int argc, char *argv[])
 {
     pcap_t *handle; 
@@ -64,8 +86,13 @@ int main(int argc, char *argv[])
         pkt_ptr += sizeof(*udp_hdr);
 
         // parse the RTP header
-        pkt_ptr += 12;
+        struct rtp *rtp_hdr = (struct rtp *)pkt_ptr;
+        pkt_ptr += sizeof(*rtp_hdr);
         const int rtp_length = udp_length - (pkt_ptr - (u_char*)udp_hdr);
+        fprintf(stderr, "RTP type %u, seq %u, (%i bytes)\n",
+            rtp_hdr->rtp_ptype,
+            ntohs(rtp_hdr->rtp_sequence),
+            rtp_length);
 
         // decode SPEEX
         speex_bits_read_from(&decoder_bits, pkt_ptr, rtp_length);
