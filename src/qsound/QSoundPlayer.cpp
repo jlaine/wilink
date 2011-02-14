@@ -53,8 +53,8 @@ int QSoundPlayer::play(QSoundFile *reader)
     QAudioOutput *output = new QAudioOutput(m_audioDevice, format, reader);
     output->setProperty("_play_id", m_readerId);
     connect(output, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
-    // buffer one second of audio
-    output->setBufferSize(format.channels() * format.sampleSize() * format.frequency() / 8);
+    // buffer 500ms of audio
+    output->setBufferSize((format.channels() * format.sampleSize() * format.frequency()) / 16);
     output->start(reader);
 
     return m_readerId;
