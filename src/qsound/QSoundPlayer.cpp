@@ -32,6 +32,8 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
 
 int QSoundPlayer::play(const QString &name, bool repeat)
 {
+    if (name.isEmpty())
+        return 0;
     QSoundFile *reader = new QSoundFile(name, this);
     reader->setRepeat(repeat);
     return play(reader);

@@ -639,8 +639,8 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
             queueNotification(message.body);
 
         // play sound, unless we sent the message
-        if (message.received && wApp->playSoundNotifications())
-            wApp->soundPlayer()->play(":/message-incoming.ogg");
+        if (message.received)
+            wApp->soundPlayer()->play(wApp->incomingMessageSound());
     }
 }
 
@@ -770,8 +770,7 @@ void ChatRoom::returnPressed()
     chatInput->clear();
 
     // play sound
-    if (wApp->playSoundNotifications())
-        wApp->soundPlayer()->play(":/message-outgoing.ogg");
+    wApp->soundPlayer()->play(wApp->outgoingMessageSound());
 }
 
 void ChatRoom::tabPressed()

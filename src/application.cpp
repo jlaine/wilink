@@ -399,14 +399,24 @@ void Application::openUrl(const QUrl &url)
     }
 }
 
-bool Application::playSoundNotifications() const
+QString Application::incomingMessageSound() const
 {
-    return d->settings->value("PlaySoundNotifications", false).toBool();
+    return d->settings->value("IncomingMessageSound").toString();
 }
 
-void Application::setPlaySoundNotifications(bool play)
+void Application::setIncomingMessageSound(const QString &soundFile)
 {
-    d->settings->setValue("PlaySoundNotifications", play);
+    d->settings->setValue("IncomingMessageSound", soundFile);
+}
+
+QString Application::outgoingMessageSound() const
+{
+    return d->settings->value("OutgoingMessageSound").toString();
+}
+
+void Application::setOutgoingMessageSound(const QString &soundFile)
+{
+    d->settings->setValue("OutgoingMessageSound", soundFile);
 }
 
 void Application::showAccounts()

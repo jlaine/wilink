@@ -121,7 +121,6 @@ public:
 
 private:
     QCheckBox *openAtLogin;
-    QCheckBox *playSoundNotifications;
     QCheckBox *showOfflineContacts;
 };
 
@@ -139,10 +138,16 @@ private slots:
     void stopOutput();
 
 private:
+    // devices
     QComboBox *inputCombo;
     QList<QAudioDeviceInfo> inputDevices;
     QComboBox *outputCombo;
     QList<QAudioDeviceInfo> outputDevices;
+
+    // notifications
+    QCheckBox *incomingMessageSound;
+    QCheckBox *outgoingMessageSound;
+
     // test
     QSoundMeterBar *testBar;
     QBuffer *testBuffer;

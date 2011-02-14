@@ -104,10 +104,6 @@ Acceptez-vous?</translation>
         <translation>À propos de %1</translation>
     </message>
     <message>
-        <source>version %1</source>
-        <translation>version %1</translation>
-    </message>
-    <message>
         <source>%1 FAQ</source>
         <translation>FAQ %1</translation>
     </message>
@@ -221,10 +217,6 @@ Acceptez-vous?</translation>
     <message>
         <source>General options</source>
         <translation>Options générales</translation>
-    </message>
-    <message>
-        <source>Play sound notifications</source>
-        <translation>Jouer les notifications sonores</translation>
     </message>
 </context>
 <context>
@@ -954,6 +946,18 @@ Acceptez-vous?</translation>
     <message>
         <source>Sound devices</source>
         <translation>Périphériques audio</translation>
+    </message>
+    <message>
+        <source>Sound notifications</source>
+        <translation>Notifications sonores</translation>
+    </message>
+    <message>
+        <source>Incoming message</source>
+        <translation>Message reçu</translation>
+    </message>
+    <message>
+        <source>Outgoing message</source>
+        <translation>Message envoyé</translation>
     </message>
 </context>
 <context>

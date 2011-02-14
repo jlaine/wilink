@@ -668,14 +668,8 @@ void Chat::setWindowTitle(const QString &title)
     QWidget::setWindowTitle(title);
 }
 
-/** Display an "about" dialog.
- */
-void Chat::showAbout()
+static QLayout *aboutBox()
 {
-    QDialog dlg;
-    dlg.setWindowTitle(tr("About %1").arg(qApp->applicationName()));
-
-    QVBoxLayout *layout = new QVBoxLayout;
     QHBoxLayout *hbox = new QHBoxLayout;
     QLabel *icon = new QLabel;
     icon->setPixmap(QPixmap(":/wiLink-64.png"));
@@ -684,8 +678,19 @@ void Chat::showAbout()
     hbox->addWidget(new QLabel(QString("<p style=\"font-size: xx-large;\">%1</p>"
         "<p style=\"font-size: large;\">%2</p>")
         .arg(qApp->applicationName(),
-            tr("version %1").arg(qApp->applicationVersion()))));
-    layout->addLayout(hbox);
+            QString("version %1").arg(qApp->applicationVersion()))));
+    return hbox;
+}
+
+/** Display an "about" dialog.
+ */
+void Chat::showAbout()
+{
+    QDialog dlg;
+    dlg.setWindowTitle(tr("About %1").arg(qApp->applicationName()));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addLayout(aboutBox());
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
     connect(buttonBox, SIGNAL(accepted()), &dlg, SLOT(accept()));
     layout->addWidget(buttonBox);
@@ -737,9 +742,13 @@ void Chat::unregisterPanel()
 
 ChatOptions::ChatOptions()
 {
-    QLayout *layout = new QVBoxLayout;
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    // GENERAL OPTIONS
     QGroupBox *group = new QGroupBox(tr("General options"));
     QVBoxLayout *vbox = new QVBoxLayout;
+    group->setLayout(vbox);
+    layout->addWidget(group);
 
     if (wApp->isInstalled())
     {
@@ -754,12 +763,8 @@ ChatOptions::ChatOptions()
     showOfflineContacts->setChecked(wApp->showOfflineContacts());
     vbox->addWidget(showOfflineContacts);
 
-    playSoundNotifications = new QCheckBox(tr("Play sound notifications"));
-    playSoundNotifications->setChecked(wApp->playSoundNotifications());
-    vbox->addWidget(playSoundNotifications);
-
-    group->setLayout(vbox);
-    layout->addWidget(group);
+    // ABOUT
+    layout->addLayout(aboutBox());
 
     setLayout(layout);
     setWindowIcon(QIcon(":/options.png"));
@@ -771,25 +776,27 @@ bool ChatOptions::save()
     if (openAtLogin)
         wApp->setOpenAtLogin(openAtLogin->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
-    wApp->setPlaySoundNotifications(playSoundNotifications->isChecked());
     return true;
 }
 
-#define SOUND_TEST_SECONDS 8
+#define SOUND_TEST_SECONDS 5
 
 SoundOptions::SoundOptions()
 {
-    testBuffer = new QBuffer(this);
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    // DEVICES
     QGroupBox *group = new QGroupBox(tr("Sound devices"));
-    QGridLayout *layout = new QGridLayout;
-    layout->setColumnStretch(2, 1);
-    group->setLayout(layout);
+    QGridLayout *devicesLayout = new QGridLayout;
+    devicesLayout->setColumnStretch(2, 1);
+    group->setLayout(devicesLayout);
+    layout->addWidget(group);
 
     // output
     QLabel *label = new QLabel;
     label->setPixmap(QPixmap(":/audio-output.png"));
-    layout->addWidget(label, 0, 0);
-    layout->addWidget(new QLabel(tr("Audio playback device")), 0, 1);
+    devicesLayout->addWidget(label, 0, 0);
+    devicesLayout->addWidget(new QLabel(tr("Audio playback device")), 0, 1);
     outputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
     outputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, outputDevices) {
@@ -797,13 +804,13 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioOutputDevice().deviceName())
             outputCombo->setCurrentIndex(outputCombo->count() - 1);
     }
-    layout->addWidget(outputCombo, 0, 2);
+    devicesLayout->addWidget(outputCombo, 0, 2);
 
     // input
     label = new QLabel;
     label->setPixmap(QPixmap(":/audio-input.png"));
-    layout->addWidget(label, 1, 0);
-    layout->addWidget(new QLabel(tr("Audio capture device")), 1, 1);
+    devicesLayout->addWidget(label, 1, 0);
+    devicesLayout->addWidget(new QLabel(tr("Audio capture device")), 1, 1);
     inputDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
     inputCombo = new QComboBox;
     foreach (const QAudioDeviceInfo &info, inputDevices) {
@@ -811,33 +818,52 @@ SoundOptions::SoundOptions()
         if (info.deviceName() == wApp->audioInputDevice().deviceName())
             inputCombo->setCurrentIndex(inputCombo->count() - 1);
     }
-    layout->addWidget(inputCombo, 1, 2);
+    devicesLayout->addWidget(inputCombo, 1, 2);
 
     // test
+    testBuffer = new QBuffer(this);
     testBar = new QSoundMeterBar;
     testBar->hide();
-    layout->addWidget(testBar, 2, 0, 1, 3);
+    devicesLayout->addWidget(testBar, 2, 0, 1, 3);
     testLabel = new QLabel;
     testLabel->setWordWrap(true);
-    layout->addWidget(testLabel, 3, 0, 1, 2);
+    devicesLayout->addWidget(testLabel, 3, 0, 1, 2);
     testButton = new QPushButton(tr("Test"));
     connect(testButton, SIGNAL(clicked()), this, SLOT(startInput()));
-    layout->addWidget(testButton, 3, 2);
+    devicesLayout->addWidget(testButton, 3, 2);
 
-    QVBoxLayout *tabLayout = new QVBoxLayout;
-    tabLayout->addWidget(group);
-    setLayout(tabLayout);
+    // NOTIFICATIONS
+    group = new QGroupBox(tr("Sound notifications"));
+    QVBoxLayout *notificationsLayout = new QVBoxLayout;
+    group->setLayout(notificationsLayout);
+    layout->addWidget(group);
+
+    incomingMessageSound = new QCheckBox(tr("Incoming message"));
+    incomingMessageSound->setChecked(!wApp->incomingMessageSound().isEmpty());
+    notificationsLayout->addWidget(incomingMessageSound);
+
+    outgoingMessageSound = new QCheckBox(tr("Outgoing message"));
+    outgoingMessageSound->setChecked(!wApp->outgoingMessageSound().isEmpty());
+    notificationsLayout->addWidget(outgoingMessageSound);
+
+    setLayout(layout);
     setWindowIcon(QIcon(":/audio-output.png"));
     setWindowTitle(tr("Sound"));
 }
 
 bool SoundOptions::save()
 {
+    // devices
     if (!inputDevices.isEmpty())
         wApp->setAudioInputDevice(inputDevices[inputCombo->currentIndex()]);
-
     if (!outputDevices.isEmpty())
         wApp->setAudioOutputDevice(outputDevices[outputCombo->currentIndex()]);
+
+    // notifications
+    wApp->setIncomingMessageSound(
+        incomingMessageSound->isChecked() ? QLatin1String(":/message-incoming.ogg") : QString());
+    wApp->setOutgoingMessageSound(
+        outgoingMessageSound->isChecked() ? QLatin1String(":/message-outgoing.ogg") : QString());
     return true;
 }
 

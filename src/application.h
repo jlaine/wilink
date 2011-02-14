@@ -60,8 +60,10 @@ public:
     // preferences
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
-    bool playSoundNotifications() const;
-    void setPlaySoundNotifications(bool play);
+    QString incomingMessageSound() const;
+    void setIncomingMessageSound(const QString &soundFile);
+    QString outgoingMessageSound() const;
+    void setOutgoingMessageSound(const QString &soundFile);
     bool showOfflineContacts() const;
     void setShowOfflineContacts(bool show);
     QAudioDeviceInfo audioInputDevice() const;

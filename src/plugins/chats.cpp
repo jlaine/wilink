@@ -224,8 +224,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     queueNotification(message.body);
 
     // play sound
-    if (wApp->playSoundNotifications())
-        wApp->soundPlayer()->play(":/message-incoming.ogg");
+    wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 /** Returns the type of entry to add to the roster.
@@ -263,8 +262,7 @@ void ChatDialog::returnPressed()
     historyWidget()->addMessage(message);
 
     // play sound
-    if (wApp->playSoundNotifications())
-        wApp->soundPlayer()->play(":/message-outgoing.ogg");
+    wApp->soundPlayer()->play(wApp->outgoingMessageSound());
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages
