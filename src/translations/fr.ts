@@ -951,6 +951,10 @@ Acceptez-vous?</translation>
         <source>Speak into the microphone for %1 seconds and check the sound level.</source>
         <translation>Parlez dans le microphone pendant %1 secondes et vérifiez le niveau sonore.</translation>
     </message>
+    <message>
+        <source>Sound devices</source>
+        <translation>Périphériques audio</translation>
+    </message>
 </context>
 <context>
     <name>UpdatesDialog</name>

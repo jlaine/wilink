@@ -783,8 +783,10 @@ bool ChatOptions::save()
 SoundOptions::SoundOptions()
 {
     testBuffer = new QBuffer(this);
+    QGroupBox *group = new QGroupBox(tr("Sound devices"));
     QGridLayout *layout = new QGridLayout;
     layout->setColumnStretch(2, 1);
+    group->setLayout(layout);
 
     // output
     QLabel *label = new QLabel;
@@ -825,7 +827,9 @@ SoundOptions::SoundOptions()
     connect(testButton, SIGNAL(clicked()), this, SLOT(startInput()));
     layout->addWidget(testButton, 3, 2);
 
-    setLayout(layout);
+    QVBoxLayout *tabLayout = new QVBoxLayout;
+    tabLayout->addWidget(group);
+    setLayout(tabLayout);
     setWindowIcon(QIcon(":/audio-output.png"));
     setWindowTitle(tr("Sound"));
 }
