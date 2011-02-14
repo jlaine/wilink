@@ -277,12 +277,13 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
 
 void PhonePanel::callNumber()
 {
-    const QString recipient = numberEdit->text().trimmed();
+    const QString recipient = numberEdit->text().replace(QRegExp("\\s+"), QString());
     if (sip->state() != SipClient::ConnectedState ||
         !callsModel->activeCalls().isEmpty() ||
         recipient.isEmpty())
         return;
 
+    numberEdit->clear();
     const QString address = buildAddress(recipient, sip->domain());
     QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
