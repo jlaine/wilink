@@ -37,7 +37,6 @@ int main(int argc, char *argv[])
     speex_bits_init(&decoder_bits);
     void *decoder_state = speex_decoder_init(&speex_nb_mode);
     speex_decoder_ctl(decoder_state, SPEEX_GET_FRAME_SIZE, &frame_samples);
-    printf("samples %i\n", frame_samples);
     short *pcm_buffer = (short*)malloc(2 * frame_samples);
 
     while (packet = pcap_next(handle, &header)) {
@@ -67,7 +66,6 @@ int main(int argc, char *argv[])
         // parse the RTP header
         pkt_ptr += 12;
         const int rtp_length = udp_length - (pkt_ptr - (u_char*)udp_hdr);
-        //fprintf(stderr, "RTP payload %i %x\n", rtp_length, *pkt_ptr);
 
         // decode SPEEX
         speex_bits_read_from(&decoder_bits, pkt_ptr, rtp_length);
