@@ -222,6 +222,10 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     // queue notification
     queueNotification(message.body);
+
+    // play sound
+    if (wApp->playSoundNotifications())
+        wApp->soundPlayer()->play(":/message-incoming.ogg");
 }
 
 /** Returns the type of entry to add to the roster.

@@ -310,11 +310,8 @@ void Chat::notifyPanel(const QString &message, int options)
         d->rosterModel->addPendingMessage(panel->objectName());
         showMessage = true;
     }
-    if (showMessage) {
-        if (wApp->playSoundNotifications())
-            wApp->soundPlayer()->play(":/message-incoming.ogg");
+    if (showMessage)
         wApp->showMessage(panel, panel->windowTitle(), message);
-    }
 
     // show the chat window
     if (!window->isVisible())

@@ -637,6 +637,10 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         // notify user
         if (notifyMessages || message.body.contains("@" + nickName))
             queueNotification(message.body);
+
+        // play sound
+        if (wApp->playSoundNotifications())
+            wApp->soundPlayer()->play(":/message-incoming.ogg");
     }
 }
 
