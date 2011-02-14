@@ -218,6 +218,10 @@ Acceptez-vous?</translation>
         <source>General options</source>
         <translation>Options générales</translation>
     </message>
+    <message>
+        <source>About %1</source>
+        <translation>À propos de %1</translation>
+    </message>
 </context>
 <context>
     <name>ChatPasswordPrompt</name>

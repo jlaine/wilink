@@ -764,7 +764,9 @@ ChatOptions::ChatOptions()
     vbox->addWidget(showOfflineContacts);
 
     // ABOUT
-    layout->addLayout(aboutBox());
+    group = new QGroupBox(tr("About %1").arg(wApp->applicationName()));
+    group->setLayout(aboutBox());
+    layout->addWidget(group);
 
     setLayout(layout);
     setWindowIcon(QIcon(":/options.png"));
