@@ -884,8 +884,17 @@ void SoundOptions::startInput()
     format.setSampleType(QAudioFormat::SignedInt);
 
     // create audio input and output
+#ifdef Q_OS_MAC
+    // 128ms at 8kHz
+    const int bufferSize = 2048 * format.channels();
+#else
+    // 160ms at 8kHz
+    const int bufferSize = 2560 * format.channels();
+#endif
     testInput = new QAudioInput(inputDevices[inputCombo->currentIndex()], format, this);
+    testInput->setBufferSize(bufferSize);
     testOutput = new QAudioOutput(outputDevices[outputCombo->currentIndex()], format, this);
+    testOutput->setBufferSize(bufferSize);
 
     // start input
     testBar->show();
