@@ -39,7 +39,7 @@
 #include "sip.h"
 
 #define DATE_WIDTH 150
-#define DURATION_WIDTH 100
+#define DURATION_WIDTH 60
 
 #define FLAGS_DIRECTION 0x1
 #define FLAGS_ERROR 0x2
@@ -534,5 +534,7 @@ void PhoneCallsView::resizeEvent(QResizeEvent *e)
 {
     QTableView::resizeEvent(e);
     setColumnWidth(NameColumn, e->size().width() - DATE_WIDTH - DURATION_WIDTH);
+    setColumnWidth(DateColumn, DATE_WIDTH);
+    setColumnWidth(DurationColumn, DURATION_WIDTH);
 }
 
