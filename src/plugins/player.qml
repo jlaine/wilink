@@ -6,7 +6,28 @@ Rectangle {
     Component {
         id: playerDelegate
         Item {
-            width: 180; height: 40
+            height: 40
+            width: 180
+
+            function formatDuration(ms) {
+                var secs = ms / 1000;
+                var hours = Number(secs / 3600).toFixed();
+                var minutes = Number(secs / 60).toFixed() % 3600;
+                var seconds = Number(secs).toFixed() % 60
+
+                function padNumber(n) {
+                    var s = n.toString();
+                    if (s.length == 1)
+                        return '0' + s;
+                    return s;
+                }
+
+                if (hours > 0)
+                    return hours.toString() + ':' + padNumber(minutes) + ':' + padNumber(seconds);
+                else
+                    return minutes.toString() + ':' + padNumber(seconds);
+            }
+
             Row {
                 Column {
                     width: 100
@@ -14,24 +35,6 @@ Rectangle {
                     Text { text: title }
                 }
                 Text {
-
-                    function padNumber(n) {
-                        var s = n.toString();
-                        if (s.length == 1)
-                            return '0' + s;
-                        return s;
-                    }
-                    function formatDuration(ms) {
-                        var secs = ms / 1000;
-                        var hours = Number(secs / 3600).toFixed();
-                        var minutes = Number(secs / 60).toFixed() % 3600;
-                        var seconds = Number(secs).toFixed() % 60
-
-                        if (hours > 0)
-                            return hours.toString() + ':' + padNumber(minutes) + ':' + padNumber(seconds);
-                        else
-                            return minutes.toString() + ':' + padNumber(seconds);
-                    }
                     text: formatDuration(duration)
                 }
             }
