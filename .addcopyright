@@ -1,6 +1,7 @@
 {
 'directories': [
     'src',
+    'src/data',
     'src/plugins',
     'src/plugins/phone',
     'src/plugins/shares',
