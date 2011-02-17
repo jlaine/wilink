@@ -1,13 +1,15 @@
 import QtQuick 1.0
 
 Rectangle {
-    width: 180; height: 200
+    width: 320
+    height: 400
 
     Component {
         id: playerDelegate
         Item {
+            id: item
             height: 40
-            width: 180
+            width: parent.width
 
             function formatDuration(ms) {
                 var secs = ms / 1000;
@@ -28,13 +30,16 @@ Rectangle {
                     return minutes.toString() + ':' + padNumber(seconds);
             }
 
-            Row {
+            Rectangle {
                 Column {
-                    width: 100
+                    id: firstColumn
+                    x: 10
+                    width: item.width - 60
                     Text { text: '<b>' + artist + '</b>' }
                     Text { text: title }
                 }
                 Text {
+                    anchors.left: firstColumn.right
                     text: formatDuration(duration)
                 }
             }
@@ -42,10 +47,11 @@ Rectangle {
     }
 
     ListView {
+        id: playerView
         anchors.fill: parent
-        model: PlayerModel {}
+        model: playerModel
         delegate: playerDelegate
-        highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+        highlight: Rectangle { color: "lightsteelblue"; radius: 5; width: playerView.width }
         focus: true
     }
 }

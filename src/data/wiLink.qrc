@@ -44,6 +44,7 @@
     <file>call-outgoing.ogg</file>
     <file>message-incoming.ogg</file>
     <file>message-outgoing.ogg</file>
+    <file>player.qml</file>
     <file>UTN_USERFirst_Hardware_Root_CA.pem</file>
 </qresource>
 </RCC>
