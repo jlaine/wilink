@@ -60,6 +60,7 @@ private:
         ~Item();
         int row() const;
 
+        QString album;
         QString artist;
         qint64 duration;
         QString title;

@@ -44,7 +44,8 @@ enum PlayerColumns {
 };
 
 enum PlayerRole {
-    ArtistRole = Qt::UserRole,
+    AlbumRole = Qt::UserRole,
+    ArtistRole,
     DurationRole,
     TitleRole,
     UrlRole,
@@ -77,6 +78,7 @@ PlayerModel::PlayerModel(QObject *parent)
 
     // set role names
     QHash<int, QByteArray> roleNames;
+    roleNames.insert(AlbumRole, "album");
     roleNames.insert(ArtistRole, "artist");
     roleNames.insert(DurationRole, "duration");
     roleNames.insert(TitleRole, "title");
@@ -106,15 +108,21 @@ bool PlayerModel::addUrl(const QUrl &url)
     item->url = url;
     item->duration = file.duration();
 
-    QStringList values = file.metaData(QSoundFile::TitleMetaData);
+    // get metadata
+    QStringList values;
+    values = file.metaData(QSoundFile::AlbumMetaData);
     if (!values.isEmpty())
-        item->title = values.first();
-    else
-        item->title = QFileInfo(url.toLocalFile()).baseName();
+        item->album = values.first();
 
     values = file.metaData(QSoundFile::ArtistMetaData);
     if (!values.isEmpty())
         item->artist = values.first();
+
+    values = file.metaData(QSoundFile::TitleMetaData);
+    if (!values.isEmpty())
+        item->title = values.first();
+    else
+        item->title = QFileInfo(url.toLocalFile()).baseName();
 
     beginInsertRows(createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
     m_rootItem->children.append(item);
@@ -155,7 +163,9 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == ArtistRole)
+    if (role == AlbumRole)
+        return item->album;
+    else if (role == ArtistRole)
         return item->artist;
     else if (role == DurationRole)
         return item->duration;
