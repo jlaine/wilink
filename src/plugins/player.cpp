@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#undef USE_DECLARATIVE
 #ifdef USE_DECLARATIVE
 #include <QDeclarativeContext>
 #include <QDeclarativeView>
@@ -63,11 +64,15 @@ enum PlayerRole {
     UrlRole,
 };
 
+static bool isLocal(const QUrl &url)
+{
+    return url.scheme() == "file" || url.scheme() == "qrc";
+}
+
 class Item {
 public:
     Item();
     ~Item();
-    bool isLocal() const;
     int row() const;
     bool updateMetaData(QSoundFile *file);
 
@@ -92,11 +97,6 @@ Item::~Item()
 {
     foreach (Item *item, children)
         delete item;
-}
-
-bool Item::isLocal() const
-{
-    return url.scheme() == "file" || url.scheme() == "qrc";
 }
 
 // Update the metadata for the current item.
@@ -190,8 +190,10 @@ void PlayerModelPrivate::processQueue()
 
     QList<Item*> items = find(rootItem, QUrl());
     foreach (Item *item, items) {
+#ifndef USE_DECLARATIVE
         // check image
         if (item->imageUrl.isValid() &&
+            !isLocal(item->imageUrl) &&
             !dataCache.contains(item->imageUrl))
         {
             //qDebug("Requesting image %s", qPrintable(item->imageUrl.toString()));
@@ -201,10 +203,11 @@ void PlayerModelPrivate::processQueue()
             q->connect(dataReply, SIGNAL(finished()), q, SLOT(dataReceived()));
             return;
         }
+#endif
 
         // check data
         if (item->url.isValid() &&
-            !item->isLocal() &&
+            !isLocal(item->url) &&
             !dataCache.contains(item->url))
         {
             //qDebug("Requesting data %s", qPrintable(url.toString()));
@@ -264,7 +267,7 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
 
 QIODevice *PlayerModelPrivate::dataFile(Item *item)
 {
-    if (item->isLocal())
+    if (isLocal(item->url))
         return new QFile(item->url.toLocalFile());
     else if (dataCache.contains(item->url)) {
         const QUrl dataUrl = dataCache.value(item->url);
@@ -275,7 +278,7 @@ QIODevice *PlayerModelPrivate::dataFile(Item *item)
 
 QSoundFile::FileType PlayerModelPrivate::dataType(Item *item)
 {
-    if (item->isLocal()) {
+    if (isLocal(item->url)) {
         return QSoundFile::typeFromFileName(item->url.toLocalFile());
     } else if (dataCache.contains(item->url)) {
         const QUrl audioUrl = dataCache.value(item->url);
@@ -358,6 +361,7 @@ bool PlayerModel::addUrl(const QUrl &url)
     Item *item = new Item;
     item->parent = d->rootItem;
     item->title = QFileInfo(url.path()).baseName();
+    item->imageUrl = QUrl("qrc:/file.png");
     item->url = url;
 
     // fetch meta data
@@ -491,6 +495,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     else if (role == UrlRole)
         return item->url;
 
+#ifndef USE_DECLARATIVE
     if (index.column() == ArtistColumn) {
         if (role == Qt::DisplayRole)
             return item->artist;
@@ -500,6 +505,14 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
                 return QPixmap(":/start.png");
             else if (d->dataReply && d->dataReply->property("_request_url").toUrl() == item->url)
                 return QPixmap(":/download.png");
+            else if (item->imageUrl.scheme() == "file") {
+                const QString path = item->imageUrl.toLocalFile();
+                return QPixmap(path);
+            }
+            else if (item->imageUrl.scheme() == "qrc") {
+                const QString path = ":" + item->imageUrl.path();
+                return QPixmap(path);
+            }
             else if (QPixmapCache::find(item->imageUrl.toString(), &pixmap))
                 return QIcon(pixmap);
         }
@@ -511,6 +524,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
             return QTime().addMSecs(item->duration).toString("m:ss");
         }
     }
+#endif
     return QVariant();
 }
 
@@ -726,7 +740,7 @@ void PlayerPanel::play()
 }
 
 static QList<QUrl> getUrls(const QUrl &url) {
-    if (url.scheme() != "file" && url.scheme() != "qrc")
+    if (isLocal(url))
         return QList<QUrl>() << url;
 
     QList<QUrl> urls;
@@ -753,10 +767,9 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
     foreach (const QUrl &url, event->mimeData()->urls())
     {
         // check protocol is supported
-        if (url.scheme() != "file" &&
+        if (!isLocal(url) &&
             url.scheme() != "http" &&
-            url.scheme() != "https" &&
-            url.scheme() != "qrc")
+            url.scheme() != "https")
             continue;
 
         if (event->type() == QEvent::Drop) {
