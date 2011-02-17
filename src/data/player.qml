@@ -62,7 +62,7 @@ Rectangle {
                 Image {
                     id: imageColumn
                     x: 10
-                    source: model.playing ? "start.png" : (model.downloading ? "download.png" : "");
+                    source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl);
                 }
                 Column {
                     id: textColumn

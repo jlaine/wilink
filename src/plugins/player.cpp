@@ -28,6 +28,7 @@
 #include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPixmapCache>
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
@@ -56,6 +57,7 @@ enum PlayerRole {
     ArtistRole,
     DownloadingRole,
     DurationRole,
+    ImageUrlRole,
     PlayingRole,
     TitleRole,
     UrlRole,
@@ -133,6 +135,7 @@ class PlayerModelPrivate
 public:
     PlayerModelPrivate(PlayerModel *qq);
     QModelIndex createIndex(Item *item, int column = 0) const;
+    void processXml(Item *item, QIODevice *reply);
     void processQueue();
     void save();
     QSoundFile *soundFile(Item *item);
@@ -176,13 +179,62 @@ void PlayerModelPrivate::processQueue()
             continue;
 
         if (!audioCache.contains(url)) {
-            qDebug("Requesting audio %s", qPrintable(url.toString()));
+            qDebug("Requesting data %s", qPrintable(url.toString()));
             audioReply = network->get(QNetworkRequest(url));
             audioReply->setProperty("_request_url", url);
-            q->connect(audioReply, SIGNAL(finished()), q, SLOT(audioReceived()));
+            q->connect(audioReply, SIGNAL(finished()), q, SLOT(dataReceived()));
             emit q->dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
             return;
         }
+    }
+}
+
+void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
+{
+    // parse document
+    QDomDocument doc;
+    if (!doc.setContent(reply)) {
+        qWarning("Received invalid XML");
+        return;
+    }
+    qDebug() << doc.toString();
+
+    QDomElement channelElement = doc.documentElement().firstChildElement("channel");
+
+    // parse channel
+    channel->artist = channelElement.firstChildElement("itunes:author").text();
+    channel->title = channelElement.firstChildElement("title").text();
+    QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
+    if (!imageUrlElement.isNull()) {
+#if 0
+        channel->imageUrl = QUrl(imageUrlElement.text());
+        QNetworkReply *reply = network->get(QNetworkRequest(channel->imageUrl));
+        q->connect(reply, SIGNAL(finished()), q, SLOT(imageReceived()));
+#endif
+    }
+    emit q->dataChanged(createIndex(channel, 0), createIndex(channel, MaxColumn));
+
+    // parse items
+    QDomElement itemElement = channelElement.firstChildElement("item");
+    while (!itemElement.isNull()) {
+        const QString title = itemElement.firstChildElement("title").text();
+        QUrl audioUrl;
+        QDomElement enclosureElement = itemElement.firstChildElement("enclosure");
+        while (!enclosureElement.isNull() && !audioUrl.isValid()) {
+            if (QSoundFile::fileType(enclosureElement.attribute("type").toAscii()) != QSoundFile::UnknownFile)
+                audioUrl = QUrl(enclosureElement.attribute("url"));
+            enclosureElement = enclosureElement.nextSiblingElement("enclosure");
+        }
+
+        Item *item = new Item;
+        item->url = audioUrl;
+        item->imageUrl = channel->imageUrl;
+        item->title = title;
+        item->parent = channel;
+        q->beginInsertRows(createIndex(channel, 0), channel->children.size(), channel->children.size());
+        channel->children.append(item);
+        q->endInsertRows();
+        itemElement = itemElement.nextSiblingElement("item");
     }
 }
 
@@ -249,6 +301,7 @@ PlayerModel::PlayerModel(QObject *parent)
     roleNames.insert(ArtistRole, "artist");
     roleNames.insert(DownloadingRole, "downloading");
     roleNames.insert(DurationRole, "duration");
+    roleNames.insert(ImageUrlRole, "imageUrl");
     roleNames.insert(PlayingRole, "playing");
     roleNames.insert(TitleRole, "title");
     roleNames.insert(UrlRole, "url");
@@ -295,13 +348,13 @@ bool PlayerModel::addUrl(const QUrl &url)
     return true;
 }
 
-void PlayerModel::audioReceived()
+void PlayerModel::dataReceived()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply)
         return;
     reply->deleteLater();
-    const QUrl audioUrl = reply->property("_request_url").toUrl();
+    const QUrl dataUrl = reply->property("_request_url").toUrl();
 
     if (reply->error() != QNetworkReply::NoError) {
         qWarning("Request for audio failed");
@@ -316,21 +369,25 @@ void PlayerModel::audioReceived()
 
         //qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
         d->audioReply = d->network->get(QNetworkRequest(redirectUrl));
-        d->audioReply->setProperty("_request_url", audioUrl);
-        connect(d->audioReply, SIGNAL(finished()), this, SLOT(audioReceived()));
+        d->audioReply->setProperty("_request_url", dataUrl);
+        connect(d->audioReply, SIGNAL(finished()), this, SLOT(dataReceived()));
         return;
     }
 
-    qDebug("Received audio %s", qPrintable(audioUrl.toString()));
-    d->audioCache[audioUrl] = reply->url();
+    d->audioCache[dataUrl] = reply->url();
     d->audioReply = 0;
     foreach (Item *item, d->rootItem->children) {
-        if (item->url == audioUrl) {
-            QSoundFile *file = d->soundFile(item);
-            if (file) {
-                if (item->updateMetaData(file))
-                    emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
-                delete file;
+        if (item->url == dataUrl) {
+            const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+            if (mimeType == "application/xml") {
+                d->processXml(item, reply);
+            } else {
+                QSoundFile *file = d->soundFile(item);
+                if (file) {
+                    if (item->updateMetaData(file))
+                        emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+                    delete file;
+                }
             }
         }
     }
@@ -376,6 +433,8 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
         return d->audioReply && d->audioReply->property("_request_url").toUrl() == item->url;
     else if (role == DurationRole)
         return item->duration;
+    else if (role == ImageUrlRole)
+        return item->imageUrl;
     else if (role == PlayingRole)
         return (item == d->cursorItem);
     else if (role == TitleRole)
@@ -415,6 +474,37 @@ QVariant PlayerModel::headerData(int section, Qt::Orientation orientation, int r
     }
     return QVariant();
 }
+
+void PlayerModel::imageReceived()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply)
+        return;
+    reply->deleteLater();
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Request for image failed");
+        return;
+    }
+
+    // store result
+    const QUrl imageUrl = reply->url();
+    const QByteArray data = reply->readAll();
+    QPixmap pixmap;
+    if (!pixmap.loadFromData(data, 0)) {
+        qWarning("Received invalid image");
+        return;
+    }
+    QPixmapCache::insert(imageUrl.toString(), pixmap);
+
+    // update affected items
+    foreach (Item *item, d->rootItem->children) {
+        if (item->imageUrl == imageUrl) {
+            emit dataChanged(d->createIndex(item, 0),
+                             d->createIndex(item, MaxColumn));
+        }
+    }
+}
+
 
 QModelIndex PlayerModel::index(int row, int column, const QModelIndex &parent) const
 {
@@ -505,74 +595,6 @@ void PlayerModel::stop()
         d->player->stop(d->playId);
         d->playStop = true;
     }
-}
-
-void PlayerModel::xmlReceived()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply)
-        return;
-    reply->deleteLater();
-
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Request for XML failed");
-        return;
-    }
-
-    // find channel
-    Item *channel = 0;
-    foreach (Item *item, d->rootItem->children) {
-        if (item->url == reply->url()) {
-            channel = item;
-            break;
-        }
-    }
-    if (!channel)
-        return;
-
-    // parse document
-    QDomDocument doc;
-    if (!doc.setContent(reply)) {
-        qWarning("Received invalid XML");
-        return;
-    }
-
-    QDomElement channelElement = doc.documentElement().firstChildElement("channel");
-
-    // parse channel
-    channel->title = channelElement.firstChildElement("title").text();
-    QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
-    if (!imageUrlElement.isNull()) {
-        channel->imageUrl = QUrl(imageUrlElement.text());
-        QNetworkReply *reply = d->network->get(QNetworkRequest(channel->imageUrl));
-        connect(reply, SIGNAL(finished()), this, SLOT(imageReceived()));
-    }
-    emit dataChanged(d->createIndex(channel, 0), d->createIndex(channel, MaxColumn));
-
-    // parse items
-    QDomElement itemElement = channelElement.firstChildElement("item");
-    while (!itemElement.isNull()) {
-        const QString title = itemElement.firstChildElement("title").text();
-        QUrl audioUrl;
-        QDomElement enclosureElement = itemElement.firstChildElement("enclosure");
-        while (!enclosureElement.isNull() && !audioUrl.isValid()) {
-            if (QSoundFile::fileType(enclosureElement.attribute("type").toAscii()) != QSoundFile::UnknownFile)
-                audioUrl = QUrl(enclosureElement.attribute("url"));
-            enclosureElement = enclosureElement.nextSiblingElement("enclosure");
-        }
-
-        Item *item = new Item;
-        item->url = audioUrl;
-        item->imageUrl = channel->imageUrl;
-        item->title = title;
-        item->parent = channel;
-        beginInsertRows(d->createIndex(channel, 0), channel->children.size(), channel->children.size());
-        channel->children.append(item);
-        endInsertRows();
-        itemElement = itemElement.nextSiblingElement("item");
-    }
-
-    d->processQueue();
 }
 
 PlayerPanel::PlayerPanel(Chat *chatWindow)
@@ -705,11 +727,11 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
     int found = 0;
     foreach (const QUrl &url, event->mimeData()->urls())
     {
-        qDebug() << "add" << url.toString();
         // check protocol is supported
         if (url.scheme() != "file" &&
             url.scheme() != "http" &&
-            url.scheme() != "https")
+            url.scheme() != "https" &&
+            url.scheme() != "qrc")
             continue;
 
         if (event->type() == QEvent::Drop) {

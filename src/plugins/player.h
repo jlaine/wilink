@@ -61,9 +61,9 @@ signals:
     void cursorChanged(const QModelIndex &index);
 
 private slots:
-    void audioReceived();
+    void dataReceived();
+    void imageReceived();
     void finished(int id);
-    void xmlReceived();
 
 private:
     PlayerModelPrivate *d;
