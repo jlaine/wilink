@@ -43,6 +43,13 @@ enum PlayerColumns {
     MaxColumn
 };
 
+enum PlayerRole {
+    ArtistRole = Qt::UserRole,
+    DurationRole,
+    TitleRole,
+    UrlRole,
+};
+
 PlayerModel::Item::Item()
     : duration(0),
     parent(0)
@@ -67,6 +74,14 @@ PlayerModel::PlayerModel(QObject *parent)
     m_cursorItem(0)
 {
     m_rootItem = new Item;
+
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ArtistRole, "artist");
+    roleNames.insert(DurationRole, "duration");
+    roleNames.insert(TitleRole, "title");
+    roleNames.insert(UrlRole, "url");
+    setRoleNames(roleNames);
 
     // load saved playlist
     QSettings settings;
@@ -140,7 +155,13 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == Qt::UserRole)
+    if (role == ArtistRole)
+        return item->artist;
+    else if (role == DurationRole)
+        return item->duration;
+    else if (role == TitleRole)
+        return item->title;
+    else if (role == UrlRole)
         return item->url;
 
     if (index.column() == ArtistColumn) {
@@ -311,7 +332,7 @@ void PlayerPanel::doubleClicked(const QModelIndex &index)
     if (m_playId >= 0)
         m_player->stop(m_playId);
 
-    QUrl audioUrl = index.data(Qt::UserRole).toUrl();
+    QUrl audioUrl = index.data(UrlRole).toUrl();
     if (audioUrl.isValid()) {
         m_model->setCursor(index);
         m_playId = m_player->play(audioUrl.toLocalFile());
