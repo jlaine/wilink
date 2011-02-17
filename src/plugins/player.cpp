@@ -21,10 +21,13 @@
 #include <QDeclarativeContext>
 #include <QDeclarativeView>
 #endif
+#include <QAbstractNetworkCache>
 #include <QDir>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QLayout>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
@@ -61,8 +64,9 @@ class Item {
 public:
     Item();
     ~Item();
+    bool isLocal() const;
     int row() const;
-    bool updateMetaData();
+    bool updateMetaData(QSoundFile *file);
 
     QString album;
     QString artist;
@@ -86,25 +90,29 @@ Item::~Item()
         delete item;
 }
 
-// Update the metadata for the current item.
-bool Item::updateMetaData()
+bool Item::isLocal() const
 {
-    QSoundFile file(url.toLocalFile());
-    if (!file.open(QIODevice::ReadOnly))
+    return url.scheme() == "file" || url.scheme() == "qrc";
+}
+
+// Update the metadata for the current item.
+bool Item::updateMetaData(QSoundFile *file)
+{
+    if (!file || !file->open(QIODevice::ReadOnly))
         return false;
 
-    duration = file.duration();
+    duration = file->duration();
 
     QStringList values;
-    values = file.metaData(QSoundFile::AlbumMetaData);
+    values = file->metaData(QSoundFile::AlbumMetaData);
     if (!values.isEmpty())
         album = values.first();
 
-    values = file.metaData(QSoundFile::ArtistMetaData);
+    values = file->metaData(QSoundFile::ArtistMetaData);
     if (!values.isEmpty())
         artist = values.first();
 
-    values = file.metaData(QSoundFile::TitleMetaData);
+    values = file->metaData(QSoundFile::TitleMetaData);
     if (!values.isEmpty())
         title = values.first();
 
@@ -123,9 +131,14 @@ class PlayerModelPrivate
 public:
     PlayerModelPrivate(PlayerModel *qq);
     QModelIndex createIndex(Item *item, int column = 0) const;
+    void processQueue();
     void save();
+    QSoundFile *soundFile(Item *item);
 
+    QMap<QUrl, QUrl> audioCache;
+    QNetworkReply *audioReply;
     Item *cursorItem;
+    QNetworkAccessManager *network;
     QSoundPlayer *player;
     int playId;
     bool playStop;
@@ -134,7 +147,8 @@ public:
 };
 
 PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
-    : cursorItem(0),
+    : audioReply(0),
+    cursorItem(0),
     playId(-1),
     playStop(false),
     q(qq)
@@ -147,6 +161,38 @@ QModelIndex PlayerModelPrivate::createIndex(Item *item, int column) const
         return q->createIndex(item->row(), column, item);
     else
         return QModelIndex();
+}
+
+void PlayerModelPrivate::processQueue()
+{
+    foreach (Item *item, rootItem->children) {
+        const QUrl url = item->url;
+        if (!url.isValid() || item->isLocal())
+            continue;
+
+        if (!audioCache.contains(url)) {
+            qDebug("Requesting audio %s", qPrintable(url.toString()));
+            audioReply = network->get(QNetworkRequest(url));
+            audioReply->setProperty("_request_url", url);
+            q->connect(audioReply, SIGNAL(finished()), q, SLOT(audioReceived()));
+            return;
+        }
+        break;
+    }
+}
+
+QSoundFile *PlayerModelPrivate::soundFile(Item *item)
+{
+    QSoundFile *file = 0;
+    if (item->isLocal()) {
+        file = new QSoundFile(item->url.toLocalFile());
+    } else if (audioCache.contains(item->url)) {
+        const QUrl audioUrl = audioCache.value(item->url);
+        QIODevice *device = wApp->networkCache()->data(audioUrl);
+        if (device)
+            file = new QSoundFile(device, QSoundFile::Mp3File);
+    }
+    return file;
 }
 
 void PlayerModelPrivate::save()
@@ -164,6 +210,9 @@ PlayerModel::PlayerModel(QObject *parent)
     bool check;
     d = new PlayerModelPrivate(this);
     d->rootItem = new Item;
+
+    d->network = new QNetworkAccessManager(this);
+    d->network->setCache(wApp->networkCache());
 
     // init player
     d->player = wApp->soundPlayer();
@@ -196,24 +245,71 @@ PlayerModel::~PlayerModel()
 
 bool PlayerModel::addUrl(const QUrl &url)
 {
+    if (!url.isValid())
+        return false;
+
     Item *item = new Item;
     item->parent = d->rootItem;
-    item->title = QFileInfo(url.toLocalFile()).baseName();
+    item->title = QFileInfo(url.path()).baseName();
     item->url = url;
 
     // fetch meta data
-    if (!item->updateMetaData()) {
-        delete item;
-        return false;
+    QSoundFile *file = d->soundFile(item);
+    if (file) {
+        item->updateMetaData(file);
+        delete file;
     }
 
     beginInsertRows(d->createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
     d->rootItem->children.append(item);
     endInsertRows();
 
+    d->processQueue();
+
     // save playlist
     d->save();
     return true;
+}
+
+void PlayerModel::audioReceived()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply)
+        return;
+    reply->deleteLater();
+    const QUrl audioUrl = reply->property("_request_url").toUrl();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Request for audio failed");
+        return;
+    }
+
+    // follow redirect
+    QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+    if (redirectUrl.isValid()) {
+        redirectUrl = reply->url().resolved(redirectUrl);
+
+        qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
+        d->audioReply = d->network->get(QNetworkRequest(redirectUrl));
+        d->audioReply->setProperty("_request_url", audioUrl);
+        connect(d->audioReply, SIGNAL(finished()), this, SLOT(audioReceived()));
+        return;
+    }
+
+    qDebug("Received audio %s", qPrintable(audioUrl.toString()));
+    d->audioCache[audioUrl] = reply->url();
+    d->audioReply = 0;
+    foreach (Item *item, d->rootItem->children) {
+        if (item->url == audioUrl) {
+            QSoundFile *file = d->soundFile(item);
+            if (file) {
+                if (item->updateMetaData(file))
+                    emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+                delete file;
+            }
+        }
+    }
+    d->processQueue();
 }
 
 int PlayerModel::columnCount(const QModelIndex &parent) const
@@ -331,10 +427,14 @@ void PlayerModel::play(const QModelIndex &index)
     }
 
     // start new audio output
-    const QUrl audioUrl = index.data(UrlRole).toUrl();
-    if (audioUrl.isValid()) {
+    Item *item = static_cast<Item*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return;
+
+    QSoundFile *file = d->soundFile(item);
+    if (file) {
+        d->playId = d->player->play(file);
         setCursor(index);
-        d->playId = d->player->play(audioUrl.toLocalFile());
     } else {
         setCursor(QModelIndex());
     }
@@ -480,6 +580,9 @@ void PlayerPanel::play()
 }
 
 static QList<QUrl> getUrls(const QUrl &url) {
+    if (url.scheme() != "file" && url.scheme() != "qrc")
+        return QList<QUrl>() << url;
+
     QList<QUrl> urls;
     const QString path = url.toLocalFile();
     if (QFileInfo(path).isDir()) {
@@ -503,8 +606,13 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
     int found = 0;
     foreach (const QUrl &url, event->mimeData()->urls())
     {
-        if (url.scheme() != "file")
+        qDebug() << "add" << url.toString();
+        // check protocol is supported
+        if (url.scheme() != "file" &&
+            url.scheme() != "http" &&
+            url.scheme() != "https")
             continue;
+
         if (event->type() == QEvent::Drop) {
             foreach (const QUrl &child, getUrls(url))
                 m_model->addUrl(child);

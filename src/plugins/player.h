@@ -61,6 +61,7 @@ signals:
     void cursorChanged(const QModelIndex &index);
 
 private slots:
+    void audioReceived();
     void finished(int id);
 
 private:
