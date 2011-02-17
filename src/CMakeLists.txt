@@ -5,6 +5,7 @@ add_subdirectory(qnetio)
 add_subdirectory(qsound)
 add_subdirectory(qxmpp)
 
+set(QT_USE_QTDECLARATIVE 1)
 set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
@@ -29,6 +30,9 @@ add_definitions(-DQT_STATICPLUGIN)
 if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
 endif(NOT APPLE)
+if(QT_QTDECLARATIVE_FOUND)
+    add_definitions(-DUSE_DECLARATIVE)
+endif()
 
 set(wiLink_SOURCES
     application.cpp

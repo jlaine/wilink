@@ -63,6 +63,7 @@ signals:
 private slots:
     void audioReceived();
     void finished(int id);
+    void xmlReceived();
 
 private:
     PlayerModelPrivate *d;

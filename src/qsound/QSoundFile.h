@@ -64,6 +64,8 @@ public:
     bool repeat() const;
     void setRepeat(bool repeat);
 
+    static FileType fileType(const QByteArray &mimeType);
+
 protected:
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char * data, qint64 maxSize);

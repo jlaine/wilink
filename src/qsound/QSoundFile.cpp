@@ -816,6 +816,26 @@ void QSoundFile::setFormat(const QAudioFormat &format)
         d->m_format = format;
 }
 
+/** Guesses the file type from a MIME type.
+ *
+ * @param mimeType
+ */
+QSoundFile::FileType QSoundFile::fileType(const QByteArray &mimeType)
+{
+    if (mimeType == "audio/mpeg")
+        return QSoundFile::Mp3File;
+    else if (mimeType == "audio/ogg" ||
+             mimeType == "application/ogg")
+        return QSoundFile::OggFile;
+    else if (mimeType == "audio/vnd.wave" ||
+             mimeType == "audio/wav" ||
+             mimeType == "audio/wave" ||
+             mimeType == "audio/x-wav")
+        return QSoundFile::WavFile;
+    else
+        return QSoundFile::UnknownFile;
+}
+
 QStringList QSoundFile::metaData(MetaData key) const
 {
     QStringList values;

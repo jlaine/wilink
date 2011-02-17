@@ -72,6 +72,7 @@ public:
     QString album;
     QString artist;
     qint64 duration;
+    QUrl imageUrl;
     QString title;
     QUrl url;
 
@@ -202,16 +203,7 @@ QSoundFile *PlayerModelPrivate::soundFile(Item *item)
             foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
             {
                 if (header.first.toLower() == "content-type") {
-                    if (header.second == "audio/mpeg")
-                        type = QSoundFile::Mp3File;
-                    else if (header.second == "audio/ogg" ||
-                             header.second == "application/ogg")
-                        type = QSoundFile::OggFile;
-                    else if (header.second == "audio/vnd.wave" ||
-                             header.second == "audio/wav" ||
-                             header.second == "audio/wave" ||
-                             header.second == "audio/x-wav")
-                        type = QSoundFile::WavFile;
+                    type = QSoundFile::fileType(header.second);
                     break;
                 }
             }
@@ -322,7 +314,7 @@ void PlayerModel::audioReceived()
     if (redirectUrl.isValid()) {
         redirectUrl = reply->url().resolved(redirectUrl);
 
-        qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
+        //qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
         d->audioReply = d->network->get(QNetworkRequest(redirectUrl));
         d->audioReply->setProperty("_request_url", audioUrl);
         connect(d->audioReply, SIGNAL(finished()), this, SLOT(audioReceived()));
@@ -513,6 +505,74 @@ void PlayerModel::stop()
         d->player->stop(d->playId);
         d->playStop = true;
     }
+}
+
+void PlayerModel::xmlReceived()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply)
+        return;
+    reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Request for XML failed");
+        return;
+    }
+
+    // find channel
+    Item *channel = 0;
+    foreach (Item *item, d->rootItem->children) {
+        if (item->url == reply->url()) {
+            channel = item;
+            break;
+        }
+    }
+    if (!channel)
+        return;
+
+    // parse document
+    QDomDocument doc;
+    if (!doc.setContent(reply)) {
+        qWarning("Received invalid XML");
+        return;
+    }
+
+    QDomElement channelElement = doc.documentElement().firstChildElement("channel");
+
+    // parse channel
+    channel->title = channelElement.firstChildElement("title").text();
+    QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
+    if (!imageUrlElement.isNull()) {
+        channel->imageUrl = QUrl(imageUrlElement.text());
+        QNetworkReply *reply = d->network->get(QNetworkRequest(channel->imageUrl));
+        connect(reply, SIGNAL(finished()), this, SLOT(imageReceived()));
+    }
+    emit dataChanged(d->createIndex(channel, 0), d->createIndex(channel, MaxColumn));
+
+    // parse items
+    QDomElement itemElement = channelElement.firstChildElement("item");
+    while (!itemElement.isNull()) {
+        const QString title = itemElement.firstChildElement("title").text();
+        QUrl audioUrl;
+        QDomElement enclosureElement = itemElement.firstChildElement("enclosure");
+        while (!enclosureElement.isNull() && !audioUrl.isValid()) {
+            if (QSoundFile::fileType(enclosureElement.attribute("type").toAscii()) != QSoundFile::UnknownFile)
+                audioUrl = QUrl(enclosureElement.attribute("url"));
+            enclosureElement = enclosureElement.nextSiblingElement("enclosure");
+        }
+
+        Item *item = new Item;
+        item->url = audioUrl;
+        item->imageUrl = channel->imageUrl;
+        item->title = title;
+        item->parent = channel;
+        beginInsertRows(d->createIndex(channel, 0), channel->children.size(), channel->children.size());
+        channel->children.append(item);
+        endInsertRows();
+        itemElement = itemElement.nextSiblingElement("item");
+    }
+
+    d->processQueue();
 }
 
 PlayerPanel::PlayerPanel(Chat *chatWindow)
