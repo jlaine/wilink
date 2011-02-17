@@ -25,6 +25,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileInfo>
+#include <QGraphicsView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -90,10 +91,12 @@ public:
 
 void ApplicationStyle::polish(QWidget *widget)
 {
-    if (widget->inherits("QGraphicsView") ||
+#if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
+    if (!widget->inherits("QDeclarativeView") &&
+        (widget->inherits("QGraphicsView") ||
         widget->inherits("QListView") ||
         widget->inherits("QTextBrowser") ||
-        widget->inherits("QTreeView"))
+        widget->inherits("QTreeView")))
     {
         QAbstractItemView *view = qobject_cast<QAbstractItemView*>(widget);
         if (view)
@@ -104,10 +107,18 @@ void ApplicationStyle::polish(QWidget *widget)
     if (widget->inherits("QDialog") ||
         widget->inherits("QMainWindow"))
     {
-#ifndef Q_OS_SYMBIAN
         widget->setMaximumSize(200, 320);
-#endif
     }
+#endif
+#if 0
+    if (widget->inherits("QGraphicsView")) {
+        QGraphicsView *view = qobject_cast<QGraphicsView*>(widget);
+        if (view) {
+            qDebug() << "activating antialias";
+            view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+        }
+    }
+#endif
 };
 
 Application::Application(int &argc, char **argv)
@@ -129,7 +140,6 @@ Application::Application(int &argc, char **argv)
 
     /* initialise cache and wallet */
     QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    qDebug() << "Using data directory" << dataPath;
     QDir().mkpath(dataPath);
     d->networkCache = new QNetworkDiskCache(this);
     d->networkCache->setCacheDirectory(QDir(dataPath).filePath("cache"));
@@ -156,9 +166,7 @@ Application::Application(int &argc, char **argv)
     }
 
     /* initialise style */
-#if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
     setStyle(new ApplicationStyle);
-#endif
     QFile css(":/wiLink.css");
     if (css.open(QIODevice::ReadOnly))
        setStyleSheet(QString::fromUtf8(css.readAll()));
