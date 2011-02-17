@@ -41,6 +41,7 @@ public:
     bool addUrl(const QUrl &url);
     QModelIndex cursor() const;
     void setCursor(const QModelIndex &index);
+    Q_INVOKABLE QModelIndex row(int row);
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -50,8 +51,15 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent) const;
 
+public slots:
+    void play(const QModelIndex &index);
+    void stop();
+
 signals:
     void cursorChanged(const QModelIndex &index);
+
+private slots:
+    void finished(int id);
 
 private:
     class Item {
@@ -80,6 +88,9 @@ private:
 
     void save();
 
+    QSoundPlayer *m_player;
+    int m_playId;
+    bool m_playStop;
     Item *m_cursorItem;
     Item *m_rootItem;
 };
@@ -95,18 +106,13 @@ public:
 
 private slots:
     void cursorChanged(const QModelIndex &index);
-    void doubleClicked(const QModelIndex &index);
-    void finished(int id);
     void play();
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
-    void stop();
 
 private:
     Chat *m_chat;
     PlayerModel *m_model;
     QSoundPlayer *m_player;
-    int m_playId;
-    bool m_playStop;
     QTreeView *m_view;
 
     QPushButton *m_playButton;

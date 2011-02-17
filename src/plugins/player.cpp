@@ -17,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef USE_DECLARATIVE
+#include <QDeclarativeContext>
+#include <QDeclarativeView>
+#endif
+#include <QDir>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QLayout>
@@ -47,6 +52,7 @@ enum PlayerRole {
     AlbumRole = Qt::UserRole,
     ArtistRole,
     DurationRole,
+    PlayingRole,
     TitleRole,
     UrlRole,
 };
@@ -72,15 +78,25 @@ int PlayerModel::Item::row() const
 
 PlayerModel::PlayerModel(QObject *parent)
     : QAbstractItemModel(parent),
-    m_cursorItem(0)
+    m_cursorItem(0),
+    m_playId(-1),
+    m_playStop(false)
 {
+    bool check;
     m_rootItem = new Item;
+
+    // init player
+    m_player = wApp->soundPlayer();
+    check = connect(m_player, SIGNAL(finished(int)),
+                    this, SLOT(finished(int)));
+    Q_ASSERT(check);
 
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(AlbumRole, "album");
     roleNames.insert(ArtistRole, "artist");
     roleNames.insert(DurationRole, "duration");
+    roleNames.insert(PlayingRole, "playing");
     roleNames.insert(TitleRole, "title");
     roleNames.insert(UrlRole, "url");
     setRoleNames(roleNames);
@@ -146,6 +162,7 @@ QModelIndex PlayerModel::cursor() const
 void PlayerModel::setCursor(const QModelIndex &index)
 {
     Item *item = static_cast<Item*>(index.internalPointer());
+
     if (item != m_cursorItem) {
         Item *oldItem = m_cursorItem;
         m_cursorItem = item;
@@ -169,6 +186,8 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
         return item->artist;
     else if (role == DurationRole)
         return item->duration;
+    else if (role == PlayingRole)
+        return (item == m_cursorItem);
     else if (role == TitleRole)
         return item->title;
     else if (role == UrlRole)
@@ -221,6 +240,40 @@ QModelIndex PlayerModel::parent(const QModelIndex &index) const
     return createIndex(item->parent);
 }
 
+void PlayerModel::finished(int id)
+{
+    if (id != m_playId)
+        return;
+    m_playId = -1;
+    if (m_playStop) {
+        setCursor(QModelIndex());
+        m_playStop = false;
+    } else {
+        const QModelIndex index = cursor();
+        QModelIndex nextIndex = index.sibling(index.row() + 1, index.column());
+        play(nextIndex);
+    }
+}
+
+void PlayerModel::play(const QModelIndex &index)
+{
+    // stop previous audio
+    if (m_playId >= 0) {
+        m_player->stop(m_playId);
+        m_playId = -1;
+    }
+
+    // start new audio output
+    const QUrl audioUrl = index.data(UrlRole).toUrl();
+    if (audioUrl.isValid()) {
+        setCursor(index);
+        m_playId = m_player->play(audioUrl.toLocalFile());
+    } else {
+        setCursor(QModelIndex());
+    }
+}
+
+
 bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
@@ -235,6 +288,11 @@ bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
     // save playlist
     save();
     return true;
+}
+
+QModelIndex PlayerModel::row(int row)
+{
+    return index(row, 0, QModelIndex());
 }
 
 int PlayerModel::rowCount(const QModelIndex &parent) const
@@ -252,11 +310,17 @@ void PlayerModel::save()
     settings.setValue("PlayerUrls", values);
 }
 
+void PlayerModel::stop()
+{
+    if (m_playId >= 0) {
+        m_player->stop(m_playId);
+        m_playStop = true;
+    }
+}
+
 PlayerPanel::PlayerPanel(Chat *chatWindow)
     : ChatPanel(chatWindow),
-    m_chat(chatWindow),
-    m_playId(-1),
-    m_playStop(false)
+    m_chat(chatWindow)
 {
     bool check;
 
@@ -270,15 +334,13 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     Q_ASSERT(check);
 
     m_player = wApp->soundPlayer();
-    check = connect(m_player, SIGNAL(finished(int)),
-                    this, SLOT(finished(int)));
-    Q_ASSERT(check);
 
     // build layout
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
     layout->addSpacing(5);
+    setLayout(layout);
 
     // controls
     QHBoxLayout *controls = new QHBoxLayout;
@@ -293,7 +355,7 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     m_stopButton = new QPushButton(QIcon(":/stop.png"), tr("Stop"));
     m_stopButton->hide();
     check = connect(m_stopButton, SIGNAL(clicked()),
-                    this, SLOT(stop()));
+                    m_model, SLOT(stop()));
     Q_ASSERT(check);
     controls->addWidget(m_stopButton);
 
@@ -302,20 +364,28 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     layout->addSpacing(10);
 
     // playlist
+#ifdef USE_DECLARATIVE
+    QDeclarativeView *view = new QDeclarativeView;
+    QDeclarativeContext *ctxt = view->rootContext();
+    ctxt->setContextProperty("playerModel", m_model);
+    //view->setSource(QUrl::fromLocalFile("src/data/player.qml"));
+    view->setSource(QUrl("qrc:/player.qml"));
+    view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    layout->addWidget(view, 1);
+    filterDrops(view);
+#else
     m_view = new PlayerView;
     m_view->setModel(m_model);
     m_view->setIconSize(QSize(32, 32));
     m_view->setSelectionMode(QAbstractItemView::SingleSelection);
     check = connect(m_view, SIGNAL(doubleClicked(QModelIndex)),
-                    this, SLOT(doubleClicked(QModelIndex)));
+                    m_model, SLOT(play(QModelIndex)));
     Q_ASSERT(check);
-    layout->addWidget(m_view);
-
-    setLayout(layout);
+    layout->addWidget(m_view, 1);
+    filterDrops(m_view);
+#endif
 
     // register panel
-    filterDrops(m_view);
-
     check = connect(m_chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
                     this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     Q_ASSERT(check);
@@ -330,6 +400,7 @@ void PlayerPanel::cursorChanged(const QModelIndex &index)
 {
     if (index.isValid()) {
         m_playButton->hide();
+        m_stopButton->setEnabled(true);
         m_stopButton->show();
     } else {
         m_stopButton->hide();
@@ -337,44 +408,31 @@ void PlayerPanel::cursorChanged(const QModelIndex &index)
     }
 }
 
-void PlayerPanel::doubleClicked(const QModelIndex &index)
-{
-    if (m_playId >= 0)
-        m_player->stop(m_playId);
-
-    QUrl audioUrl = index.data(UrlRole).toUrl();
-    if (audioUrl.isValid()) {
-        m_model->setCursor(index);
-        m_playId = m_player->play(audioUrl.toLocalFile());
-    } else {
-        m_model->setCursor(QModelIndex());
-        m_playId = -1;
-    }
-}
-
-void PlayerPanel::finished(int id)
-{
-    if (id != m_playId)
-        return;
-    m_playId = -1;
-    if (m_playStop) {
-        m_model->setCursor(QModelIndex());
-        m_stopButton->setEnabled(true);
-        m_playStop = false;
-    } else {
-        const QModelIndex cursor = m_model->cursor();
-        QModelIndex nextIndex = cursor.sibling(cursor.row() + 1, cursor.column());
-        doubleClicked(nextIndex);
-    }
-}
-
 void PlayerPanel::play()
 {
+#ifdef USE_DECLARATIVE
+    m_model->play(m_model->index(0, 0, QModelIndex()));
+#else
     QList<QModelIndex> selected = m_view->selectionModel()->selectedIndexes();
     if (!selected.isEmpty())
-        doubleClicked(selected.first());
+        m_model->play(selected.first());
     else if (m_model->rowCount(QModelIndex()))
-        doubleClicked(m_model->index(0, 0, QModelIndex()));
+        m_model->play(m_model->index(0, 0, QModelIndex()));
+#endif
+}
+
+static QList<QUrl> getUrls(const QUrl &url) {
+    QList<QUrl> urls;
+    const QString path = url.toLocalFile();
+    if (QFileInfo(path).isDir()) {
+        QDir dir(path);
+        QStringList children = dir.entryList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+        foreach (const QString &child, children)
+            urls << getUrls(QUrl::fromLocalFile(dir.filePath(child)));
+    } else {
+        urls << url;
+    }
+    return urls;
 }
 
 /** Handle a drop event on a roster entry.
@@ -389,21 +447,14 @@ void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
     {
         if (url.scheme() != "file")
             continue;
-        if (event->type() == QEvent::Drop)
-            m_model->addUrl(url);
+        if (event->type() == QEvent::Drop) {
+            foreach (const QUrl &child, getUrls(url))
+                m_model->addUrl(child);
+        }
         found++;
     }
     if (found)
         event->acceptProposedAction();
-}
-
-void PlayerPanel::stop()
-{
-    if (m_playId >= 0) {
-        m_player->stop(m_playId);
-        m_playStop = true;
-        m_stopButton->setEnabled(false);
-    }
 }
 
 PlayerView::PlayerView(QWidget *parent)

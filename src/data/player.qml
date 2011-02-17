@@ -49,16 +49,30 @@ Rectangle {
                     return minutes.toString() + ':' + padNumber(seconds);
             }
 
+            MouseArea {
+                anchors.fill: parent
+                onClicked: playerView.currentIndex = index;
+                onDoubleClicked: {
+                    var row = playerView.model.row(index);
+                    playerView.model.play(row);
+                }
+            }
+
             Rectangle {
-                Column {
-                    id: firstColumn
+                Image {
+                    id: imageColumn
                     x: 10
-                    width: item.width - 60
+                    source: model.playing ? "start.png" : "";
+                }
+                Column {
+                    id: textColumn
+                    anchors.left: imageColumn.right;
+                    width: item.width - imageColumn.width - 60
                     Text { text: '<b>' + artist + '</b>' }
                     Text { text: title }
                 }
                 Text {
-                    anchors.left: firstColumn.right
+                    anchors.left: textColumn.right
                     text: formatDuration(duration)
                 }
             }
