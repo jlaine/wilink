@@ -738,7 +738,7 @@ void PlayerPanel::play()
 }
 
 static QList<QUrl> getUrls(const QUrl &url) {
-    if (isLocal(url))
+    if (!isLocal(url))
         return QList<QUrl>() << url;
 
     QList<QUrl> urls;
@@ -748,7 +748,7 @@ static QList<QUrl> getUrls(const QUrl &url) {
         QStringList children = dir.entryList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
         foreach (const QString &child, children)
             urls << getUrls(QUrl::fromLocalFile(dir.filePath(child)));
-    } else {
+    } else if (QSoundFile::typeFromFileName(path) != QSoundFile::UnknownFile) {
         urls << url;
     }
     return urls;
