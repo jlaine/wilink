@@ -63,24 +63,6 @@ signals:
 private slots:
     void finished(int id);
 
-public:
-    class Item {
-    public:
-        Item();
-        ~Item();
-        int row() const;
-        bool updateMetaData();
-
-        QString album;
-        QString artist;
-        qint64 duration;
-        QString title;
-        QUrl url;
-
-        Item *parent;
-        QList<Item*> children;
-    };
-
 private:
     PlayerModelPrivate *d;
     friend class PlayerModelPrivate;

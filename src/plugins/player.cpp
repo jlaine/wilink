@@ -57,20 +57,37 @@ enum PlayerRole {
     UrlRole,
 };
 
-PlayerModel::Item::Item()
+class Item {
+public:
+    Item();
+    ~Item();
+    int row() const;
+    bool updateMetaData();
+
+    QString album;
+    QString artist;
+    qint64 duration;
+    QString title;
+    QUrl url;
+
+    Item *parent;
+    QList<Item*> children;
+};
+
+Item::Item()
     : duration(0),
     parent(0)
 {
 }
 
-PlayerModel::Item::~Item()
+Item::~Item()
 {
     foreach (Item *item, children)
         delete item;
 }
 
 // Update the metadata for the current item.
-bool PlayerModel::Item::updateMetaData()
+bool Item::updateMetaData()
 {
     QSoundFile file(url.toLocalFile());
     if (!file.open(QIODevice::ReadOnly))
@@ -94,7 +111,7 @@ bool PlayerModel::Item::updateMetaData()
     return true;
 }
 
-int PlayerModel::Item::row() const
+int Item::row() const
 {
     if (!parent)
         return -1;
@@ -105,15 +122,15 @@ class PlayerModelPrivate
 {
 public:
     PlayerModelPrivate(PlayerModel *qq);
-    QModelIndex createIndex(PlayerModel::Item *item, int column = 0) const;
+    QModelIndex createIndex(Item *item, int column = 0) const;
     void save();
 
-    PlayerModel::Item *cursorItem;
+    Item *cursorItem;
     QSoundPlayer *player;
     int playId;
     bool playStop;
     PlayerModel *q;
-    PlayerModel::Item *rootItem;
+    Item *rootItem;
 };
 
 PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
@@ -124,7 +141,7 @@ PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
 {
 }
 
-QModelIndex PlayerModelPrivate::createIndex(PlayerModel::Item *item, int column) const
+QModelIndex PlayerModelPrivate::createIndex(Item *item, int column) const
 {
     if (item && item != rootItem)
         return q->createIndex(item->row(), column, item);
@@ -136,7 +153,7 @@ void PlayerModelPrivate::save()
 {
     QSettings settings;
     QStringList values;
-    foreach (PlayerModel::Item *item, rootItem->children)
+    foreach (Item *item, rootItem->children)
         values << item->url.toString();
     settings.setValue("PlayerUrls", values);
 }
