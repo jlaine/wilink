@@ -90,7 +90,6 @@ private:
     QSoundPlayer *m_player;
     QTreeView *m_view;
 
-    QPushButton *m_playButton;
     QPushButton *m_stopButton;
 };
 

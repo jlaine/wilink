@@ -43,7 +43,7 @@
 #include "chat_roster.h"
 #include "player.h"
 
-#define DURATION_WIDTH 60
+#define DURATION_WIDTH 30
 #define PLAYER_ROSTER_ID "0_player"
 
 enum PlayerColumns {
@@ -664,12 +664,6 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     QHBoxLayout *controls = new QHBoxLayout;
     controls->addStretch();
 
-    m_playButton = new QPushButton(QIcon(":/start.png"), tr("Play"));
-    check = connect(m_playButton, SIGNAL(clicked()),
-                    this, SLOT(play()));
-    Q_ASSERT(check);
-    controls->addWidget(m_playButton);
-
     m_stopButton = new QPushButton(QIcon(":/stop.png"), tr("Stop"));
     m_stopButton->hide();
     check = connect(m_stopButton, SIGNAL(clicked()),
@@ -690,6 +684,7 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     view->setSource(QUrl("qrc:/player.qml"));
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
+    setFocusProxy(view);
     filterDrops(view);
 #else
     m_view = new PlayerView;
@@ -700,7 +695,12 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
                     m_model, SLOT(play(QModelIndex)));
     Q_ASSERT(check);
     layout->addWidget(m_view, 1);
+    setFocusProxy(m_view);
     filterDrops(m_view);
+
+    // select first track
+    if (m_model->rowCount(QModelIndex()))
+        m_view->selectionModel()->select(m_model->index(0, 0, QModelIndex()), QItemSelectionModel::Rows | QItemSelectionModel::Select);
 #endif
 
     // register panel
@@ -717,12 +717,10 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
 void PlayerPanel::cursorChanged(const QModelIndex &index)
 {
     if (index.isValid()) {
-        m_playButton->hide();
         m_stopButton->setEnabled(true);
         m_stopButton->show();
     } else {
         m_stopButton->hide();
-        m_playButton->show();
     }
 }
 
@@ -791,7 +789,7 @@ PlayerView::PlayerView(QWidget *parent)
 void PlayerView::setModel(PlayerModel *model)
 {
     QTreeView::setModel(model);
-    setColumnWidth(DurationColumn, 40);
+    setColumnWidth(DurationColumn, DURATION_WIDTH);
 }
 
 void PlayerView::keyPressEvent(QKeyEvent *event)
@@ -818,9 +816,10 @@ void PlayerView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
 
-    const int available = e->size().width() - DURATION_WIDTH;
+    const int available = e->size().width() - 16 - DURATION_WIDTH;
     setColumnWidth(ArtistColumn, available/2);
     setColumnWidth(TitleColumn, available/2);
+    setColumnWidth(DurationColumn, DURATION_WIDTH);
 }
 
 // PLUGIN
