@@ -764,13 +764,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PodcastsPanel</name>
-    <message>
-        <source>My podcasts</source>
-        <translation>Mes podcasts</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Downloads</source>

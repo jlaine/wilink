@@ -68,7 +68,6 @@ set(wiLink_SOURCES
     plugins/phone/sip.cpp
     plugins/phone/stun.cpp
     plugins/player.cpp
-    plugins/podcasts.cpp
     plugins/rooms.cpp
     plugins/shares.cpp
     plugins/shares/model.cpp
@@ -111,7 +110,6 @@ set(wiLink_MOC_HEADERS
     plugins/phone/sip.h
     plugins/phone/stun.h
     plugins/player.h
-    plugins/podcasts.h
     plugins/rooms.h
     plugins/shares.h
     plugins/shares/options.h
