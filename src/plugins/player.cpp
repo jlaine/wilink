@@ -29,6 +29,7 @@
 #include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QPixmapCache>
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
@@ -143,8 +144,8 @@ public:
     QSoundFile::FileType dataType(Item *item);
     QSoundFile *soundFile(Item *item);
 
-    QMap<QUrl, QUrl> audioCache;
-    QNetworkReply *audioReply;
+    QMap<QUrl, QUrl> dataCache;
+    QNetworkReply *dataReply;
     Item *cursorItem;
     QNetworkAccessManager *network;
     QSoundPlayer *player;
@@ -155,7 +156,7 @@ public:
 };
 
 PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
-    : audioReply(0),
+    : dataReply(0),
     cursorItem(0),
     playId(-1),
     playStop(false),
@@ -185,20 +186,33 @@ QList<Item*> PlayerModelPrivate::find(Item *parent, const QUrl &url)
 
 void PlayerModelPrivate::processQueue()
 {
-    if (audioReply)
+    if (dataReply)
         return;
 
     QList<Item*> items = find(rootItem, QUrl());
     foreach (Item *item, items) {
-        const QUrl url = item->url;
-        if (!url.isValid() || item->isLocal())
-            continue;
+        // check image
+        if (item->imageUrl.isValid() &&
+            !dataCache.contains(item->imageUrl))
+        {
+            //qDebug("Requesting image %s", qPrintable(item->imageUrl.toString()));
+            dataReply = network->get(QNetworkRequest(item->imageUrl));
+            dataReply->setProperty("_request_url", item->imageUrl);
+            dataReply->setProperty("_request_type", "image");
+            q->connect(dataReply, SIGNAL(finished()), q, SLOT(dataReceived()));
+            return;
+        }
 
-        if (!audioCache.contains(url)) {
+        // check data
+        if (item->url.isValid() &&
+            !item->isLocal() &&
+            !dataCache.contains(item->url))
+        {
             //qDebug("Requesting data %s", qPrintable(url.toString()));
-            audioReply = network->get(QNetworkRequest(url));
-            audioReply->setProperty("_request_url", url);
-            q->connect(audioReply, SIGNAL(finished()), q, SLOT(dataReceived()));
+            dataReply = network->get(QNetworkRequest(item->url));
+            dataReply->setProperty("_request_url", item->url);
+            dataReply->setProperty("_request_type", "data");
+            q->connect(dataReply, SIGNAL(finished()), q, SLOT(dataReceived()));
             emit q->dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
             return;
         }
@@ -253,8 +267,8 @@ QIODevice *PlayerModelPrivate::dataFile(Item *item)
 {
     if (item->isLocal())
         return new QFile(item->url.toLocalFile());
-    else if (audioCache.contains(item->url)) {
-        const QUrl dataUrl = audioCache.value(item->url);
+    else if (dataCache.contains(item->url)) {
+        const QUrl dataUrl = dataCache.value(item->url);
         return wApp->networkCache()->data(dataUrl);
     }
     return 0;
@@ -264,8 +278,8 @@ QSoundFile::FileType PlayerModelPrivate::dataType(Item *item)
 {
     if (item->isLocal()) {
         return QSoundFile::typeFromFileName(item->url.toLocalFile());
-    } else if (audioCache.contains(item->url)) {
-        const QUrl audioUrl = audioCache.value(item->url);
+    } else if (dataCache.contains(item->url)) {
+        const QUrl audioUrl = dataCache.value(item->url);
         QNetworkCacheMetaData::RawHeaderList headers = wApp->networkCache()->metaData(audioUrl).rawHeaders();
         foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
         {
@@ -372,10 +386,11 @@ void PlayerModel::dataReceived()
         return;
     reply->deleteLater();
     const QUrl dataUrl = reply->property("_request_url").toUrl();
+    const QString dataType = reply->property("_request_type").toString();
 
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Request for audio failed");
-        d->audioReply = 0;
+        qWarning("Request for data failed");
+        d->dataReply = 0;
         return;
     }
 
@@ -385,26 +400,44 @@ void PlayerModel::dataReceived()
         redirectUrl = reply->url().resolved(redirectUrl);
 
         //qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
-        d->audioReply = d->network->get(QNetworkRequest(redirectUrl));
-        d->audioReply->setProperty("_request_url", dataUrl);
-        connect(d->audioReply, SIGNAL(finished()), this, SLOT(dataReceived()));
+        d->dataReply = d->network->get(QNetworkRequest(redirectUrl));
+        d->dataReply->setProperty("_request_url", dataUrl);
+        d->dataReply->setProperty("_request_type", dataType);
+        connect(d->dataReply, SIGNAL(finished()), this, SLOT(dataReceived()));
         return;
     }
 
-    d->audioCache[dataUrl] = reply->url();
-    d->audioReply = 0;
+    d->dataCache[dataUrl] = reply->url();
+    d->dataReply = 0;
+
+    // process data
     const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-    QList<Item*> items = d->find(d->rootItem, dataUrl);
+
+    if (dataType == "image") { 
+        const QByteArray data = reply->readAll();
+        QPixmap pixmap;
+        if (!pixmap.loadFromData(data, 0)) {
+            qWarning("Received invalid image");
+            return;
+        }
+        QPixmapCache::insert(dataUrl.toString(), pixmap);
+    }
+
+    QList<Item*> items = d->find(d->rootItem, QUrl());
     foreach (Item *item, items) {
-        if (mimeType == "application/xml") {
-            QIODevice *device = d->dataFile(item);
-            d->processXml(item, device);
-        } else {
-            QSoundFile *file = d->soundFile(item);
-            if (file) {
-                if (item->updateMetaData(file))
-                    emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
-                delete file;
+        if (dataUrl == item->imageUrl) {
+            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+        } else if (dataUrl == item->url) {
+            if (mimeType == "application/xml") {
+                QIODevice *device = d->dataFile(item);
+                d->processXml(item, device);
+            } else {
+                QSoundFile *file = d->soundFile(item);
+                if (file) {
+                    if (item->updateMetaData(file))
+                        emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+                    delete file;
+                }
             }
         }
     }
@@ -447,7 +480,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     else if (role == ArtistRole)
         return item->artist;
     else if (role == DownloadingRole)
-        return d->audioReply && d->audioReply->property("_request_url").toUrl() == item->url;
+        return d->dataReply && d->dataReply->property("_request_url").toUrl() == item->url;
     else if (role == DurationRole)
         return item->duration;
     else if (role == ImageUrlRole)
@@ -463,10 +496,13 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
         if (role == Qt::DisplayRole)
             return item->artist;
         else if (role == Qt::DecorationRole) {
+            QPixmap pixmap;
             if (item == d->cursorItem)
                 return QPixmap(":/start.png");
-            else if (d->audioReply && d->audioReply->property("_request_url").toUrl() == item->url)
+            else if (d->dataReply && d->dataReply->property("_request_url").toUrl() == item->url)
                 return QPixmap(":/download.png");
+            else if (QPixmapCache::find(item->imageUrl.toString(), &pixmap))
+                return QIcon(pixmap);
         }
     } else if (index.column() == TitleColumn) {
         if (role == Qt::DisplayRole)
