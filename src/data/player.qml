@@ -89,5 +89,18 @@ Rectangle {
         delegate: playerDelegate
         highlight: Rectangle { color: "lightsteelblue"; radius: 5; width: playerView.width }
         focus: true
+
+        Keys.onPressed: {
+            if (event.key == Qt.Key_Backspace ||
+                event.key == Qt.Key_Delete) {
+                model.removeRow(currentIndex);
+            }
+            else if (event.key == Qt.Key_Enter ||
+                     event.key == Qt.Key_Return) {
+                var row = model.row(currentIndex);
+                model.play(row);
+            }
+        }
+
     }
 }

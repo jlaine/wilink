@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#undef USE_DECLARATIVE
 #ifdef USE_DECLARATIVE
 #include <QDeclarativeContext>
 #include <QDeclarativeView>
@@ -583,6 +582,10 @@ void PlayerModel::play(const QModelIndex &index)
     }
 }
 
+bool PlayerModel::removeRow(int row)
+{
+    return QAbstractItemModel::removeRow(row);
+}
 
 bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
 {
