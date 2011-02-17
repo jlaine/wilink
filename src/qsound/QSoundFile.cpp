@@ -728,18 +728,6 @@ static QSoundFilePrivate *factory(QIODevice *file, QSoundFile::FileType type, QS
     }
 }
 
-static QSoundFile::FileType guessMime(const QString &name)
-{
-    if (name.endsWith(".wav"))
-        return QSoundFile::WavFile;
-    else if (name.endsWith(".mp3"))
-        return QSoundFile::Mp3File;
-    else if (name.endsWith(".ogg"))
-        return QSoundFile::OggFile;
-    else
-        return QSoundFile::UnknownFile;
-}
-
 /** Constructs a QSoundFile.
  *
  * @param file
@@ -762,7 +750,7 @@ QSoundFile::QSoundFile(const QString &name, QObject *parent)
     : QIODevice(parent)
 {
     QFile *file = new QFile(name, this);
-    d = factory(file, guessMime(name), this);
+    d = factory(file, typeFromFileName(name), this);
     if (d)
         d->m_name = name;
 }
@@ -816,11 +804,28 @@ void QSoundFile::setFormat(const QAudioFormat &format)
         d->m_format = format;
 }
 
+/** Guesses the file type from a file name.
+ *
+ * @param fileName
+ */
+QSoundFile::FileType QSoundFile::typeFromFileName(const QString &name)
+{
+    if (name.endsWith(".wav"))
+        return QSoundFile::WavFile;
+    else if (name.endsWith(".mp3"))
+        return QSoundFile::Mp3File;
+    else if (name.endsWith(".ogg"))
+        return QSoundFile::OggFile;
+    else
+        return QSoundFile::UnknownFile;
+}
+
+
 /** Guesses the file type from a MIME type.
  *
  * @param mimeType
  */
-QSoundFile::FileType QSoundFile::fileType(const QByteArray &mimeType)
+QSoundFile::FileType QSoundFile::typeFromMimeType(const QByteArray &mimeType)
 {
     if (mimeType == "audio/mpeg")
         return QSoundFile::Mp3File;

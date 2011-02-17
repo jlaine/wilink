@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#undef USE_DECLARATIVE
 #ifdef USE_DECLARATIVE
 #include <QDeclarativeContext>
 #include <QDeclarativeView>
@@ -134,9 +135,12 @@ class PlayerModelPrivate
 public:
     PlayerModelPrivate(PlayerModel *qq);
     QModelIndex createIndex(Item *item, int column = 0) const;
+    QList<Item*> find(Item *parent, const QUrl &url);
     void processXml(Item *item, QIODevice *reply);
     void processQueue();
     void save();
+    QIODevice *dataFile(Item *item);
+    QSoundFile::FileType dataType(Item *item);
     QSoundFile *soundFile(Item *item);
 
     QMap<QUrl, QUrl> audioCache;
@@ -167,18 +171,31 @@ QModelIndex PlayerModelPrivate::createIndex(Item *item, int column) const
         return QModelIndex();
 }
 
+QList<Item*> PlayerModelPrivate::find(Item *parent, const QUrl &url)
+{
+    QList<Item*> items;
+    foreach (Item *item, parent->children) {
+        if (url.isEmpty() || item->url == url)
+            items << item;
+        if (!item->children.isEmpty())
+            items << find(item, url);
+    }
+    return items;
+}
+
 void PlayerModelPrivate::processQueue()
 {
     if (audioReply)
         return;
 
-    foreach (Item *item, rootItem->children) {
+    QList<Item*> items = find(rootItem, QUrl());
+    foreach (Item *item, items) {
         const QUrl url = item->url;
         if (!url.isValid() || item->isLocal())
             continue;
 
         if (!audioCache.contains(url)) {
-            qDebug("Requesting data %s", qPrintable(url.toString()));
+            //qDebug("Requesting data %s", qPrintable(url.toString()));
             audioReply = network->get(QNetworkRequest(url));
             audioReply->setProperty("_request_url", url);
             q->connect(audioReply, SIGNAL(finished()), q, SLOT(dataReceived()));
@@ -214,13 +231,14 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
         QUrl audioUrl;
         QDomElement enclosureElement = itemElement.firstChildElement("enclosure");
         while (!enclosureElement.isNull() && !audioUrl.isValid()) {
-            if (QSoundFile::fileType(enclosureElement.attribute("type").toAscii()) != QSoundFile::UnknownFile)
+            if (QSoundFile::typeFromMimeType(enclosureElement.attribute("type").toAscii()) != QSoundFile::UnknownFile)
                 audioUrl = QUrl(enclosureElement.attribute("url"));
             enclosureElement = enclosureElement.nextSiblingElement("enclosure");
         }
 
         Item *item = new Item;
         item->url = audioUrl;
+        item->artist = channel->artist;
         item->imageUrl = channel->imageUrl;
         item->title = title;
         item->parent = channel;
@@ -231,34 +249,42 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
     }
 }
 
-QSoundFile *PlayerModelPrivate::soundFile(Item *item)
+QIODevice *PlayerModelPrivate::dataFile(Item *item)
 {
-    QSoundFile *file = 0;
+    if (item->isLocal())
+        return new QFile(item->url.toLocalFile());
+    else if (audioCache.contains(item->url)) {
+        const QUrl dataUrl = audioCache.value(item->url);
+        return wApp->networkCache()->data(dataUrl);
+    }
+    return 0;
+}
+
+QSoundFile::FileType PlayerModelPrivate::dataType(Item *item)
+{
     if (item->isLocal()) {
-        file = new QSoundFile(item->url.toLocalFile());
+        return QSoundFile::typeFromFileName(item->url.toLocalFile());
     } else if (audioCache.contains(item->url)) {
         const QUrl audioUrl = audioCache.value(item->url);
-        // FIXME : free device?
-        QIODevice *device = wApp->networkCache()->data(audioUrl);
-        if (device) {
-            QSoundFile::FileType type = QSoundFile::UnknownFile;
-
-            // get content type
-            QNetworkCacheMetaData::RawHeaderList headers = wApp->networkCache()->metaData(audioUrl).rawHeaders();
-            foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
-            {
-                if (header.first.toLower() == "content-type") {
-                    type = QSoundFile::fileType(header.second);
-                    break;
-                }
-            }
-            if (type != QSoundFile::UnknownFile)
-                file = new QSoundFile(device, type);
-            else
-                delete device;
+        QNetworkCacheMetaData::RawHeaderList headers = wApp->networkCache()->metaData(audioUrl).rawHeaders();
+        foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
+        {
+            if (header.first.toLower() == "content-type")
+                return QSoundFile::typeFromMimeType(header.second);
         }
     }
-    return file;
+    return QSoundFile::UnknownFile;
+}
+
+QSoundFile *PlayerModelPrivate::soundFile(Item *item)
+{
+    QSoundFile::FileType type = dataType(item);
+    if (type != QSoundFile::UnknownFile) {
+        QIODevice *device = dataFile(item);
+        if (device)
+            return new QSoundFile(device, type);
+    }
+    return 0;
 }
 
 void PlayerModelPrivate::save()
@@ -367,18 +393,18 @@ void PlayerModel::dataReceived()
 
     d->audioCache[dataUrl] = reply->url();
     d->audioReply = 0;
-    foreach (Item *item, d->rootItem->children) {
-        if (item->url == dataUrl) {
-            const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-            if (mimeType == "application/xml") {
-                d->processXml(item, reply);
-            } else {
-                QSoundFile *file = d->soundFile(item);
-                if (file) {
-                    if (item->updateMetaData(file))
-                        emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
-                    delete file;
-                }
+    const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+    QList<Item*> items = d->find(d->rootItem, dataUrl);
+    foreach (Item *item, items) {
+        if (mimeType == "application/xml") {
+            QIODevice *device = d->dataFile(item);
+            d->processXml(item, device);
+        } else {
+            QSoundFile *file = d->soundFile(item);
+            if (file) {
+                if (item->updateMetaData(file))
+                    emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+                delete file;
             }
         }
     }

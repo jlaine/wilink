@@ -62,6 +62,7 @@ Rectangle {
                 Image {
                     id: imageColumn
                     x: 10
+                    fillMode: Image.PreserveAspectFit
                     width: 32
                     height: 32
                     source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl);
