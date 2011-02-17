@@ -62,7 +62,6 @@ signals:
 
 private slots:
     void dataReceived();
-    void imageReceived();
     void finished(int id);
 
 private:

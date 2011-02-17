@@ -62,6 +62,8 @@ Rectangle {
                 Image {
                     id: imageColumn
                     x: 10
+                    width: 32
+                    height: 32
                     source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl);
                 }
                 Column {

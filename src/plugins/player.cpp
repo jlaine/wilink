@@ -28,7 +28,6 @@
 #include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QPixmapCache>
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
@@ -197,7 +196,6 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
         qWarning("Received invalid XML");
         return;
     }
-    qDebug() << doc.toString();
 
     QDomElement channelElement = doc.documentElement().firstChildElement("channel");
 
@@ -205,13 +203,8 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
     channel->artist = channelElement.firstChildElement("itunes:author").text();
     channel->title = channelElement.firstChildElement("title").text();
     QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
-    if (!imageUrlElement.isNull()) {
-#if 0
+    if (!imageUrlElement.isNull())
         channel->imageUrl = QUrl(imageUrlElement.text());
-        QNetworkReply *reply = network->get(QNetworkRequest(channel->imageUrl));
-        q->connect(reply, SIGNAL(finished()), q, SLOT(imageReceived()));
-#endif
-    }
     emit q->dataChanged(createIndex(channel, 0), createIndex(channel, MaxColumn));
 
     // parse items
@@ -261,10 +254,8 @@ QSoundFile *PlayerModelPrivate::soundFile(Item *item)
             }
             if (type != QSoundFile::UnknownFile)
                 file = new QSoundFile(device, type);
-            else {
+            else
                 delete device;
-                qWarning("Unknown content type for %s", qPrintable(item->url.toString()));
-            }
         }
     }
     return file;
@@ -474,37 +465,6 @@ QVariant PlayerModel::headerData(int section, Qt::Orientation orientation, int r
     }
     return QVariant();
 }
-
-void PlayerModel::imageReceived()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    if (!reply)
-        return;
-    reply->deleteLater();
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Request for image failed");
-        return;
-    }
-
-    // store result
-    const QUrl imageUrl = reply->url();
-    const QByteArray data = reply->readAll();
-    QPixmap pixmap;
-    if (!pixmap.loadFromData(data, 0)) {
-        qWarning("Received invalid image");
-        return;
-    }
-    QPixmapCache::insert(imageUrl.toString(), pixmap);
-
-    // update affected items
-    foreach (Item *item, d->rootItem->children) {
-        if (item->imageUrl == imageUrl) {
-            emit dataChanged(d->createIndex(item, 0),
-                             d->createIndex(item, MaxColumn));
-        }
-    }
-}
-
 
 QModelIndex PlayerModel::index(int row, int column, const QModelIndex &parent) const
 {
