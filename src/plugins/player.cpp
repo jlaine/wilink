@@ -54,6 +54,7 @@ enum PlayerColumns {
 enum PlayerRole {
     AlbumRole = Qt::UserRole,
     ArtistRole,
+    DownloadingRole,
     DurationRole,
     PlayingRole,
     TitleRole,
@@ -165,6 +166,9 @@ QModelIndex PlayerModelPrivate::createIndex(Item *item, int column) const
 
 void PlayerModelPrivate::processQueue()
 {
+    if (audioReply)
+        return;
+
     foreach (Item *item, rootItem->children) {
         const QUrl url = item->url;
         if (!url.isValid() || item->isLocal())
@@ -175,9 +179,9 @@ void PlayerModelPrivate::processQueue()
             audioReply = network->get(QNetworkRequest(url));
             audioReply->setProperty("_request_url", url);
             q->connect(audioReply, SIGNAL(finished()), q, SLOT(audioReceived()));
+            emit q->dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
             return;
         }
-        break;
     }
 }
 
@@ -188,9 +192,36 @@ QSoundFile *PlayerModelPrivate::soundFile(Item *item)
         file = new QSoundFile(item->url.toLocalFile());
     } else if (audioCache.contains(item->url)) {
         const QUrl audioUrl = audioCache.value(item->url);
+        // FIXME : free device?
         QIODevice *device = wApp->networkCache()->data(audioUrl);
-        if (device)
-            file = new QSoundFile(device, QSoundFile::Mp3File);
+        if (device) {
+            QSoundFile::FileType type = QSoundFile::UnknownFile;
+
+            // get content type
+            QNetworkCacheMetaData::RawHeaderList headers = wApp->networkCache()->metaData(audioUrl).rawHeaders();
+            foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
+            {
+                if (header.first.toLower() == "content-type") {
+                    if (header.second == "audio/mpeg")
+                        type = QSoundFile::Mp3File;
+                    else if (header.second == "audio/ogg" ||
+                             header.second == "application/ogg")
+                        type = QSoundFile::OggFile;
+                    else if (header.second == "audio/vnd.wave" ||
+                             header.second == "audio/wav" ||
+                             header.second == "audio/wave" ||
+                             header.second == "audio/x-wav")
+                        type = QSoundFile::WavFile;
+                    break;
+                }
+            }
+            if (type != QSoundFile::UnknownFile)
+                file = new QSoundFile(device, type);
+            else {
+                delete device;
+                qWarning("Unknown content type for %s", qPrintable(item->url.toString()));
+            }
+        }
     }
     return file;
 }
@@ -224,6 +255,7 @@ PlayerModel::PlayerModel(QObject *parent)
     QHash<int, QByteArray> roleNames;
     roleNames.insert(AlbumRole, "album");
     roleNames.insert(ArtistRole, "artist");
+    roleNames.insert(DownloadingRole, "downloading");
     roleNames.insert(DurationRole, "duration");
     roleNames.insert(PlayingRole, "playing");
     roleNames.insert(TitleRole, "title");
@@ -281,6 +313,7 @@ void PlayerModel::audioReceived()
 
     if (reply->error() != QNetworkReply::NoError) {
         qWarning("Request for audio failed");
+        d->audioReply = 0;
         return;
     }
 
@@ -347,6 +380,8 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
         return item->album;
     else if (role == ArtistRole)
         return item->artist;
+    else if (role == DownloadingRole)
+        return d->audioReply && d->audioReply->property("_request_url").toUrl() == item->url;
     else if (role == DurationRole)
         return item->duration;
     else if (role == PlayingRole)
@@ -359,8 +394,12 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (index.column() == ArtistColumn) {
         if (role == Qt::DisplayRole)
             return item->artist;
-        else if (role == Qt::DecorationRole && item == d->cursorItem)
-            return QPixmap(":/start.png");
+        else if (role == Qt::DecorationRole) {
+            if (item == d->cursorItem)
+                return QPixmap(":/start.png");
+            else if (d->audioReply && d->audioReply->property("_request_url").toUrl() == item->url)
+                return QPixmap(":/download.png");
+        }
     } else if (index.column() == TitleColumn) {
         if (role == Qt::DisplayRole)
             return item->title;
