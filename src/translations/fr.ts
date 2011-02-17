@@ -755,12 +755,8 @@ Acceptez-vous?</translation>
         <translation>Lecteur média</translation>
     </message>
     <message>
-        <source>Play</source>
-        <translation>Lecture</translation>
-    </message>
-    <message>
         <source>Stop</source>
-        <translation>Arrêt</translation>
+        <translation>Arrêter</translation>
     </message>
 </context>
 <context>
