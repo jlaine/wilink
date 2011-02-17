@@ -81,7 +81,6 @@ public:
 
 private slots:
     void cursorChanged(const QModelIndex &index);
-    void play();
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
 
 private:

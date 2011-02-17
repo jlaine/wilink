@@ -724,19 +724,6 @@ void PlayerPanel::cursorChanged(const QModelIndex &index)
     }
 }
 
-void PlayerPanel::play()
-{
-#ifdef USE_DECLARATIVE
-    m_model->play(m_model->index(0, 0, QModelIndex()));
-#else
-    QList<QModelIndex> selected = m_view->selectionModel()->selectedIndexes();
-    if (!selected.isEmpty())
-        m_model->play(selected.first());
-    else if (m_model->rowCount(QModelIndex()))
-        m_model->play(m_model->index(0, 0, QModelIndex()));
-#endif
-}
-
 static QList<QUrl> getUrls(const QUrl &url) {
     if (!isLocal(url))
         return QList<QUrl>() << url;
