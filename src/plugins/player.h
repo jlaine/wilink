@@ -30,6 +30,8 @@ class Chat;
 class QPushButton;
 class QSoundPlayer;
 
+class PlayerModelPrivate;
+
 class PlayerModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -61,12 +63,13 @@ signals:
 private slots:
     void finished(int id);
 
-private:
+public:
     class Item {
     public:
         Item();
         ~Item();
         int row() const;
+        bool updateMetaData();
 
         QString album;
         QString artist;
@@ -78,21 +81,9 @@ private:
         QList<Item*> children;
     };
 
-    QModelIndex createIndex(Item *item, int column = 0) const
-    {
-        if (item && item != m_rootItem)
-            return QAbstractItemModel::createIndex(item->row(), column, item);
-        else
-            return QModelIndex();
-    }
-
-    void save();
-
-    QSoundPlayer *m_player;
-    int m_playId;
-    bool m_playStop;
-    Item *m_cursorItem;
-    Item *m_rootItem;
+private:
+    PlayerModelPrivate *d;
+    friend class PlayerModelPrivate;
 };
 
 /** The PlayerPanel class represents a panel for playing media.

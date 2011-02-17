@@ -69,6 +69,31 @@ PlayerModel::Item::~Item()
         delete item;
 }
 
+// Update the metadata for the current item.
+bool PlayerModel::Item::updateMetaData()
+{
+    QSoundFile file(url.toLocalFile());
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    duration = file.duration();
+
+    QStringList values;
+    values = file.metaData(QSoundFile::AlbumMetaData);
+    if (!values.isEmpty())
+        album = values.first();
+
+    values = file.metaData(QSoundFile::ArtistMetaData);
+    if (!values.isEmpty())
+        artist = values.first();
+
+    values = file.metaData(QSoundFile::TitleMetaData);
+    if (!values.isEmpty())
+        title = values.first();
+
+    return true;
+}
+
 int PlayerModel::Item::row() const
 {
     if (!parent)
@@ -76,18 +101,56 @@ int PlayerModel::Item::row() const
     return parent->children.indexOf((Item*)this);
 }
 
+class PlayerModelPrivate
+{
+public:
+    PlayerModelPrivate(PlayerModel *qq);
+    QModelIndex createIndex(PlayerModel::Item *item, int column = 0) const;
+    void save();
+
+    PlayerModel::Item *cursorItem;
+    QSoundPlayer *player;
+    int playId;
+    bool playStop;
+    PlayerModel *q;
+    PlayerModel::Item *rootItem;
+};
+
+PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
+    : cursorItem(0),
+    playId(-1),
+    playStop(false),
+    q(qq)
+{
+}
+
+QModelIndex PlayerModelPrivate::createIndex(PlayerModel::Item *item, int column) const
+{
+    if (item && item != rootItem)
+        return q->createIndex(item->row(), column, item);
+    else
+        return QModelIndex();
+}
+
+void PlayerModelPrivate::save()
+{
+    QSettings settings;
+    QStringList values;
+    foreach (PlayerModel::Item *item, rootItem->children)
+        values << item->url.toString();
+    settings.setValue("PlayerUrls", values);
+}
+
 PlayerModel::PlayerModel(QObject *parent)
-    : QAbstractItemModel(parent),
-    m_cursorItem(0),
-    m_playId(-1),
-    m_playStop(false)
+    : QAbstractItemModel(parent)
 {
     bool check;
-    m_rootItem = new Item;
+    d = new PlayerModelPrivate(this);
+    d->rootItem = new Item;
 
     // init player
-    m_player = wApp->soundPlayer();
-    check = connect(m_player, SIGNAL(finished(int)),
+    d->player = wApp->soundPlayer();
+    check = connect(d->player, SIGNAL(finished(int)),
                     this, SLOT(finished(int)));
     Q_ASSERT(check);
 
@@ -110,42 +173,29 @@ PlayerModel::PlayerModel(QObject *parent)
 
 PlayerModel::~PlayerModel()
 {
-    delete m_rootItem;
+    delete d->rootItem;
+    delete d;
 }
 
 bool PlayerModel::addUrl(const QUrl &url)
 {
-    QSoundFile file(url.toLocalFile());
-    if (!file.open(QIODevice::ReadOnly))
-        return false;
-
     Item *item = new Item;
-    item->parent = m_rootItem;
+    item->parent = d->rootItem;
+    item->title = QFileInfo(url.toLocalFile()).baseName();
     item->url = url;
-    item->duration = file.duration();
 
-    // get metadata
-    QStringList values;
-    values = file.metaData(QSoundFile::AlbumMetaData);
-    if (!values.isEmpty())
-        item->album = values.first();
+    // fetch meta data
+    if (!item->updateMetaData()) {
+        delete item;
+        return false;
+    }
 
-    values = file.metaData(QSoundFile::ArtistMetaData);
-    if (!values.isEmpty())
-        item->artist = values.first();
-
-    values = file.metaData(QSoundFile::TitleMetaData);
-    if (!values.isEmpty())
-        item->title = values.first();
-    else
-        item->title = QFileInfo(url.toLocalFile()).baseName();
-
-    beginInsertRows(createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
-    m_rootItem->children.append(item);
+    beginInsertRows(d->createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
+    d->rootItem->children.append(item);
     endInsertRows();
 
     // save playlist
-    save();
+    d->save();
     return true;
 }
 
@@ -156,20 +206,20 @@ int PlayerModel::columnCount(const QModelIndex &parent) const
 
 QModelIndex PlayerModel::cursor() const
 {
-    return createIndex(m_cursorItem);
+    return d->createIndex(d->cursorItem);
 }
 
 void PlayerModel::setCursor(const QModelIndex &index)
 {
     Item *item = static_cast<Item*>(index.internalPointer());
 
-    if (item != m_cursorItem) {
-        Item *oldItem = m_cursorItem;
-        m_cursorItem = item;
+    if (item != d->cursorItem) {
+        Item *oldItem = d->cursorItem;
+        d->cursorItem = item;
         if (oldItem)
-            emit dataChanged(createIndex(oldItem, 0), createIndex(oldItem, MaxColumn));
+            emit dataChanged(d->createIndex(oldItem, 0), d->createIndex(oldItem, MaxColumn));
         if (item)
-            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
+            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
         emit cursorChanged(index);
     }
 }
@@ -187,7 +237,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     else if (role == DurationRole)
         return item->duration;
     else if (role == PlayingRole)
-        return (item == m_cursorItem);
+        return (item == d->cursorItem);
     else if (role == TitleRole)
         return item->title;
     else if (role == UrlRole)
@@ -196,7 +246,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     if (index.column() == ArtistColumn) {
         if (role == Qt::DisplayRole)
             return item->artist;
-        else if (role == Qt::DecorationRole && item == m_cursorItem)
+        else if (role == Qt::DecorationRole && item == d->cursorItem)
             return QPixmap(":/start.png");
     } else if (index.column() == TitleColumn) {
         if (role == Qt::DisplayRole)
@@ -227,8 +277,8 @@ QModelIndex PlayerModel::index(int row, int column, const QModelIndex &parent) c
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
-    return createIndex(parentItem->children[row], column);
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;
+    return d->createIndex(parentItem->children[row], column);
 }
 
 QModelIndex PlayerModel::parent(const QModelIndex &index) const
@@ -237,17 +287,17 @@ QModelIndex PlayerModel::parent(const QModelIndex &index) const
         return QModelIndex();
 
     Item *item = static_cast<Item*>(index.internalPointer());
-    return createIndex(item->parent);
+    return d->createIndex(item->parent);
 }
 
 void PlayerModel::finished(int id)
 {
-    if (id != m_playId)
+    if (id != d->playId)
         return;
-    m_playId = -1;
-    if (m_playStop) {
+    d->playId = -1;
+    if (d->playStop) {
         setCursor(QModelIndex());
-        m_playStop = false;
+        d->playStop = false;
     } else {
         const QModelIndex index = cursor();
         QModelIndex nextIndex = index.sibling(index.row() + 1, index.column());
@@ -258,16 +308,16 @@ void PlayerModel::finished(int id)
 void PlayerModel::play(const QModelIndex &index)
 {
     // stop previous audio
-    if (m_playId >= 0) {
-        m_player->stop(m_playId);
-        m_playId = -1;
+    if (d->playId >= 0) {
+        d->player->stop(d->playId);
+        d->playId = -1;
     }
 
     // start new audio output
     const QUrl audioUrl = index.data(UrlRole).toUrl();
     if (audioUrl.isValid()) {
         setCursor(index);
-        m_playId = m_player->play(audioUrl.toLocalFile());
+        d->playId = d->player->play(audioUrl.toLocalFile());
     } else {
         setCursor(QModelIndex());
     }
@@ -276,7 +326,7 @@ void PlayerModel::play(const QModelIndex &index)
 
 bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;
 
     const int minIndex = qMax(0, row);
     const int maxIndex = qMin(row + count, parentItem->children.size()) - 1;
@@ -286,7 +336,7 @@ bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
     endRemoveRows();
 
     // save playlist
-    save();
+    d->save();
     return true;
 }
 
@@ -297,24 +347,15 @@ QModelIndex PlayerModel::row(int row)
 
 int PlayerModel::rowCount(const QModelIndex &parent) const
 {
-    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : m_rootItem;
+    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;
     return parentItem->children.size();
-}
-
-void PlayerModel::save()
-{
-    QSettings settings;
-    QStringList values;
-    foreach (Item *item, m_rootItem->children)
-        values << item->url.toString();
-    settings.setValue("PlayerUrls", values);
 }
 
 void PlayerModel::stop()
 {
-    if (m_playId >= 0) {
-        m_player->stop(m_playId);
-        m_playStop = true;
+    if (d->playId >= 0) {
+        d->player->stop(d->playId);
+        d->playStop = true;
     }
 }
 
