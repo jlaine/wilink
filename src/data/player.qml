@@ -100,8 +100,10 @@ Rectangle {
         focus: true
 
         Keys.onPressed: {
-            if (event.key == Qt.Key_Backspace ||
-                event.key == Qt.Key_Delete) {
+            if (event.key == Qt.Key_Backspace) {
+                playerView.model.rootIndex = playerView.model.parentModelIndex();
+            }
+            else if (event.key == Qt.Key_Delete) {
                 playerModel.removeRow(currentIndex, playerView.model.rootIndex);
             }
             else if (event.key == Qt.Key_Enter ||
