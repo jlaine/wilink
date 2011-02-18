@@ -124,6 +124,14 @@ private:
     QCheckBox *showOfflineContacts;
 };
 
+class PluginOptions : public ChatPreferencesTab
+{
+    Q_OBJECT
+
+public:
+    PluginOptions();
+};
+
 class SoundOptions : public ChatPreferencesTab
 {
     Q_OBJECT

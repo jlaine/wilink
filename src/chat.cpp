@@ -717,6 +717,7 @@ void Chat::showPreferences(const QString &focusTab)
 
     dialog->addTab(new ChatOptions);
     dialog->addTab(new SoundOptions);
+    dialog->addTab(new PluginOptions);
     foreach (ChatPlugin *plugin, d->plugins)
         plugin->preferences(dialog);
 
@@ -779,6 +780,28 @@ bool ChatOptions::save()
         wApp->setOpenAtLogin(openAtLogin->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
     return true;
+}
+
+PluginOptions::PluginOptions()
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    QGroupBox *group = new QGroupBox(tr("Plugins"));
+    QVBoxLayout *box = new QVBoxLayout;
+    group->setLayout(box);
+    QObjectList plugins = QPluginLoader::staticInstances();
+    foreach (QObject *object, plugins)
+    {
+        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
+        if (plugin) {
+            box->addWidget(new QLabel(plugin->name()));
+        }
+    }
+    layout->addWidget(group);
+
+    setLayout(layout);
+    setWindowIcon(QIcon(":/plugin.png"));
+    setWindowTitle(tr("Plugins"));
 }
 
 #define SOUND_TEST_SECONDS 5

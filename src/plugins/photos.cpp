@@ -681,7 +681,7 @@ class PhotosPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
-    QString name() const { return "Online photos"; };
+    QString name() const { return "Photos"; };
 };
 
 bool PhotosPlugin::initialize(Chat *chat)

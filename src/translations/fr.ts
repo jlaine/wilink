@@ -760,6 +760,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PluginOptions</name>
+    <message>
+        <source>Plugins</source>
+        <translation>Greffons</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Downloads</source>

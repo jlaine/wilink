@@ -27,6 +27,7 @@ generate_png(png
     options.svg
     peer.svg
     photos.svg
+    plugin.svg
     refresh.svg
     remove.svg
     search.svg

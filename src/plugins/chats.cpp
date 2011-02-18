@@ -321,7 +321,7 @@ class ChatsPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
-    QString name() const { return "Person-to-person chats"; };
+    QString name() const { return "Person-to-person chat"; };
 };
 
 bool ChatsPlugin::initialize(Chat *chat)
