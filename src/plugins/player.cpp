@@ -135,7 +135,7 @@ class PlayerModelPrivate
 public:
     PlayerModelPrivate(PlayerModel *qq);
     QModelIndex createIndex(Item *item, int column = 0) const;
-    QList<Item*> find(Item *parent, const QUrl &url);
+    QList<Item*> find(Item *parent, PlayerRole role, const QUrl &url);
     void processXml(Item *item, QIODevice *reply);
     void processQueue();
     void save();
@@ -171,14 +171,16 @@ QModelIndex PlayerModelPrivate::createIndex(Item *item, int column) const
         return QModelIndex();
 }
 
-QList<Item*> PlayerModelPrivate::find(Item *parent, const QUrl &url)
+QList<Item*> PlayerModelPrivate::find(Item *parent, PlayerRole role, const QUrl &url)
 {
     QList<Item*> items;
     foreach (Item *item, parent->children) {
-        if (url.isEmpty() || item->url == url)
+        if (url.isEmpty() ||
+            (role == UrlRole && item->url == url) ||
+            (role == ImageUrlRole && item->imageUrl == url))
             items << item;
         if (!item->children.isEmpty())
-            items << find(item, url);
+            items << find(item, role, url);
     }
     return items;
 }
@@ -188,7 +190,7 @@ void PlayerModelPrivate::processQueue()
     if (dataReply)
         return;
 
-    QList<Item*> items = find(rootItem, QUrl());
+    QList<Item*> items = find(rootItem, UrlRole, QUrl());
     foreach (Item *item, items) {
 #ifndef USE_DECLARATIVE
         // check image
@@ -395,11 +397,6 @@ void PlayerModel::dataReceived()
     const QUrl dataUrl = reply->property("_request_url").toUrl();
     const QString dataType = reply->property("_request_type").toString();
 
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Request for data failed for %s", qPrintable(dataUrl.toString()));
-        d->dataReply = 0;
-        return;
-    }
 
     // follow redirect
     QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
@@ -418,6 +415,17 @@ void PlayerModel::dataReceived()
     d->dataCache[dataUrl] = reply->url();
     d->dataReply = 0;
 
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Request for data failed for %s", qPrintable(dataUrl.toString()));
+
+        QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
+        foreach (Item *item, items)
+            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+
+        d->processQueue();
+        return;
+    }
+
     // process data
     const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
 
@@ -430,16 +438,13 @@ void PlayerModel::dataReceived()
         }
         QPixmapCache::insert(dataUrl.toString(), pixmap);
 
-        QList<Item*> items = d->find(d->rootItem, QUrl());
-        foreach (Item *item, items)
-            if (dataUrl == item->imageUrl)
-                emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
-        return;
-    } else {
-        QList<Item*> items = d->find(d->rootItem, QUrl());
+        QList<Item*> items = d->find(d->rootItem, ImageUrlRole, dataUrl);
         foreach (Item *item, items) {
-            if (dataUrl != item->url)
-                continue;
+            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+        }
+    } else {
+        QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
+        foreach (Item *item, items) {
             if (mimeType == "application/xml") {
                 QIODevice *device = d->dataFile(item);
                 d->processXml(item, device);
