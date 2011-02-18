@@ -96,7 +96,13 @@ Rectangle {
         anchors.fill: parent
         model: visualModel
         delegate: playerDelegate
-        highlight: Rectangle { color: "lightsteelblue"; radius: 5; width: playerView.width }
+        highlight: Rectangle {
+            color: "lightsteelblue"
+            radius: 5
+            x: 1
+            width: playerView.width - 2
+        }
+        highlightMoveDuration: 300
         focus: true
 
         Keys.onPressed: {
