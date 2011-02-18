@@ -27,6 +27,7 @@ Rectangle {
         id: playerDelegate
         Item {
             id: item
+            property bool isCurrent: playerView.currentItem == item
             height: 40
             width: parent.width
 
@@ -34,7 +35,7 @@ Rectangle {
                 var secs = ms / 1000;
                 var hours = Number(secs / 3600).toFixed();
                 var minutes = Number(secs / 60).toFixed() % 60;
-                var seconds = Number(secs).toFixed() % 60
+                var seconds = Number(secs).toFixed() % 60;
 
                 function padNumber(n) {
                     var s = n.toString();
@@ -51,7 +52,9 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: playerView.currentIndex = index;
+                onClicked: {
+                    playerView.currentIndex = index;
+                }
                 onDoubleClicked: {
                     var row = visualModel.modelIndex(index);
                     if (playerModel.rowCount(row))
@@ -68,14 +71,14 @@ Rectangle {
                     fillMode: Image.PreserveAspectFit
                     width: 32
                     height: 32
-                    source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl);
+                    source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
                 }
                 Column {
                     id: textColumn
-                    anchors.left: imageColumn.right;
+                    anchors.left: imageColumn.right
                     width: item.width - imageColumn.width - 60
-                    Text { text: '<b>' + artist + '</b>' }
-                    Text { text: title }
+                    Text { text: '<b>' + title + '</b>' }
+                    Text { text: (item.isCurrent && album) ? artist + ' - ' + album : artist }
                 }
                 Text {
                     anchors.left: textColumn.right
@@ -123,6 +126,5 @@ Rectangle {
                     playerModel.play(row);
             }
         }
-
     }
 }
