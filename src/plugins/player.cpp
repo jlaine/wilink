@@ -626,6 +626,10 @@ bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
+int PlayerModel::row(const QModelIndex &row) const
+{
+    return row.row();
+}
 int PlayerModel::rowCount(const QModelIndex &parent) const
 {
     Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;

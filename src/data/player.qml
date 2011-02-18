@@ -101,7 +101,9 @@ Rectangle {
 
         Keys.onPressed: {
             if (event.key == Qt.Key_Backspace) {
+                var oldIndex = playerView.model.rootIndex;
                 playerView.model.rootIndex = playerView.model.parentModelIndex();
+                currentIndex = playerModel.row(oldIndex);
             }
             else if (event.key == Qt.Key_Delete) {
                 playerModel.removeRow(currentIndex, playerView.model.rootIndex);
