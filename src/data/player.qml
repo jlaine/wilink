@@ -53,9 +53,9 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: playerView.currentIndex = index;
                 onDoubleClicked: {
-                    var row = playerView.model.modelIndex(index);
+                    var row = visualModel.modelIndex(index);
                     if (playerModel.rowCount(row))
-                        playerView.model.rootIndex = row;
+                        visualModel.rootIndex = row;
                     else
                         playerModel.play(row);
                 }
@@ -101,18 +101,18 @@ Rectangle {
 
         Keys.onPressed: {
             if (event.key == Qt.Key_Backspace) {
-                var oldIndex = playerView.model.rootIndex;
-                playerView.model.rootIndex = playerView.model.parentModelIndex();
+                var oldIndex = visualModel.rootIndex;
+                visualModel.rootIndex = visualModel.parentModelIndex();
                 currentIndex = playerModel.row(oldIndex);
             }
             else if (event.key == Qt.Key_Delete) {
-                playerModel.removeRow(currentIndex, playerView.model.rootIndex);
+                playerModel.removeRow(currentIndex, visualModel.rootIndex);
             }
             else if (event.key == Qt.Key_Enter ||
                      event.key == Qt.Key_Return) {
-                var row = playerView.model.modelIndex(currentIndex);
+                var row = visualModel.modelIndex(currentIndex);
                 if (playerModel.rowCount(row))
-                    playerView.model.rootIndex = row;
+                    visualModel.rootIndex = row;
                 else
                     playerModel.play(row);
             }
