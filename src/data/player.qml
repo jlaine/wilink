@@ -27,8 +27,8 @@ Rectangle {
         id: playerDelegate
         Item {
             id: item
-            property bool isCurrent: playerView.currentItem == item
-            height: 40
+            property bool isSelected: playerView.currentItem == item
+            height: 42
             width: parent.width
 
             function formatDuration(ms) {
@@ -65,24 +65,49 @@ Rectangle {
             }
 
             Rectangle {
+                id: rect
+                anchors.fill: parent
+                anchors.topMargin: 2
+                anchors.bottomMargin: 2
+                anchors.leftMargin: 3
+                anchors.rightMargin: 3
+                radius: 5
+                state: item.isSelected ? 'selected' : ''
+
                 Image {
                     id: imageColumn
-                    x: 10
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5
+                    anchors.verticalCenter: parent.verticalCenter
                     fillMode: Image.PreserveAspectFit
                     width: 32
                     height: 32
                     source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
                 }
+
                 Column {
                     id: textColumn
                     anchors.left: imageColumn.right
-                    width: item.width - imageColumn.width - 60
+                    anchors.verticalCenter: parent.verticalCenter
+                    /*width: item.width - imageColumn.width - 60 */
                     Text { text: '<b>' + title + '</b>' }
-                    Text { text: (item.isCurrent && album) ? artist + ' - ' + album : artist }
+                    Text { text: (item.isSelected && album) ? artist + ' - ' + album : artist }
                 }
+
                 Text {
-                    anchors.left: textColumn.right
+                    anchors.right: parent.right
+                    anchors.rightMargin: 5
+                    anchors.verticalCenter: parent.verticalCenter
                     text: formatDuration(duration)
+                }
+
+                states: State {
+                    name: "selected"
+                    PropertyChanges { target: rect; color: 'lightsteelblue'}
+                }
+
+                transitions: Transition {
+                    PropertyAnimation { target: rect; properties: 'color'; duration: 300 }
                 }
             }
         }
@@ -99,13 +124,6 @@ Rectangle {
         anchors.fill: parent
         model: visualModel
         delegate: playerDelegate
-        highlight: Rectangle {
-            color: "lightsteelblue"
-            radius: 5
-            x: 1
-            width: playerView.width - 2
-        }
-        highlightMoveDuration: 300
         focus: true
 
         Keys.onPressed: {
