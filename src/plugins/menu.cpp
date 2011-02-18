@@ -198,6 +198,7 @@ class MenuPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Menu"; };
 };
 
 bool MenuPlugin::initialize(Chat *chat)

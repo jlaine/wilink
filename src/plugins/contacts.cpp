@@ -338,6 +338,7 @@ class ContactsPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Contacts management"; };
 };
 
 bool ContactsPlugin::initialize(Chat *chat)

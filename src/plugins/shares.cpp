@@ -860,6 +860,7 @@ public:
     SharesPlugin();
     bool initialize(Chat *chat);
     void finalize(Chat *chat);
+    QString name() const { return "Shares"; };
     void preferences(ChatPreferences *prefs);
 
 private:

@@ -1018,6 +1018,7 @@ class RoomsPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Multi-user chat"; };
 };
 
 bool RoomsPlugin::initialize(Chat *chat)

@@ -274,6 +274,7 @@ class DiscoveryPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Service discovery"; };
 };
 
 bool DiscoveryPlugin::initialize(Chat *chat)

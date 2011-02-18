@@ -599,6 +599,7 @@ public:
     DiagnosticsPlugin() : m_references(0) {};
     bool initialize(Chat *chat);
     void finalize(Chat *chat);
+    QString name() const { return "Diagnostics"; };
 
 private:
     int m_references;

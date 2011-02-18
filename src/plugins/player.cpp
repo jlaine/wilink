@@ -419,7 +419,7 @@ void PlayerModel::dataReceived()
     d->dataReply = 0;
 
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Request for data failed for %s", qPrintable(dataUrl.toString()));
+        qWarning("%s", qPrintable(reply->errorString()));
 
         QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
         foreach (Item *item, items)
@@ -831,6 +831,7 @@ class PlayerPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Media player"; };
 };
 
 bool PlayerPlugin::initialize(Chat *chat)

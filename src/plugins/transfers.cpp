@@ -503,6 +503,7 @@ class TransfersPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "File transfers"; };
 };
 
 bool TransfersPlugin::initialize(Chat *chat)

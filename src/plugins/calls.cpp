@@ -341,6 +341,7 @@ class CallsPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Calls"; };
 };
 
 bool CallsPlugin::initialize(Chat *chat)

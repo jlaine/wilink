@@ -226,6 +226,7 @@ class ConsolePlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    QString name() const { return "Debugging console"; };
 };
 
 bool ConsolePlugin::initialize(Chat *chat)

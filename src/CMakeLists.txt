@@ -12,12 +12,6 @@ set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
-# On old cmake versions we need to include QtMultimedia explicitly
-if(CMAKE_MAJOR_VERSION EQUAL 2 AND (CMAKE_MINOR_VERSION LESS 8 OR (CMAKE_MINOR_VERSION EQUAL 8 AND CMAKE_PATCH_VERSION LESS 2)))
-set(QT_LIBRARIES ${QT_LIBRARIES} QtMultimedia)
-include_directories(${QT_INCLUDE_DIR}/QtMultimedia)
-endif()
-
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qdjango/src)
@@ -30,9 +24,6 @@ add_definitions(-DQT_STATICPLUGIN)
 if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
 endif(NOT APPLE)
-if(QT_QTDECLARATIVE_FOUND)
-    add_definitions(-DUSE_DECLARATIVE)
-endif()
 
 set(wiLink_SOURCES
     application.cpp
@@ -142,11 +133,16 @@ endif(WIN32)
 add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
 
 # libraries
+set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY})
+if(QT_QTDECLARATIVE_FOUND)
+    list(APPEND wilink_LIBRARIES ${QT_QTDECLARATIVE_LIBRARY})
+    add_definitions(-DUSE_DECLARATIVE)
+endif()
 if(APPLE)
-    set(wilink_LIBRARIES "-framework AppKit")
+    list(APPEND wilink_LIBRARIES "-framework AppKit")
 endif(APPLE)
 
-target_link_libraries(wiLink idle qnetio qxmpp qdjango qsound diagnostics ${wilink_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(wiLink idle qnetio qxmpp qdjango qsound diagnostics ${wilink_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
