@@ -601,15 +601,18 @@ void PlayerModel::play(const QModelIndex &index)
 
     // start new audio output
     Item *item = static_cast<Item*>(index.internalPointer());
-    if (!index.isValid() || !item)
+    if (!index.isValid() || !item) {
+        setCursor(QModelIndex());
         return;
+    }
 
     QSoundFile *file = d->soundFile(item);
     if (file) {
         d->playId = d->player->play(file);
         setCursor(index);
     } else {
-        setCursor(QModelIndex());
+        QModelIndex nextIndex = index.sibling(index.row() + 1, index.column());
+        play(nextIndex);
     }
 }
 
@@ -803,7 +806,7 @@ void PlayerView::keyPressEvent(QKeyEvent *event)
         {
         case Qt::Key_Delete:
         case Qt::Key_Backspace:
-            model()->removeRow(index.row());
+            model()->removeRow(index.row(), index.parent());
             break;
         case Qt::Key_Enter:
         case Qt::Key_Return:
