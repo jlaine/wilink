@@ -303,8 +303,11 @@ QSoundFile *PlayerModelPrivate::soundFile(Item *item)
     QSoundFile::FileType type = dataType(item);
     if (type != QSoundFile::UnknownFile) {
         QIODevice *device = dataFile(item);
-        if (device)
-            return new QSoundFile(device, type);
+        if (device) {
+            QSoundFile *file = new QSoundFile(device, type);
+            device->setParent(file);
+            return file;
+        }
     }
     return 0;
 }
@@ -427,27 +430,27 @@ void PlayerModel::dataReceived()
     }
 
     // process data
-    const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-
     if (dataType == "image") { 
         const QByteArray data = reply->readAll();
         QPixmap pixmap;
-        if (!pixmap.loadFromData(data, 0)) {
-            qWarning("Received invalid image");
-            return;
-        }
-        QPixmapCache::insert(dataUrl.toString(), pixmap);
+        if (pixmap.loadFromData(data, 0)) {
+            QPixmapCache::insert(dataUrl.toString(), pixmap);
 
-        QList<Item*> items = d->find(d->rootItem, ImageUrlRole, dataUrl);
-        foreach (Item *item, items) {
-            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+            QList<Item*> items = d->find(d->rootItem, ImageUrlRole, dataUrl);
+            foreach (Item *item, items) {
+                emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+            }
+        } else {
+            qWarning("Received invalid image for %s", qPrintable(dataUrl.toString()));
         }
     } else {
+        const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
         QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
         foreach (Item *item, items) {
             if (mimeType == "application/xml") {
                 QIODevice *device = d->dataFile(item);
                 d->processXml(item, device);
+                delete device;
             } else {
                 QSoundFile *file = d->soundFile(item);
                 if (file) {
@@ -693,8 +696,8 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     QDeclarativeView *view = new QDeclarativeView;
     QDeclarativeContext *ctxt = view->rootContext();
     ctxt->setContextProperty("playerModel", m_model);
-    //view->setSource(QUrl::fromLocalFile("src/data/player.qml"));
-    view->setSource(QUrl("qrc:/player.qml"));
+    view->setSource(QUrl::fromLocalFile("src/data/player.qml"));
+    //view->setSource(QUrl("qrc:/player.qml"));
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
     setFocusProxy(view);
