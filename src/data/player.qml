@@ -127,12 +127,13 @@ Rectangle {
         focus: true
 
         Keys.onPressed: {
-            if (event.key == Qt.Key_Backspace) {
+            if (event.key == Qt.Key_Backspace && event.modifiers == Qt.NoModifier) {
                 var oldIndex = visualModel.rootIndex;
                 visualModel.rootIndex = visualModel.parentModelIndex();
                 currentIndex = playerModel.row(oldIndex);
             }
-            else if (event.key == Qt.Key_Delete) {
+            else if (event.key == Qt.Key_Delete ||
+                    (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
                 playerModel.removeRow(currentIndex, visualModel.rootIndex);
             }
             else if (event.key == Qt.Key_Enter ||
