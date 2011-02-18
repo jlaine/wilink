@@ -33,7 +33,7 @@ Rectangle {
             function formatDuration(ms) {
                 var secs = ms / 1000;
                 var hours = Number(secs / 3600).toFixed();
-                var minutes = Number(secs / 60).toFixed() % 3600;
+                var minutes = Number(secs / 60).toFixed() % 60;
                 var seconds = Number(secs).toFixed() % 60
 
                 function padNumber(n) {
@@ -53,8 +53,11 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: playerView.currentIndex = index;
                 onDoubleClicked: {
-                    var row = playerView.model.row(index);
-                    playerView.model.play(row);
+                    var row = playerView.model.modelIndex(index);
+                    if (playerModel.rowCount(row))
+                        playerView.model.rootIndex = row;
+                    else
+                        playerModel.play(row);
                 }
             }
 
@@ -82,10 +85,16 @@ Rectangle {
         }
     }
 
+    VisualDataModel {
+        id: visualModel
+        model: playerModel
+        delegate: playerDelegate
+    }
+
     ListView {
         id: playerView
         anchors.fill: parent
-        model: playerModel
+        model: visualModel
         delegate: playerDelegate
         highlight: Rectangle { color: "lightsteelblue"; radius: 5; width: playerView.width }
         focus: true
@@ -93,12 +102,15 @@ Rectangle {
         Keys.onPressed: {
             if (event.key == Qt.Key_Backspace ||
                 event.key == Qt.Key_Delete) {
-                model.removeRow(currentIndex);
+                playerModel.removeRow(currentIndex, playerView.model.rootIndex);
             }
             else if (event.key == Qt.Key_Enter ||
                      event.key == Qt.Key_Return) {
-                var row = model.row(currentIndex);
-                model.play(row);
+                var row = playerView.model.modelIndex(currentIndex);
+                if (playerModel.rowCount(row))
+                    playerView.model.rootIndex = row;
+                else
+                    playerModel.play(row);
             }
         }
 

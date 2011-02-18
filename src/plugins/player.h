@@ -43,16 +43,15 @@ public:
     bool addUrl(const QUrl &url);
     QModelIndex cursor() const;
     void setCursor(const QModelIndex &index);
-    Q_INVOKABLE QModelIndex row(int row);
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex & index) const;
-    Q_INVOKABLE bool removeRow(int row);
+    Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    int rowCount(const QModelIndex &parent) const;
+    Q_INVOKABLE int rowCount(const QModelIndex &parent) const;
 
 public slots:
     void play(const QModelIndex &index);

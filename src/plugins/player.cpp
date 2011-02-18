@@ -210,7 +210,7 @@ void PlayerModelPrivate::processQueue()
             !isLocal(item->url) &&
             !dataCache.contains(item->url))
         {
-            //qDebug("Requesting data %s", qPrintable(url.toString()));
+            //qDebug("Requesting data %s", qPrintable(item->url.toString()));
             dataReply = network->get(QNetworkRequest(item->url));
             dataReply->setProperty("_request_url", item->url);
             dataReply->setProperty("_request_type", "data");
@@ -258,6 +258,10 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
         item->imageUrl = channel->imageUrl;
         item->title = title;
         item->parent = channel;
+        const QStringList durationBits = itemElement.firstChildElement("itunes:duration").text().split(":");
+        if (durationBits.size() == 3)
+            item->duration = ((((durationBits[0].toInt() * 60) + durationBits[1].toInt()) * 60) + durationBits[2].toInt()) * 1000;
+
         q->beginInsertRows(createIndex(channel, 0), channel->children.size(), channel->children.size());
         channel->children.append(item);
         q->endInsertRows();
@@ -392,7 +396,7 @@ void PlayerModel::dataReceived()
     const QString dataType = reply->property("_request_type").toString();
 
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Request for data failed");
+        qWarning("Request for data failed for %s", qPrintable(dataUrl.toString()));
         d->dataReply = 0;
         return;
     }
@@ -410,6 +414,7 @@ void PlayerModel::dataReceived()
         return;
     }
 
+    //qDebug("Received data for %s", qPrintable(dataUrl.toString()));
     d->dataCache[dataUrl] = reply->url();
     d->dataReply = 0;
 
@@ -424,23 +429,27 @@ void PlayerModel::dataReceived()
             return;
         }
         QPixmapCache::insert(dataUrl.toString(), pixmap);
-    }
 
-    QList<Item*> items = d->find(d->rootItem, QUrl());
-    foreach (Item *item, items) {
-        if (dataUrl == item->imageUrl) {
-            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
-        } else if (dataUrl == item->url) {
+        QList<Item*> items = d->find(d->rootItem, QUrl());
+        foreach (Item *item, items)
+            if (dataUrl == item->imageUrl)
+                emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+        return;
+    } else {
+        QList<Item*> items = d->find(d->rootItem, QUrl());
+        foreach (Item *item, items) {
+            if (dataUrl != item->url)
+                continue;
             if (mimeType == "application/xml") {
                 QIODevice *device = d->dataFile(item);
                 d->processXml(item, device);
             } else {
                 QSoundFile *file = d->soundFile(item);
                 if (file) {
-                    if (item->updateMetaData(file))
-                        emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+                    item->updateMetaData(file);
                     delete file;
                 }
+                emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
             }
         }
     }
@@ -596,9 +605,9 @@ void PlayerModel::play(const QModelIndex &index)
     }
 }
 
-bool PlayerModel::removeRow(int row)
+bool PlayerModel::removeRow(int row, const QModelIndex &parent)
 {
-    return QAbstractItemModel::removeRow(row);
+    return QAbstractItemModel::removeRow(row, parent);
 }
 
 bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
@@ -615,11 +624,6 @@ bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
     // save playlist
     d->save();
     return true;
-}
-
-QModelIndex PlayerModel::row(int row)
-{
-    return index(row, 0, QModelIndex());
 }
 
 int PlayerModel::rowCount(const QModelIndex &parent) const
