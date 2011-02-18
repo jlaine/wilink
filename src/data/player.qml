@@ -71,6 +71,8 @@ Rectangle {
                 anchors.bottomMargin: 2
                 anchors.leftMargin: 3
                 anchors.rightMargin: 3
+                border.color: 'lightgray'
+                border.width: 1
                 radius: 5
                 state: item.isSelected ? 'selected' : ''
 
@@ -103,11 +105,11 @@ Rectangle {
 
                 states: State {
                     name: "selected"
-                    PropertyChanges { target: rect; color: 'lightsteelblue'}
+                    PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray'}
                 }
 
                 transitions: Transition {
-                    PropertyAnimation { target: rect; properties: 'color'; duration: 300 }
+                    PropertyAnimation { target: rect; properties: 'color,border.color'; duration: 300 }
                 }
             }
         }
