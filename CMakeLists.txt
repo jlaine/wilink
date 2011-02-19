@@ -11,6 +11,7 @@ set(WILINK_VERSION ${WILINK_VERSION_MAJOR}.${WILINK_VERSION_MINOR}.${WILINK_VERS
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_BINARY_DIR}/src/config.h)
 
 # Required
+set(QT_MIN_VERSION 4.6.0)
 find_package(Qt4 REQUIRED)
 
 # Extra runtime dependencies
