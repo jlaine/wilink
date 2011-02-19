@@ -704,7 +704,7 @@ PlayerPanel::PlayerPanel(Chat *chatWindow)
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
     setFocusProxy(view);
-    filterDrops(view);
+    filterDrops(view->viewport());
 #else
     m_view = new PlayerView;
     m_view->setModel(m_model);
