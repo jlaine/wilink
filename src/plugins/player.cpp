@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QHeaderView>
+#include <QImageReader>
 #include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -430,18 +431,9 @@ void PlayerModel::dataReceived()
 
     // process data
     if (dataType == "image") { 
-        const QByteArray data = reply->readAll();
-        QPixmap pixmap;
-        if (pixmap.loadFromData(data, 0)) {
-            QPixmapCache::insert(dataUrl.toString(), pixmap);
-
-            QList<Item*> items = d->find(d->rootItem, ImageUrlRole, dataUrl);
-            foreach (Item *item, items) {
-                emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
-            }
-        } else {
-            qWarning("Received invalid image for %s", qPrintable(dataUrl.toString()));
-        }
+        QList<Item*> items = d->find(d->rootItem, ImageUrlRole, dataUrl);
+        foreach (Item *item, items)
+            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
     } else {
         const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
         QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
@@ -530,7 +522,15 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
                 return QPixmap(path);
             }
             else if (QPixmapCache::find(item->imageUrl.toString(), &pixmap))
-                return QIcon(pixmap);
+                return pixmap;
+            else if (d->dataCache.contains(item->imageUrl)) {
+                const QUrl dataUrl = d->dataCache.value(item->imageUrl);
+                QImageReader reader(wApp->networkCache()->data(dataUrl));
+                reader.setScaledSize(QSize(32, 32));
+                pixmap = QPixmap::fromImage(reader.read());
+                QPixmapCache::insert(item->imageUrl.toString(), pixmap);
+                return pixmap;
+            }
         }
     } else if (index.column() == TitleColumn) {
         if (role == Qt::DisplayRole)
