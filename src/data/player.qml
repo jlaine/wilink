@@ -105,7 +105,7 @@ Rectangle {
 
                 states: State {
                     name: "selected"
-                    PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray'}
+                    PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
                 }
 
                 transitions: Transition {
@@ -132,11 +132,12 @@ Rectangle {
             if (event.key == Qt.Key_Backspace && event.modifiers == Qt.NoModifier) {
                 var oldIndex = visualModel.rootIndex;
                 visualModel.rootIndex = visualModel.parentModelIndex();
-                currentIndex = playerModel.row(oldIndex);
+                currentIndex = playerModel.row(oldIndex, visualModel.rootIndex);
             }
             else if (event.key == Qt.Key_Delete ||
                     (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
-                playerModel.removeRow(currentIndex, visualModel.rootIndex);
+                if (currentIndex >= 0)
+                    playerModel.removeRow(currentIndex, visualModel.rootIndex);
             }
             else if (event.key == Qt.Key_Enter ||
                      event.key == Qt.Key_Return) {
