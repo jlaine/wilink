@@ -57,14 +57,14 @@ private slots:
 private:
     void sendRequest();
 
-    QHostAddress serverAddress;
-    quint16 serverPort;
     QXmppStunMessage request;
     QHostAddress requestAddress;
     quint16 requestPort;
     int retries;
-    int step;
+    QHostAddress serverAddress;
+    quint16 serverPort;
     QUdpSocket *socket;
+    int step;
     QTimer *timer;
 };
 
