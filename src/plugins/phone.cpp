@@ -352,6 +352,7 @@ void PhonePanel::handleSettings()
 
     // check service is activated
     const bool enabled = settings.firstChildElement("enabled").text() == "true";
+    const QString username = settings.firstChildElement("username").text();
     const QString password = settings.firstChildElement("password").text();
     const QString number = settings.firstChildElement("number").text();
     const QString callsUrl = settings.firstChildElement("calls-url").text();
@@ -362,9 +363,7 @@ void PhonePanel::handleSettings()
         setWindowExtra(tr("Your number is %1").arg(number));
 
     // connect to server
-    const QString jid = client->configuration().jid();
-    const QString domain = jidToDomain(jid);
-    const QString username = jidToUser(jid);
+    const QString domain = client->configuration().domain();
     if (sip->displayName() != number ||
         sip->domain() != domain ||
         sip->username() != username ||
