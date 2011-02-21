@@ -287,7 +287,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 
     bool check;
     check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
-                    this, SLOT(scrollChanged()));
+                    this, SLOT(reposition()));
     Q_ASSERT(check);
 
     check = connect(m_delay, SIGNAL(timeout()),
@@ -297,9 +297,8 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 
 void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
-    if (!m_layout->count())
-        setPos(m_view->mapToScene(QPoint(0, 0)));
     m_layout->addItem(widget);
+    reposition();
     widget->appear();
 }
 
@@ -315,7 +314,7 @@ bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-void ChatPanelBar::scrollChanged()
+void ChatPanelBar::reposition()
 {
     if (m_layout->count())
         setPos(m_view->mapToScene(QPoint(0, 0)));

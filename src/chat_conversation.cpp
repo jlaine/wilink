@@ -61,6 +61,9 @@ ChatConversation::ChatConversation(QWidget *parent)
     panelBar = new ChatPanelBar(chatHistory);
     panelBar->setZValue(10);
     chatHistory->scene()->addItem(panelBar);
+    check = connect(chatHistory->scene(), SIGNAL(sceneRectChanged(QRectF)),
+                    panelBar, SLOT(reposition()));
+    Q_ASSERT(check);
 
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());

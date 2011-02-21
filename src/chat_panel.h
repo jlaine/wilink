@@ -97,8 +97,10 @@ public:
 protected:
     bool eventFilter(QObject *watched, QEvent *Event);
 
+public slots:
+    void reposition();
+
 private slots:
-    void scrollChanged();
     void trackView();
 
 private:
