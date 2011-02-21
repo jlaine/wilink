@@ -717,7 +717,6 @@ void Chat::showPreferences(const QString &focusTab)
 
     dialog->addTab(new ChatOptions);
     dialog->addTab(new SoundOptions);
-    dialog->addTab(new PluginOptions);
     foreach (ChatPlugin *plugin, d->plugins)
         plugin->preferences(dialog);
 
