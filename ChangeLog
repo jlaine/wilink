@@ -1,4 +1,4 @@
-wiLink 1.1.0 (UNRELEASED)
+wiLink 1.1.0 (2011-02-22)
  * Conversations:
   - Recognise /me command.
   - Add optional sound notifications for incoming/outgoing messages.
@@ -16,6 +16,7 @@ wiLink 1.1.0 (UNRELEASED)
    - Add support for SIP voice-over-IP calls.
  * Transfers:
    - Disable sending files to room members, it doesn't work.
+   - Make sure transfer widgets are always visible.
 
 wiLink 1.0.2 (2010-11-22)
  * Conversations:
