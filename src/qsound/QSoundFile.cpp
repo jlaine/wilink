@@ -206,8 +206,8 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
         pos += 5;
 
         // flags
-        const quint8 flags = (quint8)(m_inputBuffer.at(pos));
 #if 0
+        const quint8 flags = (quint8)(m_inputBuffer.at(pos));
         qDebug("flags %x", flags);
         if (flags & 0x80) {
             qDebug("unsynchronisation");

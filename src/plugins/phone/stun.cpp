@@ -41,8 +41,8 @@ enum StunStep {
 StunTester::StunTester(QObject *parent)
     : QXmppLoggable(parent),
     retries(0),
-    step(0),
-    serverPort(0)
+    serverPort(0),
+    step(0)
 {
     socket = new QUdpSocket(this);
     connect(socket, SIGNAL(readyRead()),
