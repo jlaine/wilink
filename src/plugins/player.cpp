@@ -801,16 +801,12 @@ void PlayerView::keyPressEvent(QKeyEvent *event)
 {
     const QModelIndex &index = currentIndex();
     if (index.isValid()) {
-        switch (event->key())
-        {
-        case Qt::Key_Delete:
-        case Qt::Key_Backspace:
+        if (event->key() == Qt::Key_Delete ||
+            (event->key() == Qt::Key_Backspace && event->modifiers() == Qt::ControlModifier)) {
             model()->removeRow(index.row(), index.parent());
-            break;
-        case Qt::Key_Enter:
-        case Qt::Key_Return:
+        } else if (event->key() == Qt::Key_Enter ||
+                   event->key() == Qt::Key_Return) {
             emit doubleClicked(index);
-            break;
         }
     }
 
