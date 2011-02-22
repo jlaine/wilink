@@ -20,7 +20,6 @@
 #ifndef __WILINK_PLAYER_H__
 #define __WILINK_PLAYER_H__
 
-#include <QAbstractItemModel>
 #include <QUrl>
 #include <QTreeView>
 

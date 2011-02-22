@@ -20,7 +20,6 @@
 #ifndef __WILINK_CHAT_ROSTER_H__
 #define __WILINK_CHAT_ROSTER_H__
 
-#include <QAbstractItemModel>
 #include <QTreeView>
 
 #include "chat_model.h"
