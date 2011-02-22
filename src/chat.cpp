@@ -61,7 +61,6 @@
 #include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
-#include "chat_roster_item.h"
 #include "chat_status.h"
 #include "chat_utils.h"
 #include "systeminfo.h"

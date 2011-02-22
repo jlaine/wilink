@@ -45,7 +45,6 @@
 
 #include "application.h"
 #include "chat_roster.h"
-#include "chat_roster_item.h"
 
 #ifdef WILINK_EMBEDDED
 #define FLAT_CONTACTS
@@ -60,6 +59,104 @@ enum RosterColumns {
     SortingColumn,
     MaxColumn,
 };
+
+class ChatRosterItem : public ChatModelItem
+{
+public:
+    ChatRosterItem(ChatRosterModel::Type type);
+
+    QVariant data(int role) const;
+    void setData(int role, const QVariant &value);
+
+    QString id() const;
+    void setId(const QString &id);
+
+    ChatRosterModel::Type type() const;
+
+    void append(ChatRosterItem *item);
+    ChatRosterItem* find(const QString &id);
+    void remove(ChatModelItem *item);
+
+private:
+    QString itemId;
+    QMap<int, QVariant> itemData;
+    ChatRosterModel::Type itemType;
+};
+
+ChatRosterItem::ChatRosterItem(enum ChatRosterModel::Type type)
+    : itemType(type)
+{
+}
+
+void ChatRosterItem::append(ChatRosterItem *item)
+{
+    if (item->parent)
+    {
+        qWarning("item already has a parent");
+        return;
+    }
+    item->parent = this;
+    children.append(item);
+}
+
+QVariant ChatRosterItem::data(int role) const
+{
+    return itemData.value(role);
+}
+
+ChatRosterItem *ChatRosterItem::find(const QString &id)
+{
+    /* look at immediate children */
+    foreach (ChatModelItem *it, children) {
+        ChatRosterItem *item = static_cast<ChatRosterItem*>(it);
+        if (item->itemId == id)
+            return item;
+    }
+
+    /* recurse */
+    foreach (ChatModelItem *item, children) {
+        ChatRosterItem *found = static_cast<ChatRosterItem*>(item)->find(id);
+        if (found)
+            return found;
+    }
+    return 0;
+}
+
+QString ChatRosterItem::id() const
+{
+    return itemId;
+}
+
+void ChatRosterItem::setId(const QString &id)
+{
+    itemId = id;
+
+    QString name;
+    if (itemType == ChatRosterModel::RoomMember)
+        name = id.split('/').last();
+    else
+        name = id.split('@').first();
+    setData(Qt::DisplayRole, name);
+}
+
+void ChatRosterItem::remove(ChatModelItem *child)
+{
+    if (children.contains(child))
+    {
+        children.removeAll(child);
+        delete child;
+    }
+}
+
+void ChatRosterItem::setData(int role, const QVariant &value)
+{
+    itemData.insert(role, value);
+}
+
+enum ChatRosterModel::Type ChatRosterItem::type() const
+{
+    return itemType;
+}
 
 static void paintMessages(QPixmap &icon, int messages)
 {

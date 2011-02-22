@@ -38,7 +38,6 @@ set(wiLink_SOURCES
     chat_panel.cpp
     chat_preferences.cpp
     chat_roster.cpp
-    chat_roster_item.cpp
     chat_search.cpp
     chat_status.cpp
     chat_utils.cpp
