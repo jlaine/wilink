@@ -69,11 +69,10 @@ static bool isLocal(const QUrl &url)
     return url.scheme() == "file" || url.scheme() == "qrc";
 }
 
-class Item {
+class Item : public ChatModelItem
+{
 public:
     Item();
-    ~Item();
-    int row() const;
     bool updateMetaData(QSoundFile *file);
 
     QString album;
@@ -82,21 +81,11 @@ public:
     QUrl imageUrl;
     QString title;
     QUrl url;
-
-    Item *parent;
-    QList<Item*> children;
 };
 
 Item::Item()
-    : duration(0),
-    parent(0)
+    : duration(0)
 {
-}
-
-Item::~Item()
-{
-    foreach (Item *item, children)
-        delete item;
 }
 
 // Update the metadata for the current item.
@@ -123,19 +112,11 @@ bool Item::updateMetaData(QSoundFile *file)
     return true;
 }
 
-int Item::row() const
-{
-    if (!parent)
-        return -1;
-    return parent->children.indexOf((Item*)this);
-}
-
 class PlayerModelPrivate
 {
 public:
     PlayerModelPrivate(PlayerModel *qq);
-    QModelIndex createIndex(Item *item, int column = 0) const;
-    QList<Item*> find(Item *parent, PlayerRole role, const QUrl &url);
+    QList<Item*> find(ChatModelItem *parent, PlayerRole role, const QUrl &url);
     void processXml(Item *item, QIODevice *reply);
     void processQueue();
     void save();
@@ -151,7 +132,6 @@ public:
     int playId;
     bool playStop;
     PlayerModel *q;
-    Item *rootItem;
 };
 
 PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
@@ -163,18 +143,11 @@ PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
 {
 }
 
-QModelIndex PlayerModelPrivate::createIndex(Item *item, int column) const
-{
-    if (item && item != rootItem)
-        return q->createIndex(item->row(), column, item);
-    else
-        return QModelIndex();
-}
-
-QList<Item*> PlayerModelPrivate::find(Item *parent, PlayerRole role, const QUrl &url)
+QList<Item*> PlayerModelPrivate::find(ChatModelItem *parent, PlayerRole role, const QUrl &url)
 {
     QList<Item*> items;
-    foreach (Item *item, parent->children) {
+    foreach (ChatModelItem *it, parent->children) {
+        Item *item = static_cast<Item*>(it);
         if (url.isEmpty() ||
             (role == UrlRole && item->url == url) ||
             (role == ImageUrlRole && item->imageUrl == url))
@@ -190,7 +163,7 @@ void PlayerModelPrivate::processQueue()
     if (dataReply)
         return;
 
-    QList<Item*> items = find(rootItem, UrlRole, QUrl());
+    QList<Item*> items = find(q->rootItem, UrlRole, QUrl());
     foreach (Item *item, items) {
 #ifndef USE_DECLARATIVE
         // check image
@@ -217,7 +190,7 @@ void PlayerModelPrivate::processQueue()
             dataReply->setProperty("_request_url", item->url);
             dataReply->setProperty("_request_type", "data");
             q->connect(dataReply, SIGNAL(finished()), q, SLOT(dataReceived()));
-            emit q->dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
+            emit q->dataChanged(q->createIndex(item, 0), q->createIndex(item, MaxColumn));
             return;
         }
     }
@@ -240,7 +213,7 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
     QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
     if (!imageUrlElement.isNull())
         channel->imageUrl = QUrl(imageUrlElement.text());
-    emit q->dataChanged(createIndex(channel, 0), createIndex(channel, MaxColumn));
+    emit q->dataChanged(q->createIndex(channel, 0), q->createIndex(channel, MaxColumn));
 
     // parse items
     QDomElement itemElement = channelElement.firstChildElement("item");
@@ -264,7 +237,7 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
         if (durationBits.size() == 3)
             item->duration = ((((durationBits[0].toInt() * 60) + durationBits[1].toInt()) * 60) + durationBits[2].toInt()) * 1000;
 
-        q->beginInsertRows(createIndex(channel, 0), channel->children.size(), channel->children.size());
+        q->beginInsertRows(q->createIndex(channel, 0), channel->children.size(), channel->children.size());
         channel->children.append(item);
         q->endInsertRows();
         itemElement = itemElement.nextSiblingElement("item");
@@ -316,17 +289,17 @@ void PlayerModelPrivate::save()
 {
     QSettings settings;
     QStringList values;
-    foreach (Item *item, rootItem->children)
-        values << item->url.toString();
+    foreach (ChatModelItem *item, q->rootItem->children)
+        values << static_cast<Item*>(item)->url.toString();
     settings.setValue("PlayerUrls", values);
 }
 
 PlayerModel::PlayerModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : ChatModel(parent)
 {
     bool check;
     d = new PlayerModelPrivate(this);
-    d->rootItem = new Item;
+    rootItem = new Item;
 
     d->network = new QNetworkAccessManager(this);
     d->network->setCache(wApp->networkCache());
@@ -358,7 +331,6 @@ PlayerModel::PlayerModel(QObject *parent)
 
 PlayerModel::~PlayerModel()
 {
-    delete d->rootItem;
     delete d;
 }
 
@@ -368,7 +340,7 @@ bool PlayerModel::addUrl(const QUrl &url)
         return false;
 
     Item *item = new Item;
-    item->parent = d->rootItem;
+    item->parent = rootItem;
     item->title = QFileInfo(url.path()).baseName();
     item->imageUrl = QUrl("qrc:/file.png");
     item->url = url;
@@ -380,8 +352,8 @@ bool PlayerModel::addUrl(const QUrl &url)
         delete file;
     }
 
-    beginInsertRows(d->createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
-    d->rootItem->children.append(item);
+    beginInsertRows(createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
+    rootItem->children.append(item);
     endInsertRows();
 
     d->processQueue();
@@ -421,9 +393,9 @@ void PlayerModel::dataReceived()
     if (reply->error() != QNetworkReply::NoError) {
         qWarning("%s", qPrintable(reply->errorString()));
 
-        QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
+        QList<Item*> items = d->find(rootItem, UrlRole, dataUrl);
         foreach (Item *item, items)
-            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
 
         d->processQueue();
         return;
@@ -431,12 +403,12 @@ void PlayerModel::dataReceived()
 
     // process data
     if (dataType == "image") { 
-        QList<Item*> items = d->find(d->rootItem, ImageUrlRole, dataUrl);
+        QList<Item*> items = d->find(rootItem, ImageUrlRole, dataUrl);
         foreach (Item *item, items)
-            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
     } else {
         const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-        QList<Item*> items = d->find(d->rootItem, UrlRole, dataUrl);
+        QList<Item*> items = d->find(rootItem, UrlRole, dataUrl);
         foreach (Item *item, items) {
             if (mimeType == "application/xml") {
                 QIODevice *device = d->dataFile(item);
@@ -448,7 +420,7 @@ void PlayerModel::dataReceived()
                     item->updateMetaData(file);
                     delete file;
                 }
-                emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+                emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
             }
         }
     }
@@ -462,7 +434,7 @@ int PlayerModel::columnCount(const QModelIndex &parent) const
 
 QModelIndex PlayerModel::cursor() const
 {
-    return d->createIndex(d->cursorItem);
+    return createIndex(d->cursorItem);
 }
 
 void PlayerModel::setCursor(const QModelIndex &index)
@@ -473,9 +445,9 @@ void PlayerModel::setCursor(const QModelIndex &index)
         Item *oldItem = d->cursorItem;
         d->cursorItem = item;
         if (oldItem)
-            emit dataChanged(d->createIndex(oldItem, 0), d->createIndex(oldItem, MaxColumn));
+            emit dataChanged(createIndex(oldItem, 0), createIndex(oldItem, MaxColumn));
         if (item)
-            emit dataChanged(d->createIndex(item, 0), d->createIndex(item, MaxColumn));
+            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
         emit cursorChanged(index);
     }
 }
@@ -557,24 +529,6 @@ QVariant PlayerModel::headerData(int section, Qt::Orientation orientation, int r
     return QVariant();
 }
 
-QModelIndex PlayerModel::index(int row, int column, const QModelIndex &parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;
-    return d->createIndex(parentItem->children[row], column);
-}
-
-QModelIndex PlayerModel::parent(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
-
-    Item *item = static_cast<Item*>(index.internalPointer());
-    return d->createIndex(item->parent);
-}
-
 void PlayerModel::finished(int id)
 {
     if (id != d->playId)
@@ -622,28 +576,17 @@ bool PlayerModel::removeRow(int row, const QModelIndex &parent)
 
 bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;
-
-    const int minIndex = qMax(0, row);
-    const int maxIndex = qMin(row + count, parentItem->children.size()) - 1;
-    beginRemoveRows(parent, minIndex, maxIndex);
-    for (int i = maxIndex; i >= minIndex; --i)
-        parentItem->children.removeAt(i);
-    endRemoveRows();
-
-    // save playlist
-    d->save();
-    return true;
+    if (ChatModel::removeRows(row, count, parent)) {
+        // save playlist
+        d->save();
+        return true;
+    }
+    return false;
 }
 
 int PlayerModel::row(const QModelIndex &row) const
 {
     return row.row();
-}
-int PlayerModel::rowCount(const QModelIndex &parent) const
-{
-    Item *parentItem = parent.isValid() ? static_cast<Item*>(parent.internalPointer()) : d->rootItem;
-    return parentItem->children.size();
 }
 
 void PlayerModel::stop()

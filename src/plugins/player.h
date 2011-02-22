@@ -24,6 +24,7 @@
 #include <QUrl>
 #include <QTreeView>
 
+#include "chat_model.h"
 #include "chat_panel.h"
 
 class Chat;
@@ -32,7 +33,7 @@ class QSoundPlayer;
 
 class PlayerModelPrivate;
 
-class PlayerModel : public QAbstractItemModel
+class PlayerModel : public ChatModel
 {
     Q_OBJECT
 
@@ -48,11 +49,8 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex & index) const;
     Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    Q_INVOKABLE int rowCount(const QModelIndex &parent) const;
 
 public slots:
     void play(const QModelIndex &index);
