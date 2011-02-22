@@ -25,20 +25,12 @@
 #include <QString>
 #include <QVariant>
 
-#include "chat_model.h"
+#include "chat_roster.h"
 
 class ChatRosterItem : public ChatModelItem
 {
 public:
-    enum Type {
-        Root,
-        Contact,
-        Room,
-        RoomMember,
-        Other,
-    };
-
-    ChatRosterItem(enum Type type);
+    ChatRosterItem(ChatRosterModel::Type type);
 
     QVariant data(int role) const;
     void setData(int role, const QVariant &value);
@@ -46,7 +38,7 @@ public:
     QString id() const;
     void setId(const QString &id);
 
-    enum Type type() const;
+    ChatRosterModel::Type type() const;
 
     void append(ChatRosterItem *item);
     ChatRosterItem* find(const QString &id);
@@ -55,7 +47,7 @@ public:
 private:
     QString itemId;
     QMap<int, QVariant> itemData;
-    enum Type itemType;
+    ChatRosterModel::Type itemType;
 };
 
 #endif

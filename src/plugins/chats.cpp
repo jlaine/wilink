@@ -229,9 +229,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
 /** Returns the type of entry to add to the roster.
  */
-ChatRosterItem::Type ChatDialog::objectType() const
+ChatRosterModel::Type ChatDialog::objectType() const
 {
-    return ChatRosterItem::Contact;
+    return ChatRosterModel::Contact;
 }
 
 /** Sends a message to the remote party.
@@ -311,7 +311,7 @@ void ChatsWatcher::rosterClick(const QModelIndex &index)
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
     // create conversation if necessary
-    if (type == ChatRosterItem::Contact && !chat->panel(jid))
+    if (type == ChatRosterModel::Contact && !chat->panel(jid))
         chat->addPanel(new ChatDialog(chat->client(), chat->rosterModel(), jid));
 }
 

@@ -378,7 +378,7 @@ void ChatRoomWatcher::mucServerFound(const QString &mucServer)
 void ChatRoomWatcher::rosterClick(const QModelIndex &index)
 {
     const int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type != ChatRosterItem::Room)
+    if (type != ChatRosterModel::Room)
         return;
 
     const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
@@ -393,7 +393,7 @@ void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type != ChatRosterItem::Room || !event->mimeData()->hasUrls())
+    if (type != ChatRosterModel::Room || !event->mimeData()->hasUrls())
         return;
 
     const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
@@ -424,7 +424,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
-    if (type == ChatRosterItem::Room) {
+    if (type == ChatRosterModel::Room) {
         int flags = index.data(ChatRosterModel::FlagsRole).toInt();
 
         if (flags & ChatRosterModel::SubjectFlag)
@@ -447,7 +447,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
             action->setData(jid);
             connect(action, SIGNAL(triggered()), this, SLOT(roomMembers()));
         }
-    } else if (type == ChatRosterItem::RoomMember) {
+    } else if (type == ChatRosterModel::RoomMember) {
         QModelIndex room = index.parent();
         if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
         {
@@ -646,9 +646,9 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
 
 /** Return the type of entry to add to the roster.
  */
-ChatRosterItem::Type ChatRoom::objectType() const
+ChatRosterModel::Type ChatRoom::objectType() const
 {
-    return ChatRosterItem::Room;
+    return ChatRosterModel::Room;
 }
 
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
@@ -728,7 +728,7 @@ void ChatRoom::rosterClick(const QModelIndex &index)
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
     // talk "at" somebody
-    if (type == ChatRosterItem::RoomMember && jidToBareJid(jid) == roomJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
+    if (type == ChatRosterModel::RoomMember && jidToBareJid(jid) == roomJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
     {
         const QString newAt = "@" + jidToResource(jid);
         QTextCursor cursor = chatInput->textCursor();

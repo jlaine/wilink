@@ -23,9 +23,7 @@
 #include <QAbstractItemModel>
 #include <QTreeView>
 
-#include "QXmppVCardIq.h"
-
-#include "chat_roster_item.h"
+#include "chat_model.h"
 
 class QContextMenuEvent;
 class QMenu;
@@ -33,6 +31,7 @@ class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;
+class QXmppVCardIq;
 class QXmppVCardManager;
 
 class ChatRosterModelPrivate;
@@ -72,6 +71,14 @@ public:
         SubjectFlag = 8,
     };
 
+    enum Type {
+        Root,
+        Contact,
+        Room,
+        RoomMember,
+        Other,
+    };
+
     ChatRosterModel(QXmppClient *client, QObject *parent = 0);
     ~ChatRosterModel();
 
@@ -90,7 +97,7 @@ public:
     bool isOwnNameReceived() const;
     QString ownName() const;
 
-    QModelIndex addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
+    QModelIndex addItem(ChatRosterModel::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
     QModelIndex contactsItem() const;
     QModelIndex findItem(const QString &bareJid) const;
 

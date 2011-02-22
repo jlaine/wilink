@@ -21,7 +21,7 @@
 
 #include "chat_roster_item.h"
 
-ChatRosterItem::ChatRosterItem(enum ChatRosterItem::Type type)
+ChatRosterItem::ChatRosterItem(enum ChatRosterModel::Type type)
     : itemType(type)
 {
 }
@@ -70,7 +70,7 @@ void ChatRosterItem::setId(const QString &id)
     itemId = id;
 
     QString name;
-    if (itemType == RoomMember)
+    if (itemType == ChatRosterModel::RoomMember)
         name = id.split('/').last();
     else
         name = id.split('@').first();
@@ -91,7 +91,7 @@ void ChatRosterItem::setData(int role, const QVariant &value)
     itemData.insert(role, value);
 }
 
-enum ChatRosterItem::Type ChatRosterItem::type() const
+enum ChatRosterModel::Type ChatRosterItem::type() const
 {
     return itemType;
 }

@@ -286,7 +286,7 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     const int type = index.data(ChatRosterModel::TypeRole).toInt();
     
     QAction *action;
-    if (type == ChatRosterItem::Contact || type == ChatRosterItem::RoomMember)
+    if (type == ChatRosterModel::Contact || type == ChatRosterModel::RoomMember)
     {
         const QString url = index.data(ChatRosterModel::UrlRole).toString();
         if (!url.isEmpty())
@@ -297,7 +297,7 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         }
     }
 
-    if (type == ChatRosterItem::Contact)
+    if (type == ChatRosterModel::Contact)
     {
         const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
 

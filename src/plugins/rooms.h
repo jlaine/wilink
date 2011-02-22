@@ -93,7 +93,7 @@ class ChatRoom : public ChatConversation
 
 public:
     ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
-    ChatRosterItem::Type objectType() const;
+    ChatRosterModel::Type objectType() const;
     void invite(const QString &jid);
 
 private slots:

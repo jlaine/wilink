@@ -23,6 +23,7 @@
 #endif
 #include <QAbstractNetworkCache>
 #include <QDir>
+#include <QDomDocument>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QImageReader>
@@ -33,6 +34,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
+#include <QTime>
 
 #include "QSoundFile.h"
 #include "QSoundPlayer.h"

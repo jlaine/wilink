@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
+#include <QDomDocument>
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QLabel>

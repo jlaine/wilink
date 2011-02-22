@@ -129,9 +129,9 @@ void ChatPanel::addWidget(ChatPanelWidget *widget)
 
 /** Return the type of entry to add to the roster.
  */
-ChatRosterItem::Type ChatPanel::objectType() const
+ChatRosterModel::Type ChatPanel::objectType() const
 {
-    return ChatRosterItem::Other;
+    return ChatRosterModel::Other;
 }
 
 /** When additional text is set, update the header text.

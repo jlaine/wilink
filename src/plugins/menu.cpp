@@ -57,7 +57,7 @@ Menu::Menu(Chat *window)
     servicesMenu = chatWindow->menuBar()->addMenu(tr("&Services"));
 
     /* add roster entry */
-    QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterItem::Other,
+    QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterModel::Other,
         HOME_ROSTER_ID,
         tr("My residence"),
         QIcon(":/home.png"));
@@ -162,7 +162,7 @@ void Menu::showMenu()
                     model->reparentItem(index, homeIndex);
                 else if (roomWatcher)
                 {
-                    index = model->addItem(ChatRosterItem::Room,
+                    index = model->addItem(ChatRosterModel::Room,
                         linkUrl.path(), tr("Chat room"), QIcon(":/chat.png"),
                         homeIndex);
                     roomWatcher->joinRoom(linkUrl.path(), false);

@@ -183,13 +183,13 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 
     d->client = xmppClient;
     d->nickNameReceived = false;
-    d->ownItem = new ChatRosterItem(ChatRosterItem::Contact);
-    d->rootItem = new ChatRosterItem(ChatRosterItem::Root);
+    d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
+    d->rootItem = new ChatRosterItem(ChatRosterModel::Root);
     rootItem = d->rootItem;
 #ifdef FLAT_CONTACTS
     d->contactsItem = d->rootItem;
 #else
-    d->contactsItem = new ChatRosterItem(ChatRosterItem::Other);
+    d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
     d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
     d->contactsItem->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
@@ -269,7 +269,7 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     QStringList jids;
 
     ChatRosterItem *item = d->rootItem->find(bareJid);
-    if (item && (item->type() == ChatRosterItem::Room))
+    if (item && (item->type() == ChatRosterModel::Room))
         return jids;
 
     if (jidToResource(bareJid).isEmpty())
@@ -355,7 +355,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
-    } else if (role == StatusRole && item->type() == ChatRosterItem::Contact) {
+    } else if (role == StatusRole && item->type() == ChatRosterModel::Contact) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
         // condition upon disconnection, because the roster has not yet been cleared
@@ -390,7 +390,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             return QBrush(grad);
         }
     } else {
-        if (item->type() == ChatRosterItem::Contact)
+        if (item->type() == ChatRosterModel::Contact)
         {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(index)));
@@ -402,7 +402,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
-        } else if (item->type() == ChatRosterItem::Room) {
+        } else if (item->type() == ChatRosterModel::Room) {
             if (role == Qt::DisplayRole && index.column() == ContactColumn && item->children.size() > 0) {
                 return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->children.size()));
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
@@ -413,7 +413,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatroom") + sortSeparator + bareJid.toLower();
             }
-        } else if (item->type() == ChatRosterItem::RoomMember) {
+        } else if (item->type() == ChatRosterModel::RoomMember) {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
@@ -465,7 +465,7 @@ void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
     {
         if (id.name() == "iChatAgent")
             features |= ChatStatesFeature;
-        if (item && item->type() == ChatRosterItem::Room &&
+        if (item && item->type() == ChatRosterModel::Room &&
             id.category() == "conference")
         {
             item->setData(Qt::DisplayRole, id.name());
@@ -502,7 +502,7 @@ Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
         return defaultFlags;
 
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
-    if (item->type() == ChatRosterItem::Contact)
+    if (item->type() == ChatRosterModel::Contact)
         return Qt::ItemIsDragEnabled | defaultFlags;
     else
         return defaultFlags;
@@ -561,7 +561,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
 
     // handle chat rooms
     ChatRosterItem *roomItem = d->rootItem->find(bareJid);
-    if (!roomItem || roomItem->type() != ChatRosterItem::Room)
+    if (!roomItem || roomItem->type() != ChatRosterModel::Room)
         return;
 
     ChatRosterItem *memberItem = roomItem->find(jid);
@@ -570,7 +570,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
         if (!memberItem)
         {
             // create roster entry
-            memberItem = new ChatRosterItem(ChatRosterItem::RoomMember);
+            memberItem = new ChatRosterItem(ChatRosterModel::RoomMember);
             memberItem->setId(jid);
             memberItem->setData(StatusRole, presence.status().type());
 
@@ -647,7 +647,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
                          createIndex(item, SortingColumn));
     } else {
         // add a new entry
-        item = new ChatRosterItem(ChatRosterItem::Contact);
+        item = new ChatRosterItem(ChatRosterModel::Contact);
         item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
@@ -668,7 +668,7 @@ void ChatRosterModel::rosterReceived()
     QStringList oldJids;
     foreach (ChatModelItem *item, d->contactsItem->children) {
         ChatRosterItem *child = static_cast<ChatRosterItem*>(item);
-        if (child->type() == ChatRosterItem::Contact)
+        if (child->type() == ChatRosterModel::Contact)
             oldJids << child->id();
     }
 
@@ -723,7 +723,7 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
 
         // store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name
-        if (item->type() == ChatRosterItem::Contact)
+        if (item->type() == ChatRosterModel::Contact)
         {
             QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(bareJid);
             if (!vcard.nickName().isEmpty())
@@ -775,21 +775,21 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &reqParent)
+QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &reqParent)
 {
     ChatRosterItem *parentItem;
     if (reqParent.isValid())
         parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
 #ifndef FLAT_CONTACTS
-    else if (type == ChatRosterItem::Contact)
+    else if (type == ChatRosterModel::Contact)
         parentItem = d->contactsItem;
 #endif
 #ifndef FLAT_ROOMS
-    else if (type == ChatRosterItem::Room)
+    else if (type == ChatRosterModel::Room)
     {
         if (!d->roomsItem)
         {
-            d->roomsItem = new ChatRosterItem(ChatRosterItem::Other);
+            d->roomsItem = new ChatRosterItem(ChatRosterModel::Other);
             d->roomsItem->setId(ROOMS_ROSTER_ID);
             d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
             d->roomsItem->setData(Qt::DecorationRole, QPixmap(":/chat.png"));
