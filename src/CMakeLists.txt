@@ -34,6 +34,7 @@ set(wiLink_SOURCES
     chat_edit.cpp
     chat_form.cpp
     chat_history.cpp
+    chat_model.cpp
     chat_panel.cpp
     chat_preferences.cpp
     chat_roster.cpp
@@ -79,6 +80,7 @@ set(wiLink_MOC_HEADERS
     chat_edit.h
     chat_form.h
     chat_history.h
+    chat_model.h
     chat_panel.h
     chat_plugin.h
     chat_preferences.h
