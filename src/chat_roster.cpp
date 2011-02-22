@@ -73,7 +73,6 @@ public:
 
     ChatRosterModel::Type type() const;
 
-    void append(ChatRosterItem *item);
     ChatRosterItem* find(const QString &id);
     void remove(ChatModelItem *item);
 
@@ -86,17 +85,6 @@ private:
 ChatRosterItem::ChatRosterItem(enum ChatRosterModel::Type type)
     : itemType(type)
 {
-}
-
-void ChatRosterItem::append(ChatRosterItem *item)
-{
-    if (item->parent)
-    {
-        qWarning("item already has a parent");
-        return;
-    }
-    item->parent = this;
-    children.append(item);
 }
 
 QVariant ChatRosterItem::data(int role) const
@@ -290,7 +278,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
     d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
     d->contactsItem->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
-    d->rootItem->append(d->contactsItem);
+    ChatModel::addItem(d->contactsItem, rootItem);
 #endif
     d->roomsItem = 0;
 
@@ -670,11 +658,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             memberItem = new ChatRosterItem(ChatRosterModel::RoomMember);
             memberItem->setId(jid);
             memberItem->setData(StatusRole, presence.status().type());
-
-            const int size = roomItem->children.size();
-            beginInsertRows(createIndex(roomItem, 0), size, size);
-            roomItem->append(memberItem);
-            endInsertRows();
+            ChatModel::addItem(memberItem, roomItem);
 
             // fetch vCard
             d->fetchVCard(memberItem->id());
@@ -723,11 +707,11 @@ void ChatRosterModel::rosterChanged(const QString &jid)
     QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
 
     // remove an existing entry
-    QModelIndex contactsIndex = createIndex(d->contactsItem, 0);
     if (entry.subscriptionType() == QXmppRosterIq::Item::Remove)
     {
         if (item)
         {
+            QModelIndex contactsIndex = createIndex(d->contactsItem, 0);
             beginRemoveRows(contactsIndex, item->row(), item->row());
             d->contactsItem->remove(item);
             endRemoveRows();
@@ -748,11 +732,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
-
-        const int size = d->contactsItem->children.size();
-        beginInsertRows(contactsIndex, size, size);
-        d->contactsItem->append(item);
-        endInsertRows();
+        ChatModel::addItem(item, d->contactsItem);
     }
 
     // fetch vCard
@@ -890,11 +870,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
             d->roomsItem->setId(ROOMS_ROSTER_ID);
             d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
             d->roomsItem->setData(Qt::DecorationRole, QPixmap(":/chat.png"));
-
-            const int size = d->rootItem->children.size();
-            beginInsertRows(QModelIndex(), size, size);
-            d->rootItem->append(d->roomsItem);
-            endInsertRows();
+            ChatModel::addItem(d->roomsItem, rootItem);
         }
         parentItem = d->roomsItem;
     }
@@ -907,19 +883,15 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     if (item)
         return createIndex(item, 0);
 
-    // prepare item
+    // add item
     item = new ChatRosterItem(type);
     item->setId(id);
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
     if (!icon.isNull())
         item->setData(Qt::DecorationRole, icon);
+    ChatModel::addItem(item, parentItem);
 
-    // add item
-    const int size = parentItem->children.size();
-    beginInsertRows(createIndex(parentItem, 0), size, size);
-    parentItem->append(item);
-    endInsertRows();
     return createIndex(item, 0);
 }
 

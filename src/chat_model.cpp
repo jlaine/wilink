@@ -47,6 +47,16 @@ ChatModel::~ChatModel()
     delete rootItem;
 }
 
+void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem)
+{
+    Q_ASSERT(!item->parent);
+    const int size = parentItem->children.size();
+    beginInsertRows(createIndex(parentItem, 0), size, size);
+    item->parent = parentItem;
+    parentItem->children.append(item);
+    endInsertRows();
+}
+
 QModelIndex ChatModel::createIndex(ChatModelItem *item, int column) const
 {
     if (item && item != rootItem)

@@ -29,8 +29,11 @@ public:
     ~ChatModelItem();
     int row() const;
 
-    ChatModelItem *parent;
     QList<ChatModelItem*> children;
+
+private:
+    friend class ChatModel;
+    ChatModelItem *parent;
 };
 
 /** Base class for tree-like models to avoid some of the tedium of
@@ -53,6 +56,7 @@ public:
     QModelIndex reparentItem(const QModelIndex &index, const QModelIndex &newParent);
 
 protected:
+    void addItem(ChatModelItem *item, ChatModelItem *parentItem);
     QModelIndex createIndex(ChatModelItem *item, int column = 0) const;
 
     ChatModelItem *rootItem;

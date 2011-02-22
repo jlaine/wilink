@@ -234,14 +234,11 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
         item->artist = channel->artist;
         item->imageUrl = channel->imageUrl;
         item->title = title;
-        item->parent = channel;
         const QStringList durationBits = itemElement.firstChildElement("itunes:duration").text().split(":");
         if (durationBits.size() == 3)
             item->duration = ((((durationBits[0].toInt() * 60) + durationBits[1].toInt()) * 60) + durationBits[2].toInt()) * 1000;
 
-        q->beginInsertRows(q->createIndex(channel, 0), channel->children.size(), channel->children.size());
-        channel->children.append(item);
-        q->endInsertRows();
+        q->addItem(item, channel);
         itemElement = itemElement.nextSiblingElement("item");
     }
 }
@@ -342,7 +339,6 @@ bool PlayerModel::addUrl(const QUrl &url)
         return false;
 
     Item *item = new Item;
-    item->parent = rootItem;
     item->title = QFileInfo(url.path()).baseName();
     item->imageUrl = QUrl("qrc:/file.png");
     item->url = url;
@@ -354,9 +350,7 @@ bool PlayerModel::addUrl(const QUrl &url)
         delete file;
     }
 
-    beginInsertRows(createIndex(item->parent), item->parent->children.size(), item->parent->children.size());
-    rootItem->children.append(item);
-    endInsertRows();
+    addItem(item, rootItem);
 
     d->processQueue();
 
