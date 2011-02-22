@@ -49,7 +49,6 @@ public:
     enum Type type() const;
 
     void append(ChatRosterItem *item);
-    void clear();
     ChatRosterItem* find(const QString &id);
     void remove(ChatModelItem *item);
 

@@ -37,13 +37,6 @@ void ChatRosterItem::append(ChatRosterItem *item)
     children.append(item);
 }
 
-void ChatRosterItem::clear()
-{
-    foreach (ChatModelItem *item, children)
-        delete item;
-    children.clear();
-}
-
 QVariant ChatRosterItem::data(int role) const
 {
     return itemData.value(role);
