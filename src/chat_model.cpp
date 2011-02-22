@@ -99,6 +99,15 @@ bool ChatModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
+void ChatModel::removeItem(ChatModelItem *item)
+{
+    Q_ASSERT(item && item->parent);
+    beginRemoveRows(createIndex(item->parent, 0), item->row(), item->row());
+    item->parent->children.removeAll(item);
+    delete item;
+    endRemoveRows();
+}
+
 /** Move an item to the given parent.
  *
  * @param index

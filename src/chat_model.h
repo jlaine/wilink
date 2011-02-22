@@ -58,6 +58,7 @@ public:
 protected:
     void addItem(ChatModelItem *item, ChatModelItem *parentItem);
     QModelIndex createIndex(ChatModelItem *item, int column = 0) const;
+    void removeItem(ChatModelItem *item);
 
     ChatModelItem *rootItem;
 };
