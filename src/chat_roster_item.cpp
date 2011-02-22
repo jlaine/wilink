@@ -93,20 +93,9 @@ void ChatRosterItem::remove(ChatModelItem *child)
     }
 }
 
-void ChatRosterItem::removeAt(int row)
-{
-    if (row >= 0 && row < children.size())
-        children.removeAt(row);
-}
-
 void ChatRosterItem::setData(int role, const QVariant &value)
 {
     itemData.insert(role, value);
-}
-
-int ChatRosterItem::size() const
-{
-    return children.size();
 }
 
 enum ChatRosterItem::Type ChatRosterItem::type() const

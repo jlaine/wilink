@@ -403,8 +403,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterItem::Room) {
-            if (role == Qt::DisplayRole && index.column() == ContactColumn && item->size() > 0) {
-                return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->size()));
+            if (role == Qt::DisplayRole && index.column() == ContactColumn && item->children.size() > 0) {
+                return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->children.size()));
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 QPixmap icon(":/chat.png");
                 if (messages)
@@ -437,7 +437,7 @@ void ChatRosterModel::disconnected()
 {
     d->clientFeatures.clear();
 
-    if (d->rootItem->size() > 0)
+    if (d->rootItem->children.size() > 0)
     {
         ChatModelItem *first = d->rootItem->children.first();
         ChatModelItem *last = d->rootItem->children.last();
@@ -573,7 +573,9 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             memberItem = new ChatRosterItem(ChatRosterItem::RoomMember);
             memberItem->setId(jid);
             memberItem->setData(StatusRole, presence.status().type());
-            beginInsertRows(createIndex(roomItem, 0), roomItem->size(), roomItem->size());
+
+            const int size = roomItem->children.size();
+            beginInsertRows(createIndex(roomItem, 0), size, size);
             roomItem->append(memberItem);
             endInsertRows();
 
@@ -649,7 +651,9 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
-        beginInsertRows(contactsIndex, d->contactsItem->size(), d->contactsItem->size());
+
+        const int size = d->contactsItem->children.size();
+        beginInsertRows(contactsIndex, size, size);
         d->contactsItem->append(item);
         endInsertRows();
     }
@@ -789,7 +793,9 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
             d->roomsItem->setId(ROOMS_ROSTER_ID);
             d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
             d->roomsItem->setData(Qt::DecorationRole, QPixmap(":/chat.png"));
-            beginInsertRows(QModelIndex(), d->rootItem->size(), d->rootItem->size());
+
+            const int size = d->rootItem->children.size();
+            beginInsertRows(QModelIndex(), size, size);
             d->rootItem->append(d->roomsItem);
             endInsertRows();
         }
@@ -813,7 +819,8 @@ QModelIndex ChatRosterModel::addItem(ChatRosterItem::Type type, const QString &i
         item->setData(Qt::DecorationRole, icon);
 
     // add item
-    beginInsertRows(createIndex(parentItem, 0), parentItem->size(), parentItem->size());
+    const int size = parentItem->children.size();
+    beginInsertRows(createIndex(parentItem, 0), size, size);
     parentItem->append(item);
     endInsertRows();
     return createIndex(item, 0);

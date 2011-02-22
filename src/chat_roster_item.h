@@ -52,8 +52,6 @@ public:
     void clear();
     ChatRosterItem* find(const QString &id);
     void remove(ChatModelItem *item);
-    void removeAt(int row);
-    int size() const;
 
 private:
     QString itemId;
