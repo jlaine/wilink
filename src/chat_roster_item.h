@@ -25,7 +25,9 @@
 #include <QString>
 #include <QVariant>
 
-class ChatRosterItem
+#include "chat_model.h"
+
+class ChatRosterItem : public ChatModelItem
 {
 public:
     enum Type {
@@ -37,7 +39,6 @@ public:
     };
 
     ChatRosterItem(enum Type type);
-    ~ChatRosterItem();
 
     QVariant data(int role) const;
     void setData(int role, const QVariant &value);
@@ -45,26 +46,19 @@ public:
     QString id() const;
     void setId(const QString &id);
 
-    ChatRosterItem* parent();
-    void setParent(ChatRosterItem *parent);
-
     enum Type type() const;
 
     void append(ChatRosterItem *item);
-    ChatRosterItem *child(int row);
     void clear();
     ChatRosterItem* find(const QString &id);
-    void remove(ChatRosterItem *item);
+    void remove(ChatModelItem *item);
     void removeAt(int row);
-    int row() const;
     int size() const;
 
 private:
     QString itemId;
     QMap<int, QVariant> itemData;
     enum Type itemType;
-    QList <ChatRosterItem*> childItems;
-    ChatRosterItem *parentItem;
 };
 
 #endif

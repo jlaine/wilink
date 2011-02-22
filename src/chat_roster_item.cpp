@@ -22,40 +22,26 @@
 #include "chat_roster_item.h"
 
 ChatRosterItem::ChatRosterItem(enum ChatRosterItem::Type type)
-    : itemType(type), parentItem(0)
+    : itemType(type)
 {
-}
-
-ChatRosterItem::~ChatRosterItem()
-{
-    foreach (ChatRosterItem *item, childItems)
-        delete item;
 }
 
 void ChatRosterItem::append(ChatRosterItem *item)
 {
-    if (item->parentItem)
+    if (item->parent)
     {
         qWarning("item already has a parent");
         return;
     }
-    item->parentItem = this;
-    childItems.append(item);
-}
-
-ChatRosterItem *ChatRosterItem::child(int row)
-{
-    if (row >= 0 && row < childItems.size())
-        return childItems.at(row);
-    else
-        return 0;
+    item->parent = this;
+    children.append(item);
 }
 
 void ChatRosterItem::clear()
 {
-    foreach (ChatRosterItem *item, childItems)
+    foreach (ChatModelItem *item, children)
         delete item;
-    childItems.clear();
+    children.clear();
 }
 
 QVariant ChatRosterItem::data(int role) const
@@ -66,14 +52,15 @@ QVariant ChatRosterItem::data(int role) const
 ChatRosterItem *ChatRosterItem::find(const QString &id)
 {
     /* look at immediate children */
-    foreach (ChatRosterItem *item, childItems)
+    foreach (ChatModelItem *it, children) {
+        ChatRosterItem *item = static_cast<ChatRosterItem*>(it);
         if (item->itemId == id)
             return item;
+    }
 
     /* recurse */
-    foreach (ChatRosterItem *item, childItems)
-    {
-        ChatRosterItem *found = item->find(id);
+    foreach (ChatModelItem *item, children) {
+        ChatRosterItem *found = static_cast<ChatRosterItem*>(item)->find(id);
         if (found)
             return found;
     }
@@ -97,43 +84,19 @@ void ChatRosterItem::setId(const QString &id)
     setData(Qt::DisplayRole, name);
 }
 
-ChatRosterItem* ChatRosterItem::parent()
+void ChatRosterItem::remove(ChatModelItem *child)
 {
-    return parentItem;
-}
-
-void ChatRosterItem::setParent(ChatRosterItem *parent)
-{
-    if (parentItem == parent)
-        return;
-    if (parentItem)
-        parentItem->childItems.removeAll(this);
-    if (parent && !parent->childItems.contains(this))
-        parent->childItems.append(this);
-    parentItem = parent;
-}
-
-void ChatRosterItem::remove(ChatRosterItem *child)
-{
-    if (childItems.contains(child))
+    if (children.contains(child))
     {
-        childItems.removeAll(child);
+        children.removeAll(child);
         delete child;
     }
 }
 
 void ChatRosterItem::removeAt(int row)
 {
-    if (row >= 0 && row < childItems.size())
-        childItems.removeAt(row);
-}
-
-int ChatRosterItem::row() const
-{
-    if (parentItem)
-        return parentItem->childItems.indexOf(const_cast<ChatRosterItem*>(this));
-
-    return 0;
+    if (row >= 0 && row < children.size())
+        children.removeAt(row);
 }
 
 void ChatRosterItem::setData(int role, const QVariant &value)
@@ -143,7 +106,7 @@ void ChatRosterItem::setData(int role, const QVariant &value)
 
 int ChatRosterItem::size() const
 {
-    return childItems.size();
+    return children.size();
 }
 
 enum ChatRosterItem::Type ChatRosterItem::type() const

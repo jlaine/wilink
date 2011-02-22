@@ -41,7 +41,7 @@ class ChatRosterModelPrivate;
 #define ROOMS_ROSTER_ID     "2_rooms"
 #define CONTACTS_ROSTER_ID  "z_1_contacts"
 
-class ChatRosterModel : public QAbstractItemModel
+class ChatRosterModel : public ChatModel
 {
     Q_OBJECT
 
@@ -79,12 +79,8 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QMimeData *mimeData(const QModelIndexList &indexes) const;
     QStringList mimeTypes() const;
-    QModelIndex parent(const QModelIndex & index) const;
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
 
     QPixmap contactAvatar(const QString &bareJid) const;
@@ -97,7 +93,6 @@ public:
     QModelIndex addItem(ChatRosterItem::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
     QModelIndex contactsItem() const;
     QModelIndex findItem(const QString &bareJid) const;
-    QModelIndex reparentItem(const QModelIndex &index, const QModelIndex &parent);
 
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
