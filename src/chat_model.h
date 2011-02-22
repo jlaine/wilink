@@ -44,10 +44,13 @@ public:
     ChatModel(QObject *parent);
     ~ChatModel();
 
+    // QAbstractItemModel
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent) const;
+
+    QModelIndex reparentItem(const QModelIndex &index, const QModelIndex &newParent);
 
 protected:
     QModelIndex createIndex(ChatModelItem *item, int column = 0) const;
