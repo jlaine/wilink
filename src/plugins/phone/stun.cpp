@@ -127,7 +127,7 @@ void StunTester::sendRequest()
     logSent(QString("STUN packet to %1 port %2\n%3").arg(requestAddress.toString(),
             QString::number(requestPort), request.toString()));
 #endif
-    socket->writeDatagram(request.encode(QString(), 0), requestAddress, requestPort);
+    socket->writeDatagram(request.encode(QByteArray(), false), requestAddress, requestPort);
     timer->start();
 }
 

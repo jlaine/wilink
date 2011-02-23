@@ -1292,7 +1292,7 @@ void SipClient::sendStun()
     logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunServerAddress.toString(),
             QString::number(d->stunServerPort), request.toString()));
 #endif
-    d->socket->writeDatagram(request.encode(QString(), false), d->stunServerAddress, d->stunServerPort);
+    d->socket->writeDatagram(request.encode(QByteArray(), false), d->stunServerAddress, d->stunServerPort);
     d->stunTimer->start(STUN_RETRY_MS);
 }
 
