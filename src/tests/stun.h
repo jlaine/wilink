@@ -57,9 +57,10 @@ private:
     QHostAddress m_turnHost;
     quint16 m_turnPort;
 
-    // permissions
+    // channels
     typedef QPair<QHostAddress, quint16> Address;
-    QMap<Address, QByteArray> m_permissions;
+    quint16 m_channelNumber;
+    QMap<quint16, Address> m_channels;
 
     // state
     quint32 m_lifetime;

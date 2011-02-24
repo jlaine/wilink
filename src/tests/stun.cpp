@@ -21,6 +21,7 @@ TurnAllocation::TurnAllocation(QObject *parent)
     : QXmppLoggable(parent),
     m_relayedPort(0),
     m_turnPort(0),
+    m_channelNumber(0x4000),
     m_lifetime(600),
     m_state(UnconnectedState)
 {
@@ -78,6 +79,19 @@ void TurnAllocation::readyRead()
 
     QByteArray buffer(size, 0);
     socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
+
+    // demultiplex channel data
+    if (buffer.size() >= 4 && (buffer[0] & 0xc0) == 0x40) {
+        QDataStream stream(buffer);
+        quint16 channel, length;
+        stream >> channel;
+        stream >> length;
+        if (m_channels.contains(channel) && length == buffer.size() - 4) {
+            emit datagramReceived(buffer.mid(4), m_channels[channel].first,
+                m_channels[channel].second);
+        }
+        return;
+    }
 
     // parse STUN message
     QXmppStunMessage message;
@@ -143,23 +157,11 @@ void TurnAllocation::readyRead()
 
         setState(ConnectedState);
 
-    } else if (message.messageMethod() == QXmppStunMessage::CreatePermission) {
+    } else if (message.messageMethod() == QXmppStunMessage::ChannelBind) {
         if (message.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("CreatePermission failed: %1 %2").arg(
+            warning(QString("ChannelBind failed: %1 %2").arg(
                 QString::number(message.errorCode), message.errorPhrase));
             return;
-        }
-
-        // store permission
-        //m_permissions << qMakePair(message.xorPeerHost, message.xorPeerPort);
-
-    } else if (message.messageMethod() == QXmppStunMessage::Data &&
-               message.messageClass() == QXmppStunMessage::Indication) {
-
-        const Address addr = qMakePair(message.xorPeerHost, message.xorPeerPort);
-        if (m_permissions.contains(addr)) {
-            emit datagramReceived(message.data(),
-                message.xorPeerHost, message.xorPeerPort);
         }
 
     } else if (message.messageMethod() == QXmppStunMessage::Refresh) {
@@ -234,33 +236,34 @@ void TurnAllocation::setState(AllocationState state)
 void TurnAllocation::writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port)
 {
     const Address addr = qMakePair(host, port);
+    quint16 channel = m_channels.key(addr);
 
-    if (!m_permissions.contains(addr)) {
-        // create permission
+    if (!channel) {
+        channel = m_channelNumber++;
+
+        // create channel
         QXmppStunMessage request;
-        request.setType(QXmppStunMessage::CreatePermission);
+        request.setType(QXmppStunMessage::ChannelBind);
         request.setId(generateRandomBytes(12));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
         request.setUsername(m_username);
+        request.setChannelNumber(channel);
         request.xorPeerHost = host;
         request.xorPeerPort = port;
         writeStun(request);
 
-        m_permissions.insert(addr, request.id());
+        m_channels.insert(channel, addr);
     }
 
     // send data
-    QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Send | QXmppStunMessage::Indication);
-    request.setId(generateRandomBytes(12));
-    request.setNonce(m_nonce);
-    request.setRealm(m_realm);
-    request.setUsername(m_username);
-    request.xorPeerHost = host;
-    request.xorPeerPort = port;
-    request.setData(data);
-    writeStun(request);
+    QByteArray channelData;
+    channelData.reserve(4 + data.size());
+    QDataStream stream(&channelData, QIODevice::WriteOnly);
+    stream << channel;
+    stream << quint16(data.size());
+    stream.writeRawData(data.data(), data.size());
+    socket->writeDatagram(channelData, m_turnHost, m_turnPort);
 }
 
 qint64 TurnAllocation::writeStun(const QXmppStunMessage &message)
@@ -294,6 +297,7 @@ void TurnTester::connected()
 
 void TurnTester::datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port)
 {
+    qDebug() << "DATA" << data;
     emit finished();
 }
 
