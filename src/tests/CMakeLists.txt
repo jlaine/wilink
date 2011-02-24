@@ -32,7 +32,8 @@ add_executable(phone
     ${phone_MOC_SOURCES})
 target_link_libraries(phone qsound qxmpp ${QT_LIBRARIES})
 
-add_executable(stun stun.cpp)
+qt4_wrap_cpp(stun_MOC_SOURCES stun.h)
+add_executable(stun stun.cpp ${stun_MOC_SOURCES})
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})
 
 qt4_add_resources(tones_RCC_SOURCES tones.qrc)
