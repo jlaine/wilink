@@ -5,6 +5,7 @@
 #include "QXmppStun.h"
 
 class QUdpSocket;
+class QTimer;
 
 class TurnAllocation : public QXmppLoggable
 {
@@ -28,8 +29,11 @@ public:
     void setUsername(const QString &username);
     void setPassword(const QString &password);
 
+    void writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port);
+
 signals:
     void connected();
+    void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
     void disconnected();
 
 public slots:
@@ -38,11 +42,14 @@ public slots:
 
 private slots:
     void readyRead();
+    void refresh();
 
 private:
+    void setState(AllocationState state);
     qint64 writeStun(const QXmppStunMessage &message);
 
     QUdpSocket *socket;
+    QTimer *timer;
     QString m_password;
     QString m_username;
     QHostAddress m_relayedHost;
@@ -51,10 +58,11 @@ private:
     quint16 m_turnPort;
 
     // permissions
-    QHostAddress m_peerHost;
-    quint16 m_peerPort;
+    typedef QPair<QHostAddress, quint16> Address;
+    QMap<Address, QByteArray> m_permissions;
 
     // state
+    quint32 m_lifetime;
     QByteArray m_key;
     QString m_realm;
     QByteArray m_nonce;
@@ -62,4 +70,21 @@ private:
     AllocationState m_state;
 };
 
+class TurnTester : public QObject
+{
+    Q_OBJECT
+
+public:
+    TurnTester(TurnAllocation *allocation);
+
+signals:
+    void finished();
+
+private slots:
+    void connected();
+    void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
+
+private:
+    TurnAllocation *m_allocation;
+};
 
