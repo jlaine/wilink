@@ -17,11 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QHostAddress>
 #include <QObject>
 
 #include "QXmppLogger.h"
 
-class QHostAddress;
 class QXmppTurnAllocation;
 
 class TurnTester : public QObject
@@ -29,7 +29,7 @@ class TurnTester : public QObject
     Q_OBJECT
 
 public:
-    TurnTester(QXmppTurnAllocation *allocation);
+    TurnTester(QXmppTurnAllocation *allocation, const QHostAddress &host, quint16 port);
 
 signals:
     void finished();
@@ -40,5 +40,7 @@ private slots:
 
 private:
     QXmppTurnAllocation *m_allocation;
+    QHostAddress m_host;
+    quint16 m_port;
 };
 
