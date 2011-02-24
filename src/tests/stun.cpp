@@ -1,9 +1,26 @@
+/*
+ * wiLink
+ * Copyright (C) 2009-2011 Bolloré telecom
+ * See AUTHORS file for a full list of contributors.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <cstdlib>
 
 #include <QCoreApplication>
-#include <QCryptographicHash>
 #include <QHostInfo>
-#include <QUdpSocket>
 #include <QTimer>
 
 #include "QXmppLogger.h"
@@ -12,274 +29,7 @@
 
 #include "stun.h"
 
-static bool operator<(const QHostAddress &a1, const QHostAddress &a2)
-{
-    return a1.toString() < a2.toString();
-}
-
-TurnAllocation::TurnAllocation(QObject *parent)
-    : QXmppLoggable(parent),
-    m_relayedPort(0),
-    m_turnPort(0),
-    m_channelNumber(0x4000),
-    m_lifetime(600),
-    m_state(UnconnectedState)
-{
-    socket = new QUdpSocket(this);
-    socket->bind();
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(refresh()));
-}
-
-void TurnAllocation::connectToHost()
-{
-    if (m_state != UnconnectedState)
-        return;
-
-    // send allocate request
-    QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Allocate);
-    request.setId(generateRandomBytes(12));
-    request.setLifetime(m_lifetime);
-    request.setRequestedTransport(0x11);
-    writeStun(request);
-
-    // update state
-    setState(ConnectingState);
-}
-
-void TurnAllocation::disconnectFromHost()
-{
-    timer->stop();
-    if (m_state != ConnectedState)
-        return;
-
-    // send refresh request with zero lifetime
-    QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Refresh);
-    request.setId(generateRandomBytes(12));
-    request.setNonce(m_nonce);
-    request.setRealm(m_realm);
-    request.setUsername(m_username);
-    request.setLifetime(0);
-    writeStun(request);
-
-    // update state
-    setState(ClosingState);
-}
-
-void TurnAllocation::readyRead()
-{
-    const qint64 size = socket->pendingDatagramSize();
-    QHostAddress remoteHost;
-    quint16 remotePort;
-
-    QByteArray buffer(size, 0);
-    socket->readDatagram(buffer.data(), buffer.size(), &remoteHost, &remotePort);
-
-    // demultiplex channel data
-    if (buffer.size() >= 4 && (buffer[0] & 0xc0) == 0x40) {
-        QDataStream stream(buffer);
-        quint16 channel, length;
-        stream >> channel;
-        stream >> length;
-        if (m_channels.contains(channel) && length == buffer.size() - 4) {
-            emit datagramReceived(buffer.mid(4), m_channels[channel].first,
-                m_channels[channel].second);
-        }
-        return;
-    }
-
-    // parse STUN message
-    QXmppStunMessage message;
-    QStringList errors;
-    if (!message.decode(buffer, QByteArray(), &errors)) {
-        foreach (const QString &error, errors)
-            warning(error);
-        return;
-    }
-
-    logReceived(QString("STUN packet from %1 port %2\n%3").arg(
-            remoteHost.toString(),
-            QString::number(remotePort),
-            message.toString()));
-
-    // handle authentication
-    if (message.messageClass() == QXmppStunMessage::Error &&
-        message.errorCode == 401 &&
-        message.id() == m_request.id())
-    {
-        if (m_nonce != message.nonce() ||
-            m_realm != message.realm()) {
-            // update long-term credentials
-            m_nonce = message.nonce();
-            m_realm = message.realm();
-            QCryptographicHash hash(QCryptographicHash::Md5);
-            hash.addData((m_username + ":" + m_realm + ":" + m_password).toUtf8());
-            m_key = hash.result();
-
-            // retry request
-            QXmppStunMessage request(m_request);
-            request.setId(generateRandomBytes(12));
-            request.setNonce(m_nonce);
-            request.setRealm(m_realm);
-            request.setUsername(m_username);
-            writeStun(request);
-            return;
-        }
-    }
-
-    if (message.messageMethod() == QXmppStunMessage::Allocate) {
-        if (message.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("Allocation failed: %1 %2").arg(
-                QString::number(message.errorCode), message.errorPhrase));
-            setState(UnconnectedState);
-            return;
-        }
-        if (message.xorRelayedHost.isNull() ||
-            message.xorRelayedHost.protocol() != QAbstractSocket::IPv4Protocol ||
-            !message.xorRelayedPort) {
-            warning("Allocation did not yield a valid relayed address");
-            setState(UnconnectedState);
-            return;
-        }
-
-        // store relayed address
-        m_relayedHost = message.xorRelayedHost;
-        m_relayedPort = message.xorRelayedPort;
-
-        // schedule refresh
-        m_lifetime = message.lifetime();
-        timer->start((m_lifetime - 60) * 1000);
-
-        setState(ConnectedState);
-
-    } else if (message.messageMethod() == QXmppStunMessage::ChannelBind) {
-        if (message.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("ChannelBind failed: %1 %2").arg(
-                QString::number(message.errorCode), message.errorPhrase));
-            return;
-        }
-
-    } else if (message.messageMethod() == QXmppStunMessage::Refresh) {
-        if (message.messageClass() == QXmppStunMessage::Error) {
-            warning(QString("Refresh failed: %1 %2").arg(
-                QString::number(message.errorCode), message.errorPhrase));
-            setState(UnconnectedState);
-            return;
-        }
-
-        if (m_state == ClosingState) {
-            setState(UnconnectedState);
-            return;
-        }
-
-        // schedule refresh
-        m_lifetime = message.lifetime();
-        timer->start((m_lifetime - 60) * 1000);
-    }
-}
-
-void TurnAllocation::refresh()
-{
-    QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Refresh);
-    request.setId(generateRandomBytes(12));
-    request.setNonce(m_nonce);
-    request.setRealm(m_realm);
-    request.setUsername(m_username);
-    writeStun(request);
-}
-
-QHostAddress TurnAllocation::relayedHost() const
-{
-    return m_relayedHost;
-}
-
-quint16 TurnAllocation::relayedPort() const
-{
-    return m_relayedPort;
-}
-
-void TurnAllocation::setServer(const QHostAddress &host, quint16 port)
-{
-    m_turnHost = host;
-    m_turnPort = port;
-}
-
-void TurnAllocation::setPassword(const QString &password)
-{
-    m_password = password;
-}
-
-void TurnAllocation::setUsername(const QString &username)
-{
-    m_username = username;
-}
-
-void TurnAllocation::setState(AllocationState state)
-{
-    if (state == m_state)
-        return;
-    m_state = state;
-    if (m_state == ConnectedState) {
-        emit connected();
-    } else if (m_state == UnconnectedState) {
-        timer->stop();
-        emit disconnected();
-    }
-}
-
-void TurnAllocation::writeDatagram(const QByteArray &data, const QHostAddress &host, quint16 port)
-{
-    const Address addr = qMakePair(host, port);
-    quint16 channel = m_channels.key(addr);
-
-    if (!channel) {
-        channel = m_channelNumber++;
-
-        // create channel
-        QXmppStunMessage request;
-        request.setType(QXmppStunMessage::ChannelBind);
-        request.setId(generateRandomBytes(12));
-        request.setNonce(m_nonce);
-        request.setRealm(m_realm);
-        request.setUsername(m_username);
-        request.setChannelNumber(channel);
-        request.xorPeerHost = host;
-        request.xorPeerPort = port;
-        writeStun(request);
-
-        m_channels.insert(channel, addr);
-    }
-
-    // send data
-    QByteArray channelData;
-    channelData.reserve(4 + data.size());
-    QDataStream stream(&channelData, QIODevice::WriteOnly);
-    stream << channel;
-    stream << quint16(data.size());
-    stream.writeRawData(data.data(), data.size());
-    socket->writeDatagram(channelData, m_turnHost, m_turnPort);
-}
-
-qint64 TurnAllocation::writeStun(const QXmppStunMessage &message)
-{
-    qint64 ret = socket->writeDatagram(message.encode(m_key),
-        m_turnHost, m_turnPort);
-    if (message.messageClass() == QXmppStunMessage::Request)
-        m_request = message;
-    logSent(QString("STUN packet to %1 port %2\n%3").arg(
-            m_turnHost.toString(),
-            QString::number(m_turnPort),
-            message.toString()));
-    return ret;
-}
-
-TurnTester::TurnTester(TurnAllocation *allocation)
+TurnTester::TurnTester(QXmppTurnAllocation *allocation)
     : m_allocation(allocation)
 {
     connect(m_allocation, SIGNAL(connected()),
@@ -346,18 +96,18 @@ int main(int argc, char* argv[])
     connection.bind(QXmppIceComponent::discoverAddresses());
     connection.connectToHost();
 #else
-    TurnAllocation turn;
-    turn.setServer(host);
-    turn.setUsername(QLatin1String("test"));
-    turn.setPassword(QLatin1String("test"));
-    QObject::connect(&turn, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+    QXmppTurnAllocation allocation;
+    allocation.setServer(host);
+    allocation.setUsername(QLatin1String("test"));
+    allocation.setPassword(QLatin1String("test"));
+    QObject::connect(&allocation, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         &logger, SLOT(log(QXmppLogger::MessageType,QString)));
 
-    TurnTester turnTester(&turn);
+    TurnTester turnTester(&allocation);
     QObject::connect(&turnTester, SIGNAL(finished()),
                      &app, SLOT(quit()));
 
-    turn.connectToHost();
+    allocation.connectToHost();
 #endif
     return app.exec();
 }
