@@ -26,7 +26,6 @@
 
 #include "QXmppCallManager.h"
 #include "QXmppLogger.h"
-#include "stun.h"
 
 class QAudioDeviceInfo;
 class QHostInfo;
