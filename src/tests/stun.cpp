@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
         QObject::connect(&turnTester, SIGNAL(finished()),
                          &app, SLOT(quit()));
 
+        allocation.bind();
         allocation.connectToHost();
         return app.exec();
     } else {
