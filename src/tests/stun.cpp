@@ -12,8 +12,9 @@
 
 #include "stun.h"
 
-Turn::Turn(QObject *parent)
-    : QObject(parent),
+TurnAllocation::TurnAllocation(QObject *parent)
+    : QXmppLoggable(parent),
+    m_relayedPort(0),
     m_turnPort(0)
 {
     socket = new QUdpSocket(this);
@@ -24,7 +25,7 @@ Turn::Turn(QObject *parent)
     m_peerPort = 1234;
 }
 
-void Turn::connectToHost()
+void TurnAllocation::connectToHost()
 {
     QXmppStunMessage request;
     request.setType(QXmppStunMessage::Allocate);
@@ -34,7 +35,7 @@ void Turn::connectToHost()
     writeStun(request);
 }
 
-void Turn::readyRead()
+void TurnAllocation::readyRead()
 {
     const qint64 size = socket->pendingDatagramSize();
     QHostAddress remoteHost;
@@ -52,12 +53,13 @@ void Turn::readyRead()
         return;
     }
 
-    qDebug() << QString("STUN packet from %1 port %2\n%3").arg(remoteHost.toString(),
+    logReceived(QString("STUN packet from %1 port %2\n%3").arg(
+            remoteHost.toString(),
             QString::number(remotePort),
-            message.toString());
+            message.toString()));
 
     if (message.id() != m_request.id()) {
-        qWarning("Bad STUN packet ID");
+        warning("Bad STUN packet ID");
         return;
     }
 
@@ -66,7 +68,7 @@ void Turn::readyRead()
         message.errorCode == 401)
     {
         if (m_nonce != message.nonce() ||
-            m_realm == message.realm()) {
+            m_realm != message.realm()) {
             // update long-term credentials
             m_nonce = message.nonce();
             m_realm = message.realm();
@@ -85,12 +87,24 @@ void Turn::readyRead()
         }
     }
 
-    if (m_request.messageMethod() == QXmppStunMessage::Allocate) {
+    if (message.messageMethod() == QXmppStunMessage::Allocate) {
         if (message.messageClass() == QXmppStunMessage::Error) {
-            qWarning("Allocation failed, code %i", message.errorCode);
-            emit finished();
+            warning(QString("Allocation failed: %1 %2").arg(
+                QString::number(message.errorCode), message.errorPhrase));
+            emit disconnected();
             return;
         }
+        if (message.xorRelayedHost.isNull() ||
+            message.xorRelayedHost.protocol() != QAbstractSocket::IPv4Protocol ||
+            !message.xorRelayedPort) {
+            warning("Allocation did not yield a valid relayed address");
+            emit disconnected();
+            return;
+        }
+
+        // store relayed address
+        m_relayedHost = message.xorRelayedHost;
+        m_relayedPort = message.xorRelayedPort;
 
         // create permission
         QXmppStunMessage request;
@@ -103,9 +117,10 @@ void Turn::readyRead()
         request.xorPeerPort = m_peerPort;
         writeStun(request);
 
-    } else if (m_request.messageMethod() == QXmppStunMessage::CreatePermission) {
+    } else if (message.messageMethod() == QXmppStunMessage::CreatePermission) {
         if (message.messageClass() == QXmppStunMessage::Error) {
-            qWarning("CreatePermission failed, code %i", message.errorCode);
+            warning(QString("CreatePermission failed: %1 %2").arg(
+                QString::number(message.errorCode), message.errorPhrase));
             emit finished();
             return;
         }
@@ -124,31 +139,41 @@ void Turn::readyRead()
     }
 }
 
-void Turn::setTurnServer(const QHostAddress &host, quint16 port)
+QHostAddress TurnAllocation::relayedHost() const
+{
+    return m_relayedHost;
+}
+
+quint16 TurnAllocation::relayedPort() const
+{
+    return m_relayedPort;
+}
+
+void TurnAllocation::setServer(const QHostAddress &host, quint16 port)
 {
     m_turnHost = host;
     m_turnPort = port;
 }
 
-void Turn::setPassword(const QString &password)
+void TurnAllocation::setPassword(const QString &password)
 {
     m_password = password;
 }
 
-void Turn::setUsername(const QString &username)
+void TurnAllocation::setUsername(const QString &username)
 {
     m_username = username;
 }
 
-qint64 Turn::writeStun(const QXmppStunMessage &message)
+qint64 TurnAllocation::writeStun(const QXmppStunMessage &message)
 {
     qint64 ret = socket->writeDatagram(message.encode(m_key),
         m_turnHost, m_turnPort);
     m_request = message;
-    qDebug() << QString("STUN packet to %1 port %2\n%3").arg(
+    logSent(QString("STUN packet to %1 port %2\n%3").arg(
             m_turnHost.toString(),
             QString::number(m_turnPort),
-            message.toString());
+            message.toString()));
     return ret;
 }
 
@@ -198,13 +223,15 @@ int main(int argc, char* argv[])
     connection.bind(QXmppIceComponent::discoverAddresses());
     connection.connectToHost();
 #else
-    Turn turn;
-    turn.setTurnServer(host);
+    TurnAllocation turn;
+    turn.setServer(host);
     turn.setUsername(QLatin1String("test"));
     turn.setPassword(QLatin1String("test"));
-    turn.connectToHost();
-    QObject::connect(&turn, SIGNAL(finished()),
+    QObject::connect(&turn, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    QObject::connect(&turn, SIGNAL(disconnected()),
                      &app, SLOT(quit()));
+    turn.connectToHost();
 #endif
     return app.exec();
 }

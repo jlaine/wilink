@@ -1,21 +1,27 @@
 #include <QHostAddress>
 #include <QObject>
 
+#include "QXmppLogger.h"
 #include "QXmppStun.h"
 
 class QUdpSocket;
 
-class Turn : public QObject
+class TurnAllocation : public QXmppLoggable
 {
     Q_OBJECT
 
 public:
-    Turn(QObject *parent = 0);
-    void setTurnServer(const QHostAddress &host, quint16 port = 3478);
+    TurnAllocation(QObject *parent = 0);
+
+    QHostAddress relayedHost() const;
+    quint16 relayedPort() const;
+
+    void setServer(const QHostAddress &host, quint16 port = 3478);
     void setUsername(const QString &username);
     void setPassword(const QString &password);
 
 signals:
+    void disconnected();
     void finished();
 
 public slots:
@@ -30,6 +36,8 @@ private:
     QUdpSocket *socket;
     QString m_password;
     QString m_username;
+    QHostAddress m_relayedHost;
+    quint16 m_relayedPort;
     QHostAddress m_turnHost;
     quint16 m_turnPort;
 
