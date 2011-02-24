@@ -10,6 +10,14 @@ class TurnAllocation : public QXmppLoggable
 {
     Q_OBJECT
 
+    enum AllocationState
+    {
+        UnconnectedState,
+        ConnectingState,
+        ConnectedState,
+        ClosingState,
+    };
+
 public:
     TurnAllocation(QObject *parent = 0);
 
@@ -21,11 +29,12 @@ public:
     void setPassword(const QString &password);
 
 signals:
+    void connected();
     void disconnected();
-    void finished();
 
 public slots:
     void connectToHost();
+    void disconnectFromHost();
 
 private slots:
     void readyRead();
@@ -50,6 +59,7 @@ private:
     QString m_realm;
     QByteArray m_nonce;
     QXmppStunMessage m_request;
+    AllocationState m_state;
 };
 
 

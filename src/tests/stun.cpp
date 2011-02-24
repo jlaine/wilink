@@ -15,7 +15,8 @@
 TurnAllocation::TurnAllocation(QObject *parent)
     : QXmppLoggable(parent),
     m_relayedPort(0),
-    m_turnPort(0)
+    m_turnPort(0),
+    m_state(UnconnectedState)
 {
     socket = new QUdpSocket(this);
     socket->bind();
@@ -27,12 +28,32 @@ TurnAllocation::TurnAllocation(QObject *parent)
 
 void TurnAllocation::connectToHost()
 {
+    if (m_state != UnconnectedState)
+        return;
+
     QXmppStunMessage request;
     request.setType(QXmppStunMessage::Allocate);
     request.setId(generateRandomBytes(12));
     request.setLifetime(165);
     request.setRequestedTransport(0x11);
     writeStun(request);
+    m_state = ConnectingState;
+}
+
+void TurnAllocation::disconnectFromHost()
+{
+    if (m_state != ConnectedState)
+        return;
+
+    QXmppStunMessage request;
+    request.setType(QXmppStunMessage::Refresh);
+    request.setId(generateRandomBytes(12));
+    request.setNonce(m_nonce);
+    request.setRealm(m_realm);
+    request.setUsername(m_username);
+    request.setLifetime(0);
+    writeStun(request);
+    m_state = ClosingState;
 }
 
 void TurnAllocation::readyRead()
@@ -49,7 +70,7 @@ void TurnAllocation::readyRead()
     QStringList errors;
     if (!message.decode(buffer, QByteArray(), &errors)) {
         foreach (const QString &error, errors)
-            qWarning() << error;
+            warning(error);
         return;
     }
 
@@ -91,6 +112,7 @@ void TurnAllocation::readyRead()
         if (message.messageClass() == QXmppStunMessage::Error) {
             warning(QString("Allocation failed: %1 %2").arg(
                 QString::number(message.errorCode), message.errorPhrase));
+            m_state = UnconnectedState;
             emit disconnected();
             return;
         }
@@ -98,6 +120,7 @@ void TurnAllocation::readyRead()
             message.xorRelayedHost.protocol() != QAbstractSocket::IPv4Protocol ||
             !message.xorRelayedPort) {
             warning("Allocation did not yield a valid relayed address");
+            m_state = UnconnectedState;
             emit disconnected();
             return;
         }
@@ -105,6 +128,8 @@ void TurnAllocation::readyRead()
         // store relayed address
         m_relayedHost = message.xorRelayedHost;
         m_relayedPort = message.xorRelayedPort;
+        m_state = ConnectedState;
+        emit connected();
 
         // create permission
         QXmppStunMessage request;
@@ -121,9 +146,13 @@ void TurnAllocation::readyRead()
         if (message.messageClass() == QXmppStunMessage::Error) {
             warning(QString("CreatePermission failed: %1 %2").arg(
                 QString::number(message.errorCode), message.errorPhrase));
-            emit finished();
+            m_state = UnconnectedState;
+            emit disconnected();
             return;
         }
+
+        disconnectFromHost();
+        return;
 
         // send some data
         QXmppStunMessage request;
@@ -136,6 +165,10 @@ void TurnAllocation::readyRead()
         request.xorPeerPort = m_peerPort;
         request.setData(QByteArray("12345\n"));
         writeStun(request);
+
+    } else if (message.messageMethod() == QXmppStunMessage::Refresh) {
+        m_state = UnconnectedState;
+        emit disconnected();
     }
 }
 
