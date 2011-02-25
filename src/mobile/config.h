@@ -1,6 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define WILINK_VERSION "1.0.2"
+#define WILINK_VERSION "1.1.0"
 
 #endif
