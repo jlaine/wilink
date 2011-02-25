@@ -263,7 +263,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
     rootItem = new ChatRosterItem(ChatRosterModel::Root);
 #ifdef FLAT_CONTACTS
-    d->contactsItem = rootItem;
+    d->contactsItem = (ChatRosterItem*)rootItem;
 #else
     d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
