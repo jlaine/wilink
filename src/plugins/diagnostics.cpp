@@ -622,7 +622,7 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     /* add menu entry */
     QList<QAction*> actions = chat->fileMenu()->actions();
     QAction *firstAction = actions.isEmpty() ? 0 : actions.first();
-    QAction *action = new QAction(QIcon(":/diagnostics.png"), diagnostics->windowTitle(), chat->fileMenu());
+    QAction *action = new QAction(diagnostics->windowIcon(), diagnostics->windowTitle(), chat->fileMenu());
     chat->fileMenu()->insertAction(firstAction, action);
     check = connect(action, SIGNAL(triggered()),
                     diagnostics, SIGNAL(showPanel()));
