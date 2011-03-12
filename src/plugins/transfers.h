@@ -116,6 +116,7 @@ private slots:
 
 private:
     Chat *chatWindow;
+    QXmppTransferManager *transferManager;
 };
 
 #endif
