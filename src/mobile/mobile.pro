@@ -72,8 +72,10 @@ HEADERS += \
     ../plugins/phone.h \
     ../plugins/phone/models.h \
     ../plugins/phone/sip.h \
+    ../plugins/phone/sip_p.h \
     ../plugins/rooms.h \
-    ../plugins/transfers.h
+    ../plugins/transfers.h \
+    config.h
 
 mac {
     SOURCES += ../application_mac.mm

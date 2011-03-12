@@ -19,6 +19,7 @@
 
 #include <QLabel>
 #include <QLayout>
+#include <QMenu>
 #include <QPushButton>
 #include <QScrollBar>
 #include <QShortcut>
@@ -231,18 +232,29 @@ public:
 
 bool ConsolePlugin::initialize(Chat *chat)
 {
+    bool check;
+
     /* register panel */
     ConsolePanel *console = new ConsolePanel(chat->client()->logger());
     console->setObjectName(CONSOLE_ROSTER_ID);
     chat->addPanel(console);
 
 #ifdef WILINK_EMBEDDED
-    QTimer::singleShot(0, console, SIGNAL(registerPanel()));
-#else
+    /* add menu entry */
+    QList<QAction*> actions = chat->fileMenu()->actions();
+    QAction *firstAction = actions.isEmpty() ? 0 : actions.first();
+    QAction *action = new QAction(console->windowIcon(), console->windowTitle(), chat->fileMenu());
+    chat->fileMenu()->insertAction(firstAction, action);
+    check = connect(action, SIGNAL(triggered()),
+                    console, SIGNAL(showPanel()));
+    Q_ASSERT(check);
+#endif
+
     /* register shortcut */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
-    connect(shortcut, SIGNAL(activated()), console, SIGNAL(showPanel()));
-#endif
+    check = connect(shortcut, SIGNAL(activated()),
+                    console, SIGNAL(showPanel()));
+    Q_ASSERT(check);
     return true;
 }
 

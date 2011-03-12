@@ -263,7 +263,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
     rootItem = new ChatRosterItem(ChatRosterModel::Root);
 #ifdef FLAT_CONTACTS
-    d->contactsItem = rootItem;
+    d->contactsItem = (ChatRosterItem*)rootItem;
 #else
     d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
@@ -775,6 +775,9 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         buffer.setData(vcard.photo());
         buffer.open(QIODevice::ReadOnly);
         QImageReader imageReader(&buffer);
+#ifdef WILINK_EMBEDDED
+        imageReader.setScaledSize(QSize(32, 32));
+#endif
         item->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
         // store the nickName or fullName found in the vCard for display,

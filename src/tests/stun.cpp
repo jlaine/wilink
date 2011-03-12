@@ -63,6 +63,11 @@ static QHostAddress lookup(const QString &hostName)
     return QHostAddress();
 }
 
+static void usage()
+{
+    fprintf(stderr, "Usage: stun <hostname> [turn_peer] [turn_port]\n");
+}
+
 int main(int argc, char* argv[])
 {
     QCoreApplication app(argc, argv);
@@ -70,7 +75,7 @@ int main(int argc, char* argv[])
     // parse command line arguments
     if (argc < 2)
     {
-        fprintf(stderr, "Usage: stun <hostname> [turn_peer] [turn_port]\n");
+        usage();
         return EXIT_FAILURE;
     }
 
@@ -98,6 +103,7 @@ int main(int argc, char* argv[])
 
         connection.bind(QXmppIceComponent::discoverAddresses());
         connection.connectToHost();
+        return app.exec();
     } else if (argc == 4) {
         const QString peerName = QString::fromLocal8Bit(argv[2]);
         const QHostAddress peer = lookup(peerName);
@@ -119,7 +125,11 @@ int main(int argc, char* argv[])
         QObject::connect(&turnTester, SIGNAL(finished()),
                          &app, SLOT(quit()));
 
+        allocation.bind();
         allocation.connectToHost();
+        return app.exec();
+    } else {
+        usage();
+        return EXIT_FAILURE;
     }
-    return app.exec();
 }
