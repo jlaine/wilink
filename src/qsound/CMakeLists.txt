@@ -9,6 +9,15 @@ if(APPLE)
   include_directories(/opt/local/include)
 endif(APPLE)
 
+# needed for Qt >= 4.7 on Debian/Ubuntu
+find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
+if(QTMULTIMEDIAKIT_LIBRARY)
+    message(STATUS "Found QtMultimediaKit library")
+    include_directories(/usr/include/QtMobility)
+    include_directories(/usr/include/QtMultimediaKit)
+    set(qsound_LIBRARIES ${qsound_LIBRARIES} ${QTMULTIMEDIAKIT_LIBRARY})
+endif()
+
 # mad support
 find_library(MAD_LIBRARY mad)
 if(MAD_LIBRARY)
