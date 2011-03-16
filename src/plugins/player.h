@@ -74,7 +74,7 @@ class PlayerPanel : public ChatPanel
     Q_OBJECT
 
 public:
-    PlayerPanel(Chat *chatWindow);
+    PlayerPanel(Chat *chatWindow, QWidget *parent = 0);
 
 private slots:
     void cursorChanged(const QModelIndex &index);

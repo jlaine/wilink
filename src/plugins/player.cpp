@@ -593,8 +593,8 @@ void PlayerModel::stop()
     }
 }
 
-PlayerPanel::PlayerPanel(Chat *chatWindow)
-    : ChatPanel(chatWindow),
+PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
+    : ChatPanel(parent),
     m_chat(chatWindow)
 {
     bool check;
