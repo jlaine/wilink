@@ -84,9 +84,6 @@ int main(int argc, char *argv[])
 
     /* Install signal handler */
     signal(SIGINT, signal_handler);
-#ifdef SIGKILL
-    signal(SIGKILL, signal_handler);
-#endif
     signal(SIGTERM, signal_handler);
 
     /* Create system tray icon */
