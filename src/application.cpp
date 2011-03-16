@@ -30,7 +30,6 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
-#include <QNetworkDiskCache>
 #include <QProcess>
 #include <QProxyStyle>
 #include <QPushButton>
@@ -59,7 +58,6 @@ public:
     ApplicationPrivate();
 
     QList<Chat*> chats;
-    QNetworkDiskCache *networkCache;
     QSettings *settings;
     QSoundPlayer *soundPlayer;
     QAudioDeviceInfo audioInputDevice;
@@ -139,10 +137,8 @@ Application::Application(int &argc, char **argv)
 #endif
 
     /* initialise cache and wallet */
-    QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);
-    d->networkCache = new QNetworkDiskCache(this);
-    d->networkCache->setCacheDirectory(QDir(dataPath).filePath("cache"));
     QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 
     /* initialise settings */
@@ -217,6 +213,12 @@ void Application::platformInit()
 {
 }
 #endif
+
+QString Application::cacheDirectory() const
+{
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    return QDir(dataPath).filePath("cache");
+}
 
 /** Create the system tray icon.
  */
@@ -324,11 +326,6 @@ void Application::migrateFromWdesktop()
     if (QFileInfo(uninstaller).isExecutable())
         QProcess::execute(uninstaller, QStringList() << "/S");
 #endif
-}
-
-QAbstractNetworkCache *Application::networkCache()
-{
-    return d->networkCache;
 }
 
 bool Application::openAtLogin() const

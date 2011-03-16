@@ -47,9 +47,9 @@ public:
     ~Application();
 
     static void alert(QWidget *widget);
+    QString cacheDirectory() const;
     static void platformInit();
     void createSystemTrayIcon();
-    QAbstractNetworkCache *networkCache();
     QSoundPlayer *soundPlayer();
     UpdatesDialog *updatesDialog();
     void setUpdatesDialog(UpdatesDialog *updatesDialog);

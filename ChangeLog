@@ -1,3 +1,7 @@
+wiLink 1.1.1 (UNRELEASED)
+ * Player:
+  - Do not use app-wide network cache (fixes crash on account add/remove).
+
 wiLink 1.1.0 (2011-02-21)
  * Conversations:
   - Recognise /me command.

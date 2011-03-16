@@ -29,6 +29,7 @@
 #include <QImageReader>
 #include <QLayout>
 #include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QPixmapCache>
 #include <QPushButton>
@@ -130,6 +131,7 @@ public:
     QNetworkReply *dataReply;
     Item *cursorItem;
     QNetworkAccessManager *network;
+    QNetworkDiskCache *networkCache;
     QSoundPlayer *player;
     int playId;
     bool playStop;
@@ -249,7 +251,7 @@ QIODevice *PlayerModelPrivate::dataFile(Item *item)
         return new QFile(item->url.toLocalFile());
     else if (dataCache.contains(item->url)) {
         const QUrl dataUrl = dataCache.value(item->url);
-        return wApp->networkCache()->data(dataUrl);
+        return networkCache->data(dataUrl);
     }
     return 0;
 }
@@ -260,7 +262,7 @@ QSoundFile::FileType PlayerModelPrivate::dataType(Item *item)
         return QSoundFile::typeFromFileName(item->url.toLocalFile());
     } else if (dataCache.contains(item->url)) {
         const QUrl audioUrl = dataCache.value(item->url);
-        QNetworkCacheMetaData::RawHeaderList headers = wApp->networkCache()->metaData(audioUrl).rawHeaders();
+        QNetworkCacheMetaData::RawHeaderList headers = networkCache->metaData(audioUrl).rawHeaders();
         foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
         {
             if (header.first.toLower() == "content-type")
@@ -300,8 +302,10 @@ PlayerModel::PlayerModel(QObject *parent)
     d = new PlayerModelPrivate(this);
     rootItem = new Item;
 
+    d->networkCache = new QNetworkDiskCache(this);
+    d->networkCache->setCacheDirectory(wApp->cacheDirectory());
     d->network = new QNetworkAccessManager(this);
-    d->network->setCache(wApp->networkCache());
+    d->network->setCache(d->networkCache);
 
     // init player
     d->player = wApp->soundPlayer();
@@ -493,7 +497,7 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
                 return pixmap;
             else if (d->dataCache.contains(item->imageUrl)) {
                 const QUrl dataUrl = d->dataCache.value(item->imageUrl);
-                QImageReader reader(wApp->networkCache()->data(dataUrl));
+                QImageReader reader(d->networkCache->data(dataUrl));
                 reader.setScaledSize(QSize(32, 32));
                 pixmap = QPixmap::fromImage(reader.read());
                 QPixmapCache::insert(item->imageUrl.toString(), pixmap);
