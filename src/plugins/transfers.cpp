@@ -375,9 +375,13 @@ ChatTransfersWatcher::ChatTransfersWatcher(Chat *window)
     : QObject(window),
     chatWindow(window)
 {
+    transferManager = chatWindow->client()->findExtension<QXmppTransferManager>();
+    if (!transferManager) {
+        transferManager = new QXmppTransferManager;
+        chatWindow->client()->addExtension(transferManager);
+    }
     // disable in-band bytestreams
-    chatWindow->client()->transferManager().setSupportedMethods(
-        QXmppTransferJob::SocksMethod);
+    transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
 #if 0
     const QString downloadsLink = QString("<a href=\"%1\">%2</a>").arg(
@@ -387,7 +391,7 @@ ChatTransfersWatcher::ChatTransfersWatcher(Chat *window)
 #endif
 
     /* connect signals */
-    connect(&chatWindow->client()->transferManager(), SIGNAL(fileReceived(QXmppTransferJob*)),
+    connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
         this, SLOT(fileReceived(QXmppTransferJob*)));
 }
 
@@ -472,7 +476,7 @@ void ChatTransfersWatcher::sendFile(const QString &fullJid, const QString &fileP
     }
 
     // send file
-    QXmppTransferJob *job = chatWindow->client()->transferManager().sendFile(fullJid, filePath);
+    QXmppTransferJob *job = transferManager->sendFile(fullJid, filePath);
     job->setData(QXmppShareExtension::LocalPathRole, filePath);
     addJob(job);
 }

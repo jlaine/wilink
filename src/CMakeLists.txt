@@ -18,6 +18,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qdjango/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qsound)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp/src)
 
+# Needed for Qt >= 4.7 on Debian/Ubuntu
+find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
+if(QTMULTIMEDIAKIT_LIBRARY)
+    message(STATUS "Found QtMultimediaKit library")
+    include_directories(/usr/include/QtMobility)
+    include_directories(/usr/include/QtMultimediaKit)
+endif()
+
 # wiLink
 
 add_definitions(-DQT_STATICPLUGIN)

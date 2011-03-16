@@ -94,7 +94,9 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
                  id.type() == "bytestreams")
         {
             info("Found bytestream proxy " + disco.from());
-            transferManager().setProxy(disco.from());
+            QXmppTransferManager *transferManager = findExtension<QXmppTransferManager>();
+            if (transferManager)
+                transferManager->setProxy(disco.from());
         }
         // check if it's a file sharing server
         else if (id.category() == "store" &&
