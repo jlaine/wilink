@@ -65,7 +65,7 @@ static QHostAddress lookup(const QString &hostName)
 
 static void usage()
 {
-    fprintf(stderr, "Usage: stun <hostname> <peer_host>\n");
+    fprintf(stderr, "Usage: stun [-s <stun_server>] [-t <turn_server>] <peer_host>\n");
 }
 
 int main(int argc, char* argv[])
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     QCoreApplication app(argc, argv);
 
     // parse command line arguments
-    if (argc < 3)
+    if (argc < 2)
     {
         usage();
         return EXIT_FAILURE;
