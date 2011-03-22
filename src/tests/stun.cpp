@@ -79,6 +79,9 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    const QString iceUsername = QLatin1String("foo");
+    const QString icePassword = QLatin1String("bar");
+
     // lookup STUN/TURN server
     const QString hostName = QString::fromLocal8Bit(argv[1]);
     const QHostAddress host = lookup(hostName);
@@ -103,12 +106,16 @@ int main(int argc, char* argv[])
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     QXmppIceConnection connection(true);
+    connection.setLocalUser(iceUsername);
+    connection.setLocalPassword(icePassword);
     //connection.setStunServer(host);
     connection.setTurnServer(host);
     connection.setTurnUsername(turnUsername);
     connection.setTurnPassword(turnPassword);
+#if 0
     QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
         &app, SLOT(quit()));
+#endif
     QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     connection.addComponent(1);
@@ -123,8 +130,8 @@ int main(int argc, char* argv[])
     candidate.setType(QXmppJingleCandidate::HostType);
 
     connection.addRemoteCandidate(candidate);
-    connection.setRemoteUser("test");
-    connection.setRemotePassword("test");
+    connection.setRemoteUser(iceUsername);
+    connection.setRemotePassword(icePassword);
 
     connection.connectToHost();
     return app.exec();
