@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     bool iceControlling = false;
     QHostAddress stunHost;
     QHostAddress turnHost;
-    const QString turnUsername = QLatin1String("test");
+    const QString turnUser = QLatin1String("test");
     const QString turnPassword = QLatin1String("test");
     for (int i = 1; i < argc - 2; ++i) {
         if (!strcmp(argv[i], "-c")) {
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
     QXmppIceConnection connection(iceControlling);
     connection.setStunServer(stunHost);
     connection.setTurnServer(turnHost);
-    connection.setTurnUsername(turnUsername);
+    connection.setTurnUser(turnUser);
     connection.setTurnPassword(turnPassword);
     QObject::connect(&connection, SIGNAL(connected()),
         &app, SLOT(quit()));
