@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSimpleTextItem>
+#include <QHostInfo>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -37,6 +38,7 @@
 #include "QXmppClient.h"
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
+#include "QXmppSrvInfo.h"
 #include "QXmppUtils.h"
 
 #include "calls.h"
@@ -234,7 +236,7 @@ void CallWidget::callStateChanged(QXmppCall::State state)
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)
-    : QObject(chatWindow), m_window(chatWindow)
+    : QXmppLoggable(chatWindow), m_window(chatWindow)
 {
     m_client = chatWindow->client();
 
@@ -245,6 +247,8 @@ CallWatcher::CallWatcher(Chat *chatWindow)
     m_client->addExtension(m_callManager);
     connect(m_callManager, SIGNAL(callReceived(QXmppCall*)),
             this, SLOT(callReceived(QXmppCall*)));
+    connect(m_client, SIGNAL(connected()),
+            this, SLOT(connected()));
 }
 
 CallWatcher::~CallWatcher()
@@ -323,6 +327,15 @@ void CallWatcher::callReceived(QXmppCall *call)
     box->show();
 }
 
+void CallWatcher::connected()
+{
+    // lookup TURN server
+    const QString domain = m_client->configuration().domain();
+    debug(QString("Looking up STUN server for domain %1").arg(domain));
+    QXmppSrvInfo::lookupService("_turn._udp." + domain, this,
+                                SLOT(setTurnServer(QXmppSrvInfo)));
+}
+
 void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 {
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
@@ -333,6 +346,30 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     QAction *action = menu->addAction(QIcon(":/call.png"), tr("Call"));
     action->setData(fullJids.first());
     connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
+}
+
+void CallWatcher::setTurnServer(const QXmppSrvInfo &serviceInfo)
+{
+    QString serverName = "turn." + m_client->configuration().domain();
+    m_turnPort = 5060;
+    if (!serviceInfo.records().isEmpty()) {
+        serverName = serviceInfo.records().first().target();
+        m_turnPort = serviceInfo.records().first().port();
+    }
+
+    // lookup TURN host name
+    QHostInfo::lookupHost(serverName, this, SLOT(setTurnServer(QHostInfo)));
+}
+
+void CallWatcher::setTurnServer(const QHostInfo &hostInfo)
+{
+    if (hostInfo.addresses().isEmpty()) {
+        warning(QString("Could not lookup TURN server %1").arg(hostInfo.hostName()));
+        return;
+    }
+    m_callManager->setTurnServer(hostInfo.addresses().first(), m_turnPort);
+    m_callManager->setTurnUser(m_client->configuration().user());
+    m_callManager->setTurnPassword(m_client->configuration().password());
 }
 
 // PLUGIN

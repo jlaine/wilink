@@ -25,6 +25,7 @@
 #include <QWidget>
 
 #include "QXmppCallManager.h"
+#include "QXmppLogger.h"
 
 #include "chat_panel.h"
 
@@ -35,6 +36,7 @@ class QAudioFormat;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
+class QHostInfo;
 class QLabel;
 class QMenu;
 class QModelIndex;
@@ -42,6 +44,7 @@ class QThread;
 class QTimer;
 class QXmppCall;
 class QXmppCallManager;
+class QXmppSrvInfo;
 
 //#define FAKE_AUDIO_INPUT
 
@@ -91,7 +94,7 @@ private:
     QGraphicsSimpleTextItem *m_label;
 };
 
-class CallWatcher : public QObject
+class CallWatcher : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -103,7 +106,10 @@ private slots:
     void callClicked(QAbstractButton * button);
     void callContact();
     void callReceived(QXmppCall *call);
+    void connected();
     void rosterMenu(QMenu *menu, const QModelIndex &index);
+    void setTurnServer(const QXmppSrvInfo &serviceInfo);
+    void setTurnServer(const QHostInfo &hostInfo);
 
 private:
     void addCall(QXmppCall *call);
@@ -111,6 +117,7 @@ private:
     QXmppCallManager *m_callManager;
     QThread *m_callThread;
     QXmppClient *m_client;
+    quint16 m_turnPort;
     Chat *m_window;
 };
 
