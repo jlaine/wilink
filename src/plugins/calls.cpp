@@ -351,7 +351,7 @@ void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
 void CallWatcher::setTurnServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName = "turn." + m_client->configuration().domain();
-    m_turnPort = 5060;
+    m_turnPort = 3478;
     if (!serviceInfo.records().isEmpty()) {
         serverName = serviceInfo.records().first().target();
         m_turnPort = serviceInfo.records().first().port();
