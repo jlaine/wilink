@@ -40,7 +40,6 @@ class QHostInfo;
 class QLabel;
 class QMenu;
 class QModelIndex;
-class QThread;
 class QTimer;
 class QXmppCall;
 class QXmppCallManager;
@@ -115,7 +114,6 @@ private:
     void addCall(QXmppCall *call);
 
     QXmppCallManager *m_callManager;
-    QThread *m_callThread;
     QXmppClient *m_client;
     quint16 m_turnPort;
     Chat *m_window;

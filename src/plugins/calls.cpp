@@ -31,7 +31,6 @@
 #include <QPushButton>
 #include <QtCore/qmath.h>
 #include <QtCore/qendian.h>
-#include <QThread>
 #include <QTimer>
 
 #include "QXmppCallManager.h"
@@ -104,6 +103,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_audioOutput(0),
     m_call(call)
 {
+    m_call->setParent(this);
+
     // setup GUI
     setIconPixmap(QPixmap(":/call.png"));
     setButtonPixmap(QPixmap(":/hangup.png"));
@@ -240,9 +241,6 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 {
     m_client = chatWindow->client();
 
-    m_callThread = new QThread(this);
-    m_callThread->start();
-
     m_callManager = new QXmppCallManager;
     m_client->addExtension(m_callManager);
     connect(m_callManager, SIGNAL(callReceived(QXmppCall*)),
@@ -253,8 +251,6 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
 CallWatcher::~CallWatcher()
 {
-    m_callThread->quit();
-    m_callThread->wait();
 }
 
 void CallWidget::setGeometry(const QRectF &rect)
