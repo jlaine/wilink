@@ -65,7 +65,7 @@ static QHostAddress lookup(const QString &hostName)
 
 static void usage()
 {
-    fprintf(stderr, "Usage: stun <hostname> [turn_peer] [turn_port]\n");
+    fprintf(stderr, "Usage: stun <hostname> <peer_host> <peer_port>\n");
 }
 
 int main(int argc, char* argv[])
@@ -73,14 +73,11 @@ int main(int argc, char* argv[])
     QCoreApplication app(argc, argv);
 
     // parse command line arguments
-    if (argc < 2)
+    if (argc < 4)
     {
         usage();
         return EXIT_FAILURE;
     }
-
-    QXmppLogger logger;
-    logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     // lookup STUN/TURN server
     const QString hostName = QString::fromLocal8Bit(argv[1]);
@@ -90,46 +87,45 @@ int main(int argc, char* argv[])
         qWarning("Could not lookup STUN/TURN server %s", qPrintable(hostName));
         return EXIT_FAILURE;
     }
+    const QString turnUsername = QLatin1String("test");
+    const QString turnPassword = QLatin1String("test");
 
-    if (argc == 2) {
-        QXmppIceConnection connection(true);
-        connection.setStunServer(host);
-        QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
-            &app, SLOT(quit()));
-        QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
-        connection.addComponent(1);
-        connection.addComponent(2);
-
-        connection.bind(QXmppIceComponent::discoverAddresses());
-        connection.connectToHost();
-        return app.exec();
-    } else if (argc == 4) {
-        const QString peerName = QString::fromLocal8Bit(argv[2]);
-        const QHostAddress peer = lookup(peerName);
-        if (peer.isNull())
-        {
-            qWarning("Could not lookup peer %s", qPrintable(peerName));
-            return EXIT_FAILURE;
-        }
-        quint16 port = atoi(argv[3]);
-
-        QXmppTurnAllocation allocation;
-        allocation.setServer(host);
-        allocation.setUsername(QLatin1String("test"));
-        allocation.setPassword(QLatin1String("test"));
-        QObject::connect(&allocation, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
-            &logger, SLOT(log(QXmppLogger::MessageType,QString)));
-
-        TurnTester turnTester(&allocation, peer, port);
-        QObject::connect(&turnTester, SIGNAL(finished()),
-                         &app, SLOT(quit()));
-
-        allocation.bind();
-        allocation.connectToHost();
-        return app.exec();
-    } else {
-        usage();
+    // lookup peer
+    const QString peerName = QString::fromLocal8Bit(argv[2]);
+    const quint16 peerPort = atoi(argv[3]);
+    const QHostAddress peerHost = lookup(peerName);
+    if (peerHost.isNull()) {
+        qWarning("Could not lookup peer %s", qPrintable(peerName));
         return EXIT_FAILURE;
     }
+
+    QXmppLogger logger;
+    logger.setLoggingType(QXmppLogger::StdoutLogging);
+
+    QXmppIceConnection connection(true);
+    //connection.setStunServer(host);
+    connection.setTurnServer(host);
+    connection.setTurnUsername(turnUsername);
+    connection.setTurnPassword(turnPassword);
+    QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
+        &app, SLOT(quit()));
+    QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+        &logger, SLOT(log(QXmppLogger::MessageType,QString)));
+    connection.addComponent(1);
+    //connection.bind(QXmppIceComponent::discoverAddresses());
+    connection.bind(QList<QHostAddress>());
+
+    QXmppJingleCandidate candidate;
+    candidate.setComponent(1);
+    candidate.setHost(peerHost);
+    candidate.setPort(peerPort);
+    candidate.setProtocol("udp");
+    candidate.setType(QXmppJingleCandidate::HostType);
+
+    connection.addRemoteCandidate(candidate);
+    connection.setRemoteUser("test");
+    connection.setRemotePassword("test");
+
+    connection.connectToHost();
+    return app.exec();
 }
