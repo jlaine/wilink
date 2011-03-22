@@ -50,7 +50,7 @@ void TurnTester::connected()
 void TurnTester::datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port)
 {
     qDebug() << "DATA" << data;
-    emit finished();
+    m_allocation->disconnectFromHost();
 }
 
 static QHostAddress lookup(const QString &hostName)
