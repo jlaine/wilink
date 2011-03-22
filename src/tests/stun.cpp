@@ -79,22 +79,32 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const QString iceUsername = QLatin1String("foo");
-    const QString icePassword = QLatin1String("bar");
-
-    // lookup STUN/TURN server
-    const QString hostName = QString::fromLocal8Bit(argv[1]);
-    const QHostAddress host = lookup(hostName);
-    if (host.isNull())
-    {
-        qWarning("Could not lookup STUN/TURN server %s", qPrintable(hostName));
-        return EXIT_FAILURE;
-    }
+    QHostAddress stunHost;
+    QHostAddress turnHost;
     const QString turnUsername = QLatin1String("test");
     const QString turnPassword = QLatin1String("test");
+    for (int i = 1; i < argc - 2; ++i) {
+        if (!strcmp(argv[i], "-s")) {
+            // lookup STUN server
+            const QString hostName = QString::fromLocal8Bit(argv[++i]);
+            stunHost = lookup(hostName);
+            if (stunHost.isNull()) {
+                qWarning("Could not lookup STUN server %s", qPrintable(hostName));
+                return EXIT_FAILURE;
+            }
+        } else if (!strcmp(argv[i], "-t")) {
+            // lookup TURN server
+            const QString hostName = QString::fromLocal8Bit(argv[++i]);
+            turnHost = lookup(hostName);
+            if (turnHost.isNull()) {
+                qWarning("Could not lookup TURN server %s", qPrintable(hostName));
+                return EXIT_FAILURE;
+            }
+        }
+    }
 
     // lookup peer
-    const QString peerName = QString::fromLocal8Bit(argv[2]);
+    const QString peerName = QString::fromLocal8Bit(argv[argc - 1]);
     const quint16 peerPort = 40000;
     const QHostAddress peerHost = lookup(peerName);
     if (peerHost.isNull()) {
@@ -106,21 +116,16 @@ int main(int argc, char* argv[])
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
     QXmppIceConnection connection(true);
-    connection.setLocalUser(iceUsername);
-    connection.setLocalPassword(icePassword);
-    //connection.setStunServer(host);
-    connection.setTurnServer(host);
+    connection.setStunServer(stunHost);
+    connection.setTurnServer(turnHost);
     connection.setTurnUsername(turnUsername);
     connection.setTurnPassword(turnPassword);
-#if 0
-    QObject::connect(&connection, SIGNAL(localCandidatesChanged()),
+    QObject::connect(&connection, SIGNAL(connected()),
         &app, SLOT(quit()));
-#endif
     QObject::connect(&connection, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
         &logger, SLOT(log(QXmppLogger::MessageType,QString)));
     connection.addComponent(1);
-    //connection.bind(QXmppIceComponent::discoverAddresses());
-    connection.bind(QList<QHostAddress>());
+    connection.bind(QXmppIceComponent::discoverAddresses());
 
     QXmppJingleCandidate candidate;
     candidate.setComponent(1);
@@ -130,8 +135,8 @@ int main(int argc, char* argv[])
     candidate.setType(QXmppJingleCandidate::HostType);
 
     connection.addRemoteCandidate(candidate);
-    connection.setRemoteUser(iceUsername);
-    connection.setRemotePassword(icePassword);
+    connection.setRemoteUser("test");
+    connection.setRemotePassword("test");
 
     connection.connectToHost();
     return app.exec();
