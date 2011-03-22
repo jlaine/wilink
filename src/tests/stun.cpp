@@ -79,12 +79,15 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    bool iceControlling = false;
     QHostAddress stunHost;
     QHostAddress turnHost;
     const QString turnUsername = QLatin1String("test");
     const QString turnPassword = QLatin1String("test");
     for (int i = 1; i < argc - 2; ++i) {
-        if (!strcmp(argv[i], "-s")) {
+        if (!strcmp(argv[i], "-c")) {
+            iceControlling = atoi(argv[++i]);
+        } else if (!strcmp(argv[i], "-s")) {
             // lookup STUN server
             const QString hostName = QString::fromLocal8Bit(argv[++i]);
             stunHost = lookup(hostName);
@@ -115,7 +118,7 @@ int main(int argc, char* argv[])
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
-    QXmppIceConnection connection(true);
+    QXmppIceConnection connection(iceControlling);
     connection.setStunServer(stunHost);
     connection.setTurnServer(turnHost);
     connection.setTurnUsername(turnUsername);
@@ -133,10 +136,19 @@ int main(int argc, char* argv[])
     candidate.setPort(peerPort);
     candidate.setProtocol("udp");
     candidate.setType(QXmppJingleCandidate::HostType);
-
     connection.addRemoteCandidate(candidate);
-    connection.setRemoteUser("test");
-    connection.setRemotePassword("test");
+
+    if (iceControlling) {
+        connection.setLocalUser("master");
+        connection.setLocalPassword("masterPass");
+        connection.setRemoteUser("slave");
+        connection.setRemotePassword("slavePass");
+    } else {
+        connection.setLocalUser("slave");
+        connection.setLocalPassword("slavePass");
+        connection.setRemoteUser("master");
+        connection.setRemotePassword("masterPass");
+    }
 
     connection.connectToHost();
     return app.exec();
