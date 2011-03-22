@@ -65,7 +65,7 @@ static QHostAddress lookup(const QString &hostName)
 
 static void usage()
 {
-    fprintf(stderr, "Usage: stun <hostname> <peer_host> <peer_port>\n");
+    fprintf(stderr, "Usage: stun <hostname> <peer_host>\n");
 }
 
 int main(int argc, char* argv[])
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     QCoreApplication app(argc, argv);
 
     // parse command line arguments
-    if (argc < 4)
+    if (argc < 3)
     {
         usage();
         return EXIT_FAILURE;
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     // lookup peer
     const QString peerName = QString::fromLocal8Bit(argv[2]);
-    const quint16 peerPort = atoi(argv[3]);
+    const quint16 peerPort = 40000;
     const QHostAddress peerHost = lookup(peerName);
     if (peerHost.isNull()) {
         qWarning("Could not lookup peer %s", qPrintable(peerName));
