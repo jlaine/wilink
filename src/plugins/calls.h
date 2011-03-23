@@ -32,7 +32,6 @@
 class Chat;
 class ChatRosterModel;
 class QAbstractButton;
-class QAudioFormat;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
@@ -44,27 +43,6 @@ class QTimer;
 class QXmppCall;
 class QXmppCallManager;
 class QXmppSrvInfo;
-
-//#define FAKE_AUDIO_INPUT
-
-class Reader : public QObject
-{
-    Q_OBJECT
-
-public:
-    Reader(const QAudioFormat &format, QObject *parent);
-    void start(QIODevice *device);
-    void stop();
-
-private slots:
-    void tick();
-
-private:
-    qint64 m_block;
-    QTimer *m_timer;
-    QFile *m_input;
-    QIODevice *m_output;
-};
 
 class CallWidget : public ChatPanelWidget
 {
@@ -83,11 +61,7 @@ private slots:
 private:
     void debug(const QString&) {};
     void warning(const QString&) {};
-#ifdef FAKE_AUDIO_INPUT
-    Reader *m_audioInput;
-#else
     QAudioInput *m_audioInput;
-#endif
     QAudioOutput *m_audioOutput;
 
     QXmppCall *m_call;

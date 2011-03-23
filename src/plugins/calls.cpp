@@ -29,8 +29,6 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QtCore/qmath.h>
-#include <QtCore/qendian.h>
 #include <QTimer>
 
 #include "QXmppCallManager.h"
@@ -48,8 +46,6 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
-const int ToneFrequencyHz = 600;
-
 static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 {
     QAudioFormat format;
@@ -60,41 +56,6 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::SignedInt);
     return format;
-}
-
-Reader::Reader(const QAudioFormat &format, QObject *parent)
-    : QObject(parent)
-{
-    int durationMs = 20;
-
-    // 100ms
-    m_block = (format.frequency() * format.channels() * (format.sampleSize() / 8)) * durationMs / 1000;
-    m_input = new QFile(QString("test-%1.raw").arg(format.frequency()), this);
-    if (!m_input->open(QIODevice::ReadOnly))
-        qWarning() << "Could not open" << m_input->fileName();
-    m_timer = new QTimer(this);
-    m_timer->setInterval(durationMs);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(tick()));
-}
-
-void Reader::start(QIODevice *device)
-{
-    m_output = device;
-    m_timer->start();
-}
-
-void Reader::stop()
-{
-    m_timer->stop();
-}
-
-void Reader::tick()
-{
-    QByteArray block(m_block, 0);
-    if (m_input->read(block.data(), block.size()) > 0)
-        m_output->write(block);
-    else
-        qWarning() << "Reader could not read from" << m_input->fileName();
 }
 
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
@@ -127,7 +88,6 @@ void CallWidget::audioStateChanged(QAudio::State state)
         return;
     if (audio == m_audioInput)
     {
-#ifndef FAKE_AUDIO_INPUT
         warning(QString("Audio input state %1 error %2").arg(
             QString::number(m_audioInput->state()),
             QString::number(m_audioInput->error())));
@@ -139,7 +99,6 @@ void CallWidget::audioStateChanged(QAudio::State state)
             warning("Audio input needs restart due to buffer underrun");
             m_audioInput->start(m_call->audioChannel());
         }
-#endif
     } else if (audio == m_audioOutput) {
         debug(QString("Audio output state %1 error %2").arg(
             QString::number(m_audioOutput->state()),
@@ -186,13 +145,9 @@ void CallWidget::callStateChanged(QXmppCall::State state)
 
         if (!m_audioInput)
         {
-#ifdef FAKE_AUDIO_INPUT
-            m_audioInput = new Reader(format, this);
-#else
             m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
             m_audioInput->setBufferSize(bufferSize);
             connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-#endif
             m_audioInput->start(channel);
         }
     } else {
