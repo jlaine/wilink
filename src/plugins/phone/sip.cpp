@@ -1336,7 +1336,7 @@ void SipClient::setStunServer(const QHostInfo &hostInfo)
 void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName = "stun." + d->domain;
-    d->stunServerPort = 5060;
+    d->stunServerPort = 3478;
     if (!serviceInfo.records().isEmpty()) {
         serverName = serviceInfo.records().first().target();
         d->stunServerPort = serviceInfo.records().first().port();
