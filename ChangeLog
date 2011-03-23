@@ -3,6 +3,8 @@ wiLink 1.1.1 (UNRELEASED)
   - Add support for double NAT traversal using TURN.
  * Player:
   - Do not use app-wide network cache (fixes crash on account add/remove).
+ * Telephone:
+  - Fix STUN fallback port when SRV lookups are not available.
 
 wiLink 1.1.0 (2011-02-21)
  * Conversations:
