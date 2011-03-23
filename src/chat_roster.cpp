@@ -145,7 +145,6 @@ class ChatRosterModelPrivate
 {
 public:
     int countPendingMessages();
-    void fetchInfo(const QString &jid);
     void fetchVCard(const QString &jid);
     ChatRosterItem* find(const QString &id, ChatRosterItem *parent = 0);
 
@@ -197,20 +196,6 @@ int ChatRosterModelPrivate::countPendingMessages()
         pending += child->data(ChatRosterModel::MessagesRole).toInt();
     }
     return pending;
-}
-
-/** Check whether the discovery info for the given roster item is cached, otherwise
- *  request the information.
- *
- * @param item
- */
-void ChatRosterModelPrivate::fetchInfo(const QString &jid)
-{
-    QXmppDiscoveryIq disco;
-    if (readIq(QString("xmpp:%1?disco;type=get;request=info").arg(jid), disco))
-        q->discoveryInfoFound(disco);
-    else
-        client->findExtension<QXmppDiscoveryManager>()->requestInfo(jid);
 }
 
 /** Check whether the vCard for the given roster item is cached, otherwise
@@ -632,8 +617,16 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
     {
         if (presence.type() == QXmppPresence::Unavailable)
             d->clientFeatures.remove(jid);
-        else if (presence.type() == QXmppPresence::Available && !d->clientFeatures.contains(jid))
-            d->fetchInfo(jid);
+        else if (presence.type() == QXmppPresence::Available && !d->clientFeatures.contains(jid)) {
+            QXmppDiscoveryIq disco;
+            if (d->readIq(QString("xmpp:%1?disco;type=get;request=info").arg(jid), disco) &&
+                (presence.capabilityVer().isEmpty() || presence.capabilityVer() == disco.verificationString()))
+            {
+                discoveryInfoFound(disco);
+            } else {
+                d->client->findExtension<QXmppDiscoveryManager>()->requestInfo(jid);
+            }
+        }
     }
 
     // handle chat rooms
