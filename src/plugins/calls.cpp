@@ -210,6 +210,15 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     }
 }
 
+void CallWidget::setGeometry(const QRectF &rect)
+{
+    ChatPanelWidget::setGeometry(rect);
+
+    QRectF contents = contentsRect();
+    m_label->setPos(contents.left(), contents.top() +
+        (contents.height() - m_label->boundingRect().height()) / 2);
+}
+
 CallWatcher::CallWatcher(Chat *chatWindow)
     : QXmppLoggable(chatWindow), m_window(chatWindow)
 {
@@ -225,15 +234,6 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
 CallWatcher::~CallWatcher()
 {
-}
-
-void CallWidget::setGeometry(const QRectF &rect)
-{
-    ChatPanelWidget::setGeometry(rect);
-
-    QRectF contents = contentsRect();
-    m_label->setPos(contents.left(), contents.top() +
-        (contents.height() - m_label->boundingRect().height()) / 2);
 }
 
 void CallWatcher::addCall(QXmppCall *call)
