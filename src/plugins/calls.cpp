@@ -31,6 +31,7 @@
 #include <QPushButton>
 #include <QTimer>
 
+#include "QSoundPlayer.h"
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
 #include "QXmppJingleIq.h"
@@ -62,7 +63,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     : ChatPanelWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
-    m_call(call)
+    m_call(call),
+    m_soundId(0)
 {
     // setup GUI
     setIconPixmap(QPixmap(":/call.png"));
@@ -78,6 +80,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
 CallWidget::~CallWidget()
 {
+    if (m_soundId)
+        wApp->soundPlayer()->stop(m_soundId);
     delete m_call;
 }
 
@@ -117,10 +121,18 @@ void CallWidget::audioStateChanged(QAudio::State state)
 void CallWidget::callRinging()
 {
     m_label->setText(tr("Ringing.."));
+    if (!m_soundId)
+        m_soundId = wApp->soundPlayer()->play(":/call-outgoing.ogg", true);
 }
 
 void CallWidget::callStateChanged(QXmppCall::State state)
 {
+    // stop tone
+    if (m_soundId && state != QXmppCall::OfferState) {
+        wApp->soundPlayer()->stop(m_soundId);
+        m_soundId = 0;
+    }
+
     // start or stop capture
     if (state == QXmppCall::ActiveState)
     {

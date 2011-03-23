@@ -66,6 +66,7 @@ private:
 
     QXmppCall *m_call;
     QGraphicsSimpleTextItem *m_label;
+    int m_soundId;
 };
 
 class CallWatcher : public QXmppLoggable
