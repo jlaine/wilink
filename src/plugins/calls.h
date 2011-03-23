@@ -78,6 +78,7 @@ public:
     ~CallWatcher();
 
 private slots:
+    void callAborted();
     void callClicked(QAbstractButton * button);
     void callContact();
     void callReceived(QXmppCall *call);
@@ -90,6 +91,7 @@ private:
     void addCall(QXmppCall *call);
 
     QXmppCallManager *m_callManager;
+    QMap<QXmppCall*, int> m_callQueue;
     QXmppClient *m_client;
     quint16 m_turnPort;
     Chat *m_window;

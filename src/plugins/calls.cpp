@@ -76,10 +76,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
-
-    // start incoming tone
-    if (m_call->direction() == QXmppCall::IncomingDirection)
-        m_soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
 }
 
 CallWidget::~CallWidget()
@@ -253,6 +249,22 @@ void CallWatcher::addCall(QXmppCall *call)
         panel->addWidget(widget);
 }
 
+/** The call finished without the user accepting it.
+ */
+void CallWatcher::callAborted()
+{
+    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    if (!call)
+        return;
+
+    // stop ring tone
+    int soundId = m_callQueue.take(call);
+    if (soundId)
+        wApp->soundPlayer()->stop(soundId);
+
+    call->deleteLater();
+}
+
 void CallWatcher::callClicked(QAbstractButton * button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
@@ -260,9 +272,14 @@ void CallWatcher::callClicked(QAbstractButton * button)
     if (!call)
         return;
 
+    // stop ring tone
+    int soundId = m_callQueue.take(call);
+    if (soundId)
+        wApp->soundPlayer()->stop(soundId);
+
     if (box->standardButton(button) == QMessageBox::Yes)
     {
-        disconnect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
+        disconnect(call, SIGNAL(finished()), this, SLOT(callAborted()));
         addCall(call);
         call->accept();
     } else {
@@ -293,12 +310,16 @@ void CallWatcher::callReceived(QXmppCall *call)
     box->setDefaultButton(QMessageBox::NoButton);
     box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
 
-    /* connect signals */
-    connect(call, SIGNAL(finished()), call, SLOT(deleteLater()));
+    // connect signals
+    connect(call, SIGNAL(finished()), this, SLOT(callAborted()));
     connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callClicked(QAbstractButton*)));
     box->show();
+
+    // start incoming tone
+    int soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
+    m_callQueue.insert(call, soundId);
 }
 
 void CallWatcher::connected()
