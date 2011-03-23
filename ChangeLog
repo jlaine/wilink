@@ -1,4 +1,6 @@
 wiLink 1.1.1 (UNRELEASED)
+ * Calls:
+  - Add support for double NAT traversal using TURN.
  * Player:
   - Do not use app-wide network cache (fixes crash on account add/remove).
 
