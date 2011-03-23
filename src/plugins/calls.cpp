@@ -103,8 +103,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_audioOutput(0),
     m_call(call)
 {
-    m_call->setParent(this);
-
     // setup GUI
     setIconPixmap(QPixmap(":/call.png"));
     setButtonPixmap(QPixmap(":/hangup.png"));
@@ -115,6 +113,11 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
+}
+
+CallWidget::~CallWidget()
+{
+    delete m_call;
 }
 
 void CallWidget::audioStateChanged(QAudio::State state)

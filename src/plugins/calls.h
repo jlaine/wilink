@@ -72,6 +72,7 @@ class CallWidget : public ChatPanelWidget
 
 public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
+    ~CallWidget();
     void setGeometry(const QRectF &rect);
 
 private slots:
