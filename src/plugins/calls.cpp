@@ -76,12 +76,18 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
+
+    // start incoming tone
+    if (m_call->direction() == QXmppCall::IncomingDirection)
+        m_soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
 }
 
 CallWidget::~CallWidget()
 {
+    // stop tone
     if (m_soundId)
         wApp->soundPlayer()->stop(m_soundId);
+
     delete m_call;
 }
 
@@ -121,6 +127,8 @@ void CallWidget::audioStateChanged(QAudio::State state)
 void CallWidget::callRinging()
 {
     m_label->setText(tr("Ringing.."));
+
+    // start outgoing tone
     if (!m_soundId)
         m_soundId = wApp->soundPlayer()->play(":/call-outgoing.ogg", true);
 }
