@@ -169,7 +169,5 @@ int main(int argc, char* argv[])
     }
 
     connection.connectToHost();
-    int ret = app.exec();
-    connection.close();
-    return ret;
+    return app.exec();
 }
