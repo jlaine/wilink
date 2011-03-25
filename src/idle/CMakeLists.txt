@@ -14,7 +14,7 @@ else(APPLE)
     if(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
         message(STATUS "Found X11 Screen saver library: ${XSS_LIBRARY}")
         add_definitions(-DHAVE_XSS)
-        set(IDLE_LIBRARIES ${XSS_LIBRARY})
+        set(IDLE_LIBRARIES ${XSS_LIBRARY} X11)
     endif(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
 endif(APPLE)
 
