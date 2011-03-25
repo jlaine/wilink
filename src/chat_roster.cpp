@@ -543,7 +543,7 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
-    d->writeIq(QString("xmpp:%1?disco;type=get;request=info").arg(disco.from()), disco, 600);
+    d->writeIq(QString("xmpp:%1?disco;type=get;request=info").arg(disco.from()), disco, 3600);
     discoveryInfoFound(disco);
 }
 
