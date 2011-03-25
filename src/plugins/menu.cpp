@@ -41,12 +41,9 @@
 
 static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/1");
 
-static const QString authSuffix = "@wifirst.net";
-static int retryInterval = 15000;
-
 Menu::Menu(Chat *window)
     : QObject(window),
-    refreshInterval(0),
+    refreshInterval(60000),
     chatWindow(window),
     servicesMenu(0)
 {
@@ -127,7 +124,8 @@ void Menu::showMenu()
     if (reply->error() != QNetworkReply::NoError)
     {
         qWarning("Failed to retrieve menu: %s", qPrintable(reply->errorString()));
-        QTimer::singleShot(retryInterval, this, SLOT(fetchMenu()));
+        if (refreshInterval > 0)
+            QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
         return;
     }
 
