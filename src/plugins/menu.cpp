@@ -43,14 +43,13 @@ static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/1");
 
 Menu::Menu(Chat *window)
     : QObject(window),
-    refreshInterval(60000),
+    refreshInterval(300000),
     chatWindow(window),
     servicesMenu(0)
 {
     bool check;
 
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
-
     servicesMenu = chatWindow->menuBar()->addMenu(tr("&Services"));
 
     /* add roster entry */
@@ -67,10 +66,27 @@ Menu::Menu(Chat *window)
                     QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
     Q_ASSERT(check);
 
-    /* once we are connected to the server, fetch menu */
-    check = connect(chatWindow->client(), SIGNAL(connected()),
+    /* prepare timer */
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+    check = connect(timer, SIGNAL(timeout()),
                     this, SLOT(fetchMenu()));
     Q_ASSERT(check);
+
+    /* wait for initial connection to the XMPP server */
+    check = connect(chatWindow->client(), SIGNAL(connected()),
+                    this, SLOT(connected()));
+    Q_ASSERT(check);
+}
+
+void Menu::connected()
+{
+    /* we are no longer interested in connected events */
+    disconnect(chatWindow->client(), SIGNAL(connected()),
+               this, SLOT(connected()));
+
+    /* initial menu fetch */
+    timer->start(0);
 }
 
 void Menu::fetchIcon(const QUrl &url, QAction *action)
@@ -125,7 +141,7 @@ void Menu::showMenu()
     {
         qWarning("Failed to retrieve menu: %s", qPrintable(reply->errorString()));
         if (refreshInterval > 0)
-            QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
+            timer->start(refreshInterval);
         return;
     }
 
@@ -187,7 +203,7 @@ void Menu::showMenu()
     QDomElement preferences = doc.documentElement().firstChildElement("preferences");
     refreshInterval = preferences.firstChildElement("refresh").text().toInt() * 1000;
     if (refreshInterval > 0)
-        QTimer::singleShot(refreshInterval, this, SLOT(fetchMenu()));
+        timer->start(refreshInterval);
 }
 
 // PLUGIN

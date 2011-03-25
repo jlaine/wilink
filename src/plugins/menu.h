@@ -29,6 +29,7 @@ class QAction;
 class QMenu;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QTimer;
 class Chat;
 
 class Menu : public QObject
@@ -39,6 +40,7 @@ public:
     Menu(Chat *window);
 
 private slots:
+    void connected();
     void fetchMenu();
     void openUrl();
     void showIcon();
@@ -50,11 +52,11 @@ private:
     QMap<QNetworkReply *, QAction *> icons;
     QNetworkAccessManager *network;
     int refreshInterval;
-    QStringList seenMessages;
     QByteArray userAgent;
 
     Chat *chatWindow;
     QMenu *servicesMenu;
+    QTimer *timer;
 };
 
 #endif

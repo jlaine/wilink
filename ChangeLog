@@ -1,6 +1,9 @@
 wiLink 1.1.1 (UNRELEASED)
  * Calls:
   - Add support for double NAT traversal using TURN.
+ * Menu:
+  - Raise retry interval to 5 minutes.
+  - Make sure there are no concurrent refreshes.
  * Player:
   - Do not use app-wide network cache (fixes crash on account add/remove).
  * Roster:
