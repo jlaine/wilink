@@ -18,16 +18,31 @@
  */
 
 #include <cstdlib>
+#include <signal.h>
 
 #include <QCoreApplication>
 #include <QHostInfo>
 #include <QTimer>
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 #include "QXmppLogger.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
 #include "stun.h"
+
+static int aborted = 0;
+static void signal_handler(int sig)
+{
+    if (aborted)
+        exit(1);
+
+    qApp->quit();
+    aborted = 1;
+}
 
 TurnTester::TurnTester(QXmppTurnAllocation *allocation, const QHostAddress &host, quint16 port)
     : m_allocation(allocation),
@@ -115,6 +130,9 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
+
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
@@ -151,5 +169,7 @@ int main(int argc, char* argv[])
     }
 
     connection.connectToHost();
-    return app.exec();
+    int ret = app.exec();
+    connection.close();
+    return ret;
 }
