@@ -868,16 +868,13 @@ QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap
     digest.setNc("00000001");
     digest.setNonce(challenge.value("nonce"));
     digest.setQop(challenge.value("qop"));
-    digest.setRealm(challenge.value("realm"));
-    digest.setUsername(username.toUtf8());
-    digest.setPassword(password.toUtf8());
 
-    const QByteArray A1 = digest.username() + ':' + digest.realm() + ':' + password.toUtf8();
+    const QByteArray A1 = username.toUtf8() + ':' + challenge.value("realm") + ':' + password.toUtf8();
     const QByteArray A2 = request.method() + ':' + request.uri();
 
     QMap<QByteArray, QByteArray> response;
-    response["username"] = digest.username();
-    response["realm"] = digest.realm();
+    response["username"] = username.toUtf8();
+    response["realm"] = challenge.value("realm");
     response["nonce"] = digest.nonce();
     response["uri"] = request.uri();
     response["response"] = digest.calculateDigest(A1, A2);
