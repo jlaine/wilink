@@ -28,35 +28,46 @@ Rectangle {
         id: historyDelegate
         Item {
             id: item
-            height: txt.height + 20
+            height: column.height + 10
             width: item.ListView.view.width - 10
 
-            Rectangle {
-                id: rect
-                height: item.height - 10
+            Column {
+                id: column
+                /*height: header.height + rect.height*/
                 width: item.width
-                border.color: 'darkgray'
-                border.width: 1
-                radius: 8
                 x: 5
-                y: 5
 
                 Text {
-                    id: txt
-                    anchors.centerIn: parent
-                    width: rect.width - 20
-                    text: '<html>' + body + '</html>'
-                    textFormat: Qt.RichText
-                    wrapMode: Text.WordWrap
+                    id: header
+                    text: date.toString()
+                    width: parent.width
                 }
 
-                states: State {
-                    name: "selected"
-                    PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
-                }
+                Rectangle {
+                    id: rect
+                    height: text.height + 10
+                    border.color: 'darkgray'
+                    border.width: 1
+                    radius: 8
+                    width: parent.width
 
-                transitions: Transition {
-                    PropertyAnimation { target: rect; properties: 'color,border.color'; duration: 300 }
+                    Text {
+                        id: text
+                        anchors.centerIn: parent
+                        width: rect.width - 20
+                        text: '<html>' + body + '</html>'
+                        textFormat: Qt.RichText
+                        wrapMode: Text.WordWrap
+                    }
+
+                    states: State {
+                        name: "selected"
+                        PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
+                    }
+
+                    transitions: Transition {
+                        PropertyAnimation { target: rect; properties: 'color,border.color'; duration: 300 }
+                    }
                 }
             }
         }

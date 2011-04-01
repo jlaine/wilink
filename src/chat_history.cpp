@@ -68,6 +68,7 @@ enum HistoryColumns {
 
 enum HistoryRole {
     BodyRole = Qt::UserRole,
+    DateRole,
     FromRole,
 };
 
@@ -598,6 +599,7 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(BodyRole, "body");
+    roleNames.insert(DateRole, "date");
     roleNames.insert(FromRole, "from");
     setRoleNames(roleNames);
 }
@@ -703,6 +705,13 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
                 bodies += "<p>" + child->message.html() + "</p>";
             }
             return bodies;
+        }
+    } else if (role == DateRole) {
+        if (item->children.isEmpty())
+            return item->message.date;
+        else {
+            ChatHistoryItem *child = static_cast<ChatHistoryItem*>(item->children.first());
+            return child->message.date;
         }
     } else if (role == FromRole) {
         if (item->children.isEmpty())

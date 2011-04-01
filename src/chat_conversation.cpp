@@ -79,10 +79,10 @@ ChatConversation::ChatConversation(QWidget *parent)
     ctxt->setContextProperty("historyModel", chatHistoryWidget->model());
     view->setSource(QUrl("src/data/history.qml"));
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    layout->addWidget(view);
+    layout->addWidget(view, 1);
 #endif
 
-    layout->addWidget(chatHistory);
+    layout->addWidget(chatHistory, 1);
     filterDrops(chatHistory->viewport());
 
     /* spacer */
