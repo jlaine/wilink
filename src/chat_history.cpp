@@ -70,6 +70,7 @@ enum HistoryRole {
     BodyRole = Qt::UserRole,
     DateRole,
     FromRole,
+    ReceivedRole,
 };
 
 class ChatHistoryItem : public ChatModelItem
@@ -601,6 +602,7 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     roleNames.insert(BodyRole, "body");
     roleNames.insert(DateRole, "date");
     roleNames.insert(FromRole, "from");
+    roleNames.insert(ReceivedRole, "received");
     setRoleNames(roleNames);
 }
 
@@ -681,6 +683,7 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         ChatHistoryItem *bubble = new ChatHistoryItem;
         addItem(bubble, rootItem, bubblePos);
         addItem(msg, bubble);
+        emit dataChanged(createIndex(bubble, 0), createIndex(bubble, MaxColumn));
     }
 }
 
@@ -695,6 +698,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
+    ChatHistoryItem *msg = static_cast<ChatHistoryItem*>(item->children.isEmpty() ? item : item->children.first());
     if (role == BodyRole) {
         if (item->children.isEmpty())
             return item->message.body;
@@ -707,19 +711,11 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
             return bodies;
         }
     } else if (role == DateRole) {
-        if (item->children.isEmpty())
-            return item->message.date;
-        else {
-            ChatHistoryItem *child = static_cast<ChatHistoryItem*>(item->children.first());
-            return child->message.date;
-        }
+        return msg->message.date;
     } else if (role == FromRole) {
-        if (item->children.isEmpty())
-            return item->message.from;
-        else {
-            ChatHistoryItem *child = static_cast<ChatHistoryItem*>(item->children.first());
-            return child->message.from;
-        }
+        return msg->message.from;
+    } else if (role == ReceivedRole) {
+        return msg->message.received;
     }
 
     return QVariant();

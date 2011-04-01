@@ -143,7 +143,7 @@ add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURC
 
 # libraries
 set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY})
-if(QT_QTDECLARATIVE_FOUND AND USE_DECLARATIVE)
+if(QT_QTDECLARATIVE_FOUND)
     list(APPEND wilink_LIBRARIES ${QT_QTDECLARATIVE_LIBRARY})
     add_definitions(-DUSE_DECLARATIVE)
 endif()

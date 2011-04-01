@@ -33,26 +33,27 @@ Rectangle {
 
             Column {
                 id: column
-                /*height: header.height + rect.height*/
                 width: item.width
                 x: 5
 
                 Text {
-                    id: header
-                    text: date.toString()
+                    id: headerText
+                    color: received ? '#2689d6': '#7b7b7b'
+                    text: '' + from + ''
                     width: parent.width
                 }
 
                 Rectangle {
                     id: rect
-                    height: text.height + 10
-                    border.color: 'darkgray'
+                    height: bodyText.height + 10
+                    border.color: received ? '#2689d6': '#7b7b7b'
                     border.width: 1
+                    color: received ? '#e7f4fe' : '#fafafa'
                     radius: 8
                     width: parent.width
 
                     Text {
-                        id: text
+                        id: bodyText
                         anchors.centerIn: parent
                         width: rect.width - 20
                         text: '<html>' + body + '</html>'
