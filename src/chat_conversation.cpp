@@ -36,6 +36,11 @@
 #define SPACING 2
 #endif
 
+#ifdef USE_DECLARATIVE
+#include <QDeclarativeContext>
+#include <QDeclarativeView>
+#endif
+
 ChatConversation::ChatConversation(QWidget *parent)
     : ChatPanel(parent),
     spacerItem(0)
@@ -67,6 +72,14 @@ ChatConversation::ChatConversation(QWidget *parent)
     check = connect(chatHistory->scene(), SIGNAL(sceneRectChanged(QRectF)),
                     panelBar, SLOT(reposition()));
     Q_ASSERT(check);
+
+#ifdef USE_DECLARATIVE
+    QDeclarativeView *view = new QDeclarativeView;
+    QDeclarativeContext *ctxt = view->rootContext();
+    ctxt->setContextProperty("historyModel", chatHistoryWidget->model());
+    view->setSource(QUrl("src/data/history.qml"));
+    layout->addWidget(view);
+#endif
 
     layout->addWidget(chatHistory);
     filterDrops(chatHistory->viewport());

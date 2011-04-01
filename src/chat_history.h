@@ -151,6 +151,7 @@ public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
     void addMessage(const ChatMessage &message);
     void adjustSize();
+    ChatHistoryModel *model();
     void setView(QGraphicsView *view);
 
 signals:

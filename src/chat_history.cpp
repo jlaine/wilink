@@ -66,6 +66,11 @@ enum HistoryColumns {
     MaxColumn
 };
 
+enum HistoryRole {
+    BodyRole = Qt::UserRole,
+    FromRole,
+};
+
 class ChatHistoryItem : public ChatModelItem
 {
 public:
@@ -589,6 +594,12 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     : ChatModel(parent)
 {
     rootItem = new ChatHistoryItem;
+
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(BodyRole, "body");
+    roleNames.insert(FromRole, "from");
+    setRoleNames(roleNames);
 }
 
 void ChatHistoryModel::addMessage(const ChatMessage &message)
@@ -678,6 +689,30 @@ int ChatHistoryModel::columnCount(const QModelIndex &parent) const
 
 QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
 {
+    ChatHistoryItem *item = static_cast<ChatHistoryItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == BodyRole) {
+        if (item->children.isEmpty())
+            return item->message.body;
+        else {
+            QStringList bodies;
+            foreach (ChatModelItem *ptr, item->children) {
+                ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
+                bodies << child->message.body; 
+            }
+            return bodies.join("<br/>");
+        }
+    } else if (role == FromRole) {
+        if (item->children.isEmpty())
+            return item->message.from;
+        else {
+            ChatHistoryItem *child = static_cast<ChatHistoryItem*>(item->children.first());
+            return child->message.from;
+        }
+    }
+
     return QVariant();
 }
 
@@ -1001,6 +1036,11 @@ ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
         hit = hit->parentItem();
     }
     return 0;
+}
+
+ChatHistoryModel *ChatHistoryWidget::model()
+{
+    return m_model;
 }
 
 void ChatHistoryWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
