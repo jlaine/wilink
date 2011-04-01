@@ -501,8 +501,8 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(historyWidget(), SIGNAL(messageClicked(ChatMessage)),
-                    this, SLOT(messageClicked(ChatMessage)));
+    check = connect(this, SIGNAL(messageClicked(ChatMessage)),
+                    this, SLOT(onMessageClicked(ChatMessage)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
@@ -565,7 +565,7 @@ void ChatRoom::join()
     nickName = rosterModel->ownName();
 
     // clear history
-    historyWidget()->clear();
+    clear();
 
     // send join request
     client->findExtension<QXmppMucManager>()->joinRoom(roomJid, nickName);
@@ -596,7 +596,7 @@ void ChatRoom::leave()
     deleteLater();
 }
 
-void ChatRoom::messageClicked(const ChatMessage &msg)
+void ChatRoom::onMessageClicked(const ChatMessage &msg)
 {
     QModelIndex roomIndex = rosterModel->findItem(roomJid);
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
@@ -632,7 +632,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         message.date = msg.stamp();
         if (!message.date.isValid())
             message.date = client->serverTime();
-        historyWidget()->addMessage(message);
+        addMessage(message);
 
         // notify user
         if (notifyMessages || message.body.contains("@" + nickName))

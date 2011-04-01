@@ -57,6 +57,9 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistoryWidget = new ChatHistoryWidget;
     chatHistory->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(chatHistory);
+    check = connect(chatHistoryWidget, SIGNAL(messageClicked(ChatMessage)),
+                    this, SIGNAL(messageClicked(ChatMessage)));
+    Q_ASSERT(check);
 
     panelBar = new ChatPanelBar(chatHistory);
     panelBar->setZValue(10);
@@ -119,14 +122,19 @@ ChatConversation::ChatConversation(QWidget *parent)
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 }
 
+void ChatConversation::addMessage(const ChatMessage &message)
+{
+    chatHistoryWidget->addMessage(message);
+}
+
 void ChatConversation::addWidget(ChatPanelWidget *widget)
 {
     panelBar->addWidget(widget);
 }
 
-ChatHistoryWidget *ChatConversation::historyWidget()
+void ChatConversation::clear()
 {
-    return chatHistoryWidget;
+    chatHistoryWidget->clear();
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)

@@ -26,6 +26,7 @@
 
 class ChatEdit;
 class ChatHistoryWidget;
+class ChatMessage;
 class ChatSearchBar;
 class QGraphicsView;
 class QSpacerItem;
@@ -36,14 +37,19 @@ class ChatConversation : public ChatPanel
 
 public:
     ChatConversation(QWidget *parent = NULL);
+    void addMessage(const ChatMessage &message);
     void addWidget(ChatPanelWidget *widget);
+
+public slots:
+    void clear();
+
+signals:
+    void messageClicked(const ChatMessage &message);
 
 protected slots:
     void slotSearchDisplayed(bool visible);
 
 protected:
-    ChatHistoryWidget *historyWidget();
-
     // FIXME: this should be private
     ChatEdit *chatInput;
 

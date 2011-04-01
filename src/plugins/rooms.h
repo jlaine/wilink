@@ -101,7 +101,7 @@ private slots:
     void disconnected();
     void join();
     void leave();
-    void messageClicked(const ChatMessage &msg);
+    void onMessageClicked(const ChatMessage &msg);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &msg);
     void returnPressed();

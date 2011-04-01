@@ -117,7 +117,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.from = msg.isReceived() ? rosterModel->contactName(chatRemoteJid) : rosterModel->ownName();
         message.fromJid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
         message.received = msg.isReceived();
-        historyWidget()->addMessage(message);
+        addMessage(message);
     }
 }
 
@@ -214,7 +214,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.from = rosterModel->contactName(chatRemoteJid);
     message.fromJid = chatRemoteJid;
     message.received = true;
-    historyWidget()->addMessage(message);
+    addMessage(message);
 
     // queue notification
     queueNotification(message.body);
@@ -255,7 +255,7 @@ void ChatDialog::returnPressed()
     message.date = client->serverTime();
     message.from = rosterModel->ownName();
     message.received = false;
-    historyWidget()->addMessage(message);
+    addMessage(message);
 
     // play sound
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());
