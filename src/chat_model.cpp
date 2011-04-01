@@ -54,7 +54,7 @@ void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
         pos = parentItem->children.size();
     beginInsertRows(createIndex(parentItem, 0), pos, pos);
     item->parent = parentItem;
-    parentItem->children.append(item);
+    parentItem->children.insert(pos, item);
     endInsertRows();
 }
 
