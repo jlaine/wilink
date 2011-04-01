@@ -47,11 +47,12 @@ ChatModel::~ChatModel()
     delete rootItem;
 }
 
-void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem)
+void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
 {
     Q_ASSERT(!item->parent);
-    const int size = parentItem->children.size();
-    beginInsertRows(createIndex(parentItem, 0), size, size);
+    if (pos < 0 || pos > parentItem->children.size())
+        pos = parentItem->children.size();
+    beginInsertRows(createIndex(parentItem, 0), pos, pos);
     item->parent = parentItem;
     parentItem->children.append(item);
     endInsertRows();

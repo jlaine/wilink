@@ -61,6 +61,17 @@ static QList<TextTransform> textTransforms;
 static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^ ]+)\\b");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
+enum HistoryColumns {
+    MainColumn = 0,
+    MaxColumn
+};
+
+class ChatHistoryItem : public ChatModelItem
+{
+public:
+    ChatMessage message;
+};
+
 /** Constructs a new ChatMessage.
  */
 ChatMessage::ChatMessage()
@@ -574,6 +585,102 @@ QGraphicsTextItem *ChatMessageWidget::textItem()
     return bodyText;
 }
 
+ChatHistoryModel::ChatHistoryModel(QObject *parent)
+    : ChatModel(parent)
+{
+    rootItem = new ChatHistoryItem;
+}
+
+void ChatHistoryModel::addMessage(const ChatMessage &message)
+{
+    if (message.body.isEmpty())
+        return;
+
+    // position cursor
+    ChatHistoryItem *prevMsg = 0;
+    ChatHistoryItem *nextMsg = 0;
+    foreach (ChatModelItem *bubblePtr, rootItem->children) {
+        ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(bubblePtr);
+        foreach (ChatModelItem *childPtr, bubble->children) {
+            ChatHistoryItem *child = static_cast<ChatHistoryItem*>(childPtr);
+            // check for collision
+            if (message.archived != child->message.archived &&
+                message.fromJid == child->message.fromJid &&
+                message.body == child->message.body &&
+                qAbs(message.date.secsTo(child->message.date)) < 10)
+                return;
+
+            // we use greater or equal comparison (and not strictly greater) dates
+            // because messages are usually received in chronological order
+            if (message.date >= child->message.date) {
+                prevMsg = child;
+            } else if (!nextMsg) {
+                nextMsg = child;
+            }
+        }
+    }
+
+    // prepare message
+    ChatHistoryItem *msg = new ChatHistoryItem;
+    msg->message = message;
+
+    if (prevMsg && prevMsg->message.groupWith(message))
+    {
+        // message belongs to the same bubble as previous message
+        addItem(msg, prevMsg->parent, prevMsg->row() + 1);
+    }
+    else if (nextMsg && nextMsg->message.groupWith(message))
+    {
+        // message belongs to the same bubble as next message
+        ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(nextMsg->parent);
+        addItem(msg, nextMsg->parent, nextMsg->row());
+    }
+    else
+    {
+        // split the previous bubble if needed
+        int bubblePos = 0;
+        if (prevMsg)
+        {
+            ChatModelItem *prevBubble = prevMsg->parent;
+            bubblePos = prevBubble->row() + 1;
+
+            // if the previous message is not the last in its bubble, split
+            const int index = prevMsg->row();
+            const int lastRow = prevBubble->children.size() - 1;
+            if (index < lastRow) {
+                ChatHistoryItem *bubble = new ChatHistoryItem;
+                addItem(bubble, rootItem, bubblePos);
+
+                const int firstRow = index + 1;
+                beginMoveRows(createIndex(prevBubble), firstRow, lastRow,
+                              createIndex(bubble), 0);
+                for (int i = lastRow; i >= firstRow; --i) {
+                    ChatModelItem *item = prevBubble->children.at(i);
+                    item->parent = bubble;
+                    bubble->children.insert(0, item);
+                    prevBubble->children.removeAt(i);
+                }
+                endMoveRows();
+            }
+        }
+
+        // insert the new bubble
+        ChatHistoryItem *bubble = new ChatHistoryItem;
+        addItem(bubble, rootItem, bubblePos);
+        addItem(msg, bubble);
+    }
+}
+
+int ChatHistoryModel::columnCount(const QModelIndex &parent) const
+{
+    return MaxColumn;
+}
+
+QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}
+
 /** Constructs a new ChatHistoryWidget.
  *
  * @param parent
@@ -584,6 +691,8 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_view(0),
     m_lastFindWidget(0)
 {
+    m_model = new ChatHistoryModel(this);
+
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->setSpacing(0);
@@ -596,6 +705,7 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
 
 void ChatHistoryWidget::addMessage(const ChatMessage &message)
 {
+    m_model->addMessage(message);
     if (message.body.isEmpty())
         return;
 

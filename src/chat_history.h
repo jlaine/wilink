@@ -25,10 +25,13 @@
 #include <QTextCursor>
 #include <QTextDocument>
 
+#include "chat_model.h"
+
 class QGraphicsLinearLayout;
 class QGraphicsView;
 class QUrl;
 
+class ChatHistoryModelPrivate;
 class ChatMessageWidget;
 class ChatSearchBubble;
 typedef QPair<QRectF, QTextCursor> RectCursor;
@@ -124,6 +127,20 @@ private:
     QGraphicsTextItem *dateText;
 };
 
+class ChatHistoryModel : public ChatModel
+{
+    Q_OBJECT
+
+public:
+    ChatHistoryModel(QObject *parent = 0);
+    void addMessage(const ChatMessage &message);
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+private:
+    ChatHistoryModelPrivate *d;
+};
+
 /** The ChatHistoryWidget class represents a widget containing a list
  *  of ChatMessageWidget.
  */
@@ -173,6 +190,7 @@ private:
     qreal m_maximumWidth;
     QList<ChatMessageBubble*> m_bubbles;
     QList<ChatMessageWidget*> m_messages;
+    ChatHistoryModel *m_model;
 
     // selection
     QList<ChatMessageWidget*> m_selectedMessages;
