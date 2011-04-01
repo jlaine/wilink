@@ -697,12 +697,12 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         if (item->children.isEmpty())
             return item->message.body;
         else {
-            QStringList bodies;
+            QString bodies;
             foreach (ChatModelItem *ptr, item->children) {
                 ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
-                bodies << child->message.body; 
+                bodies += "<p>" + child->message.html() + "</p>";
             }
-            return bodies.join("<br/>");
+            return bodies;
         }
     } else if (role == FromRole) {
         if (item->children.isEmpty())

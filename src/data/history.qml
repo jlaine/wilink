@@ -22,28 +22,32 @@ import QtQuick 1.0
 Rectangle {
     width: 320
     height: 400
+    anchors.topMargin: 10
 
     Component {
         id: historyDelegate
         Item {
             id: item
-            height: 100
-            width: parent.width
+            height: txt.height + 20
+            width: item.ListView.view.width - 10
 
             Rectangle {
                 id: rect
-                anchors.fill: parent
-                anchors.topMargin: 2
-                anchors.bottomMargin: 2
-                anchors.leftMargin: 3
-                anchors.rightMargin: 3
-                border.color: 'lightgray'
+                height: item.height - 10
+                width: item.width
+                border.color: 'darkgray'
                 border.width: 1
-                radius: 5
+                radius: 8
+                x: 5
+                y: 5
 
                 Text {
-                    anchors.fill: parent
-                    text: body
+                    id: txt
+                    anchors.centerIn: parent
+                    width: rect.width - 20
+                    text: '<html>' + body + '</html>'
+                    textFormat: Qt.RichText
+                    wrapMode: Text.WordWrap
                 }
 
                 states: State {
