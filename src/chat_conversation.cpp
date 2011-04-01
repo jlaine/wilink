@@ -78,6 +78,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     QDeclarativeContext *ctxt = view->rootContext();
     ctxt->setContextProperty("historyModel", chatHistoryWidget->model());
     view->setSource(QUrl("src/data/history.qml"));
+    view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view);
 #endif
 

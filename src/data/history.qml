@@ -27,7 +27,7 @@ Rectangle {
         id: historyDelegate
         Item {
             id: item
-            height: 42
+            height: 100
             width: parent.width
 
             Rectangle {
@@ -42,9 +42,7 @@ Rectangle {
                 radius: 5
 
                 Text {
-                    anchors.right: parent.right
-                    anchors.rightMargin: 5
-                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.fill: parent
                     text: body
                 }
 
