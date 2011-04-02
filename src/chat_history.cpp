@@ -813,7 +813,6 @@ void ChatHistoryWidget::clear()
 {
     QList<ChatMessageBubble*> bubbles = m_bubbles;
     m_bubbles.clear();
-    m_messages.clear();
     m_selectedMessages.clear();
     for (int i = 0; i < bubbles.size(); ++i)
         delete bubbles[i];
@@ -864,6 +863,9 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
     }
 
     // retrieve previous cursor
+    QList<ChatMessageWidget*> m_messages;
+    foreach (ChatMessageBubble *bubble, m_bubbles)
+        m_messages << bubble->m_messages;
     QTextCursor cursor;
     int startIndex = (flags && QTextDocument::FindBackward) ? m_messages.size() -1 : 0;
     if (m_lastFindWidget)
@@ -982,18 +984,17 @@ void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
 void ChatHistoryWidget::messageDestroyed(QObject *obj)
 {
     ChatMessageWidget *widget = static_cast<ChatMessageWidget*>(obj);
-    m_messages.removeAll(widget);
     m_selectedMessages.removeAll(widget);
 }
 
 ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
 {
     QGraphicsItem *hit = scene()->itemAt(pos);
-    while (hit)
-    {
+    while (hit) {
         ChatMessageWidget *widget = static_cast<ChatMessageWidget*>(hit);
-        if (m_messages.contains(widget))
-            return widget;
+        foreach (ChatMessageBubble *bubble, m_bubbles)
+            if (bubble->m_messages.contains(widget))
+                return widget;
         hit = hit->parentItem();
     }
     return 0;
@@ -1217,14 +1218,14 @@ void ChatHistoryWidget::slotSelectionChanged()
 
     // update the selected items
     QList<ChatMessageWidget*> newSelection;
-    foreach (ChatMessageWidget *child, m_messages)
-    {
-        if (selection.contains(child))
-        {
-            newSelection << child;
-            child->setSelection(rect);
-        } else if (m_selectedMessages.contains(child)) {
-            child->setSelection(QRectF());
+    foreach (ChatMessageBubble *bubble, m_bubbles) {
+        foreach (ChatMessageWidget *child, bubble->m_messages) {
+            if (selection.contains(child)) {
+                newSelection << child;
+                child->setSelection(rect);
+            } else if (m_selectedMessages.contains(child)) {
+                child->setSelection(QRectF());
+            }
         }
     }
     m_selectedMessages = newSelection;

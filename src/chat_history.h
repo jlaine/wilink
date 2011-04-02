@@ -90,6 +90,8 @@ private:
     // layout
     qreal m_maximumWidth;
     QList<ChatMessageWidget*> m_messages;
+
+    friend class ChatHistoryWidget;
 };
 
 /** The ChatMessageWidget class represents a widget for displaying a single
@@ -196,7 +198,6 @@ private:
     QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
     QList<ChatMessageBubble*> m_bubbles;
-    QList<ChatMessageWidget*> m_messages;
     ChatHistoryModel *m_model;
 
     // selection
