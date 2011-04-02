@@ -150,6 +150,18 @@ QModelIndex ChatModel::reparentItem(const QModelIndex &index, const QModelIndex 
     return createIndex(item, 0);
 }
 
+/** Returns the row for the given index.
+ *
+ * This method is provided for convenience when using models
+ * in a QML view.
+ *
+ * @param index
+ */
+int ChatModel::row(const QModelIndex &index) const
+{
+    return index.row();
+}
+
 int ChatModel::rowCount(const QModelIndex &parent) const
 {
     ChatModelItem *parentItem = parent.isValid() ? static_cast<ChatModelItem*>(parent.internalPointer()) : rootItem;

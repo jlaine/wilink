@@ -53,6 +53,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
     // Q_INVOKABLE so that it can be accessed from QML
+    Q_INVOKABLE int row(const QModelIndex &index) const;
     Q_INVOKABLE int rowCount(const QModelIndex &parent) const;
 
     QModelIndex reparentItem(const QModelIndex &index, const QModelIndex &newParent);

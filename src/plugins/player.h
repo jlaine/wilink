@@ -43,7 +43,6 @@ public:
     bool addUrl(const QUrl &url);
     QModelIndex cursor() const;
     void setCursor(const QModelIndex &index);
-    Q_INVOKABLE int row(const QModelIndex &row) const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

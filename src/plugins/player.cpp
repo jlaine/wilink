@@ -584,11 +584,6 @@ bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
     return false;
 }
 
-int PlayerModel::row(const QModelIndex &row) const
-{
-    return row.row();
-}
-
 void PlayerModel::stop()
 {
     if (d->playId >= 0) {
