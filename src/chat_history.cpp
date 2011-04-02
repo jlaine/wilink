@@ -67,7 +67,8 @@ enum HistoryColumns {
 };
 
 enum HistoryRole {
-    BodyRole = Qt::UserRole,
+    ActionRole = Qt::UserRole,
+    BodyRole,
     DateRole,
     FromRole,
     JidRole,
@@ -171,10 +172,21 @@ int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
  */
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
+    const bool isFirstMessage = m_messages.isEmpty();
+
+    // add widget
+    widget->setBubble(this);
+    widget->setParentItem(this);
+    widget->setMaximumWidth(m_maximumWidth - 2);
+    connect(widget, SIGNAL(destroyed(QObject*)),
+            this, SLOT(messageDestroyed(QObject*)));
+    m_messages.insert(pos, widget);
+
     // initialise style if this is the first message
-    if (m_messages.isEmpty()) {
-        if (!widget->message().isAction()) {
-            bool isReceived = widget->message().received;
+    if (isFirstMessage) {
+        QModelIndex index = widget->index();
+        if (!index.data(ActionRole).toBool()) {
+            bool isReceived = index.data(ReceivedRole).toBool();
             QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
             QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
 
@@ -185,7 +197,7 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
             m_from->setFont(font);
             m_from->installSceneEventFilter(this);
             m_from->setDefaultTextColor(baseColor);
-            m_from->setPlainText(widget->message().from);
+            m_from->setPlainText(index.data(FromRole).toString());
 
             // bubble frame
             m_frame = new QGraphicsPathItem(this);
@@ -194,12 +206,6 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
             m_frame->setBrush(backgroundColor);
         }
     }
-    widget->setBubble(this);
-    widget->setParentItem(this);
-    widget->setMaximumWidth(m_maximumWidth - 2);
-    connect(widget, SIGNAL(destroyed(QObject*)),
-            this, SLOT(messageDestroyed(QObject*)));
-    m_messages.insert(pos, widget);
     updateGeometry();
 }
 
@@ -226,7 +232,8 @@ bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
     if (item == m_from && !m_messages.isEmpty() &&
         event->type() == QEvent::GraphicsSceneMousePress)
     {
-        emit messageClicked(m_messages[0]->message());
+        // FIXME: restore this
+        //emit messageClicked(m_messages[0]->message());
     }
     return false;
 }
@@ -323,30 +330,12 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     }
 }
 
-/** Moves all the messages after the given one to a new bubble.
- *
- * @param widget
- */
-ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
+ChatMessageWidget *ChatMessageBubble::takeAt(int i)
 {
-    const int index = m_messages.indexOf(widget);
-    Q_ASSERT(index >= 0);
-
-    // if this is the last message in the bubble, do nothing
-    if (index == m_messages.size() - 1)
-        return 0;
-
-    ChatMessageBubble *bubble = new ChatMessageBubble(m_history);
-    for (int i = m_messages.size() - 1; i > index; --i)
-    {
-        ChatMessageWidget *widget = m_messages[i];
-        disconnect(widget, SIGNAL(destroyed(QObject*)),
-                   this, SLOT(messageDestroyed(QObject*)));
-        bubble->insertAt(0, widget);
-        m_messages.removeAt(i);
-    }
-    updateGeometry();
-    return bubble;
+    ChatMessageWidget *widget = m_messages.takeAt(i);
+    disconnect(widget, SIGNAL(destroyed(QObject*)),
+               this, SLOT(messageDestroyed(QObject*)));
+    return widget;
 }
 
 /** Constructs a new ChatMesageWidget.
@@ -357,8 +346,7 @@ ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
 ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
-    m_bubble(0),
-    m_message(message)
+    m_bubble(0)
 {
     const QColor textColor(Qt::black);
 
@@ -491,13 +479,6 @@ QModelIndex ChatMessageWidget::index() const
     return m_bubble->model()->index(row, 0, m_bubble->index());
 }
 
-/** Returns the message which this widget displays.
- */
-ChatMessage ChatMessageWidget::message() const
-{
-    return m_message;
-}
-
 /** Filters events on the body label.
  */
 bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
@@ -627,6 +608,7 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
 
     // set role names
     QHash<int, QByteArray> roleNames;
+    roleNames.insert(ActionRole, "action");
     roleNames.insert(BodyRole, "body");
     roleNames.insert(DateRole, "date");
     roleNames.insert(FromRole, "from");
@@ -729,7 +711,9 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     ChatHistoryItem *msg = static_cast<ChatHistoryItem*>(item->children.isEmpty() ? item : item->children.first());
-    if (role == BodyRole) {
+    if (role == ActionRole) {
+        return msg->message.isAction();
+    } else if (role == BodyRole) {
         if (item->children.isEmpty())
             return item->message.body;
         else {
@@ -774,7 +758,17 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_view(0),
     m_lastFindWidget(0)
 {
+    bool check;
     m_model = new ChatHistoryModel(this);
+    check = connect(m_model, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                    this, SLOT(rowsInserted(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(m_model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
+                    this, SLOT(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
+    Q_ASSERT(check);
+    check = connect(m_model, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                    this, SLOT(rowsRemoved(QModelIndex,int,int)));
+    Q_ASSERT(check);
 
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);
@@ -789,72 +783,6 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
 void ChatHistoryWidget::addMessage(const ChatMessage &message)
 {
     m_model->addMessage(message);
-    if (message.body.isEmpty())
-        return;
-
-    // position cursor
-    int pos = 0;
-    foreach (ChatMessageWidget *child, m_messages)
-    {
-        // check for collision
-        if (message.archived != child->message().archived &&
-            message.fromJid == child->message().fromJid &&
-            message.body == child->message().body &&
-            qAbs(message.date.secsTo(child->message().date)) < 10)
-            return;
-
-        // we use greater or equal comparison (and not strictly greater) dates
-        // because messages are usually received in chronological order
-        if (message.date >= child->message().date)
-            pos++;
-    }
-    ChatMessageWidget *prevMsg = (pos > 0) ? m_messages[pos-1] : 0;
-    ChatMessageWidget *nextMsg = (pos < m_messages.size()) ? m_messages[pos] : 0;
-
-    // prepare message
-    ChatMessageWidget *msg = new ChatMessageWidget(message, this);
-    if (prevMsg && prevMsg->message().groupWith(message))
-    {
-        // message belongs to the same bubble as previous message
-        ChatMessageBubble *bubble = prevMsg->bubble();
-        bubble->insertAt(bubble->indexOf(prevMsg) + 1, msg);
-    }
-    else if (nextMsg && nextMsg->message().groupWith(message))
-    {
-        // message belongs to the same bubble as next message
-        ChatMessageBubble *bubble = nextMsg->bubble();
-        bubble->insertAt(bubble->indexOf(nextMsg), msg);
-    }
-    else
-    {
-        // split the previous bubble if needed
-        int bubblePos = 0;
-        if (prevMsg)
-        {
-            ChatMessageBubble *prevBubble = prevMsg->bubble();
-            bubblePos = m_bubbles.indexOf(prevBubble) + 1;
-            ChatMessageBubble *nextBubble = prevBubble->splitAfter(prevMsg);
-            if (nextBubble)
-                insertBubble(bubblePos, nextBubble);
-        }
-
-        // insert the new bubble
-        ChatMessageBubble *bubble = new ChatMessageBubble(this);
-        bubble->insertAt(0, msg);
-        insertBubble(bubblePos, bubble);
-    }
-
-    connect(msg, SIGNAL(destroyed(QObject*)),
-            this, SLOT(messageDestroyed(QObject*)));
-    m_messages.insert(pos, msg);
-
-    // trigger updates
-    if (prevMsg)
-        prevMsg->dataChanged();
-    msg->dataChanged();
-    if (nextMsg)
-        nextMsg->dataChanged();
-    adjustSize();
 }
 
 /** Resizes the ChatHistoryWidget to its preferred size hint.
@@ -877,7 +805,7 @@ void ChatHistoryWidget::adjustSize()
     }
 
     // adjust viewed rectangle
-    if (m_messages.isEmpty())
+    if (m_bubbles.isEmpty())
         m_view->setSceneRect(0, 0, m_maximumWidth, 50);
     else
         m_view->setSceneRect(boundingRect());
@@ -1163,6 +1091,47 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
     e->accept();
 }
 
+void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int end)
+{
+    if (parent.isValid()) {
+        //qDebug("messages inserted in bubble %i: %i-%i", parent.row(), start, end);
+        ChatMessageBubble *bubble = m_bubbles.at(parent.row());
+        Q_ASSERT(bubble);
+        for (int i = start; i <= end; ++i) {
+            ChatMessageWidget *message = new ChatMessageWidget(ChatMessage(), bubble);
+            bubble->insertAt(i, message);
+            message->dataChanged();
+        }
+    } else {
+        //qDebug("bubbles inserted: %i-%i", start, end);
+        for (int i = start; i <= end; ++i)
+            insertBubble(i, new ChatMessageBubble(this));
+    }
+    adjustSize();
+}
+
+void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow)
+{
+    //qDebug("rows moved from %i: %i-%i to %i: %i", sourceParent.row(), sourceStart, sourceEnd, destParent.row(), destRow);
+    Q_ASSERT(sourceParent.isValid());
+    Q_ASSERT(destParent.isValid());
+
+    ChatMessageBubble *sourceBubble = m_bubbles.at(sourceParent.row());
+    ChatMessageBubble *destBubble = m_bubbles.at(destParent.row());
+    const int destEnd = destRow + (sourceEnd - sourceStart);
+    for (; destRow <= destEnd; ++destRow) {
+        ChatMessageWidget *message = sourceBubble->takeAt(sourceStart);
+        destBubble->insertAt(destRow, message);
+    }
+    adjustSize();
+}
+
+void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int end)
+{
+    qWarning("rows removed from %i: %i-%i", parent.row(), start, end);
+    adjustSize();
+}
+
 /** Selects all the messages.
  */
 void ChatHistoryWidget::selectAll()
@@ -1181,19 +1150,16 @@ QString ChatHistoryWidget::selectedText() const
     // gather the message senders
     QSet<QString> senders;
     foreach (ChatMessageWidget *child, m_selectedMessages)
-        senders.insert(child->message().from);
+        senders.insert(child->index().data(FromRole).toString());
 
     // copy selected messages
-    foreach (ChatMessageWidget *child, m_selectedMessages)
-    {
-        ChatMessage message = child->message();
-
+    foreach (ChatMessageWidget *child, m_selectedMessages) {
         if (!copyText.isEmpty())
             copyText += "\n";
 
         // if this is a conversation, prefix the message with its sender
         if (senders.size() > 1)
-            copyText += message.from + "> ";
+            copyText += child->index().data(FromRole).toString() + "> ";
 
         copyText += child->textItem()->textCursor().selectedText().replace("\r\n", "\n");
     }

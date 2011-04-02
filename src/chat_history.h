@@ -73,7 +73,7 @@ public:
     ChatHistoryModel *model();
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    ChatMessageBubble *splitAfter(ChatMessageWidget *widget);
+    ChatMessageWidget *takeAt(int pos);
 
 signals:
     void messageClicked(const ChatMessage &message);
@@ -106,7 +106,6 @@ public:
     ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     QModelIndex index() const;
-    ChatMessage message() const;
     ChatMessageBubble *bubble();
     void setBubble(ChatMessageBubble *bubble);
 
@@ -126,7 +125,6 @@ protected:
 private:
     int maxWidth;
     ChatMessageBubble *m_bubble;
-    ChatMessage m_message;
 
     // Text
     QString bodyAnchor;
@@ -176,6 +174,9 @@ public slots:
 private slots:
     void bubbleDestroyed(QObject *obj);
     void messageDestroyed(QObject *obj);
+    void rowsInserted(const QModelIndex &parent, int start, int end);
+    void rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow);
+    void rowsRemoved(const QModelIndex &parent, int start, int end);
     void slotScrollChanged();
     void slotSelectionChanged();
 
