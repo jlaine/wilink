@@ -56,7 +56,7 @@ Rectangle {
                         id: bodyText
                         anchors.centerIn: parent
                         width: rect.width - 20
-                        text: '<html>' + body + '</html>'
+                        text: '<html>' + html + '</html>'
                         textFormat: Qt.RichText
                         wrapMode: Text.WordWrap
                     }

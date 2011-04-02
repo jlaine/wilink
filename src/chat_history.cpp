@@ -70,6 +70,8 @@ enum HistoryRole {
     BodyRole = Qt::UserRole,
     DateRole,
     FromRole,
+    JidRole,
+    HtmlRole,
     ReceivedRole,
 };
 
@@ -384,9 +386,6 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-    // fetch data
-    dataChanged();
 }
 
 /** Returns the bubble this message belongs to.
@@ -463,6 +462,9 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
 
 void ChatMessageWidget::dataChanged()
 {
+    QString html = index().data(HtmlRole).toString();
+    if (html != m_message.html())
+        qDebug("message mismatch");
     bodyText->setHtml(m_message.html());
 
     if (dateText) {
@@ -588,7 +590,7 @@ void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
     if (!dateText)
         return;
     if (!previous ||
-        m_message.fromJid != previous->message().fromJid ||
+        m_message.fromJid != previous->m_message.fromJid ||
         m_message.date > previous->message().date.addSecs(60))
     {
         dateText->show();
@@ -636,6 +638,8 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     roleNames.insert(BodyRole, "body");
     roleNames.insert(DateRole, "date");
     roleNames.insert(FromRole, "from");
+    roleNames.insert(HtmlRole, "html");
+    roleNames.insert(JidRole, "jid");
     roleNames.insert(ReceivedRole, "received");
     setRoleNames(roleNames);
 }
@@ -737,6 +741,21 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         if (item->children.isEmpty())
             return item->message.body;
         else {
+            QStringList bodies;
+            foreach (ChatModelItem *ptr, item->children) {
+                ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
+                bodies << child->message.body;
+            }
+            return bodies.join("\n");
+        }
+    } else if (role == DateRole) {
+        return msg->message.date;
+    } else if (role == FromRole) {
+        return msg->message.from;
+    } else if (role == HtmlRole) {
+        if (item->children.isEmpty())
+            return item->message.html();
+        else {
             QString bodies;
             foreach (ChatModelItem *ptr, item->children) {
                 ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
@@ -744,10 +763,8 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
             }
             return bodies;
         }
-    } else if (role == DateRole) {
-        return msg->message.date;
-    } else if (role == FromRole) {
-        return msg->message.from;
+    } else if (role == JidRole) {
+        return msg->message.fromJid;
     } else if (role == ReceivedRole) {
         return msg->message.received;
     }
@@ -851,6 +868,7 @@ void ChatHistoryWidget::addMessage(const ChatMessage &message)
     connect(msg, SIGNAL(destroyed(QObject*)),
             this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, msg);
+    msg->dataChanged();
     adjustSize();
 }
 
