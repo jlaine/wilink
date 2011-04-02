@@ -462,15 +462,24 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
 
 void ChatMessageWidget::dataChanged()
 {
-    QString html = index().data(HtmlRole).toString();
-    if (html != m_message.html())
-        qDebug("message mismatch");
-    bodyText->setHtml(m_message.html());
+    QModelIndex idx = index();
+    const QString html = idx.data(HtmlRole).toString();
+    bodyText->setHtml(html);
 
     if (dateText) {
-        const QDateTime datetime = m_message.date.toLocalTime();
-        dateText->setPlainText(datetime.date() == QDate::currentDate() ?
-            datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+
+        QModelIndex previous = idx.sibling(idx.row() - 1 , idx.column());
+        if (!previous.isValid() ||
+            idx.data(JidRole) != previous.data(JidRole) ||
+            idx.data(DateRole).toDateTime() > previous.data(DateRole).toDateTime().addSecs(60))
+        {
+            const QDateTime datetime = idx.data(DateRole).toDateTime().toLocalTime();
+            dateText->setPlainText(datetime.date() == QDate::currentDate() ?
+                datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+            dateText->show();
+        } else {
+            dateText->hide();
+        }
     }
 }
 
@@ -580,23 +589,6 @@ void ChatMessageWidget::setSelection(const QRectF &rect)
     cursor.setPosition(startPos);
     cursor.setPosition(endPos, QTextCursor::KeepAnchor);
     bodyText->setTextCursor(cursor);
-}
-
-/** Determines whether to show message date depending
- *  on the previous message in the list.
- */
-void ChatMessageWidget::setPrevious(ChatMessageWidget *previous)
-{
-    if (!dateText)
-        return;
-    if (!previous ||
-        m_message.fromJid != previous->m_message.fromJid ||
-        m_message.date > previous->message().date.addSecs(60))
-    {
-        dateText->show();
-    } else {
-        dateText->hide();
-    }
 }
 
 /** Returns the given size hint for the message.
@@ -829,11 +821,6 @@ void ChatHistoryWidget::addMessage(const ChatMessage &message)
 
     // prepare message
     ChatMessageWidget *msg = new ChatMessageWidget(message, this);
-    if (prevMsg)
-        msg->setPrevious(prevMsg);
-    if (nextMsg)
-        nextMsg->setPrevious(msg);
-
     if (prevMsg && prevMsg->message().groupWith(message))
     {
         // message belongs to the same bubble as previous message
@@ -868,7 +855,13 @@ void ChatHistoryWidget::addMessage(const ChatMessage &message)
     connect(msg, SIGNAL(destroyed(QObject*)),
             this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, msg);
+
+    // trigger updates
+    if (prevMsg)
+        prevMsg->dataChanged();
     msg->dataChanged();
+    if (nextMsg)
+        nextMsg->dataChanged();
     adjustSize();
 }
 

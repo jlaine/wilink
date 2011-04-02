@@ -112,7 +112,6 @@ public:
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    void setPrevious(ChatMessageWidget *previous);
     QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
     QGraphicsTextItem *textItem();
