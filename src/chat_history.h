@@ -100,7 +100,7 @@ class ChatMessageWidget : public QGraphicsWidget
     Q_OBJECT
 
 public:
-    ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent);
+    ChatMessageWidget(QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     QModelIndex index() const;
     ChatMessageBubble *bubble();

@@ -129,7 +129,7 @@ bool ChatMessage::isAction() const
     return body.indexOf(meRegex) >= 0;
 }
 
-/** Constructs a new ChatMesageBubble.
+/** Constructs a new ChatMessageBubble.
  *
  * @param parent
  */
@@ -325,12 +325,11 @@ ChatMessageWidget *ChatMessageBubble::takeAt(int i)
     return widget;
 }
 
-/** Constructs a new ChatMesageWidget.
+/** Constructs a new ChatMessageWidget.
  *
- * @param message
  * @param parent
  */
-ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent)
+ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     maxWidth(2 * DATE_WIDTH),
     m_bubble(0)
@@ -1085,7 +1084,7 @@ void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int e
         ChatMessageBubble *bubble = m_bubbles.at(parent.row());
         Q_ASSERT(bubble);
         for (int i = start; i <= end; ++i) {
-            ChatMessageWidget *message = new ChatMessageWidget(ChatMessage(), bubble);
+            ChatMessageWidget *message = new ChatMessageWidget(bubble);
             bubble->insertAt(i, message);
             message->dataChanged();
         }
