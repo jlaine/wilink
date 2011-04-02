@@ -145,6 +145,8 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
 #endif
 }
 
+/** Returns the model index which this widget displays.
+ */
 QModelIndex ChatMessageBubble::index() const
 {
     int row = m_history->indexOf((ChatMessageBubble*)this);
@@ -206,6 +208,13 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 void ChatMessageBubble::messageDestroyed(QObject *obj)
 {
     m_messages.removeAll(static_cast<ChatMessageWidget*>(obj));
+}
+
+/** Returns the underlying data model.
+ */
+ChatHistoryModel *ChatMessageBubble::model()
+{
+    return m_history->model();
 }
 
 /** Filters events on the sender label.
@@ -461,6 +470,14 @@ void ChatMessageWidget::dataChanged()
         dateText->setPlainText(datetime.date() == QDate::currentDate() ?
             datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
     }
+}
+
+/** Returns the model index which this widget displays.
+ */
+QModelIndex ChatMessageWidget::index() const
+{
+    int row = m_bubble->indexOf((ChatMessageWidget*)this);
+    return m_bubble->model()->index(row, 0, m_bubble->index());
 }
 
 /** Returns the message which this widget displays.
@@ -1065,6 +1082,8 @@ ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
     return 0;
 }
 
+/** Returns the underlying data model.
+ */
 ChatHistoryModel *ChatHistoryWidget::model()
 {
     return m_model;

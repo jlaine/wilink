@@ -31,6 +31,7 @@ class QGraphicsLinearLayout;
 class QGraphicsView;
 class QUrl;
 
+class ChatHistoryModel;
 class ChatHistoryModelPrivate;
 class ChatHistoryWidget;
 class ChatMessageWidget;
@@ -69,7 +70,7 @@ public:
     QModelIndex index() const;
     int indexOf(ChatMessageWidget *widget) const;
     void insertAt(int pos, ChatMessageWidget *widget);
-
+    ChatHistoryModel *model();
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     ChatMessageBubble *splitAfter(ChatMessageWidget *widget);
@@ -104,6 +105,7 @@ class ChatMessageWidget : public QGraphicsWidget
 public:
     ChatMessageWidget(const ChatMessage &message, QGraphicsItem *parent);
     bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
+    QModelIndex index() const;
     ChatMessage message() const;
     ChatMessageBubble *bubble();
     void setBubble(ChatMessageBubble *bubble);
