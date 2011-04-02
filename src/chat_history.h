@@ -32,6 +32,7 @@ class QGraphicsView;
 class QUrl;
 
 class ChatHistoryModelPrivate;
+class ChatHistoryWidget;
 class ChatMessageWidget;
 class ChatSearchBubble;
 typedef QPair<QRectF, QTextCursor> RectCursor;
@@ -64,7 +65,8 @@ class ChatMessageBubble : public QGraphicsWidget
     Q_OBJECT
 
 public:
-    ChatMessageBubble(QGraphicsItem *parent = 0);
+    ChatMessageBubble(ChatHistoryWidget *parent);
+    QModelIndex index() const;
     int indexOf(ChatMessageWidget *widget) const;
     void insertAt(int pos, ChatMessageWidget *widget);
 
@@ -83,6 +85,7 @@ private slots:
     void messageDestroyed(QObject *obj);
 
 private:
+    ChatHistoryWidget *m_history;
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
 
@@ -111,6 +114,9 @@ public:
     QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
     void setSelection(const QRectF &rect);
     QGraphicsTextItem *textItem();
+
+public slots:
+    void dataChanged();
 
 protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
@@ -151,6 +157,7 @@ public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
     void addMessage(const ChatMessage &message);
     void adjustSize();
+    int indexOf(ChatMessageBubble *bubble);
     ChatHistoryModel *model();
     void setView(QGraphicsView *view);
 

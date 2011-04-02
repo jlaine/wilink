@@ -130,10 +130,11 @@ bool ChatMessage::isAction() const
  *
  * @param parent
  */
-ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
+ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     : QGraphicsWidget(parent),
     m_frame(0),
-    m_from(0)
+    m_from(0),
+    m_history(parent)
 {
 #if 0
     // bubble shadow
@@ -142,6 +143,12 @@ ChatMessageBubble::ChatMessageBubble(QGraphicsItem *parent)
     effect->setOffset(QPointF(2, 2));
     m_frame->setGraphicsEffect(effect);
 #endif
+}
+
+QModelIndex ChatMessageBubble::index() const
+{
+    int row = m_history->indexOf((ChatMessageBubble*)this);
+    return m_history->model()->index(row, 0, QModelIndex());
 }
 
 /** Returns the index of a message within the bubble.
@@ -318,7 +325,7 @@ ChatMessageBubble *ChatMessageBubble::splitAfter(ChatMessageWidget *widget)
     if (index == m_messages.size() - 1)
         return 0;
 
-    ChatMessageBubble *bubble = new ChatMessageBubble(parentItem());
+    ChatMessageBubble *bubble = new ChatMessageBubble(m_history);
     for (int i = m_messages.size() - 1; i > index; --i)
     {
         ChatMessageWidget *widget = m_messages[i];
@@ -352,7 +359,6 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     bodyText->setDefaultTextColor(textColor);
     bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
-    bodyText->setHtml(message.html());
 
     // message date
 #ifdef WILINK_EMBEDDED
@@ -364,14 +370,14 @@ ChatMessageWidget::ChatMessageWidget(const ChatMessage &message, QGraphicsItem *
     dateText->setFont(font);
     dateText->setDefaultTextColor(textColor);
     dateText->setTextWidth(90);
-
-    QDateTime datetime = message.date.toLocalTime();
-    dateText->setPlainText(datetime.date() == QDate::currentDate() ? datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
 #endif
 
     // set controls
     setAcceptedMouseButtons(Qt::NoButton);
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+    // fetch data
+    dataChanged();
 }
 
 /** Returns the bubble this message belongs to.
@@ -444,6 +450,17 @@ QList<RectCursor> ChatMessageWidget::chunkSelection(const QTextCursor &cursor) c
 bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelectionMode mode) const
 {
     return bodyText->collidesWithPath(path, mode);
+}
+
+void ChatMessageWidget::dataChanged()
+{
+    bodyText->setHtml(m_message.html());
+
+    if (dateText) {
+        const QDateTime datetime = m_message.date.toLocalTime();
+        dateText->setPlainText(datetime.date() == QDate::currentDate() ?
+            datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+    }
 }
 
 /** Returns the message which this widget displays.
@@ -1000,6 +1017,11 @@ void ChatHistoryWidget::findClear()
         delete item;
     }
     m_glassItems.clear();
+}
+
+int ChatHistoryWidget::indexOf(ChatMessageBubble *bubble)
+{
+    return m_bubbles.indexOf(bubble);
 }
 
 /** Inserts a bubble at the given position.
