@@ -82,9 +82,6 @@ protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
-private slots:
-    void messageDestroyed(QObject *obj);
-
 private:
     ChatHistoryWidget *m_history;
     QGraphicsPathItem *m_frame;

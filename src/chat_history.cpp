@@ -178,8 +178,6 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
     widget->setBubble(this);
     widget->setParentItem(this);
     widget->setMaximumWidth(m_maximumWidth - 2);
-    connect(widget, SIGNAL(destroyed(QObject*)),
-            this, SLOT(messageDestroyed(QObject*)));
     m_messages.insert(pos, widget);
 
     // initialise style if this is the first message
@@ -207,15 +205,6 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
         }
     }
     updateGeometry();
-}
-
-/** When a message is destroyed, update the bubble's internal list.
- *
- * @param obj
- */
-void ChatMessageBubble::messageDestroyed(QObject *obj)
-{
-    m_messages.removeAll(static_cast<ChatMessageWidget*>(obj));
 }
 
 /** Returns the underlying data model.
@@ -333,8 +322,6 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 ChatMessageWidget *ChatMessageBubble::takeAt(int i)
 {
     ChatMessageWidget *widget = m_messages.takeAt(i);
-    disconnect(widget, SIGNAL(destroyed(QObject*)),
-               this, SLOT(messageDestroyed(QObject*)));
     return widget;
 }
 
