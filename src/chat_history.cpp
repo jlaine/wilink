@@ -792,14 +792,6 @@ void ChatHistoryWidget::addMessage(const ChatMessage &message)
     if (message.body.isEmpty())
         return;
 
-    // check we hit the message limit and this message is too old
-    if (m_messages.size() >= MESSAGE_MAX)
-    {
-        ChatMessageWidget *oldest = m_messages.first();
-        if (message.date < oldest->message().date)
-            return;
-    }
-
     // position cursor
     int pos = 0;
     foreach (ChatMessageWidget *child, m_messages)
