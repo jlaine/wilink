@@ -501,8 +501,8 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(messageClicked(ChatMessage)),
-                    this, SLOT(onMessageClicked(ChatMessage)));
+    check = connect(this, SIGNAL(messageClicked(QModelIndex)),
+                    this, SLOT(onMessageClicked(QModelIndex)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
@@ -596,14 +596,13 @@ void ChatRoom::leave()
     deleteLater();
 }
 
-void ChatRoom::onMessageClicked(const ChatMessage &msg)
+void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
+    const QString fromJid = messageIndex.data(ChatHistoryModel::JidRole).toString();
     QModelIndex roomIndex = rosterModel->findItem(roomJid);
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
-    {
+    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++) {
         QModelIndex index = roomIndex.child(i, 0);
-        if (index.data(ChatRosterModel::IdRole).toString() == msg.fromJid)
-        {
+        if (index.data(ChatRosterModel::IdRole).toString() == fromJid) {
             rosterClick(index);
             break;
         }

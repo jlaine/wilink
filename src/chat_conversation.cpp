@@ -66,8 +66,8 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistoryWidget->setModel(chatHistoryModel);
     chatHistory->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(chatHistory);
-    check = connect(chatHistoryWidget, SIGNAL(messageClicked(ChatMessage)),
-                    this, SIGNAL(messageClicked(ChatMessage)));
+    check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
+                    this, SIGNAL(messageClicked(QModelIndex)));
     Q_ASSERT(check);
 
     panelBar = new ChatPanelBar(chatHistory);

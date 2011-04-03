@@ -76,7 +76,7 @@ public:
     ChatMessageWidget *takeAt(int pos);
 
 signals:
-    void messageClicked(const ChatMessage &message);
+    void messageClicked(const QModelIndex &index);
 
 protected:
     bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
@@ -171,7 +171,7 @@ public:
 
 signals:
     void findFinished(bool found);
-    void messageClicked(const ChatMessage &message);
+    void messageClicked(const QModelIndex &index);
 
 public slots:
     void clear();

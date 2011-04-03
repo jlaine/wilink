@@ -45,7 +45,7 @@ public slots:
     void clear();
 
 signals:
-    void messageClicked(const ChatMessage &message);
+    void messageClicked(const QModelIndex &index);
 
 protected slots:
     void slotSearchDisplayed(bool visible);

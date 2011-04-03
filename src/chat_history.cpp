@@ -211,8 +211,7 @@ bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
     if (item == m_from && !m_messages.isEmpty() &&
         event->type() == QEvent::GraphicsSceneMousePress)
     {
-        // FIXME: restore this
-        //emit messageClicked(m_messages[0]->message());
+        emit messageClicked(m_messages.first()->index());
     }
     return false;
 }
@@ -949,8 +948,8 @@ void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
                     this, SLOT(bubbleDestroyed(QObject*)));
     Q_ASSERT(check);
 
-    check = connect(bubble, SIGNAL(messageClicked(ChatMessage)),
-                    this, SIGNAL(messageClicked(ChatMessage)));
+    check = connect(bubble, SIGNAL(messageClicked(QModelIndex)),
+                    this, SIGNAL(messageClicked(QModelIndex)));
     Q_ASSERT(check);
 }
 
