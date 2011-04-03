@@ -744,18 +744,6 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_view(0),
     m_lastFindWidget(0)
 {
-    bool check;
-    m_model = new ChatHistoryModel(this);
-    check = connect(m_model, SIGNAL(rowsInserted(QModelIndex,int,int)),
-                    this, SLOT(rowsInserted(QModelIndex,int,int)));
-    Q_ASSERT(check);
-    check = connect(m_model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
-                    this, SLOT(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
-    Q_ASSERT(check);
-    check = connect(m_model, SIGNAL(rowsRemoved(QModelIndex,int,int)),
-                    this, SLOT(rowsRemoved(QModelIndex,int,int)));
-    Q_ASSERT(check);
-
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(0, 0, 0, 0);
     m_layout->setSpacing(0);
@@ -764,11 +752,6 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_trippleClickTimer = new QTimer(this);
     m_trippleClickTimer->setSingleShot(true);
     m_trippleClickTimer->setInterval(QApplication::doubleClickInterval());
-}
-
-void ChatHistoryWidget::addMessage(const ChatMessage &message)
-{
-    m_model->addMessage(message);
 }
 
 /** Resizes the ChatHistoryWidget to its preferred size hint.
@@ -1005,6 +988,26 @@ ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
 ChatHistoryModel *ChatHistoryWidget::model()
 {
     return m_model;
+}
+
+/** Sets the underlying data model.
+ *
+ * @param model
+ */
+void ChatHistoryWidget::setModel(ChatHistoryModel *model)
+{
+    bool check;
+
+    m_model = model;
+    check = connect(m_model, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                    this, SLOT(rowsInserted(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(m_model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
+                    this, SLOT(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
+    Q_ASSERT(check);
+    check = connect(m_model, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                    this, SLOT(rowsRemoved(QModelIndex,int,int)));
+    Q_ASSERT(check);
 }
 
 void ChatHistoryWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

@@ -25,6 +25,7 @@
 #include "chat_panel.h"
 
 class ChatEdit;
+class ChatHistoryModel;
 class ChatHistoryWidget;
 class ChatMessage;
 class ChatSearchBar;
@@ -55,6 +56,7 @@ protected:
 
 private:
     QGraphicsView *chatHistory;
+    ChatHistoryModel *chatHistoryModel;
     ChatHistoryWidget *chatHistoryWidget;
     ChatSearchBar *chatSearch;
     ChatPanelBar *panelBar;

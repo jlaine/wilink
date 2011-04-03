@@ -153,10 +153,10 @@ class ChatHistoryWidget : public QGraphicsWidget
     Q_OBJECT
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
-    void addMessage(const ChatMessage &message);
     void adjustSize();
     int indexOf(ChatMessageBubble *bubble);
     ChatHistoryModel *model();
+    void setModel(ChatHistoryModel *model);
     void setView(QGraphicsView *view);
 
 signals:

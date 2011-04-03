@@ -53,6 +53,9 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* status bar */
     layout->addLayout(headerLayout());
 
+    /* chat history model */
+    chatHistoryModel = new ChatHistoryModel(this);
+
     /* chat history */
     chatHistory = new QGraphicsView;
     chatHistory->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
@@ -60,6 +63,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistory->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     chatHistoryWidget = new ChatHistoryWidget;
+    chatHistoryWidget->setModel(chatHistoryModel);
     chatHistory->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(chatHistory);
     check = connect(chatHistoryWidget, SIGNAL(messageClicked(ChatMessage)),
@@ -76,7 +80,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 #ifdef USE_DECLARATIVE
     QDeclarativeView *view = new QDeclarativeView;
     QDeclarativeContext *ctxt = view->rootContext();
-    ctxt->setContextProperty("historyModel", chatHistoryWidget->model());
+    ctxt->setContextProperty("historyModel", chatHistoryModel);
     view->setSource(QUrl("qrc:/history.qml"));
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
@@ -138,7 +142,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 
 void ChatConversation::addMessage(const ChatMessage &message)
 {
-    chatHistoryWidget->addMessage(message);
+    chatHistoryModel->addMessage(message);
 }
 
 void ChatConversation::addWidget(ChatPanelWidget *widget)
