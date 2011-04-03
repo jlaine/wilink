@@ -136,6 +136,16 @@ class ChatHistoryModel : public ChatModel
     Q_OBJECT
 
 public:
+    enum HistoryRole {
+        ActionRole = Qt::UserRole,
+        BodyRole,
+        DateRole,
+        FromRole,
+        JidRole,
+        HtmlRole,
+        ReceivedRole,
+    };
+
     ChatHistoryModel(QObject *parent = 0);
     void addMessage(const ChatMessage &message);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;

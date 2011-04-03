@@ -66,16 +66,6 @@ enum HistoryColumns {
     MaxColumn
 };
 
-enum HistoryRole {
-    ActionRole = Qt::UserRole,
-    BodyRole,
-    DateRole,
-    FromRole,
-    JidRole,
-    HtmlRole,
-    ReceivedRole,
-};
-
 class ChatHistoryItem : public ChatModelItem
 {
 public:
@@ -183,8 +173,8 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
     // initialise style if this is the first message
     if (isFirstMessage) {
         QModelIndex index = widget->index();
-        if (!index.data(ActionRole).toBool()) {
-            bool isReceived = index.data(ReceivedRole).toBool();
+        if (!index.data(ChatHistoryModel::ActionRole).toBool()) {
+            bool isReceived = index.data(ChatHistoryModel::ReceivedRole).toBool();
             QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
             QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
 
@@ -195,7 +185,7 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
             m_from->setFont(font);
             m_from->installSceneEventFilter(this);
             m_from->setDefaultTextColor(baseColor);
-            m_from->setPlainText(index.data(FromRole).toString());
+            m_from->setPlainText(index.data(ChatHistoryModel::FromRole).toString());
 
             // bubble frame
             m_frame = new QGraphicsPathItem(this);
@@ -437,17 +427,17 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
 void ChatMessageWidget::dataChanged()
 {
     QModelIndex idx = index();
-    const QString html = idx.data(HtmlRole).toString();
+    const QString html = idx.data(ChatHistoryModel::HtmlRole).toString();
     bodyText->setHtml(html);
 
     if (dateText) {
 
         QModelIndex previous = idx.sibling(idx.row() - 1 , idx.column());
         if (!previous.isValid() ||
-            idx.data(JidRole) != previous.data(JidRole) ||
-            idx.data(DateRole).toDateTime() > previous.data(DateRole).toDateTime().addSecs(60))
+            idx.data(ChatHistoryModel::JidRole) != previous.data(ChatHistoryModel::JidRole) ||
+            idx.data(ChatHistoryModel::DateRole).toDateTime() > previous.data(ChatHistoryModel::DateRole).toDateTime().addSecs(60))
         {
-            const QDateTime datetime = idx.data(DateRole).toDateTime().toLocalTime();
+            const QDateTime datetime = idx.data(ChatHistoryModel::DateRole).toDateTime().toLocalTime();
             dateText->setPlainText(datetime.date() == QDate::currentDate() ?
                 datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
             dateText->show();
@@ -1140,7 +1130,7 @@ QString ChatHistoryWidget::selectedText() const
     // gather the message senders
     QSet<QString> senders;
     foreach (ChatMessageWidget *child, m_selectedMessages)
-        senders.insert(child->index().data(FromRole).toString());
+        senders.insert(child->index().data(ChatHistoryModel::FromRole).toString());
 
     // copy selected messages
     foreach (ChatMessageWidget *child, m_selectedMessages) {
@@ -1149,7 +1139,7 @@ QString ChatHistoryWidget::selectedText() const
 
         // if this is a conversation, prefix the message with its sender
         if (senders.size() > 1)
-            copyText += child->index().data(FromRole).toString() + "> ";
+            copyText += child->index().data(ChatHistoryModel::FromRole).toString() + "> ";
 
         copyText += child->textItem()->textCursor().selectedText().replace("\r\n", "\n");
     }
