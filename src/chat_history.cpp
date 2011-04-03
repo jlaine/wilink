@@ -774,11 +774,6 @@ void ChatHistoryWidget::adjustSize()
         scrollBar->setSliderPosition(scrollBar->maximum());
 }
 
-void ChatHistoryWidget::bubbleDestroyed(QObject *obj)
-{
-    m_bubbles.removeAll(static_cast<ChatMessageBubble*>(obj));
-}
-
 /** Clears all messages.
  */
 void ChatHistoryWidget::clear()
@@ -944,19 +939,9 @@ void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
     m_layout->insertItem(pos, bubble);
 
     bool check;
-    check = connect(bubble, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(bubbleDestroyed(QObject*)));
-    Q_ASSERT(check);
-
     check = connect(bubble, SIGNAL(messageClicked(QModelIndex)),
                     this, SIGNAL(messageClicked(QModelIndex)));
     Q_ASSERT(check);
-}
-
-void ChatHistoryWidget::messageDestroyed(QObject *obj)
-{
-    ChatMessageWidget *widget = static_cast<ChatMessageWidget*>(obj);
-    m_selectedMessages.removeAll(widget);
 }
 
 ChatMessageWidget *ChatHistoryWidget::messageWidgetAt(const QPointF &pos) const
@@ -1107,7 +1092,22 @@ void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceSta
 
 void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    qWarning("rows removed from %i: %i-%i", parent.row(), start, end);
+    qDebug("rows removed from %i: %i-%i", parent.row(), start, end);
+    if (parent.isValid()) {
+        ChatMessageBubble *bubble = m_bubbles.at(parent.row());
+        for (int i = end; i >= start; --i) {
+            ChatMessageWidget *message = bubble->takeAt(i);
+            m_selectedMessages.removeAll(message);
+            message->deleteLater();
+        }
+    } else {
+        for (int i = end; i >= start; --i) {
+            ChatMessageBubble *bubble = m_bubbles.takeAt(i);
+            foreach (ChatMessageWidget *message, bubble->m_messages)
+                m_selectedMessages.removeAll(message);
+            bubble->deleteLater();
+        }
+    }
     adjustSize();
 }
 

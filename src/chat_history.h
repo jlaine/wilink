@@ -181,8 +181,6 @@ public slots:
     void selectAll();
 
 private slots:
-    void bubbleDestroyed(QObject *obj);
-    void messageDestroyed(QObject *obj);
     void rowsInserted(const QModelIndex &parent, int start, int end);
     void rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow);
     void rowsRemoved(const QModelIndex &parent, int start, int end);
