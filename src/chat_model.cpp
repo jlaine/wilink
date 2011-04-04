@@ -88,8 +88,8 @@ bool ChatModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     ChatModelItem *parentItem = parent.isValid() ? static_cast<ChatModelItem*>(parent.internalPointer()) : rootItem;
 
-    const int minIndex = qMax(0, row);
-    const int maxIndex = qMin(row + count, parentItem->children.size()) - 1;
+    const int minIndex = qBound(0, row, parentItem->children.size() - 1);
+    const int maxIndex = qBound(0, row + count, parentItem->children.size() - 1);
     beginRemoveRows(parent, minIndex, maxIndex);
     for (int i = maxIndex; i >= minIndex; --i) {
         ChatModelItem *item = parentItem->children.takeAt(i);
