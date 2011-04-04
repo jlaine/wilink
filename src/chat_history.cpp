@@ -778,12 +778,9 @@ void ChatHistoryWidget::adjustSize()
  */
 void ChatHistoryWidget::clear()
 {
-    QList<ChatMessageBubble*> bubbles = m_bubbles;
-    m_bubbles.clear();
-    m_selectedMessages.clear();
-    for (int i = 0; i < bubbles.size(); ++i)
-        delete bubbles[i];
-    adjustSize();
+    int rows = m_model->rowCount(QModelIndex());
+    if (rows > 0)
+        m_model->removeRows(0, rows);
 }
 
 /** Copies the selected text to the clipboard.
