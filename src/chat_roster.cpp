@@ -318,6 +318,8 @@ QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
     ChatRosterItem *item = d->find(bareJid);
     if (item)
         return item->data(AvatarRole).value<QPixmap>();
+    else if (jidToBareJid(bareJid) == d->ownItem->id())
+        return d->ownItem->data(AvatarRole).value<QPixmap>();
     return QPixmap();
 }
 
@@ -800,6 +802,16 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
     }
     if (bareJid == d->client->configuration().jidBare())
     {
+        // read vCard image
+        QBuffer buffer;
+        buffer.setData(vcard.photo());
+        buffer.open(QIODevice::ReadOnly);
+        QImageReader imageReader(&buffer);
+#ifdef WILINK_EMBEDDED
+        imageReader.setScaledSize(QSize(32, 32));
+#endif
+        d->ownItem->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
+
         if (!vcard.nickName().isEmpty())
             d->ownItem->setData(NicknameRole, vcard.nickName());
         d->nickNameReceived = true;

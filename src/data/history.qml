@@ -37,11 +37,13 @@ Rectangle {
                 width: parent.width
 
                 Image {
+                    id: avatar
                     source: model.avatar
+                    height: 32
                     width: 32
                 }
                 Column {
-                    width: parent.width - 32
+                    width: parent.width - avatar.width
 
                     Item {
                         id: header

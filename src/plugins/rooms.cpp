@@ -475,11 +475,11 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     rosterModel(chatRosterModel)
 {
     setObjectName(jid);
+    setRosterModel(rosterModel);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
     setWindowExtra(jid);
     setWindowHelp(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
-    historyModel()->setRosterModel(rosterModel);
 
     bool check;
     check = connect(chatInput, SIGNAL(returnPressed()),

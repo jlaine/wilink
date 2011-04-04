@@ -24,6 +24,7 @@
 
 #include "chat_panel.h"
 
+class ChatConversationPrivate;
 class ChatEdit;
 class ChatHistoryModel;
 class ChatHistoryWidget;
@@ -39,8 +40,10 @@ class ChatConversation : public ChatPanel
 
 public:
     ChatConversation(QWidget *parent = NULL);
+    ~ChatConversation();
     void addWidget(ChatPanelWidget *widget);
     ChatHistoryModel *historyModel();
+    void setRosterModel(ChatRosterModel *rosterModel);
 
 public slots:
     void clear();
@@ -57,11 +60,11 @@ protected:
 
 private:
     QGraphicsView *chatHistory;
-    ChatHistoryModel *chatHistoryModel;
     ChatHistoryWidget *chatHistoryWidget;
     ChatSearchBar *chatSearch;
     ChatPanelBar *panelBar;
-    QSpacerItem *spacerItem;
+    QSpacerItem *m_spacerItem;
+    ChatConversationPrivate *d;
 };
 
 #endif

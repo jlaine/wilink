@@ -54,11 +54,11 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     rosterModel(chatRosterModel)
 {
     setObjectName(jid);
+    setRosterModel(rosterModel);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(rosterModel->contactAvatar(jid));
     setWindowExtra(rosterModel->contactExtra(jid));
 
-    historyModel()->setRosterModel(rosterModel);
 
     // load archive manager
     archiveManager = client->findExtension<QXmppArchiveManager>();

@@ -38,14 +38,61 @@
 
 #ifdef USE_DECLARATIVE
 #include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeImageProvider>
 #include <QDeclarativeView>
+
+class RosterImageProvider : public QDeclarativeImageProvider
+{
+public:
+    RosterImageProvider();
+    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
+    void setRosterModel(ChatRosterModel *rosterModel);
+
+private:
+    ChatRosterModel *m_rosterModel;
+};
+
+RosterImageProvider::RosterImageProvider()
+    : QDeclarativeImageProvider(Pixmap),
+    m_rosterModel(0)
+{
+}
+
+QPixmap RosterImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    Q_ASSERT(m_rosterModel);
+    const QPixmap pixmap = m_rosterModel->contactAvatar(id);
+    if (size)
+        *size = pixmap.size();
+    if (requestedSize.isValid())
+        return pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
+    else
+        return pixmap;
+}
+
+void RosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
+{
+    m_rosterModel = rosterModel;
+}
+
 #endif
+
+class ChatConversationPrivate
+{
+public:
+    ChatHistoryModel *historyModel;
+#ifdef USE_DECLARATIVE
+    RosterImageProvider *imageProvider;
+#endif
+};
 
 ChatConversation::ChatConversation(QWidget *parent)
     : ChatPanel(parent),
-    spacerItem(0)
+    m_spacerItem(0)
 {
     bool check;
+    d = new ChatConversationPrivate;
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -54,7 +101,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     layout->addLayout(headerLayout());
 
     /* chat history model */
-    chatHistoryModel = new ChatHistoryModel(this);
+    d->historyModel = new ChatHistoryModel(this);
 
     /* chat history */
     chatHistory = new QGraphicsView;
@@ -63,7 +110,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistory->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     chatHistoryWidget = new ChatHistoryWidget;
-    chatHistoryWidget->setModel(chatHistoryModel);
+    chatHistoryWidget->setModel(d->historyModel);
     chatHistory->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(chatHistory);
     check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
@@ -78,11 +125,14 @@ ChatConversation::ChatConversation(QWidget *parent)
     Q_ASSERT(check);
 
 #ifdef USE_DECLARATIVE
+    d->imageProvider = new RosterImageProvider;
+
     QDeclarativeView *view = new QDeclarativeView;
     QDeclarativeContext *ctxt = view->rootContext();
-    ctxt->setContextProperty("historyModel", chatHistoryModel);
-    view->setSource(QUrl("qrc:/history.qml"));
+    ctxt->setContextProperty("historyModel", d->historyModel);
+    view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    view->setSource(QUrl("qrc:/history.qml"));
     layout->addWidget(view, 1);
 #endif
 
@@ -90,8 +140,8 @@ ChatConversation::ChatConversation(QWidget *parent)
     filterDrops(chatHistory->viewport());
 
     /* spacer */
-    spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
-    layout->addSpacerItem(spacerItem);
+    m_spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addSpacerItem(m_spacerItem);
 
     /* search bar */
     chatSearch = new ChatSearchBar;
@@ -140,6 +190,11 @@ ChatConversation::ChatConversation(QWidget *parent)
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 }
 
+ChatConversation::~ChatConversation()
+{
+    delete d;
+}
+
 void ChatConversation::addWidget(ChatPanelWidget *widget)
 {
     panelBar->addWidget(widget);
@@ -152,17 +207,25 @@ void ChatConversation::clear()
 
 ChatHistoryModel *ChatConversation::historyModel()
 {
-    return chatHistoryModel;
+    return d->historyModel;
+}
+
+void ChatConversation::setRosterModel(ChatRosterModel *model)
+{
+    d->historyModel->setRosterModel(model);
+#ifdef USE_DECLARATIVE
+    d->imageProvider->setRosterModel(model);
+#endif
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)
 {
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
-        spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        m_spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
     else {
         chatHistoryWidget->findClear();
-        spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        m_spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
     vbox->invalidate();
 }
