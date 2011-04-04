@@ -36,7 +36,6 @@
 #define SPACING 2
 #endif
 
-#undef USE_DECLARATIVE
 #ifdef USE_DECLARATIVE
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>

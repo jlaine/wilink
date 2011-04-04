@@ -357,13 +357,16 @@ ChatMessageBubble *ChatMessageWidget::bubble()
 }
 
 /** Break a text selection into a list of rectangles, which one rectangle per line.
+ *
+ * @param textItem
+ * @param cursor
  */
-QList<RectCursor> ChatMessageWidget::chunkSelection(const QTextCursor &cursor) const
+static QList<RectCursor> chunkSelection(QGraphicsTextItem *textItem, const QTextCursor &cursor)
 {
     QList<RectCursor> rectangles;
 
     const QTextLayout *layout = cursor.block().layout();
-    const qreal margin = bodyText->document()->documentMargin();
+    const qreal margin = cursor.document()->documentMargin();
     const int startPos = cursor.anchor() - cursor.block().position();
     const int endPos = cursor.position() - cursor.block().position();
     for (int i = 0; i < layout->lineCount(); ++i)
@@ -402,7 +405,7 @@ QList<RectCursor> ChatMessageWidget::chunkSelection(const QTextCursor &cursor) c
         localRect.setBottomRight(bottomRight);
 
         // map to scene coordinates
-        rectangles << qMakePair(bodyText->mapRectToScene(localRect.translated(margin, margin)), localCursor);
+        rectangles << qMakePair(textItem->mapRectToScene(localRect.translated(margin, margin)), localCursor);
 
         if (lineEnd > endPos)
             break;
@@ -410,6 +413,8 @@ QList<RectCursor> ChatMessageWidget::chunkSelection(const QTextCursor &cursor) c
 
     return rectangles;
 }
+
+
 
 /** Returns true if the message's body collides with the given path.
  *
@@ -529,22 +534,23 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 
 /** Sets the text cursor to select the given rectangle.
  *
+ * @param textItem
  * @param rect
  */
-void ChatMessageWidget::setSelection(const QRectF &rect)
+static void setSelection(QGraphicsTextItem *textItem, const QRectF &rect)
 {
-    QRectF localRect = bodyText->boundingRect().intersected(bodyText->mapRectFromScene(rect));
+    QRectF localRect = textItem->boundingRect().intersected(textItem->mapRectFromScene(rect));
 
     // determine selected text
-    QAbstractTextDocumentLayout *layout = bodyText->document()->documentLayout();
+    QAbstractTextDocumentLayout *layout = textItem->document()->documentLayout();
     int startPos = layout->hitTest(localRect.topLeft(), Qt::FuzzyHit);
     int endPos = layout->hitTest(localRect.bottomRight(), Qt::FuzzyHit);
 
     // set cursor
-    QTextCursor cursor(bodyText->document());
+    QTextCursor cursor(textItem->document());
     cursor.setPosition(startPos);
     cursor.setPosition(endPos, QTextCursor::KeepAnchor);
-    bodyText->setTextCursor(cursor);
+    textItem->setTextCursor(cursor);
 }
 
 /** Returns the given size hint for the message.
@@ -830,8 +836,7 @@ void ChatHistoryWidget::adjustSize()
     if (!m_glassItems.isEmpty() && m_lastFindWidget)
     {
         findClear();
-        foreach (const RectCursor &textRect, m_lastFindWidget->chunkSelection(m_lastFindCursor))
-        {
+        foreach (RectCursor textRect, chunkSelection(m_lastFindWidget, m_lastFindCursor)) {
             ChatSearchBubble *glass = new ChatSearchBubble;
             glass->setSelection(textRect);
             scene()->addItem(glass);
@@ -915,9 +920,11 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
     }
 
     // retrieve previous cursor
-    QList<ChatMessageWidget*> m_messages;
+    QList<QGraphicsTextItem*> m_messages;
     foreach (ChatMessageBubble *bubble, m_bubbles)
-        m_messages << bubble->m_messages;
+        foreach (ChatMessageWidget *message, bubble->m_messages)
+            m_messages << message->textItem();
+
     QTextCursor cursor;
     int startIndex = (flags && QTextDocument::FindBackward) ? m_messages.size() -1 : 0;
     if (m_lastFindWidget)
@@ -940,8 +947,8 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
     int i = startIndex;
     while (i >= 0 && i < m_messages.size())
     {
-        ChatMessageWidget *child = m_messages[i];
-        QTextDocument *document = child->textItem()->document();
+        QGraphicsTextItem *textItem = m_messages[i];
+        QTextDocument *document = textItem->document();
 
         // position cursor
         if (cursor.isNull())
@@ -956,7 +963,7 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
         {
             // build new glass
             QRectF boundingRect;
-            foreach (const RectCursor &textRect, child->chunkSelection(cursor))
+            foreach (const RectCursor &textRect, chunkSelection(textItem, cursor))
             {
                 ChatSearchBubble *glass = new ChatSearchBubble;
                 glass->setSelection(textRect);
@@ -972,7 +979,7 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
             ensureVisible(boundingRect);
 
             m_lastFindCursor = cursor;
-            m_lastFindWidget = child;
+            m_lastFindWidget = textItem;
             emit findFinished(true);
             return;
         } else {
@@ -1091,7 +1098,7 @@ void ChatHistoryWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
         // update selection
         foreach (ChatMessageWidget *child, m_selectedMessages)
             if (child != selected)
-                child->setSelection(QRectF());
+                setSelection(child->textItem(), QRectF());
         m_selectedMessages.clear();
         m_selectedMessages << selected;
         QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
@@ -1135,7 +1142,7 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
         // update selection
         foreach (ChatMessageWidget *child, m_selectedMessages)
             if (child != selected)
-                child->setSelection(QRectF());
+                setSelection(child->textItem(), QRectF());
         m_selectedMessages.clear();
         m_selectedMessages << selected;
         QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
@@ -1301,9 +1308,9 @@ void ChatHistoryWidget::slotSelectionChanged()
         foreach (ChatMessageWidget *child, bubble->m_messages) {
             if (selection.contains(child)) {
                 newSelection << child;
-                child->setSelection(rect);
+                setSelection(child->textItem(), rect);
             } else if (m_selectedMessages.contains(child)) {
-                child->setSelection(QRectF());
+                setSelection(child->textItem(), QRectF());
             }
         }
     }

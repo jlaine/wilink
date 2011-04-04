@@ -112,8 +112,6 @@ public:
 
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    QList<RectCursor> chunkSelection(const QTextCursor &cursor) const;
-    void setSelection(const QRectF &rect);
     QGraphicsTextItem *textItem();
 
 public slots:
@@ -226,7 +224,7 @@ private:
 
     // search
     QList<ChatSearchBubble*> m_glassItems;
-    ChatMessageWidget *m_lastFindWidget;
+    QGraphicsTextItem *m_lastFindWidget;
     QTextCursor m_lastFindCursor;
 };
 
