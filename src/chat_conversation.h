@@ -43,10 +43,8 @@ public:
     ~ChatConversation();
     void addWidget(ChatPanelWidget *widget);
     ChatHistoryModel *historyModel();
+    ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
-
-public slots:
-    void clear();
 
 signals:
     void messageClicked(const QModelIndex &index);

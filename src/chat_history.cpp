@@ -700,6 +700,15 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
     }
 }
 
+/** Clears all messages.
+ */
+void ChatHistoryModel::clear()
+{
+    int rows = rowCount(QModelIndex());
+    if (rows > 0)
+        removeRows(0, rows);
+}
+
 int ChatHistoryModel::columnCount(const QModelIndex &parent) const
 {
     return MaxColumn;
@@ -824,9 +833,7 @@ void ChatHistoryWidget::adjustSize()
  */
 void ChatHistoryWidget::clear()
 {
-    int rows = m_model->rowCount(QModelIndex());
-    if (rows > 0)
-        m_model->removeRows(0, rows);
+    m_model->clear();
 }
 
 /** Copies the selected text to the clipboard.

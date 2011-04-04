@@ -157,6 +157,9 @@ public:
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
 
+public slots:
+    void clear();
+
 private:
     ChatHistoryModelPrivate *d;
 };

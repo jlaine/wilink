@@ -109,7 +109,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistory->setScene(new QGraphicsScene(chatHistory));
     chatHistory->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    chatHistoryWidget = new ChatHistoryWidget;
+    ChatHistoryWidget *chatHistoryWidget = new ChatHistoryWidget;
     chatHistoryWidget->setModel(d->historyModel);
     chatHistory->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(chatHistory);
@@ -198,11 +198,6 @@ ChatConversation::~ChatConversation()
 void ChatConversation::addWidget(ChatPanelWidget *widget)
 {
     panelBar->addWidget(widget);
-}
-
-void ChatConversation::clear()
-{
-    chatHistoryWidget->clear();
 }
 
 ChatHistoryModel *ChatConversation::historyModel()

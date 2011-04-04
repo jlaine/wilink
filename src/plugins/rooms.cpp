@@ -566,7 +566,7 @@ void ChatRoom::join()
     nickName = rosterModel->ownName();
 
     // clear history
-    clear();
+    historyModel()->clear();
 
     // send join request
     client->findExtension<QXmppMucManager>()->joinRoom(roomJid, nickName);
