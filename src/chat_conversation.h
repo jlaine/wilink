@@ -28,6 +28,7 @@ class ChatEdit;
 class ChatHistoryModel;
 class ChatHistoryWidget;
 class ChatMessage;
+class ChatRosterModel;
 class ChatSearchBar;
 class QGraphicsView;
 class QSpacerItem;
@@ -38,8 +39,8 @@ class ChatConversation : public ChatPanel
 
 public:
     ChatConversation(QWidget *parent = NULL);
-    void addMessage(const ChatMessage &message);
     void addWidget(ChatPanelWidget *widget);
+    ChatHistoryModel *historyModel();
 
 public slots:
     void clear();

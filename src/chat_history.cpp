@@ -18,6 +18,7 @@
  */
 
 #include "chat_history.h"
+#include "chat_roster.h"
 
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
@@ -95,20 +96,7 @@ void ChatMessage::addTransform(const QRegExp &match, const QString &replacement)
  */
 bool ChatMessage::groupWith(const ChatMessage &other) const
 {
-    return from == other.from && !isAction() && !other.isAction();
-}
-
-/** Returns the HTML for the message body.
- */
-QString ChatMessage::html() const
-{
-    QString bodyHtml = Qt::escape(body);
-    bodyHtml.replace("\n", "<br/>");
-    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-    bodyHtml.replace(meRegex, "<b>" + from + "\\1</b>");
-    foreach (const TextTransform &transform, textTransforms)
-        bodyHtml.replace(transform.first, transform.second);
-    return bodyHtml;
+    return fromJid == other.fromJid && !isAction() && !other.isAction();
 }
 
 /** Returns true if the message is an "action" message, such
@@ -590,9 +578,33 @@ QGraphicsTextItem *ChatMessageWidget::textItem()
     return bodyText;
 }
 
+class ChatHistoryModelPrivate
+{
+public:
+    QString html(ChatHistoryItem *item) const;
+    ChatRosterModel *rosterModel;
+};
+
+/** Returns the HTML for the message body.
+ */
+QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
+{
+    QString bodyHtml = Qt::escape(item->message.body);
+    bodyHtml.replace("\n", "<br/>");
+    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+    if (rosterModel)
+        bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(item->message.fromJid) + "\\1</b>");
+    foreach (const TextTransform &transform, textTransforms)
+        bodyHtml.replace(transform.first, transform.second);
+    return bodyHtml;
+}
+
 ChatHistoryModel::ChatHistoryModel(QObject *parent)
     : ChatModel(parent)
 {
+    d = new ChatHistoryModelPrivate;
+    d->rosterModel = 0;
+
     rootItem = new ChatHistoryItem;
 
     // set role names
@@ -718,15 +730,20 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     } else if (role == DateRole) {
         return msg->message.date;
     } else if (role == FromRole) {
-        return msg->message.from;
+        if (!d->rosterModel)
+            return QVariant();
+        else if (msg->message.received)
+            return d->rosterModel->contactName(msg->message.fromJid);
+        else
+            return d->rosterModel->ownName();
     } else if (role == HtmlRole) {
         if (item->children.isEmpty())
-            return item->message.html();
+            return d->html(item);
         else {
             QString bodies;
             foreach (ChatModelItem *ptr, item->children) {
                 ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
-                bodies += "<p>" + child->message.html() + "</p>";
+                bodies += "<p>" + d->html(child) + "</p>";
             }
             return bodies;
         }
@@ -737,6 +754,22 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
+}
+
+/** Returns the roster model.
+ */
+ChatRosterModel *ChatHistoryModel::rosterModel()
+{
+    return d->rosterModel;
+}
+
+/** Sets the roster model.
+ *
+ * @param rosterModel
+ */
+void ChatHistoryModel::setRosterModel(ChatRosterModel *rosterModel)
+{
+    d->rosterModel = rosterModel;
 }
 
 /** Constructs a new ChatHistoryWidget.

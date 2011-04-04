@@ -479,6 +479,7 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     setWindowIcon(QIcon(":/chat.png"));
     setWindowExtra(jid);
     setWindowHelp(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
+    historyModel()->setRosterModel(rosterModel);
 
     bool check;
     check = connect(chatInput, SIGNAL(returnPressed()),
@@ -625,13 +626,12 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     {
         ChatMessage message;
         message.body = msg.body();
-        message.from = from;
         message.fromJid = msg.from();
         message.received = jidToResource(msg.from()) != nickName;
         message.date = msg.stamp();
         if (!message.date.isValid())
             message.date = client->serverTime();
-        addMessage(message);
+        historyModel()->addMessage(message);
 
         // notify user
         if (notifyMessages || message.body.contains("@" + nickName))

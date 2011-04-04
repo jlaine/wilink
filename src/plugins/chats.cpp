@@ -58,6 +58,8 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     setWindowIcon(rosterModel->contactAvatar(jid));
     setWindowExtra(rosterModel->contactExtra(jid));
 
+    historyModel()->setRosterModel(rosterModel);
+
     // load archive manager
     archiveManager = client->findExtension<QXmppArchiveManager>();
     if (!archiveManager) {
@@ -114,10 +116,9 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
-        message.from = msg.isReceived() ? rosterModel->contactName(chatRemoteJid) : rosterModel->ownName();
         message.fromJid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
         message.received = msg.isReceived();
-        addMessage(message);
+        historyModel()->addMessage(message);
     }
 }
 
@@ -211,10 +212,9 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.date = msg.stamp();
     if (!message.date.isValid())
         message.date = client->serverTime();
-    message.from = rosterModel->contactName(chatRemoteJid);
     message.fromJid = chatRemoteJid;
     message.received = true;
-    addMessage(message);
+    historyModel()->addMessage(message);
 
     // queue notification
     queueNotification(message.body);
@@ -253,9 +253,9 @@ void ChatDialog::returnPressed()
     ChatMessage message;
     message.body = text;
     message.date = client->serverTime();
-    message.from = rosterModel->ownName();
+    message.fromJid = client->configuration().jid();
     message.received = false;
-    addMessage(message);
+    historyModel()->addMessage(message);
 
     // play sound
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());

@@ -35,6 +35,7 @@ class ChatHistoryModel;
 class ChatHistoryModelPrivate;
 class ChatHistoryWidget;
 class ChatMessageWidget;
+class ChatRosterModel;
 class ChatSearchBubble;
 typedef QPair<QRectF, QTextCursor> RectCursor;
 
@@ -45,7 +46,6 @@ class ChatMessage
 public:
     ChatMessage();
     bool groupWith(const ChatMessage &other) const;
-    QString html() const;
     bool isAction() const;
 
     static void addTransform(const QRegExp &match, const QString &replacement);
@@ -53,7 +53,6 @@ public:
     bool archived;
     QString body;
     QDateTime date;
-    QString from;
     QString fromJid;
     bool received;
 };
@@ -154,6 +153,9 @@ public:
     void addMessage(const ChatMessage &message);
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    ChatRosterModel *rosterModel();
+    void setRosterModel(ChatRosterModel *rosterModel);
 
 private:
     ChatHistoryModelPrivate *d;

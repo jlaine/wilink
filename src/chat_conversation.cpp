@@ -140,11 +140,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 }
 
-void ChatConversation::addMessage(const ChatMessage &message)
-{
-    chatHistoryModel->addMessage(message);
-}
-
 void ChatConversation::addWidget(ChatPanelWidget *widget)
 {
     panelBar->addWidget(widget);
@@ -153,6 +148,11 @@ void ChatConversation::addWidget(ChatPanelWidget *widget)
 void ChatConversation::clear()
 {
     chatHistoryWidget->clear();
+}
+
+ChatHistoryModel *ChatConversation::historyModel()
+{
+    return chatHistoryModel;
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)
