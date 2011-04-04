@@ -54,6 +54,7 @@ Rectangle {
                         id: header
                         height: fromText.height
                         width: parent.width
+                        visible: !model.action
 
                         Text {
                             id: fromText
@@ -77,8 +78,8 @@ Rectangle {
                         id: rect
                         height: bodyText.height + 10
                         border.color: model.received ? '#2689d6': '#7b7b7b'
-                        border.width: 1
-                        color: model.received ? '#e7f4fe' : '#fafafa'
+                        border.width: model.action ? 0 : 1
+                        color: model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa')
                         radius: 8
                         width: parent.width
 
