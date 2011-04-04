@@ -96,7 +96,10 @@ void ChatMessage::addTransform(const QRegExp &match, const QString &replacement)
  */
 bool ChatMessage::groupWith(const ChatMessage &other) const
 {
-    return jid == other.jid && !isAction() && !other.isAction();
+    return jid == other.jid &&
+        !isAction() &&
+        !other.isAction() &&
+        qAbs(date.secsTo(other.date)) < 2 * 3600; // 2 hours
 }
 
 /** Returns true if the message is an "action" message, such
@@ -653,7 +656,27 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
     ChatHistoryItem *msg = new ChatHistoryItem;
     msg->message = message;
 
-    if (prevMsg && prevMsg->message.groupWith(message))
+    if (prevMsg && prevMsg->message.groupWith(message) &&
+        nextMsg && nextMsg->message.groupWith(message) &&
+        prevMsg->parent != nextMsg->parent) {
+        ChatModelItem *prevBubble = prevMsg->parent;
+        ChatModelItem *nextBubble = nextMsg->parent;
+        int row = prevMsg->row() + 1;
+        addItem(msg, prevBubble, row++);
+
+        // message belongs both to the previous and next bubble, merge
+        const int lastRow = nextBubble->children.size() - 1;
+        beginMoveRows(createIndex(nextBubble), 0, lastRow,
+                      createIndex(prevBubble), row);
+        for (int i = lastRow; i >= 0; --i) {
+            ChatModelItem *item = nextBubble->children.takeAt(i);
+            item->parent = prevBubble;
+            prevBubble->children.insert(row, item);
+        }
+        endMoveRows();
+        removeRow(nextBubble->row());
+    }
+    else if (prevMsg && prevMsg->message.groupWith(message))
     {
         // message belongs to the same bubble as previous message
         addItem(msg, prevMsg->parent, prevMsg->row() + 1);
