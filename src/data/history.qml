@@ -27,6 +27,8 @@ Rectangle {
     Component {
         id: historyDelegate
         Item {
+            property Item textItem: bodyText
+
             id: item
             height: wrapper.height + 10
             width: item.ListView.view.width - 16
@@ -83,15 +85,15 @@ Rectangle {
                         radius: 8
                         width: parent.width
 
-                        Text {
+                        TextEdit {
                             id: bodyText
                             anchors.centerIn: parent
                             font.pointSize: 10
+                            readOnly: true
                             width: rect.width - 20
                             text: model.html
                             textFormat: Qt.RichText
                             wrapMode: Text.WordWrap
-                            onLinkActivated: textHelper.openUrl(link)
                         }
                     }
                 }
@@ -104,5 +106,56 @@ Rectangle {
         anchors.fill: parent
         model: historyModel
         delegate: historyDelegate
+        interactive: false
+
+        MouseArea {
+            property real pressX
+            property real pressY
+            property list<Item> selection
+
+            anchors.fill: parent
+
+            onPressed: {
+                pressX = mouse.x;
+                pressY = mouse.y;
+
+                for (var i = 0; i < selection.length; i++) {
+                    var obj = selection[i];
+                    if (obj)
+                        obj.select(0, 0);
+                }
+                selection = []
+            }
+
+            onPositionChanged: {
+                function setSelection(item) {
+                    if (!item)
+                        return 0;
+                    var start = mapToItem(item, pressX, pressY);
+                    var startPos = item.positionAt(start.x, start.y);
+                    var end = mapToItem(item, mouse.x, mouse.y);
+                    var endPos = item.positionAt(end.x, end.y);
+                    item.select(startPos, endPos);
+                    return startPos >= 0 && endPos > startPos;
+                }
+
+                // get current item
+                historyView.currentIndex = historyView.indexAt(mouse.x, mouse.y);
+                var textItem = historyView.currentItem ? historyView.currentItem.textItem : null;
+
+                // update existing selections
+                var newSelection = new Array();
+                for (var i = 0; i < selection.length; i++) {
+                    var obj = selection[i];
+                    if (obj == textItem)
+                        continue;
+                    else if (setSelection(obj))
+                        newSelection[newSelection.length] = obj;
+                }
+                if (setSelection(textItem))
+                    newSelection[newSelection.length] = textItem;
+                selection = newSelection;
+            }
+        }
     }
 }
