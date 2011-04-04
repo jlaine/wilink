@@ -598,6 +598,7 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(ActionRole, "action");
+    roleNames.insert(AvatarRole, "avatar");
     roleNames.insert(BodyRole, "body");
     roleNames.insert(DateRole, "date");
     roleNames.insert(FromRole, "from");
@@ -701,6 +702,8 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     ChatHistoryItem *msg = static_cast<ChatHistoryItem*>(item->children.isEmpty() ? item : item->children.first());
     if (role == ActionRole) {
         return msg->message.isAction();
+    } else if (role == AvatarRole) {
+        return QUrl("qrc:/peer.png");
     } else if (role == BodyRole) {
         if (item->children.isEmpty())
             return item->message.body;

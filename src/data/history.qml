@@ -29,46 +29,54 @@ Rectangle {
         Item {
             id: item
             height: column.height + 10
-            width: item.ListView.view.width - 5
+            width: item.ListView.view.width - 10
+            x: 5
 
-            Column {
-                id: column
-                width: item.width - 5
-                x: 5
+            Row {
+                width: parent.width
 
-                Row {
-                    x: 10
-
-                    Text {
-                        color: model.received ? '#2689d6': '#7b7b7b'
-                        font.pointSize: 7
-                        text: model.from
-                    }
-
-                    Text {
-                        color: model.received ? '#2689d6': '#7b7b7b'
-                        font.pointSize: 7
-                        text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
-                    }
+                Image {
+                    source: model.avatar
+                    width: 32
                 }
+                Column {
+                    id: column
+                    width: parent.width - 32
 
-                Rectangle {
-                    id: rect
-                    height: bodyText.height + 10
-                    border.color: model.received ? '#2689d6': '#7b7b7b'
-                    border.width: 1
-                    color: model.received ? '#e7f4fe' : '#fafafa'
-                    radius: 8
-                    width: parent.width
+                    Row {
+                        x: 10
 
-                    Text {
-                        id: bodyText
-                        anchors.centerIn: parent
-                        font.pointSize: 10
-                        width: rect.width - 20
-                        text: model.html
-                        textFormat: Qt.RichText
-                        wrapMode: Text.WordWrap
+                        Text {
+                            color: model.received ? '#2689d6': '#7b7b7b'
+                            font.pointSize: 7
+                            text: model.from
+                        }
+
+                        Text {
+                            color: model.received ? '#2689d6': '#7b7b7b'
+                            font.pointSize: 7
+                            text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
+                        }
+                    }
+
+                    Rectangle {
+                        id: rect
+                        height: bodyText.height + 10
+                        border.color: model.received ? '#2689d6': '#7b7b7b'
+                        border.width: 1
+                        color: model.received ? '#e7f4fe' : '#fafafa'
+                        radius: 8
+                        width: parent.width
+
+                        Text {
+                            id: bodyText
+                            anchors.centerIn: parent
+                            font.pointSize: 10
+                            width: rect.width - 20
+                            text: model.html
+                            textFormat: Qt.RichText
+                            wrapMode: Text.WordWrap
+                        }
                     }
                 }
             }
