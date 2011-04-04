@@ -114,6 +114,7 @@ Rectangle {
             property list<Item> selection
 
             anchors.fill: parent
+            acceptedButtons: Qt.LeftButton
 
             onPressed: {
                 pressX = mouse.x;
@@ -136,7 +137,7 @@ Rectangle {
                     var end = mapToItem(item, mouse.x, mouse.y);
                     var endPos = item.positionAt(end.x, end.y);
                     item.select(startPos, endPos);
-                    return startPos >= 0 && endPos > startPos;
+                    return startPos >= 0 && endPos >= 0 && endPos != startPos;
                 }
 
                 // get current item
