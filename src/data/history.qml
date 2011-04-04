@@ -38,17 +38,17 @@ Rectangle {
 
                 Text {
                     id: headerText
-                    color: received ? '#2689d6': '#7b7b7b'
-                    text: '' + from + ''
+                    color: model.received ? '#2689d6': '#7b7b7b'
+                    text: model.from
                     width: parent.width
                 }
 
                 Rectangle {
                     id: rect
                     height: bodyText.height + 10
-                    border.color: received ? '#2689d6': '#7b7b7b'
+                    border.color: model.received ? '#2689d6': '#7b7b7b'
                     border.width: 1
-                    color: received ? '#e7f4fe' : '#fafafa'
+                    color: model.received ? '#e7f4fe' : '#fafafa'
                     radius: 8
                     width: parent.width
 
@@ -56,18 +56,9 @@ Rectangle {
                         id: bodyText
                         anchors.centerIn: parent
                         width: rect.width - 20
-                        text: '<html>' + html + '</html>'
+                        text: model.html
                         textFormat: Qt.RichText
                         wrapMode: Text.WordWrap
-                    }
-
-                    states: State {
-                        name: "selected"
-                        PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
-                    }
-
-                    transitions: Transition {
-                        PropertyAnimation { target: rect; properties: 'color,border.color'; duration: 300 }
                     }
                 }
             }
