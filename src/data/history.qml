@@ -65,38 +65,10 @@ Rectangle {
         }
     }
 
-    VisualDataModel {
-        id: visualModel
-        model: historyModel
-        delegate: historyDelegate
-    }
-
     ListView {
         id: historyView
         anchors.fill: parent
-        model: visualModel
+        model: historyModel
         delegate: historyDelegate
-        focus: true
-
-        Keys.onPressed: {
-            if (event.key == Qt.Key_Backspace && event.modifiers == Qt.NoModifier) {
-                var oldIndex = visualModel.rootIndex;
-                visualModel.rootIndex = visualModel.parentModelIndex();
-                currentIndex = historyModel.row(oldIndex, visualModel.rootIndex);
-            }
-            else if (event.key == Qt.Key_Delete ||
-                    (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
-                if (currentIndex >= 0)
-                    historyModel.removeRow(currentIndex, visualModel.rootIndex);
-            }
-            else if (event.key == Qt.Key_Enter ||
-                     event.key == Qt.Key_Return) {
-                var row = visualModel.modelIndex(currentIndex);
-                if (historyModel.rowCount(row))
-                    visualModel.rootIndex = row;
-                else
-                    historyModel.play(row);
-            }
-        }
     }
 }
