@@ -566,6 +566,16 @@ QGraphicsTextItem *ChatMessageWidget::textItem()
     return bodyText;
 }
 
+ChatHistoryHelper::ChatHistoryHelper(QObject *parent)
+    : QObject(parent)
+{
+}
+
+void ChatHistoryHelper::openUrl(const QUrl &url)
+{
+    QDesktopServices::openUrl(url);
+}
+
 class ChatHistoryModelPrivate
 {
 public:

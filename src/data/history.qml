@@ -91,6 +91,7 @@ Rectangle {
                             text: model.html
                             textFormat: Qt.RichText
                             wrapMode: Text.WordWrap
+                            onLinkActivated: textHelper.openUrl(link)
                         }
                     }
                 }

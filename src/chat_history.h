@@ -161,6 +161,17 @@ private:
     ChatHistoryModelPrivate *d;
 };
 
+class ChatHistoryHelper : public QObject
+{
+    Q_OBJECT
+
+public:
+    ChatHistoryHelper(QObject *parent = 0);
+
+public slots:
+    void openUrl(const QUrl &url);
+};
+
 /** The ChatHistoryWidget class represents a widget containing a list
  *  of ChatMessageWidget.
  */

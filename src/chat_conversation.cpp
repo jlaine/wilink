@@ -125,6 +125,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     QDeclarativeView *view = new QDeclarativeView;
     QDeclarativeContext *ctxt = view->rootContext();
     ctxt->setContextProperty("historyModel", d->historyModel);
+    ctxt->setContextProperty("textHelper", new ChatHistoryHelper(this));
     view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/history.qml"));
