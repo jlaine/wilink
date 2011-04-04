@@ -29,8 +29,8 @@ Rectangle {
         Item {
             id: item
             height: wrapper.height + 10
-            width: item.ListView.view.width - 10
-            x: 5
+            width: item.ListView.view.width - 16
+            x: 8
 
             Row {
                 id: wrapper
@@ -42,8 +42,13 @@ Rectangle {
                     height: 32
                     width: 32
                 }
+                Item {
+                    id: spacer
+                    height: 32
+                    width: 8
+                }
                 Column {
-                    width: parent.width - avatar.width
+                    width: parent.width - avatar.width - spacer.width
 
                     Item {
                         id: header

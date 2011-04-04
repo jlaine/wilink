@@ -732,10 +732,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     } else if (role == FromRole) {
         if (!d->rosterModel)
             return QVariant();
-        else if (msg->message.received)
-            return d->rosterModel->contactName(msg->message.jid);
-        else
-            return d->rosterModel->ownName();
+        return d->rosterModel->contactName(msg->message.jid);
     } else if (role == HtmlRole) {
         if (item->children.isEmpty())
             return d->html(item);

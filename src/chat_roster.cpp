@@ -309,17 +309,23 @@ void ChatRosterModel::connected()
     /* request own vCard */
     d->nickNameReceived = false;
     d->ownItem->setId(d->client->configuration().jidBare());
+    d->ownItem->setData(Qt::DisplayRole, d->client->configuration().user());
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
     d->client->vCardManager().requestVCard(d->ownItem->id());
 }
 
-QPixmap ChatRosterModel::contactAvatar(const QString &bareJid) const
+QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
 {
-    ChatRosterItem *item = d->find(bareJid);
+    ChatRosterItem *item = d->find(jid);
+    if (!item) {
+        const QString bareJid = jidToBareJid(jid);
+        if (bareJid == d->ownItem->id())
+            item = d->ownItem;
+        else
+            item = d->find(bareJid);
+    }
     if (item)
         return item->data(AvatarRole).value<QPixmap>();
-    else if (jidToBareJid(bareJid) == d->ownItem->id())
-        return d->ownItem->data(AvatarRole).value<QPixmap>();
     return QPixmap();
 }
 
@@ -385,8 +391,13 @@ QString ChatRosterModel::contactExtra(const QString &bareJid) const
 QString ChatRosterModel::contactName(const QString &jid) const
 {
     ChatRosterItem *item = d->find(jid);
-    if (!item)
-        item = d->find(jidToBareJid(jid));
+    if (!item) {
+        const QString bareJid = jidToBareJid(jid);
+        if (bareJid == d->ownItem->id())
+            item = d->ownItem;
+        else
+            item = d->find(bareJid);
+    }
     if (item)
         return item->data(Qt::DisplayRole).toString();
     return jidToUser(jid);
@@ -812,8 +823,10 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
 #endif
         d->ownItem->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
-        if (!vcard.nickName().isEmpty())
+        if (!vcard.nickName().isEmpty()) {
             d->ownItem->setData(NicknameRole, vcard.nickName());
+            d->ownItem->setData(Qt::DisplayRole, vcard.nickName());
+        }
         d->nickNameReceived = true;
         emit ownNameReceived();
     }

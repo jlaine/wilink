@@ -89,10 +89,10 @@ public:
     QStringList mimeTypes() const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
 
-    QPixmap contactAvatar(const QString &bareJid) const;
+    QPixmap contactAvatar(const QString &jid) const;
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
     QString contactExtra(const QString &bareJid) const;
-    QString contactName(const QString &bareJid) const;
+    QString contactName(const QString &jid) const;
     bool isOwnNameReceived() const;
     QString ownName() const;
 
