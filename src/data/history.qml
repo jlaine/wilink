@@ -28,11 +28,12 @@ Rectangle {
         id: historyDelegate
         Item {
             id: item
-            height: column.height + 10
+            height: wrapper.height + 10
             width: item.ListView.view.width - 10
             x: 5
 
             Row {
+                id: wrapper
                 width: parent.width
 
                 Image {
@@ -40,19 +41,25 @@ Rectangle {
                     width: 32
                 }
                 Column {
-                    id: column
                     width: parent.width - 32
 
-                    Row {
-                        x: 10
+                    Item {
+                        id: header
+                        height: fromText.height
+                        width: parent.width
 
                         Text {
+                            id: fromText
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
                             color: model.received ? '#2689d6': '#7b7b7b'
                             font.pointSize: 7
                             text: model.from
                         }
 
                         Text {
+                            anchors.right: parent.right
+                            anchors.rightMargin: 10
                             color: model.received ? '#2689d6': '#7b7b7b'
                             font.pointSize: 7
                             text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
