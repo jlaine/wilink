@@ -29,18 +29,27 @@ Rectangle {
         Item {
             id: item
             height: column.height + 10
-            width: item.ListView.view.width - 10
+            width: item.ListView.view.width - 5
 
             Column {
                 id: column
-                width: item.width
+                width: item.width - 5
                 x: 5
 
-                Text {
-                    id: headerText
-                    color: model.received ? '#2689d6': '#7b7b7b'
-                    text: model.from
-                    width: parent.width
+                Row {
+                    x: 10
+
+                    Text {
+                        color: model.received ? '#2689d6': '#7b7b7b'
+                        font.pointSize: 7
+                        text: model.from
+                    }
+
+                    Text {
+                        color: model.received ? '#2689d6': '#7b7b7b'
+                        font.pointSize: 7
+                        text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
+                    }
                 }
 
                 Rectangle {
@@ -55,6 +64,7 @@ Rectangle {
                     Text {
                         id: bodyText
                         anchors.centerIn: parent
+                        font.pointSize: 10
                         width: rect.width - 20
                         text: model.html
                         textFormat: Qt.RichText
