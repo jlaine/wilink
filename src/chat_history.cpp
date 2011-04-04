@@ -62,11 +62,6 @@ static QList<TextTransform> textTransforms;
 static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^ ]+)\\b");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
-enum HistoryColumns {
-    MainColumn = 0,
-    MaxColumn
-};
-
 class ChatHistoryItem : public ChatModelItem
 {
 public:
@@ -631,8 +626,7 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
     // position cursor
     ChatHistoryItem *prevMsg = 0;
     ChatHistoryItem *nextMsg = 0;
-    foreach (ChatModelItem *bubblePtr, rootItem->children) {
-        ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(bubblePtr);
+    foreach (ChatModelItem *bubble, rootItem->children) {
         foreach (ChatModelItem *childPtr, bubble->children) {
             ChatHistoryItem *child = static_cast<ChatHistoryItem*>(childPtr);
             // check for collision
@@ -674,18 +668,22 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
             prevBubble->children.insert(row, item);
         }
         endMoveRows();
+        emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
         removeRow(nextBubble->row());
     }
     else if (prevMsg && prevMsg->message.groupWith(message))
     {
         // message belongs to the same bubble as previous message
-        addItem(msg, prevMsg->parent, prevMsg->row() + 1);
+        ChatModelItem *bubble = prevMsg->parent;
+        addItem(msg, bubble, prevMsg->row() + 1);
+        emit dataChanged(createIndex(bubble), createIndex(bubble));
     }
     else if (nextMsg && nextMsg->message.groupWith(message))
     {
         // message belongs to the same bubble as next message
-        ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(nextMsg->parent);
-        addItem(msg, nextMsg->parent, nextMsg->row());
+        ChatModelItem *bubble = nextMsg->parent;
+        addItem(msg, bubble, nextMsg->row());
+        emit dataChanged(createIndex(bubble), createIndex(bubble));
     }
     else
     {
@@ -712,6 +710,7 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
                     bubble->children.insert(0, item);
                 }
                 endMoveRows();
+                emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
             }
         }
 
@@ -719,7 +718,7 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         ChatHistoryItem *bubble = new ChatHistoryItem;
         addItem(bubble, rootItem, bubblePos);
         addItem(msg, bubble);
-        emit dataChanged(createIndex(bubble, 0), createIndex(bubble, MaxColumn));
+        emit dataChanged(createIndex(bubble), createIndex(bubble));
     }
 }
 
@@ -734,7 +733,7 @@ void ChatHistoryModel::clear()
 
 int ChatHistoryModel::columnCount(const QModelIndex &parent) const
 {
-    return MaxColumn;
+    return 1;
 }
 
 QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
