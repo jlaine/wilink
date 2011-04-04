@@ -423,6 +423,8 @@ bool ChatMessageWidget::collidesWithPath(const QPainterPath &path, Qt::ItemSelec
     return bodyText->collidesWithPath(path, mode);
 }
 
+/** Retrieves message data from the data model.
+ */
 void ChatMessageWidget::dataChanged()
 {
     QModelIndex idx = index();
@@ -657,10 +659,9 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
                 beginMoveRows(createIndex(prevBubble), firstRow, lastRow,
                               createIndex(bubble), 0);
                 for (int i = lastRow; i >= firstRow; --i) {
-                    ChatModelItem *item = prevBubble->children.at(i);
+                    ChatModelItem *item = prevBubble->children.takeAt(i);
                     item->parent = bubble;
                     bubble->children.insert(0, item);
-                    prevBubble->children.removeAt(i);
                 }
                 endMoveRows();
             }
@@ -1079,9 +1080,8 @@ void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceSta
 
     ChatMessageBubble *sourceBubble = m_bubbles.at(sourceParent.row());
     ChatMessageBubble *destBubble = m_bubbles.at(destParent.row());
-    const int destEnd = destRow + (sourceEnd - sourceStart);
-    for (; destRow <= destEnd; ++destRow) {
-        ChatMessageWidget *message = sourceBubble->takeAt(sourceStart);
+    for (int i = sourceEnd; i >= sourceStart; --i) {
+        ChatMessageWidget *message = sourceBubble->takeAt(i);
         destBubble->insertAt(destRow, message);
     }
     adjustSize();
