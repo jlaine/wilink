@@ -30,9 +30,6 @@ class ChatHistoryModel;
 class ChatHistoryWidget;
 class ChatMessage;
 class ChatRosterModel;
-class ChatSearchBar;
-class QGraphicsView;
-class QSpacerItem;
 
 class ChatConversation : public ChatPanel
 {
@@ -57,11 +54,6 @@ protected:
     ChatEdit *chatInput;
 
 private:
-    QGraphicsView *chatHistory;
-    ChatHistoryWidget *chatHistoryWidget;
-    ChatSearchBar *chatSearch;
-    ChatPanelBar *panelBar;
-    QSpacerItem *m_spacerItem;
     ChatConversationPrivate *d;
 };
 

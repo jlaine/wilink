@@ -36,6 +36,7 @@
 #define SPACING 2
 #endif
 
+#undef USE_DECLARATIVE
 #ifdef USE_DECLARATIVE
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
@@ -85,11 +86,13 @@ public:
 #ifdef USE_DECLARATIVE
     RosterImageProvider *imageProvider;
 #endif
+    ChatPanelBar *panelBar;
+    ChatSearchBar *searchBar;
+    QSpacerItem *spacerItem;
 };
 
 ChatConversation::ChatConversation(QWidget *parent)
-    : ChatPanel(parent),
-    m_spacerItem(0)
+    : ChatPanel(parent)
 {
     bool check;
     d = new ChatConversationPrivate;
@@ -100,30 +103,23 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* status bar */
     layout->addLayout(headerLayout());
 
+    /* search bar */
+    d->searchBar = new ChatSearchBar;
+    d->searchBar->hide();
+    check = connect(d->searchBar, SIGNAL(displayed(bool)),
+                    this, SLOT(slotSearchDisplayed(bool)));
+    Q_ASSERT(check);
+    check = connect(this, SIGNAL(findPanel()),
+                    d->searchBar, SLOT(activate()));
+    Q_ASSERT(check);
+    check = connect(this, SIGNAL(findAgainPanel()),
+                    d->searchBar, SLOT(findNext()));
+    Q_ASSERT(check);
+
     /* chat history model */
     d->historyModel = new ChatHistoryModel(this);
 
     /* chat history */
-    chatHistory = new QGraphicsView;
-    chatHistory->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    chatHistory->setScene(new QGraphicsScene(chatHistory));
-    chatHistory->setContextMenuPolicy(Qt::ActionsContextMenu);
-
-    ChatHistoryWidget *chatHistoryWidget = new ChatHistoryWidget;
-    chatHistoryWidget->setModel(d->historyModel);
-    chatHistory->scene()->addItem(chatHistoryWidget);
-    chatHistoryWidget->setView(chatHistory);
-    check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
-                    this, SIGNAL(messageClicked(QModelIndex)));
-    Q_ASSERT(check);
-
-    panelBar = new ChatPanelBar(chatHistory);
-    panelBar->setZValue(10);
-    chatHistory->scene()->addItem(panelBar);
-    check = connect(chatHistory->scene(), SIGNAL(sceneRectChanged(QRectF)),
-                    panelBar, SLOT(reposition()));
-    Q_ASSERT(check);
-
 #ifdef USE_DECLARATIVE
     d->imageProvider = new RosterImageProvider;
 
@@ -133,36 +129,51 @@ ChatConversation::ChatConversation(QWidget *parent)
     view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/history.qml"));
-    layout->addWidget(view, 1);
-#endif
+#else
+    QGraphicsView *view = new QGraphicsView;
+    view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    view->setScene(new QGraphicsScene(view));
+    view->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    layout->addWidget(chatHistory, 1);
-    filterDrops(chatHistory->viewport());
-
-    /* spacer */
-    m_spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
-    layout->addSpacerItem(m_spacerItem);
-
-    /* search bar */
-    chatSearch = new ChatSearchBar;
-    chatSearch->hide();
-    check = connect(chatSearch, SIGNAL(displayed(bool)),
-                    this, SLOT(slotSearchDisplayed(bool)));
+    ChatHistoryWidget *chatHistoryWidget = new ChatHistoryWidget;
+    chatHistoryWidget->setModel(d->historyModel);
+    view->scene()->addItem(chatHistoryWidget);
+    chatHistoryWidget->setView(view);
+    check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
+                    this, SIGNAL(messageClicked(QModelIndex)));
     Q_ASSERT(check);
 
-    check = connect(chatSearch, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
+    check = connect(d->searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
                     chatHistoryWidget, SLOT(find(QString, QTextDocument::FindFlags, bool)));
     Q_ASSERT(check);
 
-    check = connect(chatSearch, SIGNAL(findClear()),
+    check = connect(d->searchBar, SIGNAL(findClear()),
                     chatHistoryWidget, SLOT(findClear()));
     Q_ASSERT(check);
 
     check = connect(chatHistoryWidget, SIGNAL(findFinished(bool)),
-                    chatSearch, SLOT(findFinished(bool)));
+                    d->searchBar, SLOT(findFinished(bool)));
+    Q_ASSERT(check);
+#endif
+
+    d->panelBar = new ChatPanelBar(view);
+    d->panelBar->setZValue(10);
+#ifndef USE_DECLARATIVE
+    view->scene()->addItem(d->panelBar);
+#endif
+    check = connect(view->scene(), SIGNAL(sceneRectChanged(QRectF)),
+                    d->panelBar, SLOT(reposition()));
     Q_ASSERT(check);
 
-    layout->addWidget(chatSearch);
+    layout->addWidget(view, 1);
+    filterDrops(view->viewport());
+
+    /* spacer */
+    d->spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addSpacerItem(d->spacerItem);
+
+    /* search bar */
+    layout->addWidget(d->searchBar);
 
     /* text edit */
     chatInput = new ChatEdit(80);
@@ -186,8 +197,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     setLayout(layout);
 
     /* shortcuts */
-    connect(this, SIGNAL(findPanel()), chatSearch, SLOT(activate()));
-    connect(this, SIGNAL(findAgainPanel()), chatSearch, SLOT(findNext()));
 }
 
 ChatConversation::~ChatConversation()
@@ -197,7 +206,7 @@ ChatConversation::~ChatConversation()
 
 void ChatConversation::addWidget(ChatPanelWidget *widget)
 {
-    panelBar->addWidget(widget);
+    d->panelBar->addWidget(widget);
 }
 
 ChatHistoryModel *ChatConversation::historyModel()
@@ -217,10 +226,11 @@ void ChatConversation::slotSearchDisplayed(bool visible)
 {
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
-        m_spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+        d->spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
     else {
-        chatHistoryWidget->findClear();
-        m_spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        // FIXME: restore this
+        //chatHistoryWidget->findClear();
+        d->spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
     vbox->invalidate();
 }
