@@ -53,7 +53,7 @@ public:
     bool archived;
     QString body;
     QDateTime date;
-    QString fromJid;
+    QString jid;
     bool received;
 };
 

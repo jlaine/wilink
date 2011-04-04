@@ -96,7 +96,7 @@ void ChatMessage::addTransform(const QRegExp &match, const QString &replacement)
  */
 bool ChatMessage::groupWith(const ChatMessage &other) const
 {
-    return fromJid == other.fromJid && !isAction() && !other.isAction();
+    return jid == other.jid && !isAction() && !other.isAction();
 }
 
 /** Returns true if the message is an "action" message, such
@@ -593,7 +593,7 @@ QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
     bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
     if (rosterModel)
-        bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(item->message.fromJid) + "\\1</b>");
+        bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(item->message.jid) + "\\1</b>");
     foreach (const TextTransform &transform, textTransforms)
         bodyHtml.replace(transform.first, transform.second);
     return bodyHtml;
@@ -634,7 +634,7 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
             ChatHistoryItem *child = static_cast<ChatHistoryItem*>(childPtr);
             // check for collision
             if (message.archived != child->message.archived &&
-                message.fromJid == child->message.fromJid &&
+                message.jid == child->message.jid &&
                 message.body == child->message.body &&
                 qAbs(message.date.secsTo(child->message.date)) < 10)
                 return;
@@ -733,7 +733,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         if (!d->rosterModel)
             return QVariant();
         else if (msg->message.received)
-            return d->rosterModel->contactName(msg->message.fromJid);
+            return d->rosterModel->contactName(msg->message.jid);
         else
             return d->rosterModel->ownName();
     } else if (role == HtmlRole) {
@@ -748,7 +748,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
             return bodies;
         }
     } else if (role == JidRole) {
-        return msg->message.fromJid;
+        return msg->message.jid;
     } else if (role == ReceivedRole) {
         return msg->message.received;
     }

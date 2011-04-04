@@ -626,11 +626,11 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     {
         ChatMessage message;
         message.body = msg.body();
-        message.fromJid = msg.from();
-        message.received = jidToResource(msg.from()) != nickName;
         message.date = msg.stamp();
         if (!message.date.isValid())
             message.date = client->serverTime();
+        message.jid = msg.from();
+        message.received = jidToResource(msg.from()) != nickName;
         historyModel()->addMessage(message);
 
         // notify user

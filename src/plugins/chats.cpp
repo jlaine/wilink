@@ -116,7 +116,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
-        message.fromJid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
+        message.jid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
         message.received = msg.isReceived();
         historyModel()->addMessage(message);
     }
@@ -212,7 +212,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     message.date = msg.stamp();
     if (!message.date.isValid())
         message.date = client->serverTime();
-    message.fromJid = chatRemoteJid;
+    message.jid = chatRemoteJid;
     message.received = true;
     historyModel()->addMessage(message);
 
@@ -253,7 +253,7 @@ void ChatDialog::returnPressed()
     ChatMessage message;
     message.body = text;
     message.date = client->serverTime();
-    message.fromJid = client->configuration().jid();
+    message.jid = client->configuration().jid();
     message.received = false;
     historyModel()->addMessage(message);
 
