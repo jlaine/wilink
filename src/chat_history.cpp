@@ -129,6 +129,19 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     m_from(0),
     m_history(parent)
 {
+    // from
+    m_from = new QGraphicsTextItem(this);
+    QFont font = m_from->font();
+    font.setPixelSize(DATE_FONT);
+    m_from->setFont(font);
+    m_from->installSceneEventFilter(this);
+    m_from->hide();
+
+    // bubble frame
+    m_frame = new QGraphicsPathItem(this);
+    m_frame->setZValue(-1);
+    m_frame->hide();
+
 #if 0
     // bubble shadow
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
@@ -136,6 +149,33 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     effect->setOffset(QPointF(2, 2));
     m_frame->setGraphicsEffect(effect);
 #endif
+}
+
+/** Retrieves data from the data model.
+ */
+void ChatMessageBubble::dataChanged()
+{
+    QModelIndex idx = index();
+    const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
+    if (m_messages.isEmpty() || isAction) {
+        m_from->hide();
+        m_frame->hide();
+    } else {
+        const bool isReceived = idx.data(ChatHistoryModel::ReceivedRole).toBool();
+        QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
+        QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
+
+        // from
+        m_from->setDefaultTextColor(baseColor);
+        m_from->setPlainText(idx.data(ChatHistoryModel::FromRole).toString());
+        m_from->show();
+
+        // bubble frame
+        m_frame->setPen(baseColor);
+        m_frame->setBrush(backgroundColor);
+        m_frame->show();
+    }
+    updateGeometry();
 }
 
 /** Returns the model index which this widget displays.
@@ -162,39 +202,11 @@ int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
  */
 void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
 {
-    const bool isFirstMessage = m_messages.isEmpty();
-
     // add widget
     widget->setBubble(this);
     widget->setParentItem(this);
     widget->setMaximumWidth(m_maximumWidth - 2);
     m_messages.insert(pos, widget);
-
-    // initialise style if this is the first message
-    if (isFirstMessage) {
-        QModelIndex index = widget->index();
-        if (!index.data(ChatHistoryModel::ActionRole).toBool()) {
-            bool isReceived = index.data(ChatHistoryModel::ReceivedRole).toBool();
-            QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
-            QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
-
-            // from
-            m_from = new QGraphicsTextItem(this);
-            QFont font = m_from->font();
-            font.setPixelSize(DATE_FONT);
-            m_from->setFont(font);
-            m_from->installSceneEventFilter(this);
-            m_from->setDefaultTextColor(baseColor);
-            m_from->setPlainText(index.data(ChatHistoryModel::FromRole).toString());
-
-            // bubble frame
-            m_frame = new QGraphicsPathItem(this);
-            m_frame->setZValue(-1);
-            m_frame->setPen(baseColor);
-            m_frame->setBrush(backgroundColor);
-        }
-    }
-    updateGeometry();
 }
 
 /** Returns the underlying data model.
@@ -1064,6 +1076,7 @@ void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int e
             bubble->insertAt(i, message);
             message->dataChanged();
         }
+        bubble->dataChanged();
     } else {
         //qDebug("bubbles inserted: %i-%i", start, end);
         for (int i = start; i <= end; ++i)
@@ -1084,12 +1097,14 @@ void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceSta
         ChatMessageWidget *message = sourceBubble->takeAt(i);
         destBubble->insertAt(destRow, message);
     }
+    sourceBubble->dataChanged();
+    destBubble->dataChanged();
     adjustSize();
 }
 
 void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    qDebug("rows removed from %i: %i-%i", parent.row(), start, end);
+    //qDebug("rows removed from %i: %i-%i", parent.row(), start, end);
     if (parent.isValid()) {
         ChatMessageBubble *bubble = m_bubbles.at(parent.row());
         for (int i = end; i >= start; --i) {
@@ -1097,6 +1112,7 @@ void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int en
             m_selectedMessages.removeAll(message);
             message->deleteLater();
         }
+        bubble->dataChanged();
     } else {
         for (int i = end; i >= start; --i) {
             ChatMessageBubble *bubble = m_bubbles.takeAt(i);

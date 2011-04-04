@@ -75,6 +75,9 @@ public:
     void setMaximumWidth(qreal width);
     ChatMessageWidget *takeAt(int pos);
 
+public slots:
+    void dataChanged();
+
 signals:
     void messageClicked(const QModelIndex &index);
 
