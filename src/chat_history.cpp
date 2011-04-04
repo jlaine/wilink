@@ -883,6 +883,19 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
+void ChatHistoryWidget::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    Q_ASSERT(topLeft.parent() == bottomRight.parent());
+    if (topLeft.parent().isValid()) {
+        ChatMessageBubble *bubble = m_bubbles.at(topLeft.parent().row());
+        for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
+            bubble->m_messages.at(i)->dataChanged();
+    } else {
+        for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
+            m_bubbles.at(i)->dataChanged();
+    }
+}
+
 /** Find and highlight the given text.
  *
  * @param needle
@@ -1045,6 +1058,9 @@ void ChatHistoryWidget::setModel(ChatHistoryModel *model)
     bool check;
 
     m_model = model;
+    check = connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    this, SLOT(dataChanged(QModelIndex,QModelIndex)));
+    Q_ASSERT(check);
     check = connect(m_model, SIGNAL(rowsInserted(QModelIndex,int,int)),
                     this, SLOT(rowsInserted(QModelIndex,int,int)));
     Q_ASSERT(check);
@@ -1138,7 +1154,6 @@ void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int e
             bubble->insertAt(i, message);
             message->dataChanged();
         }
-        bubble->dataChanged();
     } else {
         //qDebug("bubbles inserted: %i-%i", start, end);
         for (int i = start; i <= end; ++i)
@@ -1159,8 +1174,6 @@ void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceSta
         ChatMessageWidget *message = sourceBubble->takeAt(i);
         destBubble->insertAt(destRow, message);
     }
-    sourceBubble->dataChanged();
-    destBubble->dataChanged();
     adjustSize();
 }
 
@@ -1174,7 +1187,6 @@ void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int en
             m_selectedMessages.removeAll(message);
             message->deleteLater();
         }
-        bubble->dataChanged();
     } else {
         for (int i = end; i >= start; --i) {
             ChatMessageBubble *bubble = m_bubbles.takeAt(i);

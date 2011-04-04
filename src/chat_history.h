@@ -190,6 +190,7 @@ public slots:
     void selectAll();
 
 private slots:
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
     void rowsInserted(const QModelIndex &parent, int start, int end);
     void rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow);
     void rowsRemoved(const QModelIndex &parent, int start, int end);
