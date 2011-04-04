@@ -105,7 +105,6 @@ class ChatMessageWidget : public QGraphicsWidget
 
 public:
     ChatMessageWidget(QGraphicsItem *parent);
-    bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
     QModelIndex index() const;
     ChatMessageBubble *bubble();
     void setBubble(ChatMessageBubble *bubble);
@@ -193,7 +192,6 @@ private slots:
     void rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow);
     void rowsRemoved(const QModelIndex &parent, int start, int end);
     void slotScrollChanged();
-    void slotSelectionChanged();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
@@ -203,7 +201,7 @@ protected:
 
 private:
     void insertBubble(int pos, ChatMessageBubble *bubble);
-    ChatMessageWidget *messageWidgetAt(const QPointF &pos) const;
+    QGraphicsTextItem *textItemAt(const QPointF &pos) const;
     QString selectedText() const;
 
     // viewport
@@ -217,7 +215,7 @@ private:
     ChatHistoryModel *m_model;
 
     // selection
-    QList<ChatMessageWidget*> m_selectedMessages;
+    QList<QGraphicsTextItem*> m_selectedMessages;
     QRectF m_selectionRectangle;
     QPointF m_selectionStart;
     QTimer *m_trippleClickTimer;
