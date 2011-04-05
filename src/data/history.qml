@@ -131,7 +131,10 @@ Rectangle {
 
     ListView {
         id: historyView
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.top: parent.top
+        height: parent.height
+        width: parent.width - scrollBar.width
         model: historyModel
         delegate: historyDelegate
         interactive: false
@@ -184,6 +187,56 @@ Rectangle {
                 if (setSelection(textItem))
                     newSelection[newSelection.length] = textItem;
                 selection = newSelection;
+            }
+        }
+    }
+
+    Item {
+        property Item flickable: historyView
+
+        id: scrollBar
+        anchors.left: flickable.right
+        height: flickable.height
+        width: 16
+
+        Rectangle {
+            id: scrollTrack
+            anchors.fill: parent
+            color: 'red'
+        }
+
+        Rectangle {
+            property Item flickable: historyView
+
+            id: scrollHandle
+            color: 'blue'
+            x: 0
+            y: flickable.visibleArea.yPosition * flickable.height
+            height: flickable.visibleArea.heightRatio * flickable.height
+            width: parent.width
+            radius: 5
+
+            MouseArea {
+                property real pressY
+
+                anchors.fill: parent
+
+                onPressed: {
+                    pressY = mouse.y;
+                }
+
+                onPositionChanged: {
+                    var deltaY = mouse.y - pressY;
+                    var minDeltaY = -scrollHandle.y;
+                    var maxDeltaY = (scrollBar.height - scrollHandle.y - scrollHandle.height);
+                    if (deltaY < minDeltaY)
+                        deltaY = minDeltaY;
+                    if (deltaY > maxDeltaY)
+                        deltaY = maxDeltaY;
+
+                    scrollBar.flickable.contentY += deltaY;
+                    pressY += deltaY;
+                }
             }
         }
     }
