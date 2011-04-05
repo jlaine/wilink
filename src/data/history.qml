@@ -101,6 +101,34 @@ Rectangle {
         }
     }
 
+/*
+    ListModel {
+        id: historyModel
+
+        ListElement {
+            avatar: "peer.png"
+            date: ""
+            from: "Osborne Cox"
+            html: "<p>Hello</p><p>How are you?</p>"
+            received: true
+        }
+        ListElement {
+            avatar: "home.png"
+            date: ""
+            from: "Me"
+            html: "<p>Just fine, how about yourself?</p><p>How are you?</p>"
+            received: false
+        }
+        ListElement {
+            avatar: "peer.png"
+            date: ""
+            from: "Osborne Cox"
+            html: "<p>Where did you spend your holidays?</p>"
+            received: true
+        }
+    }
+*/
+
     ListView {
         id: historyView
         anchors.fill: parent
