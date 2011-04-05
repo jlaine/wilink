@@ -192,11 +192,12 @@ Rectangle {
     }
 
     Item {
-        property Item flickable: historyView
-
         id: scrollBar
-        anchors.left: flickable.right
-        height: flickable.height
+
+        property Flickable flickableItem: historyView
+
+        anchors.right: parent.right
+        height: parent.height
         width: 16
 
         Rectangle {
@@ -206,37 +207,41 @@ Rectangle {
         }
 
         Rectangle {
-            property Item flickable: historyView
+            id: handle
 
-            id: scrollHandle
+            property Flickable flickableItem: historyView
+
             color: 'blue'
             x: 0
-            y: flickable.visibleArea.yPosition * flickable.height
-            height: flickable.visibleArea.heightRatio * flickable.height
+            y: flickableItem.visibleArea.yPosition * flickableItem.height
+            height: flickableItem.visibleArea.heightRatio * flickableItem.height
             width: parent.width
             radius: 5
+        }
 
-            MouseArea {
-                property real pressY
+        MouseArea {
 
-                anchors.fill: parent
+            property Flickable flickableItem: historyView
+            property int handleY: flickableItem ? Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight) : NaN
+            property real maxDragY: flickableItem ? flickableItem.height - handle.height : NaN
 
-                onPressed: {
-                    pressY = mouse.y;
-                }
+            width: handle.width
+            height: handle.height
 
-                onPositionChanged: {
-                    var deltaY = mouse.y - pressY;
-                    var minDeltaY = -scrollHandle.y;
-                    var maxDeltaY = (scrollBar.height - scrollHandle.y - scrollHandle.height);
-                    if (deltaY < minDeltaY)
-                        deltaY = minDeltaY;
-                    if (deltaY > maxDeltaY)
-                        deltaY = maxDeltaY;
+            anchors {
+                verticalCenter: flickableItem ? handle.verticalCenter : undefined
+                horizontalCenter: flickableItem ? handle.horizontalCenter : undefined
+            }
 
-                    scrollBar.flickable.contentY += deltaY;
-                    pressY += deltaY;
-                }
+            drag {
+                axis: Drag.YAxis
+                target: handle
+                minimumY: 0
+                maximumY: maxDragY
+            }
+
+            onPositionChanged: {
+                flickableItem.contentY = handleY
             }
         }
     }
