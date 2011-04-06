@@ -85,9 +85,10 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
 private:
-    ChatHistoryWidget *m_history;
+    QGraphicsTextItem *m_date;
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
+    ChatHistoryWidget *m_history;
 
     // layout
     qreal m_maximumWidth;
@@ -108,8 +109,6 @@ public:
     QModelIndex index() const;
     ChatMessageBubble *bubble();
     void setBubble(ChatMessageBubble *bubble);
-
-    void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
     QGraphicsTextItem *textItem();
 
@@ -127,7 +126,6 @@ private:
     // Text
     QString bodyAnchor;
     QGraphicsTextItem *bodyText;
-    QGraphicsTextItem *dateText;
 };
 
 class ChatHistoryModel : public ChatModel

@@ -47,12 +47,10 @@
 #ifdef WILINK_EMBEDDED
 #define BODY_FONT 18
 #define DATE_FONT 15
-#define DATE_WIDTH 0
 #define HEADER_HEIGHT 25
 #else
 #define BODY_FONT 12
 #define DATE_FONT 10
-#define DATE_WIDTH 80
 #define HEADER_HEIGHT 20
 #endif
 
@@ -111,8 +109,6 @@ bool ChatMessage::isAction() const
  */
 ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     : QGraphicsWidget(parent),
-    m_frame(0),
-    m_from(0),
     m_history(parent)
 {
     // from
@@ -122,6 +118,11 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     m_from->setFont(font);
     m_from->installSceneEventFilter(this);
     m_from->hide();
+
+    // date
+    m_date = new QGraphicsTextItem(this);
+    m_date->setFont(font);
+    m_date->hide();
 
     // bubble frame
     m_frame = new QGraphicsPathItem(this);
@@ -144,6 +145,7 @@ void ChatMessageBubble::dataChanged()
     QModelIndex idx = index();
     const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
     if (m_messages.isEmpty() || isAction) {
+        m_date->hide();
         m_from->hide();
         m_frame->hide();
     } else {
@@ -155,6 +157,13 @@ void ChatMessageBubble::dataChanged()
         m_from->setDefaultTextColor(baseColor);
         m_from->setPlainText(idx.data(ChatHistoryModel::FromRole).toString());
         m_from->show();
+
+        // date
+        m_date->setDefaultTextColor(baseColor);
+        const QDateTime datetime = idx.data(ChatHistoryModel::DateRole).toDateTime().toLocalTime();
+        m_date->setPlainText(datetime.date() == QDate::currentDate() ?
+            datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+        m_date->show();
 
         // bubble frame
         m_frame->setPen(baseColor);
@@ -226,6 +235,10 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     rect.adjust(0.5, (m_from ? HEADER_HEIGHT : 0) + 0.5, -0.5, (m_frame ? -FOOTER_HEIGHT : 0) - 0.5);
 
     QRectF arc(0, 0, 2 * BUBBLE_RADIUS, 2 * BUBBLE_RADIUS);
+
+    // date
+    if (m_date->isVisible())
+        m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, 0);
 
     if (m_frame) {
         // bubble top
@@ -318,7 +331,7 @@ ChatMessageWidget *ChatMessageBubble::takeAt(int i)
  */
 ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    maxWidth(2 * DATE_WIDTH),
+    maxWidth(128),
     m_bubble(0)
 {
     const QColor textColor(Qt::black);
@@ -331,18 +344,6 @@ ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
     bodyText->setDefaultTextColor(textColor);
     bodyText->setPos(BODY_OFFSET, 0);
     bodyText->installSceneEventFilter(this);
-
-    // message date
-#ifdef WILINK_EMBEDDED
-    dateText = 0;
-#else
-    dateText = new QGraphicsTextItem(this);
-    font = dateText->font();
-    font.setPixelSize(DATE_FONT);
-    dateText->setFont(font);
-    dateText->setDefaultTextColor(textColor);
-    dateText->setTextWidth(90);
-#endif
 }
 
 /** Returns the bubble this message belongs to.
@@ -417,22 +418,6 @@ void ChatMessageWidget::dataChanged()
     QModelIndex idx = index();
     const QString html = idx.data(ChatHistoryModel::HtmlRole).toString();
     bodyText->setHtml(html);
-
-    if (dateText) {
-
-        QModelIndex previous = idx.sibling(idx.row() - 1 , idx.column());
-        if (!previous.isValid() ||
-            idx.data(ChatHistoryModel::JidRole) != previous.data(ChatHistoryModel::JidRole) ||
-            idx.data(ChatHistoryModel::DateRole).toDateTime() > previous.data(ChatHistoryModel::DateRole).toDateTime().addSecs(60))
-        {
-            const QDateTime datetime = idx.data(ChatHistoryModel::DateRole).toDateTime().toLocalTime();
-            dateText->setPlainText(datetime.date() == QDate::currentDate() ?
-                datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-            dateText->show();
-        } else {
-            dateText->hide();
-        }
-    }
 }
 
 /** Returns the model index which this widget displays.
@@ -482,25 +467,6 @@ void ChatMessageWidget::setBubble(ChatMessageBubble *bubble)
     m_bubble = bubble;
 }
 
-/** Sets the message's geometry.
- *
- * @param baseRect
- */
-void ChatMessageWidget::setGeometry(const QRectF &baseRect)
-{
-    QGraphicsWidget::setGeometry(baseRect);
-
-    // position the date
-    if (dateText && dateText->isVisible())
-    {
-        QRectF rect(baseRect);
-        rect.moveLeft(0);
-        rect.moveTop(0);
-        dateText->setPos(rect.right() - (DATE_WIDTH + dateText->document()->idealWidth())/2,
-                         rect.top() + 2);
-    }
-}
-
 /** Sets the message's maximum width.
  *
  * @param width
@@ -512,7 +478,7 @@ void ChatMessageWidget::setMaximumWidth(qreal width)
 
     QGraphicsWidget::setMaximumWidth(width);
     maxWidth = width;
-    bodyText->document()->setTextWidth(width - DATE_WIDTH - BODY_OFFSET);
+    bodyText->document()->setTextWidth(width - BODY_OFFSET);
     updateGeometry();
 }
 
@@ -745,7 +711,9 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     ChatHistoryItem *msg = static_cast<ChatHistoryItem*>(item->children.isEmpty() ? item : item->children.first());
     if (role == ActionRole) {
         return msg->message.isAction();
-    } else if (role == AvatarRole && !msg->message.jid.isEmpty()) {
+    } else if (role == AvatarRole) {
+        if (msg->message.jid.isEmpty())
+            return QUrl("qrc://peer.png");
         return QUrl("image://roster/" + msg->message.jid);
     } else if (role == BodyRole) {
         if (item->children.isEmpty())
