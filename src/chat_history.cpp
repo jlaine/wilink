@@ -158,7 +158,10 @@ void ChatMessageBubble::dataChanged()
     QModelIndex idx = index();
     const QString jid = idx.data(ChatHistoryModel::JidRole).toString();
     const QPixmap pixmap = m_history->model()->rosterModel()->contactAvatar(jid);
-    m_avatar->setPixmap(pixmap.scaled(32, 32, Qt::KeepAspectRatio));
+    if (pixmap.isNull())
+        m_avatar->setPixmap(QPixmap());
+    else
+        m_avatar->setPixmap(pixmap.scaled(32, 32, Qt::KeepAspectRatio));
 
     const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
     if (isAction) {
@@ -885,6 +888,7 @@ void ChatHistoryWidget::dataChanged(const QModelIndex &topLeft, const QModelInde
         for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
             m_bubbles.at(i)->dataChanged();
     }
+    adjustSize();
 }
 
 /** Find and highlight the given text.
