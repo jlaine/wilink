@@ -30,17 +30,19 @@ Item {
         id: track
 
         anchors.fill: parent
-        color: 'red'
+        color: '#dfdfdf'
     }
 
     Rectangle {
         id: handle
 
-        color: 'blue'
+        border.color: '#818181'
+        border.width: 1
+        color: '#c3c3c3'
         x: 0
         y: flickableItem.visibleArea.yPosition * flickableItem.height
         height: flickableItem.visibleArea.heightRatio * flickableItem.height
-        width: parent.width
+        width: parent.width - 1
         radius: 5
 
         MouseArea {
@@ -48,6 +50,7 @@ Item {
             property real maxDragY: flickableItem ? flickableItem.height - handle.height : NaN
 
             anchors.fill: parent
+            hoverEnabled: true
 
             drag {
                 axis: Drag.YAxis
@@ -56,9 +59,22 @@ Item {
                 maximumY: maxDragY
             }
 
+            onEntered: {
+                handle.state = 'hovered'
+            }
+
+            onExited: {
+                handle.state = ''
+            }
+
             onPositionChanged: {
                 flickableItem.contentY = handleY
             }
+        }
+
+        states: State {
+            name: "hovered"
+            PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
         }
     }
 }
