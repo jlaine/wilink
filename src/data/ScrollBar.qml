@@ -22,8 +22,6 @@ import QtQuick 1.0
 Item {
     property Flickable flickableItem
 
-    anchors.right: parent.right
-    height: parent.height
     width: 16
 
     Rectangle {
@@ -46,9 +44,6 @@ Item {
         radius: 6
 
         MouseArea {
-            property int handleY: flickableItem ? Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight) : NaN
-            property real maxDragY: flickableItem ? flickableItem.height - handle.height : NaN
-
             anchors.fill: parent
             hoverEnabled: true
 
@@ -56,7 +51,7 @@ Item {
                 axis: Drag.YAxis
                 target: handle
                 minimumY: 0
-                maximumY: maxDragY
+                maximumY: track.height - handle.height
             }
 
             onEntered: {
@@ -69,7 +64,7 @@ Item {
 
             onPositionChanged: {
                 if (pressedButtons == Qt.LeftButton) {
-                    flickableItem.contentY = handleY;
+                    flickableItem.contentY = Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight);
                 }
             }
         }
