@@ -131,15 +131,17 @@ Rectangle {
 
     ListView {
         id: historyView
+
         anchors.left: parent.left
         anchors.top: parent.top
         height: parent.height
         width: parent.width - scrollBar.width
         model: historyModel
         delegate: historyDelegate
-        interactive: false
 
         MouseArea {
+            id: selector
+
             property real pressX
             property real pressY
             property list<Item> selection
@@ -148,6 +150,7 @@ Rectangle {
             acceptedButtons: Qt.LeftButton
 
             onPressed: {
+                historyView.interactive = false;
                 pressX = mouse.x;
                 pressY = mouse.y;
 
@@ -157,6 +160,10 @@ Rectangle {
                         obj.select(0, 0);
                 }
                 selection = []
+            }
+
+            onReleased: {
+                historyView.interactive = true;
             }
 
             onPositionChanged: {
@@ -217,31 +224,24 @@ Rectangle {
             height: flickableItem.visibleArea.heightRatio * flickableItem.height
             width: parent.width
             radius: 5
-        }
 
-        MouseArea {
+            MouseArea {
+                property Flickable flickableItem: historyView
+                property int handleY: flickableItem ? Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight) : NaN
+                property real maxDragY: flickableItem ? flickableItem.height - handle.height : NaN
 
-            property Flickable flickableItem: historyView
-            property int handleY: flickableItem ? Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight) : NaN
-            property real maxDragY: flickableItem ? flickableItem.height - handle.height : NaN
+                anchors.fill: parent
 
-            width: handle.width
-            height: handle.height
+                drag {
+                    axis: Drag.YAxis
+                    target: handle
+                    minimumY: 0
+                    maximumY: maxDragY
+                }
 
-            anchors {
-                verticalCenter: flickableItem ? handle.verticalCenter : undefined
-                horizontalCenter: flickableItem ? handle.horizontalCenter : undefined
-            }
-
-            drag {
-                axis: Drag.YAxis
-                target: handle
-                minimumY: 0
-                maximumY: maxDragY
-            }
-
-            onPositionChanged: {
-                flickableItem.contentY = handleY
+                onPositionChanged: {
+                    flickableItem.contentY = handleY
+                }
             }
         }
     }
