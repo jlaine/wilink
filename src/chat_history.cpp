@@ -232,15 +232,17 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
     QRectF rect(baseRect);
     rect.moveLeft(0);
     rect.moveTop(0);
-    rect.adjust(0.5, (m_from ? HEADER_HEIGHT : 0) + 0.5, -0.5, (m_frame ? -FOOTER_HEIGHT : 0) - 0.5);
 
-    QRectF arc(0, 0, 2 * BUBBLE_RADIUS, 2 * BUBBLE_RADIUS);
+    // from
+    m_from->setPos(rect.left(), rect.top());
 
     // date
-    if (m_date->isVisible())
-        m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, 0);
+    m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, rect.top());
 
+    rect.adjust(0.5, (m_from ? HEADER_HEIGHT : 0) + 0.5, -0.5, (m_frame ? -FOOTER_HEIGHT : 0) - 0.5);
     if (m_frame) {
+        QRectF arc(0, 0, 2 * BUBBLE_RADIUS, 2 * BUBBLE_RADIUS);
+
         // bubble top
         QPainterPath path;
         path.moveTo(rect.left(), rect.top() + BUBBLE_RADIUS);
