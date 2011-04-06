@@ -128,7 +128,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     ctxt->setContextProperty("textHelper", new ChatHistoryHelper(this));
     view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    view->setSource(QUrl("qrc:/history.qml"));
+    view->setSource(QUrl("qrc:/conversation.qml"));
 #else
     QGraphicsView *view = new QGraphicsView;
     view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);

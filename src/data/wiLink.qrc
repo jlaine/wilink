@@ -24,7 +24,6 @@
     <file>file-128.png</file>
     <file>forward.png</file>
     <file>hangup.png</file>
-    <file>history.qml</file>
     <file>home.png</file>
     <file>options.png</file>
     <file>peer.png</file>
@@ -44,7 +43,9 @@
     <file>wiLink-64.png</file>
     <!-- QML -->
     <file>qmldir</file>
+    <file>conversation.qml</file>
     <file>player.qml</file>
+    <file>HistoryView.qml</file>
     <file>ScrollBar.qml</file>
     <!-- Stylesheets -->
     <file>wiLink.css</file>

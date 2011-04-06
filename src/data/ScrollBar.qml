@@ -68,7 +68,9 @@ Item {
             }
 
             onPositionChanged: {
-                flickableItem.contentY = handleY
+                if (pressedButtons == Qt.LeftButton) {
+                    flickableItem.contentY = handleY;
+                }
             }
         }
 
