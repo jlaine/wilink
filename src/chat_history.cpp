@@ -39,6 +39,7 @@
 #include <QTimer>
 #include <QUrl>
 
+#define AVATAR_WIDTH 40
 #define BODY_OFFSET 5
 #define BUBBLE_RADIUS 8
 #define FOOTER_HEIGHT 5
@@ -111,6 +112,9 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     : QGraphicsWidget(parent),
     m_history(parent)
 {
+    // avatar
+    m_avatar = new QGraphicsPixmapItem(this);
+
     // from
     m_from = new QGraphicsTextItem(this);
     QFont font = m_from->font();
@@ -142,9 +146,20 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
  */
 void ChatMessageBubble::dataChanged()
 {
+    if (m_messages.isEmpty()) {
+        m_date->hide();
+        m_from->hide();
+        m_frame->hide();
+        updateGeometry();
+        return;
+    }
+
+    // avatar
     QModelIndex idx = index();
+    m_avatar->setPixmap(QPixmap(":/peer.png"));
+
     const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
-    if (m_messages.isEmpty() || isAction) {
+    if (isAction) {
         m_date->hide();
         m_from->hide();
         m_frame->hide();
@@ -200,7 +215,7 @@ void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
     // add widget
     widget->setBubble(this);
     widget->setParentItem(this);
-    widget->setMaximumWidth(m_maximumWidth - 2);
+    widget->setMaximumWidth(m_maximumWidth - AVATAR_WIDTH - 2);
     m_messages.insert(pos, widget);
 }
 
@@ -227,28 +242,33 @@ bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
  */
 void ChatMessageBubble::setGeometry(const QRectF &baseRect)
 {
+    const bool useHeader = m_from->isVisible();
     QGraphicsWidget::setGeometry(baseRect);
 
     QRectF rect(baseRect);
     rect.moveLeft(0);
     rect.moveTop(0);
 
-    // from
-    m_from->setPos(rect.left(), rect.top());
+    // header
+    rect.adjust(0.5 + AVATAR_WIDTH, 0.5, -0.5, -0.5);
+    if (useHeader) {
+        m_from->setPos(rect.left(), rect.top());
+        m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, rect.top());
+        rect.adjust(0, HEADER_HEIGHT, 0, 0);
+    }
+    m_avatar->setPos(0, rect.top() - 5);
 
-    // date
-    m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, rect.top());
-
-    rect.adjust(0.5, (m_from ? HEADER_HEIGHT : 0) + 0.5, -0.5, (m_frame ? -FOOTER_HEIGHT : 0) - 0.5);
+    // bubble
     if (m_frame) {
         QRectF arc(0, 0, 2 * BUBBLE_RADIUS, 2 * BUBBLE_RADIUS);
+        rect.adjust(0, 0, 0, -FOOTER_HEIGHT);
 
         // bubble top
         QPainterPath path;
         path.moveTo(rect.left(), rect.top() + BUBBLE_RADIUS);
         arc.moveTopLeft(rect.topLeft());
         path.arcTo(arc, 180, -90);
-        if (m_from) {
+        if (useHeader) {
             path.lineTo(rect.left() + 20, rect.top());
             path.lineTo(rect.left() + 17, rect.top() - 5);
             path.lineTo(rect.left() + 27, rect.top());
@@ -289,7 +309,7 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
     m_maximumWidth = width;
     QGraphicsWidget::setMaximumWidth(width);
     foreach (ChatMessageWidget *child, m_messages)
-        child->setMaximumWidth(m_maximumWidth - 2);
+        child->setMaximumWidth(m_maximumWidth - AVATAR_WIDTH - 2);
     updateGeometry();
 }
 
@@ -300,7 +320,7 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
  */
 QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-    qreal height = (m_from ? HEADER_HEIGHT : 0 ) + (m_frame ? FOOTER_HEIGHT : 0) + 2;
+    qreal height = (m_from->isVisible() ? HEADER_HEIGHT : 0 ) + (m_frame ? FOOTER_HEIGHT : 0) + 2;
 
     switch (which)
     {

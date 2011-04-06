@@ -85,6 +85,7 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
 
 private:
+    QGraphicsPixmapItem *m_avatar;
     QGraphicsTextItem *m_date;
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
