@@ -23,78 +23,69 @@ ListView {
     id: historyView
 
     delegate: historyDelegate
+    spacing: 10
 
     Component {
         id: historyDelegate
-        Item {
+        Row {
             property Item textItem: bodyText
 
             id: item
-            height: wrapper.height + 10
-            width: item.ListView.view.width - 16
+            spacing: 8
+            width: parent.width - 16
             x: 8
 
-            Row {
-                id: wrapper
-                width: parent.width
+            Image {
+                id: avatar
+                source: model.avatar
+                height: 32
+                width: 32
+            }
+            Column {
+                width: parent.width - parent.spacing - avatar.width
 
-                Image {
-                    id: avatar
-                    source: model.avatar
-                    height: 32
-                    width: 32
-                }
                 Item {
-                    id: spacer
-                    height: 32
-                    width: 8
-                }
-                Column {
-                    width: parent.width - avatar.width - spacer.width
+                    id: header
+                    height: fromText.height
+                    width: parent.width
+                    visible: !model.action
 
-                    Item {
-                        id: header
-                        height: fromText.height
-                        width: parent.width
-                        visible: !model.action
-
-                        Text {
-                            id: fromText
-                            anchors.left: parent.left
-                            anchors.leftMargin: 10
-                            color: model.received ? '#2689d6': '#7b7b7b'
-                            font.pointSize: 7
-                            text: model.from
-                        }
-
-                        Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 10
-                            color: model.received ? '#2689d6': '#7b7b7b'
-                            font.pointSize: 7
-                            text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
-                        }
+                    Text {
+                        id: fromText
+                        anchors.left: parent.left
+                        anchors.leftMargin: 10
+                        color: model.received ? '#2689d6': '#7b7b7b'
+                        font.pointSize: 7
+                        text: model.from
                     }
 
-                    Rectangle {
-                        id: rect
-                        height: bodyText.height + 10
-                        border.color: model.received ? '#2689d6': '#7b7b7b'
-                        border.width: model.action ? 0 : 1
-                        color: model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa')
-                        radius: 8
-                        width: parent.width
+                    Text {
+                        anchors.right: parent.right
+                        anchors.rightMargin: 10
+                        color: model.received ? '#2689d6': '#7b7b7b'
+                        font.pointSize: 7
+                        text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
+                    }
+                }
 
-                        TextEdit {
-                            id: bodyText
-                            anchors.centerIn: parent
-                            font.pointSize: 10
-                            readOnly: true
-                            width: rect.width - 20
-                            text: model.html
-                            textFormat: Qt.RichText
-                            wrapMode: Text.WordWrap
-                        }
+                Rectangle {
+                    id: rect
+                    height: bodyText.height + 10
+                    border.color: model.received ? '#2689d6': '#7b7b7b'
+                    border.width: model.action ? 0 : 1
+                    color: model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa')
+                    radius: 8
+                    width: parent.width
+
+                    TextEdit {
+                        id: bodyText
+                        anchors.centerIn: parent
+                        font.pointSize: 10
+                        readOnly: true
+                        width: rect.width - 20
+                        text: model.html
+                        textFormat: Qt.RichText
+                        wrapMode: Text.WordWrap
                     }
                 }
             }
