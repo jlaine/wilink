@@ -745,7 +745,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     ChatHistoryItem *msg = static_cast<ChatHistoryItem*>(item->children.isEmpty() ? item : item->children.first());
     if (role == ActionRole) {
         return msg->message.isAction();
-    } else if (role == AvatarRole) {
+    } else if (role == AvatarRole && !msg->message.jid.isEmpty()) {
         return QUrl("image://roster/" + msg->message.jid);
     } else if (role == BodyRole) {
         if (item->children.isEmpty())

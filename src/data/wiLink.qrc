@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <!-- Images -->
     <file>add.png</file>
     <file>album.png</file>
     <file>album-128.png</file>
@@ -38,15 +39,20 @@
     <file>stop.png</file>
     <file>transfers.png</file>
     <file>upload.png</file>
-    <file>wiLink.css</file>
     <file>wiLink.png</file>
     <file>wiLink-black.png</file>
     <file>wiLink-64.png</file>
+    <!-- QML -->
+    <file>qmldir</file>
+    <file>player.qml</file>
+    <file>ScrollBar.qml</file>
+    <!-- Stylesheets -->
+    <file>wiLink.css</file>
+    <!-- Sounds -->
     <file>call-incoming.ogg</file>
     <file>call-outgoing.ogg</file>
     <file>message-incoming.ogg</file>
     <file>message-outgoing.ogg</file>
-    <file>player.qml</file>
     <file>UTN_USERFirst_Hardware_Root_CA.pem</file>
 </qresource>
 </RCC>
