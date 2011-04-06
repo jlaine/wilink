@@ -36,14 +36,14 @@ Item {
     Rectangle {
         id: handle
 
-        border.color: '#818181'
+        border.color: '#c3c3c3'
         border.width: 1
         color: '#c3c3c3'
         x: 0
         y: flickableItem.visibleArea.yPosition * flickableItem.height
         height: flickableItem.visibleArea.heightRatio * flickableItem.height
         width: parent.width - 1
-        radius: 5
+        radius: 6
 
         MouseArea {
             property int handleY: flickableItem ? Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight) : NaN
