@@ -198,51 +198,10 @@ Rectangle {
         }
     }
 
-    Item {
+    ScrollBar {
         id: scrollBar
-
-        property Flickable flickableItem: historyView
-
         anchors.right: parent.right
         height: parent.height
-        width: 16
-
-        Rectangle {
-            id: scrollTrack
-            anchors.fill: parent
-            color: 'red'
-        }
-
-        Rectangle {
-            id: handle
-
-            property Flickable flickableItem: historyView
-
-            color: 'blue'
-            x: 0
-            y: flickableItem.visibleArea.yPosition * flickableItem.height
-            height: flickableItem.visibleArea.heightRatio * flickableItem.height
-            width: parent.width
-            radius: 5
-
-            MouseArea {
-                property Flickable flickableItem: historyView
-                property int handleY: flickableItem ? Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight) : NaN
-                property real maxDragY: flickableItem ? flickableItem.height - handle.height : NaN
-
-                anchors.fill: parent
-
-                drag {
-                    axis: Drag.YAxis
-                    target: handle
-                    minimumY: 0
-                    maximumY: maxDragY
-                }
-
-                onPositionChanged: {
-                    flickableItem.contentY = handleY
-                }
-            }
-        }
+        flickableItem: historyView
     }
 }
