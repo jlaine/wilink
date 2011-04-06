@@ -93,7 +93,7 @@ bool ChatMessage::groupWith(const ChatMessage &other) const
     return jid == other.jid &&
         !isAction() &&
         !other.isAction() &&
-        qAbs(date.secsTo(other.date)) < 2 * 3600; // 2 hours
+        qAbs(date.secsTo(other.date)) < 3600; // 1 hour
 }
 
 /** Returns true if the message is an "action" message, such
