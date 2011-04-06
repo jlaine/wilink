@@ -156,7 +156,9 @@ void ChatMessageBubble::dataChanged()
 
     // avatar
     QModelIndex idx = index();
-    m_avatar->setPixmap(QPixmap(":/peer.png"));
+    const QString jid = idx.data(ChatHistoryModel::JidRole).toString();
+    const QPixmap pixmap = m_history->model()->rosterModel()->contactAvatar(jid);
+    m_avatar->setPixmap(pixmap.scaled(32, 32, Qt::KeepAspectRatio));
 
     const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
     if (isAction) {
