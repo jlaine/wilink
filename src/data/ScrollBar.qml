@@ -20,7 +20,11 @@
 import QtQuick 1.0
 
 Item {
-    property Flickable flickableItem
+    id: scrollBar
+
+    property ListView flickableItem
+    property real position: flickableItem.visibleArea.yPosition
+    property real pageSize: flickableItem.visibleArea.heightRatio
 
     width: 16
 
@@ -38,41 +42,44 @@ Item {
         border.width: 1
         color: '#c3c3c3'
         x: 0
-        y: flickableItem.visibleArea.yPosition * flickableItem.height
-        height: flickableItem.visibleArea.heightRatio * flickableItem.height
+        y: scrollBar.position * (track.height - 2) + 1
+        height: scrollBar.pageSize * (track.height - 2)
         width: parent.width - 1
         radius: 6
+    }
 
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
+    MouseArea {
+        property real pressContentY
+        property real pressMouseY
+        property real pressScale
+        anchors.fill: scrollBar
 
-            drag {
-                axis: Drag.YAxis
-                target: handle
-                minimumY: 0
-                maximumY: track.height - handle.height
-            }
+        drag.axis: Drag.YAxis
 
-            onEntered: {
-                handle.state = 'hovered'
-            }
-
-            onExited: {
-                handle.state = ''
-            }
-
-            onPositionChanged: {
-                if (pressedButtons == Qt.LeftButton) {
-                    flickableItem.contentY = Math.floor(handle.y / flickableItem.height * flickableItem.contentHeight);
-                }
-            }
+        onPressed: {
+            pressContentY = flickableItem.contentY
+            pressMouseY = mouse.y
+            pressScale = scrollBar.pageSize
+            scrollBar.state = 'hovered'
         }
 
-        states: State {
-            name: "hovered"
-            PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
+        onReleased: {
+            scrollBar.state = ''
         }
+
+        onPositionChanged: {
+            var targetY = pressContentY + (mouse.y - pressMouseY) / pressScale;
+            targetY = Math.max(0, targetY);
+            if (scrollBar.position + scrollBar.pageSize >= 1 && targetY >= flickableItem.contentY) {
+                return;
+            }
+            flickableItem.contentY = targetY;
+        }
+    }
+
+    states: State {
+        name: "hovered"
+        PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
     }
 }
 
