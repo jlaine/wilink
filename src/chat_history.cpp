@@ -152,8 +152,10 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
  */
 void ChatMessageBubble::dataChanged()
 {
-#if 0
-    if (m_messages.isEmpty()) {
+    QModelIndex idx = index();
+
+    // empty bubble
+    if (!m_history->model()->rowCount(idx)) {
         m_body->setHtml(QString());
         m_date->hide();
         m_from->hide();
@@ -161,10 +163,8 @@ void ChatMessageBubble::dataChanged()
         updateGeometry();
         return;
     }
-#endif
 
     // avatar
-    QModelIndex idx = index();
     const QString jid = idx.data(ChatHistoryModel::JidRole).toString();
     const QPixmap pixmap = m_history->model()->rosterModel()->contactAvatar(jid);
     if (pixmap.isNull())
@@ -738,16 +738,6 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-void ChatHistoryWidget::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
-{
-    Q_ASSERT(topLeft.parent() == bottomRight.parent());
-    if (!topLeft.parent().isValid()) {
-        for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
-            m_bubbles.at(i)->dataChanged();
-        adjustSize();
-    }
-}
-
 /** Find and highlight the given text.
  *
  * @param needle
@@ -911,7 +901,7 @@ void ChatHistoryWidget::setModel(ChatHistoryModel *model)
 
     m_model = model;
     check = connect(m_model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                    this, SLOT(dataChanged(QModelIndex,QModelIndex)));
+                    this, SLOT(rowsChanged(QModelIndex,QModelIndex)));
     Q_ASSERT(check);
     check = connect(m_model, SIGNAL(rowsInserted(QModelIndex,int,int)),
                     this, SLOT(rowsInserted(QModelIndex,int,int)));
@@ -1006,6 +996,17 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
         QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
     }
     e->accept();
+}
+
+void ChatHistoryWidget::rowsChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    Q_ASSERT(topLeft.parent() == bottomRight.parent());
+    if (!topLeft.parent().isValid()) {
+        //qDebug("bubbles changed: %i-%i", topLeft.row(), bottomRight.row());
+        for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
+            m_bubbles.at(i)->dataChanged();
+        adjustSize();
+    }
 }
 
 void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int end)
