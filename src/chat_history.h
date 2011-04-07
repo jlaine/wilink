@@ -34,7 +34,6 @@ class QUrl;
 class ChatHistoryModel;
 class ChatHistoryModelPrivate;
 class ChatHistoryWidget;
-class ChatMessageWidget;
 class ChatRosterModel;
 class ChatSearchBubble;
 typedef QPair<QRectF, QTextCursor> RectCursor;
@@ -67,12 +66,10 @@ class ChatMessageBubble : public QGraphicsWidget
 public:
     ChatMessageBubble(ChatHistoryWidget *parent);
     QModelIndex index() const;
-    int indexOf(ChatMessageWidget *widget) const;
-    void insertAt(int pos, ChatMessageWidget *widget);
     ChatHistoryModel *model();
     void setGeometry(const QRectF &rect);
     void setMaximumWidth(qreal width);
-    ChatMessageWidget *takeAt(int pos);
+    QGraphicsTextItem *textItem();
 
 public slots:
     void dataChanged();
@@ -86,6 +83,8 @@ protected:
 
 private:
     QGraphicsPixmapItem *m_avatar;
+    QGraphicsTextItem *m_body;
+    QString m_bodyAnchor;
     QGraphicsTextItem *m_date;
     QGraphicsPathItem *m_frame;
     QGraphicsTextItem *m_from;
@@ -93,40 +92,6 @@ private:
 
     // layout
     qreal m_maximumWidth;
-    QList<ChatMessageWidget*> m_messages;
-
-    friend class ChatHistoryWidget;
-};
-
-/** The ChatMessageWidget class represents a widget for displaying a single
- *  chat message.
- */
-class ChatMessageWidget : public QGraphicsWidget
-{
-    Q_OBJECT
-
-public:
-    ChatMessageWidget(QGraphicsItem *parent);
-    QModelIndex index() const;
-    ChatMessageBubble *bubble();
-    void setBubble(ChatMessageBubble *bubble);
-    void setMaximumWidth(qreal width);
-    QGraphicsTextItem *textItem();
-
-public slots:
-    void dataChanged();
-
-protected:
-    bool sceneEventFilter(QGraphicsItem *item, QEvent *event);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF & constraint = QSizeF()) const;
-
-private:
-    int maxWidth;
-    ChatMessageBubble *m_bubble;
-
-    // Text
-    QString bodyAnchor;
-    QGraphicsTextItem *bodyText;
 };
 
 class ChatHistoryModel : public ChatModel

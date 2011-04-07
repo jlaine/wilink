@@ -133,6 +133,12 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
     m_frame->setZValue(-1);
     m_frame->hide();
 
+    // body
+    m_body = new QGraphicsTextItem(this);
+    font.setPixelSize(BODY_FONT);
+    m_body->setFont(font);
+    m_body->installSceneEventFilter(this);
+
 #if 0
     // bubble shadow
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect;
@@ -146,13 +152,16 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
  */
 void ChatMessageBubble::dataChanged()
 {
+#if 0
     if (m_messages.isEmpty()) {
+        m_body->setHtml(QString());
         m_date->hide();
         m_from->hide();
         m_frame->hide();
         updateGeometry();
         return;
     }
+#endif
 
     // avatar
     QModelIndex idx = index();
@@ -162,6 +171,9 @@ void ChatMessageBubble::dataChanged()
         m_avatar->setPixmap(QPixmap());
     else
         m_avatar->setPixmap(pixmap.scaled(32, 32, Qt::KeepAspectRatio));
+
+    // body
+    m_body->setHtml(idx.data(ChatHistoryModel::HtmlRole).toString());
 
     const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
     if (isAction) {
@@ -201,29 +213,6 @@ QModelIndex ChatMessageBubble::index() const
     return m_history->model()->index(row, 0, QModelIndex());
 }
 
-/** Returns the index of a message within the bubble.
- *
- * @param widget
- */
-int ChatMessageBubble::indexOf(ChatMessageWidget *widget) const
-{
-    return m_messages.indexOf(widget);
-}
-
-/** Inserts a message in the bubble at the given position.
- *
- * @param pos
- * @param widget
- */
-void ChatMessageBubble::insertAt(int pos, ChatMessageWidget *widget)
-{
-    // add widget
-    widget->setBubble(this);
-    widget->setParentItem(this);
-    widget->setMaximumWidth(m_maximumWidth - AVATAR_WIDTH - 2);
-    m_messages.insert(pos, widget);
-}
-
 /** Returns the underlying data model.
  */
 ChatHistoryModel *ChatMessageBubble::model()
@@ -235,10 +224,24 @@ ChatHistoryModel *ChatMessageBubble::model()
  */
 bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
-    if (item == m_from && !m_messages.isEmpty() &&
-        event->type() == QEvent::GraphicsSceneMousePress)
-    {
-        emit messageClicked(m_messages.first()->index());
+    if (item == m_from) {
+        if (event->type() == QEvent::GraphicsSceneMousePress)
+            emit messageClicked(index());
+    } else if (item == m_body) {
+        if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+            m_bodyAnchor = QString();
+            m_body->setCursor(Qt::ArrowCursor);
+        } else if (event->type() == QEvent::GraphicsSceneHoverMove) {
+            QGraphicsSceneHoverEvent *hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
+            m_bodyAnchor = m_body->document()->documentLayout()->anchorAt(hoverEvent->pos());
+            m_body->setCursor(m_bodyAnchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
+        } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+            QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
+            if (mouseEvent->button() == Qt::LeftButton) {
+                if (!m_bodyAnchor.isEmpty())
+                    QDesktopServices::openUrl(m_bodyAnchor);
+            }
+        }
     }
     return false;
 }
@@ -295,14 +298,7 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
 
     // messages
     rect.adjust(0.5, 0.5, -0.5, -0.5);
-    const qreal x = rect.left();
-    qreal y = rect.top();
-    foreach (ChatMessageWidget *widget, m_messages)
-    {
-        const QRectF wRect(QPointF(x, y), widget->preferredSize());
-        widget->setGeometry(wRect);
-        y += wRect.height();
-    }
+    m_body->setPos(rect.left() + BODY_OFFSET, rect.top());
 }
 
 /** Sets the bubble's maximum width.
@@ -313,8 +309,7 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
 {
     m_maximumWidth = width;
     QGraphicsWidget::setMaximumWidth(width);
-    foreach (ChatMessageWidget *child, m_messages)
-        child->setMaximumWidth(m_maximumWidth - AVATAR_WIDTH - 2);
+    m_body->document()->setTextWidth(m_maximumWidth - BODY_OFFSET - AVATAR_WIDTH - 2);
     updateGeometry();
 }
 
@@ -325,20 +320,13 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
  */
 QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
-    qreal height = (m_from->isVisible() ? HEADER_HEIGHT : 0 ) + (m_frame ? FOOTER_HEIGHT : 0) + 2;
-
     switch (which)
     {
         case Qt::MinimumSize:
-        {
-            foreach (ChatMessageWidget *widget, m_messages)
-                height += widget->minimumHeight();
-            return QSizeF(m_maximumWidth, height);
-        }
         case Qt::PreferredSize:
         {
-            foreach (ChatMessageWidget *widget, m_messages)
-                height += widget->preferredHeight();
+            qreal height = (m_from->isVisible() ? HEADER_HEIGHT : 0 ) + (m_frame ? FOOTER_HEIGHT : 0) + 2;
+            height += m_body->document()->size().height();
             return QSizeF(m_maximumWidth, height);
         }
         default:
@@ -346,38 +334,11 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     }
 }
 
-ChatMessageWidget *ChatMessageBubble::takeAt(int i)
-{
-    ChatMessageWidget *widget = m_messages.takeAt(i);
-    return widget;
-}
-
-/** Constructs a new ChatMessageWidget.
- *
- * @param parent
+/** Returns the bubble's text item.
  */
-ChatMessageWidget::ChatMessageWidget(QGraphicsItem *parent)
-    : QGraphicsWidget(parent),
-    maxWidth(128),
-    m_bubble(0)
+QGraphicsTextItem *ChatMessageBubble::textItem()
 {
-    const QColor textColor(Qt::black);
-
-    // message body
-    bodyText = new QGraphicsTextItem(this);
-    QFont font = bodyText->font();
-    font.setPixelSize(BODY_FONT);
-    bodyText->setFont(font);
-    bodyText->setDefaultTextColor(textColor);
-    bodyText->setPos(BODY_OFFSET, 0);
-    bodyText->installSceneEventFilter(this);
-}
-
-/** Returns the bubble this message belongs to.
- */
-ChatMessageBubble *ChatMessageWidget::bubble()
-{
-    return m_bubble;
+    return m_body;
 }
 
 /** Break a text selection into a list of rectangles, which one rectangle per line.
@@ -438,77 +399,6 @@ static QList<RectCursor> chunkSelection(QGraphicsTextItem *textItem, const QText
     return rectangles;
 }
 
-/** Retrieves message data from the data model.
- */
-void ChatMessageWidget::dataChanged()
-{
-    QModelIndex idx = index();
-    const QString html = idx.data(ChatHistoryModel::HtmlRole).toString();
-    bodyText->setHtml(html);
-}
-
-/** Returns the model index which this widget displays.
- */
-QModelIndex ChatMessageWidget::index() const
-{
-    int row = m_bubble->indexOf((ChatMessageWidget*)this);
-    return m_bubble->model()->index(row, 0, m_bubble->index());
-}
-
-/** Filters events on the body label.
- */
-bool ChatMessageWidget::sceneEventFilter(QGraphicsItem *item, QEvent *event)
-{
-    if (item == bodyText)
-    {
-        if (event->type() == QEvent::GraphicsSceneHoverLeave)
-        {
-            bodyAnchor = QString();
-            bodyText->setCursor(Qt::ArrowCursor);
-        }
-        else if (event->type() == QEvent::GraphicsSceneHoverMove)
-        {
-            QGraphicsSceneHoverEvent *hoverEvent = static_cast<QGraphicsSceneHoverEvent*>(event);
-            bodyAnchor = bodyText->document()->documentLayout()->anchorAt(hoverEvent->pos());
-            bodyText->setCursor(bodyAnchor.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
-        }
-        else if (event->type() == QEvent::GraphicsSceneMousePress)
-        {
-            QGraphicsSceneMouseEvent *mouseEvent = static_cast<QGraphicsSceneMouseEvent*>(event);
-            if (mouseEvent->button() == Qt::LeftButton)
-            {
-                if (!bodyAnchor.isEmpty())
-                    QDesktopServices::openUrl(bodyAnchor);
-            }
-        }
-    }
-    return false;
-}
-
-/** Sets the bubble this message belongs to.
- *
- * @param bubble
- */
-void ChatMessageWidget::setBubble(ChatMessageBubble *bubble)
-{
-    m_bubble = bubble;
-}
-
-/** Sets the message's maximum width.
- *
- * @param width
- */
-void ChatMessageWidget::setMaximumWidth(qreal width)
-{
-    if (width == maxWidth)
-        return;
-
-    QGraphicsWidget::setMaximumWidth(width);
-    maxWidth = width;
-    bodyText->document()->setTextWidth(width - BODY_OFFSET);
-    updateGeometry();
-}
-
 /** Sets the text cursor to select the given rectangle.
  *
  * @param textItem
@@ -528,35 +418,6 @@ static void setSelection(QGraphicsTextItem *textItem, const QRectF &rect)
     cursor.setPosition(startPos);
     cursor.setPosition(endPos, QTextCursor::KeepAnchor);
     textItem->setTextCursor(cursor);
-}
-
-/** Returns the given size hint for the message.
- *
- * @param which
- * @param constraint
- */
-QSizeF ChatMessageWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-{
-    switch (which)
-    {
-        case Qt::MinimumSize:
-        case Qt::PreferredSize:
-        {
-            QSizeF hint(bodyText->document()->size());
-            if (hint.width() < maxWidth)
-                hint.setWidth(maxWidth);
-            return hint;
-        }
-        default:
-            return constraint;
-    }
-}
-
-/** Returns the message's text item.
- */
-QGraphicsTextItem *ChatMessageWidget::textItem()
-{
-    return bodyText;
 }
 
 ChatHistoryHelper::ChatHistoryHelper(QObject *parent)
@@ -880,15 +741,11 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
 void ChatHistoryWidget::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     Q_ASSERT(topLeft.parent() == bottomRight.parent());
-    if (topLeft.parent().isValid()) {
-        ChatMessageBubble *bubble = m_bubbles.at(topLeft.parent().row());
-        for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
-            bubble->m_messages.at(i)->dataChanged();
-    } else {
+    if (!topLeft.parent().isValid()) {
         for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
             m_bubbles.at(i)->dataChanged();
+        adjustSize();
     }
-    adjustSize();
 }
 
 /** Find and highlight the given text.
@@ -912,8 +769,7 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
     // retrieve previous cursor
     QList<QGraphicsTextItem*> m_messages;
     foreach (ChatMessageBubble *bubble, m_bubbles)
-        foreach (ChatMessageWidget *message, bubble->m_messages)
-            m_messages << message->textItem();
+        m_messages << bubble->textItem();
 
     QTextCursor cursor;
     int startIndex = (flags && QTextDocument::FindBackward) ? m_messages.size() -1 : 0;
@@ -1030,10 +886,9 @@ QGraphicsTextItem *ChatHistoryWidget::textItemAt(const QPointF &pos) const
 {
     QGraphicsItem *hit = scene()->itemAt(pos);
     while (hit) {
-        ChatMessageWidget *widget = static_cast<ChatMessageWidget*>(hit);
-        foreach (ChatMessageBubble *bubble, m_bubbles)
-            if (bubble->m_messages.contains(widget))
-                return widget->textItem();
+        ChatMessageBubble *widget = static_cast<ChatMessageBubble*>(hit);
+        if (m_bubbles.contains(widget))
+            return widget->textItem();
         hit = hit->parentItem();
     }
     return 0;
@@ -1106,14 +961,12 @@ void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
         // update the selected items
         QList<QGraphicsTextItem*> newSelection;
         foreach (ChatMessageBubble *bubble, m_bubbles) {
-            foreach (ChatMessageWidget *child, bubble->m_messages) {
-                QGraphicsTextItem *textItem = child->textItem();
-                if (textItem->boundingRect().intersects(textItem->mapRectFromScene(rect))) {
-                    newSelection << textItem;
-                    setSelection(textItem, rect);
-                } else if (m_selectedMessages.contains(textItem)) {
-                    setSelection(textItem, QRectF());
-                }
+            QGraphicsTextItem *textItem = bubble->textItem();
+            if (textItem->boundingRect().intersects(textItem->mapRectFromScene(rect))) {
+                newSelection << textItem;
+                setSelection(textItem, rect);
+            } else if (m_selectedMessages.contains(textItem)) {
+                setSelection(textItem, QRectF());
             }
         }
         m_selectedMessages = newSelection;
@@ -1160,25 +1013,17 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
 
 void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int end)
 {
-    if (parent.isValid()) {
-        //qDebug("messages inserted in bubble %i: %i-%i", parent.row(), start, end);
-        ChatMessageBubble *bubble = m_bubbles.at(parent.row());
-        Q_ASSERT(bubble);
-        for (int i = start; i <= end; ++i) {
-            ChatMessageWidget *message = new ChatMessageWidget(bubble);
-            bubble->insertAt(i, message);
-            message->dataChanged();
-        }
-    } else {
+    if (!parent.isValid()) {
         //qDebug("bubbles inserted: %i-%i", start, end);
         for (int i = start; i <= end; ++i)
             insertBubble(i, new ChatMessageBubble(this));
+        adjustSize();
     }
-    adjustSize();
 }
 
 void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow)
 {
+#if 0
     //qDebug("rows moved from %i: %i-%i to %i: %i", sourceParent.row(), sourceStart, sourceEnd, destParent.row(), destRow);
     Q_ASSERT(sourceParent.isValid());
     Q_ASSERT(destParent.isValid());
@@ -1190,27 +1035,19 @@ void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceSta
         destBubble->insertAt(destRow, message);
     }
     adjustSize();
+#endif
 }
 
 void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int end)
 {
     //qDebug("rows removed from %i: %i-%i", parent.row(), start, end);
-    if (parent.isValid()) {
-        ChatMessageBubble *bubble = m_bubbles.at(parent.row());
-        for (int i = end; i >= start; --i) {
-            ChatMessageWidget *message = bubble->takeAt(i);
-            m_selectedMessages.removeAll(message->textItem());
-            message->deleteLater();
-        }
-    } else {
+    if (!parent.isValid()) {
         for (int i = end; i >= start; --i) {
             ChatMessageBubble *bubble = m_bubbles.takeAt(i);
-            foreach (ChatMessageWidget *message, bubble->m_messages)
-                m_selectedMessages.removeAll(message->textItem());
             bubble->deleteLater();
         }
+        adjustSize();
     }
-    adjustSize();
 }
 
 /** Selects all the messages.
@@ -1232,8 +1069,8 @@ QString ChatHistoryWidget::selectedText() const
     QMap<QGraphicsTextItem*, QString> senders;
     foreach (QGraphicsTextItem *textItem, m_selectedMessages) {
         // FIXME : cannot be reused in QML
-        ChatMessageWidget *child = static_cast<ChatMessageWidget*>(textItem->parentItem());
-        senders.insert(textItem, child->index().data(ChatHistoryModel::FromRole).toString());
+        ChatMessageBubble *bubble = static_cast<ChatMessageBubble*>(textItem->parentItem());
+        senders.insert(textItem, bubble->index().data(ChatHistoryModel::FromRole).toString());
     }
 
     // copy selected messages
