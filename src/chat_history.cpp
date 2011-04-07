@@ -146,7 +146,7 @@ ChatHistoryBubble::ChatHistoryBubble(ChatHistoryWidget *parent)
 #endif
 }
 
-/** Retrieves data from the data model.
+/** Retrieves updated data from the model.
  */
 void ChatHistoryBubble::dataChanged()
 {
@@ -216,7 +216,10 @@ ChatHistoryModel *ChatHistoryBubble::model()
     return m_history->model();
 }
 
-/** Filters events on the sender label.
+/** Filters events on the sender and body labels.
+ *
+ * @param item
+ * @param event
  */
 bool ChatHistoryBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
@@ -327,7 +330,7 @@ QSizeF ChatHistoryBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
     }
 }
 
-/** Returns the bubble's text item.
+/** Returns the bubble's main text item.
  */
 QGraphicsTextItem *ChatHistoryBubble::textItem()
 {
@@ -413,11 +416,19 @@ static void setSelection(QGraphicsTextItem *textItem, const QRectF &rect)
     textItem->setTextCursor(cursor);
 }
 
+/** Constructs a new ChatHistoryHelper.
+ *
+ * @param parent
+ */
 ChatHistoryHelper::ChatHistoryHelper(QObject *parent)
     : QObject(parent)
 {
 }
 
+/** Opens the given \a url using QDesktopServices.
+ *
+ * @param url
+ */
 void ChatHistoryHelper::openUrl(const QUrl &url)
 {
     QDesktopServices::openUrl(url);
@@ -444,6 +455,10 @@ QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
     return bodyHtml;
 }
 
+/** Constructs a new ChatHistoryModel.
+ *
+ * @param parent
+ */
 ChatHistoryModel::ChatHistoryModel(QObject *parent)
     : ChatModel(parent)
 {
@@ -465,6 +480,13 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
     setRoleNames(roleNames);
 }
 
+/** Adds a message in the chat history.
+ *
+ * The message is checked for duplicates, inserted in chronological order
+ * and grouped with related messages.
+ *
+ * @param message
+ */
 void ChatHistoryModel::addMessage(const ChatMessage &message)
 {
     if (message.body.isEmpty())
@@ -578,11 +600,21 @@ void ChatHistoryModel::clear()
         removeRows(0, rows);
 }
 
+/** Returns the number of columns for the children of the given parent.
+ *
+ * @param parent
+ */
 int ChatHistoryModel::columnCount(const QModelIndex &parent) const
 {
     return 1;
 }
 
+/** Returns the data stored under the given \a role for the item referred to
+ *  by the \a index.
+ *
+ * @param index
+ * @param role
+ */
 QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
 {
     ChatHistoryItem *item = static_cast<ChatHistoryItem*>(index.internalPointer());
@@ -843,11 +875,19 @@ void ChatHistoryWidget::findClear()
     m_glassItems.clear();
 }
 
+/** Returns the row of the given history bubble.
+ *
+ * @param bubble
+ */
 int ChatHistoryWidget::indexOf(ChatHistoryBubble *bubble)
 {
     return m_bubbles.indexOf(bubble);
 }
 
+/** Returns the text item at the given scene position.
+ *
+ * @param pos
+ */
 QGraphicsTextItem *ChatHistoryWidget::textItemAt(const QPointF &pos) const
 {
     QGraphicsItem *hit = scene()->itemAt(pos);
@@ -887,6 +927,10 @@ void ChatHistoryWidget::setModel(ChatHistoryModel *model)
     Q_ASSERT(check);
 }
 
+/** Handles mouse double click events to update text selection.
+ *
+ * @param event
+ */
 void ChatHistoryWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsTextItem *textItem = textItemAt(event->pos());
@@ -915,11 +959,15 @@ void ChatHistoryWidget::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
+/** Handles mouse move events to update text selection.
+ *
+ * @param event
+ */
+void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (e->buttons() == Qt::LeftButton)
+    if (event->buttons() == Qt::LeftButton)
     {
-        const QRectF rect(m_selectionStart, e->scenePos());
+        const QRectF rect(m_selectionStart, event->scenePos());
 
         // update the selected items
         QList<QGraphicsTextItem*> newSelection;
@@ -938,23 +986,27 @@ void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
         if (!m_selectedMessages.isEmpty())
             QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
 
-        e->accept();
+        event->accept();
     }
 }
 
-void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
+/** Handles mouse click and tripple click events to update text selection.
+ *
+ * @param event
+ */
+void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (e->buttons() != Qt::LeftButton)
+    if (event->buttons() != Qt::LeftButton)
         return;
 
     // clear selection
-    m_selectionStart = e->scenePos();
+    m_selectionStart = event->scenePos();
     foreach (QGraphicsTextItem *child, m_selectedMessages)
         setSelection(child, QRectF());
     m_selectedMessages.clear();
 
     // handle tripple click
-    QGraphicsTextItem *textItem = textItemAt(e->pos());
+    QGraphicsTextItem *textItem = textItemAt(event->pos());
     if (textItem && m_trippleClickTimer->isActive())
     {
         QTextCursor cursor = textItem->textCursor();
@@ -971,7 +1023,7 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *e)
         m_selectedMessages << textItem;
         QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
     }
-    e->accept();
+    event->accept();
 }
 
 void ChatHistoryWidget::rowsChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
@@ -1058,6 +1110,13 @@ QString ChatHistoryWidget::selectedText() const
 #endif
 }
 
+/** Sets the \a view which holds this history widget.
+ *
+ * This is used to monitor scroll events and setup keyboard
+ * shortcuts.
+ *
+ * @param view
+ */
 void ChatHistoryWidget::setView(QGraphicsView *view)
 {
     bool check;
@@ -1105,6 +1164,8 @@ void ChatHistoryWidget::slotScrollChanged()
     m_followEnd = scrollBar->value() >= scrollBar->maximum() - 16;
 }
 
+/** Constructs a new ChatSearchBubble.
+ */
 ChatSearchBubble::ChatSearchBubble()
     : m_margin(3), m_radius(4)
 {
