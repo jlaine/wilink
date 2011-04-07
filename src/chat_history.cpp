@@ -916,9 +916,6 @@ void ChatHistoryWidget::setModel(ChatHistoryModel *model)
     check = connect(m_model, SIGNAL(rowsInserted(QModelIndex,int,int)),
                     this, SLOT(rowsInserted(QModelIndex,int,int)));
     Q_ASSERT(check);
-    check = connect(m_model, SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)),
-                    this, SLOT(rowsMoved(QModelIndex,int,int,QModelIndex,int)));
-    Q_ASSERT(check);
     check = connect(m_model, SIGNAL(rowsRemoved(QModelIndex,int,int)),
                     this, SLOT(rowsRemoved(QModelIndex,int,int)));
     Q_ASSERT(check);
@@ -1021,27 +1018,10 @@ void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int e
     }
 }
 
-void ChatHistoryWidget::rowsMoved(const QModelIndex &sourceParent, int sourceStart, int sourceEnd, const QModelIndex &destParent, int destRow)
-{
-#if 0
-    //qDebug("rows moved from %i: %i-%i to %i: %i", sourceParent.row(), sourceStart, sourceEnd, destParent.row(), destRow);
-    Q_ASSERT(sourceParent.isValid());
-    Q_ASSERT(destParent.isValid());
-
-    ChatMessageBubble *sourceBubble = m_bubbles.at(sourceParent.row());
-    ChatMessageBubble *destBubble = m_bubbles.at(destParent.row());
-    for (int i = sourceEnd; i >= sourceStart; --i) {
-        ChatMessageWidget *message = sourceBubble->takeAt(i);
-        destBubble->insertAt(destRow, message);
-    }
-    adjustSize();
-#endif
-}
-
 void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    //qDebug("rows removed from %i: %i-%i", parent.row(), start, end);
     if (!parent.isValid()) {
+        //qDebug("bubbles removed: %i-%i", start, end);
         for (int i = end; i >= start; --i) {
             ChatMessageBubble *bubble = m_bubbles.takeAt(i);
             bubble->deleteLater();
