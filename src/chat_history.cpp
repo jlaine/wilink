@@ -121,12 +121,10 @@ ChatHistoryBubble::ChatHistoryBubble(ChatHistoryWidget *parent)
     font.setPixelSize(DATE_FONT);
     m_from->setFont(font);
     m_from->installSceneEventFilter(this);
-    m_from->hide();
 
     // date
     m_date = new QGraphicsTextItem(this);
     m_date->setFont(font);
-    m_date->hide();
 
     // bubble frame
     m_frame = new QGraphicsPathItem(this);
@@ -157,51 +155,49 @@ void ChatHistoryBubble::dataChanged()
     // empty bubble
     if (!m_history->model()->rowCount(idx)) {
         m_body->setHtml(QString());
-        m_date->hide();
-        m_from->hide();
         m_frame->hide();
         updateGeometry();
         return;
     }
 
-    // avatar
+    const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
+    const bool isReceived = idx.data(ChatHistoryModel::ReceivedRole).toBool();
     const QString jid = idx.data(ChatHistoryModel::JidRole).toString();
+
+    // avatar
     const QPixmap pixmap = m_history->model()->rosterModel()->contactAvatar(jid);
     if (pixmap.isNull())
         m_avatar->setPixmap(QPixmap());
     else
         m_avatar->setPixmap(pixmap.scaled(32, 32, Qt::KeepAspectRatio));
 
+    QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
+    QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
+
+    // from
+    m_from->setDefaultTextColor(baseColor);
+    m_from->setPlainText(idx.data(ChatHistoryModel::FromRole).toString());
+    m_from->show();
+
+    // date
+    m_date->setDefaultTextColor(baseColor);
+    const QDateTime datetime = idx.data(ChatHistoryModel::DateRole).toDateTime().toLocalTime();
+    m_date->setPlainText(datetime.date() == QDate::currentDate() ?
+        datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
+    m_date->show();
+
+    // bubble frame
+    m_frame->setPen(baseColor);
+    m_frame->setBrush(backgroundColor);
+    if (isAction) {
+        m_frame->hide();
+    } else {
+        m_frame->show();
+    }
+
     // body
     m_body->setHtml(idx.data(ChatHistoryModel::HtmlRole).toString());
 
-    const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
-    if (isAction) {
-        m_date->hide();
-        m_from->hide();
-        m_frame->hide();
-    } else {
-        const bool isReceived = idx.data(ChatHistoryModel::ReceivedRole).toBool();
-        QColor baseColor = isReceived ? QColor(0x26, 0x89, 0xd6) : QColor(0x7b, 0x7b, 0x7b);
-        QColor backgroundColor = isReceived ? QColor(0xe7, 0xf4, 0xfe) : QColor(0xfa, 0xfa, 0xfa);
-
-        // from
-        m_from->setDefaultTextColor(baseColor);
-        m_from->setPlainText(idx.data(ChatHistoryModel::FromRole).toString());
-        m_from->show();
-
-        // date
-        m_date->setDefaultTextColor(baseColor);
-        const QDateTime datetime = idx.data(ChatHistoryModel::DateRole).toDateTime().toLocalTime();
-        m_date->setPlainText(datetime.date() == QDate::currentDate() ?
-            datetime.toString("hh:mm") : datetime.toString("dd MMM hh:mm"));
-        m_date->show();
-
-        // bubble frame
-        m_frame->setPen(baseColor);
-        m_frame->setBrush(backgroundColor);
-        m_frame->show();
-    }
     updateGeometry();
 }
 
@@ -250,7 +246,6 @@ bool ChatHistoryBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
  */
 void ChatHistoryBubble::setGeometry(const QRectF &baseRect)
 {
-    const bool useHeader = m_from->isVisible();
     QGraphicsWidget::setGeometry(baseRect);
 
     QRectF rect(baseRect);
@@ -259,12 +254,12 @@ void ChatHistoryBubble::setGeometry(const QRectF &baseRect)
 
     // header
     rect.adjust(0.5 + AVATAR_WIDTH, 0.5, -0.5, -0.5);
-    if (useHeader) {
-        m_from->setPos(rect.left(), rect.top());
-        m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, rect.top());
-        rect.adjust(0, HEADER_HEIGHT, 0, 0);
-    }
-    m_avatar->setPos(0, rect.top() - 5);
+    m_from->setPos(rect.left(), rect.top());
+    m_date->setPos(rect.right() - (80 + m_date->document()->idealWidth())/2, rect.top());
+    rect.adjust(0, HEADER_HEIGHT, 0, 0);
+
+    // avatar
+    m_avatar->setPos(0, rect.top());
 
     // bubble
     if (m_frame) {
@@ -276,11 +271,9 @@ void ChatHistoryBubble::setGeometry(const QRectF &baseRect)
         path.moveTo(rect.left(), rect.top() + BUBBLE_RADIUS);
         arc.moveTopLeft(rect.topLeft());
         path.arcTo(arc, 180, -90);
-        if (useHeader) {
-            path.lineTo(rect.left() + 20, rect.top());
-            path.lineTo(rect.left() + 17, rect.top() - 5);
-            path.lineTo(rect.left() + 27, rect.top());
-        }
+        path.lineTo(rect.left() + 20, rect.top());
+        path.lineTo(rect.left() + 17, rect.top() - 5);
+        path.lineTo(rect.left() + 27, rect.top());
         path.lineTo(rect.right() - BUBBLE_RADIUS, rect.top());
         arc.moveRight(rect.right());
         path.arcTo(arc, 90, -90);
@@ -325,7 +318,7 @@ QSizeF ChatHistoryBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
         case Qt::MinimumSize:
         case Qt::PreferredSize:
         {
-            qreal height = (m_from->isVisible() ? HEADER_HEIGHT : 0 ) + (m_frame ? FOOTER_HEIGHT : 0) + 2;
+            qreal height = HEADER_HEIGHT + (m_frame ? FOOTER_HEIGHT : 0) + 2;
             height += m_body->document()->size().height();
             return QSizeF(m_maximumWidth, height);
         }
