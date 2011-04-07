@@ -104,11 +104,11 @@ bool ChatMessage::isAction() const
     return body.indexOf(meRegex) >= 0;
 }
 
-/** Constructs a new ChatMessageBubble.
+/** Constructs a new ChatHistoryBubble.
  *
  * @param parent
  */
-ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
+ChatHistoryBubble::ChatHistoryBubble(ChatHistoryWidget *parent)
     : QGraphicsWidget(parent),
     m_history(parent)
 {
@@ -150,7 +150,7 @@ ChatMessageBubble::ChatMessageBubble(ChatHistoryWidget *parent)
 
 /** Retrieves data from the data model.
  */
-void ChatMessageBubble::dataChanged()
+void ChatHistoryBubble::dataChanged()
 {
     QModelIndex idx = index();
 
@@ -207,22 +207,22 @@ void ChatMessageBubble::dataChanged()
 
 /** Returns the model index which this widget displays.
  */
-QModelIndex ChatMessageBubble::index() const
+QModelIndex ChatHistoryBubble::index() const
 {
-    int row = m_history->indexOf((ChatMessageBubble*)this);
+    int row = m_history->indexOf((ChatHistoryBubble*)this);
     return m_history->model()->index(row, 0, QModelIndex());
 }
 
 /** Returns the underlying data model.
  */
-ChatHistoryModel *ChatMessageBubble::model()
+ChatHistoryModel *ChatHistoryBubble::model()
 {
     return m_history->model();
 }
 
 /** Filters events on the sender label.
  */
-bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
+bool ChatHistoryBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
     if (item == m_from) {
         if (event->type() == QEvent::GraphicsSceneMousePress)
@@ -248,7 +248,7 @@ bool ChatMessageBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 
 /** Sets the bubble's geometry.
  */
-void ChatMessageBubble::setGeometry(const QRectF &baseRect)
+void ChatHistoryBubble::setGeometry(const QRectF &baseRect)
 {
     const bool useHeader = m_from->isVisible();
     QGraphicsWidget::setGeometry(baseRect);
@@ -305,7 +305,7 @@ void ChatMessageBubble::setGeometry(const QRectF &baseRect)
  *
  * @param widget
  */
-void ChatMessageBubble::setMaximumWidth(qreal width)
+void ChatHistoryBubble::setMaximumWidth(qreal width)
 {
     m_maximumWidth = width;
     QGraphicsWidget::setMaximumWidth(width);
@@ -318,7 +318,7 @@ void ChatMessageBubble::setMaximumWidth(qreal width)
  * @param which
  * @param constraint
  */
-QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+QSizeF ChatHistoryBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     switch (which)
     {
@@ -336,7 +336,7 @@ QSizeF ChatMessageBubble::sizeHint(Qt::SizeHint which, const QSizeF &constraint)
 
 /** Returns the bubble's text item.
  */
-QGraphicsTextItem *ChatMessageBubble::textItem()
+QGraphicsTextItem *ChatHistoryBubble::textItem()
 {
     return m_body;
 }
@@ -731,7 +731,7 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
         m_maximumWidth = m_view->viewport()->width() - 15;
-        foreach (ChatMessageBubble *bubble, m_bubbles)
+        foreach (ChatHistoryBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
         adjustSize();
     }
@@ -758,7 +758,7 @@ void ChatHistoryWidget::find(const QString &needle, QTextDocument::FindFlags fla
 
     // retrieve previous cursor
     QList<QGraphicsTextItem*> m_messages;
-    foreach (ChatMessageBubble *bubble, m_bubbles)
+    foreach (ChatHistoryBubble *bubble, m_bubbles)
         m_messages << bubble->textItem();
 
     QTextCursor cursor;
@@ -850,33 +850,16 @@ void ChatHistoryWidget::findClear()
     m_glassItems.clear();
 }
 
-int ChatHistoryWidget::indexOf(ChatMessageBubble *bubble)
+int ChatHistoryWidget::indexOf(ChatHistoryBubble *bubble)
 {
     return m_bubbles.indexOf(bubble);
-}
-
-/** Inserts a bubble at the given position.
- *
- * @param pos
- * @param bubble
- */
-void ChatHistoryWidget::insertBubble(int pos, ChatMessageBubble *bubble)
-{
-    bubble->setMaximumWidth(m_maximumWidth);
-    m_bubbles.insert(pos, bubble);
-    m_layout->insertItem(pos, bubble);
-
-    bool check;
-    check = connect(bubble, SIGNAL(messageClicked(QModelIndex)),
-                    this, SIGNAL(messageClicked(QModelIndex)));
-    Q_ASSERT(check);
 }
 
 QGraphicsTextItem *ChatHistoryWidget::textItemAt(const QPointF &pos) const
 {
     QGraphicsItem *hit = scene()->itemAt(pos);
     while (hit) {
-        ChatMessageBubble *widget = static_cast<ChatMessageBubble*>(hit);
+        ChatHistoryBubble *widget = static_cast<ChatHistoryBubble*>(hit);
         if (m_bubbles.contains(widget))
             return widget->textItem();
         hit = hit->parentItem();
@@ -947,7 +930,7 @@ void ChatHistoryWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *e)
 
         // update the selected items
         QList<QGraphicsTextItem*> newSelection;
-        foreach (ChatMessageBubble *bubble, m_bubbles) {
+        foreach (ChatHistoryBubble *bubble, m_bubbles) {
             QGraphicsTextItem *textItem = bubble->textItem();
             if (textItem->boundingRect().intersects(textItem->mapRectFromScene(rect))) {
                 newSelection << textItem;
@@ -1012,9 +995,18 @@ void ChatHistoryWidget::rowsChanged(const QModelIndex &topLeft, const QModelInde
 void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int end)
 {
     if (!parent.isValid()) {
+        bool check;
         //qDebug("bubbles inserted: %i-%i", start, end);
-        for (int i = start; i <= end; ++i)
-            insertBubble(i, new ChatMessageBubble(this));
+        for (int i = start; i <= end; ++i) {
+            ChatHistoryBubble *bubble = new ChatHistoryBubble(this);
+            bubble->setMaximumWidth(m_maximumWidth);
+            m_bubbles.insert(i, bubble);
+            m_layout->insertItem(i, bubble);
+
+            check = connect(bubble, SIGNAL(messageClicked(QModelIndex)),
+                            this, SIGNAL(messageClicked(QModelIndex)));
+            Q_ASSERT(check);
+        }
         adjustSize();
     }
 }
@@ -1024,7 +1016,7 @@ void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int en
     if (!parent.isValid()) {
         //qDebug("bubbles removed: %i-%i", start, end);
         for (int i = end; i >= start; --i) {
-            ChatMessageBubble *bubble = m_bubbles.takeAt(i);
+            ChatHistoryBubble *bubble = m_bubbles.takeAt(i);
             bubble->deleteLater();
         }
         adjustSize();
@@ -1050,7 +1042,7 @@ QString ChatHistoryWidget::selectedText() const
     QMap<QGraphicsTextItem*, QString> senders;
     foreach (QGraphicsTextItem *textItem, m_selectedMessages) {
         // FIXME : cannot be reused in QML
-        ChatMessageBubble *bubble = static_cast<ChatMessageBubble*>(textItem->parentItem());
+        ChatHistoryBubble *bubble = static_cast<ChatHistoryBubble*>(textItem->parentItem());
         senders.insert(textItem, bubble->index().data(ChatHistoryModel::FromRole).toString());
     }
 

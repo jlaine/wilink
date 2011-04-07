@@ -56,15 +56,15 @@ public:
     bool received;
 };
 
-/** The ChatMessageBubble class is a widget for display a set of
+/** The ChatHistoryBubble class is a widget for display a set of
  *  chat messages from a given sender.
  */
-class ChatMessageBubble : public QGraphicsWidget
+class ChatHistoryBubble : public QGraphicsWidget
 {
     Q_OBJECT
 
 public:
-    ChatMessageBubble(ChatHistoryWidget *parent);
+    ChatHistoryBubble(ChatHistoryWidget *parent);
     QModelIndex index() const;
     ChatHistoryModel *model();
     void setGeometry(const QRectF &rect);
@@ -94,6 +94,9 @@ private:
     qreal m_maximumWidth;
 };
 
+/** The ChatHistoryModel class represents a conversation history with
+ *  a given person or chat room.
+ */
 class ChatHistoryModel : public ChatModel
 {
     Q_OBJECT
@@ -112,11 +115,12 @@ public:
 
     ChatHistoryModel(QObject *parent = 0);
     void addMessage(const ChatMessage &message);
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
+
+    // QAbstracItemModel
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 public slots:
     void clear();
@@ -125,6 +129,9 @@ private:
     ChatHistoryModelPrivate *d;
 };
 
+/** The ChatHistoryHelper class contains text manipulation methods for use
+ *  from QML.
+ */
 class ChatHistoryHelper : public QObject
 {
     Q_OBJECT
@@ -136,16 +143,16 @@ public slots:
     void openUrl(const QUrl &url);
 };
 
-/** The ChatHistoryWidget class represents a widget containing a list
- *  of ChatMessageWidget.
+/** The ChatHistoryWidget class represents a widget for displaying messages.
  */
 class ChatHistoryWidget : public QGraphicsWidget
 {
     Q_OBJECT
+
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
     void adjustSize();
-    int indexOf(ChatMessageBubble *bubble);
+    int indexOf(ChatHistoryBubble *bubble);
     ChatHistoryModel *model();
     void setModel(ChatHistoryModel *model);
     void setView(QGraphicsView *view);
@@ -174,7 +181,6 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    void insertBubble(int pos, ChatMessageBubble *bubble);
     QGraphicsTextItem *textItemAt(const QPointF &pos) const;
     QString selectedText() const;
 
@@ -185,7 +191,7 @@ private:
     // layout
     QGraphicsLinearLayout *m_layout;
     qreal m_maximumWidth;
-    QList<ChatMessageBubble*> m_bubbles;
+    QList<ChatHistoryBubble*> m_bubbles;
     ChatHistoryModel *m_model;
 
     // selection
