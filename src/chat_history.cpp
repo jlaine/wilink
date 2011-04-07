@@ -999,12 +999,6 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (event->buttons() != Qt::LeftButton)
         return;
 
-    // clear selection
-    m_selectionStart = event->scenePos();
-    foreach (QGraphicsTextItem *child, m_selectedMessages)
-        setSelection(child, QRectF());
-    m_selectedMessages.clear();
-
     // handle tripple click
     QGraphicsTextItem *textItem = textItemAt(event->pos());
     if (textItem && m_trippleClickTimer->isActive())
@@ -1022,6 +1016,11 @@ void ChatHistoryWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
         m_selectedMessages.clear();
         m_selectedMessages << textItem;
         QApplication::clipboard()->setText(selectedText(), QClipboard::Selection);
+    } else {
+        m_selectionStart = event->scenePos();
+        foreach (QGraphicsTextItem *child, m_selectedMessages)
+            setSelection(child, QRectF());
+        m_selectedMessages.clear();
     }
     event->accept();
 }
@@ -1078,7 +1077,7 @@ void ChatHistoryWidget::selectAll()
     foreach (ChatHistoryBubble *bubble, m_bubbles) {
         QGraphicsTextItem *child = bubble->textItem();
         setSelection(child, rect);
-        m_selectedMessages;
+        m_selectedMessages << child;
     }
 }
 
