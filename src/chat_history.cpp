@@ -1072,9 +1072,14 @@ void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int en
  */
 void ChatHistoryWidget::selectAll()
 {
-    QPainterPath path;
-    path.addRect(scene()->sceneRect());
-    scene()->setSelectionArea(path);
+    const QRectF rect = scene()->sceneRect();
+
+    m_selectedMessages.clear();
+    foreach (ChatHistoryBubble *bubble, m_bubbles) {
+        QGraphicsTextItem *child = bubble->textItem();
+        setSelection(child, rect);
+        m_selectedMessages;
+    }
 }
 
 /** Retrieves the selected text.
