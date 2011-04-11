@@ -69,7 +69,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     // setup GUI
 #if 0
     ChatPanelButton *videoButton = new ChatPanelButton(this);
-    videoButton->setPixmap(QPixmap(":/play.png"));
+    videoButton->setPixmap(QPixmap(":/photos.png"));
     addButton(videoButton);
     connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
 #endif
