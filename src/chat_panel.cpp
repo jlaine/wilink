@@ -331,13 +331,78 @@ void ChatPanelBar::trackView()
     m_animation->start();
 }
 
+ChatPanelButton::ChatPanelButton(QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
+{
+    const QPalette palette = QApplication::palette();
+    m_path = new QGraphicsPathItem(this);
+    m_path->setPen(QPen(palette.color(QPalette::Shadow), 1));
+    m_pixmap = new QGraphicsPixmapItem(this);
+}
+
+
+/** Updates the widget geometry.
+ */
+void ChatPanelButton::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    QRectF rect(baseRect);
+    rect.moveLeft(0);
+    rect.moveTop(0);
+
+    QPainterPath buttonPath;
+    buttonPath.addRoundedRect(QRectF(0.5, 0.5,
+        rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
+    m_path->setPath(buttonPath);
+
+    const QSizeF pixmapSize = m_pixmap->pixmap().size();
+    m_pixmap->setPos(
+        (rect.width() - pixmapSize.width()) / 2,
+        (rect.height() - pixmapSize.height()) / 2);
+}
+
+/** Sets the widget's button pixmap.
+ */
+void ChatPanelButton::setPixmap(const QPixmap &pixmap)
+{
+    m_pixmap->setPixmap(pixmap.scaledToWidth(BUTTON_WIDTH/2, Qt::SmoothTransformation));
+}
+
+void ChatPanelButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (isEnabled() &&
+        m_path->path().contains(event->pos()))
+    {
+        const QPalette palette = QApplication::palette();
+        QLinearGradient gradient(0, 0, 0, 32);
+        gradient.setColorAt(0, palette.color(QPalette::Button));
+        gradient.setColorAt(0.6, palette.color(QPalette::Mid));
+        gradient.setColorAt(1, palette.color(QPalette::Dark));
+        m_path->setBrush(gradient);
+        m_pixmap->setOffset(0, 2);
+    }
+    event->accept();
+}
+
+void ChatPanelButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    const QPalette palette = QApplication::palette();
+    m_path->setBrush(Qt::NoBrush);
+    m_pixmap->setOffset(0, 0);
+    if (isEnabled() &&
+        m_path->path().contains(event->pos()) &&
+        m_path->path().contains(event->buttonDownPos(Qt::LeftButton)))
+        emit clicked();
+    event->accept();
+}
+
 /** Creates a new ChatPanelWidget instance.
  *
  * @param parent
  */
 ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
-    : QGraphicsWidget(parent),
-    m_buttonEnabled(true)
+    : QGraphicsWidget(parent)
 {
     const QPalette palette = QApplication::palette();
 
@@ -348,10 +413,6 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     gradient.setColorAt(1, palette.color(QPalette::Mid));
     m_border->setBrush(gradient);
     m_border->setPen(QPen(palette.color(QPalette::Shadow), 1));
-
-    m_buttonPath = new QGraphicsPathItem(this);
-    m_buttonPath->setPen(QPen(palette.color(QPalette::Shadow), 1));
-    m_buttonPixmap = new QGraphicsPixmapItem(this);
 
     m_icon = new QGraphicsPixmapItem(this);
 }
@@ -366,6 +427,11 @@ void ChatPanelWidget::appear()
     animation->setStartValue(0.0);
     animation->setEndValue(1.0);
     animation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void ChatPanelWidget::addButton(ChatPanelButton *button)
+{
+    m_buttons << button;
 }
 
 /** Returns the rectangle holding the widget's contents.
@@ -394,30 +460,12 @@ void ChatPanelWidget::disappear()
 
 void ChatPanelWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (m_buttonEnabled &&
-        m_buttonPath->path().contains(event->pos()))
-    {
-        const QPalette palette = QApplication::palette();
-        QLinearGradient gradient(0, 0, 0, 32);
-        gradient.setColorAt(0, palette.color(QPalette::Button));
-        gradient.setColorAt(0.6, palette.color(QPalette::Mid));
-        gradient.setColorAt(1, palette.color(QPalette::Dark));
-        m_buttonPath->setBrush(gradient);
-        m_buttonPixmap->setOffset(0, 2);
-    }
     event->accept();
 }
 
 void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    const QPalette palette = QApplication::palette();
-    m_buttonPath->setBrush(Qt::NoBrush);
-    m_buttonPixmap->setOffset(0, 0);
-    if (m_buttonEnabled &&
-        m_buttonPath->path().contains(event->pos()) &&
-        m_buttonPath->path().contains(event->buttonDownPos(Qt::LeftButton)))
-        emit buttonClicked();
-    else if (contentsRect().contains(event->pos()) &&
+    if (contentsRect().contains(event->pos()) &&
              contentsRect().contains(event->buttonDownPos(Qt::LeftButton)))
         emit contentsClicked();
     event->accept();
@@ -425,49 +473,24 @@ void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 /** Updates the widget geometry.
  */
-void ChatPanelWidget::setGeometry(const QRectF &rect)
+void ChatPanelWidget::setGeometry(const QRectF &baseRect)
 {
+    QGraphicsWidget::setGeometry(baseRect);
+
+    QRectF rect(baseRect);
+    rect.moveLeft(0);
+    rect.moveTop(0);
+
     QPainterPath path;
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
-    QSizeF pixmapSize = m_icon->pixmap().size();
-    m_icon->setPos((ICON_WIDTH - pixmapSize.width()) / 2,
-        (rect.height() - pixmapSize.height()) / 2);
-
-    QPainterPath buttonPath;
-    buttonPath.addRoundedRect(QRectF(0.5 + rect.width() - BUTTON_WIDTH, 0.5,
-        BUTTON_WIDTH - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
-    m_buttonPath->setPath(buttonPath);
-
-    pixmapSize = m_buttonPixmap->pixmap().size();
-    m_buttonPixmap->setPos(
-        rect.width() - (BUTTON_WIDTH + pixmapSize.width()) / 2,
-        (rect.height() - pixmapSize.height()) / 2);
-    QGraphicsWidget::setGeometry(rect);
-}
-
-/** Enable or disable the widget's button.
- *
- * @param enabled
- */
-void ChatPanelWidget::setButtonEnabled(bool enabled)
-{
-    m_buttonEnabled = enabled;
-}
-
-/** Sets the widget's button pixmap.
- */
-void ChatPanelWidget::setButtonPixmap(const QPixmap &pixmap)
-{
-    m_buttonPixmap->setPixmap(pixmap.scaledToWidth(BUTTON_WIDTH/2, Qt::SmoothTransformation));
-}
-
-/** Sets the widget's button tooltip.
- */
-void ChatPanelWidget::setButtonToolTip(const QString &toolTip)
-{
-    m_buttonPath->setToolTip(toolTip);
+    QRectF buttonRect(rect.width() - m_buttons.size() * BUTTON_WIDTH, 0,
+        BUTTON_WIDTH, rect.height());
+    foreach (ChatPanelButton *button, m_buttons) {
+        button->setGeometry(buttonRect);
+        buttonRect.moveLeft(buttonRect.left() + BUTTON_WIDTH);
+    }
 }
 
 /** Sets the widget's icon pixmap.

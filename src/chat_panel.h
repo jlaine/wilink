@@ -22,6 +22,7 @@
 
 #include <QGraphicsWidget>
 #include <QFrame>
+#include <QList>
 #include <QWidget>
 #include "chat_roster.h"
 
@@ -110,6 +111,27 @@ private:
     QGraphicsView *m_view;
 };
 
+class ChatPanelButton : public QGraphicsWidget
+{
+    Q_OBJECT
+
+public:
+    ChatPanelButton(QGraphicsItem *parent);
+    void setGeometry(const QRectF &rect);
+    void setPixmap(const QPixmap &pixmap);
+
+signals:
+    void clicked();
+
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+private:
+    QGraphicsPathItem *m_path;
+    QGraphicsPixmapItem *m_pixmap;
+};
+
 /** ChatPanelWidget is the base class for "task" widgets displayed inside
  *  a ChatPanel.
  */
@@ -121,13 +143,10 @@ public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
     QRectF contentsRect() const;
     virtual void setGeometry(const QRectF &rect);
-    void setButtonEnabled(bool enabled);
-    void setButtonPixmap(const QPixmap &pixmap);
-    void setButtonToolTip(const QString &toolTip);
+    void addButton(ChatPanelButton *button);
     void setIconPixmap(const QPixmap &pixmap);
 
 signals:
-    void buttonClicked();
     void contentsClicked();
 
 public slots:
@@ -141,9 +160,7 @@ protected:
 private:
     QGraphicsPathItem *m_border;
     QGraphicsPixmapItem *m_icon;
-    bool m_buttonEnabled;
-    QGraphicsPathItem *m_buttonPath;
-    QGraphicsPixmapItem *m_buttonPixmap;
+    QList<ChatPanelButton*> m_buttons;
 };
 
 #endif

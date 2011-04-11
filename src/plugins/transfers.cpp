@@ -129,7 +129,10 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
         setIconPixmap(QPixmap(":/upload.png"));
         m_disappearWhenFinished = true;
     }
-    setButtonPixmap(QPixmap(":/close.png"));
+
+    m_button = new ChatPanelButton(this);
+    m_button->setPixmap(QPixmap(":/close.png"));
+    addButton(m_button);
 
     m_label = new QGraphicsSimpleTextItem(QString("%1 (%2)").arg(
         m_job->fileName(),
@@ -142,7 +145,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
 
     // connect signals
     bool check;
-    check = connect(this, SIGNAL(buttonClicked()),
+    check = connect(m_button, SIGNAL(clicked()),
                     this, SLOT(slotCancel()));
     Q_ASSERT(check);
 
@@ -191,7 +194,7 @@ void ChatTransferWidget::slotCancel()
         return;
     } else {
         // make widget disappear
-        setButtonEnabled(false);
+        m_button->setEnabled(false);
         disappear();
     }
 }
@@ -241,7 +244,7 @@ void ChatTransferWidget::slotFinished()
     // make widget disappear
     if (m_disappearWhenFinished)
     {
-        setButtonEnabled(false);
+        m_button->setEnabled(false);
         QTimer::singleShot(1000, this, SLOT(disappear()));
     }
 }

@@ -68,6 +68,7 @@ private slots:
 
 private:
     bool m_disappearWhenFinished;
+    ChatPanelButton *m_button;
     QGraphicsSimpleTextItem *m_label;
     QProgressBar *m_progress;
     QGraphicsProxyWidget *m_progressProxy;

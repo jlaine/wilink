@@ -64,6 +64,7 @@ private:
     QAudioInput *m_audioInput;
     QAudioOutput *m_audioOutput;
 
+    ChatPanelButton *m_button;
     QXmppCall *m_call;
     QGraphicsSimpleTextItem *m_label;
     int m_soundId;

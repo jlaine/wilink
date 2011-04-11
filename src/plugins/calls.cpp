@@ -67,12 +67,21 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_soundId(0)
 {
     // setup GUI
-    setIconPixmap(QPixmap(":/call.png"));
-    setButtonPixmap(QPixmap(":/hangup.png"));
-    setButtonToolTip(tr("Hang up"));
-    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
+#if 0
+    ChatPanelButton *videoButton = new ChatPanelButton(this);
+    videoButton->setPixmap(QPixmap(":/play.png"));
+    addButton(videoButton);
+    connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
+#endif
 
-    connect(this, SIGNAL(buttonClicked()), m_call, SLOT(hangup()));
+    m_button = new ChatPanelButton(this);
+    m_button->setPixmap(QPixmap(":/hangup.png"));
+    m_button->setToolTip(tr("Hang up"));
+    addButton(m_button);
+    connect(m_button, SIGNAL(clicked()), m_call, SLOT(hangup()));
+
+    setIconPixmap(QPixmap(":/call.png"));
+    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
     connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
     connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
         this, SLOT(callStateChanged(QXmppCall::State)));
@@ -193,21 +202,17 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         break;
     case QXmppCall::DisconnectingState:
         m_label->setText(tr("Disconnecting.."));
-        setButtonEnabled(false);
+        m_button->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
         m_label->setText(tr("Call finished."));
-        setButtonEnabled(false);
+        m_button->setEnabled(false);
         break;
     }
 
-    // handle completion
+    // make widget disappear
     if (state == QXmppCall::FinishedState)
-    {
-        // make widget disappear
-        setButtonEnabled(false);
         QTimer::singleShot(1000, this, SLOT(disappear()));
-    }
 }
 
 void CallWidget::setGeometry(const QRectF &rect)
