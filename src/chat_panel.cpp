@@ -485,6 +485,10 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
+    QSizeF pixmapSize = m_icon->pixmap().size();
+    m_icon->setPos((ICON_WIDTH - pixmapSize.width()) / 2,
+        (rect.height() - pixmapSize.height()) / 2);
+
     QRectF buttonRect(rect.width() - m_buttons.size() * BUTTON_WIDTH, 0,
         BUTTON_WIDTH, rect.height());
     foreach (ChatPanelButton *button, m_buttons) {
