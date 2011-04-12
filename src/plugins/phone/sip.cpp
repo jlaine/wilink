@@ -610,10 +610,10 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->audioChannel = new QXmppRtpChannel(this);
 
     // bind sockets
-    bool iceControlling = (d->direction == QXmppCall::OutgoingDirection);
-    d->iceConnection = new QXmppIceConnection(iceControlling, this);
+    d->iceConnection = new QXmppIceConnection(this);
     d->iceConnection->addComponent(RTP_COMPONENT);
     d->iceConnection->addComponent(RTCP_COMPONENT);
+    d->iceConnection->setIceControlling(d->direction == QXmppCall::OutgoingDirection);
     d->iceConnection->setStunServer(d->client->d->stunServerAddress,
                                     d->client->d->stunServerPort);
     check = connect(d->iceConnection, SIGNAL(localCandidatesChanged()),

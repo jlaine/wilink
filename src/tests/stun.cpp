@@ -136,7 +136,8 @@ int main(int argc, char* argv[])
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::StdoutLogging);
 
-    QXmppIceConnection connection(iceControlling);
+    QXmppIceConnection connection;
+    connection.setIceControlling(iceControlling);
     connection.setStunServer(stunHost);
     connection.setTurnServer(turnHost);
     connection.setTurnUser(turnUser);
