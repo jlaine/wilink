@@ -887,7 +887,7 @@ bool QSoundFile::open(QIODevice::OpenMode mode)
 
     // open file
     if (!d->open(mode)) {
-        qWarning("Could not open file %s", qPrintable(d->m_name));
+        qWarning("Could not open sound file %s", qPrintable(d->m_name));
         return false;
     }
 
