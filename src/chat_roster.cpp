@@ -911,7 +911,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
 void ChatRosterModel::clearPendingMessages(const QString &bareJid)
 {
     ChatRosterItem *item = d->find(bareJid);
-    if (item)
+    if (item && item->data(MessagesRole).toInt())
     {
         item->setData(MessagesRole, 0);
         emit dataChanged(createIndex(item, ContactColumn),
