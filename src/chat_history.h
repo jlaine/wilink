@@ -127,8 +127,10 @@ public slots:
 
 private slots:
     void rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void rosterInserted(const QModelIndex &parent, int start, int end);
 
 private:
+    friend class ChatHistoryModelPrivate;
     ChatHistoryModelPrivate *d;
 };
 

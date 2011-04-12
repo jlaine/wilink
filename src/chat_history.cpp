@@ -437,9 +437,21 @@ void ChatHistoryHelper::openUrl(const QUrl &url)
 class ChatHistoryModelPrivate
 {
 public:
+    ChatHistoryModelPrivate(ChatHistoryModel *qq);
     QString html(ChatHistoryItem *item) const;
+    void rosterChanged(const QString &jid);
+
     ChatRosterModel *rosterModel;
+
+private:
+    ChatHistoryModel *q;
 };
+
+ChatHistoryModelPrivate::ChatHistoryModelPrivate(ChatHistoryModel *qq)
+    : rosterModel(0),
+    q(qq)
+{
+}
 
 /** Returns the HTML for the message body.
  */
@@ -455,6 +467,21 @@ QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
     return bodyHtml;
 }
 
+/** Handles a roster update.
+ *
+ * @param jid
+ */
+void ChatHistoryModelPrivate::rosterChanged(const QString &jid)
+{
+    foreach (ChatModelItem *it, q->rootItem->children) {
+        if (it->children.isEmpty())
+            continue;
+        ChatHistoryItem *item = static_cast<ChatHistoryItem*>(it->children.first());
+        if (item->message.jid == jid)
+            emit q->dataChanged(q->createIndex(it), q->createIndex(it));
+    }
+}
+
 /** Constructs a new ChatHistoryModel.
  *
  * @param parent
@@ -462,8 +489,7 @@ QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
 ChatHistoryModel::ChatHistoryModel(QObject *parent)
     : ChatModel(parent)
 {
-    d = new ChatHistoryModelPrivate;
-    d->rosterModel = 0;
+    d = new ChatHistoryModelPrivate(this);
 
     rootItem = new ChatHistoryItem;
 
@@ -665,9 +691,33 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+/** Handles a roster change.
+ *
+ * @param topLeft
+ * @param bottomRight
+ */
 void ChatHistoryModel::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
-    qDebug("roster changed");
+    Q_ASSERT(topLeft.parent() == bottomRight.parent());
+    const QModelIndex parent = topLeft.parent();
+    for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
+        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        d->rosterChanged(jid);
+    }
+}
+
+/** Handles a roster insertion.
+ *
+ * @param parent
+ * @param start
+ * @param end
+ */
+void ChatHistoryModel::rosterInserted(const QModelIndex &parent, int start, int end)
+{
+    for (int i = start; i <= end; ++i) {
+        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        d->rosterChanged(jid);
+    }
 }
 
 /** Returns the roster model.
@@ -686,6 +736,8 @@ void ChatHistoryModel::setRosterModel(ChatRosterModel *rosterModel)
     d->rosterModel = rosterModel;
     connect(d->rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
+    connect(d->rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
+            this, SLOT(rosterInserted(QModelIndex,int,int)));
 }
 
 /** Constructs a new ChatHistoryWidget.
