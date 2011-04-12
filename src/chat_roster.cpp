@@ -390,14 +390,22 @@ QString ChatRosterModel::contactExtra(const QString &bareJid) const
  */
 QString ChatRosterModel::contactName(const QString &jid) const
 {
+    // exact roster entry
     ChatRosterItem *item = d->find(jid);
-    if (!item) {
-        const QString bareJid = jidToBareJid(jid);
-        if (bareJid == d->ownItem->id())
-            item = d->ownItem;
-        else
-            item = d->find(bareJid);
-    }
+    if (item)
+        return item->data(Qt::DisplayRole).toString();
+
+    // own item
+    const QString bareJid = jidToBareJid(jid);
+    if (bareJid == d->ownItem->id())
+        return d->ownItem->data(Qt::DisplayRole).toString();
+
+    // chat room members
+    item = d->find(bareJid);
+    if (item && item->type() == ChatRosterModel::Room)
+        return jidToResource(jid);
+
+    // contact by bare jid
     if (item)
         return item->data(Qt::DisplayRole).toString();
     return jidToUser(jid);
