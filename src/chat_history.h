@@ -125,6 +125,9 @@ public:
 public slots:
     void clear();
 
+private slots:
+    void rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+
 private:
     ChatHistoryModelPrivate *d;
 };

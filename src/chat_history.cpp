@@ -665,6 +665,11 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void ChatHistoryModel::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    qDebug("roster changed");
+}
+
 /** Returns the roster model.
  */
 ChatRosterModel *ChatHistoryModel::rosterModel()
@@ -679,6 +684,8 @@ ChatRosterModel *ChatHistoryModel::rosterModel()
 void ChatHistoryModel::setRosterModel(ChatRosterModel *rosterModel)
 {
     d->rosterModel = rosterModel;
+    connect(d->rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+            this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
 }
 
 /** Constructs a new ChatHistoryWidget.
