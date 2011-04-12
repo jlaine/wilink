@@ -607,7 +607,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->remoteRecipient = recipient.toUtf8();
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
-    d->audioChannel = new QXmppRtpChannel(this);
+    d->audioChannel = new QXmppRtpAudioChannel(this);
 
     // bind sockets
     d->iceConnection = new QXmppIceConnection(this);
