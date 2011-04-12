@@ -546,6 +546,8 @@ void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
             features |= VersionFeature;
         else if (var == ns_jingle_rtp_audio)
             features |= VoiceFeature;
+        else if (var == ns_jingle_rtp_video)
+            features |= VideoFeature;
     }
     ChatRosterItem *item = d->find(disco.from());
     foreach (const QXmppDiscoveryIq::Identity& id, disco.identities())

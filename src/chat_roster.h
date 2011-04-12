@@ -61,6 +61,7 @@ public:
         FileTransferFeature = 2,
         VersionFeature = 4,
         VoiceFeature = 8,
+        VideoFeature = 16,
     };
 
     enum Flag {
