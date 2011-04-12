@@ -66,15 +66,16 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_call(call),
     m_soundId(0)
 {
-    m_call->setParent(this);
+    //m_call->setParent(this);
 
     // setup GUI
-#if 0
-    ChatPanelButton *videoButton = new ChatPanelButton(this);
-    videoButton->setPixmap(QPixmap(":/photos.png"));
-    addButton(videoButton);
-    connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
-#endif
+    const QStringList videoJids = rosterModel->contactFeaturing(m_call->jid(), ChatRosterModel::VideoFeature);
+    if (videoJids.contains(m_call->jid())) {
+        ChatPanelButton *videoButton = new ChatPanelButton(this);
+        videoButton->setPixmap(QPixmap(":/photos.png"));
+        addButton(videoButton);
+        connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
+    }
 
     m_button = new ChatPanelButton(this);
     m_button->setPixmap(QPixmap(":/hangup.png"));
@@ -131,6 +132,10 @@ void CallWidget::audioStateChanged(QAudio::State state)
 
 void CallWidget::callRinging()
 {
+    // we only want ring events in the "offer" state
+    if (m_call->state() != QXmppCall::OfferState)
+        return;
+
     m_label->setText(tr("Ringing.."));
 
     // start outgoing tone
