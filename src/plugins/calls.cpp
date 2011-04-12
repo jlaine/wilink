@@ -66,6 +66,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_call(call),
     m_soundId(0)
 {
+    m_call->setParent(this);
+
     // setup GUI
 #if 0
     ChatPanelButton *videoButton = new ChatPanelButton(this);
@@ -92,8 +94,6 @@ CallWidget::~CallWidget()
     // stop tone
     if (m_soundId)
         wApp->soundPlayer()->stop(m_soundId);
-
-    delete m_call;
 }
 
 void CallWidget::audioStateChanged(QAudio::State state)
