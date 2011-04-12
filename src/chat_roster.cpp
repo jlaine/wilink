@@ -314,6 +314,10 @@ void ChatRosterModel::connected()
     d->client->vCardManager().requestVCard(d->ownItem->id());
 }
 
+/** Determine the avatar for a contact.
+ *
+ * @param jid
+ */
 QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
 {
     ChatRosterItem *item = d->find(jid);
@@ -481,7 +485,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                     paintMessages(icon, messages);
                 return icon;
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-                return QIcon(contactAvatar(bareJid));
+                return QIcon(item->data(AvatarRole).value<QPixmap>());
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
@@ -502,7 +506,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-                return QIcon(contactAvatar(bareJid));
+                return QIcon(item->data(AvatarRole).value<QPixmap>());
             }
         } else {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
