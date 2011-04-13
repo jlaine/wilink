@@ -412,17 +412,17 @@ void PhonePanel::historyDoubleClicked(const QModelIndex &index)
     QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
 
-static QXmppRtpChannel::Tone keyTone(QPushButton *key)
+static QXmppRtpAudioChannel::Tone keyTone(QPushButton *key)
 {
     char c = key->text()[0].toLatin1();
     if (c >= '0' && c <= '9')
-        return QXmppRtpChannel::Tone(c - '0');
+        return QXmppRtpAudioChannel::Tone(c - '0');
     else if (c == '*')
-        return QXmppRtpChannel::Tone_Star;
+        return QXmppRtpAudioChannel::Tone_Star;
     else if (c == '#')
-        return QXmppRtpChannel::Tone_Pound;
+        return QXmppRtpAudioChannel::Tone_Pound;
     else
-        return QXmppRtpChannel::Tone(-1);
+        return QXmppRtpAudioChannel::Tone(-1);
 }
 
 void PhonePanel::keyPressed()
@@ -432,7 +432,7 @@ void PhonePanel::keyPressed()
         return;
 
     QList<SipCall*> calls = callsModel->activeCalls();
-    QXmppRtpChannel::Tone tone = keyTone(key);
+    QXmppRtpAudioChannel::Tone tone = keyTone(key);
     foreach (SipCall *call, calls)
         call->audioChannel()->startTone(tone);
 }
@@ -451,7 +451,7 @@ void PhonePanel::keyReleased()
     }
 
     // send DTMF
-    QXmppRtpChannel::Tone tone = keyTone(key);
+    QXmppRtpAudioChannel::Tone tone = keyTone(key);
     foreach (SipCall *call, calls)
         call->audioChannel()->stopTone(tone);
 }

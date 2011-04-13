@@ -44,22 +44,22 @@ ToneGenerator::ToneGenerator(QObject *parent)
     m_tonetick(0)
 {
     if (tones.isEmpty()) {
-        tones[QXmppRtpChannel::Tone_1] = qMakePair(697, 1209);
-        tones[QXmppRtpChannel::Tone_2] = qMakePair(697, 1336);
-        tones[QXmppRtpChannel::Tone_3] = qMakePair(697, 1477);
-        tones[QXmppRtpChannel::Tone_A] = qMakePair(697, 1633);
-        tones[QXmppRtpChannel::Tone_4] = qMakePair(770, 1209);
-        tones[QXmppRtpChannel::Tone_5] = qMakePair(770, 1336);
-        tones[QXmppRtpChannel::Tone_6] = qMakePair(770, 1477);
-        tones[QXmppRtpChannel::Tone_B] = qMakePair(770, 1633);
-        tones[QXmppRtpChannel::Tone_7] = qMakePair(852, 1209);
-        tones[QXmppRtpChannel::Tone_8] = qMakePair(852, 1336);
-        tones[QXmppRtpChannel::Tone_9] = qMakePair(852, 1477);
-        tones[QXmppRtpChannel::Tone_C] = qMakePair(852, 1633);
-        tones[QXmppRtpChannel::Tone_Star] = qMakePair(941, 1209);
-        tones[QXmppRtpChannel::Tone_0] = qMakePair(941, 1336);
-        tones[QXmppRtpChannel::Tone_Pound] = qMakePair(941, 1477);
-        tones[QXmppRtpChannel::Tone_D] = qMakePair(941, 1633);
+        tones[QXmppRtpAudioChannel::Tone_1] = qMakePair(697, 1209);
+        tones[QXmppRtpAudioChannel::Tone_2] = qMakePair(697, 1336);
+        tones[QXmppRtpAudioChannel::Tone_3] = qMakePair(697, 1477);
+        tones[QXmppRtpAudioChannel::Tone_A] = qMakePair(697, 1633);
+        tones[QXmppRtpAudioChannel::Tone_4] = qMakePair(770, 1209);
+        tones[QXmppRtpAudioChannel::Tone_5] = qMakePair(770, 1336);
+        tones[QXmppRtpAudioChannel::Tone_6] = qMakePair(770, 1477);
+        tones[QXmppRtpAudioChannel::Tone_B] = qMakePair(770, 1633);
+        tones[QXmppRtpAudioChannel::Tone_7] = qMakePair(852, 1209);
+        tones[QXmppRtpAudioChannel::Tone_8] = qMakePair(852, 1336);
+        tones[QXmppRtpAudioChannel::Tone_9] = qMakePair(852, 1477);
+        tones[QXmppRtpAudioChannel::Tone_C] = qMakePair(852, 1633);
+        tones[QXmppRtpAudioChannel::Tone_Star] = qMakePair(941, 1209);
+        tones[QXmppRtpAudioChannel::Tone_0] = qMakePair(941, 1336);
+        tones[QXmppRtpAudioChannel::Tone_Pound] = qMakePair(941, 1477);
+        tones[QXmppRtpAudioChannel::Tone_D] = qMakePair(941, 1633);
     }
 }
 
@@ -81,7 +81,7 @@ void ToneGenerator::stopTone(int tone)
 
 qint64 ToneGenerator::readData(char * data, qint64 maxSize)
 {
-    if (m_tone < QXmppRtpChannel::Tone_0 || m_tone > QXmppRtpChannel::Tone_D) {
+    if (m_tone < QXmppRtpAudioChannel::Tone_0 || m_tone > QXmppRtpAudioChannel::Tone_D) {
         memset(data, 0, maxSize);
         return maxSize;
     }
@@ -153,15 +153,15 @@ ToneGui::ToneGui()
     player = new QSoundPlayer(this);
 }
 
-static QXmppRtpChannel::Tone keyTone(QPushButton *key)
+static QXmppRtpAudioChannel::Tone keyTone(QPushButton *key)
 {
     char c = key->text()[0].toLatin1();
     if (c >= '0' && c <= '9')
-        return QXmppRtpChannel::Tone(c - '0');
+        return QXmppRtpAudioChannel::Tone(c - '0');
     else if (c == '*')
-        return QXmppRtpChannel::Tone_Star;
+        return QXmppRtpAudioChannel::Tone_Star;
     else if (c == '#')
-        return QXmppRtpChannel::Tone_Pound;
+        return QXmppRtpAudioChannel::Tone_Pound;
 }
 
 void ToneGui::keyPressed()
