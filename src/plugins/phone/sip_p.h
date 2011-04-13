@@ -69,7 +69,7 @@ public:
     QTime stopTime;
     QXmppCall::State state;
     QByteArray activeTime;
-    QXmppRtpChannel *audioChannel;
+    QXmppRtpAudioChannel *audioChannel;
     QAudioInput *audioInput;
     QSoundMeter *audioInputMeter;
     QAudioOutput *audioOutput;

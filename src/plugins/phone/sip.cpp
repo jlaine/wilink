@@ -691,7 +691,7 @@ void SipCall::accept()
     }
 }
 
-QXmppRtpChannel *SipCall::audioChannel() const
+QXmppRtpAudioChannel *SipCall::audioChannel() const
 {
     return d->audioChannel;
 }

@@ -154,7 +154,7 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     // start or stop capture
     if (state == QXmppCall::ActiveState)
     {
-        QXmppRtpChannel *channel = m_call->audioChannel();
+        QXmppRtpAudioChannel *channel = m_call->audioChannel();
         QAudioFormat format = formatFor(channel->payloadType());
 
 #ifdef Q_OS_MAC
