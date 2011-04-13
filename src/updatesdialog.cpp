@@ -163,6 +163,8 @@ void UpdatesDialog::downloadFinished(const Release &release)
 
 void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
 {
+    Q_UNUSED(error);
+
     statusLabel->setText(tr("Could not run software update, please try again later.") + "\n\n" + errorString);
 }
 
