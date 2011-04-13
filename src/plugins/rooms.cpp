@@ -265,6 +265,8 @@ void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
  */
 void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &jid, const QString &reason)
 {
+    Q_UNUSED(reason);
+
     // Skip invitations to rooms which we have already joined or
     // which we have already received
     if (chat->panel(roomJid) || invitations.contains(roomJid))

@@ -219,6 +219,8 @@ void ChatPanel::closeEvent(QCloseEvent *event)
 
 bool ChatPanel::eventFilter(QObject *obj, QEvent *e)
 {
+    Q_UNUSED(obj);
+
     if (e->type() == QEvent::DragEnter)
     {
         QDragEnterEvent *event = static_cast<QDragEnterEvent*>(e);

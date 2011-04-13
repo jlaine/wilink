@@ -254,6 +254,7 @@ PhonePanel::~PhonePanel()
 
 void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
 {
+    Q_UNUSED(reply);
     QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", authenticator);
 }
 
