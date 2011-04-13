@@ -8,6 +8,7 @@ Build-Depends: cdbs, debhelper (>= 5), cmake, libmad0-dev, libqt4-dev, qtmobilit
 Package: wilink
 Architecture: any
 Depends: ${shlibs:Depends}, libqt4-sql-sqlite
+Recommends: pulseaudio
 Description: Utilities for Wifirst services
  This package provides a set of utilities to interact with the Wifirst
  services.

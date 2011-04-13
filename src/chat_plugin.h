@@ -34,7 +34,7 @@ public:
     virtual bool initialize(Chat *chat) = 0;
     virtual void finalize(Chat *) {};
     virtual QString name() const = 0;
-    virtual void preferences(ChatPreferences *prefs) {};
+    virtual void preferences(ChatPreferences *) {};
 };
 
 Q_DECLARE_INTERFACE(ChatPluginInterface, "net.wifirst.ChatPlugin/1.0")
