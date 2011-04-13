@@ -4,7 +4,7 @@ include(../qnetio/qnetio.pri)
 include(../qsound/qsound.pri)
 include(../qxmpp/qxmpp.pri)
 
-QT += multimedia network xml
+QT += network xml
 
 TARGET = wiLink
 VERSION = 1.1.4
