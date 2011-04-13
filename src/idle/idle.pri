@@ -11,7 +11,7 @@ symbian {
 } else:mac {
     IDLE_INTERNAL_LIBS = -framework Carbon
 } else:unix {
-    IDLE_INTERNAL_LIBS = -lXss
+    IDLE_INTERNAL_LIBS = -lXss -lX11
 }
 
 # Libraries for apps which use idle
