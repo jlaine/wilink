@@ -277,7 +277,7 @@ void CallWidget::videoRefresh()
             m_videoImage = QImage(width, height, QImage::Format_RGB32);
         }
 
-        // convert Y420 to RGB32
+        // convert YUV 4:2:0 to RGB32
         const int cb_stride = frame.planes[1].stride;
         const int cr_stride = frame.planes[2].stride;
         quint8 *y_row = (quint8*)frame.planes[0].data.data();
@@ -289,7 +289,7 @@ void CallWidget::videoRefresh()
                 const quint8 cb = cb_row[x/2];
                 const quint8 cr = cr_row[x/2];
                 const quint32 val = (quint8(1.164 * (yp-16) + 1.596 * (cr - 128)) << 16) |
-                                    (quint8(1.164 * (yp-16) + 0.813 * (cr - 128) - 0.392 * (cb - 128)) << 8) |
+                                    (quint8(1.164 * (yp-16) - 0.813 * (cr - 128) - 0.392 * (cb - 128)) << 8) |
                                     quint8(1.164 * (yp-16) + 2.017 * (cb - 128));
                 m_videoImage.setPixel(x, y, val);
             }
