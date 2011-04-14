@@ -266,14 +266,20 @@ void CallWidget::videoRefresh()
         return;
     }
 
+    bool geometryChanged = false;
     foreach (const QXmppRtpVideoFrame &frame, channel->readFrames()) {
-        // convert Y420 to RGB32
         const int width = frame.planes[0].width;
         const int height = frame.planes[0].height;
         const int stride = frame.planes[0].stride;
+
+        if (width != m_videoImage.width() || height != m_videoImage.height()) {
+            geometryChanged = true;
+            m_videoImage = QImage(width, height, QImage::Format_RGB32);
+        }
+
+        // convert Y420 to RGB32
         const int cb_stride = frame.planes[1].stride;
         const int cr_stride = frame.planes[2].stride;
-        QImage image(width, height, QImage::Format_RGB32);
         quint8 *y_row = (quint8*)frame.planes[0].data.data();
         quint8 *cb_row = (quint8*)frame.planes[1].data.data();
         quint8 *cr_row = (quint8*)frame.planes[2].data.data();
@@ -285,7 +291,7 @@ void CallWidget::videoRefresh()
                 const quint32 val = (quint8(1.164 * (yp-16) + 1.596 * (cr - 128)) << 16) |
                                     (quint8(1.164 * (yp-16) + 0.813 * (cr - 128) - 0.392 * (cb - 128)) << 8) |
                                     quint8(1.164 * (yp-16) + 2.017 * (cb - 128));
-                image.setPixel(x, y, val);
+                m_videoImage.setPixel(x, y, val);
             }
             y_row += stride;
             if (!(y % 2)) {
@@ -293,9 +299,10 @@ void CallWidget::videoRefresh()
                 cr_row += cr_stride;
             }
         }
-        setIconPixmap(QPixmap::fromImage(image));
+        setIconPixmap(QPixmap::fromImage(m_videoImage));
     }
-    updateGeometry();
+    if (geometryChanged)
+        updateGeometry();
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)

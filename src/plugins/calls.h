@@ -70,6 +70,7 @@ private:
 
     // video
     QTimer *m_videoTimer;
+    QImage m_videoImage;
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;

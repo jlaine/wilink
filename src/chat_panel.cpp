@@ -512,6 +512,7 @@ QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) 
         case Qt::PreferredSize:
         {
             QSizeF size = m_icon->pixmap().size();
+            size.setHeight(size.height() + 4);
             foreach (ChatPanelButton *button, m_buttons)
                 size.setWidth(size.width() + BUTTON_WIDTH);
             return size;
