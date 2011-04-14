@@ -270,15 +270,28 @@ void CallWidget::videoRefresh()
         const int width = frame.planes[0].width;
         const int height = frame.planes[0].height;
         const int stride = frame.planes[0].stride;
-        qDebug("read video frame %i x %i (stride %i)", width, height, stride);
-        QImage image(width, height, QImage::Format_ARGB32);
-        quint8 *row = (quint8*)frame.planes[0].data.constData();
+        const int cb_stride = frame.planes[1].stride;
+        const int cr_stride = frame.planes[2].stride;
+        qDebug("read video frame %i x %i (stride %i, cb_stride %i)", width, height, stride, cb_stride);
+        QImage image(width, height, QImage::Format_RGB32);
+        quint8 *y_row = (quint8*)frame.planes[0].data.data();
+        quint8 *cb_row = (quint8*)frame.planes[1].data.data();
+        quint8 *cr_row = (quint8*)frame.planes[2].data.data();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; ++x) {
-                const quint8 val = row[x];
+                const quint8 yp = y_row[x];
+                const quint8 cb = cb_row[x/2];
+                const quint8 cr = cr_row[x/2];
+                const quint32 val = (quint8(1.164 * (yp-16) + 1.596 * (cr - 128)) << 16) |
+                                    (quint8(1.164 * (yp-16) + 0.813 * (cr - 128) - 0.392 * (cb - 128)) << 8) |
+                                    quint8(1.164 * (yp-16) + 2.017 * (cb - 128));
                 image.setPixel(x, y, val);
             }
-            row += stride;
+            y_row += stride;
+            if (!(y % 2)) {
+                cb_row += cb_stride;
+                cr_row += cr_stride;
+            }
         }
         setIconPixmap(QPixmap::fromImage(image));
     }
