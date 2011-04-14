@@ -267,12 +267,12 @@ void CallWidget::videoRefresh()
     }
 
     foreach (const QXmppRtpVideoFrame &frame, channel->readFrames()) {
+        // convert Y420 to RGB32
         const int width = frame.planes[0].width;
         const int height = frame.planes[0].height;
         const int stride = frame.planes[0].stride;
         const int cb_stride = frame.planes[1].stride;
         const int cr_stride = frame.planes[2].stride;
-        qDebug("read video frame %i x %i (stride %i, cb_stride %i)", width, height, stride, cb_stride);
         QImage image(width, height, QImage::Format_RGB32);
         quint8 *y_row = (quint8*)frame.planes[0].data.data();
         quint8 *cb_row = (quint8*)frame.planes[1].data.data();
