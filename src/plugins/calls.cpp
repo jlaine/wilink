@@ -294,7 +294,7 @@ void CallWidget::videoRefresh()
                 m_videoImage.setPixel(x, y, val);
             }
             y_row += stride;
-            if (!(y % 2)) {
+            if (y % 2) {
                 cb_row += cb_stride;
                 cr_row += cr_stride;
             }
