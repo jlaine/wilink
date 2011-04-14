@@ -57,12 +57,19 @@ private slots:
     void audioStateChanged(QAudio::State state);
     void callRinging();
     void callStateChanged(QXmppCall::State state);
+    void videoModeChanged(QIODevice::OpenMode mode);
+    void videoRefresh();
 
 private:
     void debug(const QString&) {};
     void warning(const QString&) {};
+
+    // audio
     QAudioInput *m_audioInput;
     QAudioOutput *m_audioOutput;
+
+    // video
+    QTimer *m_videoTimer;
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;

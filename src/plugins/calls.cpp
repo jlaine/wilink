@@ -24,6 +24,7 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSimpleTextItem>
 #include <QHostInfo>
+#include <QImage>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -66,7 +67,11 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_call(call),
     m_soundId(0)
 {
+    bool check;
     //m_call->setParent(this);
+
+    // video timer
+    m_videoTimer = new QTimer(this);
 
     // setup GUI
     const QStringList videoJids = rosterModel->contactFeaturing(m_call->jid(), ChatRosterModel::VideoFeature);
@@ -85,9 +90,24 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
     setIconPixmap(QPixmap(":/call.png"));
     m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
-    connect(m_call, SIGNAL(ringing()), this, SLOT(callRinging()));
-    connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
-        this, SLOT(callStateChanged(QXmppCall::State)));
+
+    // connect signals
+    check = connect(m_call, SIGNAL(ringing()),
+                    this, SLOT(callRinging()));
+    Q_ASSERT(check);
+
+    check = connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
+                    this, SLOT(callStateChanged(QXmppCall::State)));
+    Q_ASSERT(check);
+    
+    check = connect(m_call, SIGNAL(videoModeChanged(QIODevice::OpenMode)),
+                    this, SLOT(videoModeChanged(QIODevice::OpenMode)));
+    Q_ASSERT(check);
+    
+    check = connect(m_videoTimer, SIGNAL(timeout()),
+                    this, SLOT(videoRefresh()));
+    Q_ASSERT(check);
+
 }
 
 CallWidget::~CallWidget()
@@ -227,6 +247,42 @@ void CallWidget::setGeometry(const QRectF &rect)
     QRectF contents = contentsRect();
     m_label->setPos(contents.left(), contents.top() +
         (contents.height() - m_label->boundingRect().height()) / 2);
+}
+
+void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
+{
+    qDebug("video mode changed %i", (int)mode);
+    if (mode & QIODevice::ReadOnly) {
+        if (!m_videoTimer->isActive())
+            m_videoTimer->start(100);
+    }
+}
+
+void CallWidget::videoRefresh()
+{
+    QXmppRtpVideoChannel *channel = m_call->videoChannel();
+    if (!channel) {
+        m_videoTimer->stop();
+        return;
+    }
+
+    foreach (const QXmppRtpVideoFrame &frame, channel->readFrames()) {
+        const int width = frame.planes[0].width;
+        const int height = frame.planes[0].height;
+        const int stride = frame.planes[0].stride;
+        qDebug("read video frame %i x %i (stride %i)", width, height, stride);
+        QImage image(width, height, QImage::Format_ARGB32);
+        quint8 *row = (quint8*)frame.planes[0].data.constData();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; ++x) {
+                const quint8 val = row[x];
+                image.setPixel(x, y, val);
+            }
+            row += stride;
+        }
+        setIconPixmap(QPixmap::fromImage(image));
+    }
+    updateGeometry();
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)

@@ -33,7 +33,6 @@
 
 #include "chat_panel.h"
 
-#define ICON_WIDTH 48
 #define BUTTON_WIDTH 48
 #define BORDER_RADIUS 8
 
@@ -440,10 +439,10 @@ void ChatPanelWidget::addButton(ChatPanelButton *button)
  */
 QRectF ChatPanelWidget::contentsRect() const
 {
-    QRectF rect = geometry().adjusted(0, 1, -BUTTON_WIDTH - ICON_WIDTH, -2);
-    rect.moveLeft(ICON_WIDTH);
+    QRectF rect = geometry();
     rect.moveTop(0);
-    return rect;
+    rect.moveLeft(0);
+    return rect.adjusted(m_icon->x() + m_icon->pixmap().width(), 1, -BUTTON_WIDTH, -2);
 }
 
 /** Makes the widget disappear then deletes it.
@@ -488,8 +487,7 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     m_border->setPath(path);
 
     QSizeF pixmapSize = m_icon->pixmap().size();
-    m_icon->setPos((ICON_WIDTH - pixmapSize.width()) / 2,
-        (rect.height() - pixmapSize.height()) / 2);
+    m_icon->setPos(10, (rect.height() - pixmapSize.height()) / 2);
 
     QRectF buttonRect(rect.width() - m_buttons.size() * BUTTON_WIDTH, 0,
         BUTTON_WIDTH, rect.height());
@@ -505,3 +503,22 @@ void ChatPanelWidget::setIconPixmap(const QPixmap &pixmap)
 {
     m_icon->setPixmap(pixmap);
 }
+
+QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
+{
+    switch (which)
+    {
+        case Qt::MinimumSize:
+        case Qt::PreferredSize:
+        {
+            QSizeF size = m_icon->pixmap().size();
+            foreach (ChatPanelButton *button, m_buttons)
+                size.setWidth(size.width() + BUTTON_WIDTH);
+            return size;
+        }
+        default:
+            return constraint;
+    }
+
+}
+
