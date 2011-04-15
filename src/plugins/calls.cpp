@@ -277,7 +277,7 @@ void CallWidget::videoRefresh()
     }
 
     bool geometryChanged = false;
-    foreach (const QXmppRtpVideoFrame &frame, channel->readFrames()) {
+    foreach (const QXmppVideoFrame &frame, channel->readFrames()) {
         const int width = frame.planes[0].width;
         const int height = frame.planes[0].height;
         const int stride = frame.planes[0].stride;
