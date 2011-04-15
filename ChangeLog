@@ -1,7 +1,7 @@
 wiLink 1.2.0 (UNRELEASED)
  * Calls:
   - Add support for double NAT traversal using TURN.
-  - Start adding framework for video calls.
+  - Add initial support for video calls.
  * Conversations:
   - Display avatars in chat history.
   - Do not regroup messages over one hour apart.
