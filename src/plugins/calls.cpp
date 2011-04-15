@@ -108,6 +108,10 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
                     this, SLOT(videoRefresh()));
     Q_ASSERT(check);
 
+    check = connect(m_videoTimer, SIGNAL(timeout()),
+                    this, SLOT(videoCapture()));
+    Q_ASSERT(check);
+
 }
 
 CallWidget::~CallWidget()
@@ -267,7 +271,7 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         }
 
         if (!m_videoTimer->isActive())
-            m_videoTimer->start(100);
+            m_videoTimer->start(1000 / 30);
     }
 
     if (mode & QIODevice::WriteOnly) {
@@ -284,7 +288,37 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 
 void CallWidget::videoCapture()
 {
-    // convert YUV 4:2:0 to RGB32
+    QXmppRtpVideoChannel *channel = m_call->videoChannel();
+    if (!channel)
+        return;
+
+    QXmppVideoFrame frame;
+
+    // convert ARGB32 to YUV 4:2:0
+    const int width = m_videoInput.width();
+    const int height = m_videoInput.height();
+    const int stride = width;
+    for (int i = 0; i < 3; ++i) {
+        frame.planes[i].width = i ? width / 2 : width;
+        frame.planes[i].stride = i ? stride / 2 : stride;
+        frame.planes[i].height = i ? height / 2 : height;
+        frame.planes[i].data.resize(frame.planes[i].stride * frame.planes[i].height);
+    }
+
+    quint8 *y_row = (quint8*)frame.planes[0].data.data();
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            const quint32 pixel = m_videoInput.pixel(x, y);
+            const quint8 r = (pixel >> 16) & 0xff;
+            const quint8 g = (pixel >> 8) & 0xff;
+            const quint8 b = pixel & 0xff;
+            y_row[x] = (77 * r + 160 * g + 29 * b) / 256;
+        }
+        y_row += stride;
+    }
+    for (int i = 1; i < 3; ++i)
+        memset(frame.planes[i].data.data(), 0, frame.planes[i].data.size());
+    channel->writeFrames(QList<QXmppVideoFrame>() << frame);
 }
 
 void CallWidget::videoRefresh()
@@ -313,7 +347,7 @@ void CallWidget::videoRefresh()
         quint8 *y_row = (quint8*)frame.planes[0].data.data();
         quint8 *cb_row = (quint8*)frame.planes[1].data.data();
         quint8 *cr_row = (quint8*)frame.planes[2].data.data();
-        for (int y = 0; y < height; y++) {
+        for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 const float cb = cb_row[x/2] - 128.0;
                 const float cr = cr_row[x/2] - 128.0;
