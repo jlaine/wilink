@@ -97,6 +97,7 @@ public:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *Event);
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 public slots:
     void reposition();

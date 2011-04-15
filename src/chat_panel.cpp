@@ -299,8 +299,8 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
     m_layout->addItem(widget);
-    reposition();
     widget->appear();
+    m_delay->start();
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
@@ -321,11 +321,17 @@ void ChatPanelBar::reposition()
         setPos(m_view->mapToScene(QPoint(0, 0)));
 }
 
+QSizeF ChatPanelBar::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    QSizeF size = QGraphicsWidget::sizeHint(which, constraint);
+    size.setWidth(m_view->viewport()->width() - 1);
+    return size;
+}
+
 void ChatPanelBar::trackView()
 {
-    QSizeF newSize;
-    newSize.setWidth(m_view->viewport()->width() - 1);
-    newSize.setHeight(48);
+    reposition();
+    QSizeF newSize = sizeHint(Qt::PreferredSize);
     m_animation->setDuration(500);
     m_animation->setStartValue(size());
     m_animation->setEndValue(newSize);
