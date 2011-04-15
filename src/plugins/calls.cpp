@@ -251,10 +251,19 @@ void CallWidget::setGeometry(const QRectF &rect)
 
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 {
+    QXmppRtpVideoChannel *channel = m_call->videoChannel();
     qDebug("video mode changed %i", (int)mode);
-    if (mode & QIODevice::ReadOnly) {
+    if ((mode & QIODevice::ReadOnly) && channel) {
+        QSize size = channel->decoderFormat().frameSize();
+        if (size.width() != m_videoImage.width() || size.height() != m_videoImage.height()) {
+            m_videoImage = QImage(size, QImage::Format_RGB32);
+            setIconPixmap(QPixmap::fromImage(m_videoImage));
+            updateGeometry();
+        }
+
         if (!m_videoTimer->isActive())
             m_videoTimer->start(100);
+
     }
 }
 
