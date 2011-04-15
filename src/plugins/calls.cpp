@@ -252,20 +252,39 @@ void CallWidget::setGeometry(const QRectF &rect)
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 {
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
+    if (!channel)
+        return;
+
     qDebug("video mode changed %i", (int)mode);
-    if ((mode & QIODevice::ReadOnly) && channel) {
+    bool geometryChanged = false;
+    if (mode & QIODevice::ReadOnly) {
         QSize size = channel->decoderFormat().frameSize();
         if (size != m_videoImage.size()) {
             m_videoImage = QImage(size, QImage::Format_RGB32);
             m_videoImage.fill(0);
             setIconPixmap(QPixmap::fromImage(m_videoImage));
-            updateGeometry();
+            geometryChanged = true;
         }
 
         if (!m_videoTimer->isActive())
             m_videoTimer->start(100);
-
     }
+
+    if (mode & QIODevice::WriteOnly) {
+        QSize size = channel->encoderFormat().frameSize();
+        if (size != m_videoInput.size()) {
+            m_videoInput = QImage(size, QImage::Format_RGB32);
+            m_videoInput.fill(0xffffff);
+            geometryChanged = true;
+        }
+    }
+    if (geometryChanged)
+        updateGeometry();
+}
+
+void CallWidget::videoCapture()
+{
+    // convert YUV 4:2:0 to RGB32
 }
 
 void CallWidget::videoRefresh()
@@ -290,22 +309,24 @@ void CallWidget::videoRefresh()
         // convert YUV 4:2:0 to RGB32
         const int cb_stride = frame.planes[1].stride;
         const int cr_stride = frame.planes[2].stride;
+        //qDebug("stride %i, cb_stride %i, cr_stride %i", stride, cb_stride, cr_stride);
         quint8 *y_row = (quint8*)frame.planes[0].data.data();
         quint8 *cb_row = (quint8*)frame.planes[1].data.data();
         quint8 *cr_row = (quint8*)frame.planes[2].data.data();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; ++x) {
-                const quint8 yp = y_row[x];
-                const quint8 cb = cb_row[x/2];
-                const quint8 cr = cr_row[x/2];
-#if 0
-                const quint32 val = (quint8(yp + 1.371 * (cr - 128)) << 16) |
-                                    (quint8(yp - 0.698 * (cr - 128) - 0.336 * (cb - 128)) << 8) |
-                                    quint8(yp + 1.732 * (cb - 128));
+                const float cb = cb_row[x/2] - 128.0;
+                const float cr = cr_row[x/2] - 128.0;
+#if 1
+                const float yp = y_row[x];
+                const quint32 val = (quint8(yp + 1.371 * cr) << 16) |
+                                    (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) |
+                                    quint8(yp + 1.732 * cb);
 #else
-                const quint32 val = (quint8(1.164 * (yp-16) + 1.596 * (cr - 128)) << 16) |
-                                    (quint8(1.164 * (yp-16) - 0.813 * (cr - 128) - 0.392 * (cb - 128)) << 8) |
-                                    quint8(1.164 * (yp-16) + 2.017 * (cb - 128));
+                const float yp = y_row[x] - 16;
+                const quint32 val = (quint8(1.164 * yp + 1.596 * cr) << 16) |
+                                    (quint8(1.164 * yp - 0.813 * cr - 0.392 * cb) << 8) |
+                                    quint8(1.164 * yp + 2.017 * cb);
 #endif
                 m_videoImage.setPixel(x, y, val);
             }
