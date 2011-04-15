@@ -298,9 +298,15 @@ void CallWidget::videoRefresh()
                 const quint8 yp = y_row[x];
                 const quint8 cb = cb_row[x/2];
                 const quint8 cr = cr_row[x/2];
+#if 0
+                const quint32 val = (quint8(yp + 1.371 * (cr - 128)) << 16) |
+                                    (quint8(yp - 0.698 * (cr - 128) - 0.336 * (cb - 128)) << 8) |
+                                    quint8(yp + 1.732 * (cb - 128));
+#else
                 const quint32 val = (quint8(1.164 * (yp-16) + 1.596 * (cr - 128)) << 16) |
                                     (quint8(1.164 * (yp-16) - 0.813 * (cr - 128) - 0.392 * (cb - 128)) << 8) |
                                     quint8(1.164 * (yp-16) + 2.017 * (cb - 128));
+#endif
                 m_videoImage.setPixel(x, y, val);
             }
             y_row += stride;
