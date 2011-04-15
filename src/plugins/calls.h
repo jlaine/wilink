@@ -52,6 +52,7 @@ public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
     ~CallWidget();
     void setGeometry(const QRectF &rect);
+    void setVideoGrab(QWidget *widget);
 
 private slots:
     void audioStateChanged(QAudio::State state);
@@ -70,6 +71,7 @@ private:
     QAudioOutput *m_audioOutput;
 
     // video
+    QWidget *m_videoGrab;
     QTimer *m_videoTimer;
     QImage m_videoImage;
     QImage m_videoInput;

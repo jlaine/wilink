@@ -64,6 +64,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     : ChatPanelWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
+    m_videoGrab(0),
     m_call(call),
     m_soundId(0)
 {
@@ -253,6 +254,11 @@ void CallWidget::setGeometry(const QRectF &rect)
         (contents.height() - m_label->boundingRect().height()) / 2);
 }
 
+void CallWidget::setVideoGrab(QWidget *widget)
+{
+    m_videoGrab = widget;
+}
+
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 {
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
@@ -292,12 +298,20 @@ void CallWidget::videoCapture()
     if (!channel)
         return;
 
-    QXmppVideoFrame frame;
-
-    // FIXME: for debug
-    m_videoInput = m_videoImage;
+    if (m_videoGrab) {
+        // grab
+        QPixmap pixmap = QPixmap::grabWidget(m_videoGrab);
+        if (!pixmap.isNull())
+            m_videoInput = pixmap
+                .scaled(m_videoInput.size(), Qt::KeepAspectRatio)
+                .toImage().convertToFormat(m_videoInput.format());
+    } else {
+        // mirror received
+        m_videoInput = m_videoImage;
+    }
 
     // convert ARGB32 to YUV 4:2:0
+    QXmppVideoFrame frame;
     const int width = m_videoInput.width();
     const int height = m_videoInput.height();
     const int stride = width;
@@ -408,6 +422,7 @@ CallWatcher::~CallWatcher()
 void CallWatcher::addCall(QXmppCall *call)
 {
     CallWidget *widget = new CallWidget(call, m_window->rosterModel());
+    //widget->setVideoGrab(m_window);
     const QString bareJid = jidToBareJid(call->jid());
     QModelIndex index = m_window->rosterModel()->findItem(bareJid);
     if (index.isValid())
