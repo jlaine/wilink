@@ -58,6 +58,7 @@ private slots:
     void callRinging();
     void callStateChanged(QXmppCall::State state);
     void videoModeChanged(QIODevice::OpenMode mode);
+    void videoCapture();
     void videoRefresh();
 
 private:
@@ -71,6 +72,7 @@ private:
     // video
     QTimer *m_videoTimer;
     QImage m_videoImage;
+    QImage m_videoInput;
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;
