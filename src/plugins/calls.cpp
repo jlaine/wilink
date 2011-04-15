@@ -294,18 +294,24 @@ void CallWidget::videoCapture()
 
     QXmppVideoFrame frame;
 
+    // FIXME: for debug
+    m_videoInput = m_videoImage;
+
     // convert ARGB32 to YUV 4:2:0
     const int width = m_videoInput.width();
     const int height = m_videoInput.height();
     const int stride = width;
+    const int c_stride = width / 2;
     for (int i = 0; i < 3; ++i) {
         frame.planes[i].width = i ? width / 2 : width;
-        frame.planes[i].stride = i ? stride / 2 : stride;
+        frame.planes[i].stride = i ? c_stride : stride;
         frame.planes[i].height = i ? height / 2 : height;
         frame.planes[i].data.resize(frame.planes[i].stride * frame.planes[i].height);
     }
 
     quint8 *y_row = (quint8*)frame.planes[0].data.data();
+    quint8 *cb_row = (quint8*)frame.planes[1].data.data();
+    quint8 *cr_row = (quint8*)frame.planes[2].data.data();
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             const quint32 pixel = m_videoInput.pixel(x, y);
@@ -313,12 +319,18 @@ void CallWidget::videoCapture()
             const quint8 g = (pixel >> 8) & 0xff;
             const quint8 b = pixel & 0xff;
             y_row[x] = (77 * r + 160 * g + 29 * b) / 256;
+            if (!(y % 2)) {
+                cb_row[x/2] = 128 + (- 44 * r - 87 *g + 131 * b) / 256;
+                cr_row[x/2] = 128 + (131 * r - 110 *g - 21 * b) / 256;
+            }
         }
         y_row += stride;
+        if (y % 2) {
+            cb_row += c_stride;
+            cr_row += c_stride;
+        }
     }
-    for (int i = 1; i < 3; ++i)
-        memset(frame.planes[i].data.data(), 0, frame.planes[i].data.size());
-    channel->writeFrames(QList<QXmppVideoFrame>() << frame);
+    channel->writeFrame(frame);
 }
 
 void CallWidget::videoRefresh()
