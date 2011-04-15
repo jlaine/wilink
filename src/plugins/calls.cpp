@@ -255,8 +255,9 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     qDebug("video mode changed %i", (int)mode);
     if ((mode & QIODevice::ReadOnly) && channel) {
         QSize size = channel->decoderFormat().frameSize();
-        if (size.width() != m_videoImage.width() || size.height() != m_videoImage.height()) {
+        if (size != m_videoImage.size()) {
             m_videoImage = QImage(size, QImage::Format_RGB32);
+            m_videoImage.fill(0);
             setIconPixmap(QPixmap::fromImage(m_videoImage));
             updateGeometry();
         }
