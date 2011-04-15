@@ -69,7 +69,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_soundId(0)
 {
     bool check;
-    //m_call->setParent(this);
 
     // video timer
     m_videoTimer = new QTimer(this);
@@ -87,12 +86,19 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_button->setPixmap(QPixmap(":/hangup.png"));
     m_button->setToolTip(tr("Hang up"));
     addButton(m_button);
-    connect(m_button, SIGNAL(clicked()), m_call, SLOT(hangup()));
 
     setIconPixmap(QPixmap(":/call.png"));
     m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
 
     // connect signals
+    check = connect(this, SIGNAL(destroyed(QObject*)),
+                    m_call, SLOT(hangup()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(destroyed(QObject*)),
+                    m_call, SLOT(deleteLater()));
+    Q_ASSERT(check);
+
     check = connect(m_call, SIGNAL(ringing()),
                     this, SLOT(callRinging()));
     Q_ASSERT(check);
@@ -105,6 +111,10 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
                     this, SLOT(videoModeChanged(QIODevice::OpenMode)));
     Q_ASSERT(check);
     
+    check = connect(m_button, SIGNAL(clicked()),
+                    m_call, SLOT(hangup()));
+    Q_ASSERT(check);
+
     check = connect(m_videoTimer, SIGNAL(timeout()),
                     this, SLOT(videoRefresh()));
     Q_ASSERT(check);
