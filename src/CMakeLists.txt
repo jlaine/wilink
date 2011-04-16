@@ -26,6 +26,15 @@ if(QTMULTIMEDIAKIT_LIBRARY)
     include_directories(/usr/include/QtMultimediaKit)
 endif()
 
+# For libnotify support
+find_package(PkgConfig)
+pkg_check_modules(LIBNOTIFY "libnotify")
+if(LIBNOTIFY_FOUND)
+    message(STATUS "Found libnotify library")
+    include_directories(${LIBNOTIFY_INCLUDE_DIRS})
+    add_definitions(-DUSE_LIBNOTIFY)
+endif()
+
 # wiLink
 
 add_definitions(-DQT_STATICPLUGIN)
@@ -150,6 +159,11 @@ endif()
 if(APPLE)
     list(APPEND wilink_LIBRARIES "-framework AppKit")
 endif(APPLE)
+
+# For libnotify support
+if(LIBNOTIFY_FOUND)
+    list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
+endif()
 
 target_link_libraries(wiLink idle qnetio qxmpp qdjango qsound diagnostics ${wilink_LIBRARIES})
 

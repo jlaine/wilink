@@ -6,6 +6,7 @@ wiLink 1.2.0 (UNRELEASED)
   - Display avatars in chat history.
   - Do not regroup messages over one hour apart.
   - Update friendly names in history as roster changes.
+  - Improve notification bubbles on Linux.
  * Menu:
   - Raise retry interval to 5 minutes.
   - Make sure there are no concurrent refreshes.

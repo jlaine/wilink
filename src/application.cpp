@@ -17,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef USE_LIBNOTIFY
+#include <libnotify/notify.h>
+#endif
+
 #include <QAbstractItemView>
 #include <QAuthenticator>
 #include <QDebug>
@@ -175,6 +179,11 @@ Application::Application(int &argc, char **argv)
     d->soundPlayer->setAudioOutputDevice(d->audioOutputDevice);
     connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
             d->soundPlayer, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+
+#ifdef USE_LIBNOTIFY
+    /* initialise libnotify */
+    notify_init("wiLink application");
+#endif
 
     /* add SSL root CA for wifirst.net and download.wifirst.net */
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
@@ -523,7 +532,23 @@ void Application::messageClicked()
 
 void Application::showMessage(QWidget *context, const QString &title, const QString &message)
 {
-#ifdef USE_SYSTRAY
+#if defined(USE_LIBNOTIFY)
+    NotifyNotification *notification = notify_notification_new((const char *)title.toUtf8(),
+        (const char *)message.toUtf8(), NULL, NULL);
+    if (notification) {
+        // Set timeout
+        notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
+        // Schedule notification for showing
+        if (!notify_notification_show(notification, NULL))
+            qDebug("Failed to send notification");
+
+        // Clean up the memory
+        g_object_unref(notification);
+    } else {
+        qWarning("Failed to create notification");
+    }
+    Q_UNUSED(context);
+#elif defined(USE_SYSTRAY)
     if (d->trayIcon)
     {
         d->trayContext = context;
