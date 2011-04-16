@@ -182,7 +182,7 @@ Application::Application(int &argc, char **argv)
 
 #ifdef USE_LIBNOTIFY
     /* initialise libnotify */
-    notify_init("wiLink application");
+    notify_init(applicationName().toUtf8().constData());
 #endif
 
     /* add SSL root CA for wifirst.net and download.wifirst.net */
@@ -191,6 +191,11 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+#ifdef USE_LIBNOTIFY
+    // uninitialise libnotify
+    notify_uninit();
+#endif
+
 #ifdef USE_SYSTRAY
     // destroy tray icon
     if (d->trayIcon)
