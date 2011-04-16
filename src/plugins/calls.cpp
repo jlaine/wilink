@@ -321,21 +321,14 @@ void CallWidget::videoCapture()
     }
 
     // convert ARGB32 to YUV 4:2:0
-    QXmppVideoFrame frame;
     const int width = m_videoInput.width();
     const int height = m_videoInput.height();
     const int stride = width;
     const int c_stride = width / 2;
-    for (int i = 0; i < 3; ++i) {
-        frame.planes[i].width = i ? width / 2 : width;
-        frame.planes[i].stride = i ? c_stride : stride;
-        frame.planes[i].height = i ? height / 2 : height;
-        frame.planes[i].data.resize(frame.planes[i].stride * frame.planes[i].height);
-    }
-
-    quint8 *y_row = (quint8*)frame.planes[0].data.data();
-    quint8 *cb_row = (quint8*)frame.planes[1].data.data();
-    quint8 *cr_row = (quint8*)frame.planes[2].data.data();
+    QXmppVideoFrame frame((3 * stride * height) / 2, QSize(width, height), stride, QXmppVideoFrame::Format_YUV420P);
+    quint8 *y_row = frame.bits();
+    quint8 *cb_row = y_row + (stride * height);
+    quint8 *cr_row = cb_row + (c_stride * height / 2);
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             const quint32 pixel = m_videoInput.pixel(x, y);
@@ -367,22 +360,20 @@ void CallWidget::videoRefresh()
 
     bool geometryChanged = false;
     foreach (const QXmppVideoFrame &frame, channel->readFrames()) {
-        const int width = frame.planes[0].width;
-        const int height = frame.planes[0].height;
-        const int stride = frame.planes[0].stride;
-
-        if (width != m_videoImage.width() || height != m_videoImage.height()) {
+        if (frame.size() != m_videoImage.size()) {
             geometryChanged = true;
-            m_videoImage = QImage(width, height, QImage::Format_RGB32);
+            m_videoImage = QImage(frame.size(), QImage::Format_RGB32);
         }
 
         // convert YUV 4:2:0 to RGB32
-        const int cb_stride = frame.planes[1].stride;
-        const int cr_stride = frame.planes[2].stride;
+        const int width = frame.width();
+        const int height = frame.height();
+        const int stride = frame.bytesPerLine();
+        const int c_stride = frame.bytesPerLine() / 2;
         //qDebug("stride %i, cb_stride %i, cr_stride %i", stride, cb_stride, cr_stride);
-        quint8 *y_row = (quint8*)frame.planes[0].data.data();
-        quint8 *cb_row = (quint8*)frame.planes[1].data.data();
-        quint8 *cr_row = (quint8*)frame.planes[2].data.data();
+        const quint8 *y_row = frame.bits();
+        const quint8 *cb_row = y_row + (stride * height);
+        const quint8 *cr_row = cb_row + (c_stride * height / 2);
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 const float cb = cb_row[x/2] - 128.0;
@@ -402,8 +393,8 @@ void CallWidget::videoRefresh()
             }
             y_row += stride;
             if (y % 2) {
-                cb_row += cb_stride;
-                cr_row += cr_stride;
+                cb_row += c_stride;
+                cr_row += c_stride;
             }
         }
         setIconPixmap(QPixmap::fromImage(m_videoImage));
