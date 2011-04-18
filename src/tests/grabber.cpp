@@ -34,10 +34,8 @@ int main(int argc, char *argv[])
     }
 
     QVideoGrabber grabber;
-    if (!grabber.open())
+    if (!grabber.start())
         return -1;
-
-    grabber.start();
 
     QXmppVideoFrame frame = grabber.currentFrame();
 
@@ -64,7 +62,6 @@ int main(int argc, char *argv[])
     image.save("foo.png");
 
     grabber.stop();
-    grabber.close();
     return 0;
 }
 

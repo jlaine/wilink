@@ -27,11 +27,6 @@ QVideoGrabber::QVideoGrabber()
 
 QVideoGrabber::~QVideoGrabber()
 {
-    close();
-}
-
-void QVideoGrabber::close()
-{
 }
 
 QXmppVideoFrame QVideoGrabber::currentFrame()
@@ -39,19 +34,14 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     return QXmppVideoFrame();
 }
 
-bool QVideoGrabber::isOpen() const
-{
-    return false;
-}
-
-bool QVideoGrabber::open()
-{
-    return false;
-}
-
 bool QVideoGrabber::start()
 {
     return false;
+}
+
+QVideoGrabber::State QVideoGrabber::state() const
+{
+    return StoppedState;
 }
 
 void QVideoGrabber::stop()

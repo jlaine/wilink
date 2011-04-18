@@ -29,19 +29,23 @@ class QVideoGrabberInfoPrivate;
 class QVideoGrabber
 {
 public:
+    enum State {
+        ActiveState = 0,
+        StoppedState = 2,
+    };
+
     QVideoGrabber();
     ~QVideoGrabber();
 
-    void close();
     QXmppVideoFrame currentFrame();
-    bool isOpen() const;
-    bool open();
     bool start();
+    State state() const;
     void stop();
     QList<QXmppVideoFrame::PixelFormat> supportedFormats() const;
 
 private:
     QVideoGrabberPrivate *d;
+    bool open();
 };
 
 class QVideoGrabberInfo
