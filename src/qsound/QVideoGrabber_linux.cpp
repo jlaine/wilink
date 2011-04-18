@@ -56,6 +56,7 @@ public:
 
     int fd;
     QList<QVideoGrabberBuffer> buffers;
+    int bufferTail;
     int bytesPerLine;
     QString deviceName;
     int frameHeight;
@@ -68,6 +69,7 @@ private:
 
 QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     : fd(-1),
+    bufferTail(0),
     frameWidth(0),
     frameHeight(0),
     q(qq)
@@ -140,7 +142,7 @@ bool QVideoGrabberPrivate::open()
     memset(&reqbuf, 0, sizeof(reqbuf));
     reqbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     reqbuf.memory = V4L2_MEMORY_MMAP;
-    reqbuf.count = 4;
+    reqbuf.count = 5;
     if (ioctl(fd, VIDIOC_REQBUFS, &reqbuf) < 0) {
         qWarning("QVideoGrabber(%s): could not request buffers", qPrintable(deviceName));
         close();
@@ -198,7 +200,7 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     if (d->fd < 0)
         return QXmppVideoFrame();
 
-    QVideoGrabberBuffer &buffer = d->buffers.first();
+    QVideoGrabberBuffer &buffer = d->buffers[d->bufferTail];
     if (ioctl(d->fd, VIDIOC_DQBUF, &buffer.handle) < 0) {
         qWarning("QVideoGrabber(%s): could not dequeue buffer %i", qPrintable(d->deviceName), buffer.handle.index);
         return QXmppVideoFrame();
@@ -210,6 +212,7 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     if (ioctl(d->fd, VIDIOC_QBUF, &buffer.handle) < 0)
         qWarning("QVideoGrabber(%s): could not queue buffer %i", qPrintable(d->deviceName), buffer.handle.index);
 
+    d->bufferTail = (d->bufferTail+1) % d->buffers.size();
     return frame;
 }
 
@@ -226,10 +229,12 @@ bool QVideoGrabber::start()
     if (d->fd < 0 && !d->open())
         return false;
 
-    QVideoGrabberBuffer &buffer = d->buffers.first();
-    if (ioctl(d->fd, VIDIOC_QBUF, &buffer.handle) < 0) {
-        qWarning("QVideoGrabber(%s): could not queue buffer %i", qPrintable(d->deviceName), buffer.handle.index);
-        return false;
+    for (int i = 0; i < d->buffers.size(); ++i) {
+        QVideoGrabberBuffer &buffer = d->buffers.first();
+        if (ioctl(d->fd, VIDIOC_QBUF, &d->buffers[i].handle) < 0) {
+            qWarning("QVideoGrabber(%s): could not queue buffer %i", qPrintable(d->deviceName), i);
+            return false;
+        }
     }
 
     v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
