@@ -1,5 +1,7 @@
 set(QT_USE_QTMULTIMEDIA 1)
+set(QT_USE_QTNETWORK 1)
 include(${QT_USE_FILE})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src)
 
 set(qsound_LIBRARIES)
 
@@ -40,7 +42,7 @@ if(VORBISFILE_LIBRARY)
   endif()
 endif()
 
-SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp)
+SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp QVideoGrabber.cpp)
 qt4_wrap_cpp(qsound_MOC_SOURCES QSoundFile.h QSoundMeter.h QSoundPlayer.h)
 add_library(qsound STATIC ${qsound_SOURCES} ${qsound_MOC_SOURCES})
 target_link_libraries(qsound ${QT_LIBRARIES} ${qsound_LIBRARIES})

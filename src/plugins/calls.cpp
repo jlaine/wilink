@@ -33,6 +33,7 @@
 #include <QTimer>
 
 #include "QSoundPlayer.h"
+#include "QVideoGrabber.h"
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
 #include "QXmppJingleIq.h"
@@ -47,7 +48,6 @@
 #include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
-#include "video_grabber.h"
 
 static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 {

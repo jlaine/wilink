@@ -20,8 +20,7 @@
 #include <QByteArray>
 #include <QImage>
 
-#include "video_grabber.h"
-#include "QXmppRtpChannel.h"
+#include "QVideoGrabber.h"
 
 int main(int argc, char *argv[])
 {
