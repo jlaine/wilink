@@ -24,6 +24,7 @@
                                    quint8(yp + 1.732 * cb))
  
 class QVideoGrabberPrivate;
+class QVideoGrabberInfoPrivate;
 
 class QVideoGrabber
 {
@@ -41,5 +42,20 @@ public:
 
 private:
     QVideoGrabberPrivate *d;
+};
+
+class QVideoGrabberInfo
+{
+public:
+    QVideoGrabberInfo();
+    QVideoGrabberInfo(const QVideoGrabberInfo &other);
+    ~QVideoGrabberInfo();
+
+    QString deviceName() const;
+    QList<QXmppVideoFrame::PixelFormat> supportedPixelFormats() const;
+    QVideoGrabberInfo &operator=(const QVideoGrabberInfo &other);
+
+private:
+    QVideoGrabberInfoPrivate *d;
 };
 

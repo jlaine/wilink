@@ -20,6 +20,7 @@
 #include <QByteArray>
 
 #include "QVideoGrabber.h"
+#include "QVideoGrabber_p.h"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -126,7 +127,7 @@ bool QVideoGrabber::open()
         ::close(fd);
         return false;
     }
-    qDebug("card: %s, driver: %s", capability.card, capability.driver);
+    qDebug("QVideoGrabber opening card: %s, driver: %s", capability.card, capability.driver);
     if (!(capability.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
         qWarning("Video device is not a capture device");
         ::close(fd);

@@ -42,7 +42,7 @@ if(VORBISFILE_LIBRARY)
   endif()
 endif()
 
-SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp)
+SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp QVideoGrabber.cpp)
 if(WIN32)
     list(APPEND qsound_SOURCES QVideoGrabber_dummy.cpp)
 elseif(APPLE)

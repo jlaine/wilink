@@ -2,10 +2,11 @@
 'directories': [
     'src',
     'src/data',
-    'src/tests',
     'src/plugins',
     'src/plugins/phone',
     'src/plugins/shares',
+    'src/qsound',
+    'src/tests',
 ],
 'exclude': 'src/flickcharm',
 'license': """wiLink

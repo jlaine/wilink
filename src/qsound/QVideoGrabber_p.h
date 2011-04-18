@@ -17,42 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_SOUND_PLAYER_H__
-#define __WILINK_SOUND_PLAYER_H__
-
-#include <QAudioDeviceInfo>
-#include <QAudioOutput>
-#include <QIODevice>
-#include <QMap>
-#include <QPair>
-
-class QFile;
-class QSoundFile;
-class QSoundFilePrivate;
-
-class QSoundPlayer : public QObject
+class QVideoGrabberInfoPrivate
 {
-    Q_OBJECT
 
-public:
-    QSoundPlayer(QObject *parent = 0);
-    int play(const QString &name, bool repeat = false);
-    int play(QSoundFile *reader);
-    void stop(int id);
-
-signals:
-    void finished(int id);
-
-public slots:
-    void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
-
-private slots:
-    void stateChanged(QAudio::State state);
-
-private:
-    QAudioDeviceInfo m_audioDevice;
-    int m_readerId;
-    QMap<int, QSoundFile*> m_readers;
 };
 
-#endif
