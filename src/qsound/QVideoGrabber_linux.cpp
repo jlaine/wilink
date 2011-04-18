@@ -21,21 +21,12 @@
 
 #include "QVideoGrabber.h"
 
-#if defined(Q_OS_WIN)
-#include <windows.h>
-//#include <dshow.h>
-#elif defined(Q_OS_LINUX)
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <linux/videodev2.h>
-#endif 
 
-#define YCBCR_to_RGB(yp, cb, cr) ((quint8(yp + 1.371 * cr) << 16) | \
-                                  (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
-                                   quint8(yp + 1.732 * cb))
- 
 QVideoGrabber::QVideoGrabber()
     : m_fd(-1),
     m_base(0),
@@ -51,21 +42,23 @@ QVideoGrabber::~QVideoGrabber()
 
 void QVideoGrabber::close()
 {
-    if (!isOpen())
+    if (m_fd < 0)
         return;
-#if defined(Q_OS_LINUX)
+
+    // stop acquisition
+    stop();
+
+    // close device
     munmap(m_base, m_mappedBytes);
     ::close(m_fd);
     m_fd = -1;
-#endif
 }
 
 QXmppVideoFrame QVideoGrabber::currentFrame()
 {
-    if (!isOpen())
+    if (m_fd < 0)
         return QXmppVideoFrame();
 
-#if defined(Q_OS_LINUX)
     v4l2_buffer buffer;
     memset(&buffer, 0, sizeof(buffer));
     buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -81,22 +74,15 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     memcpy(frame.bits(), m_base, m_mappedBytes);
     qDebug("mapped bytes %i", m_mappedBytes);
     return frame;
-#else
-    return QXmppVideoFrame();
-#endif
 }
 
 bool QVideoGrabber::isOpen() const
 {
-#if defined(Q_OS_LINUX)
     return m_fd >= 0;
-#endif
-    return false;
 }
 
 bool QVideoGrabber::open()
 {
-#if defined(Q_OS_LINUX)
     v4l2_buffer buffer;
     v4l2_capability capability;
     v4l2_format format;
@@ -194,26 +180,14 @@ bool QVideoGrabber::open()
         return false;
     }
 
-    /* start */
-    v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (ioctl(fd, VIDIOC_STREAMON, &type) < 0) {
-        qWarning("Could not start streaming");
-        ::close(fd);
-        return false;
-    }
-
     m_fd = fd;
     m_base = (uchar*)base;
     m_mappedBytes = buffer.length;
     return true;
-#else
-    return false;
-#endif
 }
 
 bool QVideoGrabber::start()
 {
-#if defined(Q_OS_LINUX)
     const v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     v4l2_buffer buffer;
@@ -232,18 +206,13 @@ bool QVideoGrabber::start()
         return false;
     }
     return true;
-#else
-    return false;
-#endif
 }
 
 void QVideoGrabber::stop()
 {
-#if defined(Q_OS_LINUX)
     const v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(m_fd, VIDIOC_STREAMOFF, &type) < 0)
         qWarning("Could not stop streaming");
-#endif
 }
 
 QList<QXmppVideoFrame::PixelFormat> QVideoGrabber::supportedFormats() const
