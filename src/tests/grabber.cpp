@@ -23,6 +23,7 @@ public:
     QXmppVideoFrame currentFrame();
     bool isOpen() const;
     bool open();
+    QList<QXmppVideoFrame::PixelFormat> supportedFormats() const;
 
 private:
     int m_fd;
@@ -31,6 +32,7 @@ private:
     int m_frameHeight;
     int m_frameWidth;
     size_t m_size;
+    QList<QXmppVideoFrame::PixelFormat> m_supportedFormats;
 };
 
 QVideoGrabber::QVideoGrabber()
@@ -114,6 +116,16 @@ bool QVideoGrabber::open()
     fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     while (ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc) == 0) {
         qDebug("Supported format %s", fmtdesc.description);
+        switch (fmtdesc.pixelformat) {
+#if 0
+        case V4L2_PIX_FMT_YUYV:
+            m_supportedFormats << QXmppVideoFrame::Format_YUYV;
+            break;
+#endif
+        case V4L2_PIX_FMT_YUV420:
+            m_supportedFormats << QXmppVideoFrame::Format_YUV420P;
+            break;
+        }
         fmtdesc.index++;
     }
 
@@ -175,6 +187,11 @@ bool QVideoGrabber::open()
 #else
     return false;
 #endif
+}
+
+QList<QXmppVideoFrame::PixelFormat> QVideoGrabber::supportedFormats() const
+{
+    return m_supportedFormats;
 }
 
 int main(int argc, char *argv[])
