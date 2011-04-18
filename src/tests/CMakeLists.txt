@@ -41,7 +41,7 @@ qt4_wrap_cpp(tones_MOC_SOURCES tones.h)
 add_executable(tones tones.cpp ${tones_MOC_SOURCES} ${tones_RCC_SOURCES})
 target_link_libraries(tones qsound ${QT_LIBRARIES})
 
-add_executable(grabber grabber.cpp)
+add_executable(grabber grabber.cpp ../video_grabber.cpp)
 target_link_libraries(grabber qxmpp ${QT_LIBRARIES})
 
 add_executable(hasher hasher.cpp)

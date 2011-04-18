@@ -47,6 +47,7 @@
 #include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
+#include "video_grabber.h"
 
 static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 {
@@ -378,18 +379,8 @@ void CallWidget::videoRefresh()
             for (int x = 0; x < width; ++x) {
                 const float cb = cb_row[x/2] - 128.0;
                 const float cr = cr_row[x/2] - 128.0;
-#if 1
                 const float yp = y_row[x];
-                const quint32 val = (quint8(yp + 1.371 * cr) << 16) |
-                                    (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) |
-                                    quint8(yp + 1.732 * cb);
-#else
-                const float yp = y_row[x] - 16;
-                const quint32 val = (quint8(1.164 * yp + 1.596 * cr) << 16) |
-                                    (quint8(1.164 * yp - 0.813 * cr - 0.392 * cb) << 8) |
-                                    quint8(1.164 * yp + 2.017 * cb);
-#endif
-                m_videoImage.setPixel(x, y, val);
+                m_videoImage.setPixel(x, y, YCBCR_to_RGB(yp, cb, cr));
             }
             y_row += stride;
             if (y % 2) {
