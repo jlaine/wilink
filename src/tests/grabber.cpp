@@ -1,5 +1,7 @@
 #include <QByteArray>
 
+#include "QXmppRtpChannel.h"
+
 #if defined(Q_OS_WIN)
 #include <windows.h>
 //#include <dshow.h>
@@ -7,48 +9,81 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <linux/videodev2.h>
 #endif 
 
-class FrameGrabber
+class QVideoGrabber
 {
 public:
-    FrameGrabber();
-    ~FrameGrabber();
+    QVideoGrabber();
+    ~QVideoGrabber();
 
     void close();
+    QXmppVideoFrame currentFrame();
+    bool isOpen() const;
     bool open();
 
 private:
     int m_fd;
+    uchar *m_base;
+    int m_bytesPerLine;
+    int m_frameHeight;
+    int m_frameWidth;
+    size_t m_size;
 };
 
-FrameGrabber::FrameGrabber()
-    : m_fd(-1)
+QVideoGrabber::QVideoGrabber()
+    : m_fd(-1),
+    m_base(0),
+    m_bytesPerLine(320),
+    m_frameHeight(240),
+    m_frameWidth(320)
 {
 }
 
-FrameGrabber::~FrameGrabber()
+QVideoGrabber::~QVideoGrabber()
 {
     close();
 }
 
-void FrameGrabber::close()
+void QVideoGrabber::close()
 {
+    if (!isOpen())
+        return;
 #if defined(Q_OS_LINUX)
-    if (m_fd >= 0) {
-        ::close(m_fd);
-        m_fd = -1;
-    }
+    munmap(m_base, m_size);
+    ::close(m_fd);
+    m_fd = -1;
 #endif
 }
 
+QXmppVideoFrame QVideoGrabber::currentFrame()
+{
+    QXmppVideoFrame frame;
+    if (!isOpen())
+        return frame;
 
-bool FrameGrabber::open()
+#if defined(Q_OS_LINUX)
+#endif
+    return frame;
+}
+
+bool QVideoGrabber::isOpen() const
 {
 #if defined(Q_OS_LINUX)
+    return m_fd >= 0;
+#endif
+    return false;
+}
+
+bool QVideoGrabber::open()
+{
+#if defined(Q_OS_LINUX)
+    v4l2_buffer buffer;
     v4l2_capability capability;
     v4l2_format format;
+    v4l2_requestbuffers reqbuf;
 
     int fd = ::open("/dev/video0", O_RDWR);
     if (fd < 0) {
@@ -73,6 +108,15 @@ bool FrameGrabber::open()
     if (capability.capabilities & V4L2_CAP_STREAMING)
         qDebug("Video device supports streaming I/O");
 
+    /* get supported formats */
+    struct v4l2_fmtdesc fmtdesc;
+    memset(&fmtdesc, 0, sizeof(fmtdesc));
+    fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    while (ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc) == 0) {
+        qDebug("Supported format %s", fmtdesc.description);
+        fmtdesc.index++;
+    }
+
     /* get capture image format */
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(fd, VIDIOC_G_FMT, &format) < 0) {
@@ -80,17 +124,53 @@ bool FrameGrabber::open()
         ::close(fd);
         return false;
     }
-    qDebug("capture format width: %d, height: %d, pixelformat: %x, %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.pixelformat, V4L2_PIX_FMT_RGB24);
-    format.fmt.pix.width = 320;
-    format.fmt.pix.height = 240;
-    format.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB24;
-    //format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
+    qDebug("capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline);
+    format.fmt.pix.width = m_frameWidth;
+    format.fmt.pix.height = m_frameHeight;
+    format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+    //format.fmt.pix.bytesperline = m_bytesPerLine;
     if (ioctl(fd, VIDIOC_S_FMT, &format) < 0) {
         qWarning("Could not set format from video device");
         ::close(fd);
         return false;
     }
+    m_frameWidth = format.fmt.pix.width;
+    m_frameHeight = format.fmt.pix.height;
+    m_bytesPerLine = format.fmt.pix.bytesperline;
+
+    qDebug("capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline, format.fmt.pix.pixelformat);
+
+    /* request buffers */
+    memset(&reqbuf, 0, sizeof(reqbuf));
+    reqbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    reqbuf.memory = V4L2_MEMORY_MMAP;
+    reqbuf.count = 1;
+    if (ioctl(fd, VIDIOC_REQBUFS, &reqbuf) < 0) {
+        qWarning("Could not request buffers");
+        ::close(fd);
+        return false;
+    }
+
+    /* map buffer */
+    memset(&buffer, 0, sizeof(buffer));
+    buffer.type = reqbuf.type;
+    buffer.memory = V4L2_MEMORY_MMAP;
+    buffer.index = 0;
+    if (ioctl(fd, VIDIOC_QUERYBUF, &buffer) < 0) {
+        qWarning("Could not query buffer");
+        ::close(fd);
+        return false;
+    }
+    void *base = mmap(NULL, buffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, buffer.m.offset);
+    if (base == MAP_FAILED) {
+        qWarning("Could not map buffer");
+        ::close(fd);
+        return false;
+    }
+
     m_fd = fd;
+    m_base = (uchar*)base;
+    m_size = buffer.length;
     return true;
 #else
     return false;
@@ -99,10 +179,11 @@ bool FrameGrabber::open()
 
 int main(int argc, char *argv[])
 {
-    FrameGrabber grabber;
+    QVideoGrabber grabber;
     if (!grabber.open())
         return -1;
-   
+
+    grabber.currentFrame();   
     grabber.close();
     return 0;
 }
