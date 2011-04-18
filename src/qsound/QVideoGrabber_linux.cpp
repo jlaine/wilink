@@ -27,36 +27,63 @@
 #include <sys/mman.h>
 #include <linux/videodev2.h>
 
-QVideoGrabber::QVideoGrabber()
-    : m_fd(-1),
-    m_base(0),
-    m_frameHeight(240),
-    m_frameWidth(320)
+static QXmppVideoFrame::PixelFormat v4l_to_qxmpp_PixelFormat(__u32 pixelFormat)
 {
+    switch (pixelFormat) {
+    case V4L2_PIX_FMT_YUYV:
+        return QXmppVideoFrame::Format_YUYV;
+    case V4L2_PIX_FMT_YUV420:
+        return QXmppVideoFrame::Format_YUV420P;
+    default:
+        return QXmppVideoFrame::Format_Invalid;
+    }
+}
+
+class QVideoGrabberPrivate
+{
+public:
+    int fd;
+    uchar *base;
+    int bytesPerLine;
+    int frameHeight;
+    int frameWidth;
+    size_t mappedBytes;
+    QXmppVideoFrame::PixelFormat pixelFormat;
+    QList<QXmppVideoFrame::PixelFormat> supportedFormats;
+};
+
+QVideoGrabber::QVideoGrabber()
+{
+    d = new QVideoGrabberPrivate;
+    d->base = 0;
+    d->fd = -1;
+    d->frameWidth = 0;
+    d->frameHeight = 0;
 }
 
 QVideoGrabber::~QVideoGrabber()
 {
     close();
+    delete d;
 }
 
 void QVideoGrabber::close()
 {
-    if (m_fd < 0)
+    if (d->fd < 0)
         return;
 
     // stop acquisition
     stop();
 
     // close device
-    munmap(m_base, m_mappedBytes);
-    ::close(m_fd);
-    m_fd = -1;
+    munmap(d->base, d->mappedBytes);
+    ::close(d->fd);
+    d->fd = -1;
 }
 
 QXmppVideoFrame QVideoGrabber::currentFrame()
 {
-    if (m_fd < 0)
+    if (d->fd < 0)
         return QXmppVideoFrame();
 
     v4l2_buffer buffer;
@@ -65,20 +92,19 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     buffer.memory = V4L2_MEMORY_MMAP;
     buffer.index = 0;
 
-    if (ioctl(m_fd, VIDIOC_DQBUF, &buffer) < 0) {
+    if (ioctl(d->fd, VIDIOC_DQBUF, &buffer) < 0) {
         qWarning("Could not dequeue buffer %i", buffer.index);
         return QXmppVideoFrame();
     }
 
-    QXmppVideoFrame frame(m_mappedBytes, QSize(m_frameWidth, m_frameHeight), m_bytesPerLine, m_pixelFormat);
-    memcpy(frame.bits(), m_base, m_mappedBytes);
-    qDebug("mapped bytes %i", m_mappedBytes);
+    QXmppVideoFrame frame(d->mappedBytes, QSize(d->frameWidth, d->frameHeight), d->bytesPerLine, d->pixelFormat);
+    memcpy(frame.bits(), d->base, d->mappedBytes);
     return frame;
 }
 
 bool QVideoGrabber::isOpen() const
 {
-    return m_fd >= 0;
+    return d->fd >= 0;
 }
 
 bool QVideoGrabber::open()
@@ -112,19 +138,15 @@ bool QVideoGrabber::open()
         qDebug("Video device supports streaming I/O");
 
     /* get supported formats */
+    QList<QXmppVideoFrame::PixelFormat> pixelFormats;
     struct v4l2_fmtdesc fmtdesc;
     memset(&fmtdesc, 0, sizeof(fmtdesc));
     fmtdesc.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     while (ioctl(fd, VIDIOC_ENUM_FMT, &fmtdesc) == 0) {
         qDebug("Supported format %s", fmtdesc.description);
-        switch (fmtdesc.pixelformat) {
-        case V4L2_PIX_FMT_YUYV:
-            m_supportedFormats << QXmppVideoFrame::Format_YUYV;
-            break;
-        case V4L2_PIX_FMT_YUV420:
-            m_supportedFormats << QXmppVideoFrame::Format_YUV420P;
-            break;
-        }
+        QXmppVideoFrame::PixelFormat format = v4l_to_qxmpp_PixelFormat(fmtdesc.pixelformat);
+        if (format != QXmppVideoFrame::Format_Invalid && !pixelFormats.contains(format))
+            pixelFormats << format;
         fmtdesc.index++;
     }
 
@@ -136,8 +158,8 @@ bool QVideoGrabber::open()
         return false;
     }
     qDebug("capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline);
-    format.fmt.pix.width = m_frameWidth;
-    format.fmt.pix.height = m_frameHeight;
+    format.fmt.pix.width = 320;
+    format.fmt.pix.height = 240;
     format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     format.fmt.pix.field = V4L2_FIELD_INTERLACED;
     if (ioctl(fd, VIDIOC_S_FMT, &format) < 0) {
@@ -145,10 +167,6 @@ bool QVideoGrabber::open()
         ::close(fd);
         return false;
     }
-    m_bytesPerLine = format.fmt.pix.bytesperline;
-    m_frameWidth = format.fmt.pix.width;
-    m_frameHeight = format.fmt.pix.height;
-    m_pixelFormat = QXmppVideoFrame::Format_YUYV;
 
     qDebug("capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline, format.fmt.pix.pixelformat);
 
@@ -180,9 +198,15 @@ bool QVideoGrabber::open()
         return false;
     }
 
-    m_fd = fd;
-    m_base = (uchar*)base;
-    m_mappedBytes = buffer.length;
+    /* store config */
+    d->bytesPerLine = format.fmt.pix.bytesperline;
+    d->fd = fd;
+    d->frameWidth = format.fmt.pix.width;
+    d->frameHeight = format.fmt.pix.height;
+    d->base = (uchar*)base;
+    d->mappedBytes = buffer.length;
+    d->pixelFormat = v4l_to_qxmpp_PixelFormat(format.fmt.pix.pixelformat);
+    d->supportedFormats  = pixelFormats;
     return true;
 }
 
@@ -196,12 +220,12 @@ bool QVideoGrabber::start()
     buffer.memory = V4L2_MEMORY_MMAP;
     buffer.index = 0;
 
-    if (ioctl(m_fd, VIDIOC_QBUF, &buffer) < 0) {
+    if (ioctl(d->fd, VIDIOC_QBUF, &buffer) < 0) {
         qWarning("Could not queue buffer %i", buffer.index);
         return false;
     }
 
-    if (ioctl(m_fd, VIDIOC_STREAMON, &type) < 0) {
+    if (ioctl(d->fd, VIDIOC_STREAMON, &type) < 0) {
         qWarning("Could not start streaming");
         return false;
     }
@@ -211,12 +235,12 @@ bool QVideoGrabber::start()
 void QVideoGrabber::stop()
 {
     const v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (ioctl(m_fd, VIDIOC_STREAMOFF, &type) < 0)
+    if (ioctl(d->fd, VIDIOC_STREAMOFF, &type) < 0)
         qWarning("Could not stop streaming");
 }
 
 QList<QXmppVideoFrame::PixelFormat> QVideoGrabber::supportedFormats() const
 {
-    return m_supportedFormats;
+    return d->supportedFormats;
 }
 

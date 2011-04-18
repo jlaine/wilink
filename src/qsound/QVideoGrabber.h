@@ -23,6 +23,8 @@
                                   (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
                                    quint8(yp + 1.732 * cb))
  
+class QVideoGrabberPrivate;
+
 class QVideoGrabber
 {
 public:
@@ -38,13 +40,6 @@ public:
     QList<QXmppVideoFrame::PixelFormat> supportedFormats() const;
 
 private:
-    int m_fd;
-    uchar *m_base;
-    int m_bytesPerLine;
-    int m_frameHeight;
-    int m_frameWidth;
-    size_t m_mappedBytes;
-    QXmppVideoFrame::PixelFormat m_pixelFormat;
-    QList<QXmppVideoFrame::PixelFormat> m_supportedFormats;
+    QVideoGrabberPrivate *d;
 };
 
