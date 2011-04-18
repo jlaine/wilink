@@ -124,7 +124,6 @@ bool QVideoGrabberPrivate::open()
         close();
         return false;
     }
-    qDebug("capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline);
     format.fmt.pix.width = 320;
     format.fmt.pix.height = 240;
     format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
@@ -135,7 +134,7 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
 
-    qDebug("capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline, format.fmt.pix.pixelformat);
+    qDebug("QVideoGrabber(%s) capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", qPrintable(deviceName), format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline, format.fmt.pix.pixelformat);
 
     /* request buffers */
     memset(&reqbuf, 0, sizeof(reqbuf));

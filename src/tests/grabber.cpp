@@ -39,14 +39,17 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    QXmppVideoFormat format = grabber.format();
+
+    qDebug("Started capture %i x %i", format.frameSize().width(), format.frameSize().height());
+    QImage image(format.frameSize(), QImage::Format_RGB32);
+    image.fill(0);
     for (int i = 0; i < 10; ++i) {
         QXmppVideoFrame frame = grabber.currentFrame();
-        if (!frame.isValid()) {
+        if (!frame.isValid() || frame.size() != format.frameSize()) {
             qWarning("Invalid frame");
             return -1;
         }
-        QImage image(frame.size(), QImage::Format_RGB32);
-        image.fill(0);
         qDebug("Grabbed frame %i x %i", frame.width(), frame.height());
 
         // convert YUYV to RGB32
