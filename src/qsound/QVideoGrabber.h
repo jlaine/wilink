@@ -45,7 +45,6 @@ public:
 
 private:
     QVideoGrabberPrivate *d;
-    bool open();
 };
 
 class QVideoGrabberInfo
