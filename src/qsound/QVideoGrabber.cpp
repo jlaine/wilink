@@ -42,4 +42,13 @@ QVideoGrabberInfo &QVideoGrabberInfo::operator=(const QVideoGrabberInfo &other)
     return *this;
 }
 
+QString QVideoGrabberInfo::deviceName() const
+{
+    return d->deviceName;
+}
+
+QList<QXmppVideoFrame::PixelFormat> QVideoGrabberInfo::supportedPixelFormats() const
+{
+    return d->supportedPixelFormats;
+}
 

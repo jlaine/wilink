@@ -24,6 +24,15 @@
 
 int main(int argc, char *argv[])
 {
+    // list available devices
+    foreach (const QVideoGrabberInfo &info, QVideoGrabberInfo::availableGrabbers()) {
+        qDebug("Device %s", qPrintable(info.deviceName()));
+        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUYV))
+            qDebug(" - supports YUYV");
+        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUV420P))
+            qDebug(" - supports YUV420P");
+    }
+
     QVideoGrabber grabber;
     if (!grabber.open())
         return -1;

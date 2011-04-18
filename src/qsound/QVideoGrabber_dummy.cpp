@@ -58,8 +58,9 @@ void QVideoGrabber::stop()
 {
 }
 
-QList<QXmppVideoFrame::PixelFormat> QVideoGrabber::supportedFormats() const
+QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
 {
-    return QList<QXmppVideoFrame::PixelFormat>();
+    // No grabbers for dummy
+    return QList<QVideoGrabberInfo>();
 }
 

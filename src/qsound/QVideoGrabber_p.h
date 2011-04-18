@@ -19,6 +19,8 @@
 
 class QVideoGrabberInfoPrivate
 {
-
+public:
+    QString deviceName;
+    QList<QXmppVideoFrame::PixelFormat> supportedPixelFormats;
 };
 
