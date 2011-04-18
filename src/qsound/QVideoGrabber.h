@@ -38,10 +38,10 @@ public:
     ~QVideoGrabber();
 
     QXmppVideoFrame currentFrame();
+    QXmppVideoFormat format() const;
     bool start();
     State state() const;
     void stop();
-    QList<QXmppVideoFrame::PixelFormat> supportedFormats() const;
 
 private:
     QVideoGrabberPrivate *d;

@@ -214,6 +214,14 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     return frame;
 }
 
+QXmppVideoFormat QVideoGrabber::format() const
+{
+    QXmppVideoFormat fmt;
+    fmt.setFrameSize(QSize(d->frameWidth, d->frameHeight));
+    fmt.setPixelFormat(d->pixelFormat);
+    return fmt;
+}
+
 bool QVideoGrabber::start()
 {
     if (d->fd < 0 && !d->open())

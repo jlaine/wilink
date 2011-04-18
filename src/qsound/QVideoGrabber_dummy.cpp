@@ -34,6 +34,11 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
     return QXmppVideoFrame();
 }
 
+QXmppVideoFormat QVideoGrabber::format() const
+{
+    return QXmppVideoFormat();
+}
+
 bool QVideoGrabber::start()
 {
     return false;
