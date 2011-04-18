@@ -209,11 +209,12 @@ bool QVideoGrabber::open()
     d->frameWidth = format.fmt.pix.width;
     d->frameHeight = format.fmt.pix.height;
     d->pixelFormat = v4l_to_qxmpp_PixelFormat(format.fmt.pix.pixelformat);
+    return true;
 }
 
 bool QVideoGrabber::start()
 {
-    if (!d->fd && !open())
+    if (d->fd < 0 && !open())
         return false;
 
     QVideoGrabberBuffer &buffer = d->buffers.first();

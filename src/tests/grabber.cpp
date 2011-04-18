@@ -34,13 +34,19 @@ int main(int argc, char *argv[])
     }
 
     QVideoGrabber grabber;
-    if (!grabber.start())
+    if (!grabber.start()) {
+        qWarning("Could not start capture");
         return -1;
+    }
 
     QXmppVideoFrame frame = grabber.currentFrame();
-
+    if (!frame.isValid()) {
+        qWarning("Invalid frame");
+        return -1;
+    }
     QImage image(frame.size(), QImage::Format_RGB32);
     image.fill(0);
+    qDebug("Grabbed frame %i x %i", frame.width(), frame.height());
 
     // convert YUYV to RGB32
     const int width = frame.width();
