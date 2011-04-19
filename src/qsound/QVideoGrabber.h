@@ -26,8 +26,10 @@
 class QVideoGrabberPrivate;
 class QVideoGrabberInfoPrivate;
 
-class QVideoGrabber
+class QVideoGrabber : public QObject
 {
+    Q_OBJECT
+
 public:
     enum State {
         ActiveState = 0,
@@ -42,6 +44,9 @@ public:
     bool start();
     State state() const;
     void stop();
+
+signals:
+    void readyRead();
 
 private:
     QVideoGrabberPrivate *d;

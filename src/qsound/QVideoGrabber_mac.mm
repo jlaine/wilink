@@ -30,6 +30,27 @@
 #include "QVideoGrabber.h"
 #include "QVideoGrabber_p.h"
 
+@interface QVideoGrabberDelegate : NSObject {
+}
+
+-(void) captureOutput:(QTCaptureOutput *)captureOutput
+                    didOutputVideoFrame:(CVImageBufferRef)videoFrame
+                    withSampleBuffer:(QTSampleBuffer *)sampleBuffer
+                    fromConnection:(QTCaptureConnection *)connection;
+@end
+
+@implementation QVideoGrabberDelegate
+
+- (void) captureOutput:(QTCaptureOutput *)captureOutput
+                    didOutputVideoFrame:(CVImageBufferRef)videoFrame
+                    withSampleBuffer:(QTSampleBuffer *)sampleBuffer
+                    fromConnection:(QTCaptureConnection *)connection
+{
+    qDebug("got frame");
+}
+
+@end
+
 inline QString cfstringRefToQstring(CFStringRef cfStringRef) {
     QString retVal;
     CFIndex maxLength = 2 * CFStringGetLength(cfStringRef) + 1/*zero term*/; // max UTF8
@@ -69,10 +90,10 @@ public:
     bool open();
     void close();
 
-
-    QTCaptureDecompressedVideoOutput *decompressedVideoOutput;
+    QVideoGrabberDelegate *delegate;
     QTCaptureDevice *device;
     QTCaptureDeviceInput *deviceInput;
+    QTCaptureDecompressedVideoOutput *deviceOutput;
     NSAutoreleasePool *pool;
     QTCaptureSession *session;
 
@@ -82,9 +103,10 @@ private:
 
 QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     : q(qq),
-    decompressedVideoOutput(0),
+    delegate(0),
     device(0),
     deviceInput(0),
+    deviceOutput(0),
     pool(0),
     session(0)
 {
@@ -131,12 +153,14 @@ bool QVideoGrabberPrivate::open()
     }
 
     // add capture output
-    decompressedVideoOutput = [[QTCaptureDecompressedVideoOutput alloc] init];
-    if (![session addOutput:decompressedVideoOutput error:&error]) {
+    deviceOutput = [[QTCaptureDecompressedVideoOutput alloc] init];
+    if (![session addOutput:deviceOutput error:&error]) {
         NSLog(@"%@\n", error);
         close();
         return false;
     }
+    [deviceOutput setPixelBufferAttributes:[NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:kYUVSPixelFormat] forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey]];
+    [deviceOutput setDelegate:delegate];
 
     return true;
 }
@@ -145,6 +169,7 @@ QVideoGrabber::QVideoGrabber()
 {
     d = new QVideoGrabberPrivate(this);
     d->pool = [[NSAutoreleasePool alloc] init];
+    d->delegate = [[QVideoGrabberDelegate alloc] init];
 }
 
 QVideoGrabber::~QVideoGrabber()
@@ -166,7 +191,9 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
 
 QXmppVideoFormat QVideoGrabber::format() const
 {
-    return QXmppVideoFormat();
+    QXmppVideoFormat fmt;
+    fmt.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+    return fmt;
 }
 
 bool QVideoGrabber::start()
@@ -200,9 +227,10 @@ QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
     for (QTCaptureDevice *device in devices) {
         QVideoGrabberInfo grabber;
         grabber.d->deviceName = nsstringToQString([device uniqueID]);
+        grabber.d->supportedPixelFormats << QXmppVideoFrame::Format_YUYV;
 
-        for (QTFormatDescription* fmtDesc in [device formatDescriptions])
-            NSLog(@"Format Description - %@", [fmtDesc formatDescriptionAttributes]);
+        //for (QTFormatDescription* fmtDesc in [device formatDescriptions])
+        //    NSLog(@"Format Description - %@", [fmtDesc formatDescriptionAttributes]);
 
         grabbers << grabber;
     }
