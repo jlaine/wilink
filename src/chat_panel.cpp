@@ -300,17 +300,23 @@ void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
     m_layout->addItem(widget);
     widget->appear();
+#if 0
     m_delay->start();
+#endif
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
+#if 0
         if (m_animation->state() == QAbstractAnimation::Running)
             trackView();
         else
             m_delay->start();
+#else
+        updateGeometry();
+#endif
     }
     return false;
 }
