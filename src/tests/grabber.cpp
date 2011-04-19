@@ -17,13 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
 #include <QByteArray>
-#include <QImage>
 
 #include "QVideoGrabber.h"
+#include "grabber.h"
+
+Grabber::Grabber()
+    : m_count(0),
+    m_input(0)
+{
+}
+
+void Grabber::saveFrame()
+{
+    QXmppVideoFrame frame = m_input->currentFrame();
+    if (!frame.isValid() || frame.size() != m_image.size()) {
+        qWarning("Invalid frame");
+        return;
+    }
+    qDebug("Grabbed frame %i x %i", frame.width(), frame.height());
+
+    // convert YUYV to RGB32
+    const int width = frame.width();
+    const int height = frame.height();
+    const int stride = frame.bytesPerLine();
+    const quint8 *row = frame.bits();
+    for (int y = 0; y < height; ++y) {
+        const quint8 *ptr = row;
+        for (int x = 0; x < width; x += 2) {
+            const float yp1 = *(ptr++);
+            const float cb = *(ptr++) - 128.0;
+            const float yp2 = *(ptr++);
+            const float cr = *(ptr++) - 128.0;
+            m_image.setPixel(x, y, YCBCR_to_RGB(yp1, cb, cr));
+            m_image.setPixel(x+1, y, YCBCR_to_RGB(yp2, cb, cr));
+        }
+        row += stride;
+    }
+    m_image.save(QString("foo_%1.png").arg(QString::number(m_count++)));
+    if (m_count >= 10) {
+        m_input->stop();
+        emit finished();
+    }
+}
+
+void Grabber::start(QVideoGrabber *input)
+{
+    m_input = input;
+    connect(m_input, SIGNAL(readyRead()),
+            this, SLOT(saveFrame()));
+
+    if (!m_input->start()) {
+        qWarning("Could not start capture");
+        emit finished();
+        return;
+    }
+
+    const QXmppVideoFormat format = m_input->format();
+    qDebug("Started capture %i x %i", format.frameSize().width(), format.frameSize().height());
+    m_image = QImage(format.frameSize(), QImage::Format_RGB32);
+    m_image.fill(0);
+}
 
 int main(int argc, char *argv[])
 {
+    QApplication app(argc, argv);
+
     // list available devices
     foreach (const QVideoGrabberInfo &info, QVideoGrabberInfo::availableGrabbers()) {
         qDebug("Device %s", qPrintable(info.deviceName()));
@@ -33,46 +93,11 @@ int main(int argc, char *argv[])
             qDebug(" - supports YUV420P");
     }
 
-    QVideoGrabber grabber;
-    if (!grabber.start()) {
-        qWarning("Could not start capture");
-        return -1;
-    }
-
-    QXmppVideoFormat format = grabber.format();
-
-    qDebug("Started capture %i x %i", format.frameSize().width(), format.frameSize().height());
-    QImage image(format.frameSize(), QImage::Format_RGB32);
-    image.fill(0);
-    for (int i = 0; i < 10; ++i) {
-        QXmppVideoFrame frame = grabber.currentFrame();
-        if (!frame.isValid() || frame.size() != format.frameSize()) {
-            qWarning("Invalid frame");
-            return -1;
-        }
-        qDebug("Grabbed frame %i x %i", frame.width(), frame.height());
-
-        // convert YUYV to RGB32
-        const int width = frame.width();
-        const int height = frame.height();
-        const int stride = frame.bytesPerLine();
-        const quint8 *row = frame.bits();
-        for (int y = 0; y < height; ++y) {
-            const quint8 *ptr = row;
-            for (int x = 0; x < width; x += 2) {
-                const float yp1 = *(ptr++);
-                const float cb = *(ptr++) - 128.0;
-                const float yp2 = *(ptr++);
-                const float cr = *(ptr++) - 128.0;
-                image.setPixel(x, y, YCBCR_to_RGB(yp1, cb, cr));
-                image.setPixel(x+1, y, YCBCR_to_RGB(yp2, cb, cr));
-            }
-            row += stride;
-        }
-        image.save(QString("foo_%1.png").arg(QString::number(i)));
-    }
-
-    grabber.stop();
-    return 0;
+    // grab some frames
+    QVideoGrabber input;
+    Grabber grabber;
+    QObject::connect(&grabber, SIGNAL(finished()), &app, SLOT(quit()));
+    grabber.start(&input);
+    return app.exec();
 }
 

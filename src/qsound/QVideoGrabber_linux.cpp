@@ -25,6 +25,8 @@
 
 #include <QByteArray>
 #include <QDir>
+#include <QSocketNotifier>
+#include <QTimer>
 
 #include "QVideoGrabber.h"
 #include "QVideoGrabber_p.h"
@@ -61,7 +63,9 @@ public:
     QString deviceName;
     int frameHeight;
     int frameWidth;
+    QSocketNotifier *notifier;
     QXmppVideoFrame::PixelFormat pixelFormat;
+    QTimer *timer;
 
 private:
     QVideoGrabber *q;
@@ -72,14 +76,24 @@ QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     bufferTail(0),
     frameWidth(0),
     frameHeight(0),
+    notifier(0),
     q(qq)
 {
+    timer = new QTimer(q);
+    QObject::connect(timer, SIGNAL(timeout()),
+                     q, SIGNAL(readyRead()));
 }
 
 void QVideoGrabberPrivate::close()
 {
     if (fd < 0)
         return;
+
+    // stop watching socket
+    if (notifier) {
+        delete notifier;
+        notifier = 0;
+    }
 
     // close device
     foreach (const QVideoGrabberBuffer &b, buffers)
@@ -102,7 +116,7 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
 
-    /* query capabilities */
+    // query capabilities
     if (ioctl(fd, VIDIOC_QUERYCAP, &capability) < 0) {
         qWarning("QVideoGrabber(%s): could not query capabilities", qPrintable(deviceName));
         close();
@@ -119,7 +133,7 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
 
-    /* get capture image format */
+    // get capture image format
     format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(fd, VIDIOC_G_FMT, &format) < 0) {
         qWarning("QVideoGrabber(%s): could not get format from device", qPrintable(deviceName));
@@ -138,7 +152,7 @@ bool QVideoGrabberPrivate::open()
 
     qDebug("QVideoGrabber(%s) capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", qPrintable(deviceName), format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline, format.fmt.pix.pixelformat);
 
-    /* request buffers */
+    // request buffers
     memset(&reqbuf, 0, sizeof(reqbuf));
     reqbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     reqbuf.memory = V4L2_MEMORY_MMAP;
@@ -149,7 +163,7 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
 
-    /* map buffers */
+    // map buffers
     for (int i = 0; i < reqbuf.count; ++i) {
         QVideoGrabberBuffer buffer;
         memset(&buffer.handle, 0, sizeof(buffer.handle));
@@ -170,7 +184,12 @@ bool QVideoGrabberPrivate::open()
         buffers << buffer;
     }
 
-    /* store config */
+#if 0
+    // watch file descriptor
+    notifier = new QSocketNotifier(fd, QSocketNotifier::Read, q);
+#endif
+
+    // store config
     bytesPerLine = format.fmt.pix.bytesperline;
     frameWidth = format.fmt.pix.width;
     frameHeight = format.fmt.pix.height;
@@ -226,6 +245,7 @@ QXmppVideoFormat QVideoGrabber::format() const
 
 void QVideoGrabber::onFrameCaptured()
 {
+    qDebug("frame captured");
 }
 
 bool QVideoGrabber::start()
@@ -246,6 +266,13 @@ bool QVideoGrabber::start()
         qWarning("QVideoGrabber(%s): could not start streaming", qPrintable(d->deviceName));
         return false;
     }
+
+#if 0
+    connect(d->notifier, SIGNAL(activated(int)),
+            this, SLOT(onFrameCaptured()));
+#else
+    d->timer->start(100);
+#endif
     return true;
 }
 
@@ -256,6 +283,13 @@ QVideoGrabber::State QVideoGrabber::state() const
 
 void QVideoGrabber::stop()
 {
+#if 0
+    disconnect(d->notifier, SIGNAL(activated(int)),
+               this, SLOT(onFrameCaptured()));
+#else
+    d->timer->stop();
+#endif
+
     v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     if (ioctl(d->fd, VIDIOC_STREAMOFF, &type) < 0)
         qWarning("QVideoGrabber(%s): could not stop streaming", qPrintable(d->deviceName));
