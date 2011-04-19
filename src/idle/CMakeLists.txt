@@ -16,7 +16,7 @@ else(APPLE)
         message(STATUS "Found X11 Screen saver library: ${XSS_LIBRARY} ${X11_LIBRARY}")
         add_definitions(-DHAVE_XSS)
         set(IDLE_LIBRARIES ${XSS_LIBRARY} ${X11_LIBRARY})
-    endif(XSS_LIBRARY AND HAVE_SCRNSAVER_H)
+    endif()
 endif(APPLE)
 
 qt4_wrap_cpp(idle_MOC_SOURCES idle.h)
