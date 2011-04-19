@@ -19,6 +19,10 @@
 
 #include <Foundation/NSAutoreleasePool.h>
 #include <QTKit/QTCaptureDevice.h>
+#include <QTKit/QTCaptureDeviceInput.h>
+#include <QTKit/QTCaptureSession.h>
+#include <QTKit/QTCaptureDecompressedVideoOutput.h>
+#include <QTKit/QTFormatDescription.h>
 #include <QTKit/QTMedia.h>
 
 #include <QString>
@@ -62,23 +66,96 @@ class QVideoGrabberPrivate
 {
 public:
     QVideoGrabberPrivate(QVideoGrabber *qq);
+    bool open();
+    void close();
+
+
+    QTCaptureDecompressedVideoOutput *decompressedVideoOutput;
+    QTCaptureDevice *device;
+    QTCaptureDeviceInput *deviceInput;
+    NSAutoreleasePool *pool;
+    QTCaptureSession *session;
 
 private:
     QVideoGrabber *q;
 };
 
 QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
-    : q(qq)
+    : q(qq),
+    decompressedVideoOutput(0),
+    device(0),
+    deviceInput(0),
+    pool(0),
+    session(0)
 {
+}
+
+void QVideoGrabberPrivate::close()
+{
+    if (session) {
+        [session release];
+        session = 0;
+    }
+
+    if (device) {
+        if ([device isOpen])
+            [device close];
+        [device release];
+        device = 0;
+    }
+}
+
+bool QVideoGrabberPrivate::open()
+{
+    // create device
+    device = [QTCaptureDevice defaultInputDeviceWithMediaType:QTMediaTypeVideo];
+    if (!device)
+        return false;
+
+    // open device
+    NSError *error;
+    if (![device open:&error]) {
+        NSLog(@"%@\n", error);
+        close();
+        return false;
+    }
+
+    session = [[QTCaptureSession alloc] init];
+
+    // add capture input
+    deviceInput = [[QTCaptureDeviceInput alloc] initWithDevice:device];
+    if (![session addInput:deviceInput error:&error]) {
+        NSLog(@"%@\n", error);
+        close();
+        return false;
+    }
+
+    // add capture output
+    decompressedVideoOutput = [[QTCaptureDecompressedVideoOutput alloc] init];
+    if (![session addOutput:decompressedVideoOutput error:&error]) {
+        NSLog(@"%@\n", error);
+        close();
+        return false;
+    }
+
+    return true;
 }
 
 QVideoGrabber::QVideoGrabber()
 {
     d = new QVideoGrabberPrivate(this);
+    d->pool = [[NSAutoreleasePool alloc] init];
 }
 
 QVideoGrabber::~QVideoGrabber()
 {
+    // stop acquisition
+    stop();
+
+    // close device
+    d->close();
+
+    [d->pool release];
     delete d;
 }
 
@@ -94,7 +171,11 @@ QXmppVideoFormat QVideoGrabber::format() const
 
 bool QVideoGrabber::start()
 {
-    return false;
+    if (!d->session && !d->open())
+        return false;
+
+    [d->session startRunning];
+    return true;
 }
 
 QVideoGrabber::State QVideoGrabber::state() const
@@ -104,6 +185,9 @@ QVideoGrabber::State QVideoGrabber::state() const
 
 void QVideoGrabber::stop()
 {
+    if (!d->session)
+        return;
+     [d->session stopRunning];
 }
 
 QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
@@ -116,6 +200,10 @@ QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
     for (QTCaptureDevice *device in devices) {
         QVideoGrabberInfo grabber;
         grabber.d->deviceName = nsstringToQString([device uniqueID]);
+
+        for (QTFormatDescription* fmtDesc in [device formatDescriptions])
+            NSLog(@"Format Description - %@", [fmtDesc formatDescriptionAttributes]);
+
         grabbers << grabber;
     }
 
