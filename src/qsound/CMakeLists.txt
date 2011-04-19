@@ -46,7 +46,7 @@ SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp QVideoGrabber
 if(WIN32)
     list(APPEND qsound_SOURCES QVideoGrabber_dummy.cpp)
 elseif(APPLE)
-    list(APPEND qsound_SOURCES QVideoGrabber_dummy.cpp)
+    list(APPEND qsound_SOURCES QVideoGrabber_mac.mm)
 else()
     list(APPEND qsound_SOURCES QVideoGrabber_linux.cpp)
 endif()
