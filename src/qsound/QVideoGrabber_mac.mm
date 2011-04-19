@@ -31,6 +31,11 @@
 #include "QVideoGrabber_p.h"
 
 @interface QVideoGrabberDelegate : NSObject {
+@public
+    QVideoGrabber *grabber;
+
+@private
+    CVImageBufferRef currentFrame;
 }
 
 -(void) captureOutput:(QTCaptureOutput *)captureOutput
@@ -47,6 +52,17 @@
                     fromConnection:(QTCaptureConnection *)connection
 {
     qDebug("got frame");
+    CVImageBufferRef previousFrame;
+    CVBufferRetain(videoFrame);
+
+    @synchronized(self) {
+        previousFrame = currentFrame;
+        currentFrame = videoFrame;
+
+        QMetaObject::invokeMethod(grabber, "readyRead");
+    }
+    
+    CVBufferRelease(previousFrame);
 }
 
 @end
@@ -94,6 +110,8 @@ public:
     QTCaptureDevice *device;
     QTCaptureDeviceInput *deviceInput;
     QTCaptureDecompressedVideoOutput *deviceOutput;
+    int frameHeight;
+    int frameWidth;
     NSAutoreleasePool *pool;
     QTCaptureSession *session;
 
@@ -107,6 +125,8 @@ QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     device(0),
     deviceInput(0),
     deviceOutput(0),
+    frameWidth(0),
+    frameHeight(0),
     pool(0),
     session(0)
 {
@@ -159,9 +179,17 @@ bool QVideoGrabberPrivate::open()
         close();
         return false;
     }
-    [deviceOutput setPixelBufferAttributes:[NSDictionary dictionaryWithObject:[NSNumber numberWithUnsignedInt:kYUVSPixelFormat] forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey]];
+    [deviceOutput setPixelBufferAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithUnsignedInt:kYUVSPixelFormat], (id)kCVPixelBufferPixelFormatTypeKey,
+        [NSNumber numberWithUnsignedInt:320], (id)kCVPixelBufferWidthKey,
+        [NSNumber numberWithUnsignedInt:240], (id)kCVPixelBufferHeightKey,
+        nil]];
     [deviceOutput setDelegate:delegate];
 
+    // store config
+    NSDictionary* pixAttr = [deviceOutput pixelBufferAttributes];
+    frameWidth = [[pixAttr valueForKey:(id)kCVPixelBufferWidthKey] floatValue];
+    frameHeight = [[pixAttr valueForKey:(id)kCVPixelBufferHeightKey] floatValue];
     return true;
 }
 
@@ -170,6 +198,7 @@ QVideoGrabber::QVideoGrabber()
     d = new QVideoGrabberPrivate(this);
     d->pool = [[NSAutoreleasePool alloc] init];
     d->delegate = [[QVideoGrabberDelegate alloc] init];
+    d->delegate->grabber = this;
 }
 
 QVideoGrabber::~QVideoGrabber()
@@ -192,6 +221,7 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
 QXmppVideoFormat QVideoGrabber::format() const
 {
     QXmppVideoFormat fmt;
+    fmt.setFrameSize(QSize(d->frameWidth, d->frameHeight));
     fmt.setPixelFormat(QXmppVideoFrame::Format_YUYV);
     return fmt;
 }
