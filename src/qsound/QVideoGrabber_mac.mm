@@ -17,16 +17,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QByteArray>
+#include <Foundation/NSAutoreleasePool.h>
+#include <QTKit/QTCaptureDevice.h>
+#include <QTKit/QTMedia.h>
+
+#include <QString>
 
 #include "QVideoGrabber.h"
+#include "QVideoGrabber_p.h"
+
+inline QString cfstringRefToQstring(CFStringRef cfStringRef) {
+    QString retVal;
+    CFIndex maxLength = 2 * CFStringGetLength(cfStringRef) + 1/*zero term*/; // max UTF8
+    char *cstring = new char[maxLength];
+    if (CFStringGetCString(CFStringRef(cfStringRef), cstring, maxLength, kCFStringEncodingUTF8)) {
+        retVal = QString::fromUtf8(cstring);
+    }
+    delete cstring;
+    return retVal;
+}
+
+inline CFStringRef qstringToCFStringRef(const QString &string)
+{
+    return CFStringCreateWithCharacters(0, reinterpret_cast<const UniChar *>(string.unicode()),
+                                        string.length());
+}
+
+inline NSString *qstringToNSString(const QString &qstr)
+{
+    return [reinterpret_cast<const NSString *>(qstringToCFStringRef(qstr)) autorelease];
+}
+
+inline int nsnumberToInt(const NSNumber *nsnum)
+{
+    return nsnum ? [nsnum intValue] : 0;
+}
+
+inline QString nsstringToQString(const NSString *nsstr)
+{
+    return cfstringRefToQstring(reinterpret_cast<const CFStringRef>(nsstr));
+}
+
+class QVideoGrabberPrivate
+{
+public:
+    QVideoGrabberPrivate(QVideoGrabber *qq);
+
+private:
+    QVideoGrabber *q;
+};
+
+QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
+    : q(qq)
+{
+}
 
 QVideoGrabber::QVideoGrabber()
 {
+    d = new QVideoGrabberPrivate(this);
 }
 
 QVideoGrabber::~QVideoGrabber()
 {
+    delete d;
 }
 
 QXmppVideoFrame QVideoGrabber::currentFrame()
@@ -55,7 +108,18 @@ void QVideoGrabber::stop()
 
 QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
 {
-    // No grabbers for dummy
-    return QList<QVideoGrabberInfo>();
+    QList<QVideoGrabberInfo> grabbers;
+
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    NSArray* devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
+    for (QTCaptureDevice *device in devices) {
+        QVideoGrabberInfo grabber;
+        grabber.d->deviceName = nsstringToQString([device uniqueID]);
+        grabbers << grabber;
+    }
+
+    [pool release];
+    return grabbers;
 }
 
