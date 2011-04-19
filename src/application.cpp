@@ -535,24 +535,56 @@ void Application::messageClicked()
 #endif
 }
 
+#ifdef USE_LIBNOTIFY
+static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
+{
+    if(g_strcmp0(action, "show-conversation") == 0)
+    {
+        QMetaObject::invokeMethod(wApp, "messageClicked", Q_ARG(QWidget*, (QWidget*)data));
+        notify_notification_close(notification, NULL);
+    }
+}
+
+static void notificationClosed(NotifyNotification *notification)
+{
+    if(notification)
+    {
+        g_object_unref(G_OBJECT(notification));
+    }
+}
+#endif
+
 void Application::showMessage(QWidget *context, const QString &title, const QString &message)
 {
 #if defined(USE_LIBNOTIFY)
     NotifyNotification *notification = notify_notification_new((const char *)title.toUtf8(),
-        (const char *)message.toUtf8(), NULL, NULL);
-    if (notification) {
-        // Set timeout
-        notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
-        // Schedule notification for showing
-        if (!notify_notification_show(notification, NULL))
-            qDebug("Failed to send notification");
+                                                               (const char *)message.toUtf8(),
+                                                               NULL,
+                                                               NULL);
 
-        // Clean up the memory
-        g_object_unref(notification);
-    } else {
+    if( !notification ) {
         qWarning("Failed to create notification");
+        return;
     }
-    Q_UNUSED(context);
+
+    // Set timeout
+    notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
+
+    // set action handled when notification is closed
+    g_signal_connect(notification, "closed", G_CALLBACK(notificationClosed), NULL);
+
+    // Set callbacks
+    notify_notification_add_action(notification,
+                                   "show-conversation",
+                                   tr("Show this conversation").toUtf8(),
+                                   (NotifyActionCallback) &notificationClicked,
+                                   context,
+                                   FALSE);
+
+    // Schedule notification for showing
+    if (!notify_notification_show(notification, NULL))
+        qDebug("Failed to send notification");
+
 #elif defined(USE_SYSTRAY)
     if (d->trayIcon)
     {

@@ -11,6 +11,10 @@
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
     </message>
+    <message>
+        <source>Show this conversation</source>
+        <translation>Afficher la conversation</translation>
+    </message>
 </context>
 <context>
     <name>CallWatcher</name>
