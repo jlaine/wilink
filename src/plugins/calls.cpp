@@ -120,11 +120,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     check = connect(m_videoTimer, SIGNAL(timeout()),
                     this, SLOT(videoRefresh()));
     Q_ASSERT(check);
-
-    check = connect(m_videoTimer, SIGNAL(timeout()),
-                    this, SLOT(videoCapture()));
-    Q_ASSERT(check);
-
 }
 
 CallWidget::~CallWidget()
@@ -295,6 +290,8 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     if (mode & QIODevice::WriteOnly) {
         if (!m_videoGrabber) {
             m_videoGrabber = new QVideoGrabber;
+            connect(m_videoGrabber, SIGNAL(readyRead()),
+                    this, SLOT(videoCapture()));
             m_videoGrabber->start();
         }
     } else {
