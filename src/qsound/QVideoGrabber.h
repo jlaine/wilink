@@ -19,10 +19,7 @@
 
 #include "QXmppRtpChannel.h"
 
-#define YCBCR_to_RGB(yp, cb, cr) ((quint8(yp + 1.371 * cr) << 16) | \
-                                  (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
-                                   quint8(yp + 1.732 * cb))
- 
+class QImage;
 class QVideoGrabberPrivate;
 class QVideoGrabberInfoPrivate;
 
@@ -44,6 +41,8 @@ public:
     bool start();
     State state() const;
     void stop();
+
+    static void frameToImage(const QXmppVideoFrame *frame, QImage *image);
 
 signals:
     void readyRead();

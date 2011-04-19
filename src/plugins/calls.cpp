@@ -365,33 +365,13 @@ void CallWidget::videoRefresh()
 
     bool geometryChanged = false;
     foreach (const QXmppVideoFrame &frame, channel->readFrames()) {
+        if (!frame.isValid())
+            continue;
         if (frame.size() != m_videoImage.size()) {
             geometryChanged = true;
             m_videoImage = QImage(frame.size(), QImage::Format_RGB32);
         }
-
-        // convert YUV 4:2:0 to RGB32
-        const int width = frame.width();
-        const int height = frame.height();
-        const int stride = frame.bytesPerLine();
-        const int c_stride = frame.bytesPerLine() / 2;
-        //qDebug("stride %i, cb_stride %i, cr_stride %i", stride, cb_stride, cr_stride);
-        const quint8 *y_row = frame.bits();
-        const quint8 *cb_row = y_row + (stride * height);
-        const quint8 *cr_row = cb_row + (c_stride * height / 2);
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                const float cb = cb_row[x/2] - 128.0;
-                const float cr = cr_row[x/2] - 128.0;
-                const float yp = y_row[x];
-                m_videoImage.setPixel(x, y, YCBCR_to_RGB(yp, cb, cr));
-            }
-            y_row += stride;
-            if (y % 2) {
-                cb_row += c_stride;
-                cr_row += c_stride;
-            }
-        }
+        QVideoGrabber::frameToImage(&frame, &m_videoImage);
         setIconPixmap(QPixmap::fromImage(m_videoImage));
     }
     if (geometryChanged)
