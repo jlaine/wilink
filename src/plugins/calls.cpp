@@ -66,6 +66,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_audioInput(0),
     m_audioOutput(0),
     m_videoGrab(0),
+    m_videoGrabber(0),
     m_call(call),
     m_soundId(0)
 {
@@ -292,11 +293,15 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     }
 
     if (mode & QIODevice::WriteOnly) {
-        QSize size = channel->encoderFormat().frameSize();
-        if (size != m_videoInput.size()) {
-            m_videoInput = QImage(size, QImage::Format_RGB32);
-            m_videoInput.fill(0xffffff);
-            geometryChanged = true;
+        if (!m_videoGrabber) {
+            m_videoGrabber = new QVideoGrabber;
+            m_videoGrabber->start();
+        }
+    } else {
+        if (m_videoGrabber) {
+            m_videoGrabber->stop();
+            delete m_videoGrabber;
+            m_videoGrabber = 0;
         }
     }
     if (geometryChanged)
@@ -306,49 +311,51 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 void CallWidget::videoCapture()
 {
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
-    if (!channel)
+    if (!channel || !m_videoGrabber)
         return;
 
+#if 0
     if (m_videoGrab) {
         // grab
+        m_videoInput = QImage(size, QImage::Format_RGB32);
+        m_videoInput.fill(0xffffff);
+
         QPixmap pixmap = QPixmap::grabWidget(m_videoGrab);
         if (!pixmap.isNull())
             m_videoInput = pixmap
                 .scaled(m_videoInput.size(), Qt::KeepAspectRatio)
                 .toImage().convertToFormat(m_videoInput.format());
-    } else {
-        // mirror received
-        m_videoInput = m_videoImage;
-    }
 
-    // convert ARGB32 to YUV 4:2:0
-    const int width = m_videoInput.width();
-    const int height = m_videoInput.height();
-    const int stride = width;
-    const int c_stride = width / 2;
-    QXmppVideoFrame frame((3 * stride * height) / 2, QSize(width, height), stride, QXmppVideoFrame::Format_YUV420P);
-    quint8 *y_row = frame.bits();
-    quint8 *cb_row = y_row + (stride * height);
-    quint8 *cr_row = cb_row + (c_stride * height / 2);
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            const quint32 pixel = m_videoInput.pixel(x, y);
-            const quint8 r = (pixel >> 16) & 0xff;
-            const quint8 g = (pixel >> 8) & 0xff;
-            const quint8 b = pixel & 0xff;
-            y_row[x] = (77 * r + 160 * g + 29 * b) / 256;
-            if (!(y % 2)) {
-                cb_row[x/2] = 128 + (- 44 * r - 87 *g + 131 * b) / 256;
-                cr_row[x/2] = 128 + (131 * r - 110 *g - 21 * b) / 256;
+        // convert ARGB32 to YUV 4:2:0
+        const int width = m_videoInput.width();
+        const int height = m_videoInput.height();
+        const int stride = width;
+        const int c_stride = width / 2;
+        QXmppVideoFrame frame((3 * stride * height) / 2, QSize(width, height), stride, QXmppVideoFrame::Format_YUV420P);
+        quint8 *y_row = frame.bits();
+        quint8 *cb_row = y_row + (stride * height);
+        quint8 *cr_row = cb_row + (c_stride * height / 2);
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                const quint32 pixel = m_videoInput.pixel(x, y);
+                const quint8 r = (pixel >> 16) & 0xff;
+                const quint8 g = (pixel >> 8) & 0xff;
+                const quint8 b = pixel & 0xff;
+                y_row[x] = (77 * r + 160 * g + 29 * b) / 256;
+                if (!(y % 2)) {
+                    cb_row[x/2] = 128 + (- 44 * r - 87 *g + 131 * b) / 256;
+                    cr_row[x/2] = 128 + (131 * r - 110 *g - 21 * b) / 256;
+                }
+            }
+            y_row += stride;
+            if (y % 2) {
+                cb_row += c_stride;
+                cr_row += c_stride;
             }
         }
-        y_row += stride;
-        if (y % 2) {
-            cb_row += c_stride;
-            cr_row += c_stride;
-        }
     }
-    channel->writeFrame(frame);
+#endif
+    channel->writeFrame(m_videoGrabber->currentFrame());
 }
 
 void CallWidget::videoRefresh()

@@ -40,6 +40,7 @@ class QLabel;
 class QMenu;
 class QModelIndex;
 class QTimer;
+class QVideoGrabber;
 class QXmppCall;
 class QXmppCallManager;
 class QXmppSrvInfo;
@@ -72,9 +73,9 @@ private:
 
     // video
     QWidget *m_videoGrab;
+    QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
     QImage m_videoImage;
-    QImage m_videoInput;
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;
