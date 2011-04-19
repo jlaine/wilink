@@ -196,6 +196,10 @@ QXmppVideoFormat QVideoGrabber::format() const
     return fmt;
 }
 
+void QVideoGrabber::onFrameCaptured()
+{
+}
+
 bool QVideoGrabber::start()
 {
     if (!d->session && !d->open())

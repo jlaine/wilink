@@ -48,6 +48,9 @@ public:
 signals:
     void readyRead();
 
+private slots:
+    void onFrameCaptured();
+
 private:
     QVideoGrabberPrivate *d;
 };
