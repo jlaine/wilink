@@ -37,24 +37,7 @@ void Grabber::saveFrame()
         return;
     }
     qDebug("Grabbed frame %i x %i", frame.width(), frame.height());
-
-    // convert YUYV to RGB32
-    const int width = frame.width();
-    const int height = frame.height();
-    const int stride = frame.bytesPerLine();
-    const quint8 *row = frame.bits();
-    for (int y = 0; y < height; ++y) {
-        const quint8 *ptr = row;
-        for (int x = 0; x < width; x += 2) {
-            const float yp1 = *(ptr++);
-            const float cb = *(ptr++) - 128.0;
-            const float yp2 = *(ptr++);
-            const float cr = *(ptr++) - 128.0;
-            m_image.setPixel(x, y, YCBCR_to_RGB(yp1, cb, cr));
-            m_image.setPixel(x+1, y, YCBCR_to_RGB(yp2, cb, cr));
-        }
-        row += stride;
-    }
+    QVideoGrabber::frameToImage(&frame, &m_image);
     m_image.save(QString("foo_%1.png").arg(QString::number(m_count++)));
     if (m_count >= 10) {
         m_input->stop();
