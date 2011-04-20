@@ -108,7 +108,11 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     check = connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
                     this, SLOT(callStateChanged(QXmppCall::State)));
     Q_ASSERT(check);
-    
+
+    check = connect(m_call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
+                    this, SLOT(audioModeChanged(QIODevice::OpenMode)));
+    Q_ASSERT(check);
+
     check = connect(m_call, SIGNAL(videoModeChanged(QIODevice::OpenMode)),
                     this, SLOT(videoModeChanged(QIODevice::OpenMode)));
     Q_ASSERT(check);
@@ -127,6 +131,47 @@ CallWidget::~CallWidget()
     // stop tone
     if (m_soundId)
         wApp->soundPlayer()->stop(m_soundId);
+}
+
+void CallWidget::audioModeChanged(QIODevice::OpenMode mode)
+{
+    qDebug("audio mode changed %i", (int)mode);
+    QXmppRtpAudioChannel *channel = m_call->audioChannel();
+    QAudioFormat format = formatFor(channel->payloadType());
+
+#ifdef Q_OS_MAC
+    // 128ms at 8kHz
+    const int bufferSize = 2048 * format.channels();
+#else
+    // 160ms at 8kHz
+    const int bufferSize = 2560 * format.channels();
+#endif
+
+    // start or stop playback
+    const bool canRead = (mode & QIODevice::ReadOnly);
+    if (canRead && !m_audioOutput) {
+        m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
+        m_audioOutput->setBufferSize(bufferSize);
+        connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+        m_audioOutput->start(channel);
+    } else if (!canRead && m_audioOutput) {
+        m_audioOutput->stop();
+        delete m_audioOutput;
+        m_audioOutput = 0;
+    }
+
+    // start or stop capture
+    const bool canWrite = (mode & QIODevice::WriteOnly);
+    if (canWrite && !m_audioInput) {
+        m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
+        m_audioInput->setBufferSize(bufferSize);
+        connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+        m_audioInput->start(channel);
+    } else if (!canWrite && m_audioOutput) {
+        m_audioInput->stop();
+        delete m_audioInput;
+        m_audioInput = 0;
+    }
 }
 
 void CallWidget::audioStateChanged(QAudio::State state)
@@ -268,13 +313,15 @@ void CallWidget::setVideoGrab(QWidget *widget)
 
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 {
+    qDebug("video mode changed %i", (int)mode);
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
     if (!channel)
-        return;
-
-    qDebug("video mode changed %i", (int)mode);
+        mode = QIODevice::NotOpen;
     bool geometryChanged = false;
-    if (mode & QIODevice::ReadOnly) {
+
+    // start or stop playback
+    const bool canRead = (mode & QIODevice::ReadOnly);
+    if (canRead) {
         QSize size = channel->decoderFormat().frameSize();
         if (size != m_videoImage.size()) {
             m_videoImage = QImage(size, QImage::Format_RGB32);
@@ -285,21 +332,21 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 
         if (!m_videoTimer->isActive())
             m_videoTimer->start(1000 / 30);
+    } else {
+        m_videoTimer->stop();
     }
 
-    if (mode & QIODevice::WriteOnly) {
-        if (!m_videoGrabber) {
-            m_videoGrabber = new QVideoGrabber;
-            connect(m_videoGrabber, SIGNAL(readyRead()),
-                    this, SLOT(videoCapture()));
-            m_videoGrabber->start();
-        }
-    } else {
-        if (m_videoGrabber) {
-            m_videoGrabber->stop();
-            delete m_videoGrabber;
-            m_videoGrabber = 0;
-        }
+    // start or stop capture
+    const bool canWrite = (mode & QIODevice::WriteOnly);
+    if (canWrite && !m_videoGrabber) {
+        m_videoGrabber = new QVideoGrabber;
+        connect(m_videoGrabber, SIGNAL(readyRead()),
+                this, SLOT(videoCapture()));
+        m_videoGrabber->start();
+    } else if (!canWrite && m_videoGrabber) {
+        m_videoGrabber->stop();
+        delete m_videoGrabber;
+        m_videoGrabber = 0;
     }
     if (geometryChanged)
         updateGeometry();

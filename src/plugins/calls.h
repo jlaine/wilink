@@ -56,6 +56,7 @@ public:
     void setVideoGrab(QWidget *widget);
 
 private slots:
+    void audioModeChanged(QIODevice::OpenMode mode);
     void audioStateChanged(QAudio::State state);
     void callRinging();
     void callStateChanged(QXmppCall::State state);
