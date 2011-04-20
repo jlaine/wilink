@@ -228,50 +228,6 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         m_soundId = 0;
     }
 
-    // start or stop capture
-    if (state == QXmppCall::ActiveState)
-    {
-        QXmppRtpAudioChannel *channel = m_call->audioChannel();
-        QAudioFormat format = formatFor(channel->payloadType());
-
-#ifdef Q_OS_MAC
-        // 128ms at 8kHz
-        const int bufferSize = 2048 * format.channels();
-#else
-        // 160ms at 8kHz
-        const int bufferSize = 2560 * format.channels();
-#endif
-
-        if (!m_audioOutput)
-        {
-            m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
-            m_audioOutput->setBufferSize(bufferSize);
-            connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-            m_audioOutput->start(channel);
-        }
-
-        if (!m_audioInput)
-        {
-            m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
-            m_audioInput->setBufferSize(bufferSize);
-            connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-            m_audioInput->start(channel);
-        }
-    } else {
-        if (m_audioInput)
-        {
-            m_audioInput->stop();
-            delete m_audioInput;
-            m_audioInput = 0;
-        }
-        if (m_audioOutput)
-        {
-            m_audioOutput->stop();
-            delete m_audioOutput;
-            m_audioOutput = 0;
-        }
-    }
-
     // update status
     switch (state)
     {
