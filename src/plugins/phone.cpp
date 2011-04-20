@@ -102,6 +102,17 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
 
+    // selfcare message
+    QVBoxLayout *vbox = new QVBoxLayout;
+    selfcareMessage = new QLabel;
+    selfcareMessage->setFrameStyle(QFrame::Box);
+    selfcareMessage->setOpenExternalLinks(true);
+    selfcareMessage->setWordWrap(true);
+    selfcareMessage->hide();
+    vbox->addWidget(selfcareMessage);
+    layout->addLayout(vbox);
+
+    // calls buttons
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
     hbox->addWidget(numberEdit);
@@ -352,20 +363,31 @@ void PhonePanel::handleSettings()
     doc.setContent(reply);
     QDomElement settings = doc.documentElement();
 
-    // check service is activated
+    // parse settings from server
     const bool enabled = settings.firstChildElement("enabled").text() == "true";
+    const QString domain = settings.firstChildElement("domain").text();
     const QString username = settings.firstChildElement("username").text();
     const QString password = settings.firstChildElement("password").text();
     const QString number = settings.firstChildElement("number").text();
     const QString callsUrl = settings.firstChildElement("calls-url").text();
-    if (!enabled || password.isEmpty())
+    const QString selfcareUrl = settings.firstChildElement("selfcare-url").text();
+
+    // check service is activated
+    if (!enabled || domain.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        if (!selfcareUrl.isEmpty()) {
+            // show a message
+            selfcareMessage->setText(QString("<html>%1<br/><a href=\"%2\">%3</a></html>").arg(
+                                         tr("You can subscribe to the phone service at the following address:"), selfcareUrl, selfcareUrl));
+            selfcareMessage->show();
+            emit registerPanel();
+        }
         return;
+    }
 
     if (!number.isEmpty())
         setWindowExtra(tr("Your number is %1").arg(number));
 
     // connect to server
-    const QString domain = client->configuration().domain();
     if (sip->displayName() != number ||
         sip->domain() != domain ||
         sip->username() != username ||

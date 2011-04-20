@@ -673,6 +673,10 @@ Acceptez-vous?</translation>
         <source>Sorry, but the call could not be completed.</source>
         <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
     </message>
+    <message>
+        <source>You can subscribe to the phone service at the following address:</source>
+        <translation>Vous pouvez vous abonner à une offre qui inclut la téléphonie à l'adresse suivante :</translation>
+    </message>
 </context>
 <context>
     <name>PhotosPanel</name>
