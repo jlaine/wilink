@@ -30,6 +30,23 @@
 #include "QVideoGrabber.h"
 #include "QVideoGrabber_p.h"
 
+class AutoReleasePool
+{
+public:
+    AutoReleasePool()
+    {
+        pool = [[NSAutoreleasePool alloc] init];
+    }
+
+    ~AutoReleasePool()
+    {
+        [pool release];
+    }
+
+private:
+    NSAutoreleasePool *pool;
+};
+
 @interface QVideoGrabberDelegate : NSObject {
 @public
     int frameHeight;
@@ -69,6 +86,8 @@
 
 -(QXmppVideoFrame) readFrame
 {
+    AutoReleasePool pool;
+
     CVImageBufferRef buffer;
     @synchronized(self) {
         if (buffers.isEmpty())
@@ -128,7 +147,6 @@ public:
     QTCaptureDevice *device;
     QTCaptureDeviceInput *deviceInput;
     QTCaptureDecompressedVideoOutput *deviceOutput;
-    NSAutoreleasePool *pool;
     QTCaptureSession *session;
 
 private:
@@ -141,13 +159,14 @@ QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     device(0),
     deviceInput(0),
     deviceOutput(0),
-    pool(0),
     session(0)
 {
 }
 
 void QVideoGrabberPrivate::close()
 {
+    AutoReleasePool pool;
+
     if (session) {
         [session release];
         session = 0;
@@ -163,6 +182,8 @@ void QVideoGrabberPrivate::close()
 
 bool QVideoGrabberPrivate::open()
 {
+    AutoReleasePool pool;
+
     // create device
     device = [QTCaptureDevice defaultInputDeviceWithMediaType:QTMediaTypeVideo];
     if (!device)
@@ -210,8 +231,9 @@ bool QVideoGrabberPrivate::open()
 
 QVideoGrabber::QVideoGrabber()
 {
+    AutoReleasePool pool;
+
     d = new QVideoGrabberPrivate(this);
-    d->pool = [[NSAutoreleasePool alloc] init];
     d->delegate = [[QVideoGrabberDelegate alloc] init];
     d->delegate->q = this;
     d->delegate->frameWidth = 0;
@@ -226,7 +248,6 @@ QVideoGrabber::~QVideoGrabber()
     // close device
     d->close();
 
-    [d->pool release];
     delete d;
 }
 
@@ -249,6 +270,8 @@ void QVideoGrabber::onFrameCaptured()
 
 bool QVideoGrabber::start()
 {
+    AutoReleasePool pool;
+
     if (!d->session && !d->open())
         return false;
 
@@ -263,16 +286,18 @@ QVideoGrabber::State QVideoGrabber::state() const
 
 void QVideoGrabber::stop()
 {
+    AutoReleasePool pool;
+
     if (!d->session)
         return;
-     [d->session stopRunning];
+
+    [d->session stopRunning];
 }
 
 QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
 {
+    AutoReleasePool pool;
     QList<QVideoGrabberInfo> grabbers;
-
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     NSArray* devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
     for (QTCaptureDevice *device in devices) {
@@ -286,7 +311,6 @@ QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
         grabbers << grabber;
     }
 
-    [pool release];
     return grabbers;
 }
 
