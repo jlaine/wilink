@@ -299,9 +299,12 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
     m_layout->addItem(widget);
+    reposition();
     widget->appear();
 #if 0
     m_delay->start();
+#else
+    adjustSize();
 #endif
 }
 
