@@ -159,7 +159,7 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 }
 
 SipCallPrivate::SipCallPrivate(SipCall *qq)
-    : state(QXmppCall::OfferState),
+    : state(QXmppCall::ConnectingState),
     activeTime("0 0"),
     audioInput(0),
     audioInputMeter(0),
@@ -652,7 +652,7 @@ SipCall::~SipCall()
 
 void SipCall::accept()
 {
-    if (d->direction == QXmppCall::IncomingDirection && d->state == QXmppCall::OfferState)
+    if (d->direction == QXmppCall::IncomingDirection && d->state == QXmppCall::ConnectingState)
     {
 #if 0
         QByteArray rtcp;
@@ -686,8 +686,6 @@ void SipCall::accept()
         response.setHeaderField("Content-Type", "application/sdp");
         response.setBody(sdp.toByteArray());
         d->client->sendMessage(response);
-
-        d->setState(QXmppCall::ConnectingState);
     }
 }
 

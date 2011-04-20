@@ -203,7 +203,7 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
 
     PhoneCallsItem *item = m_items[row];
 
-    if (item->soundId && state != QXmppCall::OfferState) {
+    if (item->soundId && state != QXmppCall::ConnectingState) {
         wApp->soundPlayer()->stop(item->soundId);
         item->soundId = 0;
     }
@@ -301,7 +301,6 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         if (item->call) {
             switch (item->call->state())
             {
-            case QXmppCall::OfferState:
             case QXmppCall::ConnectingState:
                 return tr("Connecting..");
             case QXmppCall::ActiveState:

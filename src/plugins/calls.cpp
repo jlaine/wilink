@@ -209,8 +209,8 @@ void CallWidget::audioStateChanged(QAudio::State state)
 
 void CallWidget::callRinging()
 {
-    // we only want ring events in the "offer" state
-    if (m_call->state() != QXmppCall::OfferState)
+    // we only want ring events in the connecting state
+    if (m_call->state() != QXmppCall::ConnectingState)
         return;
 
     m_label->setText(tr("Ringing.."));
@@ -223,7 +223,7 @@ void CallWidget::callRinging()
 void CallWidget::callStateChanged(QXmppCall::State state)
 {
     // stop tone
-    if (m_soundId && state != QXmppCall::OfferState) {
+    if (m_soundId && state != QXmppCall::ConnectingState) {
         wApp->soundPlayer()->stop(m_soundId);
         m_soundId = 0;
     }
@@ -231,7 +231,6 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     // update status
     switch (state)
     {
-    case QXmppCall::OfferState:
     case QXmppCall::ConnectingState:
         m_label->setText(tr("Connecting.."));
         break;
