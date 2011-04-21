@@ -277,13 +277,9 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_delay->setInterval(100);
     m_delay->setSingleShot(true);
 
-    m_posAnimation = new QPropertyAnimation(this, "pos");
-    m_posAnimation->setEasingCurve(QEasingCurve::OutQuad);
-    m_posAnimation->setDuration(500);
-
-    m_sizeAnimation = new QPropertyAnimation(this, "size");
-    m_sizeAnimation->setEasingCurve(QEasingCurve::OutQuad);
-    m_sizeAnimation->setDuration(500);
+    m_animation = new QPropertyAnimation(this, "geometry");
+    m_animation->setEasingCurve(QEasingCurve::OutQuad);
+    m_animation->setDuration(500);
 
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(16, 8, 16, 8);
@@ -309,7 +305,6 @@ void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
     m_layout->addItem(widget);
     widget->appear();
-    trackView();
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
@@ -322,19 +317,22 @@ bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
 
 void ChatPanelBar::trackView()
 {
-    // position animation
+    // determine new geometry
     QPointF newPos = m_view->mapToScene(QPoint(0, 0));
-    m_posAnimation->setStartValue(pos());
-    m_posAnimation->setEndValue(newPos);
-    m_posAnimation->start();
-
-    // size animation
     QSizeF newSize = QGraphicsWidget::sizeHint(Qt::PreferredSize);
     newSize.setWidth(m_view->viewport()->width() - 1);
-    //qDebug("track from %f x %f to %f x %f", size().width(), size().height(), newSize.width(), newSize.height());
-    m_sizeAnimation->setStartValue(size());
-    m_sizeAnimation->setEndValue(newSize);
-    m_sizeAnimation->start();
+    QRectF newGeometry(newPos, newSize);
+
+    // animate geometry
+    m_animation->setStartValue(geometry());
+    m_animation->setEndValue(newGeometry);
+    m_animation->start();
+}
+
+void ChatPanelBar::updateGeometry()
+{
+    QGraphicsWidget::updateGeometry();
+    trackView();
 }
 
 ChatPanelButton::ChatPanelButton(QGraphicsItem *parent)

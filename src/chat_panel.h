@@ -98,13 +98,13 @@ public:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *Event);
+    void updateGeometry();
 
 private slots:
     void trackView();
 
 private:
-    QPropertyAnimation *m_posAnimation;
-    QPropertyAnimation *m_sizeAnimation;
+    QPropertyAnimation *m_animation;
     QTimer *m_delay;
     QGraphicsLinearLayout *m_layout;
     QGraphicsView *m_view;

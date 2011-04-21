@@ -76,7 +76,7 @@ void CallVideoWidget::present(const QXmppVideoFrame &frame)
 
 void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
 {
-    QSize size = format.frameSize();
+    const QSize size = format.frameSize();
     if (size != m_videoImage.size()) {
         m_videoImage = QImage(size, QImage::Format_RGB32);
         m_videoImage.fill(0);
@@ -309,7 +309,6 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         m_layout->insertItem(0, m_videoOutput);
         if (!m_videoTimer->isActive())
             m_videoTimer->start(1000 / 30);
-        updateGeometry();
     } else if (!canRead && m_videoOutput) {
         m_videoTimer->stop();
         delete m_videoOutput;
