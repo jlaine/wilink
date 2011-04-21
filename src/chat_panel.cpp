@@ -22,6 +22,8 @@
 #include <QDropEvent>
 #include <QGraphicsLinearLayout>
 #include <QGraphicsDropShadowEffect>
+#include <QGraphicsPathItem>
+#include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <QLabel>
@@ -29,6 +31,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QScrollBar>
+#include <QTextDocument>
 #include <QTimer>
 
 #include "chat_panel.h"
@@ -482,7 +485,7 @@ void ChatPanelText::setGeometry(const QRectF &rect)
 QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        return QSizeF(textWidth(), 24);
+        return document()->size();
     } else {
         return constraint;
     }
