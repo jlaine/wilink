@@ -280,7 +280,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_animation = new QPropertyAnimation(this, "size");
     m_animation->setEasingCurve(QEasingCurve::OutQuad);
 
-    m_layout = new QGraphicsLinearLayout;
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(16, 8, 16, 8);
     setLayout(m_layout);
     setOpacity(0.9);
@@ -327,7 +327,7 @@ void ChatPanelBar::trackView()
 {
     QSizeF newSize = QGraphicsWidget::sizeHint(Qt::PreferredSize);
     newSize.setWidth(m_view->viewport()->width() - 1);
-    qDebug("track from %f x %f to %f x %f", size().width(), size().height(), newSize.width(), newSize.height());
+    //qDebug("track from %f x %f to %f x %f", size().width(), size().height(), newSize.width(), newSize.height());
     m_animation->setDuration(500);
     m_animation->setStartValue(size());
     m_animation->setEndValue(newSize);

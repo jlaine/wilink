@@ -21,6 +21,7 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QFile>
+#include <QGraphicsLinearLayout>
 #include <QHostInfo>
 #include <QImage>
 #include <QLabel>
@@ -59,12 +60,50 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
     return format;
 }
 
+CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
+    : QGraphicsPixmapItem(parent)
+{
+    setGraphicsItem(this);
+}
+
+void CallVideoWidget::present(const QXmppVideoFrame &frame)
+{
+    if (!frame.isValid() || frame.size() != m_videoImage.size())
+        return;
+    QVideoGrabber::frameToImage(&frame, &m_videoImage);
+    setPixmap(QPixmap::fromImage(m_videoImage));
+}
+
+void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
+{
+    QSize size = format.frameSize();
+    if (size != m_videoImage.size()) {
+        m_videoImage = QImage(size, QImage::Format_RGB32);
+        m_videoImage.fill(0);
+        setPixmap(QPixmap::fromImage(m_videoImage));
+        updateGeometry();
+    }
+}
+
+QSizeF CallVideoWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        QSizeF hint = pixmap().size();
+        hint.setHeight(hint.height() + 16);
+        hint.setWidth(hint.width() + 16);
+        return hint;
+    } else {
+        return constraint;
+    }
+    return constraint;
+}
+
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
     : ChatPanelWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
-    m_videoGrab(0),
     m_videoGrabber(0),
+    m_videoOutput(0),
     m_call(call),
     m_soundId(0)
 {
@@ -90,8 +129,10 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     setIconPixmap(QPixmap(":/call.png"));
 
     // central widget
-    m_label = new ChatPanelText(tr("Connecting.."), this);
-    setCentralWidget(m_label);
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
+    m_label = new ChatPanelText(tr("Connecting.."));
+    m_layout->addItem(m_label);
+    setCentralWidget(m_layout);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -253,34 +294,26 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         QTimer::singleShot(1000, this, SLOT(disappear()));
 }
 
-void CallWidget::setVideoGrab(QWidget *widget)
-{
-    m_videoGrab = widget;
-}
-
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 {
     qDebug("video mode changed %i", (int)mode);
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
     if (!channel)
         mode = QIODevice::NotOpen;
-    bool geometryChanged = false;
 
     // start or stop playback
     const bool canRead = (mode & QIODevice::ReadOnly);
-    if (canRead) {
-        QSize size = channel->decoderFormat().frameSize();
-        if (size != m_videoImage.size()) {
-            m_videoImage = QImage(size, QImage::Format_RGB32);
-            m_videoImage.fill(0);
-            setIconPixmap(QPixmap::fromImage(m_videoImage));
-            geometryChanged = true;
-        }
-
+    if (canRead && !m_videoOutput) {
+        m_videoOutput = new CallVideoWidget;
+        m_videoOutput->setFormat(channel->decoderFormat());
+        m_layout->insertItem(0, m_videoOutput);
         if (!m_videoTimer->isActive())
             m_videoTimer->start(1000 / 30);
-    } else {
+        updateGeometry();
+    } else if (!canRead && m_videoOutput) {
         m_videoTimer->stop();
+        delete m_videoOutput;
+        m_videoOutput = 0;
     }
 
     // start or stop capture
@@ -295,8 +328,6 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         delete m_videoGrabber;
         m_videoGrabber = 0;
     }
-    if (geometryChanged)
-        updateGeometry();
 }
 
 void CallWidget::videoCapture()
@@ -357,19 +388,9 @@ void CallWidget::videoRefresh()
         return;
     }
 
-    bool geometryChanged = false;
-    foreach (const QXmppVideoFrame &frame, channel->readFrames()) {
-        if (!frame.isValid())
-            continue;
-        if (frame.size() != m_videoImage.size()) {
-            geometryChanged = true;
-            m_videoImage = QImage(frame.size(), QImage::Format_RGB32);
-        }
-        QVideoGrabber::frameToImage(&frame, &m_videoImage);
-        setIconPixmap(QPixmap::fromImage(m_videoImage));
-    }
-    if (geometryChanged)
-        updateGeometry();
+    QList<QXmppVideoFrame> frames = channel->readFrames();
+    if (!frames.isEmpty() && m_videoOutput)
+        m_videoOutput->present(frames.last());
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)
@@ -392,7 +413,6 @@ CallWatcher::~CallWatcher()
 void CallWatcher::addCall(QXmppCall *call)
 {
     CallWidget *widget = new CallWidget(call, m_window->rosterModel());
-    //widget->setVideoGrab(m_window);
     const QString bareJid = jidToBareJid(call->jid());
     QModelIndex index = m_window->rosterModel()->findItem(bareJid);
     if (index.isValid())

@@ -21,7 +21,7 @@
 #define __WILINK_CALLS_H__
 
 #include <QAudioInput>
-#include <QObject>
+#include <QGraphicsPixmapItem>
 #include <QWidget>
 
 #include "QXmppCallManager.h"
@@ -35,6 +35,7 @@ class QAbstractButton;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
+class QGraphicsLinearLayout;
 class QHostInfo;
 class QLabel;
 class QMenu;
@@ -43,7 +44,23 @@ class QTimer;
 class QVideoGrabber;
 class QXmppCall;
 class QXmppCallManager;
+class QXmppVideoFormat;
+class QXmppVideoFrame;
 class QXmppSrvInfo;
+
+class CallVideoWidget : public QGraphicsPixmapItem, public QGraphicsLayoutItem
+{
+public:
+    CallVideoWidget(QGraphicsItem *parent = 0);
+    void present(const QXmppVideoFrame &frame);
+    void setFormat(const QXmppVideoFormat &format);
+
+protected:
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+
+private:
+    QImage m_videoImage;
+};
 
 class CallWidget : public ChatPanelWidget
 {
@@ -52,7 +69,6 @@ class CallWidget : public ChatPanelWidget
 public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
     ~CallWidget();
-    void setVideoGrab(QWidget *widget);
 
 private slots:
     void audioModeChanged(QIODevice::OpenMode mode);
@@ -72,14 +88,14 @@ private:
     QAudioOutput *m_audioOutput;
 
     // video
-    QWidget *m_videoGrab;
     QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
-    QImage m_videoImage;
+    CallVideoWidget *m_videoOutput;
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;
     ChatPanelText *m_label;
+    QGraphicsLinearLayout *m_layout;
     int m_soundId;
 };
 
