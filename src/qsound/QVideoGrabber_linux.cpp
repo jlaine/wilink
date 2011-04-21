@@ -264,11 +264,6 @@ bool QVideoGrabber::start()
     return true;
 }
 
-QVideoGrabber::State QVideoGrabber::state() const
-{
-    return StoppedState;
-}
-
 void QVideoGrabber::stop()
 {
     disconnect(d->notifier, SIGNAL(activated(int)),
