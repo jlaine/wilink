@@ -10,6 +10,7 @@ generate_png(png
     call.svg
     call-incoming.svg
     call-outgoing.svg
+    camera.svg
     chat.svg
     close.svg
     contact-available.svg
