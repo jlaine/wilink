@@ -271,7 +271,7 @@ QPalette ChatPanel::palette()
     palette.setColor(QPalette::Button, QColor("#88BFE9"));
     palette.setColor(QPalette::Mid, QColor("#4A9DDD"));
     palette.setColor(QPalette::Dark, QColor("#2689D6"));
-    palette.setColor(QPalette::Shadow, QColor("#999999"));
+    palette.setColor(QPalette::Shadow, QColor("#aaaaaa"));
     palette.setColor(QPalette::ButtonText, QColor("#000000"));
     palette.setColor(QPalette::BrightText, QColor("#FFFFFF"));
 
@@ -295,7 +295,7 @@ QPalette ChatPanel::palette()
 ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     : m_view(view)
 {
-    QPalette palette = ChatPanel::palette();
+    const QPalette palette = ChatPanel::palette();
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
     effect->setColor(palette.color(QPalette::Shadow));
     effect->setOffset(0, 3);
@@ -314,7 +314,6 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
     m_layout->setContentsMargins(16, 8, 16, 8);
     setLayout(m_layout);
-    setOpacity(0.9);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     bool check;
@@ -369,14 +368,15 @@ ChatPanelButton::ChatPanelButton(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
     const QPalette palette = ChatPanel::palette();
-    QLinearGradient gradient(0, 0, 0, 32);
+    QLinearGradient gradient(0, 0, 0, 1);
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     gradient.setColorAt(0.2, palette.color(QPalette::Light));
     gradient.setColorAt(0.3, palette.color(QPalette::Midlight));
     gradient.setColorAt(0.7, palette.color(QPalette::Midlight));
     gradient.setColorAt(1, palette.color(QPalette::Button));
     m_path = new QGraphicsPathItem(this);
     m_path->setBrush(gradient);
-    m_path->setPen(QPen(palette.color(QPalette::Mid), 0.7));
+    m_path->setPen(QPen(palette.color(QPalette::Mid)));
     m_pixmap = new QGraphicsPixmapItem(this);
 }
 
@@ -386,7 +386,8 @@ void ChatPanelButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
         m_path->path().contains(event->pos()))
     {
         const QPalette palette = ChatPanel::palette();
-        QLinearGradient gradient(0, 0, 0, 32);
+        QLinearGradient gradient(0, 0, 0, 1);
+        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
         gradient.setColorAt(0.2, palette.color(QPalette::Button));
         gradient.setColorAt(0.3, palette.color(QPalette::Midlight));
         gradient.setColorAt(0.7, palette.color(QPalette::Midlight));
@@ -400,7 +401,8 @@ void ChatPanelButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void ChatPanelButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     const QPalette palette = ChatPanel::palette();
-    QLinearGradient gradient(0, 0, 0, 32);
+    QLinearGradient gradient(0, 0, 0, 1);
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     gradient.setColorAt(0.2, palette.color(QPalette::Light));
     gradient.setColorAt(0.3, palette.color(QPalette::Midlight));
     gradient.setColorAt(0.7, palette.color(QPalette::Midlight));
@@ -425,7 +427,7 @@ void ChatPanelButton::setGeometry(const QRectF &baseRect)
     rect.moveTop(0);
 
     QPainterPath buttonPath;
-    buttonPath.addRoundedRect(QRectF(5, 5, rect.width() - 10, rect.height() - 10),
+    buttonPath.addRoundedRect(QRectF(5.5, 5.5, rect.width() - 11, rect.height() - 11),
                               BORDER_RADIUS/2, BORDER_RADIUS/2);
     m_path->setPath(buttonPath);
 
@@ -500,12 +502,14 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     const QPalette palette = ChatPanel::palette();
 
     m_border = new QGraphicsPathItem(this);
-    QLinearGradient gradient(0, 0, 0, 32);
+    QLinearGradient gradient(0, 0, 0, 1);
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
     gradient.setColorAt(0, palette.color(QPalette::Light));
-    gradient.setColorAt(0.65, palette.color(QPalette::Button));
-    gradient.setColorAt(1, palette.color(QPalette::Midlight));
+    gradient.setColorAt(0.2, palette.color(QPalette::Midlight));
+    gradient.setColorAt(0.8, palette.color(QPalette::Midlight));
+    gradient.setColorAt(1, palette.color(QPalette::Light));
     m_border->setBrush(gradient);
-    m_border->setPen(QPen(palette.color(QPalette::Dark), 0.5));
+    m_border->setPen(QPen(palette.color(QPalette::Dark), 1));
 
     m_icon = new QGraphicsPixmapItem(this);
 }
