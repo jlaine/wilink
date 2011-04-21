@@ -675,7 +675,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>You can subscribe to the phone service at the following address:</source>
-        <translation>Vous pouvez vous abonner à une offre qui inclut la téléphonie à l'adresse suivante :</translation>
+        <translation>Vous pouvez vous abonner à une offre qui inclut la téléphonie à l&apos;adresse suivante :</translation>
     </message>
 </context>
 <context>
