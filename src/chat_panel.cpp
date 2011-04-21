@@ -34,7 +34,6 @@
 #include "chat_panel.h"
 
 #define BORDER_RADIUS 8
-#define BUTTON_WIDTH 48
 
 class ChatPanelPrivate
 {
@@ -450,7 +449,7 @@ void ChatPanelText::setGeometry(const QRectF &rect)
 QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        return QSizeF(128, 32);
+        return QSizeF(textWidth(), 24);
     } else {
         return constraint;
     }
@@ -543,7 +542,7 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     qreal left = BORDER_RADIUS;
     QSizeF pixmapSize = m_icon->pixmap().size();
     m_icon->setPos(left, (rect.height() - pixmapSize.height()) / 2);
-    left += pixmapSize.width() + BORDER_RADIUS;
+    left += pixmapSize.width();
 
     // position buttons
     qreal right = rect.right();
@@ -559,7 +558,8 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
 
     // position central widget
     if (m_centralWidget) {
-        QRectF geometry(left, rect.top(), right - left, rect.height());
+        QSizeF hint = m_centralWidget->effectiveSizeHint(Qt::PreferredSize);
+        QRectF geometry(left, rect.top() + (rect.height() - hint.height()) / 2, right - left, hint.height());
         m_centralWidget->setGeometry(geometry);
     }
 }
