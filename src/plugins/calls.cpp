@@ -137,7 +137,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_layout->addItem(m_videoOutput);
     m_label = new ChatPanelText(tr("Connecting.."), column);
     m_layout->addItem(m_label);
-    setCentralWidget(m_column);
+    setCentralWidget(column);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
