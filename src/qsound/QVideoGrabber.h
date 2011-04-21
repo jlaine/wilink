@@ -28,18 +28,12 @@ class QVideoGrabber : public QObject
     Q_OBJECT
 
 public:
-    enum State {
-        ActiveState = 0,
-        StoppedState = 2,
-    };
-
     QVideoGrabber();
     ~QVideoGrabber();
 
     QXmppVideoFrame currentFrame();
     QXmppVideoFormat format() const;
     bool start();
-    State state() const;
     void stop();
 
     static void frameToImage(const QXmppVideoFrame *frame, QImage *image);
