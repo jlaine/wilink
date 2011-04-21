@@ -426,9 +426,20 @@ QSizeF ChatPanelButton::sizeHint(Qt::SizeHint which, const QSizeF &constraint) c
 }
 
 ChatPanelText::ChatPanelText(const QString &text, QGraphicsItem *parent)
-    : QGraphicsSimpleTextItem(text, parent)
+    : QGraphicsTextItem(text, parent)
 {
     setGraphicsItem(this);
+}
+
+void ChatPanelText::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept();
+}
+
+void ChatPanelText::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    event->accept();
+    emit clicked();
 }
 
 void ChatPanelText::setGeometry(const QRectF &rect)
@@ -478,19 +489,11 @@ void ChatPanelWidget::appear()
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+/** Adds a button to the widget.
+ */
 void ChatPanelWidget::addButton(ChatPanelButton *button)
 {
     m_buttons << button;
-}
-
-/** Returns the rectangle holding the widget's contents.
- */
-QRectF ChatPanelWidget::contentsRect() const
-{
-    QRectF rect = geometry();
-    rect.moveTop(0);
-    rect.moveLeft(0);
-    return rect.adjusted(m_icon->x() + m_icon->pixmap().width(), 1, -BUTTON_WIDTH, -2);
 }
 
 /** Makes the widget disappear then deletes it.
@@ -505,19 +508,6 @@ void ChatPanelWidget::disappear()
     animation->start();
     connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
     animation->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-void ChatPanelWidget::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    event->accept();
-}
-
-void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    if (contentsRect().contains(event->pos()) &&
-             contentsRect().contains(event->buttonDownPos(Qt::LeftButton)))
-        emit contentsClicked();
-    event->accept();
 }
 
 /** Sets the given \a widget to be the panel widget's central widget.

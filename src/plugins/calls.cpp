@@ -214,7 +214,7 @@ void CallWidget::callRinging()
     if (m_call->state() != QXmppCall::ConnectingState)
         return;
 
-    m_label->setText(tr("Ringing.."));
+    m_label->setPlainText(tr("Ringing.."));
 
     // start outgoing tone
     if (!m_soundId)
@@ -233,17 +233,17 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     switch (state)
     {
     case QXmppCall::ConnectingState:
-        m_label->setText(tr("Connecting.."));
+        m_label->setPlainText(tr("Connecting.."));
         break;
     case QXmppCall::ActiveState:
-        m_label->setText(tr("Call connected."));
+        m_label->setPlainText(tr("Call connected."));
         break;
     case QXmppCall::DisconnectingState:
-        m_label->setText(tr("Disconnecting.."));
+        m_label->setPlainText(tr("Disconnecting.."));
         m_button->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
-        m_label->setText(tr("Call finished."));
+        m_label->setPlainText(tr("Call finished."));
         m_button->setEnabled(false);
         break;
     }

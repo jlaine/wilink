@@ -57,7 +57,6 @@ class ChatTransferWidget : public ChatPanelWidget
 
 public:
     ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent = 0);
-    void setGeometry(const QRectF &rect);
 
 private slots:
     void slotCancel();

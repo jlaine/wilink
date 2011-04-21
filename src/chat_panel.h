@@ -20,7 +20,7 @@
 #ifndef __WILINK_CHAT_PANEL_H__
 #define __WILINK_CHAT_PANEL_H__
 
-#include <QGraphicsSimpleTextItem>
+#include <QGraphicsTextItem>
 #include <QGraphicsWidget>
 #include <QFrame>
 #include <QList>
@@ -135,13 +135,21 @@ private:
     QGraphicsPixmapItem *m_pixmap;
 };
 
-class ChatPanelText : public QGraphicsSimpleTextItem, public QGraphicsLayoutItem
+class ChatPanelText : public QGraphicsTextItem, public QGraphicsLayoutItem
 {
+    Q_OBJECT
+    Q_INTERFACES(QGraphicsLayoutItem)
+
 public:
     ChatPanelText(const QString &text = QString(), QGraphicsItem *parent = 0);
     void setGeometry(const QRectF &rect);
 
+signals:
+    void clicked();
+
 protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 };
 
@@ -154,22 +162,16 @@ class ChatPanelWidget : public QGraphicsWidget
 
 public:
     ChatPanelWidget(QGraphicsItem *parent = 0);
-    QRectF contentsRect() const;
     virtual void setGeometry(const QRectF &rect);
     void addButton(ChatPanelButton *button);
     void setCentralWidget(QGraphicsLayoutItem *widget);
     void setIconPixmap(const QPixmap &pixmap);
-
-signals:
-    void contentsClicked();
 
 public slots:
     void appear();
     void disappear();
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private:

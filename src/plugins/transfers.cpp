@@ -22,9 +22,8 @@
 #include <QDropEvent>
 #include <QDir>
 #include <QFileDialog>
-#include <QGraphicsPixmapItem>
+#include <QGraphicsLinearLayout>
 #include <QGraphicsProxyWidget>
-#include <QGraphicsSimpleTextItem>
 #include <QLabel>
 #include <QHeaderView>
 #include <QLabel>
@@ -134,14 +133,20 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     m_button->setPixmap(QPixmap(":/close.png"));
     addButton(m_button);
 
-    m_label = new ChatPanelText(QString("%1 (%2)").arg(
-        m_job->fileName(),
-        sizeToString(job->fileSize())), this);
+    // central widget
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
 
     m_progress = new QProgressBar;
     m_progress->setMaximumHeight(PROGRESS_HEIGHT);
     m_progressProxy = new QGraphicsProxyWidget(this);
     m_progressProxy->setWidget(m_progress);
+    layout->addItem(m_progressProxy);
+
+    m_label = new ChatPanelText(QString("%1 (%2)").arg(
+        m_job->fileName(),
+        sizeToString(job->fileSize())), this);
+    layout->addItem(m_label);
+    setCentralWidget(layout);
 
     // connect signals
     bool check;
@@ -149,7 +154,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
                     this, SLOT(slotCancel()));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(contentsClicked()),
+    check = connect(m_label, SIGNAL(clicked()),
                     this, SLOT(slotOpen()));
     Q_ASSERT(check);
 
@@ -164,24 +169,6 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     check = connect(m_job, SIGNAL(progress(qint64, qint64)),
                     this, SLOT(slotProgress(qint64, qint64)));
     Q_ASSERT(check);
-}
-
-void ChatTransferWidget::setGeometry(const QRectF &rect)
-{
-    ChatPanelWidget::setGeometry(rect);
-    QRectF contents = contentsRect();
-    if (m_progressProxy->isVisible())
-    {
-        QPointF progressTop;
-        QRectF progress(contents);
-        progress.setTop(contents.bottom() - PROGRESS_HEIGHT);
-        progress.setHeight(PROGRESS_HEIGHT);
-        m_progressProxy->setGeometry(progress);
-
-        contents.setBottom(progress.top());
-    }
-    m_label->setPos(contents.left(), contents.top() +
-        (contents.height() - m_label->boundingRect().height()) / 2);
 }
 
 void ChatTransferWidget::slotCancel()
