@@ -52,7 +52,6 @@ class CallWidget : public ChatPanelWidget
 public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
     ~CallWidget();
-    void setGeometry(const QRectF &rect);
     void setVideoGrab(QWidget *widget);
 
 private slots:
@@ -80,7 +79,7 @@ private:
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;
-    QGraphicsSimpleTextItem *m_label;
+    ChatPanelText *m_label;
     int m_soundId;
 };
 

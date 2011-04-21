@@ -21,8 +21,6 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QFile>
-#include <QGraphicsPixmapItem>
-#include <QGraphicsSimpleTextItem>
 #include <QHostInfo>
 #include <QImage>
 #include <QLabel>
@@ -90,7 +88,10 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     addButton(m_button);
 
     setIconPixmap(QPixmap(":/call.png"));
-    m_label = new QGraphicsSimpleTextItem(tr("Connecting.."), this);
+
+    // central widget
+    m_label = new ChatPanelText(tr("Connecting.."), this);
+    setCentralWidget(m_label);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -250,15 +251,6 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     // make widget disappear
     if (state == QXmppCall::FinishedState)
         QTimer::singleShot(1000, this, SLOT(disappear()));
-}
-
-void CallWidget::setGeometry(const QRectF &rect)
-{
-    ChatPanelWidget::setGeometry(rect);
-
-    QRectF contents = contentsRect();
-    m_label->setPos(contents.left(), contents.top() +
-        (contents.height() - m_label->boundingRect().height()) / 2);
 }
 
 void CallWidget::setVideoGrab(QWidget *widget)

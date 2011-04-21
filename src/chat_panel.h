@@ -20,6 +20,7 @@
 #ifndef __WILINK_CHAT_PANEL_H__
 #define __WILINK_CHAT_PANEL_H__
 
+#include <QGraphicsSimpleTextItem>
 #include <QGraphicsWidget>
 #include <QFrame>
 #include <QList>
@@ -132,6 +133,15 @@ protected:
 private:
     QGraphicsPathItem *m_path;
     QGraphicsPixmapItem *m_pixmap;
+};
+
+class ChatPanelText : public QGraphicsSimpleTextItem, public QGraphicsLayoutItem
+{
+public:
+    ChatPanelText(const QString &text = QString(), QGraphicsItem *parent = 0);
+
+protected:
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 };
 
 /** ChatPanelWidget is the base class for "task" widgets displayed inside

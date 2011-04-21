@@ -134,7 +134,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     m_button->setPixmap(QPixmap(":/close.png"));
     addButton(m_button);
 
-    m_label = new QGraphicsSimpleTextItem(QString("%1 (%2)").arg(
+    m_label = new ChatPanelText(QString("%1 (%2)").arg(
         m_job->fileName(),
         sizeToString(job->fileSize())), this);
 

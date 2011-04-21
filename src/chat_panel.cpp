@@ -425,6 +425,21 @@ QSizeF ChatPanelButton::sizeHint(Qt::SizeHint which, const QSizeF &constraint) c
     }
 }
 
+ChatPanelText::ChatPanelText(const QString &text, QGraphicsItem *parent)
+    : QGraphicsSimpleTextItem(text, parent)
+{
+    setGraphicsItem(this);
+}
+
+QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        return QSizeF(128, 32);
+    } else {
+        return constraint;
+    }
+}
+
 /** Creates a new ChatPanelWidget instance.
  *
  * @param parent
