@@ -33,8 +33,8 @@
 
 #include "chat_panel.h"
 
-#define BUTTON_WIDTH 48
 #define BORDER_RADIUS 8
+#define BUTTON_WIDTH 48
 
 class ChatPanelPrivate
 {
@@ -356,35 +356,6 @@ ChatPanelButton::ChatPanelButton(QGraphicsItem *parent)
     m_pixmap = new QGraphicsPixmapItem(this);
 }
 
-
-/** Updates the widget geometry.
- */
-void ChatPanelButton::setGeometry(const QRectF &baseRect)
-{
-    QGraphicsWidget::setGeometry(baseRect);
-
-    QRectF rect(baseRect);
-    rect.moveLeft(0);
-    rect.moveTop(0);
-
-    QPainterPath buttonPath;
-    buttonPath.addRoundedRect(QRectF(0.5, 0.5,
-        rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
-    m_path->setPath(buttonPath);
-
-    const QSizeF pixmapSize = m_pixmap->pixmap().size();
-    m_pixmap->setPos(
-        (rect.width() - pixmapSize.width()) / 2,
-        (rect.height() - pixmapSize.height()) / 2);
-}
-
-/** Sets the widget's button pixmap.
- */
-void ChatPanelButton::setPixmap(const QPixmap &pixmap)
-{
-    m_pixmap->setPixmap(pixmap.scaledToWidth(BUTTON_WIDTH/2, Qt::SmoothTransformation));
-}
-
 void ChatPanelButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (isEnabled() &&
@@ -413,12 +384,54 @@ void ChatPanelButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
+/** Updates the widget geometry.
+ */
+void ChatPanelButton::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    QRectF rect(baseRect);
+    rect.moveLeft(0);
+    rect.moveTop(0);
+
+    QPainterPath buttonPath;
+    buttonPath.addRoundedRect(QRectF(0.5, 0.5,
+        rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
+    m_path->setPath(buttonPath);
+
+    const QSizeF pixmapSize = m_pixmap->pixmap().size();
+    m_pixmap->setPos(
+        (rect.width() - pixmapSize.width()) / 2,
+        (rect.height() - pixmapSize.height()) / 2);
+}
+
+/** Sets the widget's button pixmap.
+ */
+void ChatPanelButton::setPixmap(const QPixmap &pixmap)
+{
+    m_pixmap->setPixmap(pixmap.scaledToWidth(24, Qt::SmoothTransformation));
+    updateGeometry();
+}
+
+QSizeF ChatPanelButton::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        QSizeF hint = m_pixmap->pixmap().size();
+        hint.setHeight(hint.height() + 16);
+        hint.setWidth(hint.width() + 16);
+        return hint;
+    } else {
+        return constraint;
+    }
+}
+
 /** Creates a new ChatPanelWidget instance.
  *
  * @param parent
  */
 ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
+    : QGraphicsWidget(parent),
+    m_centralWidget(0)
 {
     const QPalette palette = QApplication::palette();
 
@@ -487,6 +500,20 @@ void ChatPanelWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     event->accept();
 }
 
+/** Sets the given \a widget to be the panel widget's central widget.
+ *
+ * @param widget
+ */
+void ChatPanelWidget::setCentralWidget(QGraphicsLayoutItem *widget)
+{
+    if (m_centralWidget) {
+        qWarning("ChatPanelWidget already has a central widget");
+        return;
+    }
+    m_centralWidget = widget;
+    updateGeometry();
+}
+
 /** Updates the widget geometry.
  */
 void ChatPanelWidget::setGeometry(const QRectF &baseRect)
@@ -497,18 +524,33 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     rect.moveLeft(0);
     rect.moveTop(0);
 
+    // position border
     QPainterPath path;
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
+    // position icon
+    qreal left = BORDER_RADIUS;
     QSizeF pixmapSize = m_icon->pixmap().size();
-    m_icon->setPos(10, (rect.height() - pixmapSize.height()) / 2);
+    m_icon->setPos(left, (rect.height() - pixmapSize.height()) / 2);
+    left += pixmapSize.width();
 
-    QRectF buttonRect(rect.width() - m_buttons.size() * BUTTON_WIDTH, 0,
-        BUTTON_WIDTH, rect.height());
-    foreach (ChatPanelButton *button, m_buttons) {
-        button->setGeometry(buttonRect);
-        buttonRect.moveLeft(buttonRect.left() + BUTTON_WIDTH);
+    // position buttons
+    qreal right = rect.right();
+    for (int i = m_buttons.size() - 1; i >= 0; --i) {
+        QGraphicsLayoutItem *button = m_buttons.at(i);
+        QRectF geometry;
+        geometry.setSize(button->effectiveSizeHint(Qt::PreferredSize));
+        geometry.moveRight(right);
+        geometry.moveTop(rect.top());
+        button->setGeometry(geometry);
+        right -= geometry.width();
+    }
+
+    // position central widget
+    if (m_centralWidget) {
+        QRectF geometry(left, rect.top(), right - left, rect.height());
+        m_centralWidget->setGeometry(geometry);
     }
 }
 
@@ -521,20 +563,24 @@ void ChatPanelWidget::setIconPixmap(const QPixmap &pixmap)
 
 QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
 {
-    switch (which)
-    {
-        case Qt::MinimumSize:
-        case Qt::PreferredSize:
-        {
-            QSizeF size = m_icon->pixmap().size();
-            size.setHeight(size.height() + 4);
-            foreach (ChatPanelButton *button, m_buttons)
-                size.setWidth(size.width() + BUTTON_WIDTH);
-            return size;
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        QSizeF hint = m_icon->pixmap().size();
+        hint.setHeight(hint.height() + BORDER_RADIUS);
+        if (m_centralWidget) {
+            QSizeF size = m_centralWidget->effectiveSizeHint(which);
+            hint.setWidth(hint.width() + size.width());
+            if (size.height() > hint.height())
+                hint.setHeight(size.height());
         }
-        default:
-            return constraint;
+        foreach (ChatPanelButton *button, m_buttons) {
+            QSizeF size = button->effectiveSizeHint(which);
+            hint.setWidth(hint.width() + size.width());
+            if (size.height() > hint.height())
+                hint.setHeight(size.height());
+        }
+        return hint;
+    } else {
+        return constraint;
     }
-
 }
 

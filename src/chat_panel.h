@@ -99,10 +99,8 @@ protected:
     bool eventFilter(QObject *watched, QEvent *Event);
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
-public slots:
-    void reposition();
-
 private slots:
+    void reposition();
     void trackView();
 
 private:
@@ -112,6 +110,8 @@ private:
     QGraphicsView *m_view;
 };
 
+/** The ChatPanelButton class represents a button in a ChatPanelWidget.
+ */
 class ChatPanelButton : public QGraphicsWidget
 {
     Q_OBJECT
@@ -127,6 +127,7 @@ signals:
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private:
     QGraphicsPathItem *m_path;
@@ -134,7 +135,7 @@ private:
 };
 
 /** ChatPanelWidget is the base class for "task" widgets displayed inside
- *  a ChatPanel.
+ *  a ChatPanelBar.
  */
 class ChatPanelWidget : public QGraphicsWidget
 {
@@ -145,6 +146,7 @@ public:
     QRectF contentsRect() const;
     virtual void setGeometry(const QRectF &rect);
     void addButton(ChatPanelButton *button);
+    void setCentralWidget(QGraphicsLayoutItem *widget);
     void setIconPixmap(const QPixmap &pixmap);
 
 signals:
@@ -161,6 +163,7 @@ protected:
 
 private:
     QGraphicsPathItem *m_border;
+    QGraphicsLayoutItem *m_centralWidget;
     QGraphicsPixmapItem *m_icon;
     QList<ChatPanelButton*> m_buttons;
 };
