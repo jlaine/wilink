@@ -100,11 +100,11 @@ protected:
     bool eventFilter(QObject *watched, QEvent *Event);
 
 private slots:
-    void reposition();
     void trackView();
 
 private:
-    QPropertyAnimation *m_animation;
+    QPropertyAnimation *m_posAnimation;
+    QPropertyAnimation *m_sizeAnimation;
     QTimer *m_delay;
     QGraphicsLinearLayout *m_layout;
     QGraphicsView *m_view;

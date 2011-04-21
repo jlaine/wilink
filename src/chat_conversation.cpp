@@ -161,10 +161,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 #ifndef USE_DECLARATIVE
     view->scene()->addItem(d->panelBar);
 #endif
-    check = connect(view->scene(), SIGNAL(sceneRectChanged(QRectF)),
-                    d->panelBar, SLOT(reposition()));
-    Q_ASSERT(check);
-
     layout->addWidget(view, 1);
     filterDrops(view->viewport());
 
