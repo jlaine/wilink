@@ -61,26 +61,26 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 }
 
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
-    : QGraphicsPixmapItem(parent)
+    : QGraphicsWidget(parent)
 {
-    setGraphicsItem(this);
+    m_pixmap = new QGraphicsPixmapItem(this);
 }
 
 void CallVideoWidget::present(const QXmppVideoFrame &frame)
 {
-    if (!frame.isValid() || frame.size() != m_videoImage.size())
+    if (!frame.isValid() || frame.size() != m_image.size())
         return;
-    QVideoGrabber::frameToImage(&frame, &m_videoImage);
-    setPixmap(QPixmap::fromImage(m_videoImage));
+    QVideoGrabber::frameToImage(&frame, &m_image);
+    m_pixmap->setPixmap(QPixmap::fromImage(m_image));
 }
 
 void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
 {
     const QSize size = format.frameSize();
-    if (size != m_videoImage.size()) {
-        m_videoImage = QImage(size, QImage::Format_RGB32);
-        m_videoImage.fill(0);
-        setPixmap(QPixmap::fromImage(m_videoImage));
+    if (size != m_image.size()) {
+        m_image = QImage(size, QImage::Format_RGB32);
+        m_image.fill(0);
+        m_pixmap->setPixmap(QPixmap::fromImage(m_image));
         updateGeometry();
     }
 }
@@ -88,10 +88,7 @@ void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
 QSizeF CallVideoWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        QSizeF hint = pixmap().size();
-        hint.setHeight(hint.height() + 16);
-        hint.setWidth(hint.width() + 16);
-        return hint;
+        return m_image.size();
     } else {
         return constraint;
     }
@@ -311,10 +308,12 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     if (canRead && !m_videoTimer->isActive()) {
         m_videoOutput->setFormat(channel->decoderFormat());
         m_videoOutput->show();
-        m_videoTimer->start(1000 / 20);
+        m_videoTimer->start(1000 / 30);
+        updateGeometry();
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
         m_videoOutput->hide();
+        updateGeometry();
     }
 
     // start or stop capture

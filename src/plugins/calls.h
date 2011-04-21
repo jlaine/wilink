@@ -48,7 +48,7 @@ class QXmppVideoFormat;
 class QXmppVideoFrame;
 class QXmppSrvInfo;
 
-class CallVideoWidget : public QGraphicsPixmapItem, public QGraphicsLayoutItem
+class CallVideoWidget : public QGraphicsWidget
 {
 public:
     CallVideoWidget(QGraphicsItem *parent = 0);
@@ -59,7 +59,8 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private:
-    QImage m_videoImage;
+    QImage m_image;
+    QGraphicsPixmapItem *m_pixmap;
 };
 
 class CallWidget : public ChatPanelWidget
