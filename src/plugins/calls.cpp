@@ -28,6 +28,7 @@
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPushButton>
 #include <QTimer>
 
@@ -63,7 +64,16 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
-    m_pixmap = new QGraphicsPixmapItem(this);
+}
+
+QRectF CallVideoWidget::boundingRect() const
+{
+    return m_boundingRect;
+}
+
+void CallVideoWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    painter->drawImage(m_boundingRect, m_image);
 }
 
 void CallVideoWidget::present(const QXmppVideoFrame &frame)
@@ -71,16 +81,16 @@ void CallVideoWidget::present(const QXmppVideoFrame &frame)
     if (!frame.isValid() || frame.size() != m_image.size())
         return;
     QVideoGrabber::frameToImage(&frame, &m_image);
-    m_pixmap->setPixmap(QPixmap::fromImage(m_image));
+    update(m_boundingRect);
 }
 
 void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
 {
     const QSize size = format.frameSize();
     if (size != m_image.size()) {
+        m_boundingRect = QRectF(QPointF(0, 0), size);
         m_image = QImage(size, QImage::Format_RGB32);
         m_image.fill(0);
-        m_pixmap->setPixmap(QPixmap::fromImage(m_image));
         updateGeometry();
     }
 }
