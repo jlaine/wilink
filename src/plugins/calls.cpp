@@ -115,7 +115,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     const QStringList videoJids = rosterModel->contactFeaturing(m_call->jid(), ChatRosterModel::VideoFeature);
     if (videoJids.contains(m_call->jid())) {
         ChatPanelButton *videoButton = new ChatPanelButton(this);
-        videoButton->setPixmap(QPixmap(":/photos.png"));
+        videoButton->setPixmap(QPixmap(":/camera.png"));
         addButton(videoButton);
         connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
     }
