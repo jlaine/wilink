@@ -284,6 +284,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_layout->setContentsMargins(16, 8, 16, 8);
     setLayout(m_layout);
     setOpacity(0.9);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     bool check;
     check = connect(m_view->verticalScrollBar(), SIGNAL(valueChanged(int)),
@@ -297,49 +298,36 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 
 void ChatPanelBar::addWidget(ChatPanelWidget *widget)
 {
-    m_layout->addItem(widget);
     reposition();
+    m_layout->addItem(widget);
     widget->appear();
-#if 0
-    m_delay->start();
-#else
-    adjustSize();
-#endif
+    trackView();
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched == m_view->viewport() && event->type() == QEvent::Resize)
     {
-#if 0
+        reposition();
         if (m_animation->state() == QAbstractAnimation::Running)
             trackView();
         else
             m_delay->start();
-#else
-        updateGeometry();
-#endif
+        //updateGeometry();
     }
     return false;
 }
 
 void ChatPanelBar::reposition()
 {
-    if (m_layout->count())
-        setPos(m_view->mapToScene(QPoint(0, 0)));
-}
-
-QSizeF ChatPanelBar::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-{
-    QSizeF size = QGraphicsWidget::sizeHint(which, constraint);
-    size.setWidth(m_view->viewport()->width() - 1);
-    return size;
+    setPos(m_view->mapToScene(QPoint(0, 0)));
 }
 
 void ChatPanelBar::trackView()
 {
-    reposition();
-    QSizeF newSize = sizeHint(Qt::PreferredSize);
+    QSizeF newSize = QGraphicsWidget::sizeHint(Qt::PreferredSize);
+    newSize.setWidth(m_view->viewport()->width() - 1);
+    qDebug("track from %f x %f to %f x %f", size().width(), size().height(), newSize.width(), newSize.height());
     m_animation->setDuration(500);
     m_animation->setStartValue(size());
     m_animation->setEndValue(newSize);
@@ -463,6 +451,9 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     m_centralWidget(0)
 {
+    // widget starts transparent, use appear() to show it
+    setOpacity(0.0);
+
     const QPalette palette = QApplication::palette();
 
     m_border = new QGraphicsPathItem(this);
