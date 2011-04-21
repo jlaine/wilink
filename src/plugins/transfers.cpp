@@ -134,7 +134,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     addButton(m_button);
 
     // central widget
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical, this);
 
     m_progress = new QProgressBar;
     m_progress->setMaximumHeight(PROGRESS_HEIGHT);
