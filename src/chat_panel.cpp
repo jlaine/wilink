@@ -431,6 +431,11 @@ ChatPanelText::ChatPanelText(const QString &text, QGraphicsItem *parent)
     setGraphicsItem(this);
 }
 
+void ChatPanelText::setGeometry(const QRectF &rect)
+{
+    setPos(rect.topLeft());
+}
+
 QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
@@ -548,7 +553,7 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     qreal left = BORDER_RADIUS;
     QSizeF pixmapSize = m_icon->pixmap().size();
     m_icon->setPos(left, (rect.height() - pixmapSize.height()) / 2);
-    left += pixmapSize.width();
+    left += pixmapSize.width() + BORDER_RADIUS;
 
     // position buttons
     qreal right = rect.right();
@@ -580,7 +585,7 @@ QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) 
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
         QSizeF hint = m_icon->pixmap().size();
-        hint.setHeight(hint.height() + BORDER_RADIUS);
+        hint.setWidth(hint.width() + 2 * BORDER_RADIUS);
         if (m_centralWidget) {
             QSizeF size = m_centralWidget->effectiveSizeHint(which);
             hint.setWidth(hint.width() + size.width());

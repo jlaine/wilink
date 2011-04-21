@@ -139,6 +139,7 @@ class ChatPanelText : public QGraphicsSimpleTextItem, public QGraphicsLayoutItem
 {
 public:
     ChatPanelText(const QString &text = QString(), QGraphicsItem *parent = 0);
+    void setGeometry(const QRectF &rect);
 
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
