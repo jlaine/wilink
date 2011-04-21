@@ -260,6 +260,34 @@ void ChatPanel::sendNotifications()
     }
 }
 
+/** Create a custom palette for chat panel */
+QPalette ChatPanel::palette()
+{
+    QPalette palette;
+
+    // colors for active and inactive content
+    palette.setColor(QPalette::Light, QColor("#E7F4FE"));
+    palette.setColor(QPalette::Midlight, QColor("#BFDDF4"));
+    palette.setColor(QPalette::Button, QColor("#88BFE9"));
+    palette.setColor(QPalette::Mid, QColor("#4A9DDD"));
+    palette.setColor(QPalette::Dark, QColor("#2689D6"));
+    palette.setColor(QPalette::Shadow, QColor("#999999"));
+    palette.setColor(QPalette::ButtonText, QColor("#000000"));
+    palette.setColor(QPalette::BrightText, QColor("#FFFFFF"));
+
+    // colors for disabled content
+    palette.setColor(QPalette::Disabled, QPalette::Light, QColor("#F5FAFE"));
+    palette.setColor(QPalette::Disabled, QPalette::Midlight, QColor("#E5F1FA"));
+    palette.setColor(QPalette::Disabled, QPalette::Button, QColor("#CFE5F6"));
+    palette.setColor(QPalette::Disabled, QPalette::Mid, QColor("#B6D7F1"));
+    palette.setColor(QPalette::Disabled, QPalette::Dark, QColor("#A8CFEE"));
+    palette.setColor(QPalette::Disabled, QPalette::Shadow, QColor("#D6D6D6"));
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, QColor("#999999"));
+    palette.setColor(QPalette::Disabled, QPalette::BrightText, QColor("#FFFFFF"));
+
+    return palette;
+}
+
 /** Creates a new ChatPanelBar instance.
  *
  * @param view
@@ -267,8 +295,10 @@ void ChatPanel::sendNotifications()
 ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     : m_view(view)
 {
+    QPalette palette = ChatPanel::palette();
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
-    effect->setOffset(5, 5);
+    effect->setColor(palette.color(QPalette::Shadow));
+    effect->setOffset(0, 3);
     effect->setBlurRadius(10);
     setGraphicsEffect(effect);
     m_view->viewport()->installEventFilter(this);
@@ -338,9 +368,15 @@ void ChatPanelBar::updateGeometry()
 ChatPanelButton::ChatPanelButton(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
-    const QPalette palette = QApplication::palette();
+    const QPalette palette = ChatPanel::palette();
+    QLinearGradient gradient(0, 0, 0, 32);
+    gradient.setColorAt(0.2, palette.color(QPalette::Light));
+    gradient.setColorAt(0.3, palette.color(QPalette::Midlight));
+    gradient.setColorAt(0.7, palette.color(QPalette::Midlight));
+    gradient.setColorAt(1, palette.color(QPalette::Button));
     m_path = new QGraphicsPathItem(this);
-    m_path->setPen(QPen(palette.color(QPalette::Shadow), 1));
+    m_path->setBrush(gradient);
+    m_path->setPen(QPen(palette.color(QPalette::Mid), 0.7));
     m_pixmap = new QGraphicsPixmapItem(this);
 }
 
@@ -349,22 +385,28 @@ void ChatPanelButton::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (isEnabled() &&
         m_path->path().contains(event->pos()))
     {
-        const QPalette palette = QApplication::palette();
+        const QPalette palette = ChatPanel::palette();
         QLinearGradient gradient(0, 0, 0, 32);
-        gradient.setColorAt(0, palette.color(QPalette::Button));
-        gradient.setColorAt(0.6, palette.color(QPalette::Mid));
-        gradient.setColorAt(1, palette.color(QPalette::Dark));
+        gradient.setColorAt(0.2, palette.color(QPalette::Button));
+        gradient.setColorAt(0.3, palette.color(QPalette::Midlight));
+        gradient.setColorAt(0.7, palette.color(QPalette::Midlight));
+        gradient.setColorAt(1, palette.color(QPalette::Light));
         m_path->setBrush(gradient);
-        m_pixmap->setOffset(0, 2);
+        m_path->setPen(QPen(palette.color(QPalette::Dark), 0.5));
     }
     event->accept();
 }
 
 void ChatPanelButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    const QPalette palette = QApplication::palette();
-    m_path->setBrush(Qt::NoBrush);
-    m_pixmap->setOffset(0, 0);
+    const QPalette palette = ChatPanel::palette();
+    QLinearGradient gradient(0, 0, 0, 32);
+    gradient.setColorAt(0.2, palette.color(QPalette::Light));
+    gradient.setColorAt(0.3, palette.color(QPalette::Midlight));
+    gradient.setColorAt(0.7, palette.color(QPalette::Midlight));
+    gradient.setColorAt(1, palette.color(QPalette::Button));
+    m_path->setBrush(gradient);
+    m_path->setPen(QPen(palette.color(QPalette::Mid), 0.7));
     if (isEnabled() &&
         m_path->path().contains(event->pos()) &&
         m_path->path().contains(event->buttonDownPos(Qt::LeftButton)))
@@ -383,8 +425,8 @@ void ChatPanelButton::setGeometry(const QRectF &baseRect)
     rect.moveTop(0);
 
     QPainterPath buttonPath;
-    buttonPath.addRoundedRect(QRectF(0.5, 0.5,
-        rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
+    buttonPath.addRoundedRect(QRectF(5, 5, rect.width() - 10, rect.height() - 10),
+                              BORDER_RADIUS/2, BORDER_RADIUS/2);
     m_path->setPath(buttonPath);
 
     const QSizeF pixmapSize = m_pixmap->pixmap().size();
@@ -455,15 +497,15 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     // widget starts transparent, use appear() to show it
     setOpacity(0.0);
 
-    const QPalette palette = QApplication::palette();
+    const QPalette palette = ChatPanel::palette();
 
     m_border = new QGraphicsPathItem(this);
     QLinearGradient gradient(0, 0, 0, 32);
     gradient.setColorAt(0, palette.color(QPalette::Light));
-    gradient.setColorAt(0.6, palette.color(QPalette::Button));
-    gradient.setColorAt(1, palette.color(QPalette::Mid));
+    gradient.setColorAt(0.65, palette.color(QPalette::Button));
+    gradient.setColorAt(1, palette.color(QPalette::Midlight));
     m_border->setBrush(gradient);
-    m_border->setPen(QPen(palette.color(QPalette::Shadow), 1));
+    m_border->setPen(QPen(palette.color(QPalette::Dark), 0.5));
 
     m_icon = new QGraphicsPixmapItem(this);
 }
