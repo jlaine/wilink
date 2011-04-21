@@ -95,7 +95,6 @@ QSizeF CallVideoWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) c
     } else {
         return constraint;
     }
-    return constraint;
 }
 
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
@@ -129,10 +128,16 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     setIconPixmap(QPixmap(":/call.png"));
 
     // central widget
-    m_layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-    m_label = new ChatPanelText(tr("Connecting.."));
+    QGraphicsWidget *column = new QGraphicsWidget(this);
+    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
+    m_layout->setContentsMargins(8, 8, 8, 8);
+    m_layout->setSpacing(0);
+    column->setLayout(m_layout);
+    m_videoOutput = new CallVideoWidget(column);
+    m_layout->addItem(m_videoOutput);
+    m_label = new ChatPanelText(tr("Connecting.."), column);
     m_layout->addItem(m_label);
-    setCentralWidget(m_layout);
+    setCentralWidget(m_column);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -303,16 +308,13 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 
     // start or stop playback
     const bool canRead = (mode & QIODevice::ReadOnly);
-    if (canRead && !m_videoOutput) {
-        m_videoOutput = new CallVideoWidget;
+    if (canRead && !m_videoTimer->isActive()) {
         m_videoOutput->setFormat(channel->decoderFormat());
-        m_layout->insertItem(0, m_videoOutput);
-        if (!m_videoTimer->isActive())
-            m_videoTimer->start(1000 / 30);
-    } else if (!canRead && m_videoOutput) {
+        m_videoOutput->show();
+        m_videoTimer->start(1000 / 20);
+    } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
-        delete m_videoOutput;
-        m_videoOutput = 0;
+        m_videoOutput->hide();
     }
 
     // start or stop capture
@@ -382,10 +384,8 @@ void CallWidget::videoCapture()
 void CallWidget::videoRefresh()
 {
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
-    if (!channel) {
-        m_videoTimer->stop();
+    if (!channel)
         return;
-    }
 
     QList<QXmppVideoFrame> frames = channel->readFrames();
     if (!frames.isEmpty() && m_videoOutput)
