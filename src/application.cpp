@@ -79,6 +79,9 @@ public:
 
 ApplicationPrivate::ApplicationPrivate()
     : settings(0),
+#ifdef USE_LIBNOTIFY
+    libnotify_accepts_actions(0),
+#endif
 #ifdef USE_SYSTRAY
     trayContext(0),
     trayIcon(0),
@@ -86,21 +89,6 @@ ApplicationPrivate::ApplicationPrivate()
 #endif
     updates(0)
 {
-#ifdef USE_LIBNOTIFY
-    // test if callbacks are supported
-    libnotify_accepts_actions = FALSE;
-    GList *capabilities = notify_get_server_caps();
-    if(capabilities != NULL) {
-        for(GList *c = capabilities; c != NULL; c = c->next) {
-            if(g_strcmp0((char*)c->data, "actions") == 0 ) {
-                libnotify_accepts_actions = TRUE;
-                break;
-            }
-        }
-        g_list_foreach(capabilities, (GFunc)g_free, NULL);
-        g_list_free(capabilities);
-    }
-#endif
 }
 
 class ApplicationStyle : public QProxyStyle
@@ -201,6 +189,20 @@ Application::Application(int &argc, char **argv)
 #ifdef USE_LIBNOTIFY
     /* initialise libnotify */
     notify_init(applicationName().toUtf8().constData());
+
+    // test if callbacks are supported
+    d->libnotify_accepts_actions = false;
+    GList *capabilities = notify_get_server_caps();
+    if(capabilities != NULL) {
+        for(GList *c = capabilities; c != NULL; c = c->next) {
+            if(g_strcmp0((char*)c->data, "actions") == 0 ) {
+                d->libnotify_accepts_actions = true;
+                break;
+            }
+        }
+        g_list_foreach(capabilities, (GFunc)g_free, NULL);
+        g_list_free(capabilities);
+    }
 #endif
 
     /* add SSL root CA for wifirst.net and download.wifirst.net */
