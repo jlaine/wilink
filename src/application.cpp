@@ -66,6 +66,9 @@ public:
     QSoundPlayer *soundPlayer;
     QAudioDeviceInfo audioInputDevice;
     QAudioDeviceInfo audioOutputDevice;
+#ifdef USE_LIBNOTIFY
+    bool libnotify_accepts_actions;
+#endif
 #ifdef USE_SYSTRAY
     QWidget *trayContext;
     QSystemTrayIcon *trayIcon;
@@ -83,6 +86,21 @@ ApplicationPrivate::ApplicationPrivate()
 #endif
     updates(0)
 {
+#ifdef USE_LIBNOTIFY
+    // test if callbacks are supported
+    libnotify_accepts_actions = FALSE;
+    GList *capabilities = notify_get_server_caps();
+    if(capabilities != NULL) {
+        for(GList *c = capabilities; c != NULL; c = c->next) {
+            if(g_strcmp0((char*)c->data, "actions") == 0 ) {
+                libnotify_accepts_actions = TRUE;
+                break;
+            }
+        }
+        g_list_foreach(capabilities, (GFunc)g_free, NULL);
+        g_list_free(capabilities);
+    }
+#endif
 }
 
 class ApplicationStyle : public QProxyStyle
@@ -573,13 +591,15 @@ void Application::showMessage(QWidget *context, const QString &title, const QStr
     // set action handled when notification is closed
     g_signal_connect(notification, "closed", G_CALLBACK(notificationClosed), NULL);
 
-    // Set callbacks
-    notify_notification_add_action(notification,
-                                   "show-conversation",
-                                   tr("Show this conversation").toUtf8(),
-                                   (NotifyActionCallback) &notificationClicked,
-                                   context,
-                                   FALSE);
+    // Set callback if supported
+    if(d->libnotify_accepts_actions) {
+        notify_notification_add_action(notification,
+                                       "show-conversation",
+                                       tr("Show this conversation").toUtf8(),
+                                       (NotifyActionCallback) &notificationClicked,
+                                       context,
+                                       FALSE);
+    }
 
     // Schedule notification for showing
     if (!notify_notification_show(notification, NULL))
