@@ -22,7 +22,8 @@
 #include "QVideoGrabber.h"
 #include "QVideoGrabber_p.h"
 
-#define YCBCR_to_RGB(yp, cb, cr) ((quint8(yp + 1.371 * cr) << 16) | \
+#define YCBCR_to_RGB(yp, cb, cr) (0xff000000 | \
+                                  (quint8(yp + 1.371 * cr) << 16) | \
                                   (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
                                    quint8(yp + 1.732 * cb))
 
