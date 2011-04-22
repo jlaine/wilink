@@ -370,8 +370,9 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     // start or stop playback
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_videoTimer->isActive()) {
-        m_area->setPlaybackFormat(channel->decoderFormat());
-        m_videoTimer->start(1000 / 30);
+        QXmppVideoFormat format = channel->decoderFormat();
+        m_area->setPlaybackFormat(format);
+        m_videoTimer->start(1000 / format.frameRate());
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
         updateGeometry();
