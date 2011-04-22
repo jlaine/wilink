@@ -863,7 +863,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Downloads</source>
-        <translation></translation>
+        <translation>Téléchargements</translation>
     </message>
     <message>
         <source>Uploads</source>
