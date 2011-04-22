@@ -800,7 +800,7 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         buffer.open(QIODevice::ReadOnly);
         QImageReader imageReader(&buffer);
 #ifdef WILINK_EMBEDDED
-        imageReader.setScaledSize(QSize(32, 32));
+        imageReader.setScaledSize(QSize(ICON_SIZE, ICON_SIZE));
 #endif
         item->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
@@ -836,7 +836,7 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         buffer.open(QIODevice::ReadOnly);
         QImageReader imageReader(&buffer);
 #ifdef WILINK_EMBEDDED
-        imageReader.setScaledSize(QSize(32, 32));
+        imageReader.setScaledSize(QSize(ICON_SIZE, ICON_SIZE));
 #endif
         d->ownItem->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
 
