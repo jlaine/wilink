@@ -98,6 +98,7 @@ bool QVideoGrabberPrivate::open()
     v4l2_capability capability;
     v4l2_format format;
     v4l2_requestbuffers reqbuf;
+    v4l2_streamparm streamparm;
 
     fd = ::open(deviceName.toAscii().constData(), O_RDWR);
     if (fd < 0) {
@@ -140,6 +141,16 @@ bool QVideoGrabberPrivate::open()
     }
 
     qDebug("QVideoGrabber(%s) capture format width: %d, height: %d, bytesperline: %d, pixelformat: %x", qPrintable(deviceName), format.fmt.pix.width, format.fmt.pix.height, format.fmt.pix.bytesperline, format.fmt.pix.pixelformat);
+
+    // set frame rate
+    memset(&streamparm, 0, sizeof(streamparm));
+    streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    streamparm.parm.capture.capability = V4L2_CAP_TIMEPERFRAME;
+    streamparm.parm.capture.timeperframe.numerator = 1;
+    streamparm.parm.capture.timeperframe.denominator = videoFormat.frameRate();
+    if (ioctl(fd, VIDIOC_S_PARM, &streamparm) < 0) {
+        qWarning("QVideoGrabber(%s): could not set frame rate", qPrintable(deviceName));
+    }
 
     // request buffers
     memset(&reqbuf, 0, sizeof(reqbuf));
