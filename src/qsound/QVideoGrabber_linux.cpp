@@ -60,6 +60,7 @@ public:
     QXmppVideoFrame currentFrame;
     QString deviceName;
     QSocketNotifier *notifier;
+    QXmppVideoFormat videoFormat;
 
 private:
     QVideoGrabber *q;
@@ -128,8 +129,8 @@ bool QVideoGrabberPrivate::open()
         close();
         return false;
     }
-    format.fmt.pix.width = 320;
-    format.fmt.pix.height = 240;
+    format.fmt.pix.width = videoFormat.frameWidth();
+    format.fmt.pix.height = videoFormat.frameHeight();
     format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     format.fmt.pix.field = V4L2_FIELD_INTERLACED;
     if (ioctl(fd, VIDIOC_S_FMT, &format) < 0) {
@@ -178,8 +179,9 @@ bool QVideoGrabberPrivate::open()
 
     // store config
     const int frameBytes = buffers.first().length;
-    const QXmppVideoFrame::PixelFormat pixelFormat = v4l_to_qxmpp_PixelFormat(format.fmt.pix.pixelformat);
-    currentFrame = QXmppVideoFrame(frameBytes, QSize(format.fmt.pix.width, format.fmt.pix.height), format.fmt.pix.bytesperline, pixelFormat);
+    videoFormat.setFrameSize(QSize(format.fmt.pix.width, format.fmt.pix.height));
+    videoFormat.setPixelFormat(v4l_to_qxmpp_PixelFormat(format.fmt.pix.pixelformat));
+    currentFrame = QXmppVideoFrame(frameBytes, videoFormat.frameSize(), format.fmt.pix.bytesperline, videoFormat.pixelFormat());
     return true;
 }
 
@@ -187,6 +189,7 @@ QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
     d = new QVideoGrabberPrivate(this);
     d->deviceName = "/dev/video0";
+    d->videoFormat = format;
 }
 
 QVideoGrabber::~QVideoGrabber()
@@ -206,10 +209,7 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
 
 QXmppVideoFormat QVideoGrabber::format() const
 {
-    QXmppVideoFormat fmt;
-    fmt.setFrameSize(d->currentFrame.size());
-    fmt.setPixelFormat(d->currentFrame.pixelFormat());
-    return fmt;
+    return d->videoFormat;
 }
 
 void QVideoGrabber::onFrameCaptured()
