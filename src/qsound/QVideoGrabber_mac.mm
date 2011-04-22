@@ -49,22 +49,14 @@ private:
 
 @interface QVideoGrabberDelegate : NSObject {
 @public
-    int frameHeight;
-    int frameWidth;
-    QXmppVideoFrame::PixelFormat pixelFormat;
+    QXmppVideoFrame currentFrame;
     QVideoGrabber *q;
-
-@private
-    QList<CVImageBufferRef> buffers;
-    CVImageBufferRef currentFrame;
 }
 
 -(void) captureOutput:(QTCaptureOutput *)captureOutput
                     didOutputVideoFrame:(CVImageBufferRef)videoFrame
                     withSampleBuffer:(QTSampleBuffer *)sampleBuffer
                     fromConnection:(QTCaptureConnection *)connection;
-
--(QXmppVideoFrame) readFrame;
 
 @end
 
@@ -75,36 +67,13 @@ private:
                     withSampleBuffer:(QTSampleBuffer *)sampleBuffer
                     fromConnection:(QTCaptureConnection *)connection
 {
-    CVBufferRetain(videoFrame);
-
-    @synchronized(self) {
-        buffers << videoFrame;
+    if (CVPixelBufferLockBaseAddress(videoFrame, 0) == kCVReturnSuccess) {
+        const int length = CVPixelBufferGetDataSize(videoFrame);
+        memcpy(currentFrame.bits(), CVPixelBufferGetBaseAddress(videoFrame), length);
+        CVPixelBufferUnlockBaseAddress(videoFrame, 0);
     }
     
     QMetaObject::invokeMethod(q, "readyRead");
-}
-
--(QXmppVideoFrame) readFrame
-{
-    AutoReleasePool pool;
-
-    CVImageBufferRef buffer;
-    @synchronized(self) {
-        if (buffers.isEmpty())
-            return QXmppVideoFrame();
-        buffer = buffers.takeFirst();
-    }
-    if (CVPixelBufferLockBaseAddress(buffer, 0) != kCVReturnSuccess) {
-        CVBufferRelease(buffer);
-        return QXmppVideoFrame();
-    }
-
-    const int length = CVPixelBufferGetDataSize(buffer);
-    QXmppVideoFrame frame(length, QSize(frameWidth, frameHeight), CVPixelBufferGetBytesPerRow(buffer), pixelFormat);
-    memcpy(frame.bits(), CVPixelBufferGetBaseAddress(buffer), length);
-    CVPixelBufferUnlockBaseAddress(buffer, 0);
-    CVBufferRelease(buffer);
-    return frame;
 }
 
 @end
@@ -223,9 +192,11 @@ bool QVideoGrabberPrivate::open()
 
     // store config
     NSDictionary* pixAttr = [deviceOutput pixelBufferAttributes];
-    delegate->frameWidth = [[pixAttr valueForKey:(id)kCVPixelBufferWidthKey] floatValue];
-    delegate->frameHeight = [[pixAttr valueForKey:(id)kCVPixelBufferHeightKey] floatValue];
-    delegate->pixelFormat = QXmppVideoFrame::Format_YUYV;
+    const int frameWidth = [[pixAttr valueForKey:(id)kCVPixelBufferWidthKey] floatValue];
+    const int frameHeight = [[pixAttr valueForKey:(id)kCVPixelBufferHeightKey] floatValue];
+    const QXmppVideoFrame::PixelFormat pixelFormat = QXmppVideoFrame::Format_YUYV;
+    const int bytesPerLine = frameWidth * 2;
+    delegate->currentFrame = QXmppVideoFrame(bytesPerLine * frameHeight, QSize(frameWidth, frameHeight), bytesPerLine, pixelFormat);
     return true;
 }
 
@@ -236,8 +207,6 @@ QVideoGrabber::QVideoGrabber()
     d = new QVideoGrabberPrivate(this);
     d->delegate = [[QVideoGrabberDelegate alloc] init];
     d->delegate->q = this;
-    d->delegate->frameWidth = 0;
-    d->delegate->frameHeight = 0;
 }
 
 QVideoGrabber::~QVideoGrabber()
@@ -253,14 +222,14 @@ QVideoGrabber::~QVideoGrabber()
 
 QXmppVideoFrame QVideoGrabber::currentFrame()
 {
-    return [d->delegate readFrame];
+    return d->delegate->currentFrame;
 }
 
 QXmppVideoFormat QVideoGrabber::format() const
 {
     QXmppVideoFormat fmt;
-    fmt.setFrameSize(QSize(d->delegate->frameWidth, d->delegate->frameHeight));
-    fmt.setPixelFormat(d->delegate->pixelFormat);
+    fmt.setFrameSize(d->delegate->currentFrame.size());
+    fmt.setPixelFormat(d->delegate->currentFrame.pixelFormat());
     return fmt;
 }
 
