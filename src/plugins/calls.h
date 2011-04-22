@@ -21,7 +21,6 @@
 #define __WILINK_CALLS_H__
 
 #include <QAudioInput>
-#include <QGraphicsPixmapItem>
 #include <QWidget>
 
 #include "QXmppCallManager.h"
@@ -97,7 +96,6 @@ private:
     CallArea *m_area;
     ChatPanelButton *m_button;
     QXmppCall *m_call;
-    ChatPanelText *m_label;
     int m_soundId;
 };
 

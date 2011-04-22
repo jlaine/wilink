@@ -21,7 +21,6 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QFile>
-#include <QGraphicsLinearLayout>
 #include <QHostInfo>
 #include <QImage>
 #include <QLabel>
@@ -106,14 +105,20 @@ public:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
     void setCaptureFormat(const QXmppVideoFormat &format);
     void setPlaybackFormat(const QXmppVideoFormat &format);
+    void setStatus(const QString &status);
 
     CallVideoWidget *videoOutput;
     CallVideoWidget *videoMonitor;
+
+private:
+    ChatPanelText *m_label;
 };
 
 CallArea::CallArea(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
+    m_label = new ChatPanelText(tr("Connecting.."), this);
+    m_label->setPos(8, 8);
     videoOutput = new CallVideoWidget(this);
     videoMonitor = new CallVideoWidget(this);
 }
@@ -133,8 +138,17 @@ void CallArea::setPlaybackFormat(const QXmppVideoFormat &format)
 {
     videoOutput->setFormat(format);
     videoOutput->setSize(format.frameSize());
-    videoMonitor->setPos(format.frameSize().width() + 8, 0);
+    videoOutput->setPos(8, 8);
+    videoMonitor->setPos(8 + format.frameSize().width(), 8);
+    m_label->setPos(8, 8 + format.frameSize().height());
     updateGeometry();
+}
+
+/** Sets the status text.
+ */
+void CallArea::setStatus(const QString &status)
+{
+    m_label->setPlainText(status);
 }
 
 QSizeF CallArea::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
@@ -142,9 +156,11 @@ QSizeF CallArea::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
         const QSizeF outputSize = videoOutput->boundingRect().size();
         const QSizeF monitorSize = videoMonitor->boundingRect().size();
-        QSizeF hint;
-        hint.setWidth(outputSize.width() + 8 + monitorSize.width());
-        hint.setHeight(qMax(outputSize.height(), monitorSize.height()));
+        QSizeF hint = m_label->effectiveSizeHint(which);
+        hint.setWidth(hint.height() + 16);
+        hint.setHeight(hint.height() + 16);
+        hint.setWidth(hint.width() + outputSize.width() + monitorSize.width());
+        hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
         return hint;
     } else {
         return constraint;
@@ -181,16 +197,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     setIconPixmap(QPixmap(":/call.png"));
 
     // central widget
-    QGraphicsWidget *column = new QGraphicsWidget(this);
-    QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
-    vbox->setContentsMargins(8, 8, 8, 8);
-    vbox->setSpacing(0);
-    column->setLayout(vbox);
-    m_area = new CallArea(column);
-    vbox->addItem(m_area);
-    m_label = new ChatPanelText(tr("Connecting.."), column);
-    vbox->addItem(m_label);
-    setCentralWidget(column);
+    m_area = new CallArea(this);
+    setCentralWidget(m_area);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -313,7 +321,7 @@ void CallWidget::callRinging()
     if (m_call->state() != QXmppCall::ConnectingState)
         return;
 
-    m_label->setPlainText(tr("Ringing.."));
+    m_area->setStatus(tr("Ringing.."));
 
     // start outgoing tone
     if (!m_soundId)
@@ -332,17 +340,17 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     switch (state)
     {
     case QXmppCall::ConnectingState:
-        m_label->setPlainText(tr("Connecting.."));
+        m_area->setStatus(tr("Connecting.."));
         break;
     case QXmppCall::ActiveState:
-        m_label->setPlainText(tr("Call connected."));
+        m_area->setStatus(tr("Call connected."));
         break;
     case QXmppCall::DisconnectingState:
-        m_label->setPlainText(tr("Disconnecting.."));
+        m_area->setStatus(tr("Disconnecting.."));
         m_button->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
-        m_label->setPlainText(tr("Call finished."));
+        m_area->setStatus(tr("Call finished."));
         m_button->setEnabled(false);
         break;
     }
