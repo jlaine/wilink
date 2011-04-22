@@ -29,6 +29,7 @@
 
 #include "chat_panel.h"
 
+class CallArea;
 class Chat;
 class ChatRosterModel;
 class QAbstractButton;
@@ -47,17 +48,17 @@ class QXmppVideoFormat;
 class QXmppVideoFrame;
 class QXmppSrvInfo;
 
-class CallVideoWidget : public QGraphicsWidget
+class CallVideoWidget : public QGraphicsItem
 {
 public:
     CallVideoWidget(QGraphicsItem *parent = 0);
     QRectF boundingRect() const;
     void present(const QXmppVideoFrame &frame);
     void setFormat(const QXmppVideoFormat &format);
+    void setSize(const QSizeF &size);
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private:
     QRectF m_boundingRect;
@@ -92,9 +93,8 @@ private:
     // video
     QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
-    CallVideoWidget *m_videoMonitor;
-    CallVideoWidget *m_videoOutput;
 
+    CallArea *m_area;
     ChatPanelButton *m_button;
     QXmppCall *m_call;
     ChatPanelText *m_label;
