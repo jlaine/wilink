@@ -184,10 +184,11 @@ bool QVideoGrabberPrivate::open()
         close();
         return false;
     }
+    [deviceOutput setMinimumVideoFrameInterval:1.0/videoFormat.frameRate()];
     [deviceOutput setPixelBufferAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithUnsignedInt:kYUVSPixelFormat], (id)kCVPixelBufferPixelFormatTypeKey,
-        [NSNumber numberWithUnsignedInt:320], (id)kCVPixelBufferWidthKey,
-        [NSNumber numberWithUnsignedInt:240], (id)kCVPixelBufferHeightKey,
+        [NSNumber numberWithUnsignedInt:videoFormat.frameWidth()], (id)kCVPixelBufferWidthKey,
+        [NSNumber numberWithUnsignedInt:videoFormat.frameHeight()], (id)kCVPixelBufferHeightKey,
         nil]];
     [deviceOutput setDelegate:delegate];
 
@@ -195,9 +196,10 @@ bool QVideoGrabberPrivate::open()
     NSDictionary* pixAttr = [deviceOutput pixelBufferAttributes];
     const int frameWidth = [[pixAttr valueForKey:(id)kCVPixelBufferWidthKey] floatValue];
     const int frameHeight = [[pixAttr valueForKey:(id)kCVPixelBufferHeightKey] floatValue];
-    const QXmppVideoFrame::PixelFormat pixelFormat = QXmppVideoFrame::Format_YUYV;
     const int bytesPerLine = frameWidth * 2;
-    delegate->currentFrame = QXmppVideoFrame(bytesPerLine * frameHeight, QSize(frameWidth, frameHeight), bytesPerLine, pixelFormat);
+    videoFormat.setFrameSize(QSize(frameWidth, frameHeight));
+    videoFormat.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+    delegate->currentFrame = QXmppVideoFrame(bytesPerLine * frameHeight, videoFormat.frameSize(), bytesPerLine, videoFormat.pixelFormat());
     return true;
 }
 
@@ -229,10 +231,7 @@ QXmppVideoFrame QVideoGrabber::currentFrame()
 
 QXmppVideoFormat QVideoGrabber::format() const
 {
-    QXmppVideoFormat fmt;
-    fmt.setFrameSize(d->delegate->currentFrame.size());
-    fmt.setPixelFormat(d->delegate->currentFrame.pixelFormat());
-    return fmt;
+    return d->videoFormat;
 }
 
 void QVideoGrabber::onFrameCaptured()
