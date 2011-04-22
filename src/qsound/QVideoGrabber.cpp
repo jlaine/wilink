@@ -38,12 +38,13 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
         const quint8 *y_row = frame->bits();
         const quint8 *cb_row = y_row + (stride * height);
         const quint8 *cr_row = cb_row + (c_stride * height / 2);
+        QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
         for (int y = 0; y < height; ++y) {
             for (int x = 0; x < width; ++x) {
                 const float cb = cb_row[x/2] - 128.0;
                 const float cr = cr_row[x/2] - 128.0;
                 const float yp = y_row[x];
-                image->setPixel(x, y, YCBCR_to_RGB(yp, cb, cr));
+                *(dest++) = YCBCR_to_RGB(yp, cb, cr);
             }
             y_row += stride;
             if (y % 2) {
@@ -57,6 +58,7 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
         const int height = frame->height();
         const int stride = frame->bytesPerLine();
         const uchar *row = frame->bits();
+        QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
         for (int y = 0; y < height; ++y) {
             const uchar *ptr = row;
             for (int x = 0; x < width; x += 2) {
@@ -64,8 +66,8 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
                 const float cb = *(ptr++) - 128.0;
                 const float yp2 = *(ptr++);
                 const float cr = *(ptr++) - 128.0;
-                image->setPixel(x, y, YCBCR_to_RGB(yp1, cb, cr));
-                image->setPixel(x+1, y, YCBCR_to_RGB(yp2, cb, cr));
+                *(dest++) = YCBCR_to_RGB(yp1, cb, cr);
+                *(dest++) = YCBCR_to_RGB(yp2, cb, cr);
             }
             row += stride;
         }
