@@ -479,6 +479,7 @@ void ChatPanelText::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void ChatPanelText::setGeometry(const QRectF &rect)
 {
+    QGraphicsLayoutItem::setGeometry(rect);
     setPos(rect.topLeft());
 }
 

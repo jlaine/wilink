@@ -28,6 +28,7 @@
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPainter>
 #include <QPushButton>
 #include <QTimer>
 
@@ -61,26 +62,35 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 }
 
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
-    : QGraphicsPixmapItem(parent)
+    : QGraphicsWidget(parent)
 {
-    setGraphicsItem(this);
+}
+
+QRectF CallVideoWidget::boundingRect() const
+{
+    return m_boundingRect;
+}
+
+void CallVideoWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    painter->drawImage(m_boundingRect, m_image);
 }
 
 void CallVideoWidget::present(const QXmppVideoFrame &frame)
 {
-    if (!frame.isValid() || frame.size() != m_videoImage.size())
+    if (!frame.isValid() || frame.size() != m_image.size())
         return;
-    QVideoGrabber::frameToImage(&frame, &m_videoImage);
-    setPixmap(QPixmap::fromImage(m_videoImage));
+    QVideoGrabber::frameToImage(&frame, &m_image);
+    update(m_boundingRect);
 }
 
 void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
 {
     const QSize size = format.frameSize();
-    if (size != m_videoImage.size()) {
-        m_videoImage = QImage(size, QImage::Format_RGB32);
-        m_videoImage.fill(0);
-        setPixmap(QPixmap::fromImage(m_videoImage));
+    if (size != m_image.size()) {
+        m_boundingRect = QRectF(QPointF(0, 0), size);
+        m_image = QImage(size, QImage::Format_RGB32);
+        m_image.fill(0);
         updateGeometry();
     }
 }
@@ -88,10 +98,7 @@ void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
 QSizeF CallVideoWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        QSizeF hint = pixmap().size();
-        hint.setHeight(hint.height() + 16);
-        hint.setWidth(hint.width() + 16);
-        return hint;
+        return m_image.size();
     } else {
         return constraint;
     }
@@ -311,10 +318,12 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     if (canRead && !m_videoTimer->isActive()) {
         m_videoOutput->setFormat(channel->decoderFormat());
         m_videoOutput->show();
-        m_videoTimer->start(1000 / 20);
+        m_videoTimer->start(1000 / 30);
+        updateGeometry();
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
         m_videoOutput->hide();
+        updateGeometry();
     }
 
     // start or stop capture
