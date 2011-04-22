@@ -48,6 +48,9 @@
 
 #ifdef WILINK_EMBEDDED
 #define FLAT_CONTACTS
+#define ICON_SIZE 32
+#else
+#define ICON_SIZE 24
 #endif
 #define FLAT_ROOMS
 
@@ -254,7 +257,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
     d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
-    d->contactsItem->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
+    d->contactsItem->setData(Qt::DecorationRole, QIcon(":/peer.png"));
     ChatModel::addItem(d->contactsItem, rootItem);
 #endif
     d->roomsItem = 0;
@@ -483,7 +486,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(index)));
                 if (messages)
                     paintMessages(icon, messages);
-                return icon;
+                return QIcon(icon);
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(item->data(AvatarRole).value<QPixmap>());
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
@@ -496,7 +499,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 QPixmap icon(":/chat.png");
                 if (messages)
                     paintMessages(icon, messages);
-                return icon;
+                return QIcon(icon);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatroom") + sortSeparator + bareJid.toLower();
             }
@@ -884,7 +887,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
             d->roomsItem = new ChatRosterItem(ChatRosterModel::Other);
             d->roomsItem->setId(ROOMS_ROSTER_ID);
             d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
-            d->roomsItem->setData(Qt::DecorationRole, QPixmap(":/chat.png"));
+            d->roomsItem->setData(Qt::DecorationRole, QIcon(":/chat.png"));
             ChatModel::addItem(d->roomsItem, rootItem);
         }
         parentItem = d->roomsItem;
@@ -933,7 +936,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
 
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);
-    setColumnWidth(ImageColumn, 40);
+    setColumnWidth(ImageColumn, ICON_SIZE + 8);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setAcceptDrops(true);
     setAnimated(true);
@@ -941,7 +944,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     setDragEnabled(true);
     setDropIndicatorShown(false);
     setHeaderHidden(true);
-    setIconSize(QSize(32, 32));
+    setIconSize(QSize(ICON_SIZE, ICON_SIZE));
     setMinimumHeight(400);
 #ifdef FLAT_CONTACTS
     setMinimumWidth(200);
@@ -1014,7 +1017,7 @@ QModelIndex ChatRosterView::mapFromRoster(const QModelIndex &index)
 void ChatRosterView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
-    setColumnWidth(ContactColumn, e->size().width() - 40);
+    setColumnWidth(ContactColumn, e->size().width() - ICON_SIZE - 8);
 }
 
 void ChatRosterView::setShowOfflineContacts(bool show)
