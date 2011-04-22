@@ -40,11 +40,16 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
         const quint8 *cr_row = cb_row + (c_stride * height / 2);
         QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
         for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
-                const float cb = cb_row[x/2] - 128.0;
-                const float cr = cr_row[x/2] - 128.0;
-                const float yp = y_row[x];
-                *(dest++) = YCBCR_to_RGB(yp, cb, cr);
+            const uchar *y_ptr = y_row;
+            const uchar *cb_ptr = cb_row;
+            const uchar *cr_ptr = cr_row;
+            for (int x = 0; x < width; x += 2) {
+                const float yp1 = *(y_ptr++);
+                const float cb = *(cb_ptr)++ - 128.0;
+                const float yp2 = *(y_ptr++);
+                const float cr = *(cr_ptr++) - 128.0;
+                *(dest++) = YCBCR_to_RGB(yp1, cb, cr);
+                *(dest++) = YCBCR_to_RGB(yp2, cb, cr);
             }
             y_row += stride;
             if (y % 2) {
