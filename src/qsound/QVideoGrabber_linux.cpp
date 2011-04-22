@@ -183,8 +183,7 @@ bool QVideoGrabberPrivate::open()
     return true;
 }
 
-
-QVideoGrabber::QVideoGrabber()
+QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
     d = new QVideoGrabberPrivate(this);
     d->deviceName = "/dev/video0";

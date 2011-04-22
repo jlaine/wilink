@@ -380,11 +380,12 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     // start or stop capture
     const bool canWrite = (mode & QIODevice::WriteOnly);
     if (canWrite && !m_videoGrabber) {
-        m_videoGrabber = new QVideoGrabber;
+        QXmppVideoFormat format = channel->encoderFormat();
+        m_videoGrabber = new QVideoGrabber(format);
         connect(m_videoGrabber, SIGNAL(readyRead()),
                 this, SLOT(videoCapture()));
         m_videoGrabber->start();
-        m_area->setCaptureFormat(channel->encoderFormat());
+        m_area->setCaptureFormat(format);
     } else if (!canWrite && m_videoGrabber) {
         m_videoGrabber->stop();
         delete m_videoGrabber;

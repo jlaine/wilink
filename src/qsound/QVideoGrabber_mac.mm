@@ -112,6 +112,7 @@ public:
     bool open();
     void close();
 
+    QXmppVideoFormat videoFormat;
     QVideoGrabberDelegate *delegate;
     QTCaptureDevice *device;
     QTCaptureDeviceInput *deviceInput;
@@ -200,13 +201,14 @@ bool QVideoGrabberPrivate::open()
     return true;
 }
 
-QVideoGrabber::QVideoGrabber()
+QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
     AutoReleasePool pool;
 
     d = new QVideoGrabberPrivate(this);
     d->delegate = [[QVideoGrabberDelegate alloc] init];
     d->delegate->q = this;
+    d->videoFormat = format;
 }
 
 QVideoGrabber::~QVideoGrabber()

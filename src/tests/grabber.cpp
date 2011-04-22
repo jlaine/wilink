@@ -77,7 +77,12 @@ int main(int argc, char *argv[])
     }
 
     // grab some frames
-    QVideoGrabber input;
+    QXmppVideoFormat format;
+    format.setFrameRate(20.0);
+    format.setFrameSize(QSize(320, 240));
+    format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+
+    QVideoGrabber input(format);
     Grabber grabber;
     QObject::connect(&grabber, SIGNAL(finished()), &app, SLOT(quit()));
     grabber.start(&input);

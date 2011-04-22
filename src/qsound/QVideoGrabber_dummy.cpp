@@ -21,7 +21,7 @@
 
 #include "QVideoGrabber.h"
 
-QVideoGrabber::QVideoGrabber()
+QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
 }
 

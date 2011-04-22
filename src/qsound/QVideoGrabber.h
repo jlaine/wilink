@@ -28,7 +28,7 @@ class QVideoGrabber : public QObject
     Q_OBJECT
 
 public:
-    QVideoGrabber();
+    QVideoGrabber(const QXmppVideoFormat &format);
     ~QVideoGrabber();
 
     QXmppVideoFrame currentFrame();
