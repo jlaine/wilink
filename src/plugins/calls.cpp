@@ -136,14 +136,18 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
     // central widget
     QGraphicsWidget *column = new QGraphicsWidget(this);
-    m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_layout->setContentsMargins(8, 8, 8, 8);
-    m_layout->setSpacing(0);
-    column->setLayout(m_layout);
+    QGraphicsLinearLayout *vbox = new QGraphicsLinearLayout(Qt::Vertical);
+    vbox->setContentsMargins(8, 8, 8, 8);
+    vbox->setSpacing(0);
+    column->setLayout(vbox);
+    QGraphicsLinearLayout *hbox = new QGraphicsLinearLayout(Qt::Horizontal);
+    vbox->addItem(hbox);
     m_videoOutput = new CallVideoWidget(column);
-    m_layout->addItem(m_videoOutput);
+    hbox->addItem(m_videoOutput);
+    m_videoMonitor = new CallVideoWidget(column);
+    hbox->addItem(m_videoMonitor);
     m_label = new ChatPanelText(tr("Connecting.."), column);
-    m_layout->addItem(m_label);
+    vbox->addItem(m_label);
     setCentralWidget(column);
 
     // connect signals
@@ -317,12 +321,10 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_videoTimer->isActive()) {
         m_videoOutput->setFormat(channel->decoderFormat());
-        m_videoOutput->show();
         m_videoTimer->start(1000 / 30);
         updateGeometry();
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
-        m_videoOutput->hide();
         updateGeometry();
     }
 
@@ -333,6 +335,7 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         connect(m_videoGrabber, SIGNAL(readyRead()),
                 this, SLOT(videoCapture()));
         m_videoGrabber->start();
+        m_videoMonitor->setFormat(channel->encoderFormat());
     } else if (!canWrite && m_videoGrabber) {
         m_videoGrabber->stop();
         delete m_videoGrabber;
@@ -387,7 +390,11 @@ void CallWidget::videoCapture()
         }
     }
 #endif
-    channel->writeFrame(m_videoGrabber->currentFrame());
+    const QXmppVideoFrame &frame = m_videoGrabber->currentFrame();
+    if (frame.isValid()) {
+        channel->writeFrame(frame);
+        m_videoMonitor->present(frame);
+    }
 }
 
 void CallWidget::videoRefresh()

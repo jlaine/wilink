@@ -35,7 +35,6 @@ class QAbstractButton;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
-class QGraphicsLinearLayout;
 class QHostInfo;
 class QLabel;
 class QMenu;
@@ -93,12 +92,12 @@ private:
     // video
     QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
+    CallVideoWidget *m_videoMonitor;
     CallVideoWidget *m_videoOutput;
 
     ChatPanelButton *m_button;
     QXmppCall *m_call;
     ChatPanelText *m_label;
-    QGraphicsLinearLayout *m_layout;
     int m_soundId;
 };
 
