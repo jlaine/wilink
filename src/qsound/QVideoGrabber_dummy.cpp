@@ -48,11 +48,6 @@ bool QVideoGrabber::start()
     return false;
 }
 
-QVideoGrabber::State QVideoGrabber::state() const
-{
-    return StoppedState;
-}
-
 void QVideoGrabber::stop()
 {
 }
