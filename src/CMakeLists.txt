@@ -27,12 +27,14 @@ if(QTMULTIMEDIAKIT_LIBRARY)
 endif()
 
 # For libnotify support
-find_package(PkgConfig)
-pkg_check_modules(LIBNOTIFY "libnotify")
-if(LIBNOTIFY_FOUND)
-    message(STATUS "Found libnotify library")
-    include_directories(${LIBNOTIFY_INCLUDE_DIRS})
-    add_definitions(-DUSE_LIBNOTIFY)
+if (UNIX)
+    find_package(PkgConfig)
+    pkg_check_modules(LIBNOTIFY "libnotify")
+    if(LIBNOTIFY_FOUND)
+        message(STATUS "Found libnotify library")
+        include_directories(${LIBNOTIFY_INCLUDE_DIRS})
+        add_definitions(-DUSE_LIBNOTIFY)
+    endif()
 endif()
 
 # wiLink
