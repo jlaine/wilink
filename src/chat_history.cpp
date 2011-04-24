@@ -1194,21 +1194,21 @@ void ChatHistoryWidget::setView(QGraphicsView *view)
     Q_ASSERT(check);
 
     /* set up keyboard shortcuts */
-    QAction *action = new QAction(tr("&Copy"), this);
+    QAction *action = new QAction(QIcon::fromTheme("edit-copy"), tr("&Copy"), this);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_C));
     check = connect(action, SIGNAL(triggered(bool)),
                     this, SLOT(copy()));
     Q_ASSERT(check);
     m_view->addAction(action);
 
-    action = new QAction(tr("Select &All"), this);
+    action = new QAction(QIcon::fromTheme("edit-select-all"), tr("Select &All"), this);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_A));
     check = connect(action, SIGNAL(triggered(bool)),
                     this, SLOT(selectAll()));
     Q_ASSERT(check);
     m_view->addAction(action);
 
-    action = new QAction(tr("Clear"), this);
+    action = new QAction(QIcon::fromTheme("edit-clear"), tr("Clear"), this);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X));
     check = connect(action, SIGNAL(triggered(bool)),
                     this, SLOT(clear()));
