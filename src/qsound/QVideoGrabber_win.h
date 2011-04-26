@@ -29,12 +29,34 @@ DEFINE_GUID( IID_ICreateDevEnum, 0x29840822, 0x5b84, 0x11d0,
              0xbd, 0x3b, 0x00, 0xa0, 0xc9, 0x11, 0xce, 0x86 );
 DEFINE_GUID( IID_IGraphBuilder, 0x56a868a9, 0x0ad4, 0x11ce,
              0xb0, 0x3a, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70 );
+DEFINE_GUID( IID_IMediaControl, 0x56a868b1, 0x0ad4, 0x11ce,
+             0xb0, 0x3a, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70 );
+DEFINE_GUID( IID_IMediaEvent, 0x56a868b6, 0x0ad4, 0x11ce,
+             0xb0, 0x3a, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70 );
 DEFINE_GUID( IID_IPropertyBag, 0x55272a00, 0x42cb, 0x11ce,
              0x81, 0x35, 0x00, 0xaa, 0x00, 0x4b, 0xb8, 0x51 );
 DEFINE_GUID( IID_ISampleGrabber, 0x6b652fff, 0x11fe, 0x4fce,
              0x92, 0xad, 0x02, 0x66, 0xb5, 0xd7, 0xc7, 0x8f );
 DEFINE_GUID( IID_ISampleGrabberCB, 0x0579154a, 0x2b53, 0x4994,
              0xb0, 0xd0, 0xe7, 0x73, 0x14, 0x8e, 0xff, 0x85 );
+DEFINE_GUID( MEDIATYPE_Video, 0x73646976, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( MEDIASUBTYPE_I420, 0x30323449, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+DEFINE_GUID( MEDIASUBTYPE_YV12, 0x32315659, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( MEDIASUBTYPE_IYUV, 0x56555949, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( MEDIASUBTYPE_YUYV, 0x56595559, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( MEDIASUBTYPE_YUY2, 0x32595559, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( MEDIASUBTYPE_UYVY, 0x59565955, 0x0000, 0x0010,
+             0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+DEFINE_GUID( MEDIASUBTYPE_RGB24, 0xe436eb7d, 0x524f, 0x11ce,
+             0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70 );
+DEFINE_GUID( PIN_CATEGORY_CAPTURE, 0xfb6c4281, 0x0353, 0x11d1,
+             0x90, 0x5f, 0x00, 0x00, 0xc0, 0xcc, 0x16, 0xba);
 
 typedef interface IAMCopyCaptureFileProgress IAMCopyCaptureFileProgress;
 typedef interface IBaseFilter IBaseFilter;
@@ -46,6 +68,8 @@ DEFINE_GUID( CLSID_CaptureGraphBuilder2, 0xbf87b6e1, 0x8c27, 0x11d0,
              0xb3, 0xf0, 0x00, 0xaa, 0x00, 0x37, 0x61, 0xc5 );
 DEFINE_GUID( CLSID_FilterGraph, 0xe436ebb3, 0x524f, 0x11ce,
              0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+DEFINE_GUID( CLSID_NullRenderer,0xc1f400a4, 0x3f08, 0x11d3,
+             0x9f, 0x0b, 0x00, 0x60, 0x08, 0x03, 0x9e, 0x37 );
 DEFINE_GUID( CLSID_SampleGrabber, 0xc1f400a0, 0x3f08, 0x11d3,
              0x9f, 0x0b, 0x00, 0x60, 0x08, 0x03, 0x9e, 0x37 );
 DEFINE_GUID( CLSID_SystemDeviceEnum, 0x62BE5D10, 0x60EB, 0x11d0,
@@ -184,9 +208,9 @@ DECLARE_INTERFACE_(ICaptureGraphBuilder2,IUnknown)
     STDMETHOD(SetFiltergraph)(THIS_ IGraphBuilder*) PURE;
     STDMETHOD(GetFiltergraph)(THIS_ IGraphBuilder*) PURE;
     STDMETHOD(SetOutputFileName)(THIS_ REFIID,LPCOLESTR,IBaseFilter**,IFileSinkFilter**) PURE;
-    STDMETHOD(FindInterface)(THIS_ REFIID,REFIID,IBaseFilter*,REFIID,PVOID*) PURE;
-    STDMETHOD(RenderStream)(THIS_ REFIID,REFIID,IUnknown*,IBaseFilter*,IBaseFilter*) PURE;
-    STDMETHOD(ControlStream)(THIS_ REFIID,REFIID,IBaseFilter*,REFERENCE_TIME*,REFERENCE_TIME*,WORD,WORD) PURE;
+    STDMETHOD(FindInterface)(THIS_ const GUID*,const GUID*,IBaseFilter*,REFIID,PVOID*) PURE;
+    STDMETHOD(RenderStream)(THIS_ const GUID*,const GUID*,IUnknown*,IBaseFilter*,IBaseFilter*) PURE;
+    STDMETHOD(ControlStream)(THIS_ const GUID*,const GUID*,IBaseFilter*,REFERENCE_TIME*,REFERENCE_TIME*,WORD,WORD) PURE;
     STDMETHOD(AllocCapFile)(THIS_ LPCOLESTR, DWORDLONG) PURE;
     STDMETHOD(CopyCaptureFile)(THIS_ LPOLESTR,LPOLESTR,int,IAMCopyCaptureFileProgress*) PURE;
     STDMETHOD(FindPin)(THIS_ IUnknown *, PIN_DIRECTION,REFIID,REFIID,BOOL,int,IPin **) PURE;
@@ -200,6 +224,43 @@ DECLARE_INTERFACE_(ICreateDevEnum,IUnknown)
   STDMETHOD_(ULONG,AddRef)(THIS) PURE;
   STDMETHOD_(ULONG,Release)(THIS) PURE;
   STDMETHOD(CreateClassEnumerator)(THIS_ REFIID,IEnumMoniker**,DWORD) PURE;
+};
+#undef INTERFACE
+
+typedef LONG_PTR OAEVENT;
+
+#define INTERFACE IMediaEvent
+DECLARE_INTERFACE_(IMediaEvent,IDispatch)
+{
+  STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+  STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+  STDMETHOD_(ULONG,Release)(THIS) PURE;
+  STDMETHOD(GetEventHandle)(THIS_ OAEVENT*) PURE;
+  STDMETHOD(GetEvent)(THIS_ long*,LONG_PTR,LONG_PTR,long) PURE;
+  STDMETHOD(WaitForCompletion)(THIS_ long,long*) PURE;
+  STDMETHOD(CancelDefaultHandling)(THIS_ long) PURE;
+  STDMETHOD(RestoreDefaultHandling)(THIS_ long) PURE;
+  STDMETHOD(FreeEventParams)(THIS_ long,LONG_PTR,LONG_PTR) PURE;
+};
+#undef INTERFACE
+
+typedef long OAFilterState;
+
+#define INTERFACE IMediaControl
+DECLARE_INTERFACE_(IMediaControl,IDispatch)
+{
+  STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+  STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+  STDMETHOD_(ULONG,Release)(THIS) PURE;
+  STDMETHOD(Run)(THIS) PURE;
+  STDMETHOD(Pause)(THIS) PURE;
+  STDMETHOD(Stop)(THIS) PURE;
+  STDMETHOD(GetState)(THIS_ LONG,OAFilterState*) PURE;
+  STDMETHOD(RenderFile)(THIS_ BSTR) PURE;
+  STDMETHOD(AddSourceFilter)(THIS_ BSTR,IDispatch**) PURE;
+  STDMETHOD(get_FilterCollection)(THIS_ IDispatch**) PURE;
+  STDMETHOD(get_RegFilterCollection)(THIS_ IDispatch**) PURE;
+  STDMETHOD(StopWhenReady)(THIS) PURE;
 };
 #undef INTERFACE
 

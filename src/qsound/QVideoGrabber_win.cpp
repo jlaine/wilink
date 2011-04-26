@@ -28,6 +28,8 @@
 class QVideoGrabberPrivate : public ISampleGrabberCB
 {
 public:
+    QVideoGrabberPrivate(QVideoGrabber *qq);
+
     STDMETHODIMP_(ULONG) AddRef() { return 1; }
     STDMETHODIMP_(ULONG) Release() { return 2; }
 
@@ -57,16 +59,32 @@ public:
         return E_NOTIMPL;
     }
 
-    bool open();
     void close();
+    HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin);
+    bool open();
 
     bool opened;
-    IGraphBuilder *filterGraph;
     ICaptureGraphBuilder2 *captureGraphBuilder;
+    IGraphBuilder *filterGraph;
+    IMediaControl *mediaControl;
+    //IBaseFilter *nullRenderer;
     ISampleGrabber *sampleGrabber;
     IBaseFilter *sampleGrabberFilter;
+    IBaseFilter *source;
     QXmppVideoFormat videoFormat;
+
+private:
+    QVideoGrabber *q;
 };
+
+QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
+    : captureGraphBuilder(0),
+    filterGraph(0),
+    opened(false),
+    source(0),
+    q(qq)
+{
+}
 
 void QVideoGrabberPrivate::close()
 {
@@ -93,9 +111,38 @@ void QVideoGrabberPrivate::close()
     opened = false;
 }
 
+HRESULT QVideoGrabberPrivate::getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin)
+{
+    *ppPin = 0;
+    IEnumPins *pEnum = 0;
+    IPin *pPin = 0;
+
+    HRESULT hr = pFilter->EnumPins(&pEnum);
+    if(FAILED(hr)) {
+        return hr;
+    }
+
+    pEnum->Reset();
+    while(pEnum->Next(1, &pPin, NULL) == S_OK) {
+        PIN_DIRECTION ThisPinDir;
+        pPin->QueryDirection(&ThisPinDir);
+        if(ThisPinDir == PinDir) {
+            pEnum->Release();
+            *ppPin = pPin;
+            return S_OK;
+        }
+        pEnum->Release();
+    }
+    pEnum->Release();
+    return E_FAIL;
+}
+
 bool QVideoGrabberPrivate::open()
 {
     HRESULT hr;
+    IMoniker* pMoniker = NULL;
+    ICreateDevEnum* pDevEnum = NULL;
+    IEnumMoniker* pEnum = NULL;
 
     CoInitialize(0);
 
@@ -122,11 +169,36 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
 
+    // Find the capture device
+    hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,
+                          CLSCTX_INPROC_SERVER, IID_ICreateDevEnum,
+                          reinterpret_cast<void**>(&pDevEnum));
+    if(SUCCEEDED(hr)) {
+        // Create the enumerator for the video capture category
+        hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
+        pDevEnum->Release();
+        if (S_OK == hr) {
+            pEnum->Reset();
+            // go through and find all video capture devices
+            while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
+                hr = pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&source);
+                pMoniker->Release();
+                if (SUCCEEDED(hr))
+                    break;
+            }
+            pEnum->Release();
+        }
+    }
+    if (!source) {
+        qWarning("Could not find capture source");
+        return false;
+    }
+
     // Sample grabber filter
     hr = CoCreateInstance(CLSID_SampleGrabber, NULL,CLSCTX_INPROC,
                           IID_IBaseFilter, (void**)&sampleGrabberFilter);
     if (FAILED(hr)) {
-        qWarning("Could not create sample grabber");
+        qWarning("Could not create sample grabber filter");
         return false;
     }
     sampleGrabberFilter->QueryInterface(IID_ISampleGrabber, (void**)&sampleGrabber);
@@ -138,12 +210,43 @@ bool QVideoGrabberPrivate::open()
     sampleGrabber->SetBufferSamples(TRUE);
     sampleGrabber->SetCallBack(this, 1);
 
+    // Add source
+    hr = filterGraph->AddFilter(source, L"Source");
+    if (FAILED(hr)) {
+        qWarning("Could not add capture filter");
+        return false;
+    }
+
     // Add sample grabber
     hr = filterGraph->AddFilter(sampleGrabberFilter, L"Sample Grabber");
     if (FAILED(hr)) {
         qWarning("Could not add sample grabber");
         return false;
     }
+
+    hr = captureGraphBuilder->RenderStream(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
+                                           source, NULL, sampleGrabberFilter);
+    if (FAILED(hr)) {
+        qWarning() << "failed to renderstream" << hr;
+        return false;
+    }
+
+#if 0
+    // Create null renderer
+    hr = CoCreateInstance(CLSID_NullRenderer, NULL,
+                          CLSCTX_INPROC, IID_IBaseFilter,
+                          (void **)&nullRenderer);
+    if (FAILED(hr)) {
+        qWarning("Could not create null renderer");
+        return false;
+    }
+    IPin **nullIn;
+    hr = getPin(nullRenderer, PINDIR_INPUT, 0);
+    if (FAILED(hr)) {
+        qWarning("Could not get null renderer input");
+        return false;
+    }
+#endif
 
     CoUninitialize();
 
@@ -153,7 +256,7 @@ bool QVideoGrabberPrivate::open()
 
 QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
-    d = new QVideoGrabberPrivate;
+    d = new QVideoGrabberPrivate(this);
     d->captureGraphBuilder = 0;
     d->filterGraph = 0;
     d->opened = false;
@@ -185,6 +288,16 @@ bool QVideoGrabber::start()
         return false;
 
     CoInitialize(0);
+
+    IMediaControl* pControl = 0;
+    HRESULT hr = d->filterGraph->QueryInterface(IID_IMediaControl, (void**)&d->mediaControl);
+    if (FAILED(hr)) {
+        qWarning("Could not get stream control");
+        return false;
+    }
+
+    hr = pControl->Run();
+    pControl->Release();
 
     CoUninitialize();
 
