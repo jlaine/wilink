@@ -347,7 +347,7 @@ static QList<RectCursor> chunkSelection(QGraphicsTextItem *textItem, const QText
     QList<RectCursor> rectangles;
 
     const QTextLayout *layout = cursor.block().layout();
-    const qreal margin = cursor.document()->documentMargin();
+    const QPointF blockOffset = layout->position();
     const int startPos = cursor.anchor() - cursor.block().position();
     const int endPos = cursor.position() - cursor.block().position();
     for (int i = 0; i < layout->lineCount(); ++i)
@@ -386,7 +386,7 @@ static QList<RectCursor> chunkSelection(QGraphicsTextItem *textItem, const QText
         localRect.setBottomRight(bottomRight);
 
         // map to scene coordinates
-        rectangles << qMakePair(textItem->mapRectToScene(localRect.translated(margin, margin)), localCursor);
+        rectangles << qMakePair(textItem->mapRectToScene(localRect.translated(blockOffset)), localCursor);
 
         if (lineEnd > endPos)
             break;
