@@ -102,6 +102,11 @@ QVideoGrabberInfo &QVideoGrabberInfo::operator=(const QVideoGrabberInfo &other)
     return *this;
 }
 
+QString QVideoGrabberInfo::deviceDescription() const
+{
+    return d->deviceDescription;
+}
+
 QString QVideoGrabberInfo::deviceName() const
 {
     return d->deviceName;

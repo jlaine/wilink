@@ -21,11 +21,8 @@
 #include <objbase.h>
 #include <initguid.h>
 
-//#include <dshow.h>
-
-#include <QByteArray>
-
 #include "QVideoGrabber.h"
+#include "QVideoGrabber_p.h"
 #include "QVideoGrabber_win.h"
 
 class QVideoGrabberPrivate
@@ -35,6 +32,7 @@ public:
     ICaptureGraphBuilder2 *captureGraphBuilder;
     ISampleGrabber *sampleGrabber;
     IBaseFilter *sampleGrabberFilter;
+    QXmppVideoFormat videoFormat;
 };
 
 QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
@@ -42,6 +40,7 @@ QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
     d = new QVideoGrabberPrivate;
     d->captureGraphBuilder = 0;
     d->filterGraph = 0;
+    d->videoFormat = format;
 }
 
 QVideoGrabber::~QVideoGrabber()
@@ -53,7 +52,7 @@ QVideoGrabber::~QVideoGrabber()
 
 QXmppVideoFormat QVideoGrabber::format() const
 {
-    return QXmppVideoFormat();
+    return d->videoFormat;
 }
 
 void QVideoGrabber::onFrameCaptured()
@@ -93,12 +92,12 @@ bool QVideoGrabber::start()
     hr = CoCreateInstance(CLSID_SampleGrabber, NULL,CLSCTX_INPROC,
                           IID_IBaseFilter, (void**)&d->sampleGrabberFilter);
     if (FAILED(hr)) {
-        qWarning() << "failed to create sample grabber";
+        qWarning("Could not create sample grabber");
         return false;
     }
     d->sampleGrabberFilter->QueryInterface(IID_ISampleGrabber, (void**)&d->sampleGrabber);
     if (FAILED(hr)) {
-        qWarning() << "failed to get sample grabber";
+        qWarning("Could not get sample grabber");
         return false;
     }
     d->sampleGrabber->SetOneShot(FALSE);
@@ -107,7 +106,7 @@ bool QVideoGrabber::start()
 
     CoUninitialize();
 
-    return false;
+    return true;
 }
 
 void QVideoGrabber::stop()
@@ -130,7 +129,61 @@ void QVideoGrabber::stop()
 
 QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
 {
+    QList<QVideoGrabberInfo> grabbers;
+    HRESULT hr;
+    IMoniker* pMoniker = NULL;
+    ICreateDevEnum* pDevEnum = NULL;
+    IEnumMoniker* pEnum = NULL;
+
+    CoInitialize(0);
+
+    // Create the System device enumerator
+    hr = CoCreateInstance(CLSID_SystemDeviceEnum, NULL,
+                          CLSCTX_INPROC_SERVER, IID_ICreateDevEnum,
+                          reinterpret_cast<void**>(&pDevEnum));
+    if(SUCCEEDED(hr)) {
+        // Create the enumerator for the video capture category
+        hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
+        if (S_OK == hr) {
+            pEnum->Reset();
+            // go through and find all video capture devices
+            while (pEnum->Next(1, &pMoniker, NULL) == S_OK) {
+                IPropertyBag *pPropBag;
+                hr = pMoniker->BindToStorage(0, 0,
+                                             IID_IPropertyBag, (void**)(&pPropBag));
+                if(FAILED(hr)) {
+                    pMoniker->Release();
+                    continue; // skip this one
+                }
+
+                // Find the description
+                QVideoGrabberInfo grabber;
+                WCHAR str[120];
+                VARIANT varName;
+                varName.vt = VT_BSTR;
+                hr = pPropBag->Read(L"Description", &varName, 0);
+                if(SUCCEEDED(hr)) {
+                    wcsncpy(str, varName.bstrVal, sizeof(str)/sizeof(str[0]));
+                    grabber.d->deviceDescription = QString::fromUtf16((unsigned short*)str);
+                }
+                hr = pPropBag->Read(L"FriendlyName", &varName, 0);
+                if(SUCCEEDED(hr)) {
+                    wcsncpy(str, varName.bstrVal, sizeof(str)/sizeof(str[0]));
+                    grabber.d->deviceName = QString::fromUtf16((unsigned short*)str);
+                    // FIXME: actually get pixel formats
+                    grabber.d->supportedPixelFormats << QXmppVideoFrame::Format_YUYV;
+                    grabbers << grabber;
+                }
+
+                pPropBag->Release();
+                pMoniker->Release();
+            }
+        }
+    }
+
+    CoUninitialize();
+
     // No grabbers for dummy
-    return QList<QVideoGrabberInfo>();
+    return grabbers;
 }
 
