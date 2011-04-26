@@ -25,9 +25,42 @@
 #include "QVideoGrabber_p.h"
 #include "QVideoGrabber_win.h"
 
-class QVideoGrabberPrivate
+class QVideoGrabberPrivate : public ISampleGrabberCB
 {
 public:
+    STDMETHODIMP_(ULONG) AddRef() { return 1; }
+    STDMETHODIMP_(ULONG) Release() { return 2; }
+
+    STDMETHODIMP QueryInterface(REFIID riid, void **ppvObject)
+    {
+        if (NULL == ppvObject)
+            return E_POINTER;
+        if (riid == IID_IUnknown /*__uuidof(IUnknown) */ ) {
+            *ppvObject = static_cast<IUnknown*>(this);
+            return S_OK;
+        }
+        if (riid == IID_ISampleGrabberCB /*__uuidof(ISampleGrabberCB)*/ ) {
+            *ppvObject = static_cast<ISampleGrabberCB*>(this);
+            return S_OK;
+        }
+        return E_NOTIMPL;
+    }
+
+    STDMETHODIMP SampleCB(double Time, IMediaSample *pSample)
+    {
+        return E_NOTIMPL;
+    }
+
+    STDMETHODIMP BufferCB(double Time, BYTE *pBuffer, long BufferLen)
+    {
+        qDebug("buffer cb");
+        return E_NOTIMPL;
+    }
+
+    bool open();
+    void close();
+
+    bool opened;
     IGraphBuilder *filterGraph;
     ICaptureGraphBuilder2 *captureGraphBuilder;
     ISampleGrabber *sampleGrabber;
@@ -35,11 +68,95 @@ public:
     QXmppVideoFormat videoFormat;
 };
 
+void QVideoGrabberPrivate::close()
+{
+    if (!opened)
+        return;
+
+    filterGraph->RemoveFilter(sampleGrabberFilter);
+
+    if (sampleGrabberFilter) {
+        sampleGrabberFilter->Release();
+        sampleGrabberFilter = 0;
+    }
+
+    if (filterGraph) {
+        filterGraph->Release();
+        filterGraph = 0;
+    }
+
+    if (captureGraphBuilder) {
+        captureGraphBuilder->Release();
+        captureGraphBuilder = 0;
+    }
+
+    opened = false;
+}
+
+bool QVideoGrabberPrivate::open()
+{
+    HRESULT hr;
+
+    CoInitialize(0);
+
+    // Create the filter graph
+    hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC,
+            IID_IGraphBuilder, (void**)&filterGraph);
+    if (FAILED(hr)) {
+        qWarning("Could not create filter graph");
+        return false;
+    }
+
+    // Create the capture graph builder
+    hr = CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC,
+        IID_ICaptureGraphBuilder2, (void**)&captureGraphBuilder);
+    if (FAILED(hr)) {
+        qWarning("Could not create capture graph builder");
+        return false;
+    }
+
+    // Attach the filter graph to the capture graph
+    hr = captureGraphBuilder->SetFiltergraph(filterGraph);
+    if (FAILED(hr)) {
+        qWarning("Could not connect capture graph and filter graph");
+        return false;
+    }
+
+    // Sample grabber filter
+    hr = CoCreateInstance(CLSID_SampleGrabber, NULL,CLSCTX_INPROC,
+                          IID_IBaseFilter, (void**)&sampleGrabberFilter);
+    if (FAILED(hr)) {
+        qWarning("Could not create sample grabber");
+        return false;
+    }
+    sampleGrabberFilter->QueryInterface(IID_ISampleGrabber, (void**)&sampleGrabber);
+    if (FAILED(hr)) {
+        qWarning("Could not get sample grabber");
+        return false;
+    }
+    sampleGrabber->SetOneShot(FALSE);
+    sampleGrabber->SetBufferSamples(TRUE);
+    sampleGrabber->SetCallBack(this, 1);
+
+    // Add sample grabber
+    hr = filterGraph->AddFilter(sampleGrabberFilter, L"Sample Grabber");
+    if (FAILED(hr)) {
+        qWarning("Could not add sample grabber");
+        return false;
+    }
+
+    CoUninitialize();
+
+    opened = true;
+    return true;
+}
+
 QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
     d = new QVideoGrabberPrivate;
     d->captureGraphBuilder = 0;
     d->filterGraph = 0;
+    d->opened = false;
     d->videoFormat = format;
 }
 
@@ -47,6 +164,9 @@ QVideoGrabber::~QVideoGrabber()
 {
     // stop acquisition
     stop();
+    
+    // close device
+    d->close();
     delete d;
 }
 
@@ -61,48 +181,10 @@ void QVideoGrabber::onFrameCaptured()
 
 bool QVideoGrabber::start()
 {
-    HRESULT hr;
+    if (!d->opened && !d->open())
+        return false;
 
     CoInitialize(0);
-
-    // Create the filter graph
-    hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC,
-            IID_IGraphBuilder, (void**)&d->filterGraph);
-    if (FAILED(hr)) {
-        qWarning("Could not create filter graph");
-        return false;
-    }
-
-    // Create the capture graph builder
-    hr = CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC,
-        IID_ICaptureGraphBuilder2, (void**)&d->captureGraphBuilder);
-    if (FAILED(hr)) {
-        qWarning("Could not create capture graph builder");
-        return false;
-    }
-
-    // Attach the filter graph to the capture graph
-    hr = d->captureGraphBuilder->SetFiltergraph(d->filterGraph);
-    if (FAILED(hr)) {
-        qWarning("Could not connect capture graph and filter graph");
-        return false;
-    }
-
-    // Sample grabber filter
-    hr = CoCreateInstance(CLSID_SampleGrabber, NULL,CLSCTX_INPROC,
-                          IID_IBaseFilter, (void**)&d->sampleGrabberFilter);
-    if (FAILED(hr)) {
-        qWarning("Could not create sample grabber");
-        return false;
-    }
-    d->sampleGrabberFilter->QueryInterface(IID_ISampleGrabber, (void**)&d->sampleGrabber);
-    if (FAILED(hr)) {
-        qWarning("Could not get sample grabber");
-        return false;
-    }
-    d->sampleGrabber->SetOneShot(FALSE);
-    d->sampleGrabber->SetBufferSamples(TRUE);
-    //pSG->SetCallback(StillCapCB, 1);
 
     CoUninitialize();
 
@@ -111,20 +193,6 @@ bool QVideoGrabber::start()
 
 void QVideoGrabber::stop()
 {
-    if (d->sampleGrabberFilter) {
-        d->sampleGrabberFilter->Release();
-        d->sampleGrabberFilter = 0;
-    }
-
-    if (d->filterGraph) {
-        d->filterGraph->Release();
-        d->filterGraph = 0;
-    }
-
-    if (d->captureGraphBuilder) {
-        d->captureGraphBuilder->Release();
-        d->captureGraphBuilder = 0;
-    }
 }
 
 QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
