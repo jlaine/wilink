@@ -42,6 +42,11 @@ if(VORBISFILE_LIBRARY)
   endif()
 endif()
 
+# DirectShow support
+if(WIN32)
+  list(APPEND qsound_LIBRARIES -lole32 -loleaut32 -lwinmm -luuid)
+endif()
+
 # QTKit support
 find_library(QTKIT_LIBRARY NAMES QTKit)
 find_library(COCOA_LIBRARY NAMES Cocoa)
@@ -53,7 +58,7 @@ endif()
 
 SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp QVideoGrabber.cpp)
 if(WIN32)
-    list(APPEND qsound_SOURCES QVideoGrabber_dummy.cpp)
+    list(APPEND qsound_SOURCES QVideoGrabber_win.cpp)
 elseif(APPLE)
     list(APPEND qsound_SOURCES QVideoGrabber_mac.mm)
 else()

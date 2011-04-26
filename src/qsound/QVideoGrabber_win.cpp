@@ -17,12 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class IFilterGraph;
-class IBaseFilter;
-class IReferenceClock;
-
 #include <windows.h>
 #include <objbase.h>
+#include <initguid.h>
+
 //#include <dshow.h>
 
 #include <QByteArray>
@@ -32,13 +30,16 @@ class IReferenceClock;
 
 class QVideoGrabberPrivate
 {
-    IGraphBuilder *graphBuilder;
+public:
+    IFilterGraph *filterGraph;
+    ICaptureGraphBuilder2 *captureGraphBuilder;
 };
 
 QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
     d = new QVideoGrabberPrivate;
-    //d->graphBuilder = 0;
+    d->captureGraphBuilder = 0;
+    d->filterGraph = 0;
 }
 
 QVideoGrabber::~QVideoGrabber()
@@ -57,7 +58,23 @@ void QVideoGrabber::onFrameCaptured()
 
 bool QVideoGrabber::start()
 {
+    HRESULT hr;
+
     CoInitialize(0);
+
+    hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC,
+            IID_IGraphBuilder, (void**)d->filterGraph);
+    if (FAILED(hr)) {
+        qWarning("Could not create filter graph");
+        return false;
+    }
+
+    hr = CoCreateInstance(CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC,
+        IID_ICaptureGraphBuilder2, (void**)&d->captureGraphBuilder);
+    if (FAILED(hr)) {
+        qWarning("Could not create capture graph builder");
+        return false;
+    }
     return false;
 }
 

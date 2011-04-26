@@ -17,6 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+DEFINE_GUID( IID_ICaptureGraphBuilder2, 0x93e5a4e0, 0x2d50, 0x11d2,
+             0xab, 0xfa, 0x00, 0xa0, 0xc9, 0xc6, 0xe3, 0x8d);
+DEFINE_GUID( IID_IGraphBuilder, 0x56a868a9, 0x0ad4, 0x11ce,
+             0xb0, 0x3a, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
+DEFINE_GUID( IID_IBaseFilter, 0x56a86895, 0x0ad4, 0x11ce,
+             0xb0, 0x3a, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70 );
+
+typedef interface IAMCopyCaptureFileProgress IAMCopyCaptureFileProgress;
+typedef interface IBaseFilter IBaseFilter;
+typedef interface IFileSinkFilter IFileSinkFilter;
+typedef interface IFilterGraph IFilterGraph;
+typedef interface IReferenceClock IReferenceClock;
+
+DEFINE_GUID( CLSID_CaptureGraphBuilder2, 0xbf87b6e1, 0x8c27, 0x11d0,
+             0xb3, 0xf0, 0x00, 0xaa, 0x00, 0x37, 0x61, 0xc5 );
+DEFINE_GUID( CLSID_FilterGraph, 0xe436ebb3, 0x524f, 0x11ce,
+             0x9f, 0x53, 0x00, 0x20, 0xaf, 0x0b, 0xa7, 0x70);
 typedef LONGLONG REFERENCE_TIME;
 
 typedef struct _AMMediaType {
@@ -138,3 +159,24 @@ DECLARE_INTERFACE_(IGraphBuilder,IFilterGraph)
   STDMETHOD(ShouldOperationContinue)(THIS) PURE;
 };
 #undef INTERFACE
+
+#define INTERFACE ICaptureGraphBuilder2
+DECLARE_INTERFACE_(ICaptureGraphBuilder2,IUnknown)
+{
+    STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+    STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+    STDMETHOD_(ULONG,Release)(THIS) PURE;
+    STDMETHOD(SetFiltergraph)(THIS_ IGraphBuilder*) PURE;
+    STDMETHOD(GetFiltergraph)(THIS_ IGraphBuilder*) PURE;
+    STDMETHOD(SetOutputFileName)(THIS_ REFIID,LPCOLESTR,IBaseFilter**,IFileSinkFilter**) PURE;
+    STDMETHOD(FindInterface)(THIS_ REFIID,REFIID,IBaseFilter*,REFIID,PVOID*) PURE;
+    STDMETHOD(RenderStream)(THIS_ REFIID,REFIID,IUnknown*,IBaseFilter*,IBaseFilter*) PURE;
+    STDMETHOD(ControlStream)(THIS_ REFIID,REFIID,IBaseFilter*,REFERENCE_TIME*,REFERENCE_TIME*,WORD,WORD) PURE;
+    STDMETHOD(AllocCapFile)(THIS_ LPCOLESTR, DWORDLONG) PURE;
+    STDMETHOD(CopyCaptureFile)(THIS_ LPOLESTR,LPOLESTR,int,IAMCopyCaptureFileProgress*) PURE;
+    STDMETHOD(FindPin)(THIS_ IUnknown *, PIN_DIRECTION,REFIID,REFIID,BOOL,int,IPin **) PURE;
+};
+#undef INTERFACE
+
+}
+
