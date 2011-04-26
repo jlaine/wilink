@@ -55,7 +55,7 @@ public:
 
     STDMETHODIMP BufferCB(double Time, BYTE *pBuffer, long BufferLen)
     {
-        qDebug("buffer cb");
+        QMetaObject::invokeMethod(q, "frameAvailable", Q_ARG(QXmppVideoFrame, currentFrame));
         return E_NOTIMPL;
     }
 
@@ -63,10 +63,10 @@ public:
     HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin);
     bool open();
 
+    QXmppVideoFrame currentFrame;
     bool opened;
     ICaptureGraphBuilder2 *captureGraphBuilder;
     IGraphBuilder *filterGraph;
-    IMediaControl *mediaControl;
     //IBaseFilter *nullRenderer;
     ISampleGrabber *sampleGrabber;
     IBaseFilter *sampleGrabberFilter;
@@ -227,7 +227,7 @@ bool QVideoGrabberPrivate::open()
     hr = captureGraphBuilder->RenderStream(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
                                            source, NULL, sampleGrabberFilter);
     if (FAILED(hr)) {
-        qWarning() << "failed to renderstream" << hr;
+        qWarning("Could not render stream");
         return false;
     }
 
@@ -250,6 +250,12 @@ bool QVideoGrabberPrivate::open()
 
     CoUninitialize();
 
+    const int frameWidth = videoFormat.frameWidth();
+    const int frameHeight = videoFormat.frameHeight();
+    const int bytesPerLine = frameWidth * 2;
+    videoFormat.setFrameSize(QSize(frameWidth, frameHeight));
+    videoFormat.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+    currentFrame = QXmppVideoFrame(bytesPerLine * frameHeight, videoFormat.frameSize(), bytesPerLine, videoFormat.pixelFormat());
     opened = true;
     return true;
 }
@@ -287,10 +293,8 @@ bool QVideoGrabber::start()
     if (!d->opened && !d->open())
         return false;
 
-    CoInitialize(0);
-
     IMediaControl* pControl = 0;
-    HRESULT hr = d->filterGraph->QueryInterface(IID_IMediaControl, (void**)&d->mediaControl);
+    HRESULT hr = d->filterGraph->QueryInterface(IID_IMediaControl, (void**)&pControl);
     if (FAILED(hr)) {
         qWarning("Could not get stream control");
         return false;
@@ -298,14 +302,22 @@ bool QVideoGrabber::start()
 
     hr = pControl->Run();
     pControl->Release();
-
-    CoUninitialize();
-
+    if (FAILED(hr))
+        return false;
     return true;
 }
 
 void QVideoGrabber::stop()
 {
+    IMediaControl* pControl = 0;
+    HRESULT hr = d->filterGraph->QueryInterface(IID_IMediaControl, (void**)&pControl);
+    if (FAILED(hr)) {
+        qWarning("Could not get stream control");
+        return;
+    }
+
+    hr = pControl->Stop();
+    pControl->Release();
 }
 
 QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
