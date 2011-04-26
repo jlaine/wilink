@@ -73,7 +73,7 @@ private:
         CVPixelBufferUnlockBaseAddress(videoFrame, 0);
     }
     
-    QMetaObject::invokeMethod(q, "readyRead");
+    QMetaObject::invokeMethod(q, "frameAvailable", Q_ARG(QXmppVideoFrame, currentFrame));
 }
 
 @end
@@ -222,11 +222,6 @@ QVideoGrabber::~QVideoGrabber()
     d->close();
 
     delete d;
-}
-
-QXmppVideoFrame QVideoGrabber::currentFrame()
-{
-    return d->delegate->currentFrame;
 }
 
 QXmppVideoFormat QVideoGrabber::format() const

@@ -213,11 +213,6 @@ QVideoGrabber::~QVideoGrabber()
     delete d;
 }
 
-QXmppVideoFrame QVideoGrabber::currentFrame()
-{
-    return d->currentFrame;
-}
-
 QXmppVideoFormat QVideoGrabber::format() const
 {
     return d->videoFormat;
@@ -244,7 +239,7 @@ void QVideoGrabber::onFrameCaptured()
     if (ioctl(d->fd, VIDIOC_QBUF, &handle) < 0)
         qWarning("QVideoGrabber(%s): could not queue buffer %i", qPrintable(d->deviceName), handle.index);
 
-    emit readyRead();
+    emit frameAvailable(d->currentFrame);
 }
 
 bool QVideoGrabber::start()

@@ -18,7 +18,7 @@
  */
 
 #include <QApplication>
-#include <QByteArray>
+#include <QMetaType>
 
 #include "QVideoGrabber.h"
 #include "grabber.h"
@@ -27,11 +27,12 @@ Grabber::Grabber()
     : m_count(0),
     m_input(0)
 {
+    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 }
 
-void Grabber::saveFrame()
+void Grabber::saveFrame(const QXmppVideoFrame &frame)
 {
-    QXmppVideoFrame frame = m_input->currentFrame();
+    //QXmppVideoFrame frame = m_input->currentFrame();
     if (!frame.isValid() || frame.size() != m_image.size()) {
         qWarning("Invalid frame");
         return;
@@ -48,8 +49,8 @@ void Grabber::saveFrame()
 void Grabber::start(QVideoGrabber *input)
 {
     m_input = input;
-    connect(m_input, SIGNAL(readyRead()),
-            this, SLOT(saveFrame()));
+    connect(m_input, SIGNAL(frameAvailable(QXmppVideoFrame)),
+            this, SLOT(saveFrame(QXmppVideoFrame)));
 
     if (!m_input->start()) {
         qWarning("Could not start capture");

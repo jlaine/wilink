@@ -31,7 +31,6 @@ public:
     QVideoGrabber(const QXmppVideoFormat &format);
     ~QVideoGrabber();
 
-    QXmppVideoFrame currentFrame();
     QXmppVideoFormat format() const;
     bool start();
     void stop();
@@ -39,7 +38,7 @@ public:
     static void frameToImage(const QXmppVideoFrame *frame, QImage *image);
 
 signals:
-    void readyRead();
+    void frameAvailable(const QXmppVideoFrame &frame);
 
 private slots:
     void onFrameCaptured();

@@ -20,6 +20,7 @@
 #include <QImage>
 #include <QObject>
 
+class QXmppVideoFrame;
 class QVideoGrabber;
 
 class Grabber : public QObject
@@ -34,7 +35,7 @@ signals:
     void finished();
 
 private slots:
-    void saveFrame();
+    void saveFrame(const QXmppVideoFrame &frame);
 
 private:
     int m_count;
