@@ -679,7 +679,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
             QString bodies;
             foreach (ChatModelItem *ptr, item->children) {
                 ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
-                bodies += "<p>" + d->html(child) + "</p>";
+                bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + d->html(child) + "</p>";
             }
             return bodies;
         }
