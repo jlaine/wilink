@@ -383,7 +383,16 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     // start or stop capture
     const bool canWrite = (mode & QIODevice::WriteOnly);
     if (canWrite && !m_videoGrabber) {
-        QXmppVideoFormat format = channel->encoderFormat();
+        const QXmppVideoFormat format = channel->encoderFormat();
+
+        // determine if we need a conversion
+        QList<QVideoGrabberInfo> grabbers = QVideoGrabberInfo::availableGrabbers();
+        QList<QXmppVideoFrame::PixelFormat> pixelFormats = grabbers.first().supportedPixelFormats();
+        if (!pixelFormats.contains(format.pixelFormat())) {
+            qWarning("we need a format conversion");
+            return;
+        }
+
         m_videoGrabber = new QVideoGrabber(format);
         connect(m_videoGrabber, SIGNAL(frameAvailable(QXmppVideoFrame)),
                 this, SLOT(videoCapture(QXmppVideoFrame)));
