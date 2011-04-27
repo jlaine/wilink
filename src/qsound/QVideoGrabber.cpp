@@ -42,7 +42,7 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
         for (int y = 0; y < height; ++y) {
             const uchar *ptr = row;
             for (int x = 0; x < width; ++x) {
-                *(dest)++ = 0xff000000 | (ptr[2] << 16) | (ptr[1] << 8) | ptr[1];
+                *(dest)++ = 0xff000000 | (ptr[2] << 16) | (ptr[1] << 8) | ptr[0];
                 ptr += 3;
             }
             row += stride;
