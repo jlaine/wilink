@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <signal.h>
+
 #include <QApplication>
 #include <QMetaType>
 
@@ -64,13 +66,27 @@ void Grabber::start(QVideoGrabber *input)
     m_image.fill(0);
 }
 
+static int aborted = 0;
+static void signal_handler(int sig)
+{
+    if (aborted)
+        exit(1);
+
+    qApp->quit();
+    aborted = 1;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    /* Install signal handler */
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
+
     // list available devices
     foreach (const QVideoGrabberInfo &info, QVideoGrabberInfo::availableGrabbers()) {
-        qDebug("Device %s", qPrintable(info.deviceName()));
+        qDebug("Device %s (%s)", qPrintable(info.deviceName()), qPrintable(info.deviceDescription()));
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUYV))
             qDebug(" - supports YUYV");
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUV420P))
