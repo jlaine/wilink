@@ -386,8 +386,12 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     if (canWrite && !m_videoGrabber) {
         const QXmppVideoFormat format = channel->encoderFormat();
 
-        // determine if we need a conversion
+        // check we have a video input
         QList<QVideoGrabberInfo> grabbers = QVideoGrabberInfo::availableGrabbers();
+        if (grabbers.isEmpty())
+            return;
+
+        // determine if we need a conversion
         QList<QXmppVideoFrame::PixelFormat> pixelFormats = grabbers.first().supportedPixelFormats();
         if (!pixelFormats.contains(format.pixelFormat())) {
             qWarning("we need a format conversion");
