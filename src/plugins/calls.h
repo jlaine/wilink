@@ -104,6 +104,7 @@ private:
     CallVideoWidget *m_videoOutput;
     CallVideoWidget *m_videoMonitor;
 
+    QList<ChatPanelButton*> m_buttons;
     ChatPanelButton *m_hangupButton;
     ChatPanelText *m_label;
     QXmppCall *m_call;

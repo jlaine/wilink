@@ -125,11 +125,13 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
         m_videoButton = new ChatPanelButton(this);
         m_videoButton->setPixmap(QPixmap(":/camera.png"));
         connect(m_videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
+        m_buttons << m_videoButton;
     }
 
     m_hangupButton = new ChatPanelButton(this);
     m_hangupButton->setPixmap(QPixmap(":/hangup.png"));
     m_hangupButton->setToolTip(tr("Hang up"));
+    m_buttons << m_hangupButton;
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -300,12 +302,8 @@ void CallWidget::setGeometry(const QRectF &baseRect)
     rect.moveLeft(0);
 
     qreal right = rect.right();
-    QList<QGraphicsLayoutItem*> buttons;
-    if (m_videoButton)
-        buttons << m_videoButton;
-    buttons << m_hangupButton;
-    for (int i = buttons.size() - 1; i >= 0; --i) {
-        QGraphicsLayoutItem *button = buttons.at(i);
+    for (int i = m_buttons.size() - 1; i >= 0; --i) {
+        ChatPanelButton *button = m_buttons.at(i);
         QRectF geometry;
         geometry.setSize(button->effectiveSizeHint(Qt::PreferredSize));
         geometry.moveRight(right);
@@ -330,6 +328,13 @@ QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
         QSizeF hint = m_label->effectiveSizeHint(which);
         hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
         hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
+
+        foreach (ChatPanelButton *button, m_buttons) {
+            QSizeF size = button->effectiveSizeHint(which);
+            hint.setWidth(hint.width() + size.width());
+            if (size.height() > hint.height())
+                hint.setHeight(size.height());
+        }
         return hint;
     } else {
         return constraint;
