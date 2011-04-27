@@ -27,6 +27,8 @@
                                   (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
                                    quint8(yp + 1.732 * cb))
 
+#define RGB_to_Y(r, g, b) ((77 * r1 + 160 * g1 + 29 * b1) / 256)
+
 void QVideoGrabber::convert(const QSize &size,
                             QXmppVideoFrame::PixelFormat inputFormat, const int inputStride, const uchar *input,
                             QXmppVideoFrame::PixelFormat outputFormat, const int outputStride, uchar *output)
@@ -34,7 +36,21 @@ void QVideoGrabber::convert(const QSize &size,
     const int width = size.width();
     const int height = size.height();
     if (inputFormat == QXmppVideoFrame::Format_RGB24) {
-        if (outputFormat == QXmppVideoFrame::Format_YUYV) {
+        if (outputFormat == QXmppVideoFrame::Format_RGB32) {
+            // convert RGB24 to RGB32
+            const uchar *i_row = input;
+            QRgb *o_row = reinterpret_cast<QRgb*>(output);
+            for (int y = 0; y < height; ++y) {
+                const uchar *i_ptr = i_row;
+                QRgb *o_ptr = o_row;
+                for (int x = 0; x < width; ++x) {
+                    *(o_ptr)++ = 0xff000000 | (i_ptr[2] << 16) | (i_ptr[1] << 8) | i_ptr[0];
+                    i_ptr += 3;
+                }
+                i_row += inputStride;
+                o_row += outputStride;
+            }
+        } else if (outputFormat == QXmppVideoFrame::Format_YUYV) {
             // convert ARGB24 to YUV 4:2:2
             const uchar *i_row = input;
             uchar *o_row = output;
@@ -48,9 +64,9 @@ void QVideoGrabber::convert(const QSize &size,
                     const quint8 b2 = *(i_ptr)++;
                     const quint8 g2 = *(i_ptr)++;
                     const quint8 r2 = *(i_ptr)++;
-                    *(o_ptr) = (77 * r1 + 160 * g1 + 29 * b1) / 256;
+                    *(o_ptr) = RGB_to_Y(r1, g1, b1);
                     *(o_ptr) = 128 + (- 44 * r1 - 87 * g1 + 131 * b1) / 256;
-                    *(o_ptr) = (77 * r2 + 160 * g2 + 29 * b2) / 256;
+                    *(o_ptr) = RGB_to_Y(r2, g2, b2);
                     *(o_ptr) = 128 + (131 * r1 - 110 * g2 - 21 * b2) / 256;
                 }
                 i_row += inputStride;
