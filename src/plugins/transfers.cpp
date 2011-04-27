@@ -117,7 +117,7 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
 }
 
 ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent)
-    : ChatPanelWidget(parent),
+    : QGraphicsWidget(parent),
     m_job(job)
 {
     if (m_job->direction() == QXmppTransferJob::IncomingDirection)
@@ -131,7 +131,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
 
     m_button = new ChatPanelButton(this);
     m_button->setPixmap(QPixmap(":/close.png"));
-    addButton(m_button);
+    //addButton(m_button);
 
     // central widget
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical, this);
@@ -182,7 +182,7 @@ void ChatTransferWidget::slotCancel()
     } else {
         // make widget disappear
         m_button->setEnabled(false);
-        disappear();
+        emit finished();
     }
 }
 
@@ -232,7 +232,7 @@ void ChatTransferWidget::slotFinished()
     if (m_disappearWhenFinished)
     {
         m_button->setEnabled(false);
-        QTimer::singleShot(1000, this, SLOT(disappear()));
+        QTimer::singleShot(1000, this, SIGNAL(finished()));
     }
 }
 

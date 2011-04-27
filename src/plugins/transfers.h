@@ -51,12 +51,15 @@ private:
 /** The ChatTransferWidget class represents a widget for displaying
  *  the progress of a file transfer.
  */
-class ChatTransferWidget : public ChatPanelWidget
+class ChatTransferWidget : public QGraphicsWidget
 {
     Q_OBJECT
 
 public:
     ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent = 0);
+
+signals:
+    void finished();
 
 private slots:
     void slotCancel();
