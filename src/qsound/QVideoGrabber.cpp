@@ -27,7 +27,7 @@
                                   (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
                                    quint8(yp + 1.732 * cb))
 
-#define RGB_to_Y(rgb) ((77 * qRed(rgb) + 160 * qGreen(rgb) + 29 * qBlue(rgb)) / 256)
+#define RGB_to_Y(r, g, b) ((77 * r1 + 160 * g1 + 29 * b1) / 256)
 
 void QVideoGrabber::convert(const QSize &size,
                             QXmppVideoFrame::PixelFormat inputFormat, const int inputStride, const uchar *input,
@@ -117,24 +117,28 @@ void QVideoGrabber::convert(const QSize &size,
             }
         }
 
-    // convert from RGB32 to any format
-    } else if (inputFormat == QXmppVideoFrame::Format_RGB32) {
-        if (outputFormat == QXmppVideoFrame::Format_YUYV) {
-            // convert RGB32 to YUV 4:2:2
-            const QRgb *i_row = reinterpret_cast<const QRgb*>(input);
+    // convert to YUYV from selected formats
+    } else if (outputFormat == QXmppVideoFrame::Format_YUYV) {
+        if (inputFormat == QXmppVideoFrame::Format_RGB24) {
+            // convert RGB24 to YUYV
+            const uchar *i_row = input;
             uchar *o_row = output;
             for (int y = 0; y < height; ++y) {
-                const QRgb *i_ptr = i_row;
+                const uchar *i_ptr = i_row;
                 uchar *o_ptr = o_row;
                 for (int x = 0; x < width; x += 2) {
-                    const QRgb rgb1 = *(i_ptr)++;
-                    const QRgb rgb2 = *(i_ptr)++;
-                    *(o_ptr) = RGB_to_Y(rgb1);
-                    *(o_ptr) = 128 + (- 44 * qRed(rgb1) - 87 * qGreen(rgb1) + 131 * qBlue(rgb1)) / 256;
-                    *(o_ptr) = RGB_to_Y(rgb2);
-                    *(o_ptr) = 128 + (131 * qRed(rgb2) - 110 * qGreen(rgb2) - 21 * qBlue(rgb2)) / 256;
+                    const quint8 b1 = *(i_ptr)++;
+                    const quint8 g1 = *(i_ptr)++;
+                    const quint8 r1 = *(i_ptr)++;
+                    const quint8 b2 = *(i_ptr)++;
+                    const quint8 g2 = *(i_ptr)++;
+                    const quint8 r2 = *(i_ptr)++;
+                    *(o_ptr) = RGB_to_Y(r1, g1, b1);
+                    *(o_ptr) = 128 + (- 44 * r1 - 87 * g1 + 131 * b1) / 256;
+                    *(o_ptr) = RGB_to_Y(r2, g2, b2);
+                    *(o_ptr) = 128 + (131 * r2 - 110 * g2 - 21 * b2) / 256;
                 }
-                i_row += inputStride/4;
+                i_row += inputStride;
                 o_row += outputStride;
             }
         }
