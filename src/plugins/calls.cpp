@@ -169,6 +169,9 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
 CallWidget::~CallWidget()
 {
+    audioModeChanged(QIODevice::NotOpen);
+    videoModeChanged(QIODevice::NotOpen);
+
     // stop tone
     if (m_soundId)
         wApp->soundPlayer()->stop(m_soundId);
