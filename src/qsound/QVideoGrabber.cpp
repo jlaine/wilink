@@ -40,7 +40,19 @@ void QVideoGrabber::convert(const QSize &size,
     if (outputFormat == QXmppVideoFrame::Format_RGB32) {
         QRgb *o_row = reinterpret_cast<QRgb*>(output);
 
-        if (inputFormat == QXmppVideoFrame::Format_RGB24) {
+        if (inputFormat  == QXmppVideoFrame::Format_RGB32) {
+
+            // copy RGB32
+            const int chunk = width * 4;
+            const uchar *i_row = input;
+            uchar *o_row = output;
+            for (int y = 0; y < height; ++y) {
+                memcpy(o_row, i_row, chunk);
+                i_row += inputStride;
+                o_row += outputStride;
+            }
+
+        } else if (inputFormat == QXmppVideoFrame::Format_RGB24) {
 
             // convert RGB24 to RGB32
             const uchar *i_row = input;
