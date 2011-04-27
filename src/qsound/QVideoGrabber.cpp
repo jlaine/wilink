@@ -51,7 +51,7 @@ void QVideoGrabber::convert(const QSize &size,
                 o_row += outputStride;
             }
         } else if (outputFormat == QXmppVideoFrame::Format_YUYV) {
-            // convert ARGB24 to YUV 4:2:2
+            // convert RGB24 to YUV 4:2:2
             const uchar *i_row = input;
             uchar *o_row = output;
             for (int y = 0; y < height; ++y) {
