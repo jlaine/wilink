@@ -118,7 +118,6 @@ CallArea::CallArea(QGraphicsItem *parent)
     : QGraphicsWidget(parent)
 {
     m_label = new ChatPanelText(tr("Connecting.."), this);
-    m_label->setPos(8, 8);
     videoOutput = new CallVideoWidget(this);
     videoMonitor = new CallVideoWidget(this);
 }
@@ -138,9 +137,8 @@ void CallArea::setPlaybackFormat(const QXmppVideoFormat &format)
 {
     videoOutput->setFormat(format);
     videoOutput->setSize(format.frameSize());
-    videoOutput->setPos(8, 8);
-    videoMonitor->setPos(8 + format.frameSize().width(), 8);
-    m_label->setPos(8, 8 + format.frameSize().height());
+    videoMonitor->setPos(format.frameSize().width(), 0);
+    m_label->setPos(0, format.frameSize().height());
     updateGeometry();
 }
 
@@ -157,9 +155,7 @@ QSizeF CallArea::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
         const QSizeF outputSize = videoOutput->boundingRect().size();
         const QSizeF monitorSize = videoMonitor->boundingRect().size();
         QSizeF hint = m_label->effectiveSizeHint(which);
-        hint.setWidth(hint.height() + 16);
-        hint.setHeight(hint.height() + 16);
-        hint.setWidth(hint.width() + outputSize.width() + monitorSize.width());
+        hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
         hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
         return hint;
     } else {
