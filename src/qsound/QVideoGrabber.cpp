@@ -29,6 +29,30 @@
 
 #define RGB_to_Y(r, g, b) ((77 * r1 + 160 * g1 + 29 * b1) / 256)
 
+QPair<int,int> QVideoGrabber::byteMetrics(QXmppVideoFrame::PixelFormat format, const QSize &size)
+{
+    const int width = size.width();
+    const int height = size.height();
+    int bytesPerLine, mappedBytes;
+    if (format == QXmppVideoFrame::Format_RGB32) {
+        bytesPerLine = width * 4;
+        mappedBytes = bytesPerLine * height;
+    } else if (format == QXmppVideoFrame::Format_RGB24) {
+        bytesPerLine = width * 3;
+        mappedBytes = bytesPerLine * height;
+    } else if (format == QXmppVideoFrame::Format_YUYV) {
+        bytesPerLine = width * 2;
+        mappedBytes = bytesPerLine * height;
+    } else if (format == QXmppVideoFrame::Format_YUV420P) {
+        bytesPerLine = width * 2;
+        mappedBytes = bytesPerLine * height / 2;
+    } else {
+        bytesPerLine = 0;
+        mappedBytes = 0;
+    }
+    return qMakePair(bytesPerLine, mappedBytes);
+}
+
 void QVideoGrabber::convert(const QSize &size,
                             QXmppVideoFrame::PixelFormat inputFormat, const int inputStride, const uchar *input,
                             QXmppVideoFrame::PixelFormat outputFormat, const int outputStride, uchar *output)
