@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
         qDebug("Device %s", qPrintable(info.deviceName()));
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_RGB32))
             qDebug(" - supports RGB32");
+        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_RGB24))
+            qDebug(" - supports RGB24");
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUYV))
             qDebug(" - supports YUYV");
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUV420P))
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
     format.setFrameRate(20.0);
     format.setFrameSize(QSize(320, 240));
 #ifdef Q_OS_WIN
-    format.setPixelFormat(QXmppVideoFrame::Format_RGB32);
+    format.setPixelFormat(QXmppVideoFrame::Format_RGB24);
 #else
     format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
 #endif
