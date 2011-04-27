@@ -129,24 +129,27 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
         m_disappearWhenFinished = true;
     }
 
-    m_button = new ChatPanelButton(this);
-    m_button->setPixmap(QPixmap(":/close.png"));
-    //addButton(m_button);
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
 
-    // central widget
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical, this);
-
+    // progress bar
     m_progress = new QProgressBar;
     m_progress->setMaximumHeight(PROGRESS_HEIGHT);
     m_progressProxy = new QGraphicsProxyWidget(this);
     m_progressProxy->setWidget(m_progress);
     layout->addItem(m_progressProxy);
 
+    // status label
     m_label = new ChatPanelText(QString("%1 (%2)").arg(
         m_job->fileName(),
         sizeToString(job->fileSize())), this);
     layout->addItem(m_label);
-    //setCentralWidget(layout);
+
+    // close button
+    m_button = new ChatPanelButton(this);
+    m_button->setPixmap(QPixmap(":/close.png"));
+    layout->addItem(m_button);
+
+    setLayout(layout);
 
     // connect signals
     bool check;
