@@ -151,16 +151,16 @@ void QVideoGrabber::convert(const QSize &size,
                 const uchar *i_ptr = i_row;
                 uchar *o_ptr = o_row;
                 for (int x = 0; x < width; x += 2) {
-                    const quint8 b1 = *(i_ptr)++;
-                    const quint8 g1 = *(i_ptr)++;
-                    const quint8 r1 = *(i_ptr)++;
-                    const quint8 b2 = *(i_ptr)++;
-                    const quint8 g2 = *(i_ptr)++;
-                    const quint8 r2 = *(i_ptr)++;
-                    *(o_ptr) = RGB_to_Y(r1, g1, b1);
-                    *(o_ptr) = 128 + (- 44 * r1 - 87 * g1 + 131 * b1) / 256;
-                    *(o_ptr) = RGB_to_Y(r2, g2, b2);
-                    *(o_ptr) = 128 + (131 * r2 - 110 * g2 - 21 * b2) / 256;
+                    const quint8 b1 = *(i_ptr++);
+                    const quint8 g1 = *(i_ptr++);
+                    const quint8 r1 = *(i_ptr++);
+                    const quint8 b2 = *(i_ptr++);
+                    const quint8 g2 = *(i_ptr++);
+                    const quint8 r2 = *(i_ptr++);
+                    *(o_ptr++) = RGB_to_Y(r1, g1, b1);
+                    *(o_ptr++) = 128 + (- 44 * r1 - 87 * g1 + 131 * b1) / 256;
+                    *(o_ptr++) = RGB_to_Y(r2, g2, b2);
+                    *(o_ptr++) = 128 + (131 * r2 - 110 * g2 - 21 * b2) / 256;
                 }
                 i_row += inputStride;
                 o_row += outputStride;
