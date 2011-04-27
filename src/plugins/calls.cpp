@@ -98,62 +98,38 @@ void CallVideoWidget::setSize(const QSizeF &size)
     m_boundingRect = QRectF(QPointF(0, 0), size);
 }
 
-class CallArea : public QGraphicsWidget
-{
-public:
-    CallArea(QGraphicsItem *parent);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
-    void setCaptureFormat(const QXmppVideoFormat &format);
-    void setPlaybackFormat(const QXmppVideoFormat &format);
-    void setStatus(const QString &status);
-
-    CallVideoWidget *videoOutput;
-    CallVideoWidget *videoMonitor;
-
-private:
-    ChatPanelText *m_label;
-};
-
-CallArea::CallArea(QGraphicsItem *parent)
-    : QGraphicsWidget(parent)
-{
-    m_label = new ChatPanelText(tr("Connecting.."), this);
-    videoOutput = new CallVideoWidget(this);
-    videoMonitor = new CallVideoWidget(this);
-}
-
 /** Sets the video capture format.
  */
-void CallArea::setCaptureFormat(const QXmppVideoFormat &format)
+void CallWidget::setCaptureFormat(const QXmppVideoFormat &format)
 {
-    videoMonitor->setFormat(format);
-    videoMonitor->setSize(QSizeF(format.frameSize().width() / 2, format.frameSize().height() / 2));
+    m_videoMonitor->setFormat(format);
+    m_videoMonitor->setSize(QSizeF(format.frameSize().width() / 2, format.frameSize().height() / 2));
     updateGeometry();
 }
 
 /** Sets the video playback format.
  */
-void CallArea::setPlaybackFormat(const QXmppVideoFormat &format)
+void CallWidget::setPlaybackFormat(const QXmppVideoFormat &format)
 {
-    videoOutput->setFormat(format);
-    videoOutput->setSize(format.frameSize());
-    videoMonitor->setPos(format.frameSize().width(), 0);
+    m_videoOutput->setFormat(format);
+    m_videoOutput->setSize(format.frameSize());
+    m_videoMonitor->setPos(format.frameSize().width(), 0);
     m_label->setPos(0, format.frameSize().height());
     updateGeometry();
 }
 
 /** Sets the status text.
  */
-void CallArea::setStatus(const QString &status)
+void CallWidget::setStatus(const QString &status)
 {
     m_label->setPlainText(status);
 }
 
-QSizeF CallArea::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        const QSizeF outputSize = videoOutput->boundingRect().size();
-        const QSizeF monitorSize = videoMonitor->boundingRect().size();
+        const QSizeF outputSize = m_videoOutput->boundingRect().size();
+        const QSizeF monitorSize = m_videoMonitor->boundingRect().size();
         QSizeF hint = m_label->effectiveSizeHint(which);
         hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
         hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
@@ -164,7 +140,7 @@ QSizeF CallArea::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 }
 
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
-    : ChatPanelWidget(parent),
+    : QGraphicsWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
     m_videoConversion(0),
@@ -180,22 +156,25 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_videoTimer = new QTimer(this);
 
     // setup GUI
+    m_label = new ChatPanelText(tr("Connecting.."), this);
+    m_videoOutput = new CallVideoWidget(this);
+    m_videoMonitor = new CallVideoWidget(this);
+
     const QStringList videoJids = rosterModel->contactFeaturing(m_call->jid(), ChatRosterModel::VideoFeature);
     if (videoJids.contains(m_call->jid())) {
         ChatPanelButton *videoButton = new ChatPanelButton(this);
         videoButton->setPixmap(QPixmap(":/camera.png"));
-        addButton(videoButton);
+        //addButton(videoButton);
         connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
     }
 
     m_button = new ChatPanelButton(this);
     m_button->setPixmap(QPixmap(":/hangup.png"));
     m_button->setToolTip(tr("Hang up"));
-    addButton(m_button);
+    //addButton(m_button);
 
     // central widget
-    m_area = new CallArea(this);
-    setCentralWidget(m_area);
+    //setCentralWidget(m_area);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -318,7 +297,7 @@ void CallWidget::callRinging()
     if (m_call->state() != QXmppCall::ConnectingState)
         return;
 
-    m_area->setStatus(tr("Ringing.."));
+    setStatus(tr("Ringing.."));
 
     // start outgoing tone
     if (!m_soundId)
@@ -337,24 +316,24 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     switch (state)
     {
     case QXmppCall::ConnectingState:
-        m_area->setStatus(tr("Connecting.."));
+        setStatus(tr("Connecting.."));
         break;
     case QXmppCall::ActiveState:
-        m_area->setStatus(tr("Call connected."));
+        setStatus(tr("Call connected."));
         break;
     case QXmppCall::DisconnectingState:
-        m_area->setStatus(tr("Disconnecting.."));
+        setStatus(tr("Disconnecting.."));
         m_button->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
-        m_area->setStatus(tr("Call finished."));
+        setStatus(tr("Call finished."));
         m_button->setEnabled(false);
         break;
     }
 
     // make widget disappear
     if (state == QXmppCall::FinishedState)
-        QTimer::singleShot(1000, this, SLOT(disappear()));
+        QTimer::singleShot(1000, this, SIGNAL(finished()));
 }
 
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
@@ -368,7 +347,7 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_videoTimer->isActive()) {
         QXmppVideoFormat format = channel->decoderFormat();
-        m_area->setPlaybackFormat(format);
+        setPlaybackFormat(format);
         m_videoTimer->start(1000 / format.frameRate());
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
@@ -402,7 +381,7 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         connect(m_videoGrabber, SIGNAL(frameAvailable(QXmppVideoFrame)),
                 this, SLOT(videoCapture(QXmppVideoFrame)));
         m_videoGrabber->start();
-        m_area->setCaptureFormat(m_videoGrabber->format());
+        setCaptureFormat(m_videoGrabber->format());
     } else if (!canWrite && m_videoGrabber) {
         m_videoGrabber->stop();
         delete m_videoGrabber;
@@ -433,7 +412,7 @@ void CallWidget::videoCapture(const QXmppVideoFrame &frame)
         } else {
             channel->writeFrame(frame);
         }
-        m_area->videoMonitor->present(frame);
+        m_videoMonitor->present(frame);
     }
 }
 
@@ -445,7 +424,7 @@ void CallWidget::videoRefresh()
 
     QList<QXmppVideoFrame> frames = channel->readFrames();
     if (!frames.isEmpty())
-        m_area->videoOutput->present(frames.last());
+        m_videoOutput->present(frames.last());
 }
 
 CallWatcher::CallWatcher(Chat *chatWindow)

@@ -38,7 +38,7 @@ class ChatConversation : public ChatPanel
 public:
     ChatConversation(QWidget *parent = NULL);
     ~ChatConversation();
-    void addWidget(ChatPanelWidget *widget);
+    void addWidget(QGraphicsWidget *widget);
     ChatHistoryModel *historyModel();
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);

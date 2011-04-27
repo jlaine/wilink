@@ -52,7 +52,7 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
-    virtual void addWidget(ChatPanelWidget *widget);
+    virtual void addWidget(QGraphicsWidget *widget);
     virtual ChatRosterModel::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
@@ -95,7 +95,7 @@ class ChatPanelBar : public QGraphicsWidget
 
 public:
     ChatPanelBar(QGraphicsView *view);
-    void addWidget(ChatPanelWidget *widget);
+    void addWidget(QGraphicsWidget *widget);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *Event);

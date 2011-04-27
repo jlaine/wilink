@@ -123,7 +123,7 @@ ChatPanel::~ChatPanel()
     delete d;
 }
 
-void ChatPanel::addWidget(ChatPanelWidget *widget)
+void ChatPanel::addWidget(QGraphicsWidget *widget)
 {
     Q_UNUSED(widget);
 }
@@ -333,10 +333,13 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     Q_ASSERT(check);
 }
 
-void ChatPanelBar::addWidget(ChatPanelWidget *widget)
+void ChatPanelBar::addWidget(QGraphicsWidget *widget)
 {
-    m_layout->addItem(widget);
-    widget->appear();
+    ChatPanelWidget *wrapper = new ChatPanelWidget(this);
+    wrapper->setCentralWidget(widget);
+    connect(widget, SIGNAL(finished()), wrapper, SLOT(disappear()));
+    m_layout->addItem(wrapper);
+    wrapper->appear();
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)

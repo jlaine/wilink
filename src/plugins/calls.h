@@ -28,7 +28,6 @@
 
 #include "chat_panel.h"
 
-class CallArea;
 class Chat;
 class ChatRosterModel;
 class QAbstractButton;
@@ -64,13 +63,16 @@ private:
     QImage m_image;
 };
 
-class CallWidget : public ChatPanelWidget
+class CallWidget : public QGraphicsWidget
 {
     Q_OBJECT
 
 public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
     ~CallWidget();
+
+signals:
+    void finished();
 
 private slots:
     void audioModeChanged(QIODevice::OpenMode mode);
@@ -81,9 +83,15 @@ private slots:
     void videoCapture(const QXmppVideoFrame &frame);
     void videoRefresh();
 
+protected:
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
+
 private:
     void debug(const QString&) {};
     void warning(const QString&) {};
+    void setCaptureFormat(const QXmppVideoFormat &format);
+    void setPlaybackFormat(const QXmppVideoFormat &format);
+    void setStatus(const QString &status);
 
     // audio
     QAudioInput *m_audioInput;
@@ -93,9 +101,11 @@ private:
     QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
     QXmppVideoFrame *m_videoConversion;
+    CallVideoWidget *m_videoOutput;
+    CallVideoWidget *m_videoMonitor;
 
-    CallArea *m_area;
     ChatPanelButton *m_button;
+    ChatPanelText *m_label;
     QXmppCall *m_call;
     int m_soundId;
 };

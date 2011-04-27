@@ -200,7 +200,7 @@ ChatConversation::~ChatConversation()
     delete d;
 }
 
-void ChatConversation::addWidget(ChatPanelWidget *widget)
+void ChatConversation::addWidget(QGraphicsWidget *widget)
 {
     d->panelBar->addWidget(widget);
 }
