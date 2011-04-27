@@ -171,6 +171,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     : ChatPanelWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
+    m_videoConversion(0),
     m_videoGrabber(0),
     m_call(call),
     m_soundId(0)
@@ -390,18 +391,28 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         QList<QXmppVideoFrame::PixelFormat> pixelFormats = grabbers.first().supportedPixelFormats();
         if (!pixelFormats.contains(format.pixelFormat())) {
             qWarning("we need a format conversion");
-            return;
+            QXmppVideoFormat auxFormat = format;
+            auxFormat.setPixelFormat(pixelFormats.first());
+            m_videoGrabber = new QVideoGrabber(auxFormat);
+
+            QPair<int, int> metrics = QVideoGrabber::byteMetrics(format.pixelFormat(), format.frameSize());
+            m_videoConversion = new QXmppVideoFrame(metrics.second, format.frameSize(), metrics.first, format.pixelFormat());
+        } else {
+            m_videoGrabber = new QVideoGrabber(format);
         }
 
-        m_videoGrabber = new QVideoGrabber(format);
         connect(m_videoGrabber, SIGNAL(frameAvailable(QXmppVideoFrame)),
                 this, SLOT(videoCapture(QXmppVideoFrame)));
         m_videoGrabber->start();
-        m_area->setCaptureFormat(format);
+        m_area->setCaptureFormat(m_videoGrabber->format());
     } else if (!canWrite && m_videoGrabber) {
         m_videoGrabber->stop();
         delete m_videoGrabber;
         m_videoGrabber = 0;
+        if (m_videoConversion) {
+            delete m_videoConversion;
+            m_videoConversion = 0;
+        }
     }
 
     // update geometry
@@ -415,7 +426,15 @@ void CallWidget::videoCapture(const QXmppVideoFrame &frame)
         return;
 
     if (frame.isValid()) {
-        channel->writeFrame(frame);
+        if (m_videoConversion) {
+            //m_videoConversion.setStartTime(frame.startTime());
+            QVideoGrabber::convert(frame.size(),
+                                   frame.pixelFormat(), frame.bytesPerLine(), frame.bits(),
+                                   m_videoConversion->pixelFormat(), m_videoConversion->bytesPerLine(), m_videoConversion->bits());
+            channel->writeFrame(*m_videoConversion);
+        } else {
+            channel->writeFrame(frame);
+        }
         m_area->videoMonitor->present(frame);
     }
 }

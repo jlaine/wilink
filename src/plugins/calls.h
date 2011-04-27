@@ -92,6 +92,7 @@ private:
     // video
     QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
+    QXmppVideoFrame *m_videoConversion;
 
     CallArea *m_area;
     ChatPanelButton *m_button;

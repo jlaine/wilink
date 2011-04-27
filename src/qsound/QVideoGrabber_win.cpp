@@ -349,25 +349,9 @@ bool QVideoGrabberPrivate::open()
 
     CoUninitialize();
 
-    const int frameWidth = videoFormat.frameWidth();
-    const int frameHeight = videoFormat.frameHeight();
-    int bytesPerLine = 0;
-    int mappedBytes = 0;
-    if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB32) {
-        bytesPerLine = frameWidth * 4;
-        mappedBytes = bytesPerLine * frameHeight;
-    } else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB24) {
-        bytesPerLine = frameWidth * 3;
-        mappedBytes = bytesPerLine * frameHeight;
-    } else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUYV) {
-        bytesPerLine = frameWidth * 2;
-        mappedBytes = bytesPerLine * frameHeight;
-    } else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
-        bytesPerLine = frameWidth * 2;
-        mappedBytes = bytesPerLine * frameHeight / 2;
-    }
-    qDebug("expecting frames to be %i", mappedBytes);
-    currentFrame = QXmppVideoFrame(mappedBytes, videoFormat.frameSize(), bytesPerLine, videoFormat.pixelFormat());
+    QPair<int, int> metrics = QVideoGrabber::byteMetrics(videoFormat.pixelFormat(), videoFormat.frameSize());
+    qDebug("expecting frames to be %i", metrics.second);
+    currentFrame = QXmppVideoFrame(metrics.second, videoFormat.frameSize(), metrics.first, videoFormat.pixelFormat());
     opened = true;
     return true;
 }
