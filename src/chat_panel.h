@@ -111,7 +111,7 @@ private:
     QGraphicsView *m_view;
 };
 
-/** The ChatPanelButton class represents a button in a ChatPanelWidget.
+/** The ChatPanelButton class represents a button.
  */
 class ChatPanelButton : public QGraphicsWidget
 {
@@ -135,6 +135,8 @@ private:
     QGraphicsPixmapItem *m_pixmap;
 };
 
+/** The ChatPanelText class represents a text label.
+ */
 class ChatPanelText : public QGraphicsTextItem, public QGraphicsLayoutItem
 {
     Q_OBJECT
@@ -153,8 +155,7 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 };
 
-/** ChatPanelWidget is the base class for "task" widgets displayed inside
- *  a ChatPanelBar.
+/** ChatPanelWidget is a wrapper for "task" widgets inside a ChatPanelBar.
  */
 class ChatPanelWidget : public QGraphicsWidget
 {
@@ -163,9 +164,6 @@ class ChatPanelWidget : public QGraphicsWidget
 public:
     ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *parent = 0);
     void setGeometry(const QRectF &rect);
-
-protected:
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private slots:
     void disappear();

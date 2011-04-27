@@ -512,7 +512,11 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *paren
     m_border->setBrush(gradient);
     m_border->setPen(QPen(palette.color(QPalette::Dark), 1));
 
-    m_centralWidget->setParentItem(this);
+    // add contents
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout;
+    layout->setContentsMargins(4, 4, 4, 4);
+    layout->addItem(m_centralWidget);
+    setLayout(layout);
     connect(m_centralWidget, SIGNAL(finished()), this, SLOT(disappear()));
 
     // widget starts transparent then appears
@@ -548,33 +552,13 @@ void ChatPanelWidget::disappear()
 
 /** Updates the widget geometry.
  */
-void ChatPanelWidget::setGeometry(const QRectF &baseRect)
+void ChatPanelWidget::setGeometry(const QRectF &rect)
 {
-    QGraphicsWidget::setGeometry(baseRect);
-
-    QRectF rect(baseRect);
-    rect.moveLeft(0);
-    rect.moveTop(0);
+    QGraphicsWidget::setGeometry(rect);
 
     // position border
     QPainterPath path;
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
-
-    // position contents
-    rect.adjust(BORDER_RADIUS/2, BORDER_RADIUS/2, -BORDER_RADIUS/2, -BORDER_RADIUS/2);
-    m_centralWidget->setGeometry(rect);
-}
-
-QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
-{
-    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        QSizeF hint = m_centralWidget->effectiveSizeHint(which);
-        hint.setWidth(hint.width() + BORDER_RADIUS);
-        hint.setHeight(hint.height() + BORDER_RADIUS);
-        return hint;
-    } else {
-        return constraint;
-    }
 }
 
