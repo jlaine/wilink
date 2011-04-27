@@ -55,11 +55,18 @@ public:
 
     STDMETHODIMP BufferCB(double Time, BYTE *pBuffer, long BufferLen)
     {
+        qDebug("got data %li", BufferLen);
+        if (BufferLen != currentFrame.mappedBytes()) {
+            qWarning("Bad data length");
+            return S_OK;
+        }
+        memcpy(currentFrame.bits(), pBuffer, BufferLen);
         QMetaObject::invokeMethod(q, "frameAvailable", Q_ARG(QXmppVideoFrame, currentFrame));
-        return E_NOTIMPL;
+        return S_OK;
     }
 
     void close();
+    void freeMediaType(AM_MEDIA_TYPE& mt);
     HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin);
     bool open();
 
@@ -67,10 +74,10 @@ public:
     bool opened;
     ICaptureGraphBuilder2 *captureGraphBuilder;
     IGraphBuilder *filterGraph;
-    //IBaseFilter *nullRenderer;
     ISampleGrabber *sampleGrabber;
     IBaseFilter *sampleGrabberFilter;
     IBaseFilter *source;
+    AM_MEDIA_TYPE stillMediaType;
     QXmppVideoFormat videoFormat;
 
 private:
@@ -81,6 +88,8 @@ QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     : captureGraphBuilder(0),
     filterGraph(0),
     opened(false),
+    sampleGrabber(0),
+    sampleGrabberFilter(0),
     source(0),
     q(qq)
 {
@@ -107,8 +116,21 @@ void QVideoGrabberPrivate::close()
         captureGraphBuilder->Release();
         captureGraphBuilder = 0;
     }
-
     opened = false;
+}
+
+void QVideoGrabberPrivate::freeMediaType(AM_MEDIA_TYPE& mt)
+{
+    if (mt.cbFormat != 0) {
+        CoTaskMemFree((PVOID)mt.pbFormat);
+        mt.cbFormat = 0;
+        mt.pbFormat = NULL;
+    }
+    if (mt.pUnk != NULL) {
+        // pUnk should not be used.
+        mt.pUnk->Release();
+        mt.pUnk = NULL;
+    }
 }
 
 HRESULT QVideoGrabberPrivate::getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin)
@@ -146,6 +168,7 @@ bool QVideoGrabberPrivate::open()
 
     CoInitialize(0);
 
+// 1: CREATE GRAPH
     // Create the filter graph
     hr = CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC,
             IID_IGraphBuilder, (void**)&filterGraph);
@@ -206,10 +229,96 @@ bool QVideoGrabberPrivate::open()
         qWarning("Could not get sample grabber");
         return false;
     }
+
     sampleGrabber->SetOneShot(FALSE);
     sampleGrabber->SetBufferSamples(TRUE);
     sampleGrabber->SetCallBack(this, 1);
 
+// 2: CONFIGURATION
+    IAMStreamConfig* pConfig = 0;
+    hr = captureGraphBuilder->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video, source,
+                                            IID_IAMStreamConfig, (void**)&pConfig);
+    if(FAILED(hr)) {
+        qWarning("Could not get configuration from capture device");
+        return false;
+    }
+
+    int iCount;
+    int iSize;
+    hr = pConfig->GetNumberOfCapabilities(&iCount, &iSize);
+    if(FAILED(hr)) {
+        qWarning("Could not get capabilities from capture device");
+        return false;
+    }
+
+    AM_MEDIA_TYPE *pmt = NULL;
+    VIDEOINFOHEADER *pvi = NULL;
+    VIDEO_STREAM_CONFIG_CAPS scc;
+    bool setFormatOK = false;
+    for (int iIndex = 0; iIndex < iCount; iIndex++) {
+        hr = pConfig->GetStreamCaps(iIndex, &pmt, reinterpret_cast<BYTE*>(&scc));
+        if (hr == S_OK) {
+            pvi = (VIDEOINFOHEADER*)pmt->pbFormat;
+
+            if ((pmt->majortype == MEDIATYPE_Video) &&
+                (pmt->formattype == FORMAT_VideoInfo)) {
+                qDebug("found %i x %i %x", pvi->bmiHeader.biWidth, pvi->bmiHeader.biHeight, pmt->subtype);
+                if (pmt->subtype == MEDIASUBTYPE_RGB32)
+                    qDebug("RGB32");
+                else if (pmt->subtype == MEDIASUBTYPE_RGB24)
+                    qDebug("RGB24");
+                else if (pmt->subtype == MEDIASUBTYPE_YUY2)
+                    qDebug("YUY2");
+                else if (pmt->subtype == MEDIASUBTYPE_I420)
+                    qDebug("I420");
+                if ((videoFormat.frameWidth() == pvi->bmiHeader.biWidth) &&
+                    (videoFormat.frameHeight() == pvi->bmiHeader.biHeight)) {
+                    hr = pConfig->SetFormat(pmt);
+                    freeMediaType(*pmt);
+                    if (SUCCEEDED(hr)) {
+                        qDebug("Set video format");
+                        setFormatOK = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    pConfig->Release();
+
+    if (!setFormatOK) {
+        qWarning("Could not set video format");
+        return false;
+    }
+
+    // Set sample grabber format
+    AM_MEDIA_TYPE am_media_type;
+    ZeroMemory(&am_media_type, sizeof(am_media_type));
+    am_media_type.majortype = MEDIATYPE_Video;
+    am_media_type.formattype = FORMAT_VideoInfo;
+
+    if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB32)
+        am_media_type.subtype = MEDIASUBTYPE_RGB32;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB24)
+        am_media_type.subtype = MEDIASUBTYPE_RGB24;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUYV)
+        am_media_type.subtype = MEDIASUBTYPE_YUY2;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUV420P)
+        am_media_type.subtype = MEDIASUBTYPE_I420;
+    else {
+        qWarning("bad format");
+        return false;
+    }
+
+    hr = sampleGrabber->SetMediaType(&am_media_type);
+    if (FAILED(hr)) {
+        qWarning("Could not set video format on grabber");
+        return false;
+    }
+
+    sampleGrabber->GetConnectedMediaType(&stillMediaType);
+
+/// 3: RENDER STREAM
     // Add source
     hr = filterGraph->AddFilter(source, L"Source");
     if (FAILED(hr)) {
@@ -218,7 +327,7 @@ bool QVideoGrabberPrivate::open()
     }
 
     // Add sample grabber
-    hr = filterGraph->AddFilter(sampleGrabberFilter, L"Sample Grabber");
+    hr = filterGraph->AddFilter(sampleGrabberFilter, L"Grabber");
     if (FAILED(hr)) {
         qWarning("Could not add sample grabber");
         return false;
@@ -231,31 +340,27 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
 
-#if 0
-    // Create null renderer
-    hr = CoCreateInstance(CLSID_NullRenderer, NULL,
-                          CLSCTX_INPROC, IID_IBaseFilter,
-                          (void **)&nullRenderer);
-    if (FAILED(hr)) {
-        qWarning("Could not create null renderer");
-        return false;
-    }
-    IPin **nullIn;
-    hr = getPin(nullRenderer, PINDIR_INPUT, 0);
-    if (FAILED(hr)) {
-        qWarning("Could not get null renderer input");
-        return false;
-    }
-#endif
-
     CoUninitialize();
 
     const int frameWidth = videoFormat.frameWidth();
     const int frameHeight = videoFormat.frameHeight();
-    const int bytesPerLine = frameWidth * 2;
-    videoFormat.setFrameSize(QSize(frameWidth, frameHeight));
-    videoFormat.setPixelFormat(QXmppVideoFrame::Format_YUYV);
-    currentFrame = QXmppVideoFrame(bytesPerLine * frameHeight, videoFormat.frameSize(), bytesPerLine, videoFormat.pixelFormat());
+    int bytesPerLine = 0;
+    int mappedBytes = 0;
+    if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB32) {
+        bytesPerLine = frameWidth * 4;
+        mappedBytes = bytesPerLine * frameHeight;
+    } else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB24) {
+        bytesPerLine = frameWidth * 3;
+        mappedBytes = bytesPerLine * frameHeight;
+    } else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUYV) {
+        bytesPerLine = frameWidth * 2;
+        mappedBytes = bytesPerLine * frameHeight;
+    } else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
+        bytesPerLine = frameWidth * 2;
+        mappedBytes = bytesPerLine * frameHeight / 2;
+    }
+    qDebug("expecting frames to be %i", mappedBytes);
+    currentFrame = QXmppVideoFrame(mappedBytes, videoFormat.frameSize(), bytesPerLine, videoFormat.pixelFormat());
     opened = true;
     return true;
 }
@@ -263,9 +368,6 @@ bool QVideoGrabberPrivate::open()
 QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
     d = new QVideoGrabberPrivate(this);
-    d->captureGraphBuilder = 0;
-    d->filterGraph = 0;
-    d->opened = false;
     d->videoFormat = format;
 }
 
