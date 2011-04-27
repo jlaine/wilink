@@ -124,14 +124,12 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     if (videoJids.contains(m_call->jid())) {
         m_videoButton = new ChatPanelButton(this);
         m_videoButton->setPixmap(QPixmap(":/camera.png"));
-        //addButton(videoButton);
         connect(m_videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
     }
 
     m_hangupButton = new ChatPanelButton(this);
     m_hangupButton->setPixmap(QPixmap(":/hangup.png"));
     m_hangupButton->setToolTip(tr("Hang up"));
-    //addButton(m_button);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),

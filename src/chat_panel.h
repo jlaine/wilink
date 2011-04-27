@@ -161,10 +161,8 @@ class ChatPanelWidget : public QGraphicsWidget
     Q_OBJECT
 
 public:
-    ChatPanelWidget(QGraphicsItem *parent = 0);
-    virtual void setGeometry(const QRectF &rect);
-    void addButton(ChatPanelButton *button);
-    void setCentralWidget(QGraphicsWidget *widget);
+    ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *parent = 0);
+    void setGeometry(const QRectF &rect);
 
 public slots:
     void appear();
@@ -176,7 +174,6 @@ protected:
 private:
     QGraphicsPathItem *m_border;
     QGraphicsWidget *m_centralWidget;
-    QList<ChatPanelButton*> m_buttons;
 };
 
 #endif

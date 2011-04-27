@@ -335,8 +335,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 
 void ChatPanelBar::addWidget(QGraphicsWidget *widget)
 {
-    ChatPanelWidget *wrapper = new ChatPanelWidget(this);
-    wrapper->setCentralWidget(widget);
+    ChatPanelWidget *wrapper = new ChatPanelWidget(widget, this);
     connect(widget, SIGNAL(finished()), wrapper, SLOT(disappear()));
     m_layout->addItem(wrapper);
     wrapper->appear();
@@ -499,9 +498,9 @@ QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) con
  *
  * @param parent
  */
-ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
+ChatPanelWidget::ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    m_centralWidget(0)
+    m_centralWidget(contents)
 {
     // widget starts transparent, use appear() to show it
     setOpacity(0.0);
@@ -517,6 +516,8 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     gradient.setColorAt(1, palette.color(QPalette::Light));
     m_border->setBrush(gradient);
     m_border->setPen(QPen(palette.color(QPalette::Dark), 1));
+
+    m_centralWidget->setParentItem(this);
 }
 
 /** Makes the widget appear.
@@ -531,13 +532,6 @@ void ChatPanelWidget::appear()
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-/** Adds a button to the widget.
- */
-void ChatPanelWidget::addButton(ChatPanelButton *button)
-{
-    m_buttons << button;
-}
-
 /** Makes the widget disappear then deletes it.
  */
 void ChatPanelWidget::disappear()
@@ -550,21 +544,6 @@ void ChatPanelWidget::disappear()
     animation->start();
     connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
     animation->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-/** Sets the given \a widget to be the panel widget's central widget.
- *
- * @param widget
- */
-void ChatPanelWidget::setCentralWidget(QGraphicsWidget *widget)
-{
-    if (m_centralWidget) {
-        qWarning("ChatPanelWidget already has a central widget");
-        return;
-    }
-    m_centralWidget = widget;
-    m_centralWidget->setParentItem(this);
-    updateGeometry();
 }
 
 /** Updates the widget geometry.
@@ -582,24 +561,9 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
-    // remove margins
-    rect.adjust(BORDER_RADIUS/2, BORDER_RADIUS/2, -BORDER_RADIUS/2, -BORDER_RADIUS/2);
-
-    // position buttons
-    qreal right = rect.right();
-    for (int i = m_buttons.size() - 1; i >= 0; --i) {
-        QGraphicsLayoutItem *button = m_buttons.at(i);
-        QRectF geometry;
-        geometry.setSize(button->effectiveSizeHint(Qt::PreferredSize));
-        geometry.moveRight(right);
-        geometry.moveTop(rect.top());
-        button->setGeometry(geometry);
-        right -= geometry.width();
-    }
-    rect.adjust(0, 0, right - rect.right(), 0);
-
     // position central widget
     if (m_centralWidget) {
+        rect.adjust(BORDER_RADIUS/2, BORDER_RADIUS/2, -BORDER_RADIUS/2, -BORDER_RADIUS/2);
         m_centralWidget->setGeometry(rect);
     }
 }
@@ -610,12 +574,6 @@ QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) 
         QSizeF hint(0, 0);
         if (m_centralWidget)
             hint = m_centralWidget->effectiveSizeHint(which);
-        foreach (ChatPanelButton *button, m_buttons) {
-            QSizeF size = button->effectiveSizeHint(which);
-            hint.setWidth(hint.width() + size.width());
-            if (size.height() > hint.height())
-                hint.setHeight(size.height());
-        }
 
         // add margins
         hint.setWidth(hint.width() + BORDER_RADIUS);
