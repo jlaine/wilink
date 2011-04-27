@@ -100,11 +100,12 @@ private:
     // video
     QVideoGrabber *m_videoGrabber;
     QTimer *m_videoTimer;
+    ChatPanelButton *m_videoButton;
     QXmppVideoFrame *m_videoConversion;
     CallVideoWidget *m_videoOutput;
     CallVideoWidget *m_videoMonitor;
 
-    ChatPanelButton *m_button;
+    ChatPanelButton *m_hangupButton;
     ChatPanelText *m_label;
     QXmppCall *m_call;
     int m_soundId;

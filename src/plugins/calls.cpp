@@ -143,6 +143,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     : QGraphicsWidget(parent),
     m_audioInput(0),
     m_audioOutput(0),
+    m_videoButton(0),
     m_videoConversion(0),
     m_videoGrabber(0),
     m_call(call),
@@ -162,19 +163,16 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
     const QStringList videoJids = rosterModel->contactFeaturing(m_call->jid(), ChatRosterModel::VideoFeature);
     if (videoJids.contains(m_call->jid())) {
-        ChatPanelButton *videoButton = new ChatPanelButton(this);
-        videoButton->setPixmap(QPixmap(":/camera.png"));
+        m_videoButton = new ChatPanelButton(this);
+        m_videoButton->setPixmap(QPixmap(":/camera.png"));
         //addButton(videoButton);
-        connect(videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
+        connect(m_videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
     }
 
-    m_button = new ChatPanelButton(this);
-    m_button->setPixmap(QPixmap(":/hangup.png"));
-    m_button->setToolTip(tr("Hang up"));
+    m_hangupButton = new ChatPanelButton(this);
+    m_hangupButton->setPixmap(QPixmap(":/hangup.png"));
+    m_hangupButton->setToolTip(tr("Hang up"));
     //addButton(m_button);
-
-    // central widget
-    //setCentralWidget(m_area);
 
     // connect signals
     check = connect(this, SIGNAL(destroyed(QObject*)),
@@ -201,7 +199,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
                     this, SLOT(videoModeChanged(QIODevice::OpenMode)));
     Q_ASSERT(check);
     
-    check = connect(m_button, SIGNAL(clicked()),
+    check = connect(m_hangupButton, SIGNAL(clicked()),
                     m_call, SLOT(hangup()));
     Q_ASSERT(check);
 
@@ -323,11 +321,11 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         break;
     case QXmppCall::DisconnectingState:
         setStatus(tr("Disconnecting.."));
-        m_button->setEnabled(false);
+        m_hangupButton->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
         setStatus(tr("Call finished."));
-        m_button->setEnabled(false);
+        m_hangupButton->setEnabled(false);
         break;
     }
 
