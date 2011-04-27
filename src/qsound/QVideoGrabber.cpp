@@ -29,7 +29,21 @@
 
 void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
 {
-    if (frame->pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
+    if (frame->pixelFormat() == QXmppVideoFrame::Format_RGB24) {
+        const int width = frame->width();
+        const int height = frame->height();
+        const int stride = frame->bytesPerLine();
+        const quint8 *row = frame->bits();
+        QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
+        for (int y = 0; y < height; ++y) {
+            const uchar *ptr = row;
+            for (int x = 0; x < width; ++x) {
+                *(dest)++ = 0xff000000 | (ptr[0] << 16) | (ptr[1] << 8) | ptr[2];
+                ptr += 3;
+            }
+            row += stride;
+        }
+    } else if (frame->pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
         // convert YUV 4:2:0 to RGB32
         const int width = frame->width();
         const int height = frame->height();
