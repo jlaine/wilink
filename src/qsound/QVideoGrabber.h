@@ -35,6 +35,7 @@ public:
     bool start();
     void stop();
 
+    static void convert(const QSize &size, QXmppVideoFrame::PixelFormat inputFormat, const int inputStride, const uchar *input, QXmppVideoFrame::PixelFormat outputFormat, const int outputStride, uchar *output);
     static void frameToImage(const QXmppVideoFrame *frame, QImage *image);
 
 signals:
