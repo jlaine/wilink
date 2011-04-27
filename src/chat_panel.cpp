@@ -315,7 +315,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
     m_animation->setDuration(500);
 
     m_layout = new QGraphicsLinearLayout(Qt::Vertical);
-    m_layout->setContentsMargins(16, 8, 16, 8);
+    m_layout->setContentsMargins(8, 8, 8, 8);
     setLayout(m_layout);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
@@ -581,10 +581,9 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     m_border->setPath(path);
 
     // position icon
-    qreal left = BORDER_RADIUS;
     QSizeF pixmapSize = m_icon->pixmap().size();
-    m_icon->setPos(left, (rect.height() - pixmapSize.height()) / 2);
-    left += pixmapSize.width();
+    m_icon->setPos(rect.left(), rect.top() + (rect.height() - pixmapSize.height()) / 2);
+    rect.adjust(pixmapSize.width(), 0, 0, 0);
 
     // position buttons
     qreal right = rect.right();
@@ -597,12 +596,14 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
         button->setGeometry(geometry);
         right -= geometry.width();
     }
+    rect.adjust(0, 0, right - rect.right(), 0);
 
     // position central widget
     if (m_centralWidget) {
-        QSizeF hint = m_centralWidget->effectiveSizeHint(Qt::PreferredSize);
-        QRectF geometry(left, rect.top() + (rect.height() - hint.height()) / 2, right - left, hint.height());
-        m_centralWidget->setGeometry(geometry);
+        rect.adjust(BORDER_RADIUS, BORDER_RADIUS, 0, 0);
+        //QSizeF hint = m_centralWidget->effectiveSizeHint(Qt::PreferredSize);
+        //QRectF geometry(rect.left(), rect.top() + (rect.height() - hint.height()) / 2, rect.width(), hint.height());
+        m_centralWidget->setGeometry(rect);
     }
 }
 
@@ -617,9 +618,10 @@ QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) 
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
         QSizeF hint = m_icon->pixmap().size();
-        hint.setWidth(hint.width() + 2 * BORDER_RADIUS);
+        hint.setWidth(hint.width() + BORDER_RADIUS);
         if (m_centralWidget) {
             QSizeF size = m_centralWidget->effectiveSizeHint(which);
+            size.setHeight(size.height() + BORDER_RADIUS);
             hint.setWidth(hint.width() + size.width());
             if (size.height() > hint.height())
                 hint.setHeight(size.height());
