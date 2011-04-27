@@ -27,7 +27,14 @@
                                   (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
                                    quint8(yp + 1.732 * cb))
 
-#define RGB_to_Y(r, g, b) ((77 * r1 + 160 * g1 + 29 * b1) / 256)
+#define RGB_to_Y(r, g, b) ((77 * r + 150 * g + 29 * b) / 256)
+#define RGB_to_CB(r, g, b) ((- 44 * r - 87 * g + 131 * b) / 256)
+#define RGB_to_CR(r, g, b) ((131 * r - 110 * g - 21 * b) / 256)
+
+static inline uchar CLAMP(int x)
+{
+  return ((x > 255) ? 255 : (x < 0) ? 0 : x);
+}
 
 QPair<int,int> QVideoGrabber::byteMetrics(QXmppVideoFrame::PixelFormat format, const QSize &size)
 {
@@ -157,10 +164,10 @@ void QVideoGrabber::convert(const QSize &size,
                     const quint8 b2 = *(i_ptr++);
                     const quint8 g2 = *(i_ptr++);
                     const quint8 r2 = *(i_ptr++);
-                    *(o_ptr++) = RGB_to_Y(r1, g1, b1);
-                    *(o_ptr++) = 128 + (- 44 * r1 - 87 * g1 + 131 * b1) / 256;
-                    *(o_ptr++) = RGB_to_Y(r2, g2, b2);
-                    *(o_ptr++) = 128 + (131 * r2 - 110 * g2 - 21 * b2) / 256;
+                    *(o_ptr++) = CLAMP(RGB_to_Y(r1, g1, b1));
+                    *(o_ptr++) = CLAMP(128 + RGB_to_CB(r1, g1, b1));
+                    *(o_ptr++) = CLAMP(RGB_to_Y(r2, g2, b2));
+                    *(o_ptr++) = CLAMP(128 + RGB_to_CR(r1, g1, b1));
                 }
                 i_row += inputStride;
                 o_row += outputStride;
