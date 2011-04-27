@@ -193,8 +193,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_button->setToolTip(tr("Hang up"));
     addButton(m_button);
 
-    setIconPixmap(QPixmap(":/call.png"));
-
     // central widget
     m_area = new CallArea(this);
     setCentralWidget(m_area);

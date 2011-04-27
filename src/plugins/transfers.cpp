@@ -122,10 +122,10 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
 {
     if (m_job->direction() == QXmppTransferJob::IncomingDirection)
     {
-        setIconPixmap(QPixmap(":/download.png"));
+        //setIconPixmap(QPixmap(":/download.png"));
         m_disappearWhenFinished = false;
     } else {
-        setIconPixmap(QPixmap(":/upload.png"));
+        //setIconPixmap(QPixmap(":/upload.png"));
         m_disappearWhenFinished = true;
     }
 
@@ -218,11 +218,11 @@ void ChatTransferWidget::slotFinished()
     setToolTip(QString());
     if (m_job->error() == QXmppTransferJob::NoError)
     {
-        setIconPixmap(QPixmap(":/contact-available.png"));
+        //setIconPixmap(QPixmap(":/contact-available.png"));
         m_localPath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
     }
     else
-        setIconPixmap(QPixmap(":/contact-busy.png"));
+        //setIconPixmap(QPixmap(":/contact-busy.png"));
     setGeometry(geometry());
 
     // delete job

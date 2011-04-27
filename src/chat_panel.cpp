@@ -514,8 +514,6 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsItem *parent)
     gradient.setColorAt(1, palette.color(QPalette::Light));
     m_border->setBrush(gradient);
     m_border->setPen(QPen(palette.color(QPalette::Dark), 1));
-
-    m_icon = new QGraphicsPixmapItem(this);
 }
 
 /** Makes the widget appear.
@@ -580,11 +578,6 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
-    // position icon
-    QSizeF pixmapSize = m_icon->pixmap().size();
-    m_icon->setPos(rect.left(), rect.top() + (rect.height() - pixmapSize.height()) / 2);
-    rect.adjust(pixmapSize.width(), 0, 0, 0);
-
     // position buttons
     qreal right = rect.right();
     for (int i = m_buttons.size() - 1; i >= 0; --i) {
@@ -600,31 +593,19 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
 
     // position central widget
     if (m_centralWidget) {
-        rect.adjust(BORDER_RADIUS, BORDER_RADIUS, 0, 0);
-        //QSizeF hint = m_centralWidget->effectiveSizeHint(Qt::PreferredSize);
-        //QRectF geometry(rect.left(), rect.top() + (rect.height() - hint.height()) / 2, rect.width(), hint.height());
+        rect.adjust(BORDER_RADIUS/2, BORDER_RADIUS/2, -BORDER_RADIUS/2, -BORDER_RADIUS/2);
         m_centralWidget->setGeometry(rect);
     }
-}
-
-/** Sets the widget's icon pixmap.
- */
-void ChatPanelWidget::setIconPixmap(const QPixmap &pixmap)
-{
-    m_icon->setPixmap(pixmap);
 }
 
 QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        QSizeF hint = m_icon->pixmap().size();
-        hint.setWidth(hint.width() + BORDER_RADIUS);
+        QSizeF hint(0, 0);
         if (m_centralWidget) {
-            QSizeF size = m_centralWidget->effectiveSizeHint(which);
-            size.setHeight(size.height() + BORDER_RADIUS);
-            hint.setWidth(hint.width() + size.width());
-            if (size.height() > hint.height())
-                hint.setHeight(size.height());
+            const QSizeF size = m_centralWidget->effectiveSizeHint(which);
+            hint.setWidth(size.width() + BORDER_RADIUS);
+            hint.setHeight(size.height() + BORDER_RADIUS);
         }
         foreach (ChatPanelButton *button, m_buttons) {
             QSizeF size = button->effectiveSizeHint(which);
