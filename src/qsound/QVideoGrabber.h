@@ -54,7 +54,6 @@ public:
     QVideoGrabberInfo(const QVideoGrabberInfo &other);
     ~QVideoGrabberInfo();
 
-    QString deviceDescription() const;
     QString deviceName() const;
     QList<QXmppVideoFrame::PixelFormat> supportedPixelFormats() const;
     QVideoGrabberInfo &operator=(const QVideoGrabberInfo &other);

@@ -55,7 +55,7 @@ public:
 
     STDMETHODIMP BufferCB(double Time, BYTE *pBuffer, long BufferLen)
     {
-        qDebug("got data %li", BufferLen);
+        //qDebug("got data %li", BufferLen);
         if (BufferLen != currentFrame.mappedBytes()) {
             qWarning("Bad data length");
             return S_OK;
@@ -67,7 +67,7 @@ public:
 
     void close();
     void freeMediaType(AM_MEDIA_TYPE& mt);
-    HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin);
+    static HRESULT getPin(IBaseFilter *pFilter, PIN_DIRECTION PinDir, IPin **ppPin);
     bool open();
 
     QXmppVideoFrame currentFrame;
@@ -165,6 +165,20 @@ bool QVideoGrabberPrivate::open()
     IMoniker* pMoniker = NULL;
     ICreateDevEnum* pDevEnum = NULL;
     IEnumMoniker* pEnum = NULL;
+    GUID requestedSubType;
+
+    if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB32)
+        requestedSubType = MEDIASUBTYPE_RGB32;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB24)
+        requestedSubType = MEDIASUBTYPE_RGB24;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUYV)
+        requestedSubType = MEDIASUBTYPE_YUY2;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUV420P)
+        requestedSubType = MEDIASUBTYPE_I420;
+    else {
+        qWarning("Invalid pixel format requested");
+        return false;
+    }
 
     CoInitialize(0);
 
@@ -261,22 +275,14 @@ bool QVideoGrabberPrivate::open()
             pvi = (VIDEOINFOHEADER*)pmt->pbFormat;
 
             if ((pmt->majortype == MEDIATYPE_Video) &&
-                (pmt->formattype == FORMAT_VideoInfo)) {
-                qDebug("found %i x %i %x", pvi->bmiHeader.biWidth, pvi->bmiHeader.biHeight, pmt->subtype);
-                if (pmt->subtype == MEDIASUBTYPE_RGB32)
-                    qDebug("RGB32");
-                else if (pmt->subtype == MEDIASUBTYPE_RGB24)
-                    qDebug("RGB24");
-                else if (pmt->subtype == MEDIASUBTYPE_YUY2)
-                    qDebug("YUY2");
-                else if (pmt->subtype == MEDIASUBTYPE_I420)
-                    qDebug("I420");
+                (pmt->formattype == FORMAT_VideoInfo) &&
+                (pmt->subtype == requestedSubType)) {
+                //qDebug("found %i x %i %x", pvi->bmiHeader.biWidth, pvi->bmiHeader.biHeight, pmt->subtype);
                 if ((videoFormat.frameWidth() == pvi->bmiHeader.biWidth) &&
                     (videoFormat.frameHeight() == pvi->bmiHeader.biHeight)) {
                     hr = pConfig->SetFormat(pmt);
                     freeMediaType(*pmt);
                     if (SUCCEEDED(hr)) {
-                        qDebug("Set video format");
                         setFormatOK = true;
                         break;
                     }
@@ -296,20 +302,7 @@ bool QVideoGrabberPrivate::open()
     ZeroMemory(&am_media_type, sizeof(am_media_type));
     am_media_type.majortype = MEDIATYPE_Video;
     am_media_type.formattype = FORMAT_VideoInfo;
-
-    if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB32)
-        am_media_type.subtype = MEDIASUBTYPE_RGB32;
-    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_RGB24)
-        am_media_type.subtype = MEDIASUBTYPE_RGB24;
-    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUYV)
-        am_media_type.subtype = MEDIASUBTYPE_YUY2;
-    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUV420P)
-        am_media_type.subtype = MEDIASUBTYPE_I420;
-    else {
-        qWarning("bad format");
-        return false;
-    }
-
+    am_media_type.subtype = requestedSubType;
     hr = sampleGrabber->SetMediaType(&am_media_type);
     if (FAILED(hr)) {
         qWarning("Could not set video format on grabber");
@@ -456,20 +449,32 @@ QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
                 WCHAR str[120];
                 VARIANT varName;
                 varName.vt = VT_BSTR;
-                hr = pPropBag->Read(L"Description", &varName, 0);
-                if(SUCCEEDED(hr)) {
-                    wcsncpy(str, varName.bstrVal, sizeof(str)/sizeof(str[0]));
-                    grabber.d->deviceDescription = QString::fromUtf16((unsigned short*)str);
-                }
                 hr = pPropBag->Read(L"FriendlyName", &varName, 0);
                 if(SUCCEEDED(hr)) {
                     wcsncpy(str, varName.bstrVal, sizeof(str)/sizeof(str[0]));
                     grabber.d->deviceName = QString::fromUtf16((unsigned short*)str);
+
                     // FIXME: actually get pixel formats
-                    grabber.d->supportedPixelFormats << QXmppVideoFrame::Format_YUYV;
+                    grabber.d->supportedPixelFormats << QXmppVideoFrame::Format_RGB24;
                     grabbers << grabber;
                 }
 
+                // Find formats
+#if 0
+                IBaseFilter *pSource = NULL;
+                IAMStreamConfig* pConfig = 0;
+                hr = pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void**)&pSource);
+                if (SUCCEEDED(hr)) {
+                    IPin *pPin = 0;
+                    QVideoGrabberPrivate::getPin(pSource, PINDIR_OUTPUT, &pPin);
+                    hr = pPin->QueryInterface(IID_IAMStreamConfig, (void**)&pConfig);
+                    if (SUCCEEDED(hr)) {
+                        // TODO
+                        pConfig->Release();
+                    }
+                    pSource->Release();
+                }
+#endif
                 pPropBag->Release();
                 pMoniker->Release();
             }

@@ -25,6 +25,8 @@
 #include "QVideoGrabber.h"
 #include "grabber.h"
 
+#define MAX_FRAMES 10
+
 Grabber::Grabber()
     : m_count(0),
     m_input(0)
@@ -34,7 +36,9 @@ Grabber::Grabber()
 
 void Grabber::saveFrame(const QXmppVideoFrame &frame)
 {
-    //QXmppVideoFrame frame = m_input->currentFrame();
+    if (m_count >= MAX_FRAMES)
+        return;
+
     if (!frame.isValid() || frame.size() != m_image.size()) {
         qWarning("Invalid frame");
         return;
@@ -42,7 +46,7 @@ void Grabber::saveFrame(const QXmppVideoFrame &frame)
     qDebug("Grabbed frame %i x %i", frame.width(), frame.height());
     QVideoGrabber::frameToImage(&frame, &m_image);
     m_image.save(QString("foo_%1.png").arg(QString::number(m_count++)));
-    if (m_count >= 10) {
+    if (m_count >= MAX_FRAMES) {
         m_input->stop();
         emit finished();
     }
@@ -79,14 +83,17 @@ static void signal_handler(int sig)
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-
     /* Install signal handler */
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
     // list available devices
     foreach (const QVideoGrabberInfo &info, QVideoGrabberInfo::availableGrabbers()) {
-        qDebug("Device %s (%s)", qPrintable(info.deviceName()), qPrintable(info.deviceDescription()));
+        qDebug("Device %s", qPrintable(info.deviceName()));
+        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_RGB32))
+            qDebug(" - supports RGB32");
+        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_RGB24))
+            qDebug(" - supports RGB24");
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUYV))
             qDebug(" - supports YUYV");
         if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUV420P))
@@ -97,7 +104,11 @@ int main(int argc, char *argv[])
     QXmppVideoFormat format;
     format.setFrameRate(20.0);
     format.setFrameSize(QSize(320, 240));
+#ifdef Q_OS_WIN
+    format.setPixelFormat(QXmppVideoFrame::Format_RGB24);
+#else
     format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+#endif
 
     QVideoGrabber input(format);
     Grabber grabber;

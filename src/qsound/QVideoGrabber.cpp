@@ -42,7 +42,7 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
         for (int y = 0; y < height; ++y) {
             const uchar *ptr = row;
             for (int x = 0; x < width; ++x) {
-                *(dest)++ = 0xff000000 | (ptr[0] << 16) | (ptr[1] << 8) | ptr[2];
+                *(dest)++ = 0xff000000 | (ptr[2] << 16) | (ptr[1] << 8) | ptr[1];
                 ptr += 3;
             }
             row += stride;
@@ -120,11 +120,6 @@ QVideoGrabberInfo &QVideoGrabberInfo::operator=(const QVideoGrabberInfo &other)
 {
     *d = *other.d;
     return *this;
-}
-
-QString QVideoGrabberInfo::deviceDescription() const
-{
-    return d->deviceDescription;
 }
 
 QString QVideoGrabberInfo::deviceName() const
