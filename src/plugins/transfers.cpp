@@ -146,7 +146,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
         m_job->fileName(),
         sizeToString(job->fileSize())), this);
     layout->addItem(m_label);
-    setCentralWidget(layout);
+    //setCentralWidget(layout);
 
     // connect signals
     bool check;

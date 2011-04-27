@@ -556,13 +556,14 @@ void ChatPanelWidget::disappear()
  *
  * @param widget
  */
-void ChatPanelWidget::setCentralWidget(QGraphicsLayoutItem *widget)
+void ChatPanelWidget::setCentralWidget(QGraphicsWidget *widget)
 {
     if (m_centralWidget) {
         qWarning("ChatPanelWidget already has a central widget");
         return;
     }
     m_centralWidget = widget;
+    m_centralWidget->setParentItem(this);
     updateGeometry();
 }
 
