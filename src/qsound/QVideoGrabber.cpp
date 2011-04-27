@@ -29,7 +29,11 @@
 
 void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
 {
-    if (frame->pixelFormat() == QXmppVideoFrame::Format_RGB24) {
+    if (frame->pixelFormat() == QXmppVideoFrame::Format_RGB32) {
+        // copy RGB32 as-is
+        memcpy(image->bits(), frame->bits(), frame->mappedBytes());
+    } else if (frame->pixelFormat() == QXmppVideoFrame::Format_RGB24) {
+        // convert RGB24 to RGB32
         const int width = frame->width();
         const int height = frame->height();
         const int stride = frame->bytesPerLine();
@@ -91,6 +95,8 @@ void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
             }
             row += stride;
         }
+    } else {
+        qWarning("Unsupported frame format");
     }
 }
 
