@@ -51,22 +51,6 @@ void QVideoGrabber::convert(const QSize &size,
                 o_row += outputStride;
             }
 
-        } else if (inputFormat == QXmppVideoFrame::Format_RGB24) {
-
-            // convert RGB24 to RGB32
-            const uchar *i_row = input;
-            QRgb *o_row = reinterpret_cast<QRgb*>(output);
-            for (int y = 0; y < height; ++y) {
-                const uchar *i_ptr = i_row;
-                QRgb *o_ptr = o_row;
-                for (int x = 0; x < width; ++x) {
-                    *(o_ptr)++ = 0xff000000 | (i_ptr[2] << 16) | (i_ptr[1] << 8) | i_ptr[0];
-                    i_ptr += 3;
-                }
-                i_row += inputStride;
-                o_row += outputStride/4;
-            }
-
         } else if (inputFormat == QXmppVideoFrame::Format_YUV420P) {
 
             // convert YUV 4:2:0 to RGB32
