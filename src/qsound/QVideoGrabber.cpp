@@ -145,75 +145,9 @@ void QVideoGrabber::convert(const QSize &size,
 
 void QVideoGrabber::frameToImage(const QXmppVideoFrame *frame, QImage *image)
 {
-    if (frame->pixelFormat() == QXmppVideoFrame::Format_RGB32) {
-        // copy RGB32 as-is
-        memcpy(image->bits(), frame->bits(), frame->mappedBytes());
-    } else if (frame->pixelFormat() == QXmppVideoFrame::Format_RGB24) {
-        // convert RGB24 to RGB32
-        const int width = frame->width();
-        const int height = frame->height();
-        const int stride = frame->bytesPerLine();
-        const quint8 *row = frame->bits();
-        QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
-        for (int y = 0; y < height; ++y) {
-            const uchar *ptr = row;
-            for (int x = 0; x < width; ++x) {
-                *(dest)++ = 0xff000000 | (ptr[2] << 16) | (ptr[1] << 8) | ptr[0];
-                ptr += 3;
-            }
-            row += stride;
-        }
-    } else if (frame->pixelFormat() == QXmppVideoFrame::Format_YUV420P) {
-        // convert YUV 4:2:0 to RGB32
-        const int width = frame->width();
-        const int height = frame->height();
-        const int stride = frame->bytesPerLine();
-        const int c_stride = frame->bytesPerLine() / 2;
-        //qDebug("stride %i, cb_stride %i, cr_stride %i", stride, cb_stride, cr_stride);
-        const quint8 *y_row = frame->bits();
-        const quint8 *cb_row = y_row + (stride * height);
-        const quint8 *cr_row = cb_row + (c_stride * height / 2);
-        QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
-        for (int y = 0; y < height; ++y) {
-            const uchar *y_ptr = y_row;
-            const uchar *cb_ptr = cb_row;
-            const uchar *cr_ptr = cr_row;
-            for (int x = 0; x < width; x += 2) {
-                const float yp1 = *(y_ptr++);
-                const float cb = *(cb_ptr)++ - 128.0;
-                const float yp2 = *(y_ptr++);
-                const float cr = *(cr_ptr++) - 128.0;
-                *(dest++) = YCBCR_to_RGB(yp1, cb, cr);
-                *(dest++) = YCBCR_to_RGB(yp2, cb, cr);
-            }
-            y_row += stride;
-            if (y % 2) {
-                cb_row += c_stride;
-                cr_row += c_stride;
-            }
-        }
-    } else if (frame->pixelFormat() == QXmppVideoFrame::Format_YUYV) {
-        // convert YUYV to RGB32
-        const int width = frame->width();
-        const int height = frame->height();
-        const int stride = frame->bytesPerLine();
-        const uchar *row = frame->bits();
-        QRgb *dest = reinterpret_cast<QRgb*>(image->bits());
-        for (int y = 0; y < height; ++y) {
-            const uchar *ptr = row;
-            for (int x = 0; x < width; x += 2) {
-                const float yp1 = *(ptr++);
-                const float cb = *(ptr++) - 128.0;
-                const float yp2 = *(ptr++);
-                const float cr = *(ptr++) - 128.0;
-                *(dest++) = YCBCR_to_RGB(yp1, cb, cr);
-                *(dest++) = YCBCR_to_RGB(yp2, cb, cr);
-            }
-            row += stride;
-        }
-    } else {
-        qWarning("Unsupported frame format");
-    }
+    convert(frame->size(),
+            frame->pixelFormat(), frame->bytesPerLine(), frame->bits(),
+            QXmppVideoFrame::Format_RGB32, frame->width() * 4, image->bits());
 }
 
 QVideoGrabberInfo::QVideoGrabberInfo()
