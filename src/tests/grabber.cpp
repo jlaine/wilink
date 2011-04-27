@@ -87,29 +87,41 @@ int main(int argc, char *argv[])
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
-    // list available devices
-    foreach (const QVideoGrabberInfo &info, QVideoGrabberInfo::availableGrabbers()) {
-        qDebug("Device %s", qPrintable(info.deviceName()));
-        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_RGB32))
-            qDebug(" - supports RGB32");
-        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_RGB24))
-            qDebug(" - supports RGB24");
-        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUYV))
-            qDebug(" - supports YUYV");
-        if (info.supportedPixelFormats().contains(QXmppVideoFrame::Format_YUV420P))
-            qDebug(" - supports YUV420P");
+    // get default device
+    QList<QVideoGrabberInfo> grabbers = QVideoGrabberInfo::availableGrabbers();
+    if (grabbers.isEmpty()) {
+        qWarning("No grabbers found");
+        return 1;
     }
+    qDebug("Device %s", qPrintable(grabbers.first().deviceName()));
 
-    // grab some frames
+    // determine format
     QXmppVideoFormat format;
     format.setFrameRate(20.0);
     format.setFrameSize(QSize(320, 240));
-#ifdef Q_OS_WIN
-    format.setPixelFormat(QXmppVideoFrame::Format_RGB24);
-#else
-    format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
-#endif
+    format.setPixelFormat(QXmppVideoFrame::Format_Invalid);
+    QList<QXmppVideoFrame::PixelFormat> pixelFormats = grabbers.first().supportedPixelFormats();
+    if (pixelFormats.contains(QXmppVideoFrame::Format_RGB32)) {
+        qDebug(" - supports RGB32");
+        format.setPixelFormat(QXmppVideoFrame::Format_RGB32);
+    }
+    if (pixelFormats.contains(QXmppVideoFrame::Format_RGB24)) {
+        qDebug(" - supports RGB24");
+        format.setPixelFormat(QXmppVideoFrame::Format_RGB24);
+    }
+    if (pixelFormats.contains(QXmppVideoFrame::Format_YUYV)) {
+        qDebug(" - supports YUYV");
+        format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
+    }
+    if (pixelFormats.contains(QXmppVideoFrame::Format_YUV420P)) {
+        qDebug(" - supports YUV420P");
+        format.setPixelFormat(QXmppVideoFrame::Format_YUV420P);
+    }
+    if (!format.pixelFormat() == QXmppVideoFrame::Format_Invalid) {
+        qWarning("No valid formats found");
+    }
 
+    // grab some frames
     QVideoGrabber input(format);
     Grabber grabber;
     QObject::connect(&grabber, SIGNAL(finished()), &app, SLOT(quit()));
