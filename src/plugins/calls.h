@@ -70,6 +70,7 @@ class CallWidget : public QGraphicsWidget
 public:
     CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent = 0);
     ~CallWidget();
+    void setGeometry(const QRectF &rect);
 
 signals:
     void finished();
@@ -89,8 +90,6 @@ protected:
 private:
     void debug(const QString&) {};
     void warning(const QString&) {};
-    void setCaptureFormat(const QXmppVideoFormat &format);
-    void setPlaybackFormat(const QXmppVideoFormat &format);
     void setStatus(const QString &status);
 
     // audio

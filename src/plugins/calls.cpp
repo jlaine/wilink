@@ -98,47 +98,6 @@ void CallVideoWidget::setSize(const QSizeF &size)
     m_boundingRect = QRectF(QPointF(0, 0), size);
 }
 
-/** Sets the video capture format.
- */
-void CallWidget::setCaptureFormat(const QXmppVideoFormat &format)
-{
-    m_videoMonitor->setFormat(format);
-    m_videoMonitor->setSize(QSizeF(format.frameSize().width() / 2, format.frameSize().height() / 2));
-    updateGeometry();
-}
-
-/** Sets the video playback format.
- */
-void CallWidget::setPlaybackFormat(const QXmppVideoFormat &format)
-{
-    m_videoOutput->setFormat(format);
-    m_videoOutput->setSize(format.frameSize());
-    m_videoMonitor->setPos(format.frameSize().width(), 0);
-    m_label->setPos(0, format.frameSize().height());
-    updateGeometry();
-}
-
-/** Sets the status text.
- */
-void CallWidget::setStatus(const QString &status)
-{
-    m_label->setPlainText(status);
-}
-
-QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
-{
-    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        const QSizeF outputSize = m_videoOutput->boundingRect().size();
-        const QSizeF monitorSize = m_videoMonitor->boundingRect().size();
-        QSizeF hint = m_label->effectiveSizeHint(which);
-        hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
-        hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
-        return hint;
-    } else {
-        return constraint;
-    }
-}
-
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     m_audioInput(0),
@@ -334,6 +293,52 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         QTimer::singleShot(1000, this, SIGNAL(finished()));
 }
 
+void CallWidget::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    QRectF rect(baseRect);
+    rect.moveTop(0);
+    rect.moveLeft(0);
+
+    qreal right = rect.right();
+    QList<QGraphicsLayoutItem*> buttons;
+    if (m_videoButton)
+        buttons << m_videoButton;
+    buttons << m_hangupButton;
+    for (int i = buttons.size() - 1; i >= 0; --i) {
+        QGraphicsLayoutItem *button = buttons.at(i);
+        QRectF geometry;
+        geometry.setSize(button->effectiveSizeHint(Qt::PreferredSize));
+        geometry.moveRight(right);
+        geometry.moveTop(rect.top());
+        button->setGeometry(geometry);
+        right -= geometry.width();
+    }
+}
+
+/** Sets the status text.
+ */
+void CallWidget::setStatus(const QString &status)
+{
+    m_label->setPlainText(status);
+}
+
+QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        const QSizeF outputSize = m_videoOutput->boundingRect().size();
+        const QSizeF monitorSize = m_videoMonitor->boundingRect().size();
+        QSizeF hint = m_label->effectiveSizeHint(which);
+        hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
+        hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
+        return hint;
+    } else {
+        return constraint;
+    }
+}
+
+
 void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 {
     qDebug("video mode changed %i", (int)mode);
@@ -345,7 +350,11 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_videoTimer->isActive()) {
         QXmppVideoFormat format = channel->decoderFormat();
-        setPlaybackFormat(format);
+        m_videoOutput->setFormat(format);
+        m_videoOutput->setSize(format.frameSize());
+        m_videoMonitor->setPos(format.frameSize().width(), 0);
+        m_label->setPos(0, format.frameSize().height());
+        updateGeometry();
         m_videoTimer->start(1000 / format.frameRate());
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
@@ -379,7 +388,10 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         connect(m_videoGrabber, SIGNAL(frameAvailable(QXmppVideoFrame)),
                 this, SLOT(videoCapture(QXmppVideoFrame)));
         m_videoGrabber->start();
-        setCaptureFormat(m_videoGrabber->format());
+
+        m_videoMonitor->setFormat(format);
+        m_videoMonitor->setSize(QSizeF(format.frameSize().width() / 2, format.frameSize().height() / 2));
+        updateGeometry();
     } else if (!canWrite && m_videoGrabber) {
         m_videoGrabber->stop();
         delete m_videoGrabber;
