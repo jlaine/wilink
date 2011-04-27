@@ -60,7 +60,19 @@ public:
             qWarning("Bad data length");
             return S_OK;
         }
-        memcpy(currentFrame.bits(), pBuffer, BufferLen);
+        if (flip) {
+            const int stride = currentFrame.bytesPerLine();
+            const int height = currentFrame.height();
+            uchar *input = pBuffer + (BufferLen - stride);
+            uchar *output = currentFrame.bits();
+            for (int y = 0; y < height; ++y) {
+                memcpy(output, input, stride);
+                input -= stride;
+                output += stride;
+            }
+        } else {
+            memcpy(currentFrame.bits(), pBuffer, BufferLen);
+        }
         QMetaObject::invokeMethod(q, "frameAvailable", Q_ARG(QXmppVideoFrame, currentFrame));
         return S_OK;
     }
@@ -74,6 +86,7 @@ public:
     bool opened;
     ICaptureGraphBuilder2 *captureGraphBuilder;
     IGraphBuilder *filterGraph;
+    bool flip;
     ISampleGrabber *sampleGrabber;
     IBaseFilter *sampleGrabberFilter;
     IBaseFilter *source;
@@ -87,6 +100,7 @@ private:
 QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     : captureGraphBuilder(0),
     filterGraph(0),
+    flip(true),
     opened(false),
     sampleGrabber(0),
     sampleGrabberFilter(0),
