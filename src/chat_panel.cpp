@@ -561,21 +561,15 @@ void ChatPanelWidget::setGeometry(const QRectF &baseRect)
     path.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1), BORDER_RADIUS, BORDER_RADIUS);
     m_border->setPath(path);
 
-    // position central widget
-    if (m_centralWidget) {
-        rect.adjust(BORDER_RADIUS/2, BORDER_RADIUS/2, -BORDER_RADIUS/2, -BORDER_RADIUS/2);
-        m_centralWidget->setGeometry(rect);
-    }
+    // position contents
+    rect.adjust(BORDER_RADIUS/2, BORDER_RADIUS/2, -BORDER_RADIUS/2, -BORDER_RADIUS/2);
+    m_centralWidget->setGeometry(rect);
 }
 
 QSizeF ChatPanelWidget::sizeHint(Qt::SizeHint which, const QSizeF & constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        QSizeF hint(0, 0);
-        if (m_centralWidget)
-            hint = m_centralWidget->effectiveSizeHint(which);
-
-        // add margins
+        QSizeF hint = m_centralWidget->effectiveSizeHint(which);
         hint.setWidth(hint.width() + BORDER_RADIUS);
         hint.setHeight(hint.height() + BORDER_RADIUS);
         return hint;
