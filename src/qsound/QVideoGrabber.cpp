@@ -22,19 +22,19 @@
 #include "QVideoGrabber.h"
 #include "QVideoGrabber_p.h"
 
-#define YCBCR_to_RGB(yp, cb, cr) (0xff000000 | \
-                                  (quint8(yp + 1.371 * cr) << 16) | \
-                                  (quint8(yp - 0.698 * cr - 0.336 * cb) << 8) | \
-                                   quint8(yp + 1.732 * cb))
-
-#define RGB_to_Y(r, g, b) ((77 * r + 150 * g + 29 * b) / 256)
-#define RGB_to_CB(r, g, b) ((- 44 * r - 87 * g + 131 * b) / 256)
-#define RGB_to_CR(r, g, b) ((131 * r - 110 * g - 21 * b) / 256)
-
 static inline uchar CLAMP(int x)
 {
   return ((x > 255) ? 255 : (x < 0) ? 0 : x);
 }
+
+#define YCBCR_to_RGB(yp, cb, cr) (0xff000000 | \
+                                  (CLAMP(yp + 1.371 * cr) << 16) | \
+                                  (CLAMP(yp - 0.698 * cr - 0.336 * cb) << 8) | \
+                                   CLAMP(yp + 1.732 * cb))
+
+#define RGB_to_Y(r, g, b) ((77 * r + 150 * g + 29 * b) / 256)
+#define RGB_to_CB(r, g, b) ((- 44 * r - 87 * g + 131 * b) / 256)
+#define RGB_to_CR(r, g, b) ((131 * r - 110 * g - 21 * b) / 256)
 
 QPair<int,int> QVideoGrabber::byteMetrics(QXmppVideoFrame::PixelFormat format, const QSize &size)
 {
