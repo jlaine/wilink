@@ -336,9 +336,7 @@ ChatPanelBar::ChatPanelBar(QGraphicsView *view)
 void ChatPanelBar::addWidget(QGraphicsWidget *widget)
 {
     ChatPanelWidget *wrapper = new ChatPanelWidget(widget, this);
-    connect(widget, SIGNAL(finished()), wrapper, SLOT(disappear()));
     m_layout->addItem(wrapper);
-    wrapper->appear();
 }
 
 bool ChatPanelBar::eventFilter(QObject *watched, QEvent *event)
@@ -502,9 +500,6 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *paren
     : QGraphicsWidget(parent),
     m_centralWidget(contents)
 {
-    // widget starts transparent, use appear() to show it
-    setOpacity(0.0);
-
     const QPalette palette = ChatPanel::palette();
 
     m_border = new QGraphicsPathItem(this);
@@ -518,6 +513,11 @@ ChatPanelWidget::ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *paren
     m_border->setPen(QPen(palette.color(QPalette::Dark), 1));
 
     m_centralWidget->setParentItem(this);
+    connect(m_centralWidget, SIGNAL(finished()), this, SLOT(disappear()));
+
+    // widget starts transparent then appears
+    setOpacity(0.0);
+    appear();
 }
 
 /** Makes the widget appear.

@@ -85,7 +85,7 @@ private slots:
     void videoRefresh();
 
 protected:
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const;
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private:
     void debug(const QString&) {};

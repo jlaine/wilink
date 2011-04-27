@@ -164,14 +164,14 @@ public:
     ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *parent = 0);
     void setGeometry(const QRectF &rect);
 
-public slots:
-    void appear();
-    void disappear();
-
 protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
+private slots:
+    void disappear();
+
 private:
+    void appear();
     QGraphicsPathItem *m_border;
     QGraphicsWidget *m_centralWidget;
 };
