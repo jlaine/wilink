@@ -135,6 +135,18 @@ private:
     QGraphicsPixmapItem *m_pixmap;
 };
 
+/** The ChatPanelImage class represents an image.
+ */
+class ChatPanelImage : public QGraphicsPixmapItem, public QGraphicsLayoutItem
+{
+public:
+    ChatPanelImage(QGraphicsItem *parent = 0);
+    void setGeometry(const QRectF &rect);
+
+protected:
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+};
+
 /** The ChatPanelText class represents a text label.
  */
 class ChatPanelText : public QGraphicsTextItem, public QGraphicsLayoutItem

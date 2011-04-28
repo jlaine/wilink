@@ -120,16 +120,19 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     : QGraphicsWidget(parent),
     m_job(job)
 {
+    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
+
+    // icon
+    m_icon = new ChatPanelImage(this);
     if (m_job->direction() == QXmppTransferJob::IncomingDirection)
     {
-        //setIconPixmap(QPixmap(":/download.png"));
+        m_icon->setPixmap(QPixmap(":/download.png"));
         m_disappearWhenFinished = false;
     } else {
-        //setIconPixmap(QPixmap(":/upload.png"));
+        m_icon->setPixmap(QPixmap(":/upload.png"));
         m_disappearWhenFinished = true;
     }
-
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
+    layout->addItem(m_icon);
 
     // progress bar
     m_progress = new QProgressBar;
@@ -221,11 +224,11 @@ void ChatTransferWidget::slotFinished()
     setToolTip(QString());
     if (m_job->error() == QXmppTransferJob::NoError)
     {
-        //setIconPixmap(QPixmap(":/contact-available.png"));
+        m_icon->setPixmap(QPixmap(":/contact-available.png"));
         m_localPath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
     }
     else
-        //setIconPixmap(QPixmap(":/contact-busy.png"));
+        m_icon->setPixmap(QPixmap(":/contact-busy.png"));
     setGeometry(geometry());
 
     // delete job

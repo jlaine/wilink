@@ -460,6 +460,27 @@ QSizeF ChatPanelButton::sizeHint(Qt::SizeHint which, const QSizeF &constraint) c
     }
 }
 
+ChatPanelImage::ChatPanelImage(QGraphicsItem *parent)
+    : QGraphicsPixmapItem(parent)
+{
+    setGraphicsItem(this);
+}
+
+void ChatPanelImage::setGeometry(const QRectF &rect)
+{
+    QGraphicsLayoutItem::setGeometry(rect);
+    setPos(rect.topLeft());
+}
+
+QSizeF ChatPanelImage::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        return pixmap().size();
+    } else {
+        return constraint;
+    }
+}
+
 ChatPanelText::ChatPanelText(const QString &text, QGraphicsItem *parent)
     : QGraphicsTextItem(text, parent)
 {
