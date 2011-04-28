@@ -37,7 +37,7 @@
 #include "chat_panel.h"
 
 #define BORDER_RADIUS 8
-#define PROGRESS_THICKNESS 24
+#define PROGRESS_THICKNESS 16
 
 class ChatPanelPrivate
 {
