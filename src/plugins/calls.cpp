@@ -73,7 +73,12 @@ QRectF CallVideoWidget::boundingRect() const
 
 void CallVideoWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if (m_boundingRect.isEmpty())
+        return;
+    const QPalette palette = ChatPanel::palette();
+    painter->setPen(QPen(palette.color(QPalette::Mid)));
     painter->drawImage(m_boundingRect, m_image);
+    painter->drawRect(m_boundingRect.adjusted(0.5, 0.5, -0.5, -0.5));
 }
 
 void CallVideoWidget::present(const QXmppVideoFrame &frame)
@@ -320,9 +325,12 @@ void CallWidget::setGeometry(const QRectF &baseRect)
         right -= geometry.width();
     }
 
-    const QSizeF videoSize = m_videoOutput->size();
-    m_videoMonitor->setPos(videoSize.width(), 0);
-    rect.adjust(0, videoSize.height(), right - rect.right(), 0);
+    const QSizeF outputSize = m_videoOutput->size();
+    if (!outputSize.isEmpty()) {
+        const QSizeF monitorSize = m_videoMonitor->size();
+        m_videoMonitor->setPos(outputSize.width() - 16, outputSize.height() - monitorSize.height() + 16);
+        rect.adjust(0, outputSize.height(), right - rect.right(), 0);
+    }
     m_label->setGeometry(rect);
 }
 
@@ -336,15 +344,17 @@ void CallWidget::setStatus(const QString &status)
 QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        const QSizeF outputSize = m_videoOutput->boundingRect().size();
-        const QSizeF monitorSize = m_videoMonitor->boundingRect().size();
+        const QSizeF outputSize = m_videoOutput->size();
+        const QSizeF monitorSize = m_videoMonitor->size();
         QSizeF hint = m_label->effectiveSizeHint(which);
-        hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
-        hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
-
+        if (!outputSize.isEmpty()) {
+            hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width() - 16));
+            hint.setHeight(hint.height() + outputSize.height() + 16);
+        }
         foreach (ChatPanelButton *button, m_buttons) {
             QSizeF size = button->effectiveSizeHint(which);
-            hint.setWidth(hint.width() + size.width());
+            if (outputSize.isEmpty())
+                hint.setWidth(hint.width() + size.width());
             if (size.height() > hint.height())
                 hint.setHeight(size.height());
         }
