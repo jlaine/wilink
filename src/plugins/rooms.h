@@ -47,6 +47,7 @@ class QXmppIq;
 class QXmppMessage;
 class QXmppMucAdminIq;
 class QXmppMucManager;
+class QXmppMucRoom;
 class QXmppPresence;
 
 class ChatRoomWatcher : public QObject
@@ -111,6 +112,7 @@ private slots:
 private:
     ChatClient *client;
     bool joined;
+    QXmppMucRoom *mucRoom;
     QString nickName;
     bool notifyMessages;
     QString roomJid;

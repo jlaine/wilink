@@ -483,6 +483,8 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     setWindowExtra(jid);
     setWindowHelp(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
 
+    mucRoom = client->findExtension<QXmppMucManager>()->addRoom(roomJid);
+
     bool check;
     check = connect(chatInput, SIGNAL(returnPressed()),
                     this, SLOT(returnPressed()));
@@ -571,9 +573,9 @@ void ChatRoom::join()
     historyModel()->clear();
 
     // send join request
-    const QXmppPresence::Status status = client->clientPresence().status();
-    const QString password;
-    client->findExtension<QXmppMucManager>()->joinRoom(roomJid, nickName, password, status);
+    mucRoom->setNickName(nickName);
+    mucRoom->setStatus(client->clientPresence().status());
+    mucRoom->join();
 
     // request room information
     client->findExtension<QXmppDiscoveryManager>()->requestInfo(roomJid);
