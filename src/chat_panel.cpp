@@ -37,6 +37,7 @@
 #include "chat_panel.h"
 
 #define BORDER_RADIUS 8
+#define PROGRESS_THICKNESS 24
 
 class ChatPanelPrivate
 {
@@ -460,6 +461,105 @@ QSizeF ChatPanelButton::sizeHint(Qt::SizeHint which, const QSizeF &constraint) c
     }
 }
 
+ChatPanelImage::ChatPanelImage(QGraphicsItem *parent)
+    : QGraphicsPixmapItem(parent)
+{
+    setGraphicsItem(this);
+}
+
+void ChatPanelImage::setGeometry(const QRectF &rect)
+{
+    QGraphicsLayoutItem::setGeometry(rect);
+    setPos(rect.topLeft());
+}
+
+QSizeF ChatPanelImage::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        return pixmap().size();
+    } else {
+        return constraint;
+    }
+}
+
+ChatPanelProgress::ChatPanelProgress(QGraphicsItem *parent)
+    : QGraphicsWidget(parent),
+    m_minimum(0),
+    m_maximum(100),
+    m_value(0)
+{
+    const QPalette palette = ChatPanel::palette();
+    m_track = new QGraphicsPathItem(this);
+    m_track->setBrush(palette.color(QPalette::Light));
+    m_track->setPen(QPen(palette.color(QPalette::Mid)));
+
+    m_bar = new QGraphicsPathItem(this);
+    m_bar->setBrush(QBrush(palette.color(QPalette::Mid)));
+    m_bar->setPen(Qt::NoPen);
+}
+
+void ChatPanelProgress::resizeBar()
+{
+    QPainterPath barPath;
+    if (m_value > m_minimum) {
+        const int width = m_rect.width() * float(m_value - m_minimum) / float(m_maximum - m_minimum);
+        barPath.addRoundedRect(QRectF(0.5, 0.5, width - 1, m_rect.height() - 1),
+                               BORDER_RADIUS/2, BORDER_RADIUS/2);
+    }
+    m_bar->setPath(barPath);
+    m_bar->setPos(m_rect.topLeft());
+}
+
+void ChatPanelProgress::setGeometry(const QRectF &baseRect)
+{
+    QGraphicsWidget::setGeometry(baseRect);
+
+    m_rect = baseRect;
+    m_rect.moveLeft(0);
+    m_rect.moveTop(0);
+
+    if (m_rect.height() > PROGRESS_THICKNESS) {
+        int dy = (m_rect.height() - PROGRESS_THICKNESS) / 2;
+        m_rect.adjust(0, dy, 0, -dy);
+    }
+
+    QPainterPath trackPath;
+    trackPath.addRoundedRect(QRectF(0.5, 0.5, m_rect.width() - 1, m_rect.height() - 1),
+                             BORDER_RADIUS/2, BORDER_RADIUS/2);
+    m_track->setPath(trackPath);
+    m_track->setPos(m_rect.topLeft());
+
+    resizeBar();
+}
+
+void ChatPanelProgress::setMaximum(int maximum)
+{
+    m_maximum = maximum;
+}
+
+void ChatPanelProgress::setMinimum(int minimum)
+{
+    m_minimum = minimum;
+}
+
+void ChatPanelProgress::setValue(int value)
+{
+    if (m_value == value || (m_value > m_maximum || m_value < m_minimum))
+        return;
+
+    m_value = value;
+    resizeBar();
+}
+
+QSizeF ChatPanelProgress::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
+{
+    if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        return QSizeF(100, PROGRESS_THICKNESS);
+    } else {
+        return constraint;
+    }
+}
+
 ChatPanelText::ChatPanelText(const QString &text, QGraphicsItem *parent)
     : QGraphicsTextItem(text, parent)
 {
@@ -480,7 +580,7 @@ void ChatPanelText::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void ChatPanelText::setGeometry(const QRectF &rect)
 {
     QGraphicsLayoutItem::setGeometry(rect);
-    setPos(rect.topLeft());
+    setPos(rect.left(), rect.top() + (rect.height() - document()->size().height()) / 2);
 }
 
 QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const

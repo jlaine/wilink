@@ -73,7 +73,12 @@ QRectF CallVideoWidget::boundingRect() const
 
 void CallVideoWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    if (m_boundingRect.isEmpty())
+        return;
+    const QPalette palette = ChatPanel::palette();
+    painter->setPen(QPen(palette.color(QPalette::Mid)));
     painter->drawImage(m_boundingRect, m_image);
+    painter->drawRect(m_boundingRect.adjusted(0.5, 0.5, -0.5, -0.5));
 }
 
 void CallVideoWidget::present(const QXmppVideoFrame &frame)
@@ -91,6 +96,11 @@ void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
         m_image = QImage(size, QImage::Format_RGB32);
         m_image.fill(0);
     }
+}
+
+QSizeF CallVideoWidget::size() const
+{
+    return m_boundingRect.size();
 }
 
 void CallVideoWidget::setSize(const QSizeF &size)
@@ -314,6 +324,14 @@ void CallWidget::setGeometry(const QRectF &baseRect)
         button->setGeometry(geometry);
         right -= geometry.width();
     }
+
+    const QSizeF outputSize = m_videoOutput->size();
+    if (!outputSize.isEmpty()) {
+        const QSizeF monitorSize = m_videoMonitor->size();
+        m_videoMonitor->setPos(outputSize.width() - 16, outputSize.height() - monitorSize.height() + 16);
+        rect.adjust(0, outputSize.height(), right - rect.right(), 0);
+    }
+    m_label->setGeometry(rect);
 }
 
 /** Sets the status text.
@@ -326,15 +344,17 @@ void CallWidget::setStatus(const QString &status)
 QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        const QSizeF outputSize = m_videoOutput->boundingRect().size();
-        const QSizeF monitorSize = m_videoMonitor->boundingRect().size();
+        const QSizeF outputSize = m_videoOutput->size();
+        const QSizeF monitorSize = m_videoMonitor->size();
         QSizeF hint = m_label->effectiveSizeHint(which);
-        hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width()));
-        hint.setHeight(hint.height() + qMax(outputSize.height(), monitorSize.height()));
-
+        if (!outputSize.isEmpty()) {
+            hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width() - 16));
+            hint.setHeight(hint.height() + outputSize.height() + 16);
+        }
         foreach (ChatPanelButton *button, m_buttons) {
             QSizeF size = button->effectiveSizeHint(which);
-            hint.setWidth(hint.width() + size.width());
+            if (outputSize.isEmpty())
+                hint.setWidth(hint.width() + size.width());
             if (size.height() > hint.height())
                 hint.setHeight(size.height());
         }
@@ -358,8 +378,6 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         QXmppVideoFormat format = channel->decoderFormat();
         m_videoOutput->setFormat(format);
         m_videoOutput->setSize(format.frameSize());
-        m_videoMonitor->setPos(format.frameSize().width(), 0);
-        m_label->setPos(0, format.frameSize().height());
         updateGeometry();
         m_videoTimer->start(1000 / format.frameRate());
     } else if (!canRead && m_videoTimer->isActive()) {

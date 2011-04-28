@@ -48,7 +48,6 @@
 #include "chat_utils.h"
 
 #define TRANSFERS_ROSTER_ID    "0_transfers"
-#define PROGRESS_HEIGHT 12
 
 static qint64 fileSizeLimit = 50000000; // 50 MB
 
@@ -120,23 +119,23 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     : QGraphicsWidget(parent),
     m_job(job)
 {
-    if (m_job->direction() == QXmppTransferJob::IncomingDirection)
-    {
-        //setIconPixmap(QPixmap(":/download.png"));
-        m_disappearWhenFinished = false;
-    } else {
-        //setIconPixmap(QPixmap(":/upload.png"));
-        m_disappearWhenFinished = true;
-    }
-
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
 
+    // icon
+    m_icon = new ChatPanelImage(this);
+    if (m_job->direction() == QXmppTransferJob::IncomingDirection)
+    {
+        m_icon->setPixmap(QPixmap(":/download.png"));
+        m_disappearWhenFinished = false;
+    } else {
+        m_icon->setPixmap(QPixmap(":/upload.png"));
+        m_disappearWhenFinished = true;
+    }
+    layout->addItem(m_icon);
+
     // progress bar
-    m_progress = new QProgressBar;
-    m_progress->setMaximumHeight(PROGRESS_HEIGHT);
-    m_progressProxy = new QGraphicsProxyWidget(this);
-    m_progressProxy->setWidget(m_progress);
-    layout->addItem(m_progressProxy);
+    m_progress = new ChatPanelProgress(this);
+    layout->addItem(m_progress);
 
     // status label
     m_label = new ChatPanelText(QString("%1 (%2)").arg(
@@ -217,16 +216,15 @@ void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
 void ChatTransferWidget::slotFinished()
 {
     // update UI
-    m_progressProxy->hide();
+//    m_progress->hide();
     setToolTip(QString());
     if (m_job->error() == QXmppTransferJob::NoError)
     {
-        //setIconPixmap(QPixmap(":/contact-available.png"));
+        m_icon->setPixmap(QPixmap(":/contact-available.png"));
         m_localPath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
     }
     else
-        //setIconPixmap(QPixmap(":/contact-busy.png"));
-    setGeometry(geometry());
+        m_icon->setPixmap(QPixmap(":/contact-busy.png"));
 
     // delete job
     m_job->deleteLater();
