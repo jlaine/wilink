@@ -415,7 +415,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     int flags = ChatRosterModel::SubjectFlag | ChatRosterModel::OptionsFlag | ChatRosterModel::MembersFlag;
 
     if (flags & ChatRosterModel::SubjectFlag) {
-        QAction *action = addAction(QIcon(":/chat.png"), tr("Change subject"));
+        QAction *action = addAction(QIcon(":/chat.png"), tr("Subject"));
         check = connect(action, SIGNAL(triggered()),
                         this, SLOT(changeSubject()));
         Q_ASSERT(check);

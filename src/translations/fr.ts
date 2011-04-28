@@ -287,6 +287,26 @@ Acceptez-vous?</translation>
 
 %2</translation>
     </message>
+    <message>
+        <source>Subject</source>
+        <translation>Sujet</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation>Permissions</translation>
+    </message>
+    <message>
+        <source>Change subject</source>
+        <translation>Changer le sujet</translation>
+    </message>
+    <message>
+        <source>Subject:</source>
+        <translation>Sujet :</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoomMembers</name>
@@ -341,10 +361,6 @@ Acceptez-vous?</translation>
 <context>
     <name>ChatRoomWatcher</name>
     <message>
-        <source>Options</source>
-        <translation>Options</translation>
-    </message>
-    <message>
         <source>Kick user</source>
         <translation>Ejecter l&apos;utilisateur</translation>
     </message>
@@ -361,24 +377,12 @@ Do you accept?</source>
 Acceptez-vous?</translation>
     </message>
     <message>
-        <source>Permissions</source>
-        <translation>Permissions</translation>
-    </message>
-    <message>
         <source>Join or create a chat room</source>
         <translation>Rejoindre ou créer un salon de discussion</translation>
     </message>
     <message>
         <source>Enter the reason for kicking the user from &apos;%1&apos;.</source>
         <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur de &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Change subject</source>
-        <translation>Changer le sujet</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Sujet :</translation>
     </message>
     <message>
         <source>Rooms</source>

@@ -75,6 +75,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->q = this;
 
     d->actions = new QToolBar;
+    d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     d->attachButton = new QPushButton;
     d->attachButton->setFlat(true);
