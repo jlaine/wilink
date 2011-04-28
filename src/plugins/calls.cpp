@@ -93,6 +93,11 @@ void CallVideoWidget::setFormat(const QXmppVideoFormat &format)
     }
 }
 
+QSizeF CallVideoWidget::size() const
+{
+    return m_boundingRect.size();
+}
+
 void CallVideoWidget::setSize(const QSizeF &size)
 {
     m_boundingRect = QRectF(QPointF(0, 0), size);
@@ -314,6 +319,11 @@ void CallWidget::setGeometry(const QRectF &baseRect)
         button->setGeometry(geometry);
         right -= geometry.width();
     }
+
+    const QSizeF videoSize = m_videoOutput->size();
+    m_videoMonitor->setPos(videoSize.width(), 0);
+    rect.adjust(0, videoSize.height(), right - rect.right(), 0);
+    m_label->setGeometry(rect);
 }
 
 /** Sets the status text.
@@ -358,8 +368,6 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         QXmppVideoFormat format = channel->decoderFormat();
         m_videoOutput->setFormat(format);
         m_videoOutput->setSize(format.frameSize());
-        m_videoMonitor->setPos(format.frameSize().width(), 0);
-        m_label->setPos(0, format.frameSize().height());
         updateGeometry();
         m_videoTimer->start(1000 / format.frameRate());
     } else if (!canRead && m_videoTimer->isActive()) {

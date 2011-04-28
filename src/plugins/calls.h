@@ -53,6 +53,7 @@ public:
     QRectF boundingRect() const;
     void present(const QXmppVideoFrame &frame);
     void setFormat(const QXmppVideoFormat &format);
+    QSizeF size() const;
     void setSize(const QSizeF &size);
 
 protected:
