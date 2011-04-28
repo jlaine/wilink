@@ -33,6 +33,7 @@
 #include <QScrollBar>
 #include <QTextDocument>
 #include <QTimer>
+#include <QToolBar>
 
 #include "chat_panel.h"
 
@@ -44,6 +45,7 @@ class ChatPanelPrivate
 public:
     void updateTitle();
 
+    QToolBar *actions;
     QVBoxLayout *header;
     QHBoxLayout *hbox;
     QHBoxLayout *widgets;
@@ -72,6 +74,8 @@ ChatPanel::ChatPanel(QWidget* parent)
     bool check;
     d->q = this;
 
+    d->actions = new QToolBar;
+
     d->attachButton = new QPushButton;
     d->attachButton->setFlat(true);
     d->attachButton->setMaximumWidth(32);
@@ -94,9 +98,10 @@ ChatPanel::ChatPanel(QWidget* parent)
 
     d->hbox = new QHBoxLayout;
     d->hbox->addSpacing(16);
+    d->hbox->addWidget(d->iconLabel);
     d->hbox->addWidget(d->nameLabel);
     d->hbox->addStretch();
-    d->hbox->addWidget(d->iconLabel);
+    d->hbox->addWidget(d->actions);
     d->hbox->addWidget(d->attachButton);
     d->hbox->addWidget(d->closeButton);
 
@@ -122,6 +127,11 @@ ChatPanel::ChatPanel(QWidget* parent)
 ChatPanel::~ChatPanel()
 {
     delete d;
+}
+
+QAction *ChatPanel::addAction(const QIcon &icon, const QString &text)
+{
+    return d->actions->addAction(icon, text);
 }
 
 void ChatPanel::addWidget(QGraphicsWidget *widget)

@@ -52,6 +52,7 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
+    QAction *addAction(const QIcon &icon, const QString &text);
     virtual void addWidget(QGraphicsWidget *widget);
     virtual ChatRosterModel::Type objectType() const;
     void setWindowIcon(const QIcon &icon);

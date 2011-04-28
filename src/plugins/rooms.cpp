@@ -94,10 +94,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
                     this, SLOT(invitationReceived(QString,QString,QString)));
     Q_ASSERT(check);
 
-    check = connect(mucManager, SIGNAL(roomConfigurationReceived(QString,QXmppDataForm)),
-                    this, SLOT(roomConfigurationReceived(QString,QXmppDataForm)));
-    Q_ASSERT(check);
-
     check = connect(client, SIGNAL(mucServerFound(const QString&)),
                     this, SLOT(mucServerFound(const QString&)));
     Q_ASSERT(check);
@@ -195,7 +191,7 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
     if (!room)
     {
-        room = new ChatRoom(chat->client(), chat->rosterModel(), jid);
+        room = new ChatRoom(chat, chat->rosterModel(), jid);
 
         // get notified when room is closed
         bool check;
@@ -316,60 +312,6 @@ void ChatRoomWatcher::roomPrompt()
     bookmarkRoom(roomJid);
 }
 
-/** Request a chat room's configuration.
- */
-void ChatRoomWatcher::roomOptions()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    const QString jid = action->data().toString();
-    mucManager->requestRoomConfiguration(jid);
-}
-
-/** Request a chat room's members.
- */
-void ChatRoomWatcher::roomMembers()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    const QString jid = action->data().toString();
-
-    // manage room members
-    ChatRoomMembers dialog(chat->client(), jid, chat);
-    dialog.exec();
-}
-
-/** Change the room's subject.
- */
-void ChatRoomWatcher::roomSubject()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    const QString jid = action->data().toString();
-
-    bool ok;
-    QString subject = QInputDialog::getText(chat,
-        tr("Change subject"), tr("Subject:"), QLineEdit::Normal,
-        QString(), &ok);
-    if (ok) {
-        QXmppMucRoom *mucRoom = mucManager->addRoom(jid);
-        if (mucRoom)
-            mucRoom->setSubject(subject);
-    }
-}
-
-/** Display room configuration dialog.
- */
-void ChatRoomWatcher::roomConfigurationReceived(const QString &roomJid, const QXmppDataForm &form)
-{
-    ChatForm dialog(form, chat);
-    if (dialog.exec())
-        mucManager->setRoomConfiguration(roomJid, dialog.form());
-}
-
 /** Once a multi-user chat server is found, enable the "chat rooms" button.
  */
 void ChatRoomWatcher::mucServerFound(const QString &mucServer)
@@ -429,30 +371,7 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
 
-    if (type == ChatRosterModel::Room) {
-        int flags = index.data(ChatRosterModel::FlagsRole).toInt();
-
-        if (flags & ChatRosterModel::SubjectFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/chat.png"), tr("Change subject"));
-            action->setData(jid);
-            connect(action, SIGNAL(triggered()), this, SLOT(roomSubject()));
-        }
-
-        if (flags & ChatRosterModel::OptionsFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/options.png"), tr("Options"));
-            action->setData(jid);
-            connect(action, SIGNAL(triggered()), this, SLOT(roomOptions()));
-        }
-
-        if (flags & ChatRosterModel::MembersFlag)
-        {
-            QAction *action = menu->addAction(QIcon(":/peer.png"), tr("Permissions"));
-            action->setData(jid);
-            connect(action, SIGNAL(triggered()), this, SLOT(roomMembers()));
-        }
-    } else if (type == ChatRosterModel::RoomMember) {
+    if (type == ChatRosterModel::RoomMember) {
         QModelIndex room = index.parent();
         if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
         {
@@ -471,14 +390,16 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
         joinRoom(url.path(), true);
 }
 
-ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
+ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
-    client(xmppClient),
+    chat(chatWindow),
     joined(false),
     notifyMessages(false),
-    roomJid(jid),
     rosterModel(chatRosterModel)
 {
+    bool check;
+    QXmppClient *client = chat->client();
+
     setObjectName(jid);
     setRosterModel(rosterModel);
     setWindowTitle(rosterModel->contactName(jid));
@@ -486,9 +407,35 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
     setWindowExtra(jid);
     setWindowHelp(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
 
-    mucRoom = client->findExtension<QXmppMucManager>()->addRoom(roomJid);
+    mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
-    bool check;
+    // add actions
+    // FIXME really get flags!
+    //int flags = index.data(ChatRosterModel::FlagsRole).toInt();
+    int flags = ChatRosterModel::SubjectFlag | ChatRosterModel::OptionsFlag | ChatRosterModel::MembersFlag;
+
+    if (flags & ChatRosterModel::SubjectFlag) {
+        QAction *action = addAction(QIcon(":/chat.png"), tr("Change subject"));
+        check = connect(action, SIGNAL(triggered()),
+                        this, SLOT(changeSubject()));
+        Q_ASSERT(check);
+    }
+
+    if (flags & ChatRosterModel::OptionsFlag) {
+        QAction *action = addAction(QIcon(":/options.png"), tr("Options"));
+        check = connect(action, SIGNAL(triggered()),
+                        mucRoom, SLOT(requestConfiguration()));
+        Q_ASSERT(check);
+    }
+
+    if (flags & ChatRosterModel::MembersFlag) {
+        QAction *action = addAction(QIcon(":/peer.png"), tr("Permissions"));
+        check = connect(action, SIGNAL(triggered()),
+                        this, SLOT(changePermissions()));
+        Q_ASSERT(check);
+    }
+
+    // connect signals
     check = connect(chatInput, SIGNAL(returnPressed()),
                     this, SLOT(returnPressed()));
     Q_ASSERT(check);
@@ -501,6 +448,10 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
 
     check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
+
+    check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
+                    this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(subjectChanged(QString)),
@@ -530,6 +481,35 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
         join();
 }
 
+/** Manage the room's members.
+ */
+void ChatRoom::changePermissions()
+{
+    ChatRoomMembers dialog(mucRoom, chat->client(), mucRoom->jid(), chat);
+    dialog.exec();
+}
+
+/** Change the room's subject.
+ */
+void ChatRoom::changeSubject()
+{
+    bool ok;
+    QString subject = QInputDialog::getText(chat,
+        tr("Change subject"), tr("Subject:"), QLineEdit::Normal,
+        QString(), &ok);
+    if (ok)
+        mucRoom->setSubject(subject);
+}
+
+/** Display room configuration dialog.
+ */
+void ChatRoom::configurationReceived(const QXmppDataForm &form)
+{
+    ChatForm dialog(form, chat);
+    if (dialog.exec())
+        mucRoom->setConfiguration(dialog.form());
+}
+
 /** Handle disconnection from server.
  */
 void ChatRoom::disconnected()
@@ -537,14 +517,14 @@ void ChatRoom::disconnected()
     joined = false;
 
     // clear chat room participants
-    QModelIndex roomIndex = rosterModel->findItem(roomJid);
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
     if (roomIndex.isValid())
         rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
 }
 
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.from() != roomJid || disco.type() != QXmppIq::Result)
+    if (disco.from() != mucRoom->jid() || disco.type() != QXmppIq::Result)
         return;
 
     // notify user of received messages if the room is not publicly listed
@@ -552,7 +532,7 @@ void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
         notifyMessages = true;
 
     // update window title
-    setWindowTitle(rosterModel->contactName(roomJid));
+    setWindowTitle(rosterModel->contactName(mucRoom->jid()));
 }
 
 /** Invite a user to the chat room.
@@ -565,7 +545,7 @@ void ChatRoom::invite(const QString &jid)
     // notify user
     queueNotification(tr("%1 has been invited to %2")
         .arg(rosterModel->contactName(jid))
-        .arg(rosterModel->contactName(roomJid)),
+        .arg(rosterModel->contactName(mucRoom->jid())),
         ForceNotification);
 }
 
@@ -576,6 +556,7 @@ void ChatRoom::join()
     if (joined)
         return;
 
+    QXmppClient *client = chat->client();
     nickName = rosterModel->ownName();
 
     // clear history
@@ -587,7 +568,7 @@ void ChatRoom::join()
     mucRoom->join();
 
     // request room information
-    client->findExtension<QXmppDiscoveryManager>()->requestInfo(roomJid);
+    client->findExtension<QXmppDiscoveryManager>()->requestInfo(mucRoom->jid());
 
     joined = true;
 }
@@ -603,7 +584,7 @@ void ChatRoom::leave()
     }
 
     /* remove room from roster */
-    QModelIndex roomIndex = rosterModel->findItem(roomJid);
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
     if (roomIndex.data(ChatRosterModel::PersistentRole).toBool())
         rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
     else
@@ -615,7 +596,7 @@ void ChatRoom::leave()
 void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
     const QString fromJid = messageIndex.data(ChatHistoryModel::JidRole).toString();
-    QModelIndex roomIndex = rosterModel->findItem(roomJid);
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++) {
         QModelIndex index = roomIndex.child(i, 0);
         if (index.data(ChatRosterModel::IdRole).toString() == fromJid) {
@@ -635,7 +616,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     message.body = msg.body();
     message.date = msg.stamp();
     if (!message.date.isValid())
-        message.date = client->serverTime();
+        message.date = chat->client()->serverTime();
     message.jid = msg.from();
     message.received = jidToResource(msg.from()) != nickName;
     historyModel()->addMessage(message);
@@ -658,14 +639,16 @@ ChatRosterModel::Type ChatRoom::objectType() const
 
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {
+    const QString roomJid = mucRoom->jid();
+
     // if our own presence changes, reflect it in the chat room
-    if (joined && presence.from() == client->configuration().jid())
+    if (joined && presence.from() == chat->client()->configuration().jid())
     {
         QXmppPresence packet;
         packet.setTo(roomJid + "/" + nickName);
         packet.setType(presence.type());
         packet.setStatus(presence.status());
-        client->sendPacket(packet);
+        chat->client()->sendPacket(packet);
     }
 
     if (jidToBareJid(presence.from()) != roomJid)
@@ -726,11 +709,12 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
 
 void ChatRoom::rosterClick(const QModelIndex &index)
 {
-    if (!client->isConnected())
+    if (!chat->client()->isConnected())
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    const QString roomJid = mucRoom->jid();
 
     // talk "at" somebody
     if (type == ChatRosterModel::RoomMember && jidToBareJid(jid) == roomJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
@@ -801,9 +785,8 @@ void ChatRoom::tabPressed()
 
     /* find matching room members */
     QStringList matches;
-    QModelIndex roomIndex = rosterModel->findItem(roomJid);
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
-    {
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
+    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++) {
         QString member = roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
         if (member.toLower().startsWith(prefix))
             matches << member;
@@ -888,7 +871,7 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
+ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
     : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
 {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -922,21 +905,18 @@ ChatRoomMembers::ChatRoomMembers(QXmppClient *xmppClient, const QString &roomJid
     setLayout(layout);
     setWindowTitle(tr("Chat room permissions"));
 
-    QXmppMucManager *mucManager = client->findExtension<QXmppMucManager>();
-    connect(mucManager, SIGNAL(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)),
-            this, SLOT(roomPermissionsReceived(QString, QList<QXmppMucAdminIq::Item>)));
+    connect(mucRoom, SIGNAL(permissionsReceived(QList<QXmppMucAdminIq::Item>)),
+            this, SLOT(permissionsReceived(QList<QXmppMucAdminIq::Item>)));
 
     affiliations[QXmppMucAdminIq::Item::MemberAffiliation] = tr("member");
     affiliations[QXmppMucAdminIq::Item::AdminAffiliation] = tr("administrator");
     affiliations[QXmppMucAdminIq::Item::OwnerAffiliation] = tr("owner");
     affiliations[QXmppMucAdminIq::Item::OutcastAffiliation] = tr("banned");
-    mucManager->requestRoomPermissions(chatRoomJid);
+    mucRoom->requestPermissions();
 }
 
-void ChatRoomMembers::roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions)
+void ChatRoomMembers::permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions)
 {
-    if (roomJid != chatRoomJid)
-        return;
     foreach (const QXmppMucAdminIq::Item &item, permissions)
     {
         const QString jid = item.jid();

@@ -64,13 +64,9 @@ private slots:
     void kickUser();
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
     void invitationHandled(QAbstractButton *button);
-    void roomConfigurationReceived(const QString &bareJid, const QXmppDataForm &form);
     void mucServerFound(const QString &roomServer);
     void roomClose();
-    void roomOptions();
-    void roomMembers();
     void roomPrompt();
-    void roomSubject();
     void rosterClick(const QModelIndex &index);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
     void rosterMenu(QMenu *menu, const QModelIndex &index);
@@ -93,11 +89,14 @@ class ChatRoom : public ChatConversation
     Q_OBJECT
 
 public:
-    ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     ChatRosterModel::Type objectType() const;
     void invite(const QString &jid);
 
 private slots:
+    void changeSubject();
+    void changePermissions();
+    void configurationReceived(const QXmppDataForm &form);
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void disconnected();
     void join();
@@ -111,12 +110,11 @@ private slots:
     void tabPressed();
 
 private:
-    ChatClient *client;
+    Chat *chat;
     bool joined;
     QXmppMucRoom *mucRoom;
     QString nickName;
     bool notifyMessages;
-    QString roomJid;
     ChatRosterModel *rosterModel;
 };
 
@@ -125,12 +123,12 @@ class ChatRoomMembers : public QDialog
     Q_OBJECT
 
 public:
-    ChatRoomMembers(QXmppClient *client, const QString &roomJid, QWidget *parent);
+    ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *client, const QString &roomJid, QWidget *parent);
 
 protected slots:
     void addMember();
     void removeMember();
-    void roomPermissionsReceived(const QString &roomJid, const QList<QXmppMucAdminIq::Item> &permissions);
+    void permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions);
     void submit();
 
 private:
