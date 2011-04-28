@@ -625,11 +625,6 @@ ChatRosterModel::Type ChatRoom::objectType() const
 void ChatRoom::presenceReceived(const QXmppPresence &presence)
 {
     const QString roomJid = mucRoom->jid();
-
-    // if our own presence changes, reflect it in the chat room
-    if (presence.from() == chat->client()->configuration().jid())
-        mucRoom->setStatus(presence.status());
-
     if (jidToBareJid(presence.from()) != roomJid)
         return;
 
@@ -640,9 +635,6 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
         {
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
             {
-                // leave room
-                emit hidePanel();
-
                 QXmppStanza::Error error = presence.error();
                 QMessageBox::warning(window(),
                     tr("Chat room error"),
@@ -656,9 +648,6 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     case QXmppPresence::Unavailable:
         if (jidToResource(presence.from()) != nickName)
             return;
-
-        // leave room
-        emit hidePanel();
 
         foreach (const QXmppElement &extension, presence.extensions())
         {
