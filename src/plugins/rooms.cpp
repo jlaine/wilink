@@ -354,8 +354,11 @@ void ChatRoomWatcher::roomSubject()
     QString subject = QInputDialog::getText(chat,
         tr("Change subject"), tr("Subject:"), QLineEdit::Normal,
         QString(), &ok);
-    if (ok)
-        mucManager->setRoomSubject(jid, subject);
+    if (ok) {
+        QXmppMucRoom *mucRoom = mucManager->addRoom(jid);
+        if (mucRoom)
+            mucRoom->setSubject(subject);
+    }
 }
 
 /** Display room configuration dialog.
@@ -500,10 +503,12 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(messageReceived(const QXmppMessage&)), this, SLOT(messageReceived(const QXmppMessage&)));
+    check = connect(mucRoom, SIGNAL(messageReceived(const QXmppMessage&)),
+                    this, SLOT(messageReceived(const QXmppMessage&)));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)), this, SLOT(presenceReceived(const QXmppPresence&)));
+    check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
+                    this, SLOT(presenceReceived(const QXmppPresence&)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(messageClicked(QModelIndex)),
