@@ -120,6 +120,7 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     m_job(job)
 {
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     // icon
     m_icon = new ChatPanelImage(this);
