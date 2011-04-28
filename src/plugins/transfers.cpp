@@ -48,7 +48,6 @@
 #include "chat_utils.h"
 
 #define TRANSFERS_ROSTER_ID    "0_transfers"
-#define PROGRESS_HEIGHT 12
 
 static qint64 fileSizeLimit = 50000000; // 50 MB
 
@@ -135,11 +134,8 @@ ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *par
     layout->addItem(m_icon);
 
     // progress bar
-    m_progress = new QProgressBar;
-    m_progress->setMaximumHeight(PROGRESS_HEIGHT);
-    m_progressProxy = new QGraphicsProxyWidget(this);
-    m_progressProxy->setWidget(m_progress);
-    layout->addItem(m_progressProxy);
+    m_progress = new ChatPanelProgress(this);
+    layout->addItem(m_progress);
 
     // status label
     m_label = new ChatPanelText(QString("%1 (%2)").arg(
@@ -220,7 +216,7 @@ void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
 void ChatTransferWidget::slotFinished()
 {
     // update UI
-    m_progressProxy->hide();
+    m_progress->hide();
     setToolTip(QString());
     if (m_job->error() == QXmppTransferJob::NoError)
     {

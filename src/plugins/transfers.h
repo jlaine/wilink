@@ -73,8 +73,7 @@ private:
     ChatPanelButton *m_button;
     ChatPanelImage *m_icon;
     ChatPanelText *m_label;
-    QProgressBar *m_progress;
-    QGraphicsProxyWidget *m_progressProxy;
+    ChatPanelProgress *m_progress;
     QXmppTransferJob *m_job;
     QString m_localPath;
 };

@@ -147,6 +147,35 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 };
 
+/** The ChatPanelProgress class represents a progress bar.
+ */
+class ChatPanelProgress : public QGraphicsWidget
+{
+    Q_OBJECT
+
+public:
+    ChatPanelProgress(QGraphicsItem *parent);
+    void setGeometry(const QRectF &rect);
+
+public slots:
+    void setMaximum(int maximum);
+    void setMinimum(int maximum);
+    void setValue(int value);
+
+protected:
+    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
+
+private:
+    void resizeBar();
+
+    QGraphicsPathItem *m_bar;
+    int m_maximum;
+    int m_minimum;
+    QRectF m_rect;
+    QGraphicsPathItem *m_track;
+    int m_value;
+};
+
 /** The ChatPanelText class represents a text label.
  */
 class ChatPanelText : public QGraphicsTextItem, public QGraphicsLayoutItem
