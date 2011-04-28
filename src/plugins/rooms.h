@@ -78,7 +78,6 @@ private:
 
     Chat *chat;
     QXmppBookmarkManager *bookmarkManager;
-    QXmppMucManager *mucManager;
     QString chatRoomServer;
     QPushButton *roomButton;
     QStringList invitations;
@@ -100,6 +99,7 @@ private slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void disconnected();
     void join();
+    void joined();
     void leave();
     void onMessageClicked(const QModelIndex &messageIndex);
     void messageReceived(const QXmppMessage &msg);
@@ -111,11 +111,15 @@ private slots:
 
 private:
     Chat *chat;
-    bool joined;
     QXmppMucRoom *mucRoom;
     QString nickName;
     bool notifyMessages;
     ChatRosterModel *rosterModel;
+
+    // actions
+    QAction *subjectAction;
+    QAction *optionsAction;
+    QAction *permissionsAction;
 };
 
 class ChatRoomMembers : public QDialog

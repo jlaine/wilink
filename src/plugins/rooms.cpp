@@ -75,7 +75,7 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     bookmarkManager = new QXmppBookmarkManager(client);
     client->addExtension(bookmarkManager);
 
-    mucManager = client->findExtension<QXmppMucManager>();
+    QXmppMucManager *mucManager = client->findExtension<QXmppMucManager>();
     if (!mucManager) {
         mucManager = new QXmppMucManager;
         client->addExtension(mucManager);
@@ -369,12 +369,13 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         return;
 
     int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-
     if (type == ChatRosterModel::RoomMember) {
-        QModelIndex room = index.parent();
-        if (room.data(ChatRosterModel::FlagsRole).toInt() & ChatRosterModel::KickFlag)
-        {
+        const QString jid = index.data(ChatRosterModel::IdRole).toString();
+        const QString roomJid = index.parent().data(ChatRosterModel::IdRole).toString();
+
+        QXmppMucManager *mucManager = chat->client()->findExtension<QXmppMucManager>();
+        QXmppMucRoom *mucRoom = mucManager->addRoom(roomJid);
+        if (mucRoom && (mucRoom->allowedActions() & QXmppMucRoom::KickAction)) {
             QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
             action->setData(jid);
             connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
@@ -393,7 +394,6 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
 ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
     chat(chatWindow),
-    joined(false),
     notifyMessages(false),
     rosterModel(chatRosterModel)
 {
@@ -410,30 +410,23 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
     // add actions
-    // FIXME really get flags!
-    //int flags = index.data(ChatRosterModel::FlagsRole).toInt();
-    int flags = ChatRosterModel::SubjectFlag | ChatRosterModel::OptionsFlag | ChatRosterModel::MembersFlag;
+    subjectAction = addAction(QIcon(":/chat.png"), tr("Subject"));
+    check = connect(subjectAction, SIGNAL(triggered()),
+                    this, SLOT(changeSubject()));
+    Q_ASSERT(check);
+    subjectAction->setVisible(false);
 
-    if (flags & ChatRosterModel::SubjectFlag) {
-        QAction *action = addAction(QIcon(":/chat.png"), tr("Subject"));
-        check = connect(action, SIGNAL(triggered()),
-                        this, SLOT(changeSubject()));
-        Q_ASSERT(check);
-    }
+    optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
+    check = connect(optionsAction, SIGNAL(triggered()),
+                    mucRoom, SLOT(requestConfiguration()));
+    Q_ASSERT(check);
+    optionsAction->setVisible(false);
 
-    if (flags & ChatRosterModel::OptionsFlag) {
-        QAction *action = addAction(QIcon(":/options.png"), tr("Options"));
-        check = connect(action, SIGNAL(triggered()),
-                        mucRoom, SLOT(requestConfiguration()));
-        Q_ASSERT(check);
-    }
-
-    if (flags & ChatRosterModel::MembersFlag) {
-        QAction *action = addAction(QIcon(":/peer.png"), tr("Permissions"));
-        check = connect(action, SIGNAL(triggered()),
-                        this, SLOT(changePermissions()));
-        Q_ASSERT(check);
-    }
+    permissionsAction = addAction(QIcon(":/peer.png"), tr("Permissions"));
+    check = connect(permissionsAction, SIGNAL(triggered()),
+                    this, SLOT(changePermissions()));
+    Q_ASSERT(check);
+    permissionsAction->setVisible(false);
 
     // connect signals
     check = connect(chatInput, SIGNAL(returnPressed()),
@@ -452,6 +445,10 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
                     this, SLOT(configurationReceived(QXmppDataForm)));
+    Q_ASSERT(check);
+
+    check = connect(mucRoom, SIGNAL(joined()), 
+                    this, SLOT(joined()));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(subjectChanged(QString)),
@@ -514,8 +511,6 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
  */
 void ChatRoom::disconnected()
 {
-    joined = false;
-
     // clear chat room participants
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
     if (roomIndex.isValid())
@@ -553,7 +548,7 @@ void ChatRoom::invite(const QString &jid)
  */
 void ChatRoom::join()
 {
-    if (joined)
+    if (mucRoom->isJoined())
         return;
 
     QXmppClient *client = chat->client();
@@ -569,19 +564,22 @@ void ChatRoom::join()
 
     // request room information
     client->findExtension<QXmppDiscoveryManager>()->requestInfo(mucRoom->jid());
+}
 
-    joined = true;
+void ChatRoom::joined()
+{
+    // set action visibility
+    QXmppMucRoom::Actions actions = mucRoom->allowedActions();
+    subjectAction->setVisible(actions & QXmppMucRoom::SubjectAction);
+    optionsAction->setVisible(actions & QXmppMucRoom::ConfigurationAction);
+    permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
 }
 
 /** Send a request to leave a multi-user chat.
  */
 void ChatRoom::leave()
 {
-    if (joined)
-    {
-        mucRoom->leave();
-        joined = false;
-    }
+    mucRoom->leave();
 
     /* remove room from roster */
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
@@ -642,7 +640,7 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     const QString roomJid = mucRoom->jid();
 
     // if our own presence changes, reflect it in the chat room
-    if (joined && presence.from() == chat->client()->configuration().jid())
+    if (mucRoom->isJoined() && presence.from() == chat->client()->configuration().jid())
     {
         QXmppPresence packet;
         packet.setTo(roomJid + "/" + nickName);
@@ -662,7 +660,6 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
             if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
             {
                 // leave room
-                joined = false;
                 emit hidePanel();
 
                 QXmppStanza::Error error = presence.error();

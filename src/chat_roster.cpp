@@ -683,28 +683,6 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             emit dataChanged(createIndex(memberItem, ContactColumn),
                              createIndex(memberItem, SortingColumn));
         }
-
-        // check whether we own the room
-        foreach (const QXmppElement &x, presence.extensions())
-        {
-            if (x.tagName() == "x" && x.attribute("xmlns") == ns_muc_user)
-            {
-                QXmppElement item = x.firstChildElement("item");
-                if (item.attribute("jid") == d->client->configuration().jid())
-                {
-                    int flags = 0;
-                    // role
-                    if (item.attribute("role") == "moderator")
-                        flags |= (KickFlag | SubjectFlag);
-                    // affiliation
-                    if (item.attribute("affiliation") == "owner")
-                        flags |= (OptionsFlag | MembersFlag | SubjectFlag);
-                    else if (item.attribute("affiliation") == "admin")
-                        flags |= (MembersFlag | SubjectFlag);
-                    roomItem->setData(FlagsRole, flags);
-                }
-            }
-        }
     }
     else if (presence.type() == QXmppPresence::Unavailable && memberItem)
     {

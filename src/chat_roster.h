@@ -49,7 +49,6 @@ public:
         TypeRole,
         MessagesRole,
         AvatarRole,
-        FlagsRole,
         StatusRole,
         UrlRole,
         NicknameRole,
@@ -62,13 +61,6 @@ public:
         VersionFeature = 4,
         VoiceFeature = 8,
         VideoFeature = 16,
-    };
-
-    enum Flag {
-        OptionsFlag = 1,
-        MembersFlag = 2,
-        KickFlag = 4,
-        SubjectFlag = 8,
     };
 
     enum Type {
