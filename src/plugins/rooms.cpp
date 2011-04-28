@@ -571,7 +571,9 @@ void ChatRoom::join()
     historyModel()->clear();
 
     // send join request
-    client->findExtension<QXmppMucManager>()->joinRoom(roomJid, nickName);
+    const QXmppPresence::Status status = client->clientPresence().status();
+    const QString password;
+    client->findExtension<QXmppMucManager>()->joinRoom(roomJid, nickName, password, status);
 
     // request room information
     client->findExtension<QXmppDiscoveryManager>()->requestInfo(roomJid);
