@@ -503,12 +503,16 @@ ChatRoom::ChatRoom(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, con
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
-    check = connect(mucRoom, SIGNAL(messageReceived(const QXmppMessage&)),
-                    this, SLOT(messageReceived(const QXmppMessage&)));
+    check = connect(mucRoom, SIGNAL(subjectChanged(QString)),
+                    this, SLOT(subjectChanged(QString)));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
-                    this, SLOT(presenceReceived(const QXmppPresence&)));
+    check = connect(mucRoom, SIGNAL(messageReceived(QXmppMessage)),
+                    this, SLOT(messageReceived(QXmppMessage)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(messageClicked(QModelIndex)),
@@ -623,35 +627,26 @@ void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
 {
-    const QString from = jidToResource(msg.from());
-    if (jidToBareJid(msg.from()) != roomJid ||
-        msg.type() != QXmppMessage::GroupChat)
+    if (msg.body().isEmpty())
         return;
 
-    // handle message subject
-    if (!msg.subject().isEmpty())
-        setWindowStatus(msg.subject());
-
     // handle message body
-    if (!msg.body().isEmpty())
-    {
-        ChatMessage message;
-        message.body = msg.body();
-        message.date = msg.stamp();
-        if (!message.date.isValid())
-            message.date = client->serverTime();
-        message.jid = msg.from();
-        message.received = jidToResource(msg.from()) != nickName;
-        historyModel()->addMessage(message);
+    ChatMessage message;
+    message.body = msg.body();
+    message.date = msg.stamp();
+    if (!message.date.isValid())
+        message.date = client->serverTime();
+    message.jid = msg.from();
+    message.received = jidToResource(msg.from()) != nickName;
+    historyModel()->addMessage(message);
 
-        // notify user
-        if (notifyMessages || message.body.contains("@" + nickName))
-            queueNotification(message.body);
+    // notify user
+    if (notifyMessages || message.body.contains("@" + nickName))
+        queueNotification(message.body);
 
-        // play sound, unless we sent the message
-        if (message.received)
-            wApp->soundPlayer()->play(wApp->incomingMessageSound());
-    }
+    // play sound, unless we sent the message
+    if (message.received)
+        wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 /** Return the type of entry to add to the roster.
@@ -762,6 +757,11 @@ void ChatRoom::rosterClick(const QModelIndex &index)
         emit showPanel();
         chatInput->setFocus();
     }
+}
+
+void ChatRoom::subjectChanged(const QString &subject)
+{
+    setWindowStatus(subject);
 }
 
 /** Send a message to the chat room.

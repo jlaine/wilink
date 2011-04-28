@@ -107,6 +107,7 @@ private slots:
     void presenceReceived(const QXmppPresence &presence);
     void returnPressed();
     void rosterClick(const QModelIndex &index);
+    void subjectChanged(const QString &subject);
     void tabPressed();
 
 private:
