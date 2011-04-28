@@ -75,7 +75,7 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     bookmarkManager = new QXmppBookmarkManager(client);
     client->addExtension(bookmarkManager);
 
-    QXmppMucManager *mucManager = client->findExtension<QXmppMucManager>();
+    mucManager = client->findExtension<QXmppMucManager>();
     if (!mucManager) {
         mucManager = new QXmppMucManager;
         client->addExtension(mucManager);
@@ -233,17 +233,9 @@ void ChatRoomWatcher::kickUser()
     if (!ok)
         return;
 
-    QXmppMucAdminIq::Item item;
-    item.setNick(jidToResource(jid));
-    item.setRole(QXmppMucAdminIq::Item::NoRole);
-    item.setReason(reason);
-
-    QXmppMucAdminIq iq;
-    iq.setType(QXmppIq::Set);
-    iq.setTo(roomJid);
-    iq.setItems(QList<QXmppMucAdminIq::Item>() << item);
-
-    chat->client()->sendPacket(iq);
+    QXmppMucRoom *mucRoom = mucManager->addRoom(roomJid);
+    if (mucRoom)
+        mucRoom->kick(jid, reason);
 }
 
 void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
@@ -373,7 +365,6 @@ void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         const QString jid = index.data(ChatRosterModel::IdRole).toString();
         const QString roomJid = index.parent().data(ChatRosterModel::IdRole).toString();
 
-        QXmppMucManager *mucManager = chat->client()->findExtension<QXmppMucManager>();
         QXmppMucRoom *mucRoom = mucManager->addRoom(roomJid);
         if (mucRoom && (mucRoom->allowedActions() & QXmppMucRoom::KickAction)) {
             QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));

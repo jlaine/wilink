@@ -78,6 +78,7 @@ private:
 
     Chat *chat;
     QXmppBookmarkManager *bookmarkManager;
+    QXmppMucManager *mucManager;
     QString chatRoomServer;
     QPushButton *roomButton;
     QStringList invitations;
