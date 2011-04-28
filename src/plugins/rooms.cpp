@@ -485,7 +485,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
  */
 void ChatRoom::changePermissions()
 {
-    ChatRoomMembers dialog(mucRoom, chat->client(), mucRoom->jid(), chat);
+    ChatRoomMembers dialog(mucRoom, chat->client(), chat);
     dialog.exec();
 }
 
@@ -871,8 +871,10 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *xmppClient, const QString &roomJid, QWidget *parent)
-    : QDialog(parent), chatRoomJid(roomJid), client(xmppClient)
+ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *xmppClient, QWidget *parent)
+    : QDialog(parent),
+    client(xmppClient),
+    room(mucRoom)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
@@ -905,14 +907,15 @@ ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *xmppClient,
     setLayout(layout);
     setWindowTitle(tr("Chat room permissions"));
 
-    connect(mucRoom, SIGNAL(permissionsReceived(QList<QXmppMucAdminIq::Item>)),
-            this, SLOT(permissionsReceived(QList<QXmppMucAdminIq::Item>)));
-
     affiliations[QXmppMucAdminIq::Item::MemberAffiliation] = tr("member");
     affiliations[QXmppMucAdminIq::Item::AdminAffiliation] = tr("administrator");
     affiliations[QXmppMucAdminIq::Item::OwnerAffiliation] = tr("owner");
     affiliations[QXmppMucAdminIq::Item::OutcastAffiliation] = tr("banned");
-    mucRoom->requestPermissions();
+
+    // request current permissions
+    connect(room, SIGNAL(permissionsReceived(QList<QXmppMucAdminIq::Item>)),
+            this, SLOT(permissionsReceived(QList<QXmppMucAdminIq::Item>)));
+    room->requestPermissions();
 }
 
 void ChatRoomMembers::permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions)
@@ -964,7 +967,7 @@ void ChatRoomMembers::submit()
     if (!items.isEmpty())
     {
         QXmppMucAdminIq iq;
-        iq.setTo(chatRoomJid);
+        iq.setTo(room->jid());
         iq.setType(QXmppIq::Set);
         iq.setItems(items);
         client->sendPacket(iq);

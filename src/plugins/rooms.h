@@ -123,7 +123,7 @@ class ChatRoomMembers : public QDialog
     Q_OBJECT
 
 public:
-    ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *client, const QString &roomJid, QWidget *parent);
+    ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *client, QWidget *parent);
 
 protected slots:
     void addMember();
@@ -133,9 +133,9 @@ protected slots:
 
 private:
     void addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation);
-    QString chatRoomJid;
     QXmppClient *client;
     QXmppElement form;
+    QXmppMucRoom *room;
     QTableWidget *tableWidget;
     QMap<QString, QXmppMucAdminIq::Item::Affiliation> initialMembers;
     QMap<QXmppMucAdminIq::Item::Affiliation, QString> affiliations;
