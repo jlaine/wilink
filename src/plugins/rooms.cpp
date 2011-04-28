@@ -485,7 +485,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
  */
 void ChatRoom::changePermissions()
 {
-    ChatRoomMembers dialog(mucRoom, chat->client(), chat);
+    ChatRoomMembers dialog(mucRoom, "@" + chat->client()->configuration().domain(), chat);
     dialog.exec();
 }
 
@@ -871,23 +871,23 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *xmppClient, QWidget *parent)
+ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
     : QDialog(parent),
-    client(xmppClient),
-    room(mucRoom)
+    m_defaultJid(defaultJid),
+    m_room(mucRoom)
 {
     QVBoxLayout *layout = new QVBoxLayout;
 
-    tableWidget = new QTableWidget(this);
-    tableWidget->setColumnCount(2);
-    tableWidget->setHorizontalHeaderItem(JidColumn, new QTableWidgetItem(tr("User")));
-    tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Role")));
-    tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    tableWidget->verticalHeader()->setVisible(false);
-    tableWidget->horizontalHeader()->setResizeMode(JidColumn, QHeaderView::Stretch);
+    m_tableWidget = new QTableWidget(this);
+    m_tableWidget->setColumnCount(2);
+    m_tableWidget->setHorizontalHeaderItem(JidColumn, new QTableWidgetItem(tr("User")));
+    m_tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Role")));
+    m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_tableWidget->verticalHeader()->setVisible(false);
+    m_tableWidget->horizontalHeader()->setResizeMode(JidColumn, QHeaderView::Stretch);
 
-    layout->addWidget(tableWidget);
+    layout->addWidget(m_tableWidget);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
@@ -907,81 +907,42 @@ ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, QXmppClient *xmppClient,
     setLayout(layout);
     setWindowTitle(tr("Chat room permissions"));
 
-    affiliations[QXmppMucAdminIq::Item::MemberAffiliation] = tr("member");
-    affiliations[QXmppMucAdminIq::Item::AdminAffiliation] = tr("administrator");
-    affiliations[QXmppMucAdminIq::Item::OwnerAffiliation] = tr("owner");
-    affiliations[QXmppMucAdminIq::Item::OutcastAffiliation] = tr("banned");
-
     // request current permissions
-    connect(room, SIGNAL(permissionsReceived(QList<QXmppMucAdminIq::Item>)),
+    connect(m_room, SIGNAL(permissionsReceived(QList<QXmppMucAdminIq::Item>)),
             this, SLOT(permissionsReceived(QList<QXmppMucAdminIq::Item>)));
-    room->requestPermissions();
+    m_room->requestPermissions();
 }
 
 void ChatRoomMembers::permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions)
 {
     foreach (const QXmppMucAdminIq::Item &item, permissions)
-    {
-        const QString jid = item.jid();
-        QXmppMucAdminIq::Item::Affiliation affiliation = item.affiliation();
-        if (!initialMembers.contains(jid))
-        {
-            addEntry(jid, affiliation);
-            initialMembers[jid] = affiliation;
-        }
-    }
-    tableWidget->sortItems(JidColumn, Qt::AscendingOrder);;
+        addEntry(item.jid(), item.affiliation());
+    m_tableWidget->sortItems(JidColumn, Qt::AscendingOrder);
 }
 
 void ChatRoomMembers::submit()
 {
     QList<QXmppMucAdminIq::Item> items;
+    for (int i = 0; i < m_tableWidget->rowCount(); i++) {
+        const QComboBox *combo = qobject_cast<QComboBox *>(m_tableWidget->cellWidget(i, AffiliationColumn));
+        Q_ASSERT(m_tableWidget->item(i, JidColumn) && combo);
 
-    // Process changed members
-    for (int i = 0; i < tableWidget->rowCount(); i++)
-    {
-        const QComboBox *combo = qobject_cast<QComboBox *>(tableWidget->cellWidget(i, AffiliationColumn));
-        Q_ASSERT(tableWidget->item(i, JidColumn) && combo);
-
-        const QString currentJid = tableWidget->item(i, JidColumn)->text();
-        QXmppMucAdminIq::Item::Affiliation currentAffiliation = static_cast<QXmppMucAdminIq::Item::Affiliation>(combo->itemData(combo->currentIndex()).toInt());
-        if (initialMembers.value(currentJid) != currentAffiliation)
-        {
-            QXmppMucAdminIq::Item item;
-            item.setAffiliation(currentAffiliation);
-            item.setJid(currentJid);
-            items.append(item);
-        }
-        initialMembers.remove(currentJid);
-    }
-
-    // Process deleted members (i.e. remaining entries in initialMember)
-    foreach(const QString &entry, initialMembers.keys())
-    {
         QXmppMucAdminIq::Item item;
-        item.setAffiliation(QXmppMucAdminIq::Item::NoAffiliation);
-        item.setJid(entry);
-        items.append(item);
+        item.setAffiliation(static_cast<QXmppMucAdminIq::Item::Affiliation>(combo->itemData(combo->currentIndex()).toInt()));
+        item.setJid(m_tableWidget->item(i, JidColumn)->text());
+        items << item;
     }
 
-    if (!items.isEmpty())
-    {
-        QXmppMucAdminIq iq;
-        iq.setTo(room->jid());
-        iq.setType(QXmppIq::Set);
-        iq.setItems(items);
-        client->sendPacket(iq);
-    }
+    m_room->setPermissions(items);
     accept();
 }
 
 void ChatRoomMembers::addMember()
 {
     bool ok = false;
-    QString jid = "@" + client->configuration().domain();
-    jid = QInputDialog::getText(this, tr("Add a user"),
+    QString jid = QInputDialog::getText(this, tr("Add a user"),
                   tr("Enter the address of the user you want to add."),
-                  QLineEdit::Normal, jid, &ok).toLower();
+                  QLineEdit::Normal, m_defaultJid, &ok).toLower();
     if (ok)
         addEntry(jid, QXmppMucAdminIq::Item::MemberAffiliation);
 }
@@ -989,20 +950,22 @@ void ChatRoomMembers::addMember()
 void ChatRoomMembers::addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation)
 {
     QComboBox *combo = new QComboBox;
-    foreach (QXmppMucAdminIq::Item::Affiliation key, affiliations.keys())
-        combo->addItem(affiliations[key], key);
+    combo->addItem(tr("member"), QXmppMucAdminIq::Item::MemberAffiliation);
+    combo->addItem(tr("administrator"), QXmppMucAdminIq::Item::AdminAffiliation);
+    combo->addItem(tr("owner"), QXmppMucAdminIq::Item::OwnerAffiliation);
+    combo->addItem(tr("banned"), QXmppMucAdminIq::Item::OutcastAffiliation);
     combo->setEditable(false);
     combo->setCurrentIndex(combo->findData(affiliation));
     QTableWidgetItem *jidItem = new QTableWidgetItem(jid);
     jidItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    tableWidget->insertRow(0);
-    tableWidget->setCellWidget(0, AffiliationColumn, combo);
-    tableWidget->setItem(0, JidColumn, jidItem);
+    m_tableWidget->insertRow(0);
+    m_tableWidget->setCellWidget(0, AffiliationColumn, combo);
+    m_tableWidget->setItem(0, JidColumn, jidItem);
 }
 
 void ChatRoomMembers::removeMember()
 {
-    tableWidget->removeRow(tableWidget->currentRow());
+    m_tableWidget->removeRow(m_tableWidget->currentRow());
 }
 
 // PLUGIN
