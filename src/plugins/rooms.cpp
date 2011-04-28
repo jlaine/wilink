@@ -427,9 +427,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     check = connect(rosterModel, SIGNAL(ownNameReceived()), this, SLOT(join()));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    Q_ASSERT(check);
-
     check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
@@ -440,6 +437,10 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     check = connect(mucRoom, SIGNAL(joined()), 
                     this, SLOT(joined()));
+    Q_ASSERT(check);
+
+    check = connect(mucRoom, SIGNAL(left()),
+                    this, SLOT(left()));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(subjectChanged(QString)),
@@ -458,7 +459,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(onMessageClicked(QModelIndex)));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(hidePanel()), this, SLOT(leave()));
+    check = connect(this, SIGNAL(hidePanel()),
+                    mucRoom, SLOT(leave()));
     Q_ASSERT(check);
 
     /* keyboard shortcut */
@@ -496,16 +498,6 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
     ChatForm dialog(form, chat);
     if (dialog.exec())
         mucRoom->setConfiguration(dialog.form());
-}
-
-/** Handle disconnection from server.
- */
-void ChatRoom::disconnected()
-{
-    // clear chat room participants
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    if (roomIndex.isValid())
-        rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
 }
 
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
@@ -566,18 +558,22 @@ void ChatRoom::joined()
     permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
 }
 
-/** Send a request to leave a multi-user chat.
- */
-void ChatRoom::leave()
+void ChatRoom::kicked()
 {
-    mucRoom->leave();
+}
 
-    /* remove room from roster */
+/** Handle leaving the room.
+ */
+void ChatRoom::left()
+{
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    if (roomIndex.data(ChatRosterModel::PersistentRole).toBool())
+    if (roomIndex.data(ChatRosterModel::PersistentRole).toBool()) {
+        // clear chat room participants
         rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
-    else
+    } else {
+        // remove room from roster
         rosterModel->removeRow(roomIndex.row(), roomIndex.parent());
+    }
 
     deleteLater();
 }
@@ -631,14 +627,8 @@ void ChatRoom::presenceReceived(const QXmppPresence &presence)
     const QString roomJid = mucRoom->jid();
 
     // if our own presence changes, reflect it in the chat room
-    if (mucRoom->isJoined() && presence.from() == chat->client()->configuration().jid())
-    {
-        QXmppPresence packet;
-        packet.setTo(roomJid + "/" + nickName);
-        packet.setType(presence.type());
-        packet.setStatus(presence.status());
-        chat->client()->sendPacket(packet);
-    }
+    if (presence.from() == chat->client()->configuration().jid())
+        mucRoom->setStatus(presence.status());
 
     if (jidToBareJid(presence.from()) != roomJid)
         return;

@@ -98,10 +98,10 @@ private slots:
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
-    void disconnected();
     void join();
     void joined();
-    void leave();
+    void left();
+    void kicked();
     void onMessageClicked(const QModelIndex &messageIndex);
     void messageReceived(const QXmppMessage &msg);
     void presenceReceived(const QXmppPresence &presence);
