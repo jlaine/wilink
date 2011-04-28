@@ -555,7 +555,7 @@ void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
  */
 void ChatRoom::invite(const QString &jid)
 {
-    if (!client->findExtension<QXmppMucManager>()->sendInvitation(roomJid, jid, "Let's talk"))
+    if (!mucRoom->sendInvitation(jid, "Let's talk"))
         return;
 
     // notify user
@@ -594,7 +594,7 @@ void ChatRoom::leave()
 {
     if (joined)
     {
-        client->findExtension<QXmppMucManager>()->leaveRoom(roomJid);
+        mucRoom->leave();
         joined = false;
     }
 
@@ -773,7 +773,7 @@ void ChatRoom::returnPressed()
         return;
 
     // try to send message
-    if (!client->findExtension<QXmppMucManager>()->sendMessage(roomJid, text))
+    if (!mucRoom->sendMessage(text))
         return;
 
     // clear input
