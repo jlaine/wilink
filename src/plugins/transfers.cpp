@@ -216,7 +216,7 @@ void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
 void ChatTransferWidget::slotFinished()
 {
     // update UI
-    m_progress->hide();
+//    m_progress->hide();
     setToolTip(QString());
     if (m_job->error() == QXmppTransferJob::NoError)
     {
@@ -225,7 +225,6 @@ void ChatTransferWidget::slotFinished()
     }
     else
         m_icon->setPixmap(QPixmap(":/contact-busy.png"));
-    setGeometry(geometry());
 
     // delete job
     m_job->deleteLater();

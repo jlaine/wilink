@@ -37,6 +37,7 @@
 #include "chat_panel.h"
 
 #define BORDER_RADIUS 8
+#define PROGRESS_THICKNESS 24
 
 class ChatPanelPrivate
 {
@@ -500,10 +501,13 @@ ChatPanelProgress::ChatPanelProgress(QGraphicsItem *parent)
 void ChatPanelProgress::resizeBar()
 {
     QPainterPath barPath;
-    const int width = m_rect.width() * float(m_value - m_minimum) / float(m_maximum - m_minimum);
-    barPath.addRoundedRect(QRectF(0.5, 0.5, width - 1, m_rect.height() - 1),
-                        BORDER_RADIUS/2, BORDER_RADIUS/2);
+    if (m_value > m_minimum) {
+        const int width = m_rect.width() * float(m_value - m_minimum) / float(m_maximum - m_minimum);
+        barPath.addRoundedRect(QRectF(0.5, 0.5, width - 1, m_rect.height() - 1),
+                               BORDER_RADIUS/2, BORDER_RADIUS/2);
+    }
     m_bar->setPath(barPath);
+    m_bar->setPos(m_rect.topLeft());
 }
 
 void ChatPanelProgress::setGeometry(const QRectF &baseRect)
@@ -514,10 +518,16 @@ void ChatPanelProgress::setGeometry(const QRectF &baseRect)
     m_rect.moveLeft(0);
     m_rect.moveTop(0);
 
+    if (m_rect.height() > PROGRESS_THICKNESS) {
+        int dy = (m_rect.height() - PROGRESS_THICKNESS) / 2;
+        m_rect.adjust(0, dy, 0, -dy);
+    }
+
     QPainterPath trackPath;
     trackPath.addRoundedRect(QRectF(0.5, 0.5, m_rect.width() - 1, m_rect.height() - 1),
-                        BORDER_RADIUS/2, BORDER_RADIUS/2);
+                             BORDER_RADIUS/2, BORDER_RADIUS/2);
     m_track->setPath(trackPath);
+    m_track->setPos(m_rect.topLeft());
 
     resizeBar();
 }
@@ -544,7 +554,7 @@ void ChatPanelProgress::setValue(int value)
 QSizeF ChatPanelProgress::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        return QSizeF(100, 16);
+        return QSizeF(100, PROGRESS_THICKNESS);
     } else {
         return constraint;
     }
@@ -570,7 +580,7 @@ void ChatPanelText::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void ChatPanelText::setGeometry(const QRectF &rect)
 {
     QGraphicsLayoutItem::setGeometry(rect);
-    setPos(rect.topLeft());
+    setPos(rect.left(), rect.top() + (rect.height() - document()->size().height()) / 2);
 }
 
 QSizeF ChatPanelText::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
