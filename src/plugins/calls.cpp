@@ -378,11 +378,9 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
         QXmppVideoFormat format = channel->decoderFormat();
         m_videoOutput->setFormat(format);
         m_videoOutput->setSize(format.frameSize());
-        updateGeometry();
         m_videoTimer->start(1000 / format.frameRate());
     } else if (!canRead && m_videoTimer->isActive()) {
         m_videoTimer->stop();
-        updateGeometry();
     }
 
     // start or stop capture
@@ -415,7 +413,6 @@ void CallWidget::videoModeChanged(QIODevice::OpenMode mode)
 
         m_videoMonitor->setFormat(format);
         m_videoMonitor->setSize(QSizeF(format.frameSize().width() / 2, format.frameSize().height() / 2));
-        updateGeometry();
     } else if (!canWrite && m_videoGrabber) {
         m_videoGrabber->stop();
         delete m_videoGrabber;
