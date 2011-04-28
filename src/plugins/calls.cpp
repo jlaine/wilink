@@ -73,12 +73,14 @@ QRectF CallVideoWidget::boundingRect() const
 
 void CallVideoWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if (m_boundingRect.isEmpty())
+    if (m_boundingRect.isEmpty() || m_image.size().isEmpty())
         return;
     const QPalette palette = ChatPanel::palette();
     painter->setPen(QPen(palette.color(QPalette::Mid)));
-    painter->drawImage(m_boundingRect, m_image);
-    painter->drawRect(m_boundingRect.adjusted(0.5, 0.5, -0.5, -0.5));
+    QBrush brush(m_image);
+    brush.setTransform(brush.transform().scale(m_boundingRect.width() / m_image.width(), m_boundingRect.height() / m_image.height()));
+    painter->setBrush(brush);
+    painter->drawRoundedRect(m_boundingRect.adjusted(0.5, 0.5, -0.5, -0.5), 8, 8);
 }
 
 void CallVideoWidget::present(const QXmppVideoFrame &frame)
