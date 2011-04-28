@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAction>
 #include <QApplication>
 #include <QDebug>
 #include <QDropEvent>
@@ -29,7 +30,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPropertyAnimation>
-#include <QPushButton>
 #include <QScrollBar>
 #include <QTextDocument>
 #include <QTimer>
@@ -49,8 +49,8 @@ public:
     QVBoxLayout *header;
     QHBoxLayout *hbox;
     QHBoxLayout *widgets;
-    QPushButton *attachButton;
-    QPushButton *closeButton;
+    QAction *attachAction;
+    QAction *closeAction;
     QLabel *helpLabel;
     QLabel *iconLabel;
     QLabel *nameLabel;
@@ -74,23 +74,18 @@ ChatPanel::ChatPanel(QWidget* parent)
     bool check;
     d->q = this;
 
+    // toolbar
     d->actions = new QToolBar;
     d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-    d->attachButton = new QPushButton;
-    d->attachButton->setFlat(true);
-    d->attachButton->setMaximumWidth(32);
-    d->attachButton->setIcon(QIcon(":/add.png"));
-    d->attachButton->hide();
-    check = connect(d->attachButton, SIGNAL(clicked()),
+    d->attachAction = d->actions->addAction(QIcon(":/add.png"), tr("Attach"));
+    d->attachAction->setVisible(false);
+    check = connect(d->attachAction, SIGNAL(triggered()),
                     this, SIGNAL(attachPanel()));
     Q_ASSERT(check);
 
-    d->closeButton = new QPushButton;
-    d->closeButton->setFlat(true);
-    d->closeButton->setMaximumWidth(32);
-    d->closeButton->setIcon(QIcon(":/close.png"));
-    check = connect(d->closeButton, SIGNAL(clicked()),
+    d->closeAction = d->actions->addAction(QIcon(":/close.png"), tr("Close"));
+    check = connect(d->closeAction, SIGNAL(triggered()),
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
 
@@ -103,8 +98,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->hbox->addWidget(d->nameLabel);
     d->hbox->addStretch();
     d->hbox->addWidget(d->actions);
-    d->hbox->addWidget(d->attachButton);
-    d->hbox->addWidget(d->closeButton);
 
     // assemble header
     d->header = new QVBoxLayout;
@@ -213,12 +206,12 @@ void ChatPanel::changeEvent(QEvent *event)
         if (parent())
         {
             layout()->setMargin(0);
-            d->attachButton->hide();
-            d->closeButton->show();
+            d->attachAction->setVisible(false);
+            d->closeAction->setVisible(true);
         } else {
             layout()->setMargin(6);
-            d->attachButton->show();
-            d->closeButton->hide();
+            d->closeAction->setVisible(false);
+            d->attachAction->setVisible(true);
         }
     }
     QWidget::changeEvent(event);
