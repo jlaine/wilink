@@ -110,7 +110,6 @@ public slots:
     void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid, const QString &filePath);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
-    void rosterMenu(QMenu *menu, const QModelIndex &index);
 
 private slots:
     void fileReceived(QXmppTransferJob *job);

@@ -438,23 +438,6 @@ void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &inde
         event->acceptProposedAction();
 }
 
-void ChatTransfersWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
-{
-    const int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type != ChatRosterModel::Contact)
-        return;
-
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-    if (!chatWindow->client()->isConnected() ||
-        fullJids.isEmpty())
-        return;
-
-    QAction *action = menu->addAction(QIcon(":/add.png"), tr("Send a file"));
-    action->setData(fullJids.first());
-    connect(action, SIGNAL(triggered()), this, SLOT(sendFilePrompt()));
-}
-
 void ChatTransfersWatcher::sendFile(const QString &fullJid, const QString &filePath)
 {
     // check file size
@@ -498,21 +481,45 @@ void ChatTransfersWatcher::sendFilePrompt()
 class TransfersPlugin : public ChatPlugin
 {
 public:
+    void finalize(Chat *chat);
     bool initialize(Chat *chat);
     QString name() const { return "File transfers"; };
+    void polish(Chat *chat, ChatPanel *panel);
+
+private:
+    QMap<Chat*,ChatTransfersWatcher*> m_watchers;
 };
 
 bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    ChatTransfersWatcher *transfers = new ChatTransfersWatcher(chat);
+    ChatTransfersWatcher *watcher = new ChatTransfersWatcher(chat);
 
     /* add roster hooks */
     connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
-            transfers, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-            transfers, SLOT(rosterMenu(QMenu*, QModelIndex)));
+            watcher, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
+
+    m_watchers.insert(chat, watcher);
     return true;
+}
+
+void TransfersPlugin::finalize(Chat *chat)
+{
+    m_watchers.remove(chat);
+}
+
+void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
+{
+    ChatTransfersWatcher *watcher = m_watchers.value(chat);
+    if (!watcher)
+        return;
+
+    const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::FileTransferFeature);
+    if (!fullJids.isEmpty()) {
+        QAction *action = panel->addAction(QIcon(":/add.png"), QObject::tr("Send a file"));
+        action->setData(fullJids.first());
+        connect(action, SIGNAL(triggered()), watcher, SLOT(sendFilePrompt()));
+    }
 }
 
 Q_EXPORT_STATIC_PLUGIN2(transfers, TransfersPlugin)

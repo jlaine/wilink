@@ -795,6 +795,10 @@ Acceptez-vous?</translation>
         <source>Call</source>
         <translation>Appeler</translation>
     </message>
+    <message>
+        <source>Send a file</source>
+        <translation>Envoyer un fichier</translation>
+    </message>
 </context>
 <context>
     <name>SharesModel</name>

@@ -631,6 +631,7 @@ void CallsPlugin::polish(Chat *chat, ChatPanel *panel)
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::VoiceFeature);
     if (!fullJids.isEmpty()) {
         QAction *action = panel->addAction(QIcon(":/call.png"), QObject::tr("Call"));
+        action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), watcher, SLOT(callContact()));
     }
 }
