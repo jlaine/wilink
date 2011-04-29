@@ -755,8 +755,8 @@ class SharesPlugin : public ChatPlugin
 {
 public:
     SharesPlugin();
-    bool initialize(Chat *chat);
     void finalize(Chat *chat);
+    bool initialize(Chat *chat);
     QString name() const { return "Shares"; };
     void preferences(ChatPreferences *prefs);
 
@@ -768,6 +768,17 @@ private:
 SharesPlugin::SharesPlugin()
     : db(0)
 {
+}
+
+void SharesPlugin::finalize(Chat *chat)
+{
+    /* cleanup database */
+    chats.remove(chat);
+    if (db && chats.isEmpty())
+    {
+        delete db;
+        db = 0;
+    }
 }
 
 bool SharesPlugin::initialize(Chat *chat)
@@ -801,17 +812,6 @@ bool SharesPlugin::initialize(Chat *chat)
     SharesPanel *shares = new SharesPanel(chat, db);
     chat->addPanel(shares);
     return true;
-}
-
-void SharesPlugin::finalize(Chat *chat)
-{
-    /* cleanup database */
-    chats.remove(chat);
-    if (db && chats.isEmpty())
-    {
-        delete db;
-        db = 0;
-    }
 }
 
 void SharesPlugin::preferences(ChatPreferences *prefs)

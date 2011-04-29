@@ -338,14 +338,24 @@ class ContactsPlugin : public ChatPlugin
 {
 public:
     bool initialize(Chat *chat);
+    void finalize(Chat *chat);
     QString name() const { return "Contacts management"; };
+
+private:
+    QMap<Chat*,ContactsWatcher*> m_watchers;
 };
+
+void ContactsPlugin::finalize(Chat *chat)
+{
+    m_watchers.remove(chat);
+}
 
 bool ContactsPlugin::initialize(Chat *chat)
 {
     ContactsWatcher *contacts = new ContactsWatcher(chat);
     connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
             contacts, SLOT(rosterMenu(QMenu*, QModelIndex)));
+    m_watchers.insert(chat, contacts);
     return true;
 }
 

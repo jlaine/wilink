@@ -353,6 +353,11 @@ private:
     QMap<Chat*,ChatTransfersWatcher*> m_watchers;
 };
 
+void TransfersPlugin::finalize(Chat *chat)
+{
+    m_watchers.remove(chat);
+}
+
 bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
@@ -364,11 +369,6 @@ bool TransfersPlugin::initialize(Chat *chat)
 
     m_watchers.insert(chat, watcher);
     return true;
-}
-
-void TransfersPlugin::finalize(Chat *chat)
-{
-    m_watchers.remove(chat);
 }
 
 void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)

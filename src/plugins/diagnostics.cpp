@@ -592,13 +592,25 @@ class DiagnosticsPlugin : public ChatPlugin
 {
 public:
     DiagnosticsPlugin() : m_references(0) {};
-    bool initialize(Chat *chat);
     void finalize(Chat *chat);
+    bool initialize(Chat *chat);
     QString name() const { return "Diagnostics"; };
 
 private:
     int m_references;
 };
+
+void DiagnosticsPlugin::finalize(Chat *chat)
+{
+    m_references--;
+    if (!m_references && diagnosticsThread)
+    {
+        diagnosticsThread->quit();
+        diagnosticsThread->wait();
+        delete diagnosticsThread;
+        diagnosticsThread = 0;
+    }
+}
 
 bool DiagnosticsPlugin::initialize(Chat *chat)
 {
@@ -630,18 +642,6 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
                     diagnostics, SIGNAL(showPanel()));
     Q_ASSERT(check);
     return true;
-}
-
-void DiagnosticsPlugin::finalize(Chat *chat)
-{
-    m_references--;
-    if (!m_references && diagnosticsThread)
-    {
-        diagnosticsThread->quit();
-        diagnosticsThread->wait();
-        delete diagnosticsThread;
-        diagnosticsThread = 0;
-    }
 }
 
 Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)
