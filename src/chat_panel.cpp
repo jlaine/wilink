@@ -85,6 +85,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     // toolbar
     d->actions = new QToolBar;
     d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    d->actions->hide();
     d->hbox->addWidget(d->actions);
 
     // static toolbar
@@ -124,7 +125,9 @@ ChatPanel::~ChatPanel()
 
 QAction *ChatPanel::addAction(const QIcon &icon, const QString &text)
 {
-    return d->actions->addAction(icon, text);
+    QAction *action = d->actions->addAction(icon, text);
+    d->actions->show();
+    return action;
 }
 
 void ChatPanel::addWidget(QGraphicsWidget *widget)
