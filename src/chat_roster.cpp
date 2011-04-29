@@ -494,7 +494,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             if (role == Qt::DisplayRole && index.column() == ContactColumn && item->children.size() > 0) {
                 return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->children.size()));
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap icon(":/chat.png");
+                QPixmap icon(item->data(role).value<QPixmap>());
                 if (messages)
                     paintMessages(icon, messages);
                 return QIcon(icon);
@@ -861,7 +861,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
     if (!icon.isNull())
-        item->setData(Qt::DecorationRole, icon);
+        item->setData(Qt::DecorationRole, icon.pixmap(ICON_SIZE, ICON_SIZE));
     ChatModel::addItem(item, parentItem);
 
     // fetch vCard
