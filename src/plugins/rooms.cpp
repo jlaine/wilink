@@ -124,26 +124,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     chat->statusBar()->addWidget(roomButton);
 }
 
-bool ChatRoomWatcher::bookmarkRoom(const QString &roomJid)
-{
-    // find bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    foreach (const QXmppBookmarkConference &conference, conferences)
-    {
-        if (conference.jid() == roomJid)
-            return true;
-    }
-
-    // add bookmark
-    QXmppBookmarkConference conference;
-    conference.setAutoJoin(true);
-    conference.setJid(roomJid);
-    conferences << conference;
-    bookmarks.setConferences(conferences);
-    return bookmarkManager->setBookmarks(bookmarks);
-}
-
 void ChatRoomWatcher::bookmarksReceived()
 {
     // join rooms marked as "autojoin"
@@ -259,8 +239,8 @@ void ChatRoomWatcher::roomPrompt()
         return;
 
     // join room and bookmark it
-    joinRoom(roomJid, true);
-    bookmarkRoom(roomJid);
+    ChatRoom *room = joinRoom(roomJid, true);
+    room->bookmark();
 }
 
 /** Once a multi-user chat server is found, enable the "chat rooms" button.
@@ -449,6 +429,30 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     /* if nickname is received, join now */
     if (rosterModel->isOwnNameReceived())
         join();
+}
+
+/** Bookmarks the room.
+ */
+void ChatRoom::bookmark()
+{
+    QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
+    // find bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    foreach (const QXmppBookmarkConference &conference, conferences) {
+        if (conference.jid() == mucRoom->jid())
+            return;
+    }
+
+    // add bookmark
+    QXmppBookmarkConference conference;
+    conference.setAutoJoin(true);
+    conference.setJid(mucRoom->jid());
+    conferences << conference;
+    bookmarks.setConferences(conferences);
+    bookmarkManager->setBookmarks(bookmarks);
 }
 
 /** Manage the room's members.

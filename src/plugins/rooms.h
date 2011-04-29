@@ -72,8 +72,6 @@ private slots:
     void urlClick(const QUrl &url);
 
 private:
-    bool bookmarkRoom(const QString &jid);
-
     Chat *chat;
     QXmppBookmarkManager *bookmarkManager;
     QXmppMucManager *mucManager;
@@ -90,6 +88,10 @@ public:
     ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     ChatRosterModel::Type objectType() const;
     void invite(const QString &jid);
+
+public slots:
+    void bookmark();
+    void unbookmark();
 
 private slots:
     void changeSubject();
@@ -110,7 +112,6 @@ private slots:
     void rosterClick(const QModelIndex &index);
     void subjectChanged(const QString &subject);
     void tabPressed();
-    void unbookmark();
 
 private:
     Chat *chat;
