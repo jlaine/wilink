@@ -460,29 +460,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatTransfersView</name>
-    <message>
-        <source>File name</source>
-        <translation>Nom du fichier</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Taille</translation>
-    </message>
-    <message>
-        <source>Progress</source>
-        <translation>Progrès</translation>
-    </message>
-    <message>
-        <source>Downloading at %1</source>
-        <translation>Téléchargement à %1</translation>
-    </message>
-    <message>
-        <source>Uploading at %1</source>
-        <translation>Téléchargement à %1</translation>
-    </message>
-</context>
-<context>
     <name>ChatTransfersWatcher</name>
     <message>
         <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
@@ -885,16 +862,8 @@ Acceptez-vous?</translation>
         <translation>Téléchargements</translation>
     </message>
     <message>
-        <source>Uploads</source>
-        <translation>Fichiers envoyés</translation>
-    </message>
-    <message>
         <source>Download</source>
         <translation>Télécharger</translation>
-    </message>
-    <message>
-        <source>Refresh my shares</source>
-        <translation>Rafraîchir mes partages</translation>
     </message>
     <message>
         <source>Remove</source>

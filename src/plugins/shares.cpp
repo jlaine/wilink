@@ -150,15 +150,6 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     downloadsWidget->addWidget(downloadsView);
     tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
 
-    /* create uploads tab */
-    uploadsView = new ChatTransfersView;
-    uploadsWidget = new SharesTab;
-    check = connect(uploadsWidget, SIGNAL(showOptions()),
-                    this, SLOT(showOptions()));
-    Q_ASSERT(check);
-    uploadsWidget->addWidget(uploadsView);
-    tabWidget->addTab(uploadsWidget, QIcon(":/upload.png"), tr("Uploads"));
-
     // FOOTER
 
     QHBoxLayout *footerLayout = new QHBoxLayout;
@@ -175,15 +166,6 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
                     this, SLOT(downloadItem()));
     Q_ASSERT(check);
     footerLayout->addWidget(downloadButton);
-
-    /* rescan button */
-    indexButton = new QPushButton(tr("Refresh my shares"));
-    indexButton->setIcon(QIcon(":/refresh.png"));
-    check = connect(indexButton, SIGNAL(clicked()),
-                    db, SLOT(index()));
-    Q_ASSERT(check);
-    footerLayout->addWidget(indexButton);
-    indexButton->hide();
 
     /* remove button */
     removeButton = new QPushButton(tr("Remove"));
@@ -243,11 +225,8 @@ void SharesPanel::directoryChanged(const QString &path)
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(path).toString(),
         tr("downloads folder"));
-    const QString helpText = tr("You can select the folders you want to share with other users from the shares options.");
-
-    sharesWidget->setText(helpText);
+    sharesWidget->setText(tr("You can select the folders you want to share with other users from the shares options."));
     downloadsWidget->setText(tr("Received files are stored in your %1. Once a file is received, you can double click to open it.").arg(sharesLink));
-    uploadsWidget->setText(helpText);
 }
 
 /** When the main XMPP stream is disconnected, disconnect the shares-specific
@@ -412,41 +391,34 @@ void SharesPanel::find(const QString &needle, QTextDocument::FindFlags flags, bo
 
 void SharesPanel::transferStarted(QXmppTransferJob *job)
 {
-    if (job->direction() == QXmppTransferJob::OutgoingDirection)
-        uploadsView->addJob(job);
-    else
-    {
-        QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
-        if (!queueItem)
-            return;
+    QXmppShareItem *queueItem = queueModel->get(Q_FIND_TRANSFER(job));
+    if (!queueItem)
+        return;
 
-        // add transfer to list
-        bool check;
-        check = connect(job, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(transferDestroyed(QObject*)));
-        Q_ASSERT(check);
+    // add transfer to list
+    bool check;
+    check = connect(job, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(transferDestroyed(QObject*)));
+    Q_ASSERT(check);
 
-        check = connect(job, SIGNAL(progress(qint64, qint64)),
-                        this, SLOT(transferProgress(qint64,qint64)));
-        Q_ASSERT(check);
+    check = connect(job, SIGNAL(progress(qint64, qint64)),
+                    this, SLOT(transferProgress(qint64,qint64)));
+    Q_ASSERT(check);
 
-        downloadJobs.append(job);
+    downloadJobs.append(job);
 
-        // update status
-        statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
-    }
+    // update status
+    statusBar->showMessage(QString("%1 - %2").arg(tr("Transfer"), queueItem->name()), STATUS_TIMEOUT);
 }
 
 void SharesPanel::indexFinished(double elapsed, int updated, int removed)
 {
     statusBar->showMessage(tr("Indexed %1 files in %2s").arg(updated).arg(elapsed), STATUS_TIMEOUT);
-    indexButton->setEnabled(true);
 }
 
 void SharesPanel::indexStarted()
 {
     statusBar->showMessage(tr("Indexing files"), STATUS_TIMEOUT);
-    indexButton->setEnabled(false);
 }
 
 /** Add the selected items to the download queue.
@@ -809,11 +781,6 @@ void SharesPanel::tabChanged(int index)
         removeButton->show();
     else
         removeButton->hide();
-
-    if (tab == uploadsWidget)
-        indexButton->show();
-    else
-        indexButton->hide();
 }
 
 SharesTab::SharesTab(QWidget *parent)

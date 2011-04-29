@@ -34,7 +34,6 @@ class SharesModel;
 class SharesTab;
 class SharesView;
 class ChatTransfers;
-class ChatTransfersView;
 class QLabel;
 class QLineEdit;
 class QModelIndex;
@@ -110,11 +109,7 @@ private:
     SharesTab *downloadsWidget;
     QList<QXmppTransferJob*> downloadJobs;
 
-    ChatTransfersView *uploadsView;
-    SharesTab *uploadsWidget;
-
     QPushButton *downloadButton;
-    QPushButton *indexButton;
     QPushButton *removeButton;
     QStatusBar *statusBar;
 };

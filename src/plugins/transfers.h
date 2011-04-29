@@ -31,6 +31,9 @@ class QModelIndex;
 class QProgressBar;
 class Chat;
 
+/** The ChatTransferPrompt class represents a message box to
+ *  ask the user whether to accept an incoming transfer.
+ */
 class ChatTransferPrompt : public QMessageBox
 {
     Q_OBJECT
@@ -76,27 +79,6 @@ private:
     ChatPanelProgress *m_progress;
     QXmppTransferJob *m_job;
     QString m_localPath;
-};
-
-class ChatTransfersView : public QTableWidget
-{
-    Q_OBJECT
-
-public:
-    ChatTransfersView(QWidget *parent = 0);
-
-public slots:
-    void addJob(QXmppTransferJob *job);
-
-private slots:
-    void slotDestroyed(QObject *object);
-    void slotDoubleClicked(int row, int column);
-    void slotFinished();
-    void slotProgress(qint64, qint64);
-    void slotStateChanged(QXmppTransferJob::State state);
-
-private:
-    QList<QXmppTransferJob*> jobs;
 };
 
 class ChatTransfersWatcher : public QObject
