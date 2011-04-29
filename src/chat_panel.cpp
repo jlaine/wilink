@@ -48,7 +48,6 @@ public:
     QToolBar *actions;
     QVBoxLayout *header;
     QHBoxLayout *hbox;
-    QHBoxLayout *widgets;
     QAction *attachAction;
     QAction *closeAction;
     QLabel *helpLabel;
@@ -74,30 +73,34 @@ ChatPanel::ChatPanel(QWidget* parent)
     bool check;
     d->q = this;
 
+    // icon and label
+    d->hbox = new QHBoxLayout;
+    d->hbox->addSpacing(16);
+    d->iconLabel = new QLabel;
+    d->hbox->addWidget(d->iconLabel);
+    d->nameLabel = new QLabel;
+    d->hbox->addWidget(d->nameLabel);
+    d->hbox->addStretch();
+
     // toolbar
     d->actions = new QToolBar;
     d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    d->hbox->addWidget(d->actions);
 
-    d->attachAction = d->actions->addAction(QIcon(":/add.png"), tr("Attach"));
+    // static toolbar
+    QToolBar *windowActions = new QToolBar;
+
+    d->attachAction = windowActions->addAction(QIcon(":/add.png"), tr("Attach"));
     d->attachAction->setVisible(false);
     check = connect(d->attachAction, SIGNAL(triggered()),
                     this, SIGNAL(attachPanel()));
     Q_ASSERT(check);
 
-    d->closeAction = d->actions->addAction(QIcon(":/close.png"), tr("Close"));
+    d->closeAction = windowActions->addAction(QIcon(":/close.png"), tr("Close"));
     check = connect(d->closeAction, SIGNAL(triggered()),
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
-
-    d->iconLabel = new QLabel;
-    d->nameLabel = new QLabel;
-
-    d->hbox = new QHBoxLayout;
-    d->hbox->addSpacing(16);
-    d->hbox->addWidget(d->iconLabel);
-    d->hbox->addWidget(d->nameLabel);
-    d->hbox->addStretch();
-    d->hbox->addWidget(d->actions);
+    d->hbox->addWidget(windowActions);
 
     // assemble header
     d->header = new QVBoxLayout;
@@ -110,10 +113,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->helpLabel->setOpenExternalLinks(true);
     d->helpLabel->hide();
     d->header->addWidget(d->helpLabel);
-
-    d->widgets = new QHBoxLayout;
-    d->widgets->addStretch();
-    d->header->addLayout(d->widgets);
 
     setMinimumWidth(300);
 }
