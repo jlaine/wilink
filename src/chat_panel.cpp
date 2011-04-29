@@ -110,7 +110,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     // assemble header
     d->header = new QVBoxLayout;
     d->header->setMargin(0);
-    d->header->setSpacing(10);
+    d->header->setSpacing(0);
     d->header->addLayout(d->hbox);
 
     d->helpLabel = new QLabel;

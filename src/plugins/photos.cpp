@@ -227,8 +227,7 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     progressFiles(0)
 {
     /* create UI */
-    helpLabel = new QLabel(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
-    helpLabel->setWordWrap(true);
+    setWindowHelp(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
 
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
@@ -271,8 +270,6 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
-    layout->addWidget(helpLabel);
-    layout->addSpacing(10);
     layout->addWidget(photosView);
     QHBoxLayout *hbox_upload = new QHBoxLayout;
     hbox_upload->addWidget(stopButton);
@@ -470,7 +467,6 @@ void PhotosPanel::fileOpened(const QUrl &url)
 
     // disable controls
     deleteButton->hide();
-    helpLabel->hide();
 
     // build playlist
     PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
@@ -565,7 +561,6 @@ void PhotosPanel::goBack()
     } else {
         deleteButton->show();
     }
-    helpLabel->show();
 }
 
 /** Open filesystem.

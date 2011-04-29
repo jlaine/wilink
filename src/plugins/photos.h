@@ -124,7 +124,6 @@ private:
     QPushButton *deleteButton;
     QPushButton *stopButton;
     Job downloadJob;
-    QLabel *helpLabel;
     QStackedWidget *photosView;
     int progressFiles;
     QProgressBar *progressBar;
