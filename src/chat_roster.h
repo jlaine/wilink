@@ -48,7 +48,6 @@ public:
         IdRole = Qt::UserRole,
         TypeRole,
         MessagesRole,
-        AvatarRole,
         StatusRole,
         UrlRole,
         NicknameRole,

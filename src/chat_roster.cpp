@@ -332,7 +332,7 @@ QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
             item = d->find(bareJid);
     }
     if (item)
-        return item->data(AvatarRole).value<QPixmap>();
+        return item->data(Qt::DecorationRole).value<QPixmap>();
     return QPixmap();
 }
 
@@ -483,7 +483,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         if (item->type() == ChatRosterModel::Contact)
         {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap icon(item->data(AvatarRole).value<QPixmap>());
+                QPixmap icon(item->data(role).value<QPixmap>());
                 if (messages)
                     paintMessages(icon, messages);
                 return QIcon(icon);
@@ -507,7 +507,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                return QIcon(item->data(AvatarRole).value<QPixmap>());
+                return QIcon(item->data(role).value<QPixmap>());
             } else if (role == Qt::DecorationRole && index.column() == StatusColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
@@ -718,7 +718,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
-        item->setData(AvatarRole, QPixmap(":/peer.png"));
+        item->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
         ChatModel::addItem(item, d->contactsItem);
     }
 
@@ -781,7 +781,7 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
 #ifdef WILINK_EMBEDDED
         imageReader.setScaledSize(QSize(ICON_SIZE, ICON_SIZE));
 #endif
-        item->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
+        item->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
 
         // store the nickName or fullName found in the vCard for display,
         // unless the roster entry has a name
@@ -817,7 +817,7 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
 #ifdef WILINK_EMBEDDED
         imageReader.setScaledSize(QSize(ICON_SIZE, ICON_SIZE));
 #endif
-        d->ownItem->setData(AvatarRole, QPixmap::fromImage(imageReader.read()));
+        d->ownItem->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
 
         if (!vcard.nickName().isEmpty()) {
             d->ownItem->setData(NicknameRole, vcard.nickName());
