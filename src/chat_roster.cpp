@@ -483,12 +483,12 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         if (item->type() == ChatRosterModel::Contact)
         {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap icon(QString(":/contact-%1.png").arg(contactStatus(index)));
+                QPixmap icon(item->data(AvatarRole).value<QPixmap>());
                 if (messages)
                     paintMessages(icon, messages);
                 return QIcon(icon);
             } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
-                return QIcon(item->data(AvatarRole).value<QPixmap>());
+                return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
@@ -507,9 +507,9 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
-            } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
                 return QIcon(item->data(AvatarRole).value<QPixmap>());
+            } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+                return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
         } else {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
@@ -718,6 +718,7 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
+        item->setData(AvatarRole, QPixmap(":/peer.png"));
         ChatModel::addItem(item, d->contactsItem);
     }
 
