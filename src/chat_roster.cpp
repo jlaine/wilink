@@ -100,13 +100,6 @@ QString ChatRosterItem::id() const
 void ChatRosterItem::setId(const QString &id)
 {
     itemId = id;
-
-    QString name;
-    if (itemType == ChatRosterModel::RoomMember)
-        name = id.split('/').last();
-    else
-        name = id.split('@').first();
-    setData(Qt::DisplayRole, name);
 }
 
 void ChatRosterItem::setData(int role, const QVariant &value)
@@ -686,6 +679,8 @@ void ChatRosterModel::rosterChanged(const QString &jid)
         item->setId(jid);
         if (!entry.name().isEmpty())
             item->setData(Qt::DisplayRole, entry.name());
+        else
+            item->setData(Qt::DisplayRole, jidToUser(jid));
         item->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
         ChatModel::addItem(item, d->contactsItem);
     }
