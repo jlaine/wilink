@@ -2,6 +2,7 @@ wiLink 1.2.0 (UNRELEASED)
  * Calls:
   - Add support for double NAT traversal using TURN.
   - Add initial support for video calls.
+  - Add a "call" action in conversations instead of right-click.
  * Conversations:
   - Display avatars in chat history.
   - Do not regroup messages over one hour apart.
@@ -14,6 +15,8 @@ wiLink 1.2.0 (UNRELEASED)
   - Do not use app-wide network cache (fixes crash on account add/remove).
  * Roster:
   - Invalidate client capabilities when the verification string changes.
+ * Transfers:
+  - Add a "send file" action in conversations instead of right-click.
  * Telephone:
   - Fix STUN fallback port when SRV lookups are not available.
 
