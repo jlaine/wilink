@@ -63,7 +63,6 @@ public:
     };
 
     enum Type {
-        Root,
         Contact,
         Room,
         RoomMember,
