@@ -71,8 +71,11 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     QXmppClient *client = chat->client();
 
     // add extensions
-    bookmarkManager = new QXmppBookmarkManager(client);
-    client->addExtension(bookmarkManager);
+    QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
+    if (!bookmarkManager) {
+        bookmarkManager = new QXmppBookmarkManager(client);
+        client->addExtension(bookmarkManager);
+    }
 
     mucManager = client->findExtension<QXmppMucManager>();
     if (!mucManager) {
@@ -126,6 +129,9 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
 
 void ChatRoomWatcher::bookmarksReceived()
 {
+    QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
     // join rooms marked as "autojoin"
     const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
     foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {

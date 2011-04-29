@@ -55,6 +55,7 @@ public:
     ChatRosterView *rosterView();
     QMenu *fileMenu();
     bool open(const QString &jid);
+    QAction *addAction(const QIcon &icon, const QString &text);
     void addPanel(ChatPanel *panel);
     ChatPanel *panel(const QString &objectName);
     void setWindowTitle(const QString &title);

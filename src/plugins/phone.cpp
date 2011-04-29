@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAction>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDomDocument>
@@ -378,7 +379,8 @@ void PhonePanel::handleSettings()
             selfcareMessage->setText(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
                                          tr("You can subscribe to the phone service at the following address:"), selfcareUrl, selfcareUrl));
             selfcareMessage->show();
-            emit registerPanel();
+            QAction *action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
+            connect(action, SIGNAL(triggered()), this, SIGNAL(showPanel()));
         }
         return;
     }
@@ -410,7 +412,8 @@ void PhonePanel::handleSettings()
     if (!callsUrl.isEmpty())
         callsModel->setUrl(QUrl(callsUrl));
 
-    emit registerPanel();
+    QAction *action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
+    connect(action, SIGNAL(triggered()), this, SIGNAL(showPanel()));
 }
 
 void PhonePanel::historyClicked(const QModelIndex &index)

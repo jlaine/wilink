@@ -42,6 +42,7 @@
 #include <QStatusBar>
 #include <QStringList>
 #include <QTimer>
+#include <QToolBar>
 
 #include "QSoundMeter.h"
 #include "QSoundPlayer.h"
@@ -69,6 +70,7 @@
 class ChatPrivate
 {
 public:
+    QToolBar *actions;
     QMenu *fileMenu;
     QAction *findAction;
     QAction *findAgainAction;
@@ -110,13 +112,23 @@ Chat::Chat(QWidget *parent)
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
+    QWidget *leftTab = new QWidget;
+    QVBoxLayout *leftLayout = new QVBoxLayout;
+
+    d->actions = new QToolBar;
+    d->actions->hide();
+    leftLayout->addWidget(d->actions);
+
     d->rosterView = new ChatRosterView(d->rosterModel);
     d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
     connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
     connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     connect(d->rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
-    splitter->addWidget(d->rosterView);
+    leftLayout->addWidget(d->rosterView);
+
+    leftTab->setLayout(leftLayout);
+    splitter->addWidget(leftTab);
     splitter->setStretchFactor(0, 0);
 
     /* right panel */
@@ -189,6 +201,18 @@ Chat::~Chat()
         d->plugins[i]->finalize(this);
 
     delete d;
+}
+
+/** Adds an action to the tool bar.
+ *
+ * @param icon
+ * @param text
+ */
+QAction *Chat::addAction(const QIcon &icon, const QString &text)
+{
+    QAction *action = d->actions->addAction(icon, text);
+    d->actions->show();
+    return action;
 }
 
 /** Connect signals for the given panel.
