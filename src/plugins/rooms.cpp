@@ -434,8 +434,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
 
-    check = connect(mucRoom, SIGNAL(error(QXmppPresence::Error)),
-                    this, SLOT(error(QXmppPresence::Error)));
+    check = connect(mucRoom, SIGNAL(error(QXmppStanza::Error)),
+                    this, SLOT(error(QXmppStanza::Error)));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(kicked(QString,QString)),
