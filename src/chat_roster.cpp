@@ -345,6 +345,8 @@ QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
 QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRosterModel::Feature feature) const
 {
     QStringList jids;
+    if (bareJid.isEmpty())
+        return jids;
 
     ChatRosterItem *item = d->find(bareJid);
     if (item && item->type() != ChatRosterModel::Contact && item->type() != ChatRosterModel::RoomMember)

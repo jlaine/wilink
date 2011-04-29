@@ -625,7 +625,7 @@ void CallsPlugin::finalize(Chat *chat)
 void CallsPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     CallWatcher *watcher = m_watchers.value(chat);
-    if (!watcher)
+    if (!watcher || panel->objectType() != ChatRosterModel::Contact)
         return;
 
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::VoiceFeature);

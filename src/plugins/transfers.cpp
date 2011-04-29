@@ -386,7 +386,7 @@ void TransfersPlugin::finalize(Chat *chat)
 void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     ChatTransfersWatcher *watcher = m_watchers.value(chat);
-    if (!watcher)
+    if (!watcher || panel->objectType() != ChatRosterModel::Contact)
         return;
 
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::FileTransferFeature);
