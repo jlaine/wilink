@@ -67,6 +67,7 @@ private slots:
     void sipStateChanged(SipClient::State state);
 
 private:
+    QAction *action;
     ChatClient *client;
     Chat *m_window;
     SipClient *sip;

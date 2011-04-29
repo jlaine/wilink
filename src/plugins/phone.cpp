@@ -245,6 +245,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
     check = connect(hangupButton, SIGNAL(clicked()),
                     callsModel, SLOT(hangup()));
+
+    // add action
+    action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
+    action->setVisible(false);
+    check = connect(action, SIGNAL(triggered()),
+                    this, SIGNAL(showPanel()));
     Q_ASSERT(check);
 }
 
@@ -379,8 +385,7 @@ void PhonePanel::handleSettings()
             selfcareMessage->setText(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
                                          tr("You can subscribe to the phone service at the following address:"), selfcareUrl, selfcareUrl));
             selfcareMessage->show();
-            QAction *action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
-            connect(action, SIGNAL(triggered()), this, SIGNAL(showPanel()));
+            action->setVisible(true);
         }
         return;
     }
@@ -412,8 +417,8 @@ void PhonePanel::handleSettings()
     if (!callsUrl.isEmpty())
         callsModel->setUrl(QUrl(callsUrl));
 
-    QAction *action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
-    connect(action, SIGNAL(triggered()), this, SIGNAL(showPanel()));
+    // enable action
+    action->setVisible(true);
 }
 
 void PhonePanel::historyClicked(const QModelIndex &index)
