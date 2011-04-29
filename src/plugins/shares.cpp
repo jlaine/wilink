@@ -48,7 +48,6 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_search.h"
-#include "transfers.h"
 #include "shares.h"
 #include "shares/model.h"
 #include "shares/options.h"

@@ -28,7 +28,6 @@
 #include "chat_panel.h"
 
 class QModelIndex;
-class QProgressBar;
 class Chat;
 
 /** The ChatTransferPrompt class represents a message box to

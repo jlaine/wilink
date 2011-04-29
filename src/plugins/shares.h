@@ -33,15 +33,11 @@ class ChatRosterModel;
 class SharesModel;
 class SharesTab;
 class SharesView;
-class ChatTransfers;
 class QLabel;
-class QLineEdit;
 class QModelIndex;
 class QPushButton;
 class QStatusBar;
 class QTabWidget;
-class QTimer;
-class QXmppPacket;
 class QXmppPresence;
 class QXmppShareDatabase;
 
@@ -55,7 +51,6 @@ public:
     SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
     void setClient(QXmppClient *client);
     void setRoster(ChatRosterModel *model);
-    void setTransfers(ChatTransfers *transfers);
 
 signals:
     void findFinished(bool found);
