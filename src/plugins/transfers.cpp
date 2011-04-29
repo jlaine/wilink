@@ -58,18 +58,6 @@ enum TransfersColumns {
     MaxColumn,
 };
 
-static QIcon jobIcon(QXmppTransferJob *job)
-{
-    if (job->state() == QXmppTransferJob::FinishedState)
-    {
-        if (job->error() == QXmppTransferJob::NoError)
-            return QIcon(":/contact-available.png");
-        else
-            return QIcon(":/contact-busy.png");
-    }
-    return QIcon(":/contact-offline.png");
-}
-
 ChatTransferPrompt::ChatTransferPrompt(QXmppTransferJob *job, const QString &contactName, QWidget *parent)
     : QMessageBox(parent), m_job(job)
 {

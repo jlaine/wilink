@@ -488,8 +488,8 @@ QSizeF ChatPanelImage::sizeHint(Qt::SizeHint which, const QSizeF &constraint) co
 
 ChatPanelProgress::ChatPanelProgress(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    m_minimum(0),
     m_maximum(100),
+    m_minimum(0),
     m_value(0)
 {
     const QPalette palette = ChatPanel::palette();

@@ -560,6 +560,7 @@ void ChatRoom::joined()
 
 void ChatRoom::kicked(const QString &jid, const QString &reason)
 {
+    Q_UNUSED(jid);
     QMessageBox::warning(window(),
         tr("Chat room error"),
         tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
