@@ -48,7 +48,6 @@
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
-#include "QXmppVCardManager.h"
 
 #include "application.h"
 #include "chat.h"
@@ -435,6 +434,14 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
 
+    check = connect(mucRoom, SIGNAL(error(QXmppPresence::Error)),
+                    this, SLOT(error(QXmppPresence::Error)));
+    Q_ASSERT(check);
+
+    check = connect(mucRoom, SIGNAL(kicked(QString,QString)),
+                    this, SLOT(kicked(QString,QString)));
+    Q_ASSERT(check);
+
     check = connect(mucRoom, SIGNAL(joined()), 
                     this, SLOT(joined()));
     Q_ASSERT(check);
@@ -449,10 +456,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     check = connect(mucRoom, SIGNAL(messageReceived(QXmppMessage)),
                     this, SLOT(messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
-
-    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(messageClicked(QModelIndex)),
@@ -513,6 +516,17 @@ void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     setWindowTitle(rosterModel->contactName(mucRoom->jid()));
 }
 
+/** Handle an error.
+ */
+void ChatRoom::error(const QXmppStanza::Error &error)
+{
+    QMessageBox::warning(window(),
+        tr("Chat room error"),
+        tr("Sorry, but you cannot join chat room '%1'.\n\n%2")
+            .arg(mucRoom->jid())
+            .arg(error.text()));
+}
+
 /** Invite a user to the chat room.
  */
 void ChatRoom::invite(const QString &jid)
@@ -558,8 +572,13 @@ void ChatRoom::joined()
     permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
 }
 
-void ChatRoom::kicked()
+void ChatRoom::kicked(const QString &jid, const QString &reason)
 {
+    QMessageBox::warning(window(),
+        tr("Chat room error"),
+        tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
+            .arg(mucRoom->jid())
+            .arg(reason));
 }
 
 /** Handle leaving the room.
@@ -620,58 +639,6 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
 ChatRosterModel::Type ChatRoom::objectType() const
 {
     return ChatRosterModel::Room;
-}
-
-void ChatRoom::presenceReceived(const QXmppPresence &presence)
-{
-    const QString roomJid = mucRoom->jid();
-    if (jidToBareJid(presence.from()) != roomJid)
-        return;
-
-    switch (presence.type())
-    {
-    case QXmppPresence::Error:
-        foreach (const QXmppElement &extension, presence.extensions())
-        {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc)
-            {
-                QXmppStanza::Error error = presence.error();
-                QMessageBox::warning(window(),
-                    tr("Chat room error"),
-                    tr("Sorry, but you cannot join chat room '%1'.\n\n%2")
-                        .arg(roomJid)
-                        .arg(error.text()));
-                break;
-            }
-        }
-        break;
-    case QXmppPresence::Unavailable:
-        if (jidToResource(presence.from()) != nickName)
-            return;
-
-        foreach (const QXmppElement &extension, presence.extensions())
-        {
-            if (extension.tagName() == "x" && extension.attribute("xmlns") == ns_muc_user)
-            {
-                QXmppElement status = extension.firstChildElement("status");
-                while (!status.isNull()) {
-                    if (status.attribute("code").toInt() == 307) {
-                        QXmppElement reason = extension.firstChildElement("item").firstChildElement("reason");
-                        QMessageBox::warning(window(),
-                            tr("Chat room error"),
-                            tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
-                                .arg(roomJid)
-                                .arg(reason.value()));
-                        break;
-                    }
-                    status = status.nextSiblingElement("status");
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
 }
 
 void ChatRoom::rosterClick(const QModelIndex &index)
