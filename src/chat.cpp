@@ -116,6 +116,7 @@ Chat::Chat(QWidget *parent)
     QVBoxLayout *leftLayout = new QVBoxLayout;
 
     d->actions = new QToolBar;
+    d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     d->actions->hide();
     leftLayout->addWidget(d->actions);
 
