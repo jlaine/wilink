@@ -473,7 +473,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             return QBrush(grad);
         }
     } else {
-        if (item->type() == ChatRosterModel::Contact)
+        if (item->type() == ChatRosterModel::Contact || item->type() == ChatRosterModel::RoomMember)
         {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 QPixmap icon(item->data(role).value<QPixmap>());
@@ -495,14 +495,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QIcon(icon);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatroom") + sortSeparator + bareJid.toLower();
-            }
-        } else if (item->type() == ChatRosterModel::RoomMember) {
-            if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
-            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                return QIcon(item->data(role).value<QPixmap>());
-            } else if (role == Qt::DecorationRole && index.column() == StatusColumn) {
-                return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
         } else {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
@@ -853,7 +845,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     ChatModel::addItem(item, parentItem);
 
     // fetch vCard
-    if (type == ChatRosterModel::RoomMember)
+    if (type == ChatRosterModel::Contact || type == ChatRosterModel::RoomMember)
         d->fetchVCard(item->id());
 
     return createIndex(item, 0);
