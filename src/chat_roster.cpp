@@ -339,7 +339,7 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     QStringList jids;
 
     ChatRosterItem *item = d->find(bareJid);
-    if (item && (item->type() == ChatRosterModel::Room))
+    if (item && item->type() != ChatRosterModel::Contact && item->type() != ChatRosterModel::RoomMember)
         return jids;
 
     if (jidToResource(bareJid).isEmpty())
@@ -400,15 +400,12 @@ QString ChatRosterModel::contactName(const QString &jid) const
     if (bareJid == d->ownItem->id())
         return d->ownItem->data(Qt::DisplayRole).toString();
 
-    // chat room members
-    item = d->find(bareJid);
-    if (item && item->type() == ChatRosterModel::Room)
-        return jidToResource(jid);
-
     // contact by bare jid
+    item = d->find(bareJid);
     if (item)
         return item->data(Qt::DisplayRole).toString();
-    return jidToUser(jid);
+
+    return jid;
 }
 
 static QString contactStatus(const QModelIndex &index)
