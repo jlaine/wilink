@@ -658,38 +658,6 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             }
         }
     }
-
-    // handle chat rooms
-    ChatRosterItem *roomItem = d->find(bareJid);
-    if (!roomItem || roomItem->type() != ChatRosterModel::Room)
-        return;
-
-    ChatRosterItem *memberItem = d->find(jid, roomItem);
-    if (presence.type() == QXmppPresence::Available)
-    {
-        if (!memberItem)
-        {
-            // create roster entry
-            memberItem = new ChatRosterItem(ChatRosterModel::RoomMember);
-            memberItem->setId(jid);
-            memberItem->setData(StatusRole, presence.status().type());
-            ChatModel::addItem(memberItem, roomItem);
-
-            // fetch vCard
-            d->fetchVCard(memberItem->id());
-        } else {
-            // update roster entry
-            memberItem->setData(StatusRole, presence.status().type());
-            emit dataChanged(createIndex(memberItem, ContactColumn),
-                             createIndex(memberItem, SortingColumn));
-        }
-    }
-    else if (presence.type() == QXmppPresence::Unavailable && memberItem)
-    {
-        removeItem(memberItem);
-    }
-    emit dataChanged(createIndex(roomItem, ContactColumn),
-                     createIndex(roomItem, SortingColumn));
 }
 
 void ChatRosterModel::rosterChanged(const QString &jid)
@@ -888,6 +856,10 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     if (!icon.isNull())
         item->setData(Qt::DecorationRole, icon);
     ChatModel::addItem(item, parentItem);
+
+    // fetch vCard
+    if (type == ChatRosterModel::RoomMember)
+        d->fetchVCard(item->id());
 
     return createIndex(item, 0);
 }

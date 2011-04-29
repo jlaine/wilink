@@ -105,6 +105,9 @@ private slots:
     void kicked(const QString &jid, const QString &reason);
     void onMessageClicked(const QModelIndex &messageIndex);
     void messageReceived(const QXmppMessage &msg);
+    void participantAdded(const QString &jid);
+    void participantChanged(const QString &jid);
+    void participantRemoved(const QString &jid);
     void returnPressed();
     void rosterClick(const QModelIndex &index);
     void subjectChanged(const QString &subject);
