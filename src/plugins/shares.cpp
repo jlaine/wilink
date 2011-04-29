@@ -79,6 +79,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     bool check;
     setWindowIcon(QIcon(":/share.png"));
     setWindowTitle(tr("Shares"));
+    setWindowHelp(tr("You can select the folders you want to share with other users from the shares options."));
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -97,19 +98,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     layout->addWidget(searchBar);
     layout->addSpacing(4);
 
-    // add actions
-    QAction *optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
-    check = connect(optionsAction, SIGNAL(triggered()),
-                    this, SLOT(showOptions()));
-    Q_ASSERT(check);
-
     // MAIN
-
-    // shares help
-    sharesHelp = new QLabel;
-    sharesHelp->setOpenExternalLinks(true);
-    sharesHelp->setWordWrap(true);
-    layout->addWidget(sharesHelp);
 
     // shares view
     SharesModel *sharesModel = new SharesModel(this);
@@ -214,7 +203,12 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
 
     directoryChanged(db->directory());
 
-    // register action
+    // add actions
+    QAction *optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
+    check = connect(optionsAction, SIGNAL(triggered()),
+                    this, SLOT(showOptions()));
+    Q_ASSERT(check);
+
     action = chat->addAction(windowIcon(), windowTitle());
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
     action->setVisible(false);
@@ -227,7 +221,6 @@ void SharesPanel::directoryChanged(const QString &path)
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(path).toString(),
         tr("downloads folder"));
-    sharesHelp->setText(tr("You can select the folders you want to share with other users from the shares options."));
     downloadsHelp->setText(tr("Received files are stored in your %1. Once a file is received, you can double click to open it.").arg(sharesLink));
 }
 

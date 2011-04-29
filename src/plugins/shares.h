@@ -90,7 +90,6 @@ private:
     SharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 
-    QLabel *sharesHelp;
     SharesView *sharesView;
     QString sharesFilter;
 
