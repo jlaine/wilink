@@ -789,9 +789,7 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         buffer.setData(vcard.photo());
         buffer.open(QIODevice::ReadOnly);
         QImageReader imageReader(&buffer);
-#ifdef WILINK_EMBEDDED
-        imageReader.setScaledSize(QSize(ICON_SIZE, ICON_SIZE));
-#endif
+        imageReader.setScaledSize(QSize(32, 32));
         d->ownItem->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
 
         if (!vcard.nickName().isEmpty()) {

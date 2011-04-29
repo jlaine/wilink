@@ -81,6 +81,7 @@ public:
     ChatRosterView *rosterView;
     QString windowTitle;
 
+    QWidget *leftPanel;
     QStackedWidget *conversationPanel;
 
     QList<ChatPlugin*> plugins;
@@ -112,7 +113,7 @@ Chat::Chat(QWidget *parent)
     splitter->setChildrenCollapsible(false);
 
     /* left panel */
-    QWidget *leftTab = new QWidget;
+    d->leftPanel = new QWidget;
     QVBoxLayout *leftLayout = new QVBoxLayout;
 
     d->actions = new QToolBar;
@@ -128,8 +129,8 @@ Chat::Chat(QWidget *parent)
     connect(d->rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
     leftLayout->addWidget(d->rosterView);
 
-    leftTab->setLayout(leftLayout);
-    splitter->addWidget(leftTab);
+    d->leftPanel->setLayout(leftLayout);
+    splitter->addWidget(d->leftPanel);
     splitter->setStretchFactor(0, 0);
 
     /* right panel */
@@ -247,10 +248,10 @@ void Chat::attachPanel()
     // add panel
     if (d->conversationPanel->indexOf(panel) < 0)
     {
-        d->conversationPanel->addWidget(panel);
 #ifdef WILINK_EMBEDDED
-        d->rosterView->hide();
+        d->leftPanel->hide();
 #endif
+        d->conversationPanel->addWidget(panel);
         d->conversationPanel->show();
         if (d->conversationPanel->count() == 1)
             resizeContacts();
@@ -316,7 +317,7 @@ void Chat::hidePanel()
     {
         d->conversationPanel->hide();
 #ifdef WILINK_EMBEDDED
-        d->rosterView->show();
+        d->leftPanel->show();
 #endif
         QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
