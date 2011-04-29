@@ -81,7 +81,6 @@ private:
     QPushButton *hangupButton;
     QLineEdit *numberEdit;
     QLabel *statusLabel;
-    QLabel *selfcareMessage;
 
     bool m_registeredHandler;
 };

@@ -164,8 +164,7 @@ void Menu::showMenu()
                 ChatRoomWatcher *roomWatcher = chatWindow->findChild<ChatRoomWatcher*>();
                 QModelIndex index = model->findItem(linkUrl.path());
                 if (index.isValid()) {
-                    model->setData(index, tr("My residence"), Qt::DisplayRole);
-                    model->setData(index, QIcon(":/home.png"), Qt::DecorationRole);
+                    model->setData(index, QPixmap(":/home.png"), Qt::DecorationRole);
                 } else if (roomWatcher) {
                     index = model->addItem(ChatRosterModel::Room, linkUrl.path(),
                                            tr("My residence"), QIcon(":/home.png"));

@@ -103,15 +103,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
 
-    // selfcare message
-    selfcareMessage = new QLabel;
-    selfcareMessage->setOpenExternalLinks(true);
-    selfcareMessage->setWordWrap(true);
-    selfcareMessage->setMargin(10);
-    selfcareMessage->setStyleSheet("QLabel { border:1px solid #8DB6CD; background-color:#B0E2FF; }");
-    selfcareMessage->hide();
-    layout->addWidget(selfcareMessage);
-
     // calls buttons
     QHBoxLayout *hbox = new QHBoxLayout;
     numberEdit = new QLineEdit;
@@ -382,9 +373,8 @@ void PhonePanel::handleSettings()
     if (!enabled || domain.isEmpty() || username.isEmpty() || password.isEmpty()) {
         if (!selfcareUrl.isEmpty()) {
             // show a message
-            selfcareMessage->setText(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
-                                         tr("You can subscribe to the phone service at the following address:"), selfcareUrl, selfcareUrl));
-            selfcareMessage->show();
+            setWindowHelp(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
+                                  tr("You can subscribe to the phone service at the following address:"), selfcareUrl, selfcareUrl));
             action->setVisible(true);
         }
         return;
