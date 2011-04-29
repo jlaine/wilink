@@ -98,12 +98,12 @@ private:
     QAudioOutput *m_audioOutput;
 
     // video
-    QVideoGrabber *m_videoGrabber;
-    QTimer *m_videoTimer;
     ChatPanelButton *m_videoButton;
     QXmppVideoFrame *m_videoConversion;
+    QVideoGrabber *m_videoGrabber;
     CallVideoWidget *m_videoOutput;
     CallVideoWidget *m_videoMonitor;
+    QTimer *m_videoTimer;
 
     QList<ChatPanelButton*> m_buttons;
     ChatPanelButton *m_hangupButton;

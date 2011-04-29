@@ -73,6 +73,8 @@ QRectF CallVideoWidget::boundingRect() const
 
 void CallVideoWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
     if (m_boundingRect.isEmpty() || m_image.size().isEmpty())
         return;
     const QPalette palette = ChatPanel::palette();
@@ -232,6 +234,8 @@ void CallWidget::audioModeChanged(QIODevice::OpenMode mode)
 
 void CallWidget::audioStateChanged(QAudio::State state)
 {
+    Q_UNUSED(state)
+
     QObject *audio = sender();
     if (!audio)
         return;
