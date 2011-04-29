@@ -90,7 +90,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     bool check;
     client = chatWindow->client();
 
-    setWindowIcon(QIcon(":/call.png"));
+    setWindowIcon(QIcon(":/phone.png"));
     setWindowTitle(tr("Phone"));
 
     // http access
