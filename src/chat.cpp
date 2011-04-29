@@ -381,7 +381,7 @@ void Chat::showPanel()
     {
         d->conversationPanel->addWidget(panel);
 #ifdef WILINK_EMBEDDED
-        d->rosterView->hide();
+        d->leftPanel->hide();
 #endif
         d->conversationPanel->show();
         if (d->conversationPanel->count() == 1)
