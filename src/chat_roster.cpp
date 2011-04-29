@@ -272,12 +272,20 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
                     this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(presenceChanged(QString, QString)),
-                    this, SLOT(presenceChanged(QString, QString)));
+    check = connect(&d->client->rosterManager(), SIGNAL(itemAdded(QString)),
+                    this, SLOT(itemAdded(QString)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(rosterChanged(QString)),
-                    this, SLOT(rosterChanged(QString)));
+    check = connect(&d->client->rosterManager(), SIGNAL(itemChanged(QString)),
+                    this, SLOT(itemChanged(QString)));
+    Q_ASSERT(check);
+
+    check = connect(&d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
+                    this, SLOT(itemRemoved(QString)));
+    Q_ASSERT(check);
+
+    check = connect(&d->client->rosterManager(), SIGNAL(presenceChanged(QString, QString)),
+                    this, SLOT(presenceChanged(QString, QString)));
     Q_ASSERT(check);
 
     check = connect(&d->client->rosterManager(), SIGNAL(rosterReceived()),
@@ -609,6 +617,57 @@ QStringList ChatRosterModel::mimeTypes() const
     return QStringList() << "text/uri-list";
 }
 
+/** Handles an item being added to the roster.
+ */
+void ChatRosterModel::itemAdded(const QString &jid)
+{
+    ChatRosterItem *item = d->find(jid, d->contactsItem);
+    if (item)
+        return;
+
+    // add a new entry
+    const QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
+    item = new ChatRosterItem(ChatRosterModel::Contact);
+    item->setId(jid);
+    if (!entry.name().isEmpty())
+        item->setData(Qt::DisplayRole, entry.name());
+    else
+        item->setData(Qt::DisplayRole, jidToUser(jid));
+    item->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
+    ChatModel::addItem(item, d->contactsItem);
+
+    // fetch vCard
+    d->fetchVCard(item->id());
+}
+
+/** Handles an item being changed in the roster.
+ */
+void ChatRosterModel::itemChanged(const QString &jid)
+{
+    ChatRosterItem *item = d->find(jid, d->contactsItem);
+    if (!item)
+        return;
+
+    // update an existing entry
+    const QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
+    if (!entry.name().isEmpty())
+        item->setData(Qt::DisplayRole, entry.name());
+    emit dataChanged(createIndex(item, ContactColumn),
+                     createIndex(item, SortingColumn));
+
+    // fetch vCard
+    d->fetchVCard(item->id());
+}
+
+/** Handles an item being removed from the roster.
+ */
+void ChatRosterModel::itemRemoved(const QString &jid)
+{
+    ChatRosterItem *item = d->find(jid, d->contactsItem);
+    if (item)
+        removeItem(item);
+}
+
 void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& resource)
 {
     Q_UNUSED(resource);
@@ -642,42 +701,6 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
     }
 }
 
-void ChatRosterModel::rosterChanged(const QString &jid)
-{
-    ChatRosterItem *item = d->find(jid, d->contactsItem);
-    QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
-
-    // remove an existing entry
-    if (entry.subscriptionType() == QXmppRosterIq::Item::Remove)
-    {
-        if (item)
-            removeItem(item);
-        return;
-    }
-
-    if (item)
-    {
-        // update an existing entry
-        if (!entry.name().isEmpty())
-            item->setData(Qt::DisplayRole, entry.name());
-        emit dataChanged(createIndex(item, ContactColumn),
-                         createIndex(item, SortingColumn));
-    } else {
-        // add a new entry
-        item = new ChatRosterItem(ChatRosterModel::Contact);
-        item->setId(jid);
-        if (!entry.name().isEmpty())
-            item->setData(Qt::DisplayRole, entry.name());
-        else
-            item->setData(Qt::DisplayRole, jidToUser(jid));
-        item->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
-        ChatModel::addItem(item, d->contactsItem);
-    }
-
-    // fetch vCard
-    d->fetchVCard(item->id());
-}
-
 void ChatRosterModel::rosterReceived()
 {
     // make a note of existing contacts
@@ -691,7 +714,7 @@ void ChatRosterModel::rosterReceived()
     // process received entries
     foreach (const QString &jid, d->client->rosterManager().getRosterBareJids())
     {
-        rosterChanged(jid);
+        itemAdded(jid);
         oldJids.removeAll(jid);
     }
 

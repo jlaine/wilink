@@ -105,9 +105,11 @@ public slots:
 
 protected slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
+    void itemAdded(const QString &jid);
+    void itemChanged(const QString &jid);
+    void itemRemoved(const QString &jid);
     void presenceChanged(const QString& bareJid, const QString& resource);
     void presenceReceived(const QXmppPresence &presence);
-    void rosterChanged(const QString &jid);
     void rosterReceived();
     void vCardReceived(const QXmppVCardIq&);
 
