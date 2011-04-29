@@ -217,6 +217,12 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     Q_ASSERT(check);
 
     directoryChanged(db->directory());
+
+    // register action
+    QAction *action = chat->addAction(windowIcon(), windowTitle());
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
+    connect(action, SIGNAL(triggered()),
+            this, SIGNAL(showPanel()));
 }
 
 void SharesPanel::directoryChanged(const QString &path)
@@ -872,11 +878,6 @@ bool SharesPlugin::initialize(Chat *chat)
     shares->setObjectName("shares");
     shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);
-
-    /* register shortcut */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S), chat);
-    connect(shortcut, SIGNAL(activated()),
-            shares, SIGNAL(showPanel()));
     return true;
 }
 

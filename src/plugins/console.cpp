@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAction>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -38,9 +39,13 @@
 
 /** Constructs a ConsolePanel.
  */
-ConsolePanel::ConsolePanel(QXmppLogger *logger, QWidget *parent)
-    : ChatPanel(parent), connected(false), currentLogger(logger)
+ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *parent)
+    : ChatPanel(parent),
+    connected(false),
+    currentLogger(logger),
+    m_window(chatWindow)
 {
+    bool check;
     setWindowIcon(QIcon(":/options.png"));
     setWindowTitle(tr("Debugging console"));
 
@@ -82,11 +87,19 @@ ConsolePanel::ConsolePanel(QXmppLogger *logger, QWidget *parent)
 
     setLayout(layout);
 
-    /* connect signals */
+    // connect signals
     connect(this, SIGNAL(findPanel()), searchBar, SLOT(activate()));
     connect(this, SIGNAL(findAgainPanel()), searchBar, SLOT(findNext()));
     connect(this, SIGNAL(hidePanel()), this, SLOT(slotStop()));
     connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
+
+    // register action
+    QAction *action = m_window->addAction(windowIcon(), windowTitle());
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D));
+    //action->hide();
+    check = connect(action, SIGNAL(triggered()),
+                    this, SIGNAL(showPanel()));
+    Q_ASSERT(check);
 }
 
 void ConsolePanel::message(QXmppLogger::MessageType type, const QString &msg)
@@ -235,7 +248,7 @@ bool ConsolePlugin::initialize(Chat *chat)
     bool check;
 
     /* register panel */
-    ConsolePanel *console = new ConsolePanel(chat->client()->logger());
+    ConsolePanel *console = new ConsolePanel(chat, chat->client()->logger());
     console->setObjectName(CONSOLE_ROSTER_ID);
     chat->addPanel(console);
 
@@ -249,12 +262,6 @@ bool ConsolePlugin::initialize(Chat *chat)
                     console, SIGNAL(showPanel()));
     Q_ASSERT(check);
 #endif
-
-    /* register shortcut */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chat);
-    check = connect(shortcut, SIGNAL(activated()),
-                    console, SIGNAL(showPanel()));
-    Q_ASSERT(check);
     return true;
 }
 

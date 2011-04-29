@@ -29,6 +29,7 @@
 
 #include "chat_panel.h"
 
+class Chat;
 class ChatSearchBar;
 class Highlighter;
 class QPushButton;
@@ -42,7 +43,7 @@ class ConsolePanel : public ChatPanel
     Q_OBJECT
 
 public:
-    ConsolePanel(QXmppLogger *logger, QWidget *parent = 0);
+    ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *parent = 0);
 
 signals:
     void findFinished(bool found);
@@ -61,6 +62,7 @@ private:
     Highlighter *highlighter;
     QPushButton *startButton;
     QPushButton *stopButton;
+    Chat *m_window;
 };
 
 class Highlighter : public QSyntaxHighlighter
