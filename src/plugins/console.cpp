@@ -93,13 +93,21 @@ ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *paren
     connect(this, SIGNAL(hidePanel()), this, SLOT(slotStop()));
     connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
 
+    // register shortcut
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), m_window);
+    check = connect(shortcut, SIGNAL(activated()),
+                    this, SIGNAL(showPanel()));
+    Q_ASSERT(check);
+
+#if 0
     // register action
     QAction *action = m_window->addAction(windowIcon(), windowTitle());
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D));
-    //action->hide();
+    action->setVisible(false);
     check = connect(action, SIGNAL(triggered()),
                     this, SIGNAL(showPanel()));
     Q_ASSERT(check);
+#endif
 }
 
 void ConsolePanel::message(QXmppLogger::MessageType type, const QString &msg)
