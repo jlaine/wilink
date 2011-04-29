@@ -52,14 +52,6 @@ Menu::Menu(Chat *window)
     userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
     servicesMenu = chatWindow->menuBar()->addMenu(tr("&Services"));
 
-    /* add roster entry */
-    QModelIndex index = chatWindow->rosterModel()->addItem(ChatRosterModel::Other,
-        HOME_ROSTER_ID,
-        tr("My residence"),
-        QIcon(":/home.png"));
-    ChatRosterView *rosterView = chatWindow->rosterView();
-    rosterView->expand(rosterView->mapFromRoster(index));
-
     /* prepare network manager */
     network = new QNetworkAccessManager(this);
     check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
@@ -170,15 +162,13 @@ void Menu::showMenu()
                 /* add or move chat room entry */
                 ChatRosterModel *model = chatWindow->rosterModel();
                 ChatRoomWatcher *roomWatcher = chatWindow->findChild<ChatRoomWatcher*>();
-                QModelIndex homeIndex = model->findItem(HOME_ROSTER_ID);
                 QModelIndex index = model->findItem(linkUrl.path());
-                if (index.isValid())
-                    model->reparentItem(index, homeIndex);
-                else if (roomWatcher)
-                {
-                    index = model->addItem(ChatRosterModel::Room,
-                        linkUrl.path(), tr("Chat room"), QIcon(":/chat.png"),
-                        homeIndex);
+                if (index.isValid()) {
+                    model->setData(index, tr("My residence"), Qt::DisplayRole);
+                    model->setData(index, QIcon(":/home.png"), Qt::DecorationRole);
+                } else if (roomWatcher) {
+                    index = model->addItem(ChatRosterModel::Room, linkUrl.path(),
+                                           tr("My residence"), QIcon(":/home.png"));
                     roomWatcher->joinRoom(linkUrl.path(), false);
                 }
                 model->setData(index, true, ChatRosterModel::PersistentRole);

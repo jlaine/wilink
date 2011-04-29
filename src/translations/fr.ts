@@ -576,10 +576,6 @@ Acceptez-vous?</translation>
         <source>My residence</source>
         <translation>Ma résidence</translation>
     </message>
-    <message>
-        <source>Chat room</source>
-        <translation>Salon de discussion</translation>
-    </message>
 </context>
 <context>
     <name>PhoneCallsModel</name>
