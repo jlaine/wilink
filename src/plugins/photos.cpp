@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAction>
 #include <QApplication>
 #include <QBuffer>
 #include <QDebug>
@@ -307,9 +308,6 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
 #endif
 
     setFocusProxy(photosView);
-
-    /* register panel */
-    QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 
 /** When a command finishes, process its results.
@@ -698,12 +696,11 @@ bool PhotosPlugin::initialize(Chat *chat)
     /* register panel */
     PhotosPanel *photos = new PhotosPanel(url);
     photos->setObjectName(PHOTOS_ROSTER_ID);
+    QAction *action = chat->addAction(photos->windowIcon(), photos->windowTitle());
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P));
+    connect(action, SIGNAL(triggered()), photos, SIGNAL(showPanel()));
     chat->addPanel(photos);
     connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));
-
-    /* register shortcut */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P), chat);
-    connect(shortcut, SIGNAL(activated()), photos, SIGNAL(showPanel()));
     return true;
 }
 
