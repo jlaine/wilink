@@ -110,10 +110,6 @@ DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
         this, SLOT(slotShow()));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(hidePanel()),
-        this, SIGNAL(unregisterPanel()));
-    Q_ASSERT(check);
-
     check = connect(m_manager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
         this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);

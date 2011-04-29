@@ -102,7 +102,6 @@ private slots:
     void hidePanel();
     void notifyPanel(const QString &message, int options);
     void showPanel();
-    void unregisterPanel();
 
 private:
     void changeEvent(QEvent *event);

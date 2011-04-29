@@ -229,7 +229,6 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
-    connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
 
     // allows plugins to polish panel
     foreach (ChatPlugin *plugin, d->plugins)
@@ -739,18 +738,6 @@ void Chat::showPreferences(const QString &focusTab)
 #else
     dialog->show();
 #endif
-}
-
-/** Unregister a panel from the roster list.
- */
-void Chat::unregisterPanel()
-{
-    QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (!panel)
-        return;
-
-    QModelIndex index = d->rosterModel->findItem(panel->objectName());
-    d->rosterModel->removeRow(index.row(), index.parent());
 }
 
 ChatOptions::ChatOptions()

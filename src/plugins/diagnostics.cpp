@@ -336,10 +336,6 @@ DiagnosticsPanel::DiagnosticsPanel(QXmppClient *client, QWidget *parent)
     check = connect(this, SIGNAL(showPanel()),
                     this, SLOT(slotShow()));
     Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(hidePanel()),
-                    this, SIGNAL(unregisterPanel()));
-    Q_ASSERT(check);
 }
 
 /** Destroys a DiagnosticsPanel.

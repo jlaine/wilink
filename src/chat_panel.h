@@ -78,7 +78,6 @@ signals:
     void hidePanel();
     void notifyPanel(const QString &message, int options);
     void showPanel();
-    void unregisterPanel();
 
 private slots:
     void sendNotifications();
