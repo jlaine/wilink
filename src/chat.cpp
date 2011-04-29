@@ -207,6 +207,11 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
+
+    // allows plugins to polish panel
+    foreach (ChatPlugin *plugin, d->plugins)
+        plugin->polish(this, panel);
+
     d->chatPanels << panel;
 }
 

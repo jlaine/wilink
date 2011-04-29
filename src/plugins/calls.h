@@ -126,7 +126,6 @@ private slots:
     void callContact();
     void callReceived(QXmppCall *call);
     void connected();
-    void rosterMenu(QMenu *menu, const QModelIndex &index);
     void setTurnServer(const QXmppSrvInfo &serviceInfo);
     void setTurnServer(const QHostInfo &hostInfo);
 

@@ -19,10 +19,6 @@
 <context>
     <name>CallWatcher</name>
     <message>
-        <source>Call</source>
-        <translation>Appeler</translation>
-    </message>
-    <message>
         <source>Call from %1</source>
         <translation>Appel de %1</translation>
     </message>
@@ -794,6 +790,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
     </message>
 </context>
 <context>

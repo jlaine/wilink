@@ -572,18 +572,6 @@ void CallWatcher::connected()
                                 SLOT(setTurnServer(QXmppSrvInfo)));
 }
 
-void CallWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
-{
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QStringList fullJids = m_window->rosterModel()->contactFeaturing(jid, ChatRosterModel::VoiceFeature);
-    if (!m_client->isConnected() || fullJids.isEmpty())
-        return;
-
-    QAction *action = menu->addAction(QIcon(":/call.png"), tr("Call"));
-    action->setData(fullJids.first());
-    connect(action, SIGNAL(triggered()), this, SLOT(callContact()));
-}
-
 void CallWatcher::setTurnServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName = "turn." + m_client->configuration().domain();
@@ -613,19 +601,38 @@ void CallWatcher::setTurnServer(const QHostInfo &hostInfo)
 class CallsPlugin : public ChatPlugin
 {
 public:
+    void finalize(Chat *chat);
     bool initialize(Chat *chat);
     QString name() const { return "Calls"; };
+    void polish(Chat *chat, ChatPanel *panel);
+
+private:
+    QMap<Chat*, CallWatcher*> m_watchers;
 };
 
 bool CallsPlugin::initialize(Chat *chat)
 {
     CallWatcher *watcher = new CallWatcher(chat);
-
-    /* add roster hooks */
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-            watcher, SLOT(rosterMenu(QMenu*, QModelIndex)));
-
+    m_watchers.insert(chat, watcher);
     return true;
+}
+
+void CallsPlugin::finalize(Chat *chat)
+{
+    m_watchers.remove(chat);
+}
+
+void CallsPlugin::polish(Chat *chat, ChatPanel *panel)
+{
+    CallWatcher *watcher = m_watchers.value(chat);
+    if (!watcher)
+        return;
+
+    const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::VoiceFeature);
+    if (!fullJids.isEmpty()) {
+        QAction *action = panel->addAction(QIcon(":/call.png"), QObject::tr("Call"));
+        connect(action, SIGNAL(triggered()), watcher, SLOT(callContact()));
+    }
 }
 
 Q_EXPORT_STATIC_PLUGIN2(calls, CallsPlugin)
