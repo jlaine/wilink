@@ -31,13 +31,11 @@
 class Chat;
 class ChatRosterModel;
 class SharesModel;
-class SharesTab;
 class SharesView;
 class QLabel;
 class QModelIndex;
 class QPushButton;
 class QStatusBar;
-class QTabWidget;
 class QXmppPresence;
 class QXmppShareDatabase;
 
@@ -77,7 +75,6 @@ private slots:
     void shareServerFound(const QString &server);
     void indexStarted();
     void indexFinished(double elapsed, int updated, int removed);
-    void tabChanged(int index);
     void directoryChanged(const QString &path);
 
 private:
@@ -93,35 +90,17 @@ private:
     SharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 
-    QTabWidget *tabWidget;
-
+    QLabel *sharesHelp;
     SharesView *sharesView;
-    SharesTab *sharesWidget;
     QString sharesFilter;
 
+    QLabel *downloadsHelp;
     SharesView *downloadsView;
-    SharesTab *downloadsWidget;
     QList<QXmppTransferJob*> downloadJobs;
 
     QPushButton *downloadButton;
     QPushButton *removeButton;
     QStatusBar *statusBar;
-};
-
-class SharesTab : public QWidget
-{
-    Q_OBJECT
-
-public:
-    SharesTab(QWidget *parent = 0);
-    void addWidget(QWidget *widget);
-    void setText(const QString &text);
-
-signals:
-    void showOptions();
-
-private:
-    QLabel *label;
 };
 
 #endif

@@ -858,10 +858,6 @@ Acceptez-vous?</translation>
         <translation>Saisissez le nom du fichier que vous cherchez.</translation>
     </message>
     <message>
-        <source>Downloads</source>
-        <translation>Téléchargements</translation>
-    </message>
-    <message>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
@@ -905,12 +901,9 @@ Acceptez-vous?</translation>
         <source>Queued</source>
         <translation>En attente</translation>
     </message>
-</context>
-<context>
-    <name>SharesTab</name>
     <message>
-        <source>Shares options</source>
-        <translation>Options de partages</translation>
+        <source>Options</source>
+        <translation>Options</translation>
     </message>
 </context>
 <context>

@@ -30,10 +30,8 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QStatusBar>
 #include <QStringList>
-#include <QTabWidget>
 #include <QTimer>
 #include <QUrl>
 
@@ -99,12 +97,21 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     layout->addWidget(searchBar);
     layout->addSpacing(4);
 
+    // add actions
+    QAction *optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
+    check = connect(optionsAction, SIGNAL(triggered()),
+                    this, SLOT(showOptions()));
+    Q_ASSERT(check);
+
     // MAIN
 
-    tabWidget = new QTabWidget;
-    layout->addWidget(tabWidget);
+    // shares help
+    sharesHelp = new QLabel;
+    sharesHelp->setOpenExternalLinks(true);
+    sharesHelp->setWordWrap(true);
+    layout->addWidget(sharesHelp);
 
-    /* create main tab */
+    // shares view
     SharesModel *sharesModel = new SharesModel(this);
     sharesView = new SharesView;
     sharesView->setExpandsOnDoubleClick(false);
@@ -121,15 +128,14 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     check = connect(sharesView, SIGNAL(expandRequested(QModelIndex)),
                     this, SLOT(itemExpandRequested(QModelIndex)));
     Q_ASSERT(check);
+    layout->addWidget(sharesView);
 
-    sharesWidget = new SharesTab;
-    check = connect(sharesWidget, SIGNAL(showOptions()),
-                    this, SLOT(showOptions()));
-    Q_ASSERT(check);
-    sharesWidget->addWidget(sharesView);
-    tabWidget->addTab(sharesWidget, QIcon(":/share.png"), tr("Shares"));
+    // downloads
+    downloadsHelp = new QLabel;
+    downloadsHelp->setOpenExternalLinks(true);
+    downloadsHelp->setWordWrap(true);
+    layout->addWidget(downloadsHelp);
 
-    /* create queue tab */
     queueModel = new SharesModel(this);
     downloadsView = new SharesView;
     downloadsView->setModel(queueModel);
@@ -141,12 +147,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
                     downloadsView, SLOT(expand(QModelIndex)));
     Q_ASSERT(check);
 
-    downloadsWidget = new SharesTab;
-    check = connect(downloadsWidget, SIGNAL(showOptions()),
-                    this, SLOT(showOptions()));
-    Q_ASSERT(check);
-    downloadsWidget->addWidget(downloadsView);
-    tabWidget->addTab(downloadsWidget, QIcon(":/download.png"), tr("Downloads"));
+    layout->addWidget(downloadsView);
 
     // FOOTER
 
@@ -172,7 +173,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
                     this, SLOT(transferRemoved()));
     Q_ASSERT(check);
     footerLayout->addWidget(removeButton);
-    removeButton->hide();
+    //removeButton->hide();
 
     setLayout(layout);
 
@@ -180,10 +181,6 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     QXmppClient *baseClient = chatWindow->client();
     check = connect(this, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
                     baseClient, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
-    Q_ASSERT(check);
-
-    check = connect(tabWidget, SIGNAL(currentChanged(int)),
-                    this, SLOT(tabChanged(int)));
     Q_ASSERT(check);
 
     setClient(baseClient);
@@ -230,8 +227,8 @@ void SharesPanel::directoryChanged(const QString &path)
     const QString sharesLink = QString("<a href=\"%1\">%2</a>").arg(
         QUrl::fromLocalFile(path).toString(),
         tr("downloads folder"));
-    sharesWidget->setText(tr("You can select the folders you want to share with other users from the shares options."));
-    downloadsWidget->setText(tr("Received files are stored in your %1. Once a file is received, you can double click to open it.").arg(sharesLink));
+    sharesHelp->setText(tr("You can select the folders you want to share with other users from the shares options."));
+    downloadsHelp->setText(tr("Received files are stored in your %1. Once a file is received, you can double click to open it.").arg(sharesLink));
 }
 
 /** When the main XMPP stream is disconnected, disconnect the shares-specific
@@ -385,7 +382,6 @@ void SharesPanel::find(const QString &needle, QTextDocument::FindFlags flags, bo
     }
 
     // search for files
-    tabWidget->setCurrentWidget(sharesWidget);
     QXmppShareExtension *extension = client->findExtension<QXmppShareExtension>();
     const QString requestId = extension->search(QXmppShareLocation(shareServer), 1, sharesFilter);
     if (!requestId.isEmpty())
@@ -430,10 +426,6 @@ void SharesPanel::indexStarted()
  */
 void SharesPanel::downloadItem()
 {
-    // determine current view
-    if (tabWidget->currentWidget() != sharesWidget)
-        return;
-
     foreach (const QModelIndex &index, sharesView->selectionModel()->selectedRows())
     {
         QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
@@ -762,57 +754,6 @@ void SharesPanel::shareServerFound(const QString &server)
     presence.setExtensions(x);
     presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
     client->sendPacket(presence);
-}
-
-void SharesPanel::tabChanged(int index)
-{
-    QWidget *tab = tabWidget->widget(index);
-    if (tab == sharesWidget)
-        downloadButton->show();
-    else
-        downloadButton->hide();
-
-    if (tab == downloadsWidget)
-        removeButton->show();
-    else
-        removeButton->hide();
-}
-
-SharesTab::SharesTab(QWidget *parent)
-    : QWidget(parent)
-{
-    bool check;
-
-    QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->setMargin(5);
-
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->setMargin(0);
-    label = new QLabel;
-    label->setOpenExternalLinks(true);
-    label->setWordWrap(true);
-    hbox->addWidget(label, 1);
-
-    QPushButton *button = new QPushButton;
-    button->setIcon(QIcon(":/options.png"));
-    button->setToolTip(tr("Shares options"));
-    check = connect(button, SIGNAL(clicked()),
-                    this, SIGNAL(showOptions()));
-    Q_ASSERT(check);
-    hbox->addWidget(button);
-
-    vbox->addLayout(hbox);
-    setLayout(vbox);
-}
-
-void SharesTab::addWidget(QWidget *widget)
-{
-    layout()->addWidget(widget);
-}
-
-void SharesTab::setText(const QString &text)
-{
-    label->setText(text);
 }
 
 // PLUGIN
