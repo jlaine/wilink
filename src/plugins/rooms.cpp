@@ -144,39 +144,13 @@ bool ChatRoomWatcher::bookmarkRoom(const QString &roomJid)
     return bookmarkManager->setBookmarks(bookmarks);
 }
 
-bool ChatRoomWatcher::unbookmarkRoom(const QString &roomJid)
-{
-    // find bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    int foundAt = -1;
-    for (int i = 0; i < conferences.size(); ++i)
-    {
-        if (conferences.at(i).jid() == roomJid)
-        {
-            foundAt = i;
-            break;
-        }
-    }
-    if (foundAt < 0)
-        return true;
-
-    // remove bookmark
-    conferences.removeAt(foundAt);
-    bookmarks.setConferences(conferences);
-    return bookmarkManager->setBookmarks(bookmarks);
-}
-
 void ChatRoomWatcher::bookmarksReceived()
 {
+    // join rooms marked as "autojoin"
     const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
-    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences())
-    {
+    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
         if (conference.autoJoin())
-        {
-            // if autojoin is enabled, join room
             joinRoom(conference.jid(), false);
-        }
     }
 }
 
@@ -192,16 +166,12 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
     {
         room = new ChatRoom(chat, chat->rosterModel(), jid);
 
-        // get notified when room is closed
-        bool check;
-        check = connect(room, SIGNAL(hidePanel()),
-                        this, SLOT(roomClose()));
-        Q_ASSERT(check);
-
         // add roster hooks
+        bool check;
         check = connect(chat, SIGNAL(rosterClick(QModelIndex)),
                         room, SLOT(rosterClick(QModelIndex)));
         Q_ASSERT(check);
+        Q_UNUSED(check);
 
         // add panel
         chat->addPanel(room);
@@ -272,16 +242,6 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
     box->open(this, SLOT(invitationHandled(QAbstractButton*)));
 
     invitations << roomJid;
-}
-
-/** When the user closes a chat room, unbookmark it.
- */
-void ChatRoomWatcher::roomClose()
-{
-    ChatRoom *room = qobject_cast<ChatRoom*>(sender());
-    if (!room)
-        return;
-    unbookmarkRoom(room->objectName());
 }
 
 /** Prompt the user for a new group chat then join it.
@@ -421,6 +381,11 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     // connect signals
     check = connect(chatInput, SIGNAL(returnPressed()),
                     this, SLOT(returnPressed()));
+    Q_ASSERT(check);
+
+    // get notified when room is closed
+    check = connect(this, SIGNAL(hidePanel()),
+                    this, SLOT(unbookmark()));
     Q_ASSERT(check);
 
     check = connect(rosterModel, SIGNAL(ownNameReceived()), this, SLOT(join()));
@@ -763,6 +728,27 @@ void ChatRoom::tabPressed()
     }
     if (matches.size() == 1)
         cursor.insertText("@" + matches[0] + ": ");
+}
+
+/** Unbookmarks the room.
+ */
+void ChatRoom::unbookmark()
+{
+    QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
+    // find bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    for (int i = 0; i < conferences.size(); ++i) {
+        if (conferences.at(i).jid() == mucRoom->jid()) {
+            // remove bookmark
+            conferences.removeAt(i);
+            bookmarks.setConferences(conferences);
+            bookmarkManager->setBookmarks(bookmarks);
+            return;
+        }
+    }
 }
 
 ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)

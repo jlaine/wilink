@@ -65,7 +65,6 @@ private slots:
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
     void invitationHandled(QAbstractButton *button);
     void mucServerFound(const QString &roomServer);
-    void roomClose();
     void roomPrompt();
     void rosterClick(const QModelIndex &index);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
@@ -74,7 +73,6 @@ private slots:
 
 private:
     bool bookmarkRoom(const QString &jid);
-    bool unbookmarkRoom(const QString &jid);
 
     Chat *chat;
     QXmppBookmarkManager *bookmarkManager;
@@ -112,6 +110,7 @@ private slots:
     void rosterClick(const QModelIndex &index);
     void subjectChanged(const QString &subject);
     void tabPressed();
+    void unbookmark();
 
 private:
     Chat *chat;
