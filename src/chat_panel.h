@@ -77,7 +77,6 @@ signals:
     void findAgainPanel();
     void hidePanel();
     void notifyPanel(const QString &message, int options);
-    void registerPanel();
     void showPanel();
     void unregisterPanel();
 

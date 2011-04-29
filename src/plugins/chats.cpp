@@ -100,9 +100,6 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     check = connect(this, SIGNAL(showPanel()),
                     this, SLOT(join()));
     Q_ASSERT(check);
-
-    // register panel
-    QMetaObject::invokeMethod(this, "registerPanel", Qt::QueuedConnection);
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)

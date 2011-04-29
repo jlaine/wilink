@@ -101,7 +101,6 @@ private slots:
     void dropPanel(QDropEvent *event);
     void hidePanel();
     void notifyPanel(const QString &message, int options);
-    void registerPanel();
     void showPanel();
     void unregisterPanel();
 

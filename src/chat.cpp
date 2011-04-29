@@ -228,7 +228,6 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(dropPanel(QDropEvent*)), this, SLOT(dropPanel(QDropEvent*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
-    connect(panel, SIGNAL(registerPanel()), this, SLOT(registerPanel()));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
     connect(panel, SIGNAL(unregisterPanel()), this, SLOT(unregisterPanel()));
 
@@ -357,20 +356,6 @@ void Chat::notifyPanel(const QString &message, int options)
      * we implement our own version.
      */
     wApp->alert(window);
-}
-
-/** Register a panel in the roster list.
-  */
-void Chat::registerPanel()
-{
-    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
-    if (!panel)
-        return;
-
-    d->rosterModel->addItem(panel->objectType(),
-        panel->objectName(),
-        panel->windowTitle(),
-        panel->windowIcon());
 }
 
 /** Show a panel.

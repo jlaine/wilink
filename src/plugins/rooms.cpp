@@ -161,7 +161,8 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 
         // add panel
         chat->addPanel(room);
-        QMetaObject::invokeMethod(room, "registerPanel");
+        chat->rosterModel()->addItem(room->objectType(), room->objectName(),
+                                     room->windowTitle(), room->windowIcon());
     }
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));
