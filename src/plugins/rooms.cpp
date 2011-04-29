@@ -595,16 +595,12 @@ void ChatRoom::kicked(const QString &jid, const QString &reason)
  */
 void ChatRoom::left()
 {
-    return;
+    // remove room from roster unless it's persistent
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    if (roomIndex.data(ChatRosterModel::PersistentRole).toBool()) {
-        // clear chat room participants
-        rosterModel->removeRows(0, rosterModel->rowCount(roomIndex), roomIndex);
-    } else {
-        // remove room from roster
+    if (!roomIndex.data(ChatRosterModel::PersistentRole).toBool())
         rosterModel->removeRow(roomIndex.row(), roomIndex.parent());
-    }
 
+    // destroy window
     deleteLater();
 }
 
