@@ -58,7 +58,7 @@ static const QChar sortSeparator('\0');
 
 enum RosterColumns {
     ContactColumn = 0,
-    ImageColumn,
+    StatusColumn,
     SortingColumn,
     MaxColumn,
 };
@@ -465,7 +465,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 statusType = type;
         }
         return statusType;
-    } else if (role == Qt::DisplayRole && index.column() == ImageColumn) {
+    } else if (role == Qt::DisplayRole && index.column() == StatusColumn) {
         return QVariant();
     } else if(role == Qt::FontRole && index.column() == ContactColumn) {
         if (messages)
@@ -487,7 +487,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 if (messages)
                     paintMessages(icon, messages);
                 return QIcon(icon);
-            } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+            } else if (role == Qt::DecorationRole && index.column() == StatusColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
@@ -508,7 +508,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 return QLatin1String("chatuser") + sortSeparator + contactStatus(index) + sortSeparator + bareJid.toLower();
             } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
                 return QIcon(item->data(AvatarRole).value<QPixmap>());
-            } else if (role == Qt::DecorationRole && index.column() == ImageColumn) {
+            } else if (role == Qt::DecorationRole && index.column() == StatusColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             }
         } else {
@@ -517,7 +517,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         }
     }
-    if (role == Qt::DecorationRole && index.column() == ImageColumn)
+    if (role == Qt::DecorationRole && index.column() == StatusColumn)
         return QVariant();
 
     return item->data(role);
@@ -915,7 +915,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
 
     setAlternatingRowColors(true);
     setColumnHidden(SortingColumn, true);
-    setColumnWidth(ImageColumn, ICON_SIZE + 8);
+    setColumnWidth(StatusColumn, ICON_SIZE + 8);
     setContextMenuPolicy(Qt::DefaultContextMenu);
     setAcceptDrops(true);
     setAnimated(true);
