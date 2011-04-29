@@ -50,7 +50,6 @@ class SharesPanel : public ChatPanel
 public:
     SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
     void setClient(QXmppClient *client);
-    void setRoster(ChatRosterModel *model);
 
 signals:
     void findFinished(bool found);
@@ -87,10 +86,10 @@ private:
 private:
     QString shareServer;
 
+    QAction *action;
     Chat *chatWindow;
     QXmppClient *client;
     QXmppShareDatabase *db;
-    ChatRosterModel *rosterModel;
     SharesModel *queueModel;
     QMap<QString, QWidget*> searches;
 

@@ -76,8 +76,7 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     : ChatPanel(parent),
     chatWindow(chat),
     client(0),
-    db(sharesDb),
-    rosterModel(0)
+    db(sharesDb)
 {
     bool check;
     setWindowIcon(QIcon(":/share.png"));
@@ -219,8 +218,9 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     directoryChanged(db->directory());
 
     // register action
-    QAction *action = chat->addAction(windowIcon(), windowTitle());
+    action = chat->addAction(windowIcon(), windowTitle());
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
+    action->setVisible(false);
     connect(action, SIGNAL(triggered()),
             this, SIGNAL(showPanel()));
 }
@@ -583,12 +583,7 @@ void SharesPanel::presenceReceived(const QXmppPresence &presence)
 
         // activate the shares view
         sharesView->setEnabled(true);
-
-        // add roster entry
-        rosterModel->addItem(objectType(),
-            objectName(),
-            windowTitle(),
-            windowIcon(), rosterModel->findItem(HOME_ROSTER_ID));
+        action->setVisible(true);
 
         // run one-time configuration
         QSettings settings;
@@ -695,11 +690,6 @@ void SharesPanel::setClient(QXmppClient *newClient)
     Q_ASSERT(check);
 }
 
-void SharesPanel::setRoster(ChatRosterModel *roster)
-{
-    rosterModel = roster;
-}
-
 void SharesPanel::showOptions()
 {
     chatWindow->showPreferences("shares");
@@ -764,7 +754,7 @@ void SharesPanel::shareServerFound(const QString &server)
 
     QXmppElement nickName;
     nickName.setTagName("nickName");
-    nickName.setValue(rosterModel->ownName());
+    nickName.setValue(chatWindow->rosterModel()->ownName());
     x.appendChild(nickName);
 
     QXmppPresence presence;
@@ -875,8 +865,6 @@ bool SharesPlugin::initialize(Chat *chat)
 
     /* register panel */
     SharesPanel *shares = new SharesPanel(chat, db);
-    shares->setObjectName("shares");
-    shares->setRoster(chat->rosterModel());
     chat->addPanel(shares);
     return true;
 }
