@@ -27,6 +27,7 @@ generate_png(png
     home.svg
     options.svg
     peer.svg
+    phone.svg
     photos.svg
     plugin.svg
     refresh.svg
