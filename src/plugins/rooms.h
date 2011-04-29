@@ -116,7 +116,6 @@ private slots:
 private:
     Chat *chat;
     QXmppMucRoom *mucRoom;
-    QString nickName;
     bool notifyMessages;
     ChatRosterModel *rosterModel;
 

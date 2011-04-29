@@ -561,14 +561,12 @@ void ChatRoom::join()
         return;
 
     QXmppClient *client = chat->client();
-    nickName = rosterModel->ownName();
 
     // clear history
     historyModel()->clear();
 
     // send join request
-    mucRoom->setNickName(nickName);
-    mucRoom->setStatus(client->clientPresence().status());
+    mucRoom->setNickName(rosterModel->ownName());
     mucRoom->join();
 
     // request room information
@@ -635,11 +633,11 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     if (!message.date.isValid())
         message.date = chat->client()->serverTime();
     message.jid = msg.from();
-    message.received = jidToResource(msg.from()) != nickName;
+    message.received = jidToResource(msg.from()) != mucRoom->nickName();
     historyModel()->addMessage(message);
 
     // notify user
-    if (notifyMessages || message.body.contains("@" + nickName))
+    if (notifyMessages || message.body.contains("@" + mucRoom->nickName()))
         queueNotification(message.body);
 
     // play sound, unless we sent the message
