@@ -365,12 +365,6 @@ void Chat::showPanel()
     if (!panel)
         return;
 
-    // register panel
-    d->rosterModel->addItem(panel->objectType(),
-        panel->objectName(),
-        panel->windowTitle(),
-        panel->windowIcon());
-
     // if the panel is detached, stop here
     if (panel->isVisible() && !panel->parent())
     {
