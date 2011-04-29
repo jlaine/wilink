@@ -116,6 +116,7 @@ Chat::Chat(QWidget *parent)
     d->leftPanel = new QWidget;
     QVBoxLayout *leftLayout = new QVBoxLayout;
     leftLayout->setMargin(0);
+    leftLayout->setSpacing(0);
 
     d->actions = new QToolBar;
     d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);

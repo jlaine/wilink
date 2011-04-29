@@ -75,9 +75,12 @@ ChatPanel::ChatPanel(QWidget* parent)
 
     // icon and label
     d->hbox = new QHBoxLayout;
-    d->hbox->addSpacing(16);
+    d->hbox->setSpacing(0);
+    d->hbox->setMargin(0);
     d->iconLabel = new QLabel;
+    d->hbox->addSpacing(8);
     d->hbox->addWidget(d->iconLabel);
+    d->hbox->addSpacing(8);
     d->nameLabel = new QLabel;
     d->hbox->addWidget(d->nameLabel);
     d->hbox->addStretch();
@@ -90,6 +93,7 @@ ChatPanel::ChatPanel(QWidget* parent)
 
     // static toolbar
     QToolBar *windowActions = new QToolBar;
+    windowActions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     d->attachAction = windowActions->addAction(QIcon(":/add.png"), tr("Attach"));
     d->attachAction->setVisible(false);
