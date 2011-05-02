@@ -323,16 +323,21 @@ void ChatRosterModel::connected()
  */
 QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
 {
+    // exact roster entry
     ChatRosterItem *item = d->find(jid);
-    if (!item) {
-        const QString bareJid = jidToBareJid(jid);
-        if (bareJid == d->ownItem->id())
-            item = d->ownItem;
-        else
-            item = d->find(bareJid);
-    }
     if (item)
         return item->data(Qt::DecorationRole).value<QPixmap>();
+
+    // own item
+    const QString bareJid = jidToBareJid(jid);
+    if (bareJid == d->ownItem->id())
+        return d->ownItem->data(Qt::DecorationRole).toString();
+
+    // contact by bare jid
+    item = d->find(bareJid);
+    if (item)
+        return item->type() == ChatRosterModel::Room ? QPixmap(":/peer.png") : item->data(Qt::DecorationRole).value<QPixmap>();
+
     return QPixmap();
 }
 
