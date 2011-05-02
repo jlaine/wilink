@@ -404,7 +404,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>My rooms</source>
-        <translation>Mes salons</translation>
+        <translation type="obsolete">Mes salons</translation>
     </message>
 </context>
 <context>
