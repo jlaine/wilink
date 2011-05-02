@@ -162,7 +162,7 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
         // add panel
         chat->addPanel(room);
         chat->rosterModel()->addItem(room->objectType(), room->objectName(),
-                                     room->windowTitle(), room->windowIcon());
+                                     room->windowTitle(), QPixmap(":/chat.png"));
     }
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));
@@ -622,7 +622,7 @@ void ChatRoom::participantAdded(const QString &jid)
 {
     //qDebug("participant added %s", qPrintable(jid));
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QIcon(":/peer.png"), roomIndex);
+    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(":/peer.png"), roomIndex);
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
     

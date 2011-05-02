@@ -167,7 +167,7 @@ void Menu::showMenu()
                     model->setData(index, QPixmap(":/home.png"), Qt::DecorationRole);
                 } else if (roomWatcher) {
                     index = model->addItem(ChatRosterModel::Room, linkUrl.path(),
-                                           tr("My residence"), QIcon(":/home.png"));
+                                           tr("My residence"), QPixmap(":/home.png"));
                     roomWatcher->joinRoom(linkUrl.path(), false);
                 }
                 model->setData(index, true, ChatRosterModel::PersistentRole);

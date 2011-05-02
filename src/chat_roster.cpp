@@ -52,7 +52,6 @@
 #else
 #define ICON_SIZE 24
 #endif
-#define FLAT_ROOMS
 
 static const QChar sortSeparator('\0');
 
@@ -822,29 +821,11 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &id, const QString &name, const QIcon &icon, const QModelIndex &reqParent)
+QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &id, const QString &name, const QPixmap &pixmap, const QModelIndex &reqParent)
 {
     ChatModelItem *parentItem;
     if (reqParent.isValid())
         parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
-#ifndef FLAT_CONTACTS
-    else if (type == ChatRosterModel::Contact)
-        parentItem = d->contactsItem;
-#endif
-#ifndef FLAT_ROOMS
-    else if (type == ChatRosterModel::Room)
-    {
-        if (!d->roomsItem)
-        {
-            d->roomsItem = new ChatRosterItem(ChatRosterModel::Other);
-            d->roomsItem->setId(ROOMS_ROSTER_ID);
-            d->roomsItem->setData(Qt::DisplayRole, tr("My rooms"));
-            d->roomsItem->setData(Qt::DecorationRole, QIcon(":/chat.png"));
-            ChatModel::addItem(d->roomsItem, rootItem);
-        }
-        parentItem = d->roomsItem;
-    }
-#endif
     else
         parentItem = rootItem;
 
@@ -858,8 +839,8 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     item->setId(id);
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
-    if (!icon.isNull())
-        item->setData(Qt::DecorationRole, icon.pixmap(ICON_SIZE, ICON_SIZE));
+    if (!pixmap.isNull())
+        item->setData(Qt::DecorationRole, pixmap);
     ChatModel::addItem(item, parentItem);
 
     // fetch vCard

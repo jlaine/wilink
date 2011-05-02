@@ -86,7 +86,7 @@ public:
     bool isOwnNameReceived() const;
     QString ownName() const;
 
-    QModelIndex addItem(ChatRosterModel::Type type, const QString &id, const QString &name = QString(), const QIcon &icon = QIcon(), const QModelIndex &parent = QModelIndex());
+    QModelIndex addItem(ChatRosterModel::Type type, const QString &id, const QString &name = QString(), const QPixmap &pixmap = QPixmap(), const QModelIndex &parent = QModelIndex());
     QModelIndex contactsItem() const;
     QModelIndex findItem(const QString &jid) const;
 
