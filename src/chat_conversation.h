@@ -30,6 +30,7 @@ class ChatHistoryModel;
 class ChatHistoryWidget;
 class ChatMessage;
 class ChatRosterModel;
+class QListView;
 
 class ChatConversation : public ChatPanel
 {
@@ -52,6 +53,7 @@ protected slots:
 protected:
     // FIXME: this should be private
     ChatEdit *chatInput;
+    QListView *chatRoomList;
 
 private:
     ChatConversationPrivate *d;
