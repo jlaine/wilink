@@ -413,7 +413,7 @@ QString ChatRosterModel::contactName(const QString &jid) const
     // contact by bare jid
     item = d->find(bareJid);
     if (item)
-        return item->data(Qt::DisplayRole).toString();
+        return item->type() == ChatRosterModel::Room ? jidToResource(jid) : item->data(Qt::DisplayRole).toString();
 
     return jid;
 }
