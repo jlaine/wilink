@@ -505,7 +505,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                     paintMessages(icon, messages);
                 return QIcon(icon);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QLatin1String("chatroom") + sortSeparator + bareJid.toLower();
+                return QLatin1String("chatroom") + QString::number(!item->data(PersistentRole).toInt()) + sortSeparator + bareJid.toLower();
             }
         } else {
             if (role == Qt::DisplayRole && index.column() == SortingColumn) {
