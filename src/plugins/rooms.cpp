@@ -116,7 +116,7 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
- 
+
     // add room button
     roomButton = new QPushButton;
     roomButton->setEnabled(false);
@@ -365,6 +365,10 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
     permissionsAction->setVisible(false);
 
+    check = connect(chatRoomList, SIGNAL(clicked(QModelIndex)),
+                    this, SLOT(participantClicked(QModelIndex)));
+    Q_ASSERT(check);
+
     // connect signals
     check = connect(chatInput, SIGNAL(returnPressed()),
                     this, SLOT(returnPressed()));
@@ -556,6 +560,11 @@ void ChatRoom::joined()
     subjectAction->setVisible(actions & QXmppMucRoom::SubjectAction);
     optionsAction->setVisible(actions & QXmppMucRoom::ConfigurationAction);
     permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
+
+    // display participants
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
+    chatRoomList->setRootIndex(roomIndex);
+    chatRoomList->show();
 }
 
 void ChatRoom::kicked(const QString &jid, const QString &reason)
@@ -625,7 +634,7 @@ void ChatRoom::participantAdded(const QString &jid)
     QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(":/peer.png"), roomIndex);
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-    
+
     // FIXME : update number of users
 }
 
@@ -635,6 +644,18 @@ void ChatRoom::participantChanged(const QString &jid)
     QModelIndex index = rosterModel->findItem(jid);
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
+}
+
+void ChatRoom::participantClicked(const QModelIndex index)
+{
+    if(!index.isValid())
+        return;
+
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    //qDebug("participant clicked %s", qPrintable(jid));
+
+    // notify plugins
+    emit rosterClick(index);
 }
 
 void ChatRoom::participantRemoved(const QString &jid)

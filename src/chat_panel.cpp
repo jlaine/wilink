@@ -117,6 +117,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->helpLabel->setMargin(10);
     d->helpLabel->setWordWrap(true);
     d->helpLabel->setOpenExternalLinks(true);
+    d->helpLabel->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) ) ;
     d->helpLabel->setStyleSheet("QLabel { border:1px solid #8DB6CD; background-color:#B0E2FF; }");
     d->helpLabel->hide();
     d->header->addWidget(d->helpLabel);

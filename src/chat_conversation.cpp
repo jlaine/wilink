@@ -22,7 +22,9 @@
 #include <QGraphicsView>
 #include <QLabel>
 #include <QLayout>
+#include <QListView>
 #include <QPushButton>
+#include <QSplitter>
 #include <QTimer>
 
 #include "chat_conversation.h"
@@ -102,6 +104,10 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* status bar */
     layout->addLayout(headerLayout());
 
+    // chatHistory and chatRoomList separation
+    QSplitter *splitter = new QSplitter;
+    layout->addWidget(splitter);
+
     /* search bar */
     d->searchBar = new ChatSearchBar;
     d->searchBar->hide();
@@ -139,6 +145,28 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistoryWidget->setModel(d->historyModel);
     view->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(view);
+    splitter->addWidget(view);
+
+    // chatroom list
+    chatRoomList = new QListView();
+    chatRoomList->setViewMode(QListView::IconMode);
+    chatRoomList->setMovement(QListView::Static);
+    chatRoomList->setResizeMode(QListView::Adjust);
+    chatRoomList->setFlow(QListView::LeftToRight);
+    chatRoomList->setGridSize(QSize(64,55));
+    chatRoomList->setWordWrap(false);
+    chatRoomList->setWrapping(true);
+    chatRoomList->setStyleSheet("QListView::item { color: #999; background: #fff; }\
+                                 QListView::item:hover { color: #000; background: #B0E2FF; }");
+    chatRoomList->hide();
+    splitter->addWidget(chatRoomList);
+
+    // set ratio between chat history and participants list
+    QList<int> sizes = QList<int>();
+    sizes.append(150);
+    sizes.append(100);
+    splitter->setSizes(sizes);
+
     check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
                     this, SIGNAL(messageClicked(QModelIndex)));
     Q_ASSERT(check);
@@ -161,7 +189,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 #ifndef USE_DECLARATIVE
     view->scene()->addItem(d->panelBar);
 #endif
-    layout->addWidget(view, 1);
     filterDrops(view->viewport());
 
     /* spacer */
@@ -215,6 +242,8 @@ void ChatConversation::setRosterModel(ChatRosterModel *model)
     d->historyModel->setRosterModel(model);
 #ifdef USE_DECLARATIVE
     d->imageProvider->setRosterModel(model);
+#else
+    chatRoomList->setModel(model);
 #endif
 }
 
