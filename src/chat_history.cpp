@@ -114,6 +114,7 @@ ChatHistoryBubble::ChatHistoryBubble(ChatHistoryWidget *parent)
 {
     // avatar
     m_avatar = new QGraphicsPixmapItem(this);
+    m_avatar->installSceneEventFilter(this);
 
     // from
     m_from = new QGraphicsTextItem(this);
@@ -223,7 +224,7 @@ ChatHistoryModel *ChatHistoryBubble::model()
  */
 bool ChatHistoryBubble::sceneEventFilter(QGraphicsItem *item, QEvent *event)
 {
-    if (item == m_from) {
+    if (item == m_avatar || item == m_from) {
         if (event->type() == QEvent::GraphicsSceneMousePress)
             emit messageClicked(index());
     } else if (item == m_body) {
