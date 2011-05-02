@@ -331,7 +331,7 @@ QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
     // own item
     const QString bareJid = jidToBareJid(jid);
     if (bareJid == d->ownItem->id())
-        return d->ownItem->data(Qt::DecorationRole).toString();
+        return d->ownItem->data(Qt::DecorationRole).value<QPixmap>();
 
     // contact by bare jid
     item = d->find(bareJid);
