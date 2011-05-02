@@ -163,7 +163,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     // set ratio between chat history and participants list
     QList<int> sizes = QList<int>();
-    sizes.append(150);
+    sizes.append(250);
     sizes.append(100);
     splitter->setSizes(sizes);
 
