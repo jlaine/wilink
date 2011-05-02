@@ -876,27 +876,27 @@ ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJi
     setWindowTitle(tr("Chat room permissions"));
 
     // request current permissions
-    connect(m_room, SIGNAL(permissionsReceived(QList<QXmppMucAdminIq::Item>)),
-            this, SLOT(permissionsReceived(QList<QXmppMucAdminIq::Item>)));
+    connect(m_room, SIGNAL(permissionsReceived(QList<QXmppMucItem>)),
+            this, SLOT(permissionsReceived(QList<QXmppMucItem>)));
     m_room->requestPermissions();
 }
 
-void ChatRoomMembers::permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions)
+void ChatRoomMembers::permissionsReceived(const QList<QXmppMucItem> &permissions)
 {
-    foreach (const QXmppMucAdminIq::Item &item, permissions)
+    foreach (const QXmppMucItem &item, permissions)
         addEntry(item.jid(), item.affiliation());
     m_tableWidget->sortItems(JidColumn, Qt::AscendingOrder);
 }
 
 void ChatRoomMembers::submit()
 {
-    QList<QXmppMucAdminIq::Item> items;
+    QList<QXmppMucItem> items;
     for (int i = 0; i < m_tableWidget->rowCount(); i++) {
         const QComboBox *combo = qobject_cast<QComboBox *>(m_tableWidget->cellWidget(i, AffiliationColumn));
         Q_ASSERT(m_tableWidget->item(i, JidColumn) && combo);
 
-        QXmppMucAdminIq::Item item;
-        item.setAffiliation(static_cast<QXmppMucAdminIq::Item::Affiliation>(combo->itemData(combo->currentIndex()).toInt()));
+        QXmppMucItem item;
+        item.setAffiliation(static_cast<QXmppMucItem::Affiliation>(combo->itemData(combo->currentIndex()).toInt()));
         item.setJid(m_tableWidget->item(i, JidColumn)->text());
         items << item;
     }
@@ -912,16 +912,16 @@ void ChatRoomMembers::addMember()
                   tr("Enter the address of the user you want to add."),
                   QLineEdit::Normal, m_defaultJid, &ok).toLower();
     if (ok)
-        addEntry(jid, QXmppMucAdminIq::Item::MemberAffiliation);
+        addEntry(jid, QXmppMucItem::MemberAffiliation);
 }
 
-void ChatRoomMembers::addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation)
+void ChatRoomMembers::addEntry(const QString &jid, QXmppMucItem::Affiliation affiliation)
 {
     QComboBox *combo = new QComboBox;
-    combo->addItem(tr("member"), QXmppMucAdminIq::Item::MemberAffiliation);
-    combo->addItem(tr("administrator"), QXmppMucAdminIq::Item::AdminAffiliation);
-    combo->addItem(tr("owner"), QXmppMucAdminIq::Item::OwnerAffiliation);
-    combo->addItem(tr("banned"), QXmppMucAdminIq::Item::OutcastAffiliation);
+    combo->addItem(tr("member"), QXmppMucItem::MemberAffiliation);
+    combo->addItem(tr("administrator"), QXmppMucItem::AdminAffiliation);
+    combo->addItem(tr("owner"), QXmppMucItem::OwnerAffiliation);
+    combo->addItem(tr("banned"), QXmppMucItem::OutcastAffiliation);
     combo->setEditable(false);
     combo->setCurrentIndex(combo->findData(affiliation));
     QTableWidgetItem *jidItem = new QTableWidgetItem(jid);

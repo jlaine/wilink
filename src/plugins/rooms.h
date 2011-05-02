@@ -134,11 +134,11 @@ public:
 protected slots:
     void addMember();
     void removeMember();
-    void permissionsReceived(const QList<QXmppMucAdminIq::Item> &permissions);
+    void permissionsReceived(const QList<QXmppMucItem> &permissions);
     void submit();
 
 private:
-    void addEntry(const QString &jid, QXmppMucAdminIq::Item::Affiliation affiliation);
+    void addEntry(const QString &jid, QXmppMucItem::Affiliation affiliation);
 
     QString m_defaultJid;
     QXmppMucRoom *m_room;
