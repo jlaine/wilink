@@ -105,7 +105,7 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
         m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
         m_audioInput->setBufferSize(bufferSize);
         m_audioInput->start(channel);
-    } else if (!canWrite && m_audioOutput) {
+    } else if (!canWrite && m_audioInput) {
         m_audioInput->stop();
         delete m_audioInput;
         m_audioInput = 0;
