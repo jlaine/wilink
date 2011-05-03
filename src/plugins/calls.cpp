@@ -198,7 +198,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_audioInputBar->setMaximum(QSoundMeter::maximum());
     m_audioOutputBar = new ChatPanelProgress(this);
     m_audioOutputBar->setMaximum(QSoundMeter::maximum());
-    m_audioOutputBar->setPos(0, 16);
     m_videoOutput = new CallVideoWidget(this);
     m_videoMonitor = new CallVideoWidget(this);
 
@@ -295,10 +294,11 @@ void CallWidget::callStateChanged(QXmppCall::State state)
     case QXmppCall::ActiveState:
         setStatus(tr("Call connected."));
         if (m_videoButton)
-            m_videoButton->setEnabled(false);
+            m_videoButton->setEnabled(true);
         break;
     case QXmppCall::DisconnectingState:
         setStatus(tr("Disconnecting.."));
+        m_videoButton->setEnabled(false);
         m_hangupButton->setEnabled(false);
         break;
     case QXmppCall::FinishedState:
@@ -330,12 +330,17 @@ void CallWidget::setGeometry(const QRectF &baseRect)
         button->setGeometry(geometry);
         right -= geometry.width();
     }
+    right -= 108;
+    m_audioInputBar->setPos(right, 0);
+    m_audioOutputBar->setPos(right, 16);
+
+    rect.adjust(0, 0, right - rect.right(), 0);
 
     const QSizeF outputSize = m_videoOutput->size();
     if (!outputSize.isEmpty()) {
         const QSizeF monitorSize = m_videoMonitor->size();
         m_videoMonitor->setPos(outputSize.width() - 16, outputSize.height() - monitorSize.height() + 16);
-        rect.adjust(0, outputSize.height(), right - rect.right(), 0);
+        rect.adjust(0, outputSize.height(), 0, 0);
     }
     m_label->setGeometry(rect);
 }
