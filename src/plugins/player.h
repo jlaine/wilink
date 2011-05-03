@@ -77,7 +77,9 @@ public:
 
 private slots:
     void cursorChanged(const QModelIndex &index);
-    void rosterDrop(QDropEvent *event, const QModelIndex &index);
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *e);
 
 private:
     Chat *m_chat;

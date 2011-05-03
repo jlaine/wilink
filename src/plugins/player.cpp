@@ -641,7 +641,10 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
     setFocusProxy(view);
-    filterDrops(view->viewport());
+
+    // handle drag & drop
+    view->viewport()->setAcceptDrops(true);
+    view->viewport()->installEventFilter(this);
 #else
     m_view = new PlayerView;
     m_view->setModel(m_model);
@@ -652,7 +655,10 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
     layout->addWidget(m_view, 1);
     setFocusProxy(m_view);
-    filterDrops(m_view);
+
+    // handle drag & drop
+    m_view->setAcceptDrops(true);
+    m_view->installEventFilter(this);
 
     // select first track
     if (m_model->rowCount(QModelIndex()))
@@ -660,10 +666,6 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
 #endif
 
     // register panel
-    check = connect(m_chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
-                    this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
-    Q_ASSERT(check);
-
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M), m_chat);
     check = connect(shortcut, SIGNAL(activated()),
                     this, SIGNAL(showPanel()));
@@ -697,30 +699,47 @@ static QList<QUrl> getUrls(const QUrl &url) {
     return urls;
 }
 
-/** Handle a drop event on a roster entry.
- */
-void PlayerPanel::rosterDrop(QDropEvent *event, const QModelIndex &index)
+bool PlayerPanel::eventFilter(QObject *obj, QEvent *e)
 {
-    if (index.data(ChatRosterModel::IdRole).toString() != objectName())
-        return;
+    Q_UNUSED(obj);
 
-    int found = 0;
-    foreach (const QUrl &url, event->mimeData()->urls())
+    if (e->type() == QEvent::DragEnter)
     {
-        // check protocol is supported
-        if (!isLocal(url) &&
-            url.scheme() != "http" &&
-            url.scheme() != "https")
-            continue;
-
-        if (event->type() == QEvent::Drop) {
-            foreach (const QUrl &child, getUrls(url))
-                m_model->addUrl(child);
-        }
-        found++;
-    }
-    if (found)
+        QDragEnterEvent *event = static_cast<QDragEnterEvent*>(e);
         event->acceptProposedAction();
+        return true;
+    }
+    else if (e->type() == QEvent::DragLeave)
+    {
+        return true;
+    }
+    else if (e->type() == QEvent::DragMove || e->type() == QEvent::Drop)
+    {
+        QDropEvent *event = static_cast<QDropEvent*>(e);
+
+        int found = 0;
+        foreach (const QUrl &url, event->mimeData()->urls())
+        {
+            // check protocol is supported
+            if (!isLocal(url) &&
+                url.scheme() != "http" &&
+                url.scheme() != "https")
+                continue;
+
+            if (event->type() == QEvent::Drop) {
+                foreach (const QUrl &child, getUrls(url))
+                    m_model->addUrl(child);
+            }
+            found++;
+        }
+        if (found)
+            event->acceptProposedAction();
+        else
+            event->ignore();
+
+        return true;
+    }
+    return false;
 }
 
 PlayerView::PlayerView(QWidget *parent)
