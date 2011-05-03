@@ -119,12 +119,14 @@ SharesPanel::SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *pare
     Q_ASSERT(check);
     layout->addWidget(sharesView);
 
-    // downloads
+    // downloads help
     downloadsHelp = new QLabel;
+    downloadsHelp->setMargin(10);
     downloadsHelp->setOpenExternalLinks(true);
     downloadsHelp->setWordWrap(true);
     layout->addWidget(downloadsHelp);
 
+    // downloads view
     queueModel = new SharesModel(this);
     downloadsView = new SharesView;
     downloadsView->setModel(queueModel);
