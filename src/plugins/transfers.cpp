@@ -379,7 +379,7 @@ void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
 
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::FileTransferFeature);
     if (!fullJids.isEmpty()) {
-        QAction *action = panel->addAction(QIcon(":/add.png"), QObject::tr("Send a file"));
+        QAction *action = panel->addAction(QIcon(":/upload.png"), QObject::tr("Send a file"));
         action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), watcher, SLOT(sendFilePrompt()));
     }
