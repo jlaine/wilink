@@ -285,7 +285,7 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
 
     setLayout(layout);
     setWindowIcon(QIcon(":/photos.png"));
-    setWindowTitle(tr("My photos"));
+    setWindowTitle(tr("Photos"));
 
     /* open filesystem */
     fs = FileSystem::factory(url, this);

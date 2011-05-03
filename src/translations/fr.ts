@@ -322,6 +322,21 @@ Acceptez-vous?</translation>
         <source>Enter the reason for kicking the user from &apos;%1&apos;.</source>
         <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur de &apos;%1&apos;.</translation>
     </message>
+    <message>
+        <source>Invite</source>
+        <translation>Inviter</translation>
+    </message>
+</context>
+<context>
+    <name>ChatRoomInvite</name>
+    <message>
+        <source>Invite a contact</source>
+        <translation>Inviter un contact</translation>
+    </message>
+    <message>
+        <source>%1 has been invited to %2</source>
+        <translation>%1 a été invité(e) à %2</translation>
+    </message>
 </context>
 <context>
     <name>ChatRoomMembers</name>
@@ -685,10 +700,6 @@ Acceptez-vous?</translation>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <source>My photos</source>
-        <translation>Mes photos</translation>
-    </message>
-    <message>
         <source>Cancelling upload..</source>
         <translation>Annulation du transfert..</translation>
     </message>
@@ -723,6 +734,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Loading your albums..</source>
         <translation>Chargement de vos albums..</translation>
+    </message>
+    <message>
+        <source>Photos</source>
+        <translation>Photos</translation>
     </message>
 </context>
 <context>

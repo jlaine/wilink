@@ -288,6 +288,11 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
     // add actions
+    QAction *inviteAction = addAction(QIcon(":/chat.png"), tr("Invite"));
+    check = connect(inviteAction, SIGNAL(triggered()),
+                    this, SLOT(inviteDialog()));
+    Q_ASSERT(check);
+
     subjectAction = addAction(QIcon(":/chat.png"), tr("Subject"));
     check = connect(subjectAction, SIGNAL(triggered()),
                     this, SLOT(changeSubject()));
@@ -501,6 +506,15 @@ void ChatRoom::invite(const QString &jid)
         ForceNotification);
 }
 
+/** Select users to invite the chat room.
+ */
+void ChatRoom::inviteDialog()
+{
+    ChatRoomInvite dialog(mucRoom, chat->rosterModel(), chat);
+    dialog.exec();
+}
+
+void invite();
 /** Send a request to join a multi-user chat.
  */
 void ChatRoom::join()
@@ -832,12 +846,51 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
+ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterModel, QWidget *parent)
+    : QDialog(parent),
+    m_room(mucRoom)
+{
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    setWindowTitle(tr("Invite a contact"));
+
+    m_reason = new QLineEdit;
+    m_reason->setText("Let's talk");
+    layout->addWidget(m_reason);
+
+    m_list = new QListView;
+    m_list->setModel(rosterModel);
+    m_list->setRootIndex(rosterModel->contactsItem());
+    layout->addWidget(m_list);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+    layout->addWidget(buttonBox);
+}
+
+void ChatRoomInvite::submit()
+{
+#if 0
+    if (m_room->sendInvitation(jid, m_reason->text())) {
+        queueNotification(tr("%1 has been invited to %2")
+            .arg(rosterModel->contactName(jid))
+            .arg(rosterModel->contactName(mucRoom->jid())),
+            ForceNotification);
+    }
+#endif
+    accept();
+}
+
 ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
     : QDialog(parent),
     m_defaultJid(defaultJid),
     m_room(mucRoom)
 {
     QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    setWindowTitle(tr("Chat room permissions"));
 
     m_tableWidget = new QTableWidget(this);
     m_tableWidget->setColumnCount(2);
@@ -865,8 +918,6 @@ ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJi
     buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
 
     layout->addWidget(buttonBox);
-    setLayout(layout);
-    setWindowTitle(tr("Chat room permissions"));
 
     // request current permissions
     connect(m_room, SIGNAL(permissionsReceived(QList<QXmppMucItem>)),

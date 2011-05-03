@@ -96,6 +96,7 @@ private slots:
     void customContextMenuRequested(const QPoint & pos);
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void error(const QXmppStanza::Error &error);
+    void inviteDialog();
     void join();
     void joined();
     void left();
@@ -122,6 +123,22 @@ private:
     QAction *subjectAction;
     QAction *optionsAction;
     QAction *permissionsAction;
+};
+
+class ChatRoomInvite : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterModel, QWidget *parent);
+
+protected slots:
+    void submit();
+
+private:
+    QListView *m_list;
+    QLineEdit *m_reason;
+    QXmppMucRoom *m_room;
 };
 
 class ChatRoomMembers : public QDialog
