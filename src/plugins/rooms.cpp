@@ -144,18 +144,9 @@ void ChatRoomWatcher::disconnected()
 ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
-    if (!room)
-    {
-        room = new ChatRoom(chat, chat->rosterModel(), jid);
-
-        // add roster hooks
-        bool check;
-        check = connect(chat, SIGNAL(rosterClick(QModelIndex)),
-                        room, SLOT(rosterClick(QModelIndex)));
-        Q_ASSERT(check);
-        Q_UNUSED(check);
-
+    if (!room) {
         // add panel
+        room = new ChatRoom(chat, chat->rosterModel(), jid);
         chat->addPanel(room);
         chat->rosterModel()->addItem(room->objectType(), room->objectName(),
                                      room->windowTitle(), QPixmap(":/chat.png"));
@@ -586,15 +577,8 @@ void ChatRoom::left()
 
 void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
-    const QString fromJid = messageIndex.data(ChatHistoryModel::JidRole).toString();
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++) {
-        QModelIndex index = roomIndex.child(i, 0);
-        if (index.data(ChatRosterModel::IdRole).toString() == fromJid) {
-            rosterClick(index);
-            break;
-        }
-    }
+    if (messageIndex.isValid())
+        talkAt(messageIndex.data(ChatHistoryModel::JidRole).toString());
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -640,16 +624,10 @@ void ChatRoom::participantChanged(const QString &jid)
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
 }
 
-void ChatRoom::participantClicked(const QModelIndex index)
+void ChatRoom::participantClicked(const QModelIndex &index)
 {
-    if(!index.isValid())
-        return;
-
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    //qDebug("participant clicked %s", qPrintable(jid));
-
-    // notify plugins
-    emit rosterClick(index);
+    if(index.isValid())
+        talkAt(index.data(ChatRosterModel::IdRole).toString());
 }
 
 void ChatRoom::participantRemoved(const QString &jid)
@@ -667,42 +645,6 @@ void ChatRoom::participantRemoved(const QString &jid)
 ChatRosterModel::Type ChatRoom::objectType() const
 {
     return ChatRosterModel::Room;
-}
-
-void ChatRoom::rosterClick(const QModelIndex &index)
-{
-    if (!chat->client()->isConnected())
-        return;
-
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QString roomJid = mucRoom->jid();
-
-    // talk "at" somebody
-    if (type == ChatRosterModel::RoomMember && jidToBareJid(jid) == roomJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
-    {
-        const QString newAt = "@" + jidToResource(jid);
-        QTextCursor cursor = chatInput->textCursor();
-
-        QRegExp rx("((@[^,:]+[,:] )+)");
-        QString text = chatInput->document()->toPlainText();
-        int oldPos;
-        if ((oldPos = rx.indexIn(text)) >= 0)
-        {
-            QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
-            if (!bits.contains(newAt))
-            {
-                bits << newAt;
-                cursor.setPosition(oldPos);
-                cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
-                cursor.insertText(bits.join(", ") + ": ");
-            }
-        } else {
-            cursor.insertText(newAt + ": ");
-        }
-        emit showPanel();
-        chatInput->setFocus();
-    }
 }
 
 void ChatRoom::subjectChanged(const QString &subject)
@@ -755,6 +697,38 @@ void ChatRoom::tabPressed()
     }
     if (matches.size() == 1)
         cursor.insertText("@" + matches[0] + ": ");
+}
+
+/** Talk "at" somebody.
+ */
+void ChatRoom::talkAt(const QString &jid)
+{
+    const QString nickName = jidToResource(jid);
+    if (!chat->client()->isConnected() ||
+        chatInput->toPlainText().contains("@" + nickName + ": "))
+        return;
+
+    const QString newAt = "@" + nickName;
+    QTextCursor cursor = chatInput->textCursor();
+
+    QRegExp rx("((@[^,:]+[,:] )+)");
+    QString text = chatInput->document()->toPlainText();
+    int oldPos;
+    if ((oldPos = rx.indexIn(text)) >= 0)
+    {
+        QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
+        if (!bits.contains(newAt))
+        {
+            bits << newAt;
+            cursor.setPosition(oldPos);
+            cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
+            cursor.insertText(bits.join(", ") + ": ");
+        }
+    } else {
+        cursor.insertText(newAt + ": ");
+    }
+    emit showPanel();
+    chatInput->setFocus();
 }
 
 /** Unbookmarks the room.

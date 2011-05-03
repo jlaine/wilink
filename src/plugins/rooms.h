@@ -105,12 +105,12 @@ private slots:
     void messageReceived(const QXmppMessage &msg);
     void participantAdded(const QString &jid);
     void participantChanged(const QString &jid);
-    void participantClicked(const QModelIndex);
+    void participantClicked(const QModelIndex &index);
     void participantRemoved(const QString &jid);
     void returnPressed();
-    void rosterClick(const QModelIndex &index);
     void subjectChanged(const QString &subject);
     void tabPressed();
+    void talkAt(const QString &jid);
 
 private:
     Chat *chat;
