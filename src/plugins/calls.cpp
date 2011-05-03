@@ -193,6 +193,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     if (videoJids.contains(m_call->jid())) {
         m_videoButton = new ChatPanelButton(this);
         m_videoButton->setPixmap(QPixmap(":/camera.png"));
+        m_videoButton->setEnabled(false);
         connect(m_videoButton, SIGNAL(clicked()), m_call, SLOT(startVideo()));
         m_buttons << m_videoButton;
     }
@@ -272,6 +273,8 @@ void CallWidget::callStateChanged(QXmppCall::State state)
         break;
     case QXmppCall::ActiveState:
         setStatus(tr("Call connected."));
+        if (m_videoButton)
+            m_videoButton->setEnabled(false);
         break;
     case QXmppCall::DisconnectingState:
         setStatus(tr("Disconnecting.."));
