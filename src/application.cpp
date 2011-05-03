@@ -40,6 +40,7 @@
 #include <QSettings>
 #include <QSslSocket>
 #include <QSystemTrayIcon>
+#include <QThread>
 #include <QTimer>
 #include <QUrl>
 
@@ -64,6 +65,7 @@ public:
     QList<Chat*> chats;
     QSettings *settings;
     QSoundPlayer *soundPlayer;
+    QThread *soundThread;
     QAudioDeviceInfo audioInputDevice;
     QAudioDeviceInfo audioOutputDevice;
 #ifdef USE_LIBNOTIFY
@@ -181,10 +183,13 @@ Application::Application(int &argc, char **argv)
     QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
 
     /* initialise sound player */
-    d->soundPlayer = new QSoundPlayer(this);
+    d->soundThread = new QThread(this);
+    d->soundThread->start();
+    d->soundPlayer = new QSoundPlayer;
     d->soundPlayer->setAudioOutputDevice(d->audioOutputDevice);
     connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
             d->soundPlayer, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+    d->soundPlayer->moveToThread(d->soundThread);
 
 #ifdef USE_LIBNOTIFY
     /* initialise libnotify */
@@ -211,6 +216,11 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+    // stop sound player
+    d->soundThread->quit();
+    d->soundThread->wait();
+    delete d->soundPlayer;
+
 #ifdef USE_LIBNOTIFY
     // uninitialise libnotify
     notify_uninit();
@@ -522,6 +532,11 @@ void Application::showChats()
 QSoundPlayer *Application::soundPlayer()
 {
     return d->soundPlayer;
+}
+
+QThread *Application::soundThread()
+{
+    return d->soundThread;
 }
 
 QAudioDeviceInfo Application::audioInputDevice() const

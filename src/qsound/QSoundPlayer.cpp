@@ -41,23 +41,24 @@ int QSoundPlayer::play(const QString &name, bool repeat)
 
 int QSoundPlayer::play(QSoundFile *reader)
 {
-    reader->setParent(this);
     if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         delete reader;
         return 0;
     }
-    m_readerId++;
-    m_readers[m_readerId] = reader;
 
-    const QAudioFormat format = reader->format();
-    QAudioOutput *output = new QAudioOutput(m_audioDevice, format, reader);
-    output->setProperty("_play_id", m_readerId);
-    connect(output, SIGNAL(stateChanged(QAudio::State)), this, SLOT(stateChanged(QAudio::State)));
-    // buffer 500ms of audio
-    output->setBufferSize((format.channels() * format.sampleSize() * format.frequency()) / 16);
-    output->start(reader);
+    // register reader
+    const int id = ++m_readerId;
+    m_readers[id] = reader;
 
-    return m_readerId;
+    // move reader to audio thread
+    reader->setParent(0);
+    reader->moveToThread(thread());
+    reader->setParent(this);
+
+    // schedule play
+    QMetaObject::invokeMethod(this, "_q_start", Q_ARG(int, id));
+
+    return id;
 }
 
 void QSoundPlayer::setAudioOutputDevice(const QAudioDeviceInfo &device)
@@ -67,12 +68,33 @@ void QSoundPlayer::setAudioOutputDevice(const QAudioDeviceInfo &device)
 
 void QSoundPlayer::stop(int id)
 {
-    QSoundFile *reader = m_readers.value(id);
-    if (reader)
-        reader->close();
+    // schedule stop
+    QMetaObject::invokeMethod(this, "_q_stop", Q_ARG(int, id));
 }
 
-void QSoundPlayer::stateChanged(QAudio::State state)
+void QSoundPlayer::_q_start(int id)
+{
+    QSoundFile *reader = m_readers.value(id);
+    if (!reader)
+        return;
+
+    const QAudioFormat format = reader->format();
+    QAudioOutput *output = new QAudioOutput(m_audioDevice, format, reader);
+    output->setProperty("_play_id", m_readerId);
+    connect(output, SIGNAL(stateChanged(QAudio::State)), this, SLOT(_q_stateChanged(QAudio::State)));
+    output->start(reader);
+}
+
+void QSoundPlayer::_q_stop(int id)
+{
+    QSoundFile *reader = m_readers.value(id);
+    if (!reader)
+        return;
+
+    reader->close();
+}
+
+void QSoundPlayer::_q_stateChanged(QAudio::State state)
 {
     QAudioOutput *output = qobject_cast<QAudioOutput*>(sender());
     if (!output || state == QAudio::ActiveState)

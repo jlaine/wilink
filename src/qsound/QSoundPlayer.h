@@ -47,7 +47,9 @@ public slots:
     void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
 
 private slots:
-    void stateChanged(QAudio::State state);
+    void _q_start(int id);
+    void _q_stop(int id);
+    void _q_stateChanged(QAudio::State state);
 
 private:
     QAudioDeviceInfo m_audioDevice;
