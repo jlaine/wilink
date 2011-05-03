@@ -31,6 +31,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSortFilterProxyModel>
 #include <QStatusBar>
 #include <QTableWidget>
 #include <QTextBlock>
@@ -894,7 +895,7 @@ QModelIndex RoomInviteModel::mapToSource(const QModelIndex &proxyIndex) const
 
 int RoomInviteModel::columnCount(const QModelIndex &parent) const
 {
-    return 1;
+    return m_rosterModel->columnCount(mapToSource(parent));
 }
 
 QVariant RoomInviteModel::data(const QModelIndex &index, int role) const
@@ -966,8 +967,13 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
 
     m_model = new RoomInviteModel(rosterModel, this);
 
+    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
+    sortedModel->setSourceModel(m_model);
+    sortedModel->setDynamicSortFilter(true);
+    sortedModel->setFilterKeyColumn(2);
+    sortedModel->setFilterRegExp(QRegExp("^(?!offline).+"));
     m_list = new QListView;
-    m_list->setModel(m_model);
+    m_list->setModel(sortedModel);
     layout->addWidget(m_list);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
