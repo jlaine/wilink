@@ -456,7 +456,11 @@ void ChatRoom::customContextMenuRequested(const QPoint &pos)
         action->setData(jid);
         connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
     }
-    menu->popup(chatRoomList->mapToGlobal(pos));
+    // FIXME : is there a better way to test if a menu is empty?
+    if (menu->sizeHint().height() > 4)
+        menu->popup(chatRoomList->mapToGlobal(pos));
+    else
+        delete menu;
 }
 
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
