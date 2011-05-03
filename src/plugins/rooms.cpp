@@ -290,7 +290,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
     // add actions
-    QAction *inviteAction = addAction(QIcon(":/chat.png"), tr("Invite"));
+    QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
     check = connect(inviteAction, SIGNAL(triggered()),
                     this, SLOT(inviteDialog()));
     Q_ASSERT(check);
@@ -307,7 +307,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
     optionsAction->setVisible(false);
 
-    permissionsAction = addAction(QIcon(":/peer.png"), tr("Permissions"));
+    permissionsAction = addAction(QIcon(":/permissions.png"), tr("Permissions"));
     check = connect(permissionsAction, SIGNAL(triggered()),
                     this, SLOT(changePermissions()));
     Q_ASSERT(check);

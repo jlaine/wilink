@@ -25,8 +25,10 @@ generate_png(png
     forward.svg
     hangup.svg
     home.svg
+    invite.svg
     options.svg
     peer.svg
+    permissions.svg
     phone.svg
     photos.svg
     plugin.svg
