@@ -34,7 +34,6 @@ class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
 class QAbstractButton;
-class QMenu;
 class QModelIndex;
 class QPushButton;
 class QTableWidget;
@@ -61,14 +60,12 @@ public:
 private slots:
     void bookmarksReceived();
     void disconnected();
-    void kickUser();
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
     void invitationHandled(QAbstractButton *button);
     void mucServerFound(const QString &roomServer);
     void roomPrompt();
     void rosterClick(const QModelIndex &index);
     void rosterDrop(QDropEvent *event, const QModelIndex &index);
-    void rosterMenu(QMenu *menu, const QModelIndex &index);
     void urlClick(const QUrl &url);
 
 private:
@@ -96,22 +93,24 @@ private slots:
     void changeSubject();
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
+    void customContextMenuRequested(const QPoint & pos);
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void error(const QXmppStanza::Error &error);
     void join();
     void joined();
     void left();
     void kicked(const QString &jid, const QString &reason);
+    void kickUser();
     void onMessageClicked(const QModelIndex &messageIndex);
     void messageReceived(const QXmppMessage &msg);
     void participantAdded(const QString &jid);
     void participantChanged(const QString &jid);
-    void participantClicked(const QModelIndex);
+    void participantClicked(const QModelIndex &index);
     void participantRemoved(const QString &jid);
     void returnPressed();
-    void rosterClick(const QModelIndex &index);
     void subjectChanged(const QString &subject);
     void tabPressed();
+    void talkAt(const QString &jid);
 
 private:
     Chat *chat;

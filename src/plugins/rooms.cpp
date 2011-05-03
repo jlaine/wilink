@@ -109,10 +109,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
                     this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
     Q_ASSERT(check);
 
-    check = connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-                    this, SLOT(rosterMenu(QMenu*, QModelIndex)));
-    Q_ASSERT(check);
-
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
@@ -148,18 +144,9 @@ void ChatRoomWatcher::disconnected()
 ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
-    if (!room)
-    {
-        room = new ChatRoom(chat, chat->rosterModel(), jid);
-
-        // add roster hooks
-        bool check;
-        check = connect(chat, SIGNAL(rosterClick(QModelIndex)),
-                        room, SLOT(rosterClick(QModelIndex)));
-        Q_ASSERT(check);
-        Q_UNUSED(check);
-
+    if (!room) {
         // add panel
+        room = new ChatRoom(chat, chat->rosterModel(), jid);
         chat->addPanel(room);
         chat->rosterModel()->addItem(room->objectType(), room->objectName(),
                                      room->windowTitle(), QPixmap(":/chat.png"));
@@ -167,31 +154,6 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));
     return room;
-}
-
-/** Kick a user from a chat room.
- */
-void ChatRoomWatcher::kickUser()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString jid = action->data().toString();
-
-    // prompt for reason
-    const QString roomJid = jidToBareJid(jid);
-    const QString roomName = chat->rosterModel()->contactName(roomJid);
-    bool ok = false;
-    QString reason;
-    reason = QInputDialog::getText(chat, tr("Kick user"),
-                  tr("Enter the reason for kicking the user from '%1'.").arg(roomName),
-                  QLineEdit::Normal, reason, &ok);
-    if (!ok)
-        return;
-
-    QXmppMucRoom *mucRoom = mucManager->addRoom(roomJid);
-    if (mucRoom)
-        mucRoom->kick(jid, reason);
 }
 
 void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
@@ -299,27 +261,6 @@ void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
         event->acceptProposedAction();
 }
 
-/** Add entries to a roster entry's context menu.
- */
-void ChatRoomWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
-{
-    if (!chat->client()->isConnected())
-        return;
-
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type == ChatRosterModel::RoomMember) {
-        const QString jid = index.data(ChatRosterModel::IdRole).toString();
-        const QString roomJid = index.parent().data(ChatRosterModel::IdRole).toString();
-
-        QXmppMucRoom *mucRoom = mucManager->addRoom(roomJid);
-        if (mucRoom && (mucRoom->allowedActions() & QXmppMucRoom::KickAction)) {
-            QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
-            action->setData(jid);
-            connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
-        }
-    }
-}
-
 /** Open a XMPP URI if it refers to a chat room.
  */
 void ChatRoomWatcher::urlClick(const QUrl &url)
@@ -367,6 +308,12 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     check = connect(chatRoomList, SIGNAL(clicked(QModelIndex)),
                     this, SLOT(participantClicked(QModelIndex)));
+    Q_ASSERT(check);
+
+    // context menu
+    chatRoomList->setContextMenuPolicy(Qt::CustomContextMenu);
+    check = connect(chatRoomList, SIGNAL(customContextMenuRequested(const QPoint)),
+                    this, SLOT(customContextMenuRequested(const QPoint)));
     Q_ASSERT(check);
 
     // connect signals
@@ -495,6 +442,27 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
         mucRoom->setConfiguration(dialog.form());
 }
 
+void ChatRoom::customContextMenuRequested(const QPoint &pos)
+{
+    const QModelIndex index = chatRoomList->currentIndex();
+    if (!index.isValid() ||
+        index.data(ChatRosterModel::TypeRole).toInt() != ChatRosterModel::RoomMember)
+        return;
+
+    QMenu *menu = new QMenu;
+    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    if (mucRoom->allowedActions() & QXmppMucRoom::KickAction) {
+        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
+        action->setData(jid);
+        connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
+    }
+    // FIXME : is there a better way to test if a menu is empty?
+    if (menu->sizeHint().height() > 4)
+        menu->popup(chatRoomList->mapToGlobal(pos));
+    else
+        delete menu;
+}
+
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     if (disco.from() != mucRoom->jid() || disco.type() != QXmppIq::Result)
@@ -577,6 +545,27 @@ void ChatRoom::kicked(const QString &jid, const QString &reason)
             .arg(reason));
 }
 
+/** Kick a user from a chat room.
+ */
+void ChatRoom::kickUser()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+    QString jid = action->data().toString();
+
+    // prompt for reason
+    const QString roomJid = jidToBareJid(jid);
+    const QString roomName = chat->rosterModel()->contactName(roomJid);
+    bool ok = false;
+    QString reason;
+    reason = QInputDialog::getText(chat, tr("Kick user"),
+                  tr("Enter the reason for kicking the user from '%1'.").arg(roomName),
+                  QLineEdit::Normal, reason, &ok);
+    if (ok)
+        mucRoom->kick(jid, reason);
+}
+
 /** Handle leaving the room.
  */
 void ChatRoom::left()
@@ -592,15 +581,8 @@ void ChatRoom::left()
 
 void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
-    const QString fromJid = messageIndex.data(ChatHistoryModel::JidRole).toString();
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++) {
-        QModelIndex index = roomIndex.child(i, 0);
-        if (index.data(ChatRosterModel::IdRole).toString() == fromJid) {
-            rosterClick(index);
-            break;
-        }
-    }
+    if (messageIndex.isValid())
+        talkAt(messageIndex.data(ChatHistoryModel::JidRole).toString());
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -646,16 +628,10 @@ void ChatRoom::participantChanged(const QString &jid)
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
 }
 
-void ChatRoom::participantClicked(const QModelIndex index)
+void ChatRoom::participantClicked(const QModelIndex &index)
 {
-    if(!index.isValid())
-        return;
-
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    //qDebug("participant clicked %s", qPrintable(jid));
-
-    // notify plugins
-    emit rosterClick(index);
+    if(index.isValid())
+        talkAt(index.data(ChatRosterModel::IdRole).toString());
 }
 
 void ChatRoom::participantRemoved(const QString &jid)
@@ -673,42 +649,6 @@ void ChatRoom::participantRemoved(const QString &jid)
 ChatRosterModel::Type ChatRoom::objectType() const
 {
     return ChatRosterModel::Room;
-}
-
-void ChatRoom::rosterClick(const QModelIndex &index)
-{
-    if (!chat->client()->isConnected())
-        return;
-
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QString roomJid = mucRoom->jid();
-
-    // talk "at" somebody
-    if (type == ChatRosterModel::RoomMember && jidToBareJid(jid) == roomJid && !chatInput->toPlainText().contains("@" + jidToResource(jid) + ": "))
-    {
-        const QString newAt = "@" + jidToResource(jid);
-        QTextCursor cursor = chatInput->textCursor();
-
-        QRegExp rx("((@[^,:]+[,:] )+)");
-        QString text = chatInput->document()->toPlainText();
-        int oldPos;
-        if ((oldPos = rx.indexIn(text)) >= 0)
-        {
-            QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
-            if (!bits.contains(newAt))
-            {
-                bits << newAt;
-                cursor.setPosition(oldPos);
-                cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
-                cursor.insertText(bits.join(", ") + ": ");
-            }
-        } else {
-            cursor.insertText(newAt + ": ");
-        }
-        emit showPanel();
-        chatInput->setFocus();
-    }
 }
 
 void ChatRoom::subjectChanged(const QString &subject)
@@ -761,6 +701,38 @@ void ChatRoom::tabPressed()
     }
     if (matches.size() == 1)
         cursor.insertText("@" + matches[0] + ": ");
+}
+
+/** Talk "at" somebody.
+ */
+void ChatRoom::talkAt(const QString &jid)
+{
+    const QString nickName = jidToResource(jid);
+    if (!chat->client()->isConnected() ||
+        chatInput->toPlainText().contains("@" + nickName + ": "))
+        return;
+
+    const QString newAt = "@" + nickName;
+    QTextCursor cursor = chatInput->textCursor();
+
+    QRegExp rx("((@[^,:]+[,:] )+)");
+    QString text = chatInput->document()->toPlainText();
+    int oldPos;
+    if ((oldPos = rx.indexIn(text)) >= 0)
+    {
+        QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
+        if (!bits.contains(newAt))
+        {
+            bits << newAt;
+            cursor.setPosition(oldPos);
+            cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
+            cursor.insertText(bits.join(", ") + ": ");
+        }
+    } else {
+        cursor.insertText(newAt + ": ");
+    }
+    emit showPanel();
+    chatInput->setFocus();
 }
 
 /** Unbookmarks the room.
