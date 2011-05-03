@@ -25,6 +25,7 @@ generate_png(png
     forward.svg
     hangup.svg
     home.svg
+    invite.svg
     options.svg
     peer.svg
     phone.svg

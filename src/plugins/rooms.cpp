@@ -290,7 +290,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
     // add actions
-    QAction *inviteAction = addAction(QIcon(":/chat.png"), tr("Invite"));
+    QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
     check = connect(inviteAction, SIGNAL(triggered()),
                     this, SLOT(inviteDialog()));
     Q_ASSERT(check);
