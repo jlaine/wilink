@@ -551,7 +551,7 @@ void ChatPanelProgress::setMinimum(int minimum)
 
 void ChatPanelProgress::setValue(int value)
 {
-    if (m_value == value || (m_value > m_maximum || m_value < m_minimum))
+    if (value == m_value || value > m_maximum || value < m_minimum)
         return;
 
     m_value = value;
