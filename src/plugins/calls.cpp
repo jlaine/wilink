@@ -196,8 +196,12 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_label = new ChatPanelText(tr("Connecting.."), this);
     m_audioInputBar = new ChatPanelProgress(this);
     m_audioInputBar->setMaximum(QSoundMeter::maximum());
+    m_audioInputIcon = new QGraphicsPixmapItem(this);
+    m_audioInputIcon->setPixmap(QPixmap(":/audio-input.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     m_audioOutputBar = new ChatPanelProgress(this);
     m_audioOutputBar->setMaximum(QSoundMeter::maximum());
+    m_audioOutputIcon = new QGraphicsPixmapItem(this);
+    m_audioOutputIcon->setPixmap(QPixmap(":/audio-output.png").scaled(16, 16, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     m_videoOutput = new CallVideoWidget(this);
     m_videoMonitor = new CallVideoWidget(this);
 
@@ -333,6 +337,9 @@ void CallWidget::setGeometry(const QRectF &baseRect)
     right -= 108;
     m_audioInputBar->setPos(right, 0);
     m_audioOutputBar->setPos(right, 16);
+    right -= 20;
+    m_audioInputIcon->setPos(right, 0);
+    m_audioOutputIcon->setPos(right, 16);
 
     rect.adjust(0, 0, right - rect.right(), 0);
 
@@ -355,9 +362,11 @@ void CallWidget::setStatus(const QString &status)
 QSizeF CallWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
+        const QSizeF barSize = m_audioInputBar->effectiveSizeHint(which);
         const QSizeF outputSize = m_videoOutput->size();
         const QSizeF monitorSize = m_videoMonitor->size();
         QSizeF hint = m_label->effectiveSizeHint(which);
+        hint.setWidth(hint.width() + barSize.width() + 28);
         if (!outputSize.isEmpty()) {
             hint.setWidth(qMax(hint.width(), outputSize.width() + monitorSize.width() - 16));
             hint.setHeight(hint.height() + outputSize.height() + 16);

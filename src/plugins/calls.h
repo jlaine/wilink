@@ -115,7 +115,9 @@ private:
 
     // audio
     ChatPanelProgress *m_audioInputBar;
+    QGraphicsPixmapItem *m_audioInputIcon;
     ChatPanelProgress *m_audioOutputBar;
+    QGraphicsPixmapItem *m_audioOutputIcon;
 
     // video
     ChatPanelButton *m_videoButton;
