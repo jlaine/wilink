@@ -862,6 +862,8 @@ public:
     int rowCount(const QModelIndex &parent) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
+    QStringList selectedJids() const;
+
 private:
     ChatRosterModel *m_rosterModel;
     QSet<QString> m_selection;
@@ -945,6 +947,11 @@ bool RoomInviteModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 }
 
+QStringList RoomInviteModel::selectedJids() const
+{
+    return m_selection.toList();
+}
+
 ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterModel, QWidget *parent)
     : QDialog(parent),
     m_room(mucRoom)
@@ -957,8 +964,10 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
     m_reason->setText("Let's talk");
     layout->addWidget(m_reason);
 
+    m_model = new RoomInviteModel(rosterModel, this);
+
     m_list = new QListView;
-    m_list->setModel(new RoomInviteModel(rosterModel, this));
+    m_list->setModel(m_model);
     layout->addWidget(m_list);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
@@ -970,14 +979,16 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
 
 void ChatRoomInvite::submit()
 {
+    foreach (const QString &jid, m_model->selectedJids()) {
+        if (m_room->sendInvitation(jid, m_reason->text())) {
 #if 0
-    if (m_room->sendInvitation(jid, m_reason->text())) {
-        queueNotification(tr("%1 has been invited to %2")
-            .arg(rosterModel->contactName(jid))
-            .arg(rosterModel->contactName(mucRoom->jid())),
-            ForceNotification);
-    }
+            queueNotification(tr("%1 has been invited to %2")
+                .arg(rosterModel->contactName(jid))
+                .arg(rosterModel->contactName(mucRoom->jid())),
+                ForceNotification);
 #endif
+        }
+    }
     accept();
 }
 

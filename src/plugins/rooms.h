@@ -30,6 +30,7 @@ class ChatClient;
 class ChatMessage;
 class ChatRoom;
 class ChatRosterModel;
+class RoomInviteModel;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
@@ -137,6 +138,7 @@ protected slots:
 
 private:
     QListView *m_list;
+    RoomInviteModel *m_model;
     QLineEdit *m_reason;
     QXmppMucRoom *m_room;
 };
