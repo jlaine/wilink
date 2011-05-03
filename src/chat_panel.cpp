@@ -509,18 +509,20 @@ ChatPanelProgress::ChatPanelProgress(QGraphicsItem *parent)
 void ChatPanelProgress::resizeBar()
 {
     QPainterPath barPath;
+    QRectF rect(m_rect);
     if (m_value > m_minimum && m_maximum > m_minimum) {
         const float pos = float(m_value - m_minimum) / float(m_maximum - m_minimum);
-        QRectF rect(m_rect);
         if (m_orientation == Qt::Horizontal)
             rect.setWidth(int(m_rect.width() * pos));
-        else
+        else {
             rect.setHeight(int(m_rect.height() * pos));
+            rect.moveBottom(m_rect.bottom());
+        }
         barPath.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1),
                                BORDER_RADIUS/2, BORDER_RADIUS/2);
     }
     m_bar->setPath(barPath);
-    m_bar->setPos(m_rect.topLeft());
+    m_bar->setPos(rect.topLeft());
 }
 
 void ChatPanelProgress::setGeometry(const QRectF &baseRect)
