@@ -28,6 +28,7 @@ generate_png(png
     invite.svg
     options.svg
     peer.svg
+    permissions.svg
     phone.svg
     photos.svg
     plugin.svg
