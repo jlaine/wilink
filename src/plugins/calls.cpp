@@ -194,6 +194,11 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
     // setup GUI
     m_label = new ChatPanelText(tr("Connecting.."), this);
+    m_audioInputBar = new ChatPanelProgress(this);
+    m_audioInputBar->setMaximum(QSoundMeter::maximum());
+    m_audioOutputBar = new ChatPanelProgress(this);
+    m_audioOutputBar->setMaximum(QSoundMeter::maximum());
+    m_audioOutputBar->setPos(0, 32);
     m_videoOutput = new CallVideoWidget(this);
     m_videoMonitor = new CallVideoWidget(this);
 
@@ -222,6 +227,14 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
     check = connect(m_call, SIGNAL(stateChanged(QXmppCall::State)),
                     this, SLOT(callStateChanged(QXmppCall::State)));
+    Q_ASSERT(check);
+
+    check = connect(m_audioHelper, SIGNAL(inputVolumeChanged(int)),
+                    m_audioInputBar, SLOT(setValue(int)));
+    Q_ASSERT(check);
+
+    check = connect(m_audioHelper, SIGNAL(outputVolumeChanged(int)),
+                    m_audioOutputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
 
     check = connect(m_call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),

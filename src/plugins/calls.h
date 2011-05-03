@@ -115,6 +115,8 @@ private:
 
     // audio
     CallAudioHelper *m_audioHelper;
+    ChatPanelProgress *m_audioInputBar;
+    ChatPanelProgress *m_audioOutputBar;
 
     // video
     ChatPanelButton *m_videoButton;
