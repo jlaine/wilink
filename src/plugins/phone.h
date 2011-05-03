@@ -71,7 +71,6 @@ private:
     ChatClient *client;
     Chat *m_window;
     SipClient *sip;
-    QThread *sipThread;
     QNetworkAccessManager *network;
 
     PhoneCallsModel *callsModel;

@@ -192,18 +192,16 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setLayout(layout);
 
     // sip client
-    sipThread = new QThread(this);
     sip = new SipClient;
     sip->setAudioInputDevice(wApp->audioInputDevice());
     sip->setAudioOutputDevice(wApp->audioOutputDevice());
-    sip->moveToThread(sipThread);
     check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
                     sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
     Q_ASSERT(check);
     check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
                     sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
     Q_ASSERT(check);
-    sipThread->start();
+    sip->moveToThread(wApp->soundThread());
 
     check = connect(sip, SIGNAL(callDialled(SipCall*)),
                     callsModel, SLOT(addCall(SipCall*)));
@@ -255,8 +253,6 @@ PhonePanel::~PhonePanel()
         QMetaObject::invokeMethod(sip, "disconnectFromServer");
         loop.exec();
     }
-    sipThread->quit();
-    sipThread->wait();
     delete sip;
 }
 
