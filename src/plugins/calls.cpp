@@ -198,7 +198,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_audioInputBar->setMaximum(QSoundMeter::maximum());
     m_audioOutputBar = new ChatPanelProgress(this);
     m_audioOutputBar->setMaximum(QSoundMeter::maximum());
-    m_audioOutputBar->setPos(0, 32);
+    m_audioOutputBar->setPos(0, 16);
     m_videoOutput = new CallVideoWidget(this);
     m_videoMonitor = new CallVideoWidget(this);
 

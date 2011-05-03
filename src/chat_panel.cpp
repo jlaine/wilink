@@ -493,6 +493,7 @@ ChatPanelProgress::ChatPanelProgress(QGraphicsItem *parent)
     : QGraphicsWidget(parent),
     m_maximum(100),
     m_minimum(0),
+    m_orientation(Qt::Horizontal),
     m_value(0)
 {
     const QPalette palette = ChatPanel::palette();
@@ -508,9 +509,14 @@ ChatPanelProgress::ChatPanelProgress(QGraphicsItem *parent)
 void ChatPanelProgress::resizeBar()
 {
     QPainterPath barPath;
-    if (m_value > m_minimum) {
-        const int width = m_rect.width() * float(m_value - m_minimum) / float(m_maximum - m_minimum);
-        barPath.addRoundedRect(QRectF(0.5, 0.5, width - 1, m_rect.height() - 1),
+    if (m_value > m_minimum && m_maximum > m_minimum) {
+        const float pos = float(m_value - m_minimum) / float(m_maximum - m_minimum);
+        QRectF rect(m_rect);
+        if (m_orientation == Qt::Horizontal)
+            rect.setWidth(int(m_rect.width() * pos));
+        else
+            rect.setHeight(int(m_rect.height() * pos));
+        barPath.addRoundedRect(QRectF(0.5, 0.5, rect.width() - 1, rect.height() - 1),
                                BORDER_RADIUS/2, BORDER_RADIUS/2);
     }
     m_bar->setPath(barPath);
@@ -525,9 +531,13 @@ void ChatPanelProgress::setGeometry(const QRectF &baseRect)
     m_rect.moveLeft(0);
     m_rect.moveTop(0);
 
-    if (m_rect.height() > PROGRESS_THICKNESS) {
+    if (m_orientation == Qt::Horizontal && m_rect.height() > PROGRESS_THICKNESS) {
         int dy = (m_rect.height() - PROGRESS_THICKNESS) / 2;
         m_rect.adjust(0, dy, 0, -dy);
+    }
+    else if (m_orientation == Qt::Vertical && m_rect.width() > PROGRESS_THICKNESS) {
+        int dx = (m_rect.width() - PROGRESS_THICKNESS) / 2;
+        m_rect.adjust(dx, 0, -dx, 0);
     }
 
     QPainterPath trackPath;
@@ -549,6 +559,16 @@ void ChatPanelProgress::setMinimum(int minimum)
     m_minimum = minimum;
 }
 
+void ChatPanelProgress::setOrientation(Qt::Orientation orientation)
+{
+    if (orientation == m_orientation)
+        return;
+
+    m_orientation = orientation;
+    updateGeometry();
+    resizeBar();
+}
+
 void ChatPanelProgress::setValue(int value)
 {
     if (value == m_value || value > m_maximum || value < m_minimum)
@@ -561,7 +581,10 @@ void ChatPanelProgress::setValue(int value)
 QSizeF ChatPanelProgress::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     if (which == Qt::MinimumSize || which == Qt::PreferredSize) {
-        return QSizeF(100, PROGRESS_THICKNESS);
+        QSizeF hint(100, PROGRESS_THICKNESS);
+        if (m_orientation == Qt::Vertical)
+            hint.transpose();
+        return hint;
     } else {
         return constraint;
     }

@@ -158,6 +158,7 @@ class ChatPanelProgress : public QGraphicsWidget
 public:
     ChatPanelProgress(QGraphicsItem *parent);
     void setGeometry(const QRectF &rect);
+    void setOrientation(Qt::Orientation orientation);
 
 public slots:
     void setMaximum(int maximum);
@@ -173,6 +174,7 @@ private:
     QGraphicsPathItem *m_bar;
     int m_maximum;
     int m_minimum;
+    Qt::Orientation m_orientation;
     QRectF m_rect;
     QGraphicsPathItem *m_track;
     int m_value;
