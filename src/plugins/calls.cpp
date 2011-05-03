@@ -208,10 +208,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
                     m_call, SLOT(hangup()));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(destroyed(QObject*)),
-                    m_call, SLOT(deleteLater()));
-    Q_ASSERT(check);
-
     check = connect(m_call, SIGNAL(ringing()),
                     this, SLOT(callRinging()));
     Q_ASSERT(check);
