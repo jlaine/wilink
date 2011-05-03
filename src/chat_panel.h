@@ -130,6 +130,9 @@ protected:
     QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
 
 private:
+    void updateGradient();
+
+    bool m_pressed;
     QGraphicsPathItem *m_path;
     QGraphicsPixmapItem *m_pixmap;
 };
