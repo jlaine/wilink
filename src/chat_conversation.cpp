@@ -156,14 +156,14 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatRoomList->setGridSize(QSize(64,55));
     chatRoomList->setWordWrap(false);
     chatRoomList->setWrapping(true);
-    chatRoomList->setStyleSheet("QListView::item { color: #999; background: #fff; }\
+    chatRoomList->setStyleSheet("QListView::item { color: #999; }\
                                  QListView::item:hover { color: #000; background: #B0E2FF; }");
     chatRoomList->hide();
     splitter->addWidget(chatRoomList);
 
     // set ratio between chat history and participants list
     QList<int> sizes = QList<int>();
-    sizes.append(150);
+    sizes.append(250);
     sizes.append(100);
     splitter->setSizes(sizes);
 
