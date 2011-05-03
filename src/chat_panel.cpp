@@ -88,24 +88,18 @@ ChatPanel::ChatPanel(QWidget* parent)
     // toolbar
     d->actions = new QToolBar;
     d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    d->actions->hide();
     d->hbox->addWidget(d->actions);
 
-    // static toolbar
-    QToolBar *windowActions = new QToolBar;
-    windowActions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-    d->attachAction = windowActions->addAction(QIcon(":/add.png"), tr("Attach"));
+    d->attachAction = d->actions->addAction(QIcon(":/add.png"), tr("Attach"));
     d->attachAction->setVisible(false);
     check = connect(d->attachAction, SIGNAL(triggered()),
                     this, SIGNAL(attachPanel()));
     Q_ASSERT(check);
 
-    d->closeAction = windowActions->addAction(QIcon(":/close.png"), tr("Close"));
+    d->closeAction = d->actions->addAction(QIcon(":/close.png"), tr("Close"));
     check = connect(d->closeAction, SIGNAL(triggered()),
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
-    d->hbox->addWidget(windowActions);
 
     // assemble header
     d->header = new QVBoxLayout;
@@ -132,8 +126,8 @@ ChatPanel::~ChatPanel()
 
 QAction *ChatPanel::addAction(const QIcon &icon, const QString &text)
 {
-    QAction *action = d->actions->addAction(icon, text);
-    d->actions->show();
+    QAction *action = new QAction(icon, text, d->actions);
+    d->actions->insertAction(d->attachAction, action);
     return action;
 }
 
