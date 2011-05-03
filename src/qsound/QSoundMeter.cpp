@@ -60,9 +60,16 @@ QSoundMeter::QSoundMeter(const QAudioFormat &format, QIODevice *device, QObject 
         return;
     }
     m_device = device;
+    connect(m_device, SIGNAL(destroyed(QObject*)),
+            this, SLOT(deviceDestroyed(QObject*)));
     m_sampleSize = format.sampleSize() / 8;
     if (m_device)
         open(device->openMode() | QIODevice::Unbuffered);
+}
+
+void QSoundMeter::deviceDestroyed(QObject *obj)
+{
+    m_device = 0;
 }
 
 int QSoundMeter::maximum()

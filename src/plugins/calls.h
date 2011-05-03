@@ -53,6 +53,13 @@ Q_OBJECT
 public:
     CallAudioHelper(QObject *parent = 0);
 
+signals:
+    // This signal is emitted when the input volume changes.
+    void inputVolumeChanged(int volume);
+
+    // This signal is emitted when the output volume changes.
+    void outputVolumeChanged(int volume);
+
 private slots:
     void audioModeChanged(QIODevice::OpenMode mode);
 

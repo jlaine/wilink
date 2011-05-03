@@ -40,6 +40,8 @@
 #include "QXmppSrvInfo.h"
 #include "QXmppUtils.h"
 
+#include "QSoundMeter.h"
+
 #include "calls.h"
 
 #include "application.h"
@@ -91,8 +93,11 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_audioOutput) {
         m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
+        QSoundMeter *audioOutputMeter = new QSoundMeter(format, channel, this);
+        QObject::connect(audioOutputMeter, SIGNAL(valueChanged(int)),
+                         this, SIGNAL(outputVolumeChanged(int)));
         m_audioOutput->setBufferSize(bufferSize);
-        m_audioOutput->start(channel);
+        m_audioOutput->start(audioOutputMeter);
     } else if (!canRead && m_audioOutput) {
         m_audioOutput->stop();
         delete m_audioOutput;
@@ -103,8 +108,11 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     const bool canWrite = (mode & QIODevice::WriteOnly);
     if (canWrite && !m_audioInput) {
         m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
+        QSoundMeter *audioInputMeter = new QSoundMeter(format, channel, this);
+        QObject::connect(audioInputMeter, SIGNAL(valueChanged(int)),
+                         this, SIGNAL(inputVolumeChanged(int)));
         m_audioInput->setBufferSize(bufferSize);
-        m_audioInput->start(channel);
+        m_audioInput->start(audioInputMeter);
     } else if (!canWrite && m_audioInput) {
         m_audioInput->stop();
         delete m_audioInput;
