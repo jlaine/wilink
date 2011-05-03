@@ -20,7 +20,7 @@
 #include <QAbstractProxyModel>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDebug>
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QInputDialog>
@@ -458,6 +458,14 @@ void ChatRoom::customContextMenuRequested(const QPoint &pos)
 
     QMenu *menu = new QMenu;
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    const QString url = index.data(ChatRosterModel::UrlRole).toString();
+    if (!url.isEmpty())
+    {
+        QAction *action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
+        action->setData(url);
+        connect(action, SIGNAL(triggered()), this, SLOT(showProfile()));
+    }
+
     if (mucRoom->allowedActions() & QXmppMucRoom::KickAction) {
         QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
         action->setData(jid);
@@ -665,6 +673,19 @@ void ChatRoom::participantRemoved(const QString &jid)
 ChatRosterModel::Type ChatRoom::objectType() const
 {
     return ChatRosterModel::Room;
+}
+
+/** Show a user's profile page.
+ */
+void ChatRoom::showProfile()
+{
+    QAction *action = qobject_cast<QAction*>(sender());
+    if (!action)
+        return;
+
+    QString url = action->data().toString();
+    if (!url.isEmpty())
+        QDesktopServices::openUrl(url);
 }
 
 void ChatRoom::subjectChanged(const QString &subject)

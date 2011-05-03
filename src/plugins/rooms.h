@@ -110,6 +110,7 @@ private slots:
     void participantClicked(const QModelIndex &index);
     void participantRemoved(const QString &jid);
     void returnPressed();
+    void showProfile();
     void subjectChanged(const QString &subject);
     void tabPressed();
     void talkAt(const QString &jid);
