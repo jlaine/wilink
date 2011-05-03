@@ -216,11 +216,6 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
-    // stop sound player
-    d->soundThread->quit();
-    d->soundThread->wait();
-    delete d->soundPlayer;
-
 #ifdef USE_LIBNOTIFY
     // uninitialise libnotify
     notify_uninit();
@@ -243,6 +238,11 @@ Application::~Application()
     // destroy chat windows
     foreach (Chat *chat, d->chats)
         delete chat;
+
+    // stop sound player
+    d->soundThread->quit();
+    d->soundThread->wait();
+    delete d->soundPlayer;
 
     delete d;
 }
