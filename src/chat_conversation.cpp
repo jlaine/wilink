@@ -135,6 +135,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/conversation.qml"));
+    splitter->addWidget(view);
 #else
     QGraphicsView *view = new QGraphicsView;
     view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
@@ -146,6 +147,23 @@ ChatConversation::ChatConversation(QWidget *parent)
     view->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(view);
     splitter->addWidget(view);
+
+    check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
+                    this, SIGNAL(messageClicked(QModelIndex)));
+    Q_ASSERT(check);
+
+    check = connect(d->searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
+                    chatHistoryWidget, SLOT(find(QString, QTextDocument::FindFlags, bool)));
+    Q_ASSERT(check);
+
+    check = connect(d->searchBar, SIGNAL(findClear()),
+                    chatHistoryWidget, SLOT(findClear()));
+    Q_ASSERT(check);
+
+    check = connect(chatHistoryWidget, SIGNAL(findFinished(bool)),
+                    d->searchBar, SLOT(findFinished(bool)));
+    Q_ASSERT(check);
+#endif
 
     // chatroom list
     chatRoomList = new QListView();
@@ -166,23 +184,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     sizes.append(250);
     sizes.append(100);
     splitter->setSizes(sizes);
-
-    check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
-                    this, SIGNAL(messageClicked(QModelIndex)));
-    Q_ASSERT(check);
-
-    check = connect(d->searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
-                    chatHistoryWidget, SLOT(find(QString, QTextDocument::FindFlags, bool)));
-    Q_ASSERT(check);
-
-    check = connect(d->searchBar, SIGNAL(findClear()),
-                    chatHistoryWidget, SLOT(findClear()));
-    Q_ASSERT(check);
-
-    check = connect(chatHistoryWidget, SIGNAL(findFinished(bool)),
-                    d->searchBar, SLOT(findFinished(bool)));
-    Q_ASSERT(check);
-#endif
 
     d->panelBar = new ChatPanelBar(view);
     d->panelBar->setZValue(10);
@@ -242,9 +243,8 @@ void ChatConversation::setRosterModel(ChatRosterModel *model)
     d->historyModel->setRosterModel(model);
 #ifdef USE_DECLARATIVE
     d->imageProvider->setRosterModel(model);
-#else
-    chatRoomList->setModel(model);
 #endif
+    chatRoomList->setModel(model);
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)
