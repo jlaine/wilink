@@ -55,7 +55,6 @@ public:
 
 private slots:
     void audioModeChanged(QIODevice::OpenMode mode);
-    void audioStateChanged(QAudio::State state);
 
 private:
     QAudioInput *m_audioInput;

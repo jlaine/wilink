@@ -92,7 +92,6 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     if (canRead && !m_audioOutput) {
         m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
         m_audioOutput->setBufferSize(bufferSize);
-        connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
         m_audioOutput->start(channel);
     } else if (!canRead && m_audioOutput) {
         m_audioOutput->stop();
@@ -105,47 +104,11 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     if (canWrite && !m_audioInput) {
         m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
         m_audioInput->setBufferSize(bufferSize);
-        connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
         m_audioInput->start(channel);
     } else if (!canWrite && m_audioOutput) {
         m_audioInput->stop();
         delete m_audioInput;
         m_audioInput = 0;
-    }
-}
-
-void CallAudioHelper::audioStateChanged(QAudio::State state)
-{
-    Q_UNUSED(state)
-
-    QObject *audio = sender();
-    if (!audio)
-        return;
-    if (audio == m_audioInput)
-    {
-        qDebug("Audio input state %i error %i",
-            m_audioInput->state(),
-            m_audioInput->error());
-
-        // restart audio input if we get an underrun
-        if (m_audioInput->state() == QAudio::StoppedState &&
-            m_audioInput->error() == QAudio::UnderrunError)
-        {
-            qWarning("Audio input needs restart due to buffer underrun");
-            //m_audioInput->start(m_call->audioChannel());
-        }
-    } else if (audio == m_audioOutput) {
-        qDebug("Audio output state %i error %i",
-            m_audioOutput->state(),
-            m_audioOutput->error());
-
-        // restart audio output if we get an underrun
-        if (m_audioOutput->state() == QAudio::StoppedState &&
-            m_audioOutput->error() == QAudio::UnderrunError)
-        {
-            qWarning("Audio output needs restart due to buffer underrun");
-            //m_audioOutput->start(m_call->audioChannel());
-        }
     }
 }
 
@@ -211,10 +174,12 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 {
     bool check;
 
+    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     // audio helper
-    m_audioHelper = new CallAudioHelper(this);
+    m_audioHelper = new CallAudioHelper;
+    m_audioHelper->moveToThread(wApp->soundThread());
 
     // video timer
     m_videoTimer = new QTimer(this);
