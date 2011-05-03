@@ -114,7 +114,6 @@ private:
     void setStatus(const QString &status);
 
     // audio
-    CallAudioHelper *m_audioHelper;
     ChatPanelProgress *m_audioInputBar;
     ChatPanelProgress *m_audioOutputBar;
 

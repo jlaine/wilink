@@ -186,8 +186,8 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     // audio helper
-    m_audioHelper = new CallAudioHelper;
-    m_audioHelper->moveToThread(wApp->soundThread());
+    CallAudioHelper *audioHelper = new CallAudioHelper;
+    audioHelper->moveToThread(wApp->soundThread());
 
     // video timer
     m_videoTimer = new QTimer(this);
@@ -229,16 +229,20 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
                     this, SLOT(callStateChanged(QXmppCall::State)));
     Q_ASSERT(check);
 
-    check = connect(m_audioHelper, SIGNAL(inputVolumeChanged(int)),
+    check = connect(audioHelper, SIGNAL(inputVolumeChanged(int)),
                     m_audioInputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
 
-    check = connect(m_audioHelper, SIGNAL(outputVolumeChanged(int)),
+    check = connect(audioHelper, SIGNAL(outputVolumeChanged(int)),
                     m_audioOutputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
 
     check = connect(m_call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
-                    m_audioHelper, SLOT(audioModeChanged(QIODevice::OpenMode)));
+                    audioHelper, SLOT(audioModeChanged(QIODevice::OpenMode)));
+    Q_ASSERT(check);
+
+    check = connect(m_call, SIGNAL(finished()),
+                    audioHelper, SLOT(deleteLater()));
     Q_ASSERT(check);
 
     check = connect(m_call, SIGNAL(videoModeChanged(QIODevice::OpenMode)),
