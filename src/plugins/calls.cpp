@@ -60,6 +60,95 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
     return format;
 }
 
+CallAudioHelper::CallAudioHelper(QObject *parent)
+    : QObject(parent),
+    m_audioInput(0),
+    m_audioOutput(0)
+{
+}
+
+void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
+{
+    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
+    if (!call)
+        return;
+
+    qDebug("audio mode changed %i", (int)mode);
+    QXmppRtpAudioChannel *channel = call->audioChannel();
+    Q_ASSERT(channel);
+
+    QAudioFormat format = formatFor(channel->payloadType());
+
+#ifdef Q_OS_MAC
+    // 128ms at 8kHz
+    const int bufferSize = 2048 * format.channels();
+#else
+    // 160ms at 8kHz
+    const int bufferSize = 2560 * format.channels();
+#endif
+
+    // start or stop playback
+    const bool canRead = (mode & QIODevice::ReadOnly);
+    if (canRead && !m_audioOutput) {
+        m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
+        m_audioOutput->setBufferSize(bufferSize);
+        connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+        m_audioOutput->start(channel);
+    } else if (!canRead && m_audioOutput) {
+        m_audioOutput->stop();
+        delete m_audioOutput;
+        m_audioOutput = 0;
+    }
+
+    // start or stop capture
+    const bool canWrite = (mode & QIODevice::WriteOnly);
+    if (canWrite && !m_audioInput) {
+        m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
+        m_audioInput->setBufferSize(bufferSize);
+        connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
+        m_audioInput->start(channel);
+    } else if (!canWrite && m_audioOutput) {
+        m_audioInput->stop();
+        delete m_audioInput;
+        m_audioInput = 0;
+    }
+}
+
+void CallAudioHelper::audioStateChanged(QAudio::State state)
+{
+    Q_UNUSED(state)
+
+    QObject *audio = sender();
+    if (!audio)
+        return;
+    if (audio == m_audioInput)
+    {
+        qDebug("Audio input state %i error %i",
+            m_audioInput->state(),
+            m_audioInput->error());
+
+        // restart audio input if we get an underrun
+        if (m_audioInput->state() == QAudio::StoppedState &&
+            m_audioInput->error() == QAudio::UnderrunError)
+        {
+            qWarning("Audio input needs restart due to buffer underrun");
+            //m_audioInput->start(m_call->audioChannel());
+        }
+    } else if (audio == m_audioOutput) {
+        qDebug("Audio output state %i error %i",
+            m_audioOutput->state(),
+            m_audioOutput->error());
+
+        // restart audio output if we get an underrun
+        if (m_audioOutput->state() == QAudio::StoppedState &&
+            m_audioOutput->error() == QAudio::UnderrunError)
+        {
+            qWarning("Audio output needs restart due to buffer underrun");
+            //m_audioOutput->start(m_call->audioChannel());
+        }
+    }
+}
+
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
     : QGraphicsItem(parent),
     m_boundingRect(0, 0, 0, 0)
@@ -114,8 +203,6 @@ void CallVideoWidget::setSize(const QSizeF &size)
 
 CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsItem *parent)
     : QGraphicsWidget(parent),
-    m_audioInput(0),
-    m_audioOutput(0),
     m_videoButton(0),
     m_videoConversion(0),
     m_videoGrabber(0),
@@ -125,6 +212,9 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     bool check;
 
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
+
+    // audio helper
+    m_audioHelper = new CallAudioHelper(this);
 
     // video timer
     m_videoTimer = new QTimer(this);
@@ -165,7 +255,7 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     Q_ASSERT(check);
 
     check = connect(m_call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
-                    this, SLOT(audioModeChanged(QIODevice::OpenMode)));
+                    m_audioHelper, SLOT(audioModeChanged(QIODevice::OpenMode)));
     Q_ASSERT(check);
 
     check = connect(m_call, SIGNAL(videoModeChanged(QIODevice::OpenMode)),
@@ -183,88 +273,12 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
 
 CallWidget::~CallWidget()
 {
-    audioModeChanged(QIODevice::NotOpen);
+    //audioModeChanged(QIODevice::NotOpen);
     videoModeChanged(QIODevice::NotOpen);
 
     // stop tone
     if (m_soundId)
         wApp->soundPlayer()->stop(m_soundId);
-}
-
-void CallWidget::audioModeChanged(QIODevice::OpenMode mode)
-{
-    qDebug("audio mode changed %i", (int)mode);
-    QXmppRtpAudioChannel *channel = m_call->audioChannel();
-    QAudioFormat format = formatFor(channel->payloadType());
-
-#ifdef Q_OS_MAC
-    // 128ms at 8kHz
-    const int bufferSize = 2048 * format.channels();
-#else
-    // 160ms at 8kHz
-    const int bufferSize = 2560 * format.channels();
-#endif
-
-    // start or stop playback
-    const bool canRead = (mode & QIODevice::ReadOnly);
-    if (canRead && !m_audioOutput) {
-        m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
-        m_audioOutput->setBufferSize(bufferSize);
-        connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-        m_audioOutput->start(channel);
-    } else if (!canRead && m_audioOutput) {
-        m_audioOutput->stop();
-        delete m_audioOutput;
-        m_audioOutput = 0;
-    }
-
-    // start or stop capture
-    const bool canWrite = (mode & QIODevice::WriteOnly);
-    if (canWrite && !m_audioInput) {
-        m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
-        m_audioInput->setBufferSize(bufferSize);
-        connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)), this, SLOT(audioStateChanged(QAudio::State)));
-        m_audioInput->start(channel);
-    } else if (!canWrite && m_audioOutput) {
-        m_audioInput->stop();
-        delete m_audioInput;
-        m_audioInput = 0;
-    }
-}
-
-void CallWidget::audioStateChanged(QAudio::State state)
-{
-    Q_UNUSED(state)
-
-    QObject *audio = sender();
-    if (!audio)
-        return;
-    if (audio == m_audioInput)
-    {
-        warning(QString("Audio input state %1 error %2").arg(
-            QString::number(m_audioInput->state()),
-            QString::number(m_audioInput->error())));
-
-        // restart audio input if we get an underrun
-        if (m_audioInput->state() == QAudio::StoppedState &&
-            m_audioInput->error() == QAudio::UnderrunError)
-        {
-            warning("Audio input needs restart due to buffer underrun");
-            m_audioInput->start(m_call->audioChannel());
-        }
-    } else if (audio == m_audioOutput) {
-        debug(QString("Audio output state %1 error %2").arg(
-            QString::number(m_audioOutput->state()),
-            QString::number(m_audioOutput->error())));
-
-        // restart audio output if we get an underrun
-        if (m_audioOutput->state() == QAudio::StoppedState &&
-            m_audioOutput->error() == QAudio::UnderrunError)
-        {
-            warning("Audio output needs restart due to buffer underrun");
-            m_audioOutput->start(m_call->audioChannel());
-        }
-    }
 }
 
 void CallWidget::callRinging()

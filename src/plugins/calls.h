@@ -46,6 +46,22 @@ class QXmppVideoFormat;
 class QXmppVideoFrame;
 class QXmppSrvInfo;
 
+class CallAudioHelper : public QObject
+{
+Q_OBJECT
+
+public:
+    CallAudioHelper(QObject *parent = 0);
+
+private slots:
+    void audioModeChanged(QIODevice::OpenMode mode);
+    void audioStateChanged(QAudio::State state);
+
+private:
+    QAudioInput *m_audioInput;
+    QAudioOutput *m_audioOutput;
+};
+
 class CallVideoWidget : public QGraphicsItem
 {
 public:
@@ -77,8 +93,6 @@ signals:
     void finished();
 
 private slots:
-    void audioModeChanged(QIODevice::OpenMode mode);
-    void audioStateChanged(QAudio::State state);
     void callRinging();
     void callStateChanged(QXmppCall::State state);
     void videoModeChanged(QIODevice::OpenMode mode);
@@ -94,8 +108,7 @@ private:
     void setStatus(const QString &status);
 
     // audio
-    QAudioInput *m_audioInput;
-    QAudioOutput *m_audioOutput;
+    CallAudioHelper *m_audioHelper;
 
     // video
     ChatPanelButton *m_videoButton;
