@@ -54,6 +54,7 @@ private slots:
 private:
     QAudioDeviceInfo m_audioDevice;
     int m_readerId;
+    QMap<int, QAudioOutput*> m_outputs;
     QMap<int, QSoundFile*> m_readers;
 };
 

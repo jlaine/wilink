@@ -78,20 +78,20 @@ void QSoundPlayer::_q_start(int id)
     if (!reader)
         return;
 
-    const QAudioFormat format = reader->format();
-    QAudioOutput *output = new QAudioOutput(m_audioDevice, format, reader);
-    output->setProperty("_play_id", m_readerId);
-    connect(output, SIGNAL(stateChanged(QAudio::State)), this, SLOT(_q_stateChanged(QAudio::State)));
+    QAudioOutput *output = new QAudioOutput(m_audioDevice, reader->format(), this);
+    connect(output, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(_q_stateChanged(QAudio::State)));
+    m_outputs.insert(id, output);
     output->start(reader);
 }
 
 void QSoundPlayer::_q_stop(int id)
 {
-    QSoundFile *reader = m_readers.value(id);
-    if (!reader)
+    QAudioOutput *output = m_outputs.value(id);
+    if (!output)
         return;
 
-    reader->close();
+    output->stop();
 }
 
 void QSoundPlayer::_q_stateChanged(QAudio::State state)
@@ -100,11 +100,16 @@ void QSoundPlayer::_q_stateChanged(QAudio::State state)
     if (!output || state == QAudio::ActiveState)
         return;
 
-    int id = output->property("_play_id").toInt();
+    // delete output
+    int id = m_outputs.key(output);
+    m_outputs.take(id);
+    output->deleteLater();
+
+    // delete reader
     QSoundFile *reader = m_readers.take(id);
-    if (reader) {
+    if (reader)
         reader->deleteLater();
-        emit finished(id);
-    }
+
+    emit finished(id);
 }
 
