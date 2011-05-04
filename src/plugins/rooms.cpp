@@ -340,6 +340,10 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
+    check = connect(mucRoom, SIGNAL(allowedActionsChanged(QXmppMucRoom::Actions)),
+                    this, SLOT(allowedActionsChanged(QXmppMucRoom::Actions)));
+    Q_ASSERT(check);
+
     check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
                     this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
@@ -394,6 +398,17 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     /* if nickname is received, join now */
     if (rosterModel->isOwnNameReceived())
         join();
+}
+
+/** Update visible actions.
+ *
+ * @param actions
+ */
+void ChatRoom::allowedActionsChanged(QXmppMucRoom::Actions actions)
+{
+    subjectAction->setVisible(actions & QXmppMucRoom::SubjectAction);
+    optionsAction->setVisible(actions & QXmppMucRoom::ConfigurationAction);
+    permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
 }
 
 /** Bookmarks the room.
@@ -547,12 +562,6 @@ void ChatRoom::join()
 
 void ChatRoom::joined()
 {
-    // set action visibility
-    QXmppMucRoom::Actions actions = mucRoom->allowedActions();
-    subjectAction->setVisible(actions & QXmppMucRoom::SubjectAction);
-    optionsAction->setVisible(actions & QXmppMucRoom::ConfigurationAction);
-    permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
-
     // display participants
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
     chatRoomList->setRootIndex(roomIndex);

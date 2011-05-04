@@ -23,6 +23,7 @@
 #include <QDialog>
 
 #include "QXmppMucIq.h"
+#include "QXmppMucManager.h"
 #include "chat_conversation.h"
 
 class Chat;
@@ -91,6 +92,7 @@ public slots:
     void unbookmark();
 
 private slots:
+    void allowedActionsChanged(QXmppMucRoom::Actions actions);
     void changeSubject();
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
