@@ -15,6 +15,23 @@ QSoundMeterBar::chunk {
     background: #46a;
 }
 
+/* splitters */
+QSplitter::handle {
+    background-color: #567dbc;
+}
+
+QSplitter::handle:horizontal {
+    width: 2px;
+}
+
+QSplitter::handle:vertical {
+    height: 2px;
+}
+
+QSplitter::handle:pressed {
+    background-color: #97b6e6;
+}
+
 /* left toolbar */
 QToolBar {
     background-color: #567dbc;
@@ -51,8 +68,8 @@ QLabel#panel-help {
     border: 1px solid #8db6cd;
     background-color: #b0e2ff;
 }
-/* chat rooms */
 
+/* chat rooms */
 QListView#participant-list::item {
     color: #999;
 }
