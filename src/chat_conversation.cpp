@@ -167,6 +167,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     // chatroom list
     chatRoomList = new QListView();
+    chatRoomList->setObjectName("participant-list");
     chatRoomList->setViewMode(QListView::IconMode);
     chatRoomList->setMovement(QListView::Static);
     chatRoomList->setResizeMode(QListView::Adjust);
@@ -174,8 +175,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatRoomList->setGridSize(QSize(64,55));
     chatRoomList->setWordWrap(false);
     chatRoomList->setWrapping(true);
-    chatRoomList->setStyleSheet("QListView::item { color: #999; }\
-                                 QListView::item:hover { color: #000; background: #B0E2FF; }");
     chatRoomList->hide();
     splitter->addWidget(chatRoomList);
 

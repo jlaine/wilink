@@ -51,4 +51,19 @@ QLabel#panel-help {
     border: 1px solid #8db6cd;
     background-color: #b0e2ff;
 }
+/* chat rooms */
+
+QListView#participant-list::item {
+    color: #999;
+}
+
+QListView#participant-list::item:hover {
+    background: #B0E2FF;
+    color: #000;
+}
+
+QListView#participant-list::item:selected, QListView#participant-list::item:selected:active {
+    background: #B0E2FF;
+    color: #000;
+}
 
