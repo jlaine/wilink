@@ -53,6 +53,11 @@ QToolButton:hover {
     border-width: 0px 1px;
 }
 
+QToolButton:pressed {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                      stop:0 rgba(255, 255, 255, 150), stop: 0.5 rgba(255, 255, 255, 50), stop:1 rgb(255, 255, 255, 150));
+}
+
 /* panel header */
 QWidget#panel-header, QLabel#panel-icon, QLabel#panel-title, QWidget#panel-header QToolBar {
     background-color: #7797c9;
