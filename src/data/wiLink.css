@@ -12,6 +12,43 @@ QSoundMeterBar {
 }
 
 QSoundMeterBar::chunk {
-   background: #46a;
+    background: #46a;
+}
+
+/* left toolbar */
+QToolBar {
+    background-color: #567dbc;
+    border: none;
+}
+
+QToolButton {
+    border: none;
+    color: #fff;
+    margin: 0px 3px;
+}
+
+QToolButton:hover {
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                      stop:0 rgba(255, 255, 255, 0), stop: 0.5 rgba(255, 255, 255, 50), stop:1 rgb(255, 255, 255, 0));
+    border-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                  stop:0 rgba(255, 255, 255, 0), stop: 0.5 rgba(255, 255, 255, 255), stop:1 rgb(255, 255, 255, 0));
+    border-style: solid;
+    border-width: 0px 1px;
+}
+
+/* panel header */
+QWidget#panel-header, QLabel#panel-icon, QLabel#panel-title, QWidget#panel-header QToolBar {
+    background-color: #7797c9;
+    border: none;
+    color: #fff;
+}
+
+QLabel#panel-icon {
+    padding: 0px 8px;
+}
+
+QLabel#panel-help {
+    border: 1px solid #8db6cd;
+    background-color: #b0e2ff;
 }
 

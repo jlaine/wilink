@@ -78,10 +78,10 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->hbox->setSpacing(0);
     d->hbox->setMargin(0);
     d->iconLabel = new QLabel;
-    d->hbox->addSpacing(8);
+    d->iconLabel->setObjectName("panel-icon");
     d->hbox->addWidget(d->iconLabel);
-    d->hbox->addSpacing(8);
     d->nameLabel = new QLabel;
+    d->nameLabel->setObjectName("panel-title");
     d->hbox->addWidget(d->nameLabel);
     d->hbox->addStretch();
 
@@ -101,20 +101,32 @@ ChatPanel::ChatPanel(QWidget* parent)
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
 
-    // assemble header
-    d->header = new QVBoxLayout;
-    d->header->setMargin(0);
-    d->header->setSpacing(0);
-    d->header->addLayout(d->hbox);
-
+    // help label
     d->helpLabel = new QLabel;
+    d->helpLabel->setObjectName("panel-help");
     d->helpLabel->setMargin(10);
     d->helpLabel->setWordWrap(true);
     d->helpLabel->setOpenExternalLinks(true);
-    d->helpLabel->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) ) ;
-    d->helpLabel->setStyleSheet("QLabel { border:1px solid #8DB6CD; background-color:#B0E2FF; }");
+    d->helpLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) ;
     d->helpLabel->hide();
-    d->header->addWidget(d->helpLabel);
+
+    // assemble header
+    QVBoxLayout *headerLayout = new QVBoxLayout;
+    headerLayout->setMargin(0);
+    headerLayout->setSpacing(0);
+    headerLayout->addLayout(d->hbox);
+    headerLayout->addWidget(d->helpLabel);
+
+    QWidget *headerWidget = new QWidget;
+    headerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    headerWidget->setLayout(headerLayout);
+    headerWidget->setObjectName("panel-header");
+
+    // for compatibility whith ChatPanel::headerLayout()
+    d->header = new QVBoxLayout;
+    d->header->addWidget(headerWidget);
+    d->header->setMargin(0);
+    d->header->setSpacing(0);
 
     setMinimumWidth(300);
 }
