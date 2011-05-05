@@ -17,7 +17,7 @@ endmacro(generate_name)
 # Generate MacOS/X .icns icons from SVG files.
 #
 macro(generate_icns OUTPUT)
-	set(${OUTPUT})
+	set(OUTPUT "${OUTPUT}")
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_icns ${_this_svg} icns)
 		add_custom_command(OUTPUT ${_this_icns} DEPENDS ${_this_svg}
@@ -36,7 +36,7 @@ endmacro(generate_icns)
 # Generate Windows .ico icons from SVG files.
 #
 macro(generate_ico OUTPUT)
-	set(${OUTPUT})
+	set(OUTPUT "${OUTPUT}")
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_ico ${_this_svg} ico)
 		add_custom_command(OUTPUT ${_this_ico} DEPENDS ${_this_svg}
@@ -54,7 +54,7 @@ endmacro(generate_ico)
 # Generate PNG icons from SVG files.
 #
 macro(generate_png OUTPUT)
-	set(${OUTPUT})
+	set(OUTPUT "${OUTPUT}")
 	set(SIZE 32)
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_png ${_this_svg} png)
@@ -69,7 +69,7 @@ endmacro(generate_png)
 # Generate smileys from SVG files.
 #
 macro(generate_smiley OUTPUT)
-	set(${OUTPUT})
+	set(OUTPUT "${OUTPUT}")
 	set(SIZE 16)
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_png ${_this_svg} png)
@@ -84,7 +84,7 @@ endmacro(generate_smiley)
 # Generate XPM icons from SVG files.
 #
 macro(generate_xpm OUTPUT)
-	set(${OUTPUT})
+	set(OUTPUT "${OUTPUT}")
 	set(SIZE 32)
 	foreach(_this_svg ${ARGN})
 		generate_name(_this_xpm ${_this_svg} xpm)
