@@ -50,7 +50,9 @@ generate_smiley(png
     smiley-confused.svg
     smiley-happy.svg
     smiley-neutral.svg
-    smiley-sad.svg)
+    smiley-raspberry.svg
+    smiley-sad.svg
+    smiley-wink.svg)
 
 # medium icons
 add_custom_command(OUTPUT wiLink-64.png DEPENDS wiLink.svg

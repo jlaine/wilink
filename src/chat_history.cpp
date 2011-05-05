@@ -202,7 +202,9 @@ void ChatHistoryBubble::dataChanged()
     text.replace(":s", "<img src=\":/smiley-confused.png\" />");
     text.replace(":)", "<img src=\":/smiley-happy.png\" />");
     text.replace(":|", "<img src=\":/smiley-neutral.png\" />");
+    text.replace(":p", "<img src=\":/smiley-raspberry.png\" />");
     text.replace(":(", "<img src=\":/smiley-sad.png\" />");
+    text.replace(";)", "<img src=\":/smiley-wink.png\" />");
 
     // body
     m_body->setHtml(text);
