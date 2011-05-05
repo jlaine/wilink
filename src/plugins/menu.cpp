@@ -159,17 +159,20 @@ void Menu::showMenu()
         {
             if (linkUrl.scheme() == "xmpp" && linkUrl.hasQueryItem("join"))
             {
-                /* add or move chat room entry */
-                ChatRosterModel *model = chatWindow->rosterModel();
+                const QString roomJid = linkUrl.path();
+
                 ChatRoomWatcher *roomWatcher = chatWindow->findChild<ChatRoomWatcher*>();
-                QModelIndex index = model->findItem(linkUrl.path());
-                if (index.isValid()) {
-                    model->setData(index, QPixmap(":/home.png"), Qt::DecorationRole);
-                } else if (roomWatcher) {
-                    index = model->addItem(ChatRosterModel::Room, linkUrl.path(),
-                                           tr("My residence"), QPixmap(":/home.png"));
-                    roomWatcher->joinRoom(linkUrl.path(), false);
+                if (!roomWatcher)
+                    continue;
+
+                // add or update room entry
+                ChatRosterModel *model = chatWindow->rosterModel();
+                QModelIndex index = model->findItem(roomJid);
+                if (!index.isValid()) {
+                    roomWatcher->joinRoom(roomJid, false);
+                    index = model->findItem(roomJid);
                 }
+                model->setData(index, QPixmap(":/home.png"), Qt::DecorationRole);
                 model->setData(index, true, ChatRosterModel::PersistentRole);
             }
             action = servicesMenu->addAction(text);

@@ -591,10 +591,6 @@ Acceptez-vous?</translation>
         <source>&amp;Services</source>
         <translation>&amp;Services</translation>
     </message>
-    <message>
-        <source>My residence</source>
-        <translation>Ma résidence</translation>
-    </message>
 </context>
 <context>
     <name>PhoneCallsModel</name>
