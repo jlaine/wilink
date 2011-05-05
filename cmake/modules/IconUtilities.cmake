@@ -64,6 +64,21 @@ macro(generate_png OUTPUT)
 	endforeach()
 endmacro(generate_png)
 
+# GENERATE_SMILEY(OUTPUT SVGS..)
+#
+# Generate smileys from SVG files.
+#
+macro(generate_smiley OUTPUT)
+	set(${OUTPUT})
+	set(SIZE 16)
+	foreach(_this_svg ${ARGN})
+		generate_name(_this_png ${_this_svg} png)
+		add_custom_command(OUTPUT ${_this_png} DEPENDS ${_this_svg}
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=${SIZE} --export-height=${SIZE})
+		list(APPEND ${OUTPUT} ${_this_png})
+	endforeach()
+endmacro(generate_smiley)
+
 # GENERATE_XPM(OUTPUT SVGS..)
 #
 # Generate XPM icons from SVG files.

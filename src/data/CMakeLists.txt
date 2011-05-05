@@ -44,6 +44,14 @@ generate_png(png
     wiLink-black.svg)
 generate_xpm(xpm wiLink.svg)
 
+# smileys
+generate_smiley(png
+    smiley-angry.svg
+    smiley-confused.svg
+    smiley-happy.svg
+    smiley-neutral.svg
+    smiley-sad.svg)
+
 # medium icons
 add_custom_command(OUTPUT wiLink-64.png DEPENDS wiLink.svg
     COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/wiLink.svg --export-png=wiLink-64.png --export-width=64 --export-height=64)

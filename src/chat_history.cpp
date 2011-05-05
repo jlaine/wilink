@@ -196,8 +196,16 @@ void ChatHistoryBubble::dataChanged()
         m_frame->show();
     }
 
+    // smileys
+    QString text = idx.data(ChatHistoryModel::HtmlRole).toString();
+    text.replace(":@", "<img src=\":/smiley-angry.png\" />");
+    text.replace(":s", "<img src=\":/smiley-confused.png\" />");
+    text.replace(":)", "<img src=\":/smiley-happy.png\" />");
+    text.replace(":|", "<img src=\":/smiley-neutral.png\" />");
+    text.replace(":(", "<img src=\":/smiley-sad.png\" />");
+
     // body
-    m_body->setHtml(idx.data(ChatHistoryModel::HtmlRole).toString());
+    m_body->setHtml(text);
 
     updateGeometry();
 }
