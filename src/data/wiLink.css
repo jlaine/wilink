@@ -17,7 +17,7 @@ QSoundMeterBar::chunk {
 
 /* splitters */
 QSplitter::handle {
-    background-color: #567dbc;
+    background-color: #6395e3;
 }
 
 QSplitter::handle:horizontal {
@@ -34,7 +34,8 @@ QSplitter::handle:pressed {
 
 /* left toolbar */
 QToolBar {
-    background-color: #567dbc;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                      stop:0 #6ea1f1, stop:1 #567dbc);
     border: none;
 }
 
@@ -60,7 +61,8 @@ QToolButton:pressed {
 
 /* panel header */
 QWidget#panel-header, QLabel#panel-icon, QLabel#panel-title, QWidget#panel-header QToolBar {
-    background-color: #7797c9;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                      stop:0 #9bbdf4, stop:1 #90acd8);
     border: none;
     color: #fff;
 }
@@ -70,7 +72,9 @@ QLabel#panel-icon {
 }
 
 QLabel#panel-help {
-    border: 1px solid #8db6cd;
+    border-color: #fff;
+    border-style: solid;
+    border-width: 1px 0px;
     background-color: #b0e2ff;
 }
 
