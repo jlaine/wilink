@@ -115,7 +115,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     headerLayout->setMargin(0);
     headerLayout->setSpacing(0);
     headerLayout->addLayout(d->hbox);
-    headerLayout->addWidget(d->helpLabel);
 
     QWidget *headerWidget = new QWidget;
     headerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -125,6 +124,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     // for compatibility whith ChatPanel::headerLayout()
     d->header = new QVBoxLayout;
     d->header->addWidget(headerWidget);
+    d->header->addWidget(d->helpLabel);
     d->header->setMargin(0);
     d->header->setSpacing(0);
 
