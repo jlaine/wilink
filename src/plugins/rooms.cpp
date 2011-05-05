@@ -160,6 +160,9 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
         chat->addPanel(room);
         model->addItem(room->objectType(), room->objectName(),
                        room->windowTitle(), QPixmap(":/chat.png"), roomsIndex);
+
+        // expand rooms
+        chat->rosterView()->setExpanded(ROOMS_ROSTER_ID, true);
     }
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));

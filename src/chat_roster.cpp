@@ -900,7 +900,7 @@ ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
     sortByColumn(SortingColumn, Qt::AscendingOrder);
 
     // expand contacts
-    setExpanded(sortedModel->mapFromSource(rosterModel->contactsItem()), true);
+    setExpanded(CONTACTS_ROSTER_ID, true);
 }
 
 void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
@@ -968,6 +968,13 @@ void ChatRosterView::setShowOfflineContacts(bool show)
         sortedModel->setFilterRegExp(QRegExp());
     else
         sortedModel->setFilterRegExp(QRegExp("^(?!offline).+"));
+}
+
+void ChatRosterView::setExpanded(const QString &id, bool expanded)
+{
+    QModelIndex rosterIndex = rosterModel->findItem(id);
+    if (rosterIndex.isValid())
+        QTreeView::setExpanded(sortedModel->mapFromSource(rosterIndex), expanded);
 }
 
 QSize ChatRosterView::sizeHint () const

@@ -127,6 +127,7 @@ class ChatRosterView : public QTreeView
 public:
     ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
     QModelIndex mapFromRoster(const QModelIndex &index);
+    void setExpanded(const QString &id, bool expanded);
     QSize sizeHint() const;
 
 signals:
