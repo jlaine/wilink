@@ -399,20 +399,20 @@ Acceptez-vous?</translation>
         <translation>Invitation de %1</translation>
     </message>
     <message>
-        <source>%1 has asked to add you to join the &apos;%2&apos; chat room.
-
-Do you accept?</source>
-        <translation>%1 vous invite au salon de discussion &apos;%2&apos;.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
         <source>Join or create a chat room</source>
         <translation>Rejoindre ou créer un salon de discussion</translation>
     </message>
     <message>
         <source>Rooms</source>
         <translation>Salons</translation>
+    </message>
+    <message>
+        <source>%1 has asked to add you to join the &apos;%2&apos; chat room</source>
+        <translation>%1 vous as invité à rejoindre le salon &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>Do you accept?</source>
+        <translation>Acceptez-vous ?</translation>
     </message>
 </context>
 <context>

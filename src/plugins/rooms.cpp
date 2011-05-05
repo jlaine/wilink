@@ -173,8 +173,6 @@ void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
  */
 void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &jid, const QString &reason)
 {
-    Q_UNUSED(reason);
-
     // Skip invitations to rooms which we have already joined or
     // which we have already received
     if (chat->panel(roomJid) || invitations.contains(roomJid))
@@ -182,9 +180,13 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
 
     const QString contactName = chat->rosterModel()->contactName(jid);
 
+    QString message = tr("%1 has asked to add you to join the '%2' chat room").arg(contactName, roomJid);
+    if(!reason.isNull() && !reason.isEmpty())
+        message += ":\n\n" + QString(reason);
+    message += "\n\n"+tr("Do you accept?");
     QMessageBox *box = new QMessageBox(QMessageBox::Question,
         tr("Invitation from %1").arg(jid),
-        tr("%1 has asked to add you to join the '%2' chat room.\n\nDo you accept?").arg(contactName, roomJid),
+        message,
         QMessageBox::Yes | QMessageBox::No,
         chat);
     box->setObjectName(roomJid);
