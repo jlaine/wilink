@@ -52,8 +52,6 @@
 #include "phone/sip.h"
 #include "phone.h"
  
-#define PHONE_ROSTER_ID "0_phone"
-
 // Builds a full SIP address from a short recipient
 static QString buildAddress(const QString &recipient, const QString &sipDomain)
 {
@@ -524,7 +522,6 @@ bool PhonePlugin::initialize(Chat *chat)
 
     /* register panel */
     PhonePanel *panel = new PhonePanel(chat);
-    panel->setObjectName(PHONE_ROSTER_ID);
     chat->addPanel(panel);
 
     return true;

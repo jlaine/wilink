@@ -47,7 +47,6 @@
 #include "player.h"
 
 #define DURATION_WIDTH 30
-#define PLAYER_ROSTER_ID "0_player"
 
 enum PlayerColumns {
     ArtistColumn = 0,
@@ -598,7 +597,6 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
 {
     bool check;
 
-    setObjectName(PLAYER_ROSTER_ID);
     setWindowIcon(QIcon(":/start.png"));
     setWindowTitle(tr("Media player"));
 

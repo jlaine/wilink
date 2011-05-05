@@ -35,8 +35,8 @@ class QXmppVCardManager;
 
 class ChatRosterModelPrivate;
 
-#define ROOMS_ROSTER_ID     "2_rooms"
-#define CONTACTS_ROSTER_ID  "z_1_contacts"
+#define ROOMS_ROSTER_ID     "1_rooms"
+#define CONTACTS_ROSTER_ID  "2_contacts"
 
 class ChatRosterModel : public ChatModel
 {
