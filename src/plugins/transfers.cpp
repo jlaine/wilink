@@ -47,8 +47,6 @@
 #include "transfers.h"
 #include "chat_utils.h"
 
-#define TRANSFERS_ROSTER_ID    "0_transfers"
-
 static qint64 fileSizeLimit = 50000000; // 50 MB
 
 enum TransfersColumns {

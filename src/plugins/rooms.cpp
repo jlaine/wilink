@@ -147,11 +147,19 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
     if (!room) {
+        ChatRosterModel *model = chat->rosterModel();
+
+        // add "rooms" item
+        QModelIndex roomsIndex = model->findItem(ROOMS_ROSTER_ID);
+        if (!roomsIndex.isValid())
+            roomsIndex = model->addItem(ChatRosterModel::Other, ROOMS_ROSTER_ID,
+                                        tr("My rooms"), QPixmap(":/chat.png"));
+
         // add panel
         room = new ChatRoom(chat, chat->rosterModel(), jid);
         chat->addPanel(room);
-        chat->rosterModel()->addItem(room->objectType(), room->objectName(),
-                                     room->windowTitle(), QPixmap(":/chat.png"));
+        model->addItem(room->objectType(), room->objectName(),
+                       room->windowTitle(), QPixmap(":/chat.png"), roomsIndex);
     }
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));
