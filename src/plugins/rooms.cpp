@@ -107,10 +107,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
                     this, SLOT(rosterClick(QModelIndex)));
     Q_ASSERT(check);
 
-    check = connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
-                    this, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
-    Q_ASSERT(check);
-
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
@@ -247,35 +243,6 @@ void ChatRoomWatcher::rosterClick(const QModelIndex &index)
     joinRoom(roomJid, true);
 }
 
-/** Handle a drop event on a roster entry.
- */
-void ChatRoomWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
-{
-    if (!chat->client()->isConnected())
-        return;
-
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type != ChatRosterModel::Room || !event->mimeData()->hasUrls())
-        return;
-
-    const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
-    int found = 0;
-    foreach (const QUrl &url, event->mimeData()->urls())
-    {
-        const QString jid = url.toString();
-        if (!isBareJid(jid))
-            continue;
-        if (event->type() == QEvent::Drop)
-        {
-            ChatRoom *room = joinRoom(roomJid, true);
-            room->invite(jid);
-        }
-        found++;
-    }
-    if (found)
-        event->acceptProposedAction();
-}
-
 /** Open a XMPP URI if it refers to a chat room.
  */
 void ChatRoomWatcher::urlClick(const QUrl &url)
@@ -297,8 +264,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     setRosterModel(rosterModel);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
-    setWindowExtra(jid);
-    setWindowHelp(tr("To invite a contact to this chat room, drag and drop it onto the chat room."));
 
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 

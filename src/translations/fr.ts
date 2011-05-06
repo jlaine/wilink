@@ -271,10 +271,6 @@ Acceptez-vous?</translation>
         <translation>Erreur de salon de discussion</translation>
     </message>
     <message>
-        <source>To invite a contact to this chat room, drag and drop it onto the chat room.</source>
-        <translation>Pour inviter un contact à ce salon de discussion, faites le glisser sur le salon.</translation>
-    </message>
-    <message>
         <source>%1 has been invited to %2</source>
         <translation>%1 a été invité(e) à %2</translation>
     </message>
