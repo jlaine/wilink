@@ -58,7 +58,7 @@
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
-static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^ ]+)\\b");
+static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^ \n]+)\\b");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
 class ChatHistoryItem : public ChatModelItem
@@ -469,8 +469,8 @@ ChatHistoryModelPrivate::ChatHistoryModelPrivate(ChatHistoryModel *qq)
 QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
 {
     QString bodyHtml = Qt::escape(item->message.body);
-    bodyHtml.replace("\n", "<br/>");
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+    bodyHtml.replace("\n", "<br/>");
     if (rosterModel)
         bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(item->message.jid) + "\\1</b>");
     foreach (const TextTransform &transform, textTransforms)
