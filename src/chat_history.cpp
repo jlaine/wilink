@@ -1169,17 +1169,19 @@ QString ChatHistoryWidget::selectedText() const
     // copy selected messages
     foreach (QGraphicsTextItem *textItem, m_selectedMessages) {
         if (!copyText.isEmpty())
-            copyText += "\n";
+            copyText += QChar('\n');
 
         // if this is a conversation, prefix the message with its sender
         if (senders.size() > 1)
             copyText += senders.value(textItem) + "> ";
 
-        copyText += textItem->textCursor().selectedText().replace("\r\n", "\n");
+        copyText += textItem->textCursor().selectedText()
+                    .replace(QChar::ParagraphSeparator, QChar('\n'))
+                    .replace(QLatin1String("\r\n"), QLatin1String("\n"));
     }
 
 #ifdef Q_OS_WIN
-    return copyText.replace("\n", "\r\n");
+    return copyText.replace(QLatin1String("\n"), QLatin1String("\r\n"));
 #else
     return copyText;
 #endif
