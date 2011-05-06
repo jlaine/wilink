@@ -58,7 +58,7 @@
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
-static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^ \n]+)\\b");
+static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^\\s]+)");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
 class ChatHistoryItem : public ChatModelItem
