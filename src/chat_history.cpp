@@ -96,6 +96,22 @@ bool ChatMessage::groupWith(const ChatMessage &other) const
         qAbs(date.secsTo(other.date)) < 3600; // 1 hour
 }
 
+/** Returns the HTML for the message body.
+ *
+ * @param rosterModel
+ */
+QString ChatMessage::html(ChatRosterModel *rosterModel) const
+{
+    QString bodyHtml = Qt::escape(body);
+    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+    bodyHtml.replace("\n", "<br/>");
+    if (rosterModel)
+        bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(jid) + "\\1</b>");
+    foreach (const TextTransform &transform, textTransforms)
+        bodyHtml.replace(transform.first, transform.second);
+    return bodyHtml;
+}
+
 /** Returns true if the message is an "action" message, such
  *  as /me.
  */
@@ -452,7 +468,6 @@ class ChatHistoryModelPrivate
 {
 public:
     ChatHistoryModelPrivate(ChatHistoryModel *qq);
-    QString html(ChatHistoryItem *item) const;
     void rosterChanged(const QString &jid);
 
     ChatRosterModel *rosterModel;
@@ -465,20 +480,6 @@ ChatHistoryModelPrivate::ChatHistoryModelPrivate(ChatHistoryModel *qq)
     : rosterModel(0),
     q(qq)
 {
-}
-
-/** Returns the HTML for the message body.
- */
-QString ChatHistoryModelPrivate::html(ChatHistoryItem *item) const
-{
-    QString bodyHtml = Qt::escape(item->message.body);
-    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
-    bodyHtml.replace("\n", "<br/>");
-    if (rosterModel)
-        bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(item->message.jid) + "\\1</b>");
-    foreach (const TextTransform &transform, textTransforms)
-        bodyHtml.replace(transform.first, transform.second);
-    return bodyHtml;
 }
 
 /** Handles a roster update.
@@ -688,12 +689,12 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         return d->rosterModel->contactName(msg->message.jid);
     } else if (role == HtmlRole) {
         if (item->children.isEmpty())
-            return d->html(item);
+            return item->message.html(d->rosterModel);
         else {
             QString bodies;
             foreach (ChatModelItem *ptr, item->children) {
                 ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
-                bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + d->html(child) + "</p>";
+                bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + child->message.html(d->rosterModel) + "</p>";
             }
             return bodies;
         }

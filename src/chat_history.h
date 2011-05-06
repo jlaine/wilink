@@ -44,6 +44,7 @@ class ChatMessage
 {
 public:
     ChatMessage();
+    QString html(ChatRosterModel *rosterModel = 0) const;
     bool groupWith(const ChatMessage &other) const;
     bool isAction() const;
 
