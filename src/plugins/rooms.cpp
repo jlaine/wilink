@@ -276,7 +276,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     participantsList->setMovement(QListView::Static);
     participantsList->setResizeMode(QListView::Adjust);
     participantsList->setFlow(QListView::LeftToRight);
-    participantsList->setGridSize(QSize(64,55));
     participantsList->setWordWrap(false);
     participantsList->setWrapping(true);
     participantsList->hide();
