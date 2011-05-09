@@ -283,8 +283,9 @@ void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bo
  */
 void ChatDialog::updateWindowTitle()
 {
-    setWindowTitle(rosterModel->contactName(chatRemoteJid));
-    setWindowIcon(rosterModel->contactAvatar(chatRemoteJid));
+    QModelIndex index = rosterModel->findItem(chatRemoteJid);
+    setWindowTitle(index.data(Qt::DisplayRole).toString());
+    setWindowIcon(index.data(Qt::DecorationRole).value<QPixmap>());
 
     const QString remoteDomain = jidToDomain(chatRemoteJid);
     if (client->configuration().domain() == "wifirst.net" &&
@@ -292,7 +293,6 @@ void ChatDialog::updateWindowTitle()
     {
         // for wifirst accounts, return the wifirst nickname if it is
         // different from the display name
-        QModelIndex index = rosterModel->findItem(chatRemoteJid);
         const QString nickName = index.data(ChatRosterModel::NicknameRole).toString();
         if (nickName != windowTitle())
             setWindowExtra(nickName);
