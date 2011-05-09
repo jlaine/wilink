@@ -66,7 +66,7 @@ ContactsPanel::ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip)
 
     setObjectName(jid);
     setWindowTitle(chatWindow->rosterModel()->contactName(jid));
-    setWindowIcon(chatWindow->rosterModel()->contactAvatar(jid));
+    setWindowIcon(QIcon(":/peer.png"));
 }
 
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
