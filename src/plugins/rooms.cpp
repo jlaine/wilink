@@ -287,6 +287,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     sizes.append(500);
     sizes.append(32);
     splitterWidget->setSizes(sizes);
+    splitterWidget->setStretchFactor(0, 1);
+    splitterWidget->setStretchFactor(1, 0);
 
     // add actions
     QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
