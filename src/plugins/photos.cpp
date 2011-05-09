@@ -245,24 +245,21 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
 
     statusLabel = new QLabel;
 
-    backButton = new QPushButton(tr("Go back"));
-    backButton->setIcon(QIcon(":/back.png"));
-    backButton->setEnabled(false);
-    connect(backButton, SIGNAL(clicked()), this, SLOT(goBack()));
+    backAction = addAction(QIcon(":/back.png"), tr("Go back"));
+    backAction->setEnabled(false);
+    connect(backAction, SIGNAL(triggered()), this, SLOT(goBack()));
 
     stopButton = new QPushButton(tr("Cancel"));
     stopButton->setIcon(QIcon(":/close.png"));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(abortUpload()));
     stopButton->hide();
 
-    createButton = new QPushButton(tr("Create an album"));
-    createButton->setIcon(QIcon(":/add.png"));
-    connect(createButton, SIGNAL(clicked()), this, SLOT(createFolder()));
+    createAction = addAction(QIcon(":/add.png"), tr("Create an album"));
+    connect(createAction, SIGNAL(triggered()), this, SLOT(createFolder()));
 
-    deleteButton = new QPushButton(tr("Delete"));
-    deleteButton->setIcon(QIcon(":/remove.png"));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteFile()));
-    deleteButton->hide();
+    deleteAction = addAction(QIcon(":/remove.png"), tr("Delete"));
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteFile()));
+    deleteAction->setVisible(false);
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
@@ -275,9 +272,6 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->addWidget(statusLabel);
     hbox->addStretch();
-    hbox->addWidget(backButton);
-    hbox->addWidget(createButton);
-    hbox->addWidget(deleteButton);
     layout->addLayout(hbox_upload);
     layout->addLayout(hbox);
 
@@ -363,9 +357,9 @@ void PhotosPanel::commandFinished(int cmd, bool error, const FileInfoList &resul
         listView->setAcceptDrops(true);
         if (photosView->count() > 1)
         {
-            backButton->setEnabled(true);
-            createButton->hide();
-            deleteButton->show();
+            backAction->setEnabled(true);
+            createAction->setVisible(false);
+            deleteAction->setVisible(true);
         }
 
         /* fetch thumbnails */
@@ -464,7 +458,7 @@ void PhotosPanel::fileOpened(const QUrl &url)
         return;
 
     // disable controls
-    deleteButton->hide();
+    deleteAction->setVisible(false);
 
     // build playlist
     PhotosList *listView = qobject_cast<PhotosList*>(photosView->currentWidget());
@@ -538,7 +532,7 @@ void PhotosPanel::folderOpened(const QUrl &url)
  */
 void PhotosPanel::goBack()
 {
-    if (photosView->count() < 2 || !backButton->isEnabled())
+    if (photosView->count() < 2 || !backAction->isEnabled())
         return;
 
     // remove obsolete items from download queue
@@ -553,11 +547,11 @@ void PhotosPanel::goBack()
     /* enable controls */
     if (photosView->count() == 1)
     {
-        backButton->setEnabled(false);
-        createButton->show();
-        deleteButton->hide();
+        backAction->setEnabled(false);
+        deleteAction->setVisible(false);
+        createAction->setVisible(true);
     } else {
-        deleteButton->show();
+        deleteAction->setVisible(true);
     }
 }
 

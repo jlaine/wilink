@@ -119,9 +119,9 @@ private:
     QIODevice *uploadDevice;
     QList<QUrl> playList;
 
-    QPushButton *backButton;
-    QPushButton *createButton;
-    QPushButton *deleteButton;
+    QAction *backAction;
+    QAction *createAction;
+    QAction *deleteAction;
     QPushButton *stopButton;
     Job downloadJob;
     QStackedWidget *photosView;
