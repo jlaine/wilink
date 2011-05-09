@@ -55,10 +55,6 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
 {
     setObjectName(jid);
     setRosterModel(rosterModel);
-    setWindowTitle(rosterModel->contactName(jid));
-    setWindowIcon(rosterModel->contactAvatar(jid));
-    setWindowExtra(rosterModel->contactExtra(jid));
-
 
     // load archive manager
     archiveManager = client->findExtension<QXmppArchiveManager>();
@@ -104,6 +100,9 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     check = connect(this, SIGNAL(showPanel()),
                     this, SLOT(join()));
     Q_ASSERT(check);
+
+    // set window title
+    updateWindowTitle();
 }
 
 void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -274,11 +273,19 @@ void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bo
     for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
         const QString jid = rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
         if (jid == chatRemoteJid) {
-            setWindowTitle(rosterModel->contactName(jid));
-            setWindowIcon(rosterModel->contactAvatar(jid));
-            setWindowExtra(rosterModel->contactExtra(jid));
+            updateWindowTitle();
+            break;
         }
     }
+}
+
+/** Updates the window title.
+ */
+void ChatDialog::updateWindowTitle()
+{
+    setWindowTitle(rosterModel->contactName(chatRemoteJid));
+    setWindowIcon(rosterModel->contactAvatar(chatRemoteJid));
+    setWindowExtra(rosterModel->contactExtra(chatRemoteJid));
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages

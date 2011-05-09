@@ -55,6 +55,8 @@ private slots:
     void returnPressed();
 
 private:
+    void updateWindowTitle();
+
     QXmppArchiveManager *archiveManager;
     QString chatRemoteJid;
     ChatClient *client;
