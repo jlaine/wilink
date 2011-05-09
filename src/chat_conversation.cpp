@@ -90,6 +90,7 @@ public:
     ChatPanelBar *panelBar;
     ChatSearchBar *searchBar;
     QSpacerItem *spacerItem;
+    QSplitter *splitter;
 };
 
 ChatConversation::ChatConversation(QWidget *parent)
@@ -105,8 +106,8 @@ ChatConversation::ChatConversation(QWidget *parent)
     layout->addLayout(headerLayout());
 
     // chatHistory and chatRoomList separation
-    QSplitter *splitter = new QSplitter;
-    layout->addWidget(splitter);
+    d->splitter = new QSplitter;
+    layout->addWidget(d->splitter);
 
     /* search bar */
     d->searchBar = new ChatSearchBar;
@@ -146,7 +147,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     chatHistoryWidget->setModel(d->historyModel);
     view->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(view);
-    splitter->addWidget(view);
+    d->splitter->addWidget(view);
 
     check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
                     this, SIGNAL(messageClicked(QModelIndex)));
@@ -164,25 +165,6 @@ ChatConversation::ChatConversation(QWidget *parent)
                     d->searchBar, SLOT(findFinished(bool)));
     Q_ASSERT(check);
 #endif
-
-    // chatroom list
-    chatRoomList = new QListView();
-    chatRoomList->setObjectName("participant-list");
-    chatRoomList->setViewMode(QListView::IconMode);
-    chatRoomList->setMovement(QListView::Static);
-    chatRoomList->setResizeMode(QListView::Adjust);
-    chatRoomList->setFlow(QListView::LeftToRight);
-    chatRoomList->setGridSize(QSize(64,55));
-    chatRoomList->setWordWrap(false);
-    chatRoomList->setWrapping(true);
-    chatRoomList->hide();
-    splitter->addWidget(chatRoomList);
-
-    // set ratio between chat history and participants list
-    QList<int> sizes = QList<int>();
-    sizes.append(250);
-    sizes.append(100);
-    splitter->setSizes(sizes);
 
     d->panelBar = new ChatPanelBar(view);
     d->panelBar->setZValue(10);
@@ -232,6 +214,11 @@ void ChatConversation::addWidget(QGraphicsWidget *widget)
     d->panelBar->addWidget(widget);
 }
 
+QSplitter *ChatConversation::getSplitter()
+{
+    return d->splitter;
+}
+
 ChatHistoryModel *ChatConversation::historyModel()
 {
     return d->historyModel;
@@ -243,7 +230,6 @@ void ChatConversation::setRosterModel(ChatRosterModel *model)
 #ifdef USE_DECLARATIVE
     d->imageProvider->setRosterModel(model);
 #endif
-    chatRoomList->setModel(model);
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)
