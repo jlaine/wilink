@@ -43,6 +43,7 @@ public:
 
 public slots:
     void messageReceived(const QXmppMessage &msg);
+    void rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);

@@ -93,6 +93,10 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
                     this, SLOT(archiveListReceived(QList<QXmppArchiveChat>)));
     Q_ASSERT(check);
 
+    check = connect(rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
+    Q_ASSERT(check);
+
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(leave()));
     Q_ASSERT(check);
@@ -256,6 +260,25 @@ void ChatDialog::returnPressed()
 
     // play sound
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());
+}
+
+/** Handles a roster change.
+ *
+ * @param topLeft
+ * @param bottomRight
+ */
+void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    Q_ASSERT(topLeft.parent() == bottomRight.parent());
+    const QModelIndex parent = topLeft.parent();
+    for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
+        const QString jid = rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        if (jid == chatRemoteJid) {
+            setWindowTitle(rosterModel->contactName(jid));
+            setWindowIcon(rosterModel->contactAvatar(jid));
+            setWindowExtra(rosterModel->contactExtra(jid));
+        }
+    }
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages
