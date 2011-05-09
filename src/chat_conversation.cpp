@@ -136,7 +136,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/conversation.qml"));
-    splitter->addWidget(view);
+    d->splitter->addWidget(view);
 #else
     QGraphicsView *view = new QGraphicsView;
     view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
