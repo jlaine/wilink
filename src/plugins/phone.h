@@ -79,7 +79,6 @@ private:
     QPushButton *callButton;
     QPushButton *hangupButton;
     QLineEdit *numberEdit;
-    QLabel *statusLabel;
 
     bool m_registeredHandler;
 };

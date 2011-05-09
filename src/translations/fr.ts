@@ -625,22 +625,6 @@ Acceptez-vous?</translation>
         <translation>Appeler</translation>
     </message>
     <message>
-        <source>Connected.</source>
-        <translation>Connecté.</translation>
-    </message>
-    <message>
-        <source>Disconnected.</source>
-        <translation>Déconnecté.</translation>
-    </message>
-    <message>
-        <source>Connecting..</source>
-        <translation>Connexion..</translation>
-    </message>
-    <message>
-        <source>Disconnecting..</source>
-        <translation>Déconnexion..</translation>
-    </message>
-    <message>
         <source>Call from %1</source>
         <translation>Appel de %1</translation>
     </message>

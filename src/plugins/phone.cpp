@@ -183,10 +183,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
     layout->addWidget(callsView, 1);
 
-    // status
-    statusLabel = new QLabel;
-    layout->addWidget(statusLabel);
-
     setLayout(layout);
 
     // sip client
@@ -486,23 +482,10 @@ void PhonePanel::openUrl(const QUrl &url)
 
 void PhonePanel::sipStateChanged(SipClient::State state)
 {
-    switch (state)
-    {
-    case SipClient::ConnectingState:
-        statusLabel->setText(tr("Connecting.."));
-        break;
-    case SipClient::ConnectedState:
-        statusLabel->setText(tr("Connected."));
+    if (state == SipClient::ConnectedState)
         callButton->setEnabled(true);
-        break;
-    case SipClient::DisconnectingState:
-        statusLabel->setText(tr("Disconnecting.."));
-        break;
-    case SipClient::DisconnectedState:
-        statusLabel->setText(tr("Disconnected."));
+    else
         callButton->setEnabled(false);
-        break;
-    }
 }
 
 // PLUGIN
