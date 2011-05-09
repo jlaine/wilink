@@ -368,33 +368,6 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     return jids;
 }
 
-/** Determine extra information for a contact.
- *
- * @param bareJid
- */
-QString ChatRosterModel::contactExtra(const QString &bareJid) const
-{
-    ChatRosterItem *item = d->find(bareJid);
-    if (!item)
-        return QString();
-
-    const QString remoteDomain = jidToDomain(bareJid);
-    if (d->client->configuration().domain() == "wifirst.net" &&
-        remoteDomain == "wifirst.net")
-    {
-        // for wifirst accounts, return the wifirst nickname if it is
-        // different from the display name
-        const QString nickName = item->data(NicknameRole).toString();
-        if (nickName != item->data(Qt::DisplayRole).toString())
-            return nickName;
-        else
-            return QString();
-    } else {
-        // for other accounts, return the JID
-        return bareJid;
-    }
-}
-
 /** Determine the display name for a contact.
  *
  *  If the user has set a name for the roster entry, it will be used,

@@ -285,7 +285,23 @@ void ChatDialog::updateWindowTitle()
 {
     setWindowTitle(rosterModel->contactName(chatRemoteJid));
     setWindowIcon(rosterModel->contactAvatar(chatRemoteJid));
-    setWindowExtra(rosterModel->contactExtra(chatRemoteJid));
+
+    const QString remoteDomain = jidToDomain(chatRemoteJid);
+    if (client->configuration().domain() == "wifirst.net" &&
+        remoteDomain == "wifirst.net")
+    {
+        // for wifirst accounts, return the wifirst nickname if it is
+        // different from the display name
+        QModelIndex index = rosterModel->findItem(chatRemoteJid);
+        const QString nickName = index.data(ChatRosterModel::NicknameRole).toString();
+        if (nickName != windowTitle())
+            setWindowExtra(nickName);
+        else
+            setWindowExtra(QString());
+    } else {
+        // for other accounts, return the JID
+        setWindowExtra(chatRemoteJid);
+    }
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages
