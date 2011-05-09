@@ -282,12 +282,12 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     participantsList->hide();
 
     // add participant list
-    QSplitter *splitter = getSplitter();
-    splitter->addWidget(participantsList);
+    QSplitter *splitterWidget = splitter();
+    splitterWidget->addWidget(participantsList);
     QList<int> sizes = QList<int>();
     sizes.append(500);
     sizes.append(32);
-    splitter->setSizes(sizes);
+    splitterWidget->setSizes(sizes);
 
     // add actions
     QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));

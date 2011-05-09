@@ -41,7 +41,7 @@ public:
     ChatConversation(QWidget *parent = NULL);
     ~ChatConversation();
     void addWidget(QGraphicsWidget *widget);
-    QSplitter *getSplitter();
+    QSplitter *splitter();
     ChatHistoryModel *historyModel();
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
