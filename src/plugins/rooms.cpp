@@ -151,12 +151,12 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
         if (!roomsIndex.isValid())
             roomsIndex = model->addItem(ChatRosterModel::Other, ROOMS_ROSTER_ID,
                                         tr("My rooms"), QPixmap(":/chat.png"));
+        model->addItem(ChatRosterModel::Room, jid,
+                       jidToUser(jid), QPixmap(":/chat.png"), roomsIndex);
 
         // add panel
         room = new ChatRoom(chat, chat->rosterModel(), jid);
         chat->addPanel(room);
-        model->addItem(ChatRosterModel::Room, room->objectName(),
-                       room->windowTitle(), QPixmap(":/chat.png"), roomsIndex);
 
         // expand rooms
         chat->rosterView()->setExpanded(ROOMS_ROSTER_ID, true);
@@ -269,9 +269,16 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
     // construct participant list
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
+    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
+    sortedModel->setSourceModel(rosterModel);
+    sortedModel->setDynamicSortFilter(true);
+    sortedModel->sort(0);
+
     participantsList = new QListView();
     participantsList->setObjectName("participant-list");
-    participantsList->setModel(rosterModel);
+    participantsList->setModel(sortedModel);
+    participantsList->setRootIndex(sortedModel->mapFromSource(roomIndex));
     participantsList->setViewMode(QListView::IconMode);
     participantsList->setMovement(QListView::Static);
     participantsList->setResizeMode(QListView::Adjust);
@@ -358,7 +365,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(joined()), 
-                    this, SLOT(joined()));
+                    participantsList, SLOT(show()));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(left()),
@@ -559,14 +566,6 @@ void ChatRoom::join()
 
     // request room information
     client->findExtension<QXmppDiscoveryManager>()->requestInfo(mucRoom->jid());
-}
-
-void ChatRoom::joined()
-{
-    // display participants
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    participantsList->setRootIndex(roomIndex);
-    participantsList->show();
 }
 
 void ChatRoom::kicked(const QString &jid, const QString &reason)

@@ -99,7 +99,6 @@ private slots:
     void error(const QXmppStanza::Error &error);
     void inviteDialog();
     void join();
-    void joined();
     void left();
     void kicked(const QString &jid, const QString &reason);
     void kickUser();
