@@ -285,7 +285,7 @@ void ChatDialog::updateWindowTitle()
 {
     QModelIndex index = rosterModel->findItem(chatRemoteJid);
     setWindowTitle(index.data(Qt::DisplayRole).toString());
-    setWindowIcon(index.data(Qt::DecorationRole).value<QPixmap>());
+    setWindowIcon(index.data(Qt::DecorationRole).value<QIcon>());
 
     const QString remoteDomain = jidToDomain(chatRemoteJid);
     if (client->configuration().domain() == "wifirst.net" &&
