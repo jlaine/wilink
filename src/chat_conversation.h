@@ -31,6 +31,7 @@ class ChatHistoryWidget;
 class ChatMessage;
 class ChatRosterModel;
 class QListView;
+class QSplitter;
 
 class ChatConversation : public ChatPanel
 {
@@ -40,6 +41,7 @@ public:
     ChatConversation(QWidget *parent = NULL);
     ~ChatConversation();
     void addWidget(QGraphicsWidget *widget);
+    QSplitter *getSplitter();
     ChatHistoryModel *historyModel();
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
@@ -53,7 +55,6 @@ protected slots:
 protected:
     // FIXME: this should be private
     ChatEdit *chatInput;
-    QListView *chatRoomList;
 
 private:
     ChatConversationPrivate *d;

@@ -32,6 +32,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
+#include <QSplitter>
 #include <QStatusBar>
 #include <QTableWidget>
 #include <QTextBlock>
@@ -267,6 +268,27 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
+    // construct participant list
+    participantsList = new QListView();
+    participantsList->setObjectName("participant-list");
+    participantsList->setModel(rosterModel);
+    participantsList->setViewMode(QListView::IconMode);
+    participantsList->setMovement(QListView::Static);
+    participantsList->setResizeMode(QListView::Adjust);
+    participantsList->setFlow(QListView::LeftToRight);
+    participantsList->setGridSize(QSize(64,55));
+    participantsList->setWordWrap(false);
+    participantsList->setWrapping(true);
+    participantsList->hide();
+
+    // add participant list
+    QSplitter *splitter = getSplitter();
+    splitter->addWidget(participantsList);
+    QList<int> sizes = QList<int>();
+    sizes.append(500);
+    sizes.append(32);
+    splitter->setSizes(sizes);
+
     // add actions
     QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
     check = connect(inviteAction, SIGNAL(triggered()),
@@ -291,13 +313,13 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
     permissionsAction->setVisible(false);
 
-    check = connect(chatRoomList, SIGNAL(clicked(QModelIndex)),
+    check = connect(participantsList, SIGNAL(clicked(QModelIndex)),
                     this, SLOT(participantClicked(QModelIndex)));
     Q_ASSERT(check);
 
     // context menu
-    chatRoomList->setContextMenuPolicy(Qt::CustomContextMenu);
-    check = connect(chatRoomList, SIGNAL(customContextMenuRequested(const QPoint)),
+    participantsList->setContextMenuPolicy(Qt::CustomContextMenu);
+    check = connect(participantsList, SIGNAL(customContextMenuRequested(const QPoint)),
                     this, SLOT(customContextMenuRequested(const QPoint)));
     Q_ASSERT(check);
 
@@ -444,7 +466,7 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
 
 void ChatRoom::customContextMenuRequested(const QPoint &pos)
 {
-    const QModelIndex index = chatRoomList->currentIndex();
+    const QModelIndex index = participantsList->currentIndex();
     if (!index.isValid() ||
         index.data(ChatRosterModel::TypeRole).toInt() != ChatRosterModel::RoomMember)
         return;
@@ -466,7 +488,7 @@ void ChatRoom::customContextMenuRequested(const QPoint &pos)
     }
     // FIXME : is there a better way to test if a menu is empty?
     if (menu->sizeHint().height() > 4)
-        menu->popup(chatRoomList->mapToGlobal(pos));
+        menu->popup(participantsList->mapToGlobal(pos));
     else
         delete menu;
 }
@@ -542,8 +564,8 @@ void ChatRoom::joined()
 {
     // display participants
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    chatRoomList->setRootIndex(roomIndex);
-    chatRoomList->show();
+    participantsList->setRootIndex(roomIndex);
+    participantsList->show();
 }
 
 void ChatRoom::kicked(const QString &jid, const QString &reason)

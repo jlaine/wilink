@@ -121,6 +121,7 @@ private:
     QXmppMucRoom *mucRoom;
     bool notifyMessages;
     ChatRosterModel *rosterModel;
+    QListView *participantsList;
 
     // actions
     QAction *subjectAction;
