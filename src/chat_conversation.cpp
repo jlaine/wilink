@@ -30,6 +30,7 @@
 #include "chat_conversation.h"
 #include "chat_edit.h"
 #include "chat_history.h"
+#include "chat_roster.h"
 #include "chat_search.h"
 
 #ifdef Q_OS_MAC
