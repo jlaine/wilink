@@ -83,7 +83,6 @@ class ChatRoom : public ChatConversation
 
 public:
     ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
-    ChatRosterModel::Type objectType() const;
     void invite(const QString &jid);
 
 public slots:

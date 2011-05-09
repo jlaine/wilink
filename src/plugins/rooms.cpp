@@ -155,7 +155,7 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
         // add panel
         room = new ChatRoom(chat, chat->rosterModel(), jid);
         chat->addPanel(room);
-        model->addItem(room->objectType(), room->objectName(),
+        model->addItem(ChatRosterModel::Room, room->objectName(),
                        room->windowTitle(), QPixmap(":/chat.png"), roomsIndex);
 
         // expand rooms
@@ -676,13 +676,6 @@ void ChatRoom::participantRemoved(const QString &jid)
         rosterModel->removeRow(index.row(), index.parent());
 
     // FIXME : update number of users
-}
-
-/** Return the type of entry to add to the roster.
- */
-ChatRosterModel::Type ChatRoom::objectType() const
-{
-    return ChatRosterModel::Room;
 }
 
 /** Show a user's profile page.

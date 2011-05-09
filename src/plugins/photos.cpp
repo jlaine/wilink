@@ -43,7 +43,6 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
-#include "chat_roster.h"
 #include "photos.h"
 
 static const int PROGRESS_STEPS = 100;

@@ -43,6 +43,7 @@
 #include "QSoundMeter.h"
 
 #include "calls.h"
+#include "chats.h"
 
 #include "application.h"
 #include "chat.h"
@@ -643,7 +644,7 @@ void CallsPlugin::finalize(Chat *chat)
 void CallsPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     CallWatcher *watcher = m_watchers.value(chat);
-    if (!watcher || panel->objectType() != ChatRosterModel::Contact)
+    if (!watcher || !qobject_cast<ChatDialog*>(panel))
         return;
 
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::VoiceFeature);

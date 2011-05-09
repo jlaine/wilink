@@ -22,10 +22,8 @@
 
 #include <QGraphicsTextItem>
 #include <QGraphicsWidget>
-#include <QFrame>
 #include <QList>
 #include <QWidget>
-#include "chat_roster.h"
 
 class QGraphicsLinearLayout;
 class QGraphicsView;
@@ -54,7 +52,6 @@ public:
 
     QAction *addAction(const QIcon &icon, const QString &text);
     virtual void addWidget(QGraphicsWidget *widget);
-    virtual ChatRosterModel::Type objectType() const;
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
     void setWindowHelp(const QString &help);

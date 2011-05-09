@@ -31,6 +31,7 @@ class ChatHistoryWidget;
 class ChatMessage;
 class ChatRosterModel;
 class QListView;
+class QModelIndex;
 class QSplitter;
 
 class ChatConversation : public ChatPanel

@@ -148,13 +148,6 @@ void ChatPanel::addWidget(QGraphicsWidget *widget)
     Q_UNUSED(widget);
 }
 
-/** Return the type of entry to add to the roster.
- */
-ChatRosterModel::Type ChatPanel::objectType() const
-{
-    return ChatRosterModel::Other;
-}
-
 /** When additional text is set, update the header text.
  */
 void ChatPanel::setWindowExtra(const QString &extra)

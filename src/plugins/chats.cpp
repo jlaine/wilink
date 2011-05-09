@@ -223,13 +223,6 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
     wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
-/** Returns the type of entry to add to the roster.
- */
-ChatRosterModel::Type ChatDialog::objectType() const
-{
-    return ChatRosterModel::Contact;
-}
-
 /** Sends a message to the remote party.
  */
 void ChatDialog::returnPressed()

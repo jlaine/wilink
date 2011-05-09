@@ -43,9 +43,10 @@
 #include "chat.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
+#include "chat_utils.h"
+#include "chats.h"
 #include "systeminfo.h"
 #include "transfers.h"
-#include "chat_utils.h"
 
 static qint64 fileSizeLimit = 50000000; // 50 MB
 
@@ -372,7 +373,7 @@ bool TransfersPlugin::initialize(Chat *chat)
 void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     ChatTransfersWatcher *watcher = m_watchers.value(chat);
-    if (!watcher || panel->objectType() != ChatRosterModel::Contact)
+    if (!watcher || !qobject_cast<ChatDialog*>(panel))
         return;
 
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::FileTransferFeature);
