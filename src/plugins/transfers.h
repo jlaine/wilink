@@ -86,11 +86,11 @@ class ChatTransfersWatcher : public QObject
 
 public:
     ChatTransfersWatcher(Chat *chatWindow);
+    bool eventFilter(QObject *obj, QEvent *e);
 
 public slots:
     void addJob(QXmppTransferJob *job);
     void sendFile(const QString &fullJid, const QString &filePath);
-    void rosterDrop(QDropEvent *event, const QModelIndex &index);
 
 private slots:
     void fileReceived(QXmppTransferJob *job);

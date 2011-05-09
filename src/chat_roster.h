@@ -131,16 +131,12 @@ public:
 
 signals:
     void itemMenu(QMenu *menu, const QModelIndex &index);
-    void itemDrop(QDropEvent *event, const QModelIndex &index);
 
 public slots:
     void setShowOfflineContacts(bool show);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
     void resizeEvent(QResizeEvent *event);
 
 private:

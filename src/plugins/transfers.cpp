@@ -262,6 +262,47 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
         panel->addWidget(widget);
 }
 
+/** Handle file drag & drop on conversations.
+ */
+bool ChatTransfersWatcher::eventFilter(QObject *obj, QEvent *e)
+{
+    Q_UNUSED(obj);
+
+    if (e->type() == QEvent::DragEnter)
+    {
+        QDragEnterEvent *event = static_cast<QDragEnterEvent*>(e);
+        event->acceptProposedAction();
+        return true;
+    }
+    else if (e->type() == QEvent::DragLeave)
+    {
+        return true;
+    }
+    else if (e->type() == QEvent::DragMove || e->type() == QEvent::Drop)
+    {
+        QDropEvent *event = static_cast<QDropEvent*>(e);
+        const QString jid = obj->property("__transfer_jid").toString();
+        const QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
+        int found = 0;
+        if (chatWindow->client()->isConnected() &&
+            event->mimeData()->hasUrls() &&
+            !fullJids.isEmpty())
+        {
+            foreach (const QUrl &url, event->mimeData()->urls()) {
+                if (url.scheme() != "file")
+                    continue;
+                if (event->type() == QEvent::Drop)
+                    sendFile(fullJids.first(), url.toLocalFile());
+                found++;
+            }
+        }
+        if (found)
+            event->acceptProposedAction();
+        return true;
+    }
+    return false;
+}
+
 void ChatTransfersWatcher::fileReceived(QXmppTransferJob *job)
 {
     // if the job was already accepted or refused (by the shares plugin)
@@ -274,30 +315,6 @@ void ChatTransfersWatcher::fileReceived(QXmppTransferJob *job)
     ChatTransferPrompt *dlg = new ChatTransferPrompt(job, contactName, chatWindow);
     connect(dlg, SIGNAL(fileAccepted(QXmppTransferJob*)), this, SLOT(addJob(QXmppTransferJob*)));
     dlg->show();
-}
-
-/** Handle file drag & drop on roster entries.
- */
-void ChatTransfersWatcher::rosterDrop(QDropEvent *event, const QModelIndex &index)
-{
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QStringList fullJids = chatWindow->rosterModel()->contactFeaturing(jid, ChatRosterModel::FileTransferFeature);
-    if (!chatWindow->client()->isConnected() ||
-        !event->mimeData()->hasUrls() ||
-        fullJids.isEmpty())
-        return;
-
-    int found = 0;
-    foreach (const QUrl &url, event->mimeData()->urls())
-    {
-        if (url.scheme() != "file")
-            continue;
-        if (event->type() == QEvent::Drop)
-            sendFile(fullJids.first(), url.toLocalFile());
-        found++;
-    }
-    if (found)
-        event->acceptProposedAction();
 }
 
 void ChatTransfersWatcher::sendFile(const QString &fullJid, const QString &filePath)
@@ -361,11 +378,6 @@ bool TransfersPlugin::initialize(Chat *chat)
 {
     /* register panel */
     ChatTransfersWatcher *watcher = new ChatTransfersWatcher(chat);
-
-    /* add roster hooks */
-    connect(chat, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)),
-            watcher, SLOT(rosterDrop(QDropEvent*, QModelIndex)));
-
     m_watchers.insert(chat, watcher);
     return true;
 }
@@ -373,15 +385,22 @@ bool TransfersPlugin::initialize(Chat *chat)
 void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     ChatTransfersWatcher *watcher = m_watchers.value(chat);
-    if (!watcher || !qobject_cast<ChatDialog*>(panel))
+    ChatDialog *dialog = qobject_cast<ChatDialog*>(panel);
+    if (!watcher || !dialog)
         return;
 
+    // add action
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::FileTransferFeature);
     if (!fullJids.isEmpty()) {
         QAction *action = panel->addAction(QIcon(":/upload.png"), QObject::tr("Send a file"));
         action->setData(fullJids.first());
         connect(action, SIGNAL(triggered()), watcher, SLOT(sendFilePrompt()));
     }
+
+    // handle drag & drop
+    dialog->historyView()->setAcceptDrops(true);
+    dialog->historyView()->setProperty("__transfer_jid", panel->objectName());
+    dialog->historyView()->installEventFilter(watcher);
 }
 
 Q_EXPORT_STATIC_PLUGIN2(transfers, TransfersPlugin)

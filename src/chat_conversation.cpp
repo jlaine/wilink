@@ -84,6 +84,7 @@ class ChatConversationPrivate
 {
 public:
     ChatHistoryModel *historyModel;
+    QAbstractScrollArea *historyView;
 #ifdef USE_DECLARATIVE
     RosterImageProvider *imageProvider;
 #endif
@@ -171,7 +172,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 #ifndef USE_DECLARATIVE
     view->scene()->addItem(d->panelBar);
 #endif
-    filterDrops(view->viewport());
+    d->historyView = view;
 
     /* spacer */
     d->spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -222,6 +223,11 @@ QSplitter *ChatConversation::splitter()
 ChatHistoryModel *ChatConversation::historyModel()
 {
     return d->historyModel;
+}
+
+QWidget *ChatConversation::historyView()
+{
+    return d->historyView->viewport();
 }
 
 void ChatConversation::setRosterModel(ChatRosterModel *model)

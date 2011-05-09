@@ -893,33 +893,6 @@ void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
         delete menu;
 }
 
-void ChatRosterView::dragEnterEvent(QDragEnterEvent *event)
-{
-    event->acceptProposedAction();
-}
-
-void ChatRosterView::dragMoveEvent(QDragMoveEvent *event)
-{
-    // ignore by default
-    event->ignore();
-
-    // let plugins process event
-    QModelIndex index = indexAt(event->pos());
-    if (index.isValid())
-        emit itemDrop(event, index);
-}
-
-void ChatRosterView::dropEvent(QDropEvent *event)
-{
-    // ignore by default
-    event->ignore();
-
-    // let plugins process event
-    QModelIndex index = indexAt(event->pos());
-    if (index.isValid())
-        emit itemDrop(event, index);
-}
-
 /** Map an index from the ChatRosterModel to the sorted / filtered model.
  *
  * @param index

@@ -66,11 +66,6 @@ signals:
      */
     void rosterClick(const QModelIndex &index);
 
-    /** Plugins should connect to this signal to handle drop events
-     *  on a roster entry.
-     */
-    void rosterDrop(QDropEvent *event, const QModelIndex &index);
-
     /** Plugins should connect to this signal to add entries
      *  to the context menu for a roster entry.
      */
@@ -98,7 +93,6 @@ private slots:
     void attachPanel();
     void detachPanel();
     void destroyPanel(QObject *obj);
-    void dropPanel(QDropEvent *event);
     void hidePanel();
     void notifyPanel(const QString &message, int options);
     void showPanel();

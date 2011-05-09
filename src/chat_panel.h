@@ -62,14 +62,11 @@ public:
 protected:
     void changeEvent(QEvent *event);
     void closeEvent(QCloseEvent *event);
-    bool eventFilter(QObject *obj, QEvent *event);
-    void filterDrops(QWidget *widget);
     QLayout *headerLayout();
     void queueNotification(const QString &message, int options = 0);
 
 signals:
     void attachPanel();
-    void dropPanel(QDropEvent *event);
     void findPanel();
     void findAgainPanel();
     void hidePanel();

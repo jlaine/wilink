@@ -128,7 +128,6 @@ Chat::Chat(QWidget *parent)
     connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
     connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
-    connect(d->rosterView, SIGNAL(itemDrop(QDropEvent*, QModelIndex)), this, SIGNAL(rosterDrop(QDropEvent*, QModelIndex)));
     leftLayout->addWidget(d->rosterView);
 
     d->leftPanel->setLayout(leftLayout);
@@ -229,7 +228,6 @@ void Chat::addPanel(ChatPanel *panel)
         return;
     connect(panel, SIGNAL(attachPanel()), this, SLOT(attachPanel()));
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
-    connect(panel, SIGNAL(dropPanel(QDropEvent*)), this, SLOT(dropPanel(QDropEvent*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
@@ -289,18 +287,6 @@ void Chat::detachPanel()
     panel->setParent(0, Qt::Window);
     panel->move(oldPos);
     panel->show();
-}
-
-void Chat::dropPanel(QDropEvent *event)
-{
-    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
-    if (!panel)
-        return;
-
-    // notify plugins
-    QModelIndex index = d->rosterModel->findItem(panel->objectName());
-    if (index.isValid())
-        emit rosterDrop(event, index);
 }
 
 /** Hide a panel.

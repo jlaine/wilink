@@ -655,8 +655,8 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     setFocusProxy(m_view);
 
     // handle drag & drop
-    m_view->setAcceptDrops(true);
-    m_view->installEventFilter(this);
+    m_view->viewport()->setAcceptDrops(true);
+    m_view->viewport()->installEventFilter(this);
 
     // select first track
     if (m_model->rowCount(QModelIndex()))

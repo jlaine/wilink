@@ -231,36 +231,6 @@ void ChatPanel::closeEvent(QCloseEvent *event)
     QWidget::closeEvent(event);
 }
 
-bool ChatPanel::eventFilter(QObject *obj, QEvent *e)
-{
-    Q_UNUSED(obj);
-
-    if (e->type() == QEvent::DragEnter)
-    {
-        QDragEnterEvent *event = static_cast<QDragEnterEvent*>(e);
-        event->acceptProposedAction();
-        return true;
-    }
-    else if (e->type() == QEvent::DragLeave)
-    {
-        return true;
-    }
-    else if (e->type() == QEvent::DragMove || e->type() == QEvent::Drop)
-    {
-        QDropEvent *event = static_cast<QDropEvent*>(e);
-        event->ignore();
-        emit dropPanel(event);
-        return true;
-    }
-    return false;
-}
-
-void ChatPanel::filterDrops(QWidget *widget)
-{
-    widget->setAcceptDrops(true);
-    widget->installEventFilter(this);
-}
-
 void ChatPanel::queueNotification(const QString &message, int options)
 {
     d->notificationQueue << qMakePair(message, options);

@@ -44,6 +44,7 @@ public:
     void addWidget(QGraphicsWidget *widget);
     QSplitter *splitter();
     ChatHistoryModel *historyModel();
+    QWidget *historyView();
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
 
