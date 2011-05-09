@@ -214,7 +214,7 @@ void ChatConversation::addWidget(QGraphicsWidget *widget)
     d->panelBar->addWidget(widget);
 }
 
-QSplitter *ChatConversation::getSplitter()
+QSplitter *ChatConversation::splitter()
 {
     return d->splitter;
 }
