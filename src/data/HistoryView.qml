@@ -25,8 +25,7 @@ ListView {
     cacheBuffer: 400
     delegate: historyDelegate
     header: Rectangle { height: 2 }
-    footer: Rectangle { height: 2 }
-    spacing: 10
+    spacing: 6
 
     Component {
         id: historyDelegate
@@ -89,7 +88,13 @@ ListView {
                         text: model.html
                         textFormat: Qt.RichText
                         wrapMode: Text.WordWrap
+                        onLinkActivated: console.log(link + " link activated")
                     }
+                }
+
+                Item {
+                    height: 4
+                    width: parent.width
                 }
             }
         }
