@@ -755,11 +755,16 @@ ChatHistoryWidget::ChatHistoryWidget(QGraphicsItem *parent)
     m_trippleClickTimer = new QTimer(this);
     m_trippleClickTimer->setSingleShot(true);
     m_trippleClickTimer->setInterval(QApplication::doubleClickInterval());
+
+    m_resizeTimer = new QTimer(this);
+    m_resizeTimer->setSingleShot(true);
+    m_resizeTimer->setInterval(100);
+    connect(m_resizeTimer, SIGNAL(timeout()), this, SLOT(resizeWidget()));
 }
 
 /** Resizes the ChatHistoryWidget to its preferred size hint.
  */
-void ChatHistoryWidget::adjustSize()
+void ChatHistoryWidget::resizeWidget()
 {
     QGraphicsWidget::adjustSize();
 
@@ -814,7 +819,7 @@ bool ChatHistoryWidget::eventFilter(QObject *watched, QEvent *event)
         m_maximumWidth = m_view->viewport()->width() - 15;
         foreach (ChatHistoryBubble *bubble, m_bubbles)
             bubble->setMaximumWidth(m_maximumWidth);
-        adjustSize();
+        m_resizeTimer->start();
     }
     return false;
 }
@@ -1088,7 +1093,7 @@ void ChatHistoryWidget::rowsChanged(const QModelIndex &topLeft, const QModelInde
         //qDebug("bubbles changed: %i-%i", topLeft.row(), bottomRight.row());
         for (int i = topLeft.row(); i <= bottomRight.row(); ++i)
             m_bubbles.at(i)->dataChanged();
-        adjustSize();
+        m_resizeTimer->start();
     }
 }
 
@@ -1109,7 +1114,7 @@ void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int e
 
             bubble->dataChanged();
         }
-        adjustSize();
+        m_resizeTimer->start();
     }
 }
 
@@ -1121,7 +1126,7 @@ void ChatHistoryWidget::rowsRemoved(const QModelIndex &parent, int start, int en
             ChatHistoryBubble *bubble = m_bubbles.takeAt(i);
             bubble->deleteLater();
         }
-        adjustSize();
+        m_resizeTimer->start();
     }
 }
 
@@ -1216,7 +1221,7 @@ void ChatHistoryWidget::setView(QGraphicsView *view)
     m_view->addAction(action);
 
     // initialise size
-    adjustSize();
+    resizeWidget();
 }
 
 /** When the scroll value changes, remember whether we were at the end

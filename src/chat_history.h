@@ -160,7 +160,6 @@ class ChatHistoryWidget : public QGraphicsWidget
 
 public:
     ChatHistoryWidget(QGraphicsItem *parent = 0);
-    void adjustSize();
     int indexOf(ChatHistoryBubble *bubble);
     ChatHistoryModel *model();
     void setModel(ChatHistoryModel *model);
@@ -175,6 +174,7 @@ public slots:
     void copy();
     void find(const QString &needle, QTextDocument::FindFlags flags, bool changed);
     void findClear();
+    void resizeWidget();
     void selectAll();
 
 private slots:
@@ -202,6 +202,7 @@ private:
     qreal m_maximumWidth;
     QList<ChatHistoryBubble*> m_bubbles;
     ChatHistoryModel *m_model;
+    QTimer *m_resizeTimer;
 
     // selection
     QList<QGraphicsTextItem*> m_selectedMessages;
