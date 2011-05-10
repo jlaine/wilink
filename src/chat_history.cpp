@@ -176,15 +176,6 @@ ChatHistoryBubble::ChatHistoryBubble(ChatHistoryWidget *parent)
 void ChatHistoryBubble::dataChanged()
 {
     QModelIndex idx = index();
-
-    // empty bubble
-    if (!m_history->model()->rowCount(idx)) {
-        m_body->setHtml(QString());
-        m_frame->hide();
-        updateGeometry();
-        return;
-    }
-
     const bool isAction = idx.data(ChatHistoryModel::ActionRole).toBool();
     const bool isReceived = idx.data(ChatHistoryModel::ReceivedRole).toBool();
     const QString jid = idx.data(ChatHistoryModel::JidRole).toString();
@@ -1115,6 +1106,8 @@ void ChatHistoryWidget::rowsInserted(const QModelIndex &parent, int start, int e
             check = connect(bubble, SIGNAL(messageClicked(QModelIndex)),
                             this, SIGNAL(messageClicked(QModelIndex)));
             Q_ASSERT(check);
+
+            bubble->dataChanged();
         }
         adjustSize();
     }
