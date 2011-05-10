@@ -48,9 +48,6 @@ ChatStatus::ChatStatus(QXmppClient *client)
     addItem(QIcon(":/contact-offline.png"), tr("Offline"));
     setCurrentIndex(OfflineIndex);
 
-    Application *app = reinterpret_cast<Application *>(qApp);
-    trayIcon = app->trayIcon();
-
     /* set up idle monitor */
     m_idle = new Idle;
     check = connect(m_idle, SIGNAL(secondsIdle(int)),
@@ -129,25 +126,33 @@ void ChatStatus::statusChanged(int currentIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Online);
-        trayIcon->setIcon(QIcon(":/wiLink-available.png"));
+#ifdef USE_SYSTRAY
+        wApp->trayIcon()->setIcon(QIcon(":/wiLink-available.png"));
+#endif
     }
     else if (currentIndex == AwayIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Away);
-        trayIcon->setIcon(QIcon(":/wiLink-away.png"));
+#ifdef USE_SYSTRAY
+        wApp->trayIcon()->setIcon(QIcon(":/wiLink-away.png"));
+#endif
     }
     else if (currentIndex == BusyIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::DND);
-        trayIcon->setIcon(QIcon(":/wiLink-busy.png"));
+#ifdef USE_SYSTRAY
+        wApp->trayIcon()->setIcon(QIcon(":/wiLink-busy.png"));
+#endif
     }
     else if (currentIndex == OfflineIndex)
     {
         presence.setType(QXmppPresence::Unavailable);
         presence.status().setType(QXmppPresence::Status::Offline);
-        trayIcon->setIcon(QIcon(":/wiLink.png"));
+#ifdef USE_SYSTRAY
+        wApp->trayIcon()->setIcon(QIcon(":/wiLink.png"));
+#endif
     }
     m_client->setClientPresence(presence);
 }
