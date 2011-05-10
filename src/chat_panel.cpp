@@ -102,7 +102,7 @@ ChatPanel::ChatPanel(QWidget* parent)
     Q_ASSERT(check);
 
     // help label
-    d->helpLabel = new QLabel;
+    d->helpLabel = new QLabel(this, Qt::Widget);
     d->helpLabel->setObjectName("panel-help");
     d->helpLabel->setWordWrap(true);
     d->helpLabel->setOpenExternalLinks(true);
