@@ -26,7 +26,7 @@ class ChatModelItem
 {
 public:
     ChatModelItem();
-    ~ChatModelItem();
+    virtual ~ChatModelItem();
     int row() const;
 
     QList<ChatModelItem*> children;

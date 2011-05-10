@@ -64,8 +64,16 @@ static const QRegExp meRegex = QRegExp("^/me( .*)");
 class ChatHistoryItem : public ChatModelItem
 {
 public:
+    ~ChatHistoryItem();
+
     QList<ChatMessage*> messages;
 };
+
+ChatHistoryItem::~ChatHistoryItem()
+{
+    foreach (ChatMessage *message, messages)
+        delete message;
+}
 
 /** Constructs a new ChatMessage.
  */
