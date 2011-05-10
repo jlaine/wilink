@@ -22,6 +22,7 @@ import QtQuick 1.0
 ListView {
     id: historyView
 
+    cacheBuffer: 400
     delegate: historyDelegate
     header: Rectangle { height: 2 }
     footer: Rectangle { height: 2 }
@@ -49,7 +50,7 @@ ListView {
 
                 Item {
                     id: header
-                    height: fromText.height
+                    height: 14
                     width: parent.width
                     visible: !model.action
 
