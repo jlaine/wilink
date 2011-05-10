@@ -129,19 +129,19 @@ void ChatStatus::statusChanged(int currentIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Online);
-        trayIcon->setIcon(QIcon(":/contact-available.png"));
+        trayIcon->setIcon(QIcon(":/wiLink-available.png"));
     }
     else if (currentIndex == AwayIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Away);
-        trayIcon->setIcon(QIcon(":/contact-away.png"));
+        trayIcon->setIcon(QIcon(":/wiLink-away.png"));
     }
     else if (currentIndex == BusyIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::DND);
-        trayIcon->setIcon(QIcon(":/contact-busy.png"));
+        trayIcon->setIcon(QIcon(":/wiLink-busy.png"));
     }
     else if (currentIndex == OfflineIndex)
     {

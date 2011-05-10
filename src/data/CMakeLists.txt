@@ -41,7 +41,10 @@ generate_png(png
     transfers.svg
     upload.svg
     wiLink.svg
-    wiLink-black.svg)
+    wiLink-available.svg
+    wiLink-away.svg
+    wiLink-black.svg
+    wiLink-busy.svg)
 generate_xpm(xpm wiLink.svg)
 
 # smileys
