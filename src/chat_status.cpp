@@ -17,9 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
+
 #include "QXmppClient.h"
 #include "QXmppPresence.h"
 
+#include "application.h"
 #include "chat_status.h"
 #include "idle/idle.h"
 
@@ -44,6 +47,9 @@ ChatStatus::ChatStatus(QXmppClient *client)
     addItem(QIcon(":/contact-away.png"), tr("Away"));
     addItem(QIcon(":/contact-offline.png"), tr("Offline"));
     setCurrentIndex(OfflineIndex);
+
+    Application *app = reinterpret_cast<Application *>(qApp);
+    trayIcon = app->trayIcon();
 
     /* set up idle monitor */
     m_idle = new Idle;
@@ -123,23 +129,25 @@ void ChatStatus::statusChanged(int currentIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Online);
+        trayIcon->setIcon(QIcon(":/contact-available.png"));
     }
     else if (currentIndex == AwayIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Away);
+        trayIcon->setIcon(QIcon(":/contact-away.png"));
     }
     else if (currentIndex == BusyIndex)
     {
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::DND);
+        trayIcon->setIcon(QIcon(":/contact-busy.png"));
     }
     else if (currentIndex == OfflineIndex)
     {
         presence.setType(QXmppPresence::Unavailable);
         presence.status().setType(QXmppPresence::Status::Offline);
+        trayIcon->setIcon(QIcon(":/wiLink.png"));
     }
     m_client->setClientPresence(presence);
 }
-
-

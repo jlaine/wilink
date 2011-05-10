@@ -35,6 +35,7 @@ class UpdatesDialog;
 class QAuthenticator;
 class QAbstractNetworkCache;
 class QSoundPlayer;
+class QSystemTrayIcon;
 class QThread;
 
 class ApplicationPrivate;
@@ -55,6 +56,9 @@ public:
     QThread *soundThread();
     UpdatesDialog *updatesDialog();
     void setUpdatesDialog(UpdatesDialog *updatesDialog);
+#ifdef USE_SYSTRAY
+    QSystemTrayIcon *trayIcon();
+#endif
 
     bool isInstalled();
     void showMessage(QWidget *context, const QString &title, const QString &message);

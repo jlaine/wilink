@@ -661,6 +661,10 @@ void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
     if (reason != QSystemTrayIcon::Context)
         showChats();
 }
+QSystemTrayIcon *Application::trayIcon()
+{
+    return d->trayIcon;
+}
 #endif
 
 UpdatesDialog *Application::updatesDialog()

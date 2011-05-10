@@ -24,6 +24,7 @@
 
 class Idle;
 class QXmppClient;
+class QSystemTrayIcon;
 
 class ChatStatus : public QComboBox
 {
@@ -44,6 +45,7 @@ private:
     QXmppClient *m_client;
     bool m_autoAway;
     bool m_freezeStatus;
+    QSystemTrayIcon *trayIcon;
 };
 
 #endif
