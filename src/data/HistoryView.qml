@@ -23,6 +23,8 @@ ListView {
     id: historyView
 
     delegate: historyDelegate
+    header: Rectangle { height: 2 }
+    footer: Rectangle { height: 2 }
     spacing: 10
 
     Component {
@@ -37,6 +39,7 @@ ListView {
 
             Image {
                 id: avatar
+                asynchronous: true
                 source: model.avatar
                 height: 32
                 width: 32
@@ -55,7 +58,7 @@ ListView {
                         anchors.left: parent.left
                         anchors.leftMargin: 10
                         color: model.received ? '#2689d6': '#7b7b7b'
-                        font.pointSize: 7
+                        font.pixelSize: 10
                         text: model.from
                     }
 
@@ -63,7 +66,7 @@ ListView {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         color: model.received ? '#2689d6': '#7b7b7b'
-                        font.pointSize: 7
+                        font.pixelSize: 10
                         text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
                     }
                 }
@@ -77,11 +80,10 @@ ListView {
                     radius: 8
                     width: parent.width
 
-                    TextEdit {
+                    Text {
                         id: bodyText
                         anchors.centerIn: parent
-                        font.pointSize: 10
-                        readOnly: true
+                        font.pixelSize: 12
                         width: rect.width - 20
                         text: model.html
                         textFormat: Qt.RichText
