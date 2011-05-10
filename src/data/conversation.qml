@@ -96,12 +96,17 @@ Rectangle {
 
     HistoryView {
         id: historyView
+        objectName: "historyView"
 
         anchors.left: parent.left
         anchors.top: parent.top
         height: parent.height
         width: parent.width - scrollBar.width
         model: historyModel
+
+        function onBottomChanged() {
+            positionViewAtIndex(count - 1, ListView.End);
+        }
     }
 
     ScrollBar {

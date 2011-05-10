@@ -138,6 +138,12 @@ ChatConversation::ChatConversation(QWidget *parent)
     view->engine()->addImageProvider("roster", d->imageProvider);
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     view->setSource(QUrl("qrc:/conversation.qml"));
+
+    QObject *item = view->rootObject()->findChild<QObject*>("historyView");
+    Q_ASSERT(item);
+    check = connect(d->historyModel, SIGNAL(bottomChanged()),
+                    item, SLOT(onBottomChanged()));
+
     d->splitter->addWidget(view);
 #else
     QGraphicsView *view = new QGraphicsView;

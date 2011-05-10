@@ -123,6 +123,9 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
+signals:
+    void bottomChanged();
+
 public slots:
     void clear();
 
