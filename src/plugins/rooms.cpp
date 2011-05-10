@@ -273,6 +273,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(rosterModel);
     sortedModel->setDynamicSortFilter(true);
+    sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->sort(0);
 
     participantsList = new QListView();
