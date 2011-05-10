@@ -64,7 +64,7 @@ static const QRegExp meRegex = QRegExp("^/me( .*)");
 class ChatHistoryItem : public ChatModelItem
 {
 public:
-    ChatMessage message;
+    QList<ChatMessage*> messages;
 };
 
 /** Constructs a new ChatMessage.
@@ -489,10 +489,8 @@ ChatHistoryModelPrivate::ChatHistoryModelPrivate(ChatHistoryModel *qq)
 void ChatHistoryModelPrivate::rosterChanged(const QString &jid)
 {
     foreach (ChatModelItem *it, q->rootItem->children) {
-        if (it->children.isEmpty())
-            continue;
-        ChatHistoryItem *item = static_cast<ChatHistoryItem*>(it->children.first());
-        if (item->message.jid == jid)
+        ChatHistoryItem *item = static_cast<ChatHistoryItem*>(it);
+        if (item->messages.first()->jid == jid)
             emit q->dataChanged(q->createIndex(it), q->createIndex(it));
     }
 }
@@ -534,105 +532,93 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         return;
 
     // position cursor
-    ChatHistoryItem *prevMsg = 0;
-    ChatHistoryItem *nextMsg = 0;
-    foreach (ChatModelItem *bubble, rootItem->children) {
-        foreach (ChatModelItem *childPtr, bubble->children) {
-            ChatHistoryItem *child = static_cast<ChatHistoryItem*>(childPtr);
+    ChatHistoryItem *prevBubble = 0;
+    ChatHistoryItem *nextBubble = 0;
+    ChatMessage *prevMsg = 0;
+    ChatMessage *nextMsg = 0;
+    foreach (ChatModelItem *bubblePtr, rootItem->children) {
+        ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(bubblePtr);
+        foreach (ChatMessage *curMessage, bubble->messages) {
+
             // check for collision
-            if (message.archived != child->message.archived &&
-                message.jid == child->message.jid &&
-                message.body == child->message.body &&
-                qAbs(message.date.secsTo(child->message.date)) < 10)
+            if (message.archived != curMessage->archived &&
+                message.jid == curMessage->jid &&
+                message.body == curMessage->body &&
+                qAbs(message.date.secsTo(curMessage->date)) < 10)
                 return;
 
             // we use greater or equal comparison (and not strictly greater) dates
             // because messages are usually received in chronological order
-            if (message.date >= child->message.date) {
-                prevMsg = child;
+            if (message.date >= curMessage->date) {
+                prevBubble = bubble;
+                prevMsg = curMessage;
             } else if (!nextMsg) {
-                nextMsg = child;
+                nextBubble = bubble;
+                nextMsg = curMessage;
             }
         }
     }
 
     // prepare message
-    ChatHistoryItem *msg = new ChatHistoryItem;
-    msg->message = message;
+    ChatMessage *msg = new ChatMessage(message);
 
-    if (prevMsg && prevMsg->message.groupWith(message) &&
-        nextMsg && nextMsg->message.groupWith(message) &&
-        prevMsg->parent != nextMsg->parent) {
-        ChatModelItem *prevBubble = prevMsg->parent;
-        ChatModelItem *nextBubble = nextMsg->parent;
-        int row = prevMsg->row() + 1;
-        addItem(msg, prevBubble, row++);
-
+    if (prevMsg && prevMsg->groupWith(message) &&
+        nextMsg && nextMsg->groupWith(message) &&
+        prevBubble != nextBubble) {
         // message belongs both to the previous and next bubble, merge
-        const int lastRow = nextBubble->children.size() - 1;
-        beginMoveRows(createIndex(nextBubble), 0, lastRow,
-                      createIndex(prevBubble), row);
+        int row = prevBubble->messages.indexOf(prevMsg) + 1;
+        prevBubble->messages.insert(row++, msg);
+        const int lastRow = nextBubble->messages.size() - 1;
         for (int i = lastRow; i >= 0; --i) {
-            ChatModelItem *item = nextBubble->children.takeAt(i);
-            item->parent = prevBubble;
-            prevBubble->children.insert(row, item);
+            ChatMessage *item = nextBubble->messages.takeAt(i);
+            prevBubble->messages.insert(row, item);
         }
-        endMoveRows();
-        emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
         removeRow(nextBubble->row());
+        emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
     }
-    else if (prevMsg && prevMsg->message.groupWith(message))
+    else if (prevMsg && prevMsg->groupWith(message))
     {
         // message belongs to the same bubble as previous message
-        ChatModelItem *bubble = prevMsg->parent;
-        addItem(msg, bubble, prevMsg->row() + 1);
-        emit dataChanged(createIndex(bubble), createIndex(bubble));
+        const int row = prevBubble->messages.indexOf(prevMsg) + 1;
+        prevBubble->messages.insert(row, msg);
+        emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
 
         // notify bottom change
-        if (bubble->row() == rootItem->children.size() - 1)
+        if (prevBubble->row() == rootItem->children.size() - 1)
             emit bottomChanged();
     }
-    else if (nextMsg && nextMsg->message.groupWith(message))
+    else if (nextMsg && nextMsg->groupWith(message))
     {
         // message belongs to the same bubble as next message
-        ChatModelItem *bubble = nextMsg->parent;
-        addItem(msg, bubble, nextMsg->row());
-        emit dataChanged(createIndex(bubble), createIndex(bubble));
+        const int row = nextBubble->messages.indexOf(nextMsg);
+        nextBubble->messages.insert(row, msg);
+        emit dataChanged(createIndex(nextBubble), createIndex(nextBubble));
     }
     else
     {
         // split the previous bubble if needed
         int bubblePos = 0;
-        if (prevMsg)
-        {
-            ChatModelItem *prevBubble = prevMsg->parent;
+        if (prevMsg) {
             bubblePos = prevBubble->row() + 1;
 
             // if the previous message is not the last in its bubble, split
-            const int index = prevMsg->row();
-            const int lastRow = prevBubble->children.size() - 1;
+            const int index = prevBubble->messages.indexOf(prevMsg);
+            const int lastRow = prevBubble->messages.size() - 1;
             if (index < lastRow) {
                 ChatHistoryItem *bubble = new ChatHistoryItem;
-                addItem(bubble, rootItem, bubblePos);
-
                 const int firstRow = index + 1;
-                beginMoveRows(createIndex(prevBubble), firstRow, lastRow,
-                              createIndex(bubble), 0);
                 for (int i = lastRow; i >= firstRow; --i) {
-                    ChatModelItem *item = prevBubble->children.takeAt(i);
-                    item->parent = bubble;
-                    bubble->children.insert(0, item);
+                    ChatMessage *item = prevBubble->messages.takeAt(i);
+                    bubble->messages.prepend(item);
                 }
-                endMoveRows();
-                emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
+                addItem(bubble, rootItem, bubblePos);
             }
         }
 
         // insert the new bubble
         ChatHistoryItem *bubble = new ChatHistoryItem;
+        bubble->messages.append(msg);
         addItem(bubble, rootItem, bubblePos);
-        addItem(msg, bubble);
-        emit dataChanged(createIndex(bubble), createIndex(bubble));
 
         // notify bottom change
         if (bubble->row() == rootItem->children.size() - 1)
@@ -671,45 +657,33 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    ChatHistoryItem *msg = static_cast<ChatHistoryItem*>(item->children.isEmpty() ? item : item->children.first());
+    ChatMessage *msg = item->messages.first();
     if (role == ActionRole) {
-        return msg->message.isAction();
+        return msg->isAction();
     } else if (role == AvatarRole) {
-        if (msg->message.jid.isEmpty())
+        if (msg->jid.isEmpty())
             return QUrl("qrc://peer.png");
-        return QUrl("image://roster/" + msg->message.jid);
+        return QUrl("image://roster/" + msg->jid);
     } else if (role == BodyRole) {
-        if (item->children.isEmpty())
-            return item->message.body;
-        else {
-            QStringList bodies;
-            foreach (ChatModelItem *ptr, item->children) {
-                ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
-                bodies << child->message.body;
-            }
-            return bodies.join("\n");
-        }
+        QStringList bodies;
+        foreach (ChatMessage *ptr, item->messages)
+            bodies << ptr->body;
+        return bodies.join("\n");
     } else if (role == DateRole) {
-        return msg->message.date;
+        return msg->date;
     } else if (role == FromRole) {
         if (!d->rosterModel)
             return QVariant();
-        return d->rosterModel->contactName(msg->message.jid);
+        return d->rosterModel->contactName(msg->jid);
     } else if (role == HtmlRole) {
-        if (item->children.isEmpty())
-            return item->message.html(d->rosterModel);
-        else {
-            QString bodies;
-            foreach (ChatModelItem *ptr, item->children) {
-                ChatHistoryItem *child = static_cast<ChatHistoryItem*>(ptr);
-                bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + child->message.html(d->rosterModel) + "</p>";
-            }
-            return bodies;
-        }
+        QString bodies;
+        foreach (ChatMessage *ptr, item->messages)
+            bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + ptr->html(d->rosterModel) + "</p>";
+        return bodies;
     } else if (role == JidRole) {
-        return msg->message.jid;
+        return msg->jid;
     } else if (role == ReceivedRole) {
-        return msg->message.received;
+        return msg->received;
     }
 
     return QVariant();
