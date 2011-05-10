@@ -25,6 +25,7 @@ Item {
     property ListView flickableItem
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
+    property int minHeight: 20
 
     width: 16
 
@@ -42,8 +43,8 @@ Item {
         border.width: 1
         color: '#c3c3c3'
         x: 0
-        y: scrollBar.position * (track.height - 2) + 1
-        height: scrollBar.pageSize * (track.height - 2)
+        y: scrollBar.position * (track.height - minHeight - 2) + 1
+        height: scrollBar.pageSize * (track.height - minHeight - 2) + minHeight
         width: parent.width - 1
         radius: 6
     }
