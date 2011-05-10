@@ -76,6 +76,7 @@ QLabel#panel-help {
     border-style: solid;
     border-width: 1px 0px;
     background-color: #b0e2ff;
+    padding: 10px;
 }
 
 /* chat rooms */

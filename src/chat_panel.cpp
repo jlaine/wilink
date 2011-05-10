@@ -104,7 +104,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     // help label
     d->helpLabel = new QLabel;
     d->helpLabel->setObjectName("panel-help");
-    d->helpLabel->setMargin(10);
     d->helpLabel->setWordWrap(true);
     d->helpLabel->setOpenExternalLinks(true);
     d->helpLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) ;
