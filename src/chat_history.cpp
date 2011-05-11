@@ -656,7 +656,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         return msg->isAction();
     } else if (role == AvatarRole) {
         if (msg->jid.isEmpty())
-            return QUrl("qrc://peer.png");
+            return QUrl("qrc:/peer.png");
         return QUrl("image://roster/" + msg->jid);
     } else if (role == BodyRole) {
         QStringList bodies;
