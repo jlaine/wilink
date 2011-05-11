@@ -135,16 +135,16 @@ ChatPanel::~ChatPanel()
     delete d;
 }
 
+/** Adds an action in the top-right toolbar.
+ *
+ * @param icon
+ * @param text
+ */
 QAction *ChatPanel::addAction(const QIcon &icon, const QString &text)
 {
     QAction *action = new QAction(icon, text, d->actions);
     d->actions->insertAction(d->attachAction, action);
     return action;
-}
-
-void ChatPanel::addWidget(QGraphicsWidget *widget)
-{
-    Q_UNUSED(widget);
 }
 
 /** When additional text is set, update the header text.

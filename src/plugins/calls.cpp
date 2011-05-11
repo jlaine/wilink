@@ -47,7 +47,7 @@
 
 #include "application.h"
 #include "chat.h"
-#include "chat_panel.h"
+#include "chat_conversation.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
@@ -504,7 +504,7 @@ void CallWatcher::addCall(QXmppCall *call)
     if (index.isValid())
         QMetaObject::invokeMethod(m_window, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    ChatPanel *panel = m_window->panel(bareJid);
+    ChatConversation *panel = qobject_cast<ChatConversation*>(m_window->panel(bareJid));
     if (panel)
         panel->addWidget(widget);
 }
