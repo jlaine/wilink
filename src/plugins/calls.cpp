@@ -147,6 +147,79 @@ int CallAudioHelper::outputVolume() const
     return m_audioOutputMeter ? m_audioOutputMeter->value() : 0;
 }
 
+#ifdef USE_DECLARATIVE
+CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
+    : QDeclarativeItem(parent),
+    m_boundingRect(0, 0, 320, 240),
+    m_radius(8)
+{
+    setFlag(QGraphicsItem::ItemHasNoContents, false);
+}
+
+QRectF CallVideoItem::boundingRect() const
+{
+    return m_boundingRect;
+}
+
+void CallVideoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+    if (m_boundingRect.isEmpty())
+        return;
+    const QPalette palette = ChatPanel::palette();
+    painter->setPen(QPen(palette.color(QPalette::Mid)));
+    if (!m_image.size().isEmpty()) {
+        QBrush brush(m_image);
+        brush.setTransform(brush.transform().scale(m_boundingRect.width() / m_image.width(), m_boundingRect.height() / m_image.height()));
+        painter->setBrush(brush);
+    } else {
+        painter->setBrush(Qt::black);
+    }
+    painter->drawRoundedRect(m_boundingRect.adjusted(0.5, 0.5, -0.5, -0.5), m_radius, m_radius);
+}
+
+void CallVideoItem::present(const QXmppVideoFrame &frame)
+{
+    if (!frame.isValid() || frame.size() != m_image.size())
+        return;
+    QVideoGrabber::frameToImage(&frame, &m_image);
+    update(m_boundingRect);
+}
+
+void CallVideoItem::setFormat(const QXmppVideoFormat &format)
+{
+    const QSize size = format.frameSize();
+    if (size != m_image.size()) {
+        m_image = QImage(size, QImage::Format_RGB32);
+        m_image.fill(0);
+    }
+}
+
+qreal CallVideoItem::radius() const
+{
+    return m_radius;
+}
+
+void CallVideoItem::setRadius(qreal radius)
+{
+    if (radius != m_radius) {
+        m_radius = radius;
+        emit radiusChanged(radius);
+    }
+}
+
+QSizeF CallVideoItem::size() const
+{
+    return m_boundingRect.size();
+}
+
+void CallVideoItem::setSize(const QSizeF &size)
+{
+    m_boundingRect = QRectF(QPointF(0, 0), size);
+}
+#endif
+
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
     : QGraphicsItem(parent),
     m_boundingRect(0, 0, 0, 0)
@@ -688,6 +761,7 @@ bool CallsPlugin::initialize(Chat *chat)
 
 #ifdef USE_DECLARATIVE
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
+    qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
 #endif
 
     CallWatcher *watcher = new CallWatcher(chat);

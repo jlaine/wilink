@@ -19,8 +19,11 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
+import wiLink 1.2
 
 Item {
+    id: callWidget
+
     property QtObject call: null
     property QtObject audio: null
     property bool videoEnabled: false
@@ -51,16 +54,15 @@ Item {
             text: qsTr('Connecting..')
         }
 
-        Rectangle {
+        CallVideoItem {
             id: videoMonitor
 
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.margins: 4
 
-            border.width: 1
-            border.color: '#2689d6'
-            color: '#000000'
+            //border.width: 1
+            //border.color: '#2689d6'
 
             radius: 8
             height: 240
@@ -69,7 +71,7 @@ Item {
             visible: videoEnabled
         }
 
-        Rectangle {
+        CallVideoItem {
             id: videoOutput
 
             anchors.top: videoMonitor.bottom
@@ -77,9 +79,8 @@ Item {
             anchors.leftMargin: -100
             anchors.topMargin: -80
 
-            border.width: 1
-            border.color: '#2689d6'
-            color: '#000000'
+            //border.width: 1
+            //border.color: '#2689d6'
 
             radius: 8
             height: 120
@@ -150,6 +151,14 @@ Item {
         target: hangupButton
         onClicked: {
             call.hangup();
+        }
+    }
+
+    Connections {
+        target: cameraButton
+        onClicked: {
+            callWidget.videoEnabled = true;
+            call.startVideo();
         }
     }
 
