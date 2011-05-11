@@ -26,6 +26,8 @@ Item {
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
     property int minHeight: 20
+    property string moveAction: ""
+    property bool autoMove: false
 
     width: 16
 
@@ -50,11 +52,13 @@ Item {
     }
 
     MouseArea {
+        id: clickableArea
+
         property real pressContentY
         property real pressMouseY
         property real pressScale
-        anchors.fill: scrollBar
 
+        anchors.fill: scrollBar
         drag.axis: Drag.YAxis
 
         onPressed: {
@@ -62,19 +66,81 @@ Item {
             pressMouseY = mouse.y
             pressScale = scrollBar.pageSize
             scrollBar.state = 'hovered'
+
+            if( mouse.y < handle.y ) {
+                moveAction = "up"
+            } else if( mouse.y > handle.y + handle.height ) {
+                moveAction = "down"
+            } else {
+                moveAction = "drag"
+            }
         }
 
         onReleased: {
+            autoMove = false
             scrollBar.state = ''
+
+            switch ( moveAction )
+            {
+                case "up":
+                    moveUp()
+                break
+                case "down":
+                    moveDown()
+                break
+            }
+
+            moveAction = ''
         }
 
         onPositionChanged: {
-            var targetY = pressContentY + (mouse.y - pressMouseY) / pressScale;
-            targetY = Math.max(0, targetY);
-            if (scrollBar.position + scrollBar.pageSize >= 1 && targetY >= flickableItem.contentY) {
-                return;
+            if( moveAction == "drag" ) {
+                var targetY = pressContentY + (mouse.y - pressMouseY) / pressScale;
+                if (mouse.y - pressMouseY > 0 && scrollBar.position + scrollBar.pageSize >= 1) {
+                    flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
+                } else if(mouse.y - pressMouseY < 0 && scrollBar.position - scrollBar.pageSize <= 0) {
+                    flickableItem.positionViewAtIndex(0, ListView.Start);
+                } else {
+                    flickableItem.contentY = targetY
+                }
             }
-            flickableItem.contentY = targetY;
+        }
+
+        Timer {
+            running: moveAction == "up" || moveAction == "down"
+            interval: 350
+            onTriggered: autoMove=true
+        }
+
+        Timer {
+            running: autoMove
+            interval: 60
+            repeat: true
+            onTriggered: moveAction == "up" ? clickableArea.moveUp() : clickableArea.moveDown()
+        }
+
+        function moveDown() {
+            var targetY = flickableItem.contentY + ( 30 / scrollBar.pageSize )
+            if (scrollBar.position + scrollBar.pageSize < 1) {
+                flickableItem.contentY = targetY
+            }
+            else
+            {
+                autoMove = false
+                flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
+            }
+        }
+
+        function moveUp() {
+            var targetY = flickableItem.contentY - 30 / scrollBar.pageSize
+            if (scrollBar.position > 0) {
+                flickableItem.contentY = targetY
+            }
+            else
+            {
+                autoMove = false
+                flickableItem.positionViewAtIndex(0, ListView.Start)
+            }
         }
     }
 
