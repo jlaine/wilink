@@ -20,6 +20,11 @@
 #include <QAudioFormat>
 #include <QAudioInput>
 #include <QAudioOutput>
+#ifdef USE_DECLARATIVE
+#include <QDeclarativeComponent>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#endif
 #include <QFile>
 #include <QHostInfo>
 #include <QImage>
@@ -498,15 +503,33 @@ CallWatcher::~CallWatcher()
 
 void CallWatcher::addCall(QXmppCall *call)
 {
-    CallWidget *widget = new CallWidget(call, m_window->rosterModel());
     const QString bareJid = jidToBareJid(call->jid());
     QModelIndex index = m_window->rosterModel()->findItem(bareJid);
     if (index.isValid())
         QMetaObject::invokeMethod(m_window, "rosterClicked", Q_ARG(QModelIndex, index));
 
     ChatConversation *panel = qobject_cast<ChatConversation*>(m_window->panel(bareJid));
-    if (panel)
+    if (panel) {
+#ifdef USE_DECLARATIVE
+        // load component if needed
+        QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__call_component").value<QObject*>());
+        if (!component) {
+            QDeclarativeEngine *engine = panel->historyView()->engine();
+            component = new QDeclarativeComponent(engine, QUrl("qrc:/CallWidget.qml"));
+            panel->setProperty("__call_component", qVariantFromValue<QObject*>(component));
+        }
+
+        // create call widget
+        QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
+        Q_ASSERT(widget);
+        widget->setProperty("call", qVariantFromValue<QObject*>(call));
+        QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
+        widget->setParentItem(bar);
+#else
+        CallWidget *widget = new CallWidget(call, m_window->rosterModel());
         panel->addWidget(widget);
+#endif
+    }
 }
 
 /** The call finished without the user accepting it.

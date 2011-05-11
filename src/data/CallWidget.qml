@@ -20,6 +20,12 @@
 import QtQuick 1.0
 
 Item {
+    property QtObject call: null
+    property bool videoEnabled: false
+
+    anchors.left: parent ? parent.left : undefined
+    anchors.right: parent ? parent.right : undefined
+    height: videoEnabled ? 400 : 40
 
     Rectangle {
         anchors.fill: parent
@@ -32,99 +38,99 @@ Item {
         }
         radius: 8
         smooth: true
-    }
 
-    Text {
-        id: text
+        Text {
+            id: text
 
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.margins: 4
-    }
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.margins: 4
+        }
 
-    Rectangle {
-        id: videoMonitor
+        Rectangle {
+            id: videoMonitor
 
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.margins: 4
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.margins: 4
 
-        border.width: 1
-        border.color: '#2689d6'
-        color: '#000000'
+            border.width: 1
+            border.color: '#2689d6'
+            color: '#000000'
 
-        radius: 8
-        height: 240
-        width: 320
+            radius: 8
+            height: 240
+            width: 320
 
-        visible: false
-    }
+            visible: videoEnabled
+        }
 
-    Rectangle {
-        id: videoOutput
+        Rectangle {
+            id: videoOutput
 
-        anchors.top: videoMonitor.bottom
-        anchors.left: videoMonitor.right
-        anchors.leftMargin: -100
-        anchors.topMargin: -80
+            anchors.top: videoMonitor.bottom
+            anchors.left: videoMonitor.right
+            anchors.leftMargin: -100
+            anchors.topMargin: -80
 
-        border.width: 1
-        border.color: '#2689d6'
-        color: '#000000'
+            border.width: 1
+            border.color: '#2689d6'
+            color: '#000000'
 
-        radius: 8
-        height: 120
-        width: 160
+            radius: 8
+            height: 120
+            width: 160
 
-        visible: false
-    }
+            visible: videoEnabled
+        }
 
-    Button {
-        id: closeButton
-        iconSource: 'close.png'
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.margins: 4
-    }
+        Button {
+            id: closeButton
+            iconSource: 'close.png'
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 4
+        }
 
-    Button {
-        id: cameraButton
-        iconSource: 'camera.png'
-        anchors.right: closeButton.left
-        anchors.top: parent.top
-        anchors.margins: 4
-    }
+        Button {
+            id: cameraButton
+            iconSource: 'camera.png'
+            anchors.right: closeButton.left
+            anchors.top: parent.top
+            anchors.margins: 4
+        }
 
-    ProgressBar {
-        id: inputVolume
-        anchors.top: parent.top
-        anchors.right: cameraButton.left
-        anchors.margins: 4
-    }
+        ProgressBar {
+            id: inputVolume
+            anchors.top: parent.top
+            anchors.right: cameraButton.left
+            anchors.margins: 4
+        }
 
-    ProgressBar {
-        id: outputVolume
-        anchors.top: inputVolume.bottom
-        anchors.right: cameraButton.left
-        anchors.leftMargin: 4
-        anchors.rightMargin: 4
-    }
+        ProgressBar {
+            id: outputVolume
+            anchors.top: inputVolume.bottom
+            anchors.right: cameraButton.left
+            anchors.leftMargin: 4
+            anchors.rightMargin: 4
+        }
 
-    Image {
-        anchors.top: inputVolume.top
-        anchors.right: inputVolume.left
-        anchors.rightMargin: 5
-        source: 'audio-input.png'
-        height: 16
-        width: 16
-    }
+        Image {
+            anchors.top: inputVolume.top
+            anchors.right: inputVolume.left
+            anchors.rightMargin: 5
+            source: 'audio-input.png'
+            height: 16
+            width: 16
+        }
 
-    Image {
-        anchors.top: outputVolume.top
-        anchors.right: outputVolume.left
-        anchors.rightMargin: 5
-        source: 'audio-output.png'
-        height: 16
-        width: 16
+        Image {
+            anchors.top: outputVolume.top
+            anchors.right: outputVolume.left
+            anchors.rightMargin: 5
+            source: 'audio-output.png'
+            height: 16
+            width: 16
+        }
     }
 }
