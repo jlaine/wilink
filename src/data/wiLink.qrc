@@ -59,8 +59,10 @@
     <file>qmldir</file>
     <file>conversation.qml</file>
     <file>player.qml</file>
+    <file>Button.qml</file>
     <file>HistoryView.qml</file>
     <file>ScrollBar.qml</file>
+    <file>TransferBar.qml</file>
     <!-- Stylesheets -->
     <file>wiLink.css</file>
     <!-- Sounds -->
