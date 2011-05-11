@@ -20,6 +20,8 @@
 import QtQuick 1.0
 
 Item {
+    property QtObject job: null
+
     width: 320
     height: 40
 
@@ -50,17 +52,25 @@ Item {
 
             anchors.left: icon.right
             anchors.verticalCenter: parent.verticalCenter
-            text: 'somefile.zip'
+            text: job ? job.fileName : ''
         }
 
         ProgressBar {
-            id: progress
+            id: progressBar
 
             anchors.left: text.right
             anchors.leftMargin: 4
             anchors.right: button.left
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
+
+            Connections {
+                target: job
+                onProgress: {
+                    progressBar.maximumValue = total;
+                    progressBar.value = done;
+                }
+            }
         }
 
         Button {

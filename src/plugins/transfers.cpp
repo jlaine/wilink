@@ -18,6 +18,11 @@
  */
 
 #include <QDesktopServices>
+#ifdef USE_DECLARATIVE
+#include <QDeclarativeComponent>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#endif
 #include <QDialogButtonBox>
 #include <QDropEvent>
 #include <QDir>
@@ -251,15 +256,32 @@ ChatTransfersWatcher::ChatTransfersWatcher(Chat *window)
 
 void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
 {
-    ChatTransferWidget *widget = new ChatTransferWidget(job);
     const QString bareJid = jidToBareJid(job->jid());
     QModelIndex index = chatWindow->rosterModel()->findItem(bareJid);
     if (index.isValid())
         QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
 
     ChatConversation *panel = qobject_cast<ChatConversation*>(chatWindow->panel(bareJid));
-    if (panel)
+    if (panel) {
+#ifdef USE_DECLARATIVE
+        // load component if needed
+        QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__transfer_component").value<QObject*>());
+        if (!component) {
+            QDeclarativeEngine *engine = panel->historyView()->engine();
+            component = new QDeclarativeComponent(engine, QUrl("qrc:/TransferWidget.qml"));
+            panel->setProperty("__transfer_component", qVariantFromValue<QObject*>(component));
+        }
+
+        // create transfer widget
+        QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
+        Q_ASSERT(widget);
+        widget->setProperty("job", qVariantFromValue<QObject*>(job));
+        widget->setParentItem(qobject_cast<QDeclarativeItem*>(panel->historyView()->rootObject()));
+#else
+        ChatTransferWidget *widget = new ChatTransferWidget(job);
         panel->addWidget(widget);
+#endif
+    }
 }
 
 /** Handle file drag & drop on conversations.
@@ -400,7 +422,7 @@ void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
     // handle drag & drop
     QWidget *viewport = dialog->historyView()->viewport();
     viewport->setAcceptDrops(true);
-    viewport->setProperty("__transfer_jid", panel->objectName());
+    viewport->setProperty("__transfer_jid", dialog->objectName());
     viewport->installEventFilter(watcher);
 }
 
