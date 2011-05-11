@@ -22,6 +22,7 @@ import QXmpp 0.4
 
 Item {
     property QtObject call: null
+    property QtObject audio: null
     property bool videoEnabled: false
 
     anchors.left: parent ? parent.left : undefined
@@ -111,6 +112,8 @@ Item {
             anchors.top: parent.top
             anchors.right: cameraButton.left
             anchors.margins: 4
+            maximumValue: audio ? audio.maximumVolume : 1
+            value: audio ? audio.outputVolume : 0
         }
 
         ProgressBar {
@@ -120,6 +123,8 @@ Item {
             anchors.right: cameraButton.left
             anchors.leftMargin: 4
             anchors.rightMargin: 4
+            maximumValue: audio ? audio.maximumVolume : 1
+            value: audio ? audio.inputVolume : 0
         }
 
         Image {

@@ -38,6 +38,7 @@ class QHostInfo;
 class QLabel;
 class QMenu;
 class QModelIndex;
+class QSoundMeter;
 class QTimer;
 class QVideoGrabber;
 class QXmppCall;
@@ -48,10 +49,17 @@ class QXmppSrvInfo;
 
 class CallAudioHelper : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
+    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
+    Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
+    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
 
 public:
     CallAudioHelper(QObject *parent = 0);
+
+    int inputVolume() const;
+    int maximumVolume() const;
+    int outputVolume() const;
 
 signals:
     // This signal is emitted when the input volume changes.
@@ -65,7 +73,9 @@ private slots:
 
 private:
     QAudioInput *m_audioInput;
+    QSoundMeter *m_audioInputMeter;
     QAudioOutput *m_audioOutput;
+    QSoundMeter *m_audioOutputMeter;
 };
 
 class CallVideoWidget : public QGraphicsItem

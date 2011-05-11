@@ -71,7 +71,9 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 CallAudioHelper::CallAudioHelper(QObject *parent)
     : QObject(parent),
     m_audioInput(0),
-    m_audioOutput(0)
+    m_audioInputMeter(0),
+    m_audioOutput(0),
+    m_audioOutputMeter(0)
 {
 }
 
@@ -99,31 +101,50 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_audioOutput) {
         m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
-        QSoundMeter *audioOutputMeter = new QSoundMeter(format, channel, this);
-        QObject::connect(audioOutputMeter, SIGNAL(valueChanged(int)),
+        m_audioOutputMeter = new QSoundMeter(format, channel, this);
+        QObject::connect(m_audioOutputMeter, SIGNAL(valueChanged(int)),
                          this, SIGNAL(outputVolumeChanged(int)));
         m_audioOutput->setBufferSize(bufferSize);
-        m_audioOutput->start(audioOutputMeter);
+        m_audioOutput->start(m_audioOutputMeter);
     } else if (!canRead && m_audioOutput) {
         m_audioOutput->stop();
         delete m_audioOutput;
         m_audioOutput = 0;
+        delete m_audioOutputMeter;
+        m_audioOutputMeter = 0;
     }
 
     // start or stop capture
     const bool canWrite = (mode & QIODevice::WriteOnly);
     if (canWrite && !m_audioInput) {
         m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
-        QSoundMeter *audioInputMeter = new QSoundMeter(format, channel, this);
-        QObject::connect(audioInputMeter, SIGNAL(valueChanged(int)),
+        m_audioInputMeter = new QSoundMeter(format, channel, this);
+        QObject::connect(m_audioInputMeter, SIGNAL(valueChanged(int)),
                          this, SIGNAL(inputVolumeChanged(int)));
         m_audioInput->setBufferSize(bufferSize);
-        m_audioInput->start(audioInputMeter);
+        m_audioInput->start(m_audioInputMeter);
     } else if (!canWrite && m_audioInput) {
         m_audioInput->stop();
         delete m_audioInput;
         m_audioInput = 0;
+        delete m_audioInputMeter;
+        m_audioInputMeter = 0;
     }
+}
+
+int CallAudioHelper::inputVolume() const
+{
+    return m_audioInputMeter ? m_audioInputMeter->value() : 0;
+}
+
+int CallAudioHelper::maximumVolume() const
+{
+    return QSoundMeter::maximum();
+}
+
+int CallAudioHelper::outputVolume() const
+{
+    return m_audioOutputMeter ? m_audioOutputMeter->value() : 0;
 }
 
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
@@ -187,9 +208,6 @@ CallWidget::CallWidget(QXmppCall *call, ChatRosterModel *rosterModel, QGraphicsI
     m_soundId(0)
 {
     bool check;
-
-    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
-    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     // audio helper
     CallAudioHelper *audioHelper = new CallAudioHelper;
@@ -511,6 +529,8 @@ void CallWatcher::addCall(QXmppCall *call)
     ChatConversation *panel = qobject_cast<ChatConversation*>(m_window->panel(bareJid));
     if (panel) {
 #ifdef USE_DECLARATIVE
+        bool check;
+
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__call_component").value<QObject*>());
         if (!component) {
@@ -519,9 +539,18 @@ void CallWatcher::addCall(QXmppCall *call)
             panel->setProperty("__call_component", qVariantFromValue<QObject*>(component));
         }
 
+        // create audio helper
+        CallAudioHelper *audioHelper = new CallAudioHelper;
+        audioHelper->moveToThread(wApp->soundThread());
+
+        check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
+                        audioHelper, SLOT(audioModeChanged(QIODevice::OpenMode)));
+        Q_ASSERT(check);
+
         // create call widget
         QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
         Q_ASSERT(widget);
+        widget->setProperty("audio", qVariantFromValue<QObject*>(audioHelper));
         widget->setProperty("call", qVariantFromValue<QObject*>(call));
         QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
@@ -654,6 +683,9 @@ private:
 
 bool CallsPlugin::initialize(Chat *chat)
 {
+    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
+    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
+
 #ifdef USE_DECLARATIVE
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
 #endif
