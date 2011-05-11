@@ -85,9 +85,11 @@ class ChatConversationPrivate
 {
 public:
     ChatHistoryModel *historyModel;
-    QAbstractScrollArea *historyView;
 #ifdef USE_DECLARATIVE
+    QDeclarativeView *historyView;
     RosterImageProvider *imageProvider;
+#else
+    QGraphicsView *historyView;
 #endif
     ChatPanelBar *panelBar;
     ChatSearchBar *searchBar;
@@ -100,6 +102,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 {
     bool check;
     d = new ChatConversationPrivate;
+    d->panelBar = 0;
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -131,31 +134,35 @@ ChatConversation::ChatConversation(QWidget *parent)
 #ifdef USE_DECLARATIVE
     d->imageProvider = new RosterImageProvider;
 
-    QDeclarativeView *view = new QDeclarativeView;
-    QDeclarativeContext *ctxt = view->rootContext();
+    d->historyView = new QDeclarativeView;
+    QDeclarativeContext *ctxt = d->historyView->rootContext();
     ctxt->setContextProperty("historyModel", d->historyModel);
     ctxt->setContextProperty("textHelper", new ChatHistoryHelper(this));
-    view->engine()->addImageProvider("roster", d->imageProvider);
-    view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    view->setSource(QUrl("qrc:/conversation.qml"));
+    d->historyView->engine()->addImageProvider("roster", d->imageProvider);
+    d->historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->historyView->setSource(QUrl("qrc:/conversation.qml"));
 
-    QObject *item = view->rootObject()->findChild<QObject*>("historyView");
+    QObject *item = d->historyView->rootObject()->findChild<QObject*>("historyView");
     Q_ASSERT(item);
     check = connect(d->historyModel, SIGNAL(bottomChanged()),
                     item, SLOT(onBottomChanged()));
 
-    d->splitter->addWidget(view);
+    d->splitter->addWidget(d->historyView);
 #else
-    QGraphicsView *view = new QGraphicsView;
-    view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    view->setScene(new QGraphicsScene(view));
-    view->setContextMenuPolicy(Qt::ActionsContextMenu);
+    d->historyView = new QGraphicsView;
+    d->historyView->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    d->historyView->setScene(new QGraphicsScene(d->historyView));
+    d->historyView->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     ChatHistoryWidget *chatHistoryWidget = new ChatHistoryWidget;
     chatHistoryWidget->setModel(d->historyModel);
-    view->scene()->addItem(chatHistoryWidget);
-    chatHistoryWidget->setView(view);
-    d->splitter->addWidget(view);
+    d->historyView->scene()->addItem(chatHistoryWidget);
+    chatHistoryWidget->setView(d->historyView);
+    d->splitter->addWidget(d->historyView);
+
+    d->panelBar = new ChatPanelBar(d->historyView);
+    d->panelBar->setZValue(10);
+    d->historyView->scene()->addItem(d->panelBar);
 
     check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
                     this, SIGNAL(messageClicked(QModelIndex)));
@@ -173,13 +180,6 @@ ChatConversation::ChatConversation(QWidget *parent)
                     d->searchBar, SLOT(findFinished(bool)));
     Q_ASSERT(check);
 #endif
-
-    d->panelBar = new ChatPanelBar(view);
-    d->panelBar->setZValue(10);
-#ifndef USE_DECLARATIVE
-    view->scene()->addItem(d->panelBar);
-#endif
-    d->historyView = view;
 
     /* spacer */
     d->spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -219,7 +219,8 @@ ChatConversation::~ChatConversation()
 
 void ChatConversation::addWidget(QGraphicsWidget *widget)
 {
-    d->panelBar->addWidget(widget);
+    if (d->panelBar)
+        d->panelBar->addWidget(widget);
 }
 
 QSplitter *ChatConversation::splitter()
