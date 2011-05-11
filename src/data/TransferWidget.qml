@@ -46,7 +46,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 4
             anchors.verticalCenter: parent.verticalCenter
-            source: (job && job.direction) ? 'upload.png' : 'download.png'
+            source: (job && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
         }
 
         Text {
