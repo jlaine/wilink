@@ -100,6 +100,7 @@ ListView {
         }
     }
 
+/*
     MouseArea {
         id: selector
 
@@ -157,4 +158,5 @@ ListView {
             selection = newSelection;
         }
     }
+*/
 }
