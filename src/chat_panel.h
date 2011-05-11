@@ -51,7 +51,6 @@ public:
     ~ChatPanel();
 
     QAction *addAction(const QIcon &icon, const QString &text);
-    virtual void addWidget(QGraphicsWidget *widget);
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
     void setWindowHelp(const QString &help);

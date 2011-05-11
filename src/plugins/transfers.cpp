@@ -257,7 +257,7 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
     if (index.isValid())
         QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    ChatPanel *panel = chatWindow->panel(bareJid);
+    ChatConversation *panel = qobject_cast<ChatConversation*>(chatWindow->panel(bareJid));
     if (panel)
         panel->addWidget(widget);
 }
