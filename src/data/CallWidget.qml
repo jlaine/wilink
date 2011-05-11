@@ -30,7 +30,7 @@ Item {
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
-    height: videoEnabled ? 400 : 40
+    height: videoEnabled ? 288 : 40
 
     Rectangle {
         anchors.fill: parent

@@ -92,9 +92,6 @@ public:
     qreal radius() const;
     void setRadius(qreal radius);
 
-    QSizeF size() const;
-    void setSize(const QSizeF &size);
-
     QRectF boundingRect() const;
     void present(const QXmppVideoFrame &frame);
     void setFormat(const QXmppVideoFormat &format);
@@ -106,7 +103,6 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 private:
-    QRectF m_boundingRect;
     QImage m_image;
     qreal m_radius;
 };

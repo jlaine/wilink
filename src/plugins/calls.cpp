@@ -150,7 +150,6 @@ int CallAudioHelper::outputVolume() const
 #ifdef USE_DECLARATIVE
 CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
     : QDeclarativeItem(parent),
-    m_boundingRect(0, 0, 320, 240),
     m_radius(8)
 {
     setFlag(QGraphicsItem::ItemHasNoContents, false);
@@ -158,13 +157,14 @@ CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
 
 QRectF CallVideoItem::boundingRect() const
 {
-    return m_boundingRect;
+    return QRectF(0, 0, width(), height());
 }
 
 void CallVideoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
+    const QRectF m_boundingRect(0, 0, width(), height());
     if (m_boundingRect.isEmpty())
         return;
     const QPalette palette = ChatPanel::palette();
@@ -184,7 +184,7 @@ void CallVideoItem::present(const QXmppVideoFrame &frame)
     if (!frame.isValid() || frame.size() != m_image.size())
         return;
     QVideoGrabber::frameToImage(&frame, &m_image);
-    update(m_boundingRect);
+    update();
 }
 
 void CallVideoItem::setFormat(const QXmppVideoFormat &format)
@@ -207,16 +207,6 @@ void CallVideoItem::setRadius(qreal radius)
         m_radius = radius;
         emit radiusChanged(radius);
     }
-}
-
-QSizeF CallVideoItem::size() const
-{
-    return m_boundingRect.size();
-}
-
-void CallVideoItem::setSize(const QSizeF &size)
-{
-    m_boundingRect = QRectF(QPointF(0, 0), size);
 }
 #endif
 
