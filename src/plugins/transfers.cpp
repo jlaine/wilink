@@ -398,9 +398,10 @@ void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
     }
 
     // handle drag & drop
-    dialog->historyView()->setAcceptDrops(true);
-    dialog->historyView()->setProperty("__transfer_jid", panel->objectName());
-    dialog->historyView()->installEventFilter(watcher);
+    QWidget *viewport = dialog->historyView()->viewport();
+    viewport->setAcceptDrops(true);
+    viewport->setProperty("__transfer_jid", panel->objectName());
+    viewport->installEventFilter(watcher);
 }
 
 Q_EXPORT_STATIC_PLUGIN2(transfers, TransfersPlugin)

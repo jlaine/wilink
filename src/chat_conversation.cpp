@@ -233,9 +233,13 @@ ChatHistoryModel *ChatConversation::historyModel()
     return d->historyModel;
 }
 
-QWidget *ChatConversation::historyView()
+#ifdef USE_DECLARATIVE
+QDeclarativeView *ChatConversation::historyView()
+#else
+QGraphicsView *ChatConversation::historyView()
+#endif
 {
-    return d->historyView->viewport();
+    return d->historyView;
 }
 
 void ChatConversation::setRosterModel(ChatRosterModel *model)
