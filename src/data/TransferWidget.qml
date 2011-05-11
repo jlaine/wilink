@@ -45,7 +45,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 4
             anchors.verticalCenter: parent.verticalCenter
-            source: 'upload.png'
+            source: (job && job.direction) ? 'upload.png' : 'download.png'
         }
 
         Text {
