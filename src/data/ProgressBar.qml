@@ -20,7 +20,9 @@
 import QtQuick 1.0
 
 Rectangle {
-    id: track
+    property real value: 0
+    property real minimumValue: 0
+    property real maximumValue: 100
 
     width: 100; height: 16
     border.color: '#4a9ddd'
@@ -34,7 +36,7 @@ Rectangle {
         anchors.top: parent.top
         radius: 4
         smooth: true
-        width: 40
+        width: parent.width * (value - minimumValue) / (maximumValue - minimumValue)
     }
 }
 
