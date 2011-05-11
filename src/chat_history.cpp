@@ -581,10 +581,6 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         const int row = prevBubble->messages.indexOf(prevMsg) + 1;
         prevBubble->messages.insert(row, msg);
         emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
-
-        // notify bottom change
-        if (prevBubble->row() == rootItem->children.size() - 1)
-            emit bottomChanged();
     }
     else if (nextMsg && nextMsg->groupWith(message))
     {
@@ -618,11 +614,10 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         ChatHistoryItem *bubble = new ChatHistoryItem;
         bubble->messages.append(msg);
         addItem(bubble, rootItem, bubblePos);
-
-        // notify bottom change
-        if (bubble->row() == rootItem->children.size() - 1)
-            emit bottomChanged();
     }
+
+    // notify bottom change
+    emit bottomChanged();
 }
 
 /** Clears all messages.
