@@ -399,6 +399,10 @@ void TransfersPlugin::finalize(Chat *chat)
 
 bool TransfersPlugin::initialize(Chat *chat)
 {
+#ifdef USE_DECLARATIVE
+    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
+#endif
+
     /* register panel */
     ChatTransfersWatcher *watcher = new ChatTransfersWatcher(chat);
     m_watchers.insert(chat, watcher);

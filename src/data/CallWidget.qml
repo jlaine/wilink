@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 
 Item {
     property QtObject call: null
@@ -40,11 +41,13 @@ Item {
         smooth: true
 
         Text {
-            id: text
+            id: status
 
             anchors.left: parent.left
+            anchors.leftMargin: 4
             anchors.top: parent.top
-            anchors.margins: 4
+            anchors.topMargin: 12
+            text: qsTr('Connecting..')
         }
 
         Rectangle {
@@ -85,8 +88,9 @@ Item {
         }
 
         Button {
-            id: closeButton
-            iconSource: 'close.png'
+            id: hangupButton
+
+            iconSource: 'hangup.png'
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.margins: 4
@@ -94,14 +98,16 @@ Item {
 
         Button {
             id: cameraButton
+
             iconSource: 'camera.png'
-            anchors.right: closeButton.left
+            anchors.right: hangupButton.left
             anchors.top: parent.top
             anchors.margins: 4
         }
 
         ProgressBar {
             id: inputVolume
+
             anchors.top: parent.top
             anchors.right: cameraButton.left
             anchors.margins: 4
@@ -109,6 +115,7 @@ Item {
 
         ProgressBar {
             id: outputVolume
+
             anchors.top: inputVolume.bottom
             anchors.right: cameraButton.left
             anchors.leftMargin: 4
@@ -133,4 +140,25 @@ Item {
             width: 16
         }
     }
+
+    Connections {
+        target: hangupButton
+        onClicked: {
+            call.hangup();
+        }
+    }
+
+    Connections {
+        target: call
+        onStateChanged: {
+            if (call.state == QXmppCall.ActiveState) {
+                status.text = qsTr('Call connected.');
+            } else if (call.state == QXmppCall.DisconnectingState) {
+                status.text = qsTr('Disconnecting..');
+            } else if (call.state == QXmppCall.FinishedState) {
+                status.text = qsTr('Call finished.');
+            }
+        }
+    }
+
 }

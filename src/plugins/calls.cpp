@@ -654,6 +654,10 @@ private:
 
 bool CallsPlugin::initialize(Chat *chat)
 {
+#ifdef USE_DECLARATIVE
+    qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
+#endif
+
     CallWatcher *watcher = new CallWatcher(chat);
     m_watchers.insert(chat, watcher);
     return true;

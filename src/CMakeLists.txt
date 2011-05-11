@@ -130,7 +130,7 @@ set(wiLink_MOC_HEADERS
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
-    qt4_create_translation(QM_FILES ${wiLink_SOURCES} translations/fr.ts)
+    qt4_create_translation(QM_FILES ${wiLink_SOURCES} data/CallWidget.qml translations/fr.ts)
 else(RELOAD_TRANSLATIONS)
     qt4_add_translation(QM_FILES translations/fr.ts)
 endif(RELOAD_TRANSLATIONS)

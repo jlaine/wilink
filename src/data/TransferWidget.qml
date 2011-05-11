@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 
 Item {
     property QtObject job: null
@@ -64,14 +65,6 @@ Item {
             anchors.right: button.left
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
-
-            Connections {
-                target: job
-                onProgress: {
-                    progressBar.maximumValue = total;
-                    progressBar.value = done;
-                }
-            }
         }
 
         Button {
@@ -84,4 +77,11 @@ Item {
         }
     }
 
+    Connections {
+        target: job
+        onProgress: {
+            progressBar.maximumValue = total;
+            progressBar.value = done;
+        }
+    }
 }
