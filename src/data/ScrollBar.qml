@@ -2,17 +2,17 @@
  * wiLink
  * Copyright (C) 2009-2011 Bolloré telecom
  * See AUTHORS file for a full list of contributors.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,6 +35,8 @@ Item {
         id: track
 
         anchors.fill: parent
+        anchors.topMargin: 16
+        anchors.bottomMargin: 16
         color: '#dfdfdf'
     }
 
@@ -45,7 +47,7 @@ Item {
         border.width: 1
         color: '#c3c3c3'
         x: 0
-        y: scrollBar.position * (track.height - minHeight - 2) + 1
+        y: scrollBar.position * (track.height - minHeight - 2) + track.anchors.topMargin + 1
         height: scrollBar.pageSize * (track.height - minHeight - 2) + minHeight
         width: parent.width - 1
         radius: 6
@@ -141,6 +143,62 @@ Item {
                 autoMove = false
                 flickableItem.positionViewAtIndex(0, ListView.Start)
             }
+        }
+    }
+
+    Rectangle {
+        id: buttonUp
+
+        anchors.top: scrollBar.top
+        height: 16
+        width: 16
+        border.color: '#999999'
+        color: '#cccccc'
+
+        MouseArea {
+            anchors.fill: parent
+
+            onPressed: {
+                buttonUp.state = 'pressed'
+            }
+
+            onReleased: {
+                buttonUp.state = ''
+                clickableArea.moveUp()
+            }
+        }
+
+        states: State {
+            name: 'pressed'
+            PropertyChanges { target: buttonUp; color: '#aaaaaa' }
+        }
+    }
+
+    Rectangle {
+        id: buttonDown
+
+        anchors.bottom: scrollBar.bottom
+        height: 16
+        width: 16
+        border.color: '#999999'
+        color: '#cccccc'
+
+        MouseArea {
+            anchors.fill: parent
+
+            onPressed: {
+                buttonDown.state = 'pressed'
+            }
+
+            onReleased: {
+                buttonDown.state = ''
+                clickableArea.moveDown()
+            }
+        }
+
+        states: State {
+            name: 'pressed'
+            PropertyChanges { target: buttonDown; color: '#aaaaaa' }
         }
     }
 
