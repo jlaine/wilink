@@ -20,15 +20,18 @@
 import QtQuick 1.0
 
 Rectangle {
+    id: button
+
     property url iconSource
+    signal clicked
 
     width: 32; height: 32
     border.color: '#2689d6'
     gradient: Gradient {
-        GradientStop { position: 0.2; color: '#88bfe9' }
-        GradientStop { position: 0.3; color: '#bfddf4' }
-        GradientStop { position: 0.7; color: '#bfddf4' }
-        GradientStop { position: 1.0; color: '#e7f4fe' }
+        GradientStop { id: stop1; position: 0.2; color: '#e7f4fe' }
+        GradientStop { id: stop2; position: 0.3; color: '#bfddf4' }
+        GradientStop { id: stop3; position: 0.7; color: '#bfddf4' }
+        GradientStop { id: stop4; position: 1.0; color: '#88bfe9' }
     }
     radius: 4
     smooth: true
@@ -38,6 +41,26 @@ Rectangle {
         anchors.centerIn: parent
         smooth: true
         source: iconSource
+    }
+
+    MouseArea {
+        anchors.fill: parent
+
+        onPressed: {
+            button.state = 'pressed'
+        }
+
+        onReleased: {
+            button.state = ''
+            button.clicked()
+        }
+    }
+
+    states: State {
+        name: 'pressed'
+        PropertyChanges { target: button; border.color: '#5488bb' }
+        PropertyChanges { target: stop1; color: '#88bfe9' }
+        PropertyChanges { target: stop4; color: '#e7f4fe' }
     }
 }
 

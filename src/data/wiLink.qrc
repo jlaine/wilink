@@ -61,6 +61,7 @@
     <file>player.qml</file>
     <file>Button.qml</file>
     <file>HistoryView.qml</file>
+    <file>ProgressBar.qml</file>
     <file>ScrollBar.qml</file>
     <file>TransferBar.qml</file>
     <!-- Stylesheets -->

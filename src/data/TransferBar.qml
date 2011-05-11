@@ -37,8 +37,8 @@ Item {
 
         Image {
             id: icon
-            width: 32; height: 32
 
+            width: 32; height: 32
             anchors.left: parent.left
             anchors.leftMargin: 4
             anchors.verticalCenter: parent.verticalCenter
@@ -46,12 +46,26 @@ Item {
         }
 
         Text {
+            id: text
+
             anchors.left: icon.right
             anchors.verticalCenter: parent.verticalCenter
             text: 'somefile.zip'
         }
 
+        ProgressBar {
+            id: progress
+
+            anchors.left: text.right
+            anchors.leftMargin: 4
+            anchors.right: button.left
+            anchors.rightMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
         Button {
+            id: button
+
             anchors.right: parent.right
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
