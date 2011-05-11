@@ -37,14 +37,25 @@ Item {
 
         Image {
             id: icon
+            width: 32; height: 32
+
+            anchors.left: parent.left
+            anchors.leftMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
             source: 'upload.png'
-            height: 32
-            width: 32
         }
 
         Text {
             anchors.left: icon.right
+            anchors.verticalCenter: parent.verticalCenter
             text: 'somefile.zip'
+        }
+
+        Button {
+            anchors.right: parent.right
+            anchors.rightMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
+            iconSource: 'close.png'
         }
     }
 

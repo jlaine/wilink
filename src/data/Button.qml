@@ -20,12 +20,24 @@
 import QtQuick 1.0
 
 Rectangle {
-    width: 320
-    height: 100
+    property url iconSource
+
+    width: 32; height: 32
+    border.color: '#2689d6'
+    gradient: Gradient {
+        GradientStop { position: 0.2; color: '#88bfe9' }
+        GradientStop { position: 0.3; color: '#bfddf4' }
+        GradientStop { position: 0.7; color: '#bfddf4' }
+        GradientStop { position: 1.0; color: '#e7f4fe' }
+    }
+    radius: 4
+    smooth: true
 
     Image {
+        width: 24; height: 24
         anchors.centerIn: parent
-        source: 'close.png'
+        smooth: true
+        source: iconSource
     }
 }
 
