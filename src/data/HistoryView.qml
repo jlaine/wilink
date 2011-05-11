@@ -88,7 +88,7 @@ ListView {
                         text: model.html
                         textFormat: Qt.RichText
                         wrapMode: Text.WordWrap
-                        onLinkActivated: console.log(link + " link activated")
+                        onLinkActivated: Qt.openUrlExternally(link)
                     }
                 }
 
