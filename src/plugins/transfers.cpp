@@ -276,7 +276,8 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
         QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
         Q_ASSERT(widget);
         widget->setProperty("job", qVariantFromValue<QObject*>(job));
-        widget->setParentItem(qobject_cast<QDeclarativeItem*>(panel->historyView()->rootObject()));
+        QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
+        widget->setParentItem(bar);
 #else
         ChatTransferWidget *widget = new ChatTransferWidget(job);
         panel->addWidget(widget);

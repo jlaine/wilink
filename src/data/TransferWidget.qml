@@ -22,7 +22,8 @@ import QtQuick 1.0
 Item {
     property QtObject job: null
 
-    width: 320
+    anchors.left: parent.left
+    anchors.right: parent.right
     height: 40
 
     Rectangle {

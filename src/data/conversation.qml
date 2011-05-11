@@ -22,97 +22,42 @@ import QtQuick 1.0
 Rectangle {
     width: 320
     height: 400
-    anchors.topMargin: 10
 
-/*
-    ListModel {
-        id: historyModel
+    Column {
+        id: widgetBar
+        objectName: 'widgetBar'
 
-        ListElement {
-            avatar: "peer.png"
-            date: ""
-            from: "Osborne Cox"
-            html: "<p>Hello</p><p>How are you?</p>"
-            received: true
-        }
-        ListElement {
-            avatar: "home.png"
-            date: ""
-            from: "Me"
-            html: "<p>Just fine, how about yourself?</p><p>How are you?</p>"
-            received: false
-        }
-        ListElement {
-            avatar: "peer.png"
-            date: ""
-            from: "Osborne Cox"
-            html: "<p>Where did you spend your holidays?</p>"
-            received: true
-        }
-        ListElement {
-            avatar: "peer.png"
-            date: ""
-            from: "Osborne Cox"
-            html: "<p>Hello</p><p>How are you?</p>"
-            received: true
-        }
-        ListElement {
-            avatar: "home.png"
-            date: ""
-            from: "Me"
-            html: "<p>Just fine, how about yourself?</p><p>How are you?</p>"
-            received: false
-        }
-        ListElement {
-            avatar: "peer.png"
-            date: ""
-            from: "Osborne Cox"
-            html: "<p>Where did you spend your holidays?</p>"
-            received: true
-        }
-        ListElement {
-            avatar: "peer.png"
-            date: ""
-            from: "Osborne Cox"
-            html: "<p>Hello</p><p>How are you?</p>"
-            received: true
-        }
-        ListElement {
-            avatar: "home.png"
-            date: ""
-            from: "Me"
-            html: "<p>Just fine, how about yourself?</p><p>How are you?</p>"
-            received: false
-        }
-        ListElement {
-            avatar: "peer.png"
-            date: ""
-            from: "Osborne Cox"
-            html: "<p>Where did you spend your holidays?</p>"
-            received: true
-        }
-    }
-*/
-
-    HistoryView {
-        id: historyView
-        objectName: "historyView"
-
-        anchors.left: parent.left
         anchors.top: parent.top
-        height: parent.height
-        width: parent.width - scrollBar.width
-        model: historyModel
-
-        function onBottomChanged() {
-            positionViewAtIndex(count - 1, ListView.End);
-        }
+        anchors.left: parent.left
+        anchors.right: parent.right
     }
 
-    ScrollBar {
-        id: scrollBar
+    Row {
+        anchors.top: widgetBar.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
         anchors.right: parent.right
-        height: parent.height
-        flickableItem: historyView
+    
+        HistoryView {
+            id: historyView
+            objectName: 'historyView'
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            width: parent.width - scrollBar.width
+            model: historyModel
+
+            function onBottomChanged() {
+                positionViewAtIndex(count - 1, ListView.End);
+            }
+        }
+
+        ScrollBar {
+            id: scrollBar
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            flickableItem: historyView
+        }
     }
 }
