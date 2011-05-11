@@ -20,8 +20,6 @@
 import QtQuick 1.0
 
 Item {
-    height: 300
-    width: 550
 
     Rectangle {
         anchors.fill: parent
@@ -36,12 +34,20 @@ Item {
         smooth: true
     }
 
+    Text {
+        id: text
+
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.margins: 4
+    }
+
     Rectangle {
         id: videoMonitor
 
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.margins: 10
+        anchors.margins: 4
 
         border.width: 1
         border.color: '#2689d6'
@@ -50,6 +56,8 @@ Item {
         radius: 8
         height: 240
         width: 320
+
+        visible: false
     }
 
     Rectangle {
@@ -67,6 +75,8 @@ Item {
         radius: 8
         height: 120
         width: 160
+
+        visible: false
     }
 
     Button {
@@ -74,7 +84,7 @@ Item {
         iconSource: 'close.png'
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 10
+        anchors.margins: 4
     }
 
     Button {
@@ -82,27 +92,22 @@ Item {
         iconSource: 'camera.png'
         anchors.right: closeButton.left
         anchors.top: parent.top
-        anchors.margins: 10
+        anchors.margins: 4
     }
 
     ProgressBar {
         id: inputVolume
         anchors.top: parent.top
         anchors.right: cameraButton.left
-        anchors.bottomMargin: 5
-        anchors.leftMargin: 5
-        anchors.rightMargin: 5
-        anchors.topMargin: 10
+        anchors.margins: 4
     }
 
     ProgressBar {
         id: outputVolume
         anchors.top: inputVolume.bottom
         anchors.right: cameraButton.left
-        anchors.bottomMargin: 10
-        anchors.leftMargin: 5
-        anchors.rightMargin: 5
-        anchors.topMargin: 5
+        anchors.leftMargin: 4
+        anchors.rightMargin: 4
     }
 
     Image {
