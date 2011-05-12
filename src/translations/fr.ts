@@ -467,11 +467,11 @@ Acceptez-vous?</translation>
     <name>ChatTransferWidget</name>
     <message>
         <source>Downloading at %1</source>
-        <translation>Téléchargement à %1</translation>
+        <translation type="obsolete">Téléchargement à %1</translation>
     </message>
     <message>
         <source>Uploading at %1</source>
-        <translation>Téléchargement à %1</translation>
+        <translation type="obsolete">Téléchargement à %1</translation>
     </message>
 </context>
 <context>

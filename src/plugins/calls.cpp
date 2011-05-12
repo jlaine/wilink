@@ -145,6 +145,127 @@ int CallAudioHelper::outputVolume() const
     return m_audioOutputMeter ? m_audioOutputMeter->value() : 0;
 }
 
+CallVideoHelper::CallVideoHelper(QObject *parent)
+    : QObject(parent),
+    m_call(0),
+    m_videoConversion(0),
+    m_videoGrabber(0),
+    m_videoMonitor(0),
+    m_videoOutput(0)
+{
+}
+
+QXmppCall* CallVideoHelper::call() const
+{
+    return m_call;
+}
+
+void CallVideoHelper::setCall(QXmppCall *call)
+{
+    if (call != m_call) {
+        m_call = call;
+        emit callChanged(call);
+    }
+}
+
+void CallVideoHelper::videoModeChanged(QIODevice::OpenMode mode)
+{
+    Q_ASSERT(m_call);
+
+    qDebug("video mode changed %i", (int)mode);
+    QXmppRtpVideoChannel *channel = m_call->videoChannel();
+    if (!channel)
+        mode = QIODevice::NotOpen;
+
+    // start or stop playback
+    const bool canRead = (mode & QIODevice::ReadOnly);
+    if (canRead && !m_videoTimer->isActive()) {
+        if (m_videoOutput) {
+            QXmppVideoFormat format = channel->decoderFormat();
+            m_videoOutput->setFormat(format);
+            m_videoTimer->start(1000 / format.frameRate());
+        }
+    } else if (!canRead && m_videoTimer->isActive()) {
+        m_videoTimer->stop();
+    }
+
+    // start or stop capture
+    const bool canWrite = (mode & QIODevice::WriteOnly);
+    if (canWrite && !m_videoGrabber) {
+        const QXmppVideoFormat format = channel->encoderFormat();
+
+        // check we have a video input
+        QList<QVideoGrabberInfo> grabbers = QVideoGrabberInfo::availableGrabbers();
+        if (grabbers.isEmpty())
+            return;
+
+        // determine if we need a conversion
+        QList<QXmppVideoFrame::PixelFormat> pixelFormats = grabbers.first().supportedPixelFormats();
+        if (!pixelFormats.contains(format.pixelFormat())) {
+            qWarning("we need a format conversion");
+            QXmppVideoFormat auxFormat = format;
+            auxFormat.setPixelFormat(pixelFormats.first());
+            m_videoGrabber = new QVideoGrabber(auxFormat);
+
+            QPair<int, int> metrics = QVideoGrabber::byteMetrics(format.pixelFormat(), format.frameSize());
+            m_videoConversion = new QXmppVideoFrame(metrics.second, format.frameSize(), metrics.first, format.pixelFormat());
+        } else {
+            m_videoGrabber = new QVideoGrabber(format);
+        }
+
+        connect(m_videoGrabber, SIGNAL(frameAvailable(QXmppVideoFrame)),
+                this, SLOT(videoCapture(QXmppVideoFrame)));
+        m_videoGrabber->start();
+
+        if (m_videoMonitor)
+            m_videoMonitor->setFormat(format);
+    } else if (!canWrite && m_videoGrabber) {
+        m_videoGrabber->stop();
+        delete m_videoGrabber;
+        m_videoGrabber = 0;
+        if (m_videoConversion) {
+            delete m_videoConversion;
+            m_videoConversion = 0;
+        }
+    }
+}
+
+void CallVideoHelper::videoCapture(const QXmppVideoFrame &frame)
+{
+    Q_ASSERT(m_call);
+
+    QXmppRtpVideoChannel *channel = m_call->videoChannel();
+    if (!channel)
+        return;
+
+    if (frame.isValid()) {
+        if (m_videoConversion) {
+            //m_videoConversion.setStartTime(frame.startTime());
+            QVideoGrabber::convert(frame.size(),
+                                   frame.pixelFormat(), frame.bytesPerLine(), frame.bits(),
+                                   m_videoConversion->pixelFormat(), m_videoConversion->bytesPerLine(), m_videoConversion->bits());
+            channel->writeFrame(*m_videoConversion);
+        } else {
+            channel->writeFrame(frame);
+        }
+        if (m_videoMonitor)
+            m_videoMonitor->present(frame);
+    }
+}
+
+void CallVideoHelper::videoRefresh()
+{
+    Q_ASSERT(m_call);
+
+    QXmppRtpVideoChannel *channel = m_call->videoChannel();
+    if (!channel)
+        return;
+
+    QList<QXmppVideoFrame> frames = channel->readFrames();
+    if (!frames.isEmpty() && m_videoOutput)
+        m_videoOutput->present(frames.last());
+}
+
 CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
     : QDeclarativeItem(parent),
     m_radius(8)
@@ -205,7 +326,6 @@ void CallVideoItem::setRadius(qreal radius)
         emit radiusChanged(radius);
     }
 }
-#endif
 
 CallVideoWidget::CallVideoWidget(QGraphicsItem *parent)
     : QGraphicsItem(parent),

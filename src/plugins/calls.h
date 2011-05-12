@@ -29,6 +29,7 @@
 
 #include "chat_panel.h"
 
+class CallVideoItem;
 class Chat;
 class ChatRosterModel;
 class QAbstractButton;
@@ -77,6 +78,34 @@ private:
     QSoundMeter *m_audioInputMeter;
     QAudioOutput *m_audioOutput;
     QSoundMeter *m_audioOutputMeter;
+};
+
+class CallVideoHelper : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppCall* call READ call WRITE setCall NOTIFY callChanged)
+
+public:
+    CallVideoHelper(QObject *parent = 0);
+
+    QXmppCall *call() const;
+    void setCall(QXmppCall *call);
+
+signals:
+    void callChanged(QXmppCall *call);
+
+private slots:
+    void videoModeChanged(QIODevice::OpenMode mode);
+    void videoCapture(const QXmppVideoFrame &frame);
+    void videoRefresh();
+
+private:
+    QXmppCall *m_call;
+    QXmppVideoFrame *m_videoConversion;
+    QVideoGrabber *m_videoGrabber;
+    CallVideoItem *m_videoOutput;
+    CallVideoItem *m_videoMonitor;
+    QTimer *m_videoTimer;
 };
 
 class CallVideoItem : public QDeclarativeItem
