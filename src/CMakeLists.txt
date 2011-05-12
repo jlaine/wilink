@@ -153,11 +153,8 @@ endif(WIN32)
 add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
 
 # libraries
-set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY})
-if(QT_QTDECLARATIVE_FOUND AND USE_DECLARATIVE)
-    list(APPEND wilink_LIBRARIES ${QT_QTDECLARATIVE_LIBRARY})
-    add_definitions(-DUSE_DECLARATIVE)
-endif()
+set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY})
+add_definitions(-DUSE_DECLARATIVE)
 if(APPLE)
     list(APPEND wilink_LIBRARIES "-framework AppKit")
 endif(APPLE)
