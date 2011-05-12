@@ -17,11 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef USE_DECLARATIVE
+#include <QAbstractNetworkCache>
 #include <QDeclarativeContext>
 #include <QDeclarativeView>
-#endif
-#include <QAbstractNetworkCache>
 #include <QDir>
 #include <QDomDocument>
 #include <QFileInfo>
@@ -168,21 +166,6 @@ void PlayerModelPrivate::processQueue()
 
     QList<Item*> items = find(q->rootItem, UrlRole, QUrl());
     foreach (Item *item, items) {
-#ifndef USE_DECLARATIVE
-        // check image
-        if (item->imageUrl.isValid() &&
-            !isLocal(item->imageUrl) &&
-            !dataCache.contains(item->imageUrl))
-        {
-            //qDebug("Requesting image %s", qPrintable(item->imageUrl.toString()));
-            dataReply = network->get(QNetworkRequest(item->imageUrl));
-            dataReply->setProperty("_request_url", item->imageUrl);
-            dataReply->setProperty("_request_type", "image");
-            q->connect(dataReply, SIGNAL(finished()), q, SLOT(dataReceived()));
-            return;
-        }
-#endif
-
         // check data
         if (item->url.isValid() &&
             !isLocal(item->url) &&
@@ -191,9 +174,8 @@ void PlayerModelPrivate::processQueue()
             //qDebug("Requesting data %s", qPrintable(item->url.toString()));
             dataReply = network->get(QNetworkRequest(item->url));
             dataReply->setProperty("_request_url", item->url);
-            dataReply->setProperty("_request_type", "data");
             q->connect(dataReply, SIGNAL(finished()), q, SLOT(dataReceived()));
-            emit q->dataChanged(q->createIndex(item, 0), q->createIndex(item, MaxColumn));
+            emit q->dataChanged(q->createIndex(item), q->createIndex(item));
             return;
         }
     }
@@ -216,7 +198,7 @@ void PlayerModelPrivate::processXml(Item *channel, QIODevice *reply)
     QDomElement imageUrlElement = channelElement.firstChildElement("image").firstChildElement("url");
     if (!imageUrlElement.isNull())
         channel->imageUrl = QUrl(imageUrlElement.text());
-    emit q->dataChanged(q->createIndex(channel, 0), q->createIndex(channel, MaxColumn));
+    emit q->dataChanged(q->createIndex(channel), q->createIndex(channel));
 
     // parse items
     QDomElement itemElement = channelElement.firstChildElement("item");
@@ -369,8 +351,6 @@ void PlayerModel::dataReceived()
         return;
     reply->deleteLater();
     const QUrl dataUrl = reply->property("_request_url").toUrl();
-    const QString dataType = reply->property("_request_type").toString();
-
 
     // follow redirect
     QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
@@ -380,7 +360,6 @@ void PlayerModel::dataReceived()
         //qDebug("Following redirect to %s", qPrintable(redirectUrl.toString()));
         d->dataReply = d->network->get(QNetworkRequest(redirectUrl));
         d->dataReply->setProperty("_request_url", dataUrl);
-        d->dataReply->setProperty("_request_type", dataType);
         connect(d->dataReply, SIGNAL(finished()), this, SLOT(dataReceived()));
         return;
     }
@@ -394,33 +373,27 @@ void PlayerModel::dataReceived()
 
         QList<Item*> items = d->find(rootItem, UrlRole, dataUrl);
         foreach (Item *item, items)
-            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
+            emit dataChanged(createIndex(item), createIndex(item));
 
         d->processQueue();
         return;
     }
 
     // process data
-    if (dataType == "image") { 
-        QList<Item*> items = d->find(rootItem, ImageUrlRole, dataUrl);
-        foreach (Item *item, items)
-            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
-    } else {
-        const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
-        QList<Item*> items = d->find(rootItem, UrlRole, dataUrl);
-        foreach (Item *item, items) {
-            if (mimeType == "application/xml") {
-                QIODevice *device = d->dataFile(item);
-                d->processXml(item, device);
-                delete device;
-            } else {
-                QSoundFile *file = d->soundFile(item);
-                if (file) {
-                    item->updateMetaData(file);
-                    delete file;
-                }
-                emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
+    const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+    QList<Item*> items = d->find(rootItem, UrlRole, dataUrl);
+    foreach (Item *item, items) {
+        if (mimeType == "application/xml") {
+            QIODevice *device = d->dataFile(item);
+            d->processXml(item, device);
+            delete device;
+        } else {
+            QSoundFile *file = d->soundFile(item);
+            if (file) {
+                item->updateMetaData(file);
+                delete file;
             }
+            emit dataChanged(createIndex(item), createIndex(item));
         }
     }
     d->processQueue();
@@ -428,7 +401,7 @@ void PlayerModel::dataReceived()
 
 int PlayerModel::columnCount(const QModelIndex &parent) const
 {
-    return MaxColumn;
+    return 1;
 }
 
 QModelIndex PlayerModel::cursor() const
@@ -444,9 +417,9 @@ void PlayerModel::setCursor(const QModelIndex &index)
         Item *oldItem = d->cursorItem;
         d->cursorItem = item;
         if (oldItem)
-            emit dataChanged(createIndex(oldItem, 0), createIndex(oldItem, MaxColumn));
+            emit dataChanged(createIndex(oldItem), createIndex(oldItem));
         if (item)
-            emit dataChanged(createIndex(item, 0), createIndex(item, MaxColumn));
+            emit dataChanged(createIndex(item), createIndex(item));
         emit cursorChanged(index);
     }
 }
@@ -474,57 +447,6 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
     else if (role == UrlRole)
         return item->url;
 
-#ifndef USE_DECLARATIVE
-    if (index.column() == ArtistColumn) {
-        if (role == Qt::DisplayRole)
-            return item->artist;
-        else if (role == Qt::DecorationRole) {
-            QPixmap pixmap;
-            if (item == d->cursorItem)
-                return QPixmap(":/start.png");
-            else if (d->dataReply && d->dataReply->property("_request_url").toUrl() == item->url)
-                return QPixmap(":/download.png");
-            else if (item->imageUrl.scheme() == "file") {
-                const QString path = item->imageUrl.toLocalFile();
-                return QPixmap(path);
-            }
-            else if (item->imageUrl.scheme() == "qrc") {
-                const QString path = ":" + item->imageUrl.path();
-                return QPixmap(path);
-            }
-            else if (QPixmapCache::find(item->imageUrl.toString(), &pixmap))
-                return pixmap;
-            else if (d->dataCache.contains(item->imageUrl)) {
-                const QUrl dataUrl = d->dataCache.value(item->imageUrl);
-                QImageReader reader(d->networkCache->data(dataUrl));
-                reader.setScaledSize(QSize(32, 32));
-                pixmap = QPixmap::fromImage(reader.read());
-                QPixmapCache::insert(item->imageUrl.toString(), pixmap);
-                return pixmap;
-            }
-        }
-    } else if (index.column() == TitleColumn) {
-        if (role == Qt::DisplayRole)
-            return item->title;
-    } else if (index.column() == DurationColumn) {
-        if (role == Qt::DisplayRole) {
-            return QTime().addMSecs(item->duration).toString("m:ss");
-        }
-    }
-#endif
-    return QVariant();
-}
-
-QVariant PlayerModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        if (section == ArtistColumn)
-            return tr("Artist");
-        else if (section == TitleColumn)
-            return tr("Title");
-        else if (section == DurationColumn)
-            return tr("Duration");
-    }
     return QVariant();
 }
 
@@ -630,11 +552,9 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     layout->addSpacing(10);
 
     // playlist
-#ifdef USE_DECLARATIVE
     QDeclarativeView *view = new QDeclarativeView;
     QDeclarativeContext *ctxt = view->rootContext();
     ctxt->setContextProperty("playerModel", m_model);
-    //view->setSource(QUrl::fromLocalFile("src/data/player.qml"));
     view->setSource(QUrl("qrc:/player.qml"));
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
@@ -643,25 +563,6 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     // handle drag & drop
     view->viewport()->setAcceptDrops(true);
     view->viewport()->installEventFilter(this);
-#else
-    m_view = new PlayerView;
-    m_view->setModel(m_model);
-    m_view->setIconSize(QSize(32, 32));
-    m_view->setSelectionMode(QAbstractItemView::SingleSelection);
-    check = connect(m_view, SIGNAL(doubleClicked(QModelIndex)),
-                    m_model, SLOT(play(QModelIndex)));
-    Q_ASSERT(check);
-    layout->addWidget(m_view, 1);
-    setFocusProxy(m_view);
-
-    // handle drag & drop
-    m_view->viewport()->setAcceptDrops(true);
-    m_view->viewport()->installEventFilter(this);
-
-    // select first track
-    if (m_model->rowCount(QModelIndex()))
-        m_view->selectionModel()->select(m_model->index(0, 0, QModelIndex()), QItemSelectionModel::Rows | QItemSelectionModel::Select);
-#endif
 
     // register panel
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M), m_chat);

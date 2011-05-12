@@ -721,21 +721,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PlayerModel</name>
-    <message>
-        <source>Artist</source>
-        <translation>Artiste</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation>Titre</translation>
-    </message>
-    <message>
-        <source>Duration</source>
-        <translation>Durée</translation>
-    </message>
-</context>
-<context>
     <name>PlayerPanel</name>
     <message>
         <source>Media player</source>
