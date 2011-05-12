@@ -35,7 +35,7 @@ Rectangle {
 
     Row {
         anchors.top: widgetBar.bottom
-        anchors.bottom: parent.bottom
+        anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
     
@@ -59,6 +59,24 @@ Rectangle {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             flickableItem: historyView
+        }
+    }
+
+    Rectangle {
+        id: footer
+
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: '#dfdfdf'
+        height: chatInput.height + 8
+
+        ChatEdit {
+            id: chatInput
+
+            x: 4
+            y: 4
+            width: parent.width - 8
         }
     }
 }

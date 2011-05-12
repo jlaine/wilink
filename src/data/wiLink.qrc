@@ -60,6 +60,7 @@
     <file>conversation.qml</file>
     <file>player.qml</file>
     <file>Button.qml</file>
+    <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
     <file>HistoryView.qml</file>
     <file>ProgressBar.qml</file>
