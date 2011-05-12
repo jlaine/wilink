@@ -615,7 +615,7 @@ void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
     if (messageIndex.isValid() && chat->client()->isConnected()) {
         const QString nickName = jidToResource(messageIndex.data(ChatHistoryModel::JidRole).toString());
-        chatInput()->talkAt(nickName);
+        QMetaObject::invokeMethod(chatInput(), "talkAt", Q_ARG(QString, nickName));
     }
 }
 
@@ -670,7 +670,7 @@ void ChatRoom::participantClicked(const QModelIndex &index)
 {
     if (index.isValid() && chat->client()->isConnected()) {
         const QString nickName = jidToResource(index.data(ChatRosterModel::IdRole).toString());
-        chatInput()->talkAt(nickName);
+        QMetaObject::invokeMethod(chatInput(), "talkAt", Q_ARG(QString, nickName));
     }
 }
 

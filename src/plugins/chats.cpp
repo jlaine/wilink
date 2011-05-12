@@ -169,13 +169,7 @@ void ChatDialog::join()
 
     // send initial state
     chatStatesJids = rosterModel->contactFeaturing(chatRemoteJid, ChatRosterModel::ChatStatesFeature);
-    foreach (const QString &fullJid, chatStatesJids)
-    {
-        QXmppMessage message;
-        message.setTo(fullJid);
-        message.setState(chatInput()->state());
-        client->sendPacket(message);
-    }
+    //chatStateChanged(chatInput()->state());
 
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately

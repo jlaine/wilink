@@ -55,7 +55,7 @@ protected slots:
     void slotSearchDisplayed(bool visible);
 
 protected:
-    ChatEdit *chatInput();
+    QObject *chatInput();
     QSplitter *splitter();
 
 private:

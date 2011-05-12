@@ -203,7 +203,7 @@ ChatConversation::~ChatConversation()
     delete d;
 }
 
-ChatEdit *ChatConversation::chatInput()
+QObject *ChatConversation::chatInput()
 {
     return d->chatInput;
 }
