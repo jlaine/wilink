@@ -31,7 +31,7 @@ class ChatEditPrivate;
 class ChatEdit : public QTextEdit
 {
     Q_OBJECT
-    Q_PROPERTY(QStringList members READ members WRITE setMembers)
+    Q_PROPERTY(QStringList participants READ participants WRITE setParticipants)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
 public:
@@ -41,8 +41,8 @@ public:
     virtual QSize minimumSizeHint() const;
     virtual QSize sizeHint() const;
 
-    QStringList members() const;
-    void setMembers(const QStringList &members);
+    QStringList participants() const;
+    void setParticipants(const QStringList &participants);
 
     QXmppMessage::State state() const;
 

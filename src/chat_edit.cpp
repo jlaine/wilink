@@ -27,7 +27,7 @@ class ChatEditPrivate
 {
 public:
     int maxHeight;
-    QStringList members;
+    QStringList participants;
     QTimer *inactiveTimer;
     QTimer *pausedTimer;
     QXmppMessage::State state;
@@ -111,9 +111,9 @@ void ChatEdit::keyPressEvent(QKeyEvent* e)
         if (prefix.startsWith("@"))
             prefix = prefix.mid(1);
 
-        /// find matching room members
+        /// find matching participants
         QStringList matches;
-        foreach (const QString &member, d->members) {
+        foreach (const QString &member, d->participants) {
             if (member.toLower().startsWith(prefix))
                 matches << member;
         }
@@ -124,14 +124,14 @@ void ChatEdit::keyPressEvent(QKeyEvent* e)
     }
 }
 
-QStringList ChatEdit::members() const
+QStringList ChatEdit::participants() const
 {
-    return d->members;
+    return d->participants;
 }
 
-void ChatEdit::setMembers(const QStringList &members)
+void ChatEdit::setParticipants(const QStringList &participants)
 {
-    d->members = members;
+    d->participants = participants;
 }
 
 QSize ChatEdit::minimumSizeHint() const

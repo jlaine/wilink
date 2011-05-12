@@ -23,7 +23,7 @@ Rectangle {
     id: chatEdit
 
     property alias text: input.text
-    property variant members: []
+    property variant participants: []
     signal returnPressed
     signal tabPressed
 
@@ -84,10 +84,12 @@ Rectangle {
                 return;
             start += 1;
 
+            // search matching participants
             var needle = input.text.slice(start, end).toLowerCase();
-            for (var i in members) {
-                if (members[i].slice(0, needle.length).toLowerCase() == needle) {
-                    var replacement = members[i] + ': ';
+            for (var i in participants) {
+                var participant = participants[i];
+                if (participant.slice(0, needle.length).toLowerCase() == needle) {
+                    var replacement = participant + ': ';
                     input.text = text.slice(0, start) + replacement + text.slice(end);
                     input.cursorPosition = start + replacement.length;
                 }

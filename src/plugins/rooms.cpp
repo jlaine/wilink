@@ -652,10 +652,10 @@ void ChatRoom::participantAdded(const QString &jid)
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
 
     // update input completions
-    QStringList members;
+    QStringList participants;
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
-        members << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-    chatInput()->setProperty("members", members);
+        participants << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
+    chatInput()->setProperty("participants", participants);
 }
 
 void ChatRoom::participantChanged(const QString &jid)
