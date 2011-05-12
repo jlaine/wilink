@@ -62,19 +62,39 @@ Item {
 
             anchors.left: text.right
             anchors.leftMargin: 4
-            anchors.right: button.left
+            anchors.right: openButton.left
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
         }
 
         Button {
-            id: button
+            id: openButton
+
+            anchors.right: closeButton.left
+            anchors.verticalCenter: parent.verticalCenter
+            iconSource: 'file.png'
+            //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
+            visible: job && job.state == QXmppTransferJob.FinishedState
+        }
+
+        Button {
+            id: closeButton
 
             anchors.right: parent.right
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
             iconSource: 'close.png'
         }
+    }
+
+    Connections {
+        target: closeButton
+        onClicked: job.abort()
+    }
+
+    Connections {
+        target: openButton
+        onClicked: Qt.openUrlExternally(job.localFileUrl)
     }
 
     Connections {
