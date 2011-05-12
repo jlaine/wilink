@@ -52,6 +52,7 @@ class QXmppSrvInfo;
 class CallAudioHelper : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QXmppCall* call READ call WRITE setCall NOTIFY callChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
@@ -59,11 +60,16 @@ class CallAudioHelper : public QObject
 public:
     CallAudioHelper(QObject *parent = 0);
 
+    QXmppCall *call() const;
+    void setCall(QXmppCall *call);
+
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
 
 signals:
+    void callChanged(QXmppCall *call);
+
     // This signal is emitted when the input volume changes.
     void inputVolumeChanged(int volume);
 
@@ -74,6 +80,7 @@ private slots:
     void audioModeChanged(QIODevice::OpenMode mode);
 
 private:
+    QXmppCall *m_call;
     QAudioInput *m_audioInput;
     QSoundMeter *m_audioInputMeter;
     QAudioOutput *m_audioOutput;

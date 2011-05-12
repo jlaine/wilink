@@ -71,18 +71,15 @@ CallAudioHelper::CallAudioHelper(QObject *parent)
     m_audioInput(0),
     m_audioInputMeter(0),
     m_audioOutput(0),
-    m_audioOutputMeter(0)
+    m_audioOutputMeter(0),
+    m_call(0)
 {
 }
 
 void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
 {
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call)
-        return;
-
     qDebug("audio mode changed %i", (int)mode);
-    QXmppRtpAudioChannel *channel = call->audioChannel();
+    QXmppRtpAudioChannel *channel = m_call->audioChannel();
     Q_ASSERT(channel);
 
     QAudioFormat format = formatFor(channel->payloadType());
@@ -130,6 +127,25 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     }
 }
 
+QXmppCall* CallAudioHelper::call() const
+{
+    return m_call;
+}
+
+void CallAudioHelper::setCall(QXmppCall *call)
+{
+    if (call != m_call) {
+        m_call = call;
+
+        bool check;
+        check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
+                        this, SLOT(audioModeChanged(QIODevice::OpenMode)));
+        Q_ASSERT(check);
+
+        emit callChanged(call);
+    }
+}
+
 int CallAudioHelper::inputVolume() const
 {
     return m_audioInputMeter ? m_audioInputMeter->value() : 0;
@@ -153,6 +169,7 @@ CallVideoHelper::CallVideoHelper(QObject *parent)
     m_videoMonitor(0),
     m_videoOutput(0)
 {
+    m_videoTimer = new QTimer(this);
 }
 
 QXmppCall* CallVideoHelper::call() const
@@ -164,6 +181,12 @@ void CallVideoHelper::setCall(QXmppCall *call)
 {
     if (call != m_call) {
         m_call = call;
+
+        bool check;
+        check = connect(call, SIGNAL(videoModeChanged(QIODevice::OpenMode)),
+                        this, SLOT(videoModeChanged(QIODevice::OpenMode)));
+        Q_ASSERT(check);
+
         emit callChanged(call);
     }
 }
@@ -708,8 +731,6 @@ void CallWatcher::addCall(QXmppCall *call)
 
     ChatConversation *panel = qobject_cast<ChatConversation*>(m_window->panel(bareJid));
     if (panel) {
-        bool check;
-
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__call_component").value<QObject*>());
         if (!component) {
@@ -721,15 +742,17 @@ void CallWatcher::addCall(QXmppCall *call)
         // create audio helper
         CallAudioHelper *audioHelper = new CallAudioHelper;
         audioHelper->moveToThread(wApp->soundThread());
+        audioHelper->setCall(call);
 
-        check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
-                        audioHelper, SLOT(audioModeChanged(QIODevice::OpenMode)));
-        Q_ASSERT(check);
+        // create video helper
+        CallVideoHelper *videoHelper = new CallVideoHelper;
+        videoHelper->setCall(call);
 
         // create call widget
         QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
         Q_ASSERT(widget);
         widget->setProperty("audio", qVariantFromValue<QObject*>(audioHelper));
+        widget->setProperty("video", qVariantFromValue<QObject*>(videoHelper));
         widget->setProperty("call", qVariantFromValue<QObject*>(call));
         QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
