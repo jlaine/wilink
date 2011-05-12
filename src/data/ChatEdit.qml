@@ -23,6 +23,7 @@ Rectangle {
     id: chatEdit
 
     property alias text: input.text
+    property variant members: []
     signal returnPressed
     signal tabPressed
 
@@ -32,7 +33,27 @@ Rectangle {
     height: input.paintedHeight + 16
 
     function talkAt(participant) {
-        console.log("talk at: " + participant);
+        var text = input.text;
+        var newText = '';
+
+        var pattern = /@([^,:]+[,:] )+/;
+        var start = text.search(pattern);
+        if (start >= 0) {
+            var m = text.match(pattern)[0];
+            var bits = m.split(/[,:] /);
+            if (start > 0)
+                newText += text.slice(0, start);
+            for (var i in bits) {
+                if (bits[i] == '@' + participant)
+                    return;
+                if (bits[i].length)
+                    newText += bits[i] + ', ';
+            }
+        } else {
+            newText = text;
+        }
+        newText += '@' + participant + ': ';
+        input.text = newText;
     }
 
     TextEdit {
@@ -64,8 +85,6 @@ Rectangle {
             start += 1;
 
             var needle = input.text.slice(start, end).toLowerCase();
-            // FIXME: get real members
-            var members = ['Foo', 'Bar'];
             for (var i in members) {
                 if (members[i].slice(0, needle.length).toLowerCase() == needle) {
                     var replacement = members[i] + ': ';
