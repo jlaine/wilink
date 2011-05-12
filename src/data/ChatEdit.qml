@@ -31,6 +31,10 @@ Rectangle {
     color: '#ffffff'
     height: input.paintedHeight + 16
 
+    function talkAt(participant) {
+        console.log("talk at: " + participant);
+    }
+
     TextEdit {
         id: input
 

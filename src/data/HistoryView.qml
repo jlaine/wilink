@@ -22,6 +22,8 @@ import QtQuick 1.0
 ListView {
     id: historyView
 
+    signal participantClicked(string participant)
+
     cacheBuffer: 400
     delegate: historyDelegate
     header: Rectangle { height: 2 }
@@ -43,6 +45,11 @@ ListView {
                 source: model.avatar
                 height: 32
                 width: 32
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: historyView.participantClicked(model.from);
+                }
             }
             Column {
                 width: parent.width - parent.spacing - avatar.width
@@ -60,6 +67,11 @@ ListView {
                         color: model.received ? '#2689d6': '#7b7b7b'
                         font.pixelSize: 10
                         text: model.from
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: historyView.participantClicked(model.from);
+                        }
                     }
 
                     Text {

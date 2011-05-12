@@ -80,4 +80,9 @@ Rectangle {
             width: parent.width - 8
         }
     }
+
+    Connections {
+        target: historyView
+        onParticipantClicked: chatInput.talkAt(participant)
+    }
 }
