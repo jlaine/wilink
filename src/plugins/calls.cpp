@@ -169,7 +169,11 @@ CallVideoHelper::CallVideoHelper(QObject *parent)
     m_videoMonitor(0),
     m_videoOutput(0)
 {
+    bool check;
     m_videoTimer = new QTimer(this);
+    check = connect(m_videoTimer, SIGNAL(timeout()),
+                    this, SLOT(videoRefresh()));
+    Q_ASSERT(check);
 }
 
 QXmppCall* CallVideoHelper::call() const
@@ -188,6 +192,32 @@ void CallVideoHelper::setCall(QXmppCall *call)
         Q_ASSERT(check);
 
         emit callChanged(call);
+    }
+}
+
+CallVideoItem *CallVideoHelper::output() const
+{
+    return m_videoOutput;
+}
+
+void CallVideoHelper::setOutput(CallVideoItem *output)
+{
+    if (output != m_videoOutput) {
+        m_videoOutput = output;
+        emit outputChanged(output);
+    }
+}
+
+CallVideoItem *CallVideoHelper::monitor() const
+{
+    return m_videoMonitor;
+}
+
+void CallVideoHelper::setMonitor(CallVideoItem *monitor)
+{
+    if (monitor != m_videoMonitor) {
+        m_videoMonitor = monitor;
+        emit monitorChanged(monitor);
     }
 }
 

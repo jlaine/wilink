@@ -91,6 +91,8 @@ class CallVideoHelper : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QXmppCall* call READ call WRITE setCall NOTIFY callChanged)
+    Q_PROPERTY(CallVideoItem* monitor READ monitor WRITE setMonitor NOTIFY monitorChanged)
+    Q_PROPERTY(CallVideoItem* output READ output WRITE setOutput NOTIFY outputChanged)
 
 public:
     CallVideoHelper(QObject *parent = 0);
@@ -98,8 +100,16 @@ public:
     QXmppCall *call() const;
     void setCall(QXmppCall *call);
 
+    CallVideoItem *monitor() const;
+    void setMonitor(CallVideoItem *monitor);
+
+    CallVideoItem *output() const;
+    void setOutput(CallVideoItem *output);
+
 signals:
     void callChanged(QXmppCall *call);
+    void monitorChanged(CallVideoItem *monitor);
+    void outputChanged(CallVideoItem *output);
 
 private slots:
     void videoModeChanged(QIODevice::OpenMode mode);
