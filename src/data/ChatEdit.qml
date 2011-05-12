@@ -22,7 +22,9 @@ import QtQuick 1.0
 Rectangle {
     id: chatEdit
 
+    property alias text: input.text
     signal returnPressed
+    signal tabPressed
 
     border.color: '#c3c3c3'
     border.width: 1
@@ -43,6 +45,9 @@ Rectangle {
             } else {
                 event.accepted = false;
             }
+        }
+        Keys.onTabPressed: {
+            chatEdit.tabPressed()
         }
     }
 }
