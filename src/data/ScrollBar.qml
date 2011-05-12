@@ -25,83 +25,150 @@ Item {
     property ListView flickableItem
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
+
+    property bool autoMove: false
+    property bool dragToBottomEnabled
     property int minHeight: 20
     property string moveAction: ""
-    property bool autoMove: false
 
     width: 16
 
-    Rectangle {
-        id: track
-
-        anchors.fill: parent
-        anchors.topMargin: 16
-        anchors.bottomMargin: 16
-        color: '#dfdfdf'
-    }
-
-    Rectangle {
-        id: handle
-
-        border.color: '#c3c3c3'
-        border.width: 1
-        color: '#c3c3c3'
-        x: 0
-        y: scrollBar.position * (track.height - minHeight - 2) + track.anchors.topMargin + 1
-        height: scrollBar.pageSize * (track.height - minHeight - 2) + minHeight
-        width: parent.width - 1
-        radius: 6
-    }
-
-    MouseArea {
-        id: clickableArea
-
-        property real pressContentY
-        property real pressMouseY
-        property real pressScale
-
+    Item {
+        id: scrollBarView
         anchors.fill: scrollBar
-        drag.axis: Drag.YAxis
 
-        onPressed: {
-            pressContentY = flickableItem.contentY
-            pressMouseY = mouse.y
-            pressScale = scrollBar.pageSize
-            scrollBar.state = 'hovered'
+        Rectangle {
+            id: track
 
-            if( mouse.y < handle.y ) {
-                moveAction = "up"
-            } else if( mouse.y > handle.y + handle.height ) {
-                moveAction = "down"
-            } else {
-                moveAction = "drag"
+            anchors.fill: parent
+            anchors.topMargin: 16
+            anchors.bottomMargin: 16
+            color: '#dfdfdf'
+        }
+
+        Rectangle {
+            id: handle
+
+            property int size: scrollBar.pageSize * (track.height - 2)
+            property int position: scrollBar.position * (track.height - 2) + track.anchors.topMargin + 1
+
+            border.color: '#c3c3c3'
+            border.width: 1
+            color: '#c3c3c3'
+            x: 0
+            y: size < minHeight ? position - scrollBar.position * minHeight : position
+            height: size < minHeight ? minHeight : size
+            width: parent.width - 1
+            radius: 6
+        }
+
+        Rectangle {
+            id: buttonUp
+
+            anchors.top: parent.top
+            height: 16
+            width: 16
+            border.color: '#999999'
+            color: '#cccccc'
+
+            MouseArea {
+                anchors.fill: parent
+
+                onPressed: {
+                    buttonUp.state = 'pressed'
+                    dragToBottomEnabled = false
+                }
+
+                onReleased: {
+                    buttonUp.state = ''
+                    scrollBar.moveUp()
+                }
+            }
+
+            states: State {
+                name: 'pressed'
+                PropertyChanges { target: buttonUp; color: '#aaaaaa' }
             }
         }
 
-        onReleased: {
-            autoMove = false
-            scrollBar.state = ''
+        Rectangle {
+            id: buttonDown
 
-            switch ( moveAction )
-            {
-                case "up":
-                    moveUp()
-                break
-                case "down":
-                    moveDown()
-                break
+            anchors.bottom: parent.bottom
+            height: 16
+            width: 16
+            border.color: '#999999'
+            color: '#cccccc'
+
+            MouseArea {
+                anchors.fill: parent
+
+                onPressed: {
+                    buttonDown.state = 'pressed'
+                }
+
+                onReleased: {
+                    buttonDown.state = ''
+                    scrollBar.moveDown()
+                }
             }
-
-            moveAction = ''
+            states: State {
+                name: 'pressed'
+                PropertyChanges { target: buttonDown; color: '#aaaaaa' }
+            }
         }
 
-        onPositionChanged: {
-            if( moveAction == "drag" ) {
-                var targetY = pressContentY + (mouse.y - pressMouseY) / pressScale;
-                if (mouse.y - pressMouseY > 0 && scrollBar.position + scrollBar.pageSize >= 1) {
-                    flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
+        states: State {
+            name: "hovered"
+            PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
+        }
+
+        MouseArea {
+            id: clickableArea
+
+            property int mousePressY
+
+            anchors.fill: track
+            drag.axis: Drag.YAxis
+
+            onPressed: {
+                scrollBarView.state = 'hovered'
+                mousePressY = mouse.y
+
+                if( mouse.y < handle.y ) {
+                    dragToBottomEnabled = false
+                    moveAction = "up"
+                } else if( mouse.y > handle.y + handle.height ) {
+                    moveAction = "down"
                 } else {
-                    flickableItem.contentY = Math.max(0, targetY);
+                    dragToBottomEnabled = false
+                    moveAction = "drag"
+                }
+            }
+
+            onReleased: {
+                autoMove = false
+                scrollBarView.state = ''
+
+                switch ( moveAction )
+                {
+                    case "up":
+                        scrollBar.moveUp()
+                    break
+                    case "down":
+                        scrollBar.moveDown()
+                    break
+                    case "drag":
+                        scrollBar.dropHandle(mousePressY, mouse.y)
+                    break
+                }
+
+                moveAction = ''
+            }
+
+            onPositionChanged: {
+                if (moveAction == "drag") {
+                    scrollBar.dragHandle(mousePressY, mouse.y)
                 }
             }
         }
@@ -116,86 +183,58 @@ Item {
             running: autoMove
             interval: 60
             repeat: true
-            onTriggered: moveAction == "up" ? clickableArea.moveUp() : clickableArea.moveDown()
-        }
-
-        function moveDown() {
-            var targetY = flickableItem.contentY + ( 30 / scrollBar.pageSize )
-            if (scrollBar.position + scrollBar.pageSize < 1) {
-                flickableItem.contentY = targetY
-            }
-            else
-            {
-                autoMove = false
-                flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
-            }
-        }
-
-        function moveUp() {
-            var targetY = Math.max(0, flickableItem.contentY - 30 / scrollBar.pageSize);
-            flickableItem.contentY = targetY;
+            onTriggered: moveAction == "up" ? scrollBar.moveUp() : scrollBar.moveDown()
         }
     }
 
-    Rectangle {
-        id: buttonUp
-
-        anchors.top: scrollBar.top
-        height: 16
-        width: 16
-        border.color: '#999999'
-        color: '#cccccc'
-
-        MouseArea {
-            anchors.fill: parent
-
-            onPressed: {
-                buttonUp.state = 'pressed'
-            }
-
-            onReleased: {
-                buttonUp.state = ''
-                clickableArea.moveUp()
-            }
-        }
-
-        states: State {
-            name: 'pressed'
-            PropertyChanges { target: buttonUp; color: '#aaaaaa' }
+    function moveDown() {
+        var targetIndex = flickableItem.currentIndex + 5
+        if (targetIndex < flickableItem.count) {
+            flickableItem.currentIndex = targetIndex
+            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
+        } else {
+            autoMove = false
+            dragToBottomEnabled = true
+            flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
         }
     }
 
-    Rectangle {
-        id: buttonDown
-
-        anchors.bottom: scrollBar.bottom
-        height: 16
-        width: 16
-        border.color: '#999999'
-        color: '#cccccc'
-
-        MouseArea {
-            anchors.fill: parent
-
-            onPressed: {
-                buttonDown.state = 'pressed'
-            }
-
-            onReleased: {
-                buttonDown.state = ''
-                clickableArea.moveDown()
-            }
-        }
-
-        states: State {
-            name: 'pressed'
-            PropertyChanges { target: buttonDown; color: '#aaaaaa' }
+    function moveUp() {
+        var targetIndex = flickableItem.currentIndex - 5
+        if (targetIndex > 0) {
+            flickableItem.currentIndex = targetIndex
+            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
+        } else {
+            autoMove = false
+            flickableItem.positionViewAtIndex(0, ListView.Start);
         }
     }
 
-    states: State {
-        name: "hovered"
-        PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
+    function dragHandle(origin, target)
+    {
+        var density = flickableItem.count / track.height
+        var targetIndex = flickableItem.currentIndex + density * (target - origin)
+
+        if (targetIndex < 0) {
+            flickableItem.positionViewAtIndex(0, ListView.Start);
+        } else if (targetIndex > flickableItem.count - 1 ) {
+            flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
+        } else {
+            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
+        }
+    }
+
+    function dropHandle(origin, target)
+    {
+        var density = flickableItem.count / track.height
+        var targetIndex = flickableItem.currentIndex + density * (target - origin)
+
+        if (targetIndex < 0) {
+            flickableItem.currentIndex = 0
+        } else if (targetIndex > flickableItem.count - 1 ) {
+            flickableItem.currentIndex = flickableItem.count - 1
+        } else {
+            flickableItem.currentIndex = targetIndex
+        }
     }
 }
-
