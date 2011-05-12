@@ -21,9 +21,7 @@
 #define __WILINK_CALLS_H__
 
 #include <QAudioInput>
-#ifdef USE_DECLARATIVE
 #include <QDeclarativeItem>
-#endif
 #include <QWidget>
 
 #include "QXmppCallManager.h"

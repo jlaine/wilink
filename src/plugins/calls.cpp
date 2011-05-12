@@ -20,11 +20,9 @@
 #include <QAudioFormat>
 #include <QAudioInput>
 #include <QAudioOutput>
-#ifdef USE_DECLARATIVE
 #include <QDeclarativeComponent>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
-#endif
 #include <QFile>
 #include <QHostInfo>
 #include <QImage>
@@ -147,7 +145,6 @@ int CallAudioHelper::outputVolume() const
     return m_audioOutputMeter ? m_audioOutputMeter->value() : 0;
 }
 
-#ifdef USE_DECLARATIVE
 CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
     : QDeclarativeItem(parent),
     m_radius(8)
@@ -591,7 +588,6 @@ void CallWatcher::addCall(QXmppCall *call)
 
     ChatConversation *panel = qobject_cast<ChatConversation*>(m_window->panel(bareJid));
     if (panel) {
-#ifdef USE_DECLARATIVE
         bool check;
 
         // load component if needed
@@ -617,10 +613,6 @@ void CallWatcher::addCall(QXmppCall *call)
         widget->setProperty("call", qVariantFromValue<QObject*>(call));
         QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
-#else
-        CallWidget *widget = new CallWidget(call, m_window->rosterModel());
-        panel->addWidget(widget);
-#endif
     }
 }
 
@@ -749,10 +741,8 @@ bool CallsPlugin::initialize(Chat *chat)
     qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
-#ifdef USE_DECLARATIVE
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
-#endif
 
     CallWatcher *watcher = new CallWatcher(chat);
     m_watchers.insert(chat, watcher);
