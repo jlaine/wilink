@@ -49,9 +49,10 @@ Rectangle {
             model: historyModel
 
             function onBottomChanged() {
-                if(scrollBar.dragToBottomEnabled)
+                if (scrollBar.dragToBottomEnabled) {
                     currentIndex = count - 1
                     positionViewAtIndex(count - 1, ListView.End);
+                }
             }
         }
 
