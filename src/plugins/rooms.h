@@ -111,7 +111,6 @@ private slots:
     void returnPressed();
     void showProfile();
     void subjectChanged(const QString &subject);
-    void tabPressed();
     void talkAt(const QString &jid);
 
 private:

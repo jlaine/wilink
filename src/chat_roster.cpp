@@ -551,9 +551,10 @@ QModelIndex ChatRosterModel::contactsItem() const
     return createIndex(d->contactsItem, 0);
 }
 
-QModelIndex ChatRosterModel::findItem(const QString &bareJid) const
+QModelIndex ChatRosterModel::findItem(const QString &bareJid, const QModelIndex &parent) const
 {
-    return createIndex(d->find(bareJid), 0);
+    ChatRosterItem *parentItem = static_cast<ChatRosterItem*>(parent.isValid() ? parent.internalPointer() : rootItem);
+    return createIndex(d->find(bareJid, parentItem), 0);
 }
 
 Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const

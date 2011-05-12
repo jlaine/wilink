@@ -402,10 +402,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(returnPressed()));
     Q_ASSERT(check);
 
-    check = connect(chatInput(), SIGNAL(tabPressed()),
-                    this, SLOT(tabPressed()));
-    Q_ASSERT(check);
-
     /* if nickname is received, join now */
     if (rosterModel->isOwnNameReceived())
         join();
@@ -653,7 +649,11 @@ void ChatRoom::participantAdded(const QString &jid)
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
 
-    // FIXME : update number of users
+    // update input completions
+    QStringList members;
+    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
+        members << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
+    chatInput()->setProperty("members", members);
 }
 
 void ChatRoom::participantChanged(const QString &jid)
@@ -673,11 +673,16 @@ void ChatRoom::participantClicked(const QModelIndex &index)
 void ChatRoom::participantRemoved(const QString &jid)
 {
     //qDebug("participant removed %s", qPrintable(jid));
-    QModelIndex index = rosterModel->findItem(jid);
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
+    QModelIndex index = rosterModel->findItem(jid, roomIndex);
     if (index.isValid())
         rosterModel->removeRow(index.row(), index.parent());
 
-    // FIXME : update number of users
+    // update input completions
+    QStringList members;
+    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
+        members << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
+    chatInput()->setProperty("members", members);
 }
 
 /** Show a user's profile page.
@@ -715,34 +720,6 @@ void ChatRoom::returnPressed()
 
     // play sound
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());
-}
-
-void ChatRoom::tabPressed()
-{
-    QTextCursor cursor = chatInput()->textCursor();
-    cursor.movePosition(QTextCursor::StartOfWord);
-    // FIXME : for some reason on OS X, a leading '@' sign is not considered
-    // part of a word
-    if (cursor.position() &&
-        cursor.document()->characterAt(cursor.position() - 1) == QChar('@')) {
-        cursor.setPosition(cursor.position() - 1);
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
-    }
-    cursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
-    QString prefix = cursor.selectedText().toLower();
-    if (prefix.startsWith("@"))
-        prefix = prefix.mid(1);
-
-    /* find matching room members */
-    QStringList matches;
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++) {
-        QString member = roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-        if (member.toLower().startsWith(prefix))
-            matches << member;
-    }
-    if (matches.size() == 1)
-        cursor.insertText("@" + matches[0] + ": ");
 }
 
 /** Talk "at" somebody.

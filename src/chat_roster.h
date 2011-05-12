@@ -87,7 +87,7 @@ public:
 
     QModelIndex addItem(ChatRosterModel::Type type, const QString &id, const QString &name = QString(), const QPixmap &pixmap = QPixmap(), const QModelIndex &parent = QModelIndex());
     QModelIndex contactsItem() const;
-    QModelIndex findItem(const QString &jid) const;
+    QModelIndex findItem(const QString &jid, const QModelIndex &parent = QModelIndex()) const;
 
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);

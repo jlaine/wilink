@@ -27,6 +27,7 @@ class ChatEditPrivate
 {
 public:
     int maxHeight;
+    QStringList members;
     QTimer *inactiveTimer;
     QTimer *pausedTimer;
     QXmppMessage::State state;
@@ -95,10 +96,42 @@ void ChatEdit::keyPressEvent(QKeyEvent* e)
         } else
             emit returnPressed();
     }
-    else if (e->key() == Qt::Key_Tab)
-        emit tabPressed();
-    else
+    else if (e->key() == Qt::Key_Tab) {
+        QTextCursor cursor = textCursor();
+        cursor.movePosition(QTextCursor::StartOfWord);
+        // FIXME : for some reason on OS X, a leading '@' sign is not considered
+        // part of a word
+        if (cursor.position() &&
+            cursor.document()->characterAt(cursor.position() - 1) == QChar('@')) {
+            cursor.setPosition(cursor.position() - 1);
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+        }
+        cursor.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+        QString prefix = cursor.selectedText().toLower();
+        if (prefix.startsWith("@"))
+            prefix = prefix.mid(1);
+
+        /// find matching room members
+        QStringList matches;
+        foreach (const QString &member, d->members) {
+            if (member.toLower().startsWith(prefix))
+                matches << member;
+        }
+        if (matches.size() == 1)
+            cursor.insertText("@" + matches[0] + ": ");
+    } else {
         QTextEdit::keyPressEvent(e);
+    }
+}
+
+QStringList ChatEdit::members() const
+{
+    return d->members;
+}
+
+void ChatEdit::setMembers(const QStringList &members)
+{
+    d->members = members;
 }
 
 QSize ChatEdit::minimumSizeHint() const
