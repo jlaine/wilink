@@ -86,13 +86,16 @@ Rectangle {
 
             // search matching participants
             var needle = input.text.slice(start, end).toLowerCase();
+            var matches = [];
             for (var i in participants) {
-                var participant = participants[i];
-                if (participant.slice(0, needle.length).toLowerCase() == needle) {
-                    var replacement = participant + ': ';
-                    input.text = text.slice(0, start) + replacement + text.slice(end);
-                    input.cursorPosition = start + replacement.length;
+                if (participants[i].slice(0, needle.length).toLowerCase() == needle) {
+                    matches[matches.length] = participants[i];
                 }
+            }
+            if (matches.length == 1) {
+                var replacement = matches[0] + ': ';
+                input.text = text.slice(0, start) + replacement + text.slice(end);
+                input.cursorPosition = start + replacement.length;
             }
         }
     }

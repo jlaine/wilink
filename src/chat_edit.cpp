@@ -113,9 +113,9 @@ void ChatEdit::keyPressEvent(QKeyEvent* e)
 
         /// find matching participants
         QStringList matches;
-        foreach (const QString &member, d->participants) {
-            if (member.toLower().startsWith(prefix))
-                matches << member;
+        foreach (const QString &participant, d->participants) {
+            if (participant.toLower().startsWith(prefix))
+                matches << participant;
         }
         if (matches.size() == 1)
             cursor.insertText("@" + matches[0] + ": ");
