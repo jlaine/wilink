@@ -18,17 +18,13 @@
  */
 
 #include <QDesktopServices>
-#ifdef USE_DECLARATIVE
 #include <QDeclarativeComponent>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
-#endif
 #include <QDialogButtonBox>
 #include <QDropEvent>
 #include <QDir>
 #include <QFileDialog>
-#include <QGraphicsLinearLayout>
-#include <QGraphicsProxyWidget>
 #include <QLabel>
 #include <QHeaderView>
 #include <QLabel>
@@ -42,7 +38,6 @@
 #include <QUrl>
 
 #include "QXmppClient.h"
-#include "QXmppShareExtension.h"
 #include "QXmppUtils.h"
 
 #include "chat.h"
@@ -91,143 +86,9 @@ void ChatTransferPrompt::slotButtonClicked(QAbstractButton *button)
     QDir downloadsDir(SystemInfo::storageLocation(SystemInfo::DownloadsLocation));
     const QString filePath = availableFilePath(downloadsDir.path(), m_job->fileName());
 
-    // open file
-    QFile *file = new QFile(filePath, m_job);
-    if (!file->open(QIODevice::WriteOnly))
-    {
-        qWarning() << "Could not write to" << filePath;
-        m_job->abort();
-        return;
-    }
-
     // start transfer
-    m_job->setData(QXmppShareExtension::LocalPathRole, filePath);
-    m_job->accept(file);
-
+    m_job->accept(filePath);
     emit fileAccepted(m_job);
-}
-
-ChatTransferWidget::ChatTransferWidget(QXmppTransferJob *job, QGraphicsItem *parent)
-    : QGraphicsWidget(parent),
-    m_job(job)
-{
-    QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal, this);
-    layout->setContentsMargins(0, 0, 0, 0);
-
-    // icon
-    m_icon = new ChatPanelImage(this);
-    if (m_job->direction() == QXmppTransferJob::IncomingDirection)
-    {
-        m_icon->setPixmap(QPixmap(":/download.png"));
-        m_disappearWhenFinished = false;
-    } else {
-        m_icon->setPixmap(QPixmap(":/upload.png"));
-        m_disappearWhenFinished = true;
-    }
-    layout->addItem(m_icon);
-
-    // progress bar
-    m_progress = new ChatPanelProgress(this);
-    layout->addItem(m_progress);
-
-    // status label
-    m_label = new ChatPanelText(QString("%1 (%2)").arg(
-        m_job->fileName(),
-        sizeToString(job->fileSize())), this);
-    layout->addItem(m_label);
-
-    // close button
-    m_button = new ChatPanelButton(this);
-    m_button->setPixmap(QPixmap(":/close.png"));
-    layout->addItem(m_button);
-
-    setLayout(layout);
-
-    // connect signals
-    bool check;
-    check = connect(m_button, SIGNAL(clicked()),
-                    this, SLOT(slotCancel()));
-    Q_ASSERT(check);
-
-    check = connect(m_label, SIGNAL(clicked()),
-                    this, SLOT(slotOpen()));
-    Q_ASSERT(check);
-
-    check = connect(m_job, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(slotDestroyed(QObject*)));
-    Q_ASSERT(check);
-
-    check = connect(m_job, SIGNAL(finished()),
-                    this, SLOT(slotFinished()));
-    Q_ASSERT(check);
-
-    check = connect(m_job, SIGNAL(progress(qint64, qint64)),
-                    this, SLOT(slotProgress(qint64, qint64)));
-    Q_ASSERT(check);
-}
-
-void ChatTransferWidget::slotCancel()
-{
-    if (m_job && m_job->state() != QXmppTransferJob::FinishedState)
-    {
-        // cancel job
-        m_disappearWhenFinished = true;
-        m_job->abort();
-        return;
-    } else {
-        // make widget disappear
-        m_button->setEnabled(false);
-        emit finished();
-    }
-}
-
-void ChatTransferWidget::slotDestroyed(QObject *object)
-{
-    Q_UNUSED(object);
-    m_job = 0;
-}
-
-void ChatTransferWidget::slotOpen()
-{
-    if (!m_localPath.isEmpty())
-        QDesktopServices::openUrl(QUrl::fromLocalFile(m_localPath));
-}
-
-void ChatTransferWidget::slotProgress(qint64 done, qint64 total)
-{
-    if (m_job && total > 0)
-    {
-        m_progress->setValue((100 * done) / total);
-        qint64 speed = m_job->speed();
-        if (m_job->direction() == QXmppTransferJob::IncomingDirection)
-            setToolTip(tr("Downloading at %1").arg(speedToString(speed)));
-        else
-            setToolTip(tr("Uploading at %1").arg(speedToString(speed)));
-    }
-}
-
-void ChatTransferWidget::slotFinished()
-{
-    // update UI
-//    m_progress->hide();
-    setToolTip(QString());
-    if (m_job->error() == QXmppTransferJob::NoError)
-    {
-        m_icon->setPixmap(QPixmap(":/contact-available.png"));
-        m_localPath = m_job->data(QXmppShareExtension::LocalPathRole).toString();
-    }
-    else
-        m_icon->setPixmap(QPixmap(":/contact-busy.png"));
-
-    // delete job
-    m_job->deleteLater();
-
-    // make widget disappear
-    if (m_disappearWhenFinished)
-    {
-        m_button->setEnabled(false);
-        QTimer::singleShot(1000, this, SIGNAL(finished()));
-    }
 }
 
 ChatTransfersWatcher::ChatTransfersWatcher(Chat *window)
@@ -263,7 +124,6 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
 
     ChatConversation *panel = qobject_cast<ChatConversation*>(chatWindow->panel(bareJid));
     if (panel) {
-#ifdef USE_DECLARATIVE
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__transfer_component").value<QObject*>());
         if (!component) {
@@ -278,10 +138,6 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
         widget->setProperty("job", qVariantFromValue<QObject*>(job));
         QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
-#else
-        ChatTransferWidget *widget = new ChatTransferWidget(job);
-        panel->addWidget(widget);
-#endif
     }
 }
 
@@ -354,7 +210,6 @@ void ChatTransfersWatcher::sendFile(const QString &fullJid, const QString &fileP
 
     // send file
     QXmppTransferJob *job = transferManager->sendFile(fullJid, filePath);
-    job->setData(QXmppShareExtension::LocalPathRole, filePath);
     addJob(job);
 }
 
@@ -399,9 +254,7 @@ void TransfersPlugin::finalize(Chat *chat)
 
 bool TransfersPlugin::initialize(Chat *chat)
 {
-#ifdef USE_DECLARATIVE
     qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
-#endif
 
     /* register panel */
     ChatTransfersWatcher *watcher = new ChatTransfersWatcher(chat);

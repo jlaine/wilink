@@ -315,7 +315,7 @@ void SharesPanel::transferFinished(QXmppTransferJob *job)
     if (job->error() == QXmppTransferJob::NoError)
     {
         statusBar->showMessage(QString("%1 - %2").arg(tr("Downloaded"), queueItem->name()), STATUS_TIMEOUT);
-        queueItem->setData(TransferPath, job->data(QXmppShareExtension::LocalPathRole));
+        queueItem->setData(TransferPath, job->localFilePath());
         queueItem->setData(TransferError, QVariant());
     } else {
         statusBar->showMessage(QString("%1 - %2").arg(tr("Failed"), queueItem->name()), STATUS_TIMEOUT);
