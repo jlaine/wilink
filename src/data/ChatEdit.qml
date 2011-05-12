@@ -37,6 +37,7 @@ Rectangle {
         x: 8
         y: 8
         smooth: true
+        textFormat: TextEdit.PlainText
         width: parent.width - 16
 
         Keys.onReturnPressed: {
@@ -47,7 +48,27 @@ Rectangle {
             }
         }
         Keys.onTabPressed: {
-            chatEdit.tabPressed()
+            // select word, including 'at' sign
+            var text = input.text;
+            var end = input.cursorPosition;
+            var start = end;
+            while (start >= 0 && text.charAt(start) != '@') {
+                start -= 1;
+            }
+            if (start < 0)
+                return;
+            start += 1;
+
+            var needle = input.text.slice(start, end).toLowerCase();
+            // FIXME: get real members
+            var members = ['Foo', 'Bar'];
+            for (var i in members) {
+                if (members[i].slice(0, needle.length).toLowerCase() == needle) {
+                    var replacement = members[i] + ': ';
+                    input.text = text.slice(0, start) + replacement + text.slice(end);
+                    input.cursorPosition = start + replacement.length;
+                }
+            }
         }
     }
 }

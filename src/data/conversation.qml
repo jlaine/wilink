@@ -73,6 +73,7 @@ Rectangle {
 
         ChatEdit {
             id: chatInput
+            objectName: 'chatInput'
 
             x: 4
             y: 4
