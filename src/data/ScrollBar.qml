@@ -25,8 +25,10 @@ Item {
     property ListView flickableItem
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
-    property bool dragToBottomEnabled
+
     property bool autoMove: false
+    property bool dragToBottomEnabled
+    property int minHeight: 20
     property string moveAction: ""
 
     width: 16
@@ -47,12 +49,15 @@ Item {
         Rectangle {
             id: handle
 
+            property int size: scrollBar.pageSize * (track.height - 2)
+            property int position: scrollBar.position * (track.height - 2) + track.anchors.topMargin + 1
+
             border.color: '#c3c3c3'
             border.width: 1
             color: '#c3c3c3'
             x: 0
-            y: scrollBar.position * (track.height - 2) + track.anchors.topMargin + 1
-            height: scrollBar.pageSize * (track.height - 2)
+            y: size < minHeight ? position - scrollBar.position * minHeight : position
+            height: size < minHeight ? minHeight : size
             width: parent.width - 1
             radius: 6
         }
