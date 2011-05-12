@@ -51,6 +51,7 @@ Rectangle {
             function onBottomChanged() {
                 if(scrollBar.dragToBottomEnabled)
                     currentIndex = count - 1
+                    positionViewAtIndex(count - 1, ListView.End);
             }
         }
 
