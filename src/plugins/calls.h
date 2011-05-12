@@ -129,13 +129,44 @@ private:
     QTimer *m_videoTimer;
 };
 
+class DeclarativePen : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(int width READ width WRITE setWidth NOTIFY penChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY penChanged)
+
+public:
+    DeclarativePen(QObject *parent=0)
+        : QObject(parent), _width(1), _color("#000000"), _valid(false)
+    {}
+
+    int width() const { return _width; }
+    void setWidth(int w);
+
+    QColor color() const { return _color; }
+    void setColor(const QColor &c);
+
+    bool isValid() { return _valid; }
+
+Q_SIGNALS:
+    void penChanged();
+
+private:
+    int _width;
+    QColor _color;
+    bool _valid;
+};
+
 class CallVideoItem : public QDeclarativeItem
 {
     Q_OBJECT
+    Q_PROPERTY(DeclarativePen * border READ border CONSTANT)
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
 
 public:
     CallVideoItem(QDeclarativeItem *parent = 0);
+
+    DeclarativePen* border();
 
     qreal radius() const;
     void setRadius(qreal radius);
@@ -151,6 +182,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 private:
+    DeclarativePen *m_border;
     QImage m_image;
     qreal m_radius;
 };

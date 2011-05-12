@@ -66,6 +66,23 @@ static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
     return format;
 }
 
+void DeclarativePen::setColor(const QColor &c)
+{
+    _color = c;
+    _valid = (_color.alpha() && _width >= 1) ? true : false;
+    emit penChanged();
+}
+
+void DeclarativePen::setWidth(int w)
+{
+    if (_width == w && _valid)
+        return;
+
+    _width = w;
+    _valid = (_color.alpha() && _width >= 1) ? true : false;
+    emit penChanged();
+}
+
 CallAudioHelper::CallAudioHelper(QObject *parent)
     : QObject(parent),
     m_audioInput(0),
@@ -330,6 +347,7 @@ CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
     : QDeclarativeItem(parent),
     m_radius(8)
 {
+    m_border = new DeclarativePen(this);
     setFlag(QGraphicsItem::ItemHasNoContents, false);
 }
 
@@ -345,8 +363,7 @@ void CallVideoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     const QRectF m_boundingRect(0, 0, width(), height());
     if (m_boundingRect.isEmpty())
         return;
-    const QPalette palette = ChatPanel::palette();
-    painter->setPen(QPen(palette.color(QPalette::Mid)));
+    painter->setPen(QPen(m_border->color(), m_border->width()));
     if (!m_image.size().isEmpty()) {
         QBrush brush(m_image);
         brush.setTransform(brush.transform().scale(m_boundingRect.width() / m_image.width(), m_boundingRect.height() / m_image.height()));
@@ -372,6 +389,11 @@ void CallVideoItem::setFormat(const QXmppVideoFormat &format)
         m_image = QImage(size, QImage::Format_RGB32);
         m_image.fill(0);
     }
+}
+
+DeclarativePen* CallVideoItem::border()
+{
+    return m_border;
 }
 
 qreal CallVideoItem::radius() const
@@ -562,8 +584,10 @@ bool CallsPlugin::initialize(Chat *chat)
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
+    qmlRegisterUncreatableType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper", "");
     qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
+    qmlRegisterUncreatableType<DeclarativePen>("wiLink", 1, 2, "DeclarativePen", "");
 
     CallWatcher *watcher = new CallWatcher(chat);
     m_watchers.insert(chat, watcher);

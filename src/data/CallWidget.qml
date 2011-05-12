@@ -67,14 +67,11 @@ Item {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.margins: 4
-
-            //border.width: 1
-            //border.color: '#2689d6'
-
+            border.width: 1
+            border.color: '#2689d6'
             radius: 8
             height: 240
             width: 320
-
             visible: video.enabled
         }
 
@@ -85,14 +82,11 @@ Item {
             anchors.left: videoOutput.right
             anchors.leftMargin: -100
             anchors.topMargin: -80
-
-            //border.width: 1
-            //border.color: '#2689d6'
-
+            border.width: 1
+            border.color: '#ff0000'
             radius: 8
             height: 120
             width: 160
-
             visible: video.enabled
         }
 
