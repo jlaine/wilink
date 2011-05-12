@@ -26,11 +26,11 @@ Item {
 
     property QtObject call: null
     property QtObject audio: null
-    property bool videoEnabled: false
+    property QtObject video: null
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
-    height: videoEnabled ? 288 : 40
+    height: (video && video.enabled) ? 288 : 40
 
     Rectangle {
         anchors.fill: parent
@@ -68,7 +68,7 @@ Item {
             height: 240
             width: 320
 
-            visible: videoEnabled
+            visible: video && video.enabled
         }
 
         CallVideoItem {
@@ -86,7 +86,7 @@ Item {
             height: 120
             width: 160
 
-            visible: videoEnabled
+            visible: video && video.enabled
         }
 
         Button {
@@ -149,17 +149,12 @@ Item {
 
     Connections {
         target: hangupButton
-        onClicked: {
-            call.hangup();
-        }
+        onClicked: call.hangup()
     }
 
     Connections {
         target: cameraButton
-        onClicked: {
-            callWidget.videoEnabled = true;
-            call.startVideo();
-        }
+        onClicked: call.startVideo()
     }
 
     Connections {

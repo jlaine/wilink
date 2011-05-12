@@ -195,6 +195,11 @@ void CallVideoHelper::setCall(QXmppCall *call)
     }
 }
 
+bool CallVideoHelper::enabled() const
+{
+    return m_call && ((m_call->videoMode() && QIODevice::ReadWrite) != QIODevice::NotOpen);
+}
+
 CallVideoItem *CallVideoHelper::output() const
 {
     return m_videoOutput;
@@ -281,6 +286,8 @@ void CallVideoHelper::videoModeChanged(QIODevice::OpenMode mode)
             m_videoConversion = 0;
         }
     }
+
+    emit enabledChanged(canRead || canWrite);
 }
 
 void CallVideoHelper::videoCapture(const QXmppVideoFrame &frame)
