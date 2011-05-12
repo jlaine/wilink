@@ -333,16 +333,12 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
 
     // connect signals
-    check = connect(chatInput, SIGNAL(returnPressed()),
-                    this, SLOT(returnPressed()));
-    Q_ASSERT(check);
-
-    // get notified when room is closed
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(unbookmark()));
     Q_ASSERT(check);
 
-    check = connect(rosterModel, SIGNAL(ownNameReceived()), this, SLOT(join()));
+    check = connect(rosterModel, SIGNAL(ownNameReceived()),
+                    this, SLOT(join()));
     Q_ASSERT(check);
 
     check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
@@ -402,7 +398,13 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
 
     /* keyboard shortcut */
-    connect(chatInput, SIGNAL(tabPressed()), this, SLOT(tabPressed()));
+    check = connect(chatInput(), SIGNAL(returnPressed()),
+                    this, SLOT(returnPressed()));
+    Q_ASSERT(check);
+
+    check = connect(chatInput(), SIGNAL(tabPressed()),
+                    this, SLOT(tabPressed()));
+    Q_ASSERT(check);
 
     /* if nickname is received, join now */
     if (rosterModel->isOwnNameReceived())
@@ -700,7 +702,7 @@ void ChatRoom::subjectChanged(const QString &subject)
  */
 void ChatRoom::returnPressed()
 {
-    QString text = chatInput->text();
+    const QString text = chatInput()->property("text").toString();
     if (text.isEmpty())
         return;
 
@@ -709,7 +711,7 @@ void ChatRoom::returnPressed()
         return;
 
     // clear input
-    chatInput->clear();
+    chatInput()->setProperty("text", QString());
 
     // play sound
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());
@@ -717,7 +719,7 @@ void ChatRoom::returnPressed()
 
 void ChatRoom::tabPressed()
 {
-    QTextCursor cursor = chatInput->textCursor();
+    QTextCursor cursor = chatInput()->textCursor();
     cursor.movePosition(QTextCursor::StartOfWord);
     // FIXME : for some reason on OS X, a leading '@' sign is not considered
     // part of a word
@@ -748,15 +750,15 @@ void ChatRoom::tabPressed()
 void ChatRoom::talkAt(const QString &jid)
 {
     const QString nickName = jidToResource(jid);
+    const QString text = chatInput()->property("text").toString();
     if (!chat->client()->isConnected() ||
-        chatInput->toPlainText().contains("@" + nickName + ": "))
+        text.contains("@" + nickName + ": "))
         return;
 
     const QString newAt = "@" + nickName;
-    QTextCursor cursor = chatInput->textCursor();
+    QTextCursor cursor = chatInput()->textCursor();
 
     QRegExp rx("((@[^,:]+[,:] )+)");
-    QString text = chatInput->document()->toPlainText();
     int oldPos;
     if ((oldPos = rx.indexIn(text)) >= 0)
     {
@@ -772,7 +774,7 @@ void ChatRoom::talkAt(const QString &jid)
         cursor.insertText(newAt + ": ");
     }
     emit showPanel();
-    chatInput->setFocus();
+    chatInput()->setFocus();
 }
 
 /** Unbookmarks the room.

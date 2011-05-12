@@ -43,7 +43,6 @@ class ChatConversation : public ChatPanel
 public:
     ChatConversation(QWidget *parent = NULL);
     ~ChatConversation();
-    QSplitter *splitter();
     ChatHistoryModel *historyModel();
     QDeclarativeView *historyView();
     ChatRosterModel *rosterModel();
@@ -56,8 +55,8 @@ protected slots:
     void slotSearchDisplayed(bool visible);
 
 protected:
-    // FIXME: this should be private
-    ChatEdit *chatInput;
+    ChatEdit *chatInput();
+    QSplitter *splitter();
 
 private:
     ChatConversationPrivate *d;

@@ -22,6 +22,8 @@ import QtQuick 1.0
 Rectangle {
     id: chatEdit
 
+    signal returnPressed
+
     border.color: '#c3c3c3'
     border.width: 1
     color: '#ffffff'
@@ -29,9 +31,19 @@ Rectangle {
 
     TextEdit {
         id: input
+
         x: 8
         y: 8
+        smooth: true
         width: parent.width - 16
+
+        Keys.onReturnPressed: {
+            if (event.modifiers == Qt.NoModifier) {
+                chatEdit.returnPressed();
+            } else {
+                event.accepted = false;
+            }
+        }
     }
 }
 

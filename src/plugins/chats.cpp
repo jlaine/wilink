@@ -65,11 +65,11 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
 
     // connect signals
     bool check;
-    check = connect(chatInput, SIGNAL(returnPressed()),
+    check = connect(chatInput(), SIGNAL(returnPressed()),
                     this, SLOT(returnPressed()));
     Q_ASSERT(check);
 
-    check = connect(chatInput, SIGNAL(stateChanged(QXmppMessage::State)),
+    check = connect(chatInput(), SIGNAL(stateChanged(QXmppMessage::State)),
                     this, SLOT(chatStateChanged(QXmppMessage::State)));
     Q_ASSERT(check);
 
@@ -173,7 +173,7 @@ void ChatDialog::join()
     {
         QXmppMessage message;
         message.setTo(fullJid);
-        message.setState(chatInput->state());
+        message.setState(chatInput()->state());
         client->sendPacket(message);
     }
 
@@ -227,7 +227,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
  */
 void ChatDialog::returnPressed()
 {
-    QString text = chatInput->text();
+    const QString text = chatInput()->property("text").toString();
     if (text.isEmpty())
         return;
 
@@ -240,7 +240,7 @@ void ChatDialog::returnPressed()
         return;
 
     // clear input
-    chatInput->clear();
+    chatInput()->setProperty("text", QString());
 
     // add message to history
     ChatMessage message;

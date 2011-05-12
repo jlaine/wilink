@@ -31,22 +31,24 @@ class ChatEditPrivate;
 class ChatEdit : public QTextEdit
 {
     Q_OBJECT
+    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
 
 public:
     ChatEdit(int maxheight = 80, QWidget* parent = NULL);
     ~ChatEdit();
 
-    void clear();
     virtual QSize minimumSizeHint() const;
     virtual QSize sizeHint() const;
     QXmppMessage::State state() const;
     QString text() const;
+    void setText(const QString &text);
 
 signals:
     void focused();
     void returnPressed();
     void stateChanged(QXmppMessage::State state);
     void tabPressed();
+    void textChanged();
 
 protected:
     virtual void focusInEvent(QFocusEvent* e);

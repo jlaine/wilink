@@ -66,13 +66,6 @@ ChatEdit::~ChatEdit()
     delete d;
 }
 
-void ChatEdit::clear()
-{
-    // set state in advance to avoid a spurious state change
-    d->state = QXmppMessage::Active;
-    document()->clear();
-}
-
 void ChatEdit::focusInEvent(QFocusEvent *e)
 {
     QTextEdit::focusInEvent(e);
@@ -171,6 +164,14 @@ QXmppMessage::State ChatEdit::state() const
 QString ChatEdit::text() const
 {
     return document()->toPlainText();
+}
+
+void ChatEdit::setText(const QString &text)
+{
+    // set state in advance to avoid a spurious state change
+    d->state = QXmppMessage::Active;
+    document()->setPlainText(text);
+    emit textChanged();
 }
 
 void ChatEdit::slotInactive()

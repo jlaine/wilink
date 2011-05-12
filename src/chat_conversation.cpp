@@ -80,6 +80,7 @@ void RosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
 class ChatConversationPrivate
 {
 public:
+    ChatEdit *chatInput;
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
     RosterImageProvider *imageProvider;
@@ -174,24 +175,24 @@ ChatConversation::ChatConversation(QWidget *parent)
     layout->addWidget(d->searchBar);
 
     /* text edit */
-    chatInput = new ChatEdit(80);
+    d->chatInput = new ChatEdit(80);
 #ifdef WILINK_EMBEDDED
     QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(chatInput);
+    hbox->addWidget(d->chatInput);
     QPushButton *sendButton = new QPushButton;
     sendButton->setFlat(true);
     sendButton->setMaximumWidth(32);
     sendButton->setIcon(QIcon(":/upload.png"));
     check = connect(sendButton, SIGNAL(clicked()),
-                    chatInput, SIGNAL(returnPressed()));
+                    d->chatInput, SIGNAL(returnPressed()));
     Q_ASSERT(check);
     hbox->addWidget(sendButton);
     layout->addLayout(hbox);
 #else
-    layout->addWidget(chatInput);
+    layout->addWidget(d->chatInput);
 #endif
 
-    setFocusProxy(chatInput);
+    setFocusProxy(d->chatInput);
     setLayout(layout);
 
     /* shortcuts */
@@ -200,6 +201,11 @@ ChatConversation::ChatConversation(QWidget *parent)
 ChatConversation::~ChatConversation()
 {
     delete d;
+}
+
+ChatEdit *ChatConversation::chatInput()
+{
+    return d->chatInput;
 }
 
 QSplitter *ChatConversation::splitter()
