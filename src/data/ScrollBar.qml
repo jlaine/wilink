@@ -100,10 +100,8 @@ Item {
                 var targetY = pressContentY + (mouse.y - pressMouseY) / pressScale;
                 if (mouse.y - pressMouseY > 0 && scrollBar.position + scrollBar.pageSize >= 1) {
                     flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
-                } else if(mouse.y - pressMouseY < 0 && scrollBar.position - scrollBar.pageSize <= 0) {
-                    flickableItem.positionViewAtIndex(0, ListView.Start);
                 } else {
-                    flickableItem.contentY = targetY
+                    flickableItem.contentY = Math.max(0, targetY);
                 }
             }
         }
@@ -134,15 +132,8 @@ Item {
         }
 
         function moveUp() {
-            var targetY = flickableItem.contentY - 30 / scrollBar.pageSize
-            if (scrollBar.position > 0) {
-                flickableItem.contentY = targetY
-            }
-            else
-            {
-                autoMove = false
-                flickableItem.positionViewAtIndex(0, ListView.Start)
-            }
+            var targetY = Math.max(0, flickableItem.contentY - 30 / scrollBar.pageSize);
+            flickableItem.contentY = targetY;
         }
     }
 
