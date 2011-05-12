@@ -39,7 +39,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Hang up</source>
-        <translation>Raccrocher</translation>
+        <translation type="obsolete">Raccrocher</translation>
     </message>
     <message>
         <source>Call connected.</source>
@@ -55,7 +55,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Ringing..</source>
-        <translation>Sonne..</translation>
+        <translation type="obsolete">Sonne..</translation>
     </message>
 </context>
 <context>
