@@ -158,6 +158,9 @@ Item {
                     case "down":
                         scrollBar.moveDown()
                     break
+                    case "drag":
+                        scrollBar.dropHandle(mousePressY, mouse.y)
+                    break
                 }
 
                 moveAction = ''
@@ -213,14 +216,25 @@ Item {
         var targetIndex = flickableItem.currentIndex + density * (target - origin)
 
         if (targetIndex < 0) {
-            flickableItem.currentIndex = 0
             flickableItem.positionViewAtIndex(0, ListView.Start);
         } else if (targetIndex > flickableItem.count - 1 ) {
-            flickableItem.currentIndex = flickableItem.count - 1
             flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
         } else {
-            flickableItem.currentIndex = targetIndex
             flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
+        }
+    }
+
+    function dropHandle(origin, target)
+    {
+        var density = flickableItem.count / track.height
+        var targetIndex = flickableItem.currentIndex + density * (target - origin)
+
+        if (targetIndex < 0) {
+            flickableItem.currentIndex = 0
+        } else if (targetIndex > flickableItem.count - 1 ) {
+            flickableItem.currentIndex = flickableItem.count - 1
+        } else {
+            flickableItem.currentIndex = targetIndex
         }
     }
 }
