@@ -62,6 +62,7 @@ protected:
 
 public slots:
     void onTextChanged();
+    void talkAt(const QString &text);
 
 private slots:
     void slotInactive();

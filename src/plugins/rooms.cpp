@@ -613,8 +613,10 @@ void ChatRoom::left()
 
 void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
-    if (messageIndex.isValid())
-        talkAt(jidToResource(messageIndex.data(ChatHistoryModel::JidRole).toString()));
+    if (messageIndex.isValid() && chat->client()->isConnected()) {
+        const QString nickName = jidToResource(messageIndex.data(ChatHistoryModel::JidRole).toString());
+        chatInput()->talkAt(nickName);
+    }
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -666,8 +668,10 @@ void ChatRoom::participantChanged(const QString &jid)
 
 void ChatRoom::participantClicked(const QModelIndex &index)
 {
-    if(index.isValid())
-        talkAt(jidToResource(index.data(ChatRosterModel::IdRole).toString()));
+    if (index.isValid() && chat->client()->isConnected()) {
+        const QString nickName = jidToResource(index.data(ChatRosterModel::IdRole).toString());
+        chatInput()->talkAt(nickName);
+    }
 }
 
 void ChatRoom::participantRemoved(const QString &jid)
@@ -720,35 +724,6 @@ void ChatRoom::returnPressed()
 
     // play sound
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());
-}
-
-/** Talk "at" somebody.
- */
-void ChatRoom::talkAt(const QString &nickName)
-{
-    const QString text = chatInput()->property("text").toString();
-    if (!chat->client()->isConnected() ||
-        text.contains("@" + nickName + ": "))
-        return;
-
-    const QString newAt = "@" + nickName;
-    QTextCursor cursor = chatInput()->textCursor();
-
-    QRegExp rx("((@[^,:]+[,:] )+)");
-    int oldPos;
-    if ((oldPos = rx.indexIn(text)) >= 0)
-    {
-        QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
-        if (!bits.contains(newAt))
-        {
-            bits << newAt;
-            cursor.setPosition(oldPos);
-            cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
-            cursor.insertText(bits.join(", ") + ": ");
-        }
-    } else {
-        cursor.insertText(newAt + ": ");
-    }
 }
 
 /** Unbookmarks the room.

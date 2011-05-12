@@ -207,6 +207,34 @@ void ChatEdit::setText(const QString &text)
     emit textChanged();
 }
 
+/** Talk "at" somebody.
+ */
+void ChatEdit::talkAt(const QString &nickName)
+{
+    const QString text = document()->toPlainText();
+    if (text.contains("@" + nickName + ": "))
+        return;
+
+    const QString newAt = "@" + nickName;
+    QTextCursor cursor = textCursor();
+
+    QRegExp rx("((@[^,:]+[,:] )+)");
+    int oldPos;
+    if ((oldPos = rx.indexIn(text)) >= 0)
+    {
+        QStringList bits = rx.cap(0).split(QRegExp("[,:] "), QString::SkipEmptyParts);
+        if (!bits.contains(newAt))
+        {
+            bits << newAt;
+            cursor.setPosition(oldPos);
+            cursor.setPosition(oldPos + rx.matchedLength(), QTextCursor::KeepAnchor);
+            cursor.insertText(bits.join(", ") + ": ");
+        }
+    } else {
+        cursor.insertText(newAt + ": ");
+    }
+}
+
 void ChatEdit::slotInactive()
 {
     if (d->state != QXmppMessage::Inactive)
