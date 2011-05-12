@@ -26,11 +26,18 @@ Item {
 
     property QtObject call: null
     property QtObject audio: null
-    property QtObject video: null
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
-    height: (video && video.enabled) ? 288 : 40
+    height: video.enabled ? 288 : 40
+
+    CallVideoHelper {
+        id: video
+
+        call: callWidget.call
+        monitor: videoMonitor
+        output: videoOutput
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -55,7 +62,7 @@ Item {
         }
 
         CallVideoItem {
-            id: videoMonitor
+            id: videoOutput
 
             anchors.left: parent.left
             anchors.top: parent.top
@@ -68,14 +75,14 @@ Item {
             height: 240
             width: 320
 
-            visible: video && video.enabled
+            visible: video.enabled
         }
 
         CallVideoItem {
-            id: videoOutput
+            id: videoMonitor
 
-            anchors.top: videoMonitor.bottom
-            anchors.left: videoMonitor.right
+            anchors.top: videoOutput.bottom
+            anchors.left: videoOutput.right
             anchors.leftMargin: -100
             anchors.topMargin: -80
 
@@ -86,7 +93,7 @@ Item {
             height: 120
             width: 160
 
-            visible: video && video.enabled
+            visible: video.enabled
         }
 
         Button {
@@ -113,8 +120,8 @@ Item {
             anchors.top: parent.top
             anchors.right: cameraButton.left
             anchors.margins: 4
-            maximumValue: audio ? audio.maximumVolume : 1
-            value: audio ? audio.outputVolume : 0
+            maximumValue: Qt.isQtObject(audio) ? audio.maximumVolume : 1
+            value: Qt.isQtObject(audio) ? audio.outputVolume : 0
         }
 
         ProgressBar {
@@ -124,8 +131,8 @@ Item {
             anchors.right: cameraButton.left
             anchors.leftMargin: 4
             anchors.rightMargin: 4
-            maximumValue: audio ? audio.maximumVolume : 1
-            value: audio ? audio.inputVolume : 0
+            maximumValue: Qt.isQtObject(audio) ? audio.maximumVolume : 1
+            value: Qt.isQtObject(audio) ? audio.inputVolume : 0
         }
 
         Image {

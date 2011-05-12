@@ -781,15 +781,10 @@ void CallWatcher::addCall(QXmppCall *call)
         audioHelper->moveToThread(wApp->soundThread());
         audioHelper->setCall(call);
 
-        // create video helper
-        CallVideoHelper *videoHelper = new CallVideoHelper;
-        videoHelper->setCall(call);
-
         // create call widget
         QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
         Q_ASSERT(widget);
         widget->setProperty("audio", qVariantFromValue<QObject*>(audioHelper));
-        widget->setProperty("video", qVariantFromValue<QObject*>(videoHelper));
         widget->setProperty("call", qVariantFromValue<QObject*>(call));
         QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
@@ -922,6 +917,7 @@ bool CallsPlugin::initialize(Chat *chat)
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
+    qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
 
     CallWatcher *watcher = new CallWatcher(chat);
