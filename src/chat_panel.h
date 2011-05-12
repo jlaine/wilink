@@ -20,18 +20,12 @@
 #ifndef __WILINK_CHAT_PANEL_H__
 #define __WILINK_CHAT_PANEL_H__
 
-#include <QGraphicsTextItem>
-#include <QGraphicsWidget>
 #include <QList>
 #include <QWidget>
 
-class QGraphicsLinearLayout;
-class QGraphicsView;
 class QHBoxLayout;
-class QPropertyAnimation;
 class QTimer;
 class ChatPanelPrivate;
-class ChatPanelWidget;
 
 /** ChatPanel is the base class for all the panels displayed in the right-hand
  *  part of the user interface, such as conversations.
@@ -77,139 +71,6 @@ private slots:
 
 private:
     ChatPanelPrivate * const d;
-};
-
-/** The ChatPanelBar class is used to display a set of "task" widgets.
- */
-class ChatPanelBar : public QGraphicsWidget
-{
-    Q_OBJECT
-
-public:
-    ChatPanelBar(QGraphicsView *view);
-    void addWidget(QGraphicsWidget *widget);
-
-protected:
-    bool eventFilter(QObject *watched, QEvent *Event);
-    void updateGeometry();
-
-private slots:
-    void trackView();
-
-private:
-    QPropertyAnimation *m_animation;
-    QTimer *m_delay;
-    QGraphicsLinearLayout *m_layout;
-    QGraphicsView *m_view;
-};
-
-/** The ChatPanelButton class represents a button.
- */
-class ChatPanelButton : public QGraphicsWidget
-{
-    Q_OBJECT
-
-public:
-    ChatPanelButton(QGraphicsItem *parent);
-    void setGeometry(const QRectF &rect);
-    void setPixmap(const QPixmap &pixmap);
-
-signals:
-    void clicked();
-
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-
-private:
-    void updateGradient();
-
-    bool m_pressed;
-    QGraphicsPathItem *m_path;
-    QGraphicsPixmapItem *m_pixmap;
-};
-
-/** The ChatPanelImage class represents an image.
- */
-class ChatPanelImage : public QGraphicsPixmapItem, public QGraphicsLayoutItem
-{
-public:
-    ChatPanelImage(QGraphicsItem *parent = 0);
-    void setGeometry(const QRectF &rect);
-
-protected:
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-};
-
-/** The ChatPanelProgress class represents a progress bar.
- */
-class ChatPanelProgress : public QGraphicsWidget
-{
-    Q_OBJECT
-
-public:
-    ChatPanelProgress(QGraphicsItem *parent);
-    void setGeometry(const QRectF &rect);
-    void setOrientation(Qt::Orientation orientation);
-
-public slots:
-    void setMaximum(int maximum);
-    void setMinimum(int maximum);
-    void setValue(int value);
-
-protected:
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-
-private:
-    void resizeBar();
-
-    QGraphicsPathItem *m_bar;
-    int m_maximum;
-    int m_minimum;
-    Qt::Orientation m_orientation;
-    QRectF m_rect;
-    QGraphicsPathItem *m_track;
-    int m_value;
-};
-
-/** The ChatPanelText class represents a text label.
- */
-class ChatPanelText : public QGraphicsTextItem, public QGraphicsLayoutItem
-{
-    Q_OBJECT
-    Q_INTERFACES(QGraphicsLayoutItem)
-
-public:
-    ChatPanelText(const QString &text = QString(), QGraphicsItem *parent = 0);
-    void setGeometry(const QRectF &rect);
-
-signals:
-    void clicked();
-
-protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
-};
-
-/** ChatPanelWidget is a wrapper for "task" widgets inside a ChatPanelBar.
- */
-class ChatPanelWidget : public QGraphicsWidget
-{
-    Q_OBJECT
-
-public:
-    ChatPanelWidget(QGraphicsWidget *contents, QGraphicsItem *parent = 0);
-    void setGeometry(const QRectF &rect);
-
-private slots:
-    void disappear();
-
-private:
-    void appear();
-    QGraphicsPathItem *m_border;
-    QGraphicsWidget *m_centralWidget;
 };
 
 #endif

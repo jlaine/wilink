@@ -20,11 +20,7 @@
 #ifndef __WILINK_CHAT_CONVERSATION_H__
 #define __WILINK_CHAT_CONVERSATION_H__
 
-#ifdef USE_DECLARATIVE
 #include <QDeclarativeView>
-#else
-#include <QGraphicsView>
-#endif
 
 #include "QXmppMessage.h"
 
@@ -47,14 +43,9 @@ class ChatConversation : public ChatPanel
 public:
     ChatConversation(QWidget *parent = NULL);
     ~ChatConversation();
-    void addWidget(QGraphicsWidget *widget);
     QSplitter *splitter();
     ChatHistoryModel *historyModel();
-#ifdef USE_DECLARATIVE
     QDeclarativeView *historyView();
-#else
-    QGraphicsView *historyView();
-#endif
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
 

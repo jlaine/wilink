@@ -21,7 +21,6 @@
 #define __WILINK_PLAYER_H__
 
 #include <QUrl>
-#include <QTreeView>
 
 #include "chat_model.h"
 #include "chat_panel.h"
@@ -84,22 +83,7 @@ private:
     Chat *m_chat;
     PlayerModel *m_model;
     QSoundPlayer *m_player;
-    QTreeView *m_view;
-
     QPushButton *m_stopButton;
-};
-
-class PlayerView : public QTreeView
-{
-    Q_OBJECT
-
-public:
-    PlayerView(QWidget *parent = 0);
-    void setModel(PlayerModel *model);
-
-protected:
-    void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent *e);
 };
 
 #endif

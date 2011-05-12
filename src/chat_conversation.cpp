@@ -18,6 +18,10 @@
  */
 
 #include <QDateTime>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeImageProvider>
+#include <QDeclarativeView>
 #include <QDebug>
 #include <QGraphicsView>
 #include <QLabel>
@@ -38,12 +42,6 @@
 #else
 #define SPACING 2
 #endif
-
-#ifdef USE_DECLARATIVE
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeImageProvider>
-#include <QDeclarativeView>
 
 class RosterImageProvider : public QDeclarativeImageProvider
 {
@@ -79,19 +77,12 @@ void RosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
     m_rosterModel = rosterModel;
 }
 
-#endif
-
 class ChatConversationPrivate
 {
 public:
     ChatHistoryModel *historyModel;
-#ifdef USE_DECLARATIVE
     QDeclarativeView *historyView;
     RosterImageProvider *imageProvider;
-#else
-    QGraphicsView *historyView;
-#endif
-    ChatPanelBar *panelBar;
     ChatSearchBar *searchBar;
     QSpacerItem *spacerItem;
     QSplitter *splitter;
@@ -102,7 +93,6 @@ ChatConversation::ChatConversation(QWidget *parent)
 {
     bool check;
     d = new ChatConversationPrivate;
-    d->panelBar = 0;
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
@@ -131,7 +121,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     d->historyModel = new ChatHistoryModel(this);
 
     /* chat history */
-#ifdef USE_DECLARATIVE
     d->imageProvider = new RosterImageProvider;
 
     d->historyView = new QDeclarativeView;
@@ -148,7 +137,7 @@ ChatConversation::ChatConversation(QWidget *parent)
                     item, SLOT(onBottomChanged()));
 
     d->splitter->addWidget(d->historyView);
-#else
+#if 0
     d->historyView = new QGraphicsView;
     d->historyView->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
     d->historyView->setScene(new QGraphicsScene(d->historyView));
@@ -159,10 +148,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     d->historyView->scene()->addItem(chatHistoryWidget);
     chatHistoryWidget->setView(d->historyView);
     d->splitter->addWidget(d->historyView);
-
-    d->panelBar = new ChatPanelBar(d->historyView);
-    d->panelBar->setZValue(10);
-    d->historyView->scene()->addItem(d->panelBar);
 
     check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
                     this, SIGNAL(messageClicked(QModelIndex)));
@@ -217,12 +202,6 @@ ChatConversation::~ChatConversation()
     delete d;
 }
 
-void ChatConversation::addWidget(QGraphicsWidget *widget)
-{
-    if (d->panelBar)
-        d->panelBar->addWidget(widget);
-}
-
 QSplitter *ChatConversation::splitter()
 {
     return d->splitter;
@@ -233,11 +212,7 @@ ChatHistoryModel *ChatConversation::historyModel()
     return d->historyModel;
 }
 
-#ifdef USE_DECLARATIVE
 QDeclarativeView *ChatConversation::historyView()
-#else
-QGraphicsView *ChatConversation::historyView()
-#endif
 {
     return d->historyView;
 }
@@ -245,9 +220,7 @@ QGraphicsView *ChatConversation::historyView()
 void ChatConversation::setRosterModel(ChatRosterModel *model)
 {
     d->historyModel->setRosterModel(model);
-#ifdef USE_DECLARATIVE
     d->imageProvider->setRosterModel(model);
-#endif
 }
 
 void ChatConversation::slotSearchDisplayed(bool visible)

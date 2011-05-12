@@ -22,6 +22,7 @@
 #include <QDeclarativeView>
 #include <QDir>
 #include <QDomDocument>
+#include <QDropEvent>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QImageReader>
@@ -639,44 +640,6 @@ bool PlayerPanel::eventFilter(QObject *obj, QEvent *e)
         return true;
     }
     return false;
-}
-
-PlayerView::PlayerView(QWidget *parent)
-    : QTreeView(parent)
-{
-    header()->setResizeMode(QHeaderView::Fixed);
-}
-
-void PlayerView::setModel(PlayerModel *model)
-{
-    QTreeView::setModel(model);
-    setColumnWidth(DurationColumn, DURATION_WIDTH);
-}
-
-void PlayerView::keyPressEvent(QKeyEvent *event)
-{
-    const QModelIndex &index = currentIndex();
-    if (index.isValid()) {
-        if (event->key() == Qt::Key_Delete ||
-            (event->key() == Qt::Key_Backspace && event->modifiers() == Qt::ControlModifier)) {
-            model()->removeRow(index.row(), index.parent());
-        } else if (event->key() == Qt::Key_Enter ||
-                   event->key() == Qt::Key_Return) {
-            emit doubleClicked(index);
-        }
-    }
-
-    QTreeView::keyPressEvent(event);
-}
-
-void PlayerView::resizeEvent(QResizeEvent *e)
-{
-    QTreeView::resizeEvent(e);
-
-    const int available = e->size().width() - 16 - DURATION_WIDTH;
-    setColumnWidth(ArtistColumn, available/2);
-    setColumnWidth(TitleColumn, available/2);
-    setColumnWidth(DurationColumn, DURATION_WIDTH);
 }
 
 // PLUGIN
