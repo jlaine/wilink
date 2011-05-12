@@ -121,11 +121,14 @@ Item {
         MouseArea {
             id: clickableArea
 
+            property int mousePressY
+
             anchors.fill: track
             drag.axis: Drag.YAxis
 
             onPressed: {
                 scrollBarView.state = 'hovered'
+                mousePressY = mouse.y
 
                 if( mouse.y < handle.y ) {
                     dragToBottomEnabled = false
@@ -133,6 +136,7 @@ Item {
                 } else if( mouse.y > handle.y + handle.height ) {
                     moveAction = "down"
                 } else {
+                    dragToBottomEnabled = false
                     moveAction = "drag"
                 }
             }
@@ -156,7 +160,7 @@ Item {
 
             onPositionChanged: {
                 if (moveAction == "drag") {
-                    // TODO
+                    scrollBar.dragHandle(mousePressY, mouse.y)
                 }
             }
         }
@@ -197,5 +201,21 @@ Item {
             flickableItem.positionViewAtIndex(0, ListView.Start);
         }
     }
-}
 
+    function dragHandle(origin, target)
+    {
+        var density = flickableItem.count / track.height
+        var targetIndex = flickableItem.currentIndex + density * (target - origin)
+
+        if (targetIndex < 0) {
+            flickableItem.currentIndex = 0
+            flickableItem.positionViewAtIndex(0, ListView.Start);
+        } else if (targetIndex > flickableItem.count - 1 ) {
+            flickableItem.currentIndex = flickableItem.count - 1
+            flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
+        } else {
+            flickableItem.currentIndex = targetIndex
+            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
+        }
+    }
+}
