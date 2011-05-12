@@ -49,7 +49,8 @@ Rectangle {
             model: historyModel
 
             function onBottomChanged() {
-                positionViewAtIndex(count - 1, ListView.End);
+                if(scrollBar.dragToBottomEnabled)
+                    currentIndex = count - 1
             }
         }
 
@@ -59,6 +60,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             flickableItem: historyView
+            dragToBottomEnabled: true
         }
     }
 
