@@ -618,7 +618,7 @@ void ChatRoom::left()
 void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
 {
     if (messageIndex.isValid())
-        talkAt(messageIndex.data(ChatHistoryModel::JidRole).toString());
+        talkAt(jidToResource(messageIndex.data(ChatHistoryModel::JidRole).toString()));
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)
@@ -667,7 +667,7 @@ void ChatRoom::participantChanged(const QString &jid)
 void ChatRoom::participantClicked(const QModelIndex &index)
 {
     if(index.isValid())
-        talkAt(index.data(ChatRosterModel::IdRole).toString());
+        talkAt(jidToResource(index.data(ChatRosterModel::IdRole).toString()));
 }
 
 void ChatRoom::participantRemoved(const QString &jid)
@@ -747,9 +747,8 @@ void ChatRoom::tabPressed()
 
 /** Talk "at" somebody.
  */
-void ChatRoom::talkAt(const QString &jid)
+void ChatRoom::talkAt(const QString &nickName)
 {
-    const QString nickName = jidToResource(jid);
     const QString text = chatInput()->property("text").toString();
     if (!chat->client()->isConnected() ||
         text.contains("@" + nickName + ": "))
@@ -773,8 +772,6 @@ void ChatRoom::talkAt(const QString &jid)
     } else {
         cursor.insertText(newAt + ": ");
     }
-    emit showPanel();
-    chatInput()->setFocus();
 }
 
 /** Unbookmarks the room.
