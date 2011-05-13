@@ -25,7 +25,7 @@ Rectangle {
 
     property int chatState: qXmppMessage.none
     property alias text: input.text
-    property QtObject model
+    property alias model: listHelper.model
     signal returnPressed
     signal tabPressed
 
@@ -60,7 +60,6 @@ Rectangle {
 
     ListHelper {
         id: listHelper
-        model: chatEdit.model
     }
 
     Timer {
