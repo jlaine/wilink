@@ -345,7 +345,7 @@ void ChatRosterModel::connected()
     d->ownItem->setId(d->client->configuration().jidBare());
     d->ownItem->setData(Qt::DisplayRole, d->client->configuration().user());
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
-    d->client->vCardManager().requestVCard(d->ownItem->id());
+    d->fetchVCard(d->ownItem->id());
     emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
 }
 
