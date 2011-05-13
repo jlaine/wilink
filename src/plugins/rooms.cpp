@@ -269,20 +269,20 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
     // construct participant list
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
+    ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(rosterModel, mucRoom->jid(), this);
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(rosterModel);
+    sortedModel->setSourceModel(roomModel);
     sortedModel->setDynamicSortFilter(true);
     sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->sort(0);
 
     QDeclarativeContext *context = historyView()->rootContext();
     context->setContextProperty("conversation", mucRoom);
+    context->setContextProperty("participantModel", sortedModel);
 
     participantsList = new QListView();
     participantsList->setObjectName("participant-list");
     participantsList->setModel(sortedModel);
-    participantsList->setRootIndex(sortedModel->mapFromSource(roomIndex));
     participantsList->setViewMode(QListView::IconMode);
     participantsList->setMovement(QListView::Static);
     participantsList->setResizeMode(QListView::Adjust);
@@ -802,7 +802,7 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
     m_reason->setText("Let's talk");
     layout->addWidget(m_reason);
 
-    m_model = new ChatRosterProxyModel(rosterModel, this);
+    m_model = new ChatRosterProxyModel(rosterModel, CONTACTS_ROSTER_ID, this);
 
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(m_model);

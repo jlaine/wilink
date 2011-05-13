@@ -850,16 +850,33 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
-ChatRosterProxyModel::ChatRosterProxyModel(ChatRosterModel *rosterModel, QObject *parent)
+ChatRosterProxyModel::ChatRosterProxyModel(ChatRosterModel *rosterModel, const QString &rosterRoot, QObject *parent)
     : QAbstractProxyModel(parent),
-    m_rosterModel(rosterModel)
+    m_rosterModel(rosterModel),
+    m_rosterRoot(rosterRoot)
 {
+    bool check;
+
     setSourceModel(rosterModel);
+    check = connect(rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    this, SLOT(onDataChanged(QModelIndex,QModelIndex)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)),
+                    this, SLOT(onRowsAboutToBeInserted(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                    this, SLOT(onRowsInserted(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),
+                    this, SLOT(onRowsAboutToBeRemoved(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                    this, SLOT(onRowsRemoved(QModelIndex,int,int)));
 }
 
 QModelIndex ChatRosterProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
-    if (!sourceIndex.isValid() || sourceIndex.parent() != m_rosterModel->contactsItem())
+    if (!isRoot(sourceIndex.parent()))
         return QModelIndex();
 
     return createIndex(sourceIndex.row(), sourceIndex.column(), 0);
@@ -870,7 +887,7 @@ QModelIndex ChatRosterProxyModel::mapToSource(const QModelIndex &proxyIndex) con
     if (!proxyIndex.isValid())
         return QModelIndex();
 
-    return m_rosterModel->index(proxyIndex.row(), proxyIndex.column(), m_rosterModel->contactsItem());
+    return m_rosterModel->index(proxyIndex.row(), proxyIndex.column(), m_rosterModel->findItem(m_rosterRoot));
 }
 
 int ChatRosterProxyModel::columnCount(const QModelIndex &parent) const
@@ -901,6 +918,38 @@ QModelIndex ChatRosterProxyModel::index(int row, int column, const QModelIndex &
     return createIndex(row, column, 0);
 }
 
+void ChatRosterProxyModel::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    if (isRoot(topLeft.parent()) && isRoot(bottomRight.parent())) {
+        qDebug("data changed");
+        emit dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight));
+    }
+}
+
+void ChatRosterProxyModel::onRowsAboutToBeInserted(const QModelIndex &sourceIndex, int start, int end)
+{
+    if (isRoot(sourceIndex))
+        beginInsertRows(QModelIndex(), start, end);
+}
+
+void ChatRosterProxyModel::onRowsInserted(const QModelIndex &sourceIndex, int start, int end)
+{
+    if (isRoot(sourceIndex))
+        endInsertRows();
+}
+
+void ChatRosterProxyModel::onRowsAboutToBeRemoved(const QModelIndex &sourceIndex, int start, int end)
+{
+    if (isRoot(sourceIndex))
+        beginRemoveRows(QModelIndex(), start, end);
+}
+
+void ChatRosterProxyModel::onRowsRemoved(const QModelIndex &sourceIndex, int start, int end)
+{
+    if (isRoot(sourceIndex))
+        endRemoveRows();
+}
+
 QModelIndex ChatRosterProxyModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
@@ -910,7 +959,7 @@ int ChatRosterProxyModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return m_rosterModel->rowCount(m_rosterModel->contactsItem());
+    return m_rosterModel->rowCount(m_rosterModel->findItem(m_rosterRoot));
 }
 
 bool ChatRosterProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)

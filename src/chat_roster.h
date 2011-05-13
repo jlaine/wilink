@@ -123,8 +123,10 @@ private:
 
 class ChatRosterProxyModel : public QAbstractProxyModel
 {
+    Q_OBJECT
+
 public:
-    ChatRosterProxyModel(ChatRosterModel *rosterModel, QObject *parent = 0);
+    ChatRosterProxyModel(ChatRosterModel *rosterModel, const QString &rosterRoot, QObject *parent = 0);
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
 
@@ -138,8 +140,20 @@ public:
 
     QStringList selectedJids() const;
 
+private slots:
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
+    void onRowsInserted(const QModelIndex &parent, int start, int end);
+    void onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+    void onRowsRemoved(const QModelIndex &parent, int start, int end);
+
 private:
+    bool isRoot(const QModelIndex &sourceIndex) const
+    {
+        return sourceIndex.isValid() && sourceIndex == m_rosterModel->findItem(m_rosterRoot);
+    }
     ChatRosterModel *m_rosterModel;
+    QString m_rosterRoot;
     QSet<QString> m_selection;
 };
 
