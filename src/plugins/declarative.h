@@ -26,20 +26,20 @@ class ListHelper : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
-    Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel NOTIFY modelChanged)
+    Q_PROPERTY(QObject* model READ model WRITE setModel NOTIFY modelChanged)
 
 public:
     ListHelper(QObject *parent = 0);
 
     int count() const;
-    Q_INVOKABLE QModelIndex get(int row) const;
+    Q_INVOKABLE QVariant get(int row) const;
 
-    QAbstractItemModel *model() const;
-    void setModel(QAbstractItemModel *model);
+    QObject *model() const;
+    void setModel(QObject *model);
 
 signals:
     void countChanged();
-    void modelChanged(QAbstractItemModel *model);
+    void modelChanged(QObject *model);
 
 private:
     QAbstractItemModel *m_model;

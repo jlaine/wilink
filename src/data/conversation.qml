@@ -95,6 +95,7 @@ Rectangle {
             id: chatInput
             objectName: 'chatInput'
 
+            model: participantModel
             x: 4
             y: 4
             width: parent.width - 8

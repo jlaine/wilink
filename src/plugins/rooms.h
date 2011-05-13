@@ -113,7 +113,6 @@ private slots:
 
 private:
     Chat *chat;
-    QObject *chatInput;
     QXmppMucRoom *mucRoom;
     bool notifyMessages;
 

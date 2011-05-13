@@ -36,20 +36,28 @@ int ListHelper::count() const
     return 0;
 }
 
-QModelIndex ListHelper::get(int row) const
+QVariant ListHelper::get(int row) const
 {
-    return QModelIndex();
+    QVariantMap result;
+    if (m_model) {
+        QModelIndex index = m_model->index(row, 0);
+        const QHash<int, QByteArray> roleNames = m_model->roleNames();
+        foreach (int role, roleNames.keys())
+            result.insert(QString::fromAscii(roleNames[role]), index.data(role));
+    }
+    return result;
 }
 
-QAbstractItemModel *ListHelper::model() const
+QObject *ListHelper::model() const
 {
     return m_model;
 }
 
-void ListHelper::setModel(QAbstractItemModel *model)
+void ListHelper::setModel(QObject *model)
 {
-    if (model != m_model) {
-        m_model = model;
+    QAbstractItemModel *itemModel = static_cast<QAbstractItemModel*>(model);
+    if (itemModel != m_model) {
+        m_model = itemModel;
         emit modelChanged(model);
     }
 }

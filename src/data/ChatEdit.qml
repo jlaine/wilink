@@ -18,13 +18,14 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Rectangle {
     id: chatEdit
 
     property int chatState: qXmppMessage.none
     property alias text: input.text
-    property variant participants: []
+    property QtObject model
     signal returnPressed
     signal tabPressed
 
@@ -55,6 +56,11 @@ Rectangle {
         }
         newText += '@' + participant + ': ';
         input.text = newText;
+    }
+
+    ListHelper {
+        id: listHelper
+        model: chatEdit.model
     }
 
     // FIXME: this is a hack to expose QXmpp constant
@@ -100,9 +106,10 @@ Rectangle {
             // search matching participants
             var needle = input.text.slice(start, end).toLowerCase();
             var matches = [];
-            for (var i in participants) {
-                if (participants[i].slice(0, needle.length).toLowerCase() == needle) {
-                    matches[matches.length] = participants[i];
+            for (var i = 0; i < listHelper.count; i += 1) {
+                var name = listHelper.get(i).name;
+                if (name.slice(0, needle.length).toLowerCase() == needle) {
+                    matches[matches.length] = name;
                 }
             }
             if (matches.length == 1) {
@@ -112,5 +119,6 @@ Rectangle {
             }
         }
     }
+
 }
 

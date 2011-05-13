@@ -301,8 +301,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));
 
-    // FIXME: move this to QML
-    chatInput = historyView->rootObject()->findChild<QObject*>("chatInput");
     layout->addWidget(historyView);
     setFocusProxy(historyView);
 
@@ -635,12 +633,6 @@ void ChatRoom::participantAdded(const QString &jid)
     QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(), roomIndex);
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-
-    // update input completions
-    QStringList participants;
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
-        participants << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-    chatInput->setProperty("participants", participants);
 }
 
 void ChatRoom::participantChanged(const QString &jid)
@@ -658,12 +650,6 @@ void ChatRoom::participantRemoved(const QString &jid)
     QModelIndex index = rosterModel->findItem(jid, roomIndex);
     if (index.isValid())
         rosterModel->removeRow(index.row(), index.parent());
-
-    // update input completions
-    QStringList participants;
-    for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
-        participants << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-    chatInput->setProperty("participants", participants);
 }
 
 /** Show a user's profile page.
