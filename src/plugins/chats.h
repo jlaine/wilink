@@ -24,11 +24,13 @@
 
 #include "QXmppMessage.h"
 
-#include "chat_conversation.h"
+#include "chat_panel.h"
 
 class Chat;
 class ChatClient;
+class ChatHistoryModel;
 class ChatRosterModel;
+class QDeclarativeView;
 class QModelIndex;
 class QXmppArchiveChat;
 class QXmppArchiveManager;
@@ -67,12 +69,13 @@ private:
     QXmppMessage::State m_state;
 };
 
-class ChatDialog : public ChatConversation
+class ChatDialog : public ChatPanel
 {
     Q_OBJECT
 
 public:
     ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    QDeclarativeView *declarativeView() const;
 
 public slots:
     void messageReceived(const QXmppMessage &msg);
@@ -93,6 +96,9 @@ private:
     QString chatRemoteJid;
     ChatClient *client;
     bool joined;
+
+    ChatHistoryModel *historyModel;
+    QDeclarativeView *historyView;
     ChatRosterModel *rosterModel;
     QStringList chatStatesJids;
 };

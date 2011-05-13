@@ -15,9 +15,7 @@ SOURCES += \
     ../application.cpp \
     ../chat.cpp \
     ../chat_accounts.cpp \
-    ../chat_conversation.cpp \
     ../chat_client.cpp \
-    ../chat_edit.cpp \
     ../chat_form.cpp \
     ../chat_history.cpp \
     ../chat_model.cpp \
@@ -48,8 +46,6 @@ HEADERS += \
     ../chat.h \
     ../chat_accounts.h \
     ../chat_client.h \
-    ../chat_conversation.h \
-    ../chat_edit.h \
     ../chat_form.h \
     ../chat_history.h \
     ../chat_model.h \

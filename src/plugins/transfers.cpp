@@ -21,6 +21,7 @@
 #include <QDeclarativeComponent>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QDialogButtonBox>
 #include <QDropEvent>
 #include <QDir>
@@ -122,12 +123,12 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
     if (index.isValid())
         QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    ChatConversation *panel = qobject_cast<ChatConversation*>(chatWindow->panel(bareJid));
+    ChatDialog *panel = qobject_cast<ChatDialog*>(chatWindow->panel(bareJid));
     if (panel) {
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__transfer_component").value<QObject*>());
         if (!component) {
-            QDeclarativeEngine *engine = panel->historyView()->engine();
+            QDeclarativeEngine *engine = panel->declarativeView()->engine();
             component = new QDeclarativeComponent(engine, QUrl("qrc:/TransferWidget.qml"));
             panel->setProperty("__transfer_component", qVariantFromValue<QObject*>(component));
         }
@@ -136,7 +137,7 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
         QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
         Q_ASSERT(widget);
         widget->setProperty("job", qVariantFromValue<QObject*>(job));
-        QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
+        QDeclarativeItem *bar = panel->declarativeView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
     }
 }
@@ -278,7 +279,7 @@ void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
     }
 
     // handle drag & drop
-    QWidget *viewport = dialog->historyView()->viewport();
+    QWidget *viewport = dialog->declarativeView()->viewport();
     viewport->setAcceptDrops(true);
     viewport->setProperty("__transfer_jid", dialog->objectName());
     viewport->installEventFilter(watcher);

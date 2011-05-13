@@ -19,6 +19,8 @@
 
 #include <QDateTime>
 #include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeView>
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
@@ -122,14 +124,14 @@ bool ChatDialogHelper::sendMessage(const QString &body)
 }
 
 ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatConversation(parent),
+    : ChatPanel(parent),
     chatRemoteJid(jid), 
     client(xmppClient),
     joined(false),
     rosterModel(chatRosterModel)
 {
+    bool check;
     setObjectName(jid);
-    setRosterModel(rosterModel);
 
     // load archive manager
     archiveManager = client->findExtension<QXmppArchiveManager>();
@@ -138,16 +140,38 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
         client->addExtension(archiveManager);
     }
 
-    // create helper
+    // prepare models
     ChatDialogHelper *helper = new ChatDialogHelper(this);
     helper->setClient(client);
     helper->setJid(jid);
-    helper->setHistoryModel(historyModel());
-    QDeclarativeContext *context = historyView()->rootContext();
+    helper->setHistoryModel(historyModel);
+
+    // header
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    layout->setSpacing(0);
+    layout->addLayout(headerLayout());
+
+    // chat history
+    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
+    historyModel = new ChatHistoryModel(this);
+    QDeclarativeView *historyView = new QDeclarativeView;
+    QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
+    context->setContextProperty("historyModel", historyModel);
+    context->setContextProperty("textHelper", new ChatHistoryHelper(this));
+    historyView->engine()->addImageProvider("roster", imageProvider);
+    historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    historyView->setSource(QUrl("qrc:/conversation.qml"));
+
+    QObject *item = historyView->rootObject()->findChild<QObject*>("historyView");
+    Q_ASSERT(item);
+    check = connect(historyModel, SIGNAL(bottomChanged()),
+                    item, SLOT(onBottomChanged()));
+
+    layout->addWidget(historyView);
 
     // connect signals
-    bool check;
 #if 0
     check = connect(chatInput(), SIGNAL(chatStateChanged(int)),
                     this, SLOT(chatStateChanged(int)));
@@ -199,7 +223,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.date = msg.date();
         message.jid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
         message.received = msg.isReceived();
-        historyModel()->addMessage(message);
+        historyModel->addMessage(message);
     }
 }
 
@@ -220,6 +244,11 @@ void ChatDialog::chatStateChanged(int state)
         message.setState(static_cast<QXmppMessage::State>(state));
         client->sendPacket(message);
     }
+}
+
+QDeclarativeView* ChatDialog::declarativeView() const
+{
+    return historyView;
 }
 
 void ChatDialog::disconnected()
@@ -288,7 +317,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
         message.date = client->serverTime();
     message.jid = chatRemoteJid;
     message.received = true;
-    historyModel()->addMessage(message);
+    historyModel->addMessage(message);
 
     // queue notification
     queueNotification(message.body);

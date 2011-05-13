@@ -23,6 +23,7 @@
 #include <QDeclarativeComponent>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QFile>
 #include <QHostInfo>
 #include <QImage>
@@ -50,7 +51,6 @@
 
 #include "application.h"
 #include "chat.h"
-#include "chat_conversation.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
@@ -433,12 +433,12 @@ void CallWatcher::addCall(QXmppCall *call)
     if (index.isValid())
         QMetaObject::invokeMethod(m_window, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    ChatConversation *panel = qobject_cast<ChatConversation*>(m_window->panel(bareJid));
+    ChatDialog *panel = qobject_cast<ChatDialog*>(m_window->panel(bareJid));
     if (panel) {
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__call_component").value<QObject*>());
         if (!component) {
-            QDeclarativeEngine *engine = panel->historyView()->engine();
+            QDeclarativeEngine *engine = panel->declarativeView()->engine();
             component = new QDeclarativeComponent(engine, QUrl("qrc:/CallWidget.qml"));
             panel->setProperty("__call_component", qVariantFromValue<QObject*>(component));
         }
@@ -453,7 +453,7 @@ void CallWatcher::addCall(QXmppCall *call)
         Q_ASSERT(widget);
         widget->setProperty("audio", qVariantFromValue<QObject*>(audioHelper));
         widget->setProperty("call", qVariantFromValue<QObject*>(call));
-        QDeclarativeItem *bar = panel->historyView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
+        QDeclarativeItem *bar = panel->declarativeView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
     }
 }
