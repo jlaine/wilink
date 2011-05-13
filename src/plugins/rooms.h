@@ -33,6 +33,7 @@ class ChatRoom;
 class ChatRosterModel;
 class RoomInviteModel;
 class QLineEdit;
+class QListView;
 class QListWidget;
 class QListWidgetItem;
 class QAbstractButton;

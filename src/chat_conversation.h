@@ -22,17 +22,12 @@
 
 #include <QDeclarativeView>
 
-#include "QXmppMessage.h"
-
 #include "chat_panel.h"
 
 class ChatConversationPrivate;
-class ChatEdit;
 class ChatHistoryModel;
 class ChatHistoryWidget;
-class ChatMessage;
 class ChatRosterModel;
-class QListView;
 class QModelIndex;
 class QSplitter;
 
@@ -50,9 +45,6 @@ public:
 
 signals:
     void messageClicked(const QModelIndex &index);
-
-protected slots:
-    void slotSearchDisplayed(bool visible);
 
 protected:
     QObject *chatInput();

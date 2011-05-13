@@ -17,30 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDateTime>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeImageProvider>
 #include <QDeclarativeView>
 #include <QDebug>
-#include <QGraphicsView>
-#include <QLabel>
 #include <QLayout>
-#include <QListView>
-#include <QPushButton>
 #include <QSplitter>
-#include <QTimer>
 
 #include "chat_conversation.h"
 #include "chat_history.h"
 #include "chat_roster.h"
-#include "chat_search.h"
-
-#ifdef Q_OS_MAC
-#define SPACING 6
-#else
-#define SPACING 2
-#endif
 
 class RosterImageProvider : public QDeclarativeImageProvider
 {
@@ -79,12 +66,9 @@ void RosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
 class ChatConversationPrivate
 {
 public:
-    ChatEdit *chatInput;
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
     RosterImageProvider *imageProvider;
-    ChatSearchBar *searchBar;
-    QSpacerItem *spacerItem;
     QSplitter *splitter;
 };
 
@@ -125,6 +109,7 @@ ChatConversation::ChatConversation(QWidget *parent)
 
     d->splitter->addWidget(d->historyView);
 
+#if 0
     /* spacer */
     d->spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->addSpacerItem(d->spacerItem);
@@ -143,7 +128,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     Q_ASSERT(check);
     layout->addWidget(d->searchBar);
 
-#if 0
     check = connect(d->searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
                     chatHistoryWidget, SLOT(find(QString, QTextDocument::FindFlags, bool)));
     Q_ASSERT(check);
@@ -191,16 +175,18 @@ void ChatConversation::setRosterModel(ChatRosterModel *model)
     d->imageProvider->setRosterModel(model);
 }
 
+#if 0
+// FIXME: restore this
 void ChatConversation::slotSearchDisplayed(bool visible)
 {
     QVBoxLayout *vbox = static_cast<QVBoxLayout*>(layout());
     if (visible)
         d->spacerItem->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
     else {
-        // FIXME: restore this
         //chatHistoryWidget->findClear();
         d->spacerItem->changeSize(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
     }
     vbox->invalidate();
 }
+#endif
 
