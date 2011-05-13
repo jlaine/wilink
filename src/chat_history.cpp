@@ -287,9 +287,11 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     if (role == ActionRole) {
         return msg->isAction();
     } else if (role == AvatarRole) {
-        if (msg->jid.isEmpty())
+        QModelIndex rosterIndex = d->rosterModel->findItem(msg->jid);
+        if (rosterIndex.isValid())
+            return rosterIndex.data(ChatRosterModel::AvatarRole);
+        else
             return QUrl("qrc:/peer.png");
-        return QUrl("image://roster/" + msg->jid);
     } else if (role == BodyRole) {
         QStringList bodies;
         foreach (ChatMessage *ptr, item->messages)
