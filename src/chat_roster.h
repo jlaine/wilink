@@ -20,6 +20,7 @@
 #ifndef __WILINK_CHAT_ROSTER_H__
 #define __WILINK_CHAT_ROSTER_H__
 
+#include <QAbstractProxyModel>
 #include <QTreeView>
 
 #include "chat_model.h"
@@ -46,11 +47,12 @@ public:
     enum Role {
         IdRole = Qt::UserRole,
         TypeRole,
+        AvatarRole,
+        NicknameRole,
         MessagesRole,
+        PersistentRole,
         StatusRole,
         UrlRole,
-        NicknameRole,
-        PersistentRole,
     };
 
     enum Feature {
@@ -117,6 +119,28 @@ private:
 
     friend class ChatRosterModelPrivate;
     ChatRosterModelPrivate * const d;
+};
+
+class ChatRosterProxyModel : public QAbstractProxyModel
+{
+public:
+    ChatRosterProxyModel(ChatRosterModel *rosterModel, QObject *parent = 0);
+    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
+    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
+
+    int columnCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex parent(const QModelIndex &index) const;
+    int rowCount(const QModelIndex &parent) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+
+    QStringList selectedJids() const;
+
+private:
+    ChatRosterModel *m_rosterModel;
+    QSet<QString> m_selection;
 };
 
 class ChatRosterView : public QTreeView

@@ -62,9 +62,18 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.right: parent.right
+            anchors.right: participantView.left
             flickableItem: historyView
             dragToBottomEnabled: true
+        }
+
+        ParticipantView {
+            id: participantView
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            model: participantModel
         }
     }
 
@@ -100,6 +109,11 @@ Rectangle {
 
     Connections {
         target: historyView
+        onParticipantClicked: chatInput.talkAt(participant)
+    }
+
+    Connections {
+        target: participantView
         onParticipantClicked: chatInput.talkAt(participant)
     }
 }

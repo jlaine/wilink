@@ -235,6 +235,13 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 {
     d->q = this;
 
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(AvatarRole, "avatar");
+    roleNames.insert(IdRole, "id");
+    roleNames.insert(Qt::DisplayRole, "name");
+    setRoleNames(roleNames);
+
     /* get cache */
     d->cache = new QNetworkDiskCache(this);
     d->cache->setCacheDirectory(wApp->cacheDirectory());
@@ -422,6 +429,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
+    } else if (role == AvatarRole) {
+        return QUrl("image://roster/" + bareJid);
     } else if (role == StatusRole && item->type() == ChatRosterModel::Contact) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
@@ -839,6 +848,89 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
                          createIndex(item, SortingColumn));
         emit pendingMessages(d->countPendingMessages());
     }
+}
+
+ChatRosterProxyModel::ChatRosterProxyModel(ChatRosterModel *rosterModel, QObject *parent)
+    : QAbstractProxyModel(parent),
+    m_rosterModel(rosterModel)
+{
+    setSourceModel(rosterModel);
+}
+
+QModelIndex ChatRosterProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+    if (!sourceIndex.isValid() || sourceIndex.parent() != m_rosterModel->contactsItem())
+        return QModelIndex();
+
+    return createIndex(sourceIndex.row(), sourceIndex.column(), 0);
+}
+
+QModelIndex ChatRosterProxyModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    if (!proxyIndex.isValid())
+        return QModelIndex();
+
+    return m_rosterModel->index(proxyIndex.row(), proxyIndex.column(), m_rosterModel->contactsItem());
+}
+
+int ChatRosterProxyModel::columnCount(const QModelIndex &parent) const
+{
+    return m_rosterModel->columnCount(mapToSource(parent));
+}
+
+QVariant ChatRosterProxyModel::data(const QModelIndex &index, int role) const
+{
+    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
+    {
+        const QString jid = index.data(ChatRosterModel::IdRole).toString();
+        return m_selection.contains(jid) ? Qt::Checked : Qt::Unchecked;
+    } else {
+        return QAbstractProxyModel::data(index, role);
+    }
+}
+
+Qt::ItemFlags ChatRosterProxyModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = m_rosterModel->flags(mapToSource(index));
+    flags |= Qt::ItemIsUserCheckable;
+    return flags;
+}
+
+QModelIndex ChatRosterProxyModel::index(int row, int column, const QModelIndex &parent) const
+{
+    return createIndex(row, column, 0);
+}
+
+QModelIndex ChatRosterProxyModel::parent(const QModelIndex &index) const
+{
+    return QModelIndex();
+}
+
+int ChatRosterProxyModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    return m_rosterModel->rowCount(m_rosterModel->contactsItem());
+}
+
+bool ChatRosterProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
+    {
+        const QString jid = index.data(ChatRosterModel::IdRole).toString();
+        if (value.toInt() == Qt::Checked)
+            m_selection += jid;
+        else
+            m_selection -= jid;
+        return true;
+    } else {
+        return QAbstractProxyModel::setData(index, value, role);
+    }
+}
+
+QStringList ChatRosterProxyModel::selectedJids() const
+{
+    return m_selection.toList();
 }
 
 ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)

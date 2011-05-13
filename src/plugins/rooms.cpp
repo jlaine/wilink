@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAbstractProxyModel>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDeclarativeContext>
@@ -791,111 +790,6 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-class RoomInviteModel : public QAbstractProxyModel
-{
-public:
-    RoomInviteModel(ChatRosterModel *rosterModel, QObject *parent = 0);
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
-
-    int columnCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-
-    QStringList selectedJids() const;
-
-private:
-    ChatRosterModel *m_rosterModel;
-    QSet<QString> m_selection;
-};
-
-RoomInviteModel::RoomInviteModel(ChatRosterModel *rosterModel, QObject *parent)
-    : QAbstractProxyModel(parent),
-    m_rosterModel(rosterModel)
-{
-    setSourceModel(rosterModel);
-}
-
-QModelIndex RoomInviteModel::mapFromSource(const QModelIndex &sourceIndex) const
-{
-    if (!sourceIndex.isValid() || sourceIndex.parent() != m_rosterModel->contactsItem())
-        return QModelIndex();
-
-    return createIndex(sourceIndex.row(), sourceIndex.column(), 0);
-}
-
-QModelIndex RoomInviteModel::mapToSource(const QModelIndex &proxyIndex) const
-{
-    if (!proxyIndex.isValid())
-        return QModelIndex();
-
-    return m_rosterModel->index(proxyIndex.row(), proxyIndex.column(), m_rosterModel->contactsItem());
-}
-
-int RoomInviteModel::columnCount(const QModelIndex &parent) const
-{
-    return m_rosterModel->columnCount(mapToSource(parent));
-}
-
-QVariant RoomInviteModel::data(const QModelIndex &index, int role) const
-{
-    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
-    {
-        const QString jid = index.data(ChatRosterModel::IdRole).toString();
-        return m_selection.contains(jid) ? Qt::Checked : Qt::Unchecked;
-    } else {
-        return QAbstractProxyModel::data(index, role);
-    }
-}
- 
-Qt::ItemFlags RoomInviteModel::flags(const QModelIndex &index) const
-{
-    Qt::ItemFlags flags = m_rosterModel->flags(mapToSource(index));
-    flags |= Qt::ItemIsUserCheckable;
-    return flags;
-}
-
-QModelIndex RoomInviteModel::index(int row, int column, const QModelIndex &parent) const
-{
-    return createIndex(row, column, 0);
-}
-
-QModelIndex RoomInviteModel::parent(const QModelIndex &index) const
-{
-    return QModelIndex();
-}
-
-int RoomInviteModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid())
-        return 0;
-    return m_rosterModel->rowCount(m_rosterModel->contactsItem());
-}
-
-bool RoomInviteModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
-    {
-        const QString jid = index.data(ChatRosterModel::IdRole).toString();
-        if (value.toInt() == Qt::Checked)
-            m_selection += jid;
-        else
-            m_selection -= jid;
-        return true;
-    } else {
-        return QAbstractProxyModel::setData(index, value, role);
-    }
-}
-
-QStringList RoomInviteModel::selectedJids() const
-{
-    return m_selection.toList();
-}
-
 ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterModel, QWidget *parent)
     : QDialog(parent),
     m_room(mucRoom)
@@ -908,7 +802,7 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
     m_reason->setText("Let's talk");
     layout->addWidget(m_reason);
 
-    m_model = new RoomInviteModel(rosterModel, this);
+    m_model = new ChatRosterProxyModel(rosterModel, this);
 
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(m_model);
