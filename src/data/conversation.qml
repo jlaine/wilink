@@ -49,10 +49,14 @@ Rectangle {
             anchors.right: scrollBar.left
             model: historyModel
 
-            function onBottomChanged() {
-                if (scrollBar.dragToBottomEnabled) {
-                    currentIndex = count - 1
-                    positionViewAtIndex(count - 1, ListView.End);
+            Connections {
+                target: historyView.model
+                onBottomChanged: {
+                    if (scrollBar.dragToBottomEnabled) {
+                        var index = historyView.count - 1;
+                        historyView.currentIndex = index;
+                        historyView.positionViewAtIndex(index, ListView.End);
+                    }
                 }
             }
         }
