@@ -114,8 +114,8 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
                     this, SLOT(returnPressed()));
     Q_ASSERT(check);
 
-    check = connect(chatInput(), SIGNAL(stateChanged(QXmppMessage::State)),
-                    this, SLOT(chatStateChanged(QXmppMessage::State)));
+    check = connect(chatInput(), SIGNAL(chatStateChanged(int)),
+                    this, SLOT(chatStateChanged(int)));
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(connected()),
@@ -176,13 +176,12 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 
 /** When the chat state changes, notify the remote party.
  */
-void ChatDialog::chatStateChanged(QXmppMessage::State state)
+void ChatDialog::chatStateChanged(int state)
 {
-    foreach (const QString &jid, chatStatesJids)
-    {
+    foreach (const QString &jid, chatStatesJids) {
         QXmppMessage message;
         message.setTo(jid);
-        message.setState(state);
+        message.setState(static_cast<QXmppMessage::State>(state));
         client->sendPacket(message);
     }
 }

@@ -77,7 +77,7 @@ public slots:
 private slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
-    void chatStateChanged(QXmppMessage::State state);
+    void chatStateChanged(int state);
     void disconnected();
     void join();
     void leave();
