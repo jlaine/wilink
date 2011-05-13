@@ -47,6 +47,8 @@ public:
     ChatModel(QObject *parent);
     ~ChatModel();
 
+    virtual QModelIndex findItem(const QString &id, const QModelIndex &parent = QModelIndex()) const;
+
     // QAbstractItemModel
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;

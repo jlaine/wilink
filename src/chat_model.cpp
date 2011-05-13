@@ -66,6 +66,13 @@ QModelIndex ChatModel::createIndex(ChatModelItem *item, int column) const
         return QModelIndex();
 }
 
+QModelIndex ChatModel::findItem(const QString &id, const QModelIndex &parent) const
+{
+    Q_UNUSED(id);
+    Q_UNUSED(parent);
+    return QModelIndex();
+}
+
 QModelIndex ChatModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
