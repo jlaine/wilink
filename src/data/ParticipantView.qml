@@ -19,7 +19,6 @@
 
 import QtQuick 1.0
 
-
 GridView {
     id: grid
 
@@ -53,9 +52,24 @@ GridView {
         }
 
         MouseArea {
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             anchors.fill: parent
-            onClicked: grid.participantClicked(model.name);
+            onClicked: {
+                if (mouse.button == Qt.LeftButton) {
+                    grid.participantClicked(model.name);
+                    menu.opacity = 0;
+                } else if (mouse.button == Qt.RightButton) {
+                    menu.x = item.x + mouse.x - menu.width + 16;
+                    menu.y = item.y + mouse.y - 16;
+                    menu.opacity = 0.9;
+                }
+            }
         }
+    }
+
+    Menu {
+        id: menu
+        opacity: 0
     }
 
 }
