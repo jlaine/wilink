@@ -17,10 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QUrl>
+
 #include "chat_history.h"
 #include "chat_roster.h"
 
-#include <QUrl>
+#include "QXmppUtils.h"
 
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
@@ -287,11 +289,13 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     if (role == ActionRole) {
         return msg->isAction();
     } else if (role == AvatarRole) {
-        QModelIndex rosterIndex = d->rosterModel->findItem(msg->jid);
-        if (rosterIndex.isValid())
-            return rosterIndex.data(ChatRosterModel::AvatarRole);
-        else
-            return QUrl("qrc:/peer.png");
+        if (d->rosterModel) {
+            QModelIndex rosterIndex = d->rosterModel->findItem(msg->jid);
+            if (rosterIndex.isValid())
+                return rosterIndex.data(ChatRosterModel::AvatarRole);
+        }
+        // fallback for chat rooms
+        return QUrl("qrc:/peer.png");
     } else if (role == BodyRole) {
         QStringList bodies;
         foreach (ChatMessage *ptr, item->messages)
@@ -300,9 +304,13 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     } else if (role == DateRole) {
         return msg->date;
     } else if (role == FromRole) {
-        if (!d->rosterModel)
-            return QVariant();
-        return d->rosterModel->contactName(msg->jid);
+        if (d->rosterModel) {
+            QModelIndex rosterIndex = d->rosterModel->findItem(msg->jid);
+            if (rosterIndex.isValid())
+                return rosterIndex.data(Qt::DisplayRole);
+        }
+        // fallback for chat rooms
+        return jidToResource(msg->jid);
     } else if (role == HtmlRole) {
         QString bodies;
         foreach (ChatMessage *ptr, item->messages)
