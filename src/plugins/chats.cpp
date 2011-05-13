@@ -164,6 +164,7 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
     context->setContextProperty("historyModel", historyModel);
+    context->setContextProperty("participantModel", QVariant());
     historyView->engine()->addImageProvider("roster", imageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));

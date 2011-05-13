@@ -58,15 +58,4 @@ GridView {
         }
     }
 
-    model: ListModel {
-        ListElement {
-            avatar: "peer.png"
-            name: "Osborne Cox"
-        }
-        ListElement {
-            avatar: "home.png"
-            name: "Me"
-        }
-    }
-
 }
