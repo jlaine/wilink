@@ -155,7 +155,7 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     // chat history
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     historyModel = new ChatHistoryModel(this);
-    QDeclarativeView *historyView = new QDeclarativeView;
+    historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
     context->setContextProperty("historyModel", historyModel);
