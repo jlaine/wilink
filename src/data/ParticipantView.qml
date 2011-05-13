@@ -33,6 +33,17 @@ GridView {
         width: grid.cellWidth
         height: grid.cellHeight
 
+        Rectangle {
+            id: itemBackground
+            anchors.fill: parent
+            border.color: '#ffffff'
+            color: '#ffffff'
+            gradient: Gradient {
+                GradientStop { id: stop1; position: 0.0; color: '#ffffff'  }
+                GradientStop { id: stop2; position: 1.0; color: '#ffffff'  }
+            }
+        }
+
         Column {
             anchors.fill: parent
             Image {
@@ -54,6 +65,7 @@ GridView {
         MouseArea {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             anchors.fill: parent
+            hoverEnabled: true
             onClicked: {
                 if (mouse.button == Qt.LeftButton) {
                     grid.participantClicked(model.name);
@@ -64,6 +76,19 @@ GridView {
                     menu.opacity = 0.9;
                 }
             }
+            onEntered: {
+                parent.state = "hovered"
+            }
+            onExited: {
+                parent.state = ''
+            }
+        }
+
+        states: State {
+            name: "hovered"
+            PropertyChanges { target: itemBackground; border.color: '#b0e2ff' }
+            PropertyChanges { target: stop1;  color: '#ffffff' }
+            PropertyChanges { target: stop2;  color: '#b0e2ff' }
         }
     }
 
