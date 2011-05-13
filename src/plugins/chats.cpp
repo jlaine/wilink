@@ -142,6 +142,9 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     }
 
     // prepare models
+    historyModel = new ChatHistoryModel(this);
+    historyModel->setRosterModel(rosterModel);
+
     ChatDialogHelper *helper = new ChatDialogHelper(this);
     helper->setClient(client);
     helper->setJid(jid);
@@ -155,7 +158,8 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
 
     // chat history
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
-    historyModel = new ChatHistoryModel(this);
+    imageProvider->setRosterModel(rosterModel);
+
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);

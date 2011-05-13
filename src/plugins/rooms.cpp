@@ -271,6 +271,9 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     // prepare models
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
+    historyModel = new ChatHistoryModel(this);
+    historyModel->setRosterModel(rosterModel);
+
     ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(rosterModel, mucRoom->jid(), this);
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(roomModel);
@@ -288,7 +291,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     imageProvider->setRosterModel(rosterModel);
 
-    historyModel = new ChatHistoryModel(this);
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", mucRoom);
