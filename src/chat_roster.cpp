@@ -125,8 +125,9 @@ QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, c
     QModelIndex index = m_rosterModel->findItem(id);
     if (!index.isValid())
         index = m_rosterModel->findItem(jidToBareJid(id));
-    const QPixmap pixmap = (!index.isValid() || index.data(ChatRosterModel::IdRole).toInt() == ChatRosterModel::Room) ?
-                            QPixmap(":/peer.png") : index.data(Qt::DecorationRole).value<QPixmap>();
+    QPixmap pixmap = index.data(Qt::DecorationRole).value<QPixmap>();
+    if (pixmap.isNull())
+        pixmap = QPixmap(":/peer.png");
 
     // scale
     if (size)
