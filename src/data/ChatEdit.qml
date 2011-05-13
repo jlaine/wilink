@@ -22,6 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: chatEdit
 
+    property int chatState: qXmppMessage.none
     property alias text: input.text
     property variant participants: []
     signal returnPressed
@@ -54,6 +55,18 @@ Rectangle {
         }
         newText += '@' + participant + ': ';
         input.text = newText;
+    }
+
+    // FIXME: this is a hack to expose QXmpp constant
+    QtObject {
+        id: qXmppMessage
+
+        property int none: 0
+        property int active: 1
+        property int inactive: 2
+        property int gone: 3
+        property int composing: 4
+        property int paused: 5
     }
 
     TextEdit {

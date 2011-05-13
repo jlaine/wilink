@@ -26,13 +26,13 @@
 
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
-#include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
 #include "application.h"
 #include "chat.h"
+#include "chat_client.h"
 #include "chat_edit.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
@@ -45,6 +45,51 @@
 #else
 #define HISTORY_DAYS 14
 #endif
+
+ChatDialogHelper::ChatDialogHelper(QObject *parent)
+    : QObject(parent),
+    m_client(0),
+    m_historyModel(0)
+{
+}
+
+ChatClient *ChatDialogHelper::client() const
+{
+    return m_client;
+}
+
+void ChatDialogHelper::setClient(ChatClient *client)
+{
+    if (client != m_client) {
+        m_client = client;
+        emit clientChanged(client);
+    }
+}
+ChatHistoryModel *ChatDialogHelper::historyModel() const
+{
+    return m_historyModel;
+}
+
+void ChatDialogHelper::setHistoryModel(ChatHistoryModel *historyModel)
+{
+    if (historyModel != m_historyModel) {
+        m_historyModel = historyModel;
+        emit historyModelChanged(historyModel);
+    }
+}
+
+QString ChatDialogHelper::jid() const
+{
+    return m_jid;
+}
+
+void ChatDialogHelper::setJid(const QString &jid)
+{
+    if (jid != m_jid) {
+        m_jid = jid;
+        emit jidChanged(jid);
+    }
+}
 
 ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),

@@ -76,7 +76,7 @@ void ChatEdit::focusInEvent(QFocusEvent *e)
         d->state != QXmppMessage::Paused)
     {
         d->state = QXmppMessage::Active;
-        emit stateChanged(d->state);
+        emit chatStateChanged(d->state);
     }
     // reset inactivity timer
     d->inactiveTimer->stop();
@@ -158,14 +158,14 @@ void ChatEdit::onTextChanged()
         if (d->state != QXmppMessage::Composing)
         {
             d->state = QXmppMessage::Composing;
-            emit stateChanged(d->state);
+            emit chatStateChanged(d->state);
         }
         d->pausedTimer->start();
     } else {
         if (d->state != QXmppMessage::Active)
         {
             d->state = QXmppMessage::Active;
-            emit stateChanged(d->state);
+            emit chatStateChanged(d->state);
         }
         d->pausedTimer->stop();
     }
@@ -189,7 +189,7 @@ QSize ChatEdit::sizeHint() const
     return sizeHint;
 }
 
-QXmppMessage::State ChatEdit::state() const
+int ChatEdit::chatState() const
 {
     return d->state;
 }
@@ -240,7 +240,7 @@ void ChatEdit::slotInactive()
     if (d->state != QXmppMessage::Inactive)
     {
         d->state = QXmppMessage::Inactive;
-        emit stateChanged(d->state);
+        emit chatStateChanged(d->state);
     }
 }
 
@@ -249,7 +249,7 @@ void ChatEdit::slotPaused()
     if (d->state == QXmppMessage::Composing)
     {
         d->state = QXmppMessage::Paused;
-        emit stateChanged(d->state);
+        emit chatStateChanged(d->state);
     }
 }
 
