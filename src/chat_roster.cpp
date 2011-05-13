@@ -271,8 +271,9 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 
     d->client = xmppClient;
     d->nickNameReceived = false;
-    d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
     rootItem = new ChatRosterItem(ChatRosterModel::Other);
+    d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
+    ChatModel::addItem(d->ownItem, rootItem);
 #ifdef FLAT_CONTACTS
     d->contactsItem = (ChatRosterItem*)rootItem;
 #else
@@ -339,12 +340,13 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 
 void ChatRosterModel::connected()
 {
-    /* request own vCard */
+    // request own vCard
     d->nickNameReceived = false;
     d->ownItem->setId(d->client->configuration().jidBare());
     d->ownItem->setData(Qt::DisplayRole, d->client->configuration().user());
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
     d->client->vCardManager().requestVCard(d->ownItem->id());
+    emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
 }
 
 /** Determine the avatar for a contact.
