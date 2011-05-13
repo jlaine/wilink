@@ -33,7 +33,7 @@ Rectangle {
         z: 1
     }
 
-    Row {
+    Item {
         anchors.top: widgetBar.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
@@ -45,7 +45,8 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            width: parent.width - scrollBar.width
+            anchors.left: parent.left
+            anchors.right: scrollBar.left
             model: historyModel
 
             function onBottomChanged() {
@@ -61,6 +62,7 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
+            anchors.right: parent.right
             flickableItem: historyView
             dragToBottomEnabled: true
         }
