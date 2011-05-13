@@ -750,54 +750,41 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
     const QString bareJid = vcard.from();
 
     ChatRosterItem *item = d->find(bareJid);
-    if (item)
-    {
-        // read vCard image
-        QBuffer buffer;
-        buffer.setData(vcard.photo());
-        buffer.open(QIODevice::ReadOnly);
-        QImageReader imageReader(&buffer);
-        imageReader.setScaledSize(QSize(32, 32));
-        item->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
+    if (!item)
+        return;
 
-        // store the nickName or fullName found in the vCard for display,
-        // unless the roster entry has a name
-        if (item->type() == ChatRosterModel::Contact)
-        {
-            QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(bareJid);
-            if (!vcard.nickName().isEmpty())
-                item->setData(NicknameRole, vcard.nickName());
-            if (entry.name().isEmpty())
-            {
-                if (!vcard.nickName().isEmpty())
-                    item->setData(Qt::DisplayRole, vcard.nickName());
-                else if (!vcard.fullName().isEmpty())
-                    item->setData(Qt::DisplayRole, vcard.fullName());
-            }
-        }
+    // read vCard image
+    QBuffer buffer;
+    buffer.setData(vcard.photo());
+    buffer.open(QIODevice::ReadOnly);
+    QImageReader imageReader(&buffer);
+    imageReader.setScaledSize(QSize(32, 32));
+    item->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
 
-        // store vCard URL
-        const QString url = vcard.url();
-        if (!url.isEmpty())
-            item->setData(UrlRole, vcard.url());
+    // store the nickName
+    if (!vcard.nickName().isEmpty())
+         item->setData(NicknameRole, vcard.nickName());
 
-        emit dataChanged(createIndex(item, ContactColumn),
-                         createIndex(item, SortingColumn));
+    // store the nickName or fullName found in the vCard for display,
+    // unless the roster entry has a name
+    QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(bareJid);
+    if (entry.name().isEmpty()) {
+        if (!vcard.nickName().isEmpty())
+            item->setData(Qt::DisplayRole, vcard.nickName());
+        else if (!vcard.fullName().isEmpty())
+            item->setData(Qt::DisplayRole, vcard.fullName());
     }
-    if (bareJid == d->client->configuration().jidBare())
-    {
-        // read vCard image
-        QBuffer buffer;
-        buffer.setData(vcard.photo());
-        buffer.open(QIODevice::ReadOnly);
-        QImageReader imageReader(&buffer);
-        imageReader.setScaledSize(QSize(32, 32));
-        d->ownItem->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
 
-        if (!vcard.nickName().isEmpty()) {
-            d->ownItem->setData(NicknameRole, vcard.nickName());
-            d->ownItem->setData(Qt::DisplayRole, vcard.nickName());
-        }
+    // store vCard URL
+    const QString url = vcard.url();
+    if (!url.isEmpty())
+        item->setData(UrlRole, vcard.url());
+
+    emit dataChanged(createIndex(item, ContactColumn),
+                     createIndex(item, SortingColumn));
+
+    // check if we got our own name
+    if (item == d->ownItem) {
         d->nickNameReceived = true;
         emit ownNameReceived();
     }
