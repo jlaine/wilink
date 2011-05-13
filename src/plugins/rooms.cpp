@@ -303,12 +303,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     // FIXME: move this to QML
     chatInput = historyView->rootObject()->findChild<QObject*>("chatInput");
-    QObject *item = historyView->rootObject()->findChild<QObject*>("historyView");
-    Q_ASSERT(item);
-    check = connect(historyModel, SIGNAL(bottomChanged()),
-                    item, SLOT(onBottomChanged()));
-
     layout->addWidget(historyView);
+    setFocusProxy(historyView);
 
     // add actions
     QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));

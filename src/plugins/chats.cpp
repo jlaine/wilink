@@ -168,13 +168,8 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     historyView->engine()->addImageProvider("roster", imageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));
-
-    QObject *item = historyView->rootObject()->findChild<QObject*>("historyView");
-    Q_ASSERT(item);
-    check = connect(historyModel, SIGNAL(bottomChanged()),
-                    item, SLOT(onBottomChanged()));
-
     layout->addWidget(historyView);
+    setFocusProxy(historyView);
 
     // connect signals
 #if 0
