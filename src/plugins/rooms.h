@@ -95,7 +95,6 @@ private slots:
     void changeSubject();
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
-    void customContextMenuRequested(const QPoint & pos);
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void error(const QXmppStanza::Error &error);
     void inviteDialog();
@@ -106,7 +105,6 @@ private slots:
     void messageReceived(const QXmppMessage &msg);
     void participantAdded(const QString &jid);
     void participantChanged(const QString &jid);
-    void participantClicked(const QModelIndex &index);
     void participantRemoved(const QString &jid);
     void showProfile();
     void subjectChanged(const QString &subject);
@@ -116,7 +114,6 @@ private:
     QXmppMucRoom *mucRoom;
     bool notifyMessages;
     ChatRosterModel *rosterModel;
-    QListView *participantsList;
 
     // actions
     QAction *subjectAction;

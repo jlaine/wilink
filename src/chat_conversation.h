@@ -29,7 +29,6 @@ class ChatHistoryModel;
 class ChatHistoryWidget;
 class ChatRosterModel;
 class QModelIndex;
-class QSplitter;
 
 class ChatConversation : public ChatPanel
 {
@@ -45,7 +44,6 @@ public:
 
 protected:
     QObject *chatInput();
-    QSplitter *splitter();
 
 private:
     ChatConversationPrivate *d;

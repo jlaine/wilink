@@ -23,7 +23,6 @@
 #include <QDeclarativeView>
 #include <QDebug>
 #include <QLayout>
-#include <QSplitter>
 
 #include "chat_conversation.h"
 #include "chat_history.h"
@@ -69,7 +68,6 @@ public:
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
     RosterImageProvider *imageProvider;
-    QSplitter *splitter;
 };
 
 ChatConversation::ChatConversation(QWidget *parent)
@@ -84,16 +82,9 @@ ChatConversation::ChatConversation(QWidget *parent)
     /* status bar */
     layout->addLayout(headerLayout());
 
-    // chatHistory and chatRoomList separation
-    d->splitter = new QSplitter;
-    layout->addWidget(d->splitter);
-
-    /* chat history model */
-    d->historyModel = new ChatHistoryModel(this);
-
     /* chat history */
     d->imageProvider = new RosterImageProvider;
-
+    d->historyModel = new ChatHistoryModel(this);
     d->historyView = new QDeclarativeView;
     QDeclarativeContext *ctxt = d->historyView->rootContext();
     ctxt->setContextProperty("historyModel", d->historyModel);
@@ -107,7 +98,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     check = connect(d->historyModel, SIGNAL(bottomChanged()),
                     item, SLOT(onBottomChanged()));
 
-    d->splitter->addWidget(d->historyView);
+    layout->addWidget(d->historyView);
 
 #if 0
     /* spacer */
@@ -152,11 +143,6 @@ ChatConversation::~ChatConversation()
 QObject *ChatConversation::chatInput()
 {
     return d->historyView->rootObject()->findChild<QObject*>("chatInput");
-}
-
-QSplitter *ChatConversation::splitter()
-{
-    return d->splitter;
 }
 
 ChatHistoryModel *ChatConversation::historyModel()

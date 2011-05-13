@@ -280,27 +280,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     context->setContextProperty("conversation", mucRoom);
     context->setContextProperty("participantModel", sortedModel);
 
-    participantsList = new QListView();
-    participantsList->setObjectName("participant-list");
-    participantsList->setModel(sortedModel);
-    participantsList->setViewMode(QListView::IconMode);
-    participantsList->setMovement(QListView::Static);
-    participantsList->setResizeMode(QListView::Adjust);
-    participantsList->setFlow(QListView::LeftToRight);
-    participantsList->setWordWrap(false);
-    participantsList->setWrapping(true);
-    participantsList->hide();
-
-    // add participant list
-    QSplitter *splitterWidget = splitter();
-    splitterWidget->addWidget(participantsList);
-    QList<int> sizes = QList<int>();
-    sizes.append(500);
-    sizes.append(32);
-    splitterWidget->setSizes(sizes);
-    splitterWidget->setStretchFactor(0, 1);
-    splitterWidget->setStretchFactor(1, 0);
-
     // add actions
     QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
     check = connect(inviteAction, SIGNAL(triggered()),
@@ -325,15 +304,12 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     Q_ASSERT(check);
     permissionsAction->setVisible(false);
 
-    check = connect(participantsList, SIGNAL(clicked(QModelIndex)),
-                    this, SLOT(participantClicked(QModelIndex)));
-    Q_ASSERT(check);
-
-    // context menu
-    participantsList->setContextMenuPolicy(Qt::CustomContextMenu);
+#if 0
+    // FIXME: context menu
     check = connect(participantsList, SIGNAL(customContextMenuRequested(const QPoint)),
                     this, SLOT(customContextMenuRequested(const QPoint)));
     Q_ASSERT(check);
+#endif
 
     // connect signals
     check = connect(this, SIGNAL(hidePanel()),
@@ -362,10 +338,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     check = connect(mucRoom, SIGNAL(kicked(QString,QString)),
                     this, SLOT(kicked(QString,QString)));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(joined()), 
-                    participantsList, SLOT(show()));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(left()),
@@ -465,6 +437,7 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
         mucRoom->setConfiguration(dialog.form());
 }
 
+#if 0
 void ChatRoom::customContextMenuRequested(const QPoint &pos)
 {
     const QModelIndex index = participantsList->currentIndex();
@@ -493,6 +466,7 @@ void ChatRoom::customContextMenuRequested(const QPoint &pos)
     else
         delete menu;
 }
+#endif
 
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
@@ -650,14 +624,6 @@ void ChatRoom::participantChanged(const QString &jid)
     QModelIndex index = rosterModel->findItem(jid);
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-}
-
-void ChatRoom::participantClicked(const QModelIndex &index)
-{
-    if (index.isValid() && chat->client()->isConnected()) {
-        const QString nickName = jidToResource(index.data(ChatRosterModel::IdRole).toString());
-        QMetaObject::invokeMethod(chatInput(), "talkAt", Q_ARG(QString, nickName));
-    }
 }
 
 void ChatRoom::participantRemoved(const QString &jid)
