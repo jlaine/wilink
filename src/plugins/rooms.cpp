@@ -20,6 +20,7 @@
 #include <QAbstractProxyModel>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDeclarativeContext>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHeaderView>
@@ -276,6 +277,9 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->sort(0);
 
+    QDeclarativeContext *context = historyView()->rootContext();
+    context->setContextProperty("conversation", mucRoom);
+
     participantsList = new QListView();
     participantsList->setObjectName("participant-list");
     participantsList->setModel(sortedModel);
@@ -395,11 +399,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     check = connect(this, SIGNAL(hidePanel()),
                     mucRoom, SLOT(leave()));
-    Q_ASSERT(check);
-
-    /* keyboard shortcut */
-    check = connect(chatInput(), SIGNAL(returnPressed()),
-                    this, SLOT(returnPressed()));
     Q_ASSERT(check);
 
     /* if nickname is received, join now */
@@ -705,25 +704,6 @@ void ChatRoom::showProfile()
 void ChatRoom::subjectChanged(const QString &subject)
 {
     setWindowStatus(subject);
-}
-
-/** Send a message to the chat room.
- */
-void ChatRoom::returnPressed()
-{
-    const QString text = chatInput()->property("text").toString();
-    if (text.isEmpty())
-        return;
-
-    // try to send message
-    if (!mucRoom->sendMessage(text))
-        return;
-
-    // clear input
-    chatInput()->setProperty("text", QString());
-
-    // play sound
-    wApp->soundPlayer()->play(wApp->outgoingMessageSound());
 }
 
 /** Unbookmarks the room.

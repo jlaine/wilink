@@ -18,6 +18,7 @@
  */
 
 #include <QDateTime>
+#include <QDeclarativeContext>
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
@@ -49,7 +50,8 @@
 ChatDialogHelper::ChatDialogHelper(QObject *parent)
     : QObject(parent),
     m_client(0),
-    m_historyModel(0)
+    m_historyModel(0),
+    m_state(QXmppMessage::None)
 {
 }
 
@@ -91,6 +93,34 @@ void ChatDialogHelper::setJid(const QString &jid)
     }
 }
 
+bool ChatDialogHelper::sendMessage(const QString &body)
+{
+    if (m_jid.isEmpty() || !m_client || !m_client->isConnected())
+        return false;
+
+    // send message
+    QXmppMessage message;
+    message.setTo(m_jid);
+    message.setBody(body);
+    message.setState(m_state);
+    if (!m_client->sendPacket(message))
+        return false;
+
+    // add message to history
+    if (m_historyModel) {
+        ChatMessage message;
+        message.body = body;
+        message.date = m_client->serverTime();
+        message.jid = m_client->configuration().jid();
+        message.received = false;
+        m_historyModel->addMessage(message);
+    }
+
+    // play sound
+    wApp->soundPlayer()->play(wApp->outgoingMessageSound());
+    return true;
+}
+
 ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatConversation(parent),
     chatRemoteJid(jid), 
@@ -108,15 +138,21 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
         client->addExtension(archiveManager);
     }
 
+    // create helper
+    ChatDialogHelper *helper = new ChatDialogHelper(this);
+    helper->setClient(client);
+    helper->setJid(jid);
+    helper->setHistoryModel(historyModel());
+    QDeclarativeContext *context = historyView()->rootContext();
+    context->setContextProperty("conversation", helper);
+
     // connect signals
     bool check;
-    check = connect(chatInput(), SIGNAL(returnPressed()),
-                    this, SLOT(returnPressed()));
-    Q_ASSERT(check);
-
+#if 0
     check = connect(chatInput(), SIGNAL(chatStateChanged(int)),
                     this, SLOT(chatStateChanged(int)));
     Q_ASSERT(check);
+#endif
 
     check = connect(client, SIGNAL(connected()),
                     this, SLOT(join()));
@@ -259,37 +295,6 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
 
     // play sound
     wApp->soundPlayer()->play(wApp->incomingMessageSound());
-}
-
-/** Sends a message to the remote party.
- */
-void ChatDialog::returnPressed()
-{
-    const QString text = chatInput()->property("text").toString();
-    if (text.isEmpty())
-        return;
-
-    // try to send message
-    QXmppMessage msg;
-    msg.setBody(text);
-    msg.setTo(chatRemoteJid);
-    msg.setState(QXmppMessage::Active);
-    if (!client->sendPacket(msg))
-        return;
-
-    // clear input
-    chatInput()->setProperty("text", QString());
-
-    // add message to history
-    ChatMessage message;
-    message.body = text;
-    message.date = client->serverTime();
-    message.jid = client->configuration().jid();
-    message.received = false;
-    historyModel()->addMessage(message);
-
-    // play sound
-    wApp->soundPlayer()->play(wApp->outgoingMessageSound());
 }
 
 /** Handles a roster change.

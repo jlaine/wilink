@@ -105,19 +105,6 @@ ChatConversation::ChatConversation(QWidget *parent)
     d->splitter = new QSplitter;
     layout->addWidget(d->splitter);
 
-    /* search bar */
-    d->searchBar = new ChatSearchBar;
-    d->searchBar->hide();
-    check = connect(d->searchBar, SIGNAL(displayed(bool)),
-                    this, SLOT(slotSearchDisplayed(bool)));
-    Q_ASSERT(check);
-    check = connect(this, SIGNAL(findPanel()),
-                    d->searchBar, SLOT(activate()));
-    Q_ASSERT(check);
-    check = connect(this, SIGNAL(findAgainPanel()),
-                    d->searchBar, SLOT(findNext()));
-    Q_ASSERT(check);
-
     /* chat history model */
     d->historyModel = new ChatHistoryModel(this);
 
@@ -138,22 +125,26 @@ ChatConversation::ChatConversation(QWidget *parent)
                     item, SLOT(onBottomChanged()));
 
     d->splitter->addWidget(d->historyView);
-#if 0
-    d->historyView = new QGraphicsView;
-    d->historyView->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    d->historyView->setScene(new QGraphicsScene(d->historyView));
-    d->historyView->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    ChatHistoryWidget *chatHistoryWidget = new ChatHistoryWidget;
-    chatHistoryWidget->setModel(d->historyModel);
-    d->historyView->scene()->addItem(chatHistoryWidget);
-    chatHistoryWidget->setView(d->historyView);
-    d->splitter->addWidget(d->historyView);
+    /* spacer */
+    d->spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addSpacerItem(d->spacerItem);
 
-    check = connect(chatHistoryWidget, SIGNAL(messageClicked(QModelIndex)),
-                    this, SIGNAL(messageClicked(QModelIndex)));
+    /* search bar */
+    d->searchBar = new ChatSearchBar;
+    d->searchBar->hide();
+    check = connect(d->searchBar, SIGNAL(displayed(bool)),
+                    this, SLOT(slotSearchDisplayed(bool)));
     Q_ASSERT(check);
+    check = connect(this, SIGNAL(findPanel()),
+                    d->searchBar, SLOT(activate()));
+    Q_ASSERT(check);
+    check = connect(this, SIGNAL(findAgainPanel()),
+                    d->searchBar, SLOT(findNext()));
+    Q_ASSERT(check);
+    layout->addWidget(d->searchBar);
 
+#if 0
     check = connect(d->searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
                     chatHistoryWidget, SLOT(find(QString, QTextDocument::FindFlags, bool)));
     Q_ASSERT(check);
@@ -167,35 +158,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     Q_ASSERT(check);
 #endif
 
-    /* spacer */
-    d->spacerItem = new QSpacerItem(16, SPACING, QSizePolicy::Expanding, QSizePolicy::Fixed);
-    layout->addSpacerItem(d->spacerItem);
-
-    /* search bar */
-    layout->addWidget(d->searchBar);
-
-    /* text edit */
-    d->chatInput = new ChatEdit(80);
-#ifdef WILINK_EMBEDDED
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addWidget(d->chatInput);
-    QPushButton *sendButton = new QPushButton;
-    sendButton->setFlat(true);
-    sendButton->setMaximumWidth(32);
-    sendButton->setIcon(QIcon(":/upload.png"));
-    check = connect(sendButton, SIGNAL(clicked()),
-                    d->chatInput, SIGNAL(returnPressed()));
-    Q_ASSERT(check);
-    hbox->addWidget(sendButton);
-    layout->addLayout(hbox);
-#else
-    layout->addWidget(d->chatInput);
-#endif
-
-    setFocusProxy(d->chatInput);
     setLayout(layout);
-
-    /* shortcuts */
 }
 
 ChatConversation::~ChatConversation()
@@ -205,7 +168,7 @@ ChatConversation::~ChatConversation()
 
 QObject *ChatConversation::chatInput()
 {
-    return d->chatInput;
+    return d->historyView->rootObject()->findChild<QObject*>("chatInput");
 }
 
 QSplitter *ChatConversation::splitter()

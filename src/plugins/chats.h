@@ -57,10 +57,14 @@ signals:
     void historyModelChanged(ChatHistoryModel *historyModel);
     void jidChanged(const QString &jid);
 
+public slots:
+    bool sendMessage(const QString &text);
+
 private:
     ChatClient *m_client;
-    QString m_jid;
     ChatHistoryModel *m_historyModel;
+    QString m_jid;
+    QXmppMessage::State m_state;
 };
 
 class ChatDialog : public ChatConversation
@@ -81,7 +85,6 @@ private slots:
     void disconnected();
     void join();
     void leave();
-    void returnPressed();
 
 private:
     void updateWindowTitle();

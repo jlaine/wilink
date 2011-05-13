@@ -88,6 +88,17 @@ Rectangle {
     }
 
     Connections {
+        target: chatInput
+        onReturnPressed: {
+            if (Qt.isQtObject(conversation)) {
+                var text = chatInput.text;
+                if (conversation.sendMessage(text, 0))
+                    chatInput.text = '';
+            }
+        }
+    }
+
+    Connections {
         target: historyView
         onParticipantClicked: chatInput.talkAt(participant)
     }
