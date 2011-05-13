@@ -393,10 +393,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
-    check = connect(this, SIGNAL(messageClicked(QModelIndex)),
-                    this, SLOT(onMessageClicked(QModelIndex)));
-    Q_ASSERT(check);
-
     check = connect(this, SIGNAL(hidePanel()),
                     mucRoom, SLOT(leave()));
     Q_ASSERT(check);
@@ -608,14 +604,6 @@ void ChatRoom::left()
 
     // destroy window
     deleteLater();
-}
-
-void ChatRoom::onMessageClicked(const QModelIndex &messageIndex)
-{
-    if (messageIndex.isValid() && chat->client()->isConnected()) {
-        const QString nickName = jidToResource(messageIndex.data(ChatHistoryModel::JidRole).toString());
-        QMetaObject::invokeMethod(chatInput(), "talkAt", Q_ARG(QString, nickName));
-    }
 }
 
 void ChatRoom::messageReceived(const QXmppMessage &msg)

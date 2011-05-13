@@ -43,9 +43,6 @@ public:
     ChatRosterModel *rosterModel();
     void setRosterModel(ChatRosterModel *rosterModel);
 
-signals:
-    void messageClicked(const QModelIndex &index);
-
 protected:
     QObject *chatInput();
     QSplitter *splitter();
