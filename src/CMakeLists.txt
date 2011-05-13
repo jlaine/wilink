@@ -67,6 +67,7 @@ set(wiLink_SOURCES
     plugins/chats.cpp
     plugins/console.cpp
     plugins/contacts.cpp
+    plugins/declarative.cpp
     plugins/diagnostics.cpp
     plugins/discovery.cpp
     plugins/menu.cpp
@@ -108,6 +109,7 @@ set(wiLink_MOC_HEADERS
     plugins/chats.h
     plugins/console.h
     plugins/contacts.h
+    plugins/declarative.h
     plugins/diagnostics.h
     plugins/discovery.h
     plugins/menu.h

@@ -1,0 +1,48 @@
+/*
+ * wiLink
+ * Copyright (C) 2009-2011 Bolloré telecom
+ * See AUTHORS file for a full list of contributors.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef __WILINK_DECLARATIVE_H__
+#define __WILINK_DECLARATIVE_H__
+
+#include <QAbstractItemModel>
+
+class ListHelper : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel NOTIFY modelChanged)
+
+public:
+    ListHelper(QObject *parent = 0);
+
+    int count() const;
+    Q_INVOKABLE QModelIndex get(int row) const;
+
+    QAbstractItemModel *model() const;
+    void setModel(QAbstractItemModel *model);
+
+signals:
+    void countChanged();
+    void modelChanged(QAbstractItemModel *model);
+
+private:
+    QAbstractItemModel *m_model;
+};
+
+#endif
