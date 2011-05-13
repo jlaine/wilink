@@ -1,6 +1,7 @@
 # Common definitions
 
-QT += multimedia
+CONFIG += mobility
+MOBILITY += multimedia
 QSOUND_INCLUDE_DIR = $$PWD
 QSOUND_LIBRARY_DIR = $$PWD
 QSOUND_LIBRARY_NAME = qsound
