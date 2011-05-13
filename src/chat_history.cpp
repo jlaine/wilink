@@ -75,15 +75,15 @@ bool ChatMessage::groupWith(const ChatMessage &other) const
 
 /** Returns the HTML for the message body.
  *
- * @param rosterModel
+ * @param meName
  */
-QString ChatMessage::html(ChatRosterModel *rosterModel) const
+QString ChatMessage::html(const QString &meName) const
 {
     QString bodyHtml = Qt::escape(body);
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
     bodyHtml.replace("\n", "<br/>");
-    if (rosterModel)
-        bodyHtml.replace(meRegex, "<b>" + rosterModel->contactName(jid) + "\\1</b>");
+    if (!meName.isEmpty())
+        bodyHtml.replace(meRegex, "<b>" + meName + "\\1</b>");
     foreach (const TextTransform &transform, textTransforms)
         bodyHtml.replace(transform.first, transform.second);
     return bodyHtml;
@@ -312,9 +312,10 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         // fallback for chat rooms
         return jidToResource(msg->jid);
     } else if (role == HtmlRole) {
+        const QString meName = d->rosterModel ? d->rosterModel->contactName(msg->jid) : QString();
         QString bodies;
         foreach (ChatMessage *ptr, item->messages)
-            bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + ptr->html(d->rosterModel) + "</p>";
+            bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + ptr->html(meName) + "</p>";
         return bodies;
     } else if (role == JidRole) {
         return msg->jid;
