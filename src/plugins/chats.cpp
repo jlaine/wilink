@@ -20,6 +20,7 @@
 #include <QDateTime>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QLabel>
 #include <QLayout>
@@ -159,7 +160,6 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
     context->setContextProperty("historyModel", historyModel);
-    context->setContextProperty("textHelper", new ChatHistoryHelper(this));
     historyView->engine()->addImageProvider("roster", imageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));

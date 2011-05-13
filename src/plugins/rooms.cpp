@@ -21,6 +21,7 @@
 #include <QComboBox>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
@@ -293,7 +294,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     context->setContextProperty("conversation", mucRoom);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
-    context->setContextProperty("textHelper", new ChatHistoryHelper(this));
 
     historyView->engine()->addImageProvider("roster", imageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);

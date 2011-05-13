@@ -189,15 +189,15 @@ Acceptez-vous?</translation>
     <name>ChatHistoryWidget</name>
     <message>
         <source>Clear</source>
-        <translation>Effacer</translation>
+        <translation type="obsolete">Effacer</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>&amp;Copier</translation>
+        <translation type="obsolete">&amp;Copier</translation>
     </message>
     <message>
         <source>Select &amp;All</source>
-        <translation>&amp;Tout sélectionner</translation>
+        <translation type="obsolete">&amp;Tout sélectionner</translation>
     </message>
 </context>
 <context>
