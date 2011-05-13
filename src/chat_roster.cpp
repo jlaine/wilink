@@ -920,10 +920,8 @@ QModelIndex ChatRosterProxyModel::index(int row, int column, const QModelIndex &
 
 void ChatRosterProxyModel::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
-    if (isRoot(topLeft.parent()) && isRoot(bottomRight.parent())) {
-        qDebug("data changed");
+    if (isRoot(topLeft.parent()) && isRoot(bottomRight.parent()))
         emit dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight));
-    }
 }
 
 void ChatRosterProxyModel::onRowsAboutToBeInserted(const QModelIndex &sourceIndex, int start, int end)
