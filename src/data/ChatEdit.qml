@@ -65,13 +65,25 @@ Rectangle {
 
     Timer {
         id: inactiveTimer
-        interval: 12000
+        interval: 120000
         running: true
 
         onTriggered: {
             if (chatEdit.chatState != qXmppMessage.inactive)
                 console.log("inactive");
             chatEdit.chatState = qXmppMessage.inactive
+        }
+    }
+
+    Timer {
+        id: pausedTimer
+        interval: 30000
+
+        onTriggered: {
+            if (chatEdit.chatState == qXmppMessage.composing) {
+                console.log("paused");
+                chatEdit.chatState = qXmppMessage.paused
+            }
         }
     }
 
@@ -90,22 +102,38 @@ Rectangle {
     TextEdit {
         id: input
 
+        focus: true
         x: 8
         y: 8
         smooth: true
         textFormat: TextEdit.PlainText
         width: parent.width - 16
 
+        onActiveFocusChanged: {
+            if (chatEdit.chatState != qXmppMessage.active &&
+                chatEdit.chatState != qXmppMessage.composing &&
+                chatEdit.chatState != qXmppMessage.paused)
+            {
+                console.log("active");
+                chatEdit.chatState = qXmppMessage.active;
+            }
+            inactiveTimer.restart();
+        }
+
         onTextChanged: {
             inactiveTimer.stop();
             if (text.length) {
-                if (chatEdit.chatState != qXmppMessage.composing)
+                if (chatEdit.chatState != qXmppMessage.composing) {
                     console.log("composing");
-                chatEdit.chatState = qXmppMessage.composing
+                    chatEdit.chatState = qXmppMessage.composing
+                }
+                pausedTimer.restart()
             } else {
-                if (chatEdit.chatState != qXmppMessage.active)
+                if (chatEdit.chatState != qXmppMessage.active) {
                     console.log("active");
-                chatEdit.chatState = qXmppMessage.active
+                    chatEdit.chatState = qXmppMessage.active
+                }
+                pausedTimer.stop()
             }
         }
 
@@ -116,6 +144,7 @@ Rectangle {
                 event.accepted = false;
             }
         }
+
         Keys.onTabPressed: {
             // select word, including 'at' sign
             var text = input.text;
