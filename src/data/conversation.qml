@@ -62,7 +62,7 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.right: participantView.left
+            anchors.right: Qt.isQtObject(participantModel) ? participantView.left : parent.right
             flickableItem: historyView
             dragToBottomEnabled: true
         }
@@ -74,6 +74,7 @@ Rectangle {
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             model: participantModel
+            visible: Qt.isQtObject(participantModel)
         }
     }
 
