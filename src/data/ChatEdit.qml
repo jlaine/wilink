@@ -63,6 +63,18 @@ Rectangle {
         model: chatEdit.model
     }
 
+    Timer {
+        id: inactiveTimer
+        interval: 12000
+        running: true
+
+        onTriggered: {
+            if (chatEdit.chatState != qXmppMessage.inactive)
+                console.log("inactive");
+            chatEdit.chatState = qXmppMessage.inactive
+        }
+    }
+
     // FIXME: this is a hack to expose QXmpp constant
     QtObject {
         id: qXmppMessage
@@ -83,6 +95,19 @@ Rectangle {
         smooth: true
         textFormat: TextEdit.PlainText
         width: parent.width - 16
+
+        onTextChanged: {
+            inactiveTimer.stop();
+            if (text.length) {
+                if (chatEdit.chatState != qXmppMessage.composing)
+                    console.log("composing");
+                chatEdit.chatState = qXmppMessage.composing
+            } else {
+                if (chatEdit.chatState != qXmppMessage.active)
+                    console.log("active");
+                chatEdit.chatState = qXmppMessage.active
+            }
+        }
 
         Keys.onReturnPressed: {
             if (event.modifiers == Qt.NoModifier) {
