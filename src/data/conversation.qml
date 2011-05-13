@@ -41,7 +41,6 @@ Rectangle {
     
         HistoryView {
             id: historyView
-            objectName: 'historyView'
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -93,7 +92,6 @@ Rectangle {
 
         ChatEdit {
             id: chatInput
-            objectName: 'chatInput'
 
             model: participantModel
             x: 4
