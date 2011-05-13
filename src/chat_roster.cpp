@@ -360,13 +360,8 @@ QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
     if (item)
         return item->data(Qt::DecorationRole).value<QPixmap>();
 
-    // own item
-    const QString bareJid = jidToBareJid(jid);
-    if (bareJid == d->ownItem->id())
-        return d->ownItem->data(Qt::DecorationRole).value<QPixmap>();
-
     // contact by bare jid
-    item = d->find(bareJid);
+    item = d->find(jidToBareJid(jid));
     if (item)
         return item->type() == ChatRosterModel::Room ? QPixmap(":/peer.png") : item->data(Qt::DecorationRole).value<QPixmap>();
 
@@ -414,13 +409,8 @@ QString ChatRosterModel::contactName(const QString &jid) const
     if (item)
         return item->data(Qt::DisplayRole).toString();
 
-    // own item
-    const QString bareJid = jidToBareJid(jid);
-    if (bareJid == d->ownItem->id())
-        return d->ownItem->data(Qt::DisplayRole).toString();
-
     // contact by bare jid
-    item = d->find(bareJid);
+    item = d->find(jidToBareJid(jid));
     if (item)
         return item->type() == ChatRosterModel::Room ? jidToResource(jid) : item->data(Qt::DisplayRole).toString();
 
