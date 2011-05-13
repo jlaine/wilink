@@ -21,6 +21,7 @@
 #define __WILINK_CHAT_ROSTER_H__
 
 #include <QAbstractProxyModel>
+#include <QDeclarativeImageProvider>
 #include <QTreeView>
 
 #include "chat_model.h"
@@ -34,10 +35,22 @@ class QXmppPresence;
 class QXmppVCardIq;
 class QXmppVCardManager;
 
+class ChatRosterModel;
 class ChatRosterModelPrivate;
 
 #define ROOMS_ROSTER_ID     "1_rooms"
 #define CONTACTS_ROSTER_ID  "2_contacts"
+
+class ChatRosterImageProvider : public QDeclarativeImageProvider
+{
+public:
+    ChatRosterImageProvider();
+    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
+    void setRosterModel(ChatRosterModel *rosterModel);
+
+private:
+    ChatRosterModel *m_rosterModel;
+};
 
 class ChatRosterModel : public ChatModel
 {

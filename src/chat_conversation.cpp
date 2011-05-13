@@ -19,7 +19,6 @@
 
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
-#include <QDeclarativeImageProvider>
 #include <QDeclarativeView>
 #include <QDebug>
 #include <QLayout>
@@ -28,46 +27,12 @@
 #include "chat_history.h"
 #include "chat_roster.h"
 
-class RosterImageProvider : public QDeclarativeImageProvider
-{
-public:
-    RosterImageProvider();
-    QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
-    void setRosterModel(ChatRosterModel *rosterModel);
-
-private:
-    ChatRosterModel *m_rosterModel;
-};
-
-RosterImageProvider::RosterImageProvider()
-    : QDeclarativeImageProvider(Pixmap),
-    m_rosterModel(0)
-{
-}
-
-QPixmap RosterImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
-{
-    Q_ASSERT(m_rosterModel);
-    const QPixmap pixmap = m_rosterModel->contactAvatar(id);
-    if (size)
-        *size = pixmap.size();
-    if (requestedSize.isValid())
-        return pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
-    else
-        return pixmap;
-}
-
-void RosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
-{
-    m_rosterModel = rosterModel;
-}
-
 class ChatConversationPrivate
 {
 public:
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
-    RosterImageProvider *imageProvider;
+    ChatRosterImageProvider *imageProvider;
 };
 
 ChatConversation::ChatConversation(QWidget *parent)
@@ -83,7 +48,7 @@ ChatConversation::ChatConversation(QWidget *parent)
     layout->addLayout(headerLayout());
 
     /* chat history */
-    d->imageProvider = new RosterImageProvider;
+    d->imageProvider = new ChatRosterImageProvider;
     d->historyModel = new ChatHistoryModel(this);
     d->historyView = new QDeclarativeView;
     QDeclarativeContext *ctxt = d->historyView->rootContext();

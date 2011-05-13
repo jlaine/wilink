@@ -111,6 +111,29 @@ enum ChatRosterModel::Type ChatRosterItem::type() const
     return itemType;
 }
 
+ChatRosterImageProvider::ChatRosterImageProvider()
+    : QDeclarativeImageProvider(Pixmap),
+    m_rosterModel(0)
+{
+}
+
+QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    Q_ASSERT(m_rosterModel);
+    const QPixmap pixmap = m_rosterModel->contactAvatar(id);
+    if (size)
+        *size = pixmap.size();
+    if (requestedSize.isValid())
+        return pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
+    else
+        return pixmap;
+}
+
+void ChatRosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
+{
+    m_rosterModel = rosterModel;
+}
+
 static void paintMessages(QPixmap &icon, int messages)
 {
     QString pending = QString::number(messages);

@@ -635,10 +635,10 @@ void ChatRoom::participantRemoved(const QString &jid)
         rosterModel->removeRow(index.row(), index.parent());
 
     // update input completions
-    QStringList members;
+    QStringList participants;
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
-        members << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-    chatInput()->setProperty("members", members);
+        participants << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
+    chatInput()->setProperty("participants", participants);
 }
 
 /** Show a user's profile page.
