@@ -125,7 +125,11 @@ QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, c
     QModelIndex index = m_rosterModel->findItem(id);
     if (!index.isValid())
         index = m_rosterModel->findItem(jidToBareJid(id));
-    QPixmap pixmap = index.data(Qt::DecorationRole).value<QPixmap>();
+    QPixmap pixmap;
+    if (index.isValid()) {
+        ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+        pixmap = item->data(Qt::DecorationRole).value<QPixmap>();
+    }
     if (pixmap.isNull()) {
         qWarning("Could not get roster picture for %s", qPrintable(id));
         pixmap = QPixmap(":/peer.png");
