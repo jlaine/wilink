@@ -20,6 +20,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHeaderView>
@@ -253,7 +255,7 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
 }
 
 ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatConversation(parent),
+    : ChatPanel(parent),
     chat(chatWindow),
     notifyMessages(false),
     rosterModel(chatRosterModel)
@@ -262,13 +264,12 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     QXmppClient *client = chat->client();
 
     setObjectName(jid);
-    setRosterModel(rosterModel);
     setWindowTitle(rosterModel->contactName(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
+    // prepare models
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
-    // construct participant list
     ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(rosterModel, mucRoom->jid(), this);
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(roomModel);
@@ -276,9 +277,36 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->sort(0);
 
-    QDeclarativeContext *context = historyView()->rootContext();
+    // header
+    QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
+    layout->setSpacing(0);
+    layout->addLayout(headerLayout());
+
+    // chat history
+    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
+    imageProvider->setRosterModel(rosterModel);
+
+    historyModel = new ChatHistoryModel(this);
+    historyView = new QDeclarativeView;
+    QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", mucRoom);
+    context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
+    context->setContextProperty("textHelper", new ChatHistoryHelper(this));
+
+    historyView->engine()->addImageProvider("roster", imageProvider);
+    historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    historyView->setSource(QUrl("qrc:/conversation.qml"));
+
+    // FIXME: move this to QML
+    chatInput = historyView->rootObject()->findChild<QObject*>("chatInput");
+    QObject *item = historyView->rootObject()->findChild<QObject*>("historyView");
+    Q_ASSERT(item);
+    check = connect(historyModel, SIGNAL(bottomChanged()),
+                    item, SLOT(onBottomChanged()));
+
+    layout->addWidget(historyView);
 
     // add actions
     QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
@@ -514,7 +542,6 @@ void ChatRoom::inviteDialog()
     dialog.exec();
 }
 
-void invite();
 /** Send a request to join a multi-user chat.
  */
 void ChatRoom::join()
@@ -525,7 +552,7 @@ void ChatRoom::join()
     QXmppClient *client = chat->client();
 
     // clear history
-    historyModel()->clear();
+    historyModel->clear();
 
     // send join request
     mucRoom->setNickName(rosterModel->ownName());
@@ -592,7 +619,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
         message.date = chat->client()->serverTime();
     message.jid = msg.from();
     message.received = jidToResource(msg.from()) != mucRoom->nickName();
-    historyModel()->addMessage(message);
+    historyModel->addMessage(message);
 
     // notify user
     if (notifyMessages || message.body.contains("@" + mucRoom->nickName()))
@@ -615,7 +642,7 @@ void ChatRoom::participantAdded(const QString &jid)
     QStringList participants;
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
         participants << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-    chatInput()->setProperty("participants", participants);
+    chatInput->setProperty("participants", participants);
 }
 
 void ChatRoom::participantChanged(const QString &jid)
@@ -638,7 +665,7 @@ void ChatRoom::participantRemoved(const QString &jid)
     QStringList participants;
     for (int i = 0; i < rosterModel->rowCount(roomIndex); i++)
         participants << roomIndex.child(i, 0).data(Qt::DisplayRole).toString();
-    chatInput()->setProperty("participants", participants);
+    chatInput->setProperty("participants", participants);
 }
 
 /** Show a user's profile page.

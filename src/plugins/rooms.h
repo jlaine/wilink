@@ -24,14 +24,16 @@
 
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
-#include "chat_conversation.h"
+#include "chat_panel.h"
 
 class Chat;
 class ChatClient;
+class ChatHistoryModel;
 class ChatMessage;
 class ChatRoom;
 class ChatRosterModel;
 class ChatRosterProxyModel;
+class QDeclarativeView;
 class QLineEdit;
 class QListView;
 class QListWidget;
@@ -78,7 +80,7 @@ private:
     QStringList invitations;
 };
 
-class ChatRoom : public ChatConversation
+class ChatRoom : public ChatPanel
 {
     Q_OBJECT
 
@@ -111,8 +113,12 @@ private slots:
 
 private:
     Chat *chat;
+    QObject *chatInput;
     QXmppMucRoom *mucRoom;
     bool notifyMessages;
+
+    ChatHistoryModel *historyModel;
+    QDeclarativeView *historyView;
     ChatRosterModel *rosterModel;
 
     // actions
