@@ -57,7 +57,6 @@
 
 #include "application.h"
 #include "chat.h"
-#include "chat_edit.h"
 #include "chat_form.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
