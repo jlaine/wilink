@@ -92,7 +92,7 @@ Rectangle {
         onReturnPressed: {
             if (Qt.isQtObject(conversation)) {
                 var text = chatInput.text;
-                if (conversation.sendMessage(text, 0))
+                if (conversation.sendMessage(text))
                     chatInput.text = '';
             }
         }

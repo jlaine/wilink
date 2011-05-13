@@ -50,7 +50,6 @@ set(wiLink_SOURCES
     chat_accounts.cpp
     chat_client.cpp
     chat_conversation.cpp
-    chat_edit.cpp
     chat_form.cpp
     chat_history.cpp
     chat_model.cpp
@@ -95,7 +94,6 @@ set(wiLink_MOC_HEADERS
     chat_accounts.h
     chat_client.h
     chat_conversation.h
-    chat_edit.h
     chat_form.h
     chat_history.h
     chat_model.h
