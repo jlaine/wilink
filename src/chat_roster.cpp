@@ -126,8 +126,10 @@ QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, c
     if (!index.isValid())
         index = m_rosterModel->findItem(jidToBareJid(id));
     QPixmap pixmap = index.data(Qt::DecorationRole).value<QPixmap>();
-    if (pixmap.isNull())
+    if (pixmap.isNull()) {
+        qWarning("Could not get roster picture for %s", qPrintable(id));
         pixmap = QPixmap(":/peer.png");
+    }
 
     // scale
     if (size)
@@ -435,6 +437,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else if (role == TypeRole) {
         return item->type();
     } else if (role == AvatarRole) {
+        if (item->data(Qt::DecorationRole).isNull())
+            return QUrl("qrc:/peer.png");
         return QUrl("image://roster/" + bareJid);
     } else if (role == StatusRole && item->type() == ChatRosterModel::Contact) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
@@ -474,10 +478,12 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         if (item->type() == ChatRosterModel::Contact || item->type() == ChatRosterModel::RoomMember)
         {
             if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap icon(item->data(role).value<QPixmap>());
+                QPixmap pixmap = item->data(role).value<QPixmap>();
+                if (pixmap.isNull())
+                    pixmap = QPixmap(":/peer.png");
                 if (messages)
-                    paintMessages(icon, messages);
-                return QIcon(icon);
+                    paintMessages(pixmap, messages);
+                return QIcon(pixmap);
             } else if (role == Qt::DecorationRole && index.column() == StatusColumn) {
                 return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
@@ -627,7 +633,6 @@ void ChatRosterModel::itemAdded(const QString &jid)
         item->setData(Qt::DisplayRole, entry.name());
     else
         item->setData(Qt::DisplayRole, jidToUser(jid));
-    item->setData(Qt::DecorationRole, QPixmap(":/peer.png"));
     ChatModel::addItem(item, d->contactsItem);
 
     // fetch vCard
@@ -821,6 +826,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
         item->setData(Qt::DisplayRole, name);
     if (!pixmap.isNull())
         item->setData(Qt::DecorationRole, pixmap);
+
     ChatModel::addItem(item, parentItem);
 
     // fetch vCard

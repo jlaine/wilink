@@ -226,7 +226,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
-        message.jid = msg.isReceived() ? chatRemoteJid : client->configuration().jid();
+        message.jid = msg.isReceived() ? chatRemoteJid : client->configuration().jidBare();
         message.received = msg.isReceived();
         historyModel->addMessage(message);
     }

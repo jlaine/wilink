@@ -636,7 +636,7 @@ void ChatRoom::participantAdded(const QString &jid)
 {
     //qDebug("participant added %s", qPrintable(jid));
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(":/peer.png"), roomIndex);
+    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(), roomIndex);
     if (index.isValid())
         rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
 
