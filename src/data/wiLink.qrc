@@ -50,10 +50,7 @@
     <file>transfers.png</file>
     <file>upload.png</file>
     <file>wiLink.png</file>
-    <file>wiLink-available.png</file>
-    <file>wiLink-away.png</file>
     <file>wiLink-black.png</file>
-    <file>wiLink-busy.png</file>
     <file>wiLink-64.png</file>
     <!-- QML -->
     <file>qmldir</file>

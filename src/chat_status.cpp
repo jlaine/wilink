@@ -18,6 +18,7 @@
  */
 
 #include <QApplication>
+#include <QPainter>
 
 #include "QXmppClient.h"
 #include "QXmppPresence.h"
@@ -115,6 +116,13 @@ void ChatStatus::secondsIdle(int secs)
 
 void ChatStatus::statusChanged(int currentIndex)
 {
+#ifdef USE_SYSTRAY
+    QIcon icon;
+    QLinearGradient gradient(0, 0, 0, 32);
+    QPainter painterIcon;
+    QPixmap pixmapIcon(":/wiLink.png");
+#endif
+
     // don't change client presence when the status change
     // was due to a disconnection from the server
     if (m_freezeStatus)
@@ -127,7 +135,16 @@ void ChatStatus::statusChanged(int currentIndex)
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Online);
 #ifdef USE_SYSTRAY
-        wApp->trayIcon()->setIcon(QIcon(":/wiLink-available.png"));
+        gradient.setColorAt(0, QColor(0, 150, 0));
+        gradient.setColorAt(1, QColor(0, 255, 0));
+
+        painterIcon.begin(&pixmapIcon);
+        painterIcon.setPen(QPen(QBrush(QColor(0, 100, 0)), 1));
+        painterIcon.setBrush(QBrush(gradient));
+        painterIcon.drawEllipse(15, 15, 15, 15);
+        painterIcon.end();
+
+        wApp->trayIcon()->setIcon(QIcon(pixmapIcon));
 #endif
     }
     else if (currentIndex == AwayIndex)
@@ -135,7 +152,16 @@ void ChatStatus::statusChanged(int currentIndex)
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::Away);
 #ifdef USE_SYSTRAY
-        wApp->trayIcon()->setIcon(QIcon(":/wiLink-away.png"));
+        gradient.setColorAt(0, QColor(210, 140, 0));
+        gradient.setColorAt(1, QColor(255, 200, 0));
+
+        painterIcon.begin(&pixmapIcon);
+        painterIcon.setPen(QPen(QBrush(QColor(200, 100, 0)), 1));
+        painterIcon.setBrush(QBrush(gradient));
+        painterIcon.drawEllipse(15, 15, 15, 15);
+        painterIcon.end();
+
+        wApp->trayIcon()->setIcon(QIcon(pixmapIcon));
 #endif
     }
     else if (currentIndex == BusyIndex)
@@ -143,7 +169,16 @@ void ChatStatus::statusChanged(int currentIndex)
         presence.setType(QXmppPresence::Available);
         presence.status().setType(QXmppPresence::Status::DND);
 #ifdef USE_SYSTRAY
-        wApp->trayIcon()->setIcon(QIcon(":/wiLink-busy.png"));
+        gradient.setColorAt(0, QColor(255, 0, 0));
+        gradient.setColorAt(1, QColor(255, 100, 100));
+
+        painterIcon.begin(&pixmapIcon);
+        painterIcon.setPen(QPen(QBrush(QColor(100, 0, 0)), 1));
+        painterIcon.setBrush(QBrush(gradient));
+        painterIcon.drawEllipse(15, 15, 15, 15);
+        painterIcon.end();
+
+        wApp->trayIcon()->setIcon(QIcon(pixmapIcon));
 #endif
     }
     else if (currentIndex == OfflineIndex)
