@@ -312,7 +312,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         // fallback for chat rooms
         return jidToResource(msg->jid);
     } else if (role == HtmlRole) {
-        const QString meName = d->rosterModel ? d->rosterModel->contactName(msg->jid) : QString();
+        const QString meName = data(index, FromRole).toString();
         QString bodies;
         foreach (ChatMessage *ptr, item->messages)
             bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + ptr->html(meName) + "</p>";
