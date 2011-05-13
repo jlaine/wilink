@@ -120,7 +120,15 @@ ChatRosterImageProvider::ChatRosterImageProvider()
 QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     Q_ASSERT(m_rosterModel);
-    const QPixmap pixmap = m_rosterModel->contactAvatar(id);
+
+    // exact roster entry or by bare jid
+    QModelIndex index = m_rosterModel->findItem(id);
+    if (!index.isValid())
+        index = m_rosterModel->findItem(jidToBareJid(id));
+    const QPixmap pixmap = (!index.isValid() || index.data(ChatRosterModel::IdRole).toInt() == ChatRosterModel::Room) ?
+                            QPixmap(":/peer.png") : index.data(Qt::DecorationRole).value<QPixmap>();
+
+    // scale
     if (size)
         *size = pixmap.size();
     if (requestedSize.isValid())
@@ -347,25 +355,6 @@ void ChatRosterModel::connected()
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
     d->fetchVCard(d->ownItem->id());
     emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
-}
-
-/** Determine the avatar for a contact.
- *
- * @param jid
- */
-QPixmap ChatRosterModel::contactAvatar(const QString &jid) const
-{
-    // exact roster entry
-    ChatRosterItem *item = d->find(jid);
-    if (item)
-        return item->data(Qt::DecorationRole).value<QPixmap>();
-
-    // contact by bare jid
-    item = d->find(jidToBareJid(jid));
-    if (item)
-        return item->type() == ChatRosterModel::Room ? QPixmap(":/peer.png") : item->data(Qt::DecorationRole).value<QPixmap>();
-
-    return QPixmap();
 }
 
 /** Returns the full JID of an online contact which has the requested feature.
