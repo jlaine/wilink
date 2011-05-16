@@ -64,7 +64,6 @@
     <file>ParticipantView.qml</file>
     <file>ProgressBar.qml</file>
     <file>ScrollBar.qml</file>
-    <file>ScrollBarView.qml</file>
     <file>TransferWidget.qml</file>
     <!-- Stylesheets -->
     <file>wiLink.css</file>
