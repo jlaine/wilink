@@ -45,8 +45,6 @@ Rectangle {
         delegate: Rectangle {
             id: listViewItem
 
-            border.color: '#496275'
-            border.width: 1
             color: '#ea2689d6'
             width: menuList.width - 1
             height: 20
