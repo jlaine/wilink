@@ -18,12 +18,13 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import wiLink 1.2
 
 Rectangle {
     id: chatEdit
 
-    property int chatState: qXmppMessage.none
+    property int chatState: QXmppMessage.None
     property alias text: input.text
     property alias model: listHelper.model
     signal returnPressed
@@ -68,9 +69,9 @@ Rectangle {
         running: true
 
         onTriggered: {
-            if (chatEdit.chatState != qXmppMessage.inactive)
-                console.log("inactive");
-            chatEdit.chatState = qXmppMessage.inactive
+            if (chatEdit.chatState != QXmppMessage.Inactive) {
+                chatEdit.chatState = QXmppMessage.Inactive;
+            }
         }
     }
 
@@ -79,23 +80,10 @@ Rectangle {
         interval: 30000
 
         onTriggered: {
-            if (chatEdit.chatState == qXmppMessage.composing) {
-                console.log("paused");
-                chatEdit.chatState = qXmppMessage.paused
+            if (chatEdit.chatState == QXmppMessage.Composing) {
+                chatEdit.chatState = QXmppMessage.Paused;
             }
         }
-    }
-
-    // FIXME: this is a hack to expose QXmpp constant
-    QtObject {
-        id: qXmppMessage
-
-        property int none: 0
-        property int active: 1
-        property int inactive: 2
-        property int gone: 3
-        property int composing: 4
-        property int paused: 5
     }
 
     TextEdit {
@@ -110,12 +98,10 @@ Rectangle {
         wrapMode: TextEdit.WordWrap
 
         onActiveFocusChanged: {
-            if (chatEdit.chatState != qXmppMessage.active &&
-                chatEdit.chatState != qXmppMessage.composing &&
-                chatEdit.chatState != qXmppMessage.paused)
-            {
-                console.log("active");
-                chatEdit.chatState = qXmppMessage.active;
+            if (chatEdit.chatState != QXmppMessage.Active &&
+                chatEdit.chatState != QXmppMessage.Composing &&
+                chatEdit.chatState != QXmppMessage.Paused) {
+                chatEdit.chatState = QXmppMessage.Active;
             }
             inactiveTimer.restart();
         }
@@ -123,15 +109,13 @@ Rectangle {
         onTextChanged: {
             inactiveTimer.stop();
             if (text.length) {
-                if (chatEdit.chatState != qXmppMessage.composing) {
-                    console.log("composing");
-                    chatEdit.chatState = qXmppMessage.composing
+                if (chatEdit.chatState != QXmppMessage.Composing) {
+                    chatEdit.chatState = QXmppMessage.Composing;
                 }
                 pausedTimer.restart()
             } else {
-                if (chatEdit.chatState != qXmppMessage.active) {
-                    console.log("active");
-                    chatEdit.chatState = qXmppMessage.active
+                if (chatEdit.chatState != QXmppMessage.Active) {
+                    chatEdit.chatState = QXmppMessage.Active;
                 }
                 pausedTimer.stop()
             }

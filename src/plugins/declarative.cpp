@@ -73,6 +73,7 @@ public:
 
 bool DeclarativePlugin::initialize(Chat *chat)
 {
+    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     return true;
 }

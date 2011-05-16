@@ -21,6 +21,23 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+#include "QXmppMessage.h"
+
+class QXmppDeclarativeMessage : public QObject
+{
+    Q_OBJECT
+    Q_ENUMS(State)
+
+public:
+    enum State {
+        None = QXmppMessage::None,
+        Active = QXmppMessage::Active,
+        Inactive = QXmppMessage::Inactive,
+        Gone = QXmppMessage::Gone,
+        Composing = QXmppMessage::Composing,
+        Paused = QXmppMessage::Paused,
+    };
+};
 
 class ListHelper : public QObject
 {

@@ -95,6 +95,26 @@ void ChatDialogHelper::setJid(const QString &jid)
     }
 }
 
+int ChatDialogHelper::state() const
+{
+    return m_state;
+}
+
+void ChatDialogHelper::setState(int state)
+{
+    if (state != m_state) {
+        m_state = static_cast<QXmppMessage::State>(state);
+
+        // notify state change
+        QXmppMessage message;
+        message.setTo(m_jid);
+        message.setState(m_state);
+        m_client->sendPacket(message);
+
+        emit stateChanged(state);
+    }
+}
+
 bool ChatDialogHelper::sendMessage(const QString &body)
 {
     if (m_jid.isEmpty() || !m_client || !m_client->isConnected())
@@ -104,9 +124,15 @@ bool ChatDialogHelper::sendMessage(const QString &body)
     QXmppMessage message;
     message.setTo(m_jid);
     message.setBody(body);
-    message.setState(m_state);
+    message.setState(QXmppMessage::Active);
     if (!m_client->sendPacket(message))
         return false;
+
+    // update state
+    if (m_state != QXmppMessage::Active) {
+        m_state = QXmppMessage::Active;
+        emit stateChanged(m_state);
+    }
 
     // add message to history
     if (m_historyModel) {
@@ -162,6 +188,7 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
+    context->setContextProperty("conversationHasState", true);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", qVariantFromValue<QObject*>(0));
     historyView->engine()->addImageProvider("roster", imageProvider);
