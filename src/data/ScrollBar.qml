@@ -79,7 +79,7 @@ Item {
                 buttonUp.state = 'pressed';
                 moveAction = 'up';
                 moveQuantity = -30;
-                scrollBar.moveUp();
+                scrollBar.moveBy(moveQuantity);
             }
 
             onReleased: {
