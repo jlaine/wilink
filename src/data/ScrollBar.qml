@@ -43,14 +43,14 @@ Item {
         Rectangle {
             id: handle
 
-            property int minHeight: 20
+            property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.height - 2))
 
             border.color: '#c3c3c3'
             border.width: 1
             color: '#c3c3c3'
             x: 0
-            y: Math.floor(scrollBar.position * (track.height - 2)) + 1
-            height: Math.ceil(scrollBar.pageSize * (track.height - 2))
+            y: Math.floor(scrollBar.position * (track.height + desiredHeight - height - 2)) + 1
+            height: Math.max(desiredHeight, 20)
             width: parent.width - 1
             radius: 6
         }
