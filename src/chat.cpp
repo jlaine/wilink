@@ -641,11 +641,10 @@ ChatPanel *Chat::panel(const QString &objectName)
  */
 void Chat::resizeContacts()
 {
-#if 0
-    QSize hint = d->rosterView->sizeHint();
-    hint.setHeight(hint.height() + d->rosterView->sizeHintForRow(0) + 4);
+    QSize hint;
+    hint.setHeight(QApplication::desktop()->availableGeometry(this).height() - 100);
+    hint.setWidth(d->rosterView->minimumWidth());
     QSize barHint = statusBar()->sizeHint();
-    hint.setHeight(hint.height() + barHint.height());
     if (barHint.width() > hint.width())
         hint.setWidth(barHint.width());
     if (d->conversationPanel->isVisible())
@@ -656,22 +655,6 @@ void Chat::resizeContacts()
         hint.setWidth(size().width());
     if (hint.height() < size().height())
         hint.setHeight(size().height());
-
-    /* Make sure we do not resize to a size exceeding the desktop size
-     * + some padding for the window title.
-     */
-    QDesktopWidget *desktop = QApplication::desktop();
-    const QRect &available = desktop->availableGeometry(this);
-    if (hint.height() > available.height() - 100)
-    {
-        hint.setHeight(available.height() - 100);
-        hint.setWidth(hint.width() + 32);
-    }
-#endif
-
-    QDesktopWidget *desktop = QApplication::desktop();
-    QSize hint = d->rosterView->sizeHint();
-    hint.setHeight(desktop->availableGeometry(this).height() - 100);
 
     resize(hint);
 }
