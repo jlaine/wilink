@@ -48,8 +48,8 @@ Item {
             border.width: 1
             color: '#c3c3c3'
             x: 0
-            y: scrollBar.position * (track.height - 2) + 1
-            height: scrollBar.pageSize * (track.height - 2)
+            y: Math.floor(scrollBar.position * (track.height - 2)) + 1
+            height: Math.ceil(scrollBar.pageSize * (track.height - 2))
             width: parent.width - 1
             radius: 6
         }
