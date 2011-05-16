@@ -20,10 +20,12 @@
 import QtQuick 1.0
 
 Item {
+    id: block
+
     property alias model: view.model
     property alias title: titleText.text
 
-    clip: true
+    signal itemClicked(string id)
 
     Rectangle {
         id: rect
@@ -52,6 +54,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        clip: true
 
         delegate: Item {
             id: item
@@ -86,6 +89,17 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: 12
                     text: model.name
+                }
+
+                MouseArea {
+                    acceptedButtons: Qt.LeftButton
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        if (mouse.button == Qt.LeftButton) {
+                            block.itemClicked(model.id);
+                        }
+                    }
                 }
             }
         }

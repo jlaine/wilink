@@ -20,6 +20,10 @@
 import QtQuick 1.0
 
 Column {
+    id: blocks
+
+    signal itemClicked(string id)
+
     anchors.fill: parent
 
     RosterView {
@@ -29,6 +33,10 @@ Column {
         title: 'My rooms'
         height: parent.height / 2
         width: parent.width
+
+        Connections {
+            onItemClicked: { blocks.itemClicked(id); }
+        }
     }
 
     RosterView {
@@ -38,5 +46,9 @@ Column {
         title: 'My contacts'
         height: parent.height / 2
         width: parent.width
+
+        Connections {
+            onItemClicked: { blocks.itemClicked(id); }
+        }
     }
 }
