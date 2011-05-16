@@ -589,6 +589,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ParticipantView</name>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+</context>
+<context>
     <name>PhoneCallsModel</name>
     <message>
         <source>Connecting..</source>

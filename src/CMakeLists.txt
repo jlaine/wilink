@@ -131,6 +131,7 @@ if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         ${wiLink_SOURCES}
         data/CallWidget.qml
+        data/ParticipantView.qml
         data/TransferWidget.qml
         translations/fr.ts)
 else(RELOAD_TRANSLATIONS)
