@@ -78,7 +78,7 @@ Item {
             onPressed: {
                 buttonUp.state = 'pressed';
                 moveAction = 'up';
-                moveQuantity = 30;
+                moveQuantity = -30;
                 scrollBar.moveUp();
             }
 
@@ -118,7 +118,7 @@ Item {
                 buttonDown.state = 'pressed';
                 moveAction = 'down';
                 moveQuantity = 30;
-                scrollBar.moveDown();
+                scrollBar.moveBy(moveQuantity);
             }
 
             onReleased: {
@@ -141,41 +141,42 @@ Item {
     MouseArea {
         id: clickableArea
 
-        property int mousePressY
+        property real pressContentY
+        property real pressMouseY
+        property real pressPageSize
 
         anchors.fill: track
         drag.axis: Drag.YAxis
 
         onPressed: {
             scrollBar.state = 'hovered'
-            mousePressY = mouse.y
 
             if (mouse.y < handle.y) {
                 moveAction = 'up';
-                moveQuantity = flickableItem.height;
-                scrollBar.moveUp();
+                moveQuantity = -flickableItem.height;
+                scrollBar.moveBy(moveQuantity);
             } else if (mouse.y > handle.y + handle.height) {
                 moveAction = 'down';
                 moveQuantity = flickableItem.height;
-                scrollBar.moveDown();
+                scrollBar.moveBy(moveQuantity);
             } else {
                 moveAction = 'drag';
+                moveQuantity = 0;
+                pressContentY = flickableItem.contentY;
+                pressMouseY = mouse.y;
+                pressPageSize = scrollBar.pageSize;
             }
         }
 
         onReleased: {
             scrollBar.state = '';
-
-            moveRepeat = false;
-            if (moveAction == 'drag') {
-                scrollBar.dropHandle(mousePressY, mouse.y);
-            }
             moveAction = '';
+            moveRepeat = false;
         }
 
         onPositionChanged: {
             if (moveAction == 'drag') {
-                scrollBar.dragHandle(mousePressY, mouse.y)
+                scrollBar.moveBy((pressContentY - flickableItem.contentY) + (mouse.y - pressMouseY) / pressPageSize);
             }
         }
     }
@@ -196,49 +197,17 @@ Item {
         repeat: true
         running: moveRepeat
 
-        onTriggered: {
-            if (moveAction == 'up')
-                scrollBar.moveUp();
-            else if (moveAction == 'down')
-                scrollBar.moveDown();
-        }
+        onTriggered: scrollBar.moveBy(moveQuantity)
     }
 
-    function moveDown() {
-        var delta = Math.max(0, Math.min((1 - position - pageSize) * flickableItem.contentHeight, moveQuantity));
-        flickableItem.contentY += delta;
-    }
+    function moveBy(delta) {
+        // do not exceed bottom
+        delta = Math.min((1 - position - pageSize) * flickableItem.contentHeight, delta);
 
-    function moveUp() {
-        var delta = Math.max(0, Math.min(position * flickableItem.contentHeight, moveQuantity));
-        flickableItem.contentY = Math.round(flickableItem.contentY - delta);
-    }
+        // do not exceed top
+        delta = Math.max(-position * flickableItem.contentHeight, delta);
 
-    function dragHandle(origin, target)
-    {
-        var density = flickableItem.count / scrollBar.height
-        var targetIndex = flickableItem.currentIndex + density * (target - origin)
-
-        if (targetIndex < 0) {
-            flickableItem.positionViewAtIndex(0, ListView.Start);
-        } else if (targetIndex > flickableItem.count - 1 ) {
-            flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
-        } else {
-            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
-        }
-    }
-
-    function dropHandle(origin, target)
-    {
-        var density = flickableItem.count / scrollBar.height
-        var targetIndex = flickableItem.currentIndex + density * (target - origin)
-
-        if (targetIndex < 0) {
-            flickableItem.currentIndex = 0
-        } else if (targetIndex > flickableItem.count - 1 ) {
-            flickableItem.currentIndex = flickableItem.count - 1
-        } else {
-            flickableItem.currentIndex = targetIndex
-        }
+        // move
+        flickableItem.contentY = Math.round(flickableItem.contentY + delta);
     }
 }
