@@ -25,7 +25,7 @@ GridView {
     signal participantClicked(string participant)
 
     cellWidth: 80
-    cellHeight: 44
+    cellHeight: 54
     width: cellWidth
 
     delegate: Item {
@@ -46,6 +46,7 @@ GridView {
 
         Column {
             anchors.fill: parent
+            anchors.margins: 5
             Image {
                 anchors.horizontalCenter: parent.horizontalCenter
                 asynchronous: true
@@ -104,9 +105,6 @@ GridView {
 
     Connections {
         target: menu
-
-        onItemClicked:  {
-            console.log('item clicked')
-        }
+        onItemClicked: Qt.openUrlExternally(menu.model.get(index).url)
     }
 }
