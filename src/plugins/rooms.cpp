@@ -273,7 +273,9 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     historyModel = new ChatHistoryModel(this);
     historyModel->setRosterModel(rosterModel);
 
-    ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(rosterModel, mucRoom->jid(), this);
+    ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(this);
+    roomModel->setSourceModel(rosterModel);
+    roomModel->setSourceRoot(rosterModel->findItem(mucRoom->jid()));
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(roomModel);
     sortedModel->setDynamicSortFilter(true);
@@ -779,7 +781,9 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
     m_reason->setText("Let's talk");
     layout->addWidget(m_reason);
 
-    m_model = new ChatRosterProxyModel(rosterModel, CONTACTS_ROSTER_ID, this);
+    m_model = new ChatRosterProxyModel(this);
+    m_model->setSourceModel(rosterModel);
+    m_model->setSourceRoot(rosterModel->contactsItem());
 
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(m_model);

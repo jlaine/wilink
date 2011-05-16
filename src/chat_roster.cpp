@@ -853,33 +853,14 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
-ChatRosterProxyModel::ChatRosterProxyModel(ChatRosterModel *rosterModel, const QString &rosterRoot, QObject *parent)
-    : QAbstractProxyModel(parent),
-    m_rosterModel(rosterModel),
-    m_rosterRoot(rosterRoot)
+ChatRosterProxyModel::ChatRosterProxyModel(QObject *parent)
+    : QAbstractProxyModel(parent)
 {
-    bool check;
-
-    setSourceModel(rosterModel);
-    check = connect(rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                    this, SLOT(onDataChanged(QModelIndex,QModelIndex)));
-    Q_ASSERT(check);
-    check = connect(rosterModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)),
-                    this, SLOT(onRowsAboutToBeInserted(QModelIndex,int,int)));
-    Q_ASSERT(check);
-    check = connect(rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
-                    this, SLOT(onRowsInserted(QModelIndex,int,int)));
-    Q_ASSERT(check);
-    check = connect(rosterModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),
-                    this, SLOT(onRowsAboutToBeRemoved(QModelIndex,int,int)));
-    Q_ASSERT(check);
-    check = connect(rosterModel, SIGNAL(rowsRemoved(QModelIndex,int,int)),
-                    this, SLOT(onRowsRemoved(QModelIndex,int,int)));
 }
 
 QModelIndex ChatRosterProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
-    if (!isRoot(sourceIndex.parent()))
+    if (sourceIndex.parent() != sourceRoot())
         return QModelIndex();
 
     return createIndex(sourceIndex.row(), sourceIndex.column(), 0);
@@ -890,12 +871,12 @@ QModelIndex ChatRosterProxyModel::mapToSource(const QModelIndex &proxyIndex) con
     if (!proxyIndex.isValid())
         return QModelIndex();
 
-    return m_rosterModel->index(proxyIndex.row(), proxyIndex.column(), m_rosterModel->findItem(m_rosterRoot));
+    return sourceModel()->index(proxyIndex.row(), proxyIndex.column(), sourceRoot());
 }
 
 int ChatRosterProxyModel::columnCount(const QModelIndex &parent) const
 {
-    return m_rosterModel->columnCount(mapToSource(parent));
+    return sourceModel()->columnCount(mapToSource(parent));
 }
 
 QVariant ChatRosterProxyModel::data(const QModelIndex &index, int role) const
@@ -911,7 +892,7 @@ QVariant ChatRosterProxyModel::data(const QModelIndex &index, int role) const
 
 Qt::ItemFlags ChatRosterProxyModel::flags(const QModelIndex &index) const
 {
-    Qt::ItemFlags flags = m_rosterModel->flags(mapToSource(index));
+    Qt::ItemFlags flags = sourceModel()->flags(mapToSource(index));
     flags |= Qt::ItemIsUserCheckable;
     return flags;
 }
@@ -923,31 +904,32 @@ QModelIndex ChatRosterProxyModel::index(int row, int column, const QModelIndex &
 
 void ChatRosterProxyModel::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
-    if (isRoot(topLeft.parent()) && isRoot(bottomRight.parent()))
+    const QModelIndex root = sourceRoot();
+    if (topLeft.parent() == root && bottomRight.parent() == root)
         emit dataChanged(mapFromSource(topLeft), mapFromSource(bottomRight));
 }
 
 void ChatRosterProxyModel::onRowsAboutToBeInserted(const QModelIndex &sourceIndex, int start, int end)
 {
-    if (isRoot(sourceIndex))
+    if (sourceIndex == sourceRoot())
         beginInsertRows(QModelIndex(), start, end);
 }
 
 void ChatRosterProxyModel::onRowsInserted(const QModelIndex &sourceIndex, int start, int end)
 {
-    if (isRoot(sourceIndex))
+    if (sourceIndex == sourceRoot())
         endInsertRows();
 }
 
 void ChatRosterProxyModel::onRowsAboutToBeRemoved(const QModelIndex &sourceIndex, int start, int end)
 {
-    if (isRoot(sourceIndex))
+    if (sourceIndex == sourceRoot())
         beginRemoveRows(QModelIndex(), start, end);
 }
 
 void ChatRosterProxyModel::onRowsRemoved(const QModelIndex &sourceIndex, int start, int end)
 {
-    if (isRoot(sourceIndex))
+    if (sourceIndex == sourceRoot())
         endRemoveRows();
 }
 
@@ -960,7 +942,7 @@ int ChatRosterProxyModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
-    return m_rosterModel->rowCount(m_rosterModel->findItem(m_rosterRoot));
+    return sourceModel()->rowCount(sourceRoot());
 }
 
 bool ChatRosterProxyModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -976,6 +958,38 @@ bool ChatRosterProxyModel::setData(const QModelIndex &index, const QVariant &val
     } else {
         return QAbstractProxyModel::setData(index, value, role);
     }
+}
+
+QModelIndex ChatRosterProxyModel::sourceRoot() const
+{
+    return sourceModel()->index(m_sourceRoot.row(), m_sourceRoot.column(), m_sourceRoot.parent());
+}
+
+void ChatRosterProxyModel::setSourceModel(QAbstractItemModel *rosterModel)
+{
+    bool check;
+    check = connect(rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    this, SLOT(onDataChanged(QModelIndex,QModelIndex)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)),
+                    this, SLOT(onRowsAboutToBeInserted(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                    this, SLOT(onRowsInserted(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),
+                    this, SLOT(onRowsAboutToBeRemoved(QModelIndex,int,int)));
+    Q_ASSERT(check);
+    check = connect(rosterModel, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                    this, SLOT(onRowsRemoved(QModelIndex,int,int)));
+    Q_ASSERT(check);
+
+    QAbstractProxyModel::setSourceModel(rosterModel);
+}
+
+void ChatRosterProxyModel::setSourceRoot(const QModelIndex &index)
+{
+    m_sourceRoot = index;
 }
 
 QStringList ChatRosterProxyModel::selectedJids() const

@@ -138,7 +138,7 @@ class ChatRosterProxyModel : public QAbstractProxyModel
     Q_OBJECT
 
 public:
-    ChatRosterProxyModel(ChatRosterModel *rosterModel, const QString &rosterRoot, QObject *parent = 0);
+    ChatRosterProxyModel(QObject *parent = 0);
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
 
@@ -151,6 +151,9 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     QStringList selectedJids() const;
+    void setSourceModel(QAbstractItemModel *rosterModel);
+    QModelIndex sourceRoot() const;
+    void setSourceRoot(const QModelIndex &index);
 
 private slots:
     void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
@@ -160,13 +163,9 @@ private slots:
     void onRowsRemoved(const QModelIndex &parent, int start, int end);
 
 private:
-    bool isRoot(const QModelIndex &sourceIndex) const
-    {
-        return sourceIndex.isValid() && sourceIndex == m_rosterModel->findItem(m_rosterRoot);
-    }
-    ChatRosterModel *m_rosterModel;
     QString m_rosterRoot;
     QSet<QString> m_selection;
+    QPersistentModelIndex m_sourceRoot;
 };
 
 class ChatRosterView : public QTreeView
