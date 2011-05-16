@@ -194,19 +194,12 @@ Item {
     }
 
     function moveDown() {
-        var targetIndex = flickableItem.currentIndex + 5
-        if (targetIndex < flickableItem.count) {
-            flickableItem.currentIndex = targetIndex
-            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
-        } else {
-            autoMove = false
-            dragToBottomEnabled = true
-            flickableItem.positionViewAtIndex(flickableItem.count - 1, ListView.End);
-        }
+        var delta = Math.max(0, Math.min((1 - position - pageSize) * flickableItem.contentHeight, 30));
+        flickableItem.contentY += delta;
     }
 
     function moveUp() {
-        var delta = Math.min(position * flickableItem.contentHeight, 30);
+        var delta = Math.max(0, Math.min(position * flickableItem.contentHeight, 30));
         flickableItem.contentY = Math.round(flickableItem.contentY - delta);
     }
 
