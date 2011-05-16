@@ -29,7 +29,7 @@ Column {
     RosterView {
         id: rooms
 
-        model: contactModel
+        model: roomModel
         title: 'My rooms'
         height: parent.height / 2
         width: parent.width

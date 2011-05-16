@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
@@ -81,7 +82,7 @@ public:
     ChatClient *client;
     QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
-    ChatRosterView *rosterView;
+    QDeclarativeView *rosterView;
     QString windowTitle;
 
     QWidget *leftPanel;
@@ -126,27 +127,38 @@ Chat::Chat(QWidget *parent)
     d->actions->hide();
     leftLayout->addWidget(d->actions);
 
+#if 0
     d->rosterView = new ChatRosterView(d->rosterModel);
     d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
     connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
     connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     leftLayout->addWidget(d->rosterView);
+#endif
 
     ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
     contactModel->setSourceModel(d->rosterModel);
     contactModel->setSourceRoot(d->rosterModel->contactsItem());
 
+    ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(this);
+    roomModel->setSourceModel(d->rosterModel);
+    roomModel->setSourceRoot(d->rosterModel->findItem(ROOMS_ROSTER_ID));
+
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     imageProvider->setRosterModel(d->rosterModel);
 
-    QDeclarativeView *rosterView = new QDeclarativeView;
-    QDeclarativeContext *context = rosterView->rootContext();
+    d->rosterView = new QDeclarativeView;
+    QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    rosterView->engine()->addImageProvider("roster", imageProvider);
-    rosterView->setSource(QUrl("qrc:/roster.qml"));
-    leftLayout->addWidget(rosterView);
+    context->setContextProperty("roomModel", roomModel);
+    d->rosterView->setMinimumWidth(200);
+    d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->rosterView->engine()->addImageProvider("roster", imageProvider);
+    d->rosterView->setSource(QUrl("qrc:/roster.qml"));
+    check = connect(d->rosterView->rootObject(), SIGNAL(itemClicked(QString)),
+                    this, SLOT(rosterClicked(QString)));
+    Q_ASSERT(check);
+    leftLayout->addWidget(d->rosterView);
 
     d->leftPanel->setLayout(leftLayout);
     splitter->addWidget(d->leftPanel);
@@ -430,6 +442,7 @@ void Chat::panelChanged(int index)
 
     d->rosterModel->clearPendingMessages(widget->objectName());
 
+#if 0
     // select the corresponding roster entry
     QModelIndex newIndex = d->rosterView->mapFromRoster(
         d->rosterModel->findItem(widget->objectName()));
@@ -438,6 +451,7 @@ void Chat::panelChanged(int index)
         currentIndex = currentIndex.parent();
     if (currentIndex != newIndex)
         d->rosterView->setCurrentIndex(newIndex);
+#endif
 
     widget->setFocus();
 }
@@ -519,7 +533,7 @@ ChatRosterModel *Chat::rosterModel()
 
 /** Return this window's chat roster view.
  */
-ChatRosterView *Chat::rosterView()
+QDeclarativeView *Chat::rosterView()
 {
     return d->rosterView;
 }
@@ -632,7 +646,7 @@ ChatPanel *Chat::panel(const QString &objectName)
  */
 void Chat::resizeContacts()
 {
-#ifndef WILINK_EMBEDDED
+#if 0
     QSize hint = d->rosterView->sizeHint();
     hint.setHeight(hint.height() + d->rosterView->sizeHintForRow(0) + 4);
     QSize barHint = statusBar()->sizeHint();
@@ -658,9 +672,20 @@ void Chat::resizeContacts()
         hint.setHeight(available.height() - 100);
         hint.setWidth(hint.width() + 32);
     }
+#endif
+
+    QDesktopWidget *desktop = QApplication::desktop();
+    QSize hint = d->rosterView->sizeHint();
+    hint.setHeight(desktop->availableGeometry(this).height() - 100);
 
     resize(hint);
-#endif
+}
+
+void Chat::rosterClicked(const QString &id)
+{
+    const QModelIndex index = d->rosterModel->findItem(id);
+    if (index.isValid())
+        rosterClicked(index);
 }
 
 void Chat::rosterClicked(const QModelIndex &index)

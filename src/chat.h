@@ -36,6 +36,7 @@ class QAudioOutput;
 class QBuffer;
 class QCheckBox;
 class QComboBox;
+class QDeclarativeView;
 class QLabel;
 class QModelIndex;
 class QSoundMeterBar;
@@ -52,7 +53,8 @@ public:
 
     ChatClient *client();
     ChatRosterModel *rosterModel();
-    ChatRosterView *rosterView();
+    QDeclarativeView *rosterView();
+
     QMenu *fileMenu();
     bool open(const QString &jid);
     QAction *addAction(const QIcon &icon, const QString &text);
@@ -87,6 +89,7 @@ private slots:
     void promptCredentials();
     void resizeContacts();
     void rosterClicked(const QModelIndex &index);
+    void rosterClicked(const QString &id);
     void showAbout();
     void showHelp();
 

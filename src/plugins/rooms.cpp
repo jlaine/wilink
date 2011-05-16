@@ -159,9 +159,6 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
         // add panel
         room = new ChatRoom(chat, chat->rosterModel(), jid);
         chat->addPanel(room);
-
-        // expand rooms
-        chat->rosterView()->setExpanded(ROOMS_ROSTER_ID, true);
     }
     if (focus)
         QTimer::singleShot(0, room, SIGNAL(showPanel()));
