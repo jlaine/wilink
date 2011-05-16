@@ -41,6 +41,7 @@ class ChatDialogHelper : public QObject
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel WRITE setHistoryModel NOTIFY historyModelChanged)
+    Q_PROPERTY(int state READ state WRITE setState NOTIFY stateChanged)
 
 public:
     ChatDialogHelper(QObject *parent = 0);
@@ -53,11 +54,15 @@ public:
 
     QString jid() const;
     void setJid(const QString &jid);
+
+    int state() const;
+    void setState(int state);
     
 signals:
     void clientChanged(ChatClient *client);
     void historyModelChanged(ChatHistoryModel *historyModel);
     void jidChanged(const QString &jid);
+    void stateChanged(int state);
 
 public slots:
     bool sendMessage(const QString &text);

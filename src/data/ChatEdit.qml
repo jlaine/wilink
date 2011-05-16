@@ -70,8 +70,7 @@ Rectangle {
 
         onTriggered: {
             if (chatEdit.chatState != QXmppMessage.Inactive) {
-                console.log("inactive");
-                chatEdit.chatState = QXmppMessage.Inactive
+                chatEdit.chatState = QXmppMessage.Inactive;
             }
         }
     }
@@ -82,8 +81,7 @@ Rectangle {
 
         onTriggered: {
             if (chatEdit.chatState == QXmppMessage.Composing) {
-                console.log("paused");
-                chatEdit.chatState = QXmppMessage.Paused
+                chatEdit.chatState = QXmppMessage.Paused;
             }
         }
     }
@@ -102,9 +100,7 @@ Rectangle {
         onActiveFocusChanged: {
             if (chatEdit.chatState != QXmppMessage.Active &&
                 chatEdit.chatState != QXmppMessage.Composing &&
-                chatEdit.chatState != QXmppMessage.Paused)
-            {
-                console.log("active");
+                chatEdit.chatState != QXmppMessage.Paused) {
                 chatEdit.chatState = QXmppMessage.Active;
             }
             inactiveTimer.restart();
@@ -114,14 +110,12 @@ Rectangle {
             inactiveTimer.stop();
             if (text.length) {
                 if (chatEdit.chatState != QXmppMessage.Composing) {
-                    console.log("composing");
-                    chatEdit.chatState = QXmppMessage.Composing
+                    chatEdit.chatState = QXmppMessage.Composing;
                 }
                 pausedTimer.restart()
             } else {
                 if (chatEdit.chatState != QXmppMessage.Active) {
-                    console.log("active");
-                    chatEdit.chatState = QXmppMessage.Active
+                    chatEdit.chatState = QXmppMessage.Active;
                 }
                 pausedTimer.stop()
             }

@@ -102,6 +102,12 @@ Rectangle {
 
     Connections {
         target: chatInput
+
+        onChatStateChanged: {
+            if (conversationHasState)
+                conversation.state = chatInput.chatState;
+        }
+
         onReturnPressed: {
             if (Qt.isQtObject(conversation)) {
                 var text = chatInput.text;
