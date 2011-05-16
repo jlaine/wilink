@@ -140,17 +140,12 @@ Chat::Chat(QWidget *parent)
     contactModel->setSourceModel(d->rosterModel);
     contactModel->setSourceRoot(d->rosterModel->contactsItem());
 
-    ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(this);
-    roomModel->setSourceModel(d->rosterModel);
-    roomModel->setSourceRoot(d->rosterModel->findItem(ROOMS_ROSTER_ID));
-
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     imageProvider->setRosterModel(d->rosterModel);
 
     d->rosterView = new QDeclarativeView;
     QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    context->setContextProperty("roomModel", roomModel);
     d->rosterView->setMinimumWidth(200);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->rosterView->engine()->addImageProvider("roster", imageProvider);

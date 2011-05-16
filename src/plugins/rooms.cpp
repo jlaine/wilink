@@ -150,9 +150,17 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 
         // add "rooms" item
         QModelIndex roomsIndex = model->findItem(ROOMS_ROSTER_ID);
-        if (!roomsIndex.isValid())
+        if (!roomsIndex.isValid()) {
             roomsIndex = model->addItem(ChatRosterModel::Other, ROOMS_ROSTER_ID,
                                         tr("My rooms"), QPixmap(":/chat.png"));
+
+            ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(this);
+            roomModel->setSourceModel(model);
+            roomModel->setSourceRoot(roomsIndex);
+
+            QDeclarativeContext *context = chat->rosterView()->rootContext();
+            context->setContextProperty("roomModel", roomModel);
+        }
         model->addItem(ChatRosterModel::Room, jid,
                        jidToUser(jid), QPixmap(":/chat.png"), roomsIndex);
 
