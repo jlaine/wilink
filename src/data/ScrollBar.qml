@@ -22,7 +22,7 @@ import QtQuick 1.0
 Item {
     id: scrollBar
 
-    property ListView flickableItem
+    property Flickable flickableItem
     property bool dragToBottomEnabled
     property string moveAction: ''
     property int moveQuantity: 30
