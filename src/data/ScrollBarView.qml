@@ -62,6 +62,7 @@ Item {
 
         Image {
             anchors.fill: parent
+            smooth: true
             source: 'back.png'
             transform: Rotation { angle: 90; origin.x: 8; origin.y: 8 }
         }
@@ -97,6 +98,7 @@ Item {
 
         Image {
             anchors.fill: parent
+            smooth: true
             source: 'back.png'
             transform: Rotation { angle: -90; origin.x: 8; origin.y: 8 }
         }
