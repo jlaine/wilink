@@ -23,9 +23,10 @@ Item {
     id: scrollBar
 
     property ListView flickableItem
-    property bool autoMove: false
     property bool dragToBottomEnabled
     property string moveAction: ''
+    property int moveQuantity: 30
+    property bool moveRepeat: false
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
 
@@ -75,12 +76,16 @@ Item {
             anchors.fill: parent
 
             onPressed: {
-                buttonUp.state = 'pressed'
+                buttonUp.state = 'pressed';
+                moveAction = 'up';
+                moveQuantity = 30;
+                scrollBar.moveUp();
             }
 
             onReleased: {
-                buttonUp.state = ''
-                scrollBar.moveUp()
+                buttonUp.state = '';
+                moveAction = '';
+                moveRepeat = false;
             }
         }
 
@@ -110,12 +115,16 @@ Item {
             anchors.fill: parent
 
             onPressed: {
-                buttonDown.state = 'pressed'
+                buttonDown.state = 'pressed';
+                moveAction = 'down';
+                moveQuantity = 30;
+                scrollBar.moveDown();
             }
 
             onReleased: {
-                buttonDown.state = ''
-                scrollBar.moveDown()
+                buttonDown.state = '';
+                moveAction = '';
+                moveRepeat = false;
             }
         }
         states: State {
@@ -142,25 +151,26 @@ Item {
             mousePressY = mouse.y
 
             if (mouse.y < handle.y) {
-                scrollBar.moveUp();
                 moveAction = 'up';
-            } else if(mouse.y > handle.y + handle.height) {
-                scrollBar.moveDown();
+                moveQuantity = flickableItem.height;
+                scrollBar.moveUp();
+            } else if (mouse.y > handle.y + handle.height) {
                 moveAction = 'down';
+                moveQuantity = flickableItem.height;
+                scrollBar.moveDown();
             } else {
                 moveAction = 'drag';
             }
         }
 
         onReleased: {
-            autoMove = false
-            scrollBar.state = ''
+            scrollBar.state = '';
 
+            moveRepeat = false;
             if (moveAction == 'drag') {
-                scrollBar.dropHandle(mousePressY, mouse.y)
+                scrollBar.dropHandle(mousePressY, mouse.y);
             }
-
-            moveAction = ''
+            moveAction = '';
         }
 
         onPositionChanged: {
@@ -176,7 +186,7 @@ Item {
         interval: 350
         running: moveAction == 'up' || moveAction == 'down'
 
-        onTriggered: autoMove=true
+        onTriggered: moveRepeat = true
     }
 
     Timer {
@@ -184,7 +194,7 @@ Item {
 
         interval: 60
         repeat: true
-        running: autoMove
+        running: moveRepeat
 
         onTriggered: {
             if (moveAction == 'up')
@@ -195,12 +205,12 @@ Item {
     }
 
     function moveDown() {
-        var delta = Math.max(0, Math.min((1 - position - pageSize) * flickableItem.contentHeight, 30));
+        var delta = Math.max(0, Math.min((1 - position - pageSize) * flickableItem.contentHeight, moveQuantity));
         flickableItem.contentY += delta;
     }
 
     function moveUp() {
-        var delta = Math.max(0, Math.min(position * flickableItem.contentHeight, 30));
+        var delta = Math.max(0, Math.min(position * flickableItem.contentHeight, moveQuantity));
         flickableItem.contentY = Math.round(flickableItem.contentY - delta);
     }
 
