@@ -206,14 +206,8 @@ Item {
     }
 
     function moveUp() {
-        var targetIndex = flickableItem.currentIndex - 5
-        if (targetIndex > 0) {
-            flickableItem.currentIndex = targetIndex
-            flickableItem.positionViewAtIndex(targetIndex, ListView.Visible);
-        } else {
-            autoMove = false
-            flickableItem.positionViewAtIndex(0, ListView.Start);
-        }
+        var delta = Math.min(position * flickableItem.contentHeight, 30);
+        flickableItem.contentY = Math.round(flickableItem.contentY - delta);
     }
 
     function dragHandle(origin, target)
