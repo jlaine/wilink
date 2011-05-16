@@ -22,12 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: menu
 
-    property ListModel model: ListModel {
-        ListElement { index: 0; name: 'show profile' }
-        ListElement { index: 0; name: '...' }
-        ListElement { index: 0; name: '...' }
-        ListElement { index: 0; name: '...' }
-    }
+    property ListModel model: ListModel {}
     signal itemClicked(int index)
 
     color: 'transparent'
@@ -56,7 +51,7 @@ Rectangle {
                 color: '#ffffff'
                 elide: Text.ElideRight
                 //font.pointSize: itemFontSize
-                text: name
+                text: title
             }
 
             states: State {
