@@ -27,7 +27,7 @@ Item {
     property bool dragToBottomEnabled
     property string moveAction: ""
 
-    width: 16
+    width: 17
 
     ScrollBarView {
         id: scrollBarView

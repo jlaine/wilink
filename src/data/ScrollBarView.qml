@@ -60,6 +60,12 @@ Item {
         border.color: '#999999'
         color: '#cccccc'
 
+        Image {
+            anchors.fill: parent
+            source: 'back.png'
+            transform: Rotation { angle: 90; origin.x: 8; origin.y: 8 }
+        }
+
         MouseArea {
             anchors.fill: parent
 
@@ -88,6 +94,12 @@ Item {
         width: parent.width - 1
         border.color: '#999999'
         color: '#cccccc'
+
+        Image {
+            anchors.fill: parent
+            source: 'back.png'
+            transform: Rotation { angle: -90; origin.x: 8; origin.y: 8 }
+        }
 
         MouseArea {
             anchors.fill: parent
