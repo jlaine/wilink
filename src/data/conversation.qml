@@ -45,13 +45,13 @@ Rectangle {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.right: scrollBar.left
+            anchors.right: historyScrollBar.left
             model: historyModel
 
             Connections {
                 target: historyView.model
                 onBottomChanged: {
-                    if (scrollBar.dragToBottomEnabled) {
+                    if (historyScrollBar.dragToBottomEnabled) {
                         var index = historyView.count - 1;
                         historyView.currentIndex = index;
                         historyView.positionViewAtIndex(index, ListView.End);
@@ -61,7 +61,7 @@ Rectangle {
         }
 
         ScrollBar {
-            id: scrollBar
+            id: historyScrollBar
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -75,9 +75,19 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.right: parent.right
+            anchors.right: participantScrollBar.left
             model: participantModel
             visible: Qt.isQtObject(participantModel)
+        }
+
+        ScrollBar {
+            id: participantScrollBar
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            flickableItem: participantView
+            visible: participantView.visibleArea.heightRatio < 1
         }
     }
 
