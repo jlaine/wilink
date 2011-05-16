@@ -104,9 +104,6 @@ GridView {
 
     Connections {
         target: menu
-
-        onItemClicked:  {
-            console.log('item clicked')
-        }
+        onItemClicked: Qt.openUrlExternally(menu.model.get(index).url)
     }
 }
