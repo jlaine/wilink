@@ -278,6 +278,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     roleNames.insert(AvatarRole, "avatar");
     roleNames.insert(IdRole, "id");
     roleNames.insert(Qt::DisplayRole, "name");
+    roleNames.insert(UrlRole, "url");
     setRoleNames(roleNames);
 
     /* get cache */

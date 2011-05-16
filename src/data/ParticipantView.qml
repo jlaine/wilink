@@ -68,9 +68,14 @@ GridView {
             hoverEnabled: true
             onClicked: {
                 if (mouse.button == Qt.LeftButton) {
+                    // hide context menu
                     grid.participantClicked(model.name);
                     menu.state = '';
                 } else if (mouse.button == Qt.RightButton) {
+                    // show context menu
+                    menu.model.clear()
+                    if (model.url != '')
+                        menu.model.append({'title': qsTr('Show profile'), 'url':model.url})
                     menu.x = item.x + mouse.x - menu.width + 16;
                     menu.y = item.y + mouse.y - 16;
                     menu.state = 'visible';
@@ -97,4 +102,11 @@ GridView {
         opacity: 0
     }
 
+    Connections {
+        target: menu
+
+        onItemClicked:  {
+            console.log('item clicked')
+        }
+    }
 }
