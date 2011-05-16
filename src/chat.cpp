@@ -25,6 +25,9 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QDialogButtonBox>
@@ -129,6 +132,21 @@ Chat::Chat(QWidget *parent)
     connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     leftLayout->addWidget(d->rosterView);
+
+    ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
+    contactModel->setSourceModel(d->rosterModel);
+    contactModel->setSourceRoot(d->rosterModel->contactsItem());
+
+    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
+    imageProvider->setRosterModel(d->rosterModel);
+
+    QDeclarativeView *rosterView = new QDeclarativeView;
+    QDeclarativeContext *context = rosterView->rootContext();
+    context->setContextProperty("contactModel", contactModel);
+    rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    rosterView->engine()->addImageProvider("roster", imageProvider);
+    rosterView->setSource(QUrl("qrc:/roster.qml"));
+    leftLayout->addWidget(rosterView);
 
     d->leftPanel->setLayout(leftLayout);
     splitter->addWidget(d->leftPanel);

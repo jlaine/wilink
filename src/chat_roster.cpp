@@ -214,7 +214,6 @@ public:
     QXmppClient *client;
     ChatRosterItem *contactsItem;
     ChatRosterItem *ownItem;
-    ChatRosterItem *roomsItem;
     bool nickNameReceived;
     QMap<QString, int> clientFeatures;
 };
@@ -299,7 +298,6 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->contactsItem->setData(Qt::DecorationRole, QIcon(":/peer.png"));
     ChatModel::addItem(d->contactsItem, rootItem);
 #endif
-    d->roomsItem = 0;
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
