@@ -136,16 +136,10 @@ Chat::Chat(QWidget *parent)
     leftLayout->addWidget(d->rosterView);
 #endif
 
-    ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
-    contactModel->setSourceModel(d->rosterModel);
-    contactModel->setSourceRoot(d->rosterModel->contactsItem());
-
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     imageProvider->setRosterModel(d->rosterModel);
 
     d->rosterView = new QDeclarativeView;
-    QDeclarativeContext *context = d->rosterView->rootContext();
-    context->setContextProperty("contactModel", contactModel);
     d->rosterView->setMinimumWidth(200);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->rosterView->engine()->addImageProvider("roster", imageProvider);

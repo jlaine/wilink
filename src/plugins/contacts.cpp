@@ -18,6 +18,9 @@
  */
 
 #include <QDesktopServices>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeView>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QInputDialog>
@@ -81,6 +84,14 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
             this, SLOT(presenceReceived(const QXmppPresence&)));
     connect(chat, SIGNAL(rosterClick(QModelIndex)),
             this, SLOT(rosterClick(QModelIndex)));
+
+    // add contact panel
+    ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
+    contactModel->setSourceModel(chat->rosterModel());
+    contactModel->setSourceRoot(chat->rosterModel()->contactsItem());
+
+    QDeclarativeContext *context = chat->rosterView()->rootContext();
+    context->setContextProperty("contactModel", contactModel);
 
     // add button to status bar
     addButton = new QPushButton;
