@@ -77,7 +77,7 @@ GridView {
                 }
             }
             onEntered: {
-                parent.state = "hovered"
+                parent.state = 'hovered'
             }
             onExited: {
                 parent.state = ''
@@ -85,7 +85,7 @@ GridView {
         }
 
         states: State {
-            name: "hovered"
+            name: 'hovered'
             PropertyChanges { target: itemBackground; border.color: '#b0e2ff' }
             PropertyChanges { target: stop1;  color: '#ffffff' }
             PropertyChanges { target: stop2;  color: '#b0e2ff' }
