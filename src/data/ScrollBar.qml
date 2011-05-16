@@ -25,7 +25,7 @@ Item {
     property ListView flickableItem
     property bool autoMove: false
     property bool dragToBottomEnabled
-    property string moveAction: ""
+    property string moveAction: ''
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
 
@@ -126,7 +126,7 @@ Item {
     }
 
     states: State {
-        name: "hovered"
+        name: 'hovered'
         PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
     }
 
@@ -144,12 +144,12 @@ Item {
 
             if( mouse.y < handle.y ) {
                 dragToBottomEnabled = false
-                moveAction = "up"
+                moveAction = 'up'
             } else if( mouse.y > handle.y + handle.height ) {
-                moveAction = "down"
+                moveAction = 'down'
             } else {
                 dragToBottomEnabled = false
-                moveAction = "drag"
+                moveAction = 'drag'
             }
         }
 
@@ -159,29 +159,29 @@ Item {
 
             switch ( moveAction )
             {
-                case "up":
+                case 'up':
                     scrollBar.moveUp()
-                break
-                case "down":
+                    break
+                case 'down':
                     scrollBar.moveDown()
-                break
-                case "drag":
+                    break
+                case 'drag':
                     scrollBar.dropHandle(mousePressY, mouse.y)
-                break
+                    break
             }
 
             moveAction = ''
         }
 
         onPositionChanged: {
-            if (moveAction == "drag") {
+            if (moveAction == 'drag') {
                 scrollBar.dragHandle(mousePressY, mouse.y)
             }
         }
     }
 
     Timer {
-        running: moveAction == "up" || moveAction == "down"
+        running: moveAction == 'up' || moveAction == 'down'
         interval: 350
         onTriggered: autoMove=true
     }
@@ -190,7 +190,7 @@ Item {
         running: autoMove
         interval: 60
         repeat: true
-        onTriggered: moveAction == "up" ? scrollBar.moveUp() : scrollBar.moveDown()
+        onTriggered: moveAction == 'up' ? scrollBar.moveUp() : scrollBar.moveDown()
     }
 
     function moveDown() {
