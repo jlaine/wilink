@@ -28,7 +28,7 @@ Rectangle {
     color: 'transparent'
     opacity: 0
     height: model.count * 20 + 1
-    width: 100;
+    width: 150;
  
     ListView {
         id: menuList
@@ -40,6 +40,7 @@ Rectangle {
         delegate: Rectangle {
             id: listViewItem
 
+            border.color: 'transparent'
             color: '#ea2689d6'
             width: menuList.width - 1
             height: 20
@@ -56,7 +57,7 @@ Rectangle {
 
             states: State {
                 name: 'hovered'
-                PropertyChanges { target: listViewItem; color: '#eae7f4fe' }
+                PropertyChanges { target: listViewItem; color: '#eae7f4fe'; border.color: '#000000' }
                 PropertyChanges { target: itemText; color: '#496275' }
             }
 
