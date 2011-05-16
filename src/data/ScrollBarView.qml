@@ -22,6 +22,7 @@ import QtQuick 1.0
 Item {
     id: scrollBarView
 
+    property int minHeight
     property real position
     property real pageSize
 
