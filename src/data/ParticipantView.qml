@@ -69,11 +69,11 @@ GridView {
             onClicked: {
                 if (mouse.button == Qt.LeftButton) {
                     grid.participantClicked(model.name);
-                    menu.opacity = 0;
+                    menu.state = '';
                 } else if (mouse.button == Qt.RightButton) {
                     menu.x = item.x + mouse.x - menu.width + 16;
                     menu.y = item.y + mouse.y - 16;
-                    menu.opacity = 0.9;
+                    menu.state = 'visible';
                 }
             }
             onEntered: {

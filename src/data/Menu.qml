@@ -23,35 +23,67 @@ Rectangle {
     id: menu
 
     property ListModel model: ListModel {
-            ListElement {name: "Red Item 0"}
-            ListElement {name: "Red Item 1"}
+        ListElement { index: 0; name: 'show profile' }
+        ListElement { index: 0; name: '...' }
+        ListElement { index: 0; name: '...' }
+        ListElement { index: 0; name: '...' }
     }
+    signal itemClicked(int index)
 
-    color: "#336699"
-    width: 100; height: model.count * 20
+    color: 'transparent'
+    opacity: 0
+    height: model.count * 20 + 1
+    width: 100;
  
     ListView {
         id: menuList
 
         anchors.fill: parent
-        highlight: Rectangle { color: "lightsteelblue" }
         clip: true
         model: menu.model
+
         delegate: Rectangle {
             id: listViewItem
-     
-            color: "transparent"
-            border { width: 1; color: "black" }
+
+            border.color: '#496275'
+            border.width: 1
+            color: '#ea2689d6'
             width: menuList.width - 1
             height: 20
      
             Text {
-                anchors.centerIn: parent
                 id: itemText
-                text: name
-                //font.pointSize: itemFontSize
+
+                anchors.centerIn: parent
+                color: '#ffffff'
                 elide: Text.ElideRight
+                //font.pointSize: itemFontSize
+                text: name
+            }
+
+            states: State {
+                name: 'hovered'
+                PropertyChanges { target: listViewItem; color: '#eae7f4fe' }
+                PropertyChanges { target: itemText; color: '#496275' }
+            }
+
+            MouseArea {
+                anchors.fill: listViewItem
+                hoverEnabled: true
+
+                onClicked: {
+                    itemClicked(index)
+                    menu.state = ''
+                }
+
+                onEntered: listViewItem.state = 'hovered'
+                onExited: listViewItem.state = ''
             }
         }
+    }
+
+    states: State {
+        name: 'visible'
+        PropertyChanges { target: menu; opacity: 1 }
     }
 }
