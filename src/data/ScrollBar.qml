@@ -76,7 +76,6 @@ Item {
 
             onPressed: {
                 buttonUp.state = 'pressed'
-                dragToBottomEnabled = false
             }
 
             onReleased: {
@@ -142,14 +141,14 @@ Item {
             scrollBar.state = 'hovered'
             mousePressY = mouse.y
 
-            if( mouse.y < handle.y ) {
-                dragToBottomEnabled = false
-                moveAction = 'up'
-            } else if( mouse.y > handle.y + handle.height ) {
-                moveAction = 'down'
+            if (mouse.y < handle.y) {
+                scrollBar.moveUp();
+                moveAction = 'up';
+            } else if(mouse.y > handle.y + handle.height) {
+                scrollBar.moveDown();
+                moveAction = 'down';
             } else {
-                dragToBottomEnabled = false
-                moveAction = 'drag'
+                moveAction = 'drag';
             }
         }
 
@@ -157,17 +156,8 @@ Item {
             autoMove = false
             scrollBar.state = ''
 
-            switch ( moveAction )
-            {
-                case 'up':
-                    scrollBar.moveUp()
-                    break
-                case 'down':
-                    scrollBar.moveDown()
-                    break
-                case 'drag':
-                    scrollBar.dropHandle(mousePressY, mouse.y)
-                    break
+            if (moveAction == 'drag') {
+                scrollBar.dropHandle(mousePressY, mouse.y)
             }
 
             moveAction = ''
@@ -181,16 +171,27 @@ Item {
     }
 
     Timer {
-        running: moveAction == 'up' || moveAction == 'down'
+        id: delayTimer
+
         interval: 350
+        running: moveAction == 'up' || moveAction == 'down'
+
         onTriggered: autoMove=true
     }
 
     Timer {
-        running: autoMove
+        id: repeatTimer
+
         interval: 60
         repeat: true
-        onTriggered: moveAction == 'up' ? scrollBar.moveUp() : scrollBar.moveDown()
+        running: autoMove
+
+        onTriggered: {
+            if (moveAction == 'up')
+                scrollBar.moveUp();
+            else if (moveAction == 'down')
+                scrollBar.moveDown();
+        }
     }
 
     function moveDown() {
