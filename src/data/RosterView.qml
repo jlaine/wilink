@@ -19,40 +19,74 @@
 
 import QtQuick 1.0
 
-ListView {
-    delegate: Item {
-        id: item
+Item {
+    property alias model: view.model
+    property alias title: titleText.text
+
+    clip: true
+
+    Rectangle {
+        id: rect
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: '#cccccc'
         width: parent.width
-        height: 28
+        height: 24
+        z: 1
 
-        Rectangle {
-            anchors.fill: parent
-            border.color: '#ffffff'
-            color: '#ffffff'
-            gradient: Gradient {
-                GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
-                GradientStop { id: stop2; position: 1.0; color: '#ffffff' }
-            }
+        Text {
+            id: titleText
 
-            Image {
-                id: avatar
+            anchors.left: parent.left
+            anchors.leftMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
 
-                anchors.left: parent.left
-                anchors.leftMargin: 6
-                anchors.verticalCenter: parent.verticalCenter
-                width: 24
-                height: 24
-                smooth: true
-                source: model.avatar
-            }
+    ListView {
+        id: view
 
-            Text {
-                anchors.left: avatar.right
-                anchors.leftMargin: 6
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 12
-                text: model.name
+        anchors.top: rect.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        delegate: Item {
+            id: item
+            width: parent.width
+            height: 28
+
+            Rectangle {
+                anchors.fill: parent
+                border.color: '#ffffff'
+                color: '#ffffff'
+                gradient: Gradient {
+                    GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
+                    GradientStop { id: stop2; position: 1.0; color: '#ffffff' }
+                }
+
+                Image {
+                    id: avatar
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: 6
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 24
+                    height: 24
+                    smooth: true
+                    source: model.avatar
+                }
+
+                Text {
+                    anchors.left: avatar.right
+                    anchors.leftMargin: 6
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 12
+                    text: model.name
+                }
             }
         }
     }

@@ -19,16 +19,24 @@
 
 import QtQuick 1.0
 
-Rectangle {
-    width: 320
-    height: 400
+Column {
+    anchors.fill: parent
 
-    Column {
-        anchors.fill: parent
+    RosterView {
+        id: rooms
 
-        RosterView {
-            id: contactView
-            model: contactModel
-        }
+        model: contactModel
+        title: 'My rooms'
+        height: parent.height / 2
+        width: parent.width
+    }
+
+    RosterView {
+        id: contacts
+
+        model: contactModel
+        title: 'My contacts'
+        height: parent.height / 2
+        width: parent.width
     }
 }
