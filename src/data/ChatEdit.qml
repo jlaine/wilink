@@ -107,6 +107,7 @@ Rectangle {
         smooth: true
         textFormat: TextEdit.PlainText
         width: parent.width - 16
+        wrapMode: TextEdit.WordWrap
 
         onActiveFocusChanged: {
             if (chatEdit.chatState != qXmppMessage.active &&
