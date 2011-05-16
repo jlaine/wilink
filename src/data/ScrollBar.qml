@@ -25,7 +25,6 @@ Item {
     property ListView flickableItem
     property bool autoMove: false
     property bool dragToBottomEnabled
-    property int minHeight: 20
     property string moveAction: ""
 
     width: 16
@@ -34,6 +33,7 @@ Item {
         id: scrollBarView
 
         anchors.fill: parent
+        minHeight: 20
         position: flickableItem.visibleArea.yPosition
         pageSize: flickableItem.visibleArea.heightRatio
 
