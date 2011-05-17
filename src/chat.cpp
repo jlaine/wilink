@@ -142,7 +142,6 @@ Chat::Chat(QWidget *parent)
     d->rosterView = new ChatRosterView(d->rosterModel);
     d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
     connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
-    connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
     leftLayout->addWidget(d->rosterView);
 #endif
 
@@ -160,7 +159,7 @@ Chat::Chat(QWidget *parent)
 
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
     check = connect(d->rosterView->rootObject(), SIGNAL(itemClicked(QString)),
-                    this, SLOT(rosterClicked(QString)));
+                    this, SLOT(onRosterClicked(QString)));
     Q_ASSERT(check);
     leftLayout->addWidget(d->rosterView);
 
@@ -681,24 +680,18 @@ void Chat::resizeContacts()
     resize(hint);
 }
 
-void Chat::rosterClicked(const QString &id)
+void Chat::onRosterClicked(const QString &id)
 {
+    // notify plugins
     const QModelIndex index = d->rosterModel->findItem(id);
     if (index.isValid())
-        rosterClicked(index);
-}
-
-void Chat::rosterClicked(const QModelIndex &index)
-{
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-
-    // notify plugins
-    emit rosterClick(index);
+        emit rosterClick(index);
 
     // show requested panel
-    ChatPanel *chatPanel = panel(jid);
+    ChatPanel *chatPanel = panel(id);
     if (chatPanel)
         QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
+
 }
 
 void Chat::setWindowTitle(const QString &title)

@@ -87,8 +87,7 @@ private slots:
     void pendingMessages(int messages);
     void promptCredentials();
     void resizeContacts();
-    void rosterClicked(const QModelIndex &index);
-    void rosterClicked(const QString &id);
+    void onRosterClicked(const QString &id);
     void showAbout();
     void showHelp();
 
