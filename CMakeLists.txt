@@ -24,11 +24,14 @@ endif(APPLE)
 if(WIN32)
     set(WILINK_EXTRA_RUNTIME
         ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtDeclarative4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtMultimedia4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtScript4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtSql4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtXmlPatterns4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libgcc_s_dw2-1.dll
