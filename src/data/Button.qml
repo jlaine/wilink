@@ -37,7 +37,7 @@ Rectangle {
     smooth: true
 
     Image {
-        width: 24; height: 24
+        width: button.height - 8; height: button.height - 8
         anchors.centerIn: parent
         smooth: true
         source: iconSource

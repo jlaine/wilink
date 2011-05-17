@@ -25,6 +25,7 @@ Item {
     property alias model: view.model
     property alias title: titleText.text
 
+    signal addClicked
     signal itemClicked(variant model)
     signal itemContextMenu(variant model, variant point)
 
@@ -45,6 +46,14 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Button {
+            anchors.right: parent.right
+            height: 24
+            iconSource: 'add.png'
+
+            onClicked: block.addClicked()
         }
     }
 
