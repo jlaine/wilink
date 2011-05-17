@@ -36,7 +36,10 @@ Column {
         width: parent.width
 
         Connections {
-            onItemClicked: { blocks.itemClicked(model.id); }
+            onItemClicked: {
+                var url = 'xmpp://' + window.objectName + '/' + model.id + '?join';
+                Qt.openUrlExternally(url);
+            }
         }
     }
 
@@ -54,7 +57,10 @@ Column {
         }
 
         Connections {
-            onItemClicked: { blocks.itemClicked(model.id); }
+            onItemClicked: {
+                blocks.itemClicked(model.id);
+            }
+
             onItemContextMenu: {
                 menu.model.clear()
                 if (model.url != undefined && model.url != '') {

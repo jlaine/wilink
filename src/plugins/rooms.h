@@ -69,7 +69,6 @@ private slots:
     void invitationHandled(QAbstractButton *button);
     void mucServerFound(const QString &roomServer);
     void roomPrompt();
-    void rosterClick(const QModelIndex &index);
     void urlClick(const QUrl &url);
 
 private:
@@ -108,7 +107,6 @@ private slots:
     void participantAdded(const QString &jid);
     void participantChanged(const QString &jid);
     void participantRemoved(const QString &jid);
-    void showProfile();
     void subjectChanged(const QString &subject);
 
 private:

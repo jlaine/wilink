@@ -570,6 +570,7 @@ bool Chat::open(const QString &jid)
         return false;
     }
     config.setJid(jid);
+    setObjectName(config.jidBare());
 
     /* get password */
     QString password;

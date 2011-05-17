@@ -318,10 +318,6 @@ Acceptez-vous?</translation>
         <source>Invite</source>
         <translation>Inviter</translation>
     </message>
-    <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
 </context>
 <context>
     <name>ChatRoomInvite</name>

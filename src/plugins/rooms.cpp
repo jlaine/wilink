@@ -106,10 +106,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     Q_ASSERT(check);
 
     // add roster hooks
-    check = connect(chat, SIGNAL(rosterClick(QModelIndex)),
-                    this, SLOT(rosterClick(QModelIndex)));
-    Q_ASSERT(check);
-
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
@@ -239,24 +235,16 @@ void ChatRoomWatcher::mucServerFound(const QString &mucServer)
     roomButton->setEnabled(true);
 }
 
-/** Handle a click event on a roster entry.
- */
-void ChatRoomWatcher::rosterClick(const QModelIndex &index)
-{
-    const int type = index.data(ChatRosterModel::TypeRole).toInt();
-    if (type != ChatRosterModel::Room)
-        return;
-
-    const QString roomJid = index.data(ChatRosterModel::IdRole).toString();
-    joinRoom(roomJid, true);
-}
-
 /** Open a XMPP URI if it refers to a chat room.
  */
 void ChatRoomWatcher::urlClick(const QUrl &url)
 {
-    if (url.scheme() == "xmpp" && url.hasQueryItem("join"))
-        joinRoom(url.path(), true);
+    if (url.scheme() == "xmpp" && url.hasQueryItem("join")) {
+        QString jid = url.path();
+        if (jid.startsWith("/"))
+            jid.remove(0, 1);
+        joinRoom(jid, true);
+    }
 }
 
 ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
@@ -478,14 +466,6 @@ void ChatRoom::customContextMenuRequested(const QPoint &pos)
 
     QMenu *menu = new QMenu;
     const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QString url = index.data(ChatRosterModel::UrlRole).toString();
-    if (!url.isEmpty())
-    {
-        QAction *action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
-        action->setData(url);
-        connect(action, SIGNAL(triggered()), this, SLOT(showProfile()));
-    }
-
     if (mucRoom->allowedActions() & QXmppMucRoom::KickAction) {
         QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
         action->setData(jid);
@@ -657,19 +637,6 @@ void ChatRoom::participantRemoved(const QString &jid)
     QModelIndex index = rosterModel->findItem(jid, roomIndex);
     if (index.isValid())
         rosterModel->removeRow(index.row(), index.parent());
-}
-
-/** Show a user's profile page.
- */
-void ChatRoom::showProfile()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-
-    QString url = action->data().toString();
-    if (!url.isEmpty())
-        QDesktopServices::openUrl(url);
 }
 
 void ChatRoom::subjectChanged(const QString &subject)
