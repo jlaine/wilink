@@ -62,7 +62,7 @@ Item {
             id: item
 
             width: parent.width
-            height: 28
+            height: 30
             state: view.currentItem == item ? 'selected' : ''
 
             Rectangle {
@@ -70,10 +70,15 @@ Item {
 
                 anchors.fill: parent
                 anchors.margins: 2
-                border.color: '#ffffff'
+                border.color: 'transparent'
                 border.width: 1
-                color: '#ffffff'
+                gradient: Gradient {
+                    GradientStop { id:stop1; position:0.0; color: '#ffffff' }
+                    GradientStop { id:stop2; position:0.5; color: '#ffffff' }
+                    GradientStop { id:stop3; position:1.0; color: '#ffffff' }
+                }
                 radius: 5
+                smooth: true
 
                 Image {
                     id: avatar
@@ -81,8 +86,8 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 24
-                    height: 24
+                    width: 22
+                    height: 22
                     smooth: true
                     source: model.avatar
                 }
@@ -113,7 +118,10 @@ Item {
 
             states: State {
                 name: 'selected'
-                PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
+                PropertyChanges { target: rect; border.color: '#ffb0c4de' }
+                PropertyChanges { target: stop1; color: '#33b0c4de' }
+                PropertyChanges { target: stop2; color: '#ffb0c4de' }
+                PropertyChanges { target: stop3; color: '#33b0c4de' }
             }
         }
     }
