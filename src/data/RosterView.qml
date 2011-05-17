@@ -28,7 +28,7 @@ Item {
     signal itemClicked(string id)
 
     Rectangle {
-        id: rect
+        id: header
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -50,7 +50,7 @@ Item {
     ListView {
         id: view
 
-        anchors.top: rect.bottom
+        anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -58,17 +58,20 @@ Item {
 
         delegate: Item {
             id: item
+
             width: parent.width
             height: 28
+            state: view.currentItem == item ? 'selected' : ''
 
             Rectangle {
+                id: rect
+
                 anchors.fill: parent
+                anchors.margins: 2
                 border.color: '#ffffff'
+                border.width: 1
                 color: '#ffffff'
-                gradient: Gradient {
-                    GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
-                    GradientStop { id: stop2; position: 1.0; color: '#ffffff' }
-                }
+                radius: 5
 
                 Image {
                     id: avatar
@@ -97,10 +100,16 @@ Item {
                     hoverEnabled: true
                     onClicked: {
                         if (mouse.button == Qt.LeftButton) {
+                            view.currentIndex = index;
                             block.itemClicked(model.id);
                         }
                     }
                 }
+            }
+
+            states: State {
+                name: 'selected'
+                PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
             }
         }
     }
