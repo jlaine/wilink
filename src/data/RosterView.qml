@@ -55,6 +55,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         clip: true
+        focus: true
 
         delegate: Item {
             id: item

@@ -31,7 +31,7 @@ Column {
 
         model: roomModel
         title: 'My rooms'
-        height: parent.height / 2
+        height: parent.height / 3
         width: parent.width
 
         Connections {
@@ -44,7 +44,7 @@ Column {
 
         model: contactModel
         title: 'My contacts'
-        height: parent.height / 2
+        height: 2 * parent.height / 3
         width: parent.width
 
         Connections {
