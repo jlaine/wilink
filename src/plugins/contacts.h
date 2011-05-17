@@ -43,8 +43,6 @@ private slots:
     void disconnected();
     void presenceHandled(QAbstractButton*);
     void presenceReceived(const QXmppPresence &presence);
-    void rosterClick(const QModelIndex &index);
-    void showContactPage();
 
 private:
     QLabel *tipLabel() const;

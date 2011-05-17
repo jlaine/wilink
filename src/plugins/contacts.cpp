@@ -82,8 +82,6 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
             this, SLOT(disconnected()));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
             this, SLOT(presenceReceived(const QXmppPresence&)));
-    connect(chat, SIGNAL(rosterClick(QModelIndex)),
-            this, SLOT(rosterClick(QModelIndex)));
 
     // add contact panel
     ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
@@ -231,33 +229,6 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         box->setEscapeButton(QMessageBox::No);
         box->open(this, SLOT(presenceHandled(QAbstractButton*)));
     }
-}
-
-/** When the user clicks on a contact in his roster, open a conversation.
- *
- * @param index The roster entry that was clicked.
- */
-void ContactsWatcher::rosterClick(const QModelIndex &index)
-{
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-    const QString contactsJid = chat->rosterModel()->contactsItem().data(ChatRosterModel::IdRole).toString();
-    const QString domain = chat->client()->configuration().domain();
-
-    if (domain == "wifirst.net" && jid == contactsJid && !chat->panel(jid))
-        chat->addPanel(new ContactsPanel(chat, jid, tipLabel()));
-}
-
-/** Show a contact's web page.
- */
-void ContactsWatcher::showContactPage()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-
-    QString url = action->data().toString();
-    if (!url.isEmpty())
-        QDesktopServices::openUrl(url);
 }
 
 QLabel *ContactsWatcher::tipLabel() const
