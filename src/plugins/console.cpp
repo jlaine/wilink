@@ -21,7 +21,6 @@
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
-#include <QPushButton>
 #include <QScrollBar>
 #include <QShortcut>
 #include <QTextBrowser>
@@ -51,7 +50,6 @@ ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *paren
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
-
     layout->addLayout(headerLayout());
 
     browser = new QTextBrowser;
@@ -67,23 +65,15 @@ ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *paren
         searchBar, SLOT(findFinished(bool)));
     layout->addWidget(searchBar);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->addStretch();
+    // actions
+    startAction = addAction(QIcon(":/start.png"), tr("Start"));
+    connect(startAction, SIGNAL(triggered()), this, SLOT(slotStart()));
 
-    // buttons
-    startButton = new QPushButton(QIcon(":/start.png"), tr("Start"));
-    connect(startButton, SIGNAL(clicked()), this, SLOT(slotStart()));
-    hbox->addWidget(startButton);
+    stopAction = addAction(QIcon(":/stop.png"), tr("Stop"));
+    connect(stopAction, SIGNAL(triggered()), this, SLOT(slotStop()));
 
-    stopButton = new QPushButton(QIcon(":/stop.png"), tr("Stop"));
-    connect(stopButton, SIGNAL(clicked()), this, SLOT(slotStop()));
-    hbox->addWidget(stopButton);
-
-    QPushButton *clearButton = new QPushButton(QIcon(":/close.png"), tr("Clear"));
-    connect(clearButton, SIGNAL(clicked()), browser, SLOT(clear()));
-    hbox->addWidget(clearButton);
-
-    layout->addLayout(hbox);
+    QAction *clearAction = addAction(QIcon(":/close.png"), tr("Clear"));
+    connect(clearAction, SIGNAL(triggered()), browser, SLOT(clear()));
 
     setLayout(layout);
 
@@ -187,20 +177,20 @@ void ConsolePanel::slotStop()
 {
     if (!connected)
         return;
-    stopButton->hide();
+    stopAction->setVisible(false);
     disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
     connected = false;
-    startButton->show();
+    startAction->setVisible(true);
 }
 
 void ConsolePanel::slotStart()
 {
     if (connected)
         return;
-    startButton->hide();
+    startAction->setVisible(false);
     connect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
     connected = true;
-    stopButton->show();
+    stopAction->setVisible(true);
 }
 
 Highlighter::Highlighter(QTextDocument *parent)

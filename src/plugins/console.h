@@ -32,7 +32,6 @@
 class Chat;
 class ChatSearchBar;
 class Highlighter;
-class QPushButton;
 class QTextBrowser;
 
 /** The ConsolePanel class represents a panel for display debugging
@@ -60,8 +59,8 @@ private:
     QXmppLogger *currentLogger;
     ChatSearchBar *searchBar;
     Highlighter *highlighter;
-    QPushButton *startButton;
-    QPushButton *stopButton;
+    QAction *startAction;
+    QAction *stopAction;
     Chat *m_window;
 };
 
