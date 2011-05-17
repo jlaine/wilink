@@ -98,6 +98,14 @@ Chat::Chat(QWidget *parent)
 {
     bool check;
 
+    qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
+    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
+
+    qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
+    qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
+    qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
+
     /* get handle to application */
     check = connect(wApp, SIGNAL(messageClicked(QWidget*)),
                     this, SLOT(messageClicked(QWidget*)));
@@ -512,9 +520,11 @@ void Chat::promptCredentials()
     }
 }
 
-bool Chat::question(const QString &title, const QString &text)
+QMessageBox *Chat::messageBox()
 {
-    return QMessageBox::question(this, title, text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes;
+    QMessageBox *box = new QMessageBox(this);
+    box->setIcon(QMessageBox::Question);
+    return box;
 }
 
 /** Return this window's chat client.

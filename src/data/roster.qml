@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Column {
     id: blocks
@@ -85,13 +86,20 @@ Column {
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(item.url);
                 } else if (item.action == 'rename') {
-                    if (window.question(qsTr("Rename contact"),
-                                        qsTr("Enter the name for this contact."))) {
-                        console.log("rename " + item.jid + " " + client.rosterManager);
+                    var box = window.messageBox();
+                    box.windowTitle = qsTr('Rename contact');
+                    box.text = qsTr("Enter the name for this contact.");
+                    box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+                    if (box.exec() == QMessageBox.Yes) {
+                        console.log("rename " + item.jid);
                     }
                 } else if (item.action == 'remove') {
-                    if (window.question(qsTr("Remove contact"),
-                                        qsTr("Do you want to remove %1 from your contact list?").replace('%1', item.name))) {
+                    var box = window.messageBox();
+                    box.windowTitle = qsTr("Remove contact");
+                    box.text = qsTr('Do you want to remove %1 from your contact list?').replace('%1', item.name);
+                    box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+                    if (box.exec() == QMessageBox.Yes) {
+                        console.log("remove " + item.jid);
                         client.rosterManager.removeItem(item.jid);
                     }
                 }

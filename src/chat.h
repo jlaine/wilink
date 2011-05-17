@@ -38,6 +38,7 @@ class QCheckBox;
 class QComboBox;
 class QDeclarativeView;
 class QLabel;
+class QMessageBox;
 class QModelIndex;
 class QSoundMeterBar;
 
@@ -79,7 +80,7 @@ signals:
 
 public slots:
     void openUrl(const QUrl &url);
-    bool question(const QString &title, const QString &text);
+    QMessageBox *messageBox();
     void showPreferences(const QString &focusTab = QString());
 
 private slots:

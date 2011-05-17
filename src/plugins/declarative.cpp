@@ -19,6 +19,7 @@
 
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
+#include <QMessageBox>
 
 #include "QXmppRosterManager.h"
 
@@ -74,26 +75,4 @@ QXmppRosterManager *QXmppDeclarativeClient::rosterManager() const
 {
     return &m_client->rosterManager();
 }
-
-// PLUGIN
-
-class DeclarativePlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Declarative interface"; };
-};
-
-bool DeclarativePlugin::initialize(Chat *chat)
-{
-    qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
-    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
-    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
-
-    qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
-    qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(declarative, DeclarativePlugin)
 
