@@ -30,7 +30,7 @@ Column {
         id: rooms
 
         model: roomModel
-        title: 'My rooms'
+        title: qsTr('My rooms')
         height: parent.height / 3
         width: parent.width
 
@@ -43,7 +43,7 @@ Column {
         id: contacts
 
         model: contactModel
-        title: 'My contacts'
+        title: qsTr('My contacts')
         height: 2 * parent.height / 3
         width: parent.width
 
