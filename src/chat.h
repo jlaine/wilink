@@ -65,11 +65,6 @@ public:
     void setWindowTitle(const QString &title);
 
 signals:
-    /** Plugins should connect to this signal to handle click events
-     *  on a roster entry.
-     */
-    void rosterClick(const QModelIndex &index);
-
     /** Plugins should connect to this signal to handle XMPP URIs.
      */
     void urlClick(const QUrl &url);
@@ -87,7 +82,6 @@ private slots:
     void pendingMessages(int messages);
     void promptCredentials();
     void resizeContacts();
-    void onRosterClicked(const QString &id);
     void showAbout();
     void showHelp();
 

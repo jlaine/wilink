@@ -32,6 +32,7 @@ class ChatHistoryModel;
 class ChatRosterModel;
 class QDeclarativeView;
 class QModelIndex;
+class QUrl;
 class QXmppArchiveChat;
 class QXmppArchiveManager;
 
@@ -117,7 +118,7 @@ public:
 
 private slots:
     void messageReceived(const QXmppMessage &msg);
-    void rosterClick(const QModelIndex &index);
+    void urlClick(const QUrl &url);
 
 private:
     Chat *chat;

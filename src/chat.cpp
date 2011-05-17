@@ -158,9 +158,6 @@ Chat::Chat(QWidget *parent)
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
-    check = connect(d->rosterView->rootObject(), SIGNAL(itemClicked(QString)),
-                    this, SLOT(onRosterClicked(QString)));
-    Q_ASSERT(check);
     leftLayout->addWidget(d->rosterView);
 
     d->leftPanel->setLayout(leftLayout);
@@ -679,20 +676,6 @@ void Chat::resizeContacts()
         hint.setHeight(size().height());
 
     resize(hint);
-}
-
-void Chat::onRosterClicked(const QString &id)
-{
-    // notify plugins
-    const QModelIndex index = d->rosterModel->findItem(id);
-    if (index.isValid())
-        emit rosterClick(index);
-
-    // show requested panel
-    ChatPanel *chatPanel = panel(id);
-    if (chatPanel)
-        QTimer::singleShot(0, chatPanel, SIGNAL(showPanel()));
-
 }
 
 void Chat::setWindowTitle(const QString &title)

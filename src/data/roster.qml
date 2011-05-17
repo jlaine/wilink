@@ -21,10 +21,6 @@ import QtQuick 1.0
 import wiLink 1.2
 
 Column {
-    id: blocks
-
-    signal itemClicked(string id)
-
     anchors.fill: parent
 
     RosterView {
@@ -58,7 +54,8 @@ Column {
 
         Connections {
             onItemClicked: {
-                blocks.itemClicked(model.id);
+                var url = 'xmpp://' + window.objectName + '/' + model.id + '?message';
+                Qt.openUrlExternally(url);
             }
 
             onItemContextMenu: {

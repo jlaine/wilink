@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QPushButton>
+#include <QTimer>
 
 #include "QSoundPlayer.h"
 
@@ -403,12 +404,16 @@ void ChatDialog::updateWindowTitle()
 ChatsWatcher::ChatsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
-    connect(chat->client(), SIGNAL(messageReceived(QXmppMessage)),
-            this, SLOT(messageReceived(QXmppMessage)));
+    bool check;
+
+    check = connect(chat->client(), SIGNAL(messageReceived(QXmppMessage)),
+                    this, SLOT(messageReceived(QXmppMessage)));
+    Q_ASSERT(check);
 
     // add roster hooks
-    connect(chat, SIGNAL(rosterClick(QModelIndex)),
-            this, SLOT(rosterClick(QModelIndex)));
+    check = connect(chat, SIGNAL(urlClick(QUrl)),
+                    this, SLOT(urlClick(QUrl)));
+    Q_ASSERT(check);
 }
 
 /** When a chat message is received, if we do not have an open conversation
@@ -428,21 +433,21 @@ void ChatsWatcher::messageReceived(const QXmppMessage &msg)
     }
 }
 
-/** When the user clicks on a contact in his roster, open a conversation.
- *
- * @param index The roster entry that was clicked.
+/** Open a XMPP URI if it refers to a conversation.
  */
-void ChatsWatcher::rosterClick(const QModelIndex &index)
+void ChatsWatcher::urlClick(const QUrl &url)
 {
-    if (!chat->client()->isConnected())
-        return;
-
-    int type = index.data(ChatRosterModel::TypeRole).toInt();
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
-
-    // create conversation if necessary
-    if (type == ChatRosterModel::Contact && !chat->panel(jid))
-        chat->addPanel(new ChatDialog(chat->client(), chat->rosterModel(), jid));
+    if (url.scheme() == "xmpp" && url.hasQueryItem("message")) {
+        QString jid = url.path();
+        if (jid.startsWith("/"))
+            jid.remove(0, 1);
+        ChatPanel *panel = chat->panel(jid);
+        if (!panel) {
+            panel = new ChatDialog(chat->client(), chat->rosterModel(), jid);
+            chat->addPanel(panel);
+        }
+        QTimer::singleShot(0, panel, SIGNAL(showPanel()));
+    }
 }
 
 // PLUGIN
