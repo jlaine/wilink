@@ -30,34 +30,26 @@ Item {
     property real pageSize: flickableItem.visibleArea.heightRatio
 
     state: pageSize == 1 ? 'collapsed' : ''
-    width: 17
+    width: 11
 
-    Rectangle {
+    Image {
         id: track
 
         anchors.fill: parent
-        anchors.topMargin: 16
-        anchors.bottomMargin: 16
-        color: '#dfdfdf'
+        anchors.topMargin: scrollBar.width - 1
+        anchors.bottomMargin: scrollBar.width - 1
+        source: 'scrollBarTrack.svg'
 
-        Rectangle {
+        Image {
             id: handle
 
             property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.height - 2))
 
-            border.color: '#c3c3c3'
-            border.width: 1
-            color: '#c3c3c3'
             x: 0
             y: Math.floor(scrollBar.position * (track.height + desiredHeight - height - 2)) + 1
             height: Math.max(desiredHeight, 20)
+            source: 'scrollBarHandle.svg'
             width: parent.width - 1
-            radius: 6
-
-            states: State {
-                name: 'pressed'
-                PropertyChanges { color: '#aac7e4'; border.color: '#5488bb' }
-            }
         }
     }
 
@@ -65,17 +57,18 @@ Item {
         id: buttonUp
 
         anchors.top: parent.top
+        border.color: '#0d88a4'
+        color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
-        border.color: '#999999'
-        color: '#cccccc'
-
+/*
         Image {
             anchors.fill: parent
             smooth: true
             source: 'back.png'
-            transform: Rotation { angle: 90; origin.x: 8; origin.y: 8 }
+            transform: Rotation { angle: 90; origin.x: Math.round(scrollBar.width/2); origin.y: Math.round(scrollBar.width/2) }
         }
+*/
 
         MouseArea {
             anchors.fill: parent
@@ -96,7 +89,7 @@ Item {
 
         states: State {
             name: 'pressed'
-            PropertyChanges { target: buttonUp; color: '#aaaaaa' }
+            PropertyChanges { target: buttonUp; color: '#ffffff' }
         }
     }
 
@@ -104,18 +97,18 @@ Item {
         id: buttonDown
 
         anchors.bottom: parent.bottom
+        border.color: '#0d88a4'
+        color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
-        border.color: '#999999'
-        color: '#cccccc'
-
+/*
         Image {
             anchors.fill: parent
             smooth: true
             source: 'back.png'
-            transform: Rotation { angle: -90; origin.x: 8; origin.y: 8 }
+            transform: Rotation { angle: -90; origin.x: Math.round(scrollBar.width/2); origin.y: Math.round(scrollBar.width/2) }
         }
-
+*/
         MouseArea {
             anchors.fill: parent
 
@@ -134,7 +127,7 @@ Item {
         }
         states: State {
             name: 'pressed'
-            PropertyChanges { target: buttonDown; color: '#aaaaaa' }
+            PropertyChanges { target: buttonDown; color: '#ffffff' }
         }
     }
 
