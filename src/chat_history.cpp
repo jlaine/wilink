@@ -195,6 +195,9 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
     // prepare message
     ChatMessage *msg = new ChatMessage(message);
 
+    // notify bottom is about to change
+    emit bottomAboutToChange();
+
     if (prevMsg && prevMsg->groupWith(message) &&
         nextMsg && nextMsg->groupWith(message) &&
         prevBubble != nextBubble) {

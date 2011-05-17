@@ -81,6 +81,7 @@ public:
 
 signals:
     void bottomChanged();
+    void bottomAboutToChange();
 
 public slots:
     void clear();

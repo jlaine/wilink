@@ -42,6 +42,8 @@ Rectangle {
         HistoryView {
             id: historyView
 
+            property bool scrollBarAtBottom
+
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -50,11 +52,17 @@ Rectangle {
 
             Connections {
                 target: historyView.model
+                onBottomAboutToChange: {
+                    // test if scrollbar should follow bottom change
+                    if (0 == Math.round((1 - historyScrollBar.position - historyScrollBar.pageSize) * historyScrollBar.flickableItem.contentHeight)) {
+                        historyView.scrollBarAtBottom = true
+                    } else {
+                        historyView.scrollBarAtBottom = false
+                    }
+                }
                 onBottomChanged: {
-                    if (historyScrollBar.dragToBottomEnabled) {
-                        var index = historyView.count - 1;
-                        historyView.currentIndex = index;
-                        historyView.positionViewAtIndex(index, ListView.End);
+                    if( historyView.scrollBarAtBottom ) {
+                        historyView.positionViewAtIndex(historyView.count - 1, ListView.End)
                     }
                 }
             }
