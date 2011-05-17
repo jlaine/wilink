@@ -25,7 +25,6 @@
 class Chat;
 class QLabel;
 class QAbstractButton;
-class QPushButton;
 class QXmppPresence;
 
 class ContactsWatcher : public QObject
@@ -36,9 +35,6 @@ public:
     ContactsWatcher(Chat *chatWindow);
 
 private slots:
-    void addContact();
-    void connected();
-    void disconnected();
     void presenceHandled(QAbstractButton*);
     void presenceReceived(const QXmppPresence &presence);
 
@@ -46,7 +42,6 @@ private:
     QLabel *tipLabel() const;
 
     Chat *chat;
-    QPushButton *addButton;
 };
 
 #endif

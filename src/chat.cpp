@@ -520,6 +520,12 @@ void Chat::promptCredentials()
 QInputDialog *Chat::inputDialog()
 {
     QInputDialog *dialog = new QDeclarativeInputDialog(this);
+    dialog->setLabelText(QString());
+    QLabel *label = dialog->findChild<QLabel*>();
+    if (label) {
+        label->setOpenExternalLinks(true);
+        label->setWordWrap(true);
+    }
     return dialog;
 }
 

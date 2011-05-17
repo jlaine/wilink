@@ -54,10 +54,13 @@ Column {
 
         Connections {
             onAddClicked: {
+                var domain = window.objectName.split('@')[1];
+                var tip = (domain == 'wifirst.net') ? '<p>' + qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') + '</p>' : '';
+
                 var dialog = window.inputDialog();
                 dialog.windowTitle = qsTr('Add a contact');
-                dialog.labelText = qsTr('Enter the address of the contact you want to add.');
-                dialog.textValue = '@' + window.objectName.split('@')[1];
+                dialog.labelText = tip + '<p>' + qsTr('Enter the address of the contact you want to add.') + '</p>';
+                dialog.textValue = '@' + domain;
 
                 var jid = '';
                 while (!jid.match(/^[^@/]+@[^@/]+$/)) {

@@ -77,10 +77,6 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
     QXmppClient *client = chat->client();
-    connect(client, SIGNAL(connected()),
-            this, SLOT(connected()));
-    connect(client, SIGNAL(disconnected()),
-            this, SLOT(disconnected()));
     connect(client, SIGNAL(presenceReceived(const QXmppPresence&)),
             this, SLOT(presenceReceived(const QXmppPresence&)));
 
@@ -91,73 +87,6 @@ ContactsWatcher::ContactsWatcher(Chat *chatWindow)
 
     QDeclarativeContext *context = chat->rosterView()->rootContext();
     context->setContextProperty("contactModel", contactModel);
-
-    // add button to status bar
-    addButton = new QPushButton;
-    addButton->setEnabled(false);
-    addButton->setIcon(QIcon(":/add.png"));
-    addButton->setToolTip(tr("Add a contact"));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addContact()));
-    chat->statusBar()->insertWidget(0, addButton);
-}
-
-/** Prompt the user for a new contact then add it to the roster.
- */
-void ContactsWatcher::addContact()
-{
-    const QString domain = chat->client()->configuration().domain();
-    QString jid = QLatin1String("@") + domain;
-
-    QDialog dialog(chat);
-    QVBoxLayout *vbox = new QVBoxLayout;
-
-    // tip
-    if (domain == "wifirst.net")
-        vbox->addWidget(tipLabel());
-
-    // prompt label
-    QLabel *label = new QLabel(tr("Enter the address of the contact you want to add."));
-    vbox->addWidget(label);
-
-    // input box
-    QLineEdit *lineEdit = new QLineEdit;
-    lineEdit->setText(jid);
-    lineEdit->setCursorPosition(0);
-    vbox->addWidget(lineEdit);
-
-    // buttons
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok |
-        QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
-    vbox->addWidget(buttonBox);
-
-    dialog.setLayout(vbox);
-    dialog.setWindowIcon(QIcon(":/add.png"));
-    dialog.setWindowTitle(tr("Add a contact"));
-
-    while (!isBareJid(jid))
-    {
-        // show prompt
-        if (dialog.exec() != QDialog::Accepted)
-            return;
-        jid = lineEdit->text().trimmed().toLower();
-    }
-
-    QXmppPresence packet;
-    packet.setTo(jid);
-    packet.setType(QXmppPresence::Subscribe);
-    chat->client()->sendPacket(packet);
-}
-
-void ContactsWatcher::connected()
-{
-    addButton->setEnabled(true);
-}
-
-void ContactsWatcher::disconnected()
-{
-    addButton->setEnabled(false);
 }
 
 /** When the user has decided whether or not to accept a subscription request,
