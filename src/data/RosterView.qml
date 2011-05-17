@@ -25,7 +25,8 @@ Item {
     property alias model: view.model
     property alias title: titleText.text
 
-    signal itemClicked(string id)
+    signal itemClicked(variant model)
+    signal itemContextMenu(variant model, variant point)
 
     Rectangle {
         id: header
@@ -96,13 +97,15 @@ Item {
                 }
 
                 MouseArea {
-                    acceptedButtons: Qt.LeftButton
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
                         if (mouse.button == Qt.LeftButton) {
                             view.currentIndex = index;
-                            block.itemClicked(model.id);
+                            block.itemClicked(model);
+                        } else if (mouse.button == Qt.RightButton) {
+                            block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
                         }
                     }
                 }

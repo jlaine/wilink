@@ -35,7 +35,7 @@ Column {
         width: parent.width
 
         Connections {
-            onItemClicked: { blocks.itemClicked(id); }
+            onItemClicked: { blocks.itemClicked(model.id); }
         }
     }
 
@@ -47,8 +47,27 @@ Column {
         height: 2 * parent.height / 3
         width: parent.width
 
+        Menu {
+            id: menu
+            opacity: 0
+        }
+
         Connections {
-            onItemClicked: { blocks.itemClicked(id); }
+            onItemClicked: { blocks.itemClicked(model.id); }
+            onItemContextMenu: {
+                menu.model.clear()
+                if (model.url != undefined && model.url != '')
+                    menu.model.append({'title': qsTr('Show profile'), 'url':model.url})
+                menu.x = 16;
+                menu.y = point.y - 16;
+                menu.state = 'visible';
+            }
+        }
+
+        Connections {
+            target: menu
+            onItemClicked: Qt.openUrlExternally(menu.model.get(index).url)
         }
     }
+
 }
