@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAction>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -75,19 +76,6 @@ DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
     /* location bar */
     QHBoxLayout *hbox = new QHBoxLayout;
 
-    m_backButton = new QPushButton;
-    m_backButton->setIcon(QIcon(":/back.png"));
-    m_backButton->setToolTip(tr("Go back"));
-    m_backButton->setEnabled(false);
-    hbox->addWidget(m_backButton);
-
-    QPushButton *m_refreshButton = new QPushButton;
-    m_refreshButton->setIcon(QIcon(":/refresh.png"));
-    m_refreshButton->setToolTip(tr("Refresh"));
-    hbox->addWidget(m_refreshButton);
-
-    hbox->addSpacing(6);
-
     m_locationJid = new QLineEdit;
     hbox->addWidget(m_locationJid);
 
@@ -105,6 +93,19 @@ DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Service discovery"));
 
+    // add actions
+    m_backAction = addAction(QIcon(":/back.png"), tr("Go back"));
+    m_backAction->setEnabled(false);
+    m_backAction->setShortcut(QKeySequence(Qt::Key_Backspace));
+    check = connect(m_backAction, SIGNAL(triggered()),
+                    this, SLOT(goBack()));
+    Q_ASSERT(check);
+
+    QAction *m_refreshAction = addAction(QIcon(":/refresh.png"), tr("Refresh"));
+    check = connect(m_refreshAction, SIGNAL(triggered()),
+                    this, SLOT(goTo()));
+    Q_ASSERT(check);
+
     /* connect signals */
     check = connect(this, SIGNAL(showPanel()),
         this, SLOT(slotShow()));
@@ -118,13 +119,6 @@ DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
         this, SLOT(discoveryItemsReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
-    check = connect(m_backButton, SIGNAL(clicked()),
-        this, SLOT(goBack()));
-    Q_ASSERT(check);
-
-    check = connect(m_refreshButton, SIGNAL(clicked()),
-        this, SLOT(goTo()));
-    Q_ASSERT(check);
 
     check = connect(m_locationJid, SIGNAL(returnPressed()),
         this, SLOT(goTo()));
@@ -201,9 +195,9 @@ void DiscoveryPanel::explore(const QXmppDiscoveryIq::Item &item)
 
     // update back button
     if (m_trail.size() < 2)
-        m_backButton->setEnabled(false);
+        m_backAction->setEnabled(false);
     else
-        m_backButton->setEnabled(true);
+        m_backAction->setEnabled(true);
 
     // request items
     const QString id = m_manager->requestItems(item.jid(), item.node());

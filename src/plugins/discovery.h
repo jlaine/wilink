@@ -20,10 +20,10 @@
 #ifndef __WILINK_DISCOVERY_H__
 #define __WILINK_DISCOVERY_H__
 
+class QAction;
 class QLineEdit;
 class QListWidget;
 class QListWidgetItem;
-class QPushButton;
 class QXmppClient;
 class QXmppDiscoveryManager;
 
@@ -56,7 +56,7 @@ private:
     QLineEdit *m_locationJid;
     QLineEdit *m_locationNode;
     QListWidget *m_listWidget;
-    QPushButton *m_backButton;
+    QAction *m_backAction;
     QList<QXmppDiscoveryIq::Item> m_trail;
     QXmppDiscoveryManager *m_manager;
     QStringList m_requests;
