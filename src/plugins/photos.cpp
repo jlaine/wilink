@@ -246,6 +246,7 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
 
     backAction = addAction(QIcon(":/back.png"), tr("Go back"));
     backAction->setEnabled(false);
+    backAction->setShortcut(QKeySequence(Qt::Key_Backspace));
     connect(backAction, SIGNAL(triggered()), this, SLOT(goBack()));
 
     stopButton = new QPushButton(tr("Cancel"));
@@ -257,6 +258,11 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     connect(createAction, SIGNAL(triggered()), this, SLOT(createFolder()));
 
     deleteAction = addAction(QIcon(":/remove.png"), tr("Delete"));
+#ifdef Q_OS_MAC
+    deleteAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Backspace));
+#else
+    deleteAction->setShortcut(QKeySequence(Qt::Key_Delete));
+#endif
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteFile()));
     deleteAction->setVisible(false);
 
@@ -283,17 +289,6 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)), this,
             SLOT(commandFinished(int, bool, const FileInfoList&)));
     connect(fs, SIGNAL(putProgress(int, int)), this, SLOT(putProgress(int, int)));
-
-    /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::Key_Backspace), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(goBack()));
-#ifdef Q_OS_MAC
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Backspace), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteFile()));
-#else
-    shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(deleteFile()));
-#endif
 
     setFocusProxy(photosView);
 }
