@@ -61,6 +61,7 @@
     <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
     <file>HistoryView.qml</file>
+    <file>KeyPad.qml</file>
     <file>Menu.qml</file>
     <file>ParticipantView.qml</file>
     <file>ProgressBar.qml</file>
