@@ -297,33 +297,16 @@ DiagnosticsPanel::DiagnosticsPanel(QXmppClient *client, QWidget *parent)
 
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
     layout->addLayout(headerLayout());
     text = new QTextBrowser;
     layout->addWidget(text);
 
-    QHBoxLayout *hbox = new QHBoxLayout;
-
-    hostEdit = new QLineEdit;
-    hostEdit->hide();
-    check = connect(hostEdit, SIGNAL(returnPressed()),
+    refreshAction = addAction(QIcon(":/refresh.png"), tr("Refresh"));
+    check = connect(refreshAction, SIGNAL(triggered()),
                     this, SLOT(refresh()));
     Q_ASSERT(check);
-    hbox->addWidget(hostEdit);
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_X), this);
-    check = connect(shortcut, SIGNAL(activated()),
-                    hostEdit, SLOT(show()));
-    Q_ASSERT(check);
 
-    hbox->addStretch();
-
-    refreshButton = new QPushButton(tr("Refresh"));
-    refreshButton->setIcon(QIcon(":/refresh.png"));
-    check = connect(refreshButton, SIGNAL(clicked()),
-                    this, SLOT(refresh()));
-    Q_ASSERT(check);
-    hbox->addWidget(refreshButton);
-
-    layout->addLayout(hbox);
     setLayout(layout);
     setWindowIcon(QIcon(":/diagnostics.png"));
     setWindowTitle(tr("Diagnostics"));
@@ -358,35 +341,17 @@ void DiagnosticsPanel::refresh()
 {
     if (m_timer->isActive())
         return;
-    refreshButton->setEnabled(false);
+    refreshAction->setEnabled(false);
 
-    QString jid = hostEdit->text();
-    if (jid.isEmpty())
-    {
-        showMessage("Running diagnostics..");
-        DiagnosticsAgent::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
-    }
-    else
-    {
-        QString fullJid = jid;
-        if (!fullJid.contains("@"))
-            fullJid += "@" + m_client->configuration().domain();
-        if (!fullJid.contains("/"))
-            fullJid += "/wiLink";
-        if (fullJid != jid)
-            hostEdit->setText(fullJid);
-
-        showMessage(QString("Querying %1..").arg(fullJid));
-        DiagnosticsExtension *extension = m_client->findExtension<DiagnosticsExtension>();
-        extension->requestDiagnostics(fullJid);
-    }
+    showMessage("Running diagnostics..");
+    DiagnosticsAgent::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
     m_timer->start();
 }
 
 void DiagnosticsPanel::timeout()
 {
     showMessage("Request timed out.");
-    refreshButton->setEnabled(true);
+    refreshAction->setEnabled(true);
 }
 
 void DiagnosticsPanel::slotShow()
@@ -430,7 +395,7 @@ void DiagnosticsPanel::showMessage(const QString &msg)
 void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
 {
     // enable buttons
-    refreshButton->setEnabled(true);
+    refreshAction->setEnabled(true);
     m_timer->stop();
 
     if (iq.type() == QXmppIq::Error)

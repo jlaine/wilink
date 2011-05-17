@@ -20,15 +20,11 @@
 #ifndef __WILINK_DIAGNOSTICS_H__
 #define __WILINK_DIAGNOSTICS_H__
 
-#include <QDialog>
-
 #include "QXmppClientExtension.h"
 
 #include "chat_panel.h"
 #include "diagnostics/iq.h"
 
-class QLineEdit;
-class QPushButton;
 class QTextBrowser;
 class QTimer;
 
@@ -55,8 +51,7 @@ private:
     void showLookup(const QList<QHostInfo> &results);
     void showMessage(const QString &msg);
 
-    QLineEdit *hostEdit;
-    QPushButton *refreshButton;
+    QAction *refreshAction;
     QTextBrowser *text;
 
     QXmppClient *m_client;
