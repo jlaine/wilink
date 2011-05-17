@@ -75,7 +75,6 @@ Rectangle {
             anchors.bottom: parent.bottom
             anchors.right: Qt.isQtObject(participantModel) ? participantView.left : parent.right
             flickableItem: historyView
-            dragToBottomEnabled: true
         }
 
         ParticipantView {

@@ -23,7 +23,6 @@ Item {
     id: scrollBar
 
     property Flickable flickableItem
-    property bool dragToBottomEnabled
     property string moveAction: ''
     property int moveQuantity: 30
     property bool moveRepeat: false
