@@ -70,11 +70,6 @@ signals:
      */
     void rosterClick(const QModelIndex &index);
 
-    /** Plugins should connect to this signal to add entries
-     *  to the context menu for a roster entry.
-     */
-    void rosterMenu(QMenu *menu, const QModelIndex &index);
-
     /** Plugins should connect to this signal to handle XMPP URIs.
      */
     void urlClick(const QUrl &url);

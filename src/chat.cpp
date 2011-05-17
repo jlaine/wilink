@@ -143,7 +143,6 @@ Chat::Chat(QWidget *parent)
     d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
     connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
     connect(d->rosterView, SIGNAL(clicked(QModelIndex)), this, SLOT(rosterClicked(QModelIndex)));
-    connect(d->rosterView, SIGNAL(itemMenu(QMenu*, QModelIndex)), this, SIGNAL(rosterMenu(QMenu*, QModelIndex)));
     leftLayout->addWidget(d->rosterView);
 #endif
 
