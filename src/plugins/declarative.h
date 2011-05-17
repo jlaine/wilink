@@ -21,7 +21,22 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+
+#include "QXmppClient.h"
 #include "QXmppMessage.h"
+
+class QXmppDeclarativeClient : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
+
+public:
+    QXmppDeclarativeClient(QXmppClient *client);
+    QXmppRosterManager *rosterManager() const;
+
+private:
+    QXmppClient *m_client;
+};
 
 class QXmppDeclarativeMessage : public QObject
 {

@@ -20,6 +20,9 @@
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
 
+#include "QXmppRosterManager.h"
+
+#include "chat.h"
 #include "chat_plugin.h"
 #include "declarative.h"
 
@@ -62,6 +65,16 @@ void ListHelper::setModel(QObject *model)
     }
 }
 
+QXmppDeclarativeClient::QXmppDeclarativeClient(QXmppClient *client)
+    : m_client(client)
+{
+}
+
+QXmppRosterManager *QXmppDeclarativeClient::rosterManager() const
+{
+    return &m_client->rosterManager();
+}
+
 // PLUGIN
 
 class DeclarativePlugin : public ChatPlugin
@@ -73,8 +86,12 @@ public:
 
 bool DeclarativePlugin::initialize(Chat *chat)
 {
+    qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
+
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
+    qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
     return true;
 }
 

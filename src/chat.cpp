@@ -68,6 +68,7 @@
 #include "chat_roster.h"
 #include "chat_status.h"
 #include "chat_utils.h"
+#include "plugins/declarative.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -143,6 +144,11 @@ Chat::Chat(QWidget *parent)
     d->rosterView->setMinimumWidth(200);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->rosterView->engine()->addImageProvider("roster", imageProvider);
+
+    QDeclarativeContext *context = d->rosterView->rootContext();
+    context->setContextProperty("client", new QXmppDeclarativeClient(d->client));
+    context->setContextProperty("window", this);
+
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
     check = connect(d->rosterView->rootObject(), SIGNAL(itemClicked(QString)),
                     this, SLOT(rosterClicked(QString)));
@@ -504,6 +510,11 @@ void Chat::promptCredentials()
         config.setPassword(password);
         d->client->connectToServer(config);
     }
+}
+
+bool Chat::question(const QString &title, const QString &text)
+{
+    return QMessageBox::question(this, title, text, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes;
 }
 
 /** Return this window's chat client.

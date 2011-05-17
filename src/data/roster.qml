@@ -56,8 +56,22 @@ Column {
             onItemClicked: { blocks.itemClicked(model.id); }
             onItemContextMenu: {
                 menu.model.clear()
-                if (model.url != undefined && model.url != '')
-                    menu.model.append({'title': qsTr('Show profile'), 'url':model.url})
+                if (model.url != undefined && model.url != '') {
+                    menu.model.append({
+                        'action': 'profile',
+                        'title': qsTr('Show profile'),
+                        'url': model.url});
+                }
+                menu.model.append({
+                    'action': 'rename',
+                    'name': model.name,
+                    'title': qsTr('Rename contact'),
+                    'jid': model.id});
+                menu.model.append({
+                    'action': 'remove',
+                    'name': model.name,
+                    'title': qsTr('Remove contact'),
+                    'jid': model.id});
                 menu.x = 16;
                 menu.y = point.y - 16;
                 menu.state = 'visible';
@@ -66,7 +80,19 @@ Column {
 
         Connections {
             target: menu
-            onItemClicked: Qt.openUrlExternally(menu.model.get(index).url)
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'profile') {
+                    Qt.openUrlExternally(item.url);
+                } else if (item.action == 'rename') {
+                    console.log("rename " + item.jid + " " + client.rosterManager);
+                } else if (item.action == 'remove') {
+                    if (window.question(qsTr("Remove contact"),
+                                        qsTr("Do you want to remove %1 from your contact list?").replace('%1', item.name))) {
+                        client.rosterManager.removeItem(item.jid);
+                    }
+                }
+            }
         }
     }
 

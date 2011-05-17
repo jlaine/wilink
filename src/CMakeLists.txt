@@ -130,6 +130,7 @@ configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/t
 if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         ${wiLink_SOURCES}
+        data/roster.qml
         data/CallWidget.qml
         data/ParticipantView.qml
         data/TransferWidget.qml

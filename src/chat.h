@@ -79,6 +79,7 @@ signals:
 
 public slots:
     void openUrl(const QUrl &url);
+    bool question(const QString &title, const QString &text);
     void showPreferences(const QString &focusTab = QString());
 
 private slots:

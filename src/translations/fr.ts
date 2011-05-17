@@ -38,10 +38,6 @@ Acceptez-vous?</translation>
         <translation>Connexion..</translation>
     </message>
     <message>
-        <source>Hang up</source>
-        <translation type="obsolete">Raccrocher</translation>
-    </message>
-    <message>
         <source>Call connected.</source>
         <translation>Appel connecté.</translation>
     </message>
@@ -973,6 +969,33 @@ Acceptez-vous?</translation>
     <message>
         <source>Your version of %1 is up to date.</source>
         <translation>Votre version de %1 est à jour.</translation>
+    </message>
+</context>
+<context>
+    <name>roster</name>
+    <message>
+        <source>My rooms</source>
+        <translation>Mes salons</translation>
+    </message>
+    <message>
+        <source>My contacts</source>
+        <translation>Mes contacts</translation>
+    </message>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Do you want to remove %1 from your contact list?</source>
+        <translation type="unfinished">Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
 </context>
 </TS>
