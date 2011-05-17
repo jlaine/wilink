@@ -53,7 +53,7 @@ Item {
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         clip: true
         focus: true
 
@@ -113,5 +113,14 @@ Item {
                 PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
             }
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: view
     }
 }
