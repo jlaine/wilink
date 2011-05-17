@@ -54,11 +54,7 @@ Rectangle {
                 target: historyView.model
                 onBottomAboutToChange: {
                     // test if scrollbar should follow bottom change
-                    if (0 == Math.round((1 - historyScrollBar.position - historyScrollBar.pageSize) * historyScrollBar.flickableItem.contentHeight)) {
-                        historyView.scrollBarAtBottom = true
-                    } else {
-                        historyView.scrollBarAtBottom = false
-                    }
+                    historyView.scrollBarAtBottom = historyView.atYEnd
                 }
                 onBottomChanged: {
                     if( historyView.scrollBarAtBottom ) {
