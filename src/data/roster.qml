@@ -53,6 +53,16 @@ Column {
         }
 
         Connections {
+            onAddClicked: {
+                var dialog = window.inputDialog();
+                dialog.windowTitle = qsTr('Add a contact');
+                dialog.labelText = qsTr('Enter the address of the contact you want to add.');
+                dialog.textValue = '@' + window.objectName.split('@')[1];
+                if (dialog.exec()) {
+                    console.log("add item " + dialog.textValue);
+                }
+            }
+
             onItemClicked: {
                 var url = 'xmpp://' + window.objectName + '/' + model.id + '?message';
                 Qt.openUrlExternally(url);
@@ -113,5 +123,4 @@ Column {
             }
         }
     }
-
 }
