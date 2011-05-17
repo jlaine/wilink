@@ -90,7 +90,6 @@ Rectangle {
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             flickableItem: participantView
-            visible: participantView.visibleArea.heightRatio < 1
         }
     }
 
