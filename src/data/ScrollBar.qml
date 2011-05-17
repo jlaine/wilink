@@ -38,7 +38,7 @@ Item {
         anchors.fill: parent
         anchors.topMargin: scrollBar.width - 1
         anchors.bottomMargin: scrollBar.width - 1
-        source: 'scrollBarTrack.svg'
+        source: 'scrollbar_track.svg'
 
         Image {
             id: handle
@@ -48,7 +48,7 @@ Item {
             x: 0
             y: Math.floor(scrollBar.position * (track.height + desiredHeight - height - 2)) + 1
             height: Math.max(desiredHeight, 20)
-            source: 'scrollBarHandle.svg'
+            source: 'scrollbar_handle.svg'
             width: parent.width - 1
         }
     }
