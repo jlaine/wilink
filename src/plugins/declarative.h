@@ -21,9 +21,20 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+#include <QInputDialog>
 
 #include "QXmppClient.h"
 #include "QXmppMessage.h"
+
+class QDeclarativeInputDialog : public QInputDialog
+{
+    Q_OBJECT
+    Q_PROPERTY(QString labelText READ labelText WRITE setLabelText)
+    Q_PROPERTY(QString textValue READ textValue WRITE setTextValue)
+
+public:
+    QDeclarativeInputDialog(QWidget *parent = 0) : QInputDialog(parent) {}
+};
 
 class QXmppDeclarativeClient : public QObject
 {

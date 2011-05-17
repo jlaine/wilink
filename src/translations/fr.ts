@@ -507,20 +507,12 @@ Acceptez-vous?</translation>
 <context>
     <name>ContactsWatcher</name>
     <message>
-        <source>Rename contact</source>
-        <translation>Renommer contact</translation>
-    </message>
-    <message>
         <source>Add a contact</source>
         <translation>Ajouter un contact</translation>
     </message>
     <message>
         <source>Enter the address of the contact you want to add.</source>
         <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
-        <source>Enter the name for this contact.</source>
-        <translation>Saisissez le nom pour ce contact.</translation>
     </message>
     <message>
         <source>Invitation from %1</source>

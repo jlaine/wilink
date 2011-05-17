@@ -33,6 +33,7 @@
 #include <QDesktopWidget>
 #include <QDialogButtonBox>
 #include <QGroupBox>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QList>
@@ -104,6 +105,7 @@ Chat::Chat(QWidget *parent)
 
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
+    qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
 
     /* get handle to application */
@@ -518,6 +520,12 @@ void Chat::promptCredentials()
         config.setPassword(password);
         d->client->connectToServer(config);
     }
+}
+
+QInputDialog *Chat::inputDialog()
+{
+    QInputDialog *dialog = new QDeclarativeInputDialog(this);
+    return dialog;
 }
 
 QMessageBox *Chat::messageBox()

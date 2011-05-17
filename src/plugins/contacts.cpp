@@ -233,26 +233,6 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
     }
 }
 
-/** Prompt the user to rename a contact.
- */
-void ContactsWatcher::renameContact()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString jid = action->data().toString();
-
-    bool ok = true;
-    QXmppRosterIq::Item item = chat->client()->rosterManager().getRosterEntry(jid);
-    QString name = QInputDialog::getText(chat, tr("Rename contact"),
-        tr("Enter the name for this contact."),
-        QLineEdit::Normal, item.name(), &ok);
-    if (ok)
-    {
-        chat->client()->rosterManager().renameItem(jid, name);
-    }
-}
-
 /** When the user clicks on a contact in his roster, open a conversation.
  *
  * @param index The roster entry that was clicked.
@@ -265,24 +245,6 @@ void ContactsWatcher::rosterClick(const QModelIndex &index)
 
     if (domain == "wifirst.net" && jid == contactsJid && !chat->panel(jid))
         chat->addPanel(new ContactsPanel(chat, jid, tipLabel()));
-}
-
-void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
-{
-    if (!chat->client()->isConnected())
-        return;
-
-    const int type = index.data(ChatRosterModel::TypeRole).toInt();
-    
-    QAction *action;
-    if (type == ChatRosterModel::Contact)
-    {
-        const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
-
-        action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
-        action->setData(bareJid);
-        connect(action, SIGNAL(triggered()), this, SLOT(renameContact()));
-    }
 }
 
 /** Show a contact's web page.
@@ -327,8 +289,6 @@ void ContactsPlugin::finalize(Chat *chat)
 bool ContactsPlugin::initialize(Chat *chat)
 {
     ContactsWatcher *contacts = new ContactsWatcher(chat);
-    connect(chat, SIGNAL(rosterMenu(QMenu*, QModelIndex)),
-            contacts, SLOT(rosterMenu(QMenu*, QModelIndex)));
     m_watchers.insert(chat, contacts);
     return true;
 }

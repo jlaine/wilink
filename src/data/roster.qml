@@ -86,12 +86,13 @@ Column {
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(item.url);
                 } else if (item.action == 'rename') {
-                    var box = window.messageBox();
-                    box.windowTitle = qsTr('Rename contact');
-                    box.text = qsTr("Enter the name for this contact.");
-                    box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                    if (box.exec() == QMessageBox.Yes) {
-                        console.log("rename " + item.jid);
+                    var dialog = window.inputDialog();
+                    dialog.windowTitle = qsTr('Rename contact');
+                    dialog.labelText = qsTr("Enter the name for this contact.");
+                    dialog.textValue = item.name;
+                    if (dialog.exec()) {
+                        console.log("rename " + item.jid + ": " + dialog.textValue);
+                        client.rosterManager.renameItem(item.jid, dialog.textValue);
                     }
                 } else if (item.action == 'remove') {
                     var box = window.messageBox();

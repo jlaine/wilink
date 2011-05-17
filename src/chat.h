@@ -37,6 +37,7 @@ class QBuffer;
 class QCheckBox;
 class QComboBox;
 class QDeclarativeView;
+class QInputDialog;
 class QLabel;
 class QMessageBox;
 class QModelIndex;
@@ -80,6 +81,7 @@ signals:
 
 public slots:
     void openUrl(const QUrl &url);
+    QInputDialog *inputDialog();
     QMessageBox *messageBox();
     void showPreferences(const QString &focusTab = QString());
 
