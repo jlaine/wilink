@@ -29,6 +29,7 @@ Item {
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
 
+    state: pageSize == 1 ? 'collapsed' : ''
     width: 17
 
     Rectangle {
@@ -52,6 +53,11 @@ Item {
             height: Math.max(desiredHeight, 20)
             width: parent.width - 1
             radius: 6
+
+            states: State {
+                name: 'pressed'
+                PropertyChanges { color: '#aac7e4'; border.color: '#5488bb' }
+            }
         }
     }
 
@@ -132,11 +138,6 @@ Item {
         }
     }
 
-    states: State {
-        name: 'hovered'
-        PropertyChanges { target: handle; color: '#aac7e4'; border.color: '#5488bb' }
-    }
-
     MouseArea {
         id: clickableArea
 
@@ -148,8 +149,6 @@ Item {
         drag.axis: Drag.YAxis
 
         onPressed: {
-            scrollBar.state = 'hovered'
-
             if (mouse.y < handle.y) {
                 moveAction = 'up';
                 moveQuantity = -flickableItem.height;
@@ -159,6 +158,7 @@ Item {
                 moveQuantity = flickableItem.height;
                 scrollBar.moveBy(moveQuantity);
             } else {
+                handle.state = 'pressed';
                 moveAction = 'drag';
                 moveQuantity = 0;
                 pressContentY = flickableItem.contentY;
@@ -168,7 +168,7 @@ Item {
         }
 
         onReleased: {
-            scrollBar.state = '';
+            handle.state = '';
             moveAction = '';
             moveRepeat = false;
         }
@@ -208,5 +208,10 @@ Item {
 
         // move
         flickableItem.contentY = Math.round(flickableItem.contentY + delta);
+    }
+
+    states: State {
+        name: 'collapsed'
+        PropertyChanges { target: scrollBar; width: 0; opacity: 0 }
     }
 }
