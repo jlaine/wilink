@@ -97,6 +97,7 @@ Item {
         id: buttonDown
 
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: 1
         border.color: '#0d88a4'
         color: '#bedfe7'
         height: parent.width - 1
