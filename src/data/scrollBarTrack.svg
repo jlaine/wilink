@@ -15,10 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.1 r9760"
-   sodipodi:docname="scrollBarTrack.svg"
-   inkscape:export-filename="scrollBarHandle.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   sodipodi:docname="scrollBarTrack.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -36,72 +33,6 @@
          offset="1"
          id="stop3781" />
     </linearGradient>
-    <linearGradient
-       id="linearGradient3763">
-      <stop
-         style="stop-color:#f0f0f0;stop-opacity:1;"
-         offset="0"
-         id="stop3765" />
-      <stop
-         id="stop3775"
-         offset="0.28571427"
-         style="stop-color:#ffffff;stop-opacity:0" />
-      <stop
-         id="stop3773"
-         offset="0.71428573"
-         style="stop-color:#ffffff;stop-opacity:1;" />
-      <stop
-         style="stop-color:#eaeaea;stop-opacity:1;"
-         offset="1"
-         id="stop3767" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3815">
-      <stop
-         style="stop-color:#10becb;stop-opacity:0;"
-         offset="0"
-         id="stop3817" />
-      <stop
-         id="stop3823"
-         offset="0.5"
-         style="stop-color:#10becb;stop-opacity:1;" />
-      <stop
-         style="stop-color:#10becb;stop-opacity:0;"
-         offset="1"
-         id="stop3819" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3786">
-      <stop
-         style="stop-color:#1bb5b5;stop-opacity:1;"
-         offset="0"
-         id="stop3788" />
-      <stop
-         style="stop-color:#1bb5b5;stop-opacity:1;"
-         offset="1"
-         id="stop3790" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient3778">
-      <stop
-         style="stop-color:#12d5e4;stop-opacity:1;"
-         offset="0"
-         id="stop3780" />
-      <stop
-         style="stop-color:#12d5e4;stop-opacity:0;"
-         offset="1"
-         id="stop3782" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3778"
-       id="linearGradient3784"
-       x1="4.75"
-       y1="1022.8622"
-       x2="-0.25624609"
-       y2="1022.8622"
-       gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3777"

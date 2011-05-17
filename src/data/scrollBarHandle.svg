@@ -15,10 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.1 r9760"
-   sodipodi:docname="scrollBarHandle.svg"
-   inkscape:export-filename="scrollBarHandle.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   sodipodi:docname="scrollBarHandle.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -36,61 +33,6 @@
          offset="1"
          id="stop3843" />
     </linearGradient>
-    <linearGradient
-       id="linearGradient3815">
-      <stop
-         style="stop-color:#e7f4fe;stop-opacity:0;"
-         offset="0"
-         id="stop3817" />
-      <stop
-         id="stop3823"
-         offset="0.20003296"
-         style="stop-color:#47daff;stop-opacity:1;" />
-      <stop
-         style="stop-color:#47daff;stop-opacity:0.15789473;"
-         offset="0.82175958"
-         id="stop3827" />
-      <stop
-         id="stop3829"
-         offset="0.88407022"
-         style="stop-color:#47daff;stop-opacity:1;" />
-      <stop
-         style="stop-color:#e7f4fe;stop-opacity:0;"
-         offset="1"
-         id="stop3819" />
-    </linearGradient>
-    <linearGradient
-       id="linearGradient3786">
-      <stop
-         style="stop-color:#1bb5b5;stop-opacity:1;"
-         offset="0"
-         id="stop3788" />
-      <stop
-         style="stop-color:#1bb5b5;stop-opacity:1;"
-         offset="1"
-         id="stop3790" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient3778">
-      <stop
-         style="stop-color:#12d5e4;stop-opacity:1;"
-         offset="0"
-         id="stop3780" />
-      <stop
-         style="stop-color:#12d5e4;stop-opacity:0;"
-         offset="1"
-         id="stop3782" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3778"
-       id="linearGradient3784"
-       x1="4.75"
-       y1="1022.8622"
-       x2="-0.25624609"
-       y2="1022.8622"
-       gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3839"
