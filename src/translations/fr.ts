@@ -507,16 +507,8 @@ Acceptez-vous?</translation>
 <context>
     <name>ContactsWatcher</name>
     <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
-    <message>
         <source>Rename contact</source>
         <translation>Renommer contact</translation>
-    </message>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
     </message>
     <message>
         <source>Add a contact</source>
@@ -529,10 +521,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Enter the name for this contact.</source>
         <translation>Saisissez le nom pour ce contact.</translation>
-    </message>
-    <message>
-        <source>Do you want to remove %1 from your contact list?</source>
-        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
     <message>
         <source>Invitation from %1</source>
@@ -995,7 +983,11 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Do you want to remove %1 from your contact list?</source>
-        <translation type="unfinished">Voulez vous retirer %1 de votre liste de contacts ?</translation>
+        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
+    </message>
+    <message>
+        <source>Enter the name for this contact.</source>
+        <translation>Saisissez le nom pour ce contact.</translation>
     </message>
 </context>
 </TS>

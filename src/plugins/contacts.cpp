@@ -233,24 +233,6 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
     }
 }
 
-/** Prompt the user for confirmation then remove a contact.
- */
-void ContactsWatcher::removeContact()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    const QString bareJid = action->data().toString();
-    const QString contactName = chat->rosterModel()->contactName(bareJid);
-
-    if (QMessageBox::question(chat, tr("Remove contact"),
-        tr("Do you want to remove %1 from your contact list?").arg(contactName),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes)
-    {
-        chat->client()->rosterManager().removeItem(bareJid);
-    }
-}
-
 /** Prompt the user to rename a contact.
  */
 void ContactsWatcher::renameContact()
@@ -293,17 +275,6 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
     const int type = index.data(ChatRosterModel::TypeRole).toInt();
     
     QAction *action;
-    if (type == ChatRosterModel::Contact || type == ChatRosterModel::RoomMember)
-    {
-        const QString url = index.data(ChatRosterModel::UrlRole).toString();
-        if (!url.isEmpty())
-        {
-            action = menu->addAction(QIcon(":/diagnostics.png"), tr("Show profile"));
-            action->setData(url);
-            connect(action, SIGNAL(triggered()), this, SLOT(showContactPage()));
-        }
-    }
-
     if (type == ChatRosterModel::Contact)
     {
         const QString bareJid = index.data(ChatRosterModel::IdRole).toString();
@@ -311,10 +282,6 @@ void ContactsWatcher::rosterMenu(QMenu *menu, const QModelIndex &index)
         action = menu->addAction(QIcon(":/options.png"), tr("Rename contact"));
         action->setData(bareJid);
         connect(action, SIGNAL(triggered()), this, SLOT(renameContact()));
-
-        action = menu->addAction(QIcon(":/remove.png"), tr("Remove contact"));
-        action->setData(bareJid);
-        connect(action, SIGNAL(triggered()), this, SLOT(removeContact()));
     }
 }
 

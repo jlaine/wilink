@@ -43,7 +43,6 @@ private slots:
     void disconnected();
     void presenceHandled(QAbstractButton*);
     void presenceReceived(const QXmppPresence &presence);
-    void removeContact();
     void renameContact();
     void rosterClick(const QModelIndex &index);
     void rosterMenu(QMenu *menu, const QModelIndex &index);

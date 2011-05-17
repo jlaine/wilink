@@ -85,7 +85,10 @@ Column {
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(item.url);
                 } else if (item.action == 'rename') {
-                    console.log("rename " + item.jid + " " + client.rosterManager);
+                    if (window.question(qsTr("Rename contact"),
+                                        qsTr("Enter the name for this contact."))) {
+                        console.log("rename " + item.jid + " " + client.rosterManager);
+                    }
                 } else if (item.action == 'remove') {
                     if (window.question(qsTr("Remove contact"),
                                         qsTr("Do you want to remove %1 from your contact list?").replace('%1', item.name))) {
