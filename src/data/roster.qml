@@ -58,9 +58,15 @@ Column {
                 dialog.windowTitle = qsTr('Add a contact');
                 dialog.labelText = qsTr('Enter the address of the contact you want to add.');
                 dialog.textValue = '@' + window.objectName.split('@')[1];
-                if (dialog.exec()) {
-                    console.log("add item " + dialog.textValue);
+
+                var jid = '';
+                while (!jid.match(/^[^@/]+@[^@/]+$/)) {
+                    if (!dialog.exec())
+                        return;
+                    jid = dialog.textValue;
                 }
+                console.log("add " + jid);
+                client.rosterManager.subscribe(jid);
             }
 
             onItemClicked: {
