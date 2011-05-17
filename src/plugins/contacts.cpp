@@ -28,6 +28,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStatusBar>
 #include <QUrl>

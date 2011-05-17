@@ -21,12 +21,10 @@
 #define __WILINK_CONTACTS_H__
 
 #include <QObject>
-#include <QMessageBox>
 
 class Chat;
-class ChatClient;
-class QMenu;
-class QModelIndex;
+class QLabel;
+class QAbstractButton;
 class QPushButton;
 class QXmppPresence;
 
