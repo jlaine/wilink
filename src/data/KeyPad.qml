@@ -32,9 +32,17 @@ GridView {
         id: button
 
         border.width: 1
-        border.color: 'black'
-        width: grid.cellWidth
-        height: grid.cellHeight
+        border.color: '#adacab'
+        gradient: Gradient {
+            GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
+            GradientStop { id: stop2; position: 1.0; color: '#edeceb' }
+        }
+
+        color: '#edeceb'
+        width: grid.cellWidth - 6
+        height: grid.cellHeight - 6
+        radius: 5
+        smooth: true
 
         Text  {
             anchors.centerIn: parent
@@ -55,7 +63,9 @@ GridView {
 
         states: State {
             name: 'pressed'
-            PropertyChanges { target: button; border.color: '#5488bb'; color: 'lightsteelblue' }
+            PropertyChanges { target: button; border.color: '#b0e2ff' }
+            PropertyChanges { target: stop2;  color: '#b0e2ff' }
+            PropertyChanges { target: stop1;  color: '#ffffff' }
         }
     }
     model: ListModel {
