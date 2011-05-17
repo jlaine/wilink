@@ -21,8 +21,10 @@ import QtQuick 1.0
 
 GridView {
     id: grid
+
     cellWidth: 40
     cellHeight: 40
+    interactive: false
     width: cellWidth * 3
     height: cellHeight * 4
 
