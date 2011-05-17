@@ -44,15 +44,30 @@ Rectangle {
             color: '#ea2689d6'
             width: menuList.width - 1
             height: 20
-     
+
+            Image {
+                id: icon
+
+                anchors.left: parent.left
+                anchors.leftMargin: 4
+                anchors.verticalCenter: parent.verticalCenter
+                smooth: true
+                source: model.icon
+                width: 16
+                height: 16
+            }
+
             Text {
                 id: itemText
 
-                anchors.centerIn: parent
+                anchors.left: icon.right
+                anchors.leftMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
                 color: '#ffffff'
                 elide: Text.ElideRight
                 //font.pointSize: itemFontSize
-                text: title
+                text: model.text
+                width: parent.width
             }
 
             states: State {

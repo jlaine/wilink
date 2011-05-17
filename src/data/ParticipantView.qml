@@ -76,7 +76,10 @@ GridView {
                     // show context menu
                     menu.model.clear()
                     if (model.url != '')
-                        menu.model.append({'title': qsTr('Show profile'), 'url':model.url})
+                        menu.model.append({
+                            'icon': 'diagnostics.png',
+                            'text': qsTr('Show profile'),
+                            'url':model.url})
                     menu.x = item.x + mouse.x - menu.width + 16;
                     menu.y = item.y + mouse.y - 16;
                     menu.state = 'visible';

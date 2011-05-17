@@ -63,18 +63,21 @@ Column {
                 if (model.url != undefined && model.url != '') {
                     menu.model.append({
                         'action': 'profile',
-                        'title': qsTr('Show profile'),
+                        'icon': 'diagnostics.png',
+                        'text': qsTr('Show profile'),
                         'url': model.url});
                 }
                 menu.model.append({
                     'action': 'rename',
+                    'icon': 'options.png',
                     'name': model.name,
-                    'title': qsTr('Rename contact'),
+                    'text': qsTr('Rename contact'),
                     'jid': model.id});
                 menu.model.append({
                     'action': 'remove',
+                    'icon': 'remove.png',
                     'name': model.name,
-                    'title': qsTr('Remove contact'),
+                    'text': qsTr('Remove contact'),
                     'jid': model.id});
                 menu.x = 16;
                 menu.y = point.y - 16;
