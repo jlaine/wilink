@@ -161,14 +161,6 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
     }
 }
 
-QLabel *ContactsWatcher::tipLabel() const
-{
-    QLabel *tip = new QLabel(tr("<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>!").arg("https://www.wifirst.net/w/friends?from=wiLink"));
-    tip->setOpenExternalLinks(true);
-    tip->setWordWrap(true);
-    return tip;
-}
-
 // PLUGIN
 
 class ContactsPlugin : public ChatPlugin

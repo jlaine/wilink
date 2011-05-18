@@ -23,7 +23,6 @@
 #include <QObject>
 
 class Chat;
-class QLabel;
 class QAbstractButton;
 class QXmppPresence;
 
@@ -39,8 +38,6 @@ private slots:
     void presenceReceived(const QXmppPresence &presence);
 
 private:
-    QLabel *tipLabel() const;
-
     Chat *chat;
 };
 
