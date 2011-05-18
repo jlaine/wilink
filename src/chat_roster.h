@@ -22,12 +22,10 @@
 
 #include <QAbstractProxyModel>
 #include <QDeclarativeImageProvider>
-#include <QTreeView>
+#include <QSet>
 
 #include "chat_model.h"
 
-class QContextMenuEvent;
-class QMenu;
 class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
@@ -90,8 +88,6 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    QMimeData *mimeData(const QModelIndexList &indexes) const;
-    QStringList mimeTypes() const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
 
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
@@ -166,31 +162,6 @@ private:
     QString m_rosterRoot;
     QSet<QString> m_selection;
     QPersistentModelIndex m_sourceRoot;
-};
-
-class ChatRosterView : public QTreeView
-{
-    Q_OBJECT
-
-public:
-    ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
-    QModelIndex mapFromRoster(const QModelIndex &index);
-    void setExpanded(const QString &id, bool expanded);
-    QSize sizeHint() const;
-
-signals:
-    void itemMenu(QMenu *menu, const QModelIndex &index);
-
-public slots:
-    void setShowOfflineContacts(bool show);
-
-protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void resizeEvent(QResizeEvent *event);
-
-private:
-    ChatRosterModel *rosterModel;
-    QSortFilterProxyModel *sortedModel;
 };
 
 #endif

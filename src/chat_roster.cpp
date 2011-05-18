@@ -18,9 +18,7 @@
  */
 
 #include <QBuffer>
-#include <QContextMenuEvent>
 #include <QDebug>
-#include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
 #include <QImageReader>
@@ -45,13 +43,6 @@
 
 #include "application.h"
 #include "chat_roster.h"
-
-#ifdef WILINK_EMBEDDED
-#define FLAT_CONTACTS
-#define ICON_SIZE 32
-#else
-#define ICON_SIZE 24
-#endif
 
 static const QChar sortSeparator('\0');
 
@@ -289,15 +280,11 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     rootItem = new ChatRosterItem(ChatRosterModel::Other);
     d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
     ChatModel::addItem(d->ownItem, rootItem);
-#ifdef FLAT_CONTACTS
-    d->contactsItem = (ChatRosterItem*)rootItem;
-#else
     d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
     d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
     d->contactsItem->setData(Qt::DecorationRole, QIcon(":/peer.png"));
     ChatModel::addItem(d->contactsItem, rootItem);
-#endif
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
@@ -601,23 +588,6 @@ bool ChatRosterModel::isOwnNameReceived() const
 QString ChatRosterModel::ownName() const
 {
     return d->ownItem->data(NicknameRole).toString();
-}
-
-QMimeData *ChatRosterModel::mimeData(const QModelIndexList &indexes) const
-{
-    QList<QUrl> urls;
-    foreach (QModelIndex index, indexes)
-        if (index.isValid() && index.column() == ContactColumn)
-            urls << QUrl(index.data(ChatRosterModel::IdRole).toString());
-
-    QMimeData *mimeData = new QMimeData();
-    mimeData->setUrls(urls);
-    return mimeData;
-}
-
-QStringList ChatRosterModel::mimeTypes() const
-{
-    return QStringList() << "text/uri-list";
 }
 
 /** Handles an item being added to the roster.
@@ -993,104 +963,5 @@ void ChatRosterProxyModel::setSourceRoot(const QModelIndex &index)
 QStringList ChatRosterProxyModel::selectedJids() const
 {
     return m_selection.toList();
-}
-
-ChatRosterView::ChatRosterView(ChatRosterModel *model, QWidget *parent)
-    : QTreeView(parent), rosterModel(model)
-{
-    sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(model);
-    sortedModel->setDynamicSortFilter(true);
-    sortedModel->setFilterKeyColumn(SortingColumn);
-    setModel(sortedModel);
-
-    setAlternatingRowColors(true);
-    setColumnHidden(SortingColumn, true);
-    setColumnWidth(StatusColumn, ICON_SIZE + 8);
-    setContextMenuPolicy(Qt::DefaultContextMenu);
-    setAcceptDrops(true);
-    setAnimated(true);
-    setDragDropMode(QAbstractItemView::DragDrop);
-    setDragEnabled(true);
-    setDropIndicatorShown(false);
-    setHeaderHidden(true);
-    setIconSize(QSize(ICON_SIZE, ICON_SIZE));
-    setMinimumHeight(400);
-#ifdef FLAT_CONTACTS
-    setMinimumWidth(200);
-    setRootIsDecorated(false);
-#else
-    setMinimumWidth(250);
-#endif
-    setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::SingleSelection);
-    setSortingEnabled(true);
-    sortByColumn(SortingColumn, Qt::AscendingOrder);
-
-    // expand contacts
-    setExpanded(CONTACTS_ROSTER_ID, true);
-}
-
-void ChatRosterView::contextMenuEvent(QContextMenuEvent *event)
-{
-    const QModelIndex &index = currentIndex();
-    if (!index.isValid())
-        return;
-
-    // allow plugins to populate menu
-    QMenu *menu = new QMenu(this);
-    emit itemMenu(menu, index);
-
-    // FIXME : is there a better way to test if a menu is empty?
-    if (menu->sizeHint().height() > 4)
-        menu->popup(event->globalPos());
-    else
-        delete menu;
-}
-
-/** Map an index from the ChatRosterModel to the sorted / filtered model.
- *
- * @param index
- */
-QModelIndex ChatRosterView::mapFromRoster(const QModelIndex &index)
-{
-    return sortedModel->mapFromSource(index);
-}
-
-void ChatRosterView::resizeEvent(QResizeEvent *e)
-{
-    QTreeView::resizeEvent(e);
-    setColumnWidth(ContactColumn, e->size().width() - ICON_SIZE - 8);
-}
-
-void ChatRosterView::setShowOfflineContacts(bool show)
-{
-    if (show)
-        sortedModel->setFilterRegExp(QRegExp());
-    else
-        sortedModel->setFilterRegExp(QRegExp("^(?!offline).+"));
-}
-
-void ChatRosterView::setExpanded(const QString &id, bool expanded)
-{
-    QModelIndex rosterIndex = rosterModel->findItem(id);
-    if (rosterIndex.isValid())
-        QTreeView::setExpanded(sortedModel->mapFromSource(rosterIndex), expanded);
-}
-
-QSize ChatRosterView::sizeHint () const
-{
-    if (!model()->rowCount())
-        return QTreeView::sizeHint();
-
-    QSize hint(minimumWidth(), minimumHeight());
-    int rowCount = sortedModel->rowCount();
-#ifndef FLAT_CONTACTS
-    rowCount += sortedModel->rowCount(sortedModel->mapFromSource(rosterModel->contactsItem()));
-#endif
-    int rowHeight = rowCount * sizeHintForRow(0);
-    if (rowHeight > hint.height())
-        hint.setHeight(rowHeight);
-    return hint;
 }
 
