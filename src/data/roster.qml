@@ -105,6 +105,26 @@ Column {
         }
 
         Connections {
+            target: client.rosterManager
+            onSubscriptionReceived: {
+                var box = window.messageBox();
+                box.windowTitle = qsTr('Invitation from %1').replace('%1', bareJid);
+                box.text = qsTr('%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', bareJid);
+                box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+                if (box.exec() == QMessageBox.Yes) {
+                    // accept subscription
+                    client.rosterManager.acceptSubscription(bareJid);
+
+                    // request reciprocal subscription
+                    client.rosterManager.subscribe(bareJid);
+                } else {
+                    // refuse subscription
+                    client.rosterManager.refuseSubscription(bareJid);
+                }
+            }
+        }
+
+        Connections {
             target: menu
             onItemClicked: {
                 var item = menu.model.get(index);
