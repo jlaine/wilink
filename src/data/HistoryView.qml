@@ -33,7 +33,7 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.right
+        anchors.right: scrollBar.left
         cacheBuffer: 400
         delegate: historyDelegate
         header: Rectangle { height: 2 }
