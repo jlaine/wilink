@@ -103,7 +103,8 @@ public:
     ChatHistoryModelPrivate(ChatHistoryModel *qq);
     void rosterChanged(const QString &jid);
 
-    ChatRosterModel *rosterModel;
+    QAbstractItemModel *rosterModel;
+    QMap<QString, QString> rosterNames;
 
 private:
     ChatHistoryModel *q;
@@ -301,13 +302,21 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     } else if (role == DateRole) {
         return msg->date;
     } else if (role == FromRole) {
-        if (d->rosterModel) {
-            QModelIndex rosterIndex = d->rosterModel->findItem(msg->jid);
-            if (rosterIndex.isValid())
-                return rosterIndex.data(Qt::DisplayRole);
+        const QString jid = msg->jid;
+        if (!d->rosterNames.contains(jid)) {
+            // fallback for chat rooms
+            d->rosterNames[jid] = jidToResource(jid);
+            if (d->rosterModel) {
+                for (int i = 0; i < d->rosterModel->rowCount(); ++i) {
+                    const QModelIndex index = d->rosterModel->index(i, 0);
+                    if (index.data(ChatRosterModel::IdRole).toString() == jid) {
+                        d->rosterNames[jid] = index.data(Qt::DisplayRole).toString();
+                        break;
+                    }
+                }
+            }
         }
-        // fallback for chat rooms
-        return jidToResource(msg->jid);
+        return d->rosterNames.value(jid);
     } else if (role == HtmlRole) {
         const QString meName = data(index, FromRole).toString();
         QString bodies;
@@ -352,20 +361,20 @@ void ChatHistoryModel::rosterInserted(const QModelIndex &parent, int start, int 
     }
 }
 
-/** Returns the roster model.
+/** Returns the participant model.
  */
-ChatRosterModel *ChatHistoryModel::rosterModel()
+QAbstractItemModel *ChatHistoryModel::participantModel()
 {
     return d->rosterModel;
 }
 
-/** Sets the roster model.
+/** Sets the participant model.
  *
- * @param rosterModel
+ * @param participantModel
  */
-void ChatHistoryModel::setRosterModel(ChatRosterModel *rosterModel)
+void ChatHistoryModel::setParticipantModel(QAbstractItemModel *participantModel)
 {
-    d->rosterModel = rosterModel;
+    d->rosterModel = participantModel;
     connect(d->rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
             this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
     connect(d->rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),

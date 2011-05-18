@@ -50,6 +50,38 @@
 #define HISTORY_DAYS 14
 #endif
 
+class ChatDialogItem : public ChatModelItem
+{
+public:
+    QString jid;
+};
+
+
+class ChatDialogModel : public ChatModel
+{
+public:
+    ChatDialogModel(QObject *parent);
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+};
+
+ChatDialogModel::ChatDialogModel(QObject *parent)
+    : ChatModel(parent)
+{
+    rootItem = new ChatModelItem;
+
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(Qt::DisplayRole, "name");
+    roleNames.insert(ChatRosterModel::AvatarRole, "avatar");
+    roleNames.insert(ChatRosterModel::IdRole, "id");
+    setRoleNames(roleNames);
+}
+
+QVariant ChatDialogModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}
+
 ChatDialogHelper::ChatDialogHelper(QObject *parent)
     : QObject(parent),
     m_client(0),
@@ -169,7 +201,7 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
 
     // prepare models
     historyModel = new ChatHistoryModel(this);
-    historyModel->setRosterModel(rosterModel);
+    historyModel->setParticipantModel(rosterModel);
 
     ChatDialogHelper *helper = new ChatDialogHelper(this);
     helper->setClient(client);

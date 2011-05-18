@@ -382,11 +382,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     mucModel->setRoom(mucRoom);
 
     historyModel = new ChatHistoryModel(this);
-    historyModel->setRosterModel(rosterModel);
+    historyModel->setParticipantModel(mucModel);
 
-    ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(this);
-    roomModel->setSourceModel(rosterModel);
-    roomModel->setSourceRoot(rosterModel->findItem(mucRoom->jid()));
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(mucModel);
     sortedModel->setDynamicSortFilter(true);

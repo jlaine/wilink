@@ -72,8 +72,8 @@ public:
 
     ChatHistoryModel(QObject *parent = 0);
     void addMessage(const ChatMessage &message);
-    ChatRosterModel *rosterModel();
-    void setRosterModel(ChatRosterModel *rosterModel);
+    QAbstractItemModel *participantModel();
+    void setParticipantModel(QAbstractItemModel *rosterModel);
 
     // QAbstracItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
