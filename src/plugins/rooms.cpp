@@ -83,13 +83,10 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
 {
     // set role names
     QHash<int, QByteArray> roleNames;
-    roleNames.insert(Qt::DisplayRole, "name");
-    roleNames.insert(ChatRosterModel::AvatarRole, "avatar");
-    roleNames.insert(ChatRosterModel::IdRole, "id");
+    roleNames.insert(ChatModel::AvatarRole, "avatar");
+    roleNames.insert(ChatModel::JidRole, "id");
+    roleNames.insert(ChatModel::NameRole, "name");
     setRoleNames(roleNames);
-
-    // create root
-    rootItem = new ChatModelItem;
 }
 
 QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
@@ -98,12 +95,12 @@ QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == Qt::DisplayRole) {
-        return jidToResource(item->jid);
-    } else if (role == ChatRosterModel::AvatarRole) {
+    if (role == ChatModel::AvatarRole) {
         return VCardCache::instance()->imageUrl(item->jid);
-    } else if (role == ChatRosterModel::IdRole) {
+    } else if (role == ChatModel::JidRole) {
         return item->jid;
+    } else if (role == ChatModel::NameRole) {
+        return jidToResource(item->jid);
     }
 
     return QVariant();
@@ -568,7 +565,7 @@ void ChatRoom::customContextMenuRequested(const QPoint &pos)
         return;
 
     QMenu *menu = new QMenu;
-    const QString jid = index.data(ChatRosterModel::IdRole).toString();
+    const QString jid = index.data(ChatModel::JidRole).toString();
     if (mucRoom->allowedActions() & QXmppMucRoom::KickAction) {
         QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
         action->setData(jid);

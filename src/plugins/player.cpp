@@ -282,7 +282,6 @@ PlayerModel::PlayerModel(QObject *parent)
 {
     bool check;
     d = new PlayerModelPrivate(this);
-    rootItem = new Item;
 
     d->networkCache = new QNetworkDiskCache(this);
     d->networkCache->setCacheDirectory(wApp->cacheDirectory());

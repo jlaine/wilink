@@ -67,14 +67,6 @@ public:
 ChatDialogModel::ChatDialogModel(QObject *parent)
     : ChatModel(parent)
 {
-    rootItem = new ChatModelItem;
-
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(Qt::DisplayRole, "name");
-    roleNames.insert(ChatRosterModel::AvatarRole, "avatar");
-    roleNames.insert(ChatRosterModel::IdRole, "id");
-    setRoleNames(roleNames);
 }
 
 QVariant ChatDialogModel::data(const QModelIndex &index, int role) const
@@ -395,7 +387,7 @@ void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bo
     Q_ASSERT(topLeft.parent() == bottomRight.parent());
     const QModelIndex parent = topLeft.parent();
     for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        const QString jid = rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        const QString jid = rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
         if (jid == chatRemoteJid) {
             updateWindowTitle();
             break;

@@ -33,7 +33,7 @@ Column {
 
         Connections {
             onItemClicked: {
-                var url = 'xmpp://' + window.objectName + '/' + model.id + '?join';
+                var url = 'xmpp://' + window.objectName + '/' + model.jid + '?join';
                 Qt.openUrlExternally(url);
             }
         }
@@ -73,7 +73,7 @@ Column {
             }
 
             onItemClicked: {
-                var url = 'xmpp://' + window.objectName + '/' + model.id + '?message';
+                var url = 'xmpp://' + window.objectName + '/' + model.jid + '?message';
                 Qt.openUrlExternally(url);
             }
 
@@ -91,13 +91,13 @@ Column {
                     'icon': 'options.png',
                     'name': model.name,
                     'text': qsTr('Rename contact'),
-                    'jid': model.id});
+                    'jid': model.jid});
                 menu.model.append({
                     'action': 'remove',
                     'icon': 'remove.png',
                     'name': model.name,
                     'text': qsTr('Remove contact'),
-                    'jid': model.id});
+                    'jid': model.jid});
                 menu.x = 16;
                 menu.y = point.y - 16;
                 menu.state = 'visible';

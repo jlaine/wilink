@@ -60,12 +60,10 @@ class ChatHistoryModel : public ChatModel
 
 public:
     enum HistoryRole {
-        ActionRole = Qt::UserRole,
-        AvatarRole,
+        ActionRole = Qt::UserRole + 10,
         BodyRole,
         DateRole,
         FromRole,
-        JidRole,
         HtmlRole,
         ReceivedRole,
     };

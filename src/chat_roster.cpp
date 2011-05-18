@@ -281,12 +281,10 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 
     d->client = xmppClient;
     d->nickNameReceived = false;
-    rootItem = new ChatRosterItem(ChatRosterModel::Other);
     d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
     ChatModel::addItem(d->ownItem, rootItem);
     d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
-    d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
     ChatModel::addItem(d->contactsItem, rootItem);
 
     bool check;

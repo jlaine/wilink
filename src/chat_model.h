@@ -44,6 +44,12 @@ class ChatModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    enum Role {
+        NameRole = Qt::DisplayRole,
+        JidRole = Qt::UserRole,
+        AvatarRole,
+    };
+
     ChatModel(QObject *parent);
     ~ChatModel();
 

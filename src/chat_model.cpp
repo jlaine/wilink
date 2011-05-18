@@ -40,6 +40,15 @@ int ChatModelItem::row() const
 ChatModel::ChatModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatModel::AvatarRole, "avatar");
+    roleNames.insert(ChatModel::JidRole, "jid");
+    roleNames.insert(ChatModel::NameRole, "name");
+    setRoleNames(roleNames);
+
+    // create rool
+    rootItem = new ChatModelItem;
 }
 
 ChatModel::~ChatModel()

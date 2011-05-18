@@ -138,8 +138,6 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
 {
     d = new ChatHistoryModelPrivate(this);
 
-    rootItem = new ChatHistoryItem;
-
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(ActionRole, "action");
@@ -309,7 +307,7 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
             if (d->rosterModel) {
                 for (int i = 0; i < d->rosterModel->rowCount(); ++i) {
                     const QModelIndex index = d->rosterModel->index(i, 0);
-                    if (index.data(ChatRosterModel::IdRole).toString() == jid) {
+                    if (index.data(ChatModel::JidRole).toString() == jid) {
                         d->rosterNames[jid] = index.data(Qt::DisplayRole).toString();
                         break;
                     }
@@ -342,7 +340,7 @@ void ChatHistoryModel::rosterChanged(const QModelIndex &topLeft, const QModelInd
     Q_ASSERT(topLeft.parent() == bottomRight.parent());
     const QModelIndex parent = topLeft.parent();
     for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
         d->rosterChanged(jid);
     }
 }

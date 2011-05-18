@@ -408,13 +408,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatRosterModel</name>
-    <message>
-        <source>My contacts</source>
-        <translation>Mes contacts</translation>
-    </message>
-</context>
-<context>
     <name>ChatSearchBar</name>
     <message>
         <source>Match case</source>
