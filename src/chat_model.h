@@ -50,6 +50,7 @@ public:
     virtual QModelIndex findItem(const QString &id, const QModelIndex &parent = QModelIndex()) const;
 
     // QAbstractItemModel
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());

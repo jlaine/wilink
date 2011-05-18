@@ -83,18 +83,36 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
 {
     // set role names
     QHash<int, QByteArray> roleNames;
+    roleNames.insert(Qt::DisplayRole, "name");
     roleNames.insert(ChatRosterModel::AvatarRole, "avatar");
     roleNames.insert(ChatRosterModel::IdRole, "id");
-    roleNames.insert(Qt::DisplayRole, "name");
+    setRoleNames(roleNames);
 
     // create root
     rootItem = new ChatModelItem;
 }
 
+QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
+{
+    ChatRoomItem *item = static_cast<ChatRoomItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == Qt::DisplayRole) {
+        return jidToResource(item->jid);
+    } else if (role == ChatRosterModel::AvatarRole) {
+        return QUrl("qrc:/peer.png");
+    } else if (role == ChatRosterModel::IdRole) {
+        return item->jid;
+    }
+
+    return QVariant();
+}
+
 void ChatRoomModel::participantAdded(const QString &jid)
 {
     Q_ASSERT(m_room);
-    qDebug("participant added %s", qPrintable(jid));
+    //qDebug("participant added %s", qPrintable(jid));
 
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
@@ -112,7 +130,7 @@ void ChatRoomModel::participantAdded(const QString &jid)
 void ChatRoomModel::participantChanged(const QString &jid)
 {
     Q_ASSERT(m_room);
-    qDebug("participant changed %s", qPrintable(jid));
+    //qDebug("participant changed %s", qPrintable(jid));
 
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
@@ -128,7 +146,7 @@ void ChatRoomModel::participantChanged(const QString &jid)
 void ChatRoomModel::participantRemoved(const QString &jid)
 {
     Q_ASSERT(m_room);
-    qDebug("participant removed %s", qPrintable(jid));
+    //qDebug("participant removed %s", qPrintable(jid));
 
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
@@ -360,6 +378,9 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     // prepare models
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
+    ChatRoomModel *mucModel = new ChatRoomModel(this);
+    mucModel->setRoom(mucRoom);
+
     historyModel = new ChatHistoryModel(this);
     historyModel->setRosterModel(rosterModel);
 
@@ -367,7 +388,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     roomModel->setSourceModel(rosterModel);
     roomModel->setSourceRoot(rosterModel->findItem(mucRoom->jid()));
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(roomModel);
+    sortedModel->setSourceModel(mucModel);
     sortedModel->setDynamicSortFilter(true);
     sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->sort(0);

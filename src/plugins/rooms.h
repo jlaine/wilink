@@ -63,6 +63,8 @@ class ChatRoomModel : public ChatModel
 public:
     ChatRoomModel(QObject *parent = 0);
 
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
     QXmppMucRoom *room() const;
     void setRoom(QXmppMucRoom *room);
 

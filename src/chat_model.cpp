@@ -58,6 +58,12 @@ void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
     endInsertRows();
 }
 
+int ChatModel::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return 1;
+}
+
 QModelIndex ChatModel::createIndex(ChatModelItem *item, int column) const
 {
     if (item && item != rootItem)
