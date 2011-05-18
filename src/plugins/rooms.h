@@ -32,6 +32,7 @@ class ChatClient;
 class ChatHistoryModel;
 class ChatMessage;
 class ChatRoom;
+class RoomListModel;
 class ChatRosterModel;
 class ChatRosterProxyModel;
 class QDeclarativeView;
@@ -99,6 +100,7 @@ private slots:
 
 private:
     Chat *chat;
+    RoomListModel *roomModel;
     QXmppMucManager *mucManager;
     QString chatRoomServer;
     QPushButton *roomButton;

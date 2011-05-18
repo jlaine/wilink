@@ -70,6 +70,66 @@ enum MembersColumns {
     AffiliationColumn,
 };
 
+class RoomListItem : public ChatModelItem
+{
+public:
+    QString jid;
+};
+
+class RoomListModel : public ChatModel
+{
+public:
+    RoomListModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const;
+    void addRoom(const QString &jid);
+    void removeRoom(const QString &jid);
+};
+
+RoomListModel::RoomListModel(QObject *parent)
+    : ChatModel(parent)
+{
+}
+
+QVariant RoomListModel::data(const QModelIndex &index, int role) const
+{
+    RoomListItem *item = static_cast<RoomListItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == ChatModel::AvatarRole) {
+        return QUrl("qrc:/chat.png");
+    } else if (role == ChatModel::JidRole) {
+        return item->jid;
+    } else if (role == ChatModel::NameRole) {
+        return jidToUser(item->jid);
+    }
+
+    return QVariant();
+}
+
+void RoomListModel::addRoom(const QString &jid)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomListItem *item = static_cast<RoomListItem*>(ptr);
+        if (item->jid == jid)
+            return;
+    }
+    RoomListItem *item = new RoomListItem;
+    item->jid = jid;
+    addItem(item, rootItem, rootItem->children.size());
+}
+
+void RoomListModel::removeRoom(const QString &jid)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomListItem *item = static_cast<RoomListItem*>(ptr);
+        if (item->jid == jid) {
+            removeItem(item);
+            break;
+        }
+    }
+}
+
 class ChatRoomItem : public ChatModelItem
 {
 public:
@@ -212,6 +272,10 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     Q_ASSERT(check);
 
     // add roster hooks
+    roomModel = new RoomListModel(this);
+    QDeclarativeContext *context = chat->rosterView()->rootContext();
+    context->setContextProperty("roomModel", roomModel);
+
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
@@ -248,23 +312,8 @@ ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
     ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
     if (!room) {
-        ChatRosterModel *model = chat->rosterModel();
-
         // add "rooms" item
-        QModelIndex roomsIndex = model->findItem(ROOMS_ROSTER_ID);
-        if (!roomsIndex.isValid()) {
-            roomsIndex = model->addItem(ChatRosterModel::Other, ROOMS_ROSTER_ID,
-                                        tr("My rooms"), QPixmap(":/chat.png"));
-
-            ChatRosterProxyModel *roomModel = new ChatRosterProxyModel(this);
-            roomModel->setSourceModel(model);
-            roomModel->setSourceRoot(roomsIndex);
-
-            QDeclarativeContext *context = chat->rosterView()->rootContext();
-            context->setContextProperty("roomModel", roomModel);
-        }
-        model->addItem(ChatRosterModel::Room, jid,
-                       jidToUser(jid), QPixmap(":/chat.png"), roomsIndex);
+        roomModel->addRoom(jid);
 
         // add panel
         room = new ChatRoom(chat, chat->rosterModel(), jid);
@@ -363,7 +412,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     QXmppClient *client = chat->client();
 
     setObjectName(jid);
-    setWindowTitle(rosterModel->contactName(jid));
+    setWindowTitle(jidToUser(jid));
     setWindowIcon(QIcon(":/chat.png"));
 
     // prepare models
@@ -388,8 +437,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     layout->addLayout(headerLayout());
 
     // chat history
-    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
-    imageProvider->setRosterModel(rosterModel);
 
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
@@ -398,7 +445,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
 
-    historyView->engine()->addImageProvider("roster", imageProvider);
+    historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));
 
@@ -581,9 +628,6 @@ void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     // notify user of received messages if the room is not publicly listed
     if (disco.features().contains("muc_hidden"))
         notifyMessages = true;
-
-    // update window title
-    setWindowTitle(rosterModel->contactName(mucRoom->jid()));
 }
 
 /** Handle an error.
@@ -674,10 +718,12 @@ void ChatRoom::kickUser()
  */
 void ChatRoom::left()
 {
-    // remove room from roster unless it's persistent
+    // FIXME: remove room from roster unless it's persistent
+#if 0
     QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
     if (!roomIndex.data(ChatRosterModel::PersistentRole).toBool())
         rosterModel->removeRow(roomIndex.row(), roomIndex.parent());
+#endif
 
     // destroy window
     deleteLater();

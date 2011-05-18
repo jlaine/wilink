@@ -56,7 +56,6 @@ public:
     QString jid;
 };
 
-
 class ChatDialogModel : public ChatModel
 {
 public:
@@ -207,16 +206,13 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     layout->addLayout(headerLayout());
 
     // chat history
-    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
-    imageProvider->setRosterModel(rosterModel);
-
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
     context->setContextProperty("conversationHasState", true);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", qVariantFromValue<QObject*>(0));
-    historyView->engine()->addImageProvider("roster", imageProvider);
+    historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));
     layout->addWidget(historyView);

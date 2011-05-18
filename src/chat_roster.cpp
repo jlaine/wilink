@@ -135,14 +135,12 @@ enum ChatRosterModel::Type ChatRosterItem::type() const
 }
 
 ChatRosterImageProvider::ChatRosterImageProvider()
-    : QDeclarativeImageProvider(Pixmap),
-    m_rosterModel(0)
+    : QDeclarativeImageProvider(Pixmap)
 {
 }
 
 QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    Q_ASSERT(m_rosterModel);
     QPixmap pixmap;
 
     // read vCard image
@@ -166,11 +164,6 @@ QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, c
     if (size)
         *size = pixmap.size();
     return pixmap;
-}
-
-void ChatRosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
-{
-    m_rosterModel = rosterModel;
 }
 
 static void paintMessages(QPixmap &icon, int messages)
