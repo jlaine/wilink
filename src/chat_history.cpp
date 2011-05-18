@@ -354,7 +354,7 @@ void ChatHistoryModel::rosterChanged(const QModelIndex &topLeft, const QModelInd
 void ChatHistoryModel::rosterInserted(const QModelIndex &parent, int start, int end)
 {
     for (int i = start; i <= end; ++i) {
-        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
         d->rosterChanged(jid);
     }
 }

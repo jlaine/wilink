@@ -269,7 +269,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(AvatarRole, "avatar");
-    roleNames.insert(IdRole, "id");
+    roleNames.insert(JidRole, "jid");
     roleNames.insert(Qt::DisplayRole, "name");
     roleNames.insert(UrlRole, "url");
     setRoleNames(roleNames);
@@ -419,12 +419,14 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     QString bareJid = item->id();
     int messages = item->data(MessagesRole).toInt();
 
-    if (role == IdRole) {
+    if (role == JidRole) {
         return bareJid;
     } else if (role == TypeRole) {
         return item->type();
     } else if (role == AvatarRole) {
         return VCardCache::instance()->imageUrl(bareJid);
+    } else if (role == UrlRole) {
+        return VCardCache::instance()->profileUrl(bareJid);
     } else if (role == StatusRole && item->type() == ChatRosterModel::Contact) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
@@ -687,11 +689,6 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
             item->setData(Qt::DisplayRole, vcard.fullName());
     }
 
-    // store vCard URL
-    const QString url = vcard.url();
-    if (!url.isEmpty())
-        item->setData(UrlRole, vcard.url());
-
     emit dataChanged(createIndex(item, ContactColumn),
                      createIndex(item, SortingColumn));
 
@@ -789,7 +786,7 @@ QVariant ChatRosterProxyModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::CheckStateRole && index.isValid() && !index.column())
     {
-        const QString jid = index.data(ChatRosterModel::IdRole).toString();
+        const QString jid = index.data(ChatModel::JidRole).toString();
         return m_selection.contains(jid) ? Qt::Checked : Qt::Unchecked;
     } else {
         return QAbstractProxyModel::data(index, role);
@@ -855,7 +852,7 @@ bool ChatRosterProxyModel::setData(const QModelIndex &index, const QVariant &val
 {
     if (role == Qt::CheckStateRole && index.isValid() && !index.column())
     {
-        const QString jid = index.data(ChatRosterModel::IdRole).toString();
+        const QString jid = index.data(ChatModel::JidRole).toString();
         if (value.toInt() == Qt::Checked)
             m_selection += jid;
         else
@@ -938,9 +935,17 @@ QUrl VCardCache::imageUrl(const QString &jid)
 {
     if (get(jid))
         return QUrl("image://roster/" + jid);
-    if (m_manager)
-        m_manager->requestVCard(jid);
-    return QUrl("qrc:/peer.png");
+    else
+        return QUrl("qrc:/peer.png");
+}
+
+QUrl VCardCache::profileUrl(const QString &jid)
+{
+    QXmppVCardIq vcard;
+    if (get(jid, &vcard))
+        return QUrl(vcard.url());
+    else
+        return QUrl();
 }
 
 VCardCache *VCardCache::instance()

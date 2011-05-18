@@ -58,9 +58,7 @@ class ChatRosterModel : public ChatModel
 
 public:
     enum Role {
-        IdRole = Qt::UserRole,
-        TypeRole,
-        AvatarRole,
+        TypeRole = Qt::UserRole + 10,
         NicknameRole,
         MessagesRole,
         PersistentRole,
@@ -186,6 +184,7 @@ signals:
 public slots:
     bool get(const QString &jid, QXmppVCardIq *iq = 0);
     QUrl imageUrl(const QString &jid);
+    QUrl profileUrl(const QString &jid);
 
 private slots:
     void vCardReceived(const QXmppVCardIq&);

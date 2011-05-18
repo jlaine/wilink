@@ -81,12 +81,6 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ChatModel::AvatarRole, "avatar");
-    roleNames.insert(ChatModel::JidRole, "id");
-    roleNames.insert(ChatModel::NameRole, "name");
-    setRoleNames(roleNames);
 }
 
 QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
