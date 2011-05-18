@@ -71,6 +71,12 @@ Item {
             width: Math.max(desiredHeight, 20)
             x: Math.floor(scrollBar.position * (track.width + desiredHeight - width - 2)) + 1
             y: 0
+
+            states: State {
+                name: 'pressed'
+                PropertyChanges { target: handleStop2; color: '#7ac6d8' }
+                PropertyChanges { target: handle; border.color: '#5fb0c3' }
+            }
         }
     }
 
@@ -84,6 +90,7 @@ Item {
         width: parent.width - 1
 
         Text {
+            id: textButtonUp
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.rightMargin: 1
@@ -113,6 +120,7 @@ Item {
         states: State {
             name: 'pressed'
             PropertyChanges { target: buttonUp; color: '#ffffff' }
+            PropertyChanges { target: textButtonUp; color: '#5fb0c3' }
         }
     }
 
@@ -127,6 +135,7 @@ Item {
         width: parent.width - 1
 
         Text {
+            id: textButtonDown
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.rightMargin: 1
@@ -155,6 +164,7 @@ Item {
         states: State {
             name: 'pressed'
             PropertyChanges { target: buttonDown; color: '#ffffff' }
+            PropertyChanges { target: textButtonDown; color: '#5fb0c3' }
         }
     }
 
