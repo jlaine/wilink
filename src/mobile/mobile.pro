@@ -32,7 +32,6 @@ SOURCES += \
     ../plugins/calls.cpp \
     ../plugins/chats.cpp \
     ../plugins/console.cpp \
-    ../plugins/contacts.cpp \
     ../plugins/declarative.cpp \
     ../plugins/phone.cpp \
     ../plugins/phone/models.cpp \
@@ -63,7 +62,6 @@ HEADERS += \
     ../updatesdialog.h \
     ../plugins/calls.h \
     ../plugins/chats.h \
-    ../plugins/contacts.h \
     ../plugins/console.h \
     ../plugins/declarative.h \
     ../plugins/photos.h \

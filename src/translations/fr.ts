@@ -501,21 +501,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ContactsWatcher</name>
-    <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-    <message>
-        <source>%1 has asked to add you to his or her contact list.
-
-Do you accept?</source>
-        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
-
-Acceptez-vous?</translation>
-    </message>
-</context>
-<context>
     <name>DiagnosticsPanel</name>
     <message>
         <source>Refresh</source>

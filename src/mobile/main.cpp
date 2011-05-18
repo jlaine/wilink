@@ -28,7 +28,6 @@ Q_IMPORT_PLUGIN(console)
 Q_IMPORT_PLUGIN(phone)
 Q_IMPORT_PLUGIN(rooms)
 Q_IMPORT_PLUGIN(transfers)
-Q_IMPORT_PLUGIN(contacts)
 
 int main(int argc, char *argv[])
 {

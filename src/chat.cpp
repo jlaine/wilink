@@ -145,9 +145,15 @@ Chat::Chat(QWidget *parent)
     leftLayout->addWidget(d->rosterView);
 #endif
 
+    // prepare models
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     imageProvider->setRosterModel(d->rosterModel);
 
+    ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
+    contactModel->setSourceModel(d->rosterModel);
+    contactModel->setSourceRoot(d->rosterModel->contactsItem());
+
+    // create declarative view
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(200);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
@@ -155,6 +161,7 @@ Chat::Chat(QWidget *parent)
 
     QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("client", new QXmppDeclarativeClient(d->client));
+    context->setContextProperty("contactModel", contactModel);
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
