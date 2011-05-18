@@ -689,24 +689,6 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &id, const QString &name)
-{
-    // check the item does not already exist
-    ChatRosterItem *item = d->find(id);
-    if (item)
-        return createIndex(item, 0);
-
-    // add item
-    item = new ChatRosterItem(type);
-    item->setId(id);
-    if (!name.isEmpty())
-        item->setData(Qt::DisplayRole, name);
-
-    ChatModel::addItem(item, rootItem);
-
-    return createIndex(item, 0);
-}
-
 void ChatRosterModel::clearPendingMessages(const QString &bareJid)
 {
     ChatRosterItem *item = d->find(bareJid);

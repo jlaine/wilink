@@ -93,7 +93,6 @@ public:
     bool isOwnNameReceived() const;
     QString ownName() const;
 
-    QModelIndex addItem(ChatRosterModel::Type type, const QString &id, const QString &name = QString());
     QModelIndex findItem(const QString &jid, const QModelIndex &parent = QModelIndex()) const;
 
     void addPendingMessage(const QString &bareJid);
