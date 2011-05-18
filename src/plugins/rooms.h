@@ -113,7 +113,6 @@ class ChatRoom : public ChatPanel
 
 public:
     ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
-    void invite(const QString &jid);
 
 public slots:
     void bookmark();

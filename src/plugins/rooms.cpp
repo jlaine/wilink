@@ -641,20 +641,6 @@ void ChatRoom::error(const QXmppStanza::Error &error)
             .arg(error.text()));
 }
 
-/** Invite a user to the chat room.
- */
-void ChatRoom::invite(const QString &jid)
-{
-    if (!mucRoom->sendInvitation(jid, "Let's talk"))
-        return;
-
-    // notify user
-    queueNotification(tr("%1 has been invited to %2")
-        .arg(rosterModel->contactName(jid))
-        .arg(jidToUser(mucRoom->jid())),
-        ForceNotification);
-}
-
 /** Select users to invite the chat room.
  */
 void ChatRoom::inviteDialog()
@@ -892,7 +878,7 @@ void ChatRoomInvite::submit()
 #if 0
             queueNotification(tr("%1 has been invited to %2")
                 .arg(rosterModel->contactName(jid))
-                .arg(rosterModel->contactName(mucRoom->jid())),
+                .arg(jidToUser(mucRoom->jid())),
                 ForceNotification);
 #endif
         }

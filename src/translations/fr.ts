@@ -268,7 +268,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>%1 has been invited to %2</source>
-        <translation>%1 a été invité(e) à %2</translation>
+        <translation type="obsolete">%1 a été invité(e) à %2</translation>
     </message>
     <message>
         <source>Sorry, but you cannot join chat room &apos;%1&apos;.
