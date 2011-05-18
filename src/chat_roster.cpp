@@ -364,10 +364,6 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     if (bareJid.isEmpty())
         return jids;
 
-    ChatRosterItem *item = d->find(bareJid);
-    if (item && item->type() != ChatRosterModel::Contact && item->type() != ChatRosterModel::RoomMember)
-        return jids;
-
     if (jidToResource(bareJid).isEmpty())
     {
         const QString sought = bareJid + "/";
@@ -453,35 +449,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return statusType;
     } else if (role == Qt::DisplayRole && index.column() == StatusColumn) {
         return QVariant();
-    } else if(role == Qt::FontRole && index.column() == ContactColumn) {
-        if (messages)
-            return QFont("", -1, QFont::Bold, true);
-    } else if(role == Qt::BackgroundRole && index.column() == ContactColumn) {
-        if (messages)
-        {
-            QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
-            grad.setColorAt(0, QColor(255, 0, 0, 144));
-            grad.setColorAt(1, Qt::transparent);
-            grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-            return QBrush(grad);
-        }
-    } else {
-        if (item->type() == ChatRosterModel::Contact || item->type() == ChatRosterModel::RoomMember)
-        {
-            if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
-            }
-        } else if (item->type() == ChatRosterModel::Room) {
-            if (role == Qt::DisplayRole && index.column() == ContactColumn && item->children.size() > 0) {
-                return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->children.size()));
-            } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return QLatin1String("chatroom") + QString::number(!item->data(PersistentRole).toInt()) + sortSeparator + bareJid.toLower();
-            }
-        } else {
-            if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-                return bareJid;
-            }
-        }
+    } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+        return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
     }
 
     return item->data(role);
@@ -975,6 +944,7 @@ QUrl VCardCache::imageUrl(const QString &jid)
         m_manager->requestVCard(jid);
     return QUrl("qrc:/peer.png");
 }
+
 VCardCache *VCardCache::instance()
 {
     if (!vcardCache)
