@@ -180,6 +180,7 @@ public:
     static VCardCache *instance();
 
 signals:
+    void cardChanged(const QString &jid);
     void managerChanged(QXmppVCardManager *manager);
 
 public slots:
@@ -192,6 +193,8 @@ private slots:
 private:
     QNetworkDiskCache *m_cache;
     QXmppVCardManager *m_manager;
+    QSet<QString> m_failed;
+    QSet<QString> m_queue;
 };
 
 #endif

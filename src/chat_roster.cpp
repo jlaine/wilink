@@ -143,28 +143,29 @@ ChatRosterImageProvider::ChatRosterImageProvider()
 QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize)
 {
     Q_ASSERT(m_rosterModel);
-
-    // exact roster entry or by bare jid
-    QModelIndex index = m_rosterModel->findItem(id);
-    if (!index.isValid())
-        index = m_rosterModel->findItem(jidToBareJid(id));
     QPixmap pixmap;
-    if (index.isValid()) {
-        ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
-        pixmap = item->data(Qt::DecorationRole).value<QPixmap>();
+
+    // read vCard image
+    QXmppVCardIq vcard;
+    if (VCardCache::instance()->get(id, &vcard)) {
+        QBuffer buffer;
+        buffer.setData(vcard.photo());
+        buffer.open(QIODevice::ReadOnly);
+        QImageReader imageReader(&buffer);
+        if (requestedSize.isValid())
+            imageReader.setScaledSize(requestedSize);
+        pixmap = QPixmap::fromImage(imageReader.read());
     }
     if (pixmap.isNull()) {
         qWarning("Could not get roster picture for %s", qPrintable(id));
         pixmap = QPixmap(":/peer.png");
+        if (requestedSize.isValid())
+            pixmap = pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
     }
 
-    // scale
     if (size)
         *size = pixmap.size();
-    if (requestedSize.isValid())
-        return pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
-    else
-        return pixmap;
+    return pixmap;
 }
 
 void ChatRosterImageProvider::setRosterModel(ChatRosterModel *rosterModel)
@@ -233,10 +234,8 @@ int ChatRosterModelPrivate::countPendingMessages()
 void ChatRosterModelPrivate::fetchVCard(const QString &jid)
 {
     QXmppVCardIq vCard;
-    if (readIq(cache, QString("xmpp:%1?vcard").arg(jid), &vCard))
+    if (VCardCache::instance()->get(jid, &vCard));
         q->vCardFound(vCard);
-    else
-        client->vCardManager().requestVCard(jid);
 }
 
 ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatRosterItem *parent)
@@ -276,6 +275,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     setRoleNames(roleNames);
 
     /* get cache */
+    VCardCache::instance()->setManager(&xmppClient->vCardManager());
     d->cache = new QNetworkDiskCache(this);
     d->cache->setCacheDirectory(wApp->cacheDirectory());
 
@@ -287,7 +287,6 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
     d->contactsItem->setId(CONTACTS_ROSTER_ID);
     d->contactsItem->setData(Qt::DisplayRole, tr("My contacts"));
-    d->contactsItem->setData(Qt::DecorationRole, QIcon(":/peer.png"));
     ChatModel::addItem(d->contactsItem, rootItem);
 
     bool check;
@@ -469,26 +468,12 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else {
         if (item->type() == ChatRosterModel::Contact || item->type() == ChatRosterModel::RoomMember)
         {
-            if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap pixmap = item->data(role).value<QPixmap>();
-                if (pixmap.isNull())
-                    pixmap = QPixmap(":/peer.png");
-                if (messages)
-                    paintMessages(pixmap, messages);
-                return QIcon(pixmap);
-            } else if (role == Qt::DecorationRole && index.column() == StatusColumn) {
-                return QIcon(QString(":/contact-%1.png").arg(contactStatus(index)));
-            } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
+            if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
             }
         } else if (item->type() == ChatRosterModel::Room) {
             if (role == Qt::DisplayRole && index.column() == ContactColumn && item->children.size() > 0) {
                 return QString("%1 (%2)").arg(item->data(role).toString(), QString::number(item->children.size()));
-            } else if (role == Qt::DecorationRole && index.column() == ContactColumn) {
-                QPixmap icon(item->data(role).value<QPixmap>());
-                if (messages)
-                    paintMessages(icon, messages);
-                return QIcon(icon);
             } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
                 return QLatin1String("chatroom") + QString::number(!item->data(PersistentRole).toInt()) + sortSeparator + bareJid.toLower();
             }
@@ -498,8 +483,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
             }
         }
     }
-    if (role == Qt::DecorationRole && index.column() == StatusColumn)
-        return QVariant();
 
     return item->data(role);
 }
@@ -723,14 +706,6 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
     if (!item)
         return;
 
-    // read vCard image
-    QBuffer buffer;
-    buffer.setData(vcard.photo());
-    buffer.open(QIODevice::ReadOnly);
-    QImageReader imageReader(&buffer);
-    imageReader.setScaledSize(QSize(32, 32));
-    item->setData(Qt::DecorationRole, QPixmap::fromImage(imageReader.read()));
-
     // store the nickName
     if (!vcard.nickName().isEmpty())
          item->setData(NicknameRole, vcard.nickName());
@@ -799,16 +774,8 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     item->setId(id);
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
-    if (!pixmap.isNull())
-        item->setData(Qt::DecorationRole, pixmap);
 
     ChatModel::addItem(item, parentItem);
-
-    // fetch vCard
-    if (type == ChatRosterModel::Contact || type == ChatRosterModel::RoomMember) {
-        VCardCache::instance()->get(item->id());
-        d->fetchVCard(item->id());
-    }
 
     return createIndex(item, 0);
 }
@@ -987,10 +954,16 @@ VCardCache::VCardCache(QObject *parent)
 
 bool VCardCache::get(const QString &jid, QXmppVCardIq *iq)
 {
+    if (m_queue.contains(jid) || m_failed.contains(jid))
+        return false;
+
     if (readIq(m_cache, QString("xmpp:%1?vcard").arg(jid), iq))
         return true;
-    if (m_manager)
+    if (m_manager) {
+        qDebug("requesting vCard %s", qPrintable(jid));
+        m_queue.insert(jid);
         m_manager->requestVCard(jid);
+    }
     return false;
 }
 
@@ -1021,6 +994,7 @@ void VCardCache::setManager(QXmppVCardManager* manager)
     if (manager == m_manager)
         return;
 
+    Q_ASSERT(manager);
     m_manager = manager;
 
     check = connect(m_manager, SIGNAL(vCardReceived(QXmppVCardIq)),
@@ -1032,9 +1006,18 @@ void VCardCache::setManager(QXmppVCardManager* manager)
 
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
 {
-    if (vCard.type() != QXmppIq::Result)
+    const QString jid = vCard.from();
+    if (!m_queue.remove(jid))
         return;
 
-    writeIq(m_cache, QString("xmpp:%1?vcard").arg(vCard.from()), vCard, 3600);
+    if (vCard.type() == QXmppIq::Result) {
+        qDebug("received vCard %s", qPrintable(jid));
+        m_failed.remove(jid);
+        writeIq(m_cache, QString("xmpp:%1?vcard").arg(jid), vCard, 3600);
+        emit cardChanged(jid);
+    } else if (vCard.type() == QXmppIq::Error) {
+        qDebug("failed vCard %s", qPrintable(jid));
+        m_failed.insert(jid);
+    }
 }
 
