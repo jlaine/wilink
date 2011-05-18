@@ -46,12 +46,44 @@
 
 static const QChar sortSeparator('\0');
 
+static VCardCache *vcardCache = 0;
+
 enum RosterColumns {
     ContactColumn = 0,
     StatusColumn,
     SortingColumn,
     MaxColumn,
 };
+
+// Try to read an IQ from disk cache.
+template <class T>
+bool readIq(QAbstractNetworkCache *cache, const QUrl &url, T *iq)
+{
+    QIODevice *ioDevice = cache->data(url);
+    if (!ioDevice)
+        return false;
+
+    if (iq) {
+        QDomDocument doc;
+        doc.setContent(ioDevice);
+        iq->parse(doc.documentElement());
+    }
+    delete ioDevice;
+    return true;
+}
+
+// Write an IQ to disk cache.
+template <class T>
+void writeIq(QAbstractNetworkCache *cache, const QUrl &url, const T &iq, int cacheSeconds)
+{
+    QNetworkCacheMetaData metaData;
+    metaData.setUrl(url);
+    metaData.setExpirationDate(QDateTime::currentDateTime().addSecs(cacheSeconds));
+    QIODevice *ioDevice = cache->prepare(metaData);
+    QXmlStreamWriter writer(ioDevice);
+    iq.toXml(&writer);
+    cache->insert(ioDevice);
+}
 
 class ChatRosterItem : public ChatModelItem
 {
@@ -172,34 +204,6 @@ public:
     void fetchVCard(const QString &jid);
     ChatRosterItem* find(const QString &id, ChatRosterItem *parent = 0);
 
-    // Try to read an IQ to disk cache.
-    template <class T>
-    bool readIq(const QUrl &url, T &iq)
-    {
-        QIODevice *ioDevice = cache->data(url);
-        if (!ioDevice)
-            return false;
-
-        QDomDocument doc;
-        doc.setContent(ioDevice);
-        iq.parse(doc.documentElement());
-        delete ioDevice;
-        return true;
-    }
-
-    // Write an IQ to disk cache.
-    template <class T>
-    void writeIq(const QUrl &url, const T &iq, int cacheSeconds)
-    {
-        QNetworkCacheMetaData metaData;
-        metaData.setUrl(url);
-        metaData.setExpirationDate(QDateTime::currentDateTime().addSecs(cacheSeconds));
-        QIODevice *ioDevice = cache->prepare(metaData);
-        QXmlStreamWriter writer(ioDevice);
-        iq.toXml(&writer);
-        cache->insert(ioDevice);
-    }
-
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
     QXmppClient *client;
@@ -229,7 +233,7 @@ int ChatRosterModelPrivate::countPendingMessages()
 void ChatRosterModelPrivate::fetchVCard(const QString &jid)
 {
     QXmppVCardIq vCard;
-    if (readIq(QString("xmpp:%1?vcard").arg(jid), vCard))
+    if (readIq(cache, QString("xmpp:%1?vcard").arg(jid), &vCard))
         q->vCardFound(vCard);
     else
         client->vCardManager().requestVCard(jid);
@@ -552,7 +556,7 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
-    d->writeIq(QString("xmpp:%1?disco;type=get;request=info").arg(disco.from()), disco, 3600);
+    writeIq(d->cache, QString("xmpp:%1?disco;type=get;request=info").arg(disco.from()), disco, 3600);
     discoveryInfoFound(disco);
 }
 
@@ -662,7 +666,7 @@ void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
             d->clientFeatures.remove(jid);
         else if (presence.type() == QXmppPresence::Available && !d->clientFeatures.contains(jid)) {
             QXmppDiscoveryIq disco;
-            if (d->readIq(QString("xmpp:%1?disco;type=get;request=info").arg(jid), disco) &&
+            if (readIq(d->cache, QString("xmpp:%1?disco;type=get;request=info").arg(jid), &disco) &&
                 (presence.capabilityVer().isEmpty() || presence.capabilityVer() == disco.verificationString()))
             {
                 discoveryInfoFound(disco);
@@ -763,7 +767,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vCard)
     if (vCard.type() != QXmppIq::Result)
         return;
 
-    d->writeIq(QString("xmpp:%1?vcard").arg(vCard.from()), vCard, 3600);
+    writeIq(d->cache, QString("xmpp:%1?vcard").arg(vCard.from()), vCard, 3600);
     vCardFound(vCard);
 }
 
@@ -803,8 +807,10 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     ChatModel::addItem(item, parentItem);
 
     // fetch vCard
-    if (type == ChatRosterModel::Contact || type == ChatRosterModel::RoomMember)
+    if (type == ChatRosterModel::Contact || type == ChatRosterModel::RoomMember) {
+        VCardCache::instance()->get(item->id());
         d->fetchVCard(item->id());
+    }
 
     return createIndex(item, 0);
 }
@@ -963,5 +969,74 @@ void ChatRosterProxyModel::setSourceRoot(const QModelIndex &index)
 QStringList ChatRosterProxyModel::selectedJids() const
 {
     return m_selection.toList();
+}
+
+VCardCache::VCardCache(QObject *parent)
+    : QObject(parent),
+    m_manager(0)
+{
+    m_cache = new QNetworkDiskCache(this);
+    m_cache->setCacheDirectory(wApp->cacheDirectory());
+}
+
+/** Tries to get the vCard for the given JID.
+ *
+ *  Returns true if the vCard was found, otherwise requests the card.
+ *
+ * @param jid
+ * @param iq
+ */
+
+bool VCardCache::get(const QString &jid, QXmppVCardIq *iq)
+{
+    if (readIq(m_cache, QString("xmpp:%1?vcard").arg(jid), iq))
+        return true;
+    if (m_manager)
+        m_manager->requestVCard(jid);
+    return false;
+}
+
+QUrl VCardCache::imageUrl(const QString &jid)
+{
+    if (get(jid))
+        return QUrl("image://roster/" + jid);
+    if (m_manager)
+        m_manager->requestVCard(jid);
+    return QUrl("qrc:/peer.png");
+}
+VCardCache *VCardCache::instance()
+{
+    if (!vcardCache)
+        vcardCache = new VCardCache;
+    return vcardCache;
+}
+
+QXmppVCardManager *VCardCache::manager() const
+{
+    return m_manager;
+}
+
+void VCardCache::setManager(QXmppVCardManager* manager)
+{
+    bool check;
+
+    if (manager == m_manager)
+        return;
+
+    m_manager = manager;
+
+    check = connect(m_manager, SIGNAL(vCardReceived(QXmppVCardIq)),
+                    this, SLOT(vCardReceived(QXmppVCardIq)));
+    Q_ASSERT(check);
+
+    emit managerChanged(m_manager);
+}
+
+void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
+{
+    if (vCard.type() != QXmppIq::Result)
+        return;
+
+    writeIq(m_cache, QString("xmpp:%1?vcard").arg(vCard.from()), vCard, 3600);
 }
 

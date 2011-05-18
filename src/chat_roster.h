@@ -23,9 +23,11 @@
 #include <QAbstractProxyModel>
 #include <QDeclarativeImageProvider>
 #include <QSet>
+#include <QUrl>
 
 #include "chat_model.h"
 
+class QNetworkDiskCache;
 class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
@@ -162,6 +164,34 @@ private:
     QString m_rosterRoot;
     QSet<QString> m_selection;
     QPersistentModelIndex m_sourceRoot;
+};
+
+class VCardCache : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppVCardManager* manager READ manager WRITE setManager NOTIFY managerChanged)
+
+public:
+    VCardCache(QObject *parent = 0);
+
+    QXmppVCardManager *manager() const;
+    void setManager(QXmppVCardManager *manager);
+
+    static VCardCache *instance();
+
+signals:
+    void managerChanged(QXmppVCardManager *manager);
+
+public slots:
+    bool get(const QString &jid, QXmppVCardIq *iq = 0);
+    QUrl imageUrl(const QString &jid);
+
+private slots:
+    void vCardReceived(const QXmppVCardIq&);
+
+private:
+    QNetworkDiskCache *m_cache;
+    QXmppVCardManager *m_manager;
 };
 
 #endif

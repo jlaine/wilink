@@ -101,7 +101,7 @@ QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
         return jidToResource(item->jid);
     } else if (role == ChatRosterModel::AvatarRole) {
-        return QUrl("qrc:/peer.png");
+        return VCardCache::instance()->imageUrl(item->jid);
     } else if (role == ChatRosterModel::IdRole) {
         return item->jid;
     }
@@ -481,18 +481,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(left()));
     Q_ASSERT(check);
 
-    check = connect(mucRoom, SIGNAL(participantAdded(QString)),
-                    this, SLOT(participantAdded(QString)));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(participantChanged(QString)),
-                    this, SLOT(participantChanged(QString)));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(participantRemoved(QString)),
-                    this, SLOT(participantRemoved(QString)));
-    Q_ASSERT(check);
-
     check = connect(mucRoom, SIGNAL(subjectChanged(QString)),
                     this, SLOT(subjectChanged(QString)));
     Q_ASSERT(check);
@@ -729,32 +717,6 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     // play sound, unless we sent the message
     if (message.received)
         wApp->soundPlayer()->play(wApp->incomingMessageSound());
-}
-
-void ChatRoom::participantAdded(const QString &jid)
-{
-    //qDebug("participant added %s", qPrintable(jid));
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(), roomIndex);
-    if (index.isValid())
-        rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-}
-
-void ChatRoom::participantChanged(const QString &jid)
-{
-    //qDebug("participant changed %s", qPrintable(jid));
-    QModelIndex index = rosterModel->findItem(jid);
-    if (index.isValid())
-        rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-}
-
-void ChatRoom::participantRemoved(const QString &jid)
-{
-    //qDebug("participant removed %s", qPrintable(jid));
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    QModelIndex index = rosterModel->findItem(jid, roomIndex);
-    if (index.isValid())
-        rosterModel->removeRow(index.row(), index.parent());
 }
 
 void ChatRoom::subjectChanged(const QString &subject)
