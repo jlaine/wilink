@@ -163,7 +163,7 @@ bool ChatDialogHelper::sendMessage(const QString &body)
         ChatMessage message;
         message.body = body;
         message.date = m_client->serverTime();
-        message.jid = m_client->configuration().jid();
+        message.jid = m_client->configuration().jidBare();
         message.received = false;
         m_historyModel->addMessage(message);
     }
