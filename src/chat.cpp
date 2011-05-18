@@ -42,6 +42,7 @@
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
+#include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -153,6 +154,13 @@ Chat::Chat(QWidget *parent)
     contactModel->setSourceModel(d->rosterModel);
     contactModel->setSourceRoot(d->rosterModel->contactsItem());
 
+    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
+    sortedModel->setSourceModel(contactModel);
+    sortedModel->setDynamicSortFilter(true);
+    sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortedModel->setFilterKeyColumn(2);
+    sortedModel->sort(0);
+
     // create declarative view
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(200);
@@ -161,7 +169,7 @@ Chat::Chat(QWidget *parent)
 
     QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("client", new QXmppDeclarativeClient(d->client));
-    context->setContextProperty("contactModel", contactModel);
+    context->setContextProperty("contactModel", sortedModel);
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
