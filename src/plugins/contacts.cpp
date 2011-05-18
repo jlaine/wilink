@@ -17,61 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDesktopServices>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeView>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QInputDialog>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QMenu>
 #include <QMessageBox>
-#include <QPushButton>
-#include <QStatusBar>
-#include <QUrl>
 
 #include "QXmppClient.h"
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
 #include "chat.h"
-#include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
-#include "chat_utils.h"
 
 #include "contacts.h"
-
-class ContactsPanel : public ChatPanel
-{
-public:
-    ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip);
-};
-
-ContactsPanel::ContactsPanel(Chat *chatWindow, const QString &jid, QLabel *tip)
-    : ChatPanel(chatWindow)
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->addLayout(headerLayout());
-    QHBoxLayout *hbox = new QHBoxLayout;
-    hbox->setMargin(16);
-    hbox->addWidget(tip);
-    layout->addLayout(hbox, 1);
-    setLayout(layout);
-
-    bool check;
-    check = connect(this, SIGNAL(hidePanel()),
-                    this, SLOT(deleteLater()));
-    Q_ASSERT(check);
-
-    setObjectName(jid);
-    setWindowTitle(chatWindow->rosterModel()->contactName(jid));
-    setWindowIcon(QIcon(":/peer.png"));
-}
 
 ContactsWatcher::ContactsWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
@@ -128,21 +87,18 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
         QXmppRosterIq::Item entry = client->rosterManager().getRosterEntry(jid);
         QXmppRosterIq::Item::SubscriptionType type = entry.subscriptionType();
 
-        /* if the contact is in our roster accept subscribe */
+        // if the contact is in our roster accept subscription
         if (type == QXmppRosterIq::Item::To || type == QXmppRosterIq::Item::Both)
         {
             // accept subscription
-            QXmppPresence packet;
-            packet.setTo(jid);
-            packet.setType(QXmppPresence::Subscribed);
-            client->sendPacket(packet);
+            client->rosterManager().acceptSubscription(jid);
 
             // request reciprocal subscription
             client->rosterManager().subscribe(jid);
             return;
         }
 
-        /* otherwise ask user */
+        // otherwise ask user
         QMessageBox *box = new QMessageBox(QMessageBox::Question,
             tr("Invitation from %1").arg(jid),
             tr("%1 has asked to add you to his or her contact list.\n\nDo you accept?").arg(jid),
