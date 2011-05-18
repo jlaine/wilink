@@ -869,7 +869,7 @@ ChatRoomInvite::ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterMod
 
     m_model = new ChatRosterProxyModel(this);
     m_model->setSourceModel(rosterModel);
-    m_model->setSourceRoot(rosterModel->contactsItem());
+    //m_model->setSourceRoot(rosterModel->contactsItem());
 
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
     sortedModel->setSourceModel(m_model);

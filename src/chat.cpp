@@ -147,12 +147,8 @@ Chat::Chat(QWidget *parent)
 #endif
 
     // prepare models
-    ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
-    contactModel->setSourceModel(d->rosterModel);
-    contactModel->setSourceRoot(d->rosterModel->contactsItem());
-
     QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(contactModel);
+    sortedModel->setSourceModel(d->rosterModel);
     sortedModel->setDynamicSortFilter(true);
     sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->setFilterKeyColumn(2);

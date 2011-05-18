@@ -201,7 +201,6 @@ public:
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
     QXmppClient *client;
-    ChatRosterItem *contactsItem;
     ChatRosterItem *ownItem;
     bool nickNameReceived;
     QMap<QString, int> clientFeatures;
@@ -268,9 +267,6 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->nickNameReceived = false;
     d->ownItem = new ChatRosterItem(ChatRosterModel::Contact);
     ChatModel::addItem(d->ownItem, rootItem);
-    d->contactsItem = new ChatRosterItem(ChatRosterModel::Other);
-    d->contactsItem->setId(CONTACTS_ROSTER_ID);
-    ChatModel::addItem(d->contactsItem, rootItem);
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
@@ -495,11 +491,6 @@ void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     discoveryInfoFound(disco);
 }
 
-QModelIndex ChatRosterModel::contactsItem() const
-{
-    return createIndex(d->contactsItem, 0);
-}
-
 QModelIndex ChatRosterModel::findItem(const QString &bareJid, const QModelIndex &parent) const
 {
     ChatRosterItem *parentItem = static_cast<ChatRosterItem*>(parent.isValid() ? parent.internalPointer() : rootItem);
@@ -533,7 +524,7 @@ QString ChatRosterModel::ownName() const
  */
 void ChatRosterModel::itemAdded(const QString &jid)
 {
-    ChatRosterItem *item = d->find(jid, d->contactsItem);
+    ChatRosterItem *item = d->find(jid);
     if (item)
         return;
 
@@ -545,7 +536,7 @@ void ChatRosterModel::itemAdded(const QString &jid)
         item->setData(Qt::DisplayRole, entry.name());
     else
         item->setData(Qt::DisplayRole, jidToUser(jid));
-    ChatModel::addItem(item, d->contactsItem);
+    ChatModel::addItem(item, rootItem);
 
     // fetch vCard
     d->fetchVCard(item->id());
@@ -555,7 +546,7 @@ void ChatRosterModel::itemAdded(const QString &jid)
  */
 void ChatRosterModel::itemChanged(const QString &jid)
 {
-    ChatRosterItem *item = d->find(jid, d->contactsItem);
+    ChatRosterItem *item = d->find(jid);
     if (!item)
         return;
 
@@ -574,7 +565,7 @@ void ChatRosterModel::itemChanged(const QString &jid)
  */
 void ChatRosterModel::itemRemoved(const QString &jid)
 {
-    ChatRosterItem *item = d->find(jid, d->contactsItem);
+    ChatRosterItem *item = d->find(jid);
     if (item)
         removeItem(item);
 }
@@ -616,7 +607,7 @@ void ChatRosterModel::rosterReceived()
 {
     // make a note of existing contacts
     QStringList oldJids;
-    foreach (ChatModelItem *item, d->contactsItem->children) {
+    foreach (ChatModelItem *item, rootItem->children) {
         ChatRosterItem *child = static_cast<ChatRosterItem*>(item);
         if (child->type() == ChatRosterModel::Contact)
             oldJids << child->id();
@@ -632,7 +623,7 @@ void ChatRosterModel::rosterReceived()
     // remove obsolete entries
     foreach (const QString &jid, oldJids)
     {
-        ChatRosterItem *item = d->find(jid, d->contactsItem);
+        ChatRosterItem *item = d->find(jid);
         if (item)
             removeItem(item);
     }
@@ -698,14 +689,8 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &id, const QString &name, const QPixmap &pixmap, const QModelIndex &reqParent)
+QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &id, const QString &name)
 {
-    ChatModelItem *parentItem;
-    if (reqParent.isValid())
-        parentItem = static_cast<ChatRosterItem*>(reqParent.internalPointer());
-    else
-        parentItem = rootItem;
-
     // check the item does not already exist
     ChatRosterItem *item = d->find(id);
     if (item)
@@ -717,7 +702,7 @@ QModelIndex ChatRosterModel::addItem(ChatRosterModel::Type type, const QString &
     if (!name.isEmpty())
         item->setData(Qt::DisplayRole, name);
 
-    ChatModel::addItem(item, parentItem);
+    ChatModel::addItem(item, rootItem);
 
     return createIndex(item, 0);
 }
