@@ -266,14 +266,6 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 {
     d->q = this;
 
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(AvatarRole, "avatar");
-    roleNames.insert(JidRole, "jid");
-    roleNames.insert(Qt::DisplayRole, "name");
-    roleNames.insert(UrlRole, "url");
-    setRoleNames(roleNames);
-
     /* get cache */
     VCardCache::instance()->setManager(&xmppClient->vCardManager());
     d->cache = new QNetworkDiskCache(this);

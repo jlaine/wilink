@@ -58,12 +58,11 @@ class ChatRosterModel : public ChatModel
 
 public:
     enum Role {
-        TypeRole = Qt::UserRole + 10,
+        TypeRole = ChatModel::UserRole,
         NicknameRole,
         MessagesRole,
         PersistentRole,
-        StatusRole,
-        UrlRole,
+        StatusRole
     };
 
     enum Feature {

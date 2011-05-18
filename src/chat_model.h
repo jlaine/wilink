@@ -48,6 +48,8 @@ public:
         NameRole = Qt::DisplayRole,
         JidRole = Qt::UserRole,
         AvatarRole,
+        UrlRole,
+        UserRole,
     };
 
     ChatModel(QObject *parent);

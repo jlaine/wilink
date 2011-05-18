@@ -55,14 +55,13 @@ enum PlayerColumns {
 };
 
 enum PlayerRole {
-    AlbumRole = Qt::UserRole,
+    AlbumRole = ChatModel::UserRole,
     ArtistRole,
     DownloadingRole,
     DurationRole,
     ImageUrlRole,
     PlayingRole,
     TitleRole,
-    UrlRole,
 };
 
 static bool isLocal(const QUrl &url)
@@ -117,7 +116,7 @@ class PlayerModelPrivate
 {
 public:
     PlayerModelPrivate(PlayerModel *qq);
-    QList<Item*> find(ChatModelItem *parent, PlayerRole role, const QUrl &url);
+    QList<Item*> find(ChatModelItem *parent, int role, const QUrl &url);
     void processXml(Item *item, QIODevice *reply);
     void processQueue();
     void save();
@@ -145,13 +144,13 @@ PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
 {
 }
 
-QList<Item*> PlayerModelPrivate::find(ChatModelItem *parent, PlayerRole role, const QUrl &url)
+QList<Item*> PlayerModelPrivate::find(ChatModelItem *parent, int role, const QUrl &url)
 {
     QList<Item*> items;
     foreach (ChatModelItem *it, parent->children) {
         Item *item = static_cast<Item*>(it);
         if (url.isEmpty() ||
-            (role == UrlRole && item->url == url) ||
+            (role == ChatModel::UrlRole && item->url == url) ||
             (role == ImageUrlRole && item->imageUrl == url))
             items << item;
         if (!item->children.isEmpty())
@@ -165,7 +164,7 @@ void PlayerModelPrivate::processQueue()
     if (dataReply)
         return;
 
-    QList<Item*> items = find(q->rootItem, UrlRole, QUrl());
+    QList<Item*> items = find(q->rootItem, ChatModel::UrlRole, QUrl());
     foreach (Item *item, items) {
         // check data
         if (item->url.isValid() &&
