@@ -37,6 +37,7 @@ Item {
 
         anchors.top: scrollBar.top
         anchors.left: scrollBar.left
+        anchors.topMargin: -1
         border.color: '#0d88a4'
         border.width: 1
         gradient: Gradient {
@@ -45,7 +46,7 @@ Item {
             GradientStop {id: trackStop3; position: 1.0; color: '#dfeff3'}
         }
         height: parent.width
-        width: parent.height - 2 * scrollBar.width
+        width: parent.height - 2 * ( scrollBar.width - 1 )
         transform: Rotation {
             angle: 90
             origin.x: 0
