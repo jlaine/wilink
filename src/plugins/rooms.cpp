@@ -651,7 +651,7 @@ void ChatRoom::invite(const QString &jid)
     // notify user
     queueNotification(tr("%1 has been invited to %2")
         .arg(rosterModel->contactName(jid))
-        .arg(rosterModel->contactName(mucRoom->jid())),
+        .arg(jidToUser(mucRoom->jid())),
         ForceNotification);
 }
 
@@ -703,12 +703,10 @@ void ChatRoom::kickUser()
     QString jid = action->data().toString();
 
     // prompt for reason
-    const QString roomJid = jidToBareJid(jid);
-    const QString roomName = chat->rosterModel()->contactName(roomJid);
     bool ok = false;
     QString reason;
     reason = QInputDialog::getText(chat, tr("Kick user"),
-                  tr("Enter the reason for kicking the user from '%1'.").arg(roomName),
+                  tr("Enter the reason for kicking the user from '%1'.").arg(jidToUser(mucRoom->jid())),
                   QLineEdit::Normal, reason, &ok);
     if (ok)
         mucRoom->kick(jid, reason);
