@@ -101,21 +101,16 @@ void ContactsWatcher::presenceHandled(QAbstractButton *button)
     QString jid = box->objectName();
     QXmppClient *client = chat->client();
             
-    QXmppPresence packet;
-    packet.setTo(jid);
     if (box->standardButton(button) == QMessageBox::Yes)
     {
         // accept subscription
-        packet.setType(QXmppPresence::Subscribed);
-        client->sendPacket(packet);
+        client->rosterManager().acceptSubscription(jid);
 
         // request reciprocal subscription
-        packet.setType(QXmppPresence::Subscribe);
-        client->sendPacket(packet);
+        client->rosterManager().subscribe(jid);
     } else {
         // refuse subscription
-        packet.setType(QXmppPresence::Unsubscribed);
-        client->sendPacket(packet);
+        client->rosterManager().refuseSubscription(jid);
     }
     box->deleteLater();
 }
@@ -143,8 +138,7 @@ void ContactsWatcher::presenceReceived(const QXmppPresence &presence)
             client->sendPacket(packet);
 
             // request reciprocal subscription
-            packet.setType(QXmppPresence::Subscribe);
-            client->sendPacket(packet);
+            client->rosterManager().subscribe(jid);
             return;
         }
 
