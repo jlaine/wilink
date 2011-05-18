@@ -50,6 +50,29 @@
 #define HISTORY_DAYS 14
 #endif
 
+class ChatDialogItem : public ChatModelItem
+{
+public:
+    QString jid;
+};
+
+class ChatDialogModel : public ChatModel
+{
+public:
+    ChatDialogModel(QObject *parent);
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+};
+
+ChatDialogModel::ChatDialogModel(QObject *parent)
+    : ChatModel(parent)
+{
+}
+
+QVariant ChatDialogModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}
+
 ChatDialogHelper::ChatDialogHelper(QObject *parent)
     : QObject(parent),
     m_client(0),
@@ -140,7 +163,7 @@ bool ChatDialogHelper::sendMessage(const QString &body)
         ChatMessage message;
         message.body = body;
         message.date = m_client->serverTime();
-        message.jid = m_client->configuration().jid();
+        message.jid = m_client->configuration().jidBare();
         message.received = false;
         m_historyModel->addMessage(message);
     }
@@ -169,7 +192,7 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
 
     // prepare models
     historyModel = new ChatHistoryModel(this);
-    historyModel->setRosterModel(rosterModel);
+    historyModel->setParticipantModel(rosterModel);
 
     ChatDialogHelper *helper = new ChatDialogHelper(this);
     helper->setClient(client);
@@ -183,16 +206,13 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     layout->addLayout(headerLayout());
 
     // chat history
-    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
-    imageProvider->setRosterModel(rosterModel);
-
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
     context->setContextProperty("conversationHasState", true);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", qVariantFromValue<QObject*>(0));
-    historyView->engine()->addImageProvider("roster", imageProvider);
+    historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/conversation.qml"));
     layout->addWidget(historyView);
@@ -363,7 +383,7 @@ void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bo
     Q_ASSERT(topLeft.parent() == bottomRight.parent());
     const QModelIndex parent = topLeft.parent();
     for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        const QString jid = rosterModel->index(i, 0, parent).data(ChatRosterModel::IdRole).toString();
+        const QString jid = rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
         if (jid == chatRemoteJid) {
             updateWindowTitle();
             break;

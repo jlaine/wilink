@@ -42,35 +42,12 @@ Rectangle {
         HistoryView {
             id: historyView
 
-            property bool scrollBarAtBottom
-
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.right: historyScrollBar.left
+            anchors.right: Qt.isQtObject(participantModel) ? participantView.left : parent.right
             model: historyModel
 
-            Connections {
-                target: historyView.model
-                onBottomAboutToChange: {
-                    // test if scrollbar should follow bottom change
-                    historyView.scrollBarAtBottom = historyView.atYEnd
-                }
-                onBottomChanged: {
-                    if( historyView.scrollBarAtBottom ) {
-                        historyView.positionViewAtIndex(historyView.count - 1, ListView.End)
-                    }
-                }
-            }
-        }
-
-        ScrollBar {
-            id: historyScrollBar
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: Qt.isQtObject(participantModel) ? participantView.left : parent.right
-            flickableItem: historyView
         }
 
         ParticipantView {
@@ -78,18 +55,10 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.right: participantScrollBar.left
+            anchors.right: parent.right
             model: participantModel
             visible: Qt.isQtObject(participantModel)
-        }
-
-        ScrollBar {
-            id: participantScrollBar
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            flickableItem: participantView
+            width: 80
         }
     }
 

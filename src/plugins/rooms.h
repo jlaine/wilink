@@ -24,6 +24,7 @@
 
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
+#include "chat_model.h"
 #include "chat_panel.h"
 
 class Chat;
@@ -31,6 +32,7 @@ class ChatClient;
 class ChatHistoryModel;
 class ChatMessage;
 class ChatRoom;
+class RoomListModel;
 class ChatRosterModel;
 class ChatRosterProxyModel;
 class QDeclarativeView;
@@ -54,6 +56,31 @@ class QXmppMucManager;
 class QXmppMucRoom;
 class QXmppPresence;
 
+class ChatRoomModel : public ChatModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppMucRoom* room READ room WRITE setRoom NOTIFY roomChanged)
+
+public:
+    ChatRoomModel(QObject *parent = 0);
+
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    QXmppMucRoom *room() const;
+    void setRoom(QXmppMucRoom *room);
+
+signals:
+    void roomChanged(QXmppMucRoom *room);
+
+private slots:
+    void participantAdded(const QString &jid);
+    void participantChanged(const QString &jid);
+    void participantRemoved(const QString &jid);
+
+private:
+    QXmppMucRoom *m_room;
+};
+
 class ChatRoomWatcher : public QObject
 {
     Q_OBJECT
@@ -73,6 +100,7 @@ private slots:
 
 private:
     Chat *chat;
+    RoomListModel *roomModel;
     QXmppMucManager *mucManager;
     QString chatRoomServer;
     QPushButton *roomButton;
@@ -104,9 +132,6 @@ private slots:
     void kicked(const QString &jid, const QString &reason);
     void kickUser();
     void messageReceived(const QXmppMessage &msg);
-    void participantAdded(const QString &jid);
-    void participantChanged(const QString &jid);
-    void participantRemoved(const QString &jid);
     void subjectChanged(const QString &subject);
 
 private:

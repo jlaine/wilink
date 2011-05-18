@@ -22,12 +22,12 @@
 
 #include <QAbstractProxyModel>
 #include <QDeclarativeImageProvider>
-#include <QTreeView>
+#include <QSet>
+#include <QUrl>
 
 #include "chat_model.h"
 
-class QContextMenuEvent;
-class QMenu;
+class QNetworkDiskCache;
 class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
@@ -46,10 +46,9 @@ class ChatRosterImageProvider : public QDeclarativeImageProvider
 public:
     ChatRosterImageProvider();
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
-    void setRosterModel(ChatRosterModel *rosterModel);
 
 private:
-    ChatRosterModel *m_rosterModel;
+    //ChatRosterModel *m_rosterModel;
 };
 
 class ChatRosterModel : public ChatModel
@@ -58,14 +57,11 @@ class ChatRosterModel : public ChatModel
 
 public:
     enum Role {
-        IdRole = Qt::UserRole,
-        TypeRole,
-        AvatarRole,
+        TypeRole = ChatModel::UserRole,
         NicknameRole,
         MessagesRole,
         PersistentRole,
-        StatusRole,
-        UrlRole,
+        StatusRole
     };
 
     enum Feature {
@@ -90,8 +86,6 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    QMimeData *mimeData(const QModelIndexList &indexes) const;
-    QStringList mimeTypes() const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
 
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
@@ -99,8 +93,6 @@ public:
     bool isOwnNameReceived() const;
     QString ownName() const;
 
-    QModelIndex addItem(ChatRosterModel::Type type, const QString &id, const QString &name = QString(), const QPixmap &pixmap = QPixmap(), const QModelIndex &parent = QModelIndex());
-    QModelIndex contactsItem() const;
     QModelIndex findItem(const QString &jid, const QModelIndex &parent = QModelIndex()) const;
 
     void addPendingMessage(const QString &bareJid);
@@ -127,7 +119,6 @@ protected slots:
 
 private:
     void discoveryInfoFound(const QXmppDiscoveryIq &disco);
-    void vCardFound(const QXmppVCardIq&);
 
     friend class ChatRosterModelPrivate;
     ChatRosterModelPrivate * const d;
@@ -168,29 +159,36 @@ private:
     QPersistentModelIndex m_sourceRoot;
 };
 
-class ChatRosterView : public QTreeView
+class VCardCache : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QXmppVCardManager* manager READ manager WRITE setManager NOTIFY managerChanged)
 
 public:
-    ChatRosterView(ChatRosterModel *model, QWidget *parent = NULL);
-    QModelIndex mapFromRoster(const QModelIndex &index);
-    void setExpanded(const QString &id, bool expanded);
-    QSize sizeHint() const;
+    VCardCache(QObject *parent = 0);
+
+    QXmppVCardManager *manager() const;
+    void setManager(QXmppVCardManager *manager);
+
+    static VCardCache *instance();
 
 signals:
-    void itemMenu(QMenu *menu, const QModelIndex &index);
+    void cardChanged(const QString &jid);
+    void managerChanged(QXmppVCardManager *manager);
 
 public slots:
-    void setShowOfflineContacts(bool show);
+    bool get(const QString &jid, QXmppVCardIq *iq = 0);
+    QUrl imageUrl(const QString &jid);
+    QUrl profileUrl(const QString &jid);
 
-protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void resizeEvent(QResizeEvent *event);
+private slots:
+    void vCardReceived(const QXmppVCardIq&);
 
 private:
-    ChatRosterModel *rosterModel;
-    QSortFilterProxyModel *sortedModel;
+    QNetworkDiskCache *m_cache;
+    QXmppVCardManager *m_manager;
+    QSet<QString> m_failed;
+    QSet<QString> m_queue;
 };
 
 #endif

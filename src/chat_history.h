@@ -60,20 +60,18 @@ class ChatHistoryModel : public ChatModel
 
 public:
     enum HistoryRole {
-        ActionRole = Qt::UserRole,
-        AvatarRole,
+        ActionRole = Qt::UserRole + 10,
         BodyRole,
         DateRole,
         FromRole,
-        JidRole,
         HtmlRole,
         ReceivedRole,
     };
 
     ChatHistoryModel(QObject *parent = 0);
     void addMessage(const ChatMessage &message);
-    ChatRosterModel *rosterModel();
-    void setRosterModel(ChatRosterModel *rosterModel);
+    QAbstractItemModel *participantModel();
+    void setParticipantModel(QAbstractItemModel *rosterModel);
 
     // QAbstracItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;

@@ -32,24 +32,52 @@ Item {
     state: pageSize == 1 ? 'collapsed' : ''
     width: 11
 
-    Image {
+    Rectangle {
         id: track
 
-        anchors.fill: parent
-        anchors.topMargin: scrollBar.width - 1
-        anchors.bottomMargin: scrollBar.width - 1
-        source: 'scrollbar-track.svg'
+        anchors.top: scrollBar.top
+        anchors.left: scrollBar.left
+        anchors.topMargin: -1
+        border.color: '#0d88a4'
+        border.width: 1
+        gradient: Gradient {
+            GradientStop {id: trackStop1; position: 0.0; color: '#bedfe7'}
+            GradientStop {id: trackStop2; position: 0.5; color: '#ffffff'}
+            GradientStop {id: trackStop3; position: 1.0; color: '#dfeff3'}
+        }
+        height: parent.width
+        width: parent.height - 2 * ( scrollBar.width - 1 )
+        transform: Rotation {
+            angle: 90
+            origin.x: 0
+            origin.y: track.height
+        }
 
-        Image {
+        Rectangle {
             id: handle
 
-            property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.height - 2))
+            property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
-            x: 0
-            y: Math.floor(scrollBar.position * (track.height + desiredHeight - height - 2)) + 1
-            height: Math.max(desiredHeight, 20)
-            source: 'scrollbar-handle.svg'
-            width: parent.width - 1
+            border.color: '#0d7a93'
+            border.width: 1
+            gradient: Gradient {
+                GradientStop {id: handleStop1; position: 0.0; color: '#ffffff'}
+                GradientStop {id: handleStop2; position: 0.5; color: '#5fb0c3'}
+                GradientStop {id: handleStop3; position: 1.0; color: '#ffffff'}
+            }
+            radius: 10
+            smooth: true
+
+            height: parent.height
+            width: Math.max(desiredHeight, 20)
+            x: Math.floor(scrollBar.position * (track.width + desiredHeight - width - 2)) + 1
+            y: 0
+
+            states: State {
+                name: 'pressed'
+                PropertyChanges { target: handleStop2; color: '#7ac6d8' }
+                PropertyChanges { target: handle; border.color: '#5fb0c3' }
+            }
         }
     }
 
@@ -61,14 +89,17 @@ Item {
         color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
-/*
-        Image {
-            anchors.fill: parent
-            smooth: true
-            source: 'back.png'
-            transform: Rotation { angle: 90; origin.x: Math.round(scrollBar.width/2); origin.y: Math.round(scrollBar.width/2) }
+
+        Text {
+            id: textButtonUp
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.rightMargin: 1
+            anchors.topMargin: 0
+            color: '#0d88a4'
+            font.pixelSize: scrollBar.width - 4
+            text: '<html>&#9650;</html>'
         }
-*/
 
         MouseArea {
             anchors.fill: parent
@@ -90,6 +121,7 @@ Item {
         states: State {
             name: 'pressed'
             PropertyChanges { target: buttonUp; color: '#ffffff' }
+            PropertyChanges { target: textButtonUp; color: '#5fb0c3' }
         }
     }
 
@@ -102,14 +134,18 @@ Item {
         color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
-/*
-        Image {
-            anchors.fill: parent
-            smooth: true
-            source: 'back.png'
-            transform: Rotation { angle: -90; origin.x: Math.round(scrollBar.width/2); origin.y: Math.round(scrollBar.width/2) }
+
+        Text {
+            id: textButtonDown
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.rightMargin: 1
+            anchors.topMargin: 0
+            color: '#0d88a4'
+            font.pixelSize: scrollBar.width - 4
+            text: '<html>&#9660;</html>'
         }
-*/
+
         MouseArea {
             anchors.fill: parent
 
@@ -129,6 +165,7 @@ Item {
         states: State {
             name: 'pressed'
             PropertyChanges { target: buttonDown; color: '#ffffff' }
+            PropertyChanges { target: textButtonDown; color: '#5fb0c3' }
         }
     }
 
@@ -139,15 +176,18 @@ Item {
         property real pressMouseY
         property real pressPageSize
 
-        anchors.fill: track
+        anchors.top: buttonUp.bottom
+        anchors.bottom: buttonDown.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         drag.axis: Drag.YAxis
 
         onPressed: {
-            if (mouse.y < handle.y) {
+            if (mouse.y < handle.x) {
                 moveAction = 'up';
                 moveQuantity = -flickableItem.height;
                 scrollBar.moveBy(moveQuantity);
-            } else if (mouse.y > handle.y + handle.height) {
+            } else if (mouse.y > handle.x + handle.width) {
                 moveAction = 'down';
                 moveQuantity = flickableItem.height;
                 scrollBar.moveBy(moveQuantity);

@@ -402,17 +402,6 @@ Acceptez-vous?</translation>
         <source>Do you accept?</source>
         <translation>Acceptez-vous ?</translation>
     </message>
-    <message>
-        <source>My rooms</source>
-        <translation>Mes salons</translation>
-    </message>
-</context>
-<context>
-    <name>ChatRosterModel</name>
-    <message>
-        <source>My contacts</source>
-        <translation>Mes contacts</translation>
-    </message>
 </context>
 <context>
     <name>ChatSearchBar</name>

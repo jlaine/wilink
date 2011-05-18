@@ -40,6 +40,16 @@ int ChatModelItem::row() const
 ChatModel::ChatModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatModel::AvatarRole, "avatar");
+    roleNames.insert(ChatModel::JidRole, "jid");
+    roleNames.insert(ChatModel::NameRole, "name");
+    roleNames.insert(ChatModel::UrlRole, "url");
+    setRoleNames(roleNames);
+
+    // create rool
+    rootItem = new ChatModelItem;
 }
 
 ChatModel::~ChatModel()
@@ -56,6 +66,12 @@ void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
     item->parent = parentItem;
     parentItem->children.insert(pos, item);
     endInsertRows();
+}
+
+int ChatModel::columnCount(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return 1;
 }
 
 QModelIndex ChatModel::createIndex(ChatModelItem *item, int column) const

@@ -141,15 +141,8 @@ Chat::Chat(QWidget *parent)
     leftLayout->addWidget(d->actions);
 
     // prepare models
-    ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
-    imageProvider->setRosterModel(d->rosterModel);
-
-    ChatRosterProxyModel *contactModel = new ChatRosterProxyModel(this);
-    contactModel->setSourceModel(d->rosterModel);
-    contactModel->setSourceRoot(d->rosterModel->contactsItem());
-
     d->sortedContactModel = new QSortFilterProxyModel(this);
-    d->sortedContactModel->setSourceModel(contactModel);
+    d->sortedContactModel->setSourceModel(d->rosterModel);
     d->sortedContactModel->setDynamicSortFilter(true);
     d->sortedContactModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     d->sortedContactModel->setFilterKeyColumn(2);
@@ -163,7 +156,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(200);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    d->rosterView->engine()->addImageProvider("roster", imageProvider);
+    d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
 
     QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("client", new QXmppDeclarativeClient(d->client));

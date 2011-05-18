@@ -44,12 +44,21 @@ class ChatModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    enum Role {
+        NameRole = Qt::DisplayRole,
+        JidRole = Qt::UserRole,
+        AvatarRole,
+        UrlRole,
+        UserRole,
+    };
+
     ChatModel(QObject *parent);
     ~ChatModel();
 
     virtual QModelIndex findItem(const QString &id, const QModelIndex &parent = QModelIndex()) const;
 
     // QAbstractItemModel
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
