@@ -86,6 +86,7 @@ public:
     QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
     QDeclarativeView *rosterView;
+    QSortFilterProxyModel *sortedContactModel;
     QString windowTitle;
 
     QWidget *leftPanel;
@@ -139,13 +140,6 @@ Chat::Chat(QWidget *parent)
     d->actions->hide();
     leftLayout->addWidget(d->actions);
 
-#if 0
-    d->rosterView = new ChatRosterView(d->rosterModel);
-    d->rosterView->setShowOfflineContacts(wApp->showOfflineContacts());
-    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)), d->rosterView, SLOT(setShowOfflineContacts(bool)));
-    leftLayout->addWidget(d->rosterView);
-#endif
-
     // prepare models
     ChatRosterImageProvider *imageProvider = new ChatRosterImageProvider;
     imageProvider->setRosterModel(d->rosterModel);
@@ -154,12 +148,16 @@ Chat::Chat(QWidget *parent)
     contactModel->setSourceModel(d->rosterModel);
     contactModel->setSourceRoot(d->rosterModel->contactsItem());
 
-    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(contactModel);
-    sortedModel->setDynamicSortFilter(true);
-    sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    sortedModel->setFilterKeyColumn(2);
-    sortedModel->sort(0);
+    d->sortedContactModel = new QSortFilterProxyModel(this);
+    d->sortedContactModel->setSourceModel(contactModel);
+    d->sortedContactModel->setDynamicSortFilter(true);
+    d->sortedContactModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    d->sortedContactModel->setFilterKeyColumn(2);
+    d->sortedContactModel->sort(0);
+
+    showOfflineContactsChanged(wApp->showOfflineContacts());
+    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)),
+            this, SLOT(showOfflineContactsChanged(bool)));
 
     // create declarative view
     d->rosterView = new QDeclarativeView;
@@ -169,7 +167,7 @@ Chat::Chat(QWidget *parent)
 
     QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("client", new QXmppDeclarativeClient(d->client));
-    context->setContextProperty("contactModel", sortedModel);
+    context->setContextProperty("contactModel", d->sortedContactModel);
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
@@ -740,6 +738,14 @@ void Chat::showAbout()
 void Chat::showHelp()
 {
     QDesktopServices::openUrl(QUrl(HELP_URL));
+}
+
+void Chat::showOfflineContactsChanged(bool show)
+{
+    if (show)
+        d->sortedContactModel->setFilterRegExp(QRegExp());
+    else
+        d->sortedContactModel->setFilterRegExp(QRegExp("^(?!offline).+"));
 }
 
 /** Display the preferenes dialog.

@@ -84,6 +84,7 @@ private slots:
     void resizeContacts();
     void showAbout();
     void showHelp();
+    void showOfflineContactsChanged(bool show);
 
     void attachPanel();
     void detachPanel();
