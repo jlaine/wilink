@@ -55,18 +55,10 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.right: participantScrollBar.left
+            anchors.right: parent.right
             model: participantModel
             visible: Qt.isQtObject(participantModel)
-        }
-
-        ScrollBar {
-            id: participantScrollBar
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            flickableItem: participantView
+            width: 80
         }
     }
 
