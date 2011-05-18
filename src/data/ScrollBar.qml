@@ -82,14 +82,16 @@ Item {
         color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
-/*
-        Image {
-            anchors.fill: parent
-            smooth: true
-            source: 'back.png'
-            transform: Rotation { angle: 90; origin.x: Math.round(scrollBar.width/2); origin.y: Math.round(scrollBar.width/2) }
+
+        Text {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.rightMargin: 1
+            anchors.topMargin: 0
+            color: '#0d88a4'
+            font.pixelSize: scrollBar.width - 4
+            text: '<html>&#9650;</html>'
         }
-*/
 
         MouseArea {
             anchors.fill: parent
@@ -123,14 +125,17 @@ Item {
         color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
-/*
-        Image {
-            anchors.fill: parent
-            smooth: true
-            source: 'back.png'
-            transform: Rotation { angle: -90; origin.x: Math.round(scrollBar.width/2); origin.y: Math.round(scrollBar.width/2) }
+
+        Text {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.rightMargin: 1
+            anchors.topMargin: 0
+            color: '#0d88a4'
+            font.pixelSize: scrollBar.width - 4
+            text: '<html>&#9660;</html>'
         }
-*/
+
         MouseArea {
             anchors.fill: parent
 
