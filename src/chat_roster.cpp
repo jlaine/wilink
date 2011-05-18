@@ -431,9 +431,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else if (role == TypeRole) {
         return item->type();
     } else if (role == AvatarRole) {
-        if (item->data(Qt::DecorationRole).isNull())
-            return QUrl("qrc:/peer.png");
-        return QUrl("image://roster/" + bareJid);
+        return VCardCache::instance()->imageUrl(bareJid);
     } else if (role == StatusRole && item->type() == ChatRosterModel::Contact) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
