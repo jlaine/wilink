@@ -70,10 +70,24 @@ enum MembersColumns {
     AffiliationColumn,
 };
 
+class ChatRoomItem : public ChatModelItem
+{
+public:
+    QString jid;
+    QXmppPresence::Status::Type status;
+};
+
 ChatRoomModel::ChatRoomModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatRosterModel::AvatarRole, "avatar");
+    roleNames.insert(ChatRosterModel::IdRole, "id");
+    roleNames.insert(Qt::DisplayRole, "name");
+
+    // create root
     rootItem = new ChatModelItem;
 }
 
@@ -81,37 +95,48 @@ void ChatRoomModel::participantAdded(const QString &jid)
 {
     Q_ASSERT(m_room);
     qDebug("participant added %s", qPrintable(jid));
-/*
-    QModelIndex roomIndex = rosterModel->findItem(m_room->jid());
-    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(), roomIndex);
-    if (index.isValid())
-        rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-*/
+
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
+        if (item->jid == jid) {
+            qWarning("participant added twice %s", qPrintable(jid));
+            return;
+        }
+    }
+
+    ChatRoomItem *item = new ChatRoomItem;
+    item->jid = jid;
+    addItem(item, rootItem, rootItem->children.size());
 }
 
 void ChatRoomModel::participantChanged(const QString &jid)
 {
     Q_ASSERT(m_room);
-    //qDebug("participant changed %s", qPrintable(jid));
+    qDebug("participant changed %s", qPrintable(jid));
 
-/*
-    QModelIndex index = rosterModel->findItem(jid);
-    if (index.isValid())
-        rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
-*/
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
+        if (item->jid == jid) {
+            removeRow(item->row());
+            item->status = m_room->participantPresence(jid).status().type();
+            emit dataChanged(createIndex(item), createIndex(item));
+            break;
+        }
+    }
 }
 
 void ChatRoomModel::participantRemoved(const QString &jid)
 {
     Q_ASSERT(m_room);
-    //qDebug("participant removed %s", qPrintable(jid));
+    qDebug("participant removed %s", qPrintable(jid));
 
-/*
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    QModelIndex index = rosterModel->findItem(jid, roomIndex);
-    if (index.isValid())
-        rosterModel->removeRow(index.row(), index.parent());
-*/
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
+        if (item->jid == jid) {
+            removeRow(item->row());
+            break;
+        }
+    }
 }
 
 QXmppMucRoom *ChatRoomModel::room() const
