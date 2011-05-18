@@ -196,7 +196,7 @@ class ChatRosterModelPrivate
 public:
     int countPendingMessages();
     void fetchVCard(const QString &jid);
-    ChatRosterItem* find(const QString &id, ChatRosterItem *parent = 0);
+    ChatRosterItem* find(const QString &id, ChatModelItem *parent = 0);
 
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
@@ -230,10 +230,10 @@ void ChatRosterModelPrivate::fetchVCard(const QString &jid)
         q->vCardReceived(vCard);
 }
 
-ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatRosterItem *parent)
+ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *parent)
 {
     if (!parent)
-        parent = static_cast<ChatRosterItem*>(q->rootItem);
+        parent = q->rootItem;
 
     /* look at immediate children */
     foreach (ChatModelItem *it, parent->children) {
@@ -624,7 +624,7 @@ void ChatRosterModel::rosterReceived()
     foreach (const QString &jid, oldJids)
     {
         ChatRosterItem *item = d->find(jid);
-        if (item)
+        if (item && item != d->ownItem)
             removeItem(item);
     }
 
