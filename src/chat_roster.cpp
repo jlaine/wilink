@@ -235,7 +235,7 @@ void ChatRosterModelPrivate::fetchVCard(const QString &jid)
 {
     QXmppVCardIq vCard;
     if (VCardCache::instance()->get(jid, &vCard));
-        q->vCardFound(vCard);
+        q->vCardReceived(vCard);
 }
 
 ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatRosterItem *parent)
@@ -667,10 +667,12 @@ bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, i
     return true;
 }
 
-void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
+void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 {
-    const QString bareJid = vcard.from();
+    if (vcard.type() != QXmppIq::Result)
+        return;
 
+    const QString bareJid = vcard.from();
     ChatRosterItem *item = d->find(bareJid);
     if (!item)
         return;
@@ -697,15 +699,6 @@ void ChatRosterModel::vCardFound(const QXmppVCardIq& vcard)
         d->nickNameReceived = true;
         emit ownNameReceived();
     }
-}
-
-void ChatRosterModel::vCardReceived(const QXmppVCardIq& vCard)
-{
-    if (vCard.type() != QXmppIq::Result)
-        return;
-
-    writeIq(d->cache, QString("xmpp:%1?vcard").arg(vCard.from()), vCard, 3600);
-    vCardFound(vCard);
 }
 
 void ChatRosterModel::addPendingMessage(const QString &bareJid)
