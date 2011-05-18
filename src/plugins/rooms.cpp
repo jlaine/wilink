@@ -70,6 +70,78 @@ enum MembersColumns {
     AffiliationColumn,
 };
 
+ChatRoomModel::ChatRoomModel(QObject *parent)
+    : ChatModel(parent),
+    m_room(0)
+{
+    rootItem = new ChatModelItem;
+}
+
+void ChatRoomModel::participantAdded(const QString &jid)
+{
+    Q_ASSERT(m_room);
+    qDebug("participant added %s", qPrintable(jid));
+/*
+    QModelIndex roomIndex = rosterModel->findItem(m_room->jid());
+    QModelIndex index = rosterModel->addItem(ChatRosterModel::RoomMember, jid, jidToResource(jid), QPixmap(), roomIndex);
+    if (index.isValid())
+        rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
+*/
+}
+
+void ChatRoomModel::participantChanged(const QString &jid)
+{
+    Q_ASSERT(m_room);
+    //qDebug("participant changed %s", qPrintable(jid));
+
+/*
+    QModelIndex index = rosterModel->findItem(jid);
+    if (index.isValid())
+        rosterModel->setData(index, mucRoom->participantPresence(jid).status().type(), ChatRosterModel::StatusRole);
+*/
+}
+
+void ChatRoomModel::participantRemoved(const QString &jid)
+{
+    Q_ASSERT(m_room);
+    //qDebug("participant removed %s", qPrintable(jid));
+
+/*
+    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
+    QModelIndex index = rosterModel->findItem(jid, roomIndex);
+    if (index.isValid())
+        rosterModel->removeRow(index.row(), index.parent());
+*/
+}
+
+QXmppMucRoom *ChatRoomModel::room() const
+{
+    return m_room;
+}
+
+void ChatRoomModel::setRoom(QXmppMucRoom *room)
+{
+    bool check;
+
+    if (room == m_room)
+        return;
+
+    m_room = room;
+    check = connect(m_room, SIGNAL(participantAdded(QString)),
+                    this, SLOT(participantAdded(QString)));
+    Q_ASSERT(check);
+
+    check = connect(m_room, SIGNAL(participantChanged(QString)),
+                    this, SLOT(participantChanged(QString)));
+    Q_ASSERT(check);
+
+    check = connect(m_room, SIGNAL(participantRemoved(QString)),
+                    this, SLOT(participantRemoved(QString)));
+    Q_ASSERT(check);
+
+    emit roomChanged(m_room);
+}
+
 ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
