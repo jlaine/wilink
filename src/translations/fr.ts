@@ -910,6 +910,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>phone</name>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+</context>
+<context>
     <name>roster</name>
     <message>
         <source>My rooms</source>
