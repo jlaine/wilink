@@ -25,7 +25,6 @@ Item {
 
     property alias model: view.model
     signal addressClicked(string address)
-    signal addressDoubleClicked(string address)
 
     ListView {
         id: view
@@ -47,22 +46,17 @@ Item {
                 anchors.fill: parent
                 border.color: '#ffffff'
                 color: model.active ? '#dd6666' : 'white'
-                gradient: Gradient {
-                    GradientStop { id: stop1; position: 0.0; color: '#ffffff'  }
-                    GradientStop { id: stop2; position: 1.0; color: '#ffffff'  }
-                }
-
 
                 Image {
                     id: image
 
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     source: model.direction == QXmppCall.OutgoingDirection ? 'call-outgoing.png' : 'call-incoming.png'
                 }
 
                 Text {
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.left: image.right
                     anchors.right: date.left
                     elide: Text.ElideRight
@@ -72,7 +66,7 @@ Item {
                 Text {
                     id: date
 
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.right: duration.left
                     text: Qt.formatDateTime(model.date)
                     width: 150
@@ -81,7 +75,7 @@ Item {
                 Text {
                     id: duration
 
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     text: model.duration + 's'
                     width: 60
@@ -104,23 +98,26 @@ Item {
 
                         // show context menu
                         menu.model.clear();
-                        menu.model.append({
-                            'action': 'call',
-                            'icon': 'call.png',
-                            'text': qsTr('Call'),
-                            'address': model.address});
+                        if (!view.model.currentCalls)
+                            menu.model.append({
+                                'action': 'call',
+                                'icon': 'call.png',
+                                'text': qsTr('Call'),
+                                'address': model.address});
                         menu.model.append({
                             'action': 'remove',
                             'icon': 'remove.png',
                             'text': qsTr('Remove'),
-                            'address': model.id});
-                        menu.show(item.x + mouse.x, item.y + mouse.y);
+                            'id': model.id});
+
+                        var point = mapToItem(block, mouse.x, mouse.y);
+                        menu.show(point.x, point.y);
                     }
                 }
                 onDoubleClicked: {
                     if (mouse.button == Qt.LeftButton) {
                         menu.hide();
-                        block.addressDoubleClicked(model.address);
+                        view.model.call(address)
                     }
                 }
             }
@@ -130,6 +127,16 @@ Item {
     Menu {
         id: menu
         opacity: 0
+
+        onItemClicked: {
+            var item = menu.model.get(index);
+            if (item.action == 'call') {
+                view.model.call(item.address)
+            } else if (item.action == 'remove') {
+                console.log("remove " + item.id);
+            }
+        }
+
     }
 
     ScrollBar {
