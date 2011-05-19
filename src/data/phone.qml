@@ -94,7 +94,6 @@ Item {
             anchors.top: parent.top
             anchors.right: callButton.left
             anchors.rightMargin: 4
-            enabled: sipClient.state == SipClient.ConnectedState
             icon: 'back.png'
         }
 
@@ -103,6 +102,7 @@ Item {
 
             anchors.top: parent.top
             anchors.right: parent.right
+            enabled: sipClient.state == SipClient.ConnectedState
             icon: 'call.png'
             text: qsTr('Call')
             visible: historyModel.currentCalls == 0
