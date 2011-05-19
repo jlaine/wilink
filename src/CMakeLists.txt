@@ -131,7 +131,7 @@ if(RELOAD_TRANSLATIONS)
         data/phone.qml
         data/roster.qml
         data/CallWidget.qml
-        data/ParticipantView.qml
+        data/RoomParticipantView.qml
         data/PhoneHistoryView.qml
         data/TransferWidget.qml
         translations/fr.ts)

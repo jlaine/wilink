@@ -507,21 +507,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ParticipantView</name>
-    <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
-    <message>
-        <source>Kick user</source>
-        <translation>Ejecter l&apos;utilisateur</translation>
-    </message>
-    <message>
-        <source>Enter the reason for kicking the user from the room.</source>
-        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
-    </message>
-</context>
-<context>
     <name>PhoneHistoryView</name>
     <message>
         <source>Call</source>
@@ -653,6 +638,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
+    </message>
+</context>
+<context>
+    <name>RoomParticipantView</name>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Kick user</source>
+        <translation>Ejecter l&apos;utilisateur</translation>
+    </message>
+    <message>
+        <source>Enter the reason for kicking the user from the room.</source>
+        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
     </message>
 </context>
 <context>

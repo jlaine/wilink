@@ -41,7 +41,7 @@ Rectangle {
             onParticipantClicked: chatInput.talkAt(participant)
         }
 
-        ParticipantView {
+        RoomParticipantView {
             id: participantView
 
             anchors.top: parent.top
