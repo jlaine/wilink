@@ -96,7 +96,7 @@ Item {
                     Rectangle {
                         id: rect
                         height: bodyText.height + 10
-                        border.color: model.received ? '#2689d6': '#7b7b7b'
+                        border.color: model.received ? '#84bde8': '#ababab'
                         border.width: model.action ? 0 : 1
                         color: model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa')
                         radius: 8
