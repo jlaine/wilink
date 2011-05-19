@@ -57,7 +57,15 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        color: '#ffb0c4de'
+//        color: '#b0c4de'
+        gradient: Gradient {
+            GradientStop { position:0.0; color: '#9fb7dd' }
+            GradientStop { position:0.5; color: '#597fbe' }
+            GradientStop { position:1.0; color: '#9fb7dd' }
+        }
+        border.color: '#aa567dbc'
+        border.width: 1
+
         width: parent.width
         height: 24
         z: 1
@@ -68,6 +76,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
+            color: '#ffffff'
             font.bold: true
         }
 
