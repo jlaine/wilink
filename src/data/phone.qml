@@ -122,4 +122,11 @@ Item {
         clip: true
         model: historyModel
     }
+
+    Connections {
+        target: historyView
+        onAddressClicked: {
+            console.log("clicked " + address);
+        }
+    }
 }

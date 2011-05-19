@@ -45,6 +45,7 @@ public:
         DirectionRole,
         DateRole,
         DurationRole,
+        IdRole,
         NameRole,
         StateRole,
     };

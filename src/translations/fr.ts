@@ -556,6 +556,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhoneHistoryView</name>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+</context>
+<context>
     <name>PhonePanel</name>
     <message>
         <source>Phone</source>

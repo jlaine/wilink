@@ -119,6 +119,7 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     roleNames.insert(DateRole, "date");
     roleNames.insert(DirectionRole, "direction");
     roleNames.insert(DurationRole, "duration");
+    roleNames.insert(IdRole, "id");
     roleNames.insert(NameRole, "name");
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
@@ -293,6 +294,8 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         return item->flags & FLAGS_DIRECTION;
     } else if (role == DurationRole) {
         return item->duration;
+    } else if (role == IdRole) {
+        return item->id;
     } else if (role == NameRole) {
         return sipAddressToName(item->address);
     }

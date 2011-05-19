@@ -79,8 +79,8 @@ Item {
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
                         // hide context menu
+                        menu.hide();
                         block.participantClicked(model.name);
-                        menu.state = '';
                     } else if (mouse.button == Qt.RightButton) {
                         // show context menu
                         menu.model.clear()
@@ -96,9 +96,7 @@ Item {
                                 'icon': 'remove.png',
                                 'text': qsTr('Kick user'),
                                 'jid': model.jid})
-                        menu.x = item.x + mouse.x - menu.width + 16;
-                        menu.y = item.y + mouse.y - 16;
-                        menu.state = 'visible';
+                        menu.show(item.x + mouse.x - menu.width + 16, item.y + mouse.y - 16);
                     }
                 }
                 onEntered: {

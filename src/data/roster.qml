@@ -73,6 +73,7 @@ Column {
             }
 
             onItemClicked: {
+                menu.hide();
                 var url = 'xmpp://' + window.objectName + '/' + model.jid + '?message';
                 Qt.openUrlExternally(url);
             }
@@ -98,9 +99,7 @@ Column {
                     'name': model.name,
                     'text': qsTr('Remove contact'),
                     'jid': model.jid});
-                menu.x = 16;
-                menu.y = point.y - 16;
-                menu.state = 'visible';
+                menu.show(16, point.y - 16);
             }
         }
 

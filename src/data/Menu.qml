@@ -33,7 +33,17 @@ Rectangle {
     height: model.count * 20 + 1
     width: 150
     z: 10
- 
+
+    function hide() {
+        menu.state = '';
+    }
+
+    function show(x, y) {
+        menu.x = x;
+        menu.y = y;
+        menu.state = 'visible';
+    }
+
     ListView {
         id: menuList
 
@@ -86,8 +96,8 @@ Rectangle {
                 hoverEnabled: true
 
                 onClicked: {
-                    itemClicked(index)
-                    menu.state = ''
+                    menu.hide();
+                    itemClicked(index);
                 }
 
                 onEntered: listViewItem.state = 'hovered'

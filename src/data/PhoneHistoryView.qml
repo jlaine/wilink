@@ -24,6 +24,7 @@ Item {
     id: block
 
     property alias model: view.model
+    signal addressClicked(string address)
 
     ListView {
         id: view
@@ -85,7 +86,39 @@ Item {
                     width: 60
                 }
             }
+
+            MouseArea {
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    if (mouse.button == Qt.LeftButton) {
+                        // hide context menu
+                        block.addressClicked(model.address);
+                        menu.hide();
+                    } else if (mouse.button == Qt.RightButton) {
+                        // show context menu
+                        menu.model.clear();
+                        menu.model.append({
+                            'action': 'call',
+                            'icon': 'call.png',
+                            'text': qsTr('Call'),
+                            'address': model.address});
+                        menu.model.append({
+                            'action': 'remove',
+                            'icon': 'remove.png',
+                            'text': qsTr('Remove'),
+                            'address': model.id});
+                        menu.show(item.x + mouse.x, item.y + mouse.y);
+                    }
+                }
+            }
         }
+    }
+
+    Menu {
+        id: menu
+        opacity: 0
     }
 
     ScrollBar {
