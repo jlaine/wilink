@@ -22,7 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: button
 
-    property url iconSource
+    property alias icon: image.source
     signal clicked
 
     width: 32; height: 32
@@ -37,10 +37,10 @@ Rectangle {
     smooth: true
 
     Image {
+        id: image
         width: button.height - 8; height: button.height - 8
         anchors.centerIn: parent
         smooth: true
-        source: iconSource
     }
 
     MouseArea {

@@ -93,7 +93,7 @@ Item {
         Button {
             id: hangupButton
 
-            iconSource: 'hangup.png'
+            icon: 'hangup.png'
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.margins: 4
@@ -102,7 +102,7 @@ Item {
         Button {
             id: cameraButton
 
-            iconSource: 'camera.png'
+            icon: 'camera.png'
             anchors.right: hangupButton.left
             anchors.top: parent.top
             anchors.margins: 4
