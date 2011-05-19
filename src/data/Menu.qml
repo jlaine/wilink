@@ -25,8 +25,11 @@ Rectangle {
     property ListModel model: ListModel {}
     signal itemClicked(int index)
 
-    color: 'transparent'
+    border.color: '#7997c1'
+    border.width: 1
+    color: '#b0c4de'
     opacity: 0
+    radius: 5
     height: model.count * 20 + 1
     width: 150
     z: 10
@@ -35,16 +38,18 @@ Rectangle {
         id: menuList
 
         anchors.fill: parent
+        anchors.topMargin: 1
+        anchors.leftMargin: 1
         clip: true
         model: menu.model
 
         delegate: Rectangle {
             id: listViewItem
 
-            border.color: 'transparent'
-            color: '#ea2689d6'
-            width: menuList.width - 1
+            color: 'transparent'
             height: 20
+            width: menuList.width
+            radius: menu.radius
 
             Image {
                 id: icon
@@ -64,7 +69,7 @@ Rectangle {
                 anchors.left: icon.right
                 anchors.leftMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                color: '#ffffff'
+                color: '#000000'
                 elide: Text.ElideRight
                 //font.pointSize: itemFontSize
                 text: model.text
@@ -73,8 +78,7 @@ Rectangle {
 
             states: State {
                 name: 'hovered'
-                PropertyChanges { target: listViewItem; color: '#eae7f4fe'; border.color: '#000000' }
-                PropertyChanges { target: itemText; color: '#496275' }
+                PropertyChanges { target: listViewItem; color: '#eae7f4fe' }
             }
 
             MouseArea {
