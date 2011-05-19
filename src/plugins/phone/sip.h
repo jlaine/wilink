@@ -109,6 +109,7 @@ private:
 class SipTransaction : public QXmppLoggable
 {
     Q_OBJECT
+    Q_ENUMS(State)
 
 public:
     enum State
@@ -149,6 +150,10 @@ private:
 class SipCall : public QXmppLoggable
 {
     Q_OBJECT
+    Q_PROPERTY(QXmppCall::Direction direction READ direction CONSTANT)
+    Q_PROPERTY(QXmppCall::State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
+    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
 
 public:
     ~SipCall();
@@ -161,6 +166,8 @@ public:
     QXmppCall::State state() const;
 
     QXmppRtpAudioChannel *audioChannel() const;
+    int inputVolume() const;
+    int outputVolume() const;
 
 signals:
     /// This signal is emitted when a call is connected.
@@ -208,6 +215,8 @@ private:
 class SipClient : public QXmppLoggable
 {
     Q_OBJECT
+    Q_ENUMS(State)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
     /// This enum is used to describe the state of a client.

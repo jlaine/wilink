@@ -78,8 +78,8 @@ Item {
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: Qt.VerticalOrientation
-                maximumValue: 100
-                value: 50
+                maximumValue: historyModel.maximumVolume
+                value: historyModel.inputVolume
             }
 
             Image {
@@ -98,8 +98,8 @@ Item {
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: Qt.VerticalOrientation
-                maximumValue: Qt.isQtObject(audio) ? audio.maximumVolume : 1
-                value: Qt.isQtObject(audio) ? audio.outputVolume : 0
+                maximumValue: historyModel.maximumVolume
+                value: historyModel.outputVolume
             }
 
             Image {

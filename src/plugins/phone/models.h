@@ -37,6 +37,9 @@ class SipCall;
 class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
+    Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
+    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
 
 public:
     enum Role {
@@ -52,6 +55,10 @@ public:
 
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
+
+    int inputVolume() const;
+    int maximumVolume() const;
+    int outputVolume() const;
 
     QList<SipCall*> activeCalls() const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;

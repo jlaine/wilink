@@ -762,6 +762,16 @@ QByteArray SipCall::id() const
     return d->id;
 }
 
+int SipCall::inputVolume() const
+{
+    return d->audioInputMeter ? d->audioInputMeter->value() : 0;
+}
+
+int SipCall::outputVolume() const
+{
+    return d->audioOutputMeter ? d->audioOutputMeter->value() : 0;
+}
+
 void SipCall::localCandidatesChanged()
 {
     // check whether we have server-reflexive candidates for all components

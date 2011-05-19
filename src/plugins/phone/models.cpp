@@ -31,6 +31,7 @@
 #include <QSortFilterProxyModel>
 #include <QTimer>
 
+#include "QSoundMeter.h"
 #include "QSoundPlayer.h"
 #include "QXmppUtils.h"
 
@@ -414,6 +415,23 @@ void PhoneCallsModel::hangup()
     for (int i = m_items.size() - 1; i >= 0; --i)
         if (m_items[i]->call)
             QMetaObject::invokeMethod(m_items[i]->call, "hangup");
+}
+
+int PhoneCallsModel::inputVolume() const
+{
+    QList<SipCall*> calls = activeCalls();
+    return calls.isEmpty() ? 0 : calls.first()->inputVolume();
+}
+
+int PhoneCallsModel::maximumVolume() const
+{
+    return QSoundMeter::maximum();
+}
+
+int PhoneCallsModel::outputVolume() const
+{
+    QList<SipCall*> calls = activeCalls();
+    return calls.isEmpty() ? 0 : calls.first()->outputVolume();
 }
 
 /** Removes \a count rows starting at the given \a row under the given \a parent.
