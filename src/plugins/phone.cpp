@@ -142,6 +142,18 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     hbox->addStretch();
     hbox->addWidget(groupBox);
 
+    // sip client
+    sip = new SipClient;
+    sip->setAudioInputDevice(wApp->audioInputDevice());
+    sip->setAudioOutputDevice(wApp->audioOutputDevice());
+    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
+                    sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
+    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
+                    sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
+    sip->moveToThread(wApp->soundThread());
+
     // input volume bar
     QGridLayout *barBox = new QGridLayout;
     QSoundMeterBar *inputBar = new QSoundMeterBar;
@@ -190,6 +202,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("historyModel", callsModel);
+    context->setContextProperty("sipClient", sip);
     context->setContextProperty("window", m_window);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
@@ -198,18 +211,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addWidget(declarativeView, 1);
 
     setLayout(layout);
-
-    // sip client
-    sip = new SipClient;
-    sip->setAudioInputDevice(wApp->audioInputDevice());
-    sip->setAudioOutputDevice(wApp->audioOutputDevice());
-    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
-                    sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
-                    sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    sip->moveToThread(wApp->soundThread());
 
     check = connect(sip, SIGNAL(callDialled(SipCall*)),
                     callsModel, SLOT(addCall(SipCall*)));
@@ -516,6 +517,9 @@ bool PhonePlugin::initialize(Chat *chat)
     const QString domain = chat->client()->configuration().domain();
     if (domain != "wifirst.net")
         return false;
+
+    qmlRegisterUncreatableType<SipClient>("wiLink", 1, 2, "SipClient", "");
+    qmlRegisterUncreatableType<SipCall>("wiLink", 1, 2, "SipCall", "");
 
     /* register panel */
     PhonePanel *panel = new PhonePanel(chat);

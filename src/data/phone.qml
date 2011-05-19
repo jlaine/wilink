@@ -19,6 +19,7 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
+import wiLink 1.2
 
 Item {
     anchors.fill: parent
@@ -178,7 +179,7 @@ Item {
     Connections {
         target: historyView
         onAddressClicked: {
-            numberEdit.text = parseAddress(address, 'wifirst.net');
+            numberEdit.text = parseAddress(address, sipClient.domain);
         }
     }
 }

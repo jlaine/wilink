@@ -217,6 +217,9 @@ class SipClient : public QXmppLoggable
     Q_OBJECT
     Q_ENUMS(State)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName)
+    Q_PROPERTY(QString domain READ domain WRITE setDomain)
+    Q_PROPERTY(QString username READ username WRITE setUsername)
 
 public:
     /// This enum is used to describe the state of a client.
