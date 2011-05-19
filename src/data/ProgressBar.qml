@@ -20,23 +20,28 @@
 import QtQuick 1.0
 
 Rectangle {
-    property real value: 0
+    property variant orientation: Qt.Horizontal
     property real minimumValue: 0
     property real maximumValue: 100
+    property real value: 0
 
-    width: 100; height: 16
+    width: orientation == Qt.Horizontal ? 100 : 16
+    height: orientation == Qt.Horizontal ? 16 : 100
     border.color: '#4a9ddd'
     color: '#e7f4fe'
     radius: 4
     smooth: true
 
     Rectangle {
+        property real position: (value - minimumValue) / (maximumValue - minimumValue)
+
         color: '#4a9ddd'
         anchors.bottom: parent.bottom
-        anchors.top: parent.top
+        anchors.left: parent.left
         radius: 4
         smooth: true
-        width: parent.width * (value - minimumValue) / (maximumValue - minimumValue)
+        width: orientation == Qt.Horizontal ? parent.width * position : parent.width
+        height: orientation == Qt.Horizontal ? parent.height : parent.height * position
     }
 }
 
