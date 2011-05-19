@@ -28,7 +28,7 @@ Rectangle {
     }
     signal itemClicked(int index)
 
-    height: 32
+    height: 40
     width: 250
 
     ListView {
@@ -45,7 +45,7 @@ Rectangle {
             id: listViewItem
 
             color: 'transparent'
-            //height: view.height
+            height: 40
             width: 40
             radius: 5
 
@@ -56,15 +56,14 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 smooth: true
                 source: model.icon
-                width: 16
-                height: 16
+                width: 24
+                height: 24
             }
 
             Text {
                 id: itemText
 
                 anchors.top: icon.bottom
-                anchors.topMargin: 4
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: '#000000'
                 text: model.text
