@@ -115,8 +115,13 @@ PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *netwo
     setRoleNames(roleNames);
 
     // http
-    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+    check = connect(m_network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
                     this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
+    Q_ASSERT(check);
+
+    // sip
+    check = connect(m_client, SIGNAL(callDialled(SipCall*)),
+                    this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);
 
     m_ticker = new QTimer(this);

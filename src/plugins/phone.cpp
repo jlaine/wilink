@@ -94,10 +94,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setLayout(layout);
     setFocusProxy(declarativeView);
 
-    check = connect(sip, SIGNAL(callDialled(SipCall*)),
-                    callsModel, SLOT(addCall(SipCall*)));
-    Q_ASSERT(check);
-
     check = connect(sip, SIGNAL(callReceived(SipCall*)),
                     this, SLOT(callReceived(SipCall*)));
     Q_ASSERT(check);
