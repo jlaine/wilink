@@ -59,9 +59,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // http access
     network = new QNetworkAccessManager(this);
-    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                    this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
-    Q_ASSERT(check);
 
     // sip client
     sip = new SipClient;
@@ -136,12 +133,6 @@ PhonePanel::~PhonePanel()
         loop.exec();
     }
     delete sip;
-}
-
-void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
-{
-    Q_UNUSED(reply);
-    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", authenticator);
 }
 
 void PhonePanel::callButtonClicked(QAbstractButton *button)

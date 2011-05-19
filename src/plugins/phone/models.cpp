@@ -30,6 +30,8 @@
 #include "QSoundPlayer.h"
 #include "QXmppUtils.h"
 
+#include "qnetio/wallet.h"
+
 #include "application.h"
 #include "models.h"
 #include "sip.h"
@@ -98,6 +100,8 @@ PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *netwo
     m_client(client),
     m_network(network)
 {
+    bool check;
+
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(ActiveRole, "active");
@@ -109,6 +113,11 @@ PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *netwo
     roleNames.insert(NameRole, "name");
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
+
+    // http
+    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                    this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
+    Q_ASSERT(check);
 
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);
@@ -162,6 +171,12 @@ void PhoneCallsModel::addCall(SipCall *call)
 
     // notify change
     emit currentCallsChanged();
+}
+
+void PhoneCallsModel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
+{
+    Q_UNUSED(reply);
+    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", authenticator);
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const

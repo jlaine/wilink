@@ -44,7 +44,6 @@ public:
     ~PhonePanel();
 
 private slots:
-    void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void callButtonClicked(QAbstractButton *button);
     void callReceived(SipCall *call);
     void error(const QString &error);
