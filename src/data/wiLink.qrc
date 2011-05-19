@@ -57,7 +57,6 @@
     <file>conversation.qml</file>
     <file>player.qml</file>
     <file>phone.qml</file>
-    <file>room.qml</file>
     <file>roster.qml</file>
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
@@ -65,6 +64,7 @@
     <file>HistoryView.qml</file>
     <file>KeyPad.qml</file>
     <file>Menu.qml</file>
+    <file>RoomPanel.qml</file>
     <file>RoomParticipantView.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>ProgressBar.qml</file>
