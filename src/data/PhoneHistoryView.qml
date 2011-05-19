@@ -25,6 +25,7 @@ Item {
 
     property alias model: view.model
     signal addressClicked(string address)
+    signal addressDoubleClicked(string address)
 
     ListView {
         id: view
@@ -45,7 +46,7 @@ Item {
                 id: itemBackground
                 anchors.fill: parent
                 border.color: '#ffffff'
-                color: '#ffffff'
+                color: model.active ? '#dd6666' : 'white'
                 gradient: Gradient {
                     GradientStop { id: stop1; position: 0.0; color: '#ffffff'  }
                     GradientStop { id: stop2; position: 1.0; color: '#ffffff'  }
@@ -93,10 +94,14 @@ Item {
                 hoverEnabled: true
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        // hide context menu
-                        block.addressClicked(model.address);
                         menu.hide();
+                        block.addressClicked(model.address);
                     } else if (mouse.button == Qt.RightButton) {
+                        if (model.active) {
+                            menu.hide();
+                            return;
+                        }
+
                         // show context menu
                         menu.model.clear();
                         menu.model.append({
@@ -110,6 +115,12 @@ Item {
                             'text': qsTr('Remove'),
                             'address': model.id});
                         menu.show(item.x + mouse.x, item.y + mouse.y);
+                    }
+                }
+                onDoubleClicked: {
+                    if (mouse.button == Qt.LeftButton) {
+                        menu.hide();
+                        block.addressDoubleClicked(model.address);
                     }
                 }
             }

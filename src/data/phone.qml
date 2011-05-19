@@ -201,5 +201,8 @@ Item {
         onAddressClicked: {
             numberEdit.text = parseAddress(address, sipClient.domain);
         }
+        onAddressDoubleClicked: {
+            historyModel.call(address)
+        }
     }
 }

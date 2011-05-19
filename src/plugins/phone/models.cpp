@@ -315,7 +315,7 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
     } else if (role == DirectionRole) {
         return item->flags & FLAGS_DIRECTION;
     } else if (role == DurationRole) {
-        return item->duration;
+        return item->call ? item->call->duration() : item->duration;
     } else if (role == IdRole) {
         return item->id;
     } else if (role == NameRole) {
