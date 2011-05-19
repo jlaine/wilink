@@ -29,15 +29,30 @@ Item {
         id: header
 
         anchors.left: parent.left
-        anchors.top: parent.top
         anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 4
         height: 32
 
-        TextEdit {
+        Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: backButton.left
+            anchors.rightMargin: 4
+            border.color: '#c3c3c3'
+            border.width: 1
+            color: '#ffffff'
+            height: input.paintedHeight + 16
             width: 100
+
+            TextEdit {
+                id: input
+                x: 8
+                y: 8
+                smooth: true
+                textFormat: TextEdit.PlainText
+                width: parent.width - 16
+            }
         }
 
         Button {
@@ -45,6 +60,7 @@ Item {
 
             anchors.top: parent.top
             anchors.right: callButton.left
+            anchors.rightMargin: 4
             icon: 'back.png'
         }
 
