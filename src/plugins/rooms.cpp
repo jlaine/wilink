@@ -155,6 +155,8 @@ QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
         return item->jid;
     } else if (role == ChatModel::NameRole) {
         return jidToResource(item->jid);
+    } else if (role == ChatModel::UrlRole) {
+        return VCardCache::instance()->profileUrl(item->jid);
     }
 
     return QVariant();
