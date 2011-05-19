@@ -37,6 +37,7 @@ Rectangle {
         anchors.topMargin: 1
         anchors.leftMargin: 1
         clip: true
+        interactive: false
         model: toolbar.model
         orientation: ListView.Horizontal
 
