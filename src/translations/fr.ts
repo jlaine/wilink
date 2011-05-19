@@ -543,6 +543,22 @@ Acceptez-vous?</translation>
         <source>You can subscribe to the phone service at the following address:</source>
         <translation>Vous pouvez vous abonner à une offre qui inclut la téléphonie à l&apos;adresse suivante :</translation>
     </message>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+    <message>
+        <source>Hangup</source>
+        <translation>Raccrocher</translation>
+    </message>
+    <message>
+        <source>Sorry, but the call could not be completed.</source>
+        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>L&apos;appel a échoué</translation>
+    </message>
 </context>
 <context>
     <name>PhotosPanel</name>
@@ -868,37 +884,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Your version of %1 is up to date.</source>
         <translation>Votre version de %1 est à jour.</translation>
-    </message>
-</context>
-<context>
-    <name>phone</name>
-    <message>
-        <source>Call</source>
-        <translation>Appeler</translation>
-    </message>
-    <message>
-        <source>Hangup</source>
-        <translation>Raccrocher</translation>
-    </message>
-    <message>
-        <source>Sorry, but the call could not be completed.</source>
-        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
-    </message>
-    <message>
-        <source>Call failed</source>
-        <translation>L&apos;appel a échoué</translation>
-    </message>
-    <message>
-        <source>%1 wants to talk to you.
-
-Do you accept?</source>
-        <translation>%1 souhaite vous parler.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Call from %1</source>
-        <translation>Appel de %1</translation>
     </message>
 </context>
 <context>

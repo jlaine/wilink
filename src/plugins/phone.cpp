@@ -87,7 +87,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     context->setContextProperty("window", m_window);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/phone.qml"));
+    declarativeView->setSource(QUrl("qrc:/PhonePanel.qml"));
 
     layout->addWidget(declarativeView, 1);
 

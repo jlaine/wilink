@@ -128,11 +128,11 @@ configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/t
 if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         ${wiLink_SOURCES}
-        data/phone.qml
         data/roster.qml
         data/CallWidget.qml
         data/RoomParticipantView.qml
         data/PhoneHistoryView.qml
+        data/PhonePanel.qml
         data/TransferWidget.qml
         translations/fr.ts)
 else(RELOAD_TRANSLATIONS)
