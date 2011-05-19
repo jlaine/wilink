@@ -58,8 +58,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 gradient: hoverGradient
-                opacity: 0.2
-                width: 1
+                opacity: 0.4
             }
 
             // left border
