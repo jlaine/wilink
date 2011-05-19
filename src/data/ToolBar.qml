@@ -46,7 +46,39 @@ Rectangle {
             color: 'transparent'
             height: 45
             width: itemText.paintedWidth + 24
-            radius: 5
+
+            Gradient {
+                id: hoverGradient
+                GradientStop { id: hoverStop1; position: 0.0; color: '#00ffffff' }
+                GradientStop { id: hoverStop2; position: 0.5; color: '#00ffffff' }
+                GradientStop { id: hoverStop3; position: 1.0; color: '#00ffffff' }
+            }
+
+            // background
+            Rectangle {
+                anchors.fill: parent
+                gradient: hoverGradient
+                opacity: 0.2
+                width: 1
+            }
+
+            // left border
+            Rectangle {
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                gradient: hoverGradient
+                width: 1
+            }
+
+            // right border
+            Rectangle {
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                gradient: hoverGradient
+                width: 1
+            }
 
             Image {
                 id: icon
@@ -70,7 +102,7 @@ Rectangle {
 
             states: State {
                 name: 'hovered'
-                PropertyChanges { target: listViewItem; color: '#eae7f4fe' }
+                PropertyChanges { target: hoverStop2; color: '#ffffff' }
             }
 
             MouseArea {
