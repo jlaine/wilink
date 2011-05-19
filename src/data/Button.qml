@@ -23,6 +23,7 @@ Rectangle {
     id: button
 
     property alias icon: image.source
+    property string text
     signal clicked
 
     width: 32; height: 32
