@@ -112,6 +112,17 @@ PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent
     : QAbstractListModel(parent),
     m_network(network)
 {
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ActiveRole, "active");
+    roleNames.insert(AddressRole, "address");
+    roleNames.insert(DateRole, "date");
+    roleNames.insert(DirectionRole, "direction");
+    roleNames.insert(DurationRole, "duration");
+    roleNames.insert(NameRole, "name");
+    roleNames.insert(StateRole, "state");
+    setRoleNames(roleNames);
+
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);
     connect(m_ticker, SIGNAL(timeout()),
@@ -276,6 +287,14 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         return item->address;
     } else if (role == ActiveRole) {
         return item->call != 0;
+    } else if (role == DateRole) {
+        return item->date;
+    } else if (role == DirectionRole) {
+        return item->flags & FLAGS_DIRECTION;
+    } else if (role == DurationRole) {
+        return item->duration;
+    } else if (role == NameRole) {
+        return sipAddressToName(item->address);
     }
 
     if (index.column() == NameColumn) {

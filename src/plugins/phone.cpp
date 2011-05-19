@@ -19,6 +19,10 @@
 
 #include <QAction>
 #include <QCoreApplication>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDomDocument>
 #include <QGroupBox>
@@ -180,7 +184,18 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
                     this, SLOT(historyDoubleClicked(QModelIndex)));
     Q_ASSERT(check);
-    layout->addWidget(callsView, 1);
+    layout->addWidget(callsView);
+
+    // declarative
+    declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
+    context->setContextProperty("historyModel", callsModel);
+    context->setContextProperty("window", m_window);
+
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/phone.qml"));
+
+    layout->addWidget(declarativeView, 1);
 
     setLayout(layout);
 

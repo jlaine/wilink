@@ -26,6 +26,7 @@
 
 class QAbstractButton;
 class QAuthenticator;
+class QDeclarativeView;
 class QGraphicsSimpleTextItem;
 class QLabel;
 class QLineEdit;
@@ -75,6 +76,7 @@ private:
 
     PhoneCallsModel *callsModel;
     PhoneCallsView *callsView;
+    QDeclarativeView *declarativeView;
 
     QPushButton *callButton;
     QPushButton *hangupButton;

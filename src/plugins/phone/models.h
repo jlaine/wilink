@@ -42,6 +42,11 @@ public:
     enum Role {
         AddressRole = Qt::UserRole,
         ActiveRole,
+        DirectionRole,
+        DateRole,
+        DurationRole,
+        NameRole,
+        StateRole,
     };
 
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);

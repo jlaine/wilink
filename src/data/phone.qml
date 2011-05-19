@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 
 Item {
     anchors.fill: parent
@@ -110,7 +111,7 @@ Item {
         }
     }
 
-    Rectangle {
+    PhoneHistoryView {
         id: historyView
 
         anchors.left: parent.left
@@ -118,6 +119,7 @@ Item {
         anchors.top: controls.bottom
         anchors.bottom: parent.bottom
         anchors.margins: 4
-        color: 'red'
+        clip: true
+        model: historyModel
     }
 }
