@@ -533,26 +533,26 @@ Acceptez-vous?</translation>
     <name>PhoneCallsModel</name>
     <message>
         <source>Connecting..</source>
-        <translation>Connexion..</translation>
+        <translation type="obsolete">Connexion..</translation>
     </message>
     <message>
         <source>Disconnecting..</source>
-        <translation>Déconnexion..</translation>
+        <translation type="obsolete">Déconnexion..</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation>Echoué</translation>
+        <translation type="obsolete">Echoué</translation>
     </message>
 </context>
 <context>
     <name>PhoneCallsView</name>
     <message>
         <source>Remove</source>
-        <translation>Retirer</translation>
+        <translation type="obsolete">Retirer</translation>
     </message>
     <message>
         <source>Call</source>
-        <translation>Appeler</translation>
+        <translation type="obsolete">Appeler</translation>
     </message>
 </context>
 <context>
@@ -574,7 +574,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Call</source>
-        <translation>Appeler</translation>
+        <translation type="obsolete">Appeler</translation>
     </message>
     <message>
         <source>Call from %1</source>
@@ -590,7 +590,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Hangup</source>
-        <translation>Raccrocher</translation>
+        <translation type="obsolete">Raccrocher</translation>
     </message>
     <message>
         <source>Your number is %1</source>

@@ -27,18 +27,11 @@
 class QAbstractButton;
 class QAuthenticator;
 class QDeclarativeView;
-class QGraphicsSimpleTextItem;
-class QLabel;
-class QLineEdit;
-class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
-class QPushButton;
-class QThread;
 class Chat;
 class ChatClient;
 class PhoneCallsModel;
-class PhoneCallsView;
 class SipCall;
 class SipClient;
 
@@ -52,20 +45,14 @@ public:
 
 private slots:
     void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
-    void backspacePressed();
     void callButtonClicked(QAbstractButton *button);
-    void callNumber();
     void callReceived(SipCall *call);
-    void callStateChanged(bool haveCalls);
     void error(const QString &error);
     void getSettings();
     void handleSettings();
-    void historyClicked(const QModelIndex &index);
-    void historyDoubleClicked(const QModelIndex &index);
     void keyPressed();
     void keyReleased();
     void openUrl(const QUrl &url);
-    void sipStateChanged(SipClient::State state);
 
 private:
     QAction *action;
@@ -75,12 +62,7 @@ private:
     QNetworkAccessManager *network;
 
     PhoneCallsModel *callsModel;
-    PhoneCallsView *callsView;
     QDeclarativeView *declarativeView;
-
-    QPushButton *callButton;
-    QPushButton *hangupButton;
-    QLineEdit *numberEdit;
 
     bool m_registeredHandler;
 };

@@ -21,14 +21,9 @@
 #include <QDateTime>
 #include <QDomDocument>
 #include <QDomElement>
-#include <QHeaderView>
-#include <QMenu>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QPixmap>
-#include <QResizeEvent>
-#include <QSortFilterProxyModel>
 #include <QTimer>
 
 #include "QSoundMeter.h"
@@ -39,19 +34,8 @@
 #include "models.h"
 #include "sip.h"
 
-#define DATE_WIDTH 150
-#define DURATION_WIDTH 60
-
 #define FLAGS_DIRECTION 0x1
 #define FLAGS_ERROR 0x2
-
-enum CallsColumns {
-    NameColumn = 0,
-    DateColumn,
-    DurationColumn,
-    SortingColumn,
-    MaxColumn,
-};
 
 static QString formatDuration(int secs)
 {
@@ -166,8 +150,8 @@ void PhoneCallsModel::addCall(SipCall *call)
     connect(item->reply, SIGNAL(finished()),
             this, SLOT(handleCreate()));
 
-    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-    m_items.append(item);
+    beginInsertRows(QModelIndex(), 0, 0);
+    m_items.prepend(item);
     endInsertRows();
 
     // schedule periodic refresh
@@ -177,7 +161,7 @@ void PhoneCallsModel::addCall(SipCall *call)
     }
 
     // notify change
-    emit activeCallsChanged();
+    emit currentCallsChanged();
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
@@ -191,7 +175,7 @@ QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
 bool PhoneCallsModel::call(const QString &address)
 {
     if (m_client->state() == SipClient::ConnectedState &&
-        activeCalls().isEmpty()) {
+        !currentCalls()) {
         QMetaObject::invokeMethod(m_client, "call", Q_ARG(QString, address));
         return true;
     }
@@ -252,7 +236,7 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
             item->flags |= FLAGS_ERROR;
             emit error(call->error());
         }
-        emit activeCallsChanged();
+        emit currentCallsChanged();
 
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
@@ -262,8 +246,7 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
 
         call->deleteLater();
     }
-    emit dataChanged(createIndex(row, NameColumn),
-                     createIndex(row, SortingColumn));
+    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
 }
 
 void PhoneCallsModel::callTick()
@@ -272,8 +255,7 @@ void PhoneCallsModel::callTick()
     for (int row = 0; row < m_items.size(); ++row) {
         if (m_items[row]->call) {
             active = true;
-            emit dataChanged(createIndex(row, DurationColumn),
-                             createIndex(row, DurationColumn));
+            emit dataChanged(createIndex(row, 0), createIndex(row, 0));
         }
     }
     if (!active) {
@@ -289,7 +271,7 @@ void PhoneCallsModel::callTick()
 int PhoneCallsModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return MaxColumn;
+    return 1;
 }
 
 int PhoneCallsModel::currentCalls() const
@@ -322,48 +304,6 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
         return sipAddressToName(item->address);
     }
 
-    if (index.column() == NameColumn) {
-        if (role == Qt::DisplayRole)
-            return sipAddressToName(item->address);
-        else if (role == Qt::DecorationRole) {
-            if ((item->flags & FLAGS_DIRECTION) == QXmppCall::OutgoingDirection)
-                return QPixmap(":/call-outgoing.png");
-            else
-                return QPixmap(":/call-incoming.png");
-        } else if(role == Qt::BackgroundRole && item->call) {
-            QLinearGradient grad(QPointF(0, 0), QPointF(0.8, 0));
-            grad.setColorAt(0, QColor(255, 0, 0, 144));
-            grad.setColorAt(1, Qt::transparent);
-            grad.setCoordinateMode(QGradient::ObjectBoundingMode);
-            return QBrush(grad);
-        }
-    } else if (index.column() == DateColumn) {
-        if (role == Qt::DisplayRole)
-            return item->date.toLocalTime().toString(Qt::SystemLocaleShortDate);
-    } else if (index.column() == DurationColumn && role == Qt::DisplayRole) {
-
-        if (item->call) {
-            switch (item->call->state())
-            {
-            case QXmppCall::ConnectingState:
-                return tr("Connecting..");
-            case QXmppCall::ActiveState:
-                return formatDuration(item->call->duration());
-            case QXmppCall::DisconnectingState:
-                return tr("Disconnecting..");
-            default:
-                break;
-            }
-        }
-        if (item->flags & FLAGS_ERROR)
-            return tr("Failed");
-        return QString::number(item->duration) + "s";
-
-    } else if (index.column() == SortingColumn) {
-        if (role == Qt::DisplayRole)
-            return QString::number(item->date.toTime_t());
-    }
-
     return QVariant();
 }
 
@@ -393,8 +333,7 @@ void PhoneCallsModel::handleCreate()
         return;
     }
     item->parse(doc.documentElement());
-    emit dataChanged(createIndex(row, NameColumn),
-                     createIndex(row, SortingColumn));
+    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
 }
 
 void PhoneCallsModel::handleList()
@@ -421,8 +360,8 @@ void PhoneCallsModel::handleList()
             PhoneCallsItem *item = new PhoneCallsItem;
             item->parse(callElement);
 
-            beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-            m_items.append(item);
+            beginInsertRows(QModelIndex(), 0, 0);
+            m_items.prepend(item);
             endInsertRows();
         }
         callElement = callElement.nextSiblingElement("call");
@@ -500,101 +439,5 @@ void PhoneCallsModel::setUrl(const QUrl &url)
 
     QNetworkReply *reply = m_network->get(buildRequest(m_url));
     connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
-}
-
-PhoneCallsView::PhoneCallsView(PhoneCallsModel *model, QWidget *parent)
-    : QTableView(parent),
-    m_callsModel(model)
-{
-    m_sortedModel = new QSortFilterProxyModel(this);
-    m_sortedModel->setSourceModel(model);
-    m_sortedModel->setDynamicSortFilter(true);
-    m_sortedModel->setFilterKeyColumn(SortingColumn);
-    setModel(m_sortedModel);
-
-    setAlternatingRowColors(true);
-    setColumnHidden(SortingColumn, true);
-    setColumnWidth(DateColumn, DATE_WIDTH);
-    setColumnWidth(DurationColumn, DURATION_WIDTH);
-    setShowGrid(false);
-    setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::SingleSelection);
-    setSortingEnabled(true);
-    sortByColumn(SortingColumn, Qt::DescendingOrder);
-    horizontalHeader()->setVisible(false);
-    verticalHeader()->setVisible(false);
-}
-
-void PhoneCallsView::contextMenuEvent(QContextMenuEvent *event)
-{
-    QModelIndex index = indexAt(event->pos());
-    if (index.isValid()) {
-        QAction *action;
-        bool check;
-        QMenu *menu = new QMenu(this);
-
-        action = menu->addAction(QIcon(":/call.png"), tr("Call"));
-        if (!m_callsModel->activeCalls().isEmpty())
-            action->setEnabled(false);
-        check = connect(action, SIGNAL(triggered()),
-                        this, SLOT(callSelected()));
-        Q_ASSERT(check);
-
-        action = menu->addAction(QIcon(":/remove.png"), tr("Remove"));
-        if (index.data(PhoneCallsModel::ActiveRole).toBool())
-            action->setEnabled(false);
-        check = connect(action, SIGNAL(triggered()),
-                        this, SLOT(removeSelected()));
-        Q_ASSERT(check);
-
-        menu->popup(event->globalPos());
-    }
-}
-
-void PhoneCallsView::callSelected()
-{
-    QModelIndexList indexes = selectedIndexes();
-    if (!indexes.isEmpty())
-        emit doubleClicked(indexes.first());
-}
-
-void PhoneCallsView::currentChanged(const QModelIndex &current, const QModelIndex &previous)
-{
-    QTableView::currentChanged(current, previous);
-    if (current.isValid())
-        emit clicked(current);
-}
-
-void PhoneCallsView::keyPressEvent(QKeyEvent *event)
-{
-    const QModelIndex &index = currentIndex();
-    if (index.isValid()) {
-        if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
-        {
-            if (!index.data(PhoneCallsModel::ActiveRole).toBool())
-                m_sortedModel->removeRow(index.row());
-        }
-        else if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
-            emit doubleClicked(index);
-    }
-    QTableView::keyPressEvent(event);
-}
-
-void PhoneCallsView::removeSelected()
-{
-    QModelIndexList indexes = selectedIndexes();
-    if (!indexes.isEmpty()) {
-        QModelIndex index = indexes.first();
-        if (!index.data(PhoneCallsModel::ActiveRole).toBool())
-            m_sortedModel->removeRow(indexes.first().row());
-    }
-}
-
-void PhoneCallsView::resizeEvent(QResizeEvent *e)
-{
-    QTableView::resizeEvent(e);
-    setColumnWidth(NameColumn, e->size().width() - DATE_WIDTH - DURATION_WIDTH);
-    setColumnWidth(DateColumn, DATE_WIDTH);
-    setColumnWidth(DurationColumn, DURATION_WIDTH);
 }
 

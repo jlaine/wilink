@@ -23,13 +23,11 @@
 #include <QAbstractListModel>
 #include <QList>
 #include <QUrl>
-#include <QTableView>
 
 #include "QXmppCallManager.h"
 
 class QNetworkAccessManager;
 class QNetworkRequest;
-class QSortFilterProxyModel;
 class QTimer;
 class PhoneCallsItem;
 class SipCall;
@@ -38,8 +36,7 @@ class SipClient;
 class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QList<SipCall*> activeCalls READ activeCalls NOTIFY activeCallsChanged)
-    Q_PROPERTY(int currentCalls READ currentCalls NOTIFY activeCallsChanged)
+    Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
@@ -59,7 +56,6 @@ public:
     PhoneCallsModel(SipClient *client, QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
 
-    QList<SipCall*> activeCalls() const;
     int currentCalls() const;
     int inputVolume() const;
     int maximumVolume() const;
@@ -72,7 +68,7 @@ public:
     void setUrl(const QUrl &url);
 
 signals:
-    void activeCallsChanged();
+    void currentCallsChanged();
     void error(const QString &error);
     void inputVolumeChanged(int);
     void outputVolumeChanged(int);
@@ -91,6 +87,7 @@ private slots:
     void handleList();
 
 private:
+    QList<SipCall*> activeCalls() const;
     QNetworkRequest buildRequest(const QUrl &url) const;
 
     SipClient *m_client;
@@ -98,30 +95,6 @@ private:
     QNetworkAccessManager *m_network;
     QTimer *m_ticker;
     QUrl m_url;
-};
-
-class PhoneCallsView : public QTableView
-{
-    Q_OBJECT
-
-public:
-    PhoneCallsView(PhoneCallsModel *model, QWidget *parent = 0);
-
-protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent *e);
-
-protected slots:
-    void currentChanged(const QModelIndex &current, const QModelIndex &previous);
-
-private slots:
-    void callSelected();
-    void removeSelected();
-
-private:
-    PhoneCallsModel *m_callsModel;
-    QSortFilterProxyModel *m_sortedModel;
 };
 
 #endif

@@ -106,20 +106,9 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // calls buttons
     QHBoxLayout *hbox = new QHBoxLayout;
-    numberEdit = new QLineEdit;
-    hbox->addWidget(numberEdit);
-    setFocusProxy(numberEdit);
     QPushButton *backspaceButton = new QPushButton;
     backspaceButton->setIcon(QIcon(":/back.png"));
     hbox->addWidget(backspaceButton);
-    callButton = new QPushButton(tr("Call"));
-    callButton->setIcon(QIcon(":/call.png"));
-    callButton->setEnabled(false);
-    hbox->addWidget(callButton);
-    hangupButton = new QPushButton(tr("Hangup"));
-    hangupButton->setIcon(QIcon(":/hangup.png"));
-    hangupButton->hide();
-    hbox->addWidget(hangupButton);
     layout->addLayout(hbox);
 
     // keyboard
@@ -180,23 +169,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     check = connect(callsModel, SIGNAL(error(QString)),
                     this, SLOT(error(QString)));
     Q_ASSERT(check);
-    check = connect(callsModel, SIGNAL(stateChanged(bool)),
-                    this, SLOT(callStateChanged(bool)));
-    Q_ASSERT(check);
     check = connect(callsModel, SIGNAL(inputVolumeChanged(int)),
                     inputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
     check = connect(callsModel, SIGNAL(outputVolumeChanged(int)),
                     outputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
-    callsView = new PhoneCallsView(callsModel, this);
-    check = connect(callsView, SIGNAL(clicked(QModelIndex)),
-                    this, SLOT(historyClicked(QModelIndex)));
-    Q_ASSERT(check);
-    check = connect(callsView, SIGNAL(doubleClicked(QModelIndex)),
-                    this, SLOT(historyDoubleClicked(QModelIndex)));
-    Q_ASSERT(check);
-    layout->addWidget(callsView);
 
     // declarative
     declarativeView = new QDeclarativeView;
@@ -211,6 +189,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addWidget(declarativeView, 1);
 
     setLayout(layout);
+    setFocusProxy(declarativeView);
 
     check = connect(sip, SIGNAL(callDialled(SipCall*)),
                     callsModel, SLOT(addCall(SipCall*)));
@@ -224,25 +203,10 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
                     client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
 
-    check = connect(sip, SIGNAL(stateChanged(SipClient::State)),
-                    this, SLOT(sipStateChanged(SipClient::State)));
-    Q_ASSERT(check);
-
     // connect signals
-    check = connect(backspaceButton, SIGNAL(clicked()),
-                    this, SLOT(backspacePressed()));
-    Q_ASSERT(check);
     check = connect(client, SIGNAL(connected()),
                     this, SLOT(getSettings()));
     Q_ASSERT(check);
-    check = connect(numberEdit, SIGNAL(returnPressed()),
-                    this, SLOT(callNumber()));
-    Q_ASSERT(check);
-    check = connect(callButton, SIGNAL(clicked()),
-                    this, SLOT(callNumber()));
-    Q_ASSERT(check);
-    check = connect(hangupButton, SIGNAL(clicked()),
-                    callsModel, SLOT(hangup()));
 
     // add action
     action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
@@ -271,11 +235,6 @@ void PhonePanel::authenticationRequired(QNetworkReply *reply, QAuthenticator *au
     QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", authenticator);
 }
 
-void PhonePanel::backspacePressed()
-{
-    numberEdit->backspace();
-}
-
 void PhonePanel::callButtonClicked(QAbstractButton *button)
 {
     QMessageBox *box = qobject_cast<QMessageBox*>(sender());
@@ -288,19 +247,6 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
     else
         QMetaObject::invokeMethod(call, "hangup");
     box->deleteLater();
-}
-
-void PhonePanel::callNumber()
-{
-    const QString recipient = numberEdit->text().replace(QRegExp("\\s+"), QString());
-    if (sip->state() != SipClient::ConnectedState ||
-        !callsModel->activeCalls().isEmpty() ||
-        recipient.isEmpty())
-        return;
-
-    numberEdit->clear();
-    const QString address = buildAddress(recipient, sip->domain());
-    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
 }
 
 void PhonePanel::callReceived(SipCall *call)
@@ -320,17 +266,6 @@ void PhonePanel::callReceived(SipCall *call)
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callButtonClicked(QAbstractButton*)));
     box->show();
-}
-
-void PhonePanel::callStateChanged(bool haveCalls)
-{
-    if (haveCalls) {
-        callButton->hide();
-        hangupButton->show();
-    } else {
-        hangupButton->hide();
-        callButton->show();
-    }
 }
 
 void PhonePanel::error(const QString &error)
@@ -416,26 +351,6 @@ void PhonePanel::handleSettings()
     action->setVisible(true);
 }
 
-void PhonePanel::historyClicked(const QModelIndex &index)
-{
-    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
-    if (recipient.isEmpty())
-        return;
-    numberEdit->setText(recipient);
-}
-
-void PhonePanel::historyDoubleClicked(const QModelIndex &index)
-{
-    const QString recipient = parseAddress(index.data(PhoneCallsModel::AddressRole).toString(), sip->domain());
-    if (sip->state() != SipClient::ConnectedState ||
-        !callsModel->activeCalls().isEmpty() ||
-        recipient.isEmpty())
-        return;
-
-    const QString address = buildAddress(recipient, sip->domain());
-    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, address));
-}
-
 static QXmppRtpAudioChannel::Tone keyTone(QPushButton *key)
 {
     char c = key->text()[0].toLatin1();
@@ -455,10 +370,13 @@ void PhonePanel::keyPressed()
     if (!key)
         return;
 
+#if 0
+    // FIXME: send DTMF
     QList<SipCall*> calls = callsModel->activeCalls();
     QXmppRtpAudioChannel::Tone tone = keyTone(key);
     foreach (SipCall *call, calls)
         call->audioChannel()->startTone(tone);
+#endif
 }
 
 void PhonePanel::keyReleased()
@@ -466,41 +384,33 @@ void PhonePanel::keyReleased()
     QPushButton *key = qobject_cast<QPushButton*>(sender());
     if (!key)
         return;
-    QList<SipCall*> calls = callsModel->activeCalls();
 
     // add digit
-    if (calls.isEmpty()) {
-        numberEdit->insert(key->text());
+    if (!callsModel->currentCalls()) {
+        //numberEdit->insert(key->text());
         return;
     }
 
-    // send DTMF
+#if 0
+    // FIXME: send DTMF
+    QList<SipCall*> calls = callsModel->activeCalls();
     QXmppRtpAudioChannel::Tone tone = keyTone(key);
     foreach (SipCall *call, calls)
         call->audioChannel()->stopTone(tone);
+#endif
 }
 
 /** Open a SIP URI.
  */
 void PhonePanel::openUrl(const QUrl &url)
 {
-    if (sip->state() != SipClient::ConnectedState ||
-        !callsModel->activeCalls().isEmpty() ||
-        url.scheme() != "sip")
+    if (url.scheme() != "sip")
         return;
 
     const QString phoneNumber = url.path().split('@').first();
     const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
-    QMetaObject::invokeMethod(sip, "call", Q_ARG(QString, recipient));
-    emit showPanel();
-}
-
-void PhonePanel::sipStateChanged(SipClient::State state)
-{
-    if (state == SipClient::ConnectedState)
-        callButton->setEnabled(true);
-    else
-        callButton->setEnabled(false);
+    if (callsModel->call(recipient))
+        emit showPanel();
 }
 
 // PLUGIN
