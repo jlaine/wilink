@@ -33,36 +33,16 @@ Rectangle {
         z: 1
     }
 
-    Item {
+    HistoryView {
+        id: historyView
+
         anchors.top: widgetBar.bottom
         anchors.bottom: chatInput.top
         anchors.left: parent.left
         anchors.right: parent.right
-    
-        HistoryView {
-            id: historyView
+        model: historyModel
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: Qt.isQtObject(participantModel) ? participantView.left : parent.right
-            model: historyModel
-
-            onParticipantClicked: chatInput.talkAt(participant)
-        }
-
-        ParticipantView {
-            id: participantView
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            model: participantModel
-            visible: Qt.isQtObject(participantModel)
-            width: 80
-
-            onParticipantClicked: chatInput.talkAt(participant)
-        }
+        onParticipantClicked: chatInput.talkAt(participant)
     }
 
     ChatEdit {
@@ -74,8 +54,7 @@ Rectangle {
         model: participantModel
 
         onChatStateChanged: {
-            if (conversationHasState)
-                conversation.state = chatInput.chatState;
+            conversation.state = chatInput.chatState;
         }
 
         onReturnPressed: {

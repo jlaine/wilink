@@ -444,7 +444,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", mucRoom);
-    context->setContextProperty("conversationHasState", qVariantFromValue(false));
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
     context->setContextProperty("window", chat);

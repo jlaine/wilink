@@ -209,7 +209,6 @@ ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRo
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("conversation", helper);
-    context->setContextProperty("conversationHasState", true);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", qVariantFromValue<QObject*>(0));
     historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
