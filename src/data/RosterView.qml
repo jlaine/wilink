@@ -76,7 +76,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             height: 24
             width: 24
-            iconSource: 'add.png'
+            icon: 'add.png'
 
             onClicked: block.addClicked()
         }

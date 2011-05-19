@@ -72,7 +72,7 @@ Item {
 
             anchors.right: closeButton.left
             anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'file.png'
+            icon: 'file.png'
             //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
             visible: job && job.state == QXmppTransferJob.FinishedState
         }
@@ -83,7 +83,7 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'close.png'
+            icon: 'close.png'
         }
     }
 
