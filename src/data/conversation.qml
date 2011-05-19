@@ -72,10 +72,6 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         model: participantModel
-    }
-
-    Connections {
-        target: chatInput
 
         onChatStateChanged: {
             if (conversationHasState)
