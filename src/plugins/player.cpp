@@ -554,7 +554,7 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     QDeclarativeView *view = new QDeclarativeView;
     QDeclarativeContext *ctxt = view->rootContext();
     ctxt->setContextProperty("playerModel", m_model);
-    view->setSource(QUrl("qrc:/player.qml"));
+    view->setSource(QUrl("qrc:/PlayerPanel.qml"));
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     layout->addWidget(view, 1);
     setFocusProxy(view);
