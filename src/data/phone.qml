@@ -143,7 +143,15 @@ Item {
             id: keypad
 
             onKeyPressed: {
-                console.log("key pressed " + key.name + ": " + key.tone);
+                if (historyModel.currentCalls)
+                    historyModel.startTone(key.tone);
+            }
+
+            onKeyReleased: {
+                if (historyModel.currentCalls)
+                    historyModel.stopTone(key.tone);
+                else
+                    numberEdit.text += key.name;
             }
         }
 

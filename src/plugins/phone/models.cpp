@@ -441,3 +441,22 @@ void PhoneCallsModel::setUrl(const QUrl &url)
     connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
 }
 
+/** Starts sending a tone.
+ *
+ * @param tone
+ */
+void PhoneCallsModel::startTone(QXmppRtpAudioChannel::Tone tone)
+{
+    foreach (SipCall *call, activeCalls())
+        call->audioChannel()->startTone(tone);
+}
+
+/** Stops sending a tone.
+ *
+ * @param tone
+ */
+void PhoneCallsModel::stopTone(QXmppRtpAudioChannel::Tone tone)
+{
+    foreach (SipCall *call, activeCalls())
+        call->audioChannel()->stopTone(tone);
+}

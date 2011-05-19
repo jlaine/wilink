@@ -24,6 +24,7 @@ GridView {
     id: grid
 
     signal keyPressed(variant key)
+    signal keyReleased(variant key)
 
     cellWidth: 40
     cellHeight: 40
@@ -57,11 +58,12 @@ GridView {
 
             onPressed: {
                 button.state = 'pressed'
+                grid.keyPressed(model)
             }
 
             onReleased: {
                 button.state = ''
-                grid.keyPressed(model)
+                grid.keyReleased(model)
             }
         }
 

@@ -25,6 +25,7 @@
 #include <QUrl>
 
 #include "QXmppCallManager.h"
+#include "QXmppRtpChannel.h"
 
 class QNetworkAccessManager;
 class QNetworkRequest;
@@ -78,6 +79,8 @@ public slots:
     void addCall(SipCall *call);
     bool call(const QString &address);
     void hangup();
+    void startTone(QXmppRtpAudioChannel::Tone tone);
+    void stopTone(QXmppRtpAudioChannel::Tone tone);
 
 private slots:
     void callRinging();

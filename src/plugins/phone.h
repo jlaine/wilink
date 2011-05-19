@@ -50,8 +50,6 @@ private slots:
     void error(const QString &error);
     void getSettings();
     void handleSettings();
-    void keyPressed();
-    void keyReleased();
     void openUrl(const QUrl &url);
 
 private:

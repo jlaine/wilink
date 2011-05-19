@@ -109,25 +109,8 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     sip->moveToThread(wApp->soundThread());
 
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setSpacing(0);
     layout->addLayout(headerLayout());
-
-    // keyboard
-    QGridLayout *grid = new QGridLayout;
-    QStringList keys;
-    keys << "1" << "2" << "3";
-    keys << "4" << "5" << "6";
-    keys << "7" << "8" << "9";
-    keys << "*" << "0" << "#";
-    for (int i = 0; i < keys.size(); ++i) {
-        QPushButton *key = new QPushButton(keys[i]);
-        connect(key, SIGNAL(pressed()), this, SLOT(keyPressed()));
-        connect(key, SIGNAL(released()), this, SLOT(keyReleased()));
-        grid->addWidget(key, i / 3, i % 3, 1, 1);
-    }
-    QGroupBox *groupBox = new QGroupBox;
-    groupBox->setLayout(grid);
-
-    layout->addWidget(groupBox);
 
     // history
     callsModel = new PhoneCallsModel(sip, network, this);
@@ -308,55 +291,6 @@ void PhonePanel::handleSettings()
 
     // enable action
     action->setVisible(true);
-}
-
-static QXmppRtpAudioChannel::Tone keyTone(QPushButton *key)
-{
-    char c = key->text()[0].toLatin1();
-    if (c >= '0' && c <= '9')
-        return QXmppRtpAudioChannel::Tone(c - '0');
-    else if (c == '*')
-        return QXmppRtpAudioChannel::Tone_Star;
-    else if (c == '#')
-        return QXmppRtpAudioChannel::Tone_Pound;
-    else
-        return QXmppRtpAudioChannel::Tone(-1);
-}
-
-void PhonePanel::keyPressed()
-{
-    QPushButton *key = qobject_cast<QPushButton*>(sender());
-    if (!key)
-        return;
-
-#if 0
-    // FIXME: send DTMF
-    QList<SipCall*> calls = callsModel->activeCalls();
-    QXmppRtpAudioChannel::Tone tone = keyTone(key);
-    foreach (SipCall *call, calls)
-        call->audioChannel()->startTone(tone);
-#endif
-}
-
-void PhonePanel::keyReleased()
-{
-    QPushButton *key = qobject_cast<QPushButton*>(sender());
-    if (!key)
-        return;
-
-    // add digit
-    if (!callsModel->currentCalls()) {
-        //numberEdit->insert(key->text());
-        return;
-    }
-
-#if 0
-    // FIXME: send DTMF
-    QList<SipCall*> calls = callsModel->activeCalls();
-    QXmppRtpAudioChannel::Tone tone = keyTone(key);
-    foreach (SipCall *call, calls)
-        call->audioChannel()->stopTone(tone);
-#endif
 }
 
 /** Open a SIP URI.
