@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 
 Item {
     id: block
@@ -83,11 +84,18 @@ Item {
                     } else if (mouse.button == Qt.RightButton) {
                         // show context menu
                         menu.model.clear()
-                        if (model.url != '')
+                        if (model.url != undefined && model.url != '')
                             menu.model.append({
+                                'action': 'profile',
                                 'icon': 'diagnostics.png',
                                 'text': qsTr('Show profile'),
-                                'url':model.url})
+                                'url': model.url})
+                        if (conversation.allowedActions & QXmppMucRoom.KickAction)
+                            menu.model.append({
+                                'action': 'kick',
+                                'icon': 'remove.png',
+                                'text': qsTr('Kick user'),
+                                'jid': model.jid})
                         menu.x = item.x + mouse.x - menu.width + 16;
                         menu.y = item.y + mouse.y - 16;
                         menu.state = 'visible';
@@ -126,6 +134,18 @@ Item {
 
     Connections {
         target: menu
-        onItemClicked: Qt.openUrlExternally(menu.model.get(index).url)
+        onItemClicked: {
+            var item = menu.model.get(index);
+            if (item.action == 'profile') {
+                Qt.openUrlExternally(item.url)
+            } else if (item.action == 'kick') {
+                var dialog = window.inputDialog();
+                dialog.windowTitle = qsTr('Kick user');
+                dialog.labelText = qsTr('Enter the reason for kicking the user from the room.');
+                if (dialog.exec()) {
+                    conversation.kick(item.jid, dialog.textValue);
+                }
+            }
+        }
     }
 }

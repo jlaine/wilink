@@ -129,7 +129,6 @@ private slots:
     void join();
     void left();
     void kicked(const QString &jid, const QString &reason);
-    void kickUser();
     void messageReceived(const QXmppMessage &msg);
     void subjectChanged(const QString &subject);
 

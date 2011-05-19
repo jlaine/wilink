@@ -307,14 +307,6 @@ Acceptez-vous?</translation>
         <translation>Sujet :</translation>
     </message>
     <message>
-        <source>Kick user</source>
-        <translation>Ejecter l&apos;utilisateur</translation>
-    </message>
-    <message>
-        <source>Enter the reason for kicking the user from &apos;%1&apos;.</source>
-        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur de &apos;%1&apos;.</translation>
-    </message>
-    <message>
         <source>Invite</source>
         <translation>Inviter</translation>
     </message>
@@ -527,6 +519,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Show profile</source>
         <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Kick user</source>
+        <translation>Ejecter l&apos;utilisateur</translation>
+    </message>
+    <message>
+        <source>Enter the reason for kicking the user from the room.</source>
+        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
     </message>
 </context>
 <context>

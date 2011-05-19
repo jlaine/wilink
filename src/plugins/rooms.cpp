@@ -444,6 +444,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     context->setContextProperty("conversationHasState", qVariantFromValue(false));
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
+    context->setContextProperty("window", chat);
 
     historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
@@ -597,29 +598,6 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
         mucRoom->setConfiguration(dialog.form());
 }
 
-#if 0
-void ChatRoom::customContextMenuRequested(const QPoint &pos)
-{
-    const QModelIndex index = participantsList->currentIndex();
-    if (!index.isValid() ||
-        index.data(ChatRosterModel::TypeRole).toInt() != ChatRosterModel::RoomMember)
-        return;
-
-    QMenu *menu = new QMenu;
-    const QString jid = index.data(ChatModel::JidRole).toString();
-    if (mucRoom->allowedActions() & QXmppMucRoom::KickAction) {
-        QAction *action = menu->addAction(QIcon(":/remove.png"), tr("Kick user"));
-        action->setData(jid);
-        connect(action, SIGNAL(triggered()), this, SLOT(kickUser()));
-    }
-    // FIXME : is there a better way to test if a menu is empty?
-    if (menu->sizeHint().height() > 4)
-        menu->popup(participantsList->mapToGlobal(pos));
-    else
-        delete menu;
-}
-#endif
-
 void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     if (disco.from() != mucRoom->jid() || disco.type() != QXmppIq::Result)
@@ -677,25 +655,6 @@ void ChatRoom::kicked(const QString &jid, const QString &reason)
         tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
             .arg(mucRoom->jid())
             .arg(reason));
-}
-
-/** Kick a user from a chat room.
- */
-void ChatRoom::kickUser()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString jid = action->data().toString();
-
-    // prompt for reason
-    bool ok = false;
-    QString reason;
-    reason = QInputDialog::getText(chat, tr("Kick user"),
-                  tr("Enter the reason for kicking the user from '%1'.").arg(jidToUser(mucRoom->jid())),
-                  QLineEdit::Normal, reason, &ok);
-    if (ok)
-        mucRoom->kick(jid, reason);
 }
 
 /** Handle leaving the room.
@@ -994,6 +953,8 @@ public:
 
 bool RoomsPlugin::initialize(Chat *chat)
 {
+    qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
+
     new ChatRoomWatcher(chat);
     return true;
 }
