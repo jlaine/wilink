@@ -50,7 +50,7 @@ Item {
 
         var recipient = cap[2].substr(4);
         var bits = recipient.split('@');
-        if (bits[1] == sipDomain || bits[1].match('/[0-9]+/'))
+        if (bits[1] == sipDomain || bits[1].match(/^[0-9]+/))
             return bits[0];
         else
             return recipient;
@@ -73,11 +73,11 @@ Item {
             border.color: '#c3c3c3'
             border.width: 1
             color: '#ffffff'
-            height: input.paintedHeight + 16
+            height: numberEdit.paintedHeight + 16
             width: 100
 
             TextEdit {
-                id: input
+                id: numberEdit
                 focus: true
                 x: 8
                 y: 8
@@ -103,6 +103,10 @@ Item {
             anchors.right: parent.right
             icon: 'call.png'
             text: qsTr('Call')
+
+            onClicked: {
+                console.log('call ' + numberEdit.text);
+            }
         }
     }
     
@@ -174,7 +178,7 @@ Item {
     Connections {
         target: historyView
         onAddressClicked: {
-            console.log("clicked " + address);
+            numberEdit.text = parseAddress(address, 'wifirst.net');
         }
     }
 }
