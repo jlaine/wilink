@@ -123,7 +123,7 @@ void ChatTransfersWatcher::addJob(QXmppTransferJob *job)
     if (index.isValid())
         QMetaObject::invokeMethod(chatWindow, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    ChatDialog *panel = qobject_cast<ChatDialog*>(chatWindow->panel(bareJid));
+    ChatDialogPanel *panel = qobject_cast<ChatDialogPanel*>(chatWindow->panel(bareJid));
     if (panel) {
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__transfer_component").value<QObject*>());
@@ -266,7 +266,7 @@ bool TransfersPlugin::initialize(Chat *chat)
 void TransfersPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     ChatTransfersWatcher *watcher = m_watchers.value(chat);
-    ChatDialog *dialog = qobject_cast<ChatDialog*>(panel);
+    ChatDialogPanel *dialog = qobject_cast<ChatDialogPanel*>(panel);
     if (!watcher || !dialog)
         return;
 

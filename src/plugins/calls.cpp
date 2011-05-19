@@ -433,7 +433,7 @@ void CallWatcher::addCall(QXmppCall *call)
     if (index.isValid())
         QMetaObject::invokeMethod(m_window, "rosterClicked", Q_ARG(QModelIndex, index));
 
-    ChatDialog *panel = qobject_cast<ChatDialog*>(m_window->panel(bareJid));
+    ChatDialogPanel *panel = qobject_cast<ChatDialogPanel*>(m_window->panel(bareJid));
     if (panel) {
         // load component if needed
         QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__call_component").value<QObject*>());
@@ -602,7 +602,7 @@ void CallsPlugin::finalize(Chat *chat)
 void CallsPlugin::polish(Chat *chat, ChatPanel *panel)
 {
     CallWatcher *watcher = m_watchers.value(chat);
-    if (!watcher || !qobject_cast<ChatDialog*>(panel))
+    if (!watcher || !qobject_cast<ChatDialogPanel*>(panel))
         return;
 
     const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::VoiceFeature);

@@ -171,7 +171,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatDialog</name>
+    <name>ChatDialogPanel</name>
     <message>
         <source>is composing a message</source>
         <translation>compose un message</translation>

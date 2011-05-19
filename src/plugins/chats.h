@@ -75,12 +75,12 @@ private:
     QXmppMessage::State m_state;
 };
 
-class ChatDialog : public ChatPanel
+class ChatDialogPanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
     QDeclarativeView *declarativeView() const;
 
 public slots:

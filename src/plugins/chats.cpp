@@ -173,7 +173,7 @@ bool ChatDialogHelper::sendMessage(const QString &body)
     return true;
 }
 
-ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
+ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatPanel(parent),
     chatRemoteJid(jid), 
     client(xmppClient),
@@ -257,7 +257,7 @@ ChatDialog::ChatDialog(ChatClient *xmppClient, ChatRosterModel *chatRosterModel,
     updateWindowTitle();
 }
 
-void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
+void ChatDialogPanel::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     if (jidToBareJid(chat.with()) != chatRemoteJid)
         return;
@@ -274,7 +274,7 @@ void ChatDialog::archiveChatReceived(const QXmppArchiveChat &chat)
     }
 }
 
-void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
+void ChatDialogPanel::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
         if (jidToBareJid(chats[i].with()) == chatRemoteJid)
@@ -283,7 +283,7 @@ void ChatDialog::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 
 /** When the chat state changes, notify the remote party.
  */
-void ChatDialog::chatStateChanged(int state)
+void ChatDialogPanel::chatStateChanged(int state)
 {
     foreach (const QString &jid, chatStatesJids) {
         QXmppMessage message;
@@ -293,12 +293,12 @@ void ChatDialog::chatStateChanged(int state)
     }
 }
 
-QDeclarativeView* ChatDialog::declarativeView() const
+QDeclarativeView* ChatDialogPanel::declarativeView() const
 {
     return historyView;
 }
 
-void ChatDialog::disconnected()
+void ChatDialogPanel::disconnected()
 {
     // FIXME : we should re-join on connect
     // joined = false;
@@ -306,7 +306,7 @@ void ChatDialog::disconnected()
 
 /** Leave a two party dialog.
  */
-void ChatDialog::leave()
+void ChatDialogPanel::leave()
 {
     if (joined)
     {
@@ -318,7 +318,7 @@ void ChatDialog::leave()
 
 /** Start a two party dialog.
  */
-void ChatDialog::join()
+void ChatDialogPanel::join()
 {
     if (joined)
         return;
@@ -339,7 +339,7 @@ void ChatDialog::join()
  *
  * @param msg The received message.
  */
-void ChatDialog::messageReceived(const QXmppMessage &msg)
+void ChatDialogPanel::messageReceived(const QXmppMessage &msg)
 {
     if (msg.type() != QXmppMessage::Chat ||
         jidToBareJid(msg.from()) != chatRemoteJid)
@@ -378,7 +378,7 @@ void ChatDialog::messageReceived(const QXmppMessage &msg)
  * @param topLeft
  * @param bottomRight
  */
-void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void ChatDialogPanel::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     Q_ASSERT(topLeft.parent() == bottomRight.parent());
     const QModelIndex parent = topLeft.parent();
@@ -393,7 +393,7 @@ void ChatDialog::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bo
 
 /** Updates the window title.
  */
-void ChatDialog::updateWindowTitle()
+void ChatDialogPanel::updateWindowTitle()
 {
     QModelIndex index = rosterModel->findItem(chatRemoteJid);
     setWindowTitle(index.data(Qt::DisplayRole).toString());
@@ -447,7 +447,7 @@ void ChatsWatcher::messageReceived(const QXmppMessage &msg)
 
     if (msg.type() == QXmppMessage::Chat && !chat->panel(bareJid) && !msg.body().isEmpty())
     {
-        ChatDialog *dialog = new ChatDialog(chat->client(), chat->rosterModel(), bareJid);
+        ChatDialogPanel *dialog = new ChatDialogPanel(chat->client(), chat->rosterModel(), bareJid);
         chat->addPanel(dialog);
         dialog->messageReceived(msg);
     }
@@ -463,7 +463,7 @@ void ChatsWatcher::urlClick(const QUrl &url)
             jid.remove(0, 1);
         ChatPanel *panel = chat->panel(jid);
         if (!panel) {
-            panel = new ChatDialog(chat->client(), chat->rosterModel(), jid);
+            panel = new ChatDialogPanel(chat->client(), chat->rosterModel(), jid);
             chat->addPanel(panel);
         }
         QTimer::singleShot(0, panel, SIGNAL(showPanel()));
