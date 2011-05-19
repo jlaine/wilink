@@ -926,6 +926,10 @@ Acceptez-vous?</translation>
         <source>Call</source>
         <translation>Appeler</translation>
     </message>
+    <message>
+        <source>Hangup</source>
+        <translation>Raccrocher</translation>
+    </message>
 </context>
 <context>
     <name>roster</name>

@@ -281,6 +281,11 @@ int PhoneCallsModel::columnCount(const QModelIndex &parent) const
     return MaxColumn;
 }
 
+int PhoneCallsModel::currentCalls() const
+{
+    return activeCalls().size();
+}
+
 QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();

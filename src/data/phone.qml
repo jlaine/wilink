@@ -105,10 +105,32 @@ Item {
             anchors.right: parent.right
             icon: 'call.png'
             text: qsTr('Call')
+            visible: historyModel.currentCalls == 0
 
             onClicked: {
-                console.log('call ' + numberEdit.text);
+                var recipient = numberEdit.text.replace(/\s+/, '');
+                if (!recipient.length ||
+                    sipClient.state != SipClient.ConnectedState ||
+                    historyModel.currentCalls) {
+                    return;
+                }
+
+                var address = buildAddress(recipient, sipClient.domain);
+                sipClient.call(address);
+                numberEdit.text = '';
             }
+        }
+
+        Button {
+            id: hangupButton
+
+            anchors.top: parent.top
+            anchors.right: parent.right
+            icon: 'hangup.png'
+            text: qsTr('Hangup')
+            visible: historyModel.currentCalls != 0
+
+            onClicked: historyModel.hangup()
         }
     }
     

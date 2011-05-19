@@ -38,6 +38,7 @@ class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QList<SipCall*> activeCalls READ activeCalls NOTIFY activeCallsChanged)
+    Q_PROPERTY(int currentCalls READ currentCalls NOTIFY activeCallsChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
@@ -58,6 +59,7 @@ public:
     ~PhoneCallsModel();
 
     QList<SipCall*> activeCalls() const;
+    int currentCalls() const;
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
