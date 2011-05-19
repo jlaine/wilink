@@ -36,9 +36,20 @@ Rectangle {
     radius: 4
     smooth: true
 
+    Rectangle {
+        id: overlay
+        anchors.fill: button
+        color: '#99ffffff'
+        opacity: !button.enabled
+        radius: 4
+        smooth: true
+        z: 10
+    }
+
     Image {
         id: image
-        width: button.height - 8; height: button.height - 8
+        height: button.height - 8
+        width: button.height - 8
         anchors.centerIn: parent
         smooth: true
     }
