@@ -85,6 +85,11 @@ Item {
                 smooth: true
                 textFormat: TextEdit.PlainText
                 width: parent.width - 16
+
+                Keys.onReturnPressed: {
+                    if (callButton.enabled)
+                        callButton.clicked()
+                }
             }
         }
 
