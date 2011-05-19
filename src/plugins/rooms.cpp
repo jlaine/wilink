@@ -141,6 +141,8 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
+    connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
+            this, SLOT(participantChanged(QString)));
 }
 
 QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
@@ -188,7 +190,6 @@ void ChatRoomModel::participantChanged(const QString &jid)
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
         if (item->jid == jid) {
-            removeRow(item->row());
             item->status = m_room->participantPresence(jid).status().type();
             emit dataChanged(createIndex(item), createIndex(item));
             break;
