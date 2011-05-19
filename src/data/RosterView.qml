@@ -82,9 +82,10 @@ Item {
 
         Button {
             anchors.right: parent.right
+            anchors.rightMargin:2
             anchors.verticalCenter: parent.verticalCenter
-            height: 24
-            width: 24
+            height: 20
+            width: 20
             icon: 'add.png'
 
             onClicked: block.addClicked()
