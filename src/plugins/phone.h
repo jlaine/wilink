@@ -25,10 +25,8 @@
 #include "plugins/phone/sip.h"
 
 class QAbstractButton;
-class QAuthenticator;
 class QDeclarativeView;
 class QNetworkAccessManager;
-class QNetworkReply;
 class Chat;
 class ChatClient;
 class PhoneCallsModel;

@@ -27,6 +27,7 @@
 #include "QXmppCallManager.h"
 #include "QXmppRtpChannel.h"
 
+class QAuthenticator;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
