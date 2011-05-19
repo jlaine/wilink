@@ -78,9 +78,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // history
     callsModel = new PhoneCallsModel(sip, network, this);
-    check = connect(callsModel, SIGNAL(error(QString)),
-                    this, SLOT(error(QString)));
-    Q_ASSERT(check);
 
     // declarative
     declarativeView = new QDeclarativeView;
@@ -166,11 +163,6 @@ void PhonePanel::callReceived(SipCall *call)
     connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
         this, SLOT(callButtonClicked(QAbstractButton*)));
     box->show();
-}
-
-void PhonePanel::error(const QString &error)
-{
-    QMessageBox::warning(this, tr("Call failed"), tr("Sorry, but the call could not be completed.") + "\n\n" + error);
 }
 
 /** Requests VoIP settings from the server.

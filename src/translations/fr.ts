@@ -49,10 +49,6 @@ Acceptez-vous?</translation>
         <source>Call finished.</source>
         <translation>Appel terminé.</translation>
     </message>
-    <message>
-        <source>Ringing..</source>
-        <translation type="obsolete">Sonne..</translation>
-    </message>
 </context>
 <context>
     <name>Chat</name>
@@ -265,10 +261,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat room error</source>
         <translation>Erreur de salon de discussion</translation>
-    </message>
-    <message>
-        <source>%1 has been invited to %2</source>
-        <translation type="obsolete">%1 a été invité(e) à %2</translation>
     </message>
     <message>
         <source>Sorry, but you cannot join chat room &apos;%1&apos;.
@@ -530,32 +522,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PhoneCallsModel</name>
-    <message>
-        <source>Connecting..</source>
-        <translation type="obsolete">Connexion..</translation>
-    </message>
-    <message>
-        <source>Disconnecting..</source>
-        <translation type="obsolete">Déconnexion..</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation type="obsolete">Echoué</translation>
-    </message>
-</context>
-<context>
-    <name>PhoneCallsView</name>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Retirer</translation>
-    </message>
-    <message>
-        <source>Call</source>
-        <translation type="obsolete">Appeler</translation>
-    </message>
-</context>
-<context>
     <name>PhoneHistoryView</name>
     <message>
         <source>Call</source>
@@ -573,10 +539,6 @@ Acceptez-vous?</translation>
         <translation>Téléphone</translation>
     </message>
     <message>
-        <source>Call</source>
-        <translation type="obsolete">Appeler</translation>
-    </message>
-    <message>
         <source>Call from %1</source>
         <translation>Appel de %1</translation>
     </message>
@@ -589,20 +551,8 @@ Do you accept?</source>
 Acceptez-vous?</translation>
     </message>
     <message>
-        <source>Hangup</source>
-        <translation type="obsolete">Raccrocher</translation>
-    </message>
-    <message>
         <source>Your number is %1</source>
         <translation>Votre numéro est %1</translation>
-    </message>
-    <message>
-        <source>Call failed</source>
-        <translation>L&apos;appel a échoué</translation>
-    </message>
-    <message>
-        <source>Sorry, but the call could not be completed.</source>
-        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
     </message>
     <message>
         <source>You can subscribe to the phone service at the following address:</source>
@@ -929,6 +879,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Hangup</source>
         <translation>Raccrocher</translation>
+    </message>
+    <message>
+        <source>Sorry, but the call could not be completed.</source>
+        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>L&apos;appel a échoué</translation>
     </message>
 </context>
 <context>

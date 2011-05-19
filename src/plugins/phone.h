@@ -46,7 +46,6 @@ public:
 private slots:
     void callButtonClicked(QAbstractButton *button);
     void callReceived(SipCall *call);
-    void error(const QString &error);
     void getSettings();
     void handleSettings();
     void openUrl(const QUrl &url);
