@@ -21,6 +21,7 @@ import QtQuick 1.0
 
 Item {
     id: block
+    clip: true
 
     property alias model: view.model
     property alias title: titleText.text
@@ -88,7 +89,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        clip: true
         focus: true
 
         delegate: Item {

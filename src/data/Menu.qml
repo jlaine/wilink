@@ -28,7 +28,8 @@ Rectangle {
     color: 'transparent'
     opacity: 0
     height: model.count * 20 + 1
-    width: 150;
+    width: 150
+    z: 10
  
     ListView {
         id: menuList
