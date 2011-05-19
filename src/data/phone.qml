@@ -109,15 +109,12 @@ Item {
 
             onClicked: {
                 var recipient = numberEdit.text.replace(/\s+/, '');
-                if (!recipient.length ||
-                    sipClient.state != SipClient.ConnectedState ||
-                    historyModel.currentCalls) {
+                if (!recipient.length)
                     return;
-                }
 
                 var address = buildAddress(recipient, sipClient.domain);
-                sipClient.call(address);
-                numberEdit.text = '';
+                if (historyModel.call(address))
+                    numberEdit.text = '';
             }
         }
 

@@ -176,7 +176,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addLayout(hbox);
 
     // history
-    callsModel = new PhoneCallsModel(network, this);
+    callsModel = new PhoneCallsModel(sip, network, this);
     check = connect(callsModel, SIGNAL(error(QString)),
                     this, SLOT(error(QString)));
     Q_ASSERT(check);

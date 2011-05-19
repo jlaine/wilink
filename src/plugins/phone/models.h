@@ -33,6 +33,7 @@ class QSortFilterProxyModel;
 class QTimer;
 class PhoneCallsItem;
 class SipCall;
+class SipClient;
 
 class PhoneCallsModel : public QAbstractListModel
 {
@@ -55,7 +56,7 @@ public:
         StateRole,
     };
 
-    PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
+    PhoneCallsModel(SipClient *client, QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
 
     QList<SipCall*> activeCalls() const;
@@ -79,6 +80,7 @@ signals:
 
 public slots:
     void addCall(SipCall *call);
+    bool call(const QString &address);
     void hangup();
 
 private slots:
@@ -91,6 +93,7 @@ private slots:
 private:
     QNetworkRequest buildRequest(const QUrl &url) const;
 
+    SipClient *m_client;
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
     QTimer *m_ticker;

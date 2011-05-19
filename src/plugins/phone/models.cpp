@@ -109,8 +109,9 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
  * @param network
  * @param parent
  */
-PhoneCallsModel::PhoneCallsModel(QNetworkAccessManager *network, QObject *parent)
+PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *network, QObject *parent)
     : QAbstractListModel(parent),
+    m_client(client),
     m_network(network)
 {
     // set role names
@@ -185,6 +186,16 @@ QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
     req.setRawHeader("Accept", "application/xml");
     req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     return req;
+}
+
+bool PhoneCallsModel::call(const QString &address)
+{
+    if (m_client->state() == SipClient::ConnectedState &&
+        activeCalls().isEmpty()) {
+        QMetaObject::invokeMethod(m_client, "call", Q_ARG(QString, address));
+        return true;
+    }
+    return false;
 }
 
 void PhoneCallsModel::callRinging()
