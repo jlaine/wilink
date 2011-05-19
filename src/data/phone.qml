@@ -94,6 +94,7 @@ Item {
             anchors.top: parent.top
             anchors.right: callButton.left
             anchors.rightMargin: 4
+            enabled: sipClient.state == SipClient.ConnectedState
             icon: 'back.png'
         }
 

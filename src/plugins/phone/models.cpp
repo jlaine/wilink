@@ -174,6 +174,9 @@ void PhoneCallsModel::addCall(SipCall *call)
         m_ticker->start();
         emit stateChanged(true);
     }
+
+    // notify change
+    emit activeCallsChanged();
 }
 
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
@@ -238,6 +241,8 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
             item->flags |= FLAGS_ERROR;
             emit error(call->error());
         }
+        emit activeCallsChanged();
+
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
         QNetworkRequest request = buildRequest(url);

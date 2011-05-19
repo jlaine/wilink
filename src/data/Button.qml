@@ -22,6 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: button
 
+    property bool enabled: true
     property alias icon: image.source
     property string text
     signal clicked
@@ -48,12 +49,16 @@ Rectangle {
         anchors.fill: parent
 
         onPressed: {
-            button.state = 'pressed'
+            if (button.enabled) {
+                button.state = 'pressed';
+            }
         }
 
         onReleased: {
-            button.state = ''
-            button.clicked()
+            if (button.enabled) {
+                button.state = '';
+                button.clicked();
+            }
         }
     }
 

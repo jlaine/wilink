@@ -37,6 +37,7 @@ class SipCall;
 class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QList<SipCall*> activeCalls READ activeCalls NOTIFY activeCallsChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
@@ -56,11 +57,11 @@ public:
     PhoneCallsModel(QNetworkAccessManager *network, QObject *parent = 0);
     ~PhoneCallsModel();
 
+    QList<SipCall*> activeCalls() const;
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
 
-    QList<SipCall*> activeCalls() const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
@@ -68,6 +69,7 @@ public:
     void setUrl(const QUrl &url);
 
 signals:
+    void activeCallsChanged();
     void error(const QString &error);
     void inputVolumeChanged(int);
     void outputVolumeChanged(int);
