@@ -69,6 +69,7 @@
     <file>ProgressBar.qml</file>
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
+    <file>ToolBar.qml</file>
     <file>TransferWidget.qml</file>
     <!-- Stylesheets -->
     <file>wiLink.css</file>
