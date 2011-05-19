@@ -38,7 +38,7 @@ Item {
         anchors.top: scrollBar.top
         anchors.left: scrollBar.left
         anchors.topMargin: -1
-        border.color: '#0d88a4'
+        border.color: '#84bde8'
         border.width: 1
         gradient: Gradient {
             GradientStop {id: trackStop1; position: 0.0; color: '#bedfe7'}
@@ -58,11 +58,11 @@ Item {
 
             property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
-            border.color: '#0d7a93'
+            border.color: track.border.color
             border.width: 1
             gradient: Gradient {
                 GradientStop {id: handleStop1; position: 0.0; color: '#ffffff'}
-                GradientStop {id: handleStop2; position: 0.5; color: '#5fb0c3'}
+                GradientStop {id: handleStop2; position: 0.5; color: '#7ac6d8'}
                 GradientStop {id: handleStop3; position: 1.0; color: '#ffffff'}
             }
             radius: 10
@@ -75,8 +75,7 @@ Item {
 
             states: State {
                 name: 'pressed'
-                PropertyChanges { target: handleStop2; color: '#7ac6d8' }
-                PropertyChanges { target: handle; border.color: '#5fb0c3' }
+                PropertyChanges { target: handleStop2; color: '#57c7e7' }
             }
         }
     }
@@ -85,7 +84,7 @@ Item {
         id: buttonUp
 
         anchors.top: parent.top
-        border.color: '#0d88a4'
+        border.color: track.border.color
         color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
@@ -130,7 +129,7 @@ Item {
 
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 1
-        border.color: '#0d88a4'
+        border.color: track.border.color
         color: '#bedfe7'
         height: parent.width - 1
         width: parent.width - 1
