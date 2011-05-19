@@ -28,12 +28,10 @@ Rectangle {
     signal clicked
 
     width: 32; height: 32
-    border.color: '#2689d6'
+    border.color: '#84bde8'
     gradient: Gradient {
-        GradientStop { id: stop1; position: 0.2; color: '#e7f4fe' }
-        GradientStop { id: stop2; position: 0.3; color: '#bfddf4' }
-        GradientStop { id: stop3; position: 0.7; color: '#bfddf4' }
-        GradientStop { id: stop4; position: 1.0; color: '#88bfe9' }
+        GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
+        GradientStop { id: stop2; position: 1.0; color: '#beceeb' }
     }
     radius: 4
     smooth: true
@@ -64,9 +62,8 @@ Rectangle {
 
     states: State {
         name: 'pressed'
-        PropertyChanges { target: button; border.color: '#5488bb' }
-        PropertyChanges { target: stop1; color: '#88bfe9' }
-        PropertyChanges { target: stop4; color: '#e7f4fe' }
+        PropertyChanges { target: stop1; color: '#aacbd9f0' }
+        PropertyChanges { target: stop2; color: '#aaffffff' }
     }
 }
 
