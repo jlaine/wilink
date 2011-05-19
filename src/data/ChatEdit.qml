@@ -30,133 +30,141 @@ Rectangle {
     signal returnPressed
     signal tabPressed
 
-    border.color: '#c3c3c3'
-    border.width: 1
-    color: '#ffffff'
-    height: input.paintedHeight + 16
+    color: '#dfdfdf'
+    height: wrapper.height + 8
 
-    function talkAt(participant) {
-        var text = input.text;
-        var newText = '';
+    Rectangle {
+        id: wrapper
 
-        var pattern = /@([^,:]+[,:] )+/;
-        var start = text.search(pattern);
-        if (start >= 0) {
-            var m = text.match(pattern)[0];
-            var bits = m.split(/[,:] /);
-            if (start > 0)
-                newText += text.slice(0, start);
-            for (var i in bits) {
-                if (bits[i] == '@' + participant)
-                    return;
-                if (bits[i].length)
-                    newText += bits[i] + ', ';
-            }
-        } else {
-            newText = text;
-        }
-        newText += '@' + participant + ': ';
-        input.text = newText;
-    }
+        border.color: '#c3c3c3'
+        border.width: 1
+        color: 'white'
+        x: 4
+        y: 4
+        height: input.paintedHeight + 16
+        width: parent.width - 8
 
-    ListHelper {
-        id: listHelper
-    }
+        function talkAt(participant) {
+            var text = input.text;
+            var newText = '';
 
-    Timer {
-        id: inactiveTimer
-        interval: 120000
-        running: true
-
-        onTriggered: {
-            if (chatEdit.chatState != QXmppMessage.Inactive) {
-                chatEdit.chatState = QXmppMessage.Inactive;
-            }
-        }
-    }
-
-    Timer {
-        id: pausedTimer
-        interval: 30000
-
-        onTriggered: {
-            if (chatEdit.chatState == QXmppMessage.Composing) {
-                chatEdit.chatState = QXmppMessage.Paused;
-            }
-        }
-    }
-
-    TextEdit {
-        id: input
-
-        focus: true
-        x: 8
-        y: 8
-        smooth: true
-        textFormat: TextEdit.PlainText
-        width: parent.width - 16
-        wrapMode: TextEdit.WordWrap
-
-        onActiveFocusChanged: {
-            if (chatEdit.chatState != QXmppMessage.Active &&
-                chatEdit.chatState != QXmppMessage.Composing &&
-                chatEdit.chatState != QXmppMessage.Paused) {
-                chatEdit.chatState = QXmppMessage.Active;
-            }
-            inactiveTimer.restart();
-        }
-
-        onTextChanged: {
-            inactiveTimer.stop();
-            if (text.length) {
-                if (chatEdit.chatState != QXmppMessage.Composing) {
-                    chatEdit.chatState = QXmppMessage.Composing;
+            var pattern = /@([^,:]+[,:] )+/;
+            var start = text.search(pattern);
+            if (start >= 0) {
+                var m = text.match(pattern)[0];
+                var bits = m.split(/[,:] /);
+                if (start > 0)
+                    newText += text.slice(0, start);
+                for (var i in bits) {
+                    if (bits[i] == '@' + participant)
+                        return;
+                    if (bits[i].length)
+                        newText += bits[i] + ', ';
                 }
-                pausedTimer.restart()
             } else {
-                if (chatEdit.chatState != QXmppMessage.Active) {
+                newText = text;
+            }
+            newText += '@' + participant + ': ';
+            input.text = newText;
+        }
+
+        ListHelper {
+            id: listHelper
+        }
+
+        Timer {
+            id: inactiveTimer
+            interval: 120000
+            running: true
+
+            onTriggered: {
+                if (chatEdit.chatState != QXmppMessage.Inactive) {
+                    chatEdit.chatState = QXmppMessage.Inactive;
+                }
+            }
+        }
+
+        Timer {
+            id: pausedTimer
+            interval: 30000
+
+            onTriggered: {
+                if (chatEdit.chatState == QXmppMessage.Composing) {
+                    chatEdit.chatState = QXmppMessage.Paused;
+                }
+            }
+        }
+
+        TextEdit {
+            id: input
+
+            focus: true
+            x: 8
+            y: 8
+            smooth: true
+            textFormat: TextEdit.PlainText
+            width: parent.width - 16
+            wrapMode: TextEdit.WordWrap
+
+            onActiveFocusChanged: {
+                if (chatEdit.chatState != QXmppMessage.Active &&
+                    chatEdit.chatState != QXmppMessage.Composing &&
+                    chatEdit.chatState != QXmppMessage.Paused) {
                     chatEdit.chatState = QXmppMessage.Active;
                 }
-                pausedTimer.stop()
+                inactiveTimer.restart();
             }
-        }
 
-        Keys.onReturnPressed: {
-            if (event.modifiers == Qt.NoModifier) {
-                chatEdit.returnPressed();
-            } else {
-                event.accepted = false;
-            }
-        }
-
-        Keys.onTabPressed: {
-            // select word, including 'at' sign
-            var text = input.text;
-            var end = input.cursorPosition;
-            var start = end;
-            while (start >= 0 && text.charAt(start) != '@') {
-                start -= 1;
-            }
-            if (start < 0)
-                return;
-            start += 1;
-
-            // search matching participants
-            var needle = input.text.slice(start, end).toLowerCase();
-            var matches = [];
-            for (var i = 0; i < listHelper.count; i += 1) {
-                var name = listHelper.get(i).name;
-                if (name.slice(0, needle.length).toLowerCase() == needle) {
-                    matches[matches.length] = name;
+            onTextChanged: {
+                inactiveTimer.stop();
+                if (text.length) {
+                    if (chatEdit.chatState != QXmppMessage.Composing) {
+                        chatEdit.chatState = QXmppMessage.Composing;
+                    }
+                    pausedTimer.restart()
+                } else {
+                    if (chatEdit.chatState != QXmppMessage.Active) {
+                        chatEdit.chatState = QXmppMessage.Active;
+                    }
+                    pausedTimer.stop()
                 }
             }
-            if (matches.length == 1) {
-                var replacement = matches[0] + ': ';
-                input.text = text.slice(0, start) + replacement + text.slice(end);
-                input.cursorPosition = start + replacement.length;
+
+            Keys.onReturnPressed: {
+                if (event.modifiers == Qt.NoModifier) {
+                    chatEdit.returnPressed();
+                } else {
+                    event.accepted = false;
+                }
+            }
+
+            Keys.onTabPressed: {
+                // select word, including 'at' sign
+                var text = input.text;
+                var end = input.cursorPosition;
+                var start = end;
+                while (start >= 0 && text.charAt(start) != '@') {
+                    start -= 1;
+                }
+                if (start < 0)
+                    return;
+                start += 1;
+
+                // search matching participants
+                var needle = input.text.slice(start, end).toLowerCase();
+                var matches = [];
+                for (var i = 0; i < listHelper.count; i += 1) {
+                    var name = listHelper.get(i).name;
+                    if (name.slice(0, needle.length).toLowerCase() == needle) {
+                        matches[matches.length] = name;
+                    }
+                }
+                if (matches.length == 1) {
+                    var replacement = matches[0] + ': ';
+                    input.text = text.slice(0, start) + replacement + text.slice(end);
+                    input.cursorPosition = start + replacement.length;
+                }
             }
         }
     }
-
 }
-

@@ -35,7 +35,7 @@ Rectangle {
 
     Item {
         anchors.top: widgetBar.bottom
-        anchors.bottom: footer.top
+        anchors.bottom: chatInput.top
         anchors.left: parent.left
         anchors.right: parent.right
     
@@ -48,6 +48,7 @@ Rectangle {
             anchors.right: Qt.isQtObject(participantModel) ? participantView.left : parent.right
             model: historyModel
 
+            onParticipantClicked: chatInput.talkAt(participant)
         }
 
         ParticipantView {
@@ -59,26 +60,18 @@ Rectangle {
             model: participantModel
             visible: Qt.isQtObject(participantModel)
             width: 80
+
+            onParticipantClicked: chatInput.talkAt(participant)
         }
     }
 
-    Rectangle {
-        id: footer
+    ChatEdit {
+        id: chatInput
 
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        color: '#dfdfdf'
-        height: chatInput.height + 8
-
-        ChatEdit {
-            id: chatInput
-
-            model: participantModel
-            x: 4
-            y: 4
-            width: parent.width - 8
-        }
+        model: participantModel
     }
 
     Connections {
@@ -96,15 +89,5 @@ Rectangle {
                     chatInput.text = '';
             }
         }
-    }
-
-    Connections {
-        target: historyView
-        onParticipantClicked: chatInput.talkAt(participant)
-    }
-
-    Connections {
-        target: participantView
-        onParticipantClicked: chatInput.talkAt(participant)
     }
 }
