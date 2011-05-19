@@ -25,18 +25,14 @@
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDomDocument>
-#include <QGroupBox>
-#include <QLabel>
 #include <QLayout>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QPushButton>
 #include <QTimer>
 #include <QUrl>
 
-#include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
 #include "qnetio/wallet.h"
@@ -50,35 +46,6 @@
 #include "phone/sip.h"
 #include "phone.h"
  
-// Builds a full SIP address from a short recipient
-static QString buildAddress(const QString &recipient, const QString &sipDomain)
-{
-    QString address, name;
-    if (recipient.contains("@")) {
-        name = recipient.split("@").first();
-        address = recipient;
-    } else {
-        name = recipient;
-        address = recipient + "@" + sipDomain;
-    }
-    return QString("\"%1\" <sip:%2>").arg(name, address);
-}
-
-// Extracts the shortest possible recipient from a full SIP address.
-static QString parseAddress(const QString &sipAddress, const QString &sipDomain)
-{
-    QRegExp rx(sipAddressPattern);
-    if (!rx.exactMatch(sipAddress))
-        return QString();
-    const QString recipient = rx.cap(2).mid(4);
-
-    QStringList bits = recipient.split("@");
-    if (bits.last() == sipDomain || QRegExp("[0-9]+").exactMatch(bits.first()))
-        return bits.first();
-    else
-        return recipient;
-}
-
 PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     : ChatPanel(parent),
     m_window(chatWindow),
