@@ -888,6 +888,18 @@ Acceptez-vous?</translation>
         <source>Call failed</source>
         <translation>L&apos;appel a échoué</translation>
     </message>
+    <message>
+        <source>%1 wants to talk to you.
+
+Do you accept?</source>
+        <translation>%1 souhaite vous parler.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Call from %1</source>
+        <translation>Appel de %1</translation>
+    </message>
 </context>
 <context>
     <name>roster</name>
