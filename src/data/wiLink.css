@@ -78,24 +78,3 @@ QLabel#panel-help {
     background-color: #b0e2ff;
     padding: 10px;
 }
-
-/* chat rooms */
-QListView#participant-list::item {
-    height: 55px;
-    width: 64px;
-    color: #999;
-    border: 1px solid transparent;
-}
-
-QListView#participant-list::item:hover {
-    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                      stop:0 rgba(176,226,255,0), stop:1 rgba(176,226,255,255));
-    border-color: #b0e2ff;
-    color: #000;
-}
-
-QListView#participant-list::item:selected, QListView#participant-list::item:selected:active {
-    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                      stop:0 rgba(176,226,255,0), stop:1 rgba(176,226,255,255));
-    color: #000;
-}
