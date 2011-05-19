@@ -25,6 +25,37 @@ Item {
     width: 320
     height: 240
 
+    // Builds a full SIP address from a short recipient
+    function buildAddress(recipient, sipDomain)
+    {
+        var address;
+        var name;
+        var bits = recipient.split('@');
+        if (bits.length > 1) {
+            name = bits[0];
+            address = recipient;
+        } else {
+            name = recipient;
+            address = recipient + "@" + sipDomain;
+        }
+        return '"' + name + '" <sip:' + address + '>';
+    }
+
+    // Extracts the shortest possible recipient from a full SIP address.
+    function parseAddress(sipAddress, sipDomain)
+    {
+        var cap = sipAddress.match(/(.*)<(sip:([^>]+))>(;.+)?/);
+        if (!cap)
+            return '';
+
+        var recipient = cap[2].substr(4);
+        var bits = recipient.split('@');
+        if (bits[1] == sipDomain || bits[1].match('/[0-9]+/'))
+            return bits[0];
+        else
+            return recipient;
+    }
+
     Item {
         id: header
 
@@ -47,6 +78,7 @@ Item {
 
             TextEdit {
                 id: input
+                focus: true
                 x: 8
                 y: 8
                 smooth: true
