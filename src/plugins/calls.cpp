@@ -584,6 +584,8 @@ bool CallsPlugin::initialize(Chat *chat)
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
+    qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
+
     qmlRegisterUncreatableType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper", "");
     qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");

@@ -18,9 +18,12 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 
 GridView {
     id: grid
+
+    signal keyPressed(variant key)
 
     cellWidth: 40
     cellHeight: 40
@@ -58,6 +61,7 @@ GridView {
 
             onReleased: {
                 button.state = ''
+                grid.keyPressed(model)
             }
         }
 
@@ -69,18 +73,18 @@ GridView {
         }
     }
     model: ListModel {
-        ListElement { name: '1' }
-        ListElement { name: '2' }
-        ListElement { name: '3' }
-        ListElement { name: '4' }
-        ListElement { name: '5' }
-        ListElement { name: '6' }
-        ListElement { name: '7' }
-        ListElement { name: '8' }
-        ListElement { name: '9' }
-        ListElement { name: '*' }
-        ListElement { name: '0' }
-        ListElement { name: '#' }
+        ListElement { name: '1'; tone: QXmppRtpAudioChannel.Tone_1 }
+        ListElement { name: '2'; tone: QXmppRtpAudioChannel.Tone_2 }
+        ListElement { name: '3'; tone: QXmppRtpAudioChannel.Tone_3 }
+        ListElement { name: '4'; tone: QXmppRtpAudioChannel.Tone_4 }
+        ListElement { name: '5'; tone: QXmppRtpAudioChannel.Tone_5 }
+        ListElement { name: '6'; tone: QXmppRtpAudioChannel.Tone_6 }
+        ListElement { name: '7'; tone: QXmppRtpAudioChannel.Tone_7 }
+        ListElement { name: '8'; tone: QXmppRtpAudioChannel.Tone_8 }
+        ListElement { name: '9'; tone: QXmppRtpAudioChannel.Tone_9 }
+        ListElement { name: '*'; tone: QXmppRtpAudioChannel.Tone_Star }
+        ListElement { name: '0'; tone: QXmppRtpAudioChannel.Tone_0 }
+        ListElement { name: '#'; tone: QXmppRtpAudioChannel.Tone_Pound }
     }
 }
 

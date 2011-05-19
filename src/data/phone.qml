@@ -141,6 +141,10 @@ Item {
 
         KeyPad {
             id: keypad
+
+            onKeyPressed: {
+                console.log("key pressed " + key.name + ": " + key.tone);
+            }
         }
 
         Column {
@@ -194,10 +198,7 @@ Item {
         anchors.margins: 4
         clip: true
         model: historyModel
-    }
 
-    Connections {
-        target: historyView
         onAddressClicked: {
             numberEdit.text = parseAddress(address, sipClient.domain);
         }

@@ -26,20 +26,15 @@
 #include <QDesktopServices>
 #include <QDomDocument>
 #include <QGroupBox>
-#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPushButton>
-#include <QThread>
 #include <QTimer>
 #include <QUrl>
-
-#include "QSoundMeter.h"
 
 #include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
@@ -101,15 +96,20 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
                     this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
     Q_ASSERT(check);
 
+    // sip client
+    sip = new SipClient;
+    sip->setAudioInputDevice(wApp->audioInputDevice());
+    sip->setAudioOutputDevice(wApp->audioOutputDevice());
+    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
+                    sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
+    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
+                    sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
+    sip->moveToThread(wApp->soundThread());
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addLayout(headerLayout());
-
-    // calls buttons
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QPushButton *backspaceButton = new QPushButton;
-    backspaceButton->setIcon(QIcon(":/back.png"));
-    hbox->addWidget(backspaceButton);
-    layout->addLayout(hbox);
 
     // keyboard
     QGridLayout *grid = new QGridLayout;
@@ -127,53 +127,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     QGroupBox *groupBox = new QGroupBox;
     groupBox->setLayout(grid);
 
-    hbox = new QHBoxLayout;
-    hbox->addStretch();
-    hbox->addWidget(groupBox);
-
-    // sip client
-    sip = new SipClient;
-    sip->setAudioInputDevice(wApp->audioInputDevice());
-    sip->setAudioOutputDevice(wApp->audioOutputDevice());
-    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
-                    sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
-                    sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    sip->moveToThread(wApp->soundThread());
-
-    // input volume bar
-    QGridLayout *barBox = new QGridLayout;
-    QSoundMeterBar *inputBar = new QSoundMeterBar;
-    inputBar->setOrientation(Qt::Vertical);
-    barBox->addWidget(inputBar, 0, 0);
-    QLabel *inputLabel = new QLabel;
-    inputLabel->setPixmap(QPixmap(":/audio-input.png"));
-    barBox->addWidget(inputLabel, 1, 0);
-
-    // output volume bar
-    QSoundMeterBar *outputBar = new QSoundMeterBar;
-    outputBar->setOrientation(Qt::Vertical);
-    barBox->addWidget(outputBar, 0, 1);
-    QLabel *outputLabel = new QLabel;
-    outputLabel->setPixmap(QPixmap(":/audio-output.png"));
-    barBox->addWidget(outputLabel, 1, 1);
-    hbox->addLayout(barBox);
-
-    hbox->addStretch();
-    layout->addLayout(hbox);
+    layout->addWidget(groupBox);
 
     // history
     callsModel = new PhoneCallsModel(sip, network, this);
     check = connect(callsModel, SIGNAL(error(QString)),
                     this, SLOT(error(QString)));
-    Q_ASSERT(check);
-    check = connect(callsModel, SIGNAL(inputVolumeChanged(int)),
-                    inputBar, SLOT(setValue(int)));
-    Q_ASSERT(check);
-    check = connect(callsModel, SIGNAL(outputVolumeChanged(int)),
-                    outputBar, SLOT(setValue(int)));
     Q_ASSERT(check);
 
     // declarative
