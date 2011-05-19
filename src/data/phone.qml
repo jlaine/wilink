@@ -100,6 +100,13 @@ Item {
             anchors.right: callButton.left
             anchors.rightMargin: 4
             icon: 'back.png'
+
+            onClicked: {
+                var oldPos = numberEdit.cursorPosition;
+                var oldText = numberEdit.text;
+                numberEdit.text = oldText.substr(0, oldPos - 1) + oldText.substr(oldPos);
+                numberEdit.cursorPosition = oldPos - 1;
+            }
         }
 
         Button {
@@ -155,8 +162,12 @@ Item {
             onKeyReleased: {
                 if (historyModel.currentCalls)
                     historyModel.stopTone(key.tone);
-                else
-                    numberEdit.text += key.name;
+                else {
+                    var oldPos = numberEdit.cursorPosition;
+                    var oldText = numberEdit.text;
+                    numberEdit.text = oldText.substr(0, oldPos) + key.name + oldText.substr(oldPos);
+                    numberEdit.cursorPosition = oldPos + 1;
+                }
             }
         }
 
