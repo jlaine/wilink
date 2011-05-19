@@ -451,7 +451,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    historyView->setSource(QUrl("qrc:/conversation.qml"));
+    historyView->setSource(QUrl("qrc:/room.qml"));
 
     layout->addWidget(historyView);
     setFocusProxy(historyView);

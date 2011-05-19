@@ -57,6 +57,7 @@
     <file>conversation.qml</file>
     <file>player.qml</file>
     <file>phone.qml</file>
+    <file>room.qml</file>
     <file>roster.qml</file>
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
