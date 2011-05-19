@@ -22,13 +22,14 @@ import wiLink 1.2
 
 Column {
     anchors.fill: parent
+    id: root
 
     RosterView {
         id: rooms
 
         model: roomModel
         title: qsTr('My rooms')
-        height: parent.height / 3
+        height: 150
         width: parent.width
 
         Connections {
@@ -39,12 +40,49 @@ Column {
         }
     }
 
+    Rectangle {
+        id: splitter
+
+        color: '#567dbc'
+        height: 5
+        width: parent.width
+
+        MouseArea {
+            property int mousePressY
+            property int roomsPressHeight
+
+            anchors.fill: parent
+
+            hoverEnabled: true
+            onEntered: parent.state = 'hovered'
+            onExited: parent.state = ''
+
+            onPressed: {
+                mousePressY = mapToItem(root, mouse.x, mouse.y).y
+                roomsPressHeight = rooms.height
+            }
+
+            onPositionChanged: {
+                if (mouse.buttons & Qt.LeftButton) {
+                    var position =  roomsPressHeight + mapToItem(root, mouse.x, mouse.y).y - mousePressY
+                    position = Math.max(position, 0)
+                    position = Math.min(position, root.height - splitter.height)
+                    rooms.height = position
+                }
+            }
+        }
+        states: State {
+            name: 'hovered'
+            PropertyChanges{ target: splitter; color: '#97b0d9' }
+        }
+    }
+
     RosterView {
         id: contacts
 
         model: contactModel
         title: qsTr('My contacts')
-        height: 2 * parent.height / 3
+        height: parent.height - splitter.height - rooms.height
         width: parent.width
 
         Menu {
