@@ -20,17 +20,32 @@
 import QtQuick 1.0
 import wiLink 1.2
 
-Column {
+Item {
     anchors.fill: parent
     id: root
+
+    ToolBar {
+        id: toolbar
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 50
+        gradient: Gradient {
+            GradientStop { position: 0; color: '#6ea1f1' }
+            GradientStop { position: 1; color: '#567dbc' }
+        }
+    }
 
     RosterView {
         id: rooms
 
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: toolbar.bottom
         model: roomModel
         title: qsTr('My rooms')
         height: 150
-        width: parent.width
 
         Connections {
             onItemClicked: {
@@ -43,9 +58,11 @@ Column {
     Rectangle {
         id: splitter
 
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: rooms.bottom
         color: '#567dbc'
         height: 5
-        width: parent.width
 
         MouseArea {
             property int mousePressY
@@ -80,10 +97,12 @@ Column {
     RosterView {
         id: contacts
 
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: splitter.bottom
+        anchors.bottom: parent.bottom
         model: contactModel
         title: qsTr('My contacts')
-        height: parent.height - splitter.height - rooms.height
-        width: parent.width
 
         Menu {
             id: menu

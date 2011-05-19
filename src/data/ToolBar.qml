@@ -21,15 +21,14 @@ import QtQuick 1.0
 
 Rectangle {
     id: toolbar
+    color: 'transparent'
 
     property ListModel model: ListModel {
-        ListElement { text: 'Foo'; icon: 'remove.png' }
-        ListElement { text: 'Bar'; icon: 'add.png' }
+        ListElement { text: 'Phone'; icon: 'phone.png' }
+        ListElement { text: 'Photos'; icon: 'photos.png' }
+        ListElement { text: 'Shares'; icon: 'share.png' }
     }
     signal itemClicked(int index)
-
-    height: 40
-    width: 250
 
     ListView {
         id: view
@@ -45,8 +44,8 @@ Rectangle {
             id: listViewItem
 
             color: 'transparent'
-            height: 40
-            width: 40
+            height: 45
+            width: itemText.paintedWidth + 24
             radius: 5
 
             Image {
@@ -54,10 +53,9 @@ Rectangle {
 
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
-                smooth: true
                 source: model.icon
-                width: 24
-                height: 24
+                width: 32
+                height: 32
             }
 
             Text {
@@ -65,7 +63,8 @@ Rectangle {
 
                 anchors.top: icon.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: '#000000'
+                color: 'white'
+                font.pixelSize: 10
                 text: model.text
             }
 
