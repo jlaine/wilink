@@ -131,6 +131,8 @@ if(RELOAD_TRANSLATIONS)
         data/roster.qml
         data/CallWidget.qml
         data/ConversationPanel.qml
+        data/Dialog.qml
+        data/RoomInviteDialog.qml
         data/RoomParticipantView.qml
         data/PhoneHistoryView.qml
         data/PhonePanel.qml

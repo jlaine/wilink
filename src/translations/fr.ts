@@ -434,6 +434,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>Dialog</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+</context>
+<context>
     <name>DiscoveryPanel</name>
     <message>
         <source>Go back</source>
