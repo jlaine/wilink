@@ -445,9 +445,9 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("client", new QXmppDeclarativeClient(client));
-    context->setContextProperty("conversation", mucRoom);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
+    context->setContextProperty("room", mucRoom);
     context->setContextProperty("window", chat);
 
     historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);

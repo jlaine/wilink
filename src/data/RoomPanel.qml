@@ -29,13 +29,13 @@ Rectangle {
         jid: client.jid
 
         onNameChanged: {
-            conversation.nickName = name;
-            if (!conversation.isJoined) {
+            room.nickName = name;
+            if (!room.isJoined) {
                 // clear history
                 historyModel.clear();
 
                 // send join request
-                conversation.join();
+                room.join();
             }
         }
     }
@@ -47,7 +47,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: 'chat.png'
-        title: '<b>' + conversation.jid.split('@')[0] + '</b>'
+        title: '<b>' + room.jid.split('@')[0] + '</b>'
         z: 1
     }
 
@@ -92,7 +92,7 @@ Rectangle {
 
         onReturnPressed: {
             var text = chatInput.text;
-            if (conversation.sendMessage(text))
+            if (room.sendMessage(text))
                 chatInput.text = '';
         }
     }
