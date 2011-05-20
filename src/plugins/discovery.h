@@ -30,6 +30,28 @@ class QXmppDiscoveryManager;
 #include "QXmppDiscoveryIq.h"
 
 #include "chat_panel.h"
+#include "chat_model.h"
+
+class DiscoveryModel : public ChatModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppDiscoveryManager* manager READ manager WRITE setManager NOTIFY managerChanged)
+
+public:
+    DiscoveryModel(QObject *parent = 0);
+
+    QXmppDiscoveryManager *manager() const;
+    void setManager(QXmppDiscoveryManager *manager);
+
+signals:
+    void managerChanged(QXmppDiscoveryManager *manager);
+
+private slots:
+    void itemsReceived(const QXmppDiscoveryIq &disco);
+
+private:
+    QXmppDiscoveryManager *m_manager;
+};
 
 /** The DiscoveryPanel class represents a panel for displaying service
  *  discovery results.

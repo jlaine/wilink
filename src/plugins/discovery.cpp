@@ -56,6 +56,38 @@ static QString itemText(QListWidgetItem *item)
     return text;
 }
 
+DiscoveryModel::DiscoveryModel(QObject *parent)
+    : ChatModel(parent),
+    m_manager(0)
+{
+}
+
+void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
+{
+
+}
+
+QXmppDiscoveryManager *DiscoveryModel::manager() const
+{
+    return m_manager;
+}
+
+void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
+{
+    bool check;
+
+    if (manager == manager)
+        return;
+
+    m_manager = manager;
+    if (m_manager) {
+        check = connect(m_manager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+            this, SLOT(itemsReceived(QXmppDiscoveryIq)));
+        Q_ASSERT(check);
+    }
+    emit managerChanged(m_manager);
+}
+
 /** Constructs a DiscoveryPanel.
  *
  * @param client The XMPP client.
