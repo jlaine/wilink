@@ -50,7 +50,7 @@ Rectangle {
     Image {
         id: image
         height: button.height - 8
-        width: button.height - 8
+        width: sourceSize.width ? (button.height - 8) : 0
         anchors.left: parent.left
         anchors.margins: 4
         anchors.verticalCenter: parent.verticalCenter
