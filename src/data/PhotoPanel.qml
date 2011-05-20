@@ -42,7 +42,7 @@ Item {
 
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         anchors.top: header.bottom
         cellWidth: 130
         cellHeight: 150
@@ -106,5 +106,14 @@ Item {
                 PropertyChanges { target: stop2;  color: '#b0e2ff' }
             }
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: view
     }
 }
