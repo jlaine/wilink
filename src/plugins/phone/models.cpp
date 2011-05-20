@@ -95,11 +95,10 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
  * @param network
  * @param parent
  */
-PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *network, QObject *parent)
+PhoneCallsModel::PhoneCallsModel(SipClient *client, QObject *parent)
     : QAbstractListModel(parent),
     m_client(client),
-    m_enabled(false),
-    m_network(network)
+    m_enabled(false)
 {
     bool check;
 
@@ -116,6 +115,7 @@ PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *netwo
     setRoleNames(roleNames);
 
     // http
+    m_network = new QNetworkAccessManager(this);
     check = connect(m_network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
                     this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
     Q_ASSERT(check);

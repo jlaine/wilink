@@ -26,7 +26,6 @@
 
 class QAbstractButton;
 class QDeclarativeView;
-class QNetworkAccessManager;
 class Chat;
 class ChatClient;
 class PhoneCallsModel;
@@ -52,7 +51,6 @@ private:
     ChatClient *client;
     Chat *m_window;
     SipClient *sip;
-    QNetworkAccessManager *network;
 
     PhoneCallsModel *callsModel;
     QDeclarativeView *declarativeView;

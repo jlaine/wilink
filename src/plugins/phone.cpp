@@ -27,15 +27,10 @@
 #include <QDomDocument>
 #include <QLayout>
 #include <QMessageBox>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QTimer>
 #include <QUrl>
 
 #include "QXmppUtils.h"
-
-#include "qnetio/wallet.h"
 
 #include "application.h"
 #include "chat.h"
@@ -57,9 +52,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setWindowIcon(QIcon(":/phone.png"));
     setWindowTitle(tr("Phone"));
 
-    // http access
-    network = new QNetworkAccessManager(this);
-
     // sip client
     sip = new SipClient;
     sip->setAudioInputDevice(wApp->audioInputDevice());
@@ -77,7 +69,7 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addLayout(headerLayout());
 
     // history
-    callsModel = new PhoneCallsModel(sip, network, this);
+    callsModel = new PhoneCallsModel(sip, this);
 
     // declarative
     declarativeView = new QDeclarativeView;

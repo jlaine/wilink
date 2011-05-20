@@ -59,7 +59,7 @@ public:
         StateRole,
     };
 
-    PhoneCallsModel(SipClient *client, QNetworkAccessManager *network, QObject *parent = 0);
+    PhoneCallsModel(SipClient *client, QObject *parent = 0);
     ~PhoneCallsModel();
 
     int currentCalls() const;
