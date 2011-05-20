@@ -71,7 +71,6 @@
     <file>RoomParticipantView.qml</file>
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
-    <file>ToolBar.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
     <!-- Stylesheets -->
