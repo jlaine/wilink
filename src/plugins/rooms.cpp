@@ -434,6 +434,12 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     sortedModel->sort(0);
 
+    QSortFilterProxyModel *contactModel = new QSortFilterProxyModel(this);
+    contactModel->setSourceModel(rosterModel);
+    contactModel->setDynamicSortFilter(true);
+    contactModel->setFilterKeyColumn(2);
+    contactModel->setFilterRegExp(QRegExp("^(?!offline).+"));
+
     // header
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -445,6 +451,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("client", new QXmppDeclarativeClient(client));
+    context->setContextProperty("contactModel", contactModel);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
     context->setContextProperty("room", mucRoom);
@@ -458,11 +465,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     setFocusProxy(historyView);
 
     // add actions
-    QAction *inviteAction = addAction(QIcon(":/invite.png"), tr("Invite"));
-    check = connect(inviteAction, SIGNAL(triggered()),
-                    this, SLOT(inviteDialog()));
-    Q_ASSERT(check);
-
     optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
     check = connect(optionsAction, SIGNAL(triggered()),
                     mucRoom, SLOT(requestConfiguration()));
@@ -557,16 +559,6 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
     ChatForm dialog(form, chat);
     if (dialog.exec())
         mucRoom->setConfiguration(dialog.form());
-}
-
-/** Select users to invite the chat room.
- */
-void ChatRoom::inviteDialog()
-{
-    RoomInviteDialog dialog;
-    dialog.setRoom(mucRoom);
-    dialog.setRosterModel(chat->rosterModel());
-    dialog.exec();
 }
 
 /** Handle leaving the room.
@@ -705,79 +697,6 @@ void ChatRoomPrompt::validate()
     accept();
 }
 
-RoomInviteDialog::RoomInviteDialog()
-    : m_model(0),
-    m_room(0),
-    m_rosterModel(0)
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-    setWindowTitle(tr("Invite a contact"));
-
-    m_reason = new QLineEdit;
-    m_reason->setText("Let's talk");
-    layout->addWidget(m_reason);
-
-    m_list = new QListView;
-    layout->addWidget(m_list);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-    layout->addWidget(buttonBox);
-}
-
-QXmppMucRoom *RoomInviteDialog::room() const
-{
-    return m_room;
-}
-
-void RoomInviteDialog::setRoom(QXmppMucRoom *room)
-{
-    if (room != m_room) {
-        m_room = room;
-        emit roomChanged(m_room);
-    }
-}
-
-ChatRosterModel *RoomInviteDialog::rosterModel() const
-{
-    return m_rosterModel;
-}
-
-void RoomInviteDialog::setRosterModel(ChatRosterModel *rosterModel)
-{
-    m_rosterModel = rosterModel;
-
-    m_model = new ChatRosterProxyModel(this);
-    m_model->setSourceModel(rosterModel);
-
-    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(m_model);
-    sortedModel->setDynamicSortFilter(true);
-    sortedModel->setFilterKeyColumn(2);
-    sortedModel->setFilterRegExp(QRegExp("^(?!offline).+"));
-    m_list->setModel(sortedModel);
-
-    emit rosterModelChanged(rosterModel);
-}
-
-void RoomInviteDialog::submit()
-{
-    foreach (const QString &jid, m_model->selectedJids()) {
-        if (m_room->sendInvitation(jid, m_reason->text())) {
-#if 0
-            queueNotification(tr("%1 has been invited to %2")
-                .arg(rosterModel->contactName(jid))
-                .arg(jidToUser(mucRoom->jid())),
-                ForceNotification);
-#endif
-        }
-    }
-    accept();
-}
-
 ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
     : QDialog(parent),
     m_defaultJid(defaultJid),
@@ -887,7 +806,6 @@ public:
 bool RoomsPlugin::initialize(Chat *chat)
 {
     qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
-    qmlRegisterType<RoomInviteDialog>("wiLink", 0, 4, "RoomInviteDialog");
 
     new ChatRoomWatcher(chat);
     return true;

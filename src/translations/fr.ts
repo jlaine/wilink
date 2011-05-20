@@ -266,10 +266,6 @@ Acceptez-vous?</translation>
         <source>Permissions</source>
         <translation>Permissions</translation>
     </message>
-    <message>
-        <source>Invite</source>
-        <translation>Inviter</translation>
-    </message>
 </context>
 <context>
     <name>ChatRoomMembers</name>
@@ -383,17 +379,6 @@ Acceptez-vous?</translation>
     <message>
         <source>File from %1</source>
         <translation>Fichier de %1</translation>
-    </message>
-</context>
-<context>
-    <name>ChatTransferWidget</name>
-    <message>
-        <source>Downloading at %1</source>
-        <translation type="obsolete">Téléchargement à %1</translation>
-    </message>
-    <message>
-        <source>Uploading at %1</source>
-        <translation type="obsolete">Téléchargement à %1</translation>
     </message>
 </context>
 <context>
@@ -626,17 +611,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
-    </message>
-</context>
-<context>
-    <name>RoomInviteDialog</name>
-    <message>
-        <source>Invite a contact</source>
-        <translation>Inviter un contact</translation>
-    </message>
-    <message>
-        <source>%1 has been invited to %2</source>
-        <translation>%1 a été invité(e) à %2</translation>
     </message>
 </context>
 <context>

@@ -60,6 +60,10 @@ Rectangle {
             ToolButton {
                 icon: 'invite.png'
                 text: qsTr('Invite')
+
+                onClicked: {
+                    inviteDialog.show()
+                }
             }
 
             ToolButton {
@@ -140,6 +144,21 @@ Rectangle {
             var text = chatInput.text;
             if (room.sendMessage(text))
                 chatInput.text = '';
+        }
+    }
+
+    RoomInviteDialog {
+        id: inviteDialog
+        x: 10
+        y: 110
+        model: contactModel
+
+        onAccepted: {
+            for (var i in selection) {
+                console.log("inviting " + selection[i]);
+                room.sendInvitation(selection[i], reason);
+            }
+            selection = [];
         }
     }
 

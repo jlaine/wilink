@@ -122,7 +122,6 @@ private slots:
     void allowedActionsChanged(QXmppMucRoom::Actions actions);
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
-    void inviteDialog();
     void left();
     void messageReceived(const QXmppMessage &msg);
 
@@ -138,34 +137,6 @@ private:
     // actions
     QAction *optionsAction;
     QAction *permissionsAction;
-};
-
-class RoomInviteDialog : public QDialog
-{
-    Q_OBJECT
-
-public:
-    RoomInviteDialog();
-    
-    QXmppMucRoom *room() const;
-    void setRoom(QXmppMucRoom *room);
-
-    ChatRosterModel *rosterModel() const;
-    void setRosterModel(ChatRosterModel *rosterModel);
-
-signals:
-    void roomChanged(QXmppMucRoom *room);
-    void rosterModelChanged(ChatRosterModel *rosterModel);
-
-protected slots:
-    void submit();
-
-private:
-    QListView *m_list;
-    ChatRosterProxyModel *m_model;
-    QLineEdit *m_reason;
-    QXmppMucRoom *m_room;
-    ChatRosterModel *m_rosterModel;
 };
 
 class ChatRoomMembers : public QDialog

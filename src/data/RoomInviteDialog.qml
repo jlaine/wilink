@@ -21,13 +21,25 @@ import QtQuick 1.0
 
 Rectangle {
     id: dialog
+
     property alias model: view.model
+    property alias reason: reasonEdit.text
     property variant selection: []
+    signal accepted
 
     color: '#ccc'
     radius: 10
     width: 320
     height: 240
+    visible: false
+
+    function show() {
+        visible = 1
+    }
+
+    function hide() {
+        visible = 0
+    }
 
     Rectangle {
         id: header
@@ -40,10 +52,10 @@ Rectangle {
         border.width: 1
         color: 'white'
         width: 100
-        height: reason.paintedHeight
+        height: reasonEdit.paintedHeight
 
         TextEdit {
-            id: reason
+            id: reasonEdit
             anchors.fill: parent
 
             focus: true
@@ -52,6 +64,7 @@ Rectangle {
             textFormat: TextEdit.PlainText
 
             Keys.onReturnPressed: {
+                return false;
             }
         }
     }
@@ -146,10 +159,15 @@ Rectangle {
 
         Button {
             text: 'OK'
+            onClicked: {
+                dialog.accepted()
+                dialog.hide()
+            }
         }
 
         Button {
             text: 'Cancel'
+            onClicked: dialog.hide()
         }
     }
 }
