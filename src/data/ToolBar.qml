@@ -52,6 +52,7 @@ Rectangle {
 
             color: 'transparent'
             height: 40
+            state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
             visible: model.visible != false
             width: visible ? (itemText.paintedWidth + 24) : 0
 
@@ -64,9 +65,9 @@ Rectangle {
 
             // background
             Rectangle {
+                id: background
                 anchors.fill: parent
                 gradient: hoverGradient
-                opacity: 0.4
             }
 
             // left border
@@ -108,22 +109,44 @@ Rectangle {
                 text: model.text
             }
 
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: hoverStop2; color: '#ffffff' }
-            }
+            states: [
+                State {
+                    name: 'hovered'
+                    PropertyChanges { target: hoverStop2; color: 'white' }
+                    PropertyChanges { target: background; opacity: 0.4 }
+                },
+                State {
+                    name: 'pressed'
+                    PropertyChanges { target: hoverStop2; color: 'white' }
+                    PropertyChanges { target: background; opacity: 0.8 }
+                }
+            ]
 
             MouseArea {
+                id: mouseArea
                 anchors.fill: parent
                 hoverEnabled: true
+
+                property bool pressed: false
+                property bool hovered: false
 
                 onClicked: {
                     if (listViewItem.enabled) {
                         itemClicked(index);
                     }
                 }
-                onEntered: listViewItem.state = 'hovered'
-                onExited: listViewItem.state = ''
+                onPressed: {
+                    if (listViewItem.enabled) {
+                        pressed = true;
+                    }
+                }
+                onReleased: pressed = false
+                onEntered: {
+                    if (listViewItem.enabled) {
+                        hovered = true;
+                    }
+                }
+                onExited: hovered = false
             }
         }
     }

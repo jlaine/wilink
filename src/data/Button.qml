@@ -72,7 +72,6 @@ Rectangle {
                 button.state = 'pressed';
             }
         }
-
         onReleased: {
             if (button.enabled) {
                 button.state = '';
