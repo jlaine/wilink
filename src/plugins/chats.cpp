@@ -190,7 +190,7 @@ ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRo
     context->setContextProperty("participantModel", qVariantFromValue<QObject*>(0));
     historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    historyView->setSource(QUrl("qrc:/conversation.qml"));
+    historyView->setSource(QUrl("qrc:/ConversationPanel.qml"));
     layout->addWidget(historyView);
     setFocusProxy(historyView);
 

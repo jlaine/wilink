@@ -54,11 +54,11 @@
     <file>wiLink-64.png</file>
     <!-- QML -->
     <file>qmldir</file>
-    <file>conversation.qml</file>
     <file>roster.qml</file>
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
+    <file>ConversationPanel.qml</file>
     <file>HistoryView.qml</file>
     <file>KeyPad.qml</file>
     <file>Menu.qml</file>
