@@ -39,11 +39,20 @@ public:
 class QXmppDeclarativeClient : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
 
 public:
     QXmppDeclarativeClient(QXmppClient *client);
+
+    QString jid() const;
     QXmppRosterManager *rosterManager() const;
+
+signals:
+    void jidChanged(const QString &jid);
+
+private slots:
+    void _q_connected();
 
 private:
     QXmppClient *m_client;

@@ -69,10 +69,25 @@ void ListHelper::setModel(QObject *model)
 QXmppDeclarativeClient::QXmppDeclarativeClient(QXmppClient *client)
     : m_client(client)
 {
+    bool check;
+    check = connect(m_client, SIGNAL(connected()),
+                    this, SLOT(_q_connected()));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+}
+
+QString QXmppDeclarativeClient::jid() const
+{
+    return m_client->configuration().jid();
 }
 
 QXmppRosterManager *QXmppDeclarativeClient::rosterManager() const
 {
     return &m_client->rosterManager();
+}
+
+void QXmppDeclarativeClient::_q_connected()
+{
+    emit jidChanged(jid());
 }
 
