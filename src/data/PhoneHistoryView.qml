@@ -24,14 +24,25 @@ Item {
     id: block
 
     property alias model: view.model
+    property ListModel model
     signal addressClicked(string address)
 
     Rectangle {
+        id: background
+        anchors.fill: parent
+        gradient: Gradient {
+            GradientStop { id: backgroundStop1; position: 0.0; color: '#cbdaf1' }
+            GradientStop { id: backgroundStop2; position: 1.0; color: '#e7effd' }
+        }
+    }
+
+    Rectangle {
         id: header
-        anchors.left: view.left
-        anchors.right: scrollBar.right
+        anchors.left: parent.left
+        anchors.right: parent.right
         color: '#7091c8'
         height: textHeader.height
+        z: 1
 
         Text {
             id: textHeader
@@ -51,9 +62,7 @@ Item {
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: header.bottom
-        anchors.bottomMargin: 4
-        anchors.leftMargin: 4
-        anchors.rightMargin: 4
+        anchors.margins: 4
         clip: true
 
         delegate: Item {
@@ -64,8 +73,8 @@ Item {
             Rectangle {
                 id: itemBackground
                 anchors.fill: parent
-                border.color: '#ffffff'
-                color: model.active ? '#dd6666' : 'white'
+                border.color: 'transparent'
+                color: model.active ? '#dd6666' : 'transparent'
 
                 Image {
                     id: image
@@ -162,7 +171,7 @@ Item {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: view.top
+        anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
