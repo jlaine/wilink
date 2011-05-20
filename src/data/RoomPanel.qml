@@ -153,9 +153,11 @@ Rectangle {
 
     RoomInviteDialog {
         id: inviteDialog
+
         x: 10
         y: 110
         model: contactModel
+        visible: false
 
         onAccepted: {
             for (var i in selection) {

@@ -26,6 +26,8 @@ Dialog {
     property alias reason: reasonEdit.text
     property variant selection: []
 
+    title: qsTr('Invite your contacts')
+
     Rectangle {
         id: bar
 

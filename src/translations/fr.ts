@@ -625,6 +625,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>RoomInviteDialog</name>
+    <message>
+        <source>Invite your contacts</source>
+        <translation>Inviter vos contacts</translation>
+    </message>
+</context>
+<context>
     <name>RoomPanel</name>
     <message>
         <source>Chat room error</source>

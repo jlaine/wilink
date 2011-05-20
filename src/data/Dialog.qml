@@ -32,20 +32,22 @@ Rectangle {
     height: 240
 
     function show() {
-        visible = true
+        visible = true;
     }
 
     function hide() {
-        visible = true
+        visible = false;
     }
 
-    Item {
+    Rectangle {
         id: header
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        color: '#e7effd'
         height: 20
+        radius: dialog.radius
 
         Text {
             id: label
@@ -60,7 +62,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: header.bottom
-        anchors.bottom: footer.bottom
+        anchors.bottom: footer.top
     }
 
     Row {
