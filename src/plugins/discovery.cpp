@@ -18,6 +18,10 @@
  */
 
 #include <QAction>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
@@ -30,6 +34,7 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
+#include "declarative.h"
 #include "discovery.h"
 
 #define DISCOVERY_ROSTER_ID "0_discovery"
@@ -98,7 +103,7 @@ void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
  * @param client The XMPP client.
  * @param parent The parent widget of the panel.
  */
-DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
+DiscoveryPanel::DiscoveryPanel(Chat *chatWindow, QXmppClient *client, QWidget *parent)
     : ChatPanel(parent),
     m_client(client)
 {
@@ -120,6 +125,15 @@ DiscoveryPanel::DiscoveryPanel(QXmppClient *client, QWidget *parent)
     hbox->addWidget(m_locationNode);
 
     layout->addLayout(hbox);
+
+    QDeclarativeView *declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
+    context->setContextProperty("client", new QXmppDeclarativeClient(client));
+    context->setContextProperty("window", chatWindow);
+
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/DiscoveryPanel.qml"));
+    layout->addWidget(declarativeView);
 
     /* main view */
     m_listWidget = new QListWidget;
@@ -307,7 +321,7 @@ public:
 bool DiscoveryPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    DiscoveryPanel *discovery = new DiscoveryPanel(chat->client(), chat);
+    DiscoveryPanel *discovery = new DiscoveryPanel(chat, chat->client(), chat);
     discovery->setObjectName(DISCOVERY_ROSTER_ID);
     chat->addPanel(discovery);
 

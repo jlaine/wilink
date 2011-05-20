@@ -458,6 +458,10 @@ Acceptez-vous?</translation>
         <source>Service discovery</source>
         <translation>Découverte de services</translation>
     </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
 </context>
 <context>
     <name>Menu</name>

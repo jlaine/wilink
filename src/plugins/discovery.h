@@ -20,6 +20,7 @@
 #ifndef __WILINK_DISCOVERY_H__
 #define __WILINK_DISCOVERY_H__
 
+class Chat;
 class QAction;
 class QLineEdit;
 class QListWidget;
@@ -62,7 +63,7 @@ class DiscoveryPanel : public ChatPanel
     Q_OBJECT
 
 public:
-    DiscoveryPanel(QXmppClient *client, QWidget *parent);
+    DiscoveryPanel(Chat *chatWindow, QXmppClient *client, QWidget *parent);
 
 private slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
