@@ -114,7 +114,7 @@ Item {
 
             anchors.top: parent.top
             anchors.right: parent.right
-            enabled: sipClient.state == SipClient.ConnectedState
+            enabled: historyModel.client.state == SipClient.ConnectedState
             icon: 'call.png'
             text: qsTr('Call')
             visible: historyModel.currentCalls == 0
@@ -124,7 +124,7 @@ Item {
                 if (!recipient.length)
                     return;
 
-                var address = buildAddress(recipient, sipClient.domain);
+                var address = buildAddress(recipient, historyModel.client.domain);
                 if (historyModel.call(address))
                     numberEdit.text = '';
             }
@@ -224,12 +224,12 @@ Item {
         model: historyModel
 
         onAddressClicked: {
-            numberEdit.text = parseAddress(address, sipClient.domain);
+            numberEdit.text = parseAddress(address, historyModel.client.domain);
         }
     }
 
     Connections {
-        target: sipClient
+        target: historyModel.client
 
         onCallReceived: {
             var contactName = call.recipient;
