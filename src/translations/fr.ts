@@ -559,6 +559,10 @@ Acceptez-vous?</translation>
         <source>Call failed</source>
         <translation>L&apos;appel a échoué</translation>
     </message>
+    <message>
+        <source>Enter the number you want to call</source>
+        <translation>Saisissez le numéro à appeler</translation>
+    </message>
 </context>
 <context>
     <name>PhotosPanel</name>

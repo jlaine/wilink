@@ -109,7 +109,7 @@ Item {
                 id: help
                 anchors.fill: numberEdit
                 color: '#999'
-                text: qsTr('Enter your phone number')
+                text: qsTr('Enter the number you want to call')
                 visible: numberEdit.text == ''
             }
         }
