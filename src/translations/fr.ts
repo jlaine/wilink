@@ -666,6 +666,26 @@ Acceptez-vous?</translation>
 
 %2</translation>
     </message>
+    <message>
+        <source>Invite</source>
+        <translation>Inviter</translation>
+    </message>
+    <message>
+        <source>Subject</source>
+        <translation>Sujet</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>Permissions</source>
+        <translation>Permissions</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
 </context>
 <context>
     <name>RoomParticipantView</name>

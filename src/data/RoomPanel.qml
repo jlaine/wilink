@@ -52,16 +52,44 @@ Rectangle {
 
         actions: ListModel {
             ListElement {
-                text: 'Invite'
+                action: 'invite'
                 icon: 'invite.png'
+                text: ''
             }
             ListElement {
-                text: 'Subject'
+                action: 'subject'
                 icon: 'chat.png'
+                text: ''
             }
             ListElement {
-                text: 'Close'
+                action: 'options'
+                icon: 'options.png'
+                text: ''
+            }
+            ListElement {
+                action: 'permissions'
+                icon: 'permissions.png'
+                text: ''
+            }
+            ListElement {
+                action: 'clicked'
                 icon: 'close.png'
+                text: ''
+            }
+        }
+
+        Component.onCompleted: {
+            actions.setProperty(0, 'text', qsTr('Invite'));
+            actions.setProperty(1, 'text', qsTr('Subject'));
+            actions.setProperty(2, 'text', qsTr('Options'));
+            actions.setProperty(3, 'text', qsTr('Permissions'));
+            actions.setProperty(4, 'text', qsTr('Close'));
+        }
+
+        onItemClicked: {
+            var item = actions.get(index);
+            if (item.action == 'subject') {
+                console.log("subject");
             }
         }
     }

@@ -26,6 +26,8 @@ Rectangle {
     property alias icon: iconImage.source
     property alias title: titleText.text
 
+    signal itemClicked(int index)
+
     gradient: Gradient {
         GradientStop { position: 0; color: '#9bbdf4' }
         GradientStop { position: 1; color: '#90acd8' }
@@ -62,6 +64,8 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         width: listView.count * 60
+
+        onItemClicked: header.itemClicked(index)
     }
 }
 

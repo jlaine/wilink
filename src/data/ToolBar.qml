@@ -129,7 +129,7 @@ Rectangle {
 
                 onClicked: {
                     if (listViewItem.enabled) {
-                        itemClicked(index);
+                        toolbar.itemClicked(index);
                     }
                 }
                 onPressed: {
