@@ -27,46 +27,29 @@ Rectangle {
     width: 320
     height: 240
 
-    Item {
+    Rectangle {
         id: header
 
         anchors.margins: 8
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 20
+        border.color: '#c3c3c3'
+        border.width: 1
+        color: 'white'
+        width: 100
+        height: reason.paintedHeight
 
-        Text {
-            id: label
+        TextEdit {
+            id: reason
+            anchors.fill: parent
 
-            anchors.top: parent.top
-            anchors.left: parent.left
-            width: paintedWidth
-            text: 'Reason'
-        }
+            focus: true
+            smooth: true
+            text: "Let's talk"
+            textFormat: TextEdit.PlainText
 
-        Rectangle {
-            anchors.top: parent.top
-            anchors.left: label.right
-            anchors.leftMargin: 16
-            anchors.right: parent.right
-            border.color: '#c3c3c3'
-            border.width: 1
-            color: 'white'
-            width: 100
-            height: reason.paintedHeight
-
-            TextEdit {
-                id: reason
-                anchors.fill: parent
-
-                focus: true
-                smooth: true
-                text: ''
-                textFormat: TextEdit.PlainText
-
-                Keys.onReturnPressed: {
-                }
+            Keys.onReturnPressed: {
             }
         }
     }
