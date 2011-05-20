@@ -505,10 +505,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(left()));
     Q_ASSERT(check);
 
-    check = connect(mucRoom, SIGNAL(subjectChanged(QString)),
-                    this, SLOT(subjectChanged(QString)));
-    Q_ASSERT(check);
-
     check = connect(mucRoom, SIGNAL(messageReceived(QXmppMessage)),
                     this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
@@ -627,11 +623,6 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
     // play sound, unless we sent the message
     if (message.received)
         wApp->soundPlayer()->play(wApp->incomingMessageSound());
-}
-
-void ChatRoom::subjectChanged(const QString &subject)
-{
-    setWindowStatus(subject);
 }
 
 /** Unbookmarks the room.

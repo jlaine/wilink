@@ -47,7 +47,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: 'chat.png'
-        title: '<b>' + room.jid.split('@')[0] + '</b>'
+        title: '<b>' + room.jid.split('@')[0] + '</b>' + '<br/>' + room.subject
         z: 1
     }
 

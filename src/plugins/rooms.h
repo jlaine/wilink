@@ -126,7 +126,6 @@ private slots:
     void inviteDialog();
     void left();
     void messageReceived(const QXmppMessage &msg);
-    void subjectChanged(const QString &subject);
 
 private:
     Chat *chat;
