@@ -21,6 +21,7 @@
 #include <QDeclarativeEngine>
 #include <QMessageBox>
 
+#include "QXmppDiscoveryManager.h"
 #include "QXmppRosterManager.h"
 
 #include "chat.h"
@@ -79,6 +80,11 @@ QXmppDeclarativeClient::QXmppDeclarativeClient(QXmppClient *client)
 QString QXmppDeclarativeClient::jid() const
 {
     return m_client->configuration().jid();
+}
+
+QXmppDiscoveryManager *QXmppDeclarativeClient::discoveryManager() const
+{
+    return m_client->findExtension<QXmppDiscoveryManager>();
 }
 
 QXmppRosterManager *QXmppDeclarativeClient::rosterManager() const

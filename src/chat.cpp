@@ -55,6 +55,7 @@
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
 #include "QXmppRosterIq.h"
@@ -103,6 +104,7 @@ Chat::Chat(QWidget *parent)
     bool check;
 
     qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
     qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
 

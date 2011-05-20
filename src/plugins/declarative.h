@@ -26,6 +26,8 @@
 #include "QXmppClient.h"
 #include "QXmppMessage.h"
 
+class QXmppDiscoveryManager;
+
 class QDeclarativeInputDialog : public QInputDialog
 {
     Q_OBJECT
@@ -40,12 +42,14 @@ class QXmppDeclarativeClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
+    Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
 
 public:
     QXmppDeclarativeClient(QXmppClient *client);
 
     QString jid() const;
+    QXmppDiscoveryManager *discoveryManager() const;
     QXmppRosterManager *rosterManager() const;
 
 signals:
