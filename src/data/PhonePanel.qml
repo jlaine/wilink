@@ -240,7 +240,7 @@ Item {
         anchors.right: parent.right
         anchors.top: controls.bottom
         anchors.bottom: parent.bottom
-        anchors.margins: 4
+        anchors.margins: 10
         clip: true
         model: historyModel
 
