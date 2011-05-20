@@ -516,6 +516,10 @@ Acceptez-vous?</translation>
         <source>Remove</source>
         <translation>Retirer</translation>
     </message>
+    <message>
+        <source>Call history</source>
+        <translation>Historique des appels</translation>
+    </message>
 </context>
 <context>
     <name>PhonePanel</name>
