@@ -59,12 +59,22 @@ Item {
             return recipient;
     }
 
-    Item {
+    PanelHeader {
         id: header
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
+        icon: 'phone.png'
+        title: qsTr('Phone')
+    }
+
+    Item {
+        id: numberRow
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
         anchors.margins: 4
         height: 32
 
@@ -149,7 +159,7 @@ Item {
         id: controls
 
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: header.bottom
+        anchors.top: numberRow.bottom
         anchors.topMargin: 8
         spacing: 4
 

@@ -30,7 +30,6 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 50
         gradient: Gradient {
             GradientStop { position: 0; color: '#6ea1f1' }
             GradientStop { position: 1; color: '#567dbc' }

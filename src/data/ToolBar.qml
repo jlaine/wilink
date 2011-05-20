@@ -22,6 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: toolbar
     color: 'transparent'
+    height: 50
 
     property ListModel model: ListModel {
         ListElement { text: 'Phone'; icon: 'phone.png' }

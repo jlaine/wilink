@@ -62,6 +62,7 @@
     <file>HistoryView.qml</file>
     <file>KeyPad.qml</file>
     <file>Menu.qml</file>
+    <file>PanelHeader.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>PhonePanel.qml</file>
     <file>PlayerPanel.qml</file>
