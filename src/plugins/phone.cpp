@@ -104,7 +104,10 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     // connect signals
     check = connect(client, SIGNAL(connected()),
-                    this, SLOT(getSettings()));
+                    callsModel, SLOT(getSettings()));
+    Q_ASSERT(check);
+    check = connect(callsModel, SIGNAL(enabledChanged(bool)),
+                    this, SLOT(handleSettings()));
     Q_ASSERT(check);
 
     // add action
@@ -161,79 +164,33 @@ void PhonePanel::callReceived(SipCall *call)
     box->show();
 }
 
-/** Requests VoIP settings from the server.
- */
-void PhonePanel::getSettings()
-{
-    QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
-    req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
-    QNetworkReply *reply = network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(handleSettings()));
-}
-
 /** Handles VoIP settings received from the server.
  */
 void PhonePanel::handleSettings()
 {
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
-        return;
-    }
-
-    QDomDocument doc;
-    doc.setContent(reply);
-    QDomElement settings = doc.documentElement();
-
-    // parse settings from server
-    const bool enabled = settings.firstChildElement("enabled").text() == "true";
-    const QString domain = settings.firstChildElement("domain").text();
-    const QString username = settings.firstChildElement("username").text();
-    const QString password = settings.firstChildElement("password").text();
-    const QString number = settings.firstChildElement("number").text();
-    const QString callsUrl = settings.firstChildElement("calls-url").text();
-    const QString selfcareUrl = settings.firstChildElement("selfcare-url").text();
-
     // check service is activated
-    if (!enabled || domain.isEmpty() || username.isEmpty() || password.isEmpty()) {
-        if (!selfcareUrl.isEmpty()) {
+    if (!callsModel->enabled()) {
+        const QUrl selfcareUrl = callsModel->selfcareUrl();
+        if (selfcareUrl.isValid()) {
             // show a message
             setWindowHelp(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
-                                  tr("You can subscribe to the phone service at the following address:"), selfcareUrl, selfcareUrl));
+                                  tr("You can subscribe to the phone service at the following address:"), selfcareUrl.toString(), selfcareUrl.toString()));
             action->setVisible(true);
         }
         return;
     }
 
+    // update number
+    const QString number = callsModel->phoneNumber();
     if (!number.isEmpty())
         setWindowExtra(tr("Your number is %1").arg(number));
-
-    // connect to server
-    if (sip->displayName() != number ||
-        sip->domain() != domain ||
-        sip->username() != username ||
-        sip->password() != password)
-    {
-        sip->setDisplayName(number);
-        sip->setDomain(domain);
-        sip->setUsername(username);
-        sip->setPassword(password);
-        QMetaObject::invokeMethod(sip, "connectToServer");
-    }
 
     // register URL handler
     if (!m_registeredHandler) {
         ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
-            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(domain));
+            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(sip->domain()));
         QDesktopServices::setUrlHandler("sip", this, "openUrl");
     }
-
-    // retrieve call history
-    if (!callsUrl.isEmpty())
-        callsModel->setUrl(QUrl(callsUrl));
 
     // enable action
     action->setVisible(true);
