@@ -501,14 +501,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
 
-    check = connect(mucRoom, SIGNAL(error(QXmppStanza::Error)),
-                    this, SLOT(error(QXmppStanza::Error)));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(kicked(QString,QString)),
-                    this, SLOT(kicked(QString,QString)));
-    Q_ASSERT(check);
-
     check = connect(mucRoom, SIGNAL(left()),
                     this, SLOT(left()));
     Q_ASSERT(check);
@@ -590,33 +582,12 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
         mucRoom->setConfiguration(dialog.form());
 }
 
-/** Handle an error.
- */
-void ChatRoom::error(const QXmppStanza::Error &error)
-{
-    QMessageBox::warning(window(),
-        tr("Chat room error"),
-        tr("Sorry, but you cannot join chat room '%1'.\n\n%2")
-            .arg(mucRoom->jid())
-            .arg(error.text()));
-}
-
 /** Select users to invite the chat room.
  */
 void ChatRoom::inviteDialog()
 {
     ChatRoomInvite dialog(mucRoom, chat->rosterModel(), chat);
     dialog.exec();
-}
-
-void ChatRoom::kicked(const QString &jid, const QString &reason)
-{
-    Q_UNUSED(jid);
-    QMessageBox::warning(window(),
-        tr("Chat room error"),
-        tr("Sorry, but you were kicked from chat room '%1'.\n\n%2")
-            .arg(mucRoom->jid())
-            .arg(reason));
 }
 
 /** Handle leaving the room.

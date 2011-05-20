@@ -130,9 +130,11 @@ if(RELOAD_TRANSLATIONS)
         ${wiLink_SOURCES}
         data/roster.qml
         data/CallWidget.qml
+        data/ConversationPanel.qml
         data/RoomParticipantView.qml
         data/PhoneHistoryView.qml
         data/PhonePanel.qml
+        data/RoomPanel.qml
         data/TransferWidget.qml
         translations/fr.ts)
 else(RELOAD_TRANSLATIONS)

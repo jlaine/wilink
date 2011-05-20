@@ -259,26 +259,6 @@ Acceptez-vous?</translation>
 <context>
     <name>ChatRoom</name>
     <message>
-        <source>Chat room error</source>
-        <translation>Erreur de salon de discussion</translation>
-    </message>
-    <message>
-        <source>Sorry, but you cannot join chat room &apos;%1&apos;.
-
-%2</source>
-        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion &apos;%1&apos;.
-
-%2</translation>
-    </message>
-    <message>
-        <source>Sorry, but you were kicked from chat room &apos;%1&apos;.
-
-%2</source>
-        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion &apos;%1&apos;.
-
-%2</translation>
-    </message>
-    <message>
         <source>Subject</source>
         <translation>Sujet</translation>
     </message>
@@ -662,6 +642,29 @@ Acceptez-vous?</translation>
     <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
+    </message>
+</context>
+<context>
+    <name>RoomPanel</name>
+    <message>
+        <source>Chat room error</source>
+        <translation>Erreur de salon de discussion</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot join chat room &apos;%1&apos;.
+
+%2</source>
+        <translation>Désolé, mais vous ne pouvez pas rejoindre le salon de discussion &apos;%1&apos;.
+
+%2</translation>
+    </message>
+    <message>
+        <source>Sorry, but you were kicked from chat room &apos;%1&apos;.
+
+%2</source>
+        <translation>Désolé, mais vous avez été éjecté(e) du salon de discussion &apos;%1&apos;.
+
+%2</translation>
     </message>
 </context>
 <context>
