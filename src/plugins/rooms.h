@@ -140,12 +140,22 @@ private:
     QAction *permissionsAction;
 };
 
-class ChatRoomInvite : public QDialog
+class RoomInviteDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatRoomInvite(QXmppMucRoom *mucRoom, ChatRosterModel *rosterModel, QWidget *parent);
+    RoomInviteDialog();
+    
+    QXmppMucRoom *room() const;
+    void setRoom(QXmppMucRoom *room);
+
+    ChatRosterModel *rosterModel() const;
+    void setRosterModel(ChatRosterModel *rosterModel);
+
+signals:
+    void roomChanged(QXmppMucRoom *room);
+    void rosterModelChanged(ChatRosterModel *rosterModel);
 
 protected slots:
     void submit();
@@ -155,6 +165,7 @@ private:
     ChatRosterProxyModel *m_model;
     QLineEdit *m_reason;
     QXmppMucRoom *m_room;
+    ChatRosterModel *m_rosterModel;
 };
 
 class ChatRoomMembers : public QDialog

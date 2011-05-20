@@ -272,17 +272,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatRoomInvite</name>
-    <message>
-        <source>Invite a contact</source>
-        <translation>Inviter un contact</translation>
-    </message>
-    <message>
-        <source>%1 has been invited to %2</source>
-        <translation>%1 a été invité(e) à %2</translation>
-    </message>
-</context>
-<context>
     <name>ChatRoomMembers</name>
     <message>
         <source>User</source>
@@ -637,6 +626,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
+    </message>
+</context>
+<context>
+    <name>RoomInviteDialog</name>
+    <message>
+        <source>Invite a contact</source>
+        <translation>Inviter un contact</translation>
+    </message>
+    <message>
+        <source>%1 has been invited to %2</source>
+        <translation>%1 a été invité(e) à %2</translation>
     </message>
 </context>
 <context>
