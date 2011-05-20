@@ -531,9 +531,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     mucRoom, SLOT(leave()));
     Q_ASSERT(check);
 
-    /* if nickname is received, join now */
-    if (rosterModel->isOwnNameReceived())
-        join();
+    // try joining room
+    join();
 }
 
 /** Update visible actions.
@@ -633,20 +632,22 @@ void ChatRoom::inviteDialog()
  */
 void ChatRoom::join()
 {
-    if (mucRoom->isJoined())
+    const QString nickName = rosterModel->ownName();
+    if (nickName.isEmpty())
         return;
 
-    QXmppClient *client = chat->client();
+    if (mucRoom->isJoined())
+        return;
 
     // clear history
     historyModel->clear();
 
     // send join request
-    mucRoom->setNickName(rosterModel->ownName());
+    mucRoom->setNickName(nickName);
     mucRoom->join();
 
     // request room information
-    client->findExtension<QXmppDiscoveryManager>()->requestInfo(mucRoom->jid());
+    chat->client()->findExtension<QXmppDiscoveryManager>()->requestInfo(mucRoom->jid());
 }
 
 void ChatRoom::kicked(const QString &jid, const QString &reason)
