@@ -26,14 +26,34 @@ Item {
     property alias model: view.model
     signal addressClicked(string address)
 
+    Rectangle {
+        id: header
+        anchors.left: view.left
+        anchors.right: scrollBar.right
+        color: '#7091c8'
+        height: textHeader.height
+
+        Text {
+            id: textHeader
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: 4
+            color: '#ffffff'
+            font.bold: true
+            text: qsTr('Call history')
+        }
+    }
+
     ListView {
         id: view
 
+        anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.margins: 4
+        anchors.top: header.bottom
+        anchors.bottomMargin: 4
+        anchors.leftMargin: 4
+        anchors.rightMargin: 4
         clip: true
 
         delegate: Item {
@@ -142,7 +162,7 @@ Item {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: parent.top
+        anchors.top: view.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
