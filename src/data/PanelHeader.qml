@@ -50,7 +50,6 @@ Rectangle {
         anchors.right: toolBar.left
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
-        font.bold: true
         width: 150
     }
 

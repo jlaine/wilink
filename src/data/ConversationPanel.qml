@@ -31,7 +31,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: vcard.avatar
-        title: conversation.jid
+        title: '<b>' + vcard.name + '</b><br/>' + vcard.jid
         z: 1
 
         VCard {

@@ -66,7 +66,7 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         icon: 'phone.png'
-        title: qsTr('Phone')
+        title: '<b>' + qsTr('Phone') + '</b>'
     }
 
     Item {

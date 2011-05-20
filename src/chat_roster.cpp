@@ -846,7 +846,8 @@ QStringList ChatRosterProxyModel::selectedJids() const
 }
 
 VCard::VCard(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+    m_cache(0)
 {
 }
 
@@ -888,15 +889,39 @@ QUrl VCard::url() const
 
 void VCard::update()
 {
-    const QUrl avatar = VCardCache::instance()->imageUrl(m_jid);
-    if (avatar != m_avatar) {
-        m_avatar = avatar;
-        emit avatarChanged(m_avatar);
+    QUrl newAvatar;
+    QString newName;
+    QUrl newUrl;
+
+    // fetch data
+    if (!m_jid.isEmpty()) {
+        if (!m_cache) {
+            m_cache = VCardCache::instance();
+            connect(m_cache, SIGNAL(cardChanged(QString)),
+                    this, SLOT(cardChanged(QString)));
+        }
+
+        QXmppVCardIq vcard;
+        if (m_cache->get(m_jid, &vcard)) {
+            newAvatar = QUrl("image://roster/" + m_jid);
+            newName = vcard.nickName();
+            newUrl = QUrl(vcard.url());
+        } else {
+            newAvatar = QUrl("qrc:/peer.png");
+        }
     }
 
-    const QUrl url = VCardCache::instance()->profileUrl(m_jid);
-    if (url != m_url) {
-        m_url = url;
+    // notify changes
+    if (newAvatar != m_avatar) {
+        m_avatar = newAvatar;
+        emit avatarChanged(m_avatar);
+    }
+    if (newName != m_name) {
+        m_name = newName;
+        emit nameChanged(m_name);
+    }
+    if (newUrl != m_url) {
+        m_url = newUrl;
         emit urlChanged(m_url);
     }
 }

@@ -30,7 +30,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: 'chat.png'
-        title: conversation.jid.split('@')[0]
+        title: '<b>' + conversation.jid.split('@')[0] + '</b>'
         z: 1
     }
 

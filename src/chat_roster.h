@@ -37,6 +37,7 @@ class QXmppVCardManager;
 
 class ChatRosterModel;
 class ChatRosterModelPrivate;
+class VCardCache;
 
 #define ROOMS_ROSTER_ID     "1_rooms"
 #define CONTACTS_ROSTER_ID  "2_contacts"
@@ -188,6 +189,7 @@ private slots:
 private:
     void update();
 
+    VCardCache *m_cache;
     QUrl m_avatar;
     QString m_jid;
     QString m_name;
