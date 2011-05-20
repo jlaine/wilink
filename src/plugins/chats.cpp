@@ -50,29 +50,6 @@
 #define HISTORY_DAYS 14
 #endif
 
-class ChatDialogItem : public ChatModelItem
-{
-public:
-    QString jid;
-};
-
-class ChatDialogModel : public ChatModel
-{
-public:
-    ChatDialogModel(QObject *parent);
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-};
-
-ChatDialogModel::ChatDialogModel(QObject *parent)
-    : ChatModel(parent)
-{
-}
-
-QVariant ChatDialogModel::data(const QModelIndex &index, int role) const
-{
-    return QVariant();
-}
-
 ChatDialogHelper::ChatDialogHelper(QObject *parent)
     : QObject(parent),
     m_client(0),
