@@ -24,10 +24,11 @@ Rectangle {
 
     property bool enabled: true
     property alias icon: image.source
-    property string text
+    property alias text: label.text
     signal clicked
 
-    width: 32; height: 32
+    height: 32
+    width: label.width + image.width + 2 * image.anchors.margins
     border.color: '#84bde8'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
@@ -50,8 +51,17 @@ Rectangle {
         id: image
         height: button.height - 8
         width: button.height - 8
-        anchors.centerIn: parent
+        anchors.left: parent.left
+        anchors.margins: 4
+        anchors.verticalCenter: parent.verticalCenter
         smooth: true
+    }
+
+    Text {
+        id: label
+        anchors.left: image.right
+        anchors.verticalCenter: parent.verticalCenter
+        font.pixelSize: Math.round(button.height / 2)
     }
 
     MouseArea {
