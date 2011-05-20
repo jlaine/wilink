@@ -22,8 +22,9 @@ import QtQuick 1.0
 Rectangle {
     id: toolbar
     color: 'transparent'
-    height: 50
+    height: 42
 
+    property alias listView: view
     property ListModel model: ListModel {
         ListElement { text: 'Phone'; icon: 'phone.png' }
         ListElement { text: 'Photos'; icon: 'photos.png' }
@@ -46,7 +47,7 @@ Rectangle {
             id: listViewItem
 
             color: 'transparent'
-            height: 45
+            height: 40
             width: itemText.paintedWidth + 24
 
             Gradient {
@@ -86,9 +87,10 @@ Rectangle {
 
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
+                smooth: true
                 source: model.icon
-                width: 32
-                height: 32
+                width: 24
+                height: 24
             }
 
             Text {
@@ -97,7 +99,7 @@ Rectangle {
                 anchors.top: icon.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: 'white'
-                font.pixelSize: 10
+                font.pixelSize: 11
                 text: model.text
             }
 

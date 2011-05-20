@@ -28,7 +28,7 @@ Rectangle {
         GradientStop { position: 0; color: '#9bbdf4' }
         GradientStop { position: 1; color: '#90acd8' }
     }
-    height: 50
+    height: toolBar.height
     width: 200
 
     Image {
@@ -44,6 +44,7 @@ Rectangle {
 
         anchors.left: iconImage.right
         anchors.leftMargin: 16
+        anchors.right: toolBar.left
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
         font.bold: true
@@ -53,10 +54,13 @@ Rectangle {
     ToolBar {
         id: toolBar
 
-        anchors.left: titleText.right
+        //anchors.left: titleText.right
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        model: ListModel {
+            ListElement { text: 'Close'; icon: 'close.png' }
+        }
+        width: listView.count * 60
     }
 }
 
