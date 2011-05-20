@@ -159,6 +159,41 @@ private:
     QPersistentModelIndex m_sourceRoot;
 };
 
+class VCard : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QUrl avatar READ avatar NOTIFY avatarChanged)
+    Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
+    Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
+
+public:
+    VCard(QObject *parent = 0);
+
+    QUrl avatar() const;
+    QString jid() const;
+    void setJid(const QString &jid);
+    QString name() const;
+    QUrl url() const;
+
+signals:
+    void avatarChanged(const QUrl &avatar);
+    void jidChanged(const QString &jid);
+    void nameChanged(const QString &name);
+    void urlChanged(const QUrl &url);
+
+private slots:
+    void cardChanged(const QString &jid);
+
+private:
+    void update();
+
+    QUrl m_avatar;
+    QString m_jid;
+    QString m_name;
+    QUrl m_url;
+};
+
 class VCardCache : public QObject
 {
     Q_OBJECT

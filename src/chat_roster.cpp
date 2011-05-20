@@ -845,6 +845,62 @@ QStringList ChatRosterProxyModel::selectedJids() const
     return m_selection.toList();
 }
 
+VCard::VCard(QObject *parent)
+    : QObject(parent)
+{
+}
+
+QUrl VCard::avatar() const
+{
+    return m_avatar;
+}
+
+void VCard::cardChanged(const QString &jid)
+{
+    if (jid == m_jid)
+        update();
+}
+
+QString VCard::jid() const
+{
+    return m_jid;
+}
+
+void VCard::setJid(const QString &jid)
+{
+    if (jid != m_jid) {
+        m_jid = jid;
+        emit jidChanged(m_jid);
+
+        update();
+    }
+}
+
+QString VCard::name() const
+{
+    return m_name;
+}
+
+QUrl VCard::url() const
+{
+    return m_url;
+}
+
+void VCard::update()
+{
+    const QUrl avatar = VCardCache::instance()->imageUrl(m_jid);
+    if (avatar != m_avatar) {
+        m_avatar = avatar;
+        emit avatarChanged(m_avatar);
+    }
+
+    const QUrl url = VCardCache::instance()->profileUrl(m_jid);
+    if (url != m_url) {
+        m_url = url;
+        emit urlChanged(m_url);
+    }
+}
+
 VCardCache::VCardCache(QObject *parent)
     : QObject(parent),
     m_manager(0)
