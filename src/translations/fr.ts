@@ -686,6 +686,14 @@ Acceptez-vous?</translation>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
+    <message>
+        <source>Change subject</source>
+        <translation>Changer le sujet</translation>
+    </message>
+    <message>
+        <source>Enter the new room subject.</source>
+        <translation>Saisissez le nouveau sujet du salon.</translation>
+    </message>
 </context>
 <context>
     <name>RoomParticipantView</name>

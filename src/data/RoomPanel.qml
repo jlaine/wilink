@@ -89,7 +89,13 @@ Rectangle {
         onItemClicked: {
             var item = actions.get(index);
             if (item.action == 'subject') {
-                console.log("subject");
+                var dialog = window.inputDialog();
+                dialog.windowTitle = qsTr('Change subject');
+                dialog.labelText = qsTr('Enter the new room subject.');
+                dialog.textValue = room.subject
+                if (dialog.exec()) {
+                    room.subject = dialog.textValue;
+                }
             }
         }
     }
