@@ -41,7 +41,7 @@ Rectangle {
         id: overlay
         anchors.fill: button
         color: '#99ffffff'
-        opacity: !button.enabled
+        visible: !button.enabled
         radius: 4
         smooth: true
         z: 10
