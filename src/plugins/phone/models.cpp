@@ -98,6 +98,7 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
 PhoneCallsModel::PhoneCallsModel(SipClient *client, QNetworkAccessManager *network, QObject *parent)
     : QAbstractListModel(parent),
     m_client(client),
+    m_enabled(false),
     m_network(network)
 {
     bool check;
@@ -327,6 +328,90 @@ QVariant PhoneCallsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+/** Returns true if the service is active.
+ */
+bool PhoneCallsModel::enabled() const
+{
+    return m_enabled;
+}
+
+/** Requests VoIP settings from the server.
+ */
+void PhoneCallsModel::getSettings()
+{
+    QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    QNetworkReply *reply = m_network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(handleSettings()));
+}
+
+/** Handles VoIP settings received from the server.
+ */
+void PhoneCallsModel::handleSettings()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    QDomDocument doc;
+    doc.setContent(reply);
+    QDomElement settings = doc.documentElement();
+
+    // parse settings from server
+    const bool enabled = settings.firstChildElement("enabled").text() == "true";
+    const QString domain = settings.firstChildElement("domain").text();
+    const QString username = settings.firstChildElement("username").text();
+    const QString password = settings.firstChildElement("password").text();
+    const QString number = settings.firstChildElement("number").text();
+    const QString callsUrl = settings.firstChildElement("calls-url").text();
+    const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
+
+    // update phone number
+    if (number != m_phoneNumber) {
+        m_phoneNumber = number;
+        emit phoneNumberChanged(m_phoneNumber);
+    }
+
+    // update selfcare url
+    if (selfcareUrl != m_selfcareUrl) {
+        m_selfcareUrl = selfcareUrl;
+        emit selfcareUrlChanged(m_selfcareUrl);
+    }
+
+    // check service is activated
+    const bool wasEnabled = m_enabled;
+    if (enabled && !domain.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
+        // connect to SIP server
+        if (m_client->displayName() != number ||
+            m_client->domain() != domain ||
+            m_client->username() != username ||
+            m_client->password() != password)
+        {
+            m_client->setDisplayName(number);
+            m_client->setDomain(domain);
+            m_client->setUsername(username);
+            m_client->setPassword(password);
+            QMetaObject::invokeMethod(m_client, "connectToServer");
+        }
+
+        // retrieve call history
+        if (!callsUrl.isEmpty())
+            setUrl(QUrl(callsUrl));
+
+        m_enabled = true;
+    } else { 
+        m_enabled = false;
+        emit enabledChanged(m_enabled);
+    }
+    if (m_enabled != wasEnabled)
+        emit enabledChanged(m_enabled);
+}
+
 void PhoneCallsModel::handleCreate()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -414,6 +499,13 @@ int PhoneCallsModel::outputVolume() const
     return calls.isEmpty() ? 0 : calls.first()->outputVolume();
 }
 
+/** Returns the user's own phone number.
+ */
+QString PhoneCallsModel::phoneNumber() const
+{
+    return m_phoneNumber;
+}
+
 /** Removes \a count rows starting at the given \a row under the given \a parent.
  *
  * @param row
@@ -459,6 +551,13 @@ void PhoneCallsModel::setUrl(const QUrl &url)
 
     QNetworkReply *reply = m_network->get(buildRequest(m_url));
     connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
+}
+
+/** Returns the selfcare URL.
+ */
+QUrl PhoneCallsModel::selfcareUrl() const
+{
+    return m_selfcareUrl;
 }
 
 /** Starts sending a tone.

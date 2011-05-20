@@ -40,9 +40,12 @@ class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
+    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
+    Q_PROPERTY(QString phoneNumber READ phoneNumber NOTIFY phoneNumberChanged)
+    Q_PROPERTY(QUrl selfcareUrl READ selfcareUrl NOTIFY selfcareUrlChanged)
 
 public:
     enum Role {
@@ -60,9 +63,12 @@ public:
     ~PhoneCallsModel();
 
     int currentCalls() const;
+    bool enabled() const;
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
+    QString phoneNumber() const;
+    QUrl selfcareUrl() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -72,9 +78,12 @@ public:
 
 signals:
     void currentCallsChanged();
+    void enabledChanged(bool enabled);
     void error(const QString &error);
-    void inputVolumeChanged(int);
-    void outputVolumeChanged(int);
+    void inputVolumeChanged(int inputVolume);
+    void outputVolumeChanged(int outputVolume);
+    void phoneNumberChanged(const QString &phoneNumber);
+    void selfcareUrlChanged(const QUrl& selfcareUrl);
     void stateChanged(bool haveCalls);
 
 public slots:
@@ -89,16 +98,21 @@ private slots:
     void callRinging();
     void callStateChanged(QXmppCall::State state);
     void callTick();
+    void getSettings();
     void handleCreate();
     void handleList();
+    void handleSettings();
 
 private:
     QList<SipCall*> activeCalls() const;
     QNetworkRequest buildRequest(const QUrl &url) const;
 
     SipClient *m_client;
+    bool m_enabled;
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
+    QString m_phoneNumber;
+    QUrl m_selfcareUrl;
     QTimer *m_ticker;
     QUrl m_url;
 };
