@@ -50,52 +50,45 @@ Rectangle {
         title: '<b>' + room.jid.split('@')[0] + '</b>' + '<br/>' + room.subject
         z: 1
 
-        actions: ListModel {
-            ListElement {
-                action: 'invite'
+        Row {
+            id: toolBar
+
+            anchors.top: parent.top
+            anchors.right: parent.right
+
+            ToolButton {
                 icon: 'invite.png'
-                text: ''
+                text: qsTr('Invite')
             }
-            ListElement {
-                action: 'subject'
+
+            ToolButton {
                 icon: 'chat.png'
-                text: ''
-            }
-            ListElement {
-                action: 'options'
-                icon: 'options.png'
-                text: ''
-            }
-            ListElement {
-                action: 'permissions'
-                icon: 'permissions.png'
-                text: ''
-            }
-            ListElement {
-                action: 'clicked'
-                icon: 'close.png'
-                text: ''
-            }
-        }
+                text: qsTr('Subject')
 
-        Component.onCompleted: {
-            actions.setProperty(0, 'text', qsTr('Invite'));
-            actions.setProperty(1, 'text', qsTr('Subject'));
-            actions.setProperty(2, 'text', qsTr('Options'));
-            actions.setProperty(3, 'text', qsTr('Permissions'));
-            actions.setProperty(4, 'text', qsTr('Close'));
-        }
-
-        onItemClicked: {
-            var item = actions.get(index);
-            if (item.action == 'subject') {
-                var dialog = window.inputDialog();
-                dialog.windowTitle = qsTr('Change subject');
-                dialog.labelText = qsTr('Enter the new room subject.');
-                dialog.textValue = room.subject
-                if (dialog.exec()) {
-                    room.subject = dialog.textValue;
+                onClicked: {
+                    var dialog = window.inputDialog();
+                    dialog.windowTitle = qsTr('Change subject');
+                    dialog.labelText = qsTr('Enter the new room subject.');
+                    dialog.textValue = room.subject
+                    if (dialog.exec()) {
+                        room.subject = dialog.textValue;
+                    }
                 }
+            }
+
+            ToolButton {
+                icon: 'options.png'
+                text: qsTr('Options')
+            }
+
+            ToolButton {
+                icon: 'permissions.png'
+                text: qsTr('Permissions')
+            }
+
+            ToolButton {
+                icon: 'close.png'
+                text: qsTr('Close')
             }
         }
     }

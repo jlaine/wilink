@@ -42,109 +42,13 @@ Rectangle {
         orientation: ListView.Horizontal
         spacing: 0
 
-        delegate: Rectangle {
+        delegate: ToolButton {
             id: listViewItem
 
-            property bool enabled: model.enabled != false
-
-            color: 'transparent'
-            height: 40
-            state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
+            enabled: model.enabled != false
+            icon: model.icon
+            text: model.text
             visible: model.visible != false
-            width: visible ? (itemText.paintedWidth + 24) : 0
-
-            Gradient {
-                id: hoverGradient
-                GradientStop { id: hoverStop1; position: 0.0; color: '#00ffffff' }
-                GradientStop { id: hoverStop2; position: 0.5; color: '#00ffffff' }
-                GradientStop { id: hoverStop3; position: 1.0; color: '#00ffffff' }
-            }
-
-            // background
-            Rectangle {
-                id: background
-                anchors.fill: parent
-                gradient: hoverGradient
-            }
-
-            // left border
-            Rectangle {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                gradient: hoverGradient
-                width: 1
-            }
-
-            // right border
-            Rectangle {
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                gradient: hoverGradient
-                width: 1
-            }
-
-            Image {
-                id: icon
-
-                anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-                smooth: true
-                source: model.icon
-                width: 24
-                height: 24
-            }
-
-            Text {
-                id: itemText
-
-                anchors.top: icon.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: 'white'
-                font.pixelSize: 11
-                text: model.text
-            }
-
-            states: [
-                State {
-                    name: 'hovered'
-                    PropertyChanges { target: hoverStop2; color: 'white' }
-                    PropertyChanges { target: background; opacity: 0.4 }
-                },
-                State {
-                    name: 'pressed'
-                    PropertyChanges { target: hoverStop2; color: 'white' }
-                    PropertyChanges { target: background; opacity: 0.8 }
-                }
-            ]
-
-            MouseArea {
-                id: mouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-
-                property bool pressed: false
-                property bool hovered: false
-
-                onClicked: {
-                    if (listViewItem.enabled) {
-                        toolbar.itemClicked(index);
-                    }
-                }
-                onPressed: {
-                    if (listViewItem.enabled) {
-                        pressed = true;
-                    }
-                }
-                onReleased: pressed = false
-                onEntered: {
-                    if (listViewItem.enabled) {
-                        hovered = true;
-                    }
-                }
-                onExited: hovered = false
-            }
         }
     }
 }

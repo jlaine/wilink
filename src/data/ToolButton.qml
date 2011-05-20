@@ -22,14 +22,15 @@ import QtQuick 1.0
 Rectangle {
     id: listViewItem
 
-    property alias icon: iconImage.source
-    property alias text: itemText.text
+    property alias icon: image.source
+    property alias text: label.text
     property bool enabled: true
+    signal clicked
 
     color: 'transparent'
     height: 40
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
-    width: visible ? (itemText.paintedWidth + 24) : 0
+    width: visible ? (label.paintedWidth + 24) : 0
 
     Gradient {
         id: hoverGradient
@@ -64,7 +65,7 @@ Rectangle {
     }
 
     Image {
-        id: iconImage
+        id: image
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
@@ -74,9 +75,9 @@ Rectangle {
     }
 
     Text {
-        id: itemText
+        id: label
 
-        anchors.top: iconImage.bottom
+        anchors.top: image.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         color: 'white'
         font.pixelSize: 11
@@ -105,7 +106,7 @@ Rectangle {
 
         onClicked: {
             if (listViewItem.enabled) {
-                toolbar.itemClicked(index);
+                listViewItem.clicked();
             }
         }
         onPressed: {
