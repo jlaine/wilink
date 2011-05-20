@@ -43,7 +43,7 @@ Rectangle {
         id: titleText
 
         anchors.left: iconImage.right
-        anchors.leftMargin: 16
+        anchors.leftMargin: 8
         anchors.right: toolBar.left
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'

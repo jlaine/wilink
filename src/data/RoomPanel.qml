@@ -23,8 +23,19 @@ Rectangle {
     width: 320
     height: 400
 
-    Item {
+    PanelHeader {
+        id: header
+
         anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        icon: 'chat.png'
+        title: conversation.jid.split('@')[0]
+        z: 1
+    }
+
+    Item {
+        anchors.top: header.bottom
         anchors.bottom: chatInput.top
         anchors.left: parent.left
         anchors.right: parent.right
