@@ -23,11 +23,21 @@ Rectangle {
     width: 320
     height: 400
 
+    PanelHeader {
+        id: header
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        title: conversation.jid
+        z: 1
+    }
+
     Column {
         id: widgetBar
         objectName: 'widgetBar'
 
-        anchors.top: parent.top
+        anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         z: 1
