@@ -71,6 +71,7 @@
 #include "chat_status.h"
 #include "chat_utils.h"
 #include "plugins/declarative.h"
+#include "plugins/discovery.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -105,6 +106,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
 
+    qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");

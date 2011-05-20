@@ -40,6 +40,7 @@ class DiscoveryModel : public ChatModel
 public:
     DiscoveryModel(QObject *parent = 0);
 
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QXmppDiscoveryManager *manager() const;
     void setManager(QXmppDiscoveryManager *manager);
 

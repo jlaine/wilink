@@ -62,6 +62,11 @@ DiscoveryModel::DiscoveryModel(QObject *parent)
 {
 }
 
+QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}
+
 void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
 {
 
