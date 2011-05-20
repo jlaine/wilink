@@ -19,33 +19,18 @@
 
 import QtQuick 1.0
 
-Rectangle {
+Dialog {
     id: dialog
 
     property alias model: view.model
     property alias reason: reasonEdit.text
     property variant selection: []
-    signal accepted
-
-    color: '#ccc'
-    radius: 10
-    width: 320
-    height: 240
-    visible: false
-
-    function show() {
-        visible = 1
-    }
-
-    function hide() {
-        visible = 0
-    }
 
     Rectangle {
-        id: header
+        id: bar
 
         anchors.margins: 8
-        anchors.top: parent.top
+        anchors.top: contents.top
         anchors.left: parent.left
         anchors.right: parent.right
         border.color: '#c3c3c3'
@@ -56,8 +41,8 @@ Rectangle {
 
         TextEdit {
             id: reasonEdit
-            anchors.fill: parent
 
+            anchors.fill: parent
             focus: true
             smooth: true
             text: "Let's talk"
@@ -75,8 +60,8 @@ Rectangle {
         anchors.margins: 8
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
-        anchors.bottom: footer.top
+        anchors.top: bar.bottom
+        anchors.bottom: contents.bottom
         clip: true
         model: ListModel {
             ListElement { jid: 'foo@example.org'; name: 'foo'; avatar: 'peer.png' }
@@ -146,28 +131,6 @@ Rectangle {
                     dialog.selection = newSelection;
                 }
             }
-        }
-    }
-
-    Row {
-        id: footer
-        anchors.margins: 8
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        height: 32
-        spacing: 8
-
-        Button {
-            text: 'OK'
-            onClicked: {
-                dialog.accepted()
-                dialog.hide()
-            }
-        }
-
-        Button {
-            text: 'Cancel'
-            onClicked: dialog.hide()
         }
     }
 }

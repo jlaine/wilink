@@ -85,18 +85,22 @@ Rectangle {
             ToolButton {
                 icon: 'options.png'
                 text: qsTr('Options')
-                visible: room.allowedActions & QXmppMucRoom.ConfigurationAction
+                visible: false //room.allowedActions & QXmppMucRoom.ConfigurationAction
             }
 
             ToolButton {
                 icon: 'permissions.png'
                 text: qsTr('Permissions')
-                visible: room.allowedActions & QXmppMucRoom.PermissionsAction
+                visible: false //room.allowedActions & QXmppMucRoom.PermissionsAction
             }
 
             ToolButton {
                 icon: 'close.png'
                 text: qsTr('Close')
+
+                onClicked: {
+                    room.leave()
+                }
             }
         }
     }

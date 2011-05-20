@@ -444,7 +444,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
     layout->setSpacing(0);
-    layout->addLayout(headerLayout());
+    //layout->addLayout(headerLayout());
 
     // chat history
 
