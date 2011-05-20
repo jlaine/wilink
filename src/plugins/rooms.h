@@ -120,7 +120,6 @@ public slots:
 
 private slots:
     void allowedActionsChanged(QXmppMucRoom::Actions actions);
-    void changeSubject();
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
     void inviteDialog();
@@ -137,7 +136,6 @@ private:
     ChatRosterModel *rosterModel;
 
     // actions
-    QAction *subjectAction;
     QAction *optionsAction;
     QAction *permissionsAction;
 };

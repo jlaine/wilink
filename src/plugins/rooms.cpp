@@ -463,12 +463,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(inviteDialog()));
     Q_ASSERT(check);
 
-    subjectAction = addAction(QIcon(":/chat.png"), tr("Subject"));
-    check = connect(subjectAction, SIGNAL(triggered()),
-                    this, SLOT(changeSubject()));
-    Q_ASSERT(check);
-    subjectAction->setVisible(false);
-
     optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
     check = connect(optionsAction, SIGNAL(triggered()),
                     mucRoom, SLOT(requestConfiguration()));
@@ -520,7 +514,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
  */
 void ChatRoom::allowedActionsChanged(QXmppMucRoom::Actions actions)
 {
-    subjectAction->setVisible(actions & QXmppMucRoom::SubjectAction);
     optionsAction->setVisible(actions & QXmppMucRoom::ConfigurationAction);
     permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
 }
@@ -555,18 +548,6 @@ void ChatRoom::changePermissions()
 {
     ChatRoomMembers dialog(mucRoom, "@" + chat->client()->configuration().domain(), chat);
     dialog.exec();
-}
-
-/** Change the room's subject.
- */
-void ChatRoom::changeSubject()
-{
-    bool ok;
-    QString subject = QInputDialog::getText(chat,
-        tr("Change subject"), tr("Subject:"), QLineEdit::Normal,
-        QString(), &ok);
-    if (ok)
-        mucRoom->setSubject(subject);
 }
 
 /** Display room configuration dialog.

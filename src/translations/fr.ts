@@ -259,24 +259,12 @@ Acceptez-vous?</translation>
 <context>
     <name>ChatRoom</name>
     <message>
-        <source>Subject</source>
-        <translation>Sujet</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Options</translation>
     </message>
     <message>
         <source>Permissions</source>
         <translation>Permissions</translation>
-    </message>
-    <message>
-        <source>Change subject</source>
-        <translation>Changer le sujet</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Sujet :</translation>
     </message>
     <message>
         <source>Invite</source>

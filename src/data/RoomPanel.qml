@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import wiLink 1.2
 
 Rectangle {
@@ -64,6 +65,7 @@ Rectangle {
             ToolButton {
                 icon: 'chat.png'
                 text: qsTr('Subject')
+                visible: room.allowedActions & QXmppMucRoom.SubjectAction
 
                 onClicked: {
                     var dialog = window.inputDialog();
@@ -79,11 +81,13 @@ Rectangle {
             ToolButton {
                 icon: 'options.png'
                 text: qsTr('Options')
+                visible: room.allowedActions & QXmppMucRoom.ConfigurationAction
             }
 
             ToolButton {
                 icon: 'permissions.png'
                 text: qsTr('Permissions')
+                visible: room.allowedActions & QXmppMucRoom.PermissionsAction
             }
 
             ToolButton {
