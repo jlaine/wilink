@@ -21,16 +21,17 @@ import QtQuick 1.0
 
 Rectangle {
     id: toolbar
-    color: 'transparent'
-    height: 42
 
     property alias listView: view
     property ListModel model: ListModel {
         ListElement { text: 'Phone'; icon: 'phone.png' }
-        ListElement { text: 'Photos'; icon: 'photos.png' }
-        ListElement { text: 'Shares'; icon: 'share.png' }
+        ListElement { text: 'Photos'; icon: 'photos.png'; visible: false }
+        ListElement { text: 'Shares'; icon: 'share.png'; enabled: false }
     }
     signal itemClicked(int index)
+
+    color: 'transparent'
+    height: 42
 
     ListView {
         id: view
@@ -42,13 +43,17 @@ Rectangle {
         interactive: false
         model: toolbar.model
         orientation: ListView.Horizontal
+        spacing: 0
 
         delegate: Rectangle {
             id: listViewItem
 
+            property bool enabled: model.enabled != false
+
             color: 'transparent'
             height: 40
-            width: itemText.paintedWidth + 24
+            visible: model.visible != false
+            width: visible ? (itemText.paintedWidth + 24) : 0
 
             Gradient {
                 id: hoverGradient
@@ -112,7 +117,11 @@ Rectangle {
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onClicked: itemClicked(index)
+                onClicked: {
+                    if (listViewItem.enabled) {
+                        itemClicked(index);
+                    }
+                }
                 onEntered: listViewItem.state = 'hovered'
                 onExited: listViewItem.state = ''
             }
