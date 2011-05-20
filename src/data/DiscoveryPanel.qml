@@ -33,6 +33,8 @@ Rectangle {
         anchors.right: parent.right
         icon: 'diagnostics.png'
         title: qsTr('Service discovery')
+        z: 1
+
         Row {
             id: toolBar
 
@@ -67,6 +69,25 @@ Rectangle {
         model: DiscoveryModel {
             manager: client.discoveryManager
             rootJid: 'wifirst.net'
+        }
+
+        delegate: Rectangle {
+            width: view.width - 1
+            height: 34
+
+            Image {
+                id: image
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                source: 'peer.png'
+            }
+
+            Text {
+                anchors.left: image.right
+                anchors.top: parent.top
+                text: '<b>' + model.name + '</b><br/>' + model.jid
+            }
         }
     }
 }

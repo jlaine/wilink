@@ -62,6 +62,14 @@ static QString itemText(QListWidgetItem *item)
     return text;
 }
 
+class DiscoveryItem : public ChatModelItem
+{
+public:
+    QString jid;
+    QString name;
+    QString node;
+};
+
 DiscoveryModel::DiscoveryModel(QObject *parent)
     : ChatModel(parent),
     m_client(0),
@@ -75,15 +83,58 @@ DiscoveryModel::DiscoveryModel(QObject *parent)
 
 QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
 {
+    DiscoveryItem *item = static_cast<DiscoveryItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == ChatModel::AvatarRole)
+        return QUrl("qrc:/peer.png");
+    else if (role == ChatModel::NameRole)
+        return item->name;
+    else if (role == ChatModel::JidRole)
+        return item->jid;
     return QVariant();
 }
 
-void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
+void DiscoveryModel::infoReceived(const QXmppDiscoveryIq &disco)
 {
     if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
         return;
 
-    qDebug("got items");
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        DiscoveryItem *item = static_cast<DiscoveryItem*>(ptr);
+        if (item->jid != disco.from() || item->node != disco.queryNode())
+            continue;
+
+        if (!disco.identities().isEmpty()) {
+            item->name = disco.identities().first().name();
+            emit dataChanged(createIndex(item), createIndex(item));
+        }
+    }
+}
+
+void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
+{
+    if (!m_requests.removeAll(disco.id()) ||
+        disco.type() != QXmppIq::Result ||
+        disco.from() != m_rootJid ||
+        disco.queryNode() != m_rootNode)
+        return;
+
+    removeRows(0, rootItem->children.size() - 1);
+    foreach (const QXmppDiscoveryIq::Item &item, disco.items()) {
+        DiscoveryItem *ptr = new DiscoveryItem;
+        ptr->jid = item.jid();
+        ptr->node = item.node();
+        ptr->name = item.name();
+        addItem(ptr, rootItem, rootItem->children.size());
+
+        // request information
+        const QString id = m_manager->requestInfo(item.jid(), item.node());
+        if (!id.isEmpty())
+            m_requests.append(id);
+    }
+
 }
 
 void DiscoveryModel::refresh()
@@ -139,6 +190,10 @@ void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
             Q_ASSERT(m_client);
             check = connect(m_client, SIGNAL(connected()),
                             this, SLOT(refresh()));
+            Q_ASSERT(check);
+
+            check = connect(m_manager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                            this, SLOT(infoReceived(QXmppDiscoveryIq)));
             Q_ASSERT(check);
 
             check = connect(m_manager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),

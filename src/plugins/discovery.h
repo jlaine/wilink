@@ -60,9 +60,12 @@ signals:
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
 
-private slots:
-    void itemsReceived(const QXmppDiscoveryIq &disco);
+public slots:
     void refresh();
+
+private slots:
+    void infoReceived(const QXmppDiscoveryIq &disco);
+    void itemsReceived(const QXmppDiscoveryIq &disco);
 
 private:
     QXmppClient *m_client;
