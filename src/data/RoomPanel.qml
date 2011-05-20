@@ -49,6 +49,21 @@ Rectangle {
         icon: 'chat.png'
         title: '<b>' + room.jid.split('@')[0] + '</b>' + '<br/>' + room.subject
         z: 1
+
+        actions: ListModel {
+            ListElement {
+                text: 'Invite'
+                icon: 'invite.png'
+            }
+            ListElement {
+                text: 'Subject'
+                icon: 'chat.png'
+            }
+            ListElement {
+                text: 'Close'
+                icon: 'close.png'
+            }
+        }
     }
 
     Item {

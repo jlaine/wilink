@@ -21,6 +21,8 @@ import QtQuick 1.0
 
 Rectangle {
     id: header
+
+    property alias actions: toolBar.actions
     property alias icon: iconImage.source
     property alias title: titleText.text
 
@@ -59,9 +61,6 @@ Rectangle {
         //anchors.left: titleText.right
         anchors.right: parent.right
         anchors.top: parent.top
-        model: ListModel {
-            ListElement { text: 'Close'; icon: 'close.png' }
-        }
         width: listView.count * 60
     }
 }

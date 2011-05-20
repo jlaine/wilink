@@ -34,6 +34,10 @@ Rectangle {
         title: '<b>' + vcard.name + '</b><br/>' + vcard.jid
         z: 1
 
+        actions: ListModel {
+            ListElement { text: 'Close'; icon: 'close.png' }
+        }
+
         VCard {
             id: vcard
             jid: conversation.jid

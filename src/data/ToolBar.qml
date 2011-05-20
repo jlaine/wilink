@@ -23,11 +23,8 @@ Rectangle {
     id: toolbar
 
     property alias listView: view
-    property ListModel model: ListModel {
-        ListElement { text: 'Phone'; icon: 'phone.png' }
-        ListElement { text: 'Photos'; icon: 'photos.png'; visible: false }
-        ListElement { text: 'Shares'; icon: 'share.png'; enabled: false }
-    }
+    property alias actions: view.model
+
     signal itemClicked(int index)
 
     color: 'transparent'

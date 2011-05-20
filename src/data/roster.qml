@@ -34,6 +34,12 @@ Item {
             GradientStop { position: 0; color: '#6ea1f1' }
             GradientStop { position: 1; color: '#567dbc' }
         }
+
+        actions: ListModel {
+            ListElement { text: 'Phone'; icon: 'phone.png' }
+            ListElement { text: 'Photos'; icon: 'photos.png'; visible: false }
+            ListElement { text: 'Shares'; icon: 'share.png'; enabled: false }
+        }
     }
 
     RosterView {
