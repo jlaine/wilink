@@ -18,10 +18,27 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Rectangle {
     width: 320
     height: 400
+
+    VCard {
+        id: ownCard
+        jid: client.jid
+
+        onNameChanged: {
+            conversation.nickName = name;
+            if (!conversation.isJoined) {
+                // clear history
+                historyModel.clear();
+
+                // send join request
+                conversation.join();
+            }
+        }
+    }
 
     PanelHeader {
         id: header

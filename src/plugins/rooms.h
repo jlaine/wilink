@@ -123,10 +123,8 @@ private slots:
     void changeSubject();
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
-    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void error(const QXmppStanza::Error &error);
     void inviteDialog();
-    void join();
     void left();
     void kicked(const QString &jid, const QString &reason);
     void messageReceived(const QXmppMessage &msg);

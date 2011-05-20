@@ -57,6 +57,7 @@
 
 #include "application.h"
 #include "chat.h"
+#include "declarative.h"
 #include "chat_form.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
@@ -408,7 +409,7 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
 ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
     : ChatPanel(parent),
     chat(chatWindow),
-    notifyMessages(false),
+    notifyMessages(true),
     rosterModel(chatRosterModel)
 {
     bool check;
@@ -443,6 +444,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
+    context->setContextProperty("client", new QXmppDeclarativeClient(client));
     context->setContextProperty("conversation", mucRoom);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);
@@ -491,14 +493,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(unbookmark()));
     Q_ASSERT(check);
 
-    check = connect(rosterModel, SIGNAL(ownNameReceived()),
-                    this, SLOT(join()));
-    Q_ASSERT(check);
-
-    check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                    this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
-
     check = connect(mucRoom, SIGNAL(allowedActionsChanged(QXmppMucRoom::Actions)),
                     this, SLOT(allowedActionsChanged(QXmppMucRoom::Actions)));
     Q_ASSERT(check);
@@ -530,9 +524,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     check = connect(this, SIGNAL(hidePanel()),
                     mucRoom, SLOT(leave()));
     Q_ASSERT(check);
-
-    // try joining room
-    join();
 }
 
 /** Update visible actions.
@@ -599,16 +590,6 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
         mucRoom->setConfiguration(dialog.form());
 }
 
-void ChatRoom::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
-{
-    if (disco.from() != mucRoom->jid() || disco.type() != QXmppIq::Result)
-        return;
-
-    // notify user of received messages if the room is not publicly listed
-    if (disco.features().contains("muc_hidden"))
-        notifyMessages = true;
-}
-
 /** Handle an error.
  */
 void ChatRoom::error(const QXmppStanza::Error &error)
@@ -626,28 +607,6 @@ void ChatRoom::inviteDialog()
 {
     ChatRoomInvite dialog(mucRoom, chat->rosterModel(), chat);
     dialog.exec();
-}
-
-/** Send a request to join a multi-user chat.
- */
-void ChatRoom::join()
-{
-    const QString nickName = rosterModel->ownName();
-    if (nickName.isEmpty())
-        return;
-
-    if (mucRoom->isJoined())
-        return;
-
-    // clear history
-    historyModel->clear();
-
-    // send join request
-    mucRoom->setNickName(nickName);
-    mucRoom->join();
-
-    // request room information
-    chat->client()->findExtension<QXmppDiscoveryManager>()->requestInfo(mucRoom->jid());
 }
 
 void ChatRoom::kicked(const QString &jid, const QString &reason)
