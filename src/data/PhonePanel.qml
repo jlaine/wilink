@@ -22,6 +22,8 @@ import QXmpp 0.4
 import wiLink 1.2
 
 Item {
+    property QtObject historyModel: PhoneCallsModel {}
+
     anchors.fill: parent
     width: 320
     height: 240

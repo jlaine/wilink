@@ -43,8 +43,9 @@
  
 PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     : ChatPanel(parent),
-    m_window(chatWindow),
-    m_registeredHandler(false)
+    m_callsModel(0),
+    m_registeredHandler(false),
+    m_window(chatWindow)
 {
     bool check;
 
@@ -55,23 +56,23 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
 
-    // history
-    m_callsModel = new PhoneCallsModel(this);
-
     // declarative
     declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("historyModel", m_callsModel);
     context->setContextProperty("window", m_window);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/PhonePanel.qml"));
 
+    QObject *obj = declarativeView->rootObject()->property("historyModel").value<QObject*>();
+    m_callsModel = qobject_cast<PhoneCallsModel*>(obj);
+    Q_ASSERT(m_callsModel);
     layout->addWidget(declarativeView, 1);
 
     setLayout(layout);
     setFocusProxy(declarativeView);
 
+    // connect signals
     check = connect(m_callsModel->client(), SIGNAL(callReceived(SipCall*)),
                     this, SLOT(callReceived(SipCall*)));
     Q_ASSERT(check);
@@ -80,10 +81,10 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
                     m_window->client(), SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
 
-    // connect signals
     check = connect(m_window->client(), SIGNAL(connected()),
                     m_callsModel, SLOT(getSettings()));
     Q_ASSERT(check);
+
     check = connect(m_callsModel, SIGNAL(enabledChanged(bool)),
                     this, SLOT(handleSettings()));
     Q_ASSERT(check);
@@ -189,6 +190,7 @@ bool PhonePlugin::initialize(Chat *chat)
     if (domain != "wifirst.net")
         return false;
 
+    qmlRegisterType<PhoneCallsModel>("wiLink", 1, 2, "PhoneCallsModel");
     qmlRegisterUncreatableType<SipClient>("wiLink", 1, 2, "SipClient", "");
     qmlRegisterUncreatableType<SipCall>("wiLink", 1, 2, "SipCall", "");
 
