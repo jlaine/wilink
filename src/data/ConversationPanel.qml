@@ -34,8 +34,15 @@ Rectangle {
         title: '<b>' + vcard.name + '</b><br/>' + vcard.jid
         z: 1
 
-        actions: ListModel {
-            ListElement { text: 'Close'; icon: 'close.png' }
+        Row {
+            id: toolBar
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            ToolButton {
+                icon: 'close.png'
+                text: qsTr('Close')
+            }
         }
 
         VCard {

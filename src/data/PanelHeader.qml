@@ -22,7 +22,6 @@ import QtQuick 1.0
 Rectangle {
     id: header
 
-    property alias actions: toolBar.actions
     property alias icon: iconImage.source
     property alias title: titleText.text
 
@@ -32,7 +31,7 @@ Rectangle {
         GradientStop { position: 0; color: '#9bbdf4' }
         GradientStop { position: 1; color: '#90acd8' }
     }
-    height: toolBar.height
+    height: 42
     width: 200
 
     Image {
@@ -51,21 +50,10 @@ Rectangle {
 
         anchors.left: iconImage.right
         anchors.leftMargin: 8
-        anchors.right: toolBar.left
+        anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
         width: 150
-    }
-
-    ToolBar {
-        id: toolBar
-
-        //anchors.left: titleText.right
-        anchors.right: parent.right
-        anchors.top: parent.top
-        width: listView.count * 60
-
-        onItemClicked: header.itemClicked(index)
     }
 }
 

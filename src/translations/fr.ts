@@ -454,6 +454,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ConversationPanel</name>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>DiagnosticsPanel</name>
     <message>
         <source>Refresh</source>

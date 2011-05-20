@@ -24,21 +24,25 @@ Item {
     anchors.fill: parent
     id: root
 
-    ToolBar {
+    Rectangle {
         id: toolbar
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        height: 42
         gradient: Gradient {
             GradientStop { position: 0; color: '#6ea1f1' }
             GradientStop { position: 1; color: '#567dbc' }
         }
 
-        actions: ListModel {
-            ListElement { text: 'Phone'; icon: 'phone.png' }
-            ListElement { text: 'Photos'; icon: 'photos.png'; visible: false }
-            ListElement { text: 'Shares'; icon: 'share.png'; enabled: false }
+        Row {
+            anchors.top: parent.top
+            anchors.left: parent.left
+
+            ToolButton { text: 'Phone'; icon: 'phone.png' }
+            ToolButton { text: 'Photos'; icon: 'photos.png'; visible: false }
+            ToolButton { text: 'Shares'; icon: 'share.png'; enabled: false }
         }
     }
 
