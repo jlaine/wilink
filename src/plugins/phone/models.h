@@ -39,6 +39,7 @@ class SipClient;
 class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(SipClient* client READ client CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
@@ -62,6 +63,7 @@ public:
     PhoneCallsModel(SipClient *client, QObject *parent = 0);
     ~PhoneCallsModel();
 
+    SipClient *client() const;
     int currentCalls() const;
     bool enabled() const;
     int inputVolume() const;

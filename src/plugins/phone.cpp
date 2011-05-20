@@ -47,13 +47,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     m_registeredHandler(false)
 {
     bool check;
-    client = chatWindow->client();
 
     setWindowIcon(QIcon(":/phone.png"));
     setWindowTitle(tr("Phone"));
 
     // sip client
-    sip = new SipClient;
+    SipClient *sip = new SipClient;
     sip->setAudioInputDevice(wApp->audioInputDevice());
     sip->setAudioOutputDevice(wApp->audioOutputDevice());
     check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
@@ -69,12 +68,12 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     layout->addLayout(headerLayout());
 
     // history
-    callsModel = new PhoneCallsModel(sip, this);
+    m_callsModel = new PhoneCallsModel(sip, this);
 
     // declarative
     declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("historyModel", callsModel);
+    context->setContextProperty("historyModel", m_callsModel);
     context->setContextProperty("sipClient", sip);
     context->setContextProperty("window", m_window);
 
@@ -91,36 +90,23 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(check);
 
     check = connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
-                    client, SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
+                    m_window->client(), SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
 
     // connect signals
-    check = connect(client, SIGNAL(connected()),
-                    callsModel, SLOT(getSettings()));
+    check = connect(m_window->client(), SIGNAL(connected()),
+                    m_callsModel, SLOT(getSettings()));
     Q_ASSERT(check);
-    check = connect(callsModel, SIGNAL(enabledChanged(bool)),
+    check = connect(m_callsModel, SIGNAL(enabledChanged(bool)),
                     this, SLOT(handleSettings()));
     Q_ASSERT(check);
 
     // add action
-    action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
-    action->setVisible(false);
-    check = connect(action, SIGNAL(triggered()),
+    m_action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
+    m_action->setVisible(false);
+    check = connect(m_action, SIGNAL(triggered()),
                     this, SIGNAL(showPanel()));
     Q_ASSERT(check);
-}
-
-PhonePanel::~PhonePanel()
-{
-    // give SIP client 5s to exit cleanly
-    if (sip->state() == SipClient::ConnectedState) {
-        QEventLoop loop;
-        QTimer::singleShot(5000, &loop, SLOT(quit()));
-        connect(sip, SIGNAL(disconnected()), &loop, SLOT(quit()));
-        QMetaObject::invokeMethod(sip, "disconnectFromServer");
-        loop.exec();
-    }
-    delete sip;
 }
 
 void PhonePanel::callButtonClicked(QAbstractButton *button)
@@ -139,7 +125,7 @@ void PhonePanel::callButtonClicked(QAbstractButton *button)
 
 void PhonePanel::callReceived(SipCall *call)
 {
-    callsModel->addCall(call);
+    m_callsModel->addCall(call);
     const QString contactName = sipAddressToName(call->recipient());
 
     QMessageBox *box = new QMessageBox(QMessageBox::Question,
@@ -161,31 +147,31 @@ void PhonePanel::callReceived(SipCall *call)
 void PhonePanel::handleSettings()
 {
     // check service is activated
-    if (!callsModel->enabled()) {
-        const QUrl selfcareUrl = callsModel->selfcareUrl();
+    if (!m_callsModel->enabled()) {
+        const QUrl selfcareUrl = m_callsModel->selfcareUrl();
         if (selfcareUrl.isValid()) {
             // show a message
             setWindowHelp(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
                                   tr("You can subscribe to the phone service at the following address:"), selfcareUrl.toString(), selfcareUrl.toString()));
-            action->setVisible(true);
+            m_action->setVisible(true);
         }
         return;
     }
 
     // update number
-    const QString number = callsModel->phoneNumber();
+    const QString number = m_callsModel->phoneNumber();
     if (!number.isEmpty())
         setWindowExtra(tr("Your number is %1").arg(number));
 
     // register URL handler
     if (!m_registeredHandler) {
         ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
-            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(sip->domain()));
+            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_callsModel->client()->domain()));
         QDesktopServices::setUrlHandler("sip", this, "openUrl");
     }
 
     // enable action
-    action->setVisible(true);
+    m_action->setVisible(true);
 }
 
 /** Open a SIP URI.
@@ -197,7 +183,7 @@ void PhonePanel::openUrl(const QUrl &url)
 
     const QString phoneNumber = url.path().split('@').first();
     const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
-    if (callsModel->call(recipient))
+    if (m_callsModel->call(recipient))
         emit showPanel();
 }
 

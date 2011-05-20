@@ -27,10 +27,8 @@
 class QAbstractButton;
 class QDeclarativeView;
 class Chat;
-class ChatClient;
 class PhoneCallsModel;
 class SipCall;
-class SipClient;
 
 class PhonePanel : public ChatPanel
 {
@@ -38,7 +36,6 @@ class PhonePanel : public ChatPanel
 
 public:
     PhonePanel(Chat *chatWindow, QWidget *parent = NULL);
-    ~PhonePanel();
 
 private slots:
     void callButtonClicked(QAbstractButton *button);
@@ -47,15 +44,11 @@ private slots:
     void openUrl(const QUrl &url);
 
 private:
-    QAction *action;
-    ChatClient *client;
-    Chat *m_window;
-    SipClient *sip;
-
-    PhoneCallsModel *callsModel;
+    QAction *m_action;
+    PhoneCallsModel *m_callsModel;
     QDeclarativeView *declarativeView;
-
     bool m_registeredHandler;
+    Chat *m_window;
 };
 
 #endif

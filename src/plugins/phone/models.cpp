@@ -133,6 +133,17 @@ PhoneCallsModel::PhoneCallsModel(SipClient *client, QObject *parent)
 
 PhoneCallsModel::~PhoneCallsModel()
 {
+    // give SIP client 2s to exit cleanly
+    if (m_client->state() == SipClient::ConnectedState) {
+        QEventLoop loop;
+        QTimer::singleShot(2000, &loop, SLOT(quit()));
+        connect(m_client, SIGNAL(disconnected()), &loop, SLOT(quit()));
+        QMetaObject::invokeMethod(m_client, "disconnectFromServer");
+        loop.exec();
+    }
+    delete m_client;
+
+    // delete items
     foreach (PhoneCallsItem *item, m_items)
         delete item;
 }
@@ -279,6 +290,15 @@ void PhoneCallsModel::callTick()
     }
     if (!active)
         m_ticker->stop();
+}
+
+/** Returns the underlying SIP client.
+ *
+ * \note Use with care as the SIP client lives in a different thread!
+ */
+SipClient *PhoneCallsModel::client() const
+{
+    return m_client;
 }
 
 /** Returns the number of columns under the given \a parent.
