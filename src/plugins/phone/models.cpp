@@ -400,8 +400,12 @@ void PhoneCallsModel::handleSettings()
         }
 
         // retrieve call history
-        if (!callsUrl.isEmpty())
-            setUrl(QUrl(callsUrl));
+        if (!callsUrl.isEmpty()) {
+            m_url = callsUrl;
+
+            QNetworkReply *reply = m_network->get(buildRequest(m_url));
+            connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
+        }
 
         m_enabled = true;
     } else { 
@@ -539,18 +543,6 @@ int PhoneCallsModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return m_items.size();
-}
-
-/** Sets the base URL for the call history.
- *
- * @param url
- */
-void PhoneCallsModel::setUrl(const QUrl &url)
-{
-    m_url = url;
-
-    QNetworkReply *reply = m_network->get(buildRequest(m_url));
-    connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
 }
 
 /** Returns the selfcare URL.

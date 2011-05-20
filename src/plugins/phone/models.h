@@ -74,7 +74,6 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    void setUrl(const QUrl &url);
 
 signals:
     void currentCallsChanged();
