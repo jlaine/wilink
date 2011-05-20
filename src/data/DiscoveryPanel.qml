@@ -66,6 +66,7 @@ Rectangle {
 
         model: DiscoveryModel {
             manager: client.discoveryManager
+            rootJid: 'wifirst.net'
         }
     }
 }

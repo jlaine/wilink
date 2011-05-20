@@ -28,6 +28,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
@@ -63,8 +64,13 @@ static QString itemText(QListWidgetItem *item)
 
 DiscoveryModel::DiscoveryModel(QObject *parent)
     : ChatModel(parent),
+    m_client(0),
     m_manager(0)
 {
+    m_timer = new QTimer(this);
+    m_timer->setSingleShot(true);
+    m_timer->setInterval(100);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(refresh()));
 }
 
 QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
@@ -74,7 +80,47 @@ QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
 
 void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
 {
+    if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
+        return;
 
+    qDebug("got items");
+}
+
+void DiscoveryModel::refresh()
+{
+    if (m_client && m_client->isConnected() && m_manager && !m_rootJid.isEmpty()) {
+        const QString id = m_manager->requestItems(m_rootJid, m_rootNode);
+        if (!id.isEmpty())
+            m_requests.append(id);
+    }
+}
+
+QString DiscoveryModel::rootJid() const
+{
+    return m_rootJid;
+}
+
+void DiscoveryModel::setRootJid(const QString &rootJid)
+{
+    if (rootJid != m_rootJid) {
+        m_rootJid = rootJid;
+        emit rootJidChanged(m_rootJid);
+        m_timer->start();
+    }
+}
+
+QString DiscoveryModel::rootNode() const
+{
+    return m_rootNode;
+}
+
+void DiscoveryModel::setRootNode(const QString &rootNode)
+{
+    if (rootNode != m_rootNode) {
+        m_rootNode = rootNode;
+        emit rootNodeChanged(m_rootNode);
+        m_timer->start();
+    }
 }
 
 QXmppDiscoveryManager *DiscoveryModel::manager() const
@@ -84,18 +130,24 @@ QXmppDiscoveryManager *DiscoveryModel::manager() const
 
 void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
 {
-    bool check;
+    if (manager != m_manager) {
+        m_manager = manager;
+        if (m_manager) {
+            bool check;
 
-    if (manager == manager)
-        return;
+            m_client = qobject_cast<QXmppClient*>(m_manager->parent());
+            Q_ASSERT(m_client);
+            check = connect(m_client, SIGNAL(connected()),
+                            this, SLOT(refresh()));
+            Q_ASSERT(check);
 
-    m_manager = manager;
-    if (m_manager) {
-        check = connect(m_manager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
-            this, SLOT(itemsReceived(QXmppDiscoveryIq)));
-        Q_ASSERT(check);
+            check = connect(m_manager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+                            this, SLOT(itemsReceived(QXmppDiscoveryIq)));
+            Q_ASSERT(check);
+        }
+        emit managerChanged(m_manager);
+        m_timer->start();
     }
-    emit managerChanged(m_manager);
 }
 
 /** Constructs a DiscoveryPanel.
