@@ -101,12 +101,21 @@ Rectangle {
         }
     }
 
-    Item {
+    Row {
         id: footer
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.margins: 8
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         height: 32
+        spacing: 8
+
+        Button {
+            text: 'OK'
+        }
+
+        Button {
+            text: 'Cancel'
+        }
     }
 }
 
