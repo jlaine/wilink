@@ -24,7 +24,6 @@ Item {
     id: block
 
     property alias model: view.model
-    property ListModel model
     signal addressClicked(string address)
 
     Rectangle {
