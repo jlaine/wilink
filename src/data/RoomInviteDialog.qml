@@ -20,7 +20,9 @@
 import QtQuick 1.0
 
 Rectangle {
+    id: dialog
     property alias model: view.model
+    property variant selection: []
 
     color: '#ccc'
     radius: 10
@@ -64,19 +66,34 @@ Rectangle {
         anchors.bottom: footer.top
         clip: true
         model: ListModel {
-            ListElement { name: 'foo'; avatar: 'peer.png' } 
+            ListElement { jid: 'foo@example.org'; name: 'foo'; avatar: 'peer.png' }
+            ListElement { jid: 'bar@example.org'; name: 'bar'; avatar: 'peer.png' }
+            ListElement { jid: 'wiz@example.org'; name: 'wiz'; avatar: 'peer.png' }
         }
         delegate: Rectangle {
             width: parent.width - 1
             height: 24
 
+            function isSelected() {
+                for (var i = 0; i < selection.length; i += 1) {
+                    if (selection[i] == model.jid)
+                        return true;
+                }
+                return false;
+            }
+
             Rectangle {
                 id: check
 
                 anchors.left: parent.left
+                anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
-                width: 16
-                height: 16
+                border.width: 1
+                border.color: '#c3c3c3'
+                color: isSelected() ? 'black' : 'white'
+                radius: 6
+                width: 12
+                height: 12
             }
 
             Image {
@@ -97,6 +114,24 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 text: model.name
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    var newSelection = [];
+                    var wasSelected = false;
+                    for (var i = 0; i < selection.length; i += 1) {
+                        if (selection[i] == model.jid) {
+                            wasSelected = true;
+                        } else {
+                            newSelection[newSelection.length] = selection[i];
+                        }
+                    }
+                    if (!wasSelected)
+                        newSelection[newSelection.length] = model.jid;
+                    dialog.selection = newSelection;
+                }
             }
         }
     }
