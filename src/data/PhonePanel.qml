@@ -95,6 +95,7 @@ Item {
                 x: 8
                 y: 8
                 smooth: true
+                text: ''
                 textFormat: TextEdit.PlainText
                 width: parent.width - 16
 
@@ -102,6 +103,14 @@ Item {
                     if (callButton.enabled)
                         callButton.clicked()
                 }
+            }
+
+            Text {
+                id: help
+                anchors.fill: numberEdit
+                color: '#999'
+                text: qsTr('Enter your phone number')
+                visible: numberEdit.text == ''
             }
         }
 
