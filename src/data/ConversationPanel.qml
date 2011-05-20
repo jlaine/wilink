@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Rectangle {
     width: 320
@@ -29,8 +30,14 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        icon: vcard.avatar
         title: conversation.jid
         z: 1
+
+        VCard {
+            id: vcard
+            jid: conversation.jid
+        }
     }
 
     Column {
