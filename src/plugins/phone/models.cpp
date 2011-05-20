@@ -170,10 +170,8 @@ void PhoneCallsModel::addCall(SipCall *call)
     endInsertRows();
 
     // schedule periodic refresh
-    if (!m_ticker->isActive()) {
+    if (!m_ticker->isActive())
         m_ticker->start();
-        emit stateChanged(true);
-    }
 
     // notify change
     emit currentCallsChanged();
@@ -279,10 +277,8 @@ void PhoneCallsModel::callTick()
             emit dataChanged(createIndex(row, 0), createIndex(row, 0));
         }
     }
-    if (!active) {
+    if (!active)
         m_ticker->stop();
-        emit stateChanged(false);
-    }
 }
 
 /** Returns the number of columns under the given \a parent.

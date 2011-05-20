@@ -83,7 +83,6 @@ signals:
     void outputVolumeChanged(int outputVolume);
     void phoneNumberChanged(const QString &phoneNumber);
     void selfcareUrlChanged(const QUrl& selfcareUrl);
-    void stateChanged(bool haveCalls);
 
 public slots:
     void addCall(SipCall *call);
