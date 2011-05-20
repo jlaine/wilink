@@ -95,9 +95,8 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
  * @param network
  * @param parent
  */
-PhoneCallsModel::PhoneCallsModel(SipClient *client, QObject *parent)
+PhoneCallsModel::PhoneCallsModel(QObject *parent)
     : QAbstractListModel(parent),
-    m_client(client),
     m_enabled(false)
 {
     bool check;
@@ -121,9 +120,19 @@ PhoneCallsModel::PhoneCallsModel(SipClient *client, QObject *parent)
     Q_ASSERT(check);
 
     // sip
+    m_client = new SipClient;
+    m_client->setAudioInputDevice(wApp->audioInputDevice());
+    m_client->setAudioOutputDevice(wApp->audioOutputDevice());
+    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
+                    m_client, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
+    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
+                    m_client, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+    Q_ASSERT(check);
     check = connect(m_client, SIGNAL(callDialled(SipCall*)),
                     this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);
+    m_client->moveToThread(wApp->soundThread());
 
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);

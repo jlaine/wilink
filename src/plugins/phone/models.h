@@ -60,7 +60,7 @@ public:
         StateRole,
     };
 
-    PhoneCallsModel(SipClient *client, QObject *parent = 0);
+    PhoneCallsModel(QObject *parent = 0);
     ~PhoneCallsModel();
 
     SipClient *client() const;

@@ -51,30 +51,17 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setWindowIcon(QIcon(":/phone.png"));
     setWindowTitle(tr("Phone"));
 
-    // sip client
-    SipClient *sip = new SipClient;
-    sip->setAudioInputDevice(wApp->audioInputDevice());
-    sip->setAudioOutputDevice(wApp->audioOutputDevice());
-    check = connect(wApp, SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
-                    sip, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    check = connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
-                    sip, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    sip->moveToThread(wApp->soundThread());
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->addLayout(headerLayout());
 
     // history
-    m_callsModel = new PhoneCallsModel(sip, this);
+    m_callsModel = new PhoneCallsModel(this);
 
     // declarative
     declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("historyModel", m_callsModel);
-    context->setContextProperty("sipClient", sip);
     context->setContextProperty("window", m_window);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
@@ -85,11 +72,11 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setLayout(layout);
     setFocusProxy(declarativeView);
 
-    check = connect(sip, SIGNAL(callReceived(SipCall*)),
+    check = connect(m_callsModel->client(), SIGNAL(callReceived(SipCall*)),
                     this, SLOT(callReceived(SipCall*)));
     Q_ASSERT(check);
 
-    check = connect(sip, SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
+    check = connect(m_callsModel->client(), SIGNAL(logMessage(QXmppLogger::MessageType, QString)),
                     m_window->client(), SIGNAL(logMessage(QXmppLogger::MessageType, QString)));
     Q_ASSERT(check);
 
