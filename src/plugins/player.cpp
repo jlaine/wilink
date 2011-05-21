@@ -31,7 +31,6 @@
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QPixmapCache>
-#include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
 #include <QTime>
@@ -420,6 +419,7 @@ void PlayerModel::setCursor(const QModelIndex &index)
         if (item)
             emit dataChanged(createIndex(item), createIndex(item));
         emit cursorChanged(index);
+        emit playingChanged(d->cursorItem != 0);
     }
 }
 
@@ -489,6 +489,11 @@ void PlayerModel::play(const QModelIndex &index)
     }
 }
 
+bool PlayerModel::playing() const
+{
+    return d->cursorItem != 0;
+}
+
 bool PlayerModel::removeRow(int row, const QModelIndex &parent)
 {
     return QAbstractItemModel::removeRow(row, parent);
@@ -518,37 +523,12 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
 {
     bool check;
 
-    setWindowIcon(QIcon(":/start.png"));
-    setWindowTitle(tr("Media player"));
-
     m_model = new PlayerModel(this);
-    check = connect(m_model, SIGNAL(cursorChanged(QModelIndex)),
-                    this, SLOT(cursorChanged(QModelIndex)));
-    Q_ASSERT(check);
-
     m_player = wApp->soundPlayer();
 
     // build layout
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
-    layout->addLayout(headerLayout());
-    layout->addSpacing(5);
     setLayout(layout);
-
-    // controls
-    QHBoxLayout *controls = new QHBoxLayout;
-    controls->addStretch();
-
-    m_stopButton = new QPushButton(QIcon(":/stop.png"), tr("Stop"));
-    m_stopButton->hide();
-    check = connect(m_stopButton, SIGNAL(clicked()),
-                    m_model, SLOT(stop()));
-    Q_ASSERT(check);
-    controls->addWidget(m_stopButton);
-
-    controls->addStretch();
-    layout->addLayout(controls);
-    layout->addSpacing(10);
 
     // playlist
     QDeclarativeView *view = new QDeclarativeView;
@@ -568,16 +548,6 @@ PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
     check = connect(shortcut, SIGNAL(activated()),
                     this, SIGNAL(showPanel()));
     Q_ASSERT(check);
-}
-
-void PlayerPanel::cursorChanged(const QModelIndex &index)
-{
-    if (index.isValid()) {
-        m_stopButton->setEnabled(true);
-        m_stopButton->show();
-    } else {
-        m_stopButton->hide();
-    }
 }
 
 static QList<QUrl> getUrls(const QUrl &url) {

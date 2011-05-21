@@ -612,17 +612,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PlayerPanel</name>
-    <message>
-        <source>Media player</source>
-        <translation>Lecteur média</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Arrêter</translation>
-    </message>
-</context>
-<context>
     <name>PluginOptions</name>
     <message>
         <source>Plugins</source>

@@ -121,9 +121,43 @@ Rectangle {
         delegate: playerDelegate
     }
 
+    PanelHeader {
+        id: header
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        icon: 'start.png'
+        title: qsTr('Media player')
+        z: 1
+
+        Row {
+            id: toolBar
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+
+            ToolButton {
+                icon: 'stop.png'
+                text: qsTr('Stop')
+                visible: playerModel.playing
+                onClicked: playerModel.stop()
+            }
+
+            ToolButton {
+                icon: 'close.png'
+                text: qsTr('Close')
+            }
+        }
+    }
+
     ListView {
         id: playerView
-        anchors.fill: parent
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: scrollBar.left
         model: visualModel
         delegate: playerDelegate
         focus: true
@@ -148,5 +182,14 @@ Rectangle {
                     playerModel.play(row);
             }
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: playerView
     }
 }

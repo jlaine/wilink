@@ -26,7 +26,6 @@
 #include "chat_panel.h"
 
 class Chat;
-class QPushButton;
 class QSoundPlayer;
 
 class PlayerModelPrivate;
@@ -34,6 +33,7 @@ class PlayerModelPrivate;
 class PlayerModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
 
 public:
     PlayerModel(QObject *parent = 0);
@@ -42,6 +42,7 @@ public:
     bool addUrl(const QUrl &url);
     QModelIndex cursor() const;
     void setCursor(const QModelIndex &index);
+    bool playing() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -54,6 +55,7 @@ public slots:
 
 signals:
     void cursorChanged(const QModelIndex &index);
+    void playingChanged(bool playing);
 
 private slots:
     void dataReceived();
@@ -73,9 +75,6 @@ class PlayerPanel : public ChatPanel
 public:
     PlayerPanel(Chat *chatWindow, QWidget *parent = 0);
 
-private slots:
-    void cursorChanged(const QModelIndex &index);
-
 protected:
     bool eventFilter(QObject *obj, QEvent *e);
 
@@ -83,7 +82,6 @@ private:
     Chat *m_chat;
     PlayerModel *m_model;
     QSoundPlayer *m_player;
-    QPushButton *m_stopButton;
 };
 
 #endif
