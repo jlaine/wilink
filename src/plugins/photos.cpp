@@ -53,6 +53,12 @@ static const int PROGRESS_STEPS = 100;
 static const QSize ICON_SIZE(128, 128);
 static const QSize UPLOAD_SIZE(2048, 2048);
 
+enum PhotoRole
+{
+    IsDirRole = ChatModel::UserRole,
+    SizeRole,
+};
+
 static bool isImage(const QString &fileName)
 {
     if (fileName.isEmpty())
@@ -225,6 +231,10 @@ PhotoModel::PhotoModel(QObject *parent)
     : ChatModel(parent),
     m_fs(0)
 {
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(IsDirRole, "isDir");
+    names.insert(SizeRole, "size");
+    setRoleNames(names);
 }
 
 /** When a command finishes, process its results.
@@ -284,7 +294,6 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
         removeRows(0, rootItem->children.size());
         foreach (const FileInfo& info, results) {
             PhotoItem *item = new PhotoItem(info);
-            qDebug("info: %s", qPrintable(info.url().toString()));
             addItem(item, rootItem);
         }
 #if 0
@@ -326,8 +335,12 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == NameRole)
+    if (role == IsDirRole)
+        return item->isDir();
+    else if (role == NameRole)
         return item->name();
+    else if (role == SizeRole)
+        return item->size();
     else if (role == UrlRole)
         return item->url();
     return QVariant();

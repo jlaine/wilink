@@ -112,7 +112,7 @@ Panel {
                 Image {
                     id: image
                     anchors.horizontalCenter: parent.horizontalCenter
-                    source: model.type == 'photo' ? model.source : 'album-128.png'
+                    source: model.isDir ? 'album-128.png' : 'file-128.png'
                 }
 
                 Text {
@@ -126,8 +126,10 @@ Panel {
                 anchors.fill: parent
                 hoverEnabled: true
                 onDoubleClicked: {
-                    crumbs.append({'url': view.model.rootUrl})
-                    view.model.rootUrl = model.url;
+                    if (model.isDir) {
+                        crumbs.append({'url': view.model.rootUrl})
+                        view.model.rootUrl = model.url;
+                    }
                 }
 
                 onEntered: {
