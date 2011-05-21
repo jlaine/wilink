@@ -344,6 +344,39 @@ static QString dumpPings(const QList<Ping> &pings)
     return table.render();
 }
 
+static QString dumpResults(const DiagnosticsIq &iq)
+{
+    QString text = makeSection("System diagnostics");
+
+    // show software
+    TextList list;
+    foreach (const Software &software, iq.softwares())
+    {
+        QString title;
+        if (software.type() == QLatin1String("os"))
+            title = QLatin1String("Operating system");
+        else if (software.type() == QLatin1String("application"))
+            title = QLatin1String("Application");
+        else
+            title = software.type();
+        list << QString("%1: %2 %3").arg(title, software.name(), software.version());
+    }
+    text += makeItem("Software", list.render());
+
+    // show interfaces
+    foreach (const Interface &interface, iq.interfaces())
+        text += dumpInterface(interface);
+
+    // show tests
+    text += makeSection("Tests");
+    text += dumpLookup(iq.lookups());
+    text += makeItem("Ping", dumpPings(iq.pings()));
+    foreach (const Traceroute &traceroute, iq.traceroutes())
+        text += makeItem("Traceroute", dumpPings(traceroute));
+
+    return text;
+}
+
 /** Constructs a DiagnosticsPanel.
  */
 DiagnosticsPanel::DiagnosticsPanel(QXmppClient *client, QWidget *parent)
@@ -436,37 +469,7 @@ void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
         return;
     }
 
-    if (iq.from().isEmpty())
-        showMessage("System diagnostics");
-    else
-        showMessage(QString("Diagnostics for %1").arg(iq.from()));
-
-    // show software
-    QString text;
-    TextList list;
-    foreach (const Software &software, iq.softwares())
-    {
-        QString title;
-        if (software.type() == QLatin1String("os"))
-            title = QLatin1String("Operating system");
-        else if (software.type() == QLatin1String("application"))
-            title = QLatin1String("Application");
-        else
-            title = software.type();
-        list << QString("%1: %2 %3").arg(title, software.name(), software.version());
-    }
-    text += makeItem("Software", list.render());
-
-    // show interfaces
-    foreach (const Interface &interface, iq.interfaces())
-        text += dumpInterface(interface);
-
-    // show tests
-    text += makeSection("Tests");
-    text += dumpLookup(iq.lookups());
-    text += makeItem("Ping", dumpPings(iq.pings()));
-    foreach (const Traceroute &traceroute, iq.traceroutes())
-        text += makeItem("Traceroute", dumpPings(traceroute));
+    text->setText(dumpResults(iq));
 }
 
 // EXTENSION
