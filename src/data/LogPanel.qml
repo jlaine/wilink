@@ -87,8 +87,19 @@ Rectangle {
         }
 
         delegate: Rectangle {
+            color: colorForType(model.type)
             width: view.width - 1
             height: content.paintedHeight + 2
+
+            function colorForType(type) {
+                if (type == QXmppLogger.ReceivedMessage)
+                    return '#ccffcc';
+                else if (type == QXmppLogger.SentMessage)
+                    return '#ccccff';
+                else if (type == QXmppLogger.WarningMessage)
+                    return '#ff9595';
+                return 'white';
+            }
 
             Text {
                 id: date
