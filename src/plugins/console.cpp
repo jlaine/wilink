@@ -163,12 +163,6 @@ ConsolePanel::ConsolePanel(Chat *chatWindow)
     check = connect(declarativeView->rootObject(), SIGNAL(close()),
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
-
-    // register shortcut
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chatWindow);
-    check = connect(shortcut, SIGNAL(activated()),
-                    this, SIGNAL(showPanel()));
-    Q_ASSERT(check);
 }
 
 #if 0
@@ -266,21 +260,17 @@ bool ConsolePlugin::initialize(Chat *chat)
 {
     bool check;
 
-    /* register panel */
+    // register panel
     ConsolePanel *console = new ConsolePanel(chat);
     console->setObjectName(CONSOLE_ROSTER_ID);
     chat->addPanel(console);
 
-#ifdef WILINK_EMBEDDED
-    /* add menu entry */
-    QList<QAction*> actions = chat->fileMenu()->actions();
-    QAction *firstAction = actions.isEmpty() ? 0 : actions.first();
-    QAction *action = new QAction(console->windowIcon(), console->windowTitle(), chat->fileMenu());
-    chat->fileMenu()->insertAction(firstAction, action);
-    check = connect(action, SIGNAL(triggered()),
-                    console, SIGNAL(showPanel()));
-    Q_ASSERT(check);
-#endif
+    // register shortcut
+    QAction *action = chat->addAction(QIcon(":/options.png"), console->windowTitle());
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D));
+    action->setVisible(false);
+    connect(action, SIGNAL(triggered()),
+            console, SIGNAL(showPanel()));
     return true;
 }
 

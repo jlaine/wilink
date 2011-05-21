@@ -268,7 +268,7 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
 
     /* assemble UI */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
+    setLayout(layout);
     layout->addLayout(headerLayout());
     layout->addWidget(photosView);
     QHBoxLayout *hbox_upload = new QHBoxLayout;
@@ -280,8 +280,6 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     layout->addLayout(hbox_upload);
     layout->addLayout(hbox);
 
-    setLayout(layout);
-    setWindowIcon(QIcon(":/photos.png"));
     setWindowTitle(tr("Photos"));
 
     /* open filesystem */
@@ -674,13 +672,17 @@ bool PhotosPlugin::initialize(Chat *chat)
     else
         return false;
 
-    /* register panel */
+    // register panel
     PhotosPanel *photos = new PhotosPanel(url);
-    QAction *action = chat->addAction(photos->windowIcon(), photos->windowTitle());
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P));
-    connect(action, SIGNAL(triggered()), photos, SIGNAL(showPanel()));
     chat->addPanel(photos);
     connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));
+
+    // register shortcut
+    QAction *action = chat->addAction(QIcon(":/photos.png"), photos->windowTitle());
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P));
+    connect(action, SIGNAL(triggered()),
+            photos, SIGNAL(showPanel()));
+
     return true;
 }
 

@@ -549,12 +549,12 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
 {
     bool check;
 
-    /* register panel */
+    // register panel
     DiagnosticsPanel *diagnostics = new DiagnosticsPanel(chat, chat->client());
     diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
     chat->addPanel(diagnostics);
 
-    /* register shortcut */
+    // register shortcut
     QAction *action = chat->addAction(QIcon(":/diagnostics.png"), "Diags");
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
     connect(action, SIGNAL(triggered()),
