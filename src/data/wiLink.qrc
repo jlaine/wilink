@@ -59,6 +59,7 @@
     <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
     <file>ConversationPanel.qml</file>
+    <file>DiagnosticsPanel.qml</file>
     <file>Dialog.qml</file>
     <file>DiscoveryPanel.qml</file>
     <file>HistoryView.qml</file>

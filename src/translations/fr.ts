@@ -421,6 +421,10 @@ Acceptez-vous?</translation>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
 </context>
 <context>
     <name>Dialog</name>

@@ -25,6 +25,7 @@
 #include "chat_panel.h"
 #include "diagnostics/iq.h"
 
+class Chat;
 class QTextBrowser;
 class QTimer;
 
@@ -35,7 +36,7 @@ class DiagnosticsPanel : public ChatPanel
     Q_OBJECT
 
 public:
-    DiagnosticsPanel(QXmppClient *client, QWidget *parent=0);
+    DiagnosticsPanel(Chat *chatWindow, QXmppClient *client);
     ~DiagnosticsPanel();
 
 private slots:
