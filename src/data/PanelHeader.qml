@@ -31,7 +31,7 @@ Rectangle {
         GradientStop { position: 0; color: '#9bbdf4' }
         GradientStop { position: 1; color: '#90acd8' }
     }
-    height: 42
+    height: 46
     width: 200
 
     Image {

@@ -54,7 +54,7 @@ Rectangle {
         Row {
             id: toolBar
 
-            anchors.top: parent.top
+            anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
 
             ToolButton {

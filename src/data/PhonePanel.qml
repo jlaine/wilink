@@ -67,6 +67,18 @@ Item {
         anchors.top: parent.top
         icon: 'phone.png'
         title: '<b>' + qsTr('Phone') + '</b>'
+
+        Row {
+            id: toolBar
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+
+            ToolButton {
+                icon: 'close.png'
+                text: qsTr('Close')
+            }
+        }
     }
 
     Item {

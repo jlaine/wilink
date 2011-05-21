@@ -36,8 +36,9 @@ Rectangle {
 
         Row {
             id: toolBar
+
+            anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.top: parent.top
 
             ToolButton {
                 icon: 'close.png'

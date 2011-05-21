@@ -531,6 +531,10 @@ Acceptez-vous?</translation>
         <source>Enter the number you want to call</source>
         <translation>Saisissez le numéro à appeler</translation>
     </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
 </context>
 <context>
     <name>PhotosPanel</name>

@@ -54,7 +54,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
-    layout->addLayout(headerLayout());
 
     // declarative
     declarativeView = new QDeclarativeView;
