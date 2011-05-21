@@ -68,6 +68,11 @@ LogModel::LogModel(QObject *parent)
     setRoleNames(roleNames);
 }
 
+void LogModel::clear()
+{
+    removeRows(0, rootItem->children.size());
+}
+
 QVariant LogModel::data(const QModelIndex &index, int role) const
 {
     LogItem *item = static_cast<LogItem*>(index.internalPointer());
@@ -124,6 +129,10 @@ void LogModel::messageReceived(QXmppLogger::MessageType type, const QString &msg
 
     LogItem *item = new LogItem;
     item->content = msg;
+    if (type == QXmppLogger::SentMessage || type == QXmppLogger::ReceivedMessage)
+        item->content = indentXml(msg);
+    else
+        item->content = msg;
     item->date = QDateTime::currentDateTime();
     item->type = type;
     addItem(item, rootItem, rootItem->children.size());
@@ -157,7 +166,7 @@ ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *paren
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/LogPanel.qml"));
-    layout->addWidget(declarativeView);
+    layout->addWidget(declarativeView, 1);
 
     // search box
     searchBar = new ChatSearchBar;

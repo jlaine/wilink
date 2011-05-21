@@ -43,6 +43,29 @@ Rectangle {
             anchors.right: parent.right
 
             ToolButton {
+                icon: 'start.png'
+                text: qsTr('Start')
+                visible: !logModel.enabled
+
+                onClicked: logModel.enabled = true
+            }
+
+            ToolButton {
+                icon: 'stop.png'
+                text: qsTr('Stop')
+                visible: logModel.enabled
+
+                onClicked: logModel.enabled = false
+            }
+
+            ToolButton {
+                icon: 'refresh.png'
+                text: qsTr('Clear')
+
+                onClicked: logModel.clear()
+            }
+
+            ToolButton {
                 icon: 'close.png'
                 text: qsTr('Close')
             }
@@ -58,6 +81,8 @@ Rectangle {
         anchors.bottom: parent.bottom
 
         model: LogModel {
+            id: logModel
+
             logger: client.logger
         }
 

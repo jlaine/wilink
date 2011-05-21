@@ -57,6 +57,9 @@ signals:
     void enabledChanged(bool enabled);
     void loggerChanged(QXmppLogger *logger);
 
+public slots:
+    void clear();
+
 private slots:
     void messageReceived(QXmppLogger::MessageType type, const QString &msg);
 
