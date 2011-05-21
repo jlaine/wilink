@@ -29,14 +29,14 @@ class Chat;
 class DiagnosticsExtension;
 class QTimer;
 
-/** The DiagnosticsPanel represents panel for displaying diagnostics results.
+/** The DiagnosticPanel represents panel for displaying diagnostics results.
  */
-class DiagnosticsPanel : public ChatPanel
+class DiagnosticPanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    DiagnosticsPanel(Chat *chatWindow, QXmppClient *client);
+    DiagnosticPanel(Chat *chatWindow, QXmppClient *client);
 
 private slots:
     void slotShow();

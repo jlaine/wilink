@@ -131,7 +131,7 @@ if(RELOAD_TRANSLATIONS)
         data/roster.qml
         data/CallWidget.qml
         data/ConversationPanel.qml
-        data/DiagnosticsPanel.qml
+        data/DiagnosticPanel.qml
         data/Dialog.qml
         data/DiscoveryPanel.qml
         data/LogPanel.qml

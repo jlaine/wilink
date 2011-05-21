@@ -375,9 +375,9 @@ static QString dumpResults(const DiagnosticsIq &iq)
     return text;
 }
 
-/** Constructs a DiagnosticsPanel.
+/** Constructs a DiagnosticPanel.
  */
-DiagnosticsPanel::DiagnosticsPanel(Chat *chatWindow, QXmppClient *client)
+DiagnosticPanel::DiagnosticPanel(Chat *chatWindow, QXmppClient *client)
     : ChatPanel(chatWindow),
     m_client(client),
     m_displayed(false)
@@ -398,7 +398,7 @@ DiagnosticsPanel::DiagnosticsPanel(Chat *chatWindow, QXmppClient *client)
     context->setContextProperty("window", chatWindow);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/DiagnosticsPanel.qml"));
+    declarativeView->setSource(QUrl("qrc:/DiagnosticPanel.qml"));
     layout->addWidget(declarativeView);
 
     // connect signals
@@ -411,7 +411,7 @@ DiagnosticsPanel::DiagnosticsPanel(Chat *chatWindow, QXmppClient *client)
     Q_ASSERT(check);
 }
 
-void DiagnosticsPanel::slotShow()
+void DiagnosticPanel::slotShow()
 {
     if (m_displayed)
         return;
@@ -550,7 +550,7 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     bool check;
 
     // register panel
-    DiagnosticsPanel *diagnostics = new DiagnosticsPanel(chat, chat->client());
+    DiagnosticPanel *diagnostics = new DiagnosticPanel(chat, chat->client());
     diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
     chat->addPanel(diagnostics);
 

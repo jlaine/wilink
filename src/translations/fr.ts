@@ -412,7 +412,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>DiagnosticsPanel</name>
+    <name>DiagnosticPanel</name>
     <message>
         <source>Refresh</source>
         <translation>Rafraîchir</translation>
