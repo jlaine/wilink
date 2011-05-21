@@ -242,8 +242,6 @@ void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &result
         m_downloadDevice->deleteLater();
         m_downloadDevice = 0;
     } else {
-        qDebug("got image %s", qPrintable(m_downloadUrl.toString()));
-
         // load image
         m_downloadDevice->reset();
         QImage *image = new QImage;
@@ -369,40 +367,9 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
 
     if (error)
         qWarning() << m_fs->commandName(cmd) << "command failed";
-     else
-        qDebug() << m_fs->commandName(cmd) << "command complete";
 
     switch (cmd)
     {
-#if 0
-    case FileSystem::Get:
-        if (!error && photosView->indexOf(downloadJob.widget) >= 0)
-        {
-            /* load image */
-            downloadDevice->reset();
-            QImage img;
-            img.load(downloadDevice, NULL);
-            downloadDevice->close();
-
-            /* display image */
-            PhotosList *listView = qobject_cast<PhotosList *>(downloadJob.widget);
-            QLabel *label = qobject_cast<QLabel *>(downloadJob.widget);
-            if (listView)
-                listView->setImage(downloadJob.remoteUrl, img);
-            else if (label)
-            {
-                QSize maxSize = photosView->size();
-                if (img.width() > maxSize.width() || img.height() > maxSize.height())
-                    img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                label->setPixmap(QPixmap::fromImage(img));
-            }
-        }
-
-        /* fetch next thumbnail */
-        downloadJob.clear();
-        processDownloadQueue();
-        break;
-#endif
     case FileSystem::Open:
         if (!error)
             refresh();
@@ -418,15 +385,6 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
                 addItem(item, rootItem);
             }
         }
-#if 0
-        /* fetch thumbnails */
-        foreach (const FileInfo& info, results)
-        {
-            if (!info.isDir() && isImage(info.name()))
-                downloadQueue.append(Job(listView, info.url(), FileSystem::SmallSize));
-        }
-        processDownloadQueue();
-#endif
         break;
     }
     case FileSystem::Mkdir:

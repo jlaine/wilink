@@ -111,7 +111,11 @@ Panel {
 
                 Image {
                     id: image
+
                     anchors.horizontalCenter: parent.horizontalCenter
+                    fillMode: Image.PreserveAspectFit
+                    width: 128
+                    height: 128
                     source: model.avatar
                 }
 
