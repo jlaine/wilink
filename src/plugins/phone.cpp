@@ -87,13 +87,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     check = connect(m_callsModel, SIGNAL(enabledChanged(bool)),
                     this, SLOT(handleSettings()));
     Q_ASSERT(check);
-
-    // add action
-    m_action = m_window->addAction(QIcon(":/phone.png"), tr("Phone"));
-    m_action->setVisible(false);
-    check = connect(m_action, SIGNAL(triggered()),
-                    this, SIGNAL(showPanel()));
-    Q_ASSERT(check);
 }
 
 void PhonePanel::callButtonClicked(QAbstractButton *button)
@@ -140,7 +133,6 @@ void PhonePanel::handleSettings()
             // show a message
             setWindowHelp(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
                                   tr("You can subscribe to the phone service at the following address:"), selfcareUrl.toString(), selfcareUrl.toString()));
-            m_action->setVisible(true);
         }
         return;
     }
@@ -156,9 +148,6 @@ void PhonePanel::handleSettings()
             QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_callsModel->client()->domain()));
         QDesktopServices::setUrlHandler("sip", this, "openUrl");
     }
-
-    // enable action
-    m_action->setVisible(true);
 }
 
 /** Open a SIP URI.

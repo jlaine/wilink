@@ -44,7 +44,7 @@ Panel {
                 enabled: !diagnosticsManager.running
                 text: qsTr('Refresh')
 
-                onClicked: diagnostiscManager.refresh();
+                onClicked: diagnosticsManager.refresh();
             }
 
             ToolButton {

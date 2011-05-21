@@ -31,6 +31,37 @@ Panel {
         icon: 'photos.png'
         title: '<b>' + qsTr('Photos') + '</b>'
         z: 1
+
+        Row {
+            id: toolBar
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+
+            ToolButton {
+                icon: 'back.png'
+                enabled: false
+                text: qsTr('Go back')
+            }
+
+            ToolButton {
+                icon: 'stop.png'
+                text: qsTr('Cancel')
+                visible: false
+            }
+
+            ToolButton {
+                icon: 'add.png'
+                text: qsTr('Create an album')
+            }
+
+            ToolButton {
+                icon: 'close.png'
+                text: qsTr('Close')
+                onClicked: panel.close()
+            }
+        }
+
     }
 
     GridView {

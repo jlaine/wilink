@@ -139,6 +139,7 @@ if(RELOAD_TRANSLATIONS)
         data/RoomParticipantView.qml
         data/PhoneHistoryView.qml
         data/PhonePanel.qml
+        data/PhotoPanel.qml
         data/RoomPanel.qml
         data/TransferWidget.qml
         translations/fr.ts)

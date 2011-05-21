@@ -553,6 +553,29 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhotoPanel</name>
+    <message>
+        <source>Photos</source>
+        <translation>Photos</translation>
+    </message>
+    <message>
+        <source>Go back</source>
+        <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Create an album</source>
+        <translation>Créer un album</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+</context>
+<context>
     <name>PhotosPanel</name>
     <message>
         <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>

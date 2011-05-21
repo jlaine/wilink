@@ -44,7 +44,6 @@ private slots:
     void openUrl(const QUrl &url);
 
 private:
-    QAction *m_action;
     PhoneCallsModel *m_callsModel;
     QDeclarativeView *declarativeView;
     bool m_registeredHandler;

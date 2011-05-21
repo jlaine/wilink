@@ -23,6 +23,7 @@
 #include <QListWidget>
 #include <QUrl>
 
+#include "chat_model.h"
 #include "chat_panel.h"
 #include "qnetio/filesystem.h"
 
@@ -66,6 +67,30 @@ private:
     bool baseDrop;
     QUrl baseUrl;
     FileInfoList fileList;
+};
+
+class PhotoModel : public ChatModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
+public:
+    PhotoModel(QObject *parent = 0);
+
+    QUrl rootUrl() const;
+    void setRootUrl(const QUrl &rootUrl);
+
+    // QAbstractItemModel
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+signals:
+    void rootUrlChanged(const QUrl &rootUrl);
+
+private slots:
+    void commandFinished(int cmd, bool error, const FileInfoList &results);
+
+private:
+    FileSystem *m_fs;
+    QUrl m_rootUrl;
 };
 
 /** The PhotosPanel class represents a panel for displaying photos.

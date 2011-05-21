@@ -21,6 +21,10 @@
 #include <QApplication>
 #include <QBuffer>
 #include <QDebug>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QDragEnterEvent>
 #include <QFile>
 #include <QFileInfo>
@@ -211,6 +215,133 @@ QUrl PhotosList::url()
     return baseUrl;
 }
 
+class PhotoItem : public ChatModelItem
+{
+public:
+};
+
+PhotoModel::PhotoModel(QObject *parent)
+    : ChatModel(parent),
+    m_fs(0)
+{
+}
+
+/** When a command finishes, process its results.
+ *
+ * @param cmd
+ * @param error
+ * @param results
+ */
+void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &results)
+{
+    if (error)
+        qWarning() << m_fs->commandName(cmd) << "command failed";
+
+#if 0
+    switch (cmd)
+    {
+    case FileSystem::Get:
+        if (!error && photosView->indexOf(downloadJob.widget) >= 0)
+        {
+            /* load image */
+            downloadDevice->reset();
+            QImage img;
+            img.load(downloadDevice, NULL);
+            downloadDevice->close();
+
+            /* display image */
+            PhotosList *listView = qobject_cast<PhotosList *>(downloadJob.widget);
+            QLabel *label = qobject_cast<QLabel *>(downloadJob.widget);
+            if (listView)
+                listView->setImage(downloadJob.remoteUrl, img);
+            else if (label)
+            {
+                QSize maxSize = photosView->size();
+                if (img.width() > maxSize.width() || img.height() > maxSize.height())
+                    img = img.scaled(maxSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                label->setPixmap(QPixmap::fromImage(img));
+            }
+        }
+
+        /* fetch next thumbnail */
+        downloadJob.clear();
+        processDownloadQueue();
+        break;
+    case FileSystem::Open:
+        if (!error)
+            refresh();
+        break;
+    case FileSystem::List: {
+        if (error)
+            return;
+
+        /* show entries */
+        PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
+        Q_ASSERT(listView != NULL);
+        listView->setEntries(results);
+
+        /* drag and drop is now allowed */
+        showMessage();
+        listView->setAcceptDrops(true);
+        if (photosView->count() > 1)
+        {
+            backAction->setEnabled(true);
+            createAction->setVisible(false);
+            deleteAction->setVisible(true);
+        }
+
+        /* fetch thumbnails */
+        foreach (const FileInfo& info, results)
+        {
+            if (!info.isDir() && isImage(info.name()))
+                downloadQueue.append(Job(listView, info.url(), FileSystem::SmallSize));
+        }
+        processDownloadQueue();
+        break;
+    }
+    case FileSystem::Mkdir:
+        refresh();
+        break;
+    case FileSystem::Put:
+        progressFiles++;
+        progressBar->setValue(PROGRESS_STEPS * progressFiles);
+        delete uploadDevice;
+        uploadDevice = 0;
+        processUploadQueue();
+        break;
+    case FileSystem::Remove:
+        if (!error)
+            refresh();
+        break;
+    default:
+        qWarning() << fs->commandName(cmd) << "was not expected";
+        break;
+    }
+#endif
+}
+
+QVariant PhotoModel::data(const QModelIndex &index, int role) const
+{
+    PhotoItem *item = static_cast<PhotoItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    return QVariant();
+}
+
+QUrl PhotoModel::rootUrl() const
+{
+    return m_rootUrl;
+}
+
+void PhotoModel::setRootUrl(const QUrl &rootUrl)
+{
+    if (rootUrl != m_rootUrl) {
+        m_rootUrl = rootUrl;
+        emit rootUrlChanged(m_rootUrl);
+    }
+}
+
 /** Constructs a PhotosPanel.
  *
  * @param url    The base URL for the photo sharing service.
@@ -223,8 +354,11 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     uploadDevice(0),
     progressFiles(0)
 {
+    bool check;
+
     /* create UI */
     setWindowHelp(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
+    setWindowTitle(tr("Photos"));
 
     photosView = new QStackedWidget;
     PhotosList *listView = new PhotosList(url);
@@ -280,7 +414,20 @@ PhotosPanel::PhotosPanel(const QString &url, QWidget *parent)
     layout->addLayout(hbox_upload);
     layout->addLayout(hbox);
 
-    setWindowTitle(tr("Photos"));
+    // declarative
+    QDeclarativeView *declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
+    //context->setContextProperty("window", chatWindow);
+    context->setContextProperty("baseUrl", QVariant::fromValue(url));
+
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/PhotoPanel.qml"));
+    layout->addWidget(declarativeView);
+
+    // connect signals
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
 
     /* open filesystem */
     fs = FileSystem::factory(url, this);
@@ -663,6 +810,8 @@ public:
 
 bool PhotosPlugin::initialize(Chat *chat)
 {
+    qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
+
     QString url;
     QString domain = chat->client()->configuration().domain();
     if (domain == "wifirst.net")
