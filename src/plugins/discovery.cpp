@@ -22,11 +22,7 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
-#include <QLabel>
 #include <QLayout>
-#include <QLineEdit>
-#include <QListWidget>
-#include <QPushButton>
 #include <QShortcut>
 #include <QTimer>
 
@@ -39,28 +35,6 @@
 #include "discovery.h"
 
 #define DISCOVERY_ROSTER_ID "0_discovery"
-
-enum Roles
-{
-    JidRole = Qt::UserRole,
-    NodeRole,
-    NameRole,
-};
-
-static QString itemText(QListWidgetItem *item)
-{
-    const QString jid = item->data(JidRole).toString();
-    const QString node = item->data(NodeRole).toString();
-    const QString name = item->data(NameRole).toString();
-
-    QString text;
-    if (!name.isEmpty())
-        text += "<b>" + name + "</b><br/>";
-    text += jid;
-    if (!node.isEmpty())
-        text += QString(" (%1)").arg(node);
-    return text;
-}
 
 class DiscoveryItem : public ChatModelItem
 {
@@ -75,6 +49,10 @@ DiscoveryModel::DiscoveryModel(QObject *parent)
     m_client(0),
     m_manager(0)
 {
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(ChatModel::UserRole, "node");
+    setRoleNames(names);
+
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
     m_timer->setInterval(100);
@@ -93,6 +71,8 @@ QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
         return item->name;
     else if (role == ChatModel::JidRole)
         return item->jid;
+    else if (role == ChatModel::UserRole)
+        return item->node;
     return QVariant();
 }
 
@@ -121,7 +101,7 @@ void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
         disco.queryNode() != m_rootNode)
         return;
 
-    removeRows(0, rootItem->children.size() - 1);
+    removeRows(0, rootItem->children.size());
     foreach (const QXmppDiscoveryIq::Item &item, disco.items()) {
         DiscoveryItem *ptr = new DiscoveryItem;
         ptr->jid = item.jid();
@@ -207,213 +187,23 @@ void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
 
 /** Constructs a DiscoveryPanel.
  *
- * @param client The XMPP client.
- * @param parent The parent widget of the panel.
+ * @param window The chat window.
  */
-DiscoveryPanel::DiscoveryPanel(Chat *chatWindow, QXmppClient *client, QWidget *parent)
-    : ChatPanel(parent),
-    m_client(client)
+DiscoveryPanel::DiscoveryPanel(Chat *chatWindow)
+    : ChatPanel(chatWindow)
 {
-    bool check;
-
-    m_manager = client->findExtension<QXmppDiscoveryManager>();
-
     /* build user interface */
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->addLayout(headerLayout());
-
-    /* location bar */
-    QHBoxLayout *hbox = new QHBoxLayout;
-
-    m_locationJid = new QLineEdit;
-    hbox->addWidget(m_locationJid);
-
-    m_locationNode = new QLineEdit;
-    hbox->addWidget(m_locationNode);
-
-    layout->addLayout(hbox);
 
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("client", new QXmppDeclarativeClient(client));
+    context->setContextProperty("client", new QXmppDeclarativeClient(chatWindow->client()));
     context->setContextProperty("window", chatWindow);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/DiscoveryPanel.qml"));
     layout->addWidget(declarativeView);
-
-    /* main view */
-    m_listWidget = new QListWidget;
-    m_listWidget->setIconSize(QSize(32, 32));
-    layout->addWidget(m_listWidget);
-
     setLayout(layout);
-    setWindowIcon(QIcon(":/diagnostics.png"));
-    setWindowTitle(tr("Service discovery"));
-
-    // add actions
-    m_backAction = addAction(QIcon(":/back.png"), tr("Go back"));
-    m_backAction->setEnabled(false);
-    m_backAction->setShortcut(QKeySequence(Qt::Key_Backspace));
-    check = connect(m_backAction, SIGNAL(triggered()),
-                    this, SLOT(goBack()));
-    Q_ASSERT(check);
-
-    QAction *m_refreshAction = addAction(QIcon(":/refresh.png"), tr("Refresh"));
-    check = connect(m_refreshAction, SIGNAL(triggered()),
-                    this, SLOT(goTo()));
-    Q_ASSERT(check);
-
-    /* connect signals */
-    check = connect(this, SIGNAL(showPanel()),
-        this, SLOT(slotShow()));
-    Q_ASSERT(check);
-
-    check = connect(m_manager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-        this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
-
-    check = connect(m_manager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
-        this, SLOT(discoveryItemsReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
-
-
-    check = connect(m_locationJid, SIGNAL(returnPressed()),
-        this, SLOT(goTo()));
-
-    check = connect(m_listWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
-        this, SLOT(goForward(QListWidgetItem*)));
-    Q_ASSERT(check);
-}
-
-void DiscoveryPanel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
-{
-    if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
-        return;
-
-    for (int i = 0; i < m_listWidget->count(); ++i)
-    {
-        QListWidgetItem *wdgItem = m_listWidget->item(i);
-        if (wdgItem->data(JidRole).toString() != disco.from() ||
-            wdgItem->data(NodeRole).toString() != disco.queryNode())
-            continue;
-
-        if (!disco.identities().isEmpty())
-        {
-            wdgItem->setData(NameRole, disco.identities().first().name());
-            QLabel *label = qobject_cast<QLabel*>(m_listWidget->itemWidget(wdgItem));
-            if (label)
-                label->setText(itemText(wdgItem));
-        }
-    }
-}
-
-void DiscoveryPanel::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
-{
-    if (!m_requests.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
-        return;
-
-    // check the results are for the current item
-    if (m_trail.isEmpty() ||
-        m_trail.last().jid() != disco.from() ||
-        m_trail.last().node() != disco.queryNode())
-        return;
-
-    foreach (const QXmppDiscoveryIq::Item &item, disco.items())
-    {
-        // insert item
-        QListWidgetItem *wdgItem = new QListWidgetItem;
-        wdgItem->setIcon(QIcon(":/chat.png"));
-        wdgItem->setData(JidRole, item.jid());
-        wdgItem->setData(NodeRole, item.node());
-        wdgItem->setData(NameRole, item.name());
-        QLabel *label = new QLabel(itemText(wdgItem));
-        m_listWidget->addItem(wdgItem);
-        m_listWidget->setItemWidget(wdgItem, label);
-
-        // request information
-        const QString id = m_manager->requestInfo(item.jid(), item.node());
-        if (!id.isEmpty())
-            m_requests.append(id);
-    }
-}
-
-void DiscoveryPanel::explore(const QXmppDiscoveryIq::Item &item)
-{
-    // update window title
-    QString extra = item.jid();
-    if (!item.node().isEmpty())
-        extra += QString(" (%1)").arg(item.node());
-    setWindowExtra(extra);
-    m_listWidget->clear();
-
-    // update location bar
-    m_locationJid->setText(item.jid());
-    m_locationNode->setText(item.node());
-
-    // update back button
-    if (m_trail.size() < 2)
-        m_backAction->setEnabled(false);
-    else
-        m_backAction->setEnabled(true);
-
-    // request items
-    const QString id = m_manager->requestItems(item.jid(), item.node());
-    if (!id.isEmpty())
-        m_requests.append(id);
-}
-
-void DiscoveryPanel::goBack()
-{
-    if (m_trail.size() < 2)
-        return;
-
-    // pop location
-    m_trail.pop_back();
-    explore(m_trail.last());
-}
-
-void DiscoveryPanel::goForward(QListWidgetItem *wdgItem)
-{
-    QXmppDiscoveryIq::Item item;
-    item.setJid(wdgItem->data(JidRole).toString());
-    item.setNode(wdgItem->data(NodeRole).toString());
-    m_trail.append(item);
-    explore(item);
-}
-
-void DiscoveryPanel::goTo()
-{
-    const QString newJid = m_locationJid->text();
-    const QString newNode = m_locationNode->text();
-    if (newJid.isEmpty())
-        return;
-
-    if (!m_trail.isEmpty() &&
-        m_trail.last().jid() == newJid &&
-        m_trail.last().node() == newNode)
-    {
-        explore(m_trail.last());
-    }
-    else
-    {
-        QXmppDiscoveryIq::Item item;
-        item.setJid(newJid);
-        item.setNode(newNode);
-        m_trail.append(item);
-        explore(item);
-    }
-}
-
-void DiscoveryPanel::slotShow()
-{
-    if (!m_trail.isEmpty())
-        return;
-
-    QXmppDiscoveryIq::Item item;
-    item.setJid(m_client->configuration().domain());
-    m_trail.append(item);
-    explore(item);
 }
 
 // PLUGIN
@@ -428,7 +218,7 @@ public:
 bool DiscoveryPlugin::initialize(Chat *chat)
 {
     /* register panel */
-    DiscoveryPanel *discovery = new DiscoveryPanel(chat, chat->client(), chat);
+    DiscoveryPanel *discovery = new DiscoveryPanel(chat);
     discovery->setObjectName(DISCOVERY_ROSTER_ID);
     chat->addPanel(discovery);
 

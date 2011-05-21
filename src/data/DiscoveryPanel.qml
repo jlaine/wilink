@@ -22,8 +22,13 @@ import QXmpp 0.4
 import wiLink 1.2
 
 Rectangle {
+    id: panel
     width: 320
     height: 400
+
+    ListModel {
+        id: crumbs
+    }
 
     PanelHeader {
         id: header
@@ -44,11 +49,23 @@ Rectangle {
             ToolButton {
                 icon: 'back.png'
                 text: qsTr('Go back')
+                enabled: crumbs.count > 0
+
+                onClicked: {
+                    var crumb = crumbs.get(crumbs.count - 1);
+                    view.model.rootJid = crumb.jid;
+                    view.model.rootNode = crumb.node;
+                    crumbs.remove(crumbs.count - 1);
+                }
             }
 
             ToolButton {
                 icon: 'refresh.png'
                 text: qsTr('Refresh')
+
+                onClicked: {
+                    view.model.refresh();
+                }
             }
 
             ToolButton {
@@ -86,7 +103,17 @@ Rectangle {
             Text {
                 anchors.left: image.right
                 anchors.top: parent.top
-                text: '<b>' + model.name + '</b><br/>' + model.jid
+                text: '<b>' + model.name + '</b><br/>' + model.jid + (model.node ? ' (' + model.node + ')' : '')
+            }
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    crumbs.append({'jid': view.model.rootJid, 'node': view.model.rootNode});
+                    view.model.rootJid = model.jid;
+                    view.model.rootNode = model.node;
+                }
             }
         }
     }

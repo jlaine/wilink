@@ -22,9 +22,6 @@
 
 class Chat;
 class QAction;
-class QLineEdit;
-class QListWidget;
-class QListWidgetItem;
 class QXmppClient;
 class QXmppDiscoveryManager;
 
@@ -33,6 +30,8 @@ class QXmppDiscoveryManager;
 #include "chat_panel.h"
 #include "chat_model.h"
 
+/** The DiscoveryModel class represents a set of service discovery results.
+ */
 class DiscoveryModel : public ChatModel
 {
     Q_OBJECT
@@ -84,27 +83,7 @@ class DiscoveryPanel : public ChatPanel
     Q_OBJECT
 
 public:
-    DiscoveryPanel(Chat *chatWindow, QXmppClient *client, QWidget *parent);
-
-private slots:
-    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
-    void discoveryItemsReceived(const QXmppDiscoveryIq &disco);
-    void goBack();
-    void goForward(QListWidgetItem *item);
-    void goTo();
-    void slotShow();
-
-private:
-    void explore(const QXmppDiscoveryIq::Item &item);
-
-    QXmppClient *m_client;
-    QLineEdit *m_locationJid;
-    QLineEdit *m_locationNode;
-    QListWidget *m_listWidget;
-    QAction *m_backAction;
-    QList<QXmppDiscoveryIq::Item> m_trail;
-    QXmppDiscoveryManager *m_manager;
-    QStringList m_requests;
+    DiscoveryPanel(Chat *chatWindow);
 };
 
 #endif
