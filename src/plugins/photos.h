@@ -93,9 +93,9 @@ private:
     QUrl m_rootUrl;
 };
 
-/** The PhotosPanel class represents a panel for displaying photos.
+/** The PhotoPanel class represents a panel for displaying photos.
  */
-class PhotosPanel : public ChatPanel
+class PhotoPanel : public ChatPanel
 {
     Q_OBJECT
 
@@ -113,7 +113,7 @@ class PhotosPanel : public ChatPanel
     };
 
 public:
-    PhotosPanel(const QString &url, QWidget *parent = NULL);
+    PhotoPanel(const QString &url, QWidget *parent = NULL);
 
 protected:
     void processDownloadQueue();

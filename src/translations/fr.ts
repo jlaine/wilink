@@ -574,24 +574,9 @@ Acceptez-vous?</translation>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
-</context>
-<context>
-    <name>PhotosPanel</name>
     <message>
         <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
         <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
-    </message>
-    <message>
-        <source>Go back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Create an album</source>
-        <translation>Créer un album</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -632,10 +617,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Loading your albums..</source>
         <translation>Chargement de vos albums..</translation>
-    </message>
-    <message>
-        <source>Photos</source>
-        <translation>Photos</translation>
     </message>
 </context>
 <context>
