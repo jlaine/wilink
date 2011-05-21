@@ -905,10 +905,14 @@ void VCard::update()
         if (m_cache->get(m_jid, &vcard)) {
             newAvatar = QUrl("image://roster/" + m_jid);
             newName = vcard.nickName();
+            if (newName.isEmpty())
+                newName = vcard.fullName();
             newUrl = QUrl(vcard.url());
         } else {
             newAvatar = QUrl("qrc:/peer.png");
         }
+        if (newName.isEmpty())
+            newName = jidToUser(m_jid);
     }
 
     // notify changes
