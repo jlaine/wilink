@@ -18,6 +18,7 @@
  */
 
 #include <QAction>
+#include <QDateTime>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -35,6 +36,61 @@
 #include "chat_utils.h"
 
 #define CONSOLE_ROSTER_ID "0_console"
+
+enum LogRole {
+    ContentRole = ChatModel::UserRole,
+    DateRole,
+    TypeRole,
+};
+
+class LogItem : public ChatModelItem
+{
+public:
+    QString content;
+    QDateTime date;
+    QXmppLogger::MessageType type;
+};
+
+LogModel::LogModel(QObject *parent)
+    : ChatModel(parent),
+    m_enabled(false)
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ContentRole, "content");
+    roleNames.insert(DateRole, "date");
+    roleNames.insert(TypeRole, "type");
+    setRoleNames(roleNames);
+}
+
+QVariant LogModel::data(const QModelIndex &index, int role) const
+{
+    LogItem *item = static_cast<LogItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == ContentRole)
+        return item->content;
+    else if (role == DateRole)
+        return item->date;
+    else if (role == TypeRole)
+        return item->type;
+
+    return QVariant();
+}
+
+bool LogModel::enabled() const
+{
+    return m_enabled;
+}
+
+void LogModel::setEnabled(bool enabled)
+{
+    if (m_enabled == enabled)
+        return;
+
+    m_enabled = enabled;
+    emit enabledChanged(m_enabled);
+}
 
 /** Constructs a ConsolePanel.
  */

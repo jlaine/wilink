@@ -19,6 +19,10 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QDomElement>
 #include <QLineEdit>
 #include <QLayout>

@@ -27,12 +27,34 @@
 
 #include "QXmppLogger.h"
 
+#include "chat_model.h"
 #include "chat_panel.h"
 
 class Chat;
 class ChatSearchBar;
 class Highlighter;
 class QTextBrowser;
+
+class LogModel : public ChatModel
+{
+    Q_OBJECT
+    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+
+public:
+    LogModel(QObject *parent = 0);
+
+    bool enabled() const;
+    void setEnabled(bool enabled);
+
+    // QAbstractItemModel
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+signals:
+    void enabledChanged(bool enabled);
+
+private:
+    bool m_enabled;
+};
 
 /** The ConsolePanel class represents a panel for display debugging
  *  information.
