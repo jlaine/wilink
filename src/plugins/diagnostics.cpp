@@ -60,30 +60,6 @@ static int id4 = qRegisterMetaType< Interface >();
 
 /* NETWORK */
 
-void DiagnosticsAgent::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
-{
-    bool check;
-
-    if (!diagnosticsThread)
-        diagnosticsThread = new QThread;
-
-    DiagnosticsAgent *agent = new DiagnosticsAgent;
-    agent->moveToThread(diagnosticsThread);
-    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
-                    receiver, member);
-    Q_ASSERT(check);
-
-    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
-                    agent, SLOT(deleteLater()));
-    Q_ASSERT(check);
-    
-    QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
-        Q_ARG(DiagnosticsIq, request));
-
-    if (!diagnosticsThread->isRunning())
-        diagnosticsThread->start();
-}
-
 void DiagnosticsAgent::handle(const DiagnosticsIq &request)
 {
     iq.setId(request.id());
@@ -258,6 +234,91 @@ public:
     };
 };
 
+static QString makeItem(const QString &title, const QString &value)
+{
+    return QString("<h3>%1</h3>%2").arg(title, value);
+}
+
+static QString makeSection(const QString &title)
+{
+    return QString("<h2>%1</h2>").arg(title);
+}
+
+static QString dumpInterface(const Interface &result)
+{
+    const bool showCinr = false;
+    QString text = makeSection("Network interface " + result.name());
+
+    // addresses
+    TextList list;
+    foreach (const QNetworkAddressEntry &entry, result.addressEntries())
+    {
+        QString protocol;
+        if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
+            protocol = "IPv4";
+        else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
+            protocol = "IPv6";
+        else
+            continue;
+        list << protocol + " address: " + entry.ip().toString();
+        list << protocol + " netmask: " + entry.netmask().toString();
+    }
+    text += makeItem("Addresses",
+        list.size() ? list.render() : "<p>No address</p>");
+
+    // wireless
+    if (result.wirelessStandards())
+        text += makeItem("Wireless standards", result.wirelessStandards().toString());
+
+    if (!result.wirelessNetworks().isEmpty())
+    {
+        TextTable table;
+        TextRow titles(true);
+        titles << "SSID" << "RSSI";
+        if (showCinr)
+            titles << "CINR";
+        titles << "";
+        table << titles;
+        foreach (const WirelessNetwork &network, result.wirelessNetworks())
+        {
+            TextRow row;
+            row << network.ssid();
+            row << QString::number(network.rssi()) + " dBm";
+            if (showCinr)
+                row << (network.cinr() ? QString::number(network.cinr()) : QString());
+            row << (network.isCurrent() ? "<b>*</b>" : "");
+            table << row;
+        }
+        text += makeItem("Wireless networks", table.render());
+    }
+    return text;
+}
+
+static QString dumpLookup(const QList<QHostInfo> &results)
+{
+    TextTable table;
+    TextRow titles(true);
+    titles << "Host name" << "Host address";
+    table << titles;
+    foreach (const QHostInfo &hostInfo, results)
+    {
+        QString hostAddress = "not found";
+        foreach (const QHostAddress &address, hostInfo.addresses())
+        {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                hostAddress = address.toString();
+                break;
+            }
+        }
+        TextRow row;
+        row.setColor(hostInfo.error() == QHostInfo::NoError ? "green" : "red");
+        row << hostInfo.hostName() << hostAddress;
+        table << row;
+    }
+    return makeItem("DNS", table.render());
+}
+
 static QString dumpPings(const QList<Ping> &pings)
 {
     TextTable table;
@@ -331,16 +392,6 @@ DiagnosticsPanel::~DiagnosticsPanel()
 {
 }
 
-void DiagnosticsPanel::addItem(const QString &title, const QString &value)
-{
-    text->append(QString("<h3>%1</h3>%2").arg(title, value));
-}
-
-void DiagnosticsPanel::addSection(const QString &title)
-{
-    text->append(QString("<h2>%1</h2>").arg(title));
-}
-
 void DiagnosticsPanel::refresh()
 {
     if (m_timer->isActive())
@@ -348,7 +399,7 @@ void DiagnosticsPanel::refresh()
     refreshAction->setEnabled(false);
 
     showMessage("Running diagnostics..");
-    DiagnosticsAgent::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
+    DiagnosticsExtension::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
     m_timer->start();
 }
 
@@ -366,30 +417,7 @@ void DiagnosticsPanel::slotShow()
     m_displayed = true;
 }
 
-void DiagnosticsPanel::showLookup(const QList<QHostInfo> &results)
-{
-    TextTable table;
-    TextRow titles(true);
-    titles << "Host name" << "Host address";
-    table << titles;
-    foreach (const QHostInfo &hostInfo, results)
-    {
-        QString hostAddress = "not found";
-        foreach (const QHostAddress &address, hostInfo.addresses())
-        {
-            if (address.protocol() == QAbstractSocket::IPv4Protocol)
-            {
-                hostAddress = address.toString();
-                break;
-            }
-        }
-        TextRow row;
-        row.setColor(hostInfo.error() == QHostInfo::NoError ? "green" : "red");
-        row << hostInfo.hostName() << hostAddress;
-        table << row;
-    }
-    addItem("DNS", table.render());
-}
+
 
 void DiagnosticsPanel::showMessage(const QString &msg)
 {
@@ -414,6 +442,7 @@ void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
         showMessage(QString("Diagnostics for %1").arg(iq.from()));
 
     // show software
+    QString text;
     TextList list;
     foreach (const Software &software, iq.softwares())
     {
@@ -426,68 +455,18 @@ void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
             title = software.type();
         list << QString("%1: %2 %3").arg(title, software.name(), software.version());
     }
-    addItem("Software", list.render());
+    text += makeItem("Software", list.render());
 
     // show interfaces
     foreach (const Interface &interface, iq.interfaces())
-        showInterface(interface);
+        text += dumpInterface(interface);
 
     // show tests
-    addSection("Tests");
-    showLookup(iq.lookups());
-    addItem("Ping", dumpPings(iq.pings()));
+    text += makeSection("Tests");
+    text += dumpLookup(iq.lookups());
+    text += makeItem("Ping", dumpPings(iq.pings()));
     foreach (const Traceroute &traceroute, iq.traceroutes())
-        addItem("Traceroute", dumpPings(traceroute));
-
-}
-
-void DiagnosticsPanel::showInterface(const Interface &result)
-{
-    const bool showCinr = false;
-    addSection("Network interface " + result.name());
-
-    // addresses
-    TextList list;
-    foreach (const QNetworkAddressEntry &entry, result.addressEntries())
-    {
-        QString protocol;
-        if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol)
-            protocol = "IPv4";
-        else if (entry.ip().protocol() == QAbstractSocket::IPv6Protocol)
-            protocol = "IPv6";
-        else
-            continue;
-        list << protocol + " address: " + entry.ip().toString();
-        list << protocol + " netmask: " + entry.netmask().toString();
-    }
-    addItem("Addresses",
-        list.size() ? list.render() : "<p>No address</p>");
-
-    // wireless
-    if (result.wirelessStandards())
-        addItem("Wireless standards", result.wirelessStandards().toString());
-
-    if (!result.wirelessNetworks().isEmpty())
-    {
-        TextTable table;
-        TextRow titles(true);
-        titles << "SSID" << "RSSI";
-        if (showCinr)
-            titles << "CINR";
-        titles << "";
-        table << titles;
-        foreach (const WirelessNetwork &network, result.wirelessNetworks())
-        {
-            TextRow row;
-            row << network.ssid();
-            row << QString::number(network.rssi()) + " dBm";
-            if (showCinr)
-                row << (network.cinr() ? QString::number(network.cinr()) : QString());
-            row << (network.isCurrent() ? "<b>*</b>" : "");
-            table << row;
-        }
-        addItem("Wireless networks", table.render());
-    }
+        text += makeItem("Traceroute", dumpPings(traceroute));
 }
 
 // EXTENSION
@@ -528,7 +507,7 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
         if (iq.type() == QXmppIq::Get)
         {
             if (iq.from() == m_diagnosticsServer)
-                DiagnosticsAgent::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
+                DiagnosticsExtension::lookup(iq, this, SLOT(handleResults(DiagnosticsIq)));
             else
             {
                 DiagnosticsIq response;
@@ -545,6 +524,30 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
         return true;
     }
     return false;
+}
+
+void DiagnosticsExtension::lookup(const DiagnosticsIq &request, QObject *receiver, const char *member)
+{
+    bool check;
+
+    if (!diagnosticsThread)
+        diagnosticsThread = new QThread;
+
+    DiagnosticsAgent *agent = new DiagnosticsAgent;
+    agent->moveToThread(diagnosticsThread);
+    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
+                    receiver, member);
+    Q_ASSERT(check);
+
+    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
+                    agent, SLOT(deleteLater()));
+    Q_ASSERT(check);
+
+    QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
+        Q_ARG(DiagnosticsIq, request));
+
+    if (!diagnosticsThread->isRunning())
+        diagnosticsThread->start();
 }
 
 void DiagnosticsExtension::requestDiagnostics(const QString &jid)

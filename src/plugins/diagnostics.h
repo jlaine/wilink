@@ -45,10 +45,6 @@ private slots:
     void timeout();
 
 private:
-    void addItem(const QString &title, const QString &value);
-    void addSection(const QString &title);
-    void showInterface(const Interface &result);
-    void showLookup(const QList<QHostInfo> &results);
     void showMessage(const QString &msg);
 
     QAction *refreshAction;
@@ -73,6 +69,8 @@ public:
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
+    static void lookup(const DiagnosticsIq &request, QObject *receiver, const char *member);
+
 signals:
     void diagnosticsReceived(const DiagnosticsIq &diagnostics);
 
@@ -89,9 +87,6 @@ class DiagnosticsAgent : public QObject
     Q_OBJECT
 
 public:
-    static void lookup(const DiagnosticsIq &request, QObject *receiver, const char *member);
-
-private:
     DiagnosticsAgent(QObject *parent = 0) : QObject(parent) {};
 
 private slots:
