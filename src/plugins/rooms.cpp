@@ -416,8 +416,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     QXmppClient *client = chat->client();
 
     setObjectName(jid);
-    setWindowTitle(jidToUser(jid));
-    setWindowIcon(QIcon(":/chat.png"));
 
     // prepare models
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
@@ -443,8 +441,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     // header
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
-    layout->setSpacing(0);
-    //layout->addLayout(headerLayout());
 
     // chat history
 

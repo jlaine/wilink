@@ -49,11 +49,8 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
 {
     bool check;
 
-    setWindowIcon(QIcon(":/phone.png"));
-    setWindowTitle(tr("Phone"));
-
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
+    setLayout(layout);
 
     // declarative
     declarativeView = new QDeclarativeView;
@@ -68,7 +65,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     Q_ASSERT(m_callsModel);
     layout->addWidget(declarativeView, 1);
 
-    setLayout(layout);
     setFocusProxy(declarativeView);
 
     // connect signals
