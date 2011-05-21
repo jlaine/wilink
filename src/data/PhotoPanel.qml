@@ -112,7 +112,7 @@ Panel {
                 Image {
                     id: image
                     anchors.horizontalCenter: parent.horizontalCenter
-                    source: model.isDir ? 'album-128.png' : 'file-128.png'
+                    source: model.avatar
                 }
 
                 Text {

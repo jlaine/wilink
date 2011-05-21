@@ -335,7 +335,13 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == IsDirRole)
+    if (role == AvatarRole) {
+        if (item->isDir()) {
+            return QUrl("qrc:/album-128.png");
+        } else {
+            return QUrl("qrc:/file-128.png");
+        }
+    } else if (role == IsDirRole)
         return item->isDir();
     else if (role == NameRole)
         return item->name();
