@@ -19,9 +19,8 @@
 
 import QtQuick 1.0
 
-Rectangle {
-    width: 320
-    height: 400
+Panel {
+    id: panel
 
     Component {
         id: playerDelegate

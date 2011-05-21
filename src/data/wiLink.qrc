@@ -66,6 +66,7 @@
     <file>KeyPad.qml</file>
     <file>LogPanel.qml</file>
     <file>Menu.qml</file>
+    <file>Panel.qml</file>
     <file>PanelHeader.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>PhonePanel.qml</file>

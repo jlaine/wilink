@@ -19,12 +19,8 @@
 
 import QtQuick 1.0
 
-Item {
-    id: block
-
-    anchors.fill: parent
-    width: 320
-    height: 240
+Panel {
+    id: panel
 
     PanelHeader {
         id: header

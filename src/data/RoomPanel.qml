@@ -21,9 +21,8 @@ import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 1.2
 
-Rectangle {
-    width: 320
-    height: 400
+Panel {
+    id: panel
 
     VCard {
         id: ownCard

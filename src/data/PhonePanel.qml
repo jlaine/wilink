@@ -21,12 +21,10 @@ import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 1.2
 
-Item {
-    property QtObject historyModel: PhoneCallsModel {}
+Panel {
+    id: panel
 
-    anchors.fill: parent
-    width: 320
-    height: 240
+    property QtObject historyModel: PhoneCallsModel {}
 
     // Builds a full SIP address from a short recipient
     function buildAddress(recipient, sipDomain)

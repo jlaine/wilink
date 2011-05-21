@@ -20,10 +20,8 @@
 import QtQuick 1.0
 import wiLink 1.2
 
-Rectangle {
+Panel {
     id: panel
-    width: 320
-    height: 400
 
     PanelHeader {
         id: header
