@@ -431,14 +431,14 @@ void DiagnosticsPanel::refresh()
         return;
     refreshAction->setEnabled(false);
 
-    showMessage("Running diagnostics..");
+    text->setText(makeSection("Running diagnostics.."));
     DiagnosticsExtension::lookup(DiagnosticsIq(), this, SLOT(showResults(DiagnosticsIq)));
     m_timer->start();
 }
 
 void DiagnosticsPanel::timeout()
 {
-    showMessage("Request timed out.");
+    text->setText(makeSection("Diagnostics timed out."));
     refreshAction->setEnabled(true);
 }
 
@@ -450,13 +450,6 @@ void DiagnosticsPanel::slotShow()
     m_displayed = true;
 }
 
-
-
-void DiagnosticsPanel::showMessage(const QString &msg)
-{
-    text->setText(QString("<h2>%1</h2>").arg(msg));
-}
-
 void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
 {
     // enable buttons
@@ -465,7 +458,7 @@ void DiagnosticsPanel::showResults(const DiagnosticsIq &iq)
 
     if (iq.type() == QXmppIq::Error)
     {
-        showMessage("Diagnostics failed");
+        text->setText(makeSection("Diagnostics failed."));
         return;
     }
 

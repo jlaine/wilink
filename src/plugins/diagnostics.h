@@ -45,8 +45,6 @@ private slots:
     void timeout();
 
 private:
-    void showMessage(const QString &msg);
-
     QAction *refreshAction;
     QTextBrowser *text;
 
