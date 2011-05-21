@@ -96,6 +96,7 @@ class PhotoModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
+
 public:
     PhotoModel(QObject *parent = 0);
 
@@ -113,6 +114,7 @@ public slots:
 
 private slots:
     void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void photoChanged(const QUrl &url);
     void putProgress(int done, int total);
 
 private:

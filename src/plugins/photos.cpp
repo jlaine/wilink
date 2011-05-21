@@ -352,6 +352,9 @@ PhotoModel::PhotoModel(QObject *parent)
     names.insert(IsDirRole, "isDir");
     names.insert(SizeRole, "size");
     setRoleNames(names);
+
+    connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl)),
+            this, SLOT(photoChanged(QUrl)));
 }
 
 /** When a command finishes, process its results.
@@ -469,6 +472,15 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     else if (role == UrlRole)
         return item->url();
     return QVariant();
+}
+
+void PhotoModel::photoChanged(const QUrl &url)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        PhotoItem *item = static_cast<PhotoItem*>(ptr);
+        if (item->url() == url)
+            emit dataChanged(createIndex(item), createIndex(item));
+    }
 }
 
 /** TODO: Update the progress bar for the current upload.
