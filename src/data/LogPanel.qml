@@ -76,7 +76,7 @@ Rectangle {
         id: view
 
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
 
@@ -88,14 +88,39 @@ Rectangle {
 
         delegate: Rectangle {
             width: view.width - 1
-            height: 34
+            height: content.paintedHeight + 2
 
             Text {
+                id: date
+
                 anchors.left: parent.left
                 anchors.top: parent.top
-                text: '<b>' + model.date + '</b><br/>' + model.content
+                text: '<b>' + Qt.formatDateTime(model.date, 'hh:mm:ss') + '</b>'
+                width: 70
+            }
+
+            Text {
+                id: content
+
+                anchors.top: parent.top
+                anchors.left: date.right
+                anchors.right: parent.right
+                text: model.content
+                textFormat: Text.PlainText
+                wrapMode: Text.WordWrap
             }
         }
     }
+
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: view
+    }
+
 }
 
