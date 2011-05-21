@@ -43,11 +43,10 @@ Rectangle {
 
             ToolButton {
                 icon: 'refresh.png'
+                enabled: !diagnosticsManager.running
                 text: qsTr('Refresh')
 
-                onClicked: {
-                    view.model.refresh();
-                }
+                onClicked: diagnostiscManager.refresh();
             }
 
             ToolButton {
