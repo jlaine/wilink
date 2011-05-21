@@ -69,6 +69,29 @@ private:
     FileInfoList fileList;
 };
 
+class PhotoCache : public QObject
+{
+    Q_OBJECT
+
+public:
+    static PhotoCache *instance();
+    QUrl imageUrl(const QUrl &url, FileSystem *fs);
+
+signals:
+    void photoChanged(const QUrl &url);
+
+private slots:
+    void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void processQueue();
+
+private:
+    PhotoCache();
+    QSet<FileSystem*> m_fileSystems;
+    QList<QPair<QUrl, FileSystem*> > m_downloadQueue;
+    QUrl m_downloadUrl;
+    QIODevice *m_downloadDevice;
+};
+
 class PhotoModel : public ChatModel
 {
     Q_OBJECT

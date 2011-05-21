@@ -20,9 +20,11 @@
 #include <QAction>
 #include <QApplication>
 #include <QBuffer>
+#include <QCache>
 #include <QDebug>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#include <QDeclarativeImageProvider>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDragEnterEvent>
@@ -52,6 +54,9 @@
 static const int PROGRESS_STEPS = 100;
 static const QSize ICON_SIZE(128, 128);
 static const QSize UPLOAD_SIZE(2048, 2048);
+
+static PhotoCache *photoCache = 0;
+static QCache<QUrl, QImage> photoImageCache;
 
 enum PhotoRole
 {
@@ -221,6 +226,118 @@ QUrl PhotosList::url()
     return baseUrl;
 }
 
+PhotoCache::PhotoCache()
+    : m_downloadDevice(0)
+{
+}
+
+void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &results)
+{
+    if (cmd != FileSystem::Get)
+        return;
+
+    Q_ASSERT(m_downloadDevice);
+
+    if (error) {
+        m_downloadDevice->deleteLater();
+        m_downloadDevice = 0;
+    } else {
+        qDebug("got image %s", qPrintable(m_downloadUrl.toString()));
+
+        // load image
+        m_downloadDevice->reset();
+        QImage *image = new QImage;
+        image->load(m_downloadDevice, NULL);
+        m_downloadDevice->close();
+        m_downloadDevice->deleteLater();
+        m_downloadDevice = 0;
+
+        photoImageCache.insert(m_downloadUrl, image);
+        emit photoChanged(m_downloadUrl);
+    }
+
+    processQueue();
+}
+
+QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem *fs)
+{
+    if (photoImageCache.contains(url)) {
+        QUrl cacheUrl("image://photo");
+        cacheUrl.setPath("/" + url.toString());
+        return cacheUrl;
+    }
+
+    // check if the url is already queued
+    bool found = false;
+    QPair<QUrl, FileSystem*> job;
+    foreach (job, m_downloadQueue) {
+        if (job.first == url) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        m_downloadQueue.append(qMakePair(url, fs));
+        processQueue();
+    }
+
+    return QUrl(":/file-128.png");
+}
+
+PhotoCache *PhotoCache::instance()
+{
+    if (!photoCache)
+        photoCache = new PhotoCache;
+    return photoCache;
+}
+
+void PhotoCache::processQueue()
+{
+    if (m_downloadDevice || m_downloadQueue.isEmpty())
+        return;
+
+    QPair<QUrl, FileSystem*> job = m_downloadQueue.takeFirst();
+    FileSystem *fs = job.second;
+    if (!m_fileSystems.contains(fs)) {
+        m_fileSystems << fs;
+        connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+                this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+    }
+    m_downloadUrl = job.first;
+    m_downloadDevice = fs->get(m_downloadUrl, FileSystem::SmallSize);
+}
+
+class PhotoImageProvider : public QDeclarativeImageProvider
+{
+public:
+    PhotoImageProvider();
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+};
+
+PhotoImageProvider::PhotoImageProvider()
+    : QDeclarativeImageProvider(Image)
+{
+}
+
+QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
+{
+    QImage image;
+    QImage *cached = photoImageCache.object(QUrl(id));
+    if (cached) {
+        image = *cached;
+    } else {
+        qWarning("Could not get photo for %s", qPrintable(id));
+        image = QImage(":/file-128.png");
+    }
+
+    if (requestedSize.isValid())
+        image = image.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
+
+    if (size)
+        *size = image.size();
+    return image;
+}
+
 class PhotoItem : public ChatModelItem, public FileInfo
 {
 public:
@@ -293,8 +410,10 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
 
         removeRows(0, rootItem->children.size());
         foreach (const FileInfo& info, results) {
-            PhotoItem *item = new PhotoItem(info);
-            addItem(item, rootItem);
+            if (info.isDir() || isImage(info.name())) {
+                PhotoItem *item = new PhotoItem(info);
+                addItem(item, rootItem);
+            }
         }
 #if 0
         /* fetch thumbnails */
@@ -324,13 +443,13 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
             refresh();
         break;
     default:
-        qWarning() << m_fs->commandName(cmd) << "was not expected";
         break;
     }
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
 {
+    Q_ASSERT(m_fs);
     PhotoItem *item = static_cast<PhotoItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
@@ -339,7 +458,7 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
         if (item->isDir()) {
             return QUrl("qrc:/album-128.png");
         } else {
-            return QUrl("qrc:/file-128.png");
+            return PhotoCache::instance()->imageUrl(item->url(), m_fs);
         }
     } else if (role == IsDirRole)
         return item->isDir();
@@ -473,6 +592,7 @@ PhotoPanel::PhotoPanel(const QString &url, QWidget *parent)
     //context->setContextProperty("window", chatWindow);
     context->setContextProperty("baseUrl", QVariant::fromValue(url));
 
+    declarativeView->engine()->addImageProvider("photo", new PhotoImageProvider);
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/PhotoPanel.qml"));
     layout->addWidget(declarativeView);
