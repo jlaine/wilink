@@ -168,10 +168,12 @@ void PhonePanel::openUrl(const QUrl &url)
     if (url.scheme() != "sip")
         return;
 
-    const QString phoneNumber = url.path().split('@').first();
-    const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
-    if (m_callsModel->call(recipient))
-        emit showPanel();
+    if (!url.path().isEmpty()) {
+        const QString phoneNumber = url.path().split('@').first();
+        const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
+        m_callsModel->call(recipient);
+    }
+    emit showPanel();
 }
 
 // PLUGIN

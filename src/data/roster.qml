@@ -40,7 +40,11 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
 
-            ToolButton { text: 'Phone'; icon: 'phone.png' }
+            ToolButton {
+                text: 'Phone'
+                icon: 'phone.png'
+                onClicked: Qt.openUrlExternally('sip://')
+            }
             ToolButton { text: 'Photos'; icon: 'photos.png'; visible: false }
             ToolButton { text: 'Shares'; icon: 'share.png'; enabled: false }
         }
