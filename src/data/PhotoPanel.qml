@@ -23,6 +23,10 @@ import wiLink 1.2
 Panel {
     id: panel
 
+    ListModel {
+        id: crumbs
+    }
+
     PanelHeader {
         id: header
 
@@ -41,8 +45,14 @@ Panel {
 
             ToolButton {
                 icon: 'back.png'
-                enabled: false
+                enabled: crumbs.count > 0
                 text: qsTr('Go back')
+
+                onClicked: {
+                    var crumb = crumbs.get(crumbs.count - 1);
+                    view.model.rootUrl = crumb.url;
+                    crumbs.remove(crumbs.count - 1);
+                }
             }
 
             ToolButton {
@@ -116,6 +126,7 @@ Panel {
                 anchors.fill: parent
                 hoverEnabled: true
                 onDoubleClicked: {
+                    crumbs.append({'url': view.model.rootUrl})
                     view.model.rootUrl = model.url;
                 }
 
