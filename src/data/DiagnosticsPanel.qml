@@ -68,7 +68,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
 
-            text: 'foo bar'
+            text: diagnosticsManager.html
         }
     }
 }

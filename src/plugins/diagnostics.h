@@ -26,7 +26,7 @@
 #include "diagnostics/iq.h"
 
 class Chat;
-class QTextBrowser;
+class DiagnosticsExtension;
 class QTimer;
 
 /** The DiagnosticsPanel represents panel for displaying diagnostics results.
@@ -37,48 +37,50 @@ class DiagnosticsPanel : public ChatPanel
 
 public:
     DiagnosticsPanel(Chat *chatWindow, QXmppClient *client);
-    ~DiagnosticsPanel();
 
 private slots:
-    void refresh();
-    void showResults(const DiagnosticsIq &iq);
     void slotShow();
-    void timeout();
 
 private:
-    QAction *refreshAction;
-    QTextBrowser *text;
-
     QXmppClient *m_client;
     bool m_displayed;
-    QTimer *m_timer;
+    DiagnosticsExtension *m_manager;
 };
 
 class DiagnosticsExtension : public QXmppClientExtension
 {
     Q_OBJECT
+    Q_PROPERTY(QString html READ html NOTIFY htmlChanged)
+    Q_PROPERTY(bool running READ running NOTIFY runningChanged)
 
 public:
     DiagnosticsExtension(QXmppClient *client);
 
-    void requestDiagnostics(const QString &jid);
+    QString html() const;
+    bool running() const;
 
     /// \cond
     QStringList discoveryFeatures() const;
     bool handleStanza(const QDomElement &element);
     /// \endcond
 
-    static void lookup(const DiagnosticsIq &request, QObject *receiver, const char *member);
-
 signals:
-    void diagnosticsReceived(const DiagnosticsIq &diagnostics);
+    void htmlChanged(const QString &html);
+    void runningChanged(bool running);
+
+public slots:
+    void refresh();
 
 private slots:
     void diagnosticsServerFound(const QString &diagServer);
     void handleResults(const DiagnosticsIq &results);
 
 private:
+    void run(const DiagnosticsIq &request);
+
     QString m_diagnosticsServer;
+    QString m_html;
+    QThread *m_thread;
 };
 
 class DiagnosticsAgent : public QObject
