@@ -554,20 +554,11 @@ bool DiagnosticsPlugin::initialize(Chat *chat)
     diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
     chat->addPanel(diagnostics);
 
-    /* add menu entry */
-    QList<QAction*> actions = chat->fileMenu()->actions();
-    QAction *firstAction = actions.isEmpty() ? 0 : actions.first();
-    QAction *action = new QAction(diagnostics->windowIcon(), diagnostics->windowTitle(), chat->fileMenu());
-    chat->fileMenu()->insertAction(firstAction, action);
-    check = connect(action, SIGNAL(triggered()),
-                    diagnostics, SIGNAL(showPanel()));
-    Q_ASSERT(check);
-
     /* register shortcut */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I), chat);
-    check = connect(shortcut, SIGNAL(activated()),
-                    diagnostics, SIGNAL(showPanel()));
-    Q_ASSERT(check);
+    QAction *action = chat->addAction(QIcon(":/diagnostics.png"), "Diags");
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
+    connect(action, SIGNAL(triggered()),
+            diagnostics, SIGNAL(showPanel()));
     return true;
 }
 

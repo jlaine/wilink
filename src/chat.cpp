@@ -81,7 +81,6 @@ class ChatPrivate
 {
 public:
     QToolBar *actions;
-    QMenu *fileMenu;
     QAction *findAction;
     QAction *findAgainAction;
 
@@ -162,7 +161,7 @@ Chat::Chat(QWidget *parent)
 
     // create declarative view
     d->rosterView = new QDeclarativeView;
-    d->rosterView->setMinimumWidth(200);
+    d->rosterView->setMinimumWidth(240);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
 
@@ -190,23 +189,23 @@ Chat::Chat(QWidget *parent)
     statusBar()->setSizeGripEnabled(false);
     statusBar()->addPermanentWidget(new ChatStatus(d->client));
 
-   /* create menu */
-    d->fileMenu = menuBar()->addMenu(tr("&File"));
+    /* "File" menu */
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
-    QAction *action = d->fileMenu->addAction(QIcon(":/options.png"), tr("&Preferences"));
+    QAction *action = fileMenu->addAction(QIcon(":/options.png"), tr("&Preferences"));
     action->setMenuRole(QAction::PreferencesRole);
     connect(action, SIGNAL(triggered()), this, SLOT(showPreferences()));
 
-    action = d->fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
+    action = fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
 
     if (wApp->updatesDialog())
     {
-        action = d->fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
+        action = fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
         connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
     }
 
-    action = d->fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    action = fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     action->setMenuRole(QAction::QuitRole);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
@@ -646,13 +645,6 @@ bool Chat::open(const QString &jid)
 void Chat::openUrl(const QUrl &url)
 {
     emit urlClick(url);
-}
-
-/** Return this window's "File" menu.
- */
-QMenu *Chat::fileMenu()
-{
-    return d->fileMenu;
 }
 
 /** Handle a click on a system tray message.
