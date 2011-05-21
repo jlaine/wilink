@@ -39,6 +39,7 @@ class LogModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
 
 public:
     LogModel(QObject *parent = 0);
@@ -46,14 +47,22 @@ public:
     bool enabled() const;
     void setEnabled(bool enabled);
 
+    QXmppLogger* logger() const;
+    void setLogger(QXmppLogger *logger);
+
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
     void enabledChanged(bool enabled);
+    void loggerChanged(QXmppLogger *logger);
+
+private slots:
+    void messageReceived(QXmppLogger::MessageType type, const QString &msg);
 
 private:
     bool m_enabled;
+    QXmppLogger *m_logger;
 };
 
 /** The ConsolePanel class represents a panel for display debugging

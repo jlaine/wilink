@@ -464,6 +464,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>LogPanel</name>
+    <message>
+        <source>Debugging console</source>
+        <translation>Console de débogage</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>Menu</name>
     <message>
         <source>&amp;Services</source>

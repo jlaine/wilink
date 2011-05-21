@@ -133,6 +133,7 @@ if(RELOAD_TRANSLATIONS)
         data/ConversationPanel.qml
         data/Dialog.qml
         data/DiscoveryPanel.qml
+        data/LogPanel.qml
         data/RoomInviteDialog.qml
         data/RoomParticipantView.qml
         data/PhoneHistoryView.qml

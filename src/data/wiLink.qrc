@@ -63,6 +63,7 @@
     <file>DiscoveryPanel.qml</file>
     <file>HistoryView.qml</file>
     <file>KeyPad.qml</file>
+    <file>LogPanel.qml</file>
     <file>Menu.qml</file>
     <file>PanelHeader.qml</file>
     <file>PhoneHistoryView.qml</file>

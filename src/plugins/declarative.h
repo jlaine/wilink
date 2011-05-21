@@ -42,6 +42,7 @@ class QXmppDeclarativeClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
+    Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
 
@@ -49,6 +50,7 @@ public:
     QXmppDeclarativeClient(QXmppClient *client);
 
     QString jid() const;
+    QXmppLogger *logger() const;
     QXmppDiscoveryManager *discoveryManager() const;
     QXmppRosterManager *rosterManager() const;
 

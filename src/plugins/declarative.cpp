@@ -82,6 +82,11 @@ QString QXmppDeclarativeClient::jid() const
     return m_client->configuration().jid();
 }
 
+QXmppLogger *QXmppDeclarativeClient::logger() const
+{
+    return m_client->logger();
+}
+
 QXmppDiscoveryManager *QXmppDeclarativeClient::discoveryManager() const
 {
     return m_client->findExtension<QXmppDiscoveryManager>();

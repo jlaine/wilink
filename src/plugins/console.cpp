@@ -19,6 +19,10 @@
 
 #include <QAction>
 #include <QDateTime>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#include <QDeclarativeView>
 #include <QLabel>
 #include <QLayout>
 #include <QMenu>
@@ -33,6 +37,7 @@
 #include "chat_plugin.h"
 #include "chat_search.h"
 #include "console.h"
+#include "declarative.h"
 #include "chat_utils.h"
 
 #define CONSOLE_ROSTER_ID "0_console"
@@ -53,7 +58,8 @@ public:
 
 LogModel::LogModel(QObject *parent)
     : ChatModel(parent),
-    m_enabled(false)
+    m_enabled(true),
+    m_logger(0)
 {
     QHash<int, QByteArray> roleNames;
     roleNames.insert(ContentRole, "content");
@@ -85,11 +91,42 @@ bool LogModel::enabled() const
 
 void LogModel::setEnabled(bool enabled)
 {
-    if (m_enabled == enabled)
+    if (m_enabled != enabled) {
+        m_enabled = enabled;
+        emit enabledChanged(m_enabled);
+    }
+}
+
+QXmppLogger *LogModel::logger() const
+{
+    return m_logger;
+}
+
+void LogModel::setLogger(QXmppLogger *logger)
+{
+    if (m_logger != logger) {
+        if (m_logger)
+            disconnect(m_logger, SIGNAL(message(QXmppLogger::MessageType,QString)),
+                       this, SLOT(messageReceived(QXmppLogger::MessageType,QString)));
+        if (logger)
+            connect(logger, SIGNAL(message(QXmppLogger::MessageType,QString)),
+                    this, SLOT(messageReceived(QXmppLogger::MessageType,QString)));
+
+        m_logger = logger;
+        emit loggerChanged(m_logger);
+    }
+}
+
+void LogModel::messageReceived(QXmppLogger::MessageType type, const QString &msg)
+{
+    if (!m_enabled)
         return;
 
-    m_enabled = enabled;
-    emit enabledChanged(m_enabled);
+    LogItem *item = new LogItem;
+    item->content = msg;
+    item->date = QDateTime::currentDateTime();
+    item->type = type;
+    addItem(item, rootItem, rootItem->children.size());
 }
 
 /** Constructs a ConsolePanel.
@@ -111,6 +148,16 @@ ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *paren
     browser = new QTextBrowser;
     layout->addWidget(browser);
     highlighter = new Highlighter(browser->document());
+
+    // declarative
+    QDeclarativeView *declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
+    context->setContextProperty("client", new QXmppDeclarativeClient(chatWindow->client()));
+    context->setContextProperty("window", chatWindow);
+
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/LogPanel.qml"));
+    layout->addWidget(declarativeView);
 
     // search box
     searchBar = new ChatSearchBar;
