@@ -402,6 +402,10 @@ DiagnosticsPanel::DiagnosticsPanel(Chat *chatWindow, QXmppClient *client)
     layout->addWidget(declarativeView);
 
     // connect signals
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
+
     check = connect(this, SIGNAL(showPanel()),
                     this, SLOT(slotShow()));
     Q_ASSERT(check);

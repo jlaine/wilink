@@ -143,8 +143,10 @@ void LogModel::messageReceived(QXmppLogger::MessageType type, const QString &msg
 ConsolePanel::ConsolePanel(Chat *chatWindow)
     : ChatPanel(chatWindow)
 {
+    bool check;
+
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing(0);
+    setLayout(layout);
 
     // declarative
     QDeclarativeView *declarativeView = new QDeclarativeView;
@@ -156,12 +158,16 @@ ConsolePanel::ConsolePanel(Chat *chatWindow)
     declarativeView->setSource(QUrl("qrc:/LogPanel.qml"));
 
     layout->addWidget(declarativeView);
-    setLayout(layout);
+
+    // connect signals
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
 
     // register shortcut
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chatWindow);
-    bool check = connect(shortcut, SIGNAL(activated()),
-                         this, SIGNAL(showPanel()));
+    check = connect(shortcut, SIGNAL(activated()),
+                    this, SIGNAL(showPanel()));
     Q_ASSERT(check);
 }
 

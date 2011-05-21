@@ -68,6 +68,10 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     setFocusProxy(declarativeView);
 
     // connect signals
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
+
     check = connect(m_callsModel->client(), SIGNAL(callReceived(SipCall*)),
                     this, SLOT(callReceived(SipCall*)));
     Q_ASSERT(check);

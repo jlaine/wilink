@@ -192,8 +192,10 @@ void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
 DiscoveryPanel::DiscoveryPanel(Chat *chatWindow)
     : ChatPanel(chatWindow)
 {
-    /* build user interface */
+    bool check;
+
     QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
 
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
@@ -203,7 +205,11 @@ DiscoveryPanel::DiscoveryPanel(Chat *chatWindow)
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/DiscoveryPanel.qml"));
     layout->addWidget(declarativeView);
-    setLayout(layout);
+
+    // connect signals
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
 }
 
 // PLUGIN

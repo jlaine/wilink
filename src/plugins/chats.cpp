@@ -194,11 +194,9 @@ ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRo
     setFocusProxy(historyView);
 
     // connect signals
-#if 0
-    check = connect(chatInput(), SIGNAL(chatStateChanged(int)),
-                    this, SLOT(chatStateChanged(int)));
+    check = connect(historyView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
-#endif
 
     check = connect(client, SIGNAL(connected()),
                     this, SLOT(join()));
