@@ -140,23 +140,11 @@ void LogModel::messageReceived(QXmppLogger::MessageType type, const QString &msg
 
 /** Constructs a ConsolePanel.
  */
-ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *parent)
-    : ChatPanel(parent),
-    connected(false),
-    currentLogger(logger),
-    m_window(chatWindow)
+ConsolePanel::ConsolePanel(Chat *chatWindow)
+    : ChatPanel(chatWindow)
 {
-    bool check;
-    setWindowIcon(QIcon(":/options.png"));
-    setWindowTitle(tr("Debugging console"));
-
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
-    layout->addLayout(headerLayout());
-
-    browser = new QTextBrowser;
-    layout->addWidget(browser);
-    highlighter = new Highlighter(browser->document());
 
     // declarative
     QDeclarativeView *declarativeView = new QDeclarativeView;
@@ -166,84 +154,18 @@ ConsolePanel::ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *paren
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/LogPanel.qml"));
-    layout->addWidget(declarativeView, 1);
 
-    // search box
-    searchBar = new ChatSearchBar;
-    searchBar->hide();
-    connect(searchBar, SIGNAL(find(QString, QTextDocument::FindFlags, bool)),
-        this, SLOT(slotFind(QString, QTextDocument::FindFlags, bool)));
-    connect(this, SIGNAL(findFinished(bool)),
-        searchBar, SLOT(findFinished(bool)));
-    layout->addWidget(searchBar);
-
-    // actions
-    startAction = addAction(QIcon(":/start.png"), tr("Start"));
-    connect(startAction, SIGNAL(triggered()), this, SLOT(slotStart()));
-
-    stopAction = addAction(QIcon(":/stop.png"), tr("Stop"));
-    connect(stopAction, SIGNAL(triggered()), this, SLOT(slotStop()));
-
-    QAction *clearAction = addAction(QIcon(":/close.png"), tr("Clear"));
-    connect(clearAction, SIGNAL(triggered()), browser, SLOT(clear()));
-
+    layout->addWidget(declarativeView);
     setLayout(layout);
 
-    // connect signals
-    connect(this, SIGNAL(findPanel()), searchBar, SLOT(activate()));
-    connect(this, SIGNAL(findAgainPanel()), searchBar, SLOT(findNext()));
-    connect(this, SIGNAL(hidePanel()), this, SLOT(slotStop()));
-    connect(this, SIGNAL(showPanel()), this, SLOT(slotStart()));
-
     // register shortcut
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), m_window);
-    check = connect(shortcut, SIGNAL(activated()),
-                    this, SIGNAL(showPanel()));
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D), chatWindow);
+    bool check = connect(shortcut, SIGNAL(activated()),
+                         this, SIGNAL(showPanel()));
     Q_ASSERT(check);
+}
 
 #if 0
-    // register action
-    QAction *action = m_window->addAction(windowIcon(), windowTitle());
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D));
-    action->setVisible(false);
-    check = connect(action, SIGNAL(triggered()),
-                    this, SIGNAL(showPanel()));
-    Q_ASSERT(check);
-#endif
-}
-
-void ConsolePanel::message(QXmppLogger::MessageType type, const QString &msg)
-{
-    QColor color;
-    QString message;
-    if (type == QXmppLogger::SentMessage || type == QXmppLogger::ReceivedMessage)
-    {
-        color = (type == QXmppLogger::SentMessage) ? QColor(0xcc, 0xcc, 0xff) : QColor(0xcc, 0xff, 0xcc);
-        message = indentXml(msg);
-    }
-    else
-    {
-        color = (type == QXmppLogger::WarningMessage) ? QColor(0xff, 0x95, 0x95) : Qt::white;
-        message = msg;
-    }
-
-    if (!message.isEmpty())
-    {
-        QScrollBar *scrollBar = browser->verticalScrollBar();
-        const bool atEnd = scrollBar->sliderPosition() > (scrollBar->maximum() - 10);
-
-        QTextCursor cursor = browser->textCursor();
-        cursor.movePosition(QTextCursor::End);
-        QTextCharFormat fmt = cursor.blockCharFormat();
-        fmt.setBackground(QBrush(color));
-        cursor.setBlockCharFormat(fmt);
-        cursor.insertText(message + "\n");
-
-        if (atEnd)
-            scrollBar->setSliderPosition(scrollBar->maximum());
-    }
-}
-
 /** Find the given text in the console history.
  *
  * @param needle
@@ -284,26 +206,7 @@ void ConsolePanel::slotFind(const QString &needle, QTextDocument::FindFlags flag
         emit findFinished(false);
     }
 }
-
-void ConsolePanel::slotStop()
-{
-    if (!connected)
-        return;
-    stopAction->setVisible(false);
-    disconnect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
-    connected = false;
-    startAction->setVisible(true);
-}
-
-void ConsolePanel::slotStart()
-{
-    if (connected)
-        return;
-    startAction->setVisible(false);
-    connect(currentLogger, SIGNAL(message(QXmppLogger::MessageType,QString)), this, SLOT(message(QXmppLogger::MessageType,QString)));
-    connected = true;
-    stopAction->setVisible(true);
-}
+#endif
 
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
@@ -358,7 +261,7 @@ bool ConsolePlugin::initialize(Chat *chat)
     bool check;
 
     /* register panel */
-    ConsolePanel *console = new ConsolePanel(chat, chat->client()->logger());
+    ConsolePanel *console = new ConsolePanel(chat);
     console->setObjectName(CONSOLE_ROSTER_ID);
     chat->addPanel(console);
 

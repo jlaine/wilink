@@ -76,26 +76,7 @@ class ConsolePanel : public ChatPanel
     Q_OBJECT
 
 public:
-    ConsolePanel(Chat *chatWindow, QXmppLogger *logger, QWidget *parent = 0);
-
-signals:
-    void findFinished(bool found);
-
-private slots:
-    void slotFind(const QString &needle, QTextDocument::FindFlags flags, bool changed);
-    void slotStart();
-    void slotStop();
-    void message(QXmppLogger::MessageType type, const QString &msg);
-
-private:
-    QTextBrowser *browser;
-    bool connected;
-    QXmppLogger *currentLogger;
-    ChatSearchBar *searchBar;
-    Highlighter *highlighter;
-    QAction *startAction;
-    QAction *stopAction;
-    Chat *m_window;
+    ConsolePanel(Chat *chatWindow);
 };
 
 class Highlighter : public QSyntaxHighlighter

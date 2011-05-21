@@ -41,6 +41,16 @@ Rectangle {
             anchors.right: parent.right
 
             ToolButton {
+                icon: 'call.png'
+                text: qsTr('Call')
+            }
+
+            ToolButton {
+                icon: 'upload.png'
+                text: qsTr('Send a file')
+            }
+
+            ToolButton {
                 icon: 'close.png'
                 text: qsTr('Close')
             }
@@ -80,7 +90,6 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        model: participantModel
 
         onChatStateChanged: {
             conversation.state = chatInput.chatState;

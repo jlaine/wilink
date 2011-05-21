@@ -397,29 +397,18 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ConsolePanel</name>
-    <message>
-        <source>Debugging console</source>
-        <translation>Console de débogage</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation>Démarrer</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Arrêter</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
-    </message>
-</context>
-<context>
     <name>ConversationPanel</name>
     <message>
         <source>Close</source>
         <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Call</source>
+        <translation>Appeler</translation>
+    </message>
+    <message>
+        <source>Send a file</source>
+        <translation>Envoyer un fichier</translation>
     </message>
 </context>
 <context>
