@@ -302,7 +302,7 @@ void PhotoCache::processQueue()
                 this, SLOT(commandFinished(int, bool, const FileInfoList&)));
     }
     m_downloadUrl = job.first;
-    m_downloadDevice = fs->get(m_downloadUrl, FileSystem::SmallSize);
+    m_downloadDevice = fs->get(m_downloadUrl, FileSystem::MediumSize);
 }
 
 class PhotoImageProvider : public QDeclarativeImageProvider

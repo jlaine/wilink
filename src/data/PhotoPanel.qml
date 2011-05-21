@@ -51,6 +51,7 @@ Panel {
                 onClicked: {
                     var crumb = crumbs.get(crumbs.count - 1);
                     view.model.rootUrl = crumb.url;
+                    image.source = '';
                     crumbs.remove(crumbs.count - 1);
                 }
             }
@@ -110,7 +111,7 @@ Panel {
                 anchors.fill: parent
 
                 Image {
-                    id: image
+                    id: thumbnail
 
                     anchors.horizontalCenter: parent.horizontalCenter
                     fillMode: Image.PreserveAspectFit
@@ -130,9 +131,11 @@ Panel {
                 anchors.fill: parent
                 hoverEnabled: true
                 onDoubleClicked: {
+                    crumbs.append({'url': view.model.rootUrl})
                     if (model.isDir) {
-                        crumbs.append({'url': view.model.rootUrl})
                         view.model.rootUrl = model.url;
+                    } else {
+                        image.source = model.avatar
                     }
                 }
 
@@ -160,5 +163,30 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
+    }
+
+    Rectangle {
+        id: display
+
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        visible: false
+        z: 1
+
+        Image {
+            id: image
+
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectFit
+            source: currentImage
+        }
+    }
+
+    state: image.source  != '' ? 'details' : ''
+    states: State {
+        name: 'details'
+        PropertyChanges { target: display; visible: true }
     }
 }
