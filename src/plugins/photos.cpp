@@ -215,9 +215,10 @@ QUrl PhotosList::url()
     return baseUrl;
 }
 
-class PhotoItem : public ChatModelItem
+class PhotoItem : public ChatModelItem, public FileInfo
 {
 public:
+    PhotoItem(const FileInfo &info) : FileInfo(info) {};
 };
 
 PhotoModel::PhotoModel(QObject *parent)
@@ -234,12 +235,16 @@ PhotoModel::PhotoModel(QObject *parent)
  */
 void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &results)
 {
+    Q_ASSERT(m_fs);
+
     if (error)
         qWarning() << m_fs->commandName(cmd) << "command failed";
+     else
+        qDebug() << m_fs->commandName(cmd) << "command complete";
 
-#if 0
     switch (cmd)
     {
+#if 0
     case FileSystem::Get:
         if (!error && photosView->indexOf(downloadJob.widget) >= 0)
         {
@@ -267,6 +272,7 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
         downloadJob.clear();
         processDownloadQueue();
         break;
+#endif
     case FileSystem::Open:
         if (!error)
             refresh();
@@ -275,21 +281,13 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
         if (error)
             return;
 
-        /* show entries */
-        PhotosList *listView = qobject_cast<PhotosList *>(photosView->currentWidget());
-        Q_ASSERT(listView != NULL);
-        listView->setEntries(results);
-
-        /* drag and drop is now allowed */
-        showMessage();
-        listView->setAcceptDrops(true);
-        if (photosView->count() > 1)
-        {
-            backAction->setEnabled(true);
-            createAction->setVisible(false);
-            deleteAction->setVisible(true);
+        removeRows(0, rootItem->children.size());
+        foreach (const FileInfo& info, results) {
+            PhotoItem *item = new PhotoItem(info);
+            qDebug("info: %s", qPrintable(info.url().toString()));
+            addItem(item, rootItem);
         }
-
+#if 0
         /* fetch thumbnails */
         foreach (const FileInfo& info, results)
         {
@@ -297,11 +295,13 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
                 downloadQueue.append(Job(listView, info.url(), FileSystem::SmallSize));
         }
         processDownloadQueue();
+#endif
         break;
     }
     case FileSystem::Mkdir:
         refresh();
         break;
+#if 0
     case FileSystem::Put:
         progressFiles++;
         progressBar->setValue(PROGRESS_STEPS * progressFiles);
@@ -309,15 +309,15 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
         uploadDevice = 0;
         processUploadQueue();
         break;
+#endif
     case FileSystem::Remove:
         if (!error)
             refresh();
         break;
     default:
-        qWarning() << fs->commandName(cmd) << "was not expected";
+        qWarning() << m_fs->commandName(cmd) << "was not expected";
         break;
     }
-#endif
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
@@ -326,7 +326,25 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
+    if (role == NameRole)
+        return item->name();
+    else if (role == UrlRole)
+        return item->url();
     return QVariant();
+}
+
+/** TODO: Update the progress bar for the current upload.
+ */
+void PhotoModel::putProgress(int done, int total)
+{
+}
+
+/** Refresh the contents of the current folder.
+ */
+void PhotoModel::refresh()
+{
+    if (m_fs)
+        m_fs->list(m_rootUrl);
 }
 
 QUrl PhotoModel::rootUrl() const
@@ -336,10 +354,26 @@ QUrl PhotoModel::rootUrl() const
 
 void PhotoModel::setRootUrl(const QUrl &rootUrl)
 {
-    if (rootUrl != m_rootUrl) {
-        m_rootUrl = rootUrl;
-        emit rootUrlChanged(m_rootUrl);
+    if (rootUrl == m_rootUrl)
+        return;
+
+    m_rootUrl = rootUrl;
+
+    if (!m_fs) {
+        bool check;
+
+        m_fs = FileSystem::factory(m_rootUrl, this);
+        connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+                this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+        connect(m_fs, SIGNAL(putProgress(int, int)),
+                this, SLOT(putProgress(int, int)));
+
+        m_fs->open(m_rootUrl);
+    } else {
+        m_fs->list(m_rootUrl);
     }
+
+    emit rootUrlChanged(m_rootUrl);
 }
 
 /** Constructs a PhotoPanel.

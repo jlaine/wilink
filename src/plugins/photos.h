@@ -85,8 +85,12 @@ public:
 signals:
     void rootUrlChanged(const QUrl &rootUrl);
 
+public slots:
+    void refresh();
+
 private slots:
     void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void putProgress(int done, int total);
 
 private:
     FileSystem *m_fs;

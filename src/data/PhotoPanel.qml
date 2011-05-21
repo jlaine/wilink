@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Panel {
     id: panel
@@ -74,13 +75,9 @@ Panel {
         cellWidth: 130
         cellHeight: 150
 
-        model: ListModel {
-            ListElement { name: 'Album1'; type: 'album' }
-            ListElement { name: 'Album2'; type: 'album' }
-            ListElement { name: 'Album3'; type: 'album' }
-            ListElement { name: 'Photo1'; type: 'photo'; source: 'file-128.png' }
-            ListElement { name: 'Photo2'; type: 'photo'; source: 'file-128.png' }
-            ListElement { name: 'Photo3'; type: 'photo'; source: 'file-128.png' }
+        model:  PhotoModel {
+            id: photoModel
+            rootUrl: baseUrl
         }
 
         delegate: Item {
@@ -118,6 +115,10 @@ Panel {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
+                onDoubleClicked: {
+                    view.model.rootUrl = model.url;
+                }
+
                 onEntered: {
                     parent.state = 'hovered'
                 }
