@@ -64,8 +64,9 @@ Panel {
                     dialog.fileMode = QFileDialog.ExistingFiles;
                     dialog.windowTitle = qsTr('Upload photos');
                     if (dialog.exec()) {
-                        var files = dialog.selectedFiles;
-                        console.log("files: " + files);
+                        for (var i in dialog.selectedFiles) {
+                            photoModel.upload(dialog.selectedFiles[i]);
+                        }
                     }
                 }
             }
@@ -93,7 +94,7 @@ Panel {
     GridView {
         id: view
 
-        anchors.bottom: parent.bottom
+        anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: header.bottom
@@ -174,7 +175,7 @@ Panel {
         id: scrollBar
 
         anchors.top: header.bottom
-        anchors.bottom: parent.bottom
+        anchors.bottom: footer.top
         anchors.right: parent.right
         flickableItem: view
     }
@@ -182,7 +183,7 @@ Panel {
     Rectangle {
         id: display
 
-        anchors.bottom: parent.bottom
+        anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: header.bottom
@@ -195,6 +196,24 @@ Panel {
             anchors.fill: parent
             fillMode: Image.PreserveAspectFit
         }
+    }
+
+    PhotoUploadView {
+        id: footer
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        model: photoModel.uploads
+/*
+        model: ListModel {
+            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
+            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
+            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
+            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
+        } 
+*/
+        z: 1
     }
 
     state: image.source  != '' ? 'details' : ''

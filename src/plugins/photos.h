@@ -99,7 +99,7 @@ class PhotoModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
-    Q_PROPERTY(PhotoUploadModel uploads READ uploads CONSTANT)
+    Q_PROPERTY(PhotoUploadModel* uploads READ uploads CONSTANT)
 
 public:
     PhotoModel(QObject *parent = 0);

@@ -509,6 +509,7 @@ PhotoUploadModel::PhotoUploadModel(QObject *parent)
 
 void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem)
 {
+    qDebug("Adding item %s", qPrintable(filePath));
     PhotoUploadItem *item = new PhotoUploadItem;
     item->filePath = filePath;
     item->fileSystem = fileSystem;
@@ -616,7 +617,7 @@ PhotoPanel::PhotoPanel(Chat *chatWindow, const QString &url)
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
     layout->addLayout(headerLayout());
-    layout->addWidget(photosView);
+    //layout->addWidget(photosView);
     QHBoxLayout *hbox_upload = new QHBoxLayout;
     hbox_upload->addWidget(stopButton);
     hbox_upload->addWidget(progressBar);
@@ -1023,8 +1024,8 @@ public:
 
 bool PhotosPlugin::initialize(Chat *chat)
 {
-    qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
     qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
+    qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
 
     QString url;
     QString domain = chat->client()->configuration().domain();
