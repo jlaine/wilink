@@ -28,12 +28,12 @@
 #define SIZE_COLUMN_WIDTH 80
 #define PROGRESS_COLUMN_WIDTH 100
 
-SharesDelegate::SharesDelegate(QObject *parent)
+ShareDelegate::ShareDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
 {
 }
 
-void SharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void ShareDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     int error = index.data(TransferError).toInt();
     qint64 done = index.data(TransferDone).toLongLong();
@@ -59,14 +59,14 @@ void SharesDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
     }
 }
 
-SharesSelectionModel::SharesSelectionModel(QAbstractItemModel *model, QObject *parent)
+ShareSelectionModel::ShareSelectionModel(QAbstractItemModel *model, QObject *parent)
     : QItemSelectionModel(model, parent)
 {
 }
 
 /** Reimplemented to never select both an item and one of its children.
  */
-void SharesSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
+void ShareSelectionModel::select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command)
 {
     if (command & QItemSelectionModel::Select)
     {
@@ -123,7 +123,7 @@ void SharesSelectionModel::select(const QItemSelection &selection, QItemSelectio
 ShareView::ShareView(QWidget *parent)
     : QTreeView(parent)
 {
-    setItemDelegate(new SharesDelegate(this));
+    setItemDelegate(new ShareDelegate(this));
     setRootIsDecorated(false);
     setSelectionBehavior(QAbstractItemView::SelectRows);
     setSelectionMode(QAbstractItemView::ExtendedSelection);
@@ -177,6 +177,6 @@ void ShareView::setModel(QAbstractItemModel *model)
     QTreeView::setModel(model);
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);
     setColumnWidth(ProgressColumn, PROGRESS_COLUMN_WIDTH);
-    setSelectionModel(new SharesSelectionModel(model, this));
+    setSelectionModel(new ShareSelectionModel(model, this));
 }
 

@@ -27,19 +27,19 @@
 #include "QXmppShareIq.h"
 #include "QXmppTransferManager.h"
 
-class SharesDelegate : public QStyledItemDelegate
+class ShareDelegate : public QStyledItemDelegate
 {
 public:
-    SharesDelegate(QObject *parent);
+    ShareDelegate(QObject *parent);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
-class SharesSelectionModel : public QItemSelectionModel
+class ShareSelectionModel : public QItemSelectionModel
 {
     Q_OBJECT
 
 public:
-    SharesSelectionModel(QAbstractItemModel *model, QObject *parent = 0);
+    ShareSelectionModel(QAbstractItemModel *model, QObject *parent = 0);
 
 public slots:
     void select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command);
