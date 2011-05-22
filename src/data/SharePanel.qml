@@ -22,6 +22,8 @@ import QtQuick 1.0
 Panel {
     id: panel
 
+    color: '#dfdfdf'
+
     PanelHeader {
         id: header
 
@@ -84,14 +86,24 @@ Panel {
             text: qsTr('Enter the name of the file you are looking for.');
         }
 
-        TextEdit {
-            id: searchEdit
-
+        Rectangle {
             anchors.left: searchLabel.right
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
-            focus: true
+            border.color: '#c3c3c3'
+            color: 'white'
+            height: searchEdit.paintedHeight + 4
+
+            TextEdit {
+                id: searchEdit
+
+                anchors.fill: parent
+                anchors.margins: 2
+                anchors.leftMargin: 4
+                anchors.rightMargin: 4
+                focus: true
+            }
         }
     }
 
@@ -102,6 +114,7 @@ Panel {
         anchors.right: parent.right
         anchors.top: searchBar.bottom
         anchors.bottom: queueHelp.top
+        anchors.bottomMargin: 8
 
         model: shareModel
     }
@@ -128,10 +141,10 @@ Panel {
         height: model.count * 30
 
         model: ListModel {
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
+            ListElement { name: 'Foo Bar.png'; size: 12434 }
+            ListElement { name: 'Foo Bar.png'; size: 45567437 }
+            ListElement { name: 'Foo Bar.png'; size: 87654724 }
+            ListElement { name: 'Foo Bar.png'; size: 573474 }
         }
         z: 1
     }
