@@ -80,6 +80,7 @@
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
+    <file>ShareView.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
     <!-- Stylesheets -->
