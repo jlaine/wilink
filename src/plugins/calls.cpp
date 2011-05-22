@@ -416,37 +416,12 @@ CallWatcher::CallWatcher(Chat *chatWindow)
 
     m_callManager = new QXmppCallManager;
     m_client->addExtension(m_callManager);
-    connect(m_callManager, SIGNAL(callReceived(QXmppCall*)),
-            this, SLOT(callReceived(QXmppCall*)));
     connect(m_client, SIGNAL(connected()),
             this, SLOT(connected()));
 }
 
 CallWatcher::~CallWatcher()
 {
-}
-
-void CallWatcher::addCall(QXmppCall *call)
-{
-    const QString bareJid = jidToBareJid(call->jid());
-
-    ChatDialogPanel *panel = qobject_cast<ChatDialogPanel*>(m_window->panel(bareJid));
-    if (panel) {
-        // load component if needed
-        QDeclarativeComponent *component = qobject_cast<QDeclarativeComponent*>(panel->property("__call_component").value<QObject*>());
-        if (!component) {
-            QDeclarativeEngine *engine = panel->declarativeView()->engine();
-            component = new QDeclarativeComponent(engine, QUrl("qrc:/CallWidget.qml"));
-            panel->setProperty("__call_component", qVariantFromValue<QObject*>(component));
-        }
-
-        // create call widget
-        QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
-        Q_ASSERT(widget);
-        widget->setProperty("call", qVariantFromValue<QObject*>(call));
-        QDeclarativeItem *bar = panel->declarativeView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
-        widget->setParentItem(bar);
-    }
 }
 
 void CallWatcher::connected()

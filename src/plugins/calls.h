@@ -200,10 +200,7 @@ private slots:
     void setTurnServer(const QHostInfo &hostInfo);
 
 private:
-    void addCall(QXmppCall *call);
-
     QXmppCallManager *m_callManager;
-    QMap<QXmppCall*, int> m_callQueue;
     QXmppClient *m_client;
     quint16 m_turnPort;
     Chat *m_window;
