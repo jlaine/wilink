@@ -32,7 +32,6 @@
 class CallVideoItem;
 class Chat;
 class ChatRosterModel;
-class QAbstractButton;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
@@ -196,9 +195,6 @@ public:
     ~CallWatcher();
 
 private slots:
-    void callAborted();
-    void callClicked(QAbstractButton * button);
-    void callReceived(QXmppCall *call);
     void connected();
     void setTurnServer(const QXmppSrvInfo &serviceInfo);
     void setTurnServer(const QHostInfo &hostInfo);

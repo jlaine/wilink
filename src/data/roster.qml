@@ -241,6 +241,8 @@ Item {
                 var url = 'xmpp://' + window.objectName + '/' + call.jid.split('/')[0] + '?message';
                 Qt.openUrlExternally(url);
                 call.accept();
+            } else {
+                call.hangup();
             }
         }
     }

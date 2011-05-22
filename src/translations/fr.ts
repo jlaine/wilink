@@ -17,21 +17,6 @@
     </message>
 </context>
 <context>
-    <name>CallWatcher</name>
-    <message>
-        <source>Call from %1</source>
-        <translation>Appel de %1</translation>
-    </message>
-    <message>
-        <source>%1 wants to talk to you.
-
-Do you accept?</source>
-        <translation>%1 souhaite vous parler.
-
-Acceptez-vous?</translation>
-    </message>
-</context>
-<context>
     <name>CallWidget</name>
     <message>
         <source>Connecting..</source>

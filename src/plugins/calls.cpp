@@ -449,68 +449,6 @@ void CallWatcher::addCall(QXmppCall *call)
     }
 }
 
-/** The call finished without the user accepting it.
- */
-void CallWatcher::callAborted()
-{
-    QXmppCall *call = qobject_cast<QXmppCall*>(sender());
-    if (!call)
-        return;
-
-    // stop ring tone
-    int soundId = m_callQueue.take(call);
-    if (soundId)
-        wApp->soundPlayer()->stop(soundId);
-
-    call->deleteLater();
-}
-
-void CallWatcher::callClicked(QAbstractButton * button)
-{
-    QMessageBox *box = qobject_cast<QMessageBox*>(sender());
-    QXmppCall *call = qobject_cast<QXmppCall*>(box->property("call").value<QObject*>());
-    if (!call)
-        return;
-
-    // stop ring tone
-    int soundId = m_callQueue.take(call);
-    if (soundId)
-        wApp->soundPlayer()->stop(soundId);
-
-    if (box->standardButton(button) == QMessageBox::Yes)
-    {
-        disconnect(call, SIGNAL(finished()), this, SLOT(callAborted()));
-        addCall(call);
-        call->accept();
-    } else {
-        call->hangup();
-    }
-    box->deleteLater();
-}
-
-void CallWatcher::callReceived(QXmppCall *call)
-{
-    const QString contactName = m_window->rosterModel()->contactName(call->jid());
-
-    QMessageBox *box = new QMessageBox(QMessageBox::Question,
-        tr("Call from %1").arg(contactName),
-        tr("%1 wants to talk to you.\n\nDo you accept?").arg(contactName),
-        QMessageBox::Yes | QMessageBox::No, m_window);
-    box->setDefaultButton(QMessageBox::NoButton);
-    box->setProperty("call", qVariantFromValue(qobject_cast<QObject*>(call)));
-
-    // connect signals
-    connect(call, SIGNAL(finished()), this, SLOT(callAborted()));
-    connect(call, SIGNAL(finished()), box, SLOT(deleteLater()));
-    connect(box, SIGNAL(buttonClicked(QAbstractButton*)),
-        this, SLOT(callClicked(QAbstractButton*)));
-    box->show();
-
-    // start incoming tone
-    int soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
-    m_callQueue.insert(call, soundId);
-}
-
 void CallWatcher::connected()
 {
     // lookup TURN server
