@@ -55,7 +55,7 @@ Panel {
         }
     }
 
-    Rectangle {
+    Item {
         id: searchBar
 
         anchors.left: parent.left
@@ -65,8 +65,10 @@ Panel {
         height: 32
 
         Image {
-            id: icon
+            id: searchIcon
 
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
             height: 16
             width: 16
             source: 'search.png'
@@ -74,13 +76,22 @@ Panel {
         }
 
         Text {
-            anchors.left: icon.right
+            id: searchLabel
+
+            anchors.left: searchIcon.right
+            anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
-            text: qsTr("Enter the name of the file you are looking for.");
+            text: qsTr('Enter the name of the file you are looking for.');
         }
 
         TextEdit {
+            id: searchEdit
 
+            anchors.left: searchLabel.right
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: 8
+            focus: true
         }
     }
 
@@ -99,20 +110,17 @@ Panel {
         }
     }
 
-    Rectangle {
+    Text {
         id: queueHelp
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: footer.top
         anchors.margins: 8
-        height: 32
+        height: paintedHeight
 
-        Text {
-            anchors.centerIn: parent
-            text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
-            wrapMode: Text.WordWrap
-        }
+        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
+        wrapMode: Text.WordWrap
     }
 
     ShareView {
