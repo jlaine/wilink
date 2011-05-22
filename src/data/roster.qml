@@ -221,4 +221,27 @@ Item {
             }
         }
     }
+
+    Connections {
+        target: client.callManager
+        onCallReceived: {
+            var contactName = call.jid;
+            console.log("Call received: " + contactName);
+
+            // start incoming tone
+            //int soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
+            //m_callQueue.insert(call, soundId);
+
+            // prompt user
+            var box = window.messageBox();
+            box.windowTitle = qsTr('Call from %1').replace('%1', contactName);
+            box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
+            box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+            if (box.exec()) {
+                var url = 'xmpp://' + window.objectName + '/' + call.jid.split('/')[0] + '?message';
+                Qt.openUrlExternally(url);
+                call.accept();
+            }
+        }
+    }
 }
