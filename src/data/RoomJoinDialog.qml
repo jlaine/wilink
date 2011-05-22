@@ -25,7 +25,6 @@ Dialog {
 
     property alias model: view.model
     property alias reason: reasonEdit.text
-    property variant selection: []
 
     title: qsTr('Join or create a chat room')
 
@@ -85,32 +84,10 @@ Dialog {
             width: parent.width - 1
             height: 24
 
-            function isSelected() {
-                for (var i = 0; i < selection.length; i += 1) {
-                    if (selection[i] == model.jid)
-                        return true;
-                }
-                return false;
-            }
-
-            Rectangle {
-                id: check
-
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                anchors.verticalCenter: parent.verticalCenter
-                border.width: 1
-                border.color: '#c3c3c3'
-                color: isSelected() ? 'black' : 'white'
-                radius: 6
-                width: 12
-                height: 12
-            }
-
             Image {
                 id: image
 
-                anchors.left: check.right
+                anchors.left: parent.left
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 width: 16
@@ -130,18 +107,10 @@ Dialog {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    var newSelection = [];
-                    var wasSelected = false;
-                    for (var i = 0; i < selection.length; i += 1) {
-                        if (selection[i] == model.jid) {
-                            wasSelected = true;
-                        } else {
-                            newSelection[newSelection.length] = selection[i];
-                        }
-                    }
-                    if (!wasSelected)
-                        newSelection[newSelection.length] = model.jid;
-                    dialog.selection = newSelection;
+                    hide();
+
+                    var url = 'xmpp://' + window.objectName + '/' + model.jid + '?join';
+                    Qt.openUrlExternally(url);
                 }
             }
         }
