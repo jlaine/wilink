@@ -281,7 +281,7 @@
     </message>
 </context>
 <context>
-    <name>ChatRoomPrompt</name>
+    <name>RoomJoinDialog</name>
     <message>
         <source>Join or create a chat room</source>
         <translation>Rejoindre ou créer un salon de discussion</translation>

@@ -371,7 +371,7 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
  */
 void ChatRoomWatcher::roomPrompt()
 {
-    ChatRoomPrompt prompt(chat->client(), chatRoomServer, chat);
+    RoomJoinDialog prompt(chat->client(), chatRoomServer, chat);
 #ifdef WILINK_EMBEDDED
     prompt.showMaximized();
 #endif
@@ -598,7 +598,7 @@ void ChatRoom::unbookmark()
     }
 }
 
-ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent)
+RoomJoinDialog::RoomJoinDialog(QXmppClient *client, const QString &roomServer, QWidget *parent)
     : QDialog(parent), chatRoomServer(roomServer)
 {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -632,7 +632,7 @@ ChatRoomPrompt::ChatRoomPrompt(QXmppClient *client, const QString &roomServer, Q
     discoveryManager->requestItems(chatRoomServer);
 }
 
-void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
+void RoomJoinDialog::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
 {
     if (disco.type() == QXmppIq::Result &&
         disco.from() == chatRoomServer)
@@ -648,18 +648,18 @@ void ChatRoomPrompt::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-void ChatRoomPrompt::itemClicked(QListWidgetItem *item)
+void RoomJoinDialog::itemClicked(QListWidgetItem *item)
 {
     lineEdit->setText(item->data(Qt::UserRole).toString());
     validate();
 }
 
-QString ChatRoomPrompt::textValue() const
+QString RoomJoinDialog::textValue() const
 {
     return lineEdit->text();
 }
 
-void ChatRoomPrompt::validate()
+void RoomJoinDialog::validate()
 {
     QString jid = lineEdit->text();
     if (jid.contains(" ") || jid.isEmpty())

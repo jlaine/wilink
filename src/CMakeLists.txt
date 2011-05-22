@@ -134,6 +134,7 @@ if(RELOAD_TRANSLATIONS)
         data/DiscoveryPanel.qml
         data/LogPanel.qml
         data/RoomInviteDialog.qml
+        data/RoomJoinDialog.qml
         data/RoomParticipantView.qml
         data/PhoneHistoryView.qml
         data/PhonePanel.qml

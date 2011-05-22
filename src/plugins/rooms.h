@@ -155,12 +155,12 @@ private:
     QTableWidget *m_tableWidget;
 };
 
-class ChatRoomPrompt : public QDialog
+class RoomJoinDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatRoomPrompt(QXmppClient *client, const QString &roomServer, QWidget *parent = 0);
+    RoomJoinDialog(QXmppClient *client, const QString &roomServer, QWidget *parent = 0);
     QString textValue() const;
 
 protected slots:
