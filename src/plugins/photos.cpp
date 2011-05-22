@@ -476,7 +476,11 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
 
 void PhotoModel::upload(const QString &filePath)
 {
-    m_uploads->append(filePath, m_fs, m_rootUrl.toString());
+    QString base = m_rootUrl.toString();
+    while (base.endsWith("/"))
+        base.chop(1);
+
+    m_uploads->append(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
 }
 
 PhotoUploadModel *PhotoModel::uploads() const
@@ -514,6 +518,8 @@ void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, c
     item->destinationPath = destinationPath;
     item->fileSystem = fileSystem;
     addItem(item, rootItem);
+
+    processQueue();
 }
 
 void PhotoUploadModel::commandFinished(int cmd, bool error, const FileInfoList &results)

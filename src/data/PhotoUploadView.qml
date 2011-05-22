@@ -57,6 +57,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: image.right
                 anchors.right: parent.right
+                maximumValue: 1.0
+                value: model.progress
 
                 Text {
                     anchors.centerIn: parent
