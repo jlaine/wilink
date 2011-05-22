@@ -651,6 +651,41 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ShareModel</name>
+    <message>
+        <source>Downloaded</source>
+        <translation>Téléchargé</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
+    <message>
+        <source>Requested</source>
+        <translation>Demandé</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>En attente</translation>
+    </message>
+    <message>
+        <source>Downloading at %1</source>
+        <translation>Téléchargement à %1</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Progrès</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Taille</translation>
+    </message>
+</context>
+<context>
     <name>SharePanel</name>
     <message>
         <source>Shares</source>
@@ -715,41 +750,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Received files are stored in your &lt;a href=&quot;%1&quot;&gt;downloads folder&lt;/a&gt;. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre &lt;a href=&quot;%1&quot;&gt;dossier de téléchargement&lt;/a&gt;. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-</context>
-<context>
-    <name>ShareModel</name>
-    <message>
-        <source>Downloaded</source>
-        <translation>Téléchargé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation>Echoué</translation>
-    </message>
-    <message>
-        <source>Requested</source>
-        <translation>Demandé</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation>En attente</translation>
-    </message>
-    <message>
-        <source>Downloading at %1</source>
-        <translation>Téléchargement à %1</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Nom</translation>
-    </message>
-    <message>
-        <source>Progress</source>
-        <translation>Progrès</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Taille</translation>
     </message>
 </context>
 <context>

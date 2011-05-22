@@ -120,7 +120,7 @@ void SharesSelectionModel::select(const QItemSelection &selection, QItemSelectio
     }
 }
 
-SharesView::SharesView(QWidget *parent)
+ShareView::ShareView(QWidget *parent)
     : QTreeView(parent)
 {
     setItemDelegate(new SharesDelegate(this));
@@ -129,7 +129,7 @@ SharesView::SharesView(QWidget *parent)
     setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
-void SharesView::contextMenuEvent(QContextMenuEvent *event)
+void ShareView::contextMenuEvent(QContextMenuEvent *event)
 {
     const QModelIndex &index = currentIndex();
     if (!index.isValid())
@@ -138,7 +138,7 @@ void SharesView::contextMenuEvent(QContextMenuEvent *event)
     emit contextMenu(index, event->globalPos());
 }
 
-void SharesView::keyPressEvent(QKeyEvent *event)
+void ShareView::keyPressEvent(QKeyEvent *event)
 {
     QModelIndex current = currentIndex();
     if (current.isValid())
@@ -161,7 +161,7 @@ void SharesView::keyPressEvent(QKeyEvent *event)
 /** When the view is resized, adjust the width of the
  *  "name" column to take all the available space.
  */
-void SharesView::resizeEvent(QResizeEvent *e)
+void ShareView::resizeEvent(QResizeEvent *e)
 {
     QTreeView::resizeEvent(e);
     int nameWidth =  e->size().width();
@@ -172,7 +172,7 @@ void SharesView::resizeEvent(QResizeEvent *e)
     setColumnWidth(NameColumn, nameWidth);
 }
 
-void SharesView::setModel(QAbstractItemModel *model)
+void ShareView::setModel(QAbstractItemModel *model)
 {
     QTreeView::setModel(model);
     setColumnWidth(SizeColumn, SIZE_COLUMN_WIDTH);

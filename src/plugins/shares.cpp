@@ -117,7 +117,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     // MAIN
 
     // shares view
-    sharesView = new SharesView;
+    sharesView = new ShareView;
     sharesView->setExpandsOnDoubleClick(false);
     sharesView->setModel(sharesModel);
     sharesView->hideColumn(ProgressColumn);
@@ -143,7 +143,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     // downloads view
     queueModel = new ShareModel(this);
-    downloadsView = new SharesView;
+    downloadsView = new ShareView;
     downloadsView->setModel(queueModel);
     check = connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)),
                     this, SLOT(transferDoubleClicked(const QModelIndex&)));
@@ -494,7 +494,7 @@ void SharePanel::itemContextMenu(const QModelIndex &index, const QPoint &globalP
  */
 void SharePanel::itemDoubleClicked(const QModelIndex &index)
 {
-    SharesView *view = qobject_cast<SharesView*>(sender());
+    ShareView *view = qobject_cast<ShareView*>(sender());
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!view || !index.isValid() || !item)
         return;
@@ -519,7 +519,7 @@ void SharePanel::itemDoubleClicked(const QModelIndex &index)
  */
 void SharePanel::itemExpandRequested(const QModelIndex &index)
 {
-    SharesView *view = qobject_cast<SharesView*>(sender());
+    ShareView *view = qobject_cast<ShareView*>(sender());
     QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
     if (!view || !index.isValid() || !item || !item->type() == QXmppShareItem::CollectionItem)
         return;
@@ -691,10 +691,10 @@ void SharePanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         return;
 
     // find target view(s)
-    SharesView *view = 0;
+    ShareView *view = 0;
     const QString requestId = shareIq.id();
     if ((shareIq.type() == QXmppIq::Result || shareIq.type() == QXmppIq::Error) && searches.contains(requestId))
-        view = qobject_cast<SharesView*>(searches.take(requestId));
+        view = qobject_cast<ShareView*>(searches.take(requestId));
     else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer && sharesFilter.isEmpty())
         view = sharesView;
     else

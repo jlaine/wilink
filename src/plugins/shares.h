@@ -31,7 +31,7 @@
 class Chat;
 class ChatRosterModel;
 class ShareModel;
-class SharesView;
+class ShareView;
 class QLabel;
 class QModelIndex;
 class QPushButton;
@@ -89,11 +89,11 @@ private:
     ShareModel *queueModel;
     QMap<QString, QWidget*> searches;
 
-    SharesView *sharesView;
+    ShareView *sharesView;
     QString sharesFilter;
 
     QLabel *downloadsHelp;
-    SharesView *downloadsView;
+    ShareView *downloadsView;
     QList<QXmppTransferJob*> downloadJobs;
 
     QPushButton *downloadButton;

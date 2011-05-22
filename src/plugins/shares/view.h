@@ -47,12 +47,12 @@ public slots:
 
 /** View for displaying a tree of share items.
  */
-class SharesView : public QTreeView
+class ShareView : public QTreeView
 {
     Q_OBJECT
 
 public:
-    SharesView(QWidget *parent = 0);
+    ShareView(QWidget *parent = 0);
     void setModel(QAbstractItemModel *model);
 
 signals:
