@@ -246,4 +246,25 @@ Item {
             }
         }
     }
+
+    Connections {
+        target: client.transferManager
+        onFileReceived: {
+            var contactName = job.jid;
+            console.log("File received: " + contactName);
+
+            // prompt user
+            var box = window.messageBox();
+            box.windowTitle = qsTr('File from %1').replace('%1', contactName);
+            box.text = qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
+            box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+            if (box.exec()) {
+                var url = 'xmpp://' + window.objectName + '/' + call.jid.split('/')[0] + '?message';
+                Qt.openUrlExternally(url);
+                job.accept();
+            } else {
+                job.abort();
+            }
+        }
+    }
 }

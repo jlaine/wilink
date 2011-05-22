@@ -64,14 +64,19 @@ Panel {
                     dialog.windowTitle = qsTr('Send a file');
                     dialog.fileMode = QFileDialog.ExistingFile;
                     if (dialog.exec()) {
-                        var component = Qt.createComponent('TransferWidget.qml');
-                        console.log("component "  + component);
                         for (var i in dialog.selectedFiles) {
                             var filePath = dialog.selectedFiles[i];
-                            var widget = component.createObject(widgetBar);
-                            widget.job = client.transferManager.sendFile(vcard.jid, filePath);
-                            console.log("job "  + widget.job + ' ' + widget.job.fileName);
+                            client.transferManager.sendFile(vcard.jid, filePath);
                         }
+                    }
+                }
+
+                Connections {
+                    target: client.transferManager
+                    onJobStarted: {
+                        var component = Qt.createComponent('TransferWidget.qml');
+                        var widget = component.createObject(widgetBar);
+                        widget.job = job;
                     }
                 }
             }

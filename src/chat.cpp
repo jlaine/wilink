@@ -62,6 +62,8 @@
 #include "QXmppMessage.h"
 #include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
+#include "QXmppRtpChannel.h"
+#include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
 #include "application.h"
@@ -106,11 +108,15 @@ Chat::Chat(QWidget *parent)
     bool check;
 
     qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
     qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
     qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
     qmlRegisterUncreatableType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger", "");
-    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
+    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
+    qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
+    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
+    qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
 
     qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");

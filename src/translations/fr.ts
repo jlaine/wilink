@@ -972,5 +972,17 @@ Do you accept?</source>
 
 Acceptez-vous?</translation>
     </message>
+    <message>
+        <source>File from %1</source>
+        <translation>Fichier de %1</translation>
+    </message>
+    <message>
+        <source>%1 wants to send you a file called &apos;%2&apos; (%3).
+
+Do you accept?</source>
+        <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
+
+Acceptez-vous?</translation>
+    </message>
 </context>
 </TS>

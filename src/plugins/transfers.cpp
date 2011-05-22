@@ -255,9 +255,6 @@ void TransfersPlugin::finalize(Chat *chat)
 
 bool TransfersPlugin::initialize(Chat *chat)
 {
-    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
-    qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
-
     /* register panel */
     ChatTransfersWatcher *watcher = new ChatTransfersWatcher(chat);
     m_watchers.insert(chat, watcher);
