@@ -61,7 +61,7 @@ Panel {
             ToolButton {
                 icon: 'upload.png'
                 text: qsTr('Upload')
-                visible: crumbs.count > 0
+                enabled: crumbs.count > 0
 
                 onClicked: {
                     var dialog = window.fileDialog();
@@ -84,6 +84,7 @@ Panel {
             ToolButton {
                 icon: 'add.png'
                 text: qsTr('Create an album')
+                enabled: crumbs.count == 0
             }
 
             ToolButton {

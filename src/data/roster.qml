@@ -46,7 +46,7 @@ Item {
                 onClicked: Qt.openUrlExternally('sip://')
             }
             ToolButton { text: 'Photos'; icon: 'photos.png'; visible: false }
-            ToolButton { text: 'Shares'; icon: 'share.png'; enabled: false }
+            ToolButton { text: 'Shares'; icon: 'share.png'; visible: false }
         }
     }
 

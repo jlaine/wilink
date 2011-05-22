@@ -102,6 +102,13 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
     layout->addWidget(declarativeView);
 
+    // connect signals
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
+
+    setFocusProxy(declarativeView);
+
     // HEADER
 
     ChatSearchBar *searchBar = new ChatSearchBar;
@@ -196,8 +203,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     check = connect(this, SIGNAL(findFinished(bool)),
                     searchBar, SLOT(findFinished(bool)));
     Q_ASSERT(check);
-
-    //setFocusProxy(lineEdit);
 
     /* database signals */
     check = connect(db, SIGNAL(directoryChanged(QString)),
