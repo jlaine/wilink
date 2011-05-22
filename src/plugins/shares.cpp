@@ -219,12 +219,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     directoryChanged(db->directory());
 
     // add actions
-    QAction *optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
-    check = connect(optionsAction, SIGNAL(triggered()),
-                    this, SLOT(showOptions()));
-    Q_ASSERT(check);
-
-    action = chat->addAction(windowIcon(), windowTitle());
+    QAction *action = chat->addAction(windowIcon(), windowTitle());
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
     action->setVisible(false);
     connect(action, SIGNAL(triggered()),
@@ -590,7 +585,7 @@ void SharePanel::presenceReceived(const QXmppPresence &presence)
         if (!settings.value("SharesConfigured").toBool())
         {
             settings.setValue("SharesConfigured", true);
-            showOptions();
+            chatWindow->showPreferences("shares");
         }
     }
     else if (presence.type() == QXmppPresence::Error &&
@@ -688,11 +683,6 @@ void SharePanel::setClient(QXmppClient *newClient)
     check = connect(client, SIGNAL(shareServerFound(const QString&)),
                     this, SLOT(shareServerFound(const QString&)));
     Q_ASSERT(check);
-}
-
-void SharePanel::showOptions()
-{
-    chatWindow->showPreferences("shares");
 }
 
 void SharePanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)

@@ -43,6 +43,8 @@ Panel {
             ToolButton {
                 icon: 'options.png'
                 text: qsTr('Options')
+
+                onClicked: window.showPreferences('shares')
             }
 
             ToolButton {

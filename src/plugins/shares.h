@@ -70,7 +70,6 @@ private slots:
     void itemExpandRequested(const QModelIndex &index);
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
-    void showOptions();
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
     void shareServerFound(const QString &server);
     void indexStarted();
