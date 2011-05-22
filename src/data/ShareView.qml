@@ -55,9 +55,10 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
+                anchors.margins: 4
                 width: 24
                 height: 24
-                source: model.avatar
+                source: 'file.png'
             }
 
             Text {
@@ -66,6 +67,7 @@ Item {
                 anchors.left: thumbnail.right
                 anchors.right: sizeText.left
                 anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 4
                 text: model.name
             }
 
@@ -73,6 +75,7 @@ Item {
                 id: sizeText
         
                 anchors.right: parent.right
+                anchors.margins: 4
                 anchors.verticalCenter: parent.verticalCenter
                 text: model.size
             }
