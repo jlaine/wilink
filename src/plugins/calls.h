@@ -35,9 +35,6 @@ class ChatRosterModel;
 class QAudioInput;
 class QAudioOutput;
 class QFile;
-class QHostInfo;
-class QLabel;
-class QMenu;
 class QModelIndex;
 class QSoundMeter;
 class QTimer;
@@ -46,7 +43,6 @@ class QXmppCall;
 class QXmppCallManager;
 class QXmppVideoFormat;
 class QXmppVideoFrame;
-class QXmppSrvInfo;
 
 class CallAudioHelper : public QObject
 {
@@ -184,26 +180,6 @@ private:
     DeclarativePen *m_border;
     QImage m_image;
     qreal m_radius;
-};
-
-class CallWatcher : public QXmppLoggable
-{
-    Q_OBJECT
-
-public:
-    CallWatcher(Chat *chatWindow);
-    ~CallWatcher();
-
-private slots:
-    void connected();
-    void setTurnServer(const QXmppSrvInfo &serviceInfo);
-    void setTurnServer(const QHostInfo &hostInfo);
-
-private:
-    QXmppCallManager *m_callManager;
-    QXmppClient *m_client;
-    quint16 m_turnPort;
-    Chat *m_window;
 };
 
 #endif

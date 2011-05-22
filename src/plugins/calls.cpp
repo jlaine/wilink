@@ -409,65 +409,13 @@ void CallVideoItem::setRadius(qreal radius)
     }
 }
 
-CallWatcher::CallWatcher(Chat *chatWindow)
-    : QXmppLoggable(chatWindow), m_window(chatWindow)
-{
-    m_client = chatWindow->client();
-
-    m_callManager = new QXmppCallManager;
-    m_client->addExtension(m_callManager);
-    connect(m_client, SIGNAL(connected()),
-            this, SLOT(connected()));
-}
-
-CallWatcher::~CallWatcher()
-{
-}
-
-void CallWatcher::connected()
-{
-    // lookup TURN server
-    const QString domain = m_client->configuration().domain();
-    debug(QString("Looking up STUN server for domain %1").arg(domain));
-    QXmppSrvInfo::lookupService("_turn._udp." + domain, this,
-                                SLOT(setTurnServer(QXmppSrvInfo)));
-}
-
-void CallWatcher::setTurnServer(const QXmppSrvInfo &serviceInfo)
-{
-    QString serverName = "turn." + m_client->configuration().domain();
-    m_turnPort = 3478;
-    if (!serviceInfo.records().isEmpty()) {
-        serverName = serviceInfo.records().first().target();
-        m_turnPort = serviceInfo.records().first().port();
-    }
-
-    // lookup TURN host name
-    QHostInfo::lookupHost(serverName, this, SLOT(setTurnServer(QHostInfo)));
-}
-
-void CallWatcher::setTurnServer(const QHostInfo &hostInfo)
-{
-    if (hostInfo.addresses().isEmpty()) {
-        warning(QString("Could not lookup TURN server %1").arg(hostInfo.hostName()));
-        return;
-    }
-    m_callManager->setTurnServer(hostInfo.addresses().first(), m_turnPort);
-    m_callManager->setTurnUser(m_client->configuration().user());
-    m_callManager->setTurnPassword(m_client->configuration().password());
-}
-
 // PLUGIN
 
 class CallsPlugin : public ChatPlugin
 {
 public:
-    void finalize(Chat *chat);
     bool initialize(Chat *chat);
     QString name() const { return "Calls"; };
-
-private:
-    QMap<Chat*, CallWatcher*> m_watchers;
 };
 
 bool CallsPlugin::initialize(Chat *chat)
@@ -483,14 +431,7 @@ bool CallsPlugin::initialize(Chat *chat)
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
     qmlRegisterUncreatableType<DeclarativePen>("wiLink", 1, 2, "DeclarativePen", "");
 
-    CallWatcher *watcher = new CallWatcher(chat);
-    m_watchers.insert(chat, watcher);
     return true;
-}
-
-void CallsPlugin::finalize(Chat *chat)
-{
-    m_watchers.remove(chat);
 }
 
 Q_EXPORT_STATIC_PLUGIN2(calls, CallsPlugin)

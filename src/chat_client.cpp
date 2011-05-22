@@ -17,11 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QHostInfo>
+
+#include "QXmppCallManager.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppEntityTimeIq.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppLogger.h"
+#include "QXmppSrvInfo.h"
 #include "QXmppTransferManager.h"
 
 #include "chat_client.h"
@@ -40,6 +44,9 @@ ChatClient::ChatClient(QObject *parent)
     timeManager = findExtension<QXmppEntityTimeManager>();
     connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
         this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
+
+    QXmppCallManager *callManager = new QXmppCallManager;
+    addExtension(callManager);
 }
 
 QDateTime ChatClient::serverTime() const
@@ -58,6 +65,39 @@ void ChatClient::slotConnected()
     const QString id = discoManager->requestInfo(domain);
     if (!id.isEmpty())
         discoQueue.append(id);
+
+    // lookup TURN server
+    debug(QString("Looking up STUN server for domain %1").arg(domain));
+    QXmppSrvInfo::lookupService("_turn._udp." + domain, this,
+                                SLOT(setTurnServer(QXmppSrvInfo)));
+}
+
+void ChatClient::setTurnServer(const QXmppSrvInfo &serviceInfo)
+{
+    QString serverName = "turn." + configuration().domain();
+    m_turnPort = 3478;
+    if (!serviceInfo.records().isEmpty()) {
+        serverName = serviceInfo.records().first().target();
+        m_turnPort = serviceInfo.records().first().port();
+    }
+
+    // lookup TURN host name
+    QHostInfo::lookupHost(serverName, this, SLOT(setTurnServer(QHostInfo)));
+}
+
+void ChatClient::setTurnServer(const QHostInfo &hostInfo)
+{
+    if (hostInfo.addresses().isEmpty()) {
+        warning(QString("Could not lookup TURN server %1").arg(hostInfo.hostName()));
+        return;
+    }
+
+    QXmppCallManager *callManager = findExtension<QXmppCallManager>();
+    if (callManager) {
+        callManager->setTurnServer(hostInfo.addresses().first(), m_turnPort);
+        callManager->setTurnUser(configuration().user());
+        callManager->setTurnPassword(configuration().password());
+    }
 }
 
 void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
