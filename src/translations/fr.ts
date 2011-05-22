@@ -352,36 +352,6 @@
     </message>
 </context>
 <context>
-    <name>ChatTransferPrompt</name>
-    <message>
-        <source>%1 wants to send you a file called &apos;%2&apos; (%3).
-
-Do you accept?</source>
-        <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>File from %1</source>
-        <translation>Fichier de %1</translation>
-    </message>
-</context>
-<context>
-    <name>ChatTransfersWatcher</name>
-    <message>
-        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
-        <source>Send a file</source>
-        <translation>Envoyer un fichier</translation>
-    </message>
-    <message>
-        <source>Sorry, but you cannot send files bigger than %1.</source>
-        <translation>Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
-    </message>
-</context>
-<context>
     <name>ConversationPanel</name>
     <message>
         <source>Close</source>
@@ -394,6 +364,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
+    </message>
+    <message>
+        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
+        <translation type="obsolete">Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>Sorry, but you cannot send files bigger than %1.</source>
+        <translation type="obsolete">Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
     </message>
 </context>
 <context>
@@ -608,10 +586,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Downloads</source>
         <translation>Téléchargements</translation>
-    </message>
-    <message>
-        <source>Send a file</source>
-        <translation>Envoyer un fichier</translation>
     </message>
 </context>
 <context>

@@ -181,8 +181,6 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     // header
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
-    layout->setSpacing(0);
-    layout->addLayout(headerLayout());
 
     // chat history
     historyView = new QDeclarativeView;

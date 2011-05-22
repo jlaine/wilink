@@ -30,17 +30,11 @@
 #include "chat_panel.h"
 
 class CallVideoItem;
-class Chat;
-class ChatRosterModel;
 class QAudioInput;
 class QAudioOutput;
-class QFile;
-class QModelIndex;
 class QSoundMeter;
 class QTimer;
 class QVideoGrabber;
-class QXmppCall;
-class QXmppCallManager;
 class QXmppVideoFormat;
 class QXmppVideoFrame;
 

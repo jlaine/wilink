@@ -45,6 +45,14 @@ ChatClient::ChatClient(QObject *parent)
     connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
         this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
 
+    QXmppTransferManager *transferManager = findExtension<QXmppTransferManager>();
+    if (!transferManager) {
+        transferManager = new QXmppTransferManager;
+        // disable in-band bytestreams
+        transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
+        addExtension(transferManager);
+    }
+
     QXmppCallManager *callManager = new QXmppCallManager;
     addExtension(callManager);
 }

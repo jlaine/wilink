@@ -259,7 +259,7 @@ Item {
             box.text = qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
             box.standardButtons = QMessageBox.Yes | QMessageBox.No;
             if (box.exec()) {
-                var url = 'xmpp://' + window.objectName + '/' + call.jid.split('/')[0] + '?message';
+                var url = 'xmpp://' + window.objectName + '/' + job.jid.split('/')[0] + '?message';
                 Qt.openUrlExternally(url);
                 job.accept();
             } else {

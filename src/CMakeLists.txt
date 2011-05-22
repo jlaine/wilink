@@ -80,8 +80,7 @@ set(wiLink_SOURCES
     plugins/shares.cpp
     plugins/shares/model.cpp
     plugins/shares/options.cpp
-    plugins/shares/view.cpp
-    plugins/transfers.cpp)
+    plugins/shares/view.cpp)
 
 if(APPLE)
     set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
@@ -121,8 +120,7 @@ set(wiLink_MOC_HEADERS
     plugins/shares.h
     plugins/shares/options.h
     plugins/shares/model.h
-    plugins/shares/view.h
-    plugins/transfers.h)
+    plugins/shares/view.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
