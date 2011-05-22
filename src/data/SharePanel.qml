@@ -103,11 +103,7 @@ Panel {
         anchors.top: searchBar.bottom
         anchors.bottom: queueHelp.top
 
-        model: ListModel {
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-        }
+        model: shareModel
     }
 
     Text {

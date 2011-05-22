@@ -27,9 +27,6 @@
 #include "QXmppShareIq.h"
 #include "QXmppTransferManager.h"
 
-class ChatRosterModel;
-class SharesModel;
-
 class SharesDelegate : public QStyledItemDelegate
 {
 public:

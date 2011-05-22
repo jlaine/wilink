@@ -26,20 +26,18 @@ Item {
 
     clip: true
 
-    GridView {
+    ListView {
         id: view
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        cellWidth: 80
-        cellHeight: 50
 
         delegate: Item {
             id: item
-            width: view.cellWidth
-            height: view.cellHeight
+            width: view.width - 1
+            height: 24
 
             Rectangle {
                 id: itemBackground
@@ -52,23 +50,31 @@ Item {
                 }
             }
 
-            Column {
-                anchors.fill: parent
+            Image {
+                id: thumbnail
 
-                Image {
-                    id: thumbnail
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                width: 24
+                height: 24
+                source: model.avatar
+            }
 
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: 32
-                    height: 32
-                    source: model.avatar
-                }
+            Text {
+                id: text
 
-                Text {
-                    id: text
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    text: model.name
-                }
+                anchors.left: thumbnail.right
+                anchors.right: sizeText.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: model.name
+            }
+
+            Text {
+                id: sizeText
+        
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: model.size
             }
 
             MouseArea {
@@ -76,11 +82,6 @@ Item {
                 hoverEnabled: true
                 onDoubleClicked: {
                     crumbs.append({'url': view.model.rootUrl})
-                    if (model.isDir) {
-                        view.model.rootUrl = model.url;
-                    } else {
-                        image.source = model.avatar
-                    }
                 }
 
                 onEntered: {

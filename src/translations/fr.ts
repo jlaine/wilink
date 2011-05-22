@@ -718,7 +718,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>SharesModel</name>
+    <name>ShareModel</name>
     <message>
         <source>Downloaded</source>
         <translation>Téléchargé</translation>

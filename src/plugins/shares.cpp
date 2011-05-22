@@ -66,7 +66,7 @@ static int parallelDownloadLimit = 2;
 #define REGISTER_INTERVAL 60
 
 // common queries
-#define Q SharesModelQuery
+#define Q ShareModelQuery
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
 #define Q_FIND_TRANSFER(job) \
     (Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::FileItem) && \
@@ -89,10 +89,14 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     setLayout(layout);
     layout->setSpacing(0);
 
+    // models
+    ShareModel *sharesModel = new ShareModel(this);
+
     // declarative
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("window", chatWindow);
+    context->setContextProperty("shareModel", sharesModel);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
@@ -113,7 +117,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     // MAIN
 
     // shares view
-    SharesModel *sharesModel = new SharesModel(this);
     sharesView = new SharesView;
     sharesView->setExpandsOnDoubleClick(false);
     sharesView->setModel(sharesModel);
@@ -139,7 +142,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->addWidget(downloadsHelp);
 
     // downloads view
-    queueModel = new SharesModel(this);
+    queueModel = new ShareModel(this);
     downloadsView = new SharesView;
     downloadsView->setModel(queueModel);
     check = connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)),
@@ -448,7 +451,7 @@ void SharePanel::queueItem(QXmppShareItem *item)
     QXmppShareItem *emptyChild = queueModel->get(
             Q(QXmppShareItem::TypeRole, Q::Equals, QXmppShareItem::CollectionItem) &&
             Q(QXmppShareItem::SizeRole, Q::Equals, 0),
-            SharesModel::QueryOptions(), queueItem);
+            ShareModel::QueryOptions(), queueItem);
     if (queueItem->type() == QXmppShareItem::CollectionItem && (!queueItem->size() || emptyChild))
     {
         if (queueItem->locations().isEmpty())
@@ -701,9 +704,9 @@ void SharePanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
     QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
 
     // update all concerned views
-    SharesModel *model = qobject_cast<SharesModel*>(view->model());
+    ShareModel *model = qobject_cast<ShareModel*>(view->model());
     QXmppShareItem *oldItem = model->get(Q_FIND_LOCATIONS(newItem->locations()),
-                                         SharesModel::QueryOptions(SharesModel::PostRecurse));
+                                         ShareModel::QueryOptions(ShareModel::PostRecurse));
 
     if (!oldItem && shareIq.from() != shareServer)
     {

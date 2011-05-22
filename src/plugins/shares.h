@@ -30,7 +30,7 @@
 
 class Chat;
 class ChatRosterModel;
-class SharesModel;
+class ShareModel;
 class SharesView;
 class QLabel;
 class QModelIndex;
@@ -86,7 +86,7 @@ private:
     Chat *chatWindow;
     QXmppClient *client;
     QXmppShareDatabase *db;
-    SharesModel *queueModel;
+    ShareModel *queueModel;
     QMap<QString, QWidget*> searches;
 
     SharesView *sharesView;
