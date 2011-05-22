@@ -46,7 +46,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 4
             anchors.verticalCenter: parent.verticalCenter
-            source: (job && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
+            source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
         }
 
         Text {
@@ -74,7 +74,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             icon: 'file.png'
             //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
-            visible: job && job.state == QXmppTransferJob.FinishedState
+            visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
         }
 
         Button {

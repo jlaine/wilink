@@ -54,6 +54,22 @@ Panel {
             ToolButton {
                 icon: 'upload.png'
                 text: qsTr('Send a file')
+
+                onClicked: {
+                    var dialog = window.fileDialog();
+                    dialog.windowTitle = qsTr('Send a file');
+                    dialog.fileMode = QFileDialog.ExistingFile;
+                    if (dialog.exec()) {
+                        var component = Qt.createComponent('TransferWidget.qml');
+                        console.log("component "  + component);
+                        for (var i in dialog.selectedFiles) {
+                            var filePath = dialog.selectedFiles[i];
+                            var widget = component.createObject(widgetBar);
+                            widget.job = client.transferManager.sendFile(vcard.jid, filePath);
+                            console.log("job "  + widget.job + ' ' + widget.job.fileName);
+                        }
+                    }
+                }
             }
 
             ToolButton {

@@ -119,8 +119,8 @@ Item {
             anchors.top: parent.top
             anchors.right: cameraButton.left
             anchors.margins: 4
-            maximumValue: Qt.isQtObject(audio) ? audio.maximumVolume : 1
-            value: Qt.isQtObject(audio) ? audio.outputVolume : 0
+            maximumValue: audio.maximumVolume
+            value: audio.outputVolume
         }
 
         ProgressBar {
@@ -130,8 +130,8 @@ Item {
             anchors.right: cameraButton.left
             anchors.leftMargin: 4
             anchors.rightMargin: 4
-            maximumValue: Qt.isQtObject(audio) ? audio.maximumVolume : 1
-            value: Qt.isQtObject(audio) ? audio.inputVolume : 0
+            maximumValue: audio.maximumVolume
+            value: audio.inputVolume
         }
 
         Image {
