@@ -29,6 +29,7 @@
 
 class QXmppCallManager;
 class QXmppDiscoveryManager;
+class QXmppTransferManager;
 
 class QDeclarativeInputDialog : public QInputDialog
 {
@@ -57,6 +58,7 @@ class QXmppDeclarativeClient : public QObject
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
+    Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
 
 public:
     QXmppDeclarativeClient(QXmppClient *client);
@@ -66,6 +68,7 @@ public:
     QXmppCallManager *callManager() const;
     QXmppDiscoveryManager *discoveryManager() const;
     QXmppRosterManager *rosterManager() const;
+    QXmppTransferManager* transferManager() const;
 
 signals:
     void jidChanged(const QString &jid);

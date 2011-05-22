@@ -29,7 +29,6 @@
 class Chat;
 class ChatClient;
 class ChatHistoryModel;
-class ChatRosterModel;
 class QDeclarativeView;
 class QModelIndex;
 class QUrl;
@@ -80,7 +79,7 @@ class ChatDialogPanel : public ChatPanel
     Q_OBJECT
 
 public:
-    ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    ChatDialogPanel(Chat *chatWindow, const QString &jid);
     QDeclarativeView *declarativeView() const;
 
 public slots:
@@ -103,9 +102,9 @@ private:
     ChatClient *client;
     bool joined;
 
+    Chat *m_window;
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
-    ChatRosterModel *rosterModel;
     QStringList chatStatesJids;
 };
 

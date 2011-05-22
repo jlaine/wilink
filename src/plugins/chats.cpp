@@ -151,13 +151,14 @@ bool ChatDialogHelper::sendMessage(const QString &body)
     return true;
 }
 
-ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatPanel(parent),
+ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
+    : ChatPanel(chatWindow),
     chatRemoteJid(jid), 
-    client(xmppClient),
     joined(false),
-    rosterModel(chatRosterModel)
+    m_window(chatWindow)
 {
+    client = chatWindow->client();
+
     bool check;
     setObjectName(jid);
 
@@ -170,7 +171,7 @@ ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRo
 
     // prepare models
     historyModel = new ChatHistoryModel(this);
-    historyModel->setParticipantModel(rosterModel);
+    historyModel->setParticipantModel(m_window->rosterModel());
 
     ChatDialogHelper *helper = new ChatDialogHelper(this);
     helper->setClient(client);
@@ -186,9 +187,10 @@ ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRo
     // chat history
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
-    context->setContextProperty("client", new QXmppDeclarativeClient(xmppClient));
+    context->setContextProperty("client", new QXmppDeclarativeClient(client));
     context->setContextProperty("conversation", helper);
     context->setContextProperty("historyModel", historyModel);
+    context->setContextProperty("window", m_window);
     historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     historyView->setSource(QUrl("qrc:/ConversationPanel.qml"));
@@ -216,7 +218,7 @@ ChatDialogPanel::ChatDialogPanel(ChatClient *xmppClient, ChatRosterModel *chatRo
                     this, SLOT(archiveListReceived(QList<QXmppArchiveChat>)));
     Q_ASSERT(check);
 
-    check = connect(rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+    check = connect(m_window->rosterModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
                     this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
     Q_ASSERT(check);
 
@@ -299,7 +301,7 @@ void ChatDialogPanel::join()
         return;
 
     // send initial state
-    chatStatesJids = rosterModel->contactFeaturing(chatRemoteJid, ChatRosterModel::ChatStatesFeature);
+    chatStatesJids = m_window->rosterModel()->contactFeaturing(chatRemoteJid, ChatRosterModel::ChatStatesFeature);
     //chatStateChanged(chatInput()->state());
 
     // FIXME : we need to check whether archives are supported
@@ -358,7 +360,7 @@ void ChatDialogPanel::rosterChanged(const QModelIndex &topLeft, const QModelInde
     Q_ASSERT(topLeft.parent() == bottomRight.parent());
     const QModelIndex parent = topLeft.parent();
     for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        const QString jid = rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
+        const QString jid = m_window->rosterModel()->index(i, 0, parent).data(ChatModel::JidRole).toString();
         if (jid == chatRemoteJid) {
             updateWindowTitle();
             break;
@@ -370,7 +372,7 @@ void ChatDialogPanel::rosterChanged(const QModelIndex &topLeft, const QModelInde
  */
 void ChatDialogPanel::updateWindowTitle()
 {
-    QModelIndex index = rosterModel->findItem(chatRemoteJid);
+    QModelIndex index = m_window->rosterModel()->findItem(chatRemoteJid);
     setWindowTitle(index.data(Qt::DisplayRole).toString());
     setWindowIcon(index.data(Qt::DecorationRole).value<QIcon>());
 
@@ -422,7 +424,7 @@ void ChatsWatcher::messageReceived(const QXmppMessage &msg)
 
     if (msg.type() == QXmppMessage::Chat && !chat->panel(bareJid) && !msg.body().isEmpty())
     {
-        ChatDialogPanel *dialog = new ChatDialogPanel(chat->client(), chat->rosterModel(), bareJid);
+        ChatDialogPanel *dialog = new ChatDialogPanel(chat, bareJid);
         chat->addPanel(dialog);
         dialog->messageReceived(msg);
     }
@@ -438,7 +440,7 @@ void ChatsWatcher::urlClick(const QUrl &url)
             jid.remove(0, 1);
         ChatPanel *panel = chat->panel(jid);
         if (!panel) {
-            panel = new ChatDialogPanel(chat->client(), chat->rosterModel(), jid);
+            panel = new ChatDialogPanel(chat, jid);
             chat->addPanel(panel);
         }
         QTimer::singleShot(0, panel, SIGNAL(showPanel()));

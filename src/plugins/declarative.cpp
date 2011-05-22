@@ -24,6 +24,7 @@
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppRosterManager.h"
+#include "QXmppTransferManager.h"
 
 #include "chat.h"
 #include "chat_plugin.h"
@@ -101,6 +102,11 @@ QXmppDiscoveryManager *QXmppDeclarativeClient::discoveryManager() const
 QXmppRosterManager *QXmppDeclarativeClient::rosterManager() const
 {
     return &m_client->rosterManager();
+}
+
+QXmppTransferManager *QXmppDeclarativeClient::transferManager() const
+{
+    return m_client->findExtension<QXmppTransferManager>();
 }
 
 void QXmppDeclarativeClient::_q_connected()
