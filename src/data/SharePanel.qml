@@ -25,7 +25,7 @@ Panel {
     PanelHeader {
         id: header
 
-        property string help: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
+        property string help: qsTr('You can select the folders you want to share with other users from the shares options.')
 
         anchors.left: parent.left
         anchors.right: parent.right
@@ -39,6 +39,11 @@ Panel {
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
+
+            ToolButton {
+                icon: 'options.png'
+                text: qsTr('Options')
+            }
 
             ToolButton {
                 icon: 'close.png'
