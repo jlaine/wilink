@@ -265,7 +265,7 @@ void PlacesModel::setSourceModel(QFileSystemModel *sourceModel)
     QAbstractProxyModel::setSourceModel(sourceModel);
 }
 
-SharesOptions::SharesOptions(QXmppShareDatabase *database)
+ShareOptions::ShareOptions(QXmppShareDatabase *database)
     : m_database(database)
 {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -342,7 +342,7 @@ SharesOptions::SharesOptions(QXmppShareDatabase *database)
     setWindowTitle(tr("Shares"));
 }
 
-void SharesOptions::browse()
+void ShareOptions::browse()
 {
     QFileDialog *dialog = new QFileDialog(this);
     dialog->setDirectory(m_directoryEdit->text());
@@ -360,13 +360,13 @@ void SharesOptions::browse()
     Q_ASSERT(check);
 }
 
-void SharesOptions::directorySelected(const QString &path)
+void ShareOptions::directorySelected(const QString &path)
 {
     m_directoryEdit->setText(path);
     m_fsModel->setForcedFolder(path);
 }
 
-void SharesOptions::fewerFolders()
+void ShareOptions::fewerFolders()
 {
     m_fsView->hide();
     m_placesView->show();
@@ -374,7 +374,7 @@ void SharesOptions::fewerFolders()
     m_moreButton->show();
 }
 
-void SharesOptions::moreFolders()
+void ShareOptions::moreFolders()
 {
     m_placesView->hide();
     m_fsView->show();
@@ -382,7 +382,7 @@ void SharesOptions::moreFolders()
     m_fewerButton->show();
 }
 
-bool SharesOptions::save()
+bool ShareOptions::save()
 {
     const QString path = m_directoryEdit->text();
     const QStringList mapped = m_fsModel->selectedFolders();
@@ -397,7 +397,7 @@ bool SharesOptions::save()
     return true;
 }
 
-void SharesOptions::scrollToHome()
+void ShareOptions::scrollToHome()
 {
     // scroll to home
     QModelIndex homeIndex = m_fsModel->index(QDir::homePath());
@@ -405,7 +405,7 @@ void SharesOptions::scrollToHome()
     m_fsView->scrollTo(homeIndex, QAbstractItemView::PositionAtTop);
 }
 
-void SharesOptions::showEvent(QShowEvent *event)
+void ShareOptions::showEvent(QShowEvent *event)
 {
     ChatPreferencesTab::showEvent(event);
     QTimer::singleShot(0, this, SLOT(scrollToHome()));

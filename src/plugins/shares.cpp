@@ -822,7 +822,7 @@ bool SharesPlugin::initialize(Chat *chat)
 void SharesPlugin::preferences(ChatPreferences *prefs)
 {
     if (db)
-        prefs->addTab(new SharesOptions(db));
+        prefs->addTab(new ShareOptions(db));
 }
 
 Q_EXPORT_STATIC_PLUGIN2(shares, SharesPlugin)

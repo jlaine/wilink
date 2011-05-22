@@ -686,6 +686,41 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ShareOptions</name>
+    <message>
+        <source>Shared folders</source>
+        <translation>Dossier partagés</translation>
+    </message>
+    <message>
+        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
+        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
+    </message>
+    <message>
+        <source>More folders..</source>
+        <translation>Plus de dossiers..</translation>
+    </message>
+    <message>
+        <source>Fewer folders..</source>
+        <translation>Moins de dossiers..</translation>
+    </message>
+    <message>
+        <source>Downloads folder</source>
+        <translation>Dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>Select the folder in which received files will be stored.</source>
+        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
+    </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+    <message>
+        <source>Shares folder</source>
+        <translation>Dossier de partages</translation>
+    </message>
+</context>
+<context>
     <name>SharePanel</name>
     <message>
         <source>Shares</source>
@@ -750,41 +785,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Received files are stored in your &lt;a href=&quot;%1&quot;&gt;downloads folder&lt;/a&gt;. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre &lt;a href=&quot;%1&quot;&gt;dossier de téléchargement&lt;/a&gt;. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-</context>
-<context>
-    <name>SharesOptions</name>
-    <message>
-        <source>Shared folders</source>
-        <translation>Dossier partagés</translation>
-    </message>
-    <message>
-        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
-        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
-    </message>
-    <message>
-        <source>More folders..</source>
-        <translation>Plus de dossiers..</translation>
-    </message>
-    <message>
-        <source>Fewer folders..</source>
-        <translation>Moins de dossiers..</translation>
-    </message>
-    <message>
-        <source>Downloads folder</source>
-        <translation>Dossier de téléchargement</translation>
-    </message>
-    <message>
-        <source>Select the folder in which received files will be stored.</source>
-        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>Shares folder</source>
-        <translation>Dossier de partages</translation>
     </message>
 </context>
 <context>

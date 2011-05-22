@@ -56,12 +56,12 @@ private:
 
 /** View for displaying a tree of share items.
  */
-class SharesOptions : public ChatPreferencesTab
+class ShareOptions : public ChatPreferencesTab
 {
     Q_OBJECT
 
 public:
-    SharesOptions(QXmppShareDatabase *database);
+    ShareOptions(QXmppShareDatabase *database);
     bool save();
 
 protected:
