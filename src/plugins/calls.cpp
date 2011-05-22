@@ -443,15 +443,9 @@ void CallWatcher::addCall(QXmppCall *call)
             panel->setProperty("__call_component", qVariantFromValue<QObject*>(component));
         }
 
-        // create audio helper
-        CallAudioHelper *audioHelper = new CallAudioHelper;
-        audioHelper->moveToThread(wApp->soundThread());
-        audioHelper->setCall(call);
-
         // create call widget
         QDeclarativeItem *widget = qobject_cast<QDeclarativeItem*>(component->create());
         Q_ASSERT(widget);
-        widget->setProperty("audio", qVariantFromValue<QObject*>(audioHelper));
         widget->setProperty("call", qVariantFromValue<QObject*>(call));
         QDeclarativeItem *bar = panel->declarativeView()->rootObject()->findChild<QDeclarativeItem*>("widgetBar");
         widget->setParentItem(bar);
@@ -586,7 +580,7 @@ bool CallsPlugin::initialize(Chat *chat)
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
     qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
 
-    qmlRegisterUncreatableType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper", "");
+    qmlRegisterType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper");
     qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
     qmlRegisterUncreatableType<DeclarativePen>("wiLink", 1, 2, "DeclarativePen", "");

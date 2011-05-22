@@ -21,6 +21,7 @@
 #include <QDeclarativeEngine>
 #include <QMessageBox>
 
+#include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppRosterManager.h"
 
@@ -85,6 +86,11 @@ QString QXmppDeclarativeClient::jid() const
 QXmppLogger *QXmppDeclarativeClient::logger() const
 {
     return m_client->logger();
+}
+
+QXmppCallManager *QXmppDeclarativeClient::callManager() const
+{
+    return m_client->findExtension<QXmppCallManager>();
 }
 
 QXmppDiscoveryManager *QXmppDeclarativeClient::discoveryManager() const

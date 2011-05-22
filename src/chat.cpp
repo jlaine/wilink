@@ -54,6 +54,7 @@
 #include "QSoundMeter.h"
 #include "QSoundPlayer.h"
 
+#include "QXmppCallManager.h"
 #include "QXmppConfiguration.h"
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryManager.h"
@@ -105,6 +106,7 @@ Chat::Chat(QWidget *parent)
     bool check;
 
     qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
     qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
     qmlRegisterUncreatableType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger", "");
     qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");

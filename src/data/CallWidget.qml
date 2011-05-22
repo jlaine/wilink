@@ -25,11 +25,16 @@ Item {
     id: callWidget
 
     property QtObject call: null
-    property QtObject audio: null
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
     height: video.enabled ? 288 : 40
+
+    CallAudioHelper {
+        id: audio
+
+        call: callWidget.call
+    }
 
     CallVideoHelper {
         id: video
