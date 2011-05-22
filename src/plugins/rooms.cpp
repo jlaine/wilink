@@ -438,6 +438,10 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 #endif
 
     // connect signals
+    check = connect(historyView->rootObject(), SIGNAL(close()),
+                    this, SIGNAL(hidePanel()));
+    Q_ASSERT(check);
+
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(unbookmark()));
     Q_ASSERT(check);
