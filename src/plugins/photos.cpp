@@ -61,6 +61,7 @@ static QCache<QUrl, QImage> photoImageCache;
 enum PhotoRole
 {
     IsDirRole = ChatModel::UserRole,
+    ProgressRole,
     SizeRole,
 };
 
@@ -392,15 +393,6 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
     case FileSystem::Mkdir:
         refresh();
         break;
-#if 0
-    case FileSystem::Put:
-        progressFiles++;
-        progressBar->setValue(PROGRESS_STEPS * progressFiles);
-        delete uploadDevice;
-        uploadDevice = 0;
-        processUploadQueue();
-        break;
-#endif
     case FileSystem::Remove:
         if (!error)
             refresh();
@@ -484,7 +476,7 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
 
 void PhotoModel::upload(const QString &filePath)
 {
-    m_uploads->append(filePath, m_fs);
+    m_uploads->append(filePath, m_fs, m_rootUrl.toString());
 }
 
 PhotoUploadModel *PhotoModel::uploads() const
@@ -495,9 +487,12 @@ PhotoUploadModel *PhotoModel::uploads() const
 class PhotoUploadItem : public ChatModelItem
 {
 public:
-    QString filePath;
+    QString sourcePath;
+    QString destinationPath;
     FileSystem *fileSystem;
-    bool done;
+    bool finished;
+    qreal progress;
+    qint64 size;
 };
 
 PhotoUploadModel::PhotoUploadModel(QObject *parent)
@@ -505,13 +500,18 @@ PhotoUploadModel::PhotoUploadModel(QObject *parent)
     m_uploadDevice(0),
     m_uploadItem(0)
 {
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(ProgressRole, "progress");
+    names.insert(SizeRole, "size");
+    setRoleNames(names);
 }
 
-void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem)
+void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
 {
     qDebug("Adding item %s", qPrintable(filePath));
     PhotoUploadItem *item = new PhotoUploadItem;
-    item->filePath = filePath;
+    item->sourcePath = filePath;
+    item->destinationPath = destinationPath;
     item->fileSystem = fileSystem;
     addItem(item, rootItem);
 }
@@ -521,7 +521,7 @@ void PhotoUploadModel::commandFinished(int cmd, bool error, const FileInfoList &
     if (cmd != FileSystem::Put)
         return;
 
-    m_uploadItem->done = true;
+    m_uploadItem->finished = true;
     emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
     m_uploadItem = 0;
 
@@ -537,22 +537,57 @@ QVariant PhotoUploadModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == AvatarRole) {
-        return QUrl::fromLocalFile(item->filePath);
+        return QUrl::fromLocalFile(item->sourcePath);
     } else if (role == NameRole) {
-        return QFileInfo(item->filePath).fileName();
+        return QFileInfo(item->sourcePath).fileName();
+    } else if (role == ProgressRole) {
+        return item->progress;
+    } else if (role == SizeRole) {
+        return item->size;
     }
     return QVariant();
 }
 
 void PhotoUploadModel::processQueue()
 {
+    if (m_uploadItem)
+        return;
 
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        PhotoUploadItem *item = static_cast<PhotoUploadItem*>(ptr);
+        if (!item->finished) {
+            m_uploadItem = item;
+
+            // process the next file to upload
+            const QByteArray imageFormat = QImageReader::imageFormat(item->sourcePath);
+            QImage image;
+            if (!imageFormat.isEmpty() && image.load(item->sourcePath, imageFormat.constData()))
+            {
+                if (image.width() > UPLOAD_SIZE.width() || image.height() > UPLOAD_SIZE.height())
+                    image = image.scaled(UPLOAD_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                m_uploadDevice = new QBuffer(this);
+                m_uploadDevice->open(QIODevice::WriteOnly);
+                image.save(m_uploadDevice, imageFormat.constData());
+                m_uploadDevice->open(QIODevice::ReadOnly);
+            } else {
+                m_uploadDevice = new QFile(item->sourcePath, this);
+            }
+
+            item->fileSystem->put(m_uploadDevice, item->destinationPath);
+            break;
+        }
+    }
 }
 
 /** TODO: Update the progress bar for the current upload.
  */
 void PhotoUploadModel::putProgress(int done, int total)
 {
+    if (m_uploadItem) {
+        m_uploadItem->size = total;
+        m_uploadItem->progress = total ? qreal(done) / qreal(total) : 0;
+        emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
+    }
 }
 
 /** Constructs a PhotoPanel.

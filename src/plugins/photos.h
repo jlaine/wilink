@@ -136,7 +136,7 @@ class PhotoUploadModel : public ChatModel
 public:
     PhotoUploadModel(QObject *parent = 0);
 
-    void append(const QString &filePath, FileSystem *fileSystem);
+    void append(const QString &sourcePath, FileSystem *fileSystem, const QString &destinationPath);
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
