@@ -198,7 +198,6 @@ public:
 private slots:
     void callAborted();
     void callClicked(QAbstractButton * button);
-    void callContact();
     void callReceived(QXmppCall *call);
     void connected();
     void setTurnServer(const QXmppSrvInfo &serviceInfo);

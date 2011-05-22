@@ -429,9 +429,6 @@ CallWatcher::~CallWatcher()
 void CallWatcher::addCall(QXmppCall *call)
 {
     const QString bareJid = jidToBareJid(call->jid());
-    QModelIndex index = m_window->rosterModel()->findItem(bareJid);
-    if (index.isValid())
-        QMetaObject::invokeMethod(m_window, "rosterClicked", Q_ARG(QModelIndex, index));
 
     ChatDialogPanel *panel = qobject_cast<ChatDialogPanel*>(m_window->panel(bareJid));
     if (panel) {
@@ -489,17 +486,6 @@ void CallWatcher::callClicked(QAbstractButton * button)
         call->hangup();
     }
     box->deleteLater();
-}
-
-void CallWatcher::callContact()
-{
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
-        return;
-    QString fullJid = action->data().toString();
-
-    QXmppCall *call = m_callManager->call(fullJid);
-    addCall(call);
 }
 
 void CallWatcher::callReceived(QXmppCall *call)
@@ -566,7 +552,6 @@ public:
     void finalize(Chat *chat);
     bool initialize(Chat *chat);
     QString name() const { return "Calls"; };
-    void polish(Chat *chat, ChatPanel *panel);
 
 private:
     QMap<Chat*, CallWatcher*> m_watchers;
@@ -593,20 +578,6 @@ bool CallsPlugin::initialize(Chat *chat)
 void CallsPlugin::finalize(Chat *chat)
 {
     m_watchers.remove(chat);
-}
-
-void CallsPlugin::polish(Chat *chat, ChatPanel *panel)
-{
-    CallWatcher *watcher = m_watchers.value(chat);
-    if (!watcher || !qobject_cast<ChatDialogPanel*>(panel))
-        return;
-
-    const QStringList fullJids = chat->rosterModel()->contactFeaturing(panel->objectName(), ChatRosterModel::VoiceFeature);
-    if (!fullJids.isEmpty()) {
-        QAction *action = panel->addAction(QIcon(":/call.png"), QObject::tr("Call"));
-        action->setData(fullJids.first());
-        connect(action, SIGNAL(triggered()), watcher, SLOT(callContact()));
-    }
 }
 
 Q_EXPORT_STATIC_PLUGIN2(calls, CallsPlugin)

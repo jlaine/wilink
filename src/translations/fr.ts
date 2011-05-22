@@ -625,10 +625,6 @@ Acceptez-vous?</translation>
         <translation>Téléchargements</translation>
     </message>
     <message>
-        <source>Call</source>
-        <translation>Appeler</translation>
-    </message>
-    <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
     </message>
