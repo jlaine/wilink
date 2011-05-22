@@ -41,12 +41,12 @@ class QXmppShareDatabase;
 
 /** The shares panel.
  */
-class SharesPanel : public ChatPanel
+class SharePanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    SharesPanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
+    SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent = 0);
     void setClient(QXmppClient *client);
 
 signals:

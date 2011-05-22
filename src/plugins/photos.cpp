@@ -444,8 +444,7 @@ void PhotoUploadModel::putProgress(int done, int total)
  * @param parent The parent widget of the panel.
  */
 PhotoPanel::PhotoPanel(Chat *chatWindow, const QString &url)
-    : ChatPanel(chatWindow),
-    baseUrl(url)
+    : ChatPanel(chatWindow)
 {
     bool check;
 

@@ -141,6 +141,7 @@ if(RELOAD_TRANSLATIONS)
         data/PhonePanel.qml
         data/PhotoPanel.qml
         data/RoomPanel.qml
+        data/SharePanel.qml
         data/TransferWidget.qml
         translations/fr.ts)
 else(RELOAD_TRANSLATIONS)

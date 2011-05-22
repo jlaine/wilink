@@ -595,14 +595,6 @@ Acceptez-vous?</translation>
         <translation type="obsolete">Suppression de %1</translation>
     </message>
     <message>
-        <source>Loading image..</source>
-        <translation type="obsolete">Chargement de l&apos;image..</translation>
-    </message>
-    <message>
-        <source>Connecting..</source>
-        <translation type="obsolete">Connexion..</translation>
-    </message>
-    <message>
         <source>Photos upload complete.</source>
         <translation type="obsolete">Envoi de photos terminé.</translation>
     </message>
@@ -611,20 +603,12 @@ Acceptez-vous?</translation>
         <translation type="obsolete">Vos photos ont été envoyées.</translation>
     </message>
     <message>
-        <source>Uploading %1</source>
-        <translation type="obsolete">Transfert de %1</translation>
-    </message>
-    <message>
-        <source>Loading your albums..</source>
-        <translation type="obsolete">Chargement de vos albums..</translation>
-    </message>
-    <message>
         <source>Upload photos</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi de photos</translation>
     </message>
     <message>
         <source>Upload</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer</translation>
     </message>
 </context>
 <context>
@@ -723,6 +707,69 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>SharePanel</name>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+    <message>
+        <source>Enter the name of the file you are looking for.</source>
+        <translation>Saisissez le nom du fichier que vous cherchez.</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>Télécharger</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+    <message>
+        <source>downloads folder</source>
+        <translation>dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>You can select the folders you want to share with other users from the shares options.</source>
+        <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
+    </message>
+    <message>
+        <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
+        <translation>Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+    </message>
+    <message>
+        <source>Downloaded</source>
+        <translation>Téléchargé</translation>
+    </message>
+    <message>
+        <source>Failed</source>
+        <translation>Echoué</translation>
+    </message>
+    <message>
+        <source>Transfer</source>
+        <translation>Transfert</translation>
+    </message>
+    <message>
+        <source>Indexed %1 files in %2s</source>
+        <translation>%1 fichiers indexés en %2s</translation>
+    </message>
+    <message>
+        <source>Indexing files</source>
+        <translation>Indexation des fichiers</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>En attente</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>SharesModel</name>
     <message>
         <source>Downloaded</source>
@@ -790,65 +837,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Shares folder</source>
         <translation>Dossier de partages</translation>
-    </message>
-</context>
-<context>
-    <name>SharesPanel</name>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>Enter the name of the file you are looking for.</source>
-        <translation>Saisissez le nom du fichier que vous cherchez.</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation>Télécharger</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Retirer</translation>
-    </message>
-    <message>
-        <source>downloads folder</source>
-        <translation>dossier de téléchargement</translation>
-    </message>
-    <message>
-        <source>You can select the folders you want to share with other users from the shares options.</source>
-        <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
-    </message>
-    <message>
-        <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
-        <source>Downloaded</source>
-        <translation>Téléchargé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation>Echoué</translation>
-    </message>
-    <message>
-        <source>Transfer</source>
-        <translation>Transfert</translation>
-    </message>
-    <message>
-        <source>Indexed %1 files in %2s</source>
-        <translation>%1 fichiers indexés en %2s</translation>
-    </message>
-    <message>
-        <source>Indexing files</source>
-        <translation>Indexation des fichiers</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation>En attente</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation>Options</translation>
     </message>
 </context>
 <context>

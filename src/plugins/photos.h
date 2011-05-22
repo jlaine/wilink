@@ -121,9 +121,6 @@ class PhotoPanel : public ChatPanel
 
 public:
     PhotoPanel(Chat *chatWindow, const QString &url);
-
-private:
-    QUrl baseUrl;
 };
 
 #endif
