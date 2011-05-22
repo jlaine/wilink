@@ -29,6 +29,9 @@
 
 using namespace QNetIO;
 
+class Chat;
+class PhotoUploadItem;
+class PhotoUploadModel;
 class QImage;
 class QLabel;
 class QProgressBar;
@@ -96,12 +99,15 @@ class PhotoModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
+    Q_PROPERTY(PhotoUploadModel uploads READ uploads CONSTANT)
 
 public:
     PhotoModel(QObject *parent = 0);
 
     QUrl rootUrl() const;
     void setRootUrl(const QUrl &rootUrl);
+
+    PhotoUploadModel *uploads() const;
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -111,15 +117,39 @@ signals:
 
 public slots:
     void refresh();
+    void upload(const QString &filePath);
 
 private slots:
     void commandFinished(int cmd, bool error, const FileInfoList &results);
     void photoChanged(const QUrl &url);
-    void putProgress(int done, int total);
 
 private:
     FileSystem *m_fs;
     QUrl m_rootUrl;
+    PhotoUploadModel *m_uploads;
+};
+
+class PhotoUploadModel : public ChatModel
+{
+    Q_OBJECT
+
+public:
+    PhotoUploadModel(QObject *parent = 0);
+
+    void append(const QString &filePath, FileSystem *fileSystem);
+
+    // QAbstractItemModel
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+private slots:
+    void commandFinished(int cmd, bool error, const FileInfoList &results);
+    void processQueue();
+    void putProgress(int done, int total);
+
+private:
+    PhotoModel *m_photoModel;
+    PhotoUploadItem *m_uploadItem;
+    QIODevice *m_uploadDevice;
 };
 
 /** The PhotoPanel class represents a panel for displaying photos.
@@ -142,7 +172,7 @@ class PhotoPanel : public ChatPanel
     };
 
 public:
-    PhotoPanel(const QString &url, QWidget *parent = NULL);
+    PhotoPanel(Chat *chatWindow, const QString &url);
 
 protected:
     void processDownloadQueue();

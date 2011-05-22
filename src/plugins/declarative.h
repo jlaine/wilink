@@ -21,6 +21,7 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+#include <QFileDialog>
 #include <QInputDialog>
 
 #include "QXmppClient.h"
@@ -36,6 +37,15 @@ class QDeclarativeInputDialog : public QInputDialog
 
 public:
     QDeclarativeInputDialog(QWidget *parent = 0) : QInputDialog(parent) {}
+};
+
+class QDeclarativeFileDialog : public QFileDialog
+{
+    Q_OBJECT
+    Q_PROPERTY(QStringList selectedFiles READ selectedFiles)
+
+public:
+    QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
 };
 
 class QXmppDeclarativeClient : public QObject

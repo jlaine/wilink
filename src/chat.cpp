@@ -32,6 +32,7 @@
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QLabel>
@@ -114,6 +115,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
+    qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
 
@@ -528,6 +530,12 @@ void Chat::promptCredentials()
         config.setPassword(password);
         d->client->connectToServer(config);
     }
+}
+
+QFileDialog *Chat::fileDialog()
+{
+    QFileDialog *dialog = new QDeclarativeFileDialog(this);
+    return dialog;
 }
 
 QInputDialog *Chat::inputDialog()

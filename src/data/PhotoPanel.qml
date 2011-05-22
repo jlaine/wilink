@@ -57,6 +57,20 @@ Panel {
             }
 
             ToolButton {
+                icon: 'upload.png'
+                text: qsTr('Upload')
+                onClicked: {
+                    var dialog = window.fileDialog();
+                    dialog.fileMode = QFileDialog.ExistingFiles;
+                    dialog.windowTitle = qsTr('Upload photos');
+                    if (dialog.exec()) {
+                        var files = dialog.selectedFiles;
+                        console.log("files: " + files);
+                    }
+                }
+            }
+
+            ToolButton {
                 icon: 'stop.png'
                 text: qsTr('Cancel')
                 visible: false
@@ -180,7 +194,6 @@ Panel {
 
             anchors.fill: parent
             fillMode: Image.PreserveAspectFit
-            source: currentImage
         }
     }
 

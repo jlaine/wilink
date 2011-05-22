@@ -351,6 +351,8 @@ PhotoModel::PhotoModel(QObject *parent)
     names.insert(SizeRole, "size");
     setRoleNames(names);
 
+    m_uploads = new PhotoUploadModel(this);
+
     connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl)),
             this, SLOT(photoChanged(QUrl)));
 }
@@ -441,12 +443,6 @@ void PhotoModel::photoChanged(const QUrl &url)
     }
 }
 
-/** TODO: Update the progress bar for the current upload.
- */
-void PhotoModel::putProgress(int done, int total)
-{
-}
-
 /** Refresh the contents of the current folder.
  */
 void PhotoModel::refresh()
@@ -473,8 +469,10 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
         m_fs = FileSystem::factory(m_rootUrl, this);
         connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
                 this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+        connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+                m_uploads, SLOT(commandFinished(int, bool, const FileInfoList&)));
         connect(m_fs, SIGNAL(putProgress(int, int)),
-                this, SLOT(putProgress(int, int)));
+                m_uploads, SLOT(putProgress(int, int)));
 
         m_fs->open(m_rootUrl);
     } else {
@@ -484,13 +482,85 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
     emit rootUrlChanged(m_rootUrl);
 }
 
+void PhotoModel::upload(const QString &filePath)
+{
+    m_uploads->append(filePath, m_fs);
+}
+
+PhotoUploadModel *PhotoModel::uploads() const
+{
+    return m_uploads;
+}
+
+class PhotoUploadItem : public ChatModelItem
+{
+public:
+    QString filePath;
+    FileSystem *fileSystem;
+    bool done;
+};
+
+PhotoUploadModel::PhotoUploadModel(QObject *parent)
+    : ChatModel(parent),
+    m_uploadDevice(0),
+    m_uploadItem(0)
+{
+}
+
+void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem)
+{
+    PhotoUploadItem *item = new PhotoUploadItem;
+    item->filePath = filePath;
+    item->fileSystem = fileSystem;
+    addItem(item, rootItem);
+}
+
+void PhotoUploadModel::commandFinished(int cmd, bool error, const FileInfoList &results)
+{
+    if (cmd != FileSystem::Put)
+        return;
+
+    m_uploadItem->done = true;
+    emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
+    m_uploadItem = 0;
+
+    delete m_uploadDevice;
+    m_uploadDevice = 0;
+    processQueue();
+}
+
+QVariant PhotoUploadModel::data(const QModelIndex &index, int role) const
+{
+    PhotoUploadItem *item = static_cast<PhotoUploadItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == AvatarRole) {
+        return QUrl::fromLocalFile(item->filePath);
+    } else if (role == NameRole) {
+        return QFileInfo(item->filePath).fileName();
+    }
+    return QVariant();
+}
+
+void PhotoUploadModel::processQueue()
+{
+
+}
+
+/** TODO: Update the progress bar for the current upload.
+ */
+void PhotoUploadModel::putProgress(int done, int total)
+{
+}
+
 /** Constructs a PhotoPanel.
  *
  * @param url    The base URL for the photo sharing service.
  * @param parent The parent widget of the panel.
  */
-PhotoPanel::PhotoPanel(const QString &url, QWidget *parent)
-    : ChatPanel(parent),
+PhotoPanel::PhotoPanel(Chat *chatWindow, const QString &url)
+    : ChatPanel(chatWindow),
     baseUrl(url),
     downloadDevice(0),
     uploadDevice(0),
@@ -559,7 +629,7 @@ PhotoPanel::PhotoPanel(const QString &url, QWidget *parent)
     // declarative
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    //context->setContextProperty("window", chatWindow);
+    context->setContextProperty("window", chatWindow);
     context->setContextProperty("baseUrl", QVariant::fromValue(url));
 
     declarativeView->engine()->addImageProvider("photo", new PhotoImageProvider);
@@ -954,6 +1024,7 @@ public:
 bool PhotosPlugin::initialize(Chat *chat)
 {
     qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
+    qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
 
     QString url;
     QString domain = chat->client()->configuration().domain();
@@ -965,7 +1036,7 @@ bool PhotosPlugin::initialize(Chat *chat)
         return false;
 
     // register panel
-    PhotoPanel *photos = new PhotoPanel(url);
+    PhotoPanel *photos = new PhotoPanel(chat, url);
     chat->addPanel(photos);
     connect(chat->client(), SIGNAL(connected()), photos, SLOT(open()));
 

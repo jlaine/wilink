@@ -618,6 +618,14 @@ Acceptez-vous?</translation>
         <source>Loading your albums..</source>
         <translation>Chargement de vos albums..</translation>
     </message>
+    <message>
+        <source>Upload photos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PluginOptions</name>
