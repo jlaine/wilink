@@ -235,10 +235,8 @@ Chat::Chat(QWidget *parent)
     connect(d->client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
 
     /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_N), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(detachPanel()));
 #ifdef Q_OS_MAC
-    shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
+    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 }
@@ -279,7 +277,6 @@ void Chat::addPanel(ChatPanel *panel)
 {
     if (d->chatPanels.contains(panel))
         return;
-    connect(panel, SIGNAL(attachPanel()), this, SLOT(attachPanel()));
     connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
     connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
     connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
@@ -292,26 +289,6 @@ void Chat::addPanel(ChatPanel *panel)
     d->chatPanels << panel;
 }
 
-void Chat::attachPanel()
-{
-    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
-    if (!panel)
-        return;
-
-    // add panel
-    if (d->conversationPanel->indexOf(panel) < 0)
-    {
-#ifdef WILINK_EMBEDDED
-        d->leftPanel->hide();
-#endif
-        d->conversationPanel->addWidget(panel);
-        d->conversationPanel->show();
-        if (d->conversationPanel->count() == 1)
-            resizeContacts();
-    }
-    d->conversationPanel->setCurrentWidget(panel);
-}
-
 /** When a panel is destroyed, from it from our list of panels.
  *
  * @param obj
@@ -319,27 +296,6 @@ void Chat::attachPanel()
 void Chat::destroyPanel(QObject *obj)
 {
     d->chatPanels.removeAll(static_cast<ChatPanel*>(obj));
-}
-
-/** Detach the current panel as a window.
- */
-void Chat::detachPanel()
-{
-    ChatPanel *panel = qobject_cast<ChatPanel*>(d->conversationPanel->currentWidget());
-    if (!panel)
-        return;
-
-    QPoint oldPos = d->conversationPanel->mapToGlobal(panel->pos());
-    oldPos.setY(oldPos.y() - 20);
-    if (d->conversationPanel->count() == 1)
-    {
-        d->conversationPanel->hide();
-        QTimer::singleShot(100, this, SLOT(resizeContacts()));
-    }
-    d->conversationPanel->removeWidget(panel);
-    panel->setParent(0, Qt::Window);
-    panel->move(oldPos);
-    panel->show();
 }
 
 /** Hide a panel.

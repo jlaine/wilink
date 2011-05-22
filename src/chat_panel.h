@@ -56,7 +56,6 @@ protected:
     void queueNotification(const QString &message, int options = 0);
 
 signals:
-    void attachPanel();
     void findPanel();
     void findAgainPanel();
     void hidePanel();

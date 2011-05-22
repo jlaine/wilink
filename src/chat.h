@@ -87,8 +87,6 @@ private slots:
     void showHelp();
     void showOfflineContactsChanged(bool show);
 
-    void attachPanel();
-    void detachPanel();
     void destroyPanel(QObject *obj);
     void hidePanel();
     void notifyPanel(const QString &message, int options);
