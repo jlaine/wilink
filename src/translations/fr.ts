@@ -580,43 +580,43 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Supprimer</translation>
+        <translation type="obsolete">Supprimer</translation>
     </message>
     <message>
         <source>Cancelling upload..</source>
-        <translation>Annulation du transfert..</translation>
+        <translation type="obsolete">Annulation du transfert..</translation>
     </message>
     <message>
         <source>Album name:</source>
-        <translation>Nom de l&apos;album :</translation>
+        <translation type="obsolete">Nom de l&apos;album :</translation>
     </message>
     <message>
         <source>Deleting %1</source>
-        <translation>Suppression de %1</translation>
+        <translation type="obsolete">Suppression de %1</translation>
     </message>
     <message>
         <source>Loading image..</source>
-        <translation>Chargement de l&apos;image..</translation>
+        <translation type="obsolete">Chargement de l&apos;image..</translation>
     </message>
     <message>
         <source>Connecting..</source>
-        <translation>Connexion..</translation>
+        <translation type="obsolete">Connexion..</translation>
     </message>
     <message>
         <source>Photos upload complete.</source>
-        <translation>Envoi de photos terminé.</translation>
+        <translation type="obsolete">Envoi de photos terminé.</translation>
     </message>
     <message>
         <source>Your photos have been uploaded.</source>
-        <translation>Vos photos ont été envoyées.</translation>
+        <translation type="obsolete">Vos photos ont été envoyées.</translation>
     </message>
     <message>
         <source>Uploading %1</source>
-        <translation>Transfert de %1</translation>
+        <translation type="obsolete">Transfert de %1</translation>
     </message>
     <message>
         <source>Loading your albums..</source>
-        <translation>Chargement de vos albums..</translation>
+        <translation type="obsolete">Chargement de vos albums..</translation>
     </message>
     <message>
         <source>Upload photos</source>

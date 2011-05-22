@@ -20,7 +20,7 @@
 #ifndef __WILINK_PHOTOS_H__
 #define __WILINK_PHOTOS_H__
 
-#include <QListWidget>
+#include <QSet>
 #include <QUrl>
 
 #include "chat_model.h"
@@ -32,45 +32,6 @@ using namespace QNetIO;
 class Chat;
 class PhotoUploadItem;
 class PhotoUploadModel;
-class QImage;
-class QLabel;
-class QProgressBar;
-class QPushButton;
-class QStackedWidget;
-
-class PhotosList : public QListWidget
-{
-    Q_OBJECT
-
-public:
-    PhotosList(const QUrl &url, QWidget *parent = NULL);
-    void setBaseDrop(bool accept);
-    FileInfoList entries() const;
-    void setEntries(const FileInfoList &entries);
-    void setImage(const QUrl &url, const QImage &img);
-    FileInfoList selectedEntries() const;
-    QUrl url();
-
-signals:
-    void fileOpened(const QUrl &url);
-    void filesDropped(const QList<QUrl> &files, const QUrl &destination);
-    void folderOpened(const QUrl &url);
-
-protected:
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dragMoveEvent(QDragMoveEvent *event);
-    void dropEvent(QDropEvent *event);
-    FileInfo itemEntry(QListWidgetItem *item) const;
-
-protected slots:
-    void slotItemDoubleClicked(QListWidgetItem *item);
-    void slotReturnPressed();
-
-private:
-    bool baseDrop;
-    QUrl baseUrl;
-    FileInfoList fileList;
-};
 
 class PhotoCache : public QObject
 {
@@ -158,60 +119,11 @@ class PhotoPanel : public ChatPanel
 {
     Q_OBJECT
 
-    class Job {
-    public:
-        Job() : type(-1), widget(0) {};
-        Job(QWidget *downloadWidget, const QUrl &downloadUrl, int downloadType)
-            : remoteUrl(downloadUrl), type(downloadType), widget(downloadWidget) {};
-        void clear() { remoteUrl.clear(); type = -1; widget = 0; };
-        bool isEmpty() { return remoteUrl.isEmpty() || type < 0; };
-
-        QUrl remoteUrl;
-        int type;
-        QWidget *widget;
-    };
-
 public:
     PhotoPanel(Chat *chatWindow, const QString &url);
 
-protected:
-    void processDownloadQueue();
-    void processUploadQueue();
-    void showMessage(const QString &message = QString());
-
-protected slots:
-    void abortUpload();
-    void createFolder();
-    void commandFinished(int cmd, bool error, const FileInfoList &results);
-    void deleteFile();
-    void fileNext();
-    void fileOpened(const QUrl &url);
-    void filesDropped(const QList<QUrl> &files, const QUrl &destination);
-    void folderOpened(const QUrl &url);
-    void goBack();
-    void open();
-    void pushView(QWidget *widget);
-    void putProgress(int done, int total);
-    void refresh();
-
 private:
-    FileSystem *fs;
     QUrl baseUrl;
-    QList<Job> downloadQueue;
-    QIODevice *downloadDevice;
-    QList< QPair<QUrl, QUrl> > uploadQueue;
-    QIODevice *uploadDevice;
-    QList<QUrl> playList;
-
-    QAction *backAction;
-    QAction *createAction;
-    QAction *deleteAction;
-    QPushButton *stopButton;
-    Job downloadJob;
-    QStackedWidget *photosView;
-    int progressFiles;
-    QProgressBar *progressBar;
-    QLabel *statusLabel;
 };
 
 #endif
