@@ -43,11 +43,15 @@ Panel {
                 icon: 'call.png'
                 text: qsTr('Call')
 
-                onClicked: {
-                    var component = Qt.createComponent('CallWidget.qml');
-                    var widget = component.createObject(widgetBar);
-                    widget.call = client.callManager.call(vcard.jid);
-                    console.log("call " + widget.call);
+                onClicked: client.callManager.call(vcard.jid)
+
+                Connections {
+                    target: client.callManager
+                    onCallStarted: {
+                        var component = Qt.createComponent('CallWidget.qml');
+                        var widget = component.createObject(widgetBar);
+                        widget.call = call;
+                    }
                 }
             }
 
