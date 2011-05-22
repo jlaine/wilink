@@ -139,13 +139,7 @@ Panel {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: model.count * 30
-
-        model: ListModel {
-            ListElement { name: 'Foo Bar.png'; size: 12434 }
-            ListElement { name: 'Foo Bar.png'; size: 45567437 }
-            ListElement { name: 'Foo Bar.png'; size: 87654724 }
-            ListElement { name: 'Foo Bar.png'; size: 573474 }
-        }
+        model: queueModel
         z: 1
     }
 }

@@ -104,9 +104,6 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onDoubleClicked: {
-                    crumbs.append({'url': view.model.rootUrl})
-                }
 
                 onEntered: {
                     parent.state = 'hovered'

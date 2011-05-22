@@ -91,11 +91,13 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     // models
     ShareModel *sharesModel = new ShareModel(this);
+    queueModel = new ShareModel(this);
 
     // declarative
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("window", chatWindow);
+    context->setContextProperty("queueModel", queueModel);
     context->setContextProperty("shareModel", sharesModel);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
@@ -149,7 +151,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->addWidget(downloadsHelp);
 
     // downloads view
-    queueModel = new ShareModel(this);
     downloadsView = new ShareView;
     downloadsView->setModel(queueModel);
     check = connect(downloadsView, SIGNAL(doubleClicked(const QModelIndex&)),
