@@ -510,6 +510,13 @@ PhotoUploadModel::PhotoUploadModel(QObject *parent)
     setRoleNames(names);
 }
 
+#if 0
+void PhotoUploadModel::abort()
+{
+    //fs->abort();
+}
+#endif
+
 void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
 {
     qDebug("Adding item %s", qPrintable(filePath));
@@ -527,12 +534,15 @@ void PhotoUploadModel::commandFinished(int cmd, bool error, const FileInfoList &
     if (cmd != FileSystem::Put)
         return;
 
-    m_uploadItem->finished = true;
-    emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
-    m_uploadItem = 0;
+    if (m_uploadItem) {
+        m_uploadItem->finished = true;
+        emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
+        m_uploadItem = 0;
 
-    delete m_uploadDevice;
-    m_uploadDevice = 0;
+        delete m_uploadDevice;
+        m_uploadDevice = 0;
+    }
+
     processQueue();
 }
 
@@ -611,7 +621,6 @@ PhotoPanel::PhotoPanel(Chat *chatWindow, const QString &url)
     bool check;
 
     /* create UI */
-    setWindowHelp(tr("To upload your photos to wifirst.net, simply drag and drop them to an album."));
     setWindowTitle(tr("Photos"));
 
     photosView = new QStackedWidget;

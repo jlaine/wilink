@@ -30,6 +30,8 @@ Panel {
     PanelHeader {
         id: header
 
+        property string help: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -44,8 +46,8 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'back.png'
                 enabled: crumbs.count > 0
+                icon: 'back.png'
                 text: qsTr('Go back')
 
                 onClicked: {
@@ -59,6 +61,8 @@ Panel {
             ToolButton {
                 icon: 'upload.png'
                 text: qsTr('Upload')
+                visible: crumbs.count > 0
+
                 onClicked: {
                     var dialog = window.fileDialog();
                     dialog.fileMode = QFileDialog.ExistingFiles;
