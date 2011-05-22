@@ -42,7 +42,6 @@ class QListWidget;
 class QListWidgetItem;
 class QAbstractButton;
 class QModelIndex;
-class QPushButton;
 class QTableWidget;
 class QXmppBookmarkManager;
 class QXmppBookmarkSet;
@@ -91,11 +90,9 @@ public:
 
 private slots:
     void bookmarksReceived();
-    void disconnected();
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
     void invitationHandled(QAbstractButton *button);
     void mucServerFound(const QString &roomServer);
-    void roomPrompt();
     void urlClick(const QUrl &url);
 
 private:
@@ -103,7 +100,6 @@ private:
     RoomListModel *roomModel;
     QXmppMucManager *mucManager;
     QString chatRoomServer;
-    QPushButton *roomButton;
     QStringList invitations;
 };
 
@@ -153,25 +149,6 @@ private:
     QString m_defaultJid;
     QXmppMucRoom *m_room;
     QTableWidget *m_tableWidget;
-};
-
-class RoomJoinDialog : public QDialog
-{
-    Q_OBJECT
-
-public:
-    RoomJoinDialog(QXmppClient *client, const QString &roomServer, QWidget *parent = 0);
-    QString textValue() const;
-
-protected slots:
-    void discoveryItemsReceived(const QXmppDiscoveryIq &disco);
-    void itemClicked(QListWidgetItem * item);
-    void validate();
-
-private:
-    QLineEdit *lineEdit;
-    QListWidget *listWidget;
-    QString chatRoomServer;
 };
 
 #endif

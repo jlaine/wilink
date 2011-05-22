@@ -24,9 +24,17 @@ Dialog {
     id: dialog
 
     property alias model: view.model
-    property alias reason: reasonEdit.text
 
     title: qsTr('Join or create a chat room')
+
+    onAccepted: {
+        if (roomEdit.text.length) {
+            dialog.hide();
+
+            var url = 'xmpp://' + window.objectName + '/' + roomEdit.text + '@' + view.model.rootJid + '?join';
+            Qt.openUrlExternally(url);
+        }
+    }
 
     Text {
         id: help
@@ -51,10 +59,10 @@ Dialog {
         border.width: 1
         color: 'white'
         width: 100
-        height: reasonEdit.paintedHeight
+        height: roomEdit.paintedHeight
 
         TextEdit {
-            id: reasonEdit
+            id: roomEdit
 
             anchors.fill: parent
             focus: true
@@ -62,6 +70,7 @@ Dialog {
             textFormat: TextEdit.PlainText
 
             Keys.onReturnPressed: {
+                dialog.accepted();
                 return false;
             }
         }
@@ -107,7 +116,7 @@ Dialog {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    hide();
+                    dialog.hide();
 
                     var url = 'xmpp://' + window.objectName + '/' + model.jid + '?join';
                     Qt.openUrlExternally(url);

@@ -259,10 +259,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     }
 
     bool check;
-    check = connect(client, SIGNAL(disconnected()),
-                    this, SLOT(disconnected()));
-    Q_ASSERT(check);
-
     check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
                     this, SLOT(bookmarksReceived()));
     Q_ASSERT(check);
@@ -283,15 +279,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
-
-    // add room button
-    roomButton = new QPushButton;
-    roomButton->setEnabled(false);
-    roomButton->setIcon(QIcon(":/chat.png"));
-    roomButton->setText(tr("Rooms"));
-    roomButton->setToolTip(tr("Join or create a chat room"));
-    connect(roomButton, SIGNAL(clicked()), this, SLOT(roomPrompt()));
-    chat->statusBar()->addWidget(roomButton);
 }
 
 void ChatRoomWatcher::bookmarksReceived()
@@ -305,11 +292,6 @@ void ChatRoomWatcher::bookmarksReceived()
         if (conference.autoJoin())
             joinRoom(conference.jid(), false);
     }
-}
-
-void ChatRoomWatcher::disconnected()
-{
-    roomButton->setEnabled(false);
 }
 
 ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
@@ -367,31 +349,11 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
     invitations << roomJid;
 }
 
-/** Prompt the user for a new group chat then join it.
- */
-void ChatRoomWatcher::roomPrompt()
-{
-    RoomJoinDialog prompt(chat->client(), chatRoomServer, chat);
-#ifdef WILINK_EMBEDDED
-    prompt.showMaximized();
-#endif
-    if (!prompt.exec())
-        return;
-    const QString roomJid = prompt.textValue();
-    if (roomJid.isEmpty())
-        return;
-
-    // join room and bookmark it
-    ChatRoom *room = joinRoom(roomJid, true);
-    room->bookmark();
-}
-
 /** Once a multi-user chat server is found, enable the "chat rooms" button.
  */
 void ChatRoomWatcher::mucServerFound(const QString &mucServer)
 {
     chatRoomServer = mucServer;
-    roomButton->setEnabled(true);
 }
 
 /** Open a XMPP URI if it refers to a chat room.
@@ -596,82 +558,6 @@ void ChatRoom::unbookmark()
             return;
         }
     }
-}
-
-RoomJoinDialog::RoomJoinDialog(QXmppClient *client, const QString &roomServer, QWidget *parent)
-    : QDialog(parent), chatRoomServer(roomServer)
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-    QLabel *label = new QLabel(tr("Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you."));
-    label->setWordWrap(true);
-    layout->addWidget(label);
-    lineEdit = new QLineEdit;
-    layout->addWidget(lineEdit);
-
-    listWidget = new QListWidget;
-    listWidget->setIconSize(QSize(32, 32));
-    listWidget->setSortingEnabled(true);
-    connect(listWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(itemClicked(QListWidgetItem*)));
-    layout->addWidget(listWidget);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    layout->addWidget(buttonBox);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(validate()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    setLayout(layout);
-    setWindowTitle(tr("Join or create a chat room"));
-
-    // get rooms
-    QXmppDiscoveryManager *discoveryManager = client->findExtension<QXmppDiscoveryManager>();
-    Q_ASSERT(discoveryManager);
-
-    bool check;
-    check = connect(discoveryManager, SIGNAL(itemsReceived(const QXmppDiscoveryIq&)),
-                    this, SLOT(discoveryItemsReceived(const QXmppDiscoveryIq&)));
-    Q_ASSERT(check);
-    discoveryManager->requestItems(chatRoomServer);
-}
-
-void RoomJoinDialog::discoveryItemsReceived(const QXmppDiscoveryIq &disco)
-{
-    if (disco.type() == QXmppIq::Result &&
-        disco.from() == chatRoomServer)
-    {
-        // chat rooms list
-        listWidget->clear();
-        foreach (const QXmppDiscoveryIq::Item &item, disco.items())
-        {
-            QListWidgetItem *wdgItem = new QListWidgetItem(QIcon(":/chat.png"), item.name());
-            wdgItem->setData(Qt::UserRole, item.jid());
-            listWidget->addItem(wdgItem);
-        }
-    }
-}
-
-void RoomJoinDialog::itemClicked(QListWidgetItem *item)
-{
-    lineEdit->setText(item->data(Qt::UserRole).toString());
-    validate();
-}
-
-QString RoomJoinDialog::textValue() const
-{
-    return lineEdit->text();
-}
-
-void RoomJoinDialog::validate()
-{
-    QString jid = lineEdit->text();
-    if (jid.contains(" ") || jid.isEmpty())
-    {
-        lineEdit->setText(jid.trimmed().replace(" ", "_"));
-        return;
-    }
-    if (!jid.contains("@"))
-        lineEdit->setText(jid.toLower() + "@" + chatRoomServer);
-    else
-        lineEdit->setText(jid.toLower());
-    accept();
 }
 
 ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
