@@ -119,7 +119,6 @@ public slots:
     void unbookmark();
 
 private slots:
-    void allowedActionsChanged(QXmppMucRoom::Actions actions);
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
     void left();
@@ -133,10 +132,6 @@ private:
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
     ChatRosterModel *rosterModel;
-
-    // actions
-    QAction *optionsAction;
-    QAction *permissionsAction;
 };
 
 class ChatRoomMembers : public QDialog

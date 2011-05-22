@@ -201,17 +201,6 @@
     </message>
 </context>
 <context>
-    <name>ChatPanel</name>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
-        <source>Attach</source>
-        <translation>Attacher</translation>
-    </message>
-</context>
-<context>
     <name>ChatPasswordPrompt</name>
     <message>
         <source>Password</source>

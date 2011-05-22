@@ -86,11 +86,19 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     setWindowHelp(tr("You can select the folders you want to share with other users from the shares options."));
 
     QVBoxLayout *layout = new QVBoxLayout;
+    setLayout(layout);
     layout->setSpacing(0);
 
-    // HEADER
+    // declarative
+    QDeclarativeView *declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
+    context->setContextProperty("window", chatWindow);
 
-    layout->addLayout(headerLayout());
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
+    layout->addWidget(declarativeView, 1);
+
+    // HEADER
 
     ChatSearchBar *searchBar = new ChatSearchBar;
     searchBar->setControlsVisible(false);
@@ -144,15 +152,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     layout->addWidget(downloadsView);
 
-    // declarative
-    QDeclarativeView *declarativeView = new QDeclarativeView;
-    QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("window", chatWindow);
-
-    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
-    layout->addWidget(declarativeView);
-
     // FOOTER
 
     QHBoxLayout *footerLayout = new QHBoxLayout;
@@ -178,8 +177,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
     footerLayout->addWidget(removeButton);
     //removeButton->hide();
-
-    setLayout(layout);
 
     /* connect signals */
     QXmppClient *baseClient = chatWindow->client();
@@ -219,7 +216,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     directoryChanged(db->directory());
 
     // add actions
-    QAction *action = chat->addAction(windowIcon(), windowTitle());
+    action = chat->addAction(windowIcon(), windowTitle());
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
     action->setVisible(false);
     connect(action, SIGNAL(triggered()),

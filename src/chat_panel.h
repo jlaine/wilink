@@ -44,7 +44,6 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
-    QAction *addAction(const QIcon &icon, const QString &text);
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
     void setWindowHelp(const QString &help);
@@ -53,9 +52,7 @@ public:
     static QPalette palette();
 
 protected:
-    void changeEvent(QEvent *event);
     void closeEvent(QCloseEvent *event);
-    QLayout *headerLayout();
     void queueNotification(const QString &message, int options = 0);
 
 signals:

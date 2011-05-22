@@ -35,11 +35,6 @@ class ChatPanelPrivate
 public:
     void updateTitle();
 
-    QToolBar *actions;
-    QVBoxLayout *header;
-    QHBoxLayout *hbox;
-    QAction *attachAction;
-    QAction *closeAction;
     QLabel *helpLabel;
     QLabel *iconLabel;
     QLabel *nameLabel;
@@ -64,32 +59,8 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->q = this;
 
     // icon and label
-    d->hbox = new QHBoxLayout;
-    d->hbox->setSpacing(0);
-    d->hbox->setMargin(0);
     d->iconLabel = new QLabel;
-    d->iconLabel->setObjectName("panel-icon");
-    d->hbox->addWidget(d->iconLabel);
     d->nameLabel = new QLabel;
-    d->nameLabel->setObjectName("panel-title");
-    d->hbox->addWidget(d->nameLabel);
-    d->hbox->addStretch();
-
-    // toolbar
-    d->actions = new QToolBar;
-    d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    d->hbox->addWidget(d->actions);
-
-    d->attachAction = d->actions->addAction(QIcon(":/add.png"), tr("Attach"));
-    d->attachAction->setVisible(false);
-    check = connect(d->attachAction, SIGNAL(triggered()),
-                    this, SIGNAL(attachPanel()));
-    Q_ASSERT(check);
-
-    d->closeAction = d->actions->addAction(QIcon(":/close.png"), tr("Close"));
-    check = connect(d->closeAction, SIGNAL(triggered()),
-                    this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
 
     // help label
     d->helpLabel = new QLabel(this, Qt::Widget);
@@ -99,42 +70,12 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->helpLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) ;
     d->helpLabel->hide();
 
-    // assemble header
-    QVBoxLayout *headerLayout = new QVBoxLayout;
-    headerLayout->setMargin(0);
-    headerLayout->setSpacing(0);
-    headerLayout->addLayout(d->hbox);
-
-    QWidget *headerWidget = new QWidget;
-    headerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    headerWidget->setLayout(headerLayout);
-    headerWidget->setObjectName("panel-header");
-
-    // for compatibility whith ChatPanel::headerLayout()
-    d->header = new QVBoxLayout;
-    d->header->addWidget(headerWidget);
-    d->header->addWidget(d->helpLabel);
-    d->header->setMargin(0);
-    d->header->setSpacing(0);
-
     setMinimumWidth(300);
 }
 
 ChatPanel::~ChatPanel()
 {
     delete d;
-}
-
-/** Adds an action in the top-right toolbar.
- *
- * @param icon
- * @param text
- */
-QAction *ChatPanel::addAction(const QIcon &icon, const QString &text)
-{
-    QAction *action = new QAction(icon, text, d->actions);
-    d->actions->insertAction(d->attachAction, action);
-    return action;
 }
 
 /** When additional text is set, update the header text.
@@ -187,31 +128,6 @@ void ChatPanel::setWindowTitle(const QString &title)
 {
     QWidget::setWindowTitle(title);
     d->updateTitle();
-}
-
-/** Return a layout object for the panel header.
- */
-QLayout* ChatPanel::headerLayout()
-{
-    return d->header;
-}
-
-void ChatPanel::changeEvent(QEvent *event)
-{
-    if (event->type() == QEvent::ParentChange)
-    {
-        if (parent())
-        {
-            layout()->setMargin(0);
-            d->attachAction->setVisible(false);
-            d->closeAction->setVisible(true);
-        } else {
-            layout()->setMargin(6);
-            d->closeAction->setVisible(false);
-            d->attachAction->setVisible(true);
-        }
-    }
-    QWidget::changeEvent(event);
 }
 
 void ChatPanel::closeEvent(QCloseEvent *event)

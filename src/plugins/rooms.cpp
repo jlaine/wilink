@@ -460,7 +460,8 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     layout->addWidget(historyView);
     setFocusProxy(historyView);
 
-    // add actions
+#if 0
+    // FIXME: add actions
     optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
     check = connect(optionsAction, SIGNAL(triggered()),
                     mucRoom, SLOT(requestConfiguration()));
@@ -472,21 +473,11 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
                     this, SLOT(changePermissions()));
     Q_ASSERT(check);
     permissionsAction->setVisible(false);
-
-#if 0
-    // FIXME: context menu
-    check = connect(participantsList, SIGNAL(customContextMenuRequested(const QPoint)),
-                    this, SLOT(customContextMenuRequested(const QPoint)));
-    Q_ASSERT(check);
 #endif
 
     // connect signals
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(unbookmark()));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(allowedActionsChanged(QXmppMucRoom::Actions)),
-                    this, SLOT(allowedActionsChanged(QXmppMucRoom::Actions)));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
@@ -504,16 +495,6 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     check = connect(this, SIGNAL(hidePanel()),
                     mucRoom, SLOT(leave()));
     Q_ASSERT(check);
-}
-
-/** Update visible actions.
- *
- * @param actions
- */
-void ChatRoom::allowedActionsChanged(QXmppMucRoom::Actions actions)
-{
-    optionsAction->setVisible(actions & QXmppMucRoom::ConfigurationAction);
-    permissionsAction->setVisible(actions & QXmppMucRoom::PermissionsAction);
 }
 
 /** Bookmarks the room.
