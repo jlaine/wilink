@@ -96,7 +96,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
-    layout->addWidget(declarativeView, 1);
+    layout->addWidget(declarativeView);
 
     // HEADER
 

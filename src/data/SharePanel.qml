@@ -55,18 +55,63 @@ Panel {
         }
     }
 
+    Rectangle {
+        id: searchBar
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        anchors.margins: 8
+        height: 32
+
+        Image {
+            id: icon
+
+            height: 16
+            width: 16
+            source: 'search.png'
+            smooth: true
+        }
+
+        Text {
+            anchors.left: icon.right
+            anchors.margins: 8
+            text: qsTr("Enter the name of the file you are looking for.");
+        }
+
+        TextEdit {
+
+        }
+    }
+
     ShareView {
         id: view
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
-        anchors.bottom: footer.top
+        anchors.top: searchBar.bottom
+        anchors.bottom: queueHelp.top
 
         model: ListModel {
             ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
             ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
             ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
+        }
+    }
+
+    Rectangle {
+        id: queueHelp
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: footer.top
+        anchors.margins: 8
+        height: 32
+
+        Text {
+            anchors.centerIn: parent
+            text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
+            wrapMode: Text.WordWrap
         }
     }
 
