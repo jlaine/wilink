@@ -50,6 +50,11 @@ Item {
         }
     }
 
+    Loader {
+        id: dialog
+        z: 10
+    }
+
     RosterView {
         id: rooms
 
@@ -61,6 +66,11 @@ Item {
         height: 150
 
         Connections {
+            onAddClicked: {
+                dialog.source = 'RoomJoinDialog.qml';
+                dialog.item.model.rootJid = 'conference.wifirst.net'
+                dialog.item.show();
+            }
             onItemClicked: {
                 var url = 'xmpp://' + window.objectName + '/' + model.jid + '?join';
                 Qt.openUrlExternally(url);

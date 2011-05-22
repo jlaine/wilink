@@ -281,17 +281,6 @@
     </message>
 </context>
 <context>
-    <name>RoomJoinDialog</name>
-    <message>
-        <source>Join or create a chat room</source>
-        <translation>Rejoindre ou créer un salon de discussion</translation>
-    </message>
-    <message>
-        <source>Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.</source>
-        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre ou créer. Si le salon n&apos;existe pas encore, il sera créé automatiquement.</translation>
-    </message>
-</context>
-<context>
     <name>ChatRoomWatcher</name>
     <message>
         <source>Invitation from %1</source>
@@ -582,6 +571,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Invite your contacts</source>
         <translation>Inviter vos contacts</translation>
+    </message>
+</context>
+<context>
+    <name>RoomJoinDialog</name>
+    <message>
+        <source>Join or create a chat room</source>
+        <translation>Rejoindre ou créer un salon de discussion</translation>
+    </message>
+    <message>
+        <source>Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.</source>
+        <translation>Saisissez le nom du salon de discussion que vous souhaitez rejoindre ou créer. Si le salon n&apos;existe pas encore, il sera créé automatiquement.</translation>
     </message>
 </context>
 <context>
