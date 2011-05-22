@@ -183,6 +183,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView->setSource(QUrl("qrc:/roster.qml"));
     leftLayout->addWidget(d->rosterView);
 
+    leftLayout->addWidget(new ChatStatus(d->client));
     d->leftPanel->setLayout(leftLayout);
     splitter->addWidget(d->leftPanel);
     splitter->setStretchFactor(0, 0);
@@ -194,10 +195,6 @@ Chat::Chat(QWidget *parent)
     splitter->addWidget(d->conversationPanel);
     splitter->setStretchFactor(1, 1);
     setCentralWidget(splitter);
-
-    /* build status bar */
-    statusBar()->setSizeGripEnabled(false);
-    statusBar()->addPermanentWidget(new ChatStatus(d->client));
 
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -647,9 +644,6 @@ void Chat::resizeContacts()
     QSize hint;
     hint.setHeight(QApplication::desktop()->availableGeometry(this).height() - 100);
     hint.setWidth(d->rosterView->minimumWidth());
-    QSize barHint = statusBar()->sizeHint();
-    if (barHint.width() > hint.width())
-        hint.setWidth(barHint.width());
     if (d->conversationPanel->isVisible())
         hint.setWidth(hint.width() + 500);
 
