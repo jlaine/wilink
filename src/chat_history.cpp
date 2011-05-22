@@ -361,7 +361,7 @@ void ChatHistoryModel::rosterInserted(const QModelIndex &parent, int start, int 
 
 /** Returns the participant model.
  */
-QAbstractItemModel *ChatHistoryModel::participantModel()
+QObject *ChatHistoryModel::participantModel()
 {
     return d->rosterModel;
 }
@@ -370,12 +370,17 @@ QAbstractItemModel *ChatHistoryModel::participantModel()
  *
  * @param participantModel
  */
-void ChatHistoryModel::setParticipantModel(QAbstractItemModel *participantModel)
+void ChatHistoryModel::setParticipantModel(QObject *participantModel)
 {
-    d->rosterModel = participantModel;
-    connect(d->rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-            this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
-    connect(d->rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
-            this, SLOT(rosterInserted(QModelIndex,int,int)));
+    QAbstractItemModel *itemModel = static_cast<QAbstractItemModel*>(participantModel);
+    if (itemModel != d->rosterModel) {
+        d->rosterModel = itemModel;
+        connect(d->rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
+        connect(d->rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                this, SLOT(rosterInserted(QModelIndex,int,int)));
+
+        emit participantModelChanged(d->rosterModel);
+    }
 }
 

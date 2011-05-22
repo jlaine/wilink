@@ -57,6 +57,7 @@ public:
 class ChatHistoryModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(QObject* participantModel READ participantModel WRITE setParticipantModel NOTIFY participantModelChanged)
 
 public:
     enum HistoryRole {
@@ -70,8 +71,9 @@ public:
 
     ChatHistoryModel(QObject *parent = 0);
     void addMessage(const ChatMessage &message);
-    QAbstractItemModel *participantModel();
-    void setParticipantModel(QAbstractItemModel *rosterModel);
+
+    QObject *participantModel();
+    void setParticipantModel(QObject *rosterModel);
 
     // QAbstracItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -80,6 +82,7 @@ public:
 signals:
     void bottomChanged();
     void bottomAboutToChange();
+    void participantModelChanged(QObject *participantModel);
 
 public slots:
     void clear();
