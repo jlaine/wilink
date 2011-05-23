@@ -43,13 +43,18 @@ Item {
     }
 
     function showPanel(source, properties) {
+        var found = false;
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
                 propEquals(panels.get(i).properties, properties)) {
-                console.log("already have panel " + source + " " + properties);
-                return;
+                panels.get(i).panel.z = 1;
+                found = true;
+            } else {
+                panels.get(i).panel.z = 0;
             }
         }
+        if (found)
+            return;
 
         // create panel
         console.log("creating panel " + source + " " + properties);
