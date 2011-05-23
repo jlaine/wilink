@@ -37,7 +37,6 @@ public:
 
     QLabel *nameLabel;
     QString windowExtra;
-    QString windowStatus;
     QList< QPair<QString, int> > notificationQueue;
 
     ChatPanel *q;
@@ -45,8 +44,8 @@ public:
 
 void ChatPanelPrivate::updateTitle()
 {
-    nameLabel->setText(QString("<b>%1</b> %2<br/>%3").arg(q->windowTitle(),
-        windowStatus, windowExtra));
+    nameLabel->setText(QString("<b>%1</b><br/>%3").arg(q->windowTitle(),
+        windowExtra));
 }
 
 ChatPanel::ChatPanel(QWidget* parent)
@@ -72,14 +71,6 @@ ChatPanel::~ChatPanel()
 void ChatPanel::setWindowExtra(const QString &extra)
 {
     d->windowExtra = extra;
-    d->updateTitle();
-}
-
-/** When additional text is set, update the header text.
- */
-void ChatPanel::setWindowStatus(const QString &status)
-{
-    d->windowStatus = status;
     d->updateTitle();
 }
 

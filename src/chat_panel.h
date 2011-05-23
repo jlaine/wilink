@@ -45,7 +45,6 @@ public:
     ~ChatPanel();
 
     void setWindowExtra(const QString &extra);
-    void setWindowStatus(const QString &status);
     void setWindowTitle(const QString &title);
     static QPalette palette();
 

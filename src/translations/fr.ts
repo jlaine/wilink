@@ -152,17 +152,6 @@
     </message>
 </context>
 <context>
-    <name>ChatDialogPanel</name>
-    <message>
-        <source>is composing a message</source>
-        <translation>compose un message</translation>
-    </message>
-    <message>
-        <source>has closed the conversation</source>
-        <translation>a fermé la conversation</translation>
-    </message>
-</context>
-<context>
     <name>ChatHistoryWidget</name>
     <message>
         <source>Clear</source>
