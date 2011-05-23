@@ -22,12 +22,12 @@
 
 class Chat;
 class QAction;
+class QTimer;
 class QXmppClient;
 class QXmppDiscoveryManager;
 
 #include "QXmppDiscoveryIq.h"
 
-#include "chat_panel.h"
 #include "chat_model.h"
 
 /** The DiscoveryModel class represents a set of service discovery results.
@@ -73,17 +73,6 @@ private:
     QString m_rootJid;
     QString m_rootNode;
     QTimer *m_timer;
-};
-
-/** The DiscoveryPanel class represents a panel for displaying service
- *  discovery results.
- */
-class DiscoveryPanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    DiscoveryPanel(Chat *chatWindow);
 };
 
 #endif

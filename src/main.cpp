@@ -34,7 +34,6 @@
 
 Q_IMPORT_PLUGIN(calls)
 Q_IMPORT_PLUGIN(chats)
-Q_IMPORT_PLUGIN(discovery)
 Q_IMPORT_PLUGIN(menu)
 Q_IMPORT_PLUGIN(phone)
 Q_IMPORT_PLUGIN(player)

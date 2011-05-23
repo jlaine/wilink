@@ -97,28 +97,28 @@ Item {
                 ToolButton {
                     text: qsTr('Diagnostics')
                     icon: 'diagnostics.png'
-                    visible: false
+                    onClicked: showPanel('DiagnosticPanel.qml')
                 }
 
+/*
                 ToolButton {
                     text: 'Debugging'
                     icon: 'options.png'
                     onClicked: showPanel('LogPanel.qml')
-                    visible: false
                 }
 
                 ToolButton {
-                    text: qsTr('Diagnostics')
+                    text: 'Discovery'
                     icon: 'options.png'
-                    onClicked: showPanel('DiagnosticPanel.qml')
+                    onClicked: showPanel('DiscoveryPanel.qml')
                 }
 
                 ToolButton {
                     text: 'Media'
                     icon: 'start.png'
                     onClicked: showPanel('PlayerPanel.qml')
-                    visible: false
                 }
+*/
 
                 ToolButton {
                     text: qsTr('Phone')
