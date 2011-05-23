@@ -428,12 +428,12 @@ DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
 
     bool check;
     check = connect(client, SIGNAL(diagnosticServerChanged(QString)),
-                    this, SLOT(diagnosticsServerFound(QString)));
+                    this, SLOT(diagnosticServerChanged(QString)));
     Q_ASSERT(check);
     Q_UNUSED(check);
 }
 
-void DiagnosticsExtension::diagnosticsServerFound(const QString &diagServer)
+void DiagnosticsExtension::diagnosticServerChanged(const QString &diagServer)
 {
     m_diagnosticsServer = diagServer;
 }

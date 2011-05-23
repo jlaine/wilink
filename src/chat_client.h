@@ -62,7 +62,6 @@ signals:
     void jidChanged(const QString &jid);
     void diagnosticServerChanged(const QString &diagnosticServer);
     void mucServerChanged(const QString &mucServer);
-    void pubSubServerFound(const QString &pubSubServer);
     void shareServerChanged(const QString &shareServer);
 
 private slots:

@@ -72,7 +72,7 @@ public slots:
     void refresh();
 
 private slots:
-    void diagnosticsServerFound(const QString &diagServer);
+    void diagnosticServerChanged(const QString &diagServer);
     void handleResults(const DiagnosticsIq &results);
 
 private:

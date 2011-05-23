@@ -173,13 +173,16 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
             info("Found diagnostics server " + m_diagnosticServer);
             emit diagnosticServerChanged(m_diagnosticServer);
         }
+#if 0
         // check if it's a publish-subscribe server
         else if (id.category() == "pubsub" &&
                  id.type() == "service")
         {
-            info("Found pubsub server " + disco.from());
-            emit pubSubServerFound(disco.from());
+            m_pubSubServer = disco.from();
+            info("Found pubsub server " + m_pubSubServer);
+            emit pubSubServerChanged(m_pubSubServer);
         }
+#endif
         // check if it's a SOCKS5 proxy server
         else if (id.category() == "proxy" &&
                  id.type() == "bytestreams")
