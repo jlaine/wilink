@@ -23,22 +23,17 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
-#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListWidget>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
-#include <QSplitter>
-#include <QStatusBar>
 #include <QTableWidget>
-#include <QTextBlock>
 #include <QTimer>
 #include <QUrl>
 
@@ -48,8 +43,6 @@
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
-#include "QXmppDiscoveryIq.h"
-#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"

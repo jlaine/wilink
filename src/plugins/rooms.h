@@ -42,7 +42,6 @@ class QXmppBookmarkManager;
 class QXmppBookmarkSet;
 class QXmppClient;
 class QXmppDataForm;
-class QXmppDiscoveryIq;
 class QXmppIq;
 class QXmppMessage;
 class QXmppMucAdminIq;
