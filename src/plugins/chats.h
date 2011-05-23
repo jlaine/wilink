@@ -92,7 +92,6 @@ public:
 
 public slots:
     void messageReceived(const QXmppMessage &msg);
-    void rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
@@ -103,8 +102,6 @@ private slots:
     void leave();
 
 private:
-    void updateWindowTitle();
-
     QXmppArchiveManager *archiveManager;
     QString chatRemoteJid;
     ChatClient *client;

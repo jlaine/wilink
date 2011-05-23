@@ -256,9 +256,6 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     check = connect(this, SIGNAL(showPanel()),
                     this, SLOT(join()));
     Q_ASSERT(check);
-
-    // set window title
-    updateWindowTitle();
 }
 
 void ChatDialogPanel::archiveChatReceived(const QXmppArchiveChat &chat)
@@ -367,48 +364,6 @@ void ChatDialogPanel::messageReceived(const QXmppMessage &msg)
 
     // play sound
     wApp->soundPlayer()->play(wApp->incomingMessageSound());
-}
-
-/** Handles a roster change.
- *
- * @param topLeft
- * @param bottomRight
- */
-void ChatDialogPanel::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
-{
-    Q_ASSERT(topLeft.parent() == bottomRight.parent());
-    const QModelIndex parent = topLeft.parent();
-    for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        const QString jid = m_window->rosterModel()->index(i, 0, parent).data(ChatModel::JidRole).toString();
-        if (jid == chatRemoteJid) {
-            updateWindowTitle();
-            break;
-        }
-    }
-}
-
-/** Updates the window title.
- */
-void ChatDialogPanel::updateWindowTitle()
-{
-    QModelIndex index = m_window->rosterModel()->findItem(chatRemoteJid);
-    setWindowTitle(index.data(Qt::DisplayRole).toString());
-
-    const QString remoteDomain = jidToDomain(chatRemoteJid);
-    if (client->configuration().domain() == "wifirst.net" &&
-        remoteDomain == "wifirst.net")
-    {
-        // for wifirst accounts, return the wifirst nickname if it is
-        // different from the display name
-        const QString nickName = index.data(ChatRosterModel::NicknameRole).toString();
-        if (nickName != windowTitle())
-            setWindowExtra(nickName);
-        else
-            setWindowExtra(QString());
-    } else {
-        // for other accounts, return the JID
-        setWindowExtra(chatRemoteJid);
-    }
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages

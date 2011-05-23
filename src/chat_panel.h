@@ -44,8 +44,6 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
-    void setWindowExtra(const QString &extra);
-    void setWindowTitle(const QString &title);
     static QPalette palette();
 
 protected:

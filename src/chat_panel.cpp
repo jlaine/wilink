@@ -33,20 +33,10 @@
 class ChatPanelPrivate
 {
 public:
-    void updateTitle();
-
-    QLabel *nameLabel;
-    QString windowExtra;
     QList< QPair<QString, int> > notificationQueue;
 
     ChatPanel *q;
 };
-
-void ChatPanelPrivate::updateTitle()
-{
-    nameLabel->setText(QString("<b>%1</b><br/>%3").arg(q->windowTitle(),
-        windowExtra));
-}
 
 ChatPanel::ChatPanel(QWidget* parent)
     : QWidget(parent),
@@ -55,33 +45,12 @@ ChatPanel::ChatPanel(QWidget* parent)
     bool check;
     d->q = this;
 
-    // icon and label
-    d->nameLabel = new QLabel;
-
     setMinimumWidth(300);
 }
 
 ChatPanel::~ChatPanel()
 {
     delete d;
-}
-
-/** When additional text is set, update the header text.
- */
-void ChatPanel::setWindowExtra(const QString &extra)
-{
-    d->windowExtra = extra;
-    d->updateTitle();
-}
-
-/** When the window title is set, update the header text.
- *
- * @param title
- */
-void ChatPanel::setWindowTitle(const QString &title)
-{
-    QWidget::setWindowTitle(title);
-    d->updateTitle();
 }
 
 void ChatPanel::closeEvent(QCloseEvent *event)
