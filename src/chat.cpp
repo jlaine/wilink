@@ -70,6 +70,7 @@
 #include "chat.h"
 #include "chat_accounts.h"
 #include "chat_client.h"
+#include "chat_history.h"
 #include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
@@ -123,6 +124,8 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
+    qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
+    qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");

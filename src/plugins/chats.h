@@ -29,6 +29,7 @@
 class Chat;
 class ChatClient;
 class ChatHistoryModel;
+class ChatRosterModel;
 class QDeclarativeView;
 class QModelIndex;
 class QUrl;
@@ -40,7 +41,8 @@ class ChatDialogHelper : public QObject
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
-    Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel WRITE setHistoryModel NOTIFY historyModelChanged)
+    Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
+    Q_PROPERTY(ChatRosterModel* rosterModel READ rosterModel WRITE setRosterModel NOTIFY rosterModelChanged)
     Q_PROPERTY(int localState READ localState WRITE setLocalState NOTIFY localStateChanged)
     Q_PROPERTY(int remoteState READ remoteState NOTIFY remoteStateChanged)
 
@@ -51,7 +53,6 @@ public:
     void setClient(ChatClient *client);
 
     ChatHistoryModel *historyModel() const;
-    void setHistoryModel(ChatHistoryModel *historyModel);
 
     QString jid() const;
     void setJid(const QString &jid);
@@ -61,12 +62,15 @@ public:
 
     int remoteState() const;
 
+    ChatRosterModel *rosterModel() const;
+    void setRosterModel(ChatRosterModel *rosterModel);
+
 signals:
     void clientChanged(ChatClient *client);
-    void historyModelChanged(ChatHistoryModel *historyModel);
-    void jidChanged(const QString &jid);
     void localStateChanged(int localState);
+    void jidChanged(const QString &jid);
     void remoteStateChanged(int remoteState);
+    void rosterModelChanged(ChatRosterModel *rosterModel);
 
 public slots:
     bool sendMessage(const QString &text);
@@ -81,8 +85,8 @@ private:
     bool m_archivesFetched;
     ChatClient *m_client;
     ChatHistoryModel *m_historyModel;
-    QString m_jid;
     QXmppMessage::State m_localState;
+    QString m_jid;
     QXmppMessage::State m_remoteState;
 };
 

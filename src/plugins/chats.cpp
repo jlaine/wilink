@@ -58,6 +58,7 @@ ChatDialogHelper::ChatDialogHelper(QObject *parent)
     m_localState(QXmppMessage::None),
     m_remoteState(QXmppMessage::None)
 {
+    m_historyModel = new ChatHistoryModel(this);
 }
 
 ChatClient *ChatDialogHelper::client() const
@@ -96,14 +97,16 @@ ChatHistoryModel *ChatDialogHelper::historyModel() const
     return m_historyModel;
 }
 
-void ChatDialogHelper::setHistoryModel(ChatHistoryModel *historyModel)
+ChatRosterModel *ChatDialogHelper::rosterModel() const
 {
-    if (historyModel != m_historyModel) {
-        m_historyModel = historyModel;
-        emit historyModelChanged(historyModel);
+    return qobject_cast<ChatRosterModel*>(m_historyModel->participantModel());
+}
 
-        // try to fetch archives
-        fetchArchives();
+void ChatDialogHelper::setRosterModel(ChatRosterModel *rosterModel)
+{
+    if (rosterModel != m_historyModel->participantModel()) {
+        m_historyModel->setParticipantModel(rosterModel);
+        emit rosterModelChanged(rosterModel);
     }
 }
 
@@ -255,13 +258,10 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     setObjectName(jid);
 
     // prepare models
-    ChatHistoryModel *historyModel = new ChatHistoryModel(this);
-    historyModel->setParticipantModel(chatWindow->rosterModel());
-
     ChatDialogHelper *helper = new ChatDialogHelper(this);
     helper->setClient(chatWindow->client());
     helper->setJid(jid);
-    helper->setHistoryModel(historyModel);
+    helper->setRosterModel(chatWindow->rosterModel());
 
     // header
     QVBoxLayout *layout = new QVBoxLayout;
@@ -272,7 +272,6 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("client", chatWindow->client());
     context->setContextProperty("conversation", helper);
-    context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("window", chatWindow);
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);

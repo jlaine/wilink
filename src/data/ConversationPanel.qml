@@ -139,7 +139,7 @@ Panel {
         anchors.bottom: chatInput.top
         anchors.left: parent.left
         anchors.right: parent.right
-        model: historyModel
+        model: conversation.historyModel
 
         onParticipantClicked: chatInput.talkAt(participant)
     }
