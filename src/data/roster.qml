@@ -69,7 +69,7 @@ Item {
                 ToolButton {
                     text: qsTr('Shares')
                     icon: 'share.png'
-                    visible: client.shareServer != ''
+                    visible: window.client.shareServer != ''
                 }
             }
         }
@@ -85,7 +85,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: toolbar.bottom
-            enabled: client.mucServer != ''
+            enabled: window.client.mucServer != ''
             model: roomModel
             title: qsTr('My rooms')
             height: 150
@@ -173,7 +173,7 @@ Item {
                         jid = dialog.textValue;
                     }
                     console.log("add " + jid);
-                    client.rosterManager.subscribe(jid);
+                    window.client.rosterManager.subscribe(jid);
                 }
 
                 onItemClicked: {
@@ -208,7 +208,7 @@ Item {
             }
 
             Connections {
-                target: client.rosterManager
+                target: window.client.rosterManager
                 onSubscriptionReceived: {
                     var box = window.messageBox();
                     box.windowTitle = qsTr('Invitation from %1').replace('%1', bareJid);
@@ -216,13 +216,13 @@ Item {
                     box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                     if (box.exec() == QMessageBox.Yes) {
                         // accept subscription
-                        client.rosterManager.acceptSubscription(bareJid);
+                        window.client.rosterManager.acceptSubscription(bareJid);
 
                         // request reciprocal subscription
-                        client.rosterManager.subscribe(bareJid);
+                        window.client.rosterManager.subscribe(bareJid);
                     } else {
                         // refuse subscription
-                        client.rosterManager.refuseSubscription(bareJid);
+                        window.client.rosterManager.refuseSubscription(bareJid);
                     }
                 }
             }
@@ -240,7 +240,7 @@ Item {
                         dialog.textValue = item.name;
                         if (dialog.exec()) {
                             console.log("rename " + item.jid + ": " + dialog.textValue);
-                            client.rosterManager.renameItem(item.jid, dialog.textValue);
+                            window.client.rosterManager.renameItem(item.jid, dialog.textValue);
                         }
                     } else if (item.action == 'remove') {
                         var box = window.messageBox();
@@ -249,7 +249,7 @@ Item {
                         box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                         if (box.exec() == QMessageBox.Yes) {
                             console.log("remove " + item.jid);
-                            client.rosterManager.removeItem(item.jid);
+                            window.client.rosterManager.removeItem(item.jid);
                         }
                     }
                 }
@@ -257,7 +257,7 @@ Item {
         }
 
         Connections {
-            target: client.callManager
+            target: window.client.callManager
             onCallReceived: {
                 var contactName = call.jid;
                 console.log("Call received: " + contactName);
@@ -282,7 +282,7 @@ Item {
         }
 
         Connections {
-            target: client.transferManager
+            target: window.client.transferManager
             onFileReceived: {
                 var contactName = job.jid;
                 console.log("File received: " + contactName);

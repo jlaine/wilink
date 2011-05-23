@@ -82,7 +82,7 @@ Panel {
         model: LogModel {
             id: logModel
 
-            logger: client.logger
+            logger: window.client.logger
         }
 
         delegate: Rectangle {

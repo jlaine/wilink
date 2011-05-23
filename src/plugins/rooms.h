@@ -31,10 +31,9 @@ class Chat;
 class ChatClient;
 class ChatHistoryModel;
 class ChatMessage;
-class ChatRoom;
 class RoomListModel;
+class RoomPanel;
 class ChatRosterModel;
-class ChatRosterProxyModel;
 class QDeclarativeView;
 class QLineEdit;
 class QListView;
@@ -86,7 +85,7 @@ class ChatRoomWatcher : public QObject
 
 public:
     ChatRoomWatcher(Chat *chatWindow);
-    ChatRoom *joinRoom(const QString &jid, bool focus);
+    RoomPanel *joinRoom(const QString &jid, bool focus);
 
 private slots:
     void bookmarksReceived();
@@ -101,12 +100,12 @@ private:
     QStringList invitations;
 };
 
-class ChatRoom : public ChatPanel
+class RoomPanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent = NULL);
+    RoomPanel(Chat *chatWindow, const QString &jid);
 
 public slots:
     void bookmark();
@@ -125,15 +124,14 @@ private:
 
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
-    ChatRosterModel *rosterModel;
 };
 
-class ChatRoomMembers : public QDialog
+class RoomPermissionDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent);
+    RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent);
 
 protected slots:
     void addMember();

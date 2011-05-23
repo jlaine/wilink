@@ -86,8 +86,8 @@ Dialog {
         anchors.bottom: contents.bottom
         clip: true
         model: DiscoveryModel {
-            manager: client.discoveryManager
-            rootJid: client.mucServer
+            manager: window.client.discoveryManager
+            rootJid: window.client.mucServer
         }
 
         delegate: Rectangle {

@@ -25,6 +25,14 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    Conversation {
+        id: conversation
+
+        client: window.client
+        jid: remoteJid
+        rosterModel: window.rosterModel
+    }
+
     PanelHeader {
         id: header
 
@@ -41,7 +49,7 @@ Panel {
                 // for wifirst accounts, return the nickname if it is
                 // different from the display name
                 if (vcard.name != vcard.nickName)
-                    return nickName;
+                    return vcard.nickName;
                 else
                     return '';
             } else {
@@ -68,10 +76,10 @@ Panel {
                 icon: 'call.png'
                 text: qsTr('Call')
 
-                onClicked: client.callManager.call(vcard.jid)
+                onClicked: window.client.callManager.call(vcard.jid)
 
                 Connections {
-                    target: client.callManager
+                    target: window.client.callManager
                     onCallStarted: {
                         var component = Qt.createComponent('CallWidget.qml');
                         var widget = component.createObject(widgetBar);
@@ -91,13 +99,13 @@ Panel {
                     if (dialog.exec()) {
                         for (var i in dialog.selectedFiles) {
                             var filePath = dialog.selectedFiles[i];
-                            client.transferManager.sendFile(vcard.jid, filePath);
+                            window.client.transferManager.sendFile(vcard.jid, filePath);
                         }
                     }
                 }
 
                 Connections {
-                    target: client.transferManager
+                    target: window.client.transferManager
                     onJobStarted: {
                         var component = Qt.createComponent('TransferWidget.qml');
                         var widget = component.createObject(widgetBar);

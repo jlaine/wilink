@@ -20,8 +20,6 @@
 #ifndef __WILINK_CHAT_DIALOG_H__
 #define __WILINK_CHAT_DIALOG_H__
 
-#include <QWidget>
-
 #include "QXmppMessage.h"
 
 #include "chat_panel.h"
@@ -31,7 +29,6 @@ class ChatClient;
 class ChatHistoryModel;
 class ChatRosterModel;
 class QDeclarativeView;
-class QModelIndex;
 class QUrl;
 class QXmppArchiveChat;
 class QXmppArchiveManager;

@@ -220,56 +220,6 @@
     </message>
 </context>
 <context>
-    <name>ChatRoom</name>
-    <message>
-        <source>Options</source>
-        <translation>Options</translation>
-    </message>
-    <message>
-        <source>Permissions</source>
-        <translation>Permissions</translation>
-    </message>
-</context>
-<context>
-    <name>ChatRoomMembers</name>
-    <message>
-        <source>User</source>
-        <translation>Utilisateur</translation>
-    </message>
-    <message>
-        <source>Role</source>
-        <translation>Role</translation>
-    </message>
-    <message>
-        <source>Add a user</source>
-        <translation>Ajouter un utilisateur</translation>
-    </message>
-    <message>
-        <source>Enter the address of the user you want to add.</source>
-        <translation>Saisissez l&apos;adresse de l&apos;utilisateur que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
-        <source>member</source>
-        <translation>membre</translation>
-    </message>
-    <message>
-        <source>administrator</source>
-        <translation>administrateur</translation>
-    </message>
-    <message>
-        <source>owner</source>
-        <translation>propriétaire</translation>
-    </message>
-    <message>
-        <source>banned</source>
-        <translation>banni</translation>
-    </message>
-    <message>
-        <source>Chat room permissions</source>
-        <translation>Permissions du salon de discussion</translation>
-    </message>
-</context>
-<context>
     <name>ChatRoomWatcher</name>
     <message>
         <source>Invitation from %1</source>
@@ -637,6 +587,45 @@ Acceptez-vous?</translation>
     <message>
         <source>Enter the reason for kicking the user from the room.</source>
         <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
+    </message>
+</context>
+<context>
+    <name>RoomPermissionDialog</name>
+    <message>
+        <source>User</source>
+        <translation>Utilisateur</translation>
+    </message>
+    <message>
+        <source>Role</source>
+        <translation>Role</translation>
+    </message>
+    <message>
+        <source>Add a user</source>
+        <translation>Ajouter un utilisateur</translation>
+    </message>
+    <message>
+        <source>Enter the address of the user you want to add.</source>
+        <translation>Saisissez l&apos;adresse de l&apos;utilisateur que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>member</source>
+        <translation>membre</translation>
+    </message>
+    <message>
+        <source>administrator</source>
+        <translation>administrateur</translation>
+    </message>
+    <message>
+        <source>owner</source>
+        <translation>propriétaire</translation>
+    </message>
+    <message>
+        <source>banned</source>
+        <translation>banni</translation>
+    </message>
+    <message>
+        <source>Chat room permissions</source>
+        <translation>Permissions du salon de discussion</translation>
     </message>
 </context>
 <context>
