@@ -22,6 +22,7 @@
 
 #include "QXmppClient.h"
 
+class DiagnosticManager;
 class QDateTime;
 class QHostInfo;
 class QXmppArchiveManager;
@@ -41,6 +42,7 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
     Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
+    Q_PROPERTY(DiagnosticManager* diagnosticManager READ diagnosticManager CONSTANT)
     Q_PROPERTY(QString diagnosticServer READ diagnosticServer NOTIFY diagnosticServerChanged)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
     Q_PROPERTY(QXmppMucManager* mucManager READ mucManager CONSTANT)
@@ -56,6 +58,7 @@ public:
 
     QXmppArchiveManager *archiveManager();
     QXmppCallManager *callManager();
+    DiagnosticManager *diagnosticManager();
     QString diagnosticServer() const;
     QXmppDiscoveryManager *discoveryManager();
     QXmppMucManager *mucManager();

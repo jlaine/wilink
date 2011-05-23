@@ -26,7 +26,7 @@
 #include "diagnostics/iq.h"
 
 class Chat;
-class DiagnosticsExtension;
+class DiagnosticManager;
 class QTimer;
 
 /** The DiagnosticPanel represents panel for displaying diagnostics results.
@@ -44,17 +44,17 @@ private slots:
 private:
     QXmppClient *m_client;
     bool m_displayed;
-    DiagnosticsExtension *m_manager;
+    DiagnosticManager *m_manager;
 };
 
-class DiagnosticsExtension : public QXmppClientExtension
+class DiagnosticManager : public QXmppClientExtension
 {
     Q_OBJECT
     Q_PROPERTY(QString html READ html NOTIFY htmlChanged)
     Q_PROPERTY(bool running READ running NOTIFY runningChanged)
 
 public:
-    DiagnosticsExtension(QXmppClient *client);
+    DiagnosticManager();
 
     QString html() const;
     bool running() const;
@@ -62,6 +62,11 @@ public:
     /// \cond
     QStringList discoveryFeatures() const;
     bool handleStanza(const QDomElement &element);
+    /// \endcond
+
+protected:
+    /// \cond
+    void setClient(QXmppClient* client);
     /// \endcond
 
 signals:

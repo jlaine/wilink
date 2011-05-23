@@ -385,7 +385,7 @@ DiagnosticPanel::DiagnosticPanel(Chat *chatWindow, QXmppClient *client)
     bool check;
 
     // build manager
-    m_manager = new DiagnosticsExtension(client);
+    m_manager = new DiagnosticManager();
     client->addExtension(m_manager);
 
     // build user interface
@@ -421,11 +421,14 @@ void DiagnosticPanel::slotShow()
 
 // EXTENSION
 
-DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
+DiagnosticManager::DiagnosticManager()
     : m_thread(0)
 {
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
+}
 
+void DiagnosticManager::setClient(QXmppClient *client)
+{
     bool check;
     check = connect(client, SIGNAL(diagnosticServerChanged(QString)),
                     this, SLOT(diagnosticServerChanged(QString)));
@@ -433,17 +436,17 @@ DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
     Q_UNUSED(check);
 }
 
-void DiagnosticsExtension::diagnosticServerChanged(const QString &diagServer)
+void DiagnosticManager::diagnosticServerChanged(const QString &diagServer)
 {
     m_diagnosticsServer = diagServer;
 }
 
-QStringList DiagnosticsExtension::discoveryFeatures() const
+QStringList DiagnosticManager::discoveryFeatures() const
 {
     return QStringList() << ns_diagnostics;
 }
 
-void DiagnosticsExtension::handleResults(const DiagnosticsIq &results)
+void DiagnosticManager::handleResults(const DiagnosticsIq &results)
 {
     m_html = dumpResults(results);
     emit htmlChanged(m_html);
@@ -460,7 +463,7 @@ void DiagnosticsExtension::handleResults(const DiagnosticsIq &results)
     }
 }
 
-bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
+bool DiagnosticManager::handleStanza(const QDomElement &stanza)
 {
     if (stanza.tagName() == "iq" && DiagnosticsIq::isDiagnosticsIq(stanza)) {
         DiagnosticsIq iq;
@@ -494,17 +497,17 @@ bool DiagnosticsExtension::handleStanza(const QDomElement &stanza)
     return false;
 }
 
-QString DiagnosticsExtension::html() const
+QString DiagnosticManager::html() const
 {
     return m_html;
 }
 
-void DiagnosticsExtension::refresh()
+void DiagnosticManager::refresh()
 {
     run(DiagnosticsIq());
 }
 
-void DiagnosticsExtension::run(const DiagnosticsIq &request)
+void DiagnosticManager::run(const DiagnosticsIq &request)
 {
     bool check;
 
@@ -530,7 +533,7 @@ void DiagnosticsExtension::run(const DiagnosticsIq &request)
     emit runningChanged(true);
 }
 
-bool DiagnosticsExtension::running() const
+bool DiagnosticManager::running() const
 {
     return m_thread != 0;
 }

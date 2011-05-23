@@ -32,6 +32,7 @@
 #include "QXmppTransferManager.h"
 
 #include "chat_client.h"
+#include "plugins/diagnostics.h"
 
 ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent),
@@ -74,6 +75,11 @@ QXmppArchiveManager *ChatClient::archiveManager()
 QXmppCallManager *ChatClient::callManager()
 {
     return getManager<QXmppCallManager>();
+}
+
+DiagnosticManager *ChatClient::diagnosticManager()
+{
+    return getManager<DiagnosticManager>();
 }
 
 QString ChatClient::diagnosticServer() const
