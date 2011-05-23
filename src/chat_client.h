@@ -35,6 +35,7 @@ class QXmppTransferManager;
 class ChatClient : public QXmppClient
 {
     Q_OBJECT
+    Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
     Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
@@ -43,13 +44,16 @@ class ChatClient : public QXmppClient
 
 public:
     ChatClient(QObject *parent);
+    QString jid() const;
+    QDateTime serverTime() const;
+
     QXmppCallManager *callManager();
     QXmppDiscoveryManager *discoveryManager();
     QXmppRosterManager *rosterManager();
     QXmppTransferManager* transferManager();
-    QDateTime serverTime() const;
 
 signals:
+    void jidChanged(const QString &jid);
     void diagnosticsServerFound(const QString &diagServer);
     void mucServerFound(const QString &mucServer);
     void pubSubServerFound(const QString &pubSubServer);

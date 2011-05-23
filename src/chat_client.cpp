@@ -54,6 +54,17 @@ ChatClient::ChatClient(QObject *parent)
     getManager<QXmppCallManager>();
 }
 
+QString ChatClient::jid() const
+{
+    QXmppClient *client = (QXmppClient*)this;
+    client->configuration().jid();
+}
+
+QDateTime ChatClient::serverTime() const
+{
+    return QDateTime::currentDateTime().addSecs(timeOffset);
+}
+
 QXmppCallManager *ChatClient::callManager()
 {
     return getManager<QXmppCallManager>();
@@ -74,14 +85,12 @@ QXmppTransferManager *ChatClient::transferManager()
     return getManager<QXmppTransferManager>();
 }
 
-QDateTime ChatClient::serverTime() const
-{
-    return QDateTime::currentDateTime().addSecs(timeOffset);
-}
-
 void ChatClient::slotConnected()
 {
     const QString domain = configuration().domain();
+
+    // notify jid change
+    emit jidChanged(jid());
 
     // get server time
     timeQueue = timeManager->requestTime(domain);
