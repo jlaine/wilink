@@ -27,8 +27,6 @@ Panel {
     PanelHeader {
         id: header
 
-        property string help: qsTr('You can select the folders you want to share with other users from the shares options.')
-
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -57,12 +55,21 @@ Panel {
         }
     }
 
+    PanelHelp {
+        id: help
+
+        anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: qsTr('You can select the folders you want to share with other users from the shares options.')
+    }
+
     Item {
         id: searchBar
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
+        anchors.top: help.bottom
         anchors.margins: 8
         height: 32
 

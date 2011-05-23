@@ -83,7 +83,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     bool check;
     setWindowIcon(QIcon(":/share.png"));
     setWindowTitle(tr("Shares"));
-    setWindowHelp(tr("You can select the folders you want to share with other users from the shares options."));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -102,7 +101,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
-    layout->addWidget(declarativeView);
+    layout->addWidget(declarativeView, 1);
 
     // connect signals
     check = connect(declarativeView->rootObject(), SIGNAL(close()),
