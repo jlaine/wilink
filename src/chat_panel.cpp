@@ -35,7 +35,6 @@ class ChatPanelPrivate
 public:
     void updateTitle();
 
-    QLabel *helpLabel;
     QLabel *iconLabel;
     QLabel *nameLabel;
     QString windowExtra;
@@ -61,14 +60,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     // icon and label
     d->iconLabel = new QLabel;
     d->nameLabel = new QLabel;
-
-    // help label
-    d->helpLabel = new QLabel(this, Qt::Widget);
-    d->helpLabel->setObjectName("panel-help");
-    d->helpLabel->setWordWrap(true);
-    d->helpLabel->setOpenExternalLinks(true);
-    d->helpLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed ) ;
-    d->helpLabel->hide();
 
     setMinimumWidth(300);
 }

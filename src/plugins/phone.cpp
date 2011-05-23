@@ -130,11 +130,6 @@ void PhonePanel::handleSettings()
     if (!m_callsModel->enabled())
         return;
 
-    // update number
-    const QString number = m_callsModel->phoneNumber();
-    if (!number.isEmpty())
-        setWindowExtra(tr("Your number is %1").arg(number));
-
     // register URL handler
     if (!m_registeredHandler) {
         ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),

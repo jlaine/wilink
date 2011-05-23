@@ -54,12 +54,3 @@ QToolButton:pressed {
                       stop:0 rgba(255, 255, 255, 150), stop: 0.5 rgba(255, 255, 255, 50), stop:1 rgb(255, 255, 255, 150));
 }
 
-/* panel header */
-QLabel#panel-help {
-    border-color: #93b9f2;
-    border-style: solid;
-    border-width: 1px 0px;
-    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                      stop:0 #e7effd, stop:1 #cbdaf1);
-    padding: 10px;
-}
