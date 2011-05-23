@@ -943,5 +943,21 @@ Do you accept?</source>
 
 Acceptez-vous?</translation>
     </message>
+    <message>
+        <source>Phone</source>
+        <translation>Téléphone</translation>
+    </message>
+    <message>
+        <source>Photos</source>
+        <translation>Photos</translation>
+    </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+    <message>
+        <source>Diagnostics</source>
+        <translation>Diagnostics</translation>
+    </message>
 </context>
 </TS>

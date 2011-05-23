@@ -48,19 +48,25 @@ Item {
                 anchors.left: parent.left
 
                 ToolButton {
-                    text: 'Phone'
+                    text: qsTr('Diagnostics')
+                    icon: 'diagnostics.png'
+                    visible: false
+                }
+
+                ToolButton {
+                    text: qsTr('Phone')
                     icon: 'phone.png'
                     onClicked: Qt.openUrlExternally('sip://')
                 }
 
                 ToolButton {
-                    text: 'Photos'
+                    text: qsTr('Photos')
                     icon: 'photos.png'
                     visible: false
                 }
 
                 ToolButton {
-                    text: 'Shares'
+                    text: qsTr('Shares')
                     icon: 'share.png'
                     visible: client.shareServer != ''
                 }
