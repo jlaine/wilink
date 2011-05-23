@@ -343,6 +343,14 @@
         <source>Sorry, but you cannot send files bigger than %1.</source>
         <translation type="obsolete">Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
     </message>
+    <message>
+        <source>is composing a message</source>
+        <translation>compose un message</translation>
+    </message>
+    <message>
+        <source>has closed the conversation</source>
+        <translation>a fermé la conversation</translation>
+    </message>
 </context>
 <context>
     <name>DiagnosticPanel</name>

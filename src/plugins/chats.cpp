@@ -66,8 +66,15 @@ ChatClient *ChatDialogHelper::client() const
 
 void ChatDialogHelper::setClient(ChatClient *client)
 {
+    bool check;
+
     if (client != m_client) {
         m_client = client;
+
+        check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
+                        this, SLOT(messageReceived(QXmppMessage)));
+        Q_ASSERT(check);
+
         emit clientChanged(client);
     }
 }
@@ -120,6 +127,23 @@ void ChatDialogHelper::setLocalState(int state)
 int ChatDialogHelper::remoteState() const
 {
     return m_remoteState;
+}
+
+void ChatDialogHelper::messageReceived(const QXmppMessage &msg)
+{
+    if (msg.type() != QXmppMessage::Chat ||
+        jidToBareJid(msg.from()) != m_jid)
+        return;
+
+    // handle chat state
+    if (msg.state() != m_remoteState) {
+        m_remoteState = msg.state();
+        emit remoteStateChanged(m_remoteState);
+    }
+
+    // handle message body
+    if (msg.body().isEmpty())
+        return;
 }
 
 bool ChatDialogHelper::sendMessage(const QString &body)

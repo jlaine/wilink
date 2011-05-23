@@ -71,6 +71,9 @@ signals:
 public slots:
     bool sendMessage(const QString &text);
 
+private slots:
+    void messageReceived(const QXmppMessage &msg);
+
 private:
     ChatClient *m_client;
     ChatHistoryModel *m_historyModel;

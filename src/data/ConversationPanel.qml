@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import wiLink 1.2
 
 Panel {
@@ -26,13 +27,21 @@ Panel {
     PanelHeader {
         id: header
 
-        property string stateName: ''
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         icon: vcard.avatar
-        title: '<b>' + vcard.name + '</b> ' + stateName + '<br/>' + vcard.jid
+        title: '<b>' + vcard.name + '</b> ' + stateText() + '<br/>' + vcard.jid
         z: 1
+
+        function stateText() {
+            if (conversation.remoteState == QXmppMessage.Composing)
+                return qsTr('is composing a message');
+            else if (conversation.remoteState == QXmppMessage.Gone)
+                return qsTr('has closed the conversation');
+            else
+                return '';
+        }
 
         Row {
             id: toolBar
