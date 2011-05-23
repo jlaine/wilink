@@ -56,18 +56,27 @@ Panel {
     }
 
     Flickable {
+        id: flickable
 
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.right
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
+        contentHeight: diagnostic.height
 
         Text {
-            anchors.top: parent.top
-            anchors.left: parent.left
+            id: diagnostic
 
             text: diagnosticsManager.html
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: flickable
     }
 }
 
