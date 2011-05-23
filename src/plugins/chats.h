@@ -72,6 +72,8 @@ public slots:
     bool sendMessage(const QString &text);
 
 private slots:
+    void archiveChatReceived(const QXmppArchiveChat &chat);
+    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void messageReceived(const QXmppMessage &msg);
 
 private:
@@ -94,13 +96,9 @@ public slots:
     void messageReceived(const QXmppMessage &msg);
 
 private slots:
-    void archiveChatReceived(const QXmppArchiveChat &chat);
-    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
-    void disconnected();
     void join();
 
 private:
-    QXmppArchiveManager *archiveManager;
     QString chatRemoteJid;
     ChatClient *client;
     bool joined;

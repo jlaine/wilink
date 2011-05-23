@@ -24,6 +24,7 @@
 
 class QDateTime;
 class QHostInfo;
+class QXmppArchiveManager;
 class QXmppCallManager;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
@@ -37,6 +38,7 @@ class ChatClient : public QXmppClient
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
     Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
+    Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
     Q_PROPERTY(QString diagnosticServer READ diagnosticServer NOTIFY diagnosticServerChanged)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
@@ -50,6 +52,7 @@ public:
     QString jid() const;
     QDateTime serverTime() const;
 
+    QXmppArchiveManager *archiveManager();
     QXmppCallManager *callManager();
     QString diagnosticServer() const;
     QXmppDiscoveryManager *discoveryManager();

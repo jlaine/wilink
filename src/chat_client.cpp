@@ -19,6 +19,7 @@
 
 #include <QHostInfo>
 
+#include "QXmppArchiveManager.h"
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
@@ -47,11 +48,10 @@ ChatClient::ChatClient(QObject *parent)
         this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
 
     // create transfer manager
-    QXmppTransferManager *transferManager = getManager<QXmppTransferManager>();
-    transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
+    transferManager()->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
     // create call manager
-    getManager<QXmppCallManager>();
+    callManager();
 }
 
 QString ChatClient::jid() const
@@ -63,6 +63,11 @@ QString ChatClient::jid() const
 QDateTime ChatClient::serverTime() const
 {
     return QDateTime::currentDateTime().addSecs(timeOffset);
+}
+
+QXmppArchiveManager *ChatClient::archiveManager()
+{
+    return getManager<QXmppArchiveManager>();
 }
 
 QXmppCallManager *ChatClient::callManager()
