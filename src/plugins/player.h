@@ -39,7 +39,6 @@ public:
     PlayerModel(QObject *parent = 0);
     ~PlayerModel();
 
-    bool addUrl(const QUrl &url);
     QModelIndex cursor() const;
     void setCursor(const QModelIndex &index);
     bool playing() const;
@@ -50,6 +49,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 public slots:
+    bool addUrl(const QUrl &url);
     void play(const QModelIndex &index);
     void stop();
 
@@ -74,14 +74,6 @@ class PlayerPanel : public ChatPanel
 
 public:
     PlayerPanel(Chat *chatWindow, QWidget *parent = 0);
-
-protected:
-    bool eventFilter(QObject *obj, QEvent *e);
-
-private:
-    Chat *m_chat;
-    PlayerModel *m_model;
-    QSoundPlayer *m_player;
 };
 
 #endif
