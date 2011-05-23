@@ -25,12 +25,11 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property alias jid: participantModel.jid
     property alias room: participantModel.room
 
     RoomModel {
         id: participantModel
-
-        jid: globalJid
         manager: window.client.mucManager
     }
 

@@ -150,7 +150,6 @@ Chat::Chat(QWidget *parent)
 
     d->client = new ChatClient(this);
     d->rosterModel =  new ChatRosterModel(d->client, this);
-    connect(d->rosterModel, SIGNAL(rosterReady()), this, SLOT(resizeContacts()));
     connect(d->rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
     /* set up logger */
@@ -201,7 +200,7 @@ Chat::Chat(QWidget *parent)
     leftLayout->addWidget(new ChatStatus(d->client));
     d->leftPanel->setLayout(leftLayout);
     splitter->addWidget(d->leftPanel);
-    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
 
     /* right panel */
     d->conversationPanel = new QStackedWidget;
@@ -251,6 +250,12 @@ Chat::Chat(QWidget *parent)
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
+
+    // resize
+    QSize size = QApplication::desktop()->availableGeometry(this).size();
+    size.setHeight(size.height() - 100);
+    size.setWidth((size.height() * 4.0) / 3.0);
+    resize(size);
 }
 
 Chat::~Chat()
@@ -328,7 +333,6 @@ void Chat::hidePanel()
 #ifdef WILINK_EMBEDDED
         d->leftPanel->show();
 #endif
-        QTimer::singleShot(100, this, SLOT(resizeContacts()));
     }
     d->conversationPanel->removeWidget(panel);
 }
@@ -393,8 +397,6 @@ void Chat::showPanel()
         d->leftPanel->hide();
 #endif
         d->conversationPanel->show();
-        if (d->conversationPanel->count() == 1)
-            resizeContacts();
     }
 
     // make sure window is visible
@@ -650,25 +652,6 @@ ChatPanel *Chat::panel(const QString &objectName)
         if (panel->objectName() == objectName)
             return panel;
     return 0;
-}
-
-/** Try to resize the window to fit the contents of the contacts list.
- */
-void Chat::resizeContacts()
-{
-    QSize hint;
-    hint.setHeight(QApplication::desktop()->availableGeometry(this).height() - 100);
-    hint.setWidth(d->rosterView->minimumWidth());
-    if (d->conversationPanel->isVisible())
-        hint.setWidth(hint.width() + 500);
-
-    // respect current size
-    if (d->conversationPanel->isVisible() && hint.width() < size().width())
-        hint.setWidth(size().width());
-    if (hint.height() < size().height())
-        hint.setHeight(size().height());
-
-    resize(hint);
 }
 
 void Chat::setWindowTitle(const QString &title)

@@ -84,7 +84,6 @@ private slots:
     void panelChanged(int index);
     void pendingMessages(int messages);
     void promptCredentials();
-    void resizeContacts();
     void showAbout();
     void showHelp();
     void showOfflineContactsChanged(bool show);

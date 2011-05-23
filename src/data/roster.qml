@@ -168,10 +168,7 @@ Item {
                     dialog.source = 'RoomJoinDialog.qml';
                     dialog.item.show();
                 }
-                onItemClicked: {
-                    var url = 'xmpp://' + window.objectName + '/' + model.jid + '?join';
-                    Qt.openUrlExternally(url);
-                }
+                onItemClicked: showPanel('RoomPanel.qml', {'jid': model.jid})
             }
         }
 

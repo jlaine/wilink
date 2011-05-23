@@ -437,10 +437,11 @@ void ChatRoomWatcher::bookmarksReceived()
 
 RoomPanel *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
+    roomModel->addRoom(jid);
+#if 0
     RoomPanel *panel = qobject_cast<RoomPanel*>(chat->panel(jid));
     if (!panel) {
         // add "rooms" item
-        roomModel->addRoom(jid);
 
         // add panel
         panel = new RoomPanel(chat, jid);
@@ -449,6 +450,9 @@ RoomPanel *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
     if (focus)
         QTimer::singleShot(0, panel, SIGNAL(showPanel()));
     return panel;
+#else
+    return 0;
+#endif
 }
 
 void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
