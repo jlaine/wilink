@@ -81,7 +81,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     db(sharesDb)
 {
     bool check;
-    setWindowIcon(QIcon(":/share.png"));
     setWindowTitle(tr("Shares"));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -224,7 +223,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     directoryChanged(db->directory());
 
     // add actions
-    action = chat->addAction(windowIcon(), windowTitle());
+    action = chat->addAction(QIcon(":/share.png"), windowTitle());
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
     action->setVisible(false);
     connect(action, SIGNAL(triggered()),

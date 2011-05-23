@@ -44,7 +44,6 @@ public:
     ChatPanel(QWidget *parent);
     ~ChatPanel();
 
-    void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
     void setWindowStatus(const QString &status);
     void setWindowTitle(const QString &title);

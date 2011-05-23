@@ -35,7 +35,6 @@ class ChatPanelPrivate
 public:
     void updateTitle();
 
-    QLabel *iconLabel;
     QLabel *nameLabel;
     QString windowExtra;
     QString windowStatus;
@@ -58,7 +57,6 @@ ChatPanel::ChatPanel(QWidget* parent)
     d->q = this;
 
     // icon and label
-    d->iconLabel = new QLabel;
     d->nameLabel = new QLabel;
 
     setMinimumWidth(300);
@@ -75,17 +73,6 @@ void ChatPanel::setWindowExtra(const QString &extra)
 {
     d->windowExtra = extra;
     d->updateTitle();
-}
-
-/** When the window icon is set, update the header icon.
- *
- * @param icon
- */
-void ChatPanel::setWindowIcon(const QIcon &icon)
-{
-    QWidget::setWindowIcon(icon);
-    const QSize actualSize = icon.actualSize(QSize(64, 64));
-    d->iconLabel->setPixmap(icon.pixmap(actualSize));
 }
 
 /** When additional text is set, update the header text.
