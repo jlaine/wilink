@@ -101,6 +101,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         text: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
+        z: 1
     }
 
     GridView {
