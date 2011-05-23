@@ -36,6 +36,9 @@ Rectangle {
     smooth: true
     width: 320
     height: 240
+    x: 0
+    y: 0
+    z: 10
 
     function show() {
         visible = true;
@@ -84,6 +87,37 @@ Rectangle {
             anchors.centerIn: parent
             font.bold: true
             color: '#ffffff'
+        }
+
+        MouseArea {
+            property int mousePressX
+            property int mousePressY
+            property int dialogPressX
+            property int dialogPressY
+
+            anchors.fill: parent
+
+            onPressed: {
+                mousePressX = mapToItem(dialog.parent, mouse.x, mouse.y).x
+                mousePressY = mapToItem(dialog.parent, mouse.x, mouse.y).y
+                dialogPressX = dialog.x
+                dialogPressY = dialog.y
+            }
+
+            onPositionChanged: {
+                if (mouse.buttons & Qt.LeftButton) {
+                    var positionX = dialogPressX + (mapToItem(dialog.parent, mouse.x, mouse.y).x - mousePressX)
+                    positionX = Math.max(positionX, 0)
+                    positionX = Math.min(positionX, dialog.parent.width - dialog.width)
+
+                    var positionY = dialogPressY + (mapToItem(dialog.parent, mouse.x, mouse.y).y - mousePressY)
+                    positionY = Math.max(positionY, 0)
+                    positionY = Math.min(positionY, dialog.parent.height - dialog.height)
+
+                    dialog.x = positionX
+                    dialog.y = positionY
+                }
+            }
         }
     }
 
