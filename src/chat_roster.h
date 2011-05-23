@@ -166,6 +166,7 @@ class VCard : public QObject
     Q_PROPERTY(QUrl avatar READ avatar NOTIFY avatarChanged)
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
+    Q_PROPERTY(QString nickName READ nickName NOTIFY nickNameChanged)
     Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
 
 public:
@@ -175,12 +176,14 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
     QString name() const;
+    QString nickName() const;
     QUrl url() const;
 
 signals:
     void avatarChanged(const QUrl &avatar);
     void jidChanged(const QString &jid);
     void nameChanged(const QString &name);
+    void nickNameChanged(const QString &nickName);
     void urlChanged(const QUrl &url);
 
 private slots:
@@ -193,6 +196,7 @@ private:
     QUrl m_avatar;
     QString m_jid;
     QString m_name;
+    QString m_nickName;
     QUrl m_url;
 };
 

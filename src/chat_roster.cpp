@@ -882,6 +882,11 @@ QString VCard::name() const
     return m_name;
 }
 
+QString VCard::nickName() const
+{
+    return m_nickName;
+}
+
 QUrl VCard::url() const
 {
     return m_url;
@@ -891,6 +896,7 @@ void VCard::update()
 {
     QUrl newAvatar;
     QString newName;
+    QString newNickName;
     QUrl newUrl;
 
     // fetch data
@@ -907,6 +913,7 @@ void VCard::update()
             newName = vcard.nickName();
             if (newName.isEmpty())
                 newName = vcard.fullName();
+            newNickName = vcard.nickName();
             newUrl = QUrl(vcard.url());
         } else {
             newAvatar = QUrl("qrc:/peer.png");
@@ -923,6 +930,10 @@ void VCard::update()
     if (newName != m_name) {
         m_name = newName;
         emit nameChanged(m_name);
+    }
+    if (newNickName != m_nickName) {
+        m_nickName = newNickName;
+        emit nickNameChanged(m_nickName);
     }
     if (newUrl != m_url) {
         m_url = newUrl;
