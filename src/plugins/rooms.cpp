@@ -23,22 +23,17 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
-#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListWidget>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSortFilterProxyModel>
-#include <QSplitter>
-#include <QStatusBar>
 #include <QTableWidget>
-#include <QTextBlock>
 #include <QTimer>
 #include <QUrl>
 
@@ -48,8 +43,6 @@
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
 #include "QXmppConstants.h"
-#include "QXmppDiscoveryIq.h"
-#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
@@ -141,6 +134,9 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
+    m_historyModel = new ChatHistoryModel(this);
+    m_historyModel->setParticipantModel(this);
+
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(participantChanged(QString)));
 }
@@ -163,6 +159,39 @@ QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
 
     return QVariant();
 }
+
+ChatHistoryModel *ChatRoomModel::historyModel() const
+{
+    return m_historyModel;
+}
+
+void ChatRoomModel::messageReceived(const QXmppMessage &msg)
+{
+    if (msg.body().isEmpty())
+        return;
+
+    // handle message body
+    ChatMessage message;
+    message.body = msg.body();
+    message.date = msg.stamp();
+    if (!message.date.isValid()) {
+        // FIXME: restore this!
+        // chat->client()->serverTime();
+        message.date = QDateTime::currentDateTime();
+    }
+    message.jid = msg.from();
+    message.received = jidToResource(msg.from()) != m_room->nickName();
+    m_historyModel->addMessage(message);
+
+    // FIXME: notify user
+    // if (notifyMessages || message.body.contains("@" + mucRoom->nickName()))
+    //    queueNotification(message.body);
+
+    // play sound, unless we sent the message
+    if (message.received)
+        wApp->soundPlayer()->play(wApp->incomingMessageSound());
+}
+
 
 void ChatRoomModel::participantAdded(const QString &jid)
 {
@@ -224,6 +253,11 @@ void ChatRoomModel::setRoom(QXmppMucRoom *room)
         return;
 
     m_room = room;
+
+    check = connect(m_room, SIGNAL(messageReceived(QXmppMessage)),
+                    this, SLOT(messageReceived(QXmppMessage)));
+    Q_ASSERT(check);
+
     check = connect(m_room, SIGNAL(participantAdded(QString)),
                     this, SLOT(participantAdded(QString)));
     Q_ASSERT(check);
@@ -358,8 +392,7 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
 
 RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     : ChatPanel(chatWindow),
-    chat(chatWindow),
-    notifyMessages(true)
+    chat(chatWindow)
 {
     bool check;
     ChatClient *client = chat->client();
@@ -371,15 +404,6 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
 
     ChatRoomModel *mucModel = new ChatRoomModel(this);
     mucModel->setRoom(mucRoom);
-
-    historyModel = new ChatHistoryModel(this);
-    historyModel->setParticipantModel(mucModel);
-
-    QSortFilterProxyModel *sortedModel = new QSortFilterProxyModel(this);
-    sortedModel->setSourceModel(mucModel);
-    sortedModel->setDynamicSortFilter(true);
-    sortedModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    sortedModel->sort(0);
 
     QSortFilterProxyModel *contactModel = new QSortFilterProxyModel(this);
     contactModel->setSourceModel(chatWindow->rosterModel());
@@ -396,8 +420,7 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    context->setContextProperty("historyModel", historyModel);
-    context->setContextProperty("participantModel", sortedModel);
+    context->setContextProperty("participantModel", mucModel);
     context->setContextProperty("room", mucRoom);
     context->setContextProperty("window", chat);
 
@@ -438,10 +461,6 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
 
     check = connect(mucRoom, SIGNAL(left()),
                     this, SLOT(left()));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()),
@@ -503,30 +522,6 @@ void RoomPanel::left()
 
     // destroy window
     deleteLater();
-}
-
-void RoomPanel::messageReceived(const QXmppMessage &msg)
-{
-    if (msg.body().isEmpty())
-        return;
-
-    // handle message body
-    ChatMessage message;
-    message.body = msg.body();
-    message.date = msg.stamp();
-    if (!message.date.isValid())
-        message.date = chat->client()->serverTime();
-    message.jid = msg.from();
-    message.received = jidToResource(msg.from()) != mucRoom->nickName();
-    historyModel->addMessage(message);
-
-    // notify user
-    if (notifyMessages || message.body.contains("@" + mucRoom->nickName()))
-        queueNotification(message.body);
-
-    // play sound, unless we sent the message
-    if (message.received)
-        wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 /** Unbookmarks the room.

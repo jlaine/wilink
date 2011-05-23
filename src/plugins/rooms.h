@@ -35,10 +35,6 @@ class RoomListModel;
 class RoomPanel;
 class ChatRosterModel;
 class QDeclarativeView;
-class QLineEdit;
-class QListView;
-class QListWidget;
-class QListWidgetItem;
 class QAbstractButton;
 class QModelIndex;
 class QTableWidget;
@@ -46,7 +42,6 @@ class QXmppBookmarkManager;
 class QXmppBookmarkSet;
 class QXmppClient;
 class QXmppDataForm;
-class QXmppDiscoveryIq;
 class QXmppIq;
 class QXmppMessage;
 class QXmppMucAdminIq;
@@ -58,11 +53,14 @@ class ChatRoomModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(QXmppMucRoom* room READ room WRITE setRoom NOTIFY roomChanged)
+    Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
 
 public:
     ChatRoomModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    ChatHistoryModel *historyModel() const;
 
     QXmppMucRoom *room() const;
     void setRoom(QXmppMucRoom *room);
@@ -71,11 +69,13 @@ signals:
     void roomChanged(QXmppMucRoom *room);
 
 private slots:
+    void messageReceived(const QXmppMessage &msg);
     void participantAdded(const QString &jid);
     void participantChanged(const QString &jid);
     void participantRemoved(const QString &jid);
 
 private:
+    ChatHistoryModel *m_historyModel;
     QXmppMucRoom *m_room;
 };
 
@@ -115,14 +115,11 @@ private slots:
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
     void left();
-    void messageReceived(const QXmppMessage &msg);
 
 private:
     Chat *chat;
     QXmppMucRoom *mucRoom;
-    bool notifyMessages;
 
-    ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
 };
 

@@ -33,7 +33,7 @@ Panel {
             room.nickName = name;
             if (!room.isJoined) {
                 // clear history
-                historyModel.clear();
+                participantModel.historyModel.clear();
 
                 // send join request
                 room.join();
@@ -115,7 +115,7 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: participantView.left
-            model: historyModel
+            model: participantModel.historyModel
 
             onParticipantClicked: chatInput.talkAt(participant)
         }
