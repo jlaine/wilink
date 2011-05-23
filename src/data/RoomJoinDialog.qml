@@ -54,7 +54,7 @@ Dialog {
         anchors.margins: 8
         anchors.top: help.bottom
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         border.color: '#c3c3c3'
         border.width: 1
         color: 'white'
@@ -124,6 +124,16 @@ Dialog {
                 }
             }
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: bar.bottom
+        anchors.bottom: contents.bottom
+        anchors.right: parent.right
+        anchors.margins: 8
+        flickableItem: view
     }
 }
 
