@@ -24,6 +24,13 @@ import 'utils.js' as Utils
 Item {
     id: root
 
+    function showPanel(source, properties) {
+        var component = Qt.createComponent(source);
+        var widget = component.createObject(swapper, properties);
+        widget.anchors = fill.parent;
+        return widget;
+    }
+
     Item {
         id: left
 
@@ -52,6 +59,12 @@ Item {
                     text: qsTr('Diagnostics')
                     icon: 'diagnostics.png'
                     visible: false
+                }
+
+                ToolButton {
+                    text: 'Media'
+                    icon: 'start.png'
+                    onClicked: showPanel('PlayerPanel.qml')
                 }
 
                 ToolButton {

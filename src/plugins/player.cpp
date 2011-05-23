@@ -516,29 +516,10 @@ void PlayerModel::stop()
     }
 }
 
-PlayerPanel::PlayerPanel(Chat *chatWindow, QWidget *parent)
-    : ChatPanel(parent)
-{
-    bool check;
-
-    // build layout
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    // playlist
-    QDeclarativeView *view = new QDeclarativeView;
-    view->setSource(QUrl("qrc:/PlayerPanel.qml"));
-    view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    layout->addWidget(view, 1);
-    setFocusProxy(view);
-
-    // register panel
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_M), chatWindow);
-    check = connect(shortcut, SIGNAL(activated()),
-                    this, SIGNAL(showPanel()));
-    Q_ASSERT(check);
-}
-
+#if 0
+// FIXME: restore drag and drop
+// view->viewport()->setAcceptDrops(true);
+// view->viewport()->installEventFilter(this);
 static QList<QUrl> getUrls(const QUrl &url) {
     if (!isLocal(url))
         return QList<QUrl>() << url;
@@ -556,10 +537,6 @@ static QList<QUrl> getUrls(const QUrl &url) {
     return urls;
 }
 
-#if 0
-// FIXME: restore drag and drop
-// view->viewport()->setAcceptDrops(true);
-// view->viewport()->installEventFilter(this);
 bool PlayerPanel::eventFilter(QObject *obj, QEvent *e)
 {
     Q_UNUSED(obj);
@@ -616,9 +593,6 @@ public:
 bool PlayerPlugin::initialize(Chat *chat)
 {
     qmlRegisterType<PlayerModel>("wiLink", 1, 2, "PlayerModel");
-
-    PlayerPanel *panel = new PlayerPanel(chat);
-    chat->addPanel(panel);
     return true;
 }
 

@@ -23,7 +23,6 @@
 #include <QUrl>
 
 #include "chat_model.h"
-#include "chat_panel.h"
 
 class Chat;
 class QSoundPlayer;
@@ -64,16 +63,6 @@ private slots:
 private:
     PlayerModelPrivate *d;
     friend class PlayerModelPrivate;
-};
-
-/** The PlayerPanel class represents a panel for playing media.
- */
-class PlayerPanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    PlayerPanel(Chat *chatWindow, QWidget *parent = 0);
 };
 
 #endif

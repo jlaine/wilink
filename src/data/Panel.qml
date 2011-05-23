@@ -24,7 +24,6 @@ Rectangle {
 
     signal close
 
-    width: 320
-    height: 400
+    anchors.fill: parent
 }
 
