@@ -142,12 +142,12 @@ Panel {
 
                 Text {
                     id: text
+
                     anchors.left: parent.left
-                    anchors.top: thumbnail.bottom
                     anchors.right: parent.right
+                    elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                     text: model.name
-                    wrapMode: Text.WordWrap
                 }
             }
 
