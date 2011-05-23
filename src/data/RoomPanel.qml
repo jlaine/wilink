@@ -126,7 +126,6 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             model: participantModel
-            width: 80
 
             onParticipantClicked: chatInput.talkAt(participant)
         }

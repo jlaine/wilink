@@ -26,6 +26,8 @@ Item {
     property alias model: view.model
     signal participantClicked(string participant)
 
+    width: view.cellWidth + scrollBar.width
+
     GridView {
         id: view
 
@@ -64,9 +66,11 @@ Item {
                  }
 
                 Text {
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                     color: '#2689d6'
                     elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: 10
                     text: model.name
                 }
