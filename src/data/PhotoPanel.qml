@@ -142,8 +142,12 @@ Panel {
 
                 Text {
                     id: text
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.left: parent.left
+                    anchors.top: thumbnail.bottom
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignHCenter
                     text: model.name
+                    wrapMode: Text.WordWrap
                 }
             }
 
