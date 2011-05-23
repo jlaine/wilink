@@ -24,11 +24,25 @@ import 'utils.js' as Utils
 Item {
     id: root
 
+    ListModel {
+        id: panels
+    }
+
     function showPanel(source, properties) {
+        for (var i = 0; i < panels.count; i += 1) {
+            if (panels.get(i).source == source &&
+                panels.get(i).properties == properties) {
+                console.log("already have panel " + source + " " + properties);
+                return;
+            }
+        }
+
+        // create panel
+        console.log("creating panel " + source + " " + properties);
         var component = Qt.createComponent(source);
-        var widget = component.createObject(swapper, properties);
-        widget.anchors = fill.parent;
-        return widget;
+        var panel = component.createObject(swapper, properties);
+        panels.append({'source': source, 'properties': properties, 'panel': panel});
+        return panel;
     }
 
     Item {
