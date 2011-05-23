@@ -289,20 +289,20 @@ void ChatRoomWatcher::bookmarksReceived()
     }
 }
 
-ChatRoom *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
+RoomPanel *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
-    ChatRoom *room = qobject_cast<ChatRoom*>(chat->panel(jid));
-    if (!room) {
+    RoomPanel *panel = qobject_cast<RoomPanel*>(chat->panel(jid));
+    if (!panel) {
         // add "rooms" item
         roomModel->addRoom(jid);
 
         // add panel
-        room = new ChatRoom(chat, chat->rosterModel(), jid);
-        chat->addPanel(room);
+        panel = new RoomPanel(chat, jid);
+        chat->addPanel(panel);
     }
     if (focus)
-        QTimer::singleShot(0, room, SIGNAL(showPanel()));
-    return room;
+        QTimer::singleShot(0, panel, SIGNAL(showPanel()));
+    return panel;
 }
 
 void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
@@ -356,11 +356,10 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
     }
 }
 
-ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QString &jid, QWidget *parent)
-    : ChatPanel(parent),
+RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
+    : ChatPanel(chatWindow),
     chat(chatWindow),
-    notifyMessages(true),
-    rosterModel(chatRosterModel)
+    notifyMessages(true)
 {
     bool check;
     ChatClient *client = chat->client();
@@ -383,7 +382,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     sortedModel->sort(0);
 
     QSortFilterProxyModel *contactModel = new QSortFilterProxyModel(this);
-    contactModel->setSourceModel(rosterModel);
+    contactModel->setSourceModel(chatWindow->rosterModel());
     contactModel->setDynamicSortFilter(true);
     contactModel->setFilterKeyColumn(2);
     contactModel->setFilterRegExp(QRegExp("^(?!offline).+"));
@@ -452,7 +451,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
 /** Bookmarks the room.
  */
-void ChatRoom::bookmark()
+void RoomPanel::bookmark()
 {
     QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
     Q_ASSERT(bookmarkManager);
@@ -476,7 +475,7 @@ void ChatRoom::bookmark()
 
 /** Manage the room's members.
  */
-void ChatRoom::changePermissions()
+void RoomPanel::changePermissions()
 {
     ChatRoomMembers dialog(mucRoom, "@" + chat->client()->configuration().domain(), chat);
     dialog.exec();
@@ -484,7 +483,7 @@ void ChatRoom::changePermissions()
 
 /** Display room configuration dialog.
  */
-void ChatRoom::configurationReceived(const QXmppDataForm &form)
+void RoomPanel::configurationReceived(const QXmppDataForm &form)
 {
     ChatForm dialog(form, chat);
     if (dialog.exec())
@@ -493,7 +492,7 @@ void ChatRoom::configurationReceived(const QXmppDataForm &form)
 
 /** Handle leaving the room.
  */
-void ChatRoom::left()
+void RoomPanel::left()
 {
     // FIXME: remove room from roster unless it's persistent
 #if 0
@@ -506,7 +505,7 @@ void ChatRoom::left()
     deleteLater();
 }
 
-void ChatRoom::messageReceived(const QXmppMessage &msg)
+void RoomPanel::messageReceived(const QXmppMessage &msg)
 {
     if (msg.body().isEmpty())
         return;
@@ -532,7 +531,7 @@ void ChatRoom::messageReceived(const QXmppMessage &msg)
 
 /** Unbookmarks the room.
  */
-void ChatRoom::unbookmark()
+void RoomPanel::unbookmark()
 {
     QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
     Q_ASSERT(bookmarkManager);

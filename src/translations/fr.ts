@@ -220,17 +220,6 @@
     </message>
 </context>
 <context>
-    <name>ChatRoom</name>
-    <message>
-        <source>Options</source>
-        <translation>Options</translation>
-    </message>
-    <message>
-        <source>Permissions</source>
-        <translation>Permissions</translation>
-    </message>
-</context>
-<context>
     <name>ChatRoomMembers</name>
     <message>
         <source>User</source>
