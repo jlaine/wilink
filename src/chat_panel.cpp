@@ -86,21 +86,6 @@ void ChatPanel::setWindowExtra(const QString &extra)
     d->updateTitle();
 }
 
-/** Sets the window's help text.
- *
- * @param help
- */
-void ChatPanel::setWindowHelp(const QString &help)
-{
-    d->helpLabel->setText(help);
-#ifndef WILINK_EMBEDDED
-    if (help.isEmpty())
-        d->helpLabel->hide();
-    else
-        d->helpLabel->show();
-#endif
-}
-
 /** When the window icon is set, update the header icon.
  *
  * @param icon

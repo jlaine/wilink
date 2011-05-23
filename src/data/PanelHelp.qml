@@ -28,8 +28,7 @@ Rectangle {
         GradientStop { position: 0; color: '#e7effd' }
         GradientStop { position: 1; color: '#cbdaf1' }
     }
-    width: 100
-    height: label.height + 2 * label.anchors.margins
+    height: visible ? label.height + 2 * label.anchors.margins : 0
  
     Text {
         id: label
@@ -39,5 +38,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.margins: 8
         wrapMode: Text.WordWrap
+
+        onLinkActivated: Qt.openUrlExternally(link)
     }
 }

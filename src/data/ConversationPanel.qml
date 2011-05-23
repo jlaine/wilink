@@ -26,11 +26,12 @@ Panel {
     PanelHeader {
         id: header
 
+        property string stateName: ''
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         icon: vcard.avatar
-        title: '<b>' + vcard.name + '</b><br/>' + vcard.jid
+        title: '<b>' + vcard.name + '</b> ' + stateName + '<br/>' + vcard.jid
         z: 1
 
         Row {

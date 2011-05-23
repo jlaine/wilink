@@ -30,8 +30,6 @@ Panel {
     PanelHeader {
         id: header
 
-        property string help: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
-
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -96,13 +94,22 @@ Panel {
 
     }
 
+    PanelHelp {
+        id: help
+
+        anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
+    }
+
     GridView {
         id: view
 
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.top: header.bottom
+        anchors.top: help.bottom
         cellWidth: 130
         cellHeight: 150
 
@@ -183,7 +190,7 @@ Panel {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: header.bottom
+        anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.right: parent.right
         flickableItem: view
@@ -195,7 +202,7 @@ Panel {
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
+        anchors.top: help.bottom
         visible: false
         z: 1
 

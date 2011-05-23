@@ -46,7 +46,6 @@ public:
 
     void setWindowIcon(const QIcon &icon);
     void setWindowExtra(const QString &extra);
-    void setWindowHelp(const QString &help);
     void setWindowStatus(const QString &status);
     void setWindowTitle(const QString &title);
     static QPalette palette();

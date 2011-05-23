@@ -80,12 +80,22 @@ Panel {
         }
     }
 
+    PanelHelp {
+        id: help
+
+        anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: qsTr('You can subscribe to the phone service at the following address:') + ' <a href="' + historyModel.selfcareUrl + '">' + historyModel.selfcareUrl + '</a>';
+        visible: !historyModel.enabled
+    }
+
     Item {
         id: numberRow
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
+        anchors.top: help.bottom
         anchors.margins: 4
         height: 32
 
@@ -117,7 +127,6 @@ Panel {
             }
 
             Text {
-                id: help
                 anchors.fill: numberEdit
                 color: '#999'
                 text: qsTr('Enter the number you want to call')

@@ -127,15 +127,8 @@ void PhonePanel::callReceived(SipCall *call)
 void PhonePanel::handleSettings()
 {
     // check service is activated
-    if (!m_callsModel->enabled()) {
-        const QUrl selfcareUrl = m_callsModel->selfcareUrl();
-        if (selfcareUrl.isValid()) {
-            // show a message
-            setWindowHelp(QString("<html>%1 <a href=\"%2\">%3</a></html>").arg(
-                                  tr("You can subscribe to the phone service at the following address:"), selfcareUrl.toString(), selfcareUrl.toString()));
-        }
+    if (!m_callsModel->enabled())
         return;
-    }
 
     // update number
     const QString number = m_callsModel->phoneNumber();
