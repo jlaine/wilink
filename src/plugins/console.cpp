@@ -150,7 +150,6 @@ ConsolePanel::ConsolePanel(Chat *chatWindow)
     // declarative
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("client", chatWindow->client());
     context->setContextProperty("window", chatWindow);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);

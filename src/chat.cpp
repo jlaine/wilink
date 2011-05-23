@@ -77,6 +77,7 @@
 #include "chat_status.h"
 #include "chat_utils.h"
 #include "plugins/console.h"
+#include "plugins/chats.h"
 #include "plugins/declarative.h"
 #include "plugins/discovery.h"
 #include "systeminfo.h"
@@ -119,13 +120,17 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
     qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
 
+    qmlRegisterUncreatableType<ChatClient>("wiLink", 1, 2, "Client", "");
+    qmlRegisterType<ChatDialogHelper>("wiLink", 1, 2, "Conversation");
     qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
+    qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
+    qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
-    qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
-    qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
+
+    // crutches for Qt..
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
@@ -179,7 +184,6 @@ Chat::Chat(QWidget *parent)
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
 
     QDeclarativeContext *context = d->rosterView->rootContext();
-    context->setContextProperty("client", d->client);
     context->setContextProperty("contactModel", d->sortedContactModel);
     context->setContextProperty("window", this);
 

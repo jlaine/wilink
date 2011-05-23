@@ -27,7 +27,7 @@ Panel {
 
     VCard {
         id: ownCard
-        jid: client.jid
+        jid: window.client.jid
 
         onNameChanged: {
             room.nickName = name;

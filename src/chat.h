@@ -49,6 +49,8 @@ class QSoundMeterBar;
 class Chat : public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(ChatClient* client READ client CONSTANT)
+    Q_PROPERTY(ChatRosterModel* rosterModel READ rosterModel CONSTANT)
 
 public:
     Chat(QWidget *parent = 0);

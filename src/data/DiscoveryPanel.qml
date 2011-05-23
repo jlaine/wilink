@@ -83,7 +83,7 @@ Panel {
         anchors.bottom: parent.bottom
 
         model: DiscoveryModel {
-            manager: client.discoveryManager
+            manager: window.client.discoveryManager
             rootJid: 'wifirst.net'
         }
 

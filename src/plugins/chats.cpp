@@ -72,7 +72,6 @@ void ChatDialogHelper::setClient(ChatClient *client)
 
     if (client != m_client) {
         m_client = client;
-
         check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
                         this, SLOT(messageReceived(QXmppMessage)));
         Q_ASSERT(check);
@@ -137,10 +136,12 @@ void ChatDialogHelper::setLocalState(int state)
         m_localState = static_cast<QXmppMessage::State>(state);
 
         // notify state change
-        QXmppMessage message;
-        message.setTo(m_jid);
-        message.setState(m_localState);
-        m_client->sendPacket(message);
+        if (m_client) {
+            QXmppMessage message;
+            message.setTo(m_jid);
+            message.setState(m_localState);
+            m_client->sendPacket(message);
+        }
 
         emit localStateChanged(m_localState);
     }
@@ -257,12 +258,6 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     bool check;
     setObjectName(jid);
 
-    // prepare models
-    ChatDialogHelper *helper = new ChatDialogHelper(this);
-    helper->setClient(chatWindow->client());
-    helper->setJid(jid);
-    helper->setRosterModel(chatWindow->rosterModel());
-
     // header
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -270,12 +265,12 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     // chat history
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("client", chatWindow->client());
-    context->setContextProperty("conversation", helper);
+    context->setContextProperty("remoteJid", QVariant::fromValue(jid));
     context->setContextProperty("window", chatWindow);
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/ConversationPanel.qml"));
+
     layout->addWidget(declarativeView);
     setFocusProxy(declarativeView);
 
