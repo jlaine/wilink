@@ -852,7 +852,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>roster</name>
+    <name>main</name>
     <message>
         <source>My rooms</source>
         <translation>Mes salons</translation>

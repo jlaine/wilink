@@ -189,7 +189,7 @@ Chat::Chat(QWidget *parent)
     context->setContextProperty("contactModel", d->sortedContactModel);
     context->setContextProperty("window", this);
 
-    d->rosterView->setSource(QUrl("qrc:/roster.qml"));
+    d->rosterView->setSource(QUrl("qrc:/main.qml"));
     leftLayout->addWidget(d->rosterView);
 
     leftLayout->addWidget(new ChatStatus(d->client));
