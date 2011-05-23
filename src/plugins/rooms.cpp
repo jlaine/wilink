@@ -102,14 +102,20 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
 
 void RoomListModel::addRoom(const QString &jid)
 {
+    int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         RoomListItem *item = static_cast<RoomListItem*>(ptr);
-        if (item->jid == jid)
+        if (item->jid == jid) {
             return;
+        } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
+            row = item->row();
+            break;
+        }
     }
+
     RoomListItem *item = new RoomListItem;
     item->jid = jid;
-    addItem(item, rootItem, rootItem->children.size());
+    addItem(item, rootItem, row);
 }
 
 void RoomListModel::removeRoom(const QString &jid)
@@ -198,17 +204,21 @@ void ChatRoomModel::participantAdded(const QString &jid)
     Q_ASSERT(m_room);
     //qDebug("participant added %s", qPrintable(jid));
 
+    int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
         if (item->jid == jid) {
             qWarning("participant added twice %s", qPrintable(jid));
             return;
+        } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
+            row = item->row();
+            break;
         }
     }
 
     ChatRoomItem *item = new ChatRoomItem;
     item->jid = jid;
-    addItem(item, rootItem, rootItem->children.size());
+    addItem(item, rootItem, row);
 }
 
 void ChatRoomModel::participantChanged(const QString &jid)
@@ -402,9 +412,6 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     // prepare models
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
-    ChatRoomModel *mucModel = new ChatRoomModel(this);
-    mucModel->setRoom(mucRoom);
-
     QSortFilterProxyModel *contactModel = new QSortFilterProxyModel(this);
     contactModel->setSourceModel(chatWindow->rosterModel());
     contactModel->setDynamicSortFilter(true);
@@ -420,8 +427,7 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    context->setContextProperty("participantModel", mucModel);
-    context->setContextProperty("room", mucRoom);
+    context->setContextProperty("globalRoom", mucRoom);
     context->setContextProperty("window", chat);
 
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);

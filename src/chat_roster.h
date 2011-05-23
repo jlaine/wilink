@@ -20,7 +20,6 @@
 #ifndef __WILINK_CHAT_ROSTER_H__
 #define __WILINK_CHAT_ROSTER_H__
 
-#include <QAbstractProxyModel>
 #include <QDeclarativeImageProvider>
 #include <QSet>
 #include <QUrl>
@@ -28,7 +27,6 @@
 #include "chat_model.h"
 
 class QNetworkDiskCache;
-class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;
@@ -123,41 +121,6 @@ private:
 
     friend class ChatRosterModelPrivate;
     ChatRosterModelPrivate * const d;
-};
-
-class ChatRosterProxyModel : public QAbstractProxyModel
-{
-    Q_OBJECT
-
-public:
-    ChatRosterProxyModel(QObject *parent = 0);
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
-
-    int columnCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-
-    QStringList selectedJids() const;
-    void setSourceModel(QAbstractItemModel *rosterModel);
-    QModelIndex sourceRoot() const;
-    void setSourceRoot(const QModelIndex &index);
-
-private slots:
-    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
-    void onRowsAboutToBeInserted(const QModelIndex &parent, int start, int end);
-    void onRowsInserted(const QModelIndex &parent, int start, int end);
-    void onRowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
-    void onRowsRemoved(const QModelIndex &parent, int start, int end);
-
-private:
-    QString m_rosterRoot;
-    QSet<QString> m_selection;
-    QPersistentModelIndex m_sourceRoot;
 };
 
 class VCard : public QObject

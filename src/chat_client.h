@@ -30,6 +30,7 @@ class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
 class QXmppEntityTimeIq;
 class QXmppEntityTimeManager;
+class QXmppMucManager;
 class QXmppSrvInfo;
 class QXmppTransferManager;
 
@@ -42,6 +43,7 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
     Q_PROPERTY(QString diagnosticServer READ diagnosticServer NOTIFY diagnosticServerChanged)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
+    Q_PROPERTY(QXmppMucManager* mucManager READ mucManager CONSTANT)
     Q_PROPERTY(QString mucServer READ mucServer NOTIFY mucServerChanged)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
     Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
@@ -56,6 +58,7 @@ public:
     QXmppCallManager *callManager();
     QString diagnosticServer() const;
     QXmppDiscoveryManager *discoveryManager();
+    QXmppMucManager *mucManager();
     QString mucServer() const;
     QXmppRosterManager *rosterManager();
     QString shareServer() const;

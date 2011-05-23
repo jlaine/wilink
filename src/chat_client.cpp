@@ -26,6 +26,7 @@
 #include "QXmppEntityTimeIq.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppLogger.h"
+#include "QXmppMucManager.h"
 #include "QXmppRosterManager.h"
 #include "QXmppSrvInfo.h"
 #include "QXmppTransferManager.h"
@@ -83,6 +84,11 @@ QString ChatClient::diagnosticServer() const
 QXmppDiscoveryManager *ChatClient::discoveryManager()
 {
     return getManager<QXmppDiscoveryManager>();
+}
+
+QXmppMucManager *ChatClient::mucManager()
+{
+    return getManager<QXmppMucManager>();
 }
 
 QString ChatClient::mucServer() const

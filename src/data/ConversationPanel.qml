@@ -29,7 +29,7 @@ Panel {
         id: conversation
 
         client: window.client
-        jid: remoteJid
+        jid: globalJid
         rosterModel: window.rosterModel
     }
 
