@@ -25,11 +25,12 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property alias jid: conversation.jid
+
     Conversation {
         id: conversation
 
         client: window.client
-        jid: globalJid
         rosterModel: window.rosterModel
     }
 

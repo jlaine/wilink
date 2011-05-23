@@ -38,6 +38,10 @@ Item {
         return true;
     }
 
+    function showConversation(jid) {
+        showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
+    }
+
     function showPanel(source, properties) {
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
@@ -228,7 +232,7 @@ Item {
 
             Connections {
                 onAddClicked: {
-                    var domain = Utils.jidToDomain(window.objectName);
+                    var domain = Utils.jidToDomain(window.client.jid);
                     var tip = (domain == 'wifirst.net') ? '<p>' + qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') + '</p>' : '';
 
                     var dialog = window.inputDialog();
@@ -248,8 +252,7 @@ Item {
 
                 onItemClicked: {
                     menu.hide();
-                    var url = 'xmpp://' + window.objectName + '/' + model.jid + '?message';
-                    Qt.openUrlExternally(url);
+                    showConversation(model.jid);
                 }
 
                 onItemContextMenu: {
@@ -342,8 +345,7 @@ Item {
                 box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
-                    var url = 'xmpp://' + window.objectName + '/' + Utils.jidToBareJid(call.jid) + '?message';
-                    Qt.openUrlExternally(url);
+                    showConversation(call.jid);
                     call.accept();
                 } else {
                     call.hangup();
@@ -363,8 +365,7 @@ Item {
                 box.text = qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
-                    var url = 'xmpp://' + window.objectName + '/' + Utils.jidToBareJid(job.jid) + '?message';
-                    Qt.openUrlExternally(url);
+                    showConversation(job.jid);
                     job.accept();
                 } else {
                     job.abort();
