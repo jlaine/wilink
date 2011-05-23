@@ -26,7 +26,9 @@ Item {
     property alias model: view.model
     signal participantClicked(string participant)
 
-    width: view.cellWidth + scrollBar.width
+    // FIXME: a non-static width crashes the program if chat room is empty
+    // width: view.cellWidth + scrollBar.width
+    width: 91
 
     GridView {
         id: view
