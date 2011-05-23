@@ -71,7 +71,7 @@ private slots:
     void presenceReceived(const QXmppPresence &presence);
     void processDownloadQueue();
     void shareSearchIqReceived(const QXmppShareSearchIq &searchIq);
-    void shareServerFound(const QString &server);
+    void shareServerChanged(const QString &server);
     void indexStarted();
     void indexFinished(double elapsed, int updated, int removed);
     void directoryChanged(const QString &path);

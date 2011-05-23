@@ -90,6 +90,11 @@ QXmppRosterManager *ChatClient::rosterManager()
     return &QXmppClient::rosterManager();
 }
 
+QString ChatClient::shareServer() const
+{
+    return m_shareServer;
+}
+
 QXmppTransferManager *ChatClient::transferManager()
 {
     return getManager<QXmppTransferManager>();
@@ -158,7 +163,7 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         {
             m_mucServer = disco.from();
             info("Found chat room server " + m_mucServer);
-            emit mucServerFound(m_mucServer);
+            emit mucServerChanged(m_mucServer);
         }
         // check if it's a diagnostics server
         else if (id.category() == "diagnostics" &&
@@ -188,8 +193,9 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         else if (id.category() == "store" &&
                  id.type() == "file")
         {
-            info("Found share server " + disco.from());
-            emit shareServerFound(disco.from());
+            m_shareServer = disco.from();
+            info("Found share server " + m_shareServer);
+            emit shareServerChanged(m_shareServer);
         }
     }
 

@@ -682,12 +682,12 @@ void SharePanel::setClient(QXmppClient *newClient)
                     this, SLOT(transferStarted(QXmppTransferJob*)));
     Q_ASSERT(check);
 
-    check = connect(extension, SIGNAL(shareSearchIqReceived(const QXmppShareSearchIq&)),
-                    this, SLOT(shareSearchIqReceived(const QXmppShareSearchIq&)));
+    check = connect(extension, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
+                    this, SLOT(shareSearchIqReceived(QXmppShareSearchIq)));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(shareServerFound(const QString&)),
-                    this, SLOT(shareServerFound(const QString&)));
+    check = connect(client, SIGNAL(shareServerChanged(QString)),
+                    this, SLOT(shareServerChanged(QString)));
     Q_ASSERT(check);
 }
 
@@ -739,7 +739,7 @@ void SharePanel::shareSearchIqReceived(const QXmppShareSearchIq &shareIq)
         processDownloadQueue();
 }
 
-void SharePanel::shareServerFound(const QString &server)
+void SharePanel::shareServerChanged(const QString &server)
 {
     // register with server
     shareServer = server;

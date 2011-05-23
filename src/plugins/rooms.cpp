@@ -266,10 +266,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
                     this, SLOT(invitationReceived(QString,QString,QString)));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(mucServerFound(const QString&)),
-                    this, SLOT(mucServerFound(const QString&)));
-    Q_ASSERT(check);
-
     // add roster hooks
     roomModel = new RoomListModel(this);
     QDeclarativeContext *context = chat->rosterView()->rootContext();
@@ -346,13 +342,6 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
     box->open(this, SLOT(invitationHandled(QAbstractButton*)));
 
     invitations << roomJid;
-}
-
-/** Once a multi-user chat server is found, enable the "chat rooms" button.
- */
-void ChatRoomWatcher::mucServerFound(const QString &mucServer)
-{
-    chatRoomServer = mucServer;
 }
 
 /** Open a XMPP URI if it refers to a chat room.

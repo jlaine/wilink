@@ -92,14 +92,12 @@ private slots:
     void bookmarksReceived();
     void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
     void invitationHandled(QAbstractButton *button);
-    void mucServerFound(const QString &roomServer);
     void urlClick(const QUrl &url);
 
 private:
     Chat *chat;
     RoomListModel *roomModel;
     QXmppMucManager *mucManager;
-    QString chatRoomServer;
     QStringList invitations;
 };
 
