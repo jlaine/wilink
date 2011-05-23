@@ -34,7 +34,6 @@ class ChatMessage;
 class RoomListModel;
 class RoomPanel;
 class ChatRosterModel;
-class QDeclarativeView;
 class QAbstractButton;
 class QModelIndex;
 class QTableWidget;
@@ -114,13 +113,10 @@ public slots:
 private slots:
     void changePermissions();
     void configurationReceived(const QXmppDataForm &form);
-    void left();
 
 private:
     Chat *chat;
     QXmppMucRoom *mucRoom;
-
-    QDeclarativeView *historyView;
 };
 
 class RoomPermissionDialog : public QDialog

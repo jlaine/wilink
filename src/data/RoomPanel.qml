@@ -97,7 +97,10 @@ Panel {
             ToolButton {
                 icon: 'close.png'
                 text: qsTr('Close')
-                onClicked: panel.close()
+                onClicked: {
+                    room.leave();
+                    panel.close();
+                }
             }
         }
     }

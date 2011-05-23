@@ -417,19 +417,19 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
 
     // chat history
 
-    historyView = new QDeclarativeView;
-    QDeclarativeContext *context = historyView->rootContext();
+    QDeclarativeView *declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("contactModel", contactModel);
     context->setContextProperty("participantModel", mucModel);
     context->setContextProperty("room", mucRoom);
     context->setContextProperty("window", chat);
 
-    historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
-    historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    historyView->setSource(QUrl("qrc:/RoomPanel.qml"));
+    declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/RoomPanel.qml"));
 
-    layout->addWidget(historyView);
-    setFocusProxy(historyView);
+    layout->addWidget(declarativeView);
+    setFocusProxy(declarativeView);
 
 #if 0
     // FIXME: add actions
@@ -447,7 +447,7 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
 #endif
 
     // connect signals
-    check = connect(historyView->rootObject(), SIGNAL(close()),
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
 
@@ -455,16 +455,12 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
                     this, SLOT(unbookmark()));
     Q_ASSERT(check);
 
+    check = connect(this, SIGNAL(hidePanel()),
+                    this, SLOT(deleteLater()));
+    Q_ASSERT(check);
+
     check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
                     this, SLOT(configurationReceived(QXmppDataForm)));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(left()),
-                    this, SLOT(left()));
-    Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(hidePanel()),
-                    mucRoom, SLOT(leave()));
     Q_ASSERT(check);
 }
 
@@ -507,21 +503,6 @@ void RoomPanel::configurationReceived(const QXmppDataForm &form)
     ChatForm dialog(form, chat);
     if (dialog.exec())
         mucRoom->setConfiguration(dialog.form());
-}
-
-/** Handle leaving the room.
- */
-void RoomPanel::left()
-{
-    // FIXME: remove room from roster unless it's persistent
-#if 0
-    QModelIndex roomIndex = rosterModel->findItem(mucRoom->jid());
-    if (!roomIndex.data(ChatRosterModel::PersistentRole).toBool())
-        rosterModel->removeRow(roomIndex.row(), roomIndex.parent());
-#endif
-
-    // destroy window
-    deleteLater();
 }
 
 /** Unbookmarks the room.
