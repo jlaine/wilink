@@ -54,7 +54,8 @@ ChatDialogHelper::ChatDialogHelper(QObject *parent)
     : QObject(parent),
     m_client(0),
     m_historyModel(0),
-    m_state(QXmppMessage::None)
+    m_localState(QXmppMessage::None),
+    m_remoteState(QXmppMessage::None)
 {
 }
 
@@ -96,24 +97,29 @@ void ChatDialogHelper::setJid(const QString &jid)
     }
 }
 
-int ChatDialogHelper::state() const
+int ChatDialogHelper::localState() const
 {
-    return m_state;
+    return m_localState;
 }
 
-void ChatDialogHelper::setState(int state)
+void ChatDialogHelper::setLocalState(int state)
 {
-    if (state != m_state) {
-        m_state = static_cast<QXmppMessage::State>(state);
+    if (state != m_localState) {
+        m_localState = static_cast<QXmppMessage::State>(state);
 
         // notify state change
         QXmppMessage message;
         message.setTo(m_jid);
-        message.setState(m_state);
+        message.setState(m_localState);
         m_client->sendPacket(message);
 
-        emit stateChanged(state);
+        emit localStateChanged(m_localState);
     }
+}
+
+int ChatDialogHelper::remoteState() const
+{
+    return m_remoteState;
 }
 
 bool ChatDialogHelper::sendMessage(const QString &body)
@@ -130,9 +136,9 @@ bool ChatDialogHelper::sendMessage(const QString &body)
         return false;
 
     // update state
-    if (m_state != QXmppMessage::Active) {
-        m_state = QXmppMessage::Active;
-        emit stateChanged(m_state);
+    if (m_localState != QXmppMessage::Active) {
+        m_localState = QXmppMessage::Active;
+        emit localStateChanged(m_localState);
     }
 
     // add message to history

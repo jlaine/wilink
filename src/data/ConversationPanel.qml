@@ -125,7 +125,7 @@ Panel {
         anchors.right: parent.right
 
         onChatStateChanged: {
-            conversation.state = chatInput.chatState;
+            conversation.localState = chatInput.chatState;
         }
 
         onReturnPressed: {
