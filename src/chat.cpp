@@ -79,6 +79,7 @@
 #include "plugins/chats.h"
 #include "plugins/console.h"
 #include "plugins/declarative.h"
+#include "plugins/diagnostics.h"
 #include "plugins/discovery.h"
 #include "plugins/rooms.h"
 #include "plugins/photos.h"
@@ -114,6 +115,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
     qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
+    qmlRegisterUncreatableType<DiagnosticManager>("QXmpp", 0, 4, "DiagnosticManager", "");
     qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
     qmlRegisterUncreatableType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger", "");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");

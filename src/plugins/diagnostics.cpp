@@ -375,50 +375,6 @@ static QString dumpResults(const DiagnosticsIq &iq)
     return text;
 }
 
-/** Constructs a DiagnosticPanel.
- */
-DiagnosticPanel::DiagnosticPanel(Chat *chatWindow, QXmppClient *client)
-    : ChatPanel(chatWindow),
-    m_client(client),
-    m_displayed(false)
-{
-    bool check;
-
-    // build manager
-    m_manager = new DiagnosticManager();
-    client->addExtension(m_manager);
-
-    // build user interface
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    QDeclarativeView *declarativeView = new QDeclarativeView;
-    QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("diagnosticsManager", m_manager);
-    context->setContextProperty("window", chatWindow);
-
-    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/DiagnosticPanel.qml"));
-    layout->addWidget(declarativeView);
-
-    // connect signals
-    check = connect(declarativeView->rootObject(), SIGNAL(close()),
-                    this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(showPanel()),
-                    this, SLOT(slotShow()));
-    Q_ASSERT(check);
-}
-
-void DiagnosticPanel::slotShow()
-{
-    if (m_displayed)
-        return;
-    m_manager->refresh();
-    m_displayed = true;
-}
-
 // EXTENSION
 
 DiagnosticManager::DiagnosticManager()
@@ -538,31 +494,3 @@ bool DiagnosticManager::running() const
     return m_thread != 0;
 }
 
-// PLUGIN
-
-class DiagnosticsPlugin : public ChatPlugin
-{
-public:
-    DiagnosticsPlugin() {};
-    bool initialize(Chat *chat);
-    QString name() const { return "Diagnostics"; };
-};
-
-bool DiagnosticsPlugin::initialize(Chat *chat)
-{
-    bool check;
-
-    // register panel
-    DiagnosticPanel *diagnostics = new DiagnosticPanel(chat, chat->client());
-    diagnostics->setObjectName(DIAGNOSTICS_ROSTER_ID);
-    chat->addPanel(diagnostics);
-
-    // register shortcut
-    QAction *action = chat->addAction(QIcon(":/diagnostics.png"), "Diags");
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_I));
-    connect(action, SIGNAL(triggered()),
-            diagnostics, SIGNAL(showPanel()));
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(diagnostics, DiagnosticsPlugin)

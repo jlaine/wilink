@@ -108,6 +108,12 @@ Item {
                 }
 
                 ToolButton {
+                    text: qsTr('Diagnostics')
+                    icon: 'options.png'
+                    onClicked: showPanel('DiagnosticPanel.qml')
+                }
+
+                ToolButton {
                     text: 'Media'
                     icon: 'start.png'
                     onClicked: showPanel('PlayerPanel.qml')

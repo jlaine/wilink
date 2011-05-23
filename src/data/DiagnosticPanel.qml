@@ -41,10 +41,10 @@ Panel {
 
             ToolButton {
                 icon: 'refresh.png'
-                enabled: !diagnosticsManager.running
+                enabled: !window.client.diagnosticManager.running
                 text: qsTr('Refresh')
 
-                onClicked: diagnosticsManager.refresh();
+                onClicked: window.client.diagnosticManager.refresh();
             }
 
             ToolButton {
@@ -67,7 +67,7 @@ Panel {
         Text {
             id: diagnostic
 
-            text: diagnosticsManager.html
+            text: window.client.diagnosticManager.html
         }
     }
 

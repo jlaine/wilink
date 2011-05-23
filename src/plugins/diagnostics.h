@@ -22,30 +22,11 @@
 
 #include "QXmppClientExtension.h"
 
-#include "chat_panel.h"
 #include "diagnostics/iq.h"
 
 class Chat;
 class DiagnosticManager;
 class QTimer;
-
-/** The DiagnosticPanel represents panel for displaying diagnostics results.
- */
-class DiagnosticPanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    DiagnosticPanel(Chat *chatWindow, QXmppClient *client);
-
-private slots:
-    void slotShow();
-
-private:
-    QXmppClient *m_client;
-    bool m_displayed;
-    DiagnosticManager *m_manager;
-};
 
 class DiagnosticManager : public QXmppClientExtension
 {
