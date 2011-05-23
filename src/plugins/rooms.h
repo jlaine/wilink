@@ -126,12 +126,12 @@ private:
     QDeclarativeView *historyView;
 };
 
-class ChatRoomMembers : public QDialog
+class RoomPermissionDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent);
+    RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent);
 
 protected slots:
     void addMember();

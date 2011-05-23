@@ -477,7 +477,7 @@ void RoomPanel::bookmark()
  */
 void RoomPanel::changePermissions()
 {
-    ChatRoomMembers dialog(mucRoom, "@" + chat->client()->configuration().domain(), chat);
+    RoomPermissionDialog dialog(mucRoom, "@" + chat->client()->configuration().domain(), chat);
     dialog.exec();
 }
 
@@ -550,7 +550,7 @@ void RoomPanel::unbookmark()
     }
 }
 
-ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
+RoomPermissionDialog::RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
     : QDialog(parent),
     m_defaultJid(defaultJid),
     m_room(mucRoom)
@@ -592,14 +592,14 @@ ChatRoomMembers::ChatRoomMembers(QXmppMucRoom *mucRoom, const QString &defaultJi
     m_room->requestPermissions();
 }
 
-void ChatRoomMembers::permissionsReceived(const QList<QXmppMucItem> &permissions)
+void RoomPermissionDialog::permissionsReceived(const QList<QXmppMucItem> &permissions)
 {
     foreach (const QXmppMucItem &item, permissions)
         addEntry(item.jid(), item.affiliation());
     m_tableWidget->sortItems(JidColumn, Qt::AscendingOrder);
 }
 
-void ChatRoomMembers::submit()
+void RoomPermissionDialog::submit()
 {
     QList<QXmppMucItem> items;
     for (int i = 0; i < m_tableWidget->rowCount(); i++) {
@@ -616,7 +616,7 @@ void ChatRoomMembers::submit()
     accept();
 }
 
-void ChatRoomMembers::addMember()
+void RoomPermissionDialog::addMember()
 {
     bool ok = false;
     QString jid = QInputDialog::getText(this, tr("Add a user"),
@@ -626,7 +626,7 @@ void ChatRoomMembers::addMember()
         addEntry(jid, QXmppMucItem::MemberAffiliation);
 }
 
-void ChatRoomMembers::addEntry(const QString &jid, QXmppMucItem::Affiliation affiliation)
+void RoomPermissionDialog::addEntry(const QString &jid, QXmppMucItem::Affiliation affiliation)
 {
     QComboBox *combo = new QComboBox;
     combo->addItem(tr("member"), QXmppMucItem::MemberAffiliation);
@@ -642,7 +642,7 @@ void ChatRoomMembers::addEntry(const QString &jid, QXmppMucItem::Affiliation aff
     m_tableWidget->setItem(0, JidColumn, jidItem);
 }
 
-void ChatRoomMembers::removeMember()
+void RoomPermissionDialog::removeMember()
 {
     m_tableWidget->removeRow(m_tableWidget->currentRow());
 }
