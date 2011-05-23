@@ -49,6 +49,7 @@ Rectangle {
 
     Image {
         id: image
+
         height: button.height - 8
         width: sourceSize.width ? (button.height - 8) : 0
         anchors.left: parent.left
@@ -59,9 +60,12 @@ Rectangle {
 
     Text {
         id: label
+
+        anchors.bottom: parent.bottom
         anchors.left: image.right
-        anchors.verticalCenter: parent.verticalCenter
-        font.pixelSize: Math.round(button.height / 2)
+        anchors.top: parent.top
+        verticalAlignment: Text.AlignVCenter
+        font.pixelSize: 12
     }
 
     MouseArea {

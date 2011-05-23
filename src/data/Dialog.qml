@@ -26,10 +26,19 @@ Rectangle {
     property alias title: label.text
     signal accepted
 
-    color: '#ccc'
+    border.color: '#aa567dbc'
+    border.width: 1
+    gradient: Gradient {
+        GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
+        GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
+    }
     radius: 10
+    smooth: true
     width: 320
     height: 240
+    x: 0
+    y: 0
+    z: 10
 
     function show() {
         visible = true;
@@ -39,20 +48,76 @@ Rectangle {
         visible = false;
     }
 
+    // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
+    Rectangle {
+        id: shadow
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.bottom
+        anchors.topMargin: -dialog.radius
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: '#66000000' }
+            GradientStop { position: 1.0; color: '#00000000' }
+        }
+        height: 2 * dialog.radius
+        z: -1
+    }
+
     Rectangle {
         id: header
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        color: '#e7effd'
+        border.color: '#aa567dbc'
+        border.width: 1
+        gradient: Gradient {
+            GradientStop { position:0.0; color: '#9fb7dd' }
+            GradientStop { position:0.5; color: '#597fbe' }
+            GradientStop { position:1.0; color: '#9fb7dd' }
+        }
         height: 20
         radius: dialog.radius
+        smooth: true
 
         Text {
             id: label
 
             anchors.centerIn: parent
+            font.bold: true
+            color: '#ffffff'
+        }
+
+        MouseArea {
+            property int mousePressX
+            property int mousePressY
+            property int dialogPressX
+            property int dialogPressY
+
+            anchors.fill: parent
+
+            onPressed: {
+                mousePressX = mapToItem(dialog.parent, mouse.x, mouse.y).x
+                mousePressY = mapToItem(dialog.parent, mouse.x, mouse.y).y
+                dialogPressX = dialog.x
+                dialogPressY = dialog.y
+            }
+
+            onPositionChanged: {
+                if (mouse.buttons & Qt.LeftButton) {
+                    var positionX = dialogPressX + (mapToItem(dialog.parent, mouse.x, mouse.y).x - mousePressX)
+                    positionX = Math.max(positionX, 0)
+                    positionX = Math.min(positionX, dialog.parent.width - dialog.width)
+
+                    var positionY = dialogPressY + (mapToItem(dialog.parent, mouse.x, mouse.y).y - mousePressY)
+                    positionY = Math.max(positionY, 0)
+                    positionY = Math.min(positionY, dialog.parent.height - dialog.height)
+
+                    dialog.x = positionX
+                    dialog.y = positionY
+                }
+            }
         }
     }
 
