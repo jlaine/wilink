@@ -51,7 +51,9 @@ class QXmppPresence;
 class ChatRoomModel : public ChatModel
 {
     Q_OBJECT
-    Q_PROPERTY(QXmppMucRoom* room READ room WRITE setRoom NOTIFY roomChanged)
+    Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
+    Q_PROPERTY(QXmppMucManager* manager READ manager WRITE setManager NOTIFY managerChanged)
+    Q_PROPERTY(QXmppMucRoom* room READ room NOTIFY roomChanged)
     Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
 
 public:
@@ -61,10 +63,17 @@ public:
 
     ChatHistoryModel *historyModel() const;
 
+    QString jid() const;
+    void setJid(const QString &jid);
+
+    QXmppMucManager *manager() const;
+    void setManager(QXmppMucManager *manager);
+
     QXmppMucRoom *room() const;
-    void setRoom(QXmppMucRoom *room);
 
 signals:
+    void jidChanged(const QString &jid);
+    void managerChanged(QXmppMucManager *manager);
     void roomChanged(QXmppMucRoom *room);
 
 private slots:
@@ -74,7 +83,11 @@ private slots:
     void participantRemoved(const QString &jid);
 
 private:
+    void setRoom(QXmppMucRoom *room);
+
     ChatHistoryModel *m_historyModel;
+    QString m_jid;
+    QXmppMucManager *m_manager;
     QXmppMucRoom *m_room;
 };
 

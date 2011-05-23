@@ -171,8 +171,47 @@ ChatHistoryModel *ChatRoomModel::historyModel() const
     return m_historyModel;
 }
 
+QString ChatRoomModel::jid() const
+{
+    return m_jid;
+}
+
+void ChatRoomModel::setJid(const QString &jid)
+{
+    if (jid != m_jid) {
+        m_jid = jid;
+
+        if (m_manager && !m_jid.isEmpty())
+            setRoom(m_manager->addRoom(m_jid));
+        else
+            setRoom(0);
+
+        emit jidChanged(m_jid);
+    }
+}
+
+QXmppMucManager *ChatRoomModel::manager() const
+{
+    return m_manager;
+}
+
+void ChatRoomModel::setManager(QXmppMucManager *manager)
+{
+    if (manager != m_manager) {
+        m_manager = manager;
+
+        if (m_manager && !m_jid.isEmpty())
+            setRoom(m_manager->addRoom(m_jid));
+        else
+            setRoom(0);
+
+        emit managerChanged(m_manager);
+    }
+}
+
 void ChatRoomModel::messageReceived(const QXmppMessage &msg)
 {
+    Q_ASSERT(m_room);
     if (msg.body().isEmpty())
         return;
 
@@ -197,7 +236,6 @@ void ChatRoomModel::messageReceived(const QXmppMessage &msg)
     if (message.received)
         wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
-
 
 void ChatRoomModel::participantAdded(const QString &jid)
 {
@@ -262,23 +300,30 @@ void ChatRoomModel::setRoom(QXmppMucRoom *room)
     if (room == m_room)
         return;
 
+    // disconnect signals
+    if (m_room)
+        m_room->disconnect(this);
+
     m_room = room;
 
-    check = connect(m_room, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
+    // connect signals
+    if (m_room) {
+        check = connect(m_room, SIGNAL(messageReceived(QXmppMessage)),
+                        this, SLOT(messageReceived(QXmppMessage)));
+        Q_ASSERT(check);
 
-    check = connect(m_room, SIGNAL(participantAdded(QString)),
-                    this, SLOT(participantAdded(QString)));
-    Q_ASSERT(check);
+        check = connect(m_room, SIGNAL(participantAdded(QString)),
+                        this, SLOT(participantAdded(QString)));
+        Q_ASSERT(check);
 
-    check = connect(m_room, SIGNAL(participantChanged(QString)),
-                    this, SLOT(participantChanged(QString)));
-    Q_ASSERT(check);
+        check = connect(m_room, SIGNAL(participantChanged(QString)),
+                        this, SLOT(participantChanged(QString)));
+        Q_ASSERT(check);
 
-    check = connect(m_room, SIGNAL(participantRemoved(QString)),
-                    this, SLOT(participantRemoved(QString)));
-    Q_ASSERT(check);
+        check = connect(m_room, SIGNAL(participantRemoved(QString)),
+                        this, SLOT(participantRemoved(QString)));
+        Q_ASSERT(check);
+    }
 
     emit roomChanged(m_room);
 }
@@ -427,7 +472,7 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    context->setContextProperty("globalRoom", mucRoom);
+    context->setContextProperty("globalJid", jid);
     context->setContextProperty("window", chat);
 
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);

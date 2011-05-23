@@ -25,12 +25,13 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
-    property QtObject room: globalRoom
+    property alias room: participantModel.room
 
     RoomModel {
         id: participantModel
 
-        room: panel.room
+        jid: globalJid
+        manager: window.client.mucManager
     }
 
     VCard {
