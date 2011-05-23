@@ -54,7 +54,7 @@ Dialog {
         anchors.margins: 8
         anchors.top: help.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         border.color: '#c3c3c3'
         border.width: 1
         color: 'white'
@@ -81,7 +81,7 @@ Dialog {
 
         anchors.margins: 8
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
         clip: true

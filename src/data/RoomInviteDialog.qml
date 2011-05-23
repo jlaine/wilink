@@ -61,7 +61,7 @@ Dialog {
 
         anchors.margins: 8
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
         clip: true
@@ -134,6 +134,16 @@ Dialog {
                 }
             }
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.margins: 8
+        anchors.right: parent.right
+        anchors.top: bar.bottom
+        anchors.bottom: contents.bottom
+        flickableItem: view
     }
 }
 
