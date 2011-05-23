@@ -147,6 +147,63 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
             this, SLOT(participantChanged(QString)));
 }
 
+/** Bookmarks the room.
+ */
+void ChatRoomModel::bookmark()
+{
+    if (m_jid.isEmpty() || !m_manager)
+        return;
+
+    QXmppClient *client = qobject_cast<QXmppClient*>(m_manager->parent());
+    Q_ASSERT(client);
+
+    QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
+    // find bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    foreach (const QXmppBookmarkConference &conference, conferences) {
+        if (conference.jid() == m_jid)
+            return;
+    }
+
+    // add bookmark
+    QXmppBookmarkConference conference;
+    conference.setAutoJoin(true);
+    conference.setJid(m_jid);
+    conferences << conference;
+    bookmarks.setConferences(conferences);
+    bookmarkManager->setBookmarks(bookmarks);
+}
+
+/** Unbookmarks the room.
+ */
+void ChatRoomModel::unbookmark()
+{
+    if (m_jid.isEmpty() || !m_manager)
+        return;
+
+    QXmppClient *client = qobject_cast<QXmppClient*>(m_manager->parent());
+    Q_ASSERT(client);
+
+    QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
+    // find bookmark
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    for (int i = 0; i < conferences.size(); ++i) {
+        if (conferences.at(i).jid() == m_jid) {
+            // remove bookmark
+            conferences.removeAt(i);
+            bookmarks.setConferences(conferences);
+            bookmarkManager->setBookmarks(bookmarks);
+            return;
+        }
+    }
+}
+
 QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
 {
     ChatRoomItem *item = static_cast<ChatRoomItem*>(index.internalPointer());
@@ -503,40 +560,12 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()),
-                    this, SLOT(unbookmark()));
-    Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(deleteLater()));
     Q_ASSERT(check);
 
     check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
                     this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
-}
-
-/** Bookmarks the room.
- */
-void RoomPanel::bookmark()
-{
-    QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
-    // find bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    foreach (const QXmppBookmarkConference &conference, conferences) {
-        if (conference.jid() == mucRoom->jid())
-            return;
-    }
-
-    // add bookmark
-    QXmppBookmarkConference conference;
-    conference.setAutoJoin(true);
-    conference.setJid(mucRoom->jid());
-    conferences << conference;
-    bookmarks.setConferences(conferences);
-    bookmarkManager->setBookmarks(bookmarks);
 }
 
 /** Manage the room's members.
@@ -554,27 +583,6 @@ void RoomPanel::configurationReceived(const QXmppDataForm &form)
     ChatForm dialog(form, chat);
     if (dialog.exec())
         mucRoom->setConfiguration(dialog.form());
-}
-
-/** Unbookmarks the room.
- */
-void RoomPanel::unbookmark()
-{
-    QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
-    // find bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    for (int i = 0; i < conferences.size(); ++i) {
-        if (conferences.at(i).jid() == mucRoom->jid()) {
-            // remove bookmark
-            conferences.removeAt(i);
-            bookmarks.setConferences(conferences);
-            bookmarkManager->setBookmarks(bookmarks);
-            return;
-        }
-    }
 }
 
 RoomPermissionDialog::RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)

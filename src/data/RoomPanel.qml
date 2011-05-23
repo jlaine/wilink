@@ -108,6 +108,7 @@ Panel {
                 text: qsTr('Close')
                 onClicked: {
                     room.leave();
+                    participantModel.unbookmark();
                     panel.close();
                 }
             }
@@ -186,6 +187,10 @@ Panel {
             // FIXME: get reason
             box.text = qsTr("Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', '');
             box.show();
+        }
+
+        onJoined: {
+            participantModel.bookmark();
         }
 
         onKicked: {
