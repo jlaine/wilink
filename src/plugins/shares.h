@@ -82,7 +82,6 @@ private:
 private:
     QString shareServer;
 
-    QAction *action;
     Chat *chatWindow;
     QXmppClient *client;
     QXmppShareDatabase *db;

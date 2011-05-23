@@ -221,13 +221,6 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     Q_ASSERT(check);
 
     directoryChanged(db->directory());
-
-    // add actions
-    action = chat->addAction(QIcon(":/share.png"), windowTitle());
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_S));
-    action->setVisible(false);
-    connect(action, SIGNAL(triggered()),
-            this, SIGNAL(showPanel()));
 }
 
 void SharePanel::directoryChanged(const QString &path)
@@ -582,7 +575,6 @@ void SharePanel::presenceReceived(const QXmppPresence &presence)
 
         // activate the shares view
         sharesView->setEnabled(true);
-        action->setVisible(true);
 
         // run one-time configuration
         QSettings settings;

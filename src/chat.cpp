@@ -89,7 +89,6 @@
 class ChatPrivate
 {
 public:
-    QToolBar *actions;
     QAction *findAction;
     QAction *findAgainAction;
 
@@ -166,11 +165,6 @@ Chat::Chat(QWidget *parent)
     QVBoxLayout *leftLayout = new QVBoxLayout;
     leftLayout->setMargin(0);
     leftLayout->setSpacing(0);
-
-    d->actions = new QToolBar;
-    d->actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    d->actions->hide();
-    leftLayout->addWidget(d->actions);
 
     // prepare models
     d->sortedContactModel = new QSortFilterProxyModel(this);
@@ -272,18 +266,6 @@ Chat::~Chat()
         d->plugins[i]->finalize(this);
 
     delete d;
-}
-
-/** Adds an action to the tool bar.
- *
- * @param icon
- * @param text
- */
-QAction *Chat::addAction(const QIcon &icon, const QString &text)
-{
-    QAction *action = d->actions->addAction(icon, text);
-    d->actions->show();
-    return action;
 }
 
 /** Connect signals for the given panel.
