@@ -196,6 +196,22 @@ void ChatDialogHelper::messageReceived(const QXmppMessage &msg)
     // handle message body
     if (msg.body().isEmpty())
         return;
+
+    ChatMessage message;
+    message.body = msg.body();
+    message.date = msg.stamp();
+    if (!message.date.isValid())
+        message.date = m_client->serverTime();
+    message.jid = m_jid;
+    message.received = true;
+    if (m_historyModel)
+        m_historyModel->addMessage(message);
+
+    // FIXME: queue notification
+    //queueNotification(message.body);
+
+    // play sound
+    wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 bool ChatDialogHelper::sendMessage(const QString &body)
@@ -233,21 +249,17 @@ bool ChatDialogHelper::sendMessage(const QString &body)
 }
 
 ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
-    : ChatPanel(chatWindow),
-    chatRemoteJid(jid), 
-    m_window(chatWindow)
+    : ChatPanel(chatWindow)
 {
-    client = chatWindow->client();
-
     bool check;
     setObjectName(jid);
 
     // prepare models
-    historyModel = new ChatHistoryModel(this);
-    historyModel->setParticipantModel(m_window->rosterModel());
+    ChatHistoryModel *historyModel = new ChatHistoryModel(this);
+    historyModel->setParticipantModel(chatWindow->rosterModel());
 
     ChatDialogHelper *helper = new ChatDialogHelper(this);
-    helper->setClient(client);
+    helper->setClient(chatWindow->client());
     helper->setJid(jid);
     helper->setHistoryModel(historyModel);
 
@@ -256,65 +268,26 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     setLayout(layout);
 
     // chat history
-    historyView = new QDeclarativeView;
-    QDeclarativeContext *context = historyView->rootContext();
-    context->setContextProperty("client", m_window->client());
+    QDeclarativeView *declarativeView = new QDeclarativeView;
+    QDeclarativeContext *context = declarativeView->rootContext();
+    context->setContextProperty("client", chatWindow->client());
     context->setContextProperty("conversation", helper);
     context->setContextProperty("historyModel", historyModel);
-    context->setContextProperty("window", m_window);
-    historyView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
-    historyView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    historyView->setSource(QUrl("qrc:/ConversationPanel.qml"));
-    layout->addWidget(historyView);
-    setFocusProxy(historyView);
+    context->setContextProperty("window", chatWindow);
+    declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
+    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    declarativeView->setSource(QUrl("qrc:/ConversationPanel.qml"));
+    layout->addWidget(declarativeView);
+    setFocusProxy(declarativeView);
 
     // connect signals
-    check = connect(historyView->rootObject(), SIGNAL(close()),
+    check = connect(declarativeView->rootObject(), SIGNAL(close()),
                     this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
-
-    check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(deleteLater()));
     Q_ASSERT(check);
-}
-
-QDeclarativeView* ChatDialogPanel::declarativeView() const
-{
-    return historyView;
-}
-
-/** Handles an incoming chat message.
- *
- * @param msg The received message.
- */
-void ChatDialogPanel::messageReceived(const QXmppMessage &msg)
-{
-    if (msg.type() != QXmppMessage::Chat ||
-        jidToBareJid(msg.from()) != chatRemoteJid)
-        return;
-
-    // handle message body
-    if (msg.body().isEmpty())
-        return;
-
-    ChatMessage message;
-    message.body = msg.body();
-    message.date = msg.stamp();
-    if (!message.date.isValid())
-        message.date = client->serverTime();
-    message.jid = chatRemoteJid;
-    message.received = true;
-    historyModel->addMessage(message);
-
-    // queue notification
-    queueNotification(message.body);
-
-    // play sound
-    wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages
@@ -350,7 +323,10 @@ void ChatsWatcher::messageReceived(const QXmppMessage &msg)
     {
         ChatDialogPanel *dialog = new ChatDialogPanel(chat, bareJid);
         chat->addPanel(dialog);
-        dialog->messageReceived(msg);
+
+        // FIXME: this is a hack to 'receive' the message now that the
+        // panel is created
+        QMetaObject::invokeMethod(chat->client(), "messageReceived", Q_ARG(QXmppMessage, msg));
     }
 }
 

@@ -92,18 +92,6 @@ class ChatDialogPanel : public ChatPanel
 
 public:
     ChatDialogPanel(Chat *chatWindow, const QString &jid);
-    QDeclarativeView *declarativeView() const;
-
-public slots:
-    void messageReceived(const QXmppMessage &msg);
-
-private:
-    QString chatRemoteJid;
-    ChatClient *client;
-
-    Chat *m_window;
-    ChatHistoryModel *historyModel;
-    QDeclarativeView *historyView;
 };
 
 class ChatsWatcher : public QObject
