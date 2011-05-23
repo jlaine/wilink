@@ -41,6 +41,16 @@ Item {
         console.log("creating panel " + source + " " + properties);
         var component = Qt.createComponent(source);
         var panel = component.createObject(swapper, properties);
+        panel.close.connect(function() {
+            for (var i = 0; i < panels.count; i += 1) {
+                if (panels.get(i).panel == panel) {
+                    console.log("removing panel " + panels.get(i).source + " " + panels.get(i).properties);
+                    panels.remove(i);
+                    panel.destroy();
+                    break;
+                }
+            }
+        })
         panels.append({'source': source, 'properties': properties, 'panel': panel});
         return panel;
     }
