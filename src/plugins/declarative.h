@@ -24,12 +24,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 
-#include "QXmppClient.h"
 #include "QXmppMessage.h"
-
-class QXmppCallManager;
-class QXmppDiscoveryManager;
-class QXmppTransferManager;
 
 class QDeclarativeInputDialog : public QInputDialog
 {
@@ -48,36 +43,6 @@ class QDeclarativeFileDialog : public QFileDialog
 
 public:
     QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
-};
-
-class QXmppDeclarativeClient : public QObject
-{
-    Q_OBJECT
-    Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
-    Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
-    Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
-    Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
-    Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
-    Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
-
-public:
-    QXmppDeclarativeClient(QXmppClient *client);
-
-    QString jid() const;
-    QXmppLogger *logger() const;
-    QXmppCallManager *callManager() const;
-    QXmppDiscoveryManager *discoveryManager() const;
-    QXmppRosterManager *rosterManager() const;
-    QXmppTransferManager* transferManager() const;
-
-signals:
-    void jidChanged(const QString &jid);
-
-private slots:
-    void _q_connected();
-
-private:
-    QXmppClient *m_client;
 };
 
 class QXmppDeclarativeMessage : public QObject

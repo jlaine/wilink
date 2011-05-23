@@ -57,7 +57,6 @@
 
 #include "application.h"
 #include "chat.h"
-#include "declarative.h"
 #include "chat_form.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
@@ -375,7 +374,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
     rosterModel(chatRosterModel)
 {
     bool check;
-    QXmppClient *client = chat->client();
+    ChatClient *client = chat->client();
 
     setObjectName(jid);
 
@@ -408,7 +407,7 @@ ChatRoom::ChatRoom(Chat *chatWindow, ChatRosterModel *chatRosterModel, const QSt
 
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
-    context->setContextProperty("client", new QXmppDeclarativeClient(client));
+    context->setContextProperty("client", client);
     context->setContextProperty("contactModel", contactModel);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("participantModel", sortedModel);

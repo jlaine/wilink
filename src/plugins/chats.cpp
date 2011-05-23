@@ -43,7 +43,6 @@
 #include "chat_roster.h"
 
 #include "chats.h"
-#include "declarative.h"
 
 #ifdef WILINK_EMBEDDED
 #define HISTORY_DAYS 7
@@ -185,7 +184,7 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     // chat history
     historyView = new QDeclarativeView;
     QDeclarativeContext *context = historyView->rootContext();
-    context->setContextProperty("client", new QXmppDeclarativeClient(client));
+    context->setContextProperty("client", m_window->client());
     context->setContextProperty("conversation", helper);
     context->setContextProperty("historyModel", historyModel);
     context->setContextProperty("window", m_window);

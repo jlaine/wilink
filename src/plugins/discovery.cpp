@@ -31,7 +31,6 @@
 
 #include "chat.h"
 #include "chat_plugin.h"
-#include "declarative.h"
 #include "discovery.h"
 
 #define DISCOVERY_ROSTER_ID "0_discovery"
@@ -199,7 +198,7 @@ DiscoveryPanel::DiscoveryPanel(Chat *chatWindow)
 
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("client", new QXmppDeclarativeClient(chatWindow->client()));
+    context->setContextProperty("client", chatWindow->client());
     context->setContextProperty("window", chatWindow);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);

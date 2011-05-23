@@ -107,7 +107,7 @@ Chat::Chat(QWidget *parent)
 {
     bool check;
 
-    qmlRegisterUncreatableType<QXmppDeclarativeClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
     qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
     qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
@@ -176,7 +176,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
 
     QDeclarativeContext *context = d->rosterView->rootContext();
-    context->setContextProperty("client", new QXmppDeclarativeClient(d->client));
+    context->setContextProperty("client", d->client);
     context->setContextProperty("contactModel", d->sortedContactModel);
     context->setContextProperty("window", this);
 

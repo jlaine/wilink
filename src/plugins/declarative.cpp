@@ -21,11 +21,6 @@
 #include <QDeclarativeEngine>
 #include <QMessageBox>
 
-#include "QXmppCallManager.h"
-#include "QXmppDiscoveryManager.h"
-#include "QXmppRosterManager.h"
-#include "QXmppTransferManager.h"
-
 #include "chat.h"
 #include "chat_plugin.h"
 #include "declarative.h"
@@ -67,50 +62,5 @@ void ListHelper::setModel(QObject *model)
         m_model = itemModel;
         emit modelChanged(model);
     }
-}
-
-QXmppDeclarativeClient::QXmppDeclarativeClient(QXmppClient *client)
-    : m_client(client)
-{
-    bool check;
-    check = connect(m_client, SIGNAL(connected()),
-                    this, SLOT(_q_connected()));
-    Q_ASSERT(check);
-    Q_UNUSED(check);
-}
-
-QString QXmppDeclarativeClient::jid() const
-{
-    return m_client->configuration().jid();
-}
-
-QXmppLogger *QXmppDeclarativeClient::logger() const
-{
-    return m_client->logger();
-}
-
-QXmppCallManager *QXmppDeclarativeClient::callManager() const
-{
-    return m_client->findExtension<QXmppCallManager>();
-}
-
-QXmppDiscoveryManager *QXmppDeclarativeClient::discoveryManager() const
-{
-    return m_client->findExtension<QXmppDiscoveryManager>();
-}
-
-QXmppRosterManager *QXmppDeclarativeClient::rosterManager() const
-{
-    return &m_client->rosterManager();
-}
-
-QXmppTransferManager *QXmppDeclarativeClient::transferManager() const
-{
-    return m_client->findExtension<QXmppTransferManager>();
-}
-
-void QXmppDeclarativeClient::_q_connected()
-{
-    emit jidChanged(jid());
 }
 
