@@ -64,7 +64,7 @@ Panel {
         anchors.right: parent.right
         anchors.top: parent.top
         icon: 'phone.png'
-        title: '<b>' + qsTr('Phone') + '</b>' + (historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : '')
+        title: '<b>' + qsTr('Phone') + '</b><br />' + (historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : '')
 
         Row {
             id: toolBar
