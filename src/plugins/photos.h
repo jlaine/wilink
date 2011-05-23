@@ -24,7 +24,6 @@
 #include <QUrl>
 
 #include "chat_model.h"
-#include "chat_panel.h"
 #include "qnetio/filesystem.h"
 
 using namespace QNetIO;
@@ -111,16 +110,6 @@ private:
     PhotoModel *m_photoModel;
     PhotoUploadItem *m_uploadItem;
     QIODevice *m_uploadDevice;
-};
-
-/** The PhotoPanel class represents a panel for displaying photos.
- */
-class PhotoPanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    PhotoPanel(Chat *chatWindow, const QString &url);
 };
 
 #endif

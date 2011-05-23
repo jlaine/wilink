@@ -34,7 +34,6 @@
 #include "QXmppClient.h"
 
 #include "chat.h"
-#include "chat_plugin.h"
 #include "chat_search.h"
 #include "console.h"
 #include "chat_utils.h"
@@ -137,32 +136,6 @@ void LogModel::messageReceived(QXmppLogger::MessageType type, const QString &msg
     addItem(item, rootItem, rootItem->children.size());
 }
 
-/** Constructs a ConsolePanel.
- */
-ConsolePanel::ConsolePanel(Chat *chatWindow)
-    : ChatPanel(chatWindow)
-{
-    bool check;
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    // declarative
-    QDeclarativeView *declarativeView = new QDeclarativeView;
-    QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("window", chatWindow);
-
-    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/LogPanel.qml"));
-
-    layout->addWidget(declarativeView);
-
-    // connect signals
-    check = connect(declarativeView->rootObject(), SIGNAL(close()),
-                    this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
-}
-
 #if 0
 /** Find the given text in the console history.
  *
@@ -204,7 +177,26 @@ void ConsolePanel::slotFind(const QString &needle, QTextDocument::FindFlags flag
         emit findFinished(false);
     }
 }
-#endif
+
+class Highlighter : public QSyntaxHighlighter
+{
+public:
+    Highlighter(QTextDocument *parent = 0);
+
+protected:
+    void highlightBlock(const QString &text);
+
+private:
+    struct HighlightingRule
+    {
+        QRegExp pattern;
+        QTextCharFormat format;
+    };
+    QVector<HighlightingRule> highlightingRules;
+
+    QTextCharFormat tagFormat;
+    QTextCharFormat quotationFormat;
+};
 
 Highlighter::Highlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
@@ -245,31 +237,4 @@ void Highlighter::highlightBlock(const QString &text)
     }
 }
 
-// PLUGIN
-
-class ConsolePlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Debugging console"; };
-};
-
-bool ConsolePlugin::initialize(Chat *chat)
-{
-    bool check;
-
-    // register panel
-    ConsolePanel *console = new ConsolePanel(chat);
-    console->setObjectName(CONSOLE_ROSTER_ID);
-    chat->addPanel(console);
-
-    // register shortcut
-    QAction *action = chat->addAction(QIcon(":/options.png"), console->windowTitle());
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_D));
-    action->setVisible(false);
-    connect(action, SIGNAL(triggered()),
-            console, SIGNAL(showPanel()));
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(console, ConsolePlugin)
+#endif

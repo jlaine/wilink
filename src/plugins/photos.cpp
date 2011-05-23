@@ -21,12 +21,7 @@
 #include <QApplication>
 #include <QBuffer>
 #include <QCache>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
 #include <QDeclarativeImageProvider>
-#include <QDeclarativeItem>
-#include <QDeclarativeView>
-#include <QDragEnterEvent>
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
@@ -438,75 +433,3 @@ void PhotoUploadModel::putProgress(int done, int total)
     }
 }
 
-/** Constructs a PhotoPanel.
- *
- * @param url    The base URL for the photo sharing service.
- * @param parent The parent widget of the panel.
- */
-PhotoPanel::PhotoPanel(Chat *chatWindow, const QString &url)
-    : ChatPanel(chatWindow)
-{
-    bool check;
-
-    /* create UI */
-    setWindowTitle(tr("Photos"));
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    // declarative
-    QDeclarativeView *declarativeView = new QDeclarativeView;
-    QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("window", chatWindow);
-    context->setContextProperty("baseUrl", QVariant::fromValue(url));
-
-    declarativeView->engine()->addImageProvider("photo", new PhotoImageProvider);
-    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/PhotoPanel.qml"));
-    layout->addWidget(declarativeView);
-
-    // connect signals
-    check = connect(declarativeView->rootObject(), SIGNAL(close()),
-                    this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
-
-    setFocusProxy(declarativeView);
-}
-
-// PLUGIN
-
-class PhotosPlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Photos"; };
-};
-
-bool PhotosPlugin::initialize(Chat *chat)
-{
-    qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
-    qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
-
-    QString url;
-    QString domain = chat->client()->configuration().domain();
-    if (domain == "wifirst.net")
-        url = "wifirst://www.wifirst.net/w";
-    else if (domain == "gmail.com")
-        url = "picasa://default";
-    else
-        return false;
-
-    // register panel
-    PhotoPanel *photos = new PhotoPanel(chat, url);
-    chat->addPanel(photos);
-
-    // register shortcut
-    QAction *action = chat->addAction(QIcon(":/photos.png"), photos->windowTitle());
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_P));
-    connect(action, SIGNAL(triggered()),
-            photos, SIGNAL(showPanel()));
-
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(photos, PhotosPlugin)

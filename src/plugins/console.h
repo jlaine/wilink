@@ -28,7 +28,6 @@
 #include "QXmppLogger.h"
 
 #include "chat_model.h"
-#include "chat_panel.h"
 
 class Chat;
 class ChatSearchBar;
@@ -66,39 +65,6 @@ private slots:
 private:
     bool m_enabled;
     QXmppLogger *m_logger;
-};
-
-/** The ConsolePanel class represents a panel for display debugging
- *  information.
- */
-class ConsolePanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    ConsolePanel(Chat *chatWindow);
-};
-
-class Highlighter : public QSyntaxHighlighter
-{
-    Q_OBJECT
-
-public:
-    Highlighter(QTextDocument *parent = 0);
-
-protected:
-    void highlightBlock(const QString &text);
-
-private:
-    struct HighlightingRule
-    {
-        QRegExp pattern;
-        QTextCharFormat format;
-    };
-    QVector<HighlightingRule> highlightingRules;
-
-    QTextCharFormat tagFormat;
-    QTextCharFormat quotationFormat;
 };
 
 #endif

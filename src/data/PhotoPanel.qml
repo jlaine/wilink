@@ -23,6 +23,8 @@ import wiLink 1.2
 Panel {
     id: panel
 
+    property alias url: photoModel.rootUrl
+
     ListModel {
         id: crumbs
     }
@@ -115,7 +117,6 @@ Panel {
 
         model:  PhotoModel {
             id: photoModel
-            rootUrl: baseUrl
         }
 
         delegate: Item {

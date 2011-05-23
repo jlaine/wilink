@@ -28,10 +28,20 @@ Item {
         id: panels
     }
 
+    function propEquals(a, b) {
+        if (a.length != b.length)
+            return false;
+        for (var key in a) {
+            if (a[key] != b[key])
+                return false;
+        }
+        return true;
+    }
+
     function showPanel(source, properties) {
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
-                panels.get(i).properties == properties) {
+                propEquals(panels.get(i).properties, properties)) {
                 console.log("already have panel " + source + " " + properties);
                 return;
             }
@@ -41,6 +51,11 @@ Item {
         console.log("creating panel " + source + " " + properties);
         var component = Qt.createComponent(source);
         var panel = component.createObject(swapper, properties);
+        // FIXME: why doesn't createObject assign the properties??
+        for (var key in properties) {
+            panel[key] = properties[key];
+        }
+
         panel.close.connect(function() {
             for (var i = 0; i < panels.count; i += 1) {
                 if (panels.get(i).panel == panel) {
@@ -86,9 +101,17 @@ Item {
                 }
 
                 ToolButton {
+                    text: 'Debugging'
+                    icon: 'options.png'
+                    onClicked: showPanel('LogPanel.qml')
+                    visible: false
+                }
+
+                ToolButton {
                     text: 'Media'
                     icon: 'start.png'
                     onClicked: showPanel('PlayerPanel.qml')
+                    visible: false
                 }
 
                 ToolButton {
@@ -98,9 +121,16 @@ Item {
                 }
 
                 ToolButton {
+
                     text: qsTr('Photos')
                     icon: 'photos.png'
-                    visible: false
+                    onClicked: {
+                        var domain = Utils.jidToDomain(window.client.jid);
+                        if (domain == 'wifirst.net')
+                            showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
+                        else if (domain == 'gmail.com')
+                            showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
+                    }
                 }
 
                 ToolButton {

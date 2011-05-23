@@ -76,11 +76,12 @@
 #include "chat_roster.h"
 #include "chat_status.h"
 #include "chat_utils.h"
-#include "plugins/console.h"
 #include "plugins/chats.h"
-#include "plugins/rooms.h"
+#include "plugins/console.h"
 #include "plugins/declarative.h"
 #include "plugins/discovery.h"
+#include "plugins/rooms.h"
+#include "plugins/photos.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -128,6 +129,8 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
+    qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
+    qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
     qmlRegisterType<ChatRoomModel>("wiLink", 1, 2, "RoomModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
