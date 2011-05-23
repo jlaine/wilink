@@ -27,7 +27,6 @@
 #include "chat_model.h"
 
 class QNetworkDiskCache;
-class QSortFilterProxyModel;
 class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;

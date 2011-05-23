@@ -198,17 +198,21 @@ void ChatRoomModel::participantAdded(const QString &jid)
     Q_ASSERT(m_room);
     //qDebug("participant added %s", qPrintable(jid));
 
+    int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
         if (item->jid == jid) {
             qWarning("participant added twice %s", qPrintable(jid));
             return;
+        } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
+            row = item->row();
+            break;
         }
     }
 
     ChatRoomItem *item = new ChatRoomItem;
     item->jid = jid;
-    addItem(item, rootItem, rootItem->children.size());
+    addItem(item, rootItem, row);
 }
 
 void ChatRoomModel::participantChanged(const QString &jid)

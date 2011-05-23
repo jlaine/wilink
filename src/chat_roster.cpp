@@ -28,7 +28,6 @@
 #include <QNetworkDiskCache>
 #include <QPainter>
 #include <QStringList>
-#include <QSortFilterProxyModel>
 #include <QUrl>
 
 #include "QXmppClient.h"
