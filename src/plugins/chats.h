@@ -96,10 +96,8 @@ public slots:
 private slots:
     void archiveChatReceived(const QXmppArchiveChat &chat);
     void archiveListReceived(const QList<QXmppArchiveChat> &chats);
-    void chatStateChanged(int state);
     void disconnected();
     void join();
-    void leave();
 
 private:
     QXmppArchiveManager *archiveManager;
@@ -110,7 +108,6 @@ private:
     Chat *m_window;
     ChatHistoryModel *historyModel;
     QDeclarativeView *historyView;
-    QStringList chatStatesJids;
 };
 
 class ChatsWatcher : public QObject

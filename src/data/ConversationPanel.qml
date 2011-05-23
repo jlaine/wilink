@@ -109,7 +109,10 @@ Panel {
             ToolButton {
                 icon: 'close.png'
                 text: qsTr('Close')
-                onClicked: panel.close()
+                onClicked: {
+                    conversation.localState = QXmppMessage.Gone
+                    panel.close()
+                }
             }
         }
 

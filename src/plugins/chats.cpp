@@ -245,12 +245,8 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
                     this, SLOT(archiveListReceived(QList<QXmppArchiveChat>)));
     Q_ASSERT(check);
 
-    check = connect(m_window->rosterModel(), SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                    this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
-    Q_ASSERT(check);
-
     check = connect(this, SIGNAL(hidePanel()),
-                    this, SLOT(leave()));
+                    this, SLOT(deleteLater()));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(showPanel()),
@@ -282,18 +278,6 @@ void ChatDialogPanel::archiveListReceived(const QList<QXmppArchiveChat> &chats)
             archiveManager->retrieveCollection(chats[i].with(), chats[i].start());
 }
 
-/** When the chat state changes, notify the remote party.
- */
-void ChatDialogPanel::chatStateChanged(int state)
-{
-    foreach (const QString &jid, chatStatesJids) {
-        QXmppMessage message;
-        message.setTo(jid);
-        message.setState(static_cast<QXmppMessage::State>(state));
-        client->sendPacket(message);
-    }
-}
-
 QDeclarativeView* ChatDialogPanel::declarativeView() const
 {
     return historyView;
@@ -305,28 +289,12 @@ void ChatDialogPanel::disconnected()
     // joined = false;
 }
 
-/** Leave a two party dialog.
- */
-void ChatDialogPanel::leave()
-{
-    if (joined)
-    {
-        chatStateChanged(QXmppMessage::Gone);
-        joined = false;
-    }
-    deleteLater();
-}
-
 /** Start a two party dialog.
  */
 void ChatDialogPanel::join()
 {
     if (joined)
         return;
-
-    // send initial state
-    chatStatesJids = m_window->rosterModel()->contactFeaturing(chatRemoteJid, ChatRosterModel::ChatStatesFeature);
-    //chatStateChanged(chatInput()->state());
 
     // FIXME : we need to check whether archives are supported
     // to clear the display appropriately
