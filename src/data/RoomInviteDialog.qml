@@ -45,6 +45,8 @@ Dialog {
             id: reasonEdit
 
             anchors.fill: parent
+            anchors.leftMargin: 4
+            anchors.rightMargin: 4
             focus: true
             smooth: true
             text: "Let's talk"
@@ -59,20 +61,34 @@ Dialog {
     ListView {
         id: view
 
-        anchors.margins: 8
+        anchors.topMargin: 8
+        anchors.leftMargin: 8
+        anchors.bottomMargin: 8
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
         clip: true
+/*
         model: ListModel {
             ListElement { jid: 'foo@example.org'; name: 'foo'; avatar: 'peer.png' }
             ListElement { jid: 'bar@example.org'; name: 'bar'; avatar: 'peer.png' }
             ListElement { jid: 'wiz@example.org'; name: 'wiz'; avatar: 'peer.png' }
         }
+*/
         delegate: Rectangle {
-            width: parent.width - 1
+            id: rect
+
+            border.color: 'transparent'
+            border.width: 1
+            gradient: Gradient {
+                GradientStop { id:stop1; position:0.0; color: '#00ffffff' }
+                GradientStop { id:stop2; position:0.5; color: '#00ffffff' }
+                GradientStop { id:stop3; position:1.0; color: '#00ffffff' }
+            }
+            state: isSelected() ? 'selected' : ''
             height: 24
+            width: parent.width - 1
 
             function isSelected() {
                 for (var i = 0; i < selection.length; i += 1) {
@@ -89,8 +105,8 @@ Dialog {
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 border.width: 1
-                border.color: '#c3c3c3'
-                color: isSelected() ? 'black' : 'white'
+                border.color: '#ffb0c4de'
+                color: 'white'
                 radius: 6
                 width: 12
                 height: 12
@@ -133,13 +149,24 @@ Dialog {
                     dialog.selection = newSelection;
                 }
             }
+
+            states: State {
+                name: 'selected'
+                PropertyChanges { target: check; color: '#597fbe' }
+                PropertyChanges { target: rect; border.color: '#ffb0c4de' }
+                PropertyChanges { target: stop1; color: '#33b0c4de' }
+                PropertyChanges { target: stop2; color: '#ffb0c4de' }
+                PropertyChanges { target: stop3; color: '#33b0c4de' }
+            }
         }
     }
 
     ScrollBar {
         id: scrollBar
 
-        anchors.margins: 8
+        anchors.topMargin: 8
+        anchors.bottomMargin: 8
+        anchors.rightMargin: 8
         anchors.right: parent.right
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
