@@ -78,6 +78,7 @@
 #include "chat_utils.h"
 #include "plugins/console.h"
 #include "plugins/chats.h"
+#include "plugins/rooms.h"
 #include "plugins/declarative.h"
 #include "plugins/discovery.h"
 #include "systeminfo.h"
@@ -126,6 +127,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
+    qmlRegisterType<ChatRoomModel>("wiLink", 1, 2, "RoomModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");

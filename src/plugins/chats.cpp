@@ -265,7 +265,7 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     // chat history
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("remoteJid", QVariant::fromValue(jid));
+    context->setContextProperty("globalJid", QVariant::fromValue(jid));
     context->setContextProperty("window", chatWindow);
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);

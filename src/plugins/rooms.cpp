@@ -402,9 +402,6 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     // prepare models
     mucRoom = client->findExtension<QXmppMucManager>()->addRoom(jid);
 
-    ChatRoomModel *mucModel = new ChatRoomModel(this);
-    mucModel->setRoom(mucRoom);
-
     QSortFilterProxyModel *contactModel = new QSortFilterProxyModel(this);
     contactModel->setSourceModel(chatWindow->rosterModel());
     contactModel->setDynamicSortFilter(true);
@@ -420,8 +417,7 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    context->setContextProperty("participantModel", mucModel);
-    context->setContextProperty("room", mucRoom);
+    context->setContextProperty("globalRoom", mucRoom);
     context->setContextProperty("window", chat);
 
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);

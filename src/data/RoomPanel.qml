@@ -25,6 +25,14 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property QtObject room: globalRoom
+
+    RoomModel {
+        id: participantModel
+
+        room: panel.room
+    }
+
     VCard {
         id: ownCard
         jid: window.client.jid
