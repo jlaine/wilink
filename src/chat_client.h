@@ -24,18 +24,29 @@
 
 class QDateTime;
 class QHostInfo;
+class QXmppCallManager;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
 class QXmppEntityTimeIq;
 class QXmppEntityTimeManager;
 class QXmppSrvInfo;
+class QXmppTransferManager;
 
 class ChatClient : public QXmppClient
 {
     Q_OBJECT
+    Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
+    Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
+    Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
+    Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
+    Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
 
 public:
     ChatClient(QObject *parent);
+    QXmppCallManager *callManager();
+    QXmppDiscoveryManager *discoveryManager();
+    QXmppRosterManager *rosterManager();
+    QXmppTransferManager* transferManager();
     QDateTime serverTime() const;
 
 signals:
@@ -53,6 +64,16 @@ private slots:
     void setTurnServer(const QHostInfo &hostInfo);
 
 private:
+    template<class T>
+    T* getManager() {
+        T* manager = findExtension<T>();
+        if (!manager) {
+            manager = new T;
+            addExtension(manager);
+        }
+        return manager;
+    }
+
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
     int timeOffset;

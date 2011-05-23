@@ -25,6 +25,7 @@
 #include "QXmppEntityTimeIq.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppLogger.h"
+#include "QXmppRosterManager.h"
 #include "QXmppSrvInfo.h"
 #include "QXmppTransferManager.h"
 
@@ -45,16 +46,32 @@ ChatClient::ChatClient(QObject *parent)
     connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
         this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
 
-    QXmppTransferManager *transferManager = findExtension<QXmppTransferManager>();
-    if (!transferManager) {
-        transferManager = new QXmppTransferManager;
-        // disable in-band bytestreams
-        transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
-        addExtension(transferManager);
-    }
+    // create transfer manager
+    QXmppTransferManager *transferManager = getManager<QXmppTransferManager>();
+    transferManager->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
-    QXmppCallManager *callManager = new QXmppCallManager;
-    addExtension(callManager);
+    // create call manager
+    getManager<QXmppCallManager>();
+}
+
+QXmppCallManager *ChatClient::callManager()
+{
+    return getManager<QXmppCallManager>();
+}
+
+QXmppDiscoveryManager *ChatClient::discoveryManager()
+{
+    return getManager<QXmppDiscoveryManager>();
+}
+
+QXmppRosterManager *ChatClient::rosterManager()
+{
+    return &QXmppClient::rosterManager();
+}
+
+QXmppTransferManager *ChatClient::transferManager()
+{
+    return getManager<QXmppTransferManager>();
 }
 
 QDateTime ChatClient::serverTime() const
