@@ -29,6 +29,7 @@ Item {
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
 
+    clip: true
     state: pageSize == 1 ? 'collapsed' : ''
     width: 11
 
