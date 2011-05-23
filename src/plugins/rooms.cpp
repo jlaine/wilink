@@ -102,14 +102,20 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
 
 void RoomListModel::addRoom(const QString &jid)
 {
+    int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         RoomListItem *item = static_cast<RoomListItem*>(ptr);
-        if (item->jid == jid)
+        if (item->jid == jid) {
             return;
+        } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
+            row = item->row();
+            break;
+        }
     }
+
     RoomListItem *item = new RoomListItem;
     item->jid = jid;
-    addItem(item, rootItem, rootItem->children.size());
+    addItem(item, rootItem, row);
 }
 
 void RoomListModel::removeRoom(const QString &jid)
