@@ -38,7 +38,9 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
     Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
+    Q_PROPERTY(QString diagnosticServer READ diagnosticServer NOTIFY diagnosticServerChanged)
     Q_PROPERTY(QXmppDiscoveryManager* discoveryManager READ discoveryManager CONSTANT)
+    Q_PROPERTY(QString mucServer READ mucServer NOTIFY mucServerFound)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
     Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
 
@@ -48,13 +50,15 @@ public:
     QDateTime serverTime() const;
 
     QXmppCallManager *callManager();
+    QString diagnosticServer() const;
     QXmppDiscoveryManager *discoveryManager();
+    QString mucServer() const;
     QXmppRosterManager *rosterManager();
     QXmppTransferManager* transferManager();
 
 signals:
     void jidChanged(const QString &jid);
-    void diagnosticsServerFound(const QString &diagServer);
+    void diagnosticServerChanged(const QString &diagnosticServer);
     void mucServerFound(const QString &mucServer);
     void pubSubServerFound(const QString &pubSubServer);
     void shareServerFound(const QString &shareServer);
@@ -78,8 +82,10 @@ private:
         return manager;
     }
 
+    QString m_diagnosticServer;
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
+    QString m_mucServer;
     int timeOffset;
     QString timeQueue;
     QXmppEntityTimeManager *timeManager;

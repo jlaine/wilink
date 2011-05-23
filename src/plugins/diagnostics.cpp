@@ -427,7 +427,7 @@ DiagnosticsExtension::DiagnosticsExtension(QXmppClient *client)
     qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
 
     bool check;
-    check = connect(client, SIGNAL(diagnosticsServerFound(QString)),
+    check = connect(client, SIGNAL(diagnosticServerChanged(QString)),
                     this, SLOT(diagnosticsServerFound(QString)));
     Q_ASSERT(check);
     Q_UNUSED(check);

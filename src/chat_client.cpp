@@ -70,9 +70,19 @@ QXmppCallManager *ChatClient::callManager()
     return getManager<QXmppCallManager>();
 }
 
+QString ChatClient::diagnosticServer() const
+{
+    return m_diagnosticServer;
+}
+
 QXmppDiscoveryManager *ChatClient::discoveryManager()
 {
     return getManager<QXmppDiscoveryManager>();
+}
+
+QString ChatClient::mucServer() const
+{
+    return m_mucServer;
 }
 
 QXmppRosterManager *ChatClient::rosterManager()
@@ -146,15 +156,17 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         if (id.category() == "conference" &&
             id.type() == "text")
         {
-            info("Found chat room server " + disco.from());
-            emit mucServerFound(disco.from());
+            m_mucServer = disco.from();
+            info("Found chat room server " + m_mucServer);
+            emit mucServerFound(m_mucServer);
         }
         // check if it's a diagnostics server
         else if (id.category() == "diagnostics" &&
                  id.type() == "server")
         {
-            info("Found diagnostics server " + disco.from());
-            emit diagnosticsServerFound(disco.from());
+            m_diagnosticServer = disco.from();
+            info("Found diagnostics server " + m_diagnosticServer);
+            emit diagnosticServerChanged(m_diagnosticServer);
         }
         // check if it's a publish-subscribe server
         else if (id.category() == "pubsub" &&
