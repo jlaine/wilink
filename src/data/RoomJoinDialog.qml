@@ -87,6 +87,7 @@ Dialog {
         clip: true
         model: DiscoveryModel {
             manager: client.discoveryManager
+            rootJid: client.mucServer
         }
 
         delegate: Rectangle {

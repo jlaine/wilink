@@ -68,6 +68,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: toolbar.bottom
+            enabled: client.mucServer != ''
             model: roomModel
             title: qsTr('My rooms')
             height: 150
@@ -75,7 +76,6 @@ Item {
             Connections {
                 onAddClicked: {
                     dialog.source = 'RoomJoinDialog.qml';
-                    dialog.item.model.rootJid = 'conference.wifirst.net'
                     dialog.item.show();
                 }
                 onItemClicked: {
