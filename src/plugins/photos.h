@@ -20,6 +20,7 @@
 #ifndef __WILINK_PHOTOS_H__
 #define __WILINK_PHOTOS_H__
 
+#include <QDeclarativeImageProvider>
 #include <QSet>
 #include <QUrl>
 
@@ -53,6 +54,13 @@ private:
     QList<QPair<QUrl, FileSystem*> > m_downloadQueue;
     QUrl m_downloadUrl;
     QIODevice *m_downloadDevice;
+};
+
+class PhotoImageProvider : public QDeclarativeImageProvider
+{
+public:
+    PhotoImageProvider();
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
 class PhotoModel : public ChatModel

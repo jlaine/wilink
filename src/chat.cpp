@@ -182,6 +182,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(240);
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
 
     QDeclarativeContext *context = d->rosterView->rootContext();

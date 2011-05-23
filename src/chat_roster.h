@@ -45,9 +45,6 @@ class ChatRosterImageProvider : public QDeclarativeImageProvider
 public:
     ChatRosterImageProvider();
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
-
-private:
-    //ChatRosterModel *m_rosterModel;
 };
 
 class ChatRosterModel : public ChatModel

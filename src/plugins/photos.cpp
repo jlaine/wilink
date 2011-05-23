@@ -21,7 +21,6 @@
 #include <QApplication>
 #include <QBuffer>
 #include <QCache>
-#include <QDeclarativeImageProvider>
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
@@ -132,13 +131,6 @@ void PhotoCache::processQueue()
     m_downloadUrl = job.first;
     m_downloadDevice = fs->get(m_downloadUrl, FileSystem::MediumSize);
 }
-
-class PhotoImageProvider : public QDeclarativeImageProvider
-{
-public:
-    PhotoImageProvider();
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
-};
 
 PhotoImageProvider::PhotoImageProvider()
     : QDeclarativeImageProvider(Image)
