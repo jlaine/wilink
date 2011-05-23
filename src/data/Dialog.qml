@@ -26,8 +26,14 @@ Rectangle {
     property alias title: label.text
     signal accepted
 
-    color: '#ccc'
+    border.color: '#aa567dbc'
+    border.width: 1
+    gradient: Gradient {
+        GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
+        GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
+    }
     radius: 10
+    smooth: true
     width: 320
     height: 240
 
@@ -39,20 +45,45 @@ Rectangle {
         visible = false;
     }
 
+    // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
+    Rectangle {
+        id: shadow
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.bottom
+        anchors.topMargin: -dialog.radius
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: '#66000000' }
+            GradientStop { position: 1.0; color: '#00000000' }
+        }
+        height: 2 * dialog.radius
+        z: -1
+    }
+
     Rectangle {
         id: header
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        color: '#e7effd'
+        border.color: '#aa567dbc'
+        border.width: 1
+        gradient: Gradient {
+            GradientStop { position:0.0; color: '#9fb7dd' }
+            GradientStop { position:0.5; color: '#597fbe' }
+            GradientStop { position:1.0; color: '#9fb7dd' }
+        }
         height: 20
         radius: dialog.radius
+        smooth: true
 
         Text {
             id: label
 
             anchors.centerIn: parent
+            font.bold: true
+            color: '#ffffff'
         }
     }
 
