@@ -57,7 +57,7 @@ ChatClient::ChatClient(QObject *parent)
 QString ChatClient::jid() const
 {
     QXmppClient *client = (QXmppClient*)this;
-    client->configuration().jid();
+    return client->configuration().jid();
 }
 
 QDateTime ChatClient::serverTime() const
