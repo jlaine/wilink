@@ -34,7 +34,6 @@ public:
     virtual bool initialize(Chat *chat) = 0;
     virtual void finalize(Chat *) {};
     virtual QString name() const = 0;
-    virtual void polish(Chat *, ChatPanel *) {};
     virtual void preferences(ChatPreferences *) {};
 };
 

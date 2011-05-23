@@ -282,10 +282,6 @@ void Chat::addPanel(ChatPanel *panel)
     connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
     connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
 
-    // allows plugins to polish panel
-    foreach (ChatPlugin *plugin, d->plugins)
-        plugin->polish(this, panel);
-
     d->chatPanels << panel;
 }
 
