@@ -54,6 +54,7 @@
     <file>wiLink-64.png</file>
     <!-- QML -->
     <file>qmldir</file>
+    <file>utils.js</file>
     <file>roster.qml</file>
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>

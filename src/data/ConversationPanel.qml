@@ -20,6 +20,7 @@
 import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 1.2
+import 'utils.js' as Utils
 
 Panel {
     id: panel
@@ -31,8 +32,22 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: vcard.avatar
-        title: '<b>' + vcard.name + '</b> ' + stateText() + '<br/>' + vcard.jid
+        title: '<b>' + vcard.name + '</b> ' + stateText() + '<br/>' + extraText()
         z: 1
+
+        function extraText() {
+            var domain = Utils.jidToDomain(vcard.jid);
+            if (domain == 'wifirst.net') {
+                // for wifirst accounts, return the nickname if it is
+                // different from the display name
+                if (vcard.name != vcard.nickName)
+                    return nickName;
+                else
+                    return '';
+            } else {
+                return vcard.jid;
+            }
+        }
 
         function stateText() {
             if (conversation.remoteState == QXmppMessage.Composing)

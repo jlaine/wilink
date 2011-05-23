@@ -20,6 +20,7 @@
 import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 1.2
+import 'utils.js' as Utils
 
 Panel {
     id: panel
@@ -47,7 +48,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: 'chat.png'
-        title: '<b>' + room.jid.split('@')[0] + '</b>' + '<br/>' + room.subject
+        title: '<b>' + Utils.jidToUser(room.jid) + '</b>' + '<br/>' + room.subject
         z: 1
 
         Row {

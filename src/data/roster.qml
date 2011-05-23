@@ -19,6 +19,7 @@
 
 import QtQuick 1.0
 import wiLink 1.2
+import 'utils.js' as Utils
 
 Item {
     id: root
@@ -157,7 +158,7 @@ Item {
 
             Connections {
                 onAddClicked: {
-                    var domain = window.objectName.split('@')[1];
+                    var domain = Utils.jidToDomain(window.objectName);
                     var tip = (domain == 'wifirst.net') ? '<p>' + qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') + '</p>' : '';
 
                     var dialog = window.inputDialog();
@@ -271,7 +272,7 @@ Item {
                 box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
-                    var url = 'xmpp://' + window.objectName + '/' + call.jid.split('/')[0] + '?message';
+                    var url = 'xmpp://' + window.objectName + '/' + Utils.jidToBareJid(call.jid) + '?message';
                     Qt.openUrlExternally(url);
                     call.accept();
                 } else {
@@ -292,7 +293,7 @@ Item {
                 box.text = qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
-                    var url = 'xmpp://' + window.objectName + '/' + job.jid.split('/')[0] + '?message';
+                    var url = 'xmpp://' + window.objectName + '/' + Utils.jidToBareJid(job.jid) + '?message';
                     Qt.openUrlExternally(url);
                     job.accept();
                 } else {
