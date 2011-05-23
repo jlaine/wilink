@@ -52,6 +52,7 @@
 
 ChatDialogHelper::ChatDialogHelper(QObject *parent)
     : QObject(parent),
+    m_archivesFetched(false),
     m_client(0),
     m_historyModel(0),
     m_localState(QXmppMessage::None),
@@ -84,6 +85,9 @@ void ChatDialogHelper::setClient(ChatClient *client)
         Q_ASSERT(check);
 
         emit clientChanged(client);
+
+        // try to fetch archives
+        fetchArchives();
     }
 }
 
@@ -97,6 +101,9 @@ void ChatDialogHelper::setHistoryModel(ChatHistoryModel *historyModel)
     if (historyModel != m_historyModel) {
         m_historyModel = historyModel;
         emit historyModelChanged(historyModel);
+
+        // try to fetch archives
+        fetchArchives();
     }
 }
 
@@ -110,6 +117,9 @@ void ChatDialogHelper::setJid(const QString &jid)
     if (jid != m_jid) {
         m_jid = jid;
         emit jidChanged(jid);
+
+        // try to fetch archives
+        fetchArchives();
     }
 }
 
@@ -159,6 +169,16 @@ void ChatDialogHelper::archiveListReceived(const QList<QXmppArchiveChat> &chats)
     for (int i = chats.size() - 1; i >= 0; i--)
         if (jidToBareJid(chats[i].with()) == m_jid)
             m_client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start());
+}
+
+void ChatDialogHelper::fetchArchives()
+{
+    if (m_archivesFetched || !m_client || !m_historyModel || m_jid.isEmpty())
+        return;
+
+    m_client->archiveManager()->listCollections(m_jid,
+        m_client->serverTime().addDays(-HISTORY_DAYS));
+    m_archivesFetched = true;
 }
 
 void ChatDialogHelper::messageReceived(const QXmppMessage &msg)
@@ -215,7 +235,6 @@ bool ChatDialogHelper::sendMessage(const QString &body)
 ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     : ChatPanel(chatWindow),
     chatRemoteJid(jid), 
-    joined(false),
     m_window(chatWindow)
 {
     client = chatWindow->client();
@@ -254,10 +273,6 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
                     this, SIGNAL(hidePanel()));
     Q_ASSERT(check);
 
-    check = connect(client, SIGNAL(connected()),
-                    this, SLOT(join()));
-    Q_ASSERT(check);
-
     check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
                     this, SLOT(messageReceived(QXmppMessage)));
     Q_ASSERT(check);
@@ -265,30 +280,11 @@ ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(deleteLater()));
     Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(showPanel()),
-                    this, SLOT(join()));
-    Q_ASSERT(check);
 }
 
 QDeclarativeView* ChatDialogPanel::declarativeView() const
 {
     return historyView;
-}
-
-/** Start a two party dialog.
- */
-void ChatDialogPanel::join()
-{
-    if (joined)
-        return;
-
-    // FIXME : we need to check whether archives are supported
-    // to clear the display appropriately
-    client->archiveManager()->listCollections(chatRemoteJid,
-        client->serverTime().addDays(-HISTORY_DAYS));
-
-    joined = true;
 }
 
 /** Handles an incoming chat message.
