@@ -17,23 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAction>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeItem>
-#include <QDeclarativeView>
-#include <QLayout>
-#include <QShortcut>
 #include <QTimer>
+#include <QUrl>
 
 #include "QXmppClient.h"
 #include "QXmppDiscoveryManager.h"
 
-#include "chat.h"
-#include "chat_plugin.h"
 #include "discovery.h"
-
-#define DISCOVERY_ROSTER_ID "0_discovery"
 
 class DiscoveryItem : public ChatModelItem
 {

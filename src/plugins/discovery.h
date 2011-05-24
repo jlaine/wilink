@@ -20,8 +20,6 @@
 #ifndef __WILINK_DISCOVERY_H__
 #define __WILINK_DISCOVERY_H__
 
-class Chat;
-class QAction;
 class QTimer;
 class QXmppClient;
 class QXmppDiscoveryManager;

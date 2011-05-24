@@ -17,28 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAction>
 #include <QDateTime>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeItem>
-#include <QDeclarativeView>
-#include <QLabel>
-#include <QLayout>
-#include <QMenu>
-#include <QScrollBar>
-#include <QShortcut>
-#include <QTextBrowser>
-#include <QTimer>
 
-#include "QXmppClient.h"
-
-#include "chat.h"
-#include "chat_search.h"
 #include "console.h"
 #include "chat_utils.h"
-
-#define CONSOLE_ROSTER_ID "0_console"
 
 enum LogRole {
     ContentRole = ChatModel::UserRole,

@@ -37,9 +37,6 @@ class ChatRosterModel;
 class ChatRosterModelPrivate;
 class VCardCache;
 
-#define ROOMS_ROSTER_ID     "1_rooms"
-#define CONTACTS_ROSTER_ID  "2_contacts"
-
 class ChatRosterImageProvider : public QDeclarativeImageProvider
 {
 public:
@@ -55,7 +52,6 @@ public:
     enum Role {
         NicknameRole = ChatModel::UserRole,
         MessagesRole,
-        PersistentRole,
         StatusRole
     };
 

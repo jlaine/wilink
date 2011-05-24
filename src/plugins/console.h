@@ -20,19 +20,9 @@
 #ifndef __WILINK_CONSOLE_H__
 #define __WILINK_CONSOLE_H__
 
-#include <QSyntaxHighlighter>
-#include <QTextCharFormat>
-#include <QTextDocument>
-#include <QVector>
-
 #include "QXmppLogger.h"
 
 #include "chat_model.h"
-
-class Chat;
-class ChatSearchBar;
-class Highlighter;
-class QTextBrowser;
 
 class LogModel : public ChatModel
 {

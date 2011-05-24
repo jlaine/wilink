@@ -42,8 +42,6 @@
 
 #include "diagnostics.h"
 
-#define DIAGNOSTICS_ROSTER_ID "0_diagnostics"
-
 static const QHostAddress serverAddress("213.91.4.201");
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
