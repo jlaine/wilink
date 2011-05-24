@@ -70,6 +70,7 @@
     <file>Panel.qml</file>
     <file>PanelHeader.qml</file>
     <file>PanelHelp.qml</file>
+    <file>PanelSwapper.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>PhonePanel.qml</file>
     <file>PhotoPanel.qml</file>

@@ -24,90 +24,16 @@ import 'utils.js' as Utils
 Item {
     id: root
 
-    ListModel {
-        id: panels
-    }
-
     /** Convenience method to show a conversation panel.
      */
     function showConversation(jid) {
-        showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
+        swapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
     }
 
     /** Convenience method to show a chat room panel.
      */
     function showRoom(jid) {
-        showPanel('RoomPanel.qml', {'jid': jid})
-    }
-
-    function showPanel(source, properties) {
-        if (properties == undefined)
-            properties = {};
-
-        function propDump(a) {
-            var dump = '';
-            for (var key in a)
-                dump += (dump.length > 0 ? ', ' : '') + key + ': ' + a[key];
-            return '{' + dump + '}';
-        }
-
-        function propEquals(a, b) {
-            if (a.length != b.length)
-                return false;
-            for (var key in a) {
-                if (a[key] != b[key])
-                    return false;
-            }
-            return true;
-        }
-
-        // if the panel already exists, show it
-        for (var i = 0; i < panels.count; i += 1) {
-            if (panels.get(i).source == source &&
-                propEquals(panels.get(i).properties, properties)) {
-                console.log("focusing panel " + source + " " + propDump(properties));
-                swapper.setCurrentItem(panels.get(i).panel);
-                return;
-            }
-        }
-
-        // otherwise create the panel
-        console.log("creating panel " + source + " " + propDump(properties));
-        var component = Qt.createComponent(source);
-        // FIXME: when Qt Quick 1.1 becomes available,
-        // let createObject assign the properties itself.
-        var panel = component.createObject(swapper);
-        for (var key in properties) {
-            panel[key] = properties[key];
-        }
-
-        panel.close.connect(function() {
-            var wasVisible = (panel.opacity > 0);
-            for (var i = 0; i < panels.count; i += 1) {
-                if (panels.get(i).panel == panel) {
-                    console.log("removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
-
-                    // if the panel was visible, show last remaining panel
-                    if (swapper.currentItem == panel) {
-                        if (panels.count == 1)
-                            swapper.setCurrentItem(null);
-                        else if (i == panels.count - 1)
-                            swapper.setCurrentItem(panels.get(i - 1).panel);
-                        else
-                            swapper.setCurrentItem(panels.get(i + 1).panel);
-                    }
-
-                    // destroy panel
-                    panels.remove(i);
-                    panel.destroy();
-                    break;
-                }
-            }
-
-        })
-        panels.append({'source': source, 'properties': properties, 'panel': panel});
-        swapper.setCurrentItem(panel);
-        return panel;
+        swapper.showPanel('RoomPanel.qml', {'jid': jid})
     }
 
     Item {
@@ -137,33 +63,33 @@ Item {
                 ToolButton {
                     text: qsTr('Diagnostics')
                     icon: 'diagnostics.png'
-                    onClicked: showPanel('DiagnosticPanel.qml')
+                    onClicked: swapper.showPanel('DiagnosticPanel.qml')
                 }
 
 /*
                 ToolButton {
                     text: 'Debugging'
                     icon: 'options.png'
-                    onClicked: showPanel('LogPanel.qml')
+                    onClicked: swapper.showPanel('LogPanel.qml')
                 }
 
                 ToolButton {
                     text: 'Discovery'
                     icon: 'options.png'
-                    onClicked: showPanel('DiscoveryPanel.qml')
+                    onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
 
                 ToolButton {
                     text: 'Media'
                     icon: 'start.png'
-                    onClicked: showPanel('PlayerPanel.qml')
+                    onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
 */
 
                 ToolButton {
                     text: qsTr('Phone')
                     icon: 'phone.png'
-                    onClicked: showPanel('PhonePanel.qml')
+                    onClicked: swapper.showPanel('PhonePanel.qml')
                 }
 
                 ToolButton {
@@ -173,9 +99,9 @@ Item {
                     onClicked: {
                         var domain = Utils.jidToDomain(window.client.jid);
                         if (domain == 'wifirst.net')
-                            showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
+                            swapper.showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
                         else if (domain == 'gmail.com')
-                            showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
+                            swapper.showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
                     }
                 }
 
@@ -414,38 +340,12 @@ Item {
         }
     }
 
-    Item {
+    PanelSwapper {
         id: swapper
-
-        property Item currentItem
-
-        function setCurrentItem(panel) {
-            if (panel == currentItem)
-                return;
-
-            // show new item
-            if (panel)
-                panel.opacity = 1;
-            else
-                background.opacity = 1;
-
-            // hide old item
-            if (currentItem)
-                currentItem.opacity = 0;
-            else
-                background.opacity = 0;
-
-            currentItem = panel;
-        }
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
-
-        Rectangle {
-            id: background
-            anchors.fill: parent
-        }
     }
 }
