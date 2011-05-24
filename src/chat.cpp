@@ -185,6 +185,11 @@ Chat::Chat(QWidget *parent)
     d->rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
 
+    d->rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
+    d->rosterView->setAttribute(Qt::WA_NoSystemBackground);
+    d->rosterView->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    d->rosterView->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+
     QDeclarativeContext *context = d->rosterView->rootContext();
     context->setContextProperty("contactModel", d->sortedContactModel);
     context->setContextProperty("window", this);
