@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
+#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDesktopServices>
@@ -66,6 +67,8 @@
 #include "QXmppRtpChannel.h"
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
+
+#include "qnetio/wallet.h"
 
 #include "application.h"
 #include "chat.h"
@@ -107,6 +110,20 @@ public:
     QStackedWidget *conversationPanel;
 
     QList<ChatPlugin*> plugins;
+};
+
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+    virtual QNetworkAccessManager *create(QObject * parent) {
+        bool check;
+
+        QNetworkAccessManager *manager = new QNetworkAccessManager(parent);
+        check = QObject::connect(manager, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
+                                 QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+        Q_ASSERT(check);
+
+        return manager;
+    }
 };
 
 Chat::Chat(QWidget *parent)
@@ -194,6 +211,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
+    d->rosterView->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
 
     d->rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
     d->rosterView->setAttribute(Qt::WA_NoSystemBackground);
