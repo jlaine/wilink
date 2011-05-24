@@ -25,7 +25,6 @@
 #include "QXmppMucIq.h"
 #include "QXmppMucManager.h"
 #include "chat_model.h"
-#include "chat_panel.h"
 
 class Chat;
 class ChatClient;
@@ -127,22 +126,6 @@ private:
     RoomListModel *roomModel;
     QXmppMucManager *mucManager;
     QStringList invitations;
-};
-
-class RoomPanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    RoomPanel(Chat *chatWindow, const QString &jid);
-
-private slots:
-    void changePermissions();
-    void configurationReceived(const QXmppDataForm &form);
-
-private:
-    Chat *chat;
-    QXmppMucRoom *mucRoom;
 };
 
 class RoomPermissionDialog : public QDialog

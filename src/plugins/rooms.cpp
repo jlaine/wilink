@@ -497,6 +497,7 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
     }
 }
 
+#if 0
 RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     : ChatPanel(chatWindow),
     chat(chatWindow)
@@ -524,7 +525,6 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     QDeclarativeView *declarativeView = new QDeclarativeView;
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("contactModel", contactModel);
-    context->setContextProperty("globalJid", jid);
     context->setContextProperty("window", chat);
 
     declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
@@ -534,20 +534,20 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     layout->addWidget(declarativeView);
     setFocusProxy(declarativeView);
 
-#if 0
-    // FIXME: add actions
-    optionsAction = addAction(QIcon(":/options.png"), tr("Options"));
+    // add actions
+    optionsAction = addAction(QIcon(":/options.png"), "Options");
     check = connect(optionsAction, SIGNAL(triggered()),
                     mucRoom, SLOT(requestConfiguration()));
     Q_ASSERT(check);
-    optionsAction->setVisible(false);
 
-    permissionsAction = addAction(QIcon(":/permissions.png"), tr("Permissions"));
+    permissionsAction = addAction(QIcon(":/permissions.png"), "Permissions");
     check = connect(permissionsAction, SIGNAL(triggered()),
                     this, SLOT(changePermissions()));
     Q_ASSERT(check);
-    permissionsAction->setVisible(false);
-#endif
+
+    check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
+                    this, SLOT(configurationReceived(QXmppDataForm)));
+    Q_ASSERT(check);
 
     // connect signals
     check = connect(declarativeView->rootObject(), SIGNAL(close()),
@@ -556,10 +556,6 @@ RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
 
     check = connect(this, SIGNAL(hidePanel()),
                     this, SLOT(deleteLater()));
-    Q_ASSERT(check);
-
-    check = connect(mucRoom, SIGNAL(configurationReceived(QXmppDataForm)),
-                    this, SLOT(configurationReceived(QXmppDataForm)));
     Q_ASSERT(check);
 }
 
@@ -579,6 +575,7 @@ void RoomPanel::configurationReceived(const QXmppDataForm &form)
     if (dialog.exec())
         mucRoom->setConfiguration(dialog.form());
 }
+#endif
 
 RoomPermissionDialog::RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
     : QDialog(parent),
