@@ -94,7 +94,6 @@ public slots:
     void stopTone(QXmppRtpAudioChannel::Tone tone);
 
 private slots:
-    void authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
     void callRinging();
     void callStateChanged(QXmppCall::State state);
     void callTick();

@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCoreApplication>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDomDocument>
@@ -34,6 +33,7 @@
 #include "qnetio/wallet.h"
 
 #include "application.h"
+#include "declarative.h"
 #include "chat_history.h"
 #include "phone.h"
 #include "phone/sip.h"
@@ -117,10 +117,7 @@ PhoneCallsModel::PhoneCallsModel(QObject *parent)
     setRoleNames(roleNames);
 
     // http
-    m_network = new QNetworkAccessManager(this);
-    check = connect(m_network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                    this, SLOT(authenticationRequired(QNetworkReply*,QAuthenticator*)));
-    Q_ASSERT(check);
+    m_network = new NetworkAccessManager(this);
 
     // sip
     m_client = new SipClient;
@@ -211,17 +208,10 @@ void PhoneCallsModel::addCall(SipCall *call)
     emit currentCallsChanged();
 }
 
-void PhoneCallsModel::authenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator)
-{
-    Q_UNUSED(reply);
-    QNetIO::Wallet::instance()->onAuthenticationRequired("www.wifirst.net", authenticator);
-}
-
 QNetworkRequest PhoneCallsModel::buildRequest(const QUrl &url) const
 {
     QNetworkRequest req(url);
     req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     return req;
 }
 
