@@ -36,6 +36,7 @@
 
 #include "application.h"
 #include "chat.h"
+#include "declarative.h"
 #include "player.h"
 
 enum PlayerRole {
@@ -268,7 +269,7 @@ PlayerModel::PlayerModel(QObject *parent)
 
     d->networkCache = new QNetworkDiskCache(this);
     d->networkCache->setCacheDirectory(wApp->cacheDirectory());
-    d->network = new QNetworkAccessManager(this);
+    d->network = new NetworkAccessManager(this);
     d->network->setCache(d->networkCache);
 
     // init player
