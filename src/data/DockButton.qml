@@ -63,9 +63,9 @@ Rectangle {
         },
         State {
             name: 'pressed'
-            PropertyChanges { target: label; opacity: 1 }
-            PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: listViewItem; color: '#beceeb'; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: label; opacity: 0.5 }
+            PropertyChanges { target: image; height: 32; width: 32; opacity: 0.5 }
+            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         }
     ]
 

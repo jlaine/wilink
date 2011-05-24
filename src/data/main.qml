@@ -88,7 +88,7 @@ Item {
 
                 DockButton {
                     text: 'Media'
-s                    icon: 'start.png'
+                    icon: 'start.png'
                     onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
 */
