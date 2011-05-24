@@ -23,6 +23,7 @@ Item {
     id: block
     clip: true
 
+    property string currentJid
     property alias model: view.model
     property alias title: titleText.text
 
@@ -106,7 +107,7 @@ Item {
 
             width: parent.width
             height: 30
-            state: view.currentItem == item ? 'selected' : ''
+            state: currentJid == model.jid ? 'selected' : ''
 
             Rectangle {
                 id: rect
@@ -151,7 +152,6 @@ Item {
                     hoverEnabled: true
                     onClicked: {
                         if (mouse.button == Qt.LeftButton) {
-                            view.currentIndex = index;
                             block.itemClicked(model);
                         } else if (mouse.button == Qt.RightButton) {
                             block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));

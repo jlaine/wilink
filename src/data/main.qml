@@ -198,6 +198,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: toolbar.bottom
+            currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
                 client: window.client
@@ -260,6 +261,7 @@ Item {
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
+            currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
             model: contactModel
             title: qsTr('My contacts')
 
