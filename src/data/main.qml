@@ -43,6 +43,9 @@ Item {
     }
 
     function showPanel(source, properties) {
+        if (properties == undefined)
+            properties = {};
+
         var found = false;
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
