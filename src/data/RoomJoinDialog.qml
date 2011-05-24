@@ -130,6 +130,7 @@ Dialog {
         anchors.bottom: contents.bottom
         anchors.right: parent.right
         anchors.margins: 8
+        clip: true
         flickableItem: view
     }
 }
