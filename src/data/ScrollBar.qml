@@ -91,12 +91,11 @@ Item {
 
         Text {
             id: textButtonUp
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.rightMargin: 1
-            anchors.topMargin: 0
+            anchors.fill: parent
             color: '#0d88a4'
             font.pixelSize: scrollBar.width - 4
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
             text: '<html>&#9650;</html>'
         }
 
@@ -136,12 +135,11 @@ Item {
 
         Text {
             id: textButtonDown
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.rightMargin: 1
-            anchors.topMargin: 0
+            anchors.fill: parent
             color: '#0d88a4'
             font.pixelSize: scrollBar.width - 4
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
             text: '<html>&#9660;</html>'
         }
 
