@@ -360,6 +360,6 @@ Item {
     }
 
     Loader {
-        source: (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : undefined
+        source: (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : ''
     }
 }

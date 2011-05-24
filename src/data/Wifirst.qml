@@ -18,27 +18,36 @@
  */
 
 import QtQuick 1.0
+import 'utils.js' as Utils
 
 Item {
 
     Component.onCompleted: {
-        var doc = new XMLHttpRequest();
-        doc.onreadystatechange = function() {
-            if (doc.readyState == XMLHttpRequest.DONE) {
-                var a = doc.responseXML.documentElement;
-                for (var ii = 0; ii < a.childNodes.length; ++ii) {
-                    console.log(a.childNodes[ii].nodeName);
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function() {
+            if (req.readyState == XMLHttpRequest.DONE) {
+                var root = req.responseXML.documentElement;
+
+                // parse preferences
+                var prefs = Utils.getElementsByTagName(root, 'preferences')[0];
+                var refresh = Utils.getElementsByTagName(prefs, 'refresh')[0].firstChild.nodeValue;
+                console.log("menu refresh in " + refresh);
+
+                // parse menu
+                var menu = Utils.getElementsByTagName(root, 'menu')[0];
+                var entries = Utils.getElementsByTagName(menu, 'menu');
+                for (var i in entries) {
+                    var image = Utils.getElementsByTagName(entries[i], 'image')[0].firstChild.nodeValue;
+                    var label = Utils.getElementsByTagName(entries[i], 'label')[0].firstChild.nodeValue;
+                    var link = Utils.getElementsByTagName(entries[i], 'link')[0].firstChild.nodeValue;
+                    console.log("menu entry '" + label + "' -> " + link);
                 }
-                console.log("Headers -->");
-                console.log(doc.getAllResponseHeaders ());
-                console.log("Last modified -->");
-                console.log(doc.getResponseHeader ("Last-Modified"));
             }
         }
         console.log("fetching menu");
-        doc.open('GET', 'https://www.wifirst.net/wilink/menu/1');
-        doc.setRequestHeader('Accept', 'application/xml');
-        doc.send();
+        req.open('GET', 'https://www.wifirst.net/wilink/menu/1');
+        req.setRequestHeader('Accept', 'application/xml');
+        req.send();
     }
 }
 
