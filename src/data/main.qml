@@ -358,4 +358,8 @@ Item {
         anchors.left: left.right
         anchors.right: parent.right
     }
+
+    Loader {
+        source: (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : undefined
+    }
 }
