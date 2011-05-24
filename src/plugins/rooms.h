@@ -48,6 +48,19 @@ class QXmppMucManager;
 class QXmppMucRoom;
 class QXmppPresence;
 
+class RoomListModel : public ChatModel
+{
+    Q_OBJECT
+
+public:
+    RoomListModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const;
+
+public slots:
+    void addRoom(const QString &jid);
+    void removeRoom(const QString &jid);
+};
+
 class ChatRoomModel : public ChatModel
 {
     Q_OBJECT

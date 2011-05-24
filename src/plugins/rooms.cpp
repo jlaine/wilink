@@ -69,15 +69,6 @@ public:
     QString jid;
 };
 
-class RoomListModel : public ChatModel
-{
-public:
-    RoomListModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const;
-    void addRoom(const QString &jid);
-    void removeRoom(const QString &jid);
-};
-
 RoomListModel::RoomListModel(QObject *parent)
     : ChatModel(parent)
 {
