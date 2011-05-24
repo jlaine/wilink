@@ -133,6 +133,7 @@ s                    icon: 'start.png'
             currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
+                id: roomListModel
                 client: window.client
             }
             title: qsTr('My rooms')

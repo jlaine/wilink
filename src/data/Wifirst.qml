@@ -41,6 +41,12 @@ Item {
                     var label = Utils.getElementsByTagName(entries[i], 'label')[0].firstChild.nodeValue;
                     var link = Utils.getElementsByTagName(entries[i], 'link')[0].firstChild.nodeValue;
                     console.log("menu entry '" + label + "' -> " + link);
+
+                    // check for "home" chat room
+                    var roomCap = link.match(/xmpp:([^?]+)\?join/);
+                    if (roomCap) {
+                        showRoom(roomCap[1]);
+                    }
                 }
             }
         }
