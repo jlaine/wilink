@@ -42,7 +42,7 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
-#include "chats.h"
+#include "conversations.h"
 
 #ifdef WILINK_EMBEDDED
 #define HISTORY_DAYS 7

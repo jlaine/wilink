@@ -30,8 +30,8 @@ SOURCES += \
     ../updates.cpp \
     ../updatesdialog.cpp \
     ../plugins/calls.cpp \
-    ../plugins/chats.cpp \
     ../plugins/console.cpp \
+    ../plugins/conversations.cpp \
     ../plugins/declarative.cpp \
     ../plugins/phone.cpp \
     ../plugins/phone/models.cpp \
@@ -61,8 +61,8 @@ HEADERS += \
     ../updates.h \
     ../updatesdialog.h \
     ../plugins/calls.h \
-    ../plugins/chats.h \
     ../plugins/console.h \
+    ../plugins/conversations.h \
     ../plugins/declarative.h \
     ../plugins/photos.h \
     ../plugins/phone.h \
