@@ -130,7 +130,7 @@ s                    icon: 'start.png'
             anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: parent.top
-            currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
+            currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
                 id: roomListModel
