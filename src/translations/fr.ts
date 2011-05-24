@@ -222,16 +222,12 @@
 <context>
     <name>ChatRoomWatcher</name>
     <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-    <message>
         <source>%1 has asked to add you to join the &apos;%2&apos; chat room</source>
-        <translation>%1 vous as invité à rejoindre le salon &apos;%2&apos;</translation>
+        <translation type="obsolete">%1 vous as invité à rejoindre le salon &apos;%2&apos;</translation>
     </message>
     <message>
         <source>Do you accept?</source>
-        <translation>Acceptez-vous ?</translation>
+        <translation type="obsolete">Acceptez-vous ?</translation>
     </message>
 </context>
 <context>
