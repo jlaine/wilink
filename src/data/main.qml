@@ -42,7 +42,7 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 250
+        width: 240
 
         Rectangle {
             id: dockBackground
@@ -194,7 +194,7 @@ s                    icon: 'start.png'
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
-            currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
+            currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
             model: contactModel
             title: qsTr('My contacts')
 
