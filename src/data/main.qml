@@ -171,7 +171,9 @@ Item {
             anchors.right: parent.right
             anchors.top: toolbar.bottom
             enabled: window.client.mucServer != ''
-            model: roomModel
+            model: RoomListModel {
+                client: window.client
+            }
             title: qsTr('My rooms')
             height: 150
 

@@ -50,14 +50,28 @@ class QXmppPresence;
 class RoomListModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
 
 public:
     RoomListModel(QObject *parent = 0);
+
+    ChatClient *client() const;
+    void setClient(ChatClient *client);
+
     QVariant data(const QModelIndex &index, int role) const;
+
+signals:
+    void clientChanged(ChatClient *client);
 
 public slots:
     void addRoom(const QString &jid);
     void removeRoom(const QString &jid);
+
+private slots:
+    void bookmarksReceived();
+
+private:
+    ChatClient *m_client;
 };
 
 class RoomModel : public ChatModel
@@ -123,7 +137,6 @@ private slots:
 
 private:
     Chat *chat;
-    RoomListModel *roomModel;
     QXmppMucManager *mucManager;
     QStringList invitations;
 };

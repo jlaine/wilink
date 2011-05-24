@@ -70,8 +70,25 @@ public:
 };
 
 RoomListModel::RoomListModel(QObject *parent)
-    : ChatModel(parent)
+    : ChatModel(parent),
+    m_client(0)
 {
+}
+
+void RoomListModel::bookmarksReceived()
+{
+    Q_ASSERT(m_client);
+
+    QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
+    // join rooms marked as "autojoin"
+    qDebug("got bookmarks");
+    const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
+    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
+        if (conference.autoJoin())
+            addRoom(conference.jid());
+    }
 }
 
 QVariant RoomListModel::data(const QModelIndex &index, int role) const
@@ -89,6 +106,37 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
+}
+
+ChatClient *RoomListModel::client() const
+{
+    return m_client;
+}
+
+void RoomListModel::setClient(ChatClient *client)
+{
+    if (client != m_client) {
+
+        m_client = client;
+
+        if (m_client) {
+            bool check;
+
+            // add extension
+            QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
+            if (!bookmarkManager) {
+                bookmarkManager = new QXmppBookmarkManager(client);
+                client->addExtension(bookmarkManager);
+            }
+
+            // connect signals
+            check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
+                            this, SLOT(bookmarksReceived()));
+            Q_ASSERT(check);
+        }
+
+        emit clientChanged(m_client);
+    }
 }
 
 void RoomListModel::addRoom(const QString &jid)
@@ -404,10 +452,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     Q_ASSERT(check);
 
     // add roster hooks
-    roomModel = new RoomListModel(this);
-    QDeclarativeContext *context = chat->rosterView()->rootContext();
-    context->setContextProperty("roomModel", roomModel);
-
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
@@ -428,8 +472,8 @@ void ChatRoomWatcher::bookmarksReceived()
 
 RoomPanel *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
 {
-    roomModel->addRoom(jid);
 #if 0
+    roomModel->addRoom(jid);
     RoomPanel *panel = qobject_cast<RoomPanel*>(chat->panel(jid));
     if (!panel) {
         // add "rooms" item
