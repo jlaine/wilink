@@ -63,6 +63,7 @@
     <file>DiagnosticPanel.qml</file>
     <file>Dialog.qml</file>
     <file>DiscoveryPanel.qml</file>
+    <file>DockButton.qml</file>
     <file>HistoryView.qml</file>
     <file>KeyPad.qml</file>
     <file>LogPanel.qml</file>
