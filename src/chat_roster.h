@@ -67,13 +67,6 @@ public:
         VideoFeature = 16,
     };
 
-    enum Type {
-        Contact,
-        Room,
-        RoomMember,
-        Other,
-    };
-
     ChatRosterModel(QXmppClient *client, QObject *parent = 0);
     ~ChatRosterModel();
 
