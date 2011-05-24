@@ -697,8 +697,6 @@ public:
 
 bool RoomsPlugin::initialize(Chat *chat)
 {
-    qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
-
     new ChatRoomWatcher(chat);
     return true;
 }
