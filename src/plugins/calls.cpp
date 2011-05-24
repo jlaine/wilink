@@ -20,23 +20,15 @@
 #include <QAudioFormat>
 #include <QAudioInput>
 #include <QAudioOutput>
-#include <QDeclarativeComponent>
-#include <QDeclarativeEngine>
 #include <QDeclarativeItem>
-#include <QDeclarativeView>
 #include <QFile>
 #include <QHostInfo>
 #include <QImage>
-#include <QLabel>
 #include <QLayout>
 #include <QMenu>
-#include <QMessageBox>
 #include <QPainter>
-#include <QPushButton>
 #include <QTimer>
 
-#include "QSoundPlayer.h"
-#include "QVideoGrabber.h"
 #include "QXmppCallManager.h"
 #include "QXmppClient.h"
 #include "QXmppJingleIq.h"
@@ -45,13 +37,13 @@
 #include "QXmppUtils.h"
 
 #include "QSoundMeter.h"
-
-#include "calls.h"
+#include "QSoundPlayer.h"
+#include "QVideoGrabber.h"
 
 #include "application.h"
+#include "calls.h"
 #include "chat.h"
 #include "chat_plugin.h"
-#include "chat_roster.h"
 
 static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 {

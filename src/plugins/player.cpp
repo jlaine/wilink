@@ -19,19 +19,16 @@
 
 #include <QAbstractNetworkCache>
 #include <QDeclarativeItem>
-#include <QDeclarativeView>
 #include <QDir>
 #include <QDomDocument>
 #include <QDropEvent>
 #include <QFileInfo>
 #include <QImageReader>
-#include <QLayout>
 #include <QNetworkAccessManager>
 #include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QPixmapCache>
 #include <QSettings>
-#include <QShortcut>
 #include <QTime>
 
 #include "QSoundFile.h"
@@ -40,17 +37,7 @@
 #include "application.h"
 #include "chat.h"
 #include "chat_plugin.h"
-#include "chat_roster.h"
 #include "player.h"
-
-#define DURATION_WIDTH 30
-
-enum PlayerColumns {
-    ArtistColumn = 0,
-    TitleColumn,
-    DurationColumn,
-    MaxColumn
-};
 
 enum PlayerRole {
     AlbumRole = ChatModel::UserRole,
