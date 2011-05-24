@@ -30,9 +30,7 @@ Dialog {
     onAccepted: {
         if (roomEdit.text.length) {
             dialog.hide();
-
-            var url = 'xmpp://' + window.objectName + '/' + roomEdit.text + '@' + view.model.rootJid + '?join';
-            Qt.openUrlExternally(url);
+            showPanel('RoomPanel.qml', {'jid': view.model.rootJid})
         }
     }
 
@@ -118,9 +116,7 @@ Dialog {
                 anchors.fill: parent
                 onClicked: {
                     dialog.hide();
-
-                    var url = 'xmpp://' + window.objectName + '/' + model.jid + '?join';
-                    Qt.openUrlExternally(url);
+                    showPanel('RoomPanel.qml', {'jid': view.model.rootJid})
                 }
             }
         }
