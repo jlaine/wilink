@@ -45,7 +45,7 @@ Item {
         width: 250
 
         Rectangle {
-            id: toolbarBackground
+            id: dockBackground
 
             anchors.top: parent.top
             anchors.left: parent.left
@@ -55,7 +55,7 @@ Item {
         }
 
         Rectangle {
-            id: toolbar
+            id: dock
 
             anchors.top: parent.top
             anchors.left: parent.left
@@ -67,43 +67,41 @@ Item {
                 anchors.top: parent.top
                 anchors.left: parent.left
 
-                ToolButton {
-                    color: '#6ea1f1'
+                DockButton {
                     icon: 'diagnostics.png'
+                    text: qsTr('Diagnostics')
                     onClicked: swapper.showPanel('DiagnosticPanel.qml')
-                    text: state != '' ? qsTr('Diagnostics') : ''
                 }
 
 /*
-                ToolButton {
+                DockButton {
                     text: 'Debugging'
                     icon: 'options.png'
                     onClicked: swapper.showPanel('LogPanel.qml')
                 }
 
-                ToolButton {
+                DockButton {
                     text: 'Discovery'
                     icon: 'options.png'
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
 
-                ToolButton {
+                DockButton {
                     text: 'Media'
-                    icon: 'start.png'
+s                    icon: 'start.png'
                     onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
 */
 
-                ToolButton {
-                    color: '#6ea1f1'
+                DockButton {
                     icon: 'phone.png'
+                    text: qsTr('Phone')
                     onClicked: swapper.showPanel('PhonePanel.qml')
-                    text: state != '' ? qsTr('Phone') : ''
                 }
 
-                ToolButton {
-                    color: '#6ea1f1'
+                DockButton {
                     icon: 'photos.png'
+                    text: qsTr('Photos')
                     onClicked: {
                         var domain = Utils.jidToDomain(window.client.jid);
                         if (domain == 'wifirst.net')
@@ -111,13 +109,11 @@ Item {
                         else if (domain == 'gmail.com')
                             swapper.showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
                     }
-                    text: state != '' ? qsTr('Photos') : ''
                 }
 
-                ToolButton {
-                    color: '#6ea1f1'
+                DockButton {
                     icon: 'share.png'
-                    text: state != '' ? qsTr('Shares') : ''
+                    text: qsTr('Shares')
                     visible: window.client.shareServer != ''
                 }
             }
@@ -131,7 +127,7 @@ Item {
         RosterView {
             id: rooms
 
-            anchors.left: toolbarBackground.right
+            anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: parent.top
             currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
@@ -154,7 +150,7 @@ Item {
         Rectangle {
             id: splitter
 
-            anchors.left: toolbarBackground.right
+            anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: rooms.bottom
             color: '#567dbc'
@@ -193,7 +189,7 @@ Item {
         RosterView {
             id: contacts
 
-            anchors.left: toolbarBackground.right
+            anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
