@@ -133,7 +133,8 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
     qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
     qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
-    qmlRegisterType<ChatRoomModel>("wiLink", 1, 2, "RoomModel");
+    qmlRegisterType<RoomModel>("wiLink", 1, 2, "RoomModel");
+    qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");

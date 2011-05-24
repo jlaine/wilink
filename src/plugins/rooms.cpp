@@ -127,7 +127,7 @@ public:
     QXmppPresence::Status::Type status;
 };
 
-ChatRoomModel::ChatRoomModel(QObject *parent)
+RoomModel::RoomModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
@@ -140,7 +140,7 @@ ChatRoomModel::ChatRoomModel(QObject *parent)
 
 /** Bookmarks the room.
  */
-void ChatRoomModel::bookmark()
+void RoomModel::bookmark()
 {
     if (m_jid.isEmpty() || !m_manager)
         return;
@@ -170,7 +170,7 @@ void ChatRoomModel::bookmark()
 
 /** Unbookmarks the room.
  */
-void ChatRoomModel::unbookmark()
+void RoomModel::unbookmark()
 {
     if (m_jid.isEmpty() || !m_manager)
         return;
@@ -195,7 +195,7 @@ void ChatRoomModel::unbookmark()
     }
 }
 
-QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
+QVariant RoomModel::data(const QModelIndex &index, int role) const
 {
     ChatRoomItem *item = static_cast<ChatRoomItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -214,17 +214,17 @@ QVariant ChatRoomModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-ChatHistoryModel *ChatRoomModel::historyModel() const
+ChatHistoryModel *RoomModel::historyModel() const
 {
     return m_historyModel;
 }
 
-QString ChatRoomModel::jid() const
+QString RoomModel::jid() const
 {
     return m_jid;
 }
 
-void ChatRoomModel::setJid(const QString &jid)
+void RoomModel::setJid(const QString &jid)
 {
     if (jid != m_jid) {
         m_jid = jid;
@@ -238,12 +238,12 @@ void ChatRoomModel::setJid(const QString &jid)
     }
 }
 
-QXmppMucManager *ChatRoomModel::manager() const
+QXmppMucManager *RoomModel::manager() const
 {
     return m_manager;
 }
 
-void ChatRoomModel::setManager(QXmppMucManager *manager)
+void RoomModel::setManager(QXmppMucManager *manager)
 {
     if (manager != m_manager) {
         m_manager = manager;
@@ -257,7 +257,7 @@ void ChatRoomModel::setManager(QXmppMucManager *manager)
     }
 }
 
-void ChatRoomModel::messageReceived(const QXmppMessage &msg)
+void RoomModel::messageReceived(const QXmppMessage &msg)
 {
     Q_ASSERT(m_room);
     if (msg.body().isEmpty())
@@ -285,7 +285,7 @@ void ChatRoomModel::messageReceived(const QXmppMessage &msg)
         wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
-void ChatRoomModel::participantAdded(const QString &jid)
+void RoomModel::participantAdded(const QString &jid)
 {
     Q_ASSERT(m_room);
     //qDebug("participant added %s", qPrintable(jid));
@@ -307,7 +307,7 @@ void ChatRoomModel::participantAdded(const QString &jid)
     addItem(item, rootItem, row);
 }
 
-void ChatRoomModel::participantChanged(const QString &jid)
+void RoomModel::participantChanged(const QString &jid)
 {
     Q_ASSERT(m_room);
     //qDebug("participant changed %s", qPrintable(jid));
@@ -322,7 +322,7 @@ void ChatRoomModel::participantChanged(const QString &jid)
     }
 }
 
-void ChatRoomModel::participantRemoved(const QString &jid)
+void RoomModel::participantRemoved(const QString &jid)
 {
     Q_ASSERT(m_room);
     //qDebug("participant removed %s", qPrintable(jid));
@@ -336,12 +336,12 @@ void ChatRoomModel::participantRemoved(const QString &jid)
     }
 }
 
-QXmppMucRoom *ChatRoomModel::room() const
+QXmppMucRoom *RoomModel::room() const
 {
     return m_room;
 }
 
-void ChatRoomModel::setRoom(QXmppMucRoom *room)
+void RoomModel::setRoom(QXmppMucRoom *room)
 {
     bool check;
 

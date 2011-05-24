@@ -61,7 +61,7 @@ public slots:
     void removeRoom(const QString &jid);
 };
 
-class ChatRoomModel : public ChatModel
+class RoomModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
@@ -70,7 +70,7 @@ class ChatRoomModel : public ChatModel
     Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
 
 public:
-    ChatRoomModel(QObject *parent = 0);
+    RoomModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
