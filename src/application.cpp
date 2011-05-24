@@ -21,22 +21,12 @@
 #include <libnotify/notify.h>
 #endif
 
-#include <QAbstractItemView>
 #include <QAuthenticator>
-#include <QDebug>
 #include <QDesktopServices>
-#include <QDialog>
-#include <QDialogButtonBox>
 #include <QDir>
 #include <QFileInfo>
-#include <QGraphicsView>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
 #include <QMenu>
 #include <QProcess>
-#include <QProxyStyle>
-#include <QPushButton>
 #include <QSettings>
 #include <QSslSocket>
 #include <QSystemTrayIcon>
@@ -53,7 +43,6 @@
 #include "chat.h"
 #include "chat_accounts.h"
 #include "chat_utils.h"
-#include "flickcharm.h"
 
 Application *wApp = 0;
 
@@ -92,44 +81,6 @@ ApplicationPrivate::ApplicationPrivate()
     updates(0)
 {
 }
-
-class ApplicationStyle : public QProxyStyle
-{
-public:
-    void polish(QWidget *widget);
-};
-
-void ApplicationStyle::polish(QWidget *widget)
-{
-#if defined(WILINK_EMBEDDED) && !defined(Q_OS_SYMBIAN)
-    if (!widget->inherits("QDeclarativeView") &&
-        (widget->inherits("QGraphicsView") ||
-        widget->inherits("QListView") ||
-        widget->inherits("QTextBrowser") ||
-        widget->inherits("QTreeView")))
-    {
-        QAbstractItemView *view = qobject_cast<QAbstractItemView*>(widget);
-        if (view)
-            view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-        FlickCharm *charm = new FlickCharm(widget);
-        charm->activateOn(widget);
-    }
-    if (widget->inherits("QDialog") ||
-        widget->inherits("QMainWindow"))
-    {
-        widget->setMaximumSize(200, 320);
-    }
-#endif
-#if 0
-    if (widget->inherits("QGraphicsView")) {
-        QGraphicsView *view = qobject_cast<QGraphicsView*>(widget);
-        if (view) {
-            qDebug() << "activating antialias";
-            view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-        }
-    }
-#endif
-};
 
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
@@ -174,7 +125,6 @@ Application::Application(int &argc, char **argv)
     }
 
     /* initialise style */
-    setStyle(new ApplicationStyle);
     QFile css(":/wiLink.css");
     if (css.open(QIODevice::ReadOnly))
        setStyleSheet(QString::fromUtf8(css.readAll()));

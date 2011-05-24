@@ -25,7 +25,6 @@ SOURCES += \
     ../chat_search.cpp \
     ../chat_status.cpp \
     ../chat_utils.cpp \
-    ../flickcharm.cpp \
     ../systeminfo.cpp \
     ../updates.cpp \
     ../updatesdialog.cpp \
@@ -56,7 +55,6 @@ HEADERS += \
     ../chat_search.h \
     ../chat_status.h \
     ../chat_utils.h \
-    ../flickcharm.h \
     ../systeminfo.h \
     ../updates.h \
     ../updatesdialog.h \
