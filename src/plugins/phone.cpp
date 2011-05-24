@@ -137,14 +137,25 @@ PhoneCallsModel::PhoneCallsModel(QObject *parent)
     Q_ASSERT(check);
     m_client->moveToThread(wApp->soundThread());
 
+    // ticker for call durations
     m_ticker = new QTimer(this);
     m_ticker->setInterval(1000);
     connect(m_ticker, SIGNAL(timeout()),
             this, SLOT(callTick()));
+
+    // periodic settings retrieval
+    m_timer = new QTimer(this);
+    m_timer->setSingleShot(true);
+    connect(m_timer, SIGNAL(timeout()),
+            this, SLOT(_q_getSettings()));
+    m_timer->start(0);
 }
 
 PhoneCallsModel::~PhoneCallsModel()
 {
+    m_ticker->stop();
+    m_timer->stop();
+
     // give SIP client 2s to exit cleanly
     if (m_client->state() == SipClient::ConnectedState) {
         QEventLoop loop;
@@ -363,17 +374,6 @@ bool PhoneCallsModel::enabled() const
     return m_enabled;
 }
 
-/** Requests VoIP settings from the server.
- */
-void PhoneCallsModel::getSettings()
-{
-    QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
-    req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
-    QNetworkReply *reply = m_network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(_q_handleSettings()));
-}
-
 /** Hangs up all active calls.
  */
 void PhoneCallsModel::hangup()
@@ -469,13 +469,27 @@ void PhoneCallsModel::stopTone(QXmppRtpAudioChannel::Tone tone)
         call->audioChannel()->stopTone(tone);
 }
 
+/** Requests VoIP settings from the server.
+ */
+void PhoneCallsModel::_q_getSettings()
+{
+    qDebug("fetching phone settings");
+    QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
+    req.setRawHeader("Accept", "application/xml");
+    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    QNetworkReply *reply = m_network->get(req);
+    connect(reply, SIGNAL(finished()), this, SLOT(_q_handleSettings()));
+}
+
 void PhoneCallsModel::_q_handleSettings()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     Q_ASSERT(reply);
 
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
+        qWarning("failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
+        // retry in 5mn
+        m_timer->start(300000);
         return;
     }
 

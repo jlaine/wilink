@@ -98,7 +98,7 @@ private slots:
     void callRinging();
     void callStateChanged(QXmppCall::State state);
     void callTick();
-    void getSettings();
+    void _q_getSettings();
     void _q_handleCreate();
     void _q_handleList();
     void _q_handleSettings();
@@ -116,6 +116,7 @@ private:
     bool m_registeredHandler;
     QUrl m_selfcareUrl;
     QTimer *m_ticker;
+    QTimer *m_timer;
     QUrl m_url;
 };
 
