@@ -92,13 +92,7 @@ public:
     QVariant data(int role) const;
     void setData(int role, const QVariant &value);
 
-    QString id() const;
-    void setId(const QString &id);
-
-    ChatRosterModel::Type type() const;
-
-private:
-    QString itemId;
+    QString jid;
     QMap<int, QVariant> itemData;
     ChatRosterModel::Type itemType;
 };
@@ -113,24 +107,9 @@ QVariant ChatRosterItem::data(int role) const
     return itemData.value(role);
 }
 
-QString ChatRosterItem::id() const
-{
-    return itemId;
-}
-
-void ChatRosterItem::setId(const QString &id)
-{
-    itemId = id;
-}
-
 void ChatRosterItem::setData(int role, const QVariant &value)
 {
     itemData.insert(role, value);
-}
-
-enum ChatRosterModel::Type ChatRosterItem::type() const
-{
-    return itemType;
 }
 
 ChatRosterImageProvider::ChatRosterImageProvider()
@@ -237,7 +216,7 @@ ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *p
     /* look at immediate children */
     foreach (ChatModelItem *it, parent->children) {
         ChatRosterItem *item = static_cast<ChatRosterItem*>(it);
-        if (item->id() == id)
+        if (item->jid == id)
             return item;
     }
 
@@ -324,10 +303,10 @@ void ChatRosterModel::connected()
 {
     // request own vCard
     d->nickNameReceived = false;
-    d->ownItem->setId(d->client->configuration().jidBare());
+    d->ownItem->jid = d->client->configuration().jidBare();
     d->ownItem->setData(Qt::DisplayRole, d->client->configuration().user());
     d->ownItem->setData(NicknameRole, d->client->configuration().user());
-    d->fetchVCard(d->ownItem->id());
+    d->fetchVCard(d->ownItem->jid);
     emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
 }
 
@@ -354,28 +333,6 @@ QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRoster
     return jids;
 }
 
-/** Determine the display name for a contact.
- *
- *  If the user has set a name for the roster entry, it will be used,
- *  otherwise we fall back to information from the vCard.
- *
- * @param jid
- */
-QString ChatRosterModel::contactName(const QString &jid) const
-{
-    // exact roster entry
-    ChatRosterItem *item = d->find(jid);
-    if (item)
-        return item->data(Qt::DisplayRole).toString();
-
-    // contact by bare jid
-    item = d->find(jidToBareJid(jid));
-    if (item)
-        return item->type() == ChatRosterModel::Room ? jidToResource(jid) : item->data(Qt::DisplayRole).toString();
-
-    return jid;
-}
-
 static QString contactStatus(const QModelIndex &index)
 {
     const int typeVal = index.data(ChatRosterModel::StatusRole).toInt();
@@ -396,25 +353,21 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    QString bareJid = item->id();
     int messages = item->data(MessagesRole).toInt();
 
     if (role == JidRole) {
-        return bareJid;
-    } else if (role == TypeRole) {
-        return item->type();
+        return item->jid;
     } else if (role == AvatarRole) {
-        return VCardCache::instance()->imageUrl(bareJid);
+        return VCardCache::instance()->imageUrl(item->jid);
     } else if (role == UrlRole) {
-        return VCardCache::instance()->profileUrl(bareJid);
-    } else if (role == StatusRole && item->type() == ChatRosterModel::Contact) {
+        return VCardCache::instance()->profileUrl(item->jid);
+    } else if (role == StatusRole) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
         // condition upon disconnection, because the roster has not yet been cleared
         if (!d->client->isConnected())
             return statusType;
-        foreach (const QXmppPresence &presence, d->client->rosterManager().getAllPresencesForBareJid(bareJid))
-        {
+        foreach (const QXmppPresence &presence, d->client->rosterManager().getAllPresencesForBareJid(item->jid)) {
             QXmppPresence::Status::Type type = presence.status().type();
             if (type == QXmppPresence::Status::Offline)
                 continue;
@@ -430,7 +383,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else if (role == Qt::DisplayRole && index.column() == StatusColumn) {
         return QVariant();
     } else if (role == Qt::DisplayRole && index.column() == SortingColumn) {
-        return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + bareJid.toLower();
+        return contactStatus(index) + sortSeparator + item->data(Qt::DisplayRole).toString().toLower() + sortSeparator + item->jid.toLower();
     }
 
     return item->data(role);
@@ -466,17 +419,9 @@ void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
             features |= VideoFeature;
     }
     ChatRosterItem *item = d->find(disco.from());
-    foreach (const QXmppDiscoveryIq::Identity& id, disco.identities())
-    {
+    foreach (const QXmppDiscoveryIq::Identity& id, disco.identities()) {
         if (id.name() == "iChatAgent")
             features |= ChatStatesFeature;
-        if (item && item->type() == ChatRosterModel::Room &&
-            id.category() == "conference")
-        {
-            item->setData(Qt::DisplayRole, id.name());
-            emit dataChanged(createIndex(item, ContactColumn),
-                             createIndex(item, SortingColumn));
-        }
     }
     d->clientFeatures.insert(disco.from(), features);
 }
@@ -494,19 +439,6 @@ QModelIndex ChatRosterModel::findItem(const QString &bareJid, const QModelIndex 
 {
     ChatRosterItem *parentItem = static_cast<ChatRosterItem*>(parent.isValid() ? parent.internalPointer() : rootItem);
     return createIndex(d->find(bareJid, parentItem), 0);
-}
-
-Qt::ItemFlags ChatRosterModel::flags(const QModelIndex &index) const
-{
-    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index);
-    if (!index.isValid())
-        return defaultFlags;
-
-    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
-    if (item->type() == ChatRosterModel::Contact)
-        return Qt::ItemIsDragEnabled | defaultFlags;
-    else
-        return defaultFlags;
 }
 
 bool ChatRosterModel::isOwnNameReceived() const
@@ -530,7 +462,7 @@ void ChatRosterModel::itemAdded(const QString &jid)
     // add a new entry
     const QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
     item = new ChatRosterItem(ChatRosterModel::Contact);
-    item->setId(jid);
+    item->jid = jid;
     if (!entry.name().isEmpty())
         item->setData(Qt::DisplayRole, entry.name());
     else
@@ -538,7 +470,7 @@ void ChatRosterModel::itemAdded(const QString &jid)
     ChatModel::addItem(item, rootItem);
 
     // fetch vCard
-    d->fetchVCard(item->id());
+    d->fetchVCard(item->jid);
 }
 
 /** Handles an item being changed in the roster.
@@ -557,7 +489,7 @@ void ChatRosterModel::itemChanged(const QString &jid)
                      createIndex(item, SortingColumn));
 
     // fetch vCard
-    d->fetchVCard(item->id());
+    d->fetchVCard(item->jid);
 }
 
 /** Handles an item being removed from the roster.
@@ -608,20 +540,17 @@ void ChatRosterModel::rosterReceived()
     QStringList oldJids;
     foreach (ChatModelItem *item, rootItem->children) {
         ChatRosterItem *child = static_cast<ChatRosterItem*>(item);
-        if (child->type() == ChatRosterModel::Contact)
-            oldJids << child->id();
+        oldJids << child->jid;
     }
 
     // process received entries
-    foreach (const QString &jid, d->client->rosterManager().getRosterBareJids())
-    {
+    foreach (const QString &jid, d->client->rosterManager().getRosterBareJids()) {
         itemAdded(jid);
         oldJids.removeAll(jid);
     }
 
     // remove obsolete entries
-    foreach (const QString &jid, oldJids)
-    {
+    foreach (const QString &jid, oldJids) {
         ChatRosterItem *item = d->find(jid);
         if (item && item != d->ownItem)
             removeItem(item);

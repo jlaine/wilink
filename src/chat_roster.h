@@ -53,8 +53,7 @@ class ChatRosterModel : public ChatModel
 
 public:
     enum Role {
-        TypeRole = ChatModel::UserRole,
-        NicknameRole,
+        NicknameRole = ChatModel::UserRole,
         MessagesRole,
         PersistentRole,
         StatusRole
@@ -81,11 +80,9 @@ public:
     // QAbstractItemModel interface
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
 
     QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
-    QString contactName(const QString &jid) const;
     bool isOwnNameReceived() const;
     QString ownName() const;
 

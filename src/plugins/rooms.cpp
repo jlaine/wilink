@@ -510,7 +510,7 @@ void ChatRoomWatcher::invitationReceived(const QString &roomJid, const QString &
     if (chat->panel(roomJid) || invitations.contains(roomJid))
         return;
 
-    const QString contactName = chat->rosterModel()->contactName(jid);
+    const QString contactName = jid;
 
     QString message = tr("%1 has asked to add you to join the '%2' chat room").arg(contactName, roomJid);
     if(!reason.isNull() && !reason.isEmpty())
