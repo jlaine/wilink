@@ -30,7 +30,7 @@ Dialog {
     onAccepted: {
         if (roomEdit.text.length) {
             dialog.hide();
-            showPanel('RoomPanel.qml', {'jid': view.model.rootJid})
+            showRoom(view.model.rootJid);
         }
     }
 
@@ -116,7 +116,7 @@ Dialog {
                 anchors.fill: parent
                 onClicked: {
                     dialog.hide();
-                    showPanel('RoomPanel.qml', {'jid': view.model.rootJid})
+                    showRoom(view.model.rootJid);
                 }
             }
         }

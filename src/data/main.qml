@@ -28,23 +28,27 @@ Item {
         id: panels
     }
 
-    function propEquals(a, b) {
-        if (a.length != b.length)
-            return false;
-        for (var key in a) {
-            if (a[key] != b[key])
-                return false;
-        }
-        return true;
-    }
-
     function showConversation(jid) {
         showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
+    }
+
+    function showRoom(jid) {
+        showPanel('RoomPanel.qml', {'jid': jid})
     }
 
     function showPanel(source, properties) {
         if (properties == undefined)
             properties = {};
+
+        function propEquals(a, b) {
+            if (a.length != b.length)
+                return false;
+            for (var key in a) {
+                if (a[key] != b[key])
+                    return false;
+            }
+            return true;
+        }
 
         var found = false;
         for (var i = 0; i < panels.count; i += 1) {
@@ -182,7 +186,7 @@ Item {
                     dialog.source = 'RoomJoinDialog.qml';
                     dialog.item.show();
                 }
-                onItemClicked: showPanel('RoomPanel.qml', {'jid': model.jid})
+                onItemClicked: showRoom(model.jid)
             }
         }
 
