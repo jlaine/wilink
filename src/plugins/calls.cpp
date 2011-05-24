@@ -47,7 +47,6 @@
 #include "QSoundMeter.h"
 
 #include "calls.h"
-#include "chats.h"
 
 #include "application.h"
 #include "chat.h"

@@ -33,7 +33,7 @@ class QUrl;
 class QXmppArchiveChat;
 class QXmppArchiveManager;
 
-class ChatDialogHelper : public QObject
+class Conversation : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
@@ -44,7 +44,7 @@ class ChatDialogHelper : public QObject
     Q_PROPERTY(int remoteState READ remoteState NOTIFY remoteStateChanged)
 
 public:
-    ChatDialogHelper(QObject *parent = 0);
+    Conversation(QObject *parent = 0);
 
     ChatClient *client() const;
     void setClient(ChatClient *client);

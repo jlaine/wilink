@@ -42,7 +42,7 @@
 #include "chat_plugin.h"
 #include "chat_roster.h"
 
-#include "chats.h"
+#include "conversations.h"
 
 #ifdef WILINK_EMBEDDED
 #define HISTORY_DAYS 7
@@ -50,7 +50,7 @@
 #define HISTORY_DAYS 14
 #endif
 
-ChatDialogHelper::ChatDialogHelper(QObject *parent)
+Conversation::Conversation(QObject *parent)
     : QObject(parent),
     m_archivesFetched(false),
     m_client(0),
@@ -61,12 +61,12 @@ ChatDialogHelper::ChatDialogHelper(QObject *parent)
     m_historyModel = new ChatHistoryModel(this);
 }
 
-ChatClient *ChatDialogHelper::client() const
+ChatClient *Conversation::client() const
 {
     return m_client;
 }
 
-void ChatDialogHelper::setClient(ChatClient *client)
+void Conversation::setClient(ChatClient *client)
 {
     bool check;
 
@@ -91,17 +91,17 @@ void ChatDialogHelper::setClient(ChatClient *client)
     }
 }
 
-ChatHistoryModel *ChatDialogHelper::historyModel() const
+ChatHistoryModel *Conversation::historyModel() const
 {
     return m_historyModel;
 }
 
-ChatRosterModel *ChatDialogHelper::rosterModel() const
+ChatRosterModel *Conversation::rosterModel() const
 {
     return qobject_cast<ChatRosterModel*>(m_historyModel->participantModel());
 }
 
-void ChatDialogHelper::setRosterModel(ChatRosterModel *rosterModel)
+void Conversation::setRosterModel(ChatRosterModel *rosterModel)
 {
     if (rosterModel != m_historyModel->participantModel()) {
         m_historyModel->setParticipantModel(rosterModel);
@@ -109,12 +109,12 @@ void ChatDialogHelper::setRosterModel(ChatRosterModel *rosterModel)
     }
 }
 
-QString ChatDialogHelper::jid() const
+QString Conversation::jid() const
 {
     return m_jid;
 }
 
-void ChatDialogHelper::setJid(const QString &jid)
+void Conversation::setJid(const QString &jid)
 {
     if (jid != m_jid) {
         m_jid = jid;
@@ -125,12 +125,12 @@ void ChatDialogHelper::setJid(const QString &jid)
     }
 }
 
-int ChatDialogHelper::localState() const
+int Conversation::localState() const
 {
     return m_localState;
 }
 
-void ChatDialogHelper::setLocalState(int state)
+void Conversation::setLocalState(int state)
 {
     if (state != m_localState) {
         m_localState = static_cast<QXmppMessage::State>(state);
@@ -147,12 +147,12 @@ void ChatDialogHelper::setLocalState(int state)
     }
 }
 
-int ChatDialogHelper::remoteState() const
+int Conversation::remoteState() const
 {
     return m_remoteState;
 }
 
-void ChatDialogHelper::archiveChatReceived(const QXmppArchiveChat &chat)
+void Conversation::archiveChatReceived(const QXmppArchiveChat &chat)
 {
     if (jidToBareJid(chat.with()) != m_jid)
         return;
@@ -168,14 +168,14 @@ void ChatDialogHelper::archiveChatReceived(const QXmppArchiveChat &chat)
     }
 }
 
-void ChatDialogHelper::archiveListReceived(const QList<QXmppArchiveChat> &chats)
+void Conversation::archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     for (int i = chats.size() - 1; i >= 0; i--)
         if (jidToBareJid(chats[i].with()) == m_jid)
             m_client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start());
 }
 
-void ChatDialogHelper::fetchArchives()
+void Conversation::fetchArchives()
 {
     if (m_archivesFetched || !m_client || !m_historyModel || m_jid.isEmpty())
         return;
@@ -185,7 +185,7 @@ void ChatDialogHelper::fetchArchives()
     m_archivesFetched = true;
 }
 
-void ChatDialogHelper::messageReceived(const QXmppMessage &msg)
+void Conversation::messageReceived(const QXmppMessage &msg)
 {
     if (msg.type() != QXmppMessage::Chat ||
         jidToBareJid(msg.from()) != m_jid)
@@ -218,7 +218,7 @@ void ChatDialogHelper::messageReceived(const QXmppMessage &msg)
     wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
-bool ChatDialogHelper::sendMessage(const QString &body)
+bool Conversation::sendMessage(const QString &body)
 {
     if (m_jid.isEmpty() || !m_client || !m_client->isConnected())
         return false;

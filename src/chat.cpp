@@ -76,8 +76,8 @@
 #include "chat_roster.h"
 #include "chat_status.h"
 #include "chat_utils.h"
-#include "plugins/chats.h"
 #include "plugins/console.h"
+#include "plugins/conversations.h"
 #include "plugins/declarative.h"
 #include "plugins/diagnostics.h"
 #include "plugins/discovery.h"
@@ -125,7 +125,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
 
     qmlRegisterUncreatableType<ChatClient>("wiLink", 1, 2, "Client", "");
-    qmlRegisterType<ChatDialogHelper>("wiLink", 1, 2, "Conversation");
+    qmlRegisterType<Conversation>("wiLink", 1, 2, "Conversation");
     qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");

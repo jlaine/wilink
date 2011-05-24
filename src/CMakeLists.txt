@@ -64,8 +64,8 @@ set(wiLink_SOURCES
     updates.cpp
     updatesdialog.cpp
     plugins/calls.cpp
-    plugins/chats.cpp
     plugins/console.cpp
+    plugins/conversations.cpp
     plugins/declarative.cpp
     plugins/diagnostics.cpp
     plugins/discovery.cpp
@@ -104,8 +104,8 @@ set(wiLink_MOC_HEADERS
     updates.h
     updatesdialog.h
     plugins/calls.h
-    plugins/chats.h
     plugins/console.h
+    plugins/conversations.h
     plugins/declarative.h
     plugins/diagnostics.h
     plugins/discovery.h
