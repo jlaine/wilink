@@ -49,18 +49,13 @@ Rectangle {
     }
 
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
-    Rectangle {
+    BorderImage {
         id: shadow
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.bottom
-        anchors.topMargin: -dialog.radius
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: '#66000000' }
-            GradientStop { position: 1.0; color: '#00000000' }
-        }
-        height: 2 * dialog.radius
+        anchors.fill: dialog
+        anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
+        border { left: 10; top: 10; right: 10; bottom: 10 }
+        source: 'shadow.png'
+        smooth: true
         z: -1
     }
 

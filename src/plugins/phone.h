@@ -20,34 +20,103 @@
 #ifndef __WILINK_PHONE_H__
 #define __WILINK_PHONE_H__
 
-#include "chat_panel.h"
+#include <QAbstractListModel>
+#include <QList>
+#include <QUrl>
 
-#include "plugins/phone/sip.h"
+#include "QXmppCallManager.h"
+#include "QXmppRtpChannel.h"
 
-class QAbstractButton;
-class QDeclarativeView;
-class Chat;
-class PhoneCallsModel;
+class QAuthenticator;
+class QNetworkAccessManager;
+class QNetworkReply;
+class QNetworkRequest;
+class QTimer;
+class PhoneCallsItem;
 class SipCall;
+class SipClient;
 
-class PhonePanel : public ChatPanel
+class PhoneCallsModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(SipClient* client READ client CONSTANT)
+    Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
+    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
+    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
+    Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
+    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
+    Q_PROPERTY(QString phoneNumber READ phoneNumber NOTIFY phoneNumberChanged)
+    Q_PROPERTY(QUrl selfcareUrl READ selfcareUrl NOTIFY selfcareUrlChanged)
 
 public:
-    PhonePanel(Chat *chatWindow, QWidget *parent = NULL);
+    enum Role {
+        AddressRole = Qt::UserRole,
+        ActiveRole,
+        DirectionRole,
+        DateRole,
+        DurationRole,
+        IdRole,
+        NameRole,
+        StateRole,
+    };
+
+    PhoneCallsModel(QObject *parent = 0);
+    ~PhoneCallsModel();
+
+    SipClient *client() const;
+    int currentCalls() const;
+    bool enabled() const;
+    int inputVolume() const;
+    int maximumVolume() const;
+    int outputVolume() const;
+    QString phoneNumber() const;
+    QUrl selfcareUrl() const;
+
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+signals:
+    void currentCallsChanged();
+    void enabledChanged(bool enabled);
+    void error(const QString &error);
+    void inputVolumeChanged(int inputVolume);
+    void outputVolumeChanged(int outputVolume);
+    void phoneNumberChanged(const QString &phoneNumber);
+    void selfcareUrlChanged(const QUrl& selfcareUrl);
+
+public slots:
+    void addCall(SipCall *call);
+    bool call(const QString &address);
+    void hangup();
+    void startTone(QXmppRtpAudioChannel::Tone tone);
+    void stopTone(QXmppRtpAudioChannel::Tone tone);
 
 private slots:
-    void callButtonClicked(QAbstractButton *button);
-    void callReceived(SipCall *call);
-    void handleSettings();
-    void openUrl(const QUrl &url);
+    void callRinging();
+    void callStateChanged(QXmppCall::State state);
+    void callTick();
+    void _q_getSettings();
+    void _q_handleCreate();
+    void _q_handleList();
+    void _q_handleSettings();
+    void _q_openUrl(const QUrl &url);
 
 private:
-    PhoneCallsModel *m_callsModel;
-    QDeclarativeView *declarativeView;
+    QList<SipCall*> activeCalls() const;
+    QNetworkRequest buildRequest(const QUrl &url) const;
+
+    SipClient *m_client;
+    bool m_enabled;
+    QList<PhoneCallsItem*> m_items;
+    QNetworkAccessManager *m_network;
+    QString m_phoneNumber;
     bool m_registeredHandler;
-    Chat *m_window;
+    QUrl m_selfcareUrl;
+    QTimer *m_ticker;
+    QTimer *m_timer;
+    QUrl m_url;
 };
 
 #endif

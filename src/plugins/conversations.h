@@ -22,16 +22,10 @@
 
 #include "QXmppMessage.h"
 
-#include "chat_panel.h"
-
-class Chat;
 class ChatClient;
 class ChatHistoryModel;
 class ChatRosterModel;
-class QDeclarativeView;
-class QUrl;
 class QXmppArchiveChat;
-class QXmppArchiveManager;
 
 class Conversation : public QObject
 {
@@ -85,29 +79,6 @@ private:
     QXmppMessage::State m_localState;
     QString m_jid;
     QXmppMessage::State m_remoteState;
-};
-
-class ChatDialogPanel : public ChatPanel
-{
-    Q_OBJECT
-
-public:
-    ChatDialogPanel(Chat *chatWindow, const QString &jid);
-};
-
-class ChatsWatcher : public QObject
-{
-    Q_OBJECT
-
-public:
-    ChatsWatcher(Chat *chatWindow);
-
-private slots:
-    void messageReceived(const QXmppMessage &msg);
-    void urlClick(const QUrl &url);
-
-private:
-    Chat *chat;
 };
 
 #endif

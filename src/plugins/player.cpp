@@ -36,7 +36,7 @@
 
 #include "application.h"
 #include "chat.h"
-#include "chat_plugin.h"
+#include "declarative.h"
 #include "player.h"
 
 enum PlayerRole {
@@ -269,7 +269,7 @@ PlayerModel::PlayerModel(QObject *parent)
 
     d->networkCache = new QNetworkDiskCache(this);
     d->networkCache->setCacheDirectory(wApp->cacheDirectory());
-    d->network = new QNetworkAccessManager(this);
+    d->network = new NetworkAccessManager(this);
     d->network->setCache(d->networkCache);
 
     // init player
@@ -567,21 +567,4 @@ bool PlayerPanel::eventFilter(QObject *obj, QEvent *e)
     return false;
 }
 #endif
-
-// PLUGIN
-
-class PlayerPlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Media player"; };
-};
-
-bool PlayerPlugin::initialize(Chat *chat)
-{
-    qmlRegisterType<PlayerModel>("wiLink", 1, 2, "PlayerModel");
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(player, PlayerPlugin)
 

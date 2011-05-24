@@ -23,6 +23,7 @@
 #include <QAbstractItemModel>
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QNetworkAccessManager>
 
 #include "QXmppMessage.h"
 
@@ -82,6 +83,15 @@ signals:
 
 private:
     QAbstractItemModel *m_model;
+};
+
+class NetworkAccessManager : public QNetworkAccessManager
+{
+public:
+    NetworkAccessManager(QObject *parent = 0);
+
+protected:
+    virtual QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData = 0);
 };
 
 #endif

@@ -24,66 +24,16 @@ import 'utils.js' as Utils
 Item {
     id: root
 
-    ListModel {
-        id: panels
-    }
-
+    /** Convenience method to show a conversation panel.
+     */
     function showConversation(jid) {
-        showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
+        swapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
     }
 
+    /** Convenience method to show a chat room panel.
+     */
     function showRoom(jid) {
-        showPanel('RoomPanel.qml', {'jid': jid})
-    }
-
-    function showPanel(source, properties) {
-        if (properties == undefined)
-            properties = {};
-
-        function propEquals(a, b) {
-            if (a.length != b.length)
-                return false;
-            for (var key in a) {
-                if (a[key] != b[key])
-                    return false;
-            }
-            return true;
-        }
-
-        var found = false;
-        for (var i = 0; i < panels.count; i += 1) {
-            if (panels.get(i).source == source &&
-                propEquals(panels.get(i).properties, properties)) {
-                panels.get(i).panel.z = 1;
-                found = true;
-            } else {
-                panels.get(i).panel.z = 0;
-            }
-        }
-        if (found)
-            return;
-
-        // create panel
-        console.log("creating panel " + source + " " + properties);
-        var component = Qt.createComponent(source);
-        var panel = component.createObject(swapper, properties);
-        // FIXME: why doesn't createObject assign the properties??
-        for (var key in properties) {
-            panel[key] = properties[key];
-        }
-
-        panel.close.connect(function() {
-            for (var i = 0; i < panels.count; i += 1) {
-                if (panels.get(i).panel == panel) {
-                    console.log("removing panel " + panels.get(i).source + " " + panels.get(i).properties);
-                    panels.remove(i);
-                    panel.destroy();
-                    break;
-                }
-            }
-        })
-        panels.append({'source': source, 'properties': properties, 'panel': panel});
-        return panel;
+        swapper.showPanel('RoomPanel.qml', {'jid': jid})
     }
 
     Item {
@@ -92,72 +42,78 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 220
+        width: 240
 
         Rectangle {
-            id: toolbar
+            id: dockBackground
 
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.right: parent.right
-            height: 46
-            gradient: Gradient {
-                GradientStop { position: 0; color: '#6ea1f1' }
-                GradientStop { position: 1; color: '#567dbc' }
-            }
+            anchors.bottom: parent.bottom
+            color: '#6ea1f1'
+            width: 24
+        }
 
-            Row {
+        Rectangle {
+            id: dock
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            z: 1
+
+            Column {
+                id: control
                 anchors.top: parent.top
                 anchors.left: parent.left
 
-                ToolButton {
-                    text: qsTr('Diagnostics')
+                DockButton {
                     icon: 'diagnostics.png'
-                    onClicked: showPanel('DiagnosticPanel.qml')
+                    text: qsTr('Diagnostics')
+                    onClicked: swapper.showPanel('DiagnosticPanel.qml')
                 }
 
 /*
-                ToolButton {
+                DockButton {
                     text: 'Debugging'
                     icon: 'options.png'
-                    onClicked: showPanel('LogPanel.qml')
+                    onClicked: swapper.showPanel('LogPanel.qml')
                 }
 
-                ToolButton {
+                DockButton {
                     text: 'Discovery'
                     icon: 'options.png'
-                    onClicked: showPanel('DiscoveryPanel.qml')
+                    onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
 
-                ToolButton {
+                DockButton {
                     text: 'Media'
                     icon: 'start.png'
-                    onClicked: showPanel('PlayerPanel.qml')
+                    onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
 */
 
-                ToolButton {
-                    text: qsTr('Phone')
+                DockButton {
                     icon: 'phone.png'
-                    onClicked: Qt.openUrlExternally('sip://')
+                    text: qsTr('Phone')
+                    onClicked: swapper.showPanel('PhonePanel.qml')
                 }
 
-                ToolButton {
-
-                    text: qsTr('Photos')
+                DockButton {
                     icon: 'photos.png'
+                    text: qsTr('Photos')
                     onClicked: {
                         var domain = Utils.jidToDomain(window.client.jid);
                         if (domain == 'wifirst.net')
-                            showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
+                            swapper.showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
                         else if (domain == 'gmail.com')
-                            showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
+                            swapper.showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
                     }
                 }
 
-                ToolButton {
-                    text: qsTr('Shares')
+                DockButton {
                     icon: 'share.png'
+                    text: qsTr('Shares')
                     visible: window.client.shareServer != ''
                 }
             }
@@ -171,11 +127,13 @@ Item {
         RosterView {
             id: rooms
 
-            anchors.left: parent.left
+            anchors.left: dockBackground.right
             anchors.right: parent.right
-            anchors.top: toolbar.bottom
+            anchors.top: parent.top
+            currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
+                id: roomListModel
                 client: window.client
             }
             title: qsTr('My rooms')
@@ -193,7 +151,7 @@ Item {
         Rectangle {
             id: splitter
 
-            anchors.left: parent.left
+            anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: rooms.bottom
             color: '#567dbc'
@@ -232,10 +190,11 @@ Item {
         RosterView {
             id: contacts
 
-            anchors.left: parent.left
+            anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
+            currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
             model: contactModel
             title: qsTr('My contacts')
 
@@ -388,12 +347,16 @@ Item {
         }
     }
 
-    Item {
+    PanelSwapper {
         id: swapper
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
+    }
+
+    Loader {
+        source: (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : ''
     }
 }

@@ -23,9 +23,7 @@
 #include "application.h"
 #include "updatesdialog.h"
 
-Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(phone)
-Q_IMPORT_PLUGIN(rooms)
 
 int main(int argc, char *argv[])
 {

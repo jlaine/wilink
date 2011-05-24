@@ -28,6 +28,7 @@
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
+#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
@@ -60,6 +61,7 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppMucManager.h"
 #include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
 #include "QXmppRtpChannel.h"
@@ -81,10 +83,22 @@
 #include "plugins/declarative.h"
 #include "plugins/diagnostics.h"
 #include "plugins/discovery.h"
+#include "plugins/phone.h"
+#include "plugins/phone/sip.h"
+#include "plugins/player.h"
 #include "plugins/rooms.h"
 #include "plugins/photos.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
+
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+public:
+    QNetworkAccessManager *create(QObject * parent)
+    {
+        return new NetworkAccessManager(parent);
+    }
+};
 
 class ChatPrivate
 {
@@ -131,8 +145,12 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
+    qmlRegisterType<PhoneCallsModel>("wiLink", 1, 2, "PhoneCallsModel");
+    qmlRegisterUncreatableType<SipClient>("wiLink", 1, 2, "SipClient", "");
+    qmlRegisterUncreatableType<SipCall>("wiLink", 1, 2, "SipCall", "");
     qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
     qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
+    qmlRegisterType<PlayerModel>("wiLink", 1, 2, "PlayerModel");
     qmlRegisterType<RoomModel>("wiLink", 1, 2, "RoomModel");
     qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
@@ -186,6 +204,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
     d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
+    d->rosterView->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
 
     d->rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
     d->rosterView->setAttribute(Qt::WA_NoSystemBackground);

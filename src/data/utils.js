@@ -47,3 +47,17 @@ function jidToUser(jid) {
         return '';
     return jid.substring(0, pos);
 }
+
+// There's no getElementsByTagName method in QML
+// ([http://www.mail-archive.com/qt-qml@trolltech.com/msg01024.html]), so we'll
+// implement our own version.
+function getElementsByTagName(rootElement, tagName) {
+    var childNodes = rootElement.childNodes;
+    var elements = [];
+    for (var i = 0; i < childNodes.length; i++) {
+        if (childNodes[i].nodeName == tagName) {
+            elements.push(childNodes[i]);
+        }
+    }
+    return elements;
+}

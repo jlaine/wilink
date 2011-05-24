@@ -37,6 +37,7 @@
     <file>refresh.png</file>
     <file>remove.png</file>
     <file>search.png</file>
+    <file>shadow.png</file>
     <file>share.png</file>
     <file>smiley-angry.png</file>
     <file>smiley-confused.png</file>
@@ -62,6 +63,7 @@
     <file>DiagnosticPanel.qml</file>
     <file>Dialog.qml</file>
     <file>DiscoveryPanel.qml</file>
+    <file>DockButton.qml</file>
     <file>HistoryView.qml</file>
     <file>KeyPad.qml</file>
     <file>LogPanel.qml</file>
@@ -69,6 +71,7 @@
     <file>Panel.qml</file>
     <file>PanelHeader.qml</file>
     <file>PanelHelp.qml</file>
+    <file>PanelSwapper.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>PhonePanel.qml</file>
     <file>PhotoPanel.qml</file>
@@ -85,6 +88,7 @@
     <file>ShareView.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
+    <file>Wifirst.qml</file>
     <!-- Stylesheets -->
     <file>wiLink.css</file>
     <!-- Sounds -->

@@ -17,45 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_MENU_H__
-#define __WILINK_MENU_H__
+#ifndef __WILINK_PHONE_H__
+#define __WILINK_PHONE_H__
 
-#include <QMap>
-#include <QObject>
-#include <QStringList>
-#include <QUrl>
+#include "chat_panel.h"
 
-class QAction;
-class QMenu;
-class QNetworkAccessManager;
-class QNetworkReply;
-class QTimer;
+#include "plugins/phone/models.h"
+#include "plugins/phone/sip.h"
+
+class QAbstractButton;
+class QDeclarativeView;
 class Chat;
+class PhoneCallsModel;
+class SipCall;
 
-class Menu : public QObject
+class PhonePanel : public ChatPanel
 {
     Q_OBJECT
 
 public:
-    Menu(Chat *window);
+    PhonePanel(Chat *chatWindow, QWidget *parent = NULL);
 
 private slots:
-    void connected();
-    void fetchMenu();
-    void openUrl();
-    void showIcon();
-    void showMenu();
+    void callButtonClicked(QAbstractButton *button);
+    void callReceived(SipCall *call);
 
 private:
-    void fetchIcon(const QUrl &url, QAction *action);
-
-    QMap<QNetworkReply *, QAction *> icons;
-    QNetworkAccessManager *network;
-    int refreshInterval;
-
-    Chat *chatWindow;
-    QMenu *servicesMenu;
-    QTimer *timer;
+    PhoneCallsModel *m_callsModel;
+    QDeclarativeView *declarativeView;
+    Chat *m_window;
 };
 
 #endif

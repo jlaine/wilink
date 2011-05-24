@@ -17,9 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
 #include <QMessageBox>
+#include <QNetworkRequest>
+
+#include "qnetio/wallet.h"
 
 #include "chat.h"
 #include "chat_plugin.h"
@@ -62,5 +66,24 @@ void ListHelper::setModel(QObject *model)
         m_model = itemModel;
         emit modelChanged(model);
     }
+}
+
+NetworkAccessManager::NetworkAccessManager(QObject *parent)
+    : QNetworkAccessManager(parent)
+{
+    bool check;
+
+    check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
+                             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+}
+
+QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData)
+{
+    QNetworkRequest request(req);
+    request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
+    request.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 

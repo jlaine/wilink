@@ -18,13 +18,6 @@
  */
 
 #include <QDateTime>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeItem>
-#include <QDeclarativeView>
-#include <QLabel>
-#include <QLayout>
-#include <QPushButton>
 #include <QTimer>
 
 #include "QSoundPlayer.h"
@@ -36,13 +29,10 @@
 #include "QXmppUtils.h"
 
 #include "application.h"
-#include "chat.h"
 #include "chat_client.h"
-#include "chat_history.h"
-#include "chat_plugin.h"
-#include "chat_roster.h"
-
 #include "conversations.h"
+#include "chat_history.h"
+#include "chat_roster.h"
 
 #ifdef WILINK_EMBEDDED
 #define HISTORY_DAYS 7
@@ -251,110 +241,4 @@ bool Conversation::sendMessage(const QString &body)
     wApp->soundPlayer()->play(wApp->outgoingMessageSound());
     return true;
 }
-
-ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
-    : ChatPanel(chatWindow)
-{
-    bool check;
-    setObjectName(jid);
-
-    // header
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    // chat history
-    QDeclarativeView *declarativeView = new QDeclarativeView;
-    QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("globalJid", QVariant::fromValue(jid));
-    context->setContextProperty("window", chatWindow);
-    declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
-    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/ConversationPanel.qml"));
-
-    layout->addWidget(declarativeView);
-    setFocusProxy(declarativeView);
-
-    // connect signals
-    check = connect(declarativeView->rootObject(), SIGNAL(close()),
-                    this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(hidePanel()),
-                    this, SLOT(deleteLater()));
-    Q_ASSERT(check);
-}
-
-/** Constructs a new ChatsWatcher, an observer which catches incoming messages
- *  and clicks on the roster and opens conversations as appropriate.
- *
- * @param chatWindow
- */
-ChatsWatcher::ChatsWatcher(Chat *chatWindow)
-    : QObject(chatWindow), chat(chatWindow)
-{
-    bool check;
-
-    check = connect(chat->client(), SIGNAL(messageReceived(QXmppMessage)),
-                    this, SLOT(messageReceived(QXmppMessage)));
-    Q_ASSERT(check);
-
-    // add roster hooks
-    check = connect(chat, SIGNAL(urlClick(QUrl)),
-                    this, SLOT(urlClick(QUrl)));
-    Q_ASSERT(check);
-}
-
-/** When a chat message is received, if we do not have an open conversation
- *  with the sender, create one.
- *
- * @param msg The received message.
- */
-void ChatsWatcher::messageReceived(const QXmppMessage &msg)
-{
-    const QString bareJid = jidToBareJid(msg.from());
-
-    if (msg.type() == QXmppMessage::Chat && !chat->panel(bareJid) && !msg.body().isEmpty())
-    {
-        ChatDialogPanel *dialog = new ChatDialogPanel(chat, bareJid);
-        chat->addPanel(dialog);
-
-        // FIXME: this is a hack to 'receive' the message now that the
-        // panel is created
-        QMetaObject::invokeMethod(chat->client(), "messageReceived", Q_ARG(QXmppMessage, msg));
-    }
-}
-
-/** Open a XMPP URI if it refers to a conversation.
- */
-void ChatsWatcher::urlClick(const QUrl &url)
-{
-    if (url.scheme() == "xmpp" && url.hasQueryItem("message")) {
-        QString jid = url.path();
-        if (jid.startsWith("/"))
-            jid.remove(0, 1);
-        ChatPanel *panel = chat->panel(jid);
-        if (!panel) {
-            panel = new ChatDialogPanel(chat, jid);
-            chat->addPanel(panel);
-        }
-        QTimer::singleShot(0, panel, SIGNAL(showPanel()));
-    }
-}
-
-// PLUGIN
-
-class ChatsPlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Person-to-person chat"; };
-};
-
-bool ChatsPlugin::initialize(Chat *chat)
-{
-    new ChatsWatcher(chat);
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(chats, ChatsPlugin)
 

@@ -34,8 +34,9 @@ Panel {
     }
 
     VCard {
-        id: ownCard
-        jid: window.client.jid
+        // NOTE: this is a hack so that we don't join the room before
+        // the room object was created
+        jid: Qt.isQtObject(room) ? Utils.jidToBareJid(window.client.jid) : ''
 
         onNameChanged: {
             room.nickName = name;
@@ -56,7 +57,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: 'chat.png'
-        title: '<b>' + Utils.jidToUser(room.jid) + '</b>' + '<br/>' + room.subject
+        title: '<b>' + Utils.jidToUser(jid) + '</b>' + '<br/>' + (Qt.isQtObject(room) ? room.subject : '')
         z: 1
 
         Row {
@@ -77,7 +78,7 @@ Panel {
             ToolButton {
                 icon: 'chat.png'
                 text: qsTr('Subject')
-                visible: room.allowedActions & QXmppMucRoom.SubjectAction
+                visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
 
                 onClicked: {
                     var dialog = window.inputDialog();
@@ -107,6 +108,7 @@ Panel {
                 text: qsTr('Close')
                 onClicked: {
                     room.leave();
+                    roomListModel.removeRoom(room.jid);
                     participantModel.unbookmark();
                     panel.close();
                 }
@@ -184,7 +186,7 @@ Panel {
             box.icon = QMessageBox.Warning;
             box.windowTitle = qsTr('Chat room error');
             // FIXME: get reason
-            box.text = qsTr("Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', '');
+            box.text = qsTr("Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', jid).replace('%2', '');
             box.show();
         }
 
@@ -196,7 +198,7 @@ Panel {
             var box = window.messageBox();
             box.icon = QMessageBox.Warning;
             box.windowTitle = qsTr('Chat room error');
-            box.text = qsTr("Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason);
+            box.text = qsTr("Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', jid).replace('%2', reason);
             box.show();
         }
     }
