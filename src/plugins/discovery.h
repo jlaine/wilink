@@ -35,12 +35,16 @@ class QXmppDiscoveryManager;
 class DiscoveryModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(bool details READ details WRITE setDetails NOTIFY detailsChanged)
     Q_PROPERTY(QXmppDiscoveryManager* manager READ manager WRITE setManager NOTIFY managerChanged)
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
     Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
 
 public:
     DiscoveryModel(QObject *parent = 0);
+
+    bool details() const;
+    void setDetails(bool details);
 
     QXmppDiscoveryManager *manager() const;
     void setManager(QXmppDiscoveryManager *manager);
@@ -55,6 +59,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
+    void detailsChanged(bool details);
     void managerChanged(QXmppDiscoveryManager *manager);
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
@@ -68,6 +73,7 @@ private slots:
 
 private:
     QXmppClient *m_client;
+    bool m_details;
     QXmppDiscoveryManager *m_manager;
     QStringList m_requests;
     QString m_rootJid;
