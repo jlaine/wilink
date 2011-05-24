@@ -32,12 +32,13 @@ SOURCES += \
     ../plugins/console.cpp \
     ../plugins/conversations.cpp \
     ../plugins/declarative.cpp \
+    ../plugins/diagnostics.cpp \
+    ../plugins/discovery.cpp \
     ../plugins/phone.cpp \
     ../plugins/phone/models.cpp \
     ../plugins/phone/sip.cpp \
     ../plugins/photos.cpp \
     ../plugins/rooms.cpp \
-    ../plugins/transfers.cpp \
     main.cpp
 
 HEADERS += \
@@ -62,13 +63,14 @@ HEADERS += \
     ../plugins/console.h \
     ../plugins/conversations.h \
     ../plugins/declarative.h \
+    ../plugins/diagnostics.h \
+    ../plugins/discovery.h \
     ../plugins/photos.h \
     ../plugins/phone.h \
     ../plugins/phone/models.h \
     ../plugins/phone/sip.h \
     ../plugins/phone/sip_p.h \
     ../plugins/rooms.h \
-    ../plugins/transfers.h \
     config.h
 
 mac {
