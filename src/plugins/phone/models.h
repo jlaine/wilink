@@ -99,9 +99,10 @@ private slots:
     void callStateChanged(QXmppCall::State state);
     void callTick();
     void getSettings();
-    void handleCreate();
-    void handleList();
-    void handleSettings();
+    void _q_handleCreate();
+    void _q_handleList();
+    void _q_handleSettings();
+    void _q_openUrl(const QUrl &url);
 
 private:
     QList<SipCall*> activeCalls() const;
@@ -112,6 +113,7 @@ private:
     QList<PhoneCallsItem*> m_items;
     QNetworkAccessManager *m_network;
     QString m_phoneNumber;
+    bool m_registeredHandler;
     QUrl m_selfcareUrl;
     QTimer *m_ticker;
     QUrl m_url;

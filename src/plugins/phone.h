@@ -22,6 +22,7 @@
 
 #include "chat_panel.h"
 
+#include "plugins/phone/models.h"
 #include "plugins/phone/sip.h"
 
 class QAbstractButton;
@@ -40,13 +41,10 @@ public:
 private slots:
     void callButtonClicked(QAbstractButton *button);
     void callReceived(SipCall *call);
-    void handleSettings();
-    void openUrl(const QUrl &url);
 
 private:
     PhoneCallsModel *m_callsModel;
     QDeclarativeView *declarativeView;
-    bool m_registeredHandler;
     Chat *m_window;
 };
 

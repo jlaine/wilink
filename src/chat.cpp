@@ -82,6 +82,8 @@
 #include "plugins/declarative.h"
 #include "plugins/diagnostics.h"
 #include "plugins/discovery.h"
+#include "plugins/phone.h"
+#include "plugins/player.h"
 #include "plugins/rooms.h"
 #include "plugins/photos.h"
 #include "systeminfo.h"
@@ -132,8 +134,12 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
+    qmlRegisterType<PhoneCallsModel>("wiLink", 1, 2, "PhoneCallsModel");
+    qmlRegisterUncreatableType<SipClient>("wiLink", 1, 2, "SipClient", "");
+    qmlRegisterUncreatableType<SipCall>("wiLink", 1, 2, "SipCall", "");
     qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
     qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
+    qmlRegisterType<PlayerModel>("wiLink", 1, 2, "PlayerModel");
     qmlRegisterType<RoomModel>("wiLink", 1, 2, "RoomModel");
     qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");

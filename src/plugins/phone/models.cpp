@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QNetworkAccessManager>
@@ -33,6 +34,7 @@
 #include "qnetio/wallet.h"
 
 #include "application.h"
+#include "chat_history.h"
 #include "models.h"
 #include "sip.h"
 
@@ -97,7 +99,8 @@ void PhoneCallsItem::parse(const QDomElement &callElement)
  */
 PhoneCallsModel::PhoneCallsModel(QObject *parent)
     : QAbstractListModel(parent),
-    m_enabled(false)
+    m_enabled(false),
+    m_registeredHandler(false)
 {
     bool check;
 
@@ -183,7 +186,7 @@ void PhoneCallsModel::addCall(SipCall *call)
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
     item->reply = m_network->post(request, item->data());
     connect(item->reply, SIGNAL(finished()),
-            this, SLOT(handleCreate()));
+            this, SLOT(_q_handleCreate()));
 
     beginInsertRows(QModelIndex(), 0, 0);
     m_items.prepend(item);
@@ -368,138 +371,7 @@ void PhoneCallsModel::getSettings()
     req.setRawHeader("Accept", "application/xml");
     req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     QNetworkReply *reply = m_network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(handleSettings()));
-}
-
-/** Handles VoIP settings received from the server.
- */
-void PhoneCallsModel::handleSettings()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
-        return;
-    }
-
-    QDomDocument doc;
-    doc.setContent(reply);
-    QDomElement settings = doc.documentElement();
-
-    // parse settings from server
-    const bool enabled = settings.firstChildElement("enabled").text() == "true";
-    const QString domain = settings.firstChildElement("domain").text();
-    const QString username = settings.firstChildElement("username").text();
-    const QString password = settings.firstChildElement("password").text();
-    const QString number = settings.firstChildElement("number").text();
-    const QString callsUrl = settings.firstChildElement("calls-url").text();
-    const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
-
-    // update phone number
-    if (number != m_phoneNumber) {
-        m_phoneNumber = number;
-        emit phoneNumberChanged(m_phoneNumber);
-    }
-
-    // update selfcare url
-    if (selfcareUrl != m_selfcareUrl) {
-        m_selfcareUrl = selfcareUrl;
-        emit selfcareUrlChanged(m_selfcareUrl);
-    }
-
-    // check service is activated
-    const bool wasEnabled = m_enabled;
-    if (enabled && !domain.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-        // connect to SIP server
-        if (m_client->displayName() != number ||
-            m_client->domain() != domain ||
-            m_client->username() != username ||
-            m_client->password() != password)
-        {
-            m_client->setDisplayName(number);
-            m_client->setDomain(domain);
-            m_client->setUsername(username);
-            m_client->setPassword(password);
-            QMetaObject::invokeMethod(m_client, "connectToServer");
-        }
-
-        // retrieve call history
-        if (!callsUrl.isEmpty()) {
-            m_url = callsUrl;
-
-            QNetworkReply *reply = m_network->get(buildRequest(m_url));
-            connect(reply, SIGNAL(finished()), this, SLOT(handleList()));
-        }
-
-        m_enabled = true;
-    } else { 
-        m_enabled = false;
-        emit enabledChanged(m_enabled);
-    }
-    if (m_enabled != wasEnabled)
-        emit enabledChanged(m_enabled);
-}
-
-void PhoneCallsModel::handleCreate()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    // find the item
-    PhoneCallsItem *item = 0;
-    int row = -1;
-    for (int i = 0; i < m_items.size(); ++i) {
-        if (m_items[i]->reply == reply) {
-            item = m_items[i];
-            item->reply = 0;
-            row = i;
-            break;
-        }
-    }
-    if (!item)
-        return;
-
-    // update the item
-    QDomDocument doc;
-    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
-        qWarning("Failed to create phone call: %s", qPrintable(reply->errorString()));
-        return;
-    }
-    item->parse(doc.documentElement());
-    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
-}
-
-void PhoneCallsModel::handleList()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    QDomDocument doc;
-    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
-        qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
-        return;
-    }
-
-    QDomElement callElement = doc.documentElement().firstChildElement("call");
-    while (!callElement.isNull()) {
-        int id = callElement.firstChildElement("id").text().toInt();
-        foreach (PhoneCallsItem *item, m_items) {
-            if (item->id == id) {
-                id = 0;
-                break;
-            }
-        }
-        if (id > 0) {
-            PhoneCallsItem *item = new PhoneCallsItem;
-            item->parse(callElement);
-
-            beginInsertRows(QModelIndex(), 0, 0);
-            m_items.prepend(item);
-            endInsertRows();
-        }
-        callElement = callElement.nextSiblingElement("call");
-    }
+    connect(reply, SIGNAL(finished()), this, SLOT(_q_handleSettings()));
 }
 
 /** Hangs up all active calls.
@@ -596,3 +468,156 @@ void PhoneCallsModel::stopTone(QXmppRtpAudioChannel::Tone tone)
     foreach (SipCall *call, activeCalls())
         call->audioChannel()->stopTone(tone);
 }
+
+void PhoneCallsModel::_q_handleSettings()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    QDomDocument doc;
+    doc.setContent(reply);
+    QDomElement settings = doc.documentElement();
+
+    // parse settings from server
+    const bool enabled = settings.firstChildElement("enabled").text() == "true";
+    const QString domain = settings.firstChildElement("domain").text();
+    const QString username = settings.firstChildElement("username").text();
+    const QString password = settings.firstChildElement("password").text();
+    const QString number = settings.firstChildElement("number").text();
+    const QString callsUrl = settings.firstChildElement("calls-url").text();
+    const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
+
+    // update phone number
+    if (number != m_phoneNumber) {
+        m_phoneNumber = number;
+        emit phoneNumberChanged(m_phoneNumber);
+    }
+
+    // update selfcare url
+    if (selfcareUrl != m_selfcareUrl) {
+        m_selfcareUrl = selfcareUrl;
+        emit selfcareUrlChanged(m_selfcareUrl);
+    }
+
+    // check service is activated
+    const bool wasEnabled = m_enabled;
+    if (enabled && !domain.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
+        // connect to SIP server
+        if (m_client->displayName() != number ||
+            m_client->domain() != domain ||
+            m_client->username() != username ||
+            m_client->password() != password)
+        {
+            m_client->setDisplayName(number);
+            m_client->setDomain(domain);
+            m_client->setUsername(username);
+            m_client->setPassword(password);
+            QMetaObject::invokeMethod(m_client, "connectToServer");
+        }
+
+        // retrieve call history
+        if (!callsUrl.isEmpty()) {
+            m_url = callsUrl;
+
+            QNetworkReply *reply = m_network->get(buildRequest(m_url));
+            connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
+        }
+
+        // register URL handler
+        if (!m_registeredHandler) {
+            ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
+                QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_client->domain()));
+            QDesktopServices::setUrlHandler("sip", this, "_q_openUrl");
+            m_registeredHandler = true;
+        }
+
+        m_enabled = true;
+    } else { 
+        m_enabled = false;
+    }
+    if (m_enabled != wasEnabled)
+        emit enabledChanged(m_enabled);
+}
+
+void PhoneCallsModel::_q_handleCreate()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    // find the item
+    PhoneCallsItem *item = 0;
+    int row = -1;
+    for (int i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->reply == reply) {
+            item = m_items[i];
+            item->reply = 0;
+            row = i;
+            break;
+        }
+    }
+    if (!item)
+        return;
+
+    // update the item
+    QDomDocument doc;
+    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
+        qWarning("Failed to create phone call: %s", qPrintable(reply->errorString()));
+        return;
+    }
+    item->parse(doc.documentElement());
+    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+}
+
+void PhoneCallsModel::_q_handleList()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    QDomDocument doc;
+    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
+        qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
+        return;
+    }
+
+    QDomElement callElement = doc.documentElement().firstChildElement("call");
+    while (!callElement.isNull()) {
+        int id = callElement.firstChildElement("id").text().toInt();
+        foreach (PhoneCallsItem *item, m_items) {
+            if (item->id == id) {
+                id = 0;
+                break;
+            }
+        }
+        if (id > 0) {
+            PhoneCallsItem *item = new PhoneCallsItem;
+            item->parse(callElement);
+
+            beginInsertRows(QModelIndex(), 0, 0);
+            m_items.prepend(item);
+            endInsertRows();
+        }
+        callElement = callElement.nextSiblingElement("call");
+    }
+}
+
+void PhoneCallsModel::_q_openUrl(const QUrl &url)
+{
+    if (url.scheme() != "sip") {
+        qWarning("PhoneCallsModel got a non-SIP URL!");
+        return;
+    }
+
+    if (!url.path().isEmpty()) {
+        const QString phoneNumber = url.path().split('@').first();
+        const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
+        call(recipient);
+    }
+    // FIXME
+    //emit showPanel();
+}
+

@@ -163,7 +163,7 @@ Item {
                 ToolButton {
                     text: qsTr('Phone')
                     icon: 'phone.png'
-                    onClicked: Qt.openUrlExternally('sip://')
+                    onClicked: showPanel('PhonePanel.qml')
                 }
 
                 ToolButton {

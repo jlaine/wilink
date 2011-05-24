@@ -23,7 +23,6 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
-#include <QDesktopServices>
 #include <QDomDocument>
 #include <QLayout>
 #include <QMessageBox>
@@ -34,8 +33,6 @@
 
 #include "application.h"
 #include "chat.h"
-#include "chat_history.h"
-#include "chat_plugin.h"
 
 #include "phone/models.h"
 #include "phone/sip.h"
@@ -44,7 +41,6 @@
 PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     : ChatPanel(parent),
     m_callsModel(0),
-    m_registeredHandler(false),
     m_window(chatWindow)
 {
     bool check;
@@ -83,10 +79,6 @@ PhonePanel::PhonePanel(Chat *chatWindow, QWidget *parent)
     check = connect(m_window->client(), SIGNAL(connected()),
                     m_callsModel, SLOT(getSettings()));
     Q_ASSERT(check);
-
-    check = connect(m_callsModel, SIGNAL(enabledChanged(bool)),
-                    this, SLOT(handleSettings()));
-    Q_ASSERT(check);
 }
 
 void PhonePanel::callButtonClicked(QAbstractButton *button)
@@ -121,63 +113,4 @@ void PhonePanel::callReceived(SipCall *call)
         this, SLOT(callButtonClicked(QAbstractButton*)));
     box->show();
 }
-
-/** Handles VoIP settings received from the server.
- */
-void PhonePanel::handleSettings()
-{
-    // check service is activated
-    if (!m_callsModel->enabled())
-        return;
-
-    // register URL handler
-    if (!m_registeredHandler) {
-        ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
-            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_callsModel->client()->domain()));
-        QDesktopServices::setUrlHandler("sip", this, "openUrl");
-    }
-}
-
-/** Open a SIP URI.
- */
-void PhonePanel::openUrl(const QUrl &url)
-{
-    if (url.scheme() != "sip")
-        return;
-
-    if (!url.path().isEmpty()) {
-        const QString phoneNumber = url.path().split('@').first();
-        const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
-        m_callsModel->call(recipient);
-    }
-    emit showPanel();
-}
-
-// PLUGIN
-
-class PhonePlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Telephone calls"; };
-};
-
-bool PhonePlugin::initialize(Chat *chat)
-{
-    const QString domain = chat->client()->configuration().domain();
-    if (domain != "wifirst.net")
-        return false;
-
-    qmlRegisterType<PhoneCallsModel>("wiLink", 1, 2, "PhoneCallsModel");
-    qmlRegisterUncreatableType<SipClient>("wiLink", 1, 2, "SipClient", "");
-    qmlRegisterUncreatableType<SipCall>("wiLink", 1, 2, "SipCall", "");
-
-    /* register panel */
-    PhonePanel *panel = new PhonePanel(chat);
-    chat->addPanel(panel);
-
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(phone, PhonePlugin)
 
