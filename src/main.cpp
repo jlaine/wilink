@@ -37,7 +37,6 @@ Q_IMPORT_PLUGIN(chats)
 Q_IMPORT_PLUGIN(menu)
 Q_IMPORT_PLUGIN(phone)
 Q_IMPORT_PLUGIN(player)
-Q_IMPORT_PLUGIN(rooms)
 Q_IMPORT_PLUGIN(shares)
 
 static int aborted = 0;

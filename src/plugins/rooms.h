@@ -23,29 +23,18 @@
 #include <QDialog>
 
 #include "QXmppMucIq.h"
-#include "QXmppMucManager.h"
+//#include "QXmppMucManager.h"
 #include "chat_model.h"
 
-class Chat;
 class ChatClient;
 class ChatHistoryModel;
 class ChatMessage;
-class RoomListModel;
-class RoomPanel;
 class ChatRosterModel;
-class QAbstractButton;
 class QModelIndex;
 class QTableWidget;
-class QXmppBookmarkManager;
-class QXmppBookmarkSet;
-class QXmppClient;
-class QXmppDataForm;
-class QXmppIq;
 class QXmppMessage;
-class QXmppMucAdminIq;
 class QXmppMucManager;
 class QXmppMucRoom;
-class QXmppPresence;
 
 class RoomListModel : public ChatModel
 {
@@ -119,26 +108,6 @@ private:
     QString m_jid;
     QXmppMucManager *m_manager;
     QXmppMucRoom *m_room;
-};
-
-class ChatRoomWatcher : public QObject
-{
-    Q_OBJECT
-
-public:
-    ChatRoomWatcher(Chat *chatWindow);
-    RoomPanel *joinRoom(const QString &jid, bool focus);
-
-private slots:
-    void bookmarksReceived();
-    void invitationReceived(const QString &roomJid, const QString &jid, const QString &text);
-    void invitationHandled(QAbstractButton *button);
-    void urlClick(const QUrl &url);
-
-private:
-    Chat *chat;
-    QXmppMucManager *mucManager;
-    QStringList invitations;
 };
 
 class RoomPermissionDialog : public QDialog

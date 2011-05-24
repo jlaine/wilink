@@ -424,6 +424,7 @@ void RoomModel::setRoom(QXmppMucRoom *room)
     emit roomChanged(m_room);
 }
 
+#if 0
 ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     : QObject(chatWindow), chat(chatWindow)
 {
@@ -443,10 +444,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     }
 
     bool check;
-    check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
-                    this, SLOT(bookmarksReceived()));
-    Q_ASSERT(check);
-
     check = connect(mucManager, SIGNAL(invitationReceived(QString,QString,QString)),
                     this, SLOT(invitationReceived(QString,QString,QString)));
     Q_ASSERT(check);
@@ -455,39 +452,6 @@ ChatRoomWatcher::ChatRoomWatcher(Chat *chatWindow)
     check = connect(chat, SIGNAL(urlClick(QUrl)),
                     this, SLOT(urlClick(QUrl)));
     Q_ASSERT(check);
-}
-
-void ChatRoomWatcher::bookmarksReceived()
-{
-    QXmppBookmarkManager *bookmarkManager = chat->client()->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
-    // join rooms marked as "autojoin"
-    const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
-    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
-        if (conference.autoJoin())
-            joinRoom(conference.jid(), false);
-    }
-}
-
-RoomPanel *ChatRoomWatcher::joinRoom(const QString &jid, bool focus)
-{
-#if 0
-    roomModel->addRoom(jid);
-    RoomPanel *panel = qobject_cast<RoomPanel*>(chat->panel(jid));
-    if (!panel) {
-        // add "rooms" item
-
-        // add panel
-        panel = new RoomPanel(chat, jid);
-        chat->addPanel(panel);
-    }
-    if (focus)
-        QTimer::singleShot(0, panel, SIGNAL(showPanel()));
-    return panel;
-#else
-    return 0;
-#endif
 }
 
 void ChatRoomWatcher::invitationHandled(QAbstractButton *button)
@@ -541,7 +505,6 @@ void ChatRoomWatcher::urlClick(const QUrl &url)
     }
 }
 
-#if 0
 RoomPanel::RoomPanel(Chat *chatWindow, const QString &jid)
     : ChatPanel(chatWindow),
     chat(chatWindow)
@@ -717,21 +680,4 @@ void RoomPermissionDialog::removeMember()
 {
     m_tableWidget->removeRow(m_tableWidget->currentRow());
 }
-
-// PLUGIN
-
-class RoomsPlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Multi-user chat"; };
-};
-
-bool RoomsPlugin::initialize(Chat *chat)
-{
-    new ChatRoomWatcher(chat);
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(rooms, RoomsPlugin)
 

@@ -60,6 +60,7 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppMucManager.h"
 #include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
 #include "QXmppRtpChannel.h"
