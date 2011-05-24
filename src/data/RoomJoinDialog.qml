@@ -84,6 +84,7 @@ Dialog {
         anchors.bottom: contents.bottom
         clip: true
         model: DiscoveryModel {
+            details: false
             manager: window.client.discoveryManager
             rootJid: window.client.mucServer
         }

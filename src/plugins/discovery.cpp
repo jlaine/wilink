@@ -46,6 +46,7 @@ public:
 DiscoveryModel::DiscoveryModel(QObject *parent)
     : ChatModel(parent),
     m_client(0),
+    m_details(false),
     m_manager(0)
 {
     QHash<int, QByteArray> names = roleNames();
@@ -73,6 +74,19 @@ QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
     else if (role == ChatModel::UserRole)
         return item->node;
     return QVariant();
+}
+
+bool DiscoveryModel::details() const
+{
+    return m_details;
+}
+
+void DiscoveryModel::setDetails(bool details)
+{
+    if (details != m_details) {
+        m_details = details;
+        emit detailsChanged(m_details);
+    }
 }
 
 void DiscoveryModel::infoReceived(const QXmppDiscoveryIq &disco)
@@ -109,11 +123,12 @@ void DiscoveryModel::itemsReceived(const QXmppDiscoveryIq &disco)
         addItem(ptr, rootItem, rootItem->children.size());
 
         // request information
-        const QString id = m_manager->requestInfo(item.jid(), item.node());
-        if (!id.isEmpty())
-            m_requests.append(id);
+        if (m_details) {
+            const QString id = m_manager->requestInfo(item.jid(), item.node());
+            if (!id.isEmpty())
+                m_requests.append(id);
+        }
     }
-
 }
 
 void DiscoveryModel::refresh()
