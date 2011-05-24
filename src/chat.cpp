@@ -27,8 +27,8 @@
 #include <QDebug>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
-#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeItem>
+#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
@@ -68,8 +68,6 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
-#include "qnetio/wallet.h"
-
 #include "application.h"
 #include "chat.h"
 #include "chat_accounts.h"
@@ -93,6 +91,15 @@
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+public:
+    QNetworkAccessManager *create(QObject * parent)
+    {
+        return new NetworkAccessManager(parent);
+    }
+};
+
 class ChatPrivate
 {
 public:
@@ -110,20 +117,6 @@ public:
     QStackedWidget *conversationPanel;
 
     QList<ChatPlugin*> plugins;
-};
-
-class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
-{
-    virtual QNetworkAccessManager *create(QObject * parent) {
-        bool check;
-
-        QNetworkAccessManager *manager = new QNetworkAccessManager(parent);
-        check = QObject::connect(manager, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-                                 QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
-        Q_ASSERT(check);
-
-        return manager;
-    }
 };
 
 Chat::Chat(QWidget *parent)

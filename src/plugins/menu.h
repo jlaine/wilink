@@ -52,7 +52,6 @@ private:
     QMap<QNetworkReply *, QAction *> icons;
     QNetworkAccessManager *network;
     int refreshInterval;
-    QByteArray userAgent;
 
     Chat *chatWindow;
     QMenu *servicesMenu;

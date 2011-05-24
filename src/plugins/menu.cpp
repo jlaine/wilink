@@ -35,6 +35,7 @@
 #include "application.h"
 #include "chat.h"
 #include "chat_plugin.h"
+#include "declarative.h"
 #include "menu.h"
 
 static const QUrl baseUrl("https://www.wifirst.net/wilink/menu/1");
@@ -47,14 +48,10 @@ Menu::Menu(Chat *window)
 {
     bool check;
 
-    userAgent = QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii();
     servicesMenu = chatWindow->menuBar()->addMenu(tr("&Services"));
 
     /* prepare network manager */
-    network = new QNetworkAccessManager(this);
-    check = connect(network, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-                    QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
-    Q_ASSERT(check);
+    network = new NetworkAccessManager(this);
 
     /* prepare timer */
     timer = new QTimer(this);
@@ -82,7 +79,6 @@ void Menu::connected()
 void Menu::fetchIcon(const QUrl &url, QAction *action)
 {
     QNetworkRequest req(url);
-    req.setRawHeader("User-Agent", userAgent);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(showIcon()));
     icons[reply] = action;
@@ -92,8 +88,6 @@ void Menu::fetchMenu()
 {
     QNetworkRequest req(baseUrl);
     req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    req.setRawHeader("User-Agent", userAgent);
     QNetworkReply *reply = network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(showMenu()));
 }
