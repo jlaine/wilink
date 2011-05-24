@@ -37,6 +37,7 @@ Panel {
         anchors.top: parent.top
         icon: 'photos.png'
         title: '<b>' + qsTr('Photos') + '</b>'
+        z: 1
 
         Row {
             id: toolBar
@@ -102,6 +103,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         text: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
+        z: 1
     }
 
     GridView {
@@ -113,7 +115,6 @@ Panel {
         anchors.top: help.bottom
         cellWidth: 130
         cellHeight: 150
-        clip: true
 
         model:  PhotoModel {
             id: photoModel

@@ -261,7 +261,6 @@ Panel {
         anchors.top: controls.bottom
         anchors.bottom: parent.bottom
         anchors.margins: 10
-        clip: true
         model: historyModel
 
         onAddressClicked: {
