@@ -27,8 +27,6 @@
 #include "QXmppCallManager.h"
 #include "QXmppLogger.h"
 
-#include "chat_panel.h"
-
 class CallVideoItem;
 class QAudioInput;
 class QAudioOutput;

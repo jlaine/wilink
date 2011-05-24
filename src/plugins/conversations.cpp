@@ -252,38 +252,7 @@ bool Conversation::sendMessage(const QString &body)
     return true;
 }
 
-ChatDialogPanel::ChatDialogPanel(Chat *chatWindow, const QString &jid)
-    : ChatPanel(chatWindow)
-{
-    bool check;
-    setObjectName(jid);
-
-    // header
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-
-    // chat history
-    QDeclarativeView *declarativeView = new QDeclarativeView;
-    QDeclarativeContext *context = declarativeView->rootContext();
-    context->setContextProperty("globalJid", QVariant::fromValue(jid));
-    context->setContextProperty("window", chatWindow);
-    declarativeView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
-    declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    declarativeView->setSource(QUrl("qrc:/ConversationPanel.qml"));
-
-    layout->addWidget(declarativeView);
-    setFocusProxy(declarativeView);
-
-    // connect signals
-    check = connect(declarativeView->rootObject(), SIGNAL(close()),
-                    this, SIGNAL(hidePanel()));
-    Q_ASSERT(check);
-
-    check = connect(this, SIGNAL(hidePanel()),
-                    this, SLOT(deleteLater()));
-    Q_ASSERT(check);
-}
-
+#if 0
 /** Constructs a new ChatsWatcher, an observer which catches incoming messages
  *  and clicks on the roster and opens conversations as appropriate.
  *
@@ -340,21 +309,5 @@ void ChatsWatcher::urlClick(const QUrl &url)
         QTimer::singleShot(0, panel, SIGNAL(showPanel()));
     }
 }
-
-// PLUGIN
-
-class ChatsPlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Person-to-person chat"; };
-};
-
-bool ChatsPlugin::initialize(Chat *chat)
-{
-    new ChatsWatcher(chat);
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(chats, ChatsPlugin)
+#endif
 
