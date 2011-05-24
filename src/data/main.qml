@@ -42,28 +42,36 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 220
+        width: 250
+
+        Rectangle {
+            id: toolbarBackground
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            color: '#6ea1f1'
+            width: 24
+        }
 
         Rectangle {
             id: toolbar
 
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.right: parent.right
-            height: 46
-            gradient: Gradient {
-                GradientStop { position: 0; color: '#6ea1f1' }
-                GradientStop { position: 1; color: '#567dbc' }
-            }
+            anchors.bottom: parent.bottom
+            z: 1
 
-            Row {
+            Column {
+                id: control
                 anchors.top: parent.top
                 anchors.left: parent.left
 
                 ToolButton {
-                    text: qsTr('Diagnostics')
+                    color: '#6ea1f1'
                     icon: 'diagnostics.png'
                     onClicked: swapper.showPanel('DiagnosticPanel.qml')
+                    text: state != '' ? qsTr('Diagnostics') : ''
                 }
 
 /*
@@ -87,14 +95,14 @@ Item {
 */
 
                 ToolButton {
-                    text: qsTr('Phone')
+                    color: '#6ea1f1'
                     icon: 'phone.png'
                     onClicked: swapper.showPanel('PhonePanel.qml')
+                    text: state != '' ? qsTr('Phone') : ''
                 }
 
                 ToolButton {
-
-                    text: qsTr('Photos')
+                    color: '#6ea1f1'
                     icon: 'photos.png'
                     onClicked: {
                         var domain = Utils.jidToDomain(window.client.jid);
@@ -103,11 +111,13 @@ Item {
                         else if (domain == 'gmail.com')
                             swapper.showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
                     }
+                    text: state != '' ? qsTr('Photos') : ''
                 }
 
                 ToolButton {
-                    text: qsTr('Shares')
+                    color: '#6ea1f1'
                     icon: 'share.png'
+                    text: state != '' ? qsTr('Shares') : ''
                     visible: window.client.shareServer != ''
                 }
             }
@@ -121,9 +131,9 @@ Item {
         RosterView {
             id: rooms
 
-            anchors.left: parent.left
+            anchors.left: toolbarBackground.right
             anchors.right: parent.right
-            anchors.top: toolbar.bottom
+            anchors.top: parent.top
             currentJid: swapper.currentItem ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
@@ -144,7 +154,7 @@ Item {
         Rectangle {
             id: splitter
 
-            anchors.left: parent.left
+            anchors.left: toolbarBackground.right
             anchors.right: parent.right
             anchors.top: rooms.bottom
             color: '#567dbc'
@@ -183,7 +193,7 @@ Item {
         RosterView {
             id: contacts
 
-            anchors.left: parent.left
+            anchors.left: toolbarBackground.right
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
