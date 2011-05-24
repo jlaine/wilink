@@ -30,7 +30,7 @@ Dialog {
     onAccepted: {
         if (roomEdit.text.length) {
             dialog.hide();
-            showRoom(view.model.rootJid);
+            showRoom(roomEdit.text + '@' + view.model.rootJid);
         }
     }
 
@@ -116,7 +116,7 @@ Dialog {
                 anchors.fill: parent
                 onClicked: {
                     dialog.hide();
-                    showRoom(view.model.rootJid);
+                    showRoom(view.model.jid);
                 }
             }
         }
