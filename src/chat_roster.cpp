@@ -86,18 +86,11 @@ void writeIq(QAbstractNetworkCache *cache, const QUrl &url, const T &iq, int cac
 class ChatRosterItem : public ChatModelItem
 {
 public:
-    void setData(int role, const QVariant &value);
-
     QString jid;
-    QString name;
     int messages;
-    QMap<int, QVariant> data;
+    QString name;
+    QString nickName;
 };
-
-void ChatRosterItem::setData(int role, const QVariant &value)
-{
-    data.insert(role, value);
-}
 
 ChatRosterImageProvider::ChatRosterImageProvider()
     : QDeclarativeImageProvider(Pixmap)
@@ -293,7 +286,7 @@ void ChatRosterModel::connected()
     d->nickNameReceived = false;
     d->ownItem->jid = d->client->configuration().jidBare();
     d->ownItem->name = d->client->configuration().user();
-    d->ownItem->setData(NicknameRole, d->client->configuration().user());
+    d->ownItem->nickName = d->client->configuration().user();
     d->fetchVCard(d->ownItem->jid);
     emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
 }
@@ -345,6 +338,8 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return item->jid;
     } else if (role == AvatarRole) {
         return VCardCache::instance()->imageUrl(item->jid);
+    } else if (role == MessagesRole) {
+        return item->messages;
     } else if (role == NameRole) {
         if (index.column() == SortingColumn)
             return contactStatus(index) + sortSeparator + item->name.toLower() + sortSeparator + item->jid.toLower();
@@ -373,7 +368,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return statusType;
     }
 
-    return item->data.value(role);
+    return QVariant();
 }
 
 void ChatRosterModel::disconnected()
@@ -435,7 +430,7 @@ bool ChatRosterModel::isOwnNameReceived() const
 
 QString ChatRosterModel::ownName() const
 {
-    return d->ownItem->data.value(NicknameRole).toString();
+    return d->ownItem->nickName;
 }
 
 /** Handles an item being added to the roster.
@@ -548,17 +543,6 @@ void ChatRosterModel::rosterReceived()
     emit rosterReady();
 }
 
-bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (!index.isValid())
-        return false;
-    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
-    item->setData(role, value);
-    emit dataChanged(createIndex(item, ContactColumn),
-                     createIndex(item, SortingColumn));
-    return true;
-}
-
 void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 {
     if (vcard.type() != QXmppIq::Result)
@@ -571,7 +555,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 
     // store the nickName
     if (!vcard.nickName().isEmpty())
-         item->setData(NicknameRole, vcard.nickName());
+         item->nickName = vcard.nickName();
 
     // store the nickName or fullName found in the vCard for display,
     // unless the roster entry has a name
