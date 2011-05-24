@@ -18,13 +18,6 @@
  */
 
 #include <QDateTime>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeItem>
-#include <QDeclarativeView>
-#include <QLabel>
-#include <QLayout>
-#include <QPushButton>
 #include <QTimer>
 
 #include "QSoundPlayer.h"
@@ -36,13 +29,10 @@
 #include "QXmppUtils.h"
 
 #include "application.h"
-#include "chat.h"
 #include "chat_client.h"
-#include "chat_history.h"
-#include "chat_plugin.h"
-#include "chat_roster.h"
-
 #include "conversations.h"
+#include "chat_history.h"
+#include "chat_roster.h"
 
 #ifdef WILINK_EMBEDDED
 #define HISTORY_DAYS 7

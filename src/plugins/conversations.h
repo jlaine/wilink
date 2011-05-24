@@ -22,14 +22,10 @@
 
 #include "QXmppMessage.h"
 
-class Chat;
 class ChatClient;
 class ChatHistoryModel;
 class ChatRosterModel;
-class QDeclarativeView;
-class QUrl;
 class QXmppArchiveChat;
-class QXmppArchiveManager;
 
 class Conversation : public QObject
 {
