@@ -170,6 +170,7 @@ Dialog {
         anchors.right: parent.right
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
+        clip: true
         flickableItem: view
     }
 }
