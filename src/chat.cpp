@@ -83,6 +83,7 @@
 #include "plugins/diagnostics.h"
 #include "plugins/discovery.h"
 #include "plugins/phone.h"
+#include "plugins/phone/sip.h"
 #include "plugins/player.h"
 #include "plugins/rooms.h"
 #include "plugins/photos.h"
