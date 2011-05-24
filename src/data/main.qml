@@ -28,10 +28,14 @@ Item {
         id: panels
     }
 
+    /** Convenience method to show a conversation panel.
+     */
     function showConversation(jid) {
         showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
     }
 
+    /** Convenience method to show a chat room panel.
+     */
     function showRoom(jid) {
         showPanel('RoomPanel.qml', {'jid': jid})
     }
@@ -39,6 +43,13 @@ Item {
     function showPanel(source, properties) {
         if (properties == undefined)
             properties = {};
+
+        function propDump(a) {
+            var dump = '';
+            for (var key in a)
+                dump += (dump.length > 0 ? ', ' : '') + key + ': ' + a[key];
+            return '{' + dump + '}';
+        }
 
         function propEquals(a, b) {
             if (a.length != b.length)
@@ -50,39 +61,52 @@ Item {
             return true;
         }
 
-        var found = false;
+        // if the panel already exists, show it
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
                 propEquals(panels.get(i).properties, properties)) {
-                panels.get(i).panel.z = 1;
-                found = true;
-            } else {
-                panels.get(i).panel.z = 0;
+                console.log("focusing panel " + source + " " + propDump(properties));
+                swapper.setCurrentItem(panels.get(i).panel);
+                return;
             }
         }
-        if (found)
-            return;
 
-        // create panel
-        console.log("creating panel " + source + " " + properties);
+        // otherwise create the panel
+        console.log("creating panel " + source + " " + propDump(properties));
         var component = Qt.createComponent(source);
-        var panel = component.createObject(swapper, properties);
-        // FIXME: why doesn't createObject assign the properties??
+        // FIXME: when Qt Quick 1.1 becomes available,
+        // let createObject assign the properties itself.
+        var panel = component.createObject(swapper);
         for (var key in properties) {
             panel[key] = properties[key];
         }
 
         panel.close.connect(function() {
+            var wasVisible = (panel.opacity > 0);
             for (var i = 0; i < panels.count; i += 1) {
                 if (panels.get(i).panel == panel) {
-                    console.log("removing panel " + panels.get(i).source + " " + panels.get(i).properties);
+                    console.log("removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
+
+                    // if the panel was visible, show last remaining panel
+                    if (swapper.currentItem == panel) {
+                        if (panels.count == 1)
+                            swapper.setCurrentItem(null);
+                        else if (i == panels.count - 1)
+                            swapper.setCurrentItem(panels.get(i - 1).panel);
+                        else
+                            swapper.setCurrentItem(panels.get(i + 1).panel);
+                    }
+
+                    // destroy panel
                     panels.remove(i);
                     panel.destroy();
                     break;
                 }
             }
+
         })
         panels.append({'source': source, 'properties': properties, 'panel': panel});
+        swapper.setCurrentItem(panel);
         return panel;
     }
 
@@ -391,9 +415,35 @@ Item {
     Item {
         id: swapper
 
+        property Item currentItem
+
+        function setCurrentItem(panel) {
+            if (panel == currentItem)
+                return;
+
+            // show new item
+            if (panel)
+                panel.opacity = 1;
+            else
+                background.opacity = 1;
+
+            // hide old item
+            if (currentItem)
+                currentItem.opacity = 0;
+            else
+                background.opacity = 0;
+
+            currentItem = panel;
+        }
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
+
+        Rectangle {
+            id: background
+            anchors.fill: parent
+        }
     }
 }
