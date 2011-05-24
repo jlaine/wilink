@@ -39,14 +39,13 @@ Dialog {
         border.width: 1
         color: 'white'
         width: 100
-        height: reasonEdit.paintedHeight
+        height: reasonEdit.paintedHeight + 8
 
         TextEdit {
             id: reasonEdit
 
             anchors.fill: parent
-            anchors.leftMargin: 4
-            anchors.rightMargin: 4
+            anchors.margins: 4
             focus: true
             smooth: true
             text: "Let's talk"

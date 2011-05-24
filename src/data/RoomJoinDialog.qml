@@ -57,12 +57,13 @@ Dialog {
         border.width: 1
         color: 'white'
         width: 100
-        height: roomEdit.paintedHeight
+        height: roomEdit.paintedHeight + 8
 
         TextEdit {
             id: roomEdit
 
             anchors.fill: parent
+            anchors.margins: 4
             focus: true
             smooth: true
             textFormat: TextEdit.PlainText
