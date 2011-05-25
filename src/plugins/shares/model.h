@@ -25,6 +25,8 @@
 
 #include "QXmppShareIq.h"
 
+class ChatClient;
+
 enum SharesColumns
 {
     NameColumn,
@@ -86,6 +88,8 @@ private:
 class ShareModel : public QAbstractItemModel
 {
     Q_OBJECT
+    Q_ENUMS(Recurse)
+    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
 
 public:
     enum Recurse
@@ -104,6 +108,10 @@ public:
 
     ShareModel(QObject *parent = 0);
     ~ShareModel();
+
+    ChatClient *client() const;
+    void setClient(ChatClient *client);
+
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
@@ -119,8 +127,12 @@ public:
     void removeItem(QXmppShareItem *item);
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
 
+signals:
+    void clientChanged(ChatClient *client);
+
 private:
     QXmppShareItem *rootItem;
+    ChatClient *m_client;
 
     // cached icons, to avoid reloading them whenever an item is added
     QIcon collectionIcon;

@@ -115,6 +115,7 @@ Item {
                     icon: 'share.png'
                     text: qsTr('Shares')
                     visible: window.client.shareServer != ''
+                    onClicked: swapper.showPanel('SharePanel.qml')
                 }
             }
         }

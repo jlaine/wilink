@@ -85,9 +85,10 @@
 #include "plugins/discovery.h"
 #include "plugins/phone.h"
 #include "plugins/phone/sip.h"
+#include "plugins/photos.h"
 #include "plugins/player.h"
 #include "plugins/rooms.h"
-#include "plugins/photos.h"
+#include "plugins/shares/model.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -154,6 +155,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<RoomModel>("wiLink", 1, 2, "RoomModel");
     qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
+    qmlRegisterType<ShareModel>("wiLink", 1, 2, "ShareModel");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
 

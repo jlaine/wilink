@@ -17,12 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDesktopServices>
+#include <QSettings>
+
+#include "QDjango.h"
+#include "QXmppClient.h"
+#include "QXmppShareExtension.h"
+#include "QXmppShareDatabase.h"
+
 #include "model.h"
+#include "chat_client.h"
 #include "chat_utils.h"
 
 // common queries
 #define Q ShareModelQuery
 #define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
+
+static QXmppShareDatabase *globalDatabase = 0;
+static int globalDatabaseRefs = 0;
+
+static QXmppShareDatabase *refDatabase()
+{
+    /* initialise database */
+    if (!globalDatabase)
+    {
+        const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+        QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+        sharesDb.setDatabaseName(databaseName);
+        Q_ASSERT(sharesDb.open());
+        QDjango::setDatabase(sharesDb);
+        // drop wiLink <= 0.9.4 table
+        sharesDb.exec("DROP TABLE files");
+
+        // sanitize settings
+        QSettings settings;
+        QString sharesDirectory = settings.value("SharesLocation",  QDir::home().filePath("Public")).toString();
+        if (sharesDirectory.endsWith("/"))
+            sharesDirectory.chop(1);
+        QStringList mappedDirectories = settings.value("SharesDirectories").toStringList();
+
+        // create shares database
+        globalDatabase = new QXmppShareDatabase;
+        globalDatabase->setDirectory(sharesDirectory);
+        globalDatabase->setMappedDirectories(mappedDirectories);
+    }
+    globalDatabaseRefs++;
+}
+
+static void unrefDatabase()
+{
+    if (!(--globalDatabaseRefs) && globalDatabase) {
+        delete globalDatabase;
+        globalDatabase = 0; 
+    }
+}
 
 /** Update collection timestamps.
  */
@@ -65,6 +113,57 @@ QXmppShareItem *ShareModel::addItem(const QXmppShareItem &item)
    endInsertRows();
    return child;
 }
+
+ChatClient *ShareModel::client() const
+{
+    return m_client;
+}
+
+void ShareModel::setClient(ChatClient *client)
+{
+    bool check;
+
+    if (client == m_client)
+        return;
+
+    m_client = client;
+
+    check = connect(m_client, SIGNAL(disconnected()),
+                    this, SLOT(disconnected()));
+    Q_ASSERT(check);
+
+    check = connect(m_client, SIGNAL(presenceReceived(const QXmppPresence&)),
+                    this, SLOT(presenceReceived(const QXmppPresence&)));
+    Q_ASSERT(check);
+
+
+    // add shares extension
+    QXmppShareExtension *extension = new QXmppShareExtension(m_client, refDatabase());
+    m_client->addExtension(extension);
+
+    check = connect(extension, SIGNAL(getFailed(QString)),
+                    this, SLOT(getFailed(QString)));
+    Q_ASSERT(check);
+
+    check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
+                    this, SLOT(transferFinished(QXmppTransferJob*)));
+    Q_ASSERT(check);
+
+    check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
+                    this, SLOT(transferStarted(QXmppTransferJob*)));
+    Q_ASSERT(check);
+
+    check = connect(extension, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
+                    this, SLOT(shareSearchIqReceived(QXmppShareSearchIq)));
+    Q_ASSERT(check);
+
+    check = connect(m_client, SIGNAL(shareServerChanged(QString)),
+                    this, SLOT(shareServerChanged(QString)));
+    Q_ASSERT(check);
+
+    emit clientChanged(m_client);
+}
+
 
 void ShareModel::clear()
 {

@@ -88,7 +88,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     layout->setSpacing(0);
 
     // models
-    ShareModel *sharesModel = new ShareModel(this);
+    ShareModel *shareModel = new ShareModel(this);
     queueModel = new ShareModel(this);
 
     // declarative
@@ -96,7 +96,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     QDeclarativeContext *context = declarativeView->rootContext();
     context->setContextProperty("window", chatWindow);
     context->setContextProperty("queueModel", queueModel);
-    context->setContextProperty("shareModel", sharesModel);
+    context->setContextProperty("shareModel", shareModel);
 
     declarativeView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     declarativeView->setSource(QUrl("qrc:/SharePanel.qml"));
@@ -126,7 +126,7 @@ SharePanel::SharePanel(Chat *chat, QXmppShareDatabase *sharesDb, QWidget *parent
     // shares view
     sharesView = new ShareView;
     sharesView->setExpandsOnDoubleClick(false);
-    sharesView->setModel(sharesModel);
+    sharesView->setModel(shareModel);
     sharesView->hideColumn(ProgressColumn);
     check = connect(sharesView, SIGNAL(contextMenu(const QModelIndex&, const QPoint&)),
                     this, SLOT(itemContextMenu(const QModelIndex&, const QPoint&)));
@@ -810,8 +810,8 @@ bool SharesPlugin::initialize(Chat *chat)
     chats << chat;
 
     /* register panel */
-    SharePanel *shares = new SharePanel(chat, db);
-    chat->addPanel(shares);
+    //SharePanel *shares = new SharePanel(chat, db);
+    //chat->addPanel(shares);
     return true;
 }
 

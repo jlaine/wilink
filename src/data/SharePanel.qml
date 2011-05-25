@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Panel {
     id: panel
@@ -123,7 +124,7 @@ Panel {
         anchors.bottom: queueHelp.top
         anchors.bottomMargin: 8
 
-        model: shareModel
+        model: ShareModel {}
     }
 
     Text {
@@ -146,7 +147,7 @@ Panel {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: model.count * 30
-        model: queueModel
+        model: ShareModel {}
         z: 1
     }
 }
