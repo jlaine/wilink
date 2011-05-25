@@ -53,6 +53,9 @@ signals:
     void clientChanged(ChatClient *client);
 
 public slots:
+    void addPendingMessage(const QString &jid);
+    void clearPendingMessages(const QString &jid);
+
     void addRoom(const QString &jid);
     void removeRoom(const QString &jid);
 

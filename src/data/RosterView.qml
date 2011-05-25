@@ -139,16 +139,28 @@ Item {
                     height: 22
                     smooth: true
                     source: model.avatar
+
                 }
 
                 Text {
                     anchors.left: avatar.right
                     anchors.leftMargin: 6
-                    anchors.right: parent.right
+                    anchors.right: label.right
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     font.pixelSize: 12
                     text: model.name
+                }
+
+                Text {
+                    id: label
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: model.messages > 0 ? 10 : 0
+                    color: 'red'
+                    font.bold: true
+                    font.pixelSize: 10
+                    text: model.messages > 0 ? model.messages : ''
                 }
 
                 MouseArea {

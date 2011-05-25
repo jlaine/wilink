@@ -51,7 +51,6 @@ class ChatRosterModel : public ChatModel
 public:
     enum Role {
         NicknameRole = ChatModel::UserRole,
-        MessagesRole,
         StatusRole
     };
 
@@ -77,19 +76,18 @@ public:
 
     QModelIndex findItem(const QString &jid, const QModelIndex &parent = QModelIndex()) const;
 
-    void addPendingMessage(const QString &bareJid);
-    void clearPendingMessages(const QString &bareJid);
-
 signals:
     void ownNameReceived();
     void pendingMessages(int messages);
     void rosterReady();
 
 public slots:
-    void connected();
-    void disconnected();
+    void addPendingMessage(const QString &bareJid);
+    void clearPendingMessages(const QString &bareJid);
 
 protected slots:
+    void _q_connected();
+    void _q_disconnected();
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void itemAdded(const QString &jid);
     void itemChanged(const QString &jid);

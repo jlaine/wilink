@@ -67,6 +67,7 @@ class RoomListItem : public ChatModelItem
 {
 public:
     QString jid;
+    int messages;
 };
 
 RoomListModel::RoomListModel(QObject *parent)
@@ -101,6 +102,8 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
         return QUrl("qrc:/chat.png");
     } else if (role == ChatModel::JidRole) {
         return item->jid;
+    } else if (role == ChatModel::MessagesRole) {
+        return item->messages;
     } else if (role == ChatModel::NameRole) {
         return jidToUser(item->jid);
     }
@@ -139,6 +142,32 @@ void RoomListModel::setClient(ChatClient *client)
     }
 }
 
+void RoomListModel::addPendingMessage(const QString &jid)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomListItem *item = static_cast<RoomListItem*>(ptr);
+        if (item->jid == jid) {
+            item->messages++;
+            emit dataChanged(createIndex(item), createIndex(item));
+            break;
+        }
+    }
+}
+
+void RoomListModel::clearPendingMessages(const QString &jid)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomListItem *item = static_cast<RoomListItem*>(ptr);
+        if (item->jid == jid) {
+            if (item->messages > 0) {
+                item->messages = 0;
+                emit dataChanged(createIndex(item), createIndex(item));
+            }
+            break;
+        }
+    }
+}
+
 void RoomListModel::addRoom(const QString &jid)
 {
     int row = rootItem->children.size();
@@ -154,6 +183,7 @@ void RoomListModel::addRoom(const QString &jid)
 
     RoomListItem *item = new RoomListItem;
     item->jid = jid;
+    item->messages = 0;
     addItem(item, rootItem, row);
 }
 
