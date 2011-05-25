@@ -60,6 +60,7 @@ PhotoCache::PhotoCache()
 
 void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &results)
 {
+    Q_UNUSED(results);
     if (cmd != FileSystem::Get)
         return;
 
@@ -278,12 +279,17 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
         bool check;
 
         m_fs = FileSystem::factory(m_rootUrl, this);
-        connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                this, SLOT(commandFinished(int, bool, const FileInfoList&)));
-        connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                m_uploads, SLOT(commandFinished(int, bool, const FileInfoList&)));
-        connect(m_fs, SIGNAL(putProgress(int, int)),
-                m_uploads, SLOT(putProgress(int, int)));
+        check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+                        this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+        Q_ASSERT(check);
+
+        check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+                        m_uploads, SLOT(commandFinished(int, bool, const FileInfoList&)));
+        Q_ASSERT(check);
+
+        check = connect(m_fs, SIGNAL(putProgress(int, int)),
+                        m_uploads, SLOT(putProgress(int, int)));
+        Q_ASSERT(check);
 
         m_fs->open(m_rootUrl);
     } else {
@@ -350,6 +356,9 @@ void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, c
 
 void PhotoUploadModel::commandFinished(int cmd, bool error, const FileInfoList &results)
 {
+    Q_UNUSED(error);
+    Q_UNUSED(results);
+
     if (cmd != FileSystem::Put)
         return;
 

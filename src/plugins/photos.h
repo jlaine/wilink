@@ -116,8 +116,8 @@ private slots:
 
 private:
     PhotoModel *m_photoModel;
-    PhotoUploadItem *m_uploadItem;
     QIODevice *m_uploadDevice;
+    PhotoUploadItem *m_uploadItem;
 };
 
 #endif

@@ -73,7 +73,7 @@ Rectangle {
             from: ''
             to: 'hovered'
             reversible: true
-            PropertyAnimation { target: label; properties: 'opacity' }
+            PropertyAnimation { target: label; properties: 'opacity'; duration: 150 }
             PropertyAnimation { target: image; properties: 'height,width'; duration: 150 }
             PropertyAnimation { target: listViewItem; properties: 'height,width'; duration: 150 }
         }
