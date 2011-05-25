@@ -151,6 +151,15 @@ Panel {
         model: conversation.historyModel
 
         onParticipantClicked: chatInput.talkAt(participant)
+
+        Connections {
+            target: historyView.model
+            onMessageReceived: {
+                if (panel.opacity == 0) {
+                    window.rosterModel.addPendingMessage(jid);
+                }
+            }
+        }
     }
 
     ChatEdit {

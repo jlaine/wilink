@@ -82,7 +82,7 @@ public:
 signals:
     void bottomChanged();
     void bottomAboutToChange();
-    void messageReceived(QString &jid, const QString &text);
+    void messageReceived(const QString &jid, const QString &text);
     void participantModelChanged(QObject *participantModel);
 
 public slots:
