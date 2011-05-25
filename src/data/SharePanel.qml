@@ -23,8 +23,6 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    color: '#e1eafa'
-
     PanelHeader {
         id: header
 
@@ -63,21 +61,24 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         text: qsTr('You can select the folders you want to share with other users from the shares options.')
+        z: 1
     }
 
-    Item {
+    Rectangle {
         id: searchBar
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: help.bottom
-        anchors.margins: 8
+        color: '#e1eafa'
         height: 32
+        z: 1
 
         Image {
             id: searchIcon
 
             anchors.left: parent.left
+            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             height: 16
             width: 16
@@ -88,6 +89,7 @@ Panel {
         Rectangle {
             anchors.left: searchIcon.right
             anchors.right: parent.right
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             border.color: '#c3c3c3'
@@ -134,6 +136,7 @@ Panel {
         anchors.right: parent.right
         anchors.bottom: footer.top
         text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
+        z: 1
     }
 
     ShareView {

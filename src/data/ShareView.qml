@@ -24,8 +24,6 @@ Item {
 
     property alias model: view.model
 
-    clip: true
-
     Rectangle {
         id: background
 
@@ -112,7 +110,7 @@ Item {
         id: scrollBar
 
         anchors.top: parent.top
-        anchors.bottom: parent.top
+        anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
     }
