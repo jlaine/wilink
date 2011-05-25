@@ -176,8 +176,10 @@ Panel {
         onReturnPressed: {
             if (Qt.isQtObject(conversation)) {
                 var text = chatInput.text;
-                if (conversation.sendMessage(text))
+                if (conversation.sendMessage(text)) {
                     chatInput.text = '';
+                    application.soundPlayer.play(application.outgoingMessageSound);
+                }
             }
         }
     }

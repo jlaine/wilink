@@ -36,7 +36,6 @@ class QSoundPlayer : public QObject
 
 public:
     QSoundPlayer(QObject *parent = 0);
-    int play(const QString &name, bool repeat = false);
     int play(QSoundFile *reader);
     void stop(int id);
 
@@ -44,6 +43,7 @@ signals:
     void finished(int id);
 
 public slots:
+    int play(const QString &name, bool repeat = false);
     void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
 
 private slots:

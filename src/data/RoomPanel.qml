@@ -165,8 +165,10 @@ Panel {
 
         onReturnPressed: {
             var text = chatInput.text;
-            if (room.sendMessage(text))
+            if (room.sendMessage(text)) {
                 chatInput.text = '';
+                application.soundPlayer.play(application.outgoingMessageSound);
+            }
         }
     }
 
