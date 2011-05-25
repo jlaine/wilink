@@ -23,7 +23,7 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    color: '#dfdfdf'
+    color: '#e1eafa'
 
     PanelHeader {
         id: header
@@ -85,22 +85,13 @@ Panel {
             smooth: true
         }
 
-        Text {
-            id: searchLabel
-
-            anchors.left: searchIcon.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.margins: 8
-            text: qsTr('Enter the name of the file you are looking for.');
-        }
-
         Rectangle {
-            anchors.left: searchLabel.right
+            anchors.left: searchIcon.right
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             border.color: '#c3c3c3'
-            color: 'white'
+            color: '#aaffffff'
             height: searchEdit.paintedHeight + 4
 
             TextEdit {
@@ -111,6 +102,16 @@ Panel {
                 anchors.leftMargin: 4
                 anchors.rightMargin: 4
                 focus: true
+                text: ''
+            }
+
+            Text {
+                id: searchLabel
+
+                anchors.fill: searchEdit
+                color: '#999999'
+                opacity: searchEdit.text == '' ? 1 : 0
+                text: qsTr('Enter the name of the file you are looking for.');
             }
         }
     }
@@ -122,22 +123,17 @@ Panel {
         anchors.right: parent.right
         anchors.top: searchBar.bottom
         anchors.bottom: queueHelp.top
-        anchors.bottomMargin: 8
 
         model: ShareModel {}
     }
 
-    Text {
+    PanelHelp {
         id: queueHelp
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: footer.top
-        anchors.margins: 8
-        height: paintedHeight
-
         text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
-        wrapMode: Text.WordWrap
     }
 
     ShareView {

@@ -29,22 +29,8 @@ Item {
     Rectangle {
         id: background
 
-        width: parent.height
-        height: parent.width
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: -parent.width
-
-        gradient: Gradient {
-            GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
-            GradientStop { id: backgroundStop2; position: 1.0; color: '#cbdaf1' }
-        }
-
-        transform: Rotation {
-            angle: 90
-            origin.x: 0
-            origin.y: background.height
-        }
+        anchors.fill: parent
+        color: '#ffffff'
     }
 
     ListView {
