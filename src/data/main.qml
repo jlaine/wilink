@@ -197,10 +197,13 @@ Item {
             anchors.bottom: parent.bottom
             currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
             model: SortFilterProxyModel {
-                sourceModel: window.rosterModel
+                id: contactModel
+
                 dynamicSortFilter: true
-                sortCaseSensitivity: Qt.CaseInsensitive
                 filterKeyColumn: 1
+                filterRegExp: application.showOfflineContacts ? /.*/ : /^(?!offline).+/
+                sortCaseSensitivity: Qt.CaseInsensitive
+                sourceModel: window.rosterModel
                 Component.onCompleted: sort(0)
             }
             title: qsTr('My contacts')

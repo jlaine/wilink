@@ -43,6 +43,7 @@ class ApplicationPrivate;
 class Application : public QApplication
 {
     Q_OBJECT
+    Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
 
 public:
     Application(int &argc, char **argv);

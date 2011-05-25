@@ -44,7 +44,6 @@
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
-#include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -111,7 +110,6 @@ public:
     QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
     QDeclarativeView *rosterView;
-    QSortFilterProxyModel *sortedContactModel;
     QString windowTitle;
 
     QWidget *leftPanel;
@@ -190,18 +188,6 @@ Chat::Chat(QWidget *parent)
     leftLayout->setMargin(0);
     leftLayout->setSpacing(0);
 
-    // prepare models
-    d->sortedContactModel = new QSortFilterProxyModel(this);
-    d->sortedContactModel->setSourceModel(d->rosterModel);
-    d->sortedContactModel->setDynamicSortFilter(true);
-    d->sortedContactModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    d->sortedContactModel->setFilterKeyColumn(2);
-    d->sortedContactModel->sort(0);
-
-    showOfflineContactsChanged(wApp->showOfflineContacts());
-    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)),
-            this, SLOT(showOfflineContactsChanged(bool)));
-
     // create declarative view
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(240);
@@ -216,7 +202,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
     QDeclarativeContext *context = d->rosterView->rootContext();
-    context->setContextProperty("contactModel", d->sortedContactModel);
+    context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
@@ -704,14 +690,6 @@ void Chat::showAbout()
 void Chat::showHelp()
 {
     QDesktopServices::openUrl(QUrl(HELP_URL));
-}
-
-void Chat::showOfflineContactsChanged(bool show)
-{
-    if (show)
-        d->sortedContactModel->setFilterRegExp(QRegExp());
-    else
-        d->sortedContactModel->setFilterRegExp(QRegExp("^(?!offline).+"));
 }
 
 /** Display the preferenes dialog.
