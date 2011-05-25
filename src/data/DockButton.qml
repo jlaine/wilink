@@ -27,6 +27,13 @@ Rectangle {
     property bool enabled: true
     signal clicked
 
+    function startAnimation() {
+        blinkingEffect.loops = Animation.Infinite
+    }
+    function stopAnimation() {
+        blinkingEffect.loops = 0
+    }
+
     color: '#597fbe'
     height: 24
     width: 24
@@ -42,6 +49,16 @@ Rectangle {
         smooth: true
         width: 24
         height: 24
+
+        PropertyAnimation on opacity  {
+            id: blinkingEffect
+
+            duration: 1000
+            easing.type: Easing.OutSine
+            loops: 0
+            from: 0.0
+            to: 1.0
+        }
     }
 
     Text {
