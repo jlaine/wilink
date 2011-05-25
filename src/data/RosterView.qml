@@ -152,15 +152,35 @@ Item {
                     text: model.name
                 }
 
+                Rectangle {
+                    anchors.fill: label
+                    anchors.margins: -3
+                    border.color: '#597fbe'
+                    border.width: 1
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: '#66597fbe' }
+                        GradientStop { position: 0.6; color: '#597fbe' }
+                        GradientStop { position: 1.0; color: '#66597fbe' }
+                    }
+
+                    opacity: model.messages > 0 ? 1 : 0
+                    radius: 10
+                    smooth: true
+                }
+
                 Text {
                     id: label
+
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    width: model.messages > 0 ? 10 : 0
-                    color: 'red'
+                    anchors.margins: 6
+                    color: 'white'
                     font.bold: true
                     font.pixelSize: 10
-                    text: model.messages > 0 ? model.messages : ''
+                    horizontalAlignment: Text.AlignHCenter
+                    opacity: model.messages > 0 ? 1 : 0
+                    text: model.messages
+                    verticalAlignment: Text.AlignVCenter
                 }
 
                 MouseArea {
