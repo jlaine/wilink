@@ -27,7 +27,7 @@ Rectangle {
     property bool enabled: true
     signal clicked
 
-    color: '#6ea1f1'
+    color: '#597fbe'
     height: 24
     width: 24
     radius: 20

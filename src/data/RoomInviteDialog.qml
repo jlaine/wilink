@@ -85,7 +85,6 @@ Dialog {
                 GradientStop { id:stop2; position:0.5; color: '#00ffffff' }
                 GradientStop { id:stop3; position:1.0; color: '#00ffffff' }
             }
-            state: isSelected() ? 'selected' : ''
             height: 24
             width: parent.width - 1
 
@@ -105,7 +104,7 @@ Dialog {
                 anchors.verticalCenter: parent.verticalCenter
                 border.width: 1
                 border.color: '#ffb0c4de'
-                color: 'white'
+                color: isSelected() ? '#597fbe' : 'white'
                 radius: 6
                 width: 12
                 height: 12
@@ -133,6 +132,7 @@ Dialog {
 
             MouseArea {
                 anchors.fill: parent
+                hoverEnabled: true
                 onClicked: {
                     var newSelection = [];
                     var wasSelected = false;
@@ -147,11 +147,12 @@ Dialog {
                         newSelection[newSelection.length] = model.jid;
                     dialog.selection = newSelection;
                 }
+                onEntered: parent.state = 'hovered'
+                onExited: parent.state = ''
             }
 
             states: State {
-                name: 'selected'
-                PropertyChanges { target: check; color: '#597fbe' }
+                name: 'hovered'
                 PropertyChanges { target: rect; border.color: '#ffb0c4de' }
                 PropertyChanges { target: stop1; color: '#33b0c4de' }
                 PropertyChanges { target: stop2; color: '#ffb0c4de' }
