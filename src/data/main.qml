@@ -50,7 +50,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            color: '#6ea1f1'
+            color: '#597fbe'
             width: 24
         }
 
