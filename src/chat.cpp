@@ -160,6 +160,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
 
     // crutches for Qt..
+    qmlRegisterUncreatableType<QAbstractItemModel>("wiLink", 1, 2, "QAbstractItemModel", "");
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");

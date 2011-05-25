@@ -54,17 +54,16 @@ QVariant ListHelper::get(int row) const
     return result;
 }
 
-QObject *ListHelper::model() const
+QAbstractItemModel *ListHelper::model() const
 {
     return m_model;
 }
 
-void ListHelper::setModel(QObject *model)
+void ListHelper::setModel(QAbstractItemModel *model)
 {
-    QAbstractItemModel *itemModel = static_cast<QAbstractItemModel*>(model);
-    if (itemModel != m_model) {
-        m_model = itemModel;
-        emit modelChanged(model);
+    if (model != m_model) {
+        m_model = model;
+        emit modelChanged(m_model);
     }
 }
 
