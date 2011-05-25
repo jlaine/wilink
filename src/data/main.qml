@@ -196,7 +196,13 @@ Item {
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
             currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
-            model: contactModel
+            model: SortFilterProxyModel {
+                sourceModel: window.rosterModel
+                dynamicSortFilter: true
+                sortCaseSensitivity: Qt.CaseInsensitive
+                filterKeyColumn: 1
+                Component.onCompleted: sort(0)
+            }
             title: qsTr('My contacts')
 
             Menu {

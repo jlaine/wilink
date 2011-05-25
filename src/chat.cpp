@@ -164,6 +164,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
+    qmlRegisterType<QDeclarativeSortFilterProxyModel>("wiLink", 1, 2, "SortFilterProxyModel");
 
     /* get handle to application */
     check = connect(wApp, SIGNAL(messageClicked(QWidget*)),

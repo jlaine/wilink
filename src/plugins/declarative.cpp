@@ -29,6 +29,24 @@
 #include "chat_plugin.h"
 #include "declarative.h"
 
+QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+{
+}
+
+void QDeclarativeSortFilterProxyModel::setSourceModel(QAbstractItemModel *model)
+{
+    if (model != sourceModel()) {
+        QSortFilterProxyModel::setSourceModel(model);
+        emit sourceModelChanged(sourceModel());
+    }
+}
+
+void QDeclarativeSortFilterProxyModel::sort(int column)
+{
+    QSortFilterProxyModel::sort(column);
+}
+
 ListHelper::ListHelper(QObject *parent)
     : QObject(parent),
     m_model(0)

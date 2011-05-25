@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QNetworkAccessManager>
+#include <QSortFilterProxyModel>
 
 #include "QXmppMessage.h"
 
@@ -44,6 +45,22 @@ class QDeclarativeFileDialog : public QFileDialog
 
 public:
     QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
+};
+
+class QDeclarativeSortFilterProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel* sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged)
+
+public:
+    QDeclarativeSortFilterProxyModel(QObject *parent = 0);
+    void setSourceModel(QAbstractItemModel *model);
+
+public slots:
+    void sort(int column);
+
+signals:
+    void sourceModelChanged(QAbstractItemModel *sourceModel);
 };
 
 class QXmppDeclarativeMessage : public QObject
