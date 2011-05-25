@@ -31,12 +31,6 @@ Item {
     signal itemClicked(variant model)
     signal itemContextMenu(variant model, variant point)
 
-    Connections {
-        onCurrentJidChanged: {
-            view.model.clearPendingMessages(currentJid);
-        }
-    }
-
     Rectangle {
         id: background
 

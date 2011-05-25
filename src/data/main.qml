@@ -145,6 +145,11 @@ Item {
                     dialog.source = 'RoomJoinDialog.qml';
                     dialog.item.show();
                 }
+
+                onCurrentJidChanged: {
+                    rooms.model.clearPendingMessages(rooms.currentJid);
+                }
+
                 onItemClicked: showRoom(model.jid)
             }
         }
@@ -231,6 +236,10 @@ Item {
                     }
                     console.log("add " + jid);
                     window.client.rosterManager.subscribe(jid);
+                }
+
+                onCurrentJidChanged: {
+                    window.rosterModel.clearPendingMessages(contacts.currentJid);
                 }
 
                 onItemClicked: {
