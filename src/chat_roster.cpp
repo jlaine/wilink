@@ -371,6 +371,21 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return false;
+
+    if (role == MessagesRole) {
+        item->messages = value.toInt();
+        emit dataChanged(index, index);
+        return true;
+    }
+
+    return false;
+}
+
 void ChatRosterModel::disconnected()
 {
     d->clientFeatures.clear();
