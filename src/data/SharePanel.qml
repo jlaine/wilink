@@ -94,7 +94,7 @@ Panel {
             anchors.margins: 8
             border.color: '#c3c3c3'
             color: '#aaffffff'
-            height: searchEdit.paintedHeight + 4
+            height: 22
 
             TextEdit {
                 id: searchEdit
