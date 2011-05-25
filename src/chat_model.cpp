@@ -44,6 +44,7 @@ ChatModel::ChatModel(QObject *parent)
     QHash<int, QByteArray> roleNames;
     roleNames.insert(ChatModel::AvatarRole, "avatar");
     roleNames.insert(ChatModel::JidRole, "jid");
+    roleNames.insert(ChatModel::MessagesRole, "messages");
     roleNames.insert(ChatModel::NameRole, "name");
     roleNames.insert(ChatModel::UrlRole, "url");
     setRoleNames(roleNames);
