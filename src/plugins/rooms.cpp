@@ -37,8 +37,6 @@
 #include <QTimer>
 #include <QUrl>
 
-#include "QSoundPlayer.h"
-
 #include "QXmppBookmarkManager.h"
 #include "QXmppBookmarkSet.h"
 #include "QXmppClient.h"
@@ -353,14 +351,6 @@ void RoomModel::messageReceived(const QXmppMessage &msg)
     message.jid = msg.from();
     message.received = jidToResource(msg.from()) != m_room->nickName();
     m_historyModel->addMessage(message);
-
-    // FIXME: notify user
-    // if (notifyMessages || message.body.contains("@" + mucRoom->nickName()))
-    //    queueNotification(message.body);
-
-    // play sound, unless we sent the message
-    if (message.received)
-        wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 void RoomModel::participantAdded(const QString &jid)
