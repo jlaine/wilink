@@ -341,6 +341,7 @@ void RoomModel::messageReceived(const QXmppMessage &msg)
 
     // handle message body
     ChatMessage message;
+    message.archived = !m_room->isJoined();
     message.body = msg.body();
     message.date = msg.stamp();
     if (!message.date.isValid()) {
