@@ -464,7 +464,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Album name:</source>
-        <translation type="obsolete">Nom de l&apos;album :</translation>
+        <translation>Nom de l&apos;album :</translation>
     </message>
     <message>
         <source>Deleting %1</source>

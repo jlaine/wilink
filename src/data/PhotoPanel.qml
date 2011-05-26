@@ -85,6 +85,15 @@ Panel {
                 icon: 'add.png'
                 text: qsTr('Create an album')
                 enabled: crumbs.count == 0
+
+                onClicked: {
+                    var dialog = window.inputDialog();
+                    dialog.windowTitle = qsTr('Create an album');
+                    dialog.labelText = qsTr('Album name:');
+                    if (dialog.exec()) {
+
+                    }
+                }
             }
 
             ToolButton {
