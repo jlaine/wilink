@@ -126,7 +126,7 @@ Item {
             anchors.left: dockBackground.right
             anchors.right: parent.right
             anchors.top: parent.top
-            currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
+            currentJid: (Qt.isQtObject(swapper.currentItem) && swapper.currentItem.jid != undefined) ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
                 id: roomListModel
@@ -195,7 +195,7 @@ Item {
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
-            currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
+            currentJid: (Qt.isQtObject(swapper.currentItem) && swapper.currentItem.jid != undefined) ? swapper.currentItem.jid : ''
             model: SortFilterProxyModel {
                 id: contactModel
 
