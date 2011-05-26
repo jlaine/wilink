@@ -85,32 +85,27 @@ Rectangle {
         }
 
         MouseArea {
-            property int mousePressX
-            property int mousePressY
-            property int dialogPressX
-            property int dialogPressY
+            property variant mousePress
+            property variant dialogPress
 
             anchors.fill: parent
 
             onPressed: {
-                mousePressX = mapToItem(dialog.parent, mouse.x, mouse.y).x
-                mousePressY = mapToItem(dialog.parent, mouse.x, mouse.y).y
-                dialogPressX = dialog.x
-                dialogPressY = dialog.y
+                mousePress = mapToItem(dialog.parent, mouse.x, mouse.y);
+                dialogPress = {x: dialog.x, y: dialog.y};
             }
 
             onPositionChanged: {
                 if (mouse.buttons & Qt.LeftButton) {
-                    var positionX = dialogPressX + (mapToItem(dialog.parent, mouse.x, mouse.y).x - mousePressX)
-                    positionX = Math.max(positionX, 0)
-                    positionX = Math.min(positionX, dialog.parent.width - dialog.width)
+                    var mouseCurrent = mapToItem(dialog.parent, mouse.x, mouse.y);
+                    var minPos = root.mapToItem(dialog.parent, 0, 0);
+                    var maxPos = root.mapToItem(dialog.parent, root.width - dialog.width, root.height - dialog.height);
 
-                    var positionY = dialogPressY + (mapToItem(dialog.parent, mouse.x, mouse.y).y - mousePressY)
-                    positionY = Math.max(positionY, 0)
-                    positionY = Math.min(positionY, dialog.parent.height - dialog.height)
+                    var positionX = dialogPress.x + (mouseCurrent.x - mousePress.x);
+                    var positionY = dialogPress.y + (mouseCurrent.y - mousePress.y);
 
-                    dialog.x = positionX
-                    dialog.y = positionY
+                    dialog.x = Math.max(minPos.x, Math.min(positionX, maxPos.x));
+                    dialog.y = Math.max(minPos.y, Math.min(positionY, maxPos.y));
                 }
             }
         }

@@ -120,11 +120,6 @@ Item {
             }
         }
 
-        Loader {
-            id: dialog
-            z: 10
-        }
-
         RosterView {
             id: rooms
 
@@ -373,6 +368,11 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
+    }
+
+    Loader {
+        id: dialog
+        z: 10
     }
 
     Loader {
