@@ -188,19 +188,19 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
 {
     Q_ASSERT(m_fs);
 
-    if (error)
+    if (error) {
         qWarning() << m_fs->commandName(cmd) << "command failed";
+        return;
+    }
 
     switch (cmd)
     {
     case FileSystem::Open:
-        if (!error)
-            refresh();
+    case FileSystem::Mkdir:
+    case FileSystem::Remove:
+        refresh();
         break;
-    case FileSystem::List: {
-        if (error)
-            return;
-
+    case FileSystem::List:
         removeRows(0, rootItem->children.size());
         foreach (const FileInfo& info, results) {
             if (info.isDir() || isImage(info.name())) {
@@ -208,14 +208,6 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
                 addItem(item, rootItem);
             }
         }
-        break;
-    }
-    case FileSystem::Mkdir:
-        refresh();
-        break;
-    case FileSystem::Remove:
-        if (!error)
-            refresh();
         break;
     default:
         break;
