@@ -90,8 +90,8 @@ Panel {
                     var dialog = window.inputDialog();
                     dialog.windowTitle = qsTr('Create an album');
                     dialog.labelText = qsTr('Album name:');
-                    if (dialog.exec()) {
-
+                    if (dialog.exec() && dialog.textValue.length > 0) {
+                        photoModel.createAlbum(dialog.textValue);
                     }
                 }
             }

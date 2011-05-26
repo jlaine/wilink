@@ -246,6 +246,16 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void PhotoModel::createAlbum(const QString &name)
+{
+    if (name.isEmpty())
+        return;
+
+    QUrl newUrl = m_rootUrl;
+    newUrl.setPath(newUrl.path() + "/" + name);
+    m_fs->mkdir(newUrl);
+}
+
 void PhotoModel::photoChanged(const QUrl &url)
 {
     foreach (ChatModelItem *ptr, rootItem->children) {

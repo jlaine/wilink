@@ -84,6 +84,7 @@ signals:
     void rootUrlChanged(const QUrl &rootUrl);
 
 public slots:
+    void createAlbum(const QString &name);
     void refresh();
     void upload(const QString &filePath);
 
