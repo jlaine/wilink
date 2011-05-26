@@ -96,6 +96,7 @@ Item {
                 DockButton {
                     icon: 'phone.png'
                     text: qsTr('Phone')
+                    visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
                     onClicked: swapper.showPanel('PhonePanel.qml')
                 }
 
