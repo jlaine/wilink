@@ -20,8 +20,6 @@
 #include <QDateTime>
 #include <QTimer>
 
-#include "QSoundPlayer.h"
-
 #include "QXmppArchiveIq.h"
 #include "QXmppArchiveManager.h"
 #include "QXmppConstants.h"
@@ -200,12 +198,6 @@ void Conversation::messageReceived(const QXmppMessage &msg)
     message.received = true;
     if (m_historyModel)
         m_historyModel->addMessage(message);
-
-    // FIXME: queue notification
-    //queueNotification(message.body);
-
-    // play sound
-    wApp->soundPlayer()->play(wApp->incomingMessageSound());
 }
 
 bool Conversation::sendMessage(const QString &body)
@@ -237,8 +229,6 @@ bool Conversation::sendMessage(const QString &body)
         m_historyModel->addMessage(message);
     }
 
-    // play sound
-    wApp->soundPlayer()->play(wApp->outgoingMessageSound());
     return true;
 }
 

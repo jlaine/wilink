@@ -85,7 +85,6 @@ private slots:
     void promptCredentials();
     void showAbout();
     void showHelp();
-    void showOfflineContactsChanged(bool show);
 
     void destroyPanel(QObject *obj);
     void hidePanel();

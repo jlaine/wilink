@@ -44,7 +44,6 @@
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
-#include <QSortFilterProxyModel>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
@@ -85,9 +84,10 @@
 #include "plugins/discovery.h"
 #include "plugins/phone.h"
 #include "plugins/phone/sip.h"
+#include "plugins/photos.h"
 #include "plugins/player.h"
 #include "plugins/rooms.h"
-#include "plugins/photos.h"
+#include "plugins/shares/model.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -110,7 +110,6 @@ public:
     QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
     QDeclarativeView *rosterView;
-    QSortFilterProxyModel *sortedContactModel;
     QString windowTitle;
 
     QWidget *leftPanel;
@@ -154,13 +153,17 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<RoomModel>("wiLink", 1, 2, "RoomModel");
     qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
+    qmlRegisterType<ShareModel>("wiLink", 1, 2, "ShareModel");
+    qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
 
     // crutches for Qt..
+    qmlRegisterUncreatableType<QAbstractItemModel>("wiLink", 1, 2, "QAbstractItemModel", "");
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
+    qmlRegisterType<QDeclarativeSortFilterProxyModel>("wiLink", 1, 2, "SortFilterProxyModel");
 
     /* get handle to application */
     check = connect(wApp, SIGNAL(messageClicked(QWidget*)),
@@ -186,18 +189,6 @@ Chat::Chat(QWidget *parent)
     leftLayout->setMargin(0);
     leftLayout->setSpacing(0);
 
-    // prepare models
-    d->sortedContactModel = new QSortFilterProxyModel(this);
-    d->sortedContactModel->setSourceModel(d->rosterModel);
-    d->sortedContactModel->setDynamicSortFilter(true);
-    d->sortedContactModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    d->sortedContactModel->setFilterKeyColumn(2);
-    d->sortedContactModel->sort(0);
-
-    showOfflineContactsChanged(wApp->showOfflineContacts());
-    connect(wApp, SIGNAL(showOfflineContactsChanged(bool)),
-            this, SLOT(showOfflineContactsChanged(bool)));
-
     // create declarative view
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(240);
@@ -212,7 +203,7 @@ Chat::Chat(QWidget *parent)
     d->rosterView->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
     QDeclarativeContext *context = d->rosterView->rootContext();
-    context->setContextProperty("contactModel", d->sortedContactModel);
+    context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
@@ -700,14 +691,6 @@ void Chat::showAbout()
 void Chat::showHelp()
 {
     QDesktopServices::openUrl(QUrl(HELP_URL));
-}
-
-void Chat::showOfflineContactsChanged(bool show)
-{
-    if (show)
-        d->sortedContactModel->setFilterRegExp(QRegExp());
-    else
-        d->sortedContactModel->setFilterRegExp(QRegExp("^(?!offline).+"));
 }
 
 /** Display the preferenes dialog.

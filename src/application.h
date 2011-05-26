@@ -43,6 +43,10 @@ class ApplicationPrivate;
 class Application : public QApplication
 {
     Q_OBJECT
+    Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
+    Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound)
+    Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound)
+    Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
 
 public:
     Application(int &argc, char **argv);

@@ -48,6 +48,7 @@ public:
         NameRole = Qt::DisplayRole,
         JidRole = Qt::UserRole,
         AvatarRole,
+        MessagesRole,
         UrlRole,
         UserRole,
     };

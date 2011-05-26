@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QNetworkAccessManager>
+#include <QSortFilterProxyModel>
 
 #include "QXmppMessage.h"
 
@@ -46,6 +47,22 @@ public:
     QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
 };
 
+class QDeclarativeSortFilterProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QAbstractItemModel* sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged)
+
+public:
+    QDeclarativeSortFilterProxyModel(QObject *parent = 0);
+    void setSourceModel(QAbstractItemModel *model);
+
+public slots:
+    void sort(int column);
+
+signals:
+    void sourceModelChanged(QAbstractItemModel *sourceModel);
+};
+
 class QXmppDeclarativeMessage : public QObject
 {
     Q_OBJECT
@@ -66,7 +83,7 @@ class ListHelper : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
-    Q_PROPERTY(QObject* model READ model WRITE setModel NOTIFY modelChanged)
+    Q_PROPERTY(QAbstractItemModel* model READ model WRITE setModel NOTIFY modelChanged)
 
 public:
     ListHelper(QObject *parent = 0);
@@ -74,12 +91,12 @@ public:
     int count() const;
     Q_INVOKABLE QVariant get(int row) const;
 
-    QObject *model() const;
-    void setModel(QObject *model);
+    QAbstractItemModel *model() const;
+    void setModel(QAbstractItemModel *model);
 
 signals:
     void countChanged();
-    void modelChanged(QObject *model);
+    void modelChanged(QAbstractItemModel *model);
 
 private:
     QAbstractItemModel *m_model;

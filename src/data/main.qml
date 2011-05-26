@@ -50,7 +50,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            color: '#6ea1f1'
+            color: '#597fbe'
             width: 24
         }
 
@@ -115,6 +115,7 @@ Item {
                     icon: 'share.png'
                     text: qsTr('Shares')
                     visible: window.client.shareServer != ''
+                    onClicked: swapper.showPanel('SharePanel.qml')
                 }
             }
         }
@@ -144,6 +145,11 @@ Item {
                     dialog.source = 'RoomJoinDialog.qml';
                     dialog.item.show();
                 }
+
+                onCurrentJidChanged: {
+                    rooms.model.clearPendingMessages(rooms.currentJid);
+                }
+
                 onItemClicked: showRoom(model.jid)
             }
         }
@@ -195,7 +201,16 @@ Item {
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
             currentJid: Qt.isQtObject(swapper.currentItem) ? swapper.currentItem.jid : ''
-            model: contactModel
+            model: SortFilterProxyModel {
+                id: contactModel
+
+                dynamicSortFilter: true
+                filterKeyColumn: 1
+                filterRegExp: application.showOfflineContacts ? /.*/ : /^(?!offline).+/
+                sortCaseSensitivity: Qt.CaseInsensitive
+                sourceModel: window.rosterModel
+                Component.onCompleted: sort(0)
+            }
             title: qsTr('My contacts')
 
             Menu {
@@ -221,6 +236,10 @@ Item {
                     }
                     console.log("add " + jid);
                     window.client.rosterManager.subscribe(jid);
+                }
+
+                onCurrentJidChanged: {
+                    window.rosterModel.clearPendingMessages(contacts.currentJid);
                 }
 
                 onItemClicked: {

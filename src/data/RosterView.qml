@@ -139,16 +139,48 @@ Item {
                     height: 22
                     smooth: true
                     source: model.avatar
+
                 }
 
                 Text {
                     anchors.left: avatar.right
                     anchors.leftMargin: 6
-                    anchors.right: parent.right
+                    anchors.right: label.right
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     font.pixelSize: 12
                     text: model.name
+                }
+
+                Rectangle {
+                    anchors.fill: label
+                    anchors.margins: -3
+                    border.color: '#597fbe'
+                    border.width: 1
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: '#66597fbe' }
+                        GradientStop { position: 0.6; color: '#597fbe' }
+                        GradientStop { position: 1.0; color: '#66597fbe' }
+                    }
+
+                    opacity: model.messages > 0 ? 1 : 0
+                    radius: 10
+                    smooth: true
+                }
+
+                Text {
+                    id: label
+
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.margins: 6
+                    color: 'white'
+                    font.bold: true
+                    font.pixelSize: 10
+                    horizontalAlignment: Text.AlignHCenter
+                    opacity: model.messages > 0 ? 1 : 0
+                    text: model.messages
+                    verticalAlignment: Text.AlignVCenter
                 }
 
                 MouseArea {

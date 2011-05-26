@@ -27,7 +27,14 @@ Rectangle {
     property bool enabled: true
     signal clicked
 
-    color: '#6ea1f1'
+    function startAnimation() {
+        blinkingEffect.loops = Animation.Infinite
+    }
+    function stopAnimation() {
+        blinkingEffect.loops = 0
+    }
+
+    color: 'transparent'
     height: 24
     width: 24
     radius: 20
@@ -42,6 +49,16 @@ Rectangle {
         smooth: true
         width: 24
         height: 24
+
+        PropertyAnimation on opacity  {
+            id: blinkingEffect
+
+            duration: 1000
+            easing.type: Easing.OutSine
+            loops: 0
+            from: 0.0
+            to: 1.0
+        }
     }
 
     Text {
@@ -59,13 +76,13 @@ Rectangle {
             name: 'hovered'
             PropertyChanges { target: label; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: listViewItem; color: '#597fbe'; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         },
         State {
             name: 'pressed'
             PropertyChanges { target: label; opacity: 0.5 }
             PropertyChanges { target: image; height: 32; width: 32; opacity: 0.5 }
-            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: listViewItem; color: '#597fbe'; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         }
     ]
 

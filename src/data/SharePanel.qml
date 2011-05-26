@@ -18,11 +18,10 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Panel {
     id: panel
-
-    color: '#dfdfdf'
 
     PanelHeader {
         id: header
@@ -62,21 +61,24 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         text: qsTr('You can select the folders you want to share with other users from the shares options.')
+        z: 1
     }
 
-    Item {
+    Rectangle {
         id: searchBar
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: help.bottom
-        anchors.margins: 8
+        color: '#e1eafa'
         height: 32
+        z: 1
 
         Image {
             id: searchIcon
 
             anchors.left: parent.left
+            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             height: 16
             width: 16
@@ -84,23 +86,15 @@ Panel {
             smooth: true
         }
 
-        Text {
-            id: searchLabel
-
-            anchors.left: searchIcon.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.margins: 8
-            text: qsTr('Enter the name of the file you are looking for.');
-        }
-
         Rectangle {
-            anchors.left: searchLabel.right
+            anchors.left: searchIcon.right
             anchors.right: parent.right
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             border.color: '#c3c3c3'
-            color: 'white'
-            height: searchEdit.paintedHeight + 4
+            color: '#aaffffff'
+            height: 22
 
             TextEdit {
                 id: searchEdit
@@ -110,6 +104,16 @@ Panel {
                 anchors.leftMargin: 4
                 anchors.rightMargin: 4
                 focus: true
+                text: ''
+            }
+
+            Text {
+                id: searchLabel
+
+                anchors.fill: searchEdit
+                color: '#999999'
+                opacity: searchEdit.text == '' ? 1 : 0
+                text: qsTr('Enter the name of the file you are looking for.');
             }
         }
     }
@@ -121,22 +125,18 @@ Panel {
         anchors.right: parent.right
         anchors.top: searchBar.bottom
         anchors.bottom: queueHelp.top
-        anchors.bottomMargin: 8
 
-        model: shareModel
+        model: ShareModel {}
     }
 
-    Text {
+    PanelHelp {
         id: queueHelp
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: footer.top
-        anchors.margins: 8
-        height: paintedHeight
-
         text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
-        wrapMode: Text.WordWrap
+        z: 1
     }
 
     ShareView {
@@ -146,7 +146,7 @@ Panel {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: model.count * 30
-        model: queueModel
+        model: ShareModel {}
         z: 1
     }
 }

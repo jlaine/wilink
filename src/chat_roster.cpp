@@ -229,11 +229,11 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
-                    this, SLOT(connected()));
+                    this, SLOT(_q_connected()));
     Q_ASSERT(check);
 
     check = connect(d->client, SIGNAL(disconnected()),
-                    this, SLOT(disconnected()));
+                    this, SLOT(_q_disconnected()));
     Q_ASSERT(check);
 
     check = connect(d->client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
@@ -278,17 +278,6 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return MaxColumn;
-}
-
-void ChatRosterModel::connected()
-{
-    // request own vCard
-    d->nickNameReceived = false;
-    d->ownItem->jid = d->client->configuration().jidBare();
-    d->ownItem->name = d->client->configuration().user();
-    d->ownItem->nickName = d->client->configuration().user();
-    d->fetchVCard(d->ownItem->jid);
-    emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
 }
 
 /** Returns the full JID of an online contact which has the requested feature.
@@ -371,7 +360,33 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void ChatRosterModel::disconnected()
+bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return false;
+
+    if (role == MessagesRole) {
+        item->messages = value.toInt();
+        emit dataChanged(index, index);
+        return true;
+    }
+
+    return false;
+}
+
+void ChatRosterModel::_q_connected()
+{
+    // request own vCard
+    d->nickNameReceived = false;
+    d->ownItem->jid = d->client->configuration().jidBare();
+    d->ownItem->name = d->client->configuration().user();
+    d->ownItem->nickName = d->client->configuration().user();
+    d->fetchVCard(d->ownItem->jid);
+    emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
+}
+
+void ChatRosterModel::_q_disconnected()
 {
     d->clientFeatures.clear();
 

@@ -254,6 +254,8 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
 
     // notify bottom change
     emit bottomChanged();
+    if (msg->received && !msg->archived)
+        emit messageReceived(msg->jid, msg->body);
 }
 
 /** Clears all messages.

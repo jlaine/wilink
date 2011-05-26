@@ -151,6 +151,16 @@ Panel {
         model: conversation.historyModel
 
         onParticipantClicked: chatInput.talkAt(participant)
+
+        Connections {
+            target: historyView.model
+            onMessageReceived: {
+                if (panel.opacity == 0) {
+                    window.rosterModel.addPendingMessage(jid);
+                    application.soundPlayer.play(application.incomingMessageSound);
+                }
+            }
+        }
     }
 
     ChatEdit {
@@ -167,8 +177,10 @@ Panel {
         onReturnPressed: {
             if (Qt.isQtObject(conversation)) {
                 var text = chatInput.text;
-                if (conversation.sendMessage(text))
+                if (conversation.sendMessage(text)) {
                     chatInput.text = '';
+                    application.soundPlayer.play(application.outgoingMessageSound);
+                }
             }
         }
     }

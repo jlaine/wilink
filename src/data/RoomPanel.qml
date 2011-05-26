@@ -132,6 +132,16 @@ Panel {
             model: participantModel.historyModel
 
             onParticipantClicked: chatInput.talkAt(participant)
+
+            Connections {
+                target: historyView.model
+                onMessageReceived: {
+                    if (panel.opacity == 0) {
+                        roomListModel.addPendingMessage(participantModel.jid);
+                        application.soundPlayer.play(application.incomingMessageSound);
+                    }
+                }
+            }
         }
 
         RoomParticipantView {
@@ -156,8 +166,10 @@ Panel {
 
         onReturnPressed: {
             var text = chatInput.text;
-            if (room.sendMessage(text))
+            if (room.sendMessage(text)) {
                 chatInput.text = '';
+                application.soundPlayer.play(application.outgoingMessageSound);
+            }
         }
     }
 
