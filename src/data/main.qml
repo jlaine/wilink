@@ -317,6 +317,19 @@ Item {
             }
         }
 
+        // FIXME : this is a hack to replay received messages after
+        // adding the appropriate conversation
+        Connections {
+            target: window.client
+            onMessageReceived: {
+                var jid = Utils.jidToBareJid(from);
+                if (!swapper.findPanel('ConversationPanel.qml', {'jid': jid})) {
+                    showConversation(jid);
+                    window.client.replayMessage();
+                }
+            }
+        }
+
         Connections {
             target: window.client.callManager
             onCallReceived: {

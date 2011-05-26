@@ -21,6 +21,7 @@
 #define __WILINK_CHAT_CLIENT_H__
 
 #include "QXmppClient.h"
+#include "QXmppMessage.h"
 
 class DiagnosticManager;
 class QDateTime;
@@ -70,13 +71,18 @@ public:
 signals:
     void jidChanged(const QString &jid);
     void diagnosticServerChanged(const QString &diagnosticServer);
+    void messageReceived(const QString &from);
     void mucServerChanged(const QString &mucServer);
     void shareServerChanged(const QString &shareServer);
+
+public slots:
+    void replayMessage();
 
 private slots:
     void slotConnected();
     void slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco);
+    void slotMessageReceived(const QXmppMessage &message);
     void slotTimeReceived(const QXmppEntityTimeIq &time);
     void setTurnServer(const QXmppSrvInfo &serviceInfo);
     void setTurnServer(const QHostInfo &hostInfo);
@@ -95,6 +101,7 @@ private:
     QString m_diagnosticServer;
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
+    QXmppMessage m_lastMessage;
     QString m_mucServer;
     QString m_shareServer;
     int timeOffset;

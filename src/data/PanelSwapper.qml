@@ -28,6 +28,27 @@ Item {
         id: panels
     }
 
+    function findPanel(source, properties) {
+        // helper to compare object properties
+        function propEquals(a, b) {
+            if (a.length != b.length)
+                return false;
+            for (var key in a) {
+                if (a[key] != b[key])
+                    return false;
+            }
+            return true;
+        }
+
+        for (var i = 0; i < panels.count; i += 1) {
+            if (panels.get(i).source == source &&
+                propEquals(panels.get(i).properties, properties)) {
+                return panels.get(i).panel;
+            }
+        }
+        return null;
+    }
+
     function showPanel(source, properties) {
         if (properties == undefined)
             properties = {};
@@ -39,24 +60,11 @@ Item {
             return '{' + dump + '}';
         }
 
-        function propEquals(a, b) {
-            if (a.length != b.length)
-                return false;
-            for (var key in a) {
-                if (a[key] != b[key])
-                    return false;
-            }
-            return true;
-        }
-
         // if the panel already exists, show it
-        for (var i = 0; i < panels.count; i += 1) {
-            if (panels.get(i).source == source &&
-                propEquals(panels.get(i).properties, properties)) {
-                console.log("focusing panel " + source + " " + propDump(properties));
-                swapper.setCurrentItem(panels.get(i).panel);
-                return;
-            }
+        var panel = findPanel(source, properties);
+        if (panel) {
+            swapper.setCurrentItem(panel);
+            return;
         }
 
         // otherwise create the panel

@@ -26,6 +26,7 @@
 #include "QXmppEntityTimeIq.h"
 #include "QXmppEntityTimeManager.h"
 #include "QXmppLogger.h"
+#include "QXmppMessage.h"
 #include "QXmppMucManager.h"
 #include "QXmppRosterManager.h"
 #include "QXmppSrvInfo.h"
@@ -39,6 +40,7 @@ ChatClient::ChatClient(QObject *parent)
     timeOffset(0)
 {
     connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
+    connect(this, SIGNAL(messageReceived(QXmppMessage)), this, SLOT(slotMessageReceived(QXmppMessage)));
     discoManager = findExtension<QXmppDiscoveryManager>();
     connect(discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
         this, SLOT(slotDiscoveryInfoReceived(QXmppDiscoveryIq)));
@@ -115,6 +117,11 @@ QString ChatClient::shareServer() const
 QXmppTransferManager *ChatClient::transferManager()
 {
     return getManager<QXmppTransferManager>();
+}
+
+void ChatClient::replayMessage()
+{
+    emit QXmppClient::messageReceived(m_lastMessage);
 }
 
 void ChatClient::slotConnected()
@@ -248,6 +255,14 @@ void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
                     discoQueue.append(id);
             }
         }
+    }
+}
+
+void ChatClient::slotMessageReceived(const QXmppMessage &message)
+{
+    if (message.type() == QXmppMessage::Chat && !message.body().isEmpty()) {
+        m_lastMessage = message;
+        emit messageReceived(message.from());
     }
 }
 
