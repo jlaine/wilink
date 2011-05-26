@@ -197,6 +197,7 @@ void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &result
     {
     case FileSystem::Open:
     case FileSystem::Mkdir:
+    case FileSystem::Put:
     case FileSystem::Remove:
         refresh();
         break;
