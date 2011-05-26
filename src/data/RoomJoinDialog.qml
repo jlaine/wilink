@@ -118,7 +118,7 @@ Dialog {
                 anchors.fill: parent
                 onClicked: {
                     dialog.hide();
-                    showRoom(view.model.jid);
+                    showRoom(model.jid);
                 }
             }
         }
