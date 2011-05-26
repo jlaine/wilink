@@ -27,7 +27,7 @@ Rectangle {
     property alias text: label.text
     signal clicked
 
-    height: 32
+    height: image.sourceSize.height ? 32 : 24
     width: label.width + image.width + 2 * image.anchors.margins
     border.color: '#84bde8'
     gradient: Gradient {
