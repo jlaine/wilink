@@ -51,7 +51,7 @@ Item {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             color: '#597fbe'
-            width: 24
+            width: 32
         }
 
         Rectangle {

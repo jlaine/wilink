@@ -35,8 +35,8 @@ Rectangle {
     }
 
     color: 'transparent'
-    height: 24
-    width: 24
+    height: 32
+    width: 32
     radius: 20
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
@@ -47,8 +47,8 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: listViewItem.enabled ? 1 : 0.5
         smooth: true
-        width: 24
-        height: 24
+        width: parent.width
+        height: parent.height
 
         PropertyAnimation on opacity  {
             id: blinkingEffect
