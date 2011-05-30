@@ -37,7 +37,6 @@ Rectangle {
     color: 'transparent'
     height: 28
     width: 28
-    radius: 20
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
     Image {
@@ -61,6 +60,17 @@ Rectangle {
         }
     }
 
+    Rectangle {
+        id: labelBackground
+
+        anchors.bottom: label.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: label.top
+        opacity: 0
+        color: '#597fbe'
+    }
+
     Text {
         id: label
 
@@ -68,6 +78,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: 0
         color: 'white'
+        font.bold: true
         font.pixelSize: 11
     }
 
@@ -75,14 +86,16 @@ Rectangle {
         State {
             name: 'hovered'
             PropertyChanges { target: label; opacity: 1 }
+            PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: listViewItem; color: '#597fbe'; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         },
         State {
             name: 'pressed'
             PropertyChanges { target: label; opacity: 0.5 }
-            PropertyChanges { target: image; height: 32; width: 32; opacity: 0.5 }
-            PropertyChanges { target: listViewItem; color: '#597fbe'; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: labelBackground; opacity: 1 }
+            PropertyChanges { target: image; height: 32; width: 32 }
+            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         }
     ]
 
