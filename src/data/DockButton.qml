@@ -35,8 +35,8 @@ Rectangle {
     }
 
     color: 'transparent'
-    height: 32
-    width: 32
+    height: 28
+    width: 28
     radius: 20
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 

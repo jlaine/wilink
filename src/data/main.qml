@@ -47,11 +47,25 @@ Item {
         Rectangle {
             id: dockBackground
 
+            height: 32
+            width: parent.height
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.bottom: parent.bottom
-            color: '#597fbe'
-            width: 32
+            anchors.topMargin: -32
+            border.color: '#597fbe'
+            border.width: 1
+
+            gradient: Gradient {
+                GradientStop { position:0.0; color: '#9fb7dd' }
+                GradientStop { position:0.8; color: '#597fbe' }
+                GradientStop { position:1.0; color: '#9fb7dd' }
+            }
+
+            transform: Rotation {
+                angle: 90
+                origin.x: 0
+                origin.y: 32
+            }
         }
 
         Rectangle {
@@ -60,6 +74,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.bottom: parent.bottom
+            anchors.margins:  2
             z: 1
 
             Column {
@@ -124,9 +139,10 @@ Item {
         RosterView {
             id: rooms
 
-            anchors.left: dockBackground.right
+            anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
+            anchors.leftMargin: dockBackground.height
             currentJid: (Qt.isQtObject(swapper.currentItem) && swapper.currentItem.jid != undefined) ? swapper.currentItem.jid : ''
             enabled: window.client.mucServer != ''
             model: RoomListModel {
@@ -153,9 +169,10 @@ Item {
         Rectangle {
             id: splitter
 
-            anchors.left: dockBackground.right
+            anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: rooms.bottom
+            anchors.leftMargin: dockBackground.height
             color: '#567dbc'
             height: 5
 
@@ -192,10 +209,11 @@ Item {
         RosterView {
             id: contacts
 
-            anchors.left: dockBackground.right
+            anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: parent.bottom
+            anchors.leftMargin: dockBackground.height
             currentJid: (Qt.isQtObject(swapper.currentItem) && swapper.currentItem.jid != undefined) ? swapper.currentItem.jid : ''
             model: SortFilterProxyModel {
                 id: contactModel
