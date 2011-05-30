@@ -30,7 +30,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        icon: 'options.png'
+        iconSource: 'options.png'
         title: qsTr('Debugging console')
         z: 1
 
@@ -41,7 +41,7 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'start.png'
+                iconSource: 'start.png'
                 text: qsTr('Start')
                 visible: !logModel.enabled
 
@@ -49,7 +49,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'stop.png'
+                iconSource: 'stop.png'
                 text: qsTr('Stop')
                 visible: logModel.enabled
 
@@ -57,14 +57,14 @@ Panel {
             }
 
             ToolButton {
-                icon: 'refresh.png'
+                iconSource: 'refresh.png'
                 text: qsTr('Clear')
 
                 onClicked: logModel.clear()
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }

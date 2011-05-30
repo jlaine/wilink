@@ -40,7 +40,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        icon: vcard.avatar
+        iconSource: vcard.avatar
         title: '<b>' + vcard.name + '</b> ' + stateText() + '<br/>' + extraText()
         z: 1
 
@@ -74,7 +74,7 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'call.png'
+                iconSource: 'call.png'
                 text: qsTr('Call')
 
                 onClicked: window.client.callManager.call(vcard.jid)
@@ -90,7 +90,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'upload.png'
+                iconSource: 'upload.png'
                 text: qsTr('Send a file')
 
                 onClicked: {
@@ -116,7 +116,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: {
                     conversation.localState = QXmppMessage.Gone

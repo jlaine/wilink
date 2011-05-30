@@ -56,7 +56,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        icon: 'chat.png'
+        iconSource: 'chat.png'
         title: '<b>' + Utils.jidToUser(jid) + '</b>' + '<br/>' + (Qt.isQtObject(room) ? room.subject : '')
         z: 1
 
@@ -67,7 +67,7 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'invite.png'
+                iconSource: 'invite.png'
                 text: qsTr('Invite')
 
                 onClicked: {
@@ -76,7 +76,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'chat.png'
+                iconSource: 'chat.png'
                 text: qsTr('Subject')
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
 
@@ -92,19 +92,19 @@ Panel {
             }
 
             ToolButton {
-                icon: 'options.png'
+                iconSource: 'options.png'
                 text: qsTr('Options')
                 visible: false //room.allowedActions & QXmppMucRoom.ConfigurationAction
             }
 
             ToolButton {
-                icon: 'permissions.png'
+                iconSource: 'permissions.png'
                 text: qsTr('Permissions')
                 visible: false //room.allowedActions & QXmppMucRoom.PermissionsAction
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: {
                     room.leave();

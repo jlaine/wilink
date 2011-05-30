@@ -98,19 +98,19 @@ Item {
         Button {
             id: hangupButton
 
-            icon: 'hangup.png'
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.margins: 4
+            iconSource: 'hangup.png'
         }
 
         Button {
             id: cameraButton
 
-            icon: 'camera.png'
             anchors.right: hangupButton.left
             anchors.top: parent.top
             anchors.margins: 4
+            iconSource: 'camera.png'
         }
 
         ProgressBar {

@@ -22,7 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: listViewItem
 
-    property alias icon: image.source
+    property alias iconSource: image.source
     property alias text: label.text
     property bool enabled: true
     signal clicked

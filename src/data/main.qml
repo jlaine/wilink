@@ -83,7 +83,7 @@ Item {
                 anchors.left: parent.left
 
                 DockButton {
-                    icon: 'diagnostics.png'
+                    iconSource: 'diagnostics.png'
                     text: qsTr('Diagnostics')
                     onClicked: swapper.showPanel('DiagnosticPanel.qml')
                 }
@@ -91,32 +91,32 @@ Item {
 /*
                 DockButton {
                     text: 'Debugging'
-                    icon: 'options.png'
+                    iconSource: 'options.png'
                     onClicked: swapper.showPanel('LogPanel.qml')
                 }
 
                 DockButton {
                     text: 'Discovery'
-                    icon: 'options.png'
+                    iconSource: 'options.png'
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
 
                 DockButton {
                     text: 'Media'
-                    icon: 'start.png'
+                    iconSource: 'start.png'
                     onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
 */
 
                 DockButton {
-                    icon: 'phone.png'
+                    iconSource: 'phone.png'
                     text: qsTr('Phone')
                     visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
                     onClicked: swapper.showPanel('PhonePanel.qml')
                 }
 
                 DockButton {
-                    icon: 'photos.png'
+                    iconSource: 'photos.png'
                     text: qsTr('Photos')
                     onClicked: {
                         var domain = Utils.jidToDomain(window.client.jid);
@@ -128,7 +128,7 @@ Item {
                 }
 
                 DockButton {
-                    icon: 'share.png'
+                    iconSource: 'share.png'
                     text: qsTr('Shares')
                     visible: window.client.shareServer != ''
                     onClicked: swapper.showPanel('SharePanel.qml')

@@ -23,7 +23,7 @@ Rectangle {
     id: button
 
     property bool enabled: true
-    property alias icon: image.source
+    property alias iconSource: image.source
     property alias text: label.text
     signal clicked
 

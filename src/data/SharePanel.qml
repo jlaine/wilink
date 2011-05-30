@@ -29,7 +29,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        icon: 'share.png'
+        iconSource: 'share.png'
         title: '<b>' + qsTr('Shares') + '</b>'
         z: 1
 
@@ -40,14 +40,14 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'options.png'
+                iconSource: 'options.png'
                 text: qsTr('Options')
 
                 onClicked: window.showPreferences('shares')
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }

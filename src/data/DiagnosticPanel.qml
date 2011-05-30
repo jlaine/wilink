@@ -29,7 +29,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        icon: 'diagnostics.png'
+        iconSource: 'diagnostics.png'
         title: '<b>' + qsTr('Diagnostics') + '</b>'
         z: 1
 
@@ -40,7 +40,7 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'refresh.png'
+                iconSource: 'refresh.png'
                 enabled: !window.client.diagnosticManager.running
                 text: qsTr('Refresh')
 
@@ -48,7 +48,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }

@@ -63,7 +63,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        icon: 'phone.png'
+        iconSource: 'phone.png'
         title: '<b>' + qsTr('Phone') + '</b><br />' + (historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : '')
 
         Row {
@@ -73,7 +73,7 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }
@@ -140,7 +140,7 @@ Panel {
             anchors.top: parent.top
             anchors.right: callButton.left
             anchors.rightMargin: 4
-            icon: 'back.png'
+            iconSource: 'back.png'
 
             onClicked: {
                 var oldPos = numberEdit.cursorPosition;
@@ -156,7 +156,7 @@ Panel {
             anchors.top: parent.top
             anchors.right: parent.right
             enabled: historyModel.client.state == SipClient.ConnectedState
-            icon: 'call.png'
+            iconSource: 'call.png'
             text: qsTr('Call')
             visible: historyModel.currentCalls == 0
 
@@ -176,7 +176,7 @@ Panel {
 
             anchors.top: parent.top
             anchors.right: parent.right
-            icon: 'hangup.png'
+            iconSource: 'hangup.png'
             text: qsTr('Hangup')
             visible: historyModel.currentCalls != 0
 

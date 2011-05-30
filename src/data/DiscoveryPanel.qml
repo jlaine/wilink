@@ -34,7 +34,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        icon: 'diagnostics.png'
+        iconSource: 'diagnostics.png'
         title: qsTr('Service discovery')
         z: 1
 
@@ -45,7 +45,7 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'back.png'
+                iconSource: 'back.png'
                 text: qsTr('Go back')
                 enabled: crumbs.count > 0
 
@@ -58,7 +58,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'refresh.png'
+                iconSource: 'refresh.png'
                 text: qsTr('Refresh')
 
                 onClicked: {
@@ -67,7 +67,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }

@@ -35,7 +35,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        icon: 'photos.png'
+        iconSource: 'photos.png'
         title: '<b>' + qsTr('Photos') + '</b>'
         z: 1
 
@@ -47,7 +47,7 @@ Panel {
 
             ToolButton {
                 enabled: crumbs.count > 0
-                icon: 'back.png'
+                iconSource: 'back.png'
                 text: qsTr('Go back')
 
                 onClicked: {
@@ -59,7 +59,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'upload.png'
+                iconSource: 'upload.png'
                 text: qsTr('Upload')
                 enabled: crumbs.count > 0
 
@@ -76,13 +76,13 @@ Panel {
             }
 
             ToolButton {
-                icon: 'stop.png'
+                iconSource: 'stop.png'
                 text: qsTr('Cancel')
                 visible: false
             }
 
             ToolButton {
-                icon: 'add.png'
+                iconSource: 'add.png'
                 text: qsTr('Create an album')
                 enabled: crumbs.count == 0
 
@@ -97,7 +97,7 @@ Panel {
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }

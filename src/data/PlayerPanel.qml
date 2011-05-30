@@ -129,7 +129,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        icon: 'start.png'
+        iconSource: 'start.png'
         title: qsTr('Media player')
         z: 1
 
@@ -140,14 +140,14 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                icon: 'stop.png'
+                iconSource: 'stop.png'
                 text: qsTr('Stop')
                 visible: playerModel.playing
                 onClicked: playerModel.stop()
             }
 
             ToolButton {
-                icon: 'close.png'
+                iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }

@@ -22,7 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: header
 
-    property alias icon: iconImage.source
+    property alias iconSource: iconImage.source
     property alias title: titleText.text
 
     signal itemClicked(int index)
