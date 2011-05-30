@@ -68,7 +68,6 @@ set(wiLink_SOURCES
     plugins/declarative.cpp
     plugins/diagnostics.cpp
     plugins/discovery.cpp
-    plugins/menu.cpp
     plugins/photos.cpp
     plugins/phone.cpp
     plugins/phone/sip.cpp
@@ -106,7 +105,6 @@ set(wiLink_MOC_HEADERS
     plugins/declarative.h
     plugins/diagnostics.h
     plugins/discovery.h
-    plugins/menu.h
     plugins/photos.h
     plugins/phone.h
     plugins/phone/sip.h

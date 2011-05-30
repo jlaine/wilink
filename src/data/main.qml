@@ -408,6 +408,13 @@ Item {
     }
 
     Loader {
-        source: (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : ''
+        id: wifirst
+
+        Connections {
+            target: window.client
+            onConnected: {
+                wifirst.source = (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : '';
+            }
+        }
     }
 }

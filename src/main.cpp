@@ -33,7 +33,6 @@
 #include "updatesdialog.h"
 
 Q_IMPORT_PLUGIN(calls)
-Q_IMPORT_PLUGIN(menu)
 Q_IMPORT_PLUGIN(shares)
 
 static int aborted = 0;
