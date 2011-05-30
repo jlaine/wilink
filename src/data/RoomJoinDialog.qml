@@ -28,6 +28,8 @@ Dialog {
     title: qsTr('Join or create a chat room')
     minWidth: 320
     minHeight: 240
+    height: 300
+    width: 400
 
     onAccepted: {
         if (roomEdit.text.length) {
@@ -36,16 +38,14 @@ Dialog {
         }
     }
 
-    Text {
+    PanelHelp {
         id: help
 
         anchors.top: contents.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 8
-        height: paintedHeight
         text: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
-        wrapMode: Text.WordWrap
     }
 
     Rectangle {
