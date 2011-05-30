@@ -145,13 +145,13 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    Image {
         id: resizeButton
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.margins: 2
         opacity: 0.5
-        color: '#ffffff'
+        source: 'resize.png'
         height: 16
         width: 16
 

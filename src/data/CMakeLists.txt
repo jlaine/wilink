@@ -34,6 +34,7 @@ generate_png(png
     plugin.svg
     refresh.svg
     remove.svg
+    resize.svg
     search.svg
     share.svg
     start.svg
