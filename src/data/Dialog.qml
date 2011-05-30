@@ -24,6 +24,8 @@ Rectangle {
 
     property alias contents: item
     property alias title: label.text
+    property int minWidth: 32
+    property int minHeight: 32
     signal accepted
 
     border.color: '#aa567dbc'
@@ -140,6 +142,51 @@ Rectangle {
         Button {
             text: qsTr('Cancel')
             onClicked: dialog.hide()
+        }
+    }
+
+    Rectangle {
+        id: resizeButton
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.margins: 2
+        opacity: 0.5
+        color: '#ffffff'
+        height: 16
+        width: 16
+
+        MouseArea {
+            property variant mousePress
+            property variant sizePress
+
+            anchors.fill: parent
+            hoverEnabled: true
+
+            onEntered: {
+                parent.opacity = 1
+            }
+
+            onExited: {
+                parent.opacity = 0.5
+            }
+
+            onPressed: {
+                mousePress = mapToItem(dialog.parent, mouse.x, mouse.y);
+                sizePress = {height: dialog.height, width: dialog.width};
+            }
+
+            onPositionChanged: {
+                if (mouse.buttons & Qt.LeftButton) {
+                    var mouseCurrent = mapToItem(dialog.parent, mouse.x, mouse.y);
+                    var maxSize = root.mapToItem(dialog.parent, root.width - dialog.x, root.height - dialog.y);
+
+                    var newWidth = sizePress.width + (mouseCurrent.x - mousePress.x);
+                    var newHeight = sizePress.height + (mouseCurrent.y - mousePress.y);
+
+                    dialog.width = Math.max(dialog.minWidth, Math.min(newWidth, maxSize.x));
+                    dialog.height = Math.max(dialog.minHeight, Math.min(newHeight, maxSize.y));
+                }
+            }
         }
     }
 }
