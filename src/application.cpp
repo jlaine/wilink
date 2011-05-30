@@ -61,7 +61,7 @@ public:
     bool libnotify_accepts_actions;
 #endif
 #ifdef USE_SYSTRAY
-    QWidget *trayContext;
+    QObject *trayContext;
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
 #endif
@@ -525,7 +525,7 @@ static void notificationClicked(NotifyNotification *notification, char *action, 
 {
     if(g_strcmp0(action, "show-conversation") == 0)
     {
-        QMetaObject::invokeMethod(wApp, "messageClicked", Q_ARG(QWidget*, (QWidget*)data));
+        QMetaObject::invokeMethod(wApp, "messageClicked", Q_ARG(QObject*, (QObject*)data));
         notify_notification_close(notification, NULL);
     }
 }
@@ -539,7 +539,7 @@ static void notificationClosed(NotifyNotification *notification)
 }
 #endif
 
-void Application::showMessage(QWidget *context, const QString &title, const QString &message)
+void Application::showMessage(QObject *context, const QString &title, const QString &message)
 {
 #if defined(USE_LIBNOTIFY)
     NotifyNotification *notification = notify_notification_new((const char *)title.toUtf8(),

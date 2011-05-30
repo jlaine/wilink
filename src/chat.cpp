@@ -166,8 +166,8 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<QDeclarativeSortFilterProxyModel>("wiLink", 1, 2, "SortFilterProxyModel");
 
     /* get handle to application */
-    check = connect(wApp, SIGNAL(messageClicked(QWidget*)),
-                    this, SLOT(messageClicked(QWidget*)));
+    check = connect(wApp, SIGNAL(messageClicked(QObject*)),
+                    this, SLOT(messageClicked(QObject*)));
     Q_ASSERT(check);
 
     d->client = new ChatClient(this);
@@ -631,7 +631,7 @@ void Chat::openUrl(const QUrl &url)
 
 /** Handle a click on a system tray message.
  */
-void Chat::messageClicked(QWidget *context)
+void Chat::messageClicked(QObject *context)
 {
     ChatPanel *panel = qobject_cast<ChatPanel*>(context);
     if (panel && d->chatPanels.contains(panel))

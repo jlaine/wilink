@@ -65,7 +65,6 @@ public:
 #endif
 
     bool isInstalled();
-    void showMessage(QWidget *context, const QString &title, const QString &message);
 
     // preferences
     bool openAtLogin() const;
@@ -84,12 +83,13 @@ public:
 signals:
     void audioInputDeviceChanged(const QAudioDeviceInfo &device);
     void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
-    void messageClicked(QWidget *context);
+    void messageClicked(QObject *context);
     void openAtLoginChanged(bool run);
     void showOfflineContactsChanged(bool show);
 
 public slots:
     void openUrl(const QUrl &url);
+    void showMessage(QObject *context, const QString &title, const QString &message);
 
 private slots:
     void messageClicked();

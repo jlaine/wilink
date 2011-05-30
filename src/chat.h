@@ -79,7 +79,7 @@ public slots:
 
 private slots:
     void error(QXmppClient::Error error);
-    void messageClicked(QWidget *context);
+    void messageClicked(QObject *context);
     void panelChanged(int index);
     void pendingMessages(int messages);
     void promptCredentials();
