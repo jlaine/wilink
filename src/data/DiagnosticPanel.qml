@@ -30,7 +30,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         icon: 'diagnostics.png'
-        title: qsTr('Diagnostics')
+        title: '<b>' + qsTr('Diagnostics') + '</b>'
         z: 1
 
         Row {
