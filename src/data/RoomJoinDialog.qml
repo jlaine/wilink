@@ -26,6 +26,8 @@ Dialog {
     property alias model: view.model
 
     title: qsTr('Join or create a chat room')
+    minWidth: 320
+    minHeight: 240
 
     onAccepted: {
         if (roomEdit.text.length) {

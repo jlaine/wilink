@@ -26,6 +26,8 @@ Dialog {
     property alias reason: reasonEdit.text
     property variant selection: []
 
+    minWidth: 200
+    minHeight: 150
     title: qsTr('Invite your contacts')
 
     Rectangle {
