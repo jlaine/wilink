@@ -138,6 +138,7 @@ Panel {
                 onMessageReceived: {
                     if (panel.opacity == 0) {
                         roomListModel.addPendingMessage(participantModel.jid);
+                        application.showMessage(panel, Utils.jidToResource(jid), text);
                         application.soundPlayer.play(application.incomingMessageSound);
                     }
                 }

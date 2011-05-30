@@ -157,6 +157,7 @@ Panel {
             onMessageReceived: {
                 if (panel.opacity == 0) {
                     window.rosterModel.addPendingMessage(jid);
+                    application.showMessage(panel, vcard.name, text);
                     application.soundPlayer.play(application.incomingMessageSound);
                 }
             }

@@ -400,6 +400,11 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
+
+        Connections {
+            target: application
+            onMessageClicked: swapper.setCurrentItem(context)
+        }
     }
 
     Loader {
