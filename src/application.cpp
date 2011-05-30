@@ -234,7 +234,7 @@ void Application::createSystemTrayIcon()
     connect(d->trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(trayActivated(QSystemTrayIcon::ActivationReason)));
     connect(d->trayIcon, SIGNAL(messageClicked()),
-            this, SLOT(messageClicked()));
+            this, SLOT(trayClicked()));
     d->trayIcon->show();
 #endif
 }
@@ -513,13 +513,6 @@ void Application::setAudioOutputDevice(const QAudioDeviceInfo &device)
     emit audioOutputDeviceChanged(device);
 }
 
-void Application::messageClicked()
-{
-#ifdef USE_SYSTRAY
-    emit messageClicked(d->trayContext);
-#endif
-}
-
 #ifdef USE_LIBNOTIFY
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {
@@ -611,6 +604,12 @@ void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
     if (reason != QSystemTrayIcon::Context)
         showChats();
 }
+
+void Application::trayClicked()
+{
+    emit messageClicked(d->trayContext);
+}
+
 QSystemTrayIcon *Application::trayIcon()
 {
     return d->trayIcon;

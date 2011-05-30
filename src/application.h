@@ -92,12 +92,12 @@ public slots:
     void showMessage(QObject *context, const QString &title, const QString &message);
 
 private slots:
-    void messageClicked();
     void resetChats();
     void showAccounts();
     void showChats();
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
+    void trayClicked();
 #endif
 
 private:
