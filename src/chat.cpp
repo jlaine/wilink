@@ -44,7 +44,6 @@
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
-#include <QSplitter>
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStringList>
@@ -72,7 +71,6 @@
 #include "chat_accounts.h"
 #include "chat_client.h"
 #include "chat_history.h"
-#include "chat_panel.h"
 #include "chat_plugin.h"
 #include "chat_roster.h"
 #include "chat_status.h"
@@ -107,13 +105,9 @@ public:
     QAction *findAgainAction;
 
     ChatClient *client;
-    QList<ChatPanel*> chatPanels;
     ChatRosterModel *rosterModel;
     QDeclarativeView *rosterView;
     QString windowTitle;
-
-    QWidget *leftPanel;
-    QStackedWidget *conversationPanel;
 
     QList<ChatPlugin*> plugins;
 };
@@ -165,29 +159,21 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
     qmlRegisterType<QDeclarativeSortFilterProxyModel>("wiLink", 1, 2, "SortFilterProxyModel");
 
-    /* get handle to application */
-    check = connect(wApp, SIGNAL(messageClicked(QObject*)),
-                    this, SLOT(messageClicked(QObject*)));
-    Q_ASSERT(check);
-
+    // create client
     d->client = new ChatClient(this);
     d->rosterModel =  new ChatRosterModel(d->client, this);
     connect(d->rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
-    /* set up logger */
     QXmppLogger *logger = new QXmppLogger(this);
     logger->setLoggingType(QXmppLogger::SignalLogging);
     d->client->setLogger(logger);
 
-    /* build splitter */
-    QSplitter *splitter = new QSplitter;
-    splitter->setChildrenCollapsible(false);
-
-    /* left panel */
-    d->leftPanel = new QWidget;
-    QVBoxLayout *leftLayout = new QVBoxLayout;
-    leftLayout->setMargin(0);
-    leftLayout->setSpacing(0);
+    // create gui
+    QWidget *centralWidget = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    centralWidget->setLayout(layout);
 
     // create declarative view
     d->rosterView = new QDeclarativeView;
@@ -207,20 +193,10 @@ Chat::Chat(QWidget *parent)
     context->setContextProperty("window", this);
 
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
-    leftLayout->addWidget(d->rosterView);
 
-    leftLayout->addWidget(new ChatStatus(d->client));
-    d->leftPanel->setLayout(leftLayout);
-    splitter->addWidget(d->leftPanel);
-    splitter->setStretchFactor(1, 1);
-
-    /* right panel */
-    d->conversationPanel = new QStackedWidget;
-    d->conversationPanel->hide();
-    connect(d->conversationPanel, SIGNAL(currentChanged(int)), this, SLOT(panelChanged(int)));
-    splitter->addWidget(d->conversationPanel);
-    splitter->setStretchFactor(1, 1);
-    setCentralWidget(splitter);
+    layout->addWidget(d->rosterView);
+    layout->addWidget(new ChatStatus(d->client));
+    setCentralWidget(centralWidget);
 
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -272,10 +248,6 @@ Chat::Chat(QWidget *parent)
 
 Chat::~Chat()
 {
-    foreach (ChatPanel *panel, d->chatPanels)
-        if (!panel->parent())
-            delete panel;
-
     // disconnect
     d->client->disconnectFromServer();
 
@@ -284,22 +256,6 @@ Chat::~Chat()
         d->plugins[i]->finalize(this);
 
     delete d;
-}
-
-/** Connect signals for the given panel.
- *
- * @param panel
- */
-void Chat::addPanel(ChatPanel *panel)
-{
-    if (d->chatPanels.contains(panel))
-        return;
-    connect(panel, SIGNAL(destroyed(QObject*)), this, SLOT(destroyPanel(QObject*)));
-    connect(panel, SIGNAL(hidePanel()), this, SLOT(hidePanel()));
-    connect(panel, SIGNAL(notifyPanel(QString, int)), this, SLOT(notifyPanel(QString, int)));
-    connect(panel, SIGNAL(showPanel()), this, SLOT(showPanel()));
-
-    d->chatPanels << panel;
 }
 
 void Chat::alert()
@@ -319,164 +275,6 @@ void Chat::alert()
      * we implement our own version.
      */
     wApp->alert(this);
-}
-
-/** When a panel is destroyed, from it from our list of panels.
- *
- * @param obj
- */
-void Chat::destroyPanel(QObject *obj)
-{
-    d->chatPanels.removeAll(static_cast<ChatPanel*>(obj));
-}
-
-/** Hide a panel.
- */
-void Chat::hidePanel()
-{
-    QWidget *panel = qobject_cast<QWidget*>(sender());
-    if (d->conversationPanel->indexOf(panel) < 0)
-    {
-        panel->hide();
-        return;
-    }
-
-    // close view
-    if (d->conversationPanel->count() == 1)
-    {
-        d->conversationPanel->hide();
-#ifdef WILINK_EMBEDDED
-        d->leftPanel->show();
-#endif
-    }
-    d->conversationPanel->removeWidget(panel);
-}
-
-/** Notify the user of activity on a panel.
- */
-void Chat::notifyPanel(const QString &message, int options)
-{
-    QWidget *panel = qobject_cast<QWidget*>(sender());
-    QWidget *window = panel->isVisible() ? panel->window() : this;
-
-    // add pending message
-    bool showMessage = (options & ChatPanel::ForceNotification);
-    if (!window->isActiveWindow() || (window == this && d->conversationPanel->currentWidget() != panel))
-    {
-        d->rosterModel->addPendingMessage(panel->objectName());
-        showMessage = true;
-    }
-    if (showMessage)
-        wApp->showMessage(panel, panel->windowTitle(), message);
-
-    // show the chat window
-    if (!window->isVisible())
-    {
-#ifdef Q_OS_MAC
-        window->show();
-#else
-        window->showMinimized();
-#endif
-    }
-
-    /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
-     * only causes the dock icon to bounce for one second, instead of
-     * bouncing until the user focuses the window. To work around this
-     * we implement our own version.
-     */
-    wApp->alert(window);
-}
-
-/** Show a panel.
- */
-void Chat::showPanel()
-{
-    ChatPanel *panel = qobject_cast<ChatPanel*>(sender());
-    if (!panel)
-        return;
-
-    // if the panel is detached, stop here
-    if (panel->isVisible() && !panel->parent())
-    {
-        panel->raise();
-        panel->activateWindow();
-        panel->setFocus();
-        return;
-    }
-
-    // add panel
-    if (d->conversationPanel->indexOf(panel) < 0)
-    {
-        d->conversationPanel->addWidget(panel);
-#ifdef WILINK_EMBEDDED
-        d->leftPanel->hide();
-#endif
-        d->conversationPanel->show();
-    }
-
-    // make sure window is visible
-    if (!isActiveWindow())
-    {
-        setWindowState(windowState() & ~Qt::WindowMinimized);
-        show();
-        raise();
-        activateWindow();
-    }
-    d->conversationPanel->setCurrentWidget(panel);
-}
-
-/** Handle switching between panels.
- *
- * @param index
- */
-void Chat::panelChanged(int index)
-{
-    disconnect(d->findAction, SIGNAL(triggered(bool)));
-    disconnect(d->findAgainAction, SIGNAL(triggered(bool)));
-
-    QWidget *widget = d->conversationPanel->widget(index);
-    if (!widget)
-    {
-        d->findAction->setEnabled(false);
-        d->findAgainAction->setEnabled(false);
-        return;
-    }
-
-    // connect find actions
-    connect(d->findAction, SIGNAL(triggered(bool)), widget, SIGNAL(findPanel()));
-    connect(d->findAgainAction, SIGNAL(triggered(bool)), widget, SIGNAL(findAgainPanel()));
-    d->findAction->setEnabled(true);
-    d->findAgainAction->setEnabled(true);
-
-    d->rosterModel->clearPendingMessages(widget->objectName());
-
-#if 0
-    // select the corresponding roster entry
-    QModelIndex newIndex = d->rosterView->mapFromRoster(
-        d->rosterModel->findItem(widget->objectName()));
-    QModelIndex currentIndex = d->rosterView->currentIndex();
-    while (currentIndex.isValid() && currentIndex != newIndex)
-        currentIndex = currentIndex.parent();
-    if (currentIndex != newIndex)
-        d->rosterView->setCurrentIndex(newIndex);
-#endif
-
-    widget->setFocus();
-}
-
-/** When the window is activated, pass focus to the active chat.
- *
- * @param event
- */
-void Chat::changeEvent(QEvent *event)
-{
-    QWidget::changeEvent(event);
-    if (event->type() == QEvent::ActivationChange && isActiveWindow())
-    {
-        int index = d->conversationPanel->currentIndex();
-        if (index >= 0)
-            panelChanged(index);
-    }
 }
 
 /** Handle an error talking to the chat server.
@@ -646,27 +444,6 @@ bool Chat::open(const QString &jid)
 void Chat::openUrl(const QUrl &url)
 {
     emit urlClick(url);
-}
-
-/** Handle a click on a system tray message.
- */
-void Chat::messageClicked(QObject *context)
-{
-    ChatPanel *panel = qobject_cast<ChatPanel*>(context);
-    if (panel && d->chatPanels.contains(panel))
-        QTimer::singleShot(0, panel, SIGNAL(showPanel()));
-}
-
-/** Find a panel by its object name.
- *
- * @param objectName
- */
-ChatPanel *Chat::panel(const QString &objectName)
-{
-    foreach (ChatPanel *panel, d->chatPanels)
-        if (panel->objectName() == objectName)
-            return panel;
-    return 0;
 }
 
 void Chat::setWindowTitle(const QString &title)

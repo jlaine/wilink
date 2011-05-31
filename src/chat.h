@@ -61,8 +61,6 @@ public:
     QDeclarativeView *rosterView();
 
     bool open(const QString &jid);
-    void addPanel(ChatPanel *panel);
-    ChatPanel *panel(const QString &objectName);
     void setWindowTitle(const QString &title);
 
 signals:
@@ -80,20 +78,10 @@ public slots:
 
 private slots:
     void error(QXmppClient::Error error);
-    void messageClicked(QObject *context);
-    void panelChanged(int index);
     void pendingMessages(int messages);
     void promptCredentials();
     void showAbout();
     void showHelp();
-
-    void destroyPanel(QObject *obj);
-    void hidePanel();
-    void notifyPanel(const QString &message, int options);
-    void showPanel();
-
-private:
-    void changeEvent(QEvent *event);
 
 private:
     ChatPrivate * const d;
