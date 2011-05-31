@@ -49,6 +49,7 @@ class Chat : public QMainWindow
     Q_OBJECT
     Q_PROPERTY(ChatClient* client READ client CONSTANT)
     Q_PROPERTY(ChatRosterModel* rosterModel READ rosterModel CONSTANT)
+    Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
 
 public:
     Chat(QWidget *parent = 0);
@@ -61,6 +62,8 @@ public:
     void setWindowTitle(const QString &title);
 
 signals:
+    void isActiveWindowChanged();
+
     /** Plugins should connect to this signal to handle XMPP URIs.
      */
     void urlClick(const QUrl &url);
@@ -79,6 +82,9 @@ private slots:
     void promptCredentials();
     void showAbout();
     void showHelp();
+
+protected:
+    void changeEvent(QEvent *event);
 
 private:
     ChatPrivate * const d;

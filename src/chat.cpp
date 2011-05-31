@@ -273,6 +273,13 @@ void Chat::alert()
     wApp->alert(this);
 }
 
+void Chat::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::ActivationChange)
+        emit isActiveWindowChanged();
+}
+
 /** Handle an error talking to the chat server.
  *
  * @param error
