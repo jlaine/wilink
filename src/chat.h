@@ -27,7 +27,6 @@
 #include "chat_preferences.h"
 
 class Application;
-class ChatPanel;
 class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
@@ -36,7 +35,6 @@ class QAudioOutput;
 class QBuffer;
 class QCheckBox;
 class QComboBox;
-class QDeclarativeView;
 class QFileDialog;
 class QInputDialog;
 class QLabel;
@@ -58,7 +56,6 @@ public:
 
     ChatClient *client();
     ChatRosterModel *rosterModel();
-    QDeclarativeView *rosterView();
 
     bool open(const QString &jid);
     void setWindowTitle(const QString &title);

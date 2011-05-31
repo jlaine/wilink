@@ -24,7 +24,6 @@
 #include <QBuffer>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDebug>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
@@ -44,11 +43,8 @@
 #include <QPluginLoader>
 #include <QPushButton>
 #include <QShortcut>
-#include <QStackedWidget>
-#include <QStatusBar>
 #include <QStringList>
 #include <QTimer>
-#include <QToolBar>
 
 #include "QSoundMeter.h"
 #include "QSoundPlayer.h"
@@ -360,13 +356,6 @@ ChatClient *Chat::client()
 ChatRosterModel *Chat::rosterModel()
 {
     return d->rosterModel;
-}
-
-/** Return this window's chat roster view.
- */
-QDeclarativeView *Chat::rosterView()
-{
-    return d->rosterView;
 }
 
 /** Open the connection to the chat server.
