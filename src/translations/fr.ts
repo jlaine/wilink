@@ -356,13 +356,6 @@
     </message>
 </context>
 <context>
-    <name>Menu</name>
-    <message>
-        <source>&amp;Services</source>
-        <translation>&amp;Services</translation>
-    </message>
-</context>
-<context>
     <name>PhoneHistoryView</name>
     <message>
         <source>Call</source>
