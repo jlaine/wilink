@@ -342,7 +342,7 @@ Item {
             onMessageReceived: {
                 var jid = Utils.jidToBareJid(from);
                 if (!swapper.findPanel('ConversationPanel.qml', {'jid': jid})) {
-                    showConversation(jid);
+                    swapper.addPanel('ConversationPanel.qml', {'jid': jid});
                     window.client.replayMessage();
                 }
             }

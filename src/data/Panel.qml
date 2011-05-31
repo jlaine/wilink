@@ -26,5 +26,6 @@ Rectangle {
     signal notify(string title, string text)
 
     anchors.fill: parent
+    opacity: 0
 }
 

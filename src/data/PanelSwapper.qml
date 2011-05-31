@@ -28,28 +28,7 @@ Item {
         id: panels
     }
 
-    function findPanel(source, properties) {
-        // helper to compare object properties
-        function propEquals(a, b) {
-            if (a.length != b.length)
-                return false;
-            for (var key in a) {
-                if (a[key] != b[key])
-                    return false;
-            }
-            return true;
-        }
-
-        for (var i = 0; i < panels.count; i += 1) {
-            if (panels.get(i).source == source &&
-                propEquals(panels.get(i).properties, properties)) {
-                return panels.get(i).panel;
-            }
-        }
-        return null;
-    }
-
-    function showPanel(source, properties) {
+    function addPanel(source, properties) {
         if (properties == undefined)
             properties = {};
 
@@ -60,11 +39,10 @@ Item {
             return '{' + dump + '}';
         }
 
-        // if the panel already exists, show it
+        // if the panel already exists, return it
         var panel = findPanel(source, properties);
         if (panel) {
-            swapper.setCurrentItem(panel);
-            return;
+            return panel;
         }
 
         // otherwise create the panel
@@ -112,6 +90,32 @@ Item {
             application.soundPlayer.play(application.incomingMessageSound);
         });
         panels.append({'source': source, 'properties': properties, 'panel': panel});
+        return panel;
+    }
+
+    function findPanel(source, properties) {
+        // helper to compare object properties
+        function propEquals(a, b) {
+            if (a.length != b.length)
+                return false;
+            for (var key in a) {
+                if (a[key] != b[key])
+                    return false;
+            }
+            return true;
+        }
+
+        for (var i = 0; i < panels.count; i += 1) {
+            if (panels.get(i).source == source &&
+                propEquals(panels.get(i).properties, properties)) {
+                return panels.get(i).panel;
+            }
+        }
+        return null;
+    }
+
+    function showPanel(source, properties) {
+        var panel = addPanel(source, properties);
         swapper.setCurrentItem(panel);
         return panel;
     }
