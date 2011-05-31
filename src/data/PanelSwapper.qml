@@ -79,7 +79,6 @@ Item {
             }
         });
         panel.notify.connect(function(title, text) {
-            console.log("title: " + title);
             // show notification
             application.showMessage(panel, title, text);
 
