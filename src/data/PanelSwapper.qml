@@ -99,8 +99,18 @@ Item {
                     break;
                 }
             }
+        });
+        panel.notify.connect(function(title, text) {
+            console.log("title: " + title);
+            // show notification
+            application.showMessage(panel, title, text);
 
-        })
+            // alert window
+            window.alert();
+
+            // play a sound
+            application.soundPlayer.play(application.incomingMessageSound);
+        });
         panels.append({'source': source, 'properties': properties, 'panel': panel});
         swapper.setCurrentItem(panel);
         return panel;

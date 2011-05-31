@@ -136,10 +136,9 @@ Panel {
             Connections {
                 target: historyView.model
                 onMessageReceived: {
-                    if (panel.opacity == 0) {
+                    if (true || !window.isActiveWindow || panel.opacity == 0) {
                         roomListModel.addPendingMessage(participantModel.jid);
-                        application.showMessage(panel, Utils.jidToResource(jid), text);
-                        application.soundPlayer.play(application.incomingMessageSound);
+                        panel.notify(Utils.jidToResource(jid), text);
                     }
                 }
             }

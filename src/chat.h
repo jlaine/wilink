@@ -71,6 +71,7 @@ signals:
     void urlClick(const QUrl &url);
 
 public slots:
+    void alert();
     void openUrl(const QUrl &url);
     QFileDialog *fileDialog();
     QInputDialog *inputDialog();

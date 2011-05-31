@@ -155,10 +155,9 @@ Panel {
         Connections {
             target: historyView.model
             onMessageReceived: {
-                if (panel.opacity == 0) {
+                if (!window.isActiveWindow || panel.opacity == 0) {
                     window.rosterModel.addPendingMessage(jid);
-                    application.showMessage(panel, vcard.name, text);
-                    application.soundPlayer.play(application.incomingMessageSound);
+                    panel.notify(vcard.name, text);
                 }
             }
         }
