@@ -71,7 +71,10 @@ Panel {
                 text: qsTr('Invite')
 
                 onClicked: {
-                    inviteDialog.show()
+                    dialog.source = 'RoomInviteDialog.qml';
+                    dialog.item.model = contactModel;
+                    dialog.item.room = room;
+                    dialog.item.show()
                 }
             }
 
@@ -173,22 +176,12 @@ Panel {
         }
     }
 
-    RoomInviteDialog {
-        id: inviteDialog
+    Loader {
+        id: dialog
 
         x: 10
         y: 110
-        model: contactModel
-        visible: false
 
-        onAccepted: {
-            for (var i in selection) {
-                console.log("inviting " + selection[i]);
-                room.sendInvitation(selection[i], reason);
-            }
-            selection = [];
-            inviteDialog.hide()
-        }
     }
 
     Connections {
