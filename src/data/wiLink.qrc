@@ -60,6 +60,7 @@
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
+    <file>ContactAddDialog.qml</file>
     <file>ConversationPanel.qml</file>
     <file>DiagnosticPanel.qml</file>
     <file>Dialog.qml</file>
