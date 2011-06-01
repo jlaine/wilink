@@ -87,12 +87,16 @@ Panel {
                 enabled: crumbs.count == 0
 
                 onClicked: {
-                    var dialog = window.inputDialog();
-                    dialog.windowTitle = qsTr('Create an album');
-                    dialog.labelText = qsTr('Album name:');
-                    if (dialog.exec() && dialog.textValue.length > 0) {
-                        photoModel.createAlbum(dialog.textValue);
-                    }
+                    dialog.source = 'InputDialog.qml';
+                    dialog.item.title = qsTr('Create an album');
+                    dialog.item.labelText = qsTr('Album name:');
+                    dialog.item.accepted.connect(function() {
+                        var name = dialog.item.textValue;
+                        if (name.length > 0) {
+                            photoModel.createAlbum(name);
+                        }
+                        dialog.item.hide();
+                    });
                 }
             }
 

@@ -143,12 +143,13 @@ Item {
             if (item.action == 'profile') {
                 Qt.openUrlExternally(item.url)
             } else if (item.action == 'kick') {
-                var dialog = window.inputDialog();
-                dialog.windowTitle = qsTr('Kick user');
-                dialog.labelText = qsTr('Enter the reason for kicking the user from the room.');
-                if (dialog.exec()) {
-                    room.kick(item.jid, dialog.textValue);
-                }
+                dialog.source = 'InputDialog.qml';
+                dialog.item.title = qsTr('Kick user');
+                dialog.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
+                dialog.item.accepted.connect(function() {
+                    room.kick(item.jid, dialog.item.textValue);
+                    dialog.item.hide();
+                });
             }
         }
     }

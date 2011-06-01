@@ -307,14 +307,15 @@ Item {
                     if (item.action == 'profile') {
                         Qt.openUrlExternally(item.url);
                     } else if (item.action == 'rename') {
-                        var dialog = window.inputDialog();
-                        dialog.windowTitle = qsTr('Rename contact');
-                        dialog.labelText = qsTr("Enter the name for this contact.");
-                        dialog.textValue = item.name;
-                        if (dialog.exec()) {
-                            console.log("rename " + item.jid + ": " + dialog.textValue);
-                            window.client.rosterManager.renameItem(item.jid, dialog.textValue);
-                        }
+                        dialog.source = 'InputDialog.qml';
+                        dialog.item.title = qsTr('Rename contact');
+                        dialog.item.labelText = qsTr("Enter the name for this contact.");
+                        dialog.item.textValue = item.name;
+                        dialog.item.accepted.connect(function() {
+                            console.log("rename " + item.jid + ": " + dialog.item.textValue);
+                            window.client.rosterManager.renameItem(item.jid, dialog.item.textValue);
+                            dialog.item.hide();
+                        });
                     } else if (item.action == 'remove') {
                         var box = window.messageBox();
                         box.windowTitle = qsTr("Remove contact");
