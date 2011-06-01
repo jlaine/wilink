@@ -52,6 +52,7 @@ Rectangle {
         }
         newText += '@' + participant + ': ';
         input.text = newText;
+        input.cursorPosition = newText.length;
     }
 
     color: '#dfdfdf'
