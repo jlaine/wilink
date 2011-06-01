@@ -23,6 +23,7 @@ import 'utils.js' as Utils
 
 Item {
     id: root
+    focus: true
 
     /** Convenience method to show a conversation panel.
      */
@@ -88,25 +89,32 @@ Item {
                     onClicked: swapper.showPanel('DiagnosticPanel.qml')
                 }
 
-/*
                 DockButton {
-                    text: 'Debugging'
+                    id: logButton
+
                     iconSource: 'options.png'
+                    text: 'Debugging'
+                    visible: false
                     onClicked: swapper.showPanel('LogPanel.qml')
                 }
 
                 DockButton {
-                    text: 'Discovery'
+                    id: discoveryButton
+
                     iconSource: 'options.png'
+                    text: 'Discovery'
+                    visible: false
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
 
                 DockButton {
-                    text: 'Media'
+                    id: playerButton
+
                     iconSource: 'start.png'
+                    text: 'Media'
+                    visible: false
                     onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
-*/
 
                 DockButton {
                     iconSource: 'phone.png'
@@ -405,6 +413,20 @@ Item {
             target: window.client
             onConnected: {
                 wifirst.source = (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : '';
+            }
+        }
+    }
+
+    Keys.onPressed: {
+        if (event.modifiers == Qt.ControlModifier) {
+            if (event.key == Qt.Key_B) {
+                discoveryButton.visible = true;
+                discoveryButton.clicked();
+            } else if (event.key == Qt.Key_L) {
+                logButton.clicked();
+            } else if (event.key == Qt.Key_M) {
+                playerButton.visible = true;
+                playerButton.clicked();
             }
         }
     }
