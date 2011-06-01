@@ -27,6 +27,7 @@ Rectangle {
     property int minWidth: 32
     property int minHeight: 32
     signal accepted
+    signal rejected
 
     border.color: '#aa567dbc'
     border.width: 1
@@ -133,14 +134,12 @@ Rectangle {
 
         Button {
             text: qsTr('OK')
-            onClicked: {
-                dialog.accepted()
-            }
+            onClicked: dialog.accepted()
         }
 
         Button {
             text: qsTr('Cancel')
-            onClicked: dialog.hide()
+            onClicked: dialog.rejected()
         }
     }
 
@@ -188,5 +187,7 @@ Rectangle {
             }
         }
     }
+
+    onRejected: hide()
 }
 
