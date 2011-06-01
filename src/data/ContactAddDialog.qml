@@ -27,10 +27,10 @@ Dialog {
     property string domain: Utils.jidToDomain(window.client.jid)
 
     title: qsTr('Add a contact')
-    minWidth: 250
+    minWidth: 280
     minHeight: (help.opacity == 1) ? 250 : 150
     height: (help.opacity == 1) ? 250 : 150
-    width: 250
+    width: 280
 
     onAccepted: {
         var jid = contactEdit.text;
