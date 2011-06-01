@@ -57,7 +57,7 @@ Item {
 
             gradient: Gradient {
                 GradientStop { position:0.0; color: '#9fb7dd' }
-                GradientStop { position:0.8; color: '#597fbe' }
+                GradientStop { position:0.5; color: '#7495ca' }
                 GradientStop { position:1.0; color: '#9fb7dd' }
             }
 
