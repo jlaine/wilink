@@ -84,13 +84,14 @@ Panel {
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
 
                 onClicked: {
-                    var dialog = window.inputDialog();
-                    dialog.windowTitle = qsTr('Change subject');
-                    dialog.labelText = qsTr('Enter the new room subject.');
-                    dialog.textValue = room.subject
-                    if (dialog.exec()) {
-                        room.subject = dialog.textValue;
-                    }
+                    dialog.source = 'InputDialog.qml';
+                    dialog.item.title = qsTr('Change subject');
+                    dialog.item.labelText = qsTr('Enter the new room subject.');
+                    dialog.item.textValue = room.subject
+                    dialog.item.accepted.connect(function() {
+                        room.subject = dialog.item.textValue;
+                        dialog.item.hide();
+                    });
                 }
             }
 
