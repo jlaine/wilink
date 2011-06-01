@@ -19,19 +19,26 @@
 
 import QtQuick 1.0
 import wiLink 1.2
+import 'utils.js' as Utils
 
 Dialog {
     id: dialog
 
+    property string domain: Utils.jidToDomain(window.client.jid)
+
     title: qsTr('Add a contact')
     minWidth: 250
-    minHeight: 250
-    height: 250
+    minHeight: (help.opacity == 1) ? 250 : 150
+    height: (help.opacity == 1) ? 250 : 150
     width: 250
 
     onAccepted: {
-        // TODO
-        dialog.hide();
+        var jid = contactEdit.text;
+        if (jid.match(/^[^@/]+@[^@/]+$/)) {
+            console.log("add " + jid);
+            window.client.rosterManager.subscribe(jid);
+            dialog.hide();
+        }
     }
 
     PanelHelp {
@@ -41,13 +48,14 @@ Dialog {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 8
+        opacity: (domain == 'wifirst.net') ? 1 : 0
         text: qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink')
     }
 
     Text {
         id: title
 
-        anchors.top: help.bottom
+        anchors.top: (domain == 'wifirst.net') ? help.bottom : contents.top
         anchors.left:  parent.left
         anchors.right: parent.right
         anchors.margins: 8
@@ -75,6 +83,7 @@ Dialog {
             anchors.margins: 4
             focus: true
             smooth: true
+            text: (domain != '') ? '@' + domain : ''
             textFormat: TextEdit.PlainText
 
             Keys.onReturnPressed: {
