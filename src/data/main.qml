@@ -93,7 +93,7 @@ Item {
                     id: logButton
 
                     iconSource: 'options.png'
-                    text: 'Debugging'
+                    text: qsTr('Debugging')
                     visible: false
                     onClicked: swapper.showPanel('LogPanel.qml')
                 }
@@ -102,7 +102,7 @@ Item {
                     id: discoveryButton
 
                     iconSource: 'peer.png'
-                    text: 'Discovery'
+                    text: qsTr('Discovery')
                     visible: false
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
@@ -111,7 +111,7 @@ Item {
                     id: playerButton
 
                     iconSource: 'start.png'
-                    text: 'Media'
+                    text: qsTr('Media')
                     visible: false
                     onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
