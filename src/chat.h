@@ -36,7 +36,6 @@ class QBuffer;
 class QCheckBox;
 class QComboBox;
 class QFileDialog;
-class QInputDialog;
 class QLabel;
 class QMessageBox;
 class QModelIndex;
@@ -72,7 +71,6 @@ public slots:
     void alert();
     void openUrl(const QUrl &url);
     QFileDialog *fileDialog();
-    QInputDialog *inputDialog();
     QMessageBox *messageBox();
     void showPreferences(const QString &focusTab = QString());
 

@@ -34,7 +34,6 @@
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QGroupBox>
-#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QList>
@@ -151,7 +150,6 @@ Chat::Chat(QWidget *parent)
     // crutches for Qt..
     qmlRegisterUncreatableType<QAbstractItemModel>("wiLink", 1, 2, "QAbstractItemModel", "");
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
-    qmlRegisterUncreatableType<QInputDialog>("wiLink", 1, 2, "QInputDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
     qmlRegisterType<QDeclarativeSortFilterProxyModel>("wiLink", 1, 2, "SortFilterProxyModel");
 
@@ -329,18 +327,6 @@ void Chat::promptCredentials()
 QFileDialog *Chat::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
-    return dialog;
-}
-
-QInputDialog *Chat::inputDialog()
-{
-    QInputDialog *dialog = new QDeclarativeInputDialog(this);
-    dialog->setLabelText(QString());
-    QLabel *label = dialog->findChild<QLabel*>();
-    if (label) {
-        label->setOpenExternalLinks(true);
-        label->setWordWrap(true);
-    }
     return dialog;
 }
 

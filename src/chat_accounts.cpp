@@ -20,9 +20,9 @@
 #include <QApplication>
 #include <QAuthenticator>
 #include <QDialogButtonBox>
-#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
 #include <QSettings>
