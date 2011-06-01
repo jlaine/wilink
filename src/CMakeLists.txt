@@ -122,6 +122,7 @@ if(RELOAD_TRANSLATIONS)
         ${wiLink_SOURCES}
         data/main.qml
         data/CallWidget.qml
+        data/ContactAddDialog.qml
         data/ConversationPanel.qml
         data/DiagnosticPanel.qml
         data/Dialog.qml
