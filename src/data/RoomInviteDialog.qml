@@ -24,6 +24,7 @@ Dialog {
 
     property alias model: view.model
     property alias reason: reasonEdit.text
+    property QtObject room
     property variant selection: []
 
     minWidth: 200
@@ -70,13 +71,6 @@ Dialog {
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
         clip: true
-/*
-        model: ListModel {
-            ListElement { jid: 'foo@example.org'; name: 'foo'; avatar: 'peer.png' }
-            ListElement { jid: 'bar@example.org'; name: 'bar'; avatar: 'peer.png' }
-            ListElement { jid: 'wiz@example.org'; name: 'wiz'; avatar: 'peer.png' }
-        }
-*/
         delegate: Rectangle {
             id: rect
 
@@ -175,5 +169,15 @@ Dialog {
         clip: true
         flickableItem: view
     }
+
+    onAccepted: {
+        for (var i in selection) {
+            console.log("inviting " + selection[i]);
+            room.sendInvitation(selection[i], reason);
+        }
+        selection = [];
+        hide()
+    }
+
 }
 
