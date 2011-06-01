@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.0
-// import wiLink 1.2
+import wiLink 1.2
 
 Dialog {
     id: dialog
@@ -81,21 +81,6 @@ Dialog {
                 dialog.accepted();
                 return false;
             }
-        }
-    }
-
-    Item {
-        id: footer
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        
-        Button {
-            text: qsTr('Ok')
-        }
-        Button {
-            text: qsTr('Cancel')
         }
     }
 }
