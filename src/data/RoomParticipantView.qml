@@ -96,7 +96,7 @@ Item {
                                 'icon': 'diagnostics.png',
                                 'text': qsTr('Show profile'),
                                 'url': model.url})
-                        if (conversation.allowedActions & QXmppMucRoom.KickAction)
+                        if (room.allowedActions & QXmppMucRoom.KickAction)
                             menu.model.append({
                                 'action': 'kick',
                                 'icon': 'remove.png',
@@ -147,7 +147,7 @@ Item {
                 dialog.windowTitle = qsTr('Kick user');
                 dialog.labelText = qsTr('Enter the reason for kicking the user from the room.');
                 if (dialog.exec()) {
-                    conversation.kick(item.jid, dialog.textValue);
+                    room.kick(item.jid, dialog.textValue);
                 }
             }
         }
