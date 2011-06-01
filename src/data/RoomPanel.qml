@@ -177,14 +177,6 @@ Panel {
         }
     }
 
-    Loader {
-        id: dialog
-
-        x: 10
-        y: 110
-        focus: dialog.item ? dialog.item.visible : false
-    }
-
     Connections {
         target: room
 

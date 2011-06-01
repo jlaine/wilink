@@ -406,6 +406,8 @@ Item {
         id: dialog
 
         focus: dialog.item ? dialog.item.visible : false
+        x: 100
+        y: 100
         z: 10
     }
 

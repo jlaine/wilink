@@ -49,6 +49,8 @@ Dialog {
         anchors.right: parent.right
         anchors.margins: 8
         wrapMode: Text.WordWrap
+
+        onLinkActivated: Qt.openUrlExternally(link)
     }
 
     Rectangle {
