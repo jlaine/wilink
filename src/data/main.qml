@@ -403,6 +403,8 @@ Item {
 
     Loader {
         id: dialog
+
+        focus: dialog.item ? dialog.item.visible : false
         z: 10
     }
 
