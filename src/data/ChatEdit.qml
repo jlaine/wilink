@@ -30,6 +30,30 @@ Rectangle {
     signal returnPressed
     signal tabPressed
 
+    function talkAt(participant) {
+        var text = input.text;
+        var newText = '';
+
+        var pattern = /@([^,:]+[,:] )+/;
+        var start = text.search(pattern);
+        if (start >= 0) {
+            var m = text.match(pattern)[0];
+            var bits = m.split(/[,:] /);
+            if (start > 0)
+                newText += text.slice(0, start);
+            for (var i in bits) {
+                if (bits[i] == '@' + participant)
+                    return;
+                if (bits[i].length)
+                    newText += bits[i] + ', ';
+            }
+        } else {
+            newText = text;
+        }
+        newText += '@' + participant + ': ';
+        input.text = newText;
+    }
+
     color: '#dfdfdf'
     height: wrapper.height + 8
 
@@ -43,30 +67,6 @@ Rectangle {
         y: 4
         height: input.paintedHeight + 16
         width: parent.width - 8
-
-        function talkAt(participant) {
-            var text = input.text;
-            var newText = '';
-
-            var pattern = /@([^,:]+[,:] )+/;
-            var start = text.search(pattern);
-            if (start >= 0) {
-                var m = text.match(pattern)[0];
-                var bits = m.split(/[,:] /);
-                if (start > 0)
-                    newText += text.slice(0, start);
-                for (var i in bits) {
-                    if (bits[i] == '@' + participant)
-                        return;
-                    if (bits[i].length)
-                        newText += bits[i] + ', ';
-                }
-            } else {
-                newText = text;
-            }
-            newText += '@' + participant + ': ';
-            input.text = newText;
-        }
 
         ListHelper {
             id: listHelper
