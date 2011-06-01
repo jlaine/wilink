@@ -135,7 +135,6 @@ Rectangle {
             text: qsTr('OK')
             onClicked: {
                 dialog.accepted()
-                dialog.hide()
             }
         }
 

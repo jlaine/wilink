@@ -187,6 +187,7 @@ Panel {
                 room.sendInvitation(selection[i], reason);
             }
             selection = [];
+            inviteDialog.hide()
         }
     }
 
