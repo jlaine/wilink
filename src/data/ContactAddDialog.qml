@@ -55,7 +55,7 @@ Dialog {
     Text {
         id: title
 
-        anchors.top: (domain == 'wifirst.net') ? help.bottom : contents.top
+        anchors.top: (help.opacity == 1) ? help.bottom : contents.top
         anchors.left:  parent.left
         anchors.right: parent.right
         anchors.margins: 8
