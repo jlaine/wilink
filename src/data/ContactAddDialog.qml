@@ -21,75 +21,22 @@ import QtQuick 1.0
 import wiLink 1.2
 import 'utils.js' as Utils
 
-Dialog {
+InputDialog {
     id: dialog
 
     property string domain: Utils.jidToDomain(window.client.jid)
 
+    helpText: (domain == 'wifirst.net') ? qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
+    labelText: qsTr('Enter the address of the contact you want to add.')
+    textValue: (domain != '') ? '@' + domain : ''
     title: qsTr('Add a contact')
-    minWidth: 280
-    minHeight: (help.opacity == 1) ? 250 : 150
-    height: (help.opacity == 1) ? 250 : 150
-    width: 280
 
     onAccepted: {
-        var jid = contactEdit.text;
+        var jid = dialog.textValue;
         if (jid.match(/^[^@/]+@[^@/]+$/)) {
             console.log("add " + jid);
             window.client.rosterManager.subscribe(jid);
             dialog.hide();
-        }
-    }
-
-    PanelHelp {
-        id: help
-
-        anchors.top: contents.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
-        opacity: (domain == 'wifirst.net') ? 1 : 0
-        text: qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink')
-    }
-
-    Text {
-        id: title
-
-        anchors.top: (help.opacity == 1) ? help.bottom : contents.top
-        anchors.left:  parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
-        text: qsTr('Enter the address of the contact you want to add.')
-        wrapMode: Text.WordWrap
-    }
-
-    Rectangle {
-        id: bar
-
-        anchors.margins: 8
-        anchors.top: title.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        border.color: '#c3c3c3'
-        border.width: 1
-        color: 'white'
-        width: 100
-        height: contactEdit.paintedHeight + 8
-
-        TextEdit {
-            id: contactEdit
-
-            anchors.fill: parent
-            anchors.margins: 4
-            focus: true
-            smooth: true
-            text: (domain != '') ? '@' + domain : ''
-            textFormat: TextEdit.PlainText
-
-            Keys.onReturnPressed: {
-                dialog.accepted();
-                return false;
-            }
         }
     }
 }
