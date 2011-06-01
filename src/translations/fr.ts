@@ -937,5 +937,17 @@ Acceptez-vous?</translation>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
+    <message>
+        <source>Debugging</source>
+        <translation>Console de débogage</translation>
+    </message>
+    <message>
+        <source>Discovery</source>
+        <translation>Découverte de services</translation>
+    </message>
+    <message>
+        <source>Media</source>
+        <translation>Lecteur de musique</translation>
+    </message>
 </context>
 </TS>

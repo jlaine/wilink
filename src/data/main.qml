@@ -58,7 +58,7 @@ Item {
 
             gradient: Gradient {
                 GradientStop { position:0.0; color: '#9fb7dd' }
-                GradientStop { position:0.8; color: '#597fbe' }
+                GradientStop { position:0.5; color: '#7495ca' }
                 GradientStop { position:1.0; color: '#9fb7dd' }
             }
 
@@ -93,7 +93,7 @@ Item {
                     id: logButton
 
                     iconSource: 'options.png'
-                    text: 'Debugging'
+                    text: qsTr('Debugging')
                     visible: false
                     onClicked: swapper.showPanel('LogPanel.qml')
                 }
@@ -102,7 +102,7 @@ Item {
                     id: discoveryButton
 
                     iconSource: 'peer.png'
-                    text: 'Discovery'
+                    text: qsTr('Discovery')
                     visible: false
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
@@ -111,7 +111,7 @@ Item {
                     id: playerButton
 
                     iconSource: 'start.png'
-                    text: 'Media'
+                    text: qsTr('Media')
                     visible: false
                     onClicked: swapper.showPanel('PlayerPanel.qml')
                 }
