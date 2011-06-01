@@ -101,7 +101,7 @@ Item {
                 DockButton {
                     id: discoveryButton
 
-                    iconSource: 'options.png'
+                    iconSource: 'peer.png'
                     text: 'Discovery'
                     visible: false
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
@@ -423,6 +423,7 @@ Item {
                 discoveryButton.visible = true;
                 discoveryButton.clicked();
             } else if (event.key == Qt.Key_L) {
+                logButton.visible = true;
                 logButton.clicked();
             } else if (event.key == Qt.Key_M) {
                 playerButton.visible = true;
