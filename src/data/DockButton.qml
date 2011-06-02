@@ -23,7 +23,7 @@ Rectangle {
     id: listViewItem
 
     property alias iconSource: image.source
-    property alias text: label.text
+    property string text
     property bool enabled: true
     property int shortcut: 0
     signal clicked
@@ -75,12 +75,27 @@ Rectangle {
     Text {
         id: label
 
+        function shortcutText(shortcut) {
+            var text = '';
+            if (shortcut & Qt.ControlModifier)
+                text += 'Ctrl-';
+            var key = shortcut & 0xffffff;
+            if (key >= Qt.Key_A && key <= Qt.Key_Z) {
+                var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                text += alpha[key - Qt.Key_A];
+            }
+            if (text.length)
+                return '<br/>' + text;
+            else
+                return '';
+        }
+
         anchors.top: image.bottom
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: 0
         color: 'white'
-        font.bold: true
         font.pixelSize: 11
+        text: '<b>' + listViewItem.text + '</b>' + shortcutText(listViewItem.shortcut)
     }
 
     states: [
