@@ -102,7 +102,8 @@ Item {
                                 'icon': 'remove.png',
                                 'text': qsTr('Kick user'),
                                 'jid': model.jid})
-                        menu.show(item.x + mouse.x - menu.width + 16, item.y + mouse.y - 16);
+                        var mousePress = mapToItem(view, mouse.x - menu.width + 16, mouse.y - 16)
+                        menu.show(mousePress.x, mousePress.y);
                     }
                 }
                 onEntered: {
