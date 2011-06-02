@@ -186,8 +186,6 @@ Chat::Chat(QWidget *parent)
     context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
-    d->rosterView->setSource(QUrl("qrc:/main.qml"));
-
     layout->addWidget(d->rosterView);
     layout->addWidget(new ChatStatus(d->client));
     setCentralWidget(centralWidget);
@@ -417,6 +415,9 @@ bool Chat::open(const QString &jid)
     action = helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
     action->setMenuRole(QAction::AboutRole);
     connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
+
+    /* load QML */
+    d->rosterView->setSource(QUrl("qrc:/main.qml"));
 
     return true;
 }
