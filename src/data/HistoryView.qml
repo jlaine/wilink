@@ -29,6 +29,7 @@ Item {
         id: historyView
 
         property bool scrollBarAtBottom
+        property bool bottomChanging: false
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -194,14 +195,37 @@ Item {
     }
 
     Connections {
+        target: historyView
+        onHeightChanged: {
+            // follow bottom if we were at the bottom
+            if (historyView.scrollBarAtBottom) {
+                historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
+            }
+        }
+    }
+
+    Connections {
         target: historyView.model
         onBottomAboutToChange: {
-            // test if scrollbar should follow bottom change
-            historyView.scrollBarAtBottom = historyView.atYEnd
+            // store whether we are at the bottom
+            historyView.bottomChanging = true;
+            historyView.scrollBarAtBottom = historyView.atYEnd;
         }
         onBottomChanged: {
-            if( historyView.scrollBarAtBottom ) {
-                historyView.positionViewAtIndex(historyView.count - 1, ListView.End)
+            // follow bottom if we were at the bottom
+            if (historyView.scrollBarAtBottom) {
+                historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
+            }
+            historyView.bottomChanging = false;
+        }
+    }
+
+    Connections {
+        target: scrollBar
+        onPositionChanged: {
+            if (!historyView.bottomChanging) {
+                // store whether we are at the bottom
+                historyView.scrollBarAtBottom = historyView.atYEnd;
             }
         }
     }
