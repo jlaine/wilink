@@ -25,6 +25,7 @@ Rectangle {
     property alias iconSource: image.source
     property alias text: label.text
     property bool enabled: true
+    property int shortcut: 0
     signal clicked
 
     function startAnimation() {

@@ -90,27 +90,24 @@ Item {
                 }
 
                 DockButton {
-                    id: logButton
-
                     iconSource: 'options.png'
+                    shortcut: Qt.ControlModifier + Qt.Key_L
                     text: qsTr('Debugging')
                     visible: false
                     onClicked: swapper.showPanel('LogPanel.qml')
                 }
 
                 DockButton {
-                    id: discoveryButton
-
                     iconSource: 'peer.png'
+                    shortcut: Qt.ControlModifier + Qt.Key_B
                     text: qsTr('Discovery')
                     visible: false
                     onClicked: swapper.showPanel('DiscoveryPanel.qml')
                 }
 
                 DockButton {
-                    id: playerButton
-
                     iconSource: 'start.png'
+                    shortcut: Qt.ControlModifier + Qt.Key_M
                     text: qsTr('Media')
                     visible: false
                     onClicked: swapper.showPanel('PlayerPanel.qml')
@@ -124,7 +121,7 @@ Item {
                     visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
                     onClicked: swapper.showPanel('PhonePanel.qml')
                     Component.onCompleted: {
-                        if (phoneButton.visible) {
+                        if (visible) {
                             swapper.addPanel('PhonePanel.qml');
                         }
                     }
@@ -143,10 +140,17 @@ Item {
                 }
 
                 DockButton {
+                    id: shareButton
+
                     iconSource: 'share.png'
                     text: qsTr('Shares')
                     visible: window.client.shareServer != ''
                     onClicked: swapper.showPanel('SharePanel.qml')
+                    onVisibleChanged: {
+                        if (shareButton.visible) {
+                            swapper.addPanel('SharePanel.qml');
+                        }
+                    }
                 }
             }
         }
@@ -444,16 +448,13 @@ Item {
     }
 
     Keys.onPressed: {
-        if (event.modifiers == Qt.ControlModifier) {
-            if (event.key == Qt.Key_B) {
-                discoveryButton.visible = true;
-                discoveryButton.clicked();
-            } else if (event.key == Qt.Key_L) {
-                logButton.visible = true;
-                logButton.clicked();
-            } else if (event.key == Qt.Key_M) {
-                playerButton.visible = true;
-                playerButton.clicked();
+        var val = event.modifiers + event.key;
+        for (var i = 0; i < control.children.length; i++) {
+            var button = control.children[i];
+            if (val == button.shortcut) {
+                button.visible = true;
+                button.clicked();
+                break;
             }
         }
     }
