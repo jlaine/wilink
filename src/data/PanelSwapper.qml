@@ -93,6 +93,9 @@ Item {
     }
 
     function findPanel(source, properties) {
+        if (properties == undefined)
+            properties = {};
+
         // helper to compare object properties
         function propEquals(a, b) {
             if (a.length != b.length)
