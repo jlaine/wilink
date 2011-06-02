@@ -1,5 +1,7 @@
 # Macros for generating various icons from SVG.
 
+include(CMakeParseArguments)
+
 find_program(ICOTOOL icotool)
 find_program(INKSCAPE inkscape)
 find_program(PNGTOPNM pngtopnm)
@@ -9,7 +11,7 @@ find_program(PNG2ICNS png2icns)
 macro(generate_name OUTPUT INPUT EXT)
 	get_filename_component(_svg_name ${INPUT} NAME_WE)
 	get_filename_component(_svg_path ${INPUT} PATH)
-	set(${OUTPUT} ${_svg_path}${_svg_name}.${EXT})
+	set(${OUTPUT} ${_svg_path}${_svg_name}${EXT})
 endmacro(generate_name)
 
 # GENERATE_ICNS(OUTPUT SVGS..)
@@ -19,7 +21,7 @@ endmacro(generate_name)
 macro(generate_icns OUTPUT)
 	set(OUTPUT "${OUTPUT}")
 	foreach(_this_svg ${ARGN})
-		generate_name(_this_icns ${_this_svg} icns)
+		generate_name(_this_icns ${_this_svg} .icns)
 		add_custom_command(OUTPUT ${_this_icns} DEPENDS ${_this_svg}
 			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_icns}.256 --export-width=256 --export-height=256
 			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_icns}.128 --export-width=128 --export-height=128
@@ -38,7 +40,7 @@ endmacro(generate_icns)
 macro(generate_ico OUTPUT)
 	set(OUTPUT "${OUTPUT}")
 	foreach(_this_svg ${ARGN})
-		generate_name(_this_ico ${_this_svg} ico)
+		generate_name(_this_ico ${_this_svg} .ico)
 		add_custom_command(OUTPUT ${_this_ico} DEPENDS ${_this_svg}
 			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_ico}.48 --export-width=48 --export-height=48
 			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_ico}.32 --export-width=32 --export-height=32
@@ -55,29 +57,17 @@ endmacro(generate_ico)
 #
 macro(generate_png OUTPUT)
 	set(OUTPUT "${OUTPUT}")
-	set(SIZE 32)
-	foreach(_this_svg ${ARGN})
-		generate_name(_this_png ${_this_svg} png)
+	cmake_parse_arguments(PNG "" "SIZE;SUFFIX" "" ${ARGN})
+	if(NOT PNG_SIZE)
+		set(PNG_SIZE 32)
+	endif()
+	foreach(_this_svg ${PNG_UNPARSED_ARGUMENTS})
+		generate_name(_this_png ${_this_svg} ${PNG_SUFFIX}.png)
 		add_custom_command(OUTPUT ${_this_png} DEPENDS ${_this_svg}
-			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=${SIZE} --export-height=${SIZE})
+			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=${PNG_SIZE} --export-height=${PNG_SIZE})
 		list(APPEND ${OUTPUT} ${_this_png})
 	endforeach()
 endmacro(generate_png)
-
-# GENERATE_SMILEY(OUTPUT SVGS..)
-#
-# Generate smileys from SVG files.
-#
-macro(generate_smiley OUTPUT)
-	set(OUTPUT "${OUTPUT}")
-	set(SIZE 16)
-	foreach(_this_svg ${ARGN})
-		generate_name(_this_png ${_this_svg} png)
-		add_custom_command(OUTPUT ${_this_png} DEPENDS ${_this_svg}
-			COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/${_this_svg} --export-png=${_this_png} --export-width=${SIZE} --export-height=${SIZE})
-		list(APPEND ${OUTPUT} ${_this_png})
-	endforeach()
-endmacro(generate_smiley)
 
 # GENERATE_XPM(OUTPUT SVGS..)
 #
@@ -87,7 +77,7 @@ macro(generate_xpm OUTPUT)
 	set(OUTPUT "${OUTPUT}")
 	set(SIZE 32)
 	foreach(_this_svg ${ARGN})
-		generate_name(_this_xpm ${_this_svg} xpm)
+		generate_name(_this_xpm ${_this_svg} .xpm)
 		get_filename_component(_this_xpm_title ${_this_svg} NAME_WE)
 		string(REPLACE "-" "_" _this_xpm_title ${_this_xpm_title})
 		set(_this_alpha ${_this_xpm}.tmp.alpha)

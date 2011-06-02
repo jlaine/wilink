@@ -1,6 +1,19 @@
 include(IconUtilities)
 generate_icns(icns wiLink.svg)
 generate_ico(ico wiLink.svg)
+generate_xpm(xpm wiLink.svg)
+
+# 16x16 icons
+generate_png(png SIZE 16
+    smiley-angry.svg
+    smiley-confused.svg
+    smiley-happy.svg
+    smiley-neutral.svg
+    smiley-raspberry.svg
+    smiley-sad.svg
+    smiley-wink.svg)
+
+# 32x32 icons
 generate_png(png
     add.svg
     album.svg
@@ -43,33 +56,16 @@ generate_png(png
     upload.svg
     wiLink.svg
     wiLink-black.svg)
-generate_xpm(xpm wiLink.svg)
 
-# smileys
-generate_smiley(png
-    smiley-angry.svg
-    smiley-confused.svg
-    smiley-happy.svg
-    smiley-neutral.svg
-    smiley-raspberry.svg
-    smiley-sad.svg
-    smiley-wink.svg)
+# 64x64 icons
+generate_png(png SIZE 64 SUFFIX -64
+    wiLink.svg)
 
-# medium icons
-add_custom_command(OUTPUT wiLink-64.png DEPENDS wiLink.svg
-    COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/wiLink.svg --export-png=wiLink-64.png --export-width=64 --export-height=64)
-list(APPEND png wiLink-64.png)
-
-# large icons
-add_custom_command(OUTPUT album-128.png DEPENDS album.svg
-    COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/album.svg --export-png=album-128.png --export-width=128 --export-height=128)
-add_custom_command(OUTPUT file-128.png DEPENDS file.svg
-    COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/file.svg --export-png=file-128.png --export-width=128 --export-height=128)
-add_custom_command(OUTPUT peer-128.png DEPENDS peer.svg
-    COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/peer.svg --export-png=peer-128.png --export-width=128 --export-height=128)
-add_custom_command(OUTPUT wiLink-64.png DEPENDS wiLink.svg
-    COMMAND ${INKSCAPE} -z --file=${CMAKE_CURRENT_SOURCE_DIR}/wiLink.svg --export-png=wiLink-64.png --export-width=64 --export-height=64)
-list(APPEND png album-128.png file-128.png peer-128.png)
+# 128x128 icons
+generate_png(png SIZE 128 SUFFIX -128
+    album.svg
+    file.svg
+    peer.svg)
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 
