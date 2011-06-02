@@ -117,10 +117,17 @@ Item {
                 }
 
                 DockButton {
+                    id: phoneButton
+
                     iconSource: 'phone.png'
                     text: qsTr('Phone')
                     visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
                     onClicked: swapper.showPanel('PhonePanel.qml')
+                    Component.onCompleted: {
+                        if (phoneButton.visible) {
+                            swapper.addPanel('PhonePanel.qml');
+                        }
+                    }
                 }
 
                 DockButton {
