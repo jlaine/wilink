@@ -224,8 +224,6 @@ Item {
             anchors.leftMargin: dockBackground.height
             currentJid: (Qt.isQtObject(swapper.currentItem) && swapper.currentItem.jid != undefined) ? swapper.currentItem.jid : ''
             model: SortFilterProxyModel {
-                id: contactModel
-
                 dynamicSortFilter: true
                 filterKeyColumn: 1
                 filterRegExp: application.showOfflineContacts ? /.*/ : /^(?!offline).+/

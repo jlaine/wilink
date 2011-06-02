@@ -18,11 +18,11 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Dialog {
     id: dialog
 
-    property alias model: view.model
     property alias reason: reasonEdit.text
     property QtObject room
     property variant selection: []
@@ -71,6 +71,14 @@ Dialog {
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
         clip: true
+        model: SortFilterProxyModel {
+            dynamicSortFilter: true
+            filterKeyColumn: 1
+            filterRegExp: /^(?!offline).+/
+            sortCaseSensitivity: Qt.CaseInsensitive
+            sourceModel: window.rosterModel
+            Component.onCompleted: sort(0)
+        }
         delegate: Rectangle {
             id: rect
 
