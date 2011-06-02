@@ -92,6 +92,7 @@ Panel {
                         room.subject = dialog.item.textValue;
                         dialog.item.hide();
                     });
+                    dialog.item.show()
                 }
             }
 
