@@ -42,10 +42,12 @@ Item {
 
         Component {
             id: historyDelegate
-            Row {
-                property Item textItem: bodyText
 
+            Row {
                 id: item
+
+                property alias textItem: bodyText
+
                 spacing: 8
                 width: parent.width - 16
                 x: 8
@@ -105,6 +107,7 @@ Item {
 
                         Text {
                             id: bodyText
+
                             anchors.centerIn: parent
                             font.pixelSize: 12
                             width: rect.width - 20
@@ -164,7 +167,7 @@ Item {
                 }
 
                 // get current item
-                historyView.currentIndex = historyView.indexAt(mouse.x, mouse.y);
+                historyView.currentIndex = historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY);
                 var textItem = historyView.currentItem ? historyView.currentItem.textItem : null;
 
                 // update existing selections
