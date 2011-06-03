@@ -227,6 +227,11 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->ownItem->messages = 0;
     ChatModel::addItem(d->ownItem, rootItem);
 
+    // set additionals role names
+    QHash<int, QByteArray> role = QHash<int, QByteArray>(roleNames());
+    role.insert(ChatRosterModel::StatusRole, "status");
+    setRoleNames(role);
+
     bool check;
     check = connect(d->client, SIGNAL(connected()),
                     this, SLOT(_q_connected()));

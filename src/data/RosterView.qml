@@ -142,6 +142,34 @@ Item {
 
                 }
 
+                Rectangle {
+                    anchors.left: avatar.right
+                    anchors.bottom: avatar.bottom
+                    anchors.leftMargin: -5
+                    width: 10
+                    height: 10
+                    border.width: 1
+                    border.color: {
+                        switch(model.status) {
+                            // FIXME: enums values should come from C++
+                            case 1: return '#006400' // Available
+                            case 2: return '#c86400' // Away
+                            case 4: return '#640000' // Busy
+                        }
+                    }
+                    color: {
+                        switch(model.status) {
+                            // FIXME: enums values should come from C++
+                            case 1: return '#64dd64' // Available
+                            case 2: return '#ffc800' // Away
+                            case 4: return '#ff6464' // Busy
+                        }
+                    }
+                    opacity: model.status ? 1 : 0
+                    radius: 20
+                    smooth: true
+                }
+
                 Text {
                     anchors.left: avatar.right
                     anchors.leftMargin: 6
