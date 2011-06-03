@@ -131,7 +131,8 @@ Item {
             id: selector
 
             property variant press
-            property list<Item> selection
+            property int selectionStart: 0
+            property int selectionEnd: -1
 
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
@@ -144,12 +145,16 @@ Item {
                     'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
                 };
 
-                for (var i = 0; i < selection.length; i++) {
-                    var obj = selection[i];
-                    if (obj)
-                        obj.select(0, 0);
+                // clear old selection
+                for (var i = selectionStart; i <= selectionEnd; i++) {
+                    historyView.currentIndex = i;
+                    if (!historyView.currentItem)
+                        continue;
+                    var item = historyView.currentItem.textItem;
+                    item.select(0, 0);
                 }
-                selection = []
+                selectionStart = 0;
+                selectionEnd = -1;
             }
 
             onReleased: {
@@ -165,8 +170,6 @@ Item {
                 };
 
                 // determine start / end
-                if (current.index < 0)
-                    return;
                 if (current.index > press.index || (current.index == press.index && current.x > press.x)) {
                     start = press;
                     end = current;
@@ -174,6 +177,10 @@ Item {
                     start = current;
                     end = press;
                 }
+
+                // check bounds
+                if (start.index < 0 || end.index < 0)
+                    return;
 
                 function setSelection(item) {
                     if (!item)
@@ -187,23 +194,28 @@ Item {
                 }
 
                 // set new selection
-                var newSelection = new Array();
                 for (var i = start.index; i <= end.index; i++) {
                     historyView.currentIndex = i;
+                    if (!historyView.currentItem)
+                        continue;
                     var item = historyView.currentItem.textItem;
                     setSelection(item);
-                    newSelection[newSelection.length] = item;
                 }
 
                 // clear old selection
-                for (var i = 0; i < selection.length; i++) {
-                    var item = selection[i];
-                    if (item && newSelection.indexOf(item) < 0)
+                for (var i = selectionStart; i <= selectionEnd; i++) {
+                    historyView.currentIndex = i;
+                    if (!historyView.currentItem)
+                        continue;
+                    if (i < start.index || i > end.index) {
+                        var item = historyView.currentItem.textItem;
                         item.select(0, 0);
+                    }
                 }
 
                 // store selection
-                selection = newSelection;
+                selectionStart = start.index;
+                selectionEnd = end.index;
             }
         }
 */
