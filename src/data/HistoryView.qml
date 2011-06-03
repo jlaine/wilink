@@ -130,8 +130,7 @@ Item {
         MouseArea {
             id: selector
 
-            property real pressX
-            property real pressY
+            property variant press
             property list<Item> selection
 
             anchors.fill: parent
@@ -139,8 +138,11 @@ Item {
 
             onPressed: {
                 historyView.interactive = false;
-                pressX = mouse.x;
-                pressY = mouse.y;
+                press = {
+                    'x': mouse.x,
+                    'y': mouse.y,
+                    'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
+                };
 
                 for (var i = 0; i < selection.length; i++) {
                     var obj = selection[i];
@@ -155,32 +157,52 @@ Item {
             }
 
             onPositionChanged: {
+                var start, end;
+                var current = {
+                    'x': mouse.x,
+                    'y': mouse.y,
+                    'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
+                };
+
+                // determine start / end
+                if (current.index < 0)
+                    return;
+                if (current.index > press.index || (current.index == press.index && current.x > press.x)) {
+                    start = press;
+                    end = current;
+                } else {
+                    start = current;
+                    end = press;
+                }
+
                 function setSelection(item) {
                     if (!item)
                         return 0;
-                    var start = mapToItem(item, pressX, pressY);
-                    var startPos = item.positionAt(start.x, start.y);
-                    var end = mapToItem(item, mouse.x, mouse.y);
-                    var endPos = item.positionAt(end.x, end.y);
+                    var startCoord = mapToItem(item, start.x, start.y);
+                    var startPos = item.positionAt(startCoord.x, startCoord.y);
+                    var endCoord = mapToItem(item, end.x, end.y);
+                    var endPos = item.positionAt(endCoord.x, endCoord.y);
                     item.select(startPos, endPos);
                     return startPos >= 0 && endPos >= 0 && endPos != startPos;
                 }
 
-                // get current item
-                historyView.currentIndex = historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY);
-                var textItem = historyView.currentItem ? historyView.currentItem.textItem : null;
-
-                // update existing selections
+                // set new selection
                 var newSelection = new Array();
-                for (var i = 0; i < selection.length; i++) {
-                    var obj = selection[i];
-                    if (obj == textItem)
-                        continue;
-                    else if (setSelection(obj))
-                        newSelection[newSelection.length] = obj;
+                for (var i = start.index; i <= end.index; i++) {
+                    historyView.currentIndex = i;
+                    var item = historyView.currentItem.textItem;
+                    setSelection(item);
+                    newSelection[newSelection.length] = item;
                 }
-                if (setSelection(textItem))
-                    newSelection[newSelection.length] = textItem;
+
+                // clear old selection
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    if (item && newSelection.indexOf(item) < 0)
+                        item.select(0, 0);
+                }
+
+                // store selection
                 selection = newSelection;
             }
         }
