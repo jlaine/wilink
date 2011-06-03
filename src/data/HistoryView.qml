@@ -29,6 +29,7 @@ Item {
         id: historyView
 
         property bool scrollBarAtBottom
+        property bool bottomChanging: false
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -41,10 +42,12 @@ Item {
 
         Component {
             id: historyDelegate
-            Row {
-                property Item textItem: bodyText
 
+            Row {
                 id: item
+
+                property alias textItem: bodyText
+
                 spacing: 8
                 width: parent.width - 16
                 x: 8
@@ -104,6 +107,7 @@ Item {
 
                         Text {
                             id: bodyText
+
                             anchors.centerIn: parent
                             font.pixelSize: 12
                             width: rect.width - 20
@@ -126,24 +130,31 @@ Item {
         MouseArea {
             id: selector
 
-            property real pressX
-            property real pressY
-            property list<Item> selection
+            property variant press
+            property int selectionStart: 0
+            property int selectionEnd: -1
 
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
 
             onPressed: {
                 historyView.interactive = false;
-                pressX = mouse.x;
-                pressY = mouse.y;
+                press = {
+                    'x': mouse.x,
+                    'y': mouse.y,
+                    'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
+                };
 
-                for (var i = 0; i < selection.length; i++) {
-                    var obj = selection[i];
-                    if (obj)
-                        obj.select(0, 0);
+                // clear old selection
+                for (var i = selectionStart; i <= selectionEnd; i++) {
+                    historyView.currentIndex = i;
+                    if (!historyView.currentItem)
+                        continue;
+                    var item = historyView.currentItem.textItem;
+                    item.select(0, 0);
                 }
-                selection = []
+                selectionStart = 0;
+                selectionEnd = -1;
             }
 
             onReleased: {
@@ -151,33 +162,60 @@ Item {
             }
 
             onPositionChanged: {
+                var start, end;
+                var current = {
+                    'x': mouse.x,
+                    'y': mouse.y,
+                    'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
+                };
+
+                // determine start / end
+                if (current.index > press.index || (current.index == press.index && current.x > press.x)) {
+                    start = press;
+                    end = current;
+                } else {
+                    start = current;
+                    end = press;
+                }
+
+                // check bounds
+                if (start.index < 0 || end.index < 0)
+                    return;
+
                 function setSelection(item) {
                     if (!item)
                         return 0;
-                    var start = mapToItem(item, pressX, pressY);
-                    var startPos = item.positionAt(start.x, start.y);
-                    var end = mapToItem(item, mouse.x, mouse.y);
-                    var endPos = item.positionAt(end.x, end.y);
+                    var startCoord = mapToItem(item, start.x, start.y);
+                    var startPos = item.positionAt(startCoord.x, startCoord.y);
+                    var endCoord = mapToItem(item, end.x, end.y);
+                    var endPos = item.positionAt(endCoord.x, endCoord.y);
                     item.select(startPos, endPos);
                     return startPos >= 0 && endPos >= 0 && endPos != startPos;
                 }
 
-                // get current item
-                historyView.currentIndex = historyView.indexAt(mouse.x, mouse.y);
-                var textItem = historyView.currentItem ? historyView.currentItem.textItem : null;
-
-                // update existing selections
-                var newSelection = new Array();
-                for (var i = 0; i < selection.length; i++) {
-                    var obj = selection[i];
-                    if (obj == textItem)
+                // set new selection
+                for (var i = start.index; i <= end.index; i++) {
+                    historyView.currentIndex = i;
+                    if (!historyView.currentItem)
                         continue;
-                    else if (setSelection(obj))
-                        newSelection[newSelection.length] = obj;
+                    var item = historyView.currentItem.textItem;
+                    setSelection(item);
                 }
-                if (setSelection(textItem))
-                    newSelection[newSelection.length] = textItem;
-                selection = newSelection;
+
+                // clear old selection
+                for (var i = selectionStart; i <= selectionEnd; i++) {
+                    historyView.currentIndex = i;
+                    if (!historyView.currentItem)
+                        continue;
+                    if (i < start.index || i > end.index) {
+                        var item = historyView.currentItem.textItem;
+                        item.select(0, 0);
+                    }
+                }
+
+                // store selection
+                selectionStart = start.index;
+                selectionEnd = end.index;
             }
         }
 */
@@ -194,14 +232,37 @@ Item {
     }
 
     Connections {
+        target: historyView
+        onHeightChanged: {
+            // follow bottom if we were at the bottom
+            if (historyView.scrollBarAtBottom) {
+                historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
+            }
+        }
+    }
+
+    Connections {
         target: historyView.model
         onBottomAboutToChange: {
-            // test if scrollbar should follow bottom change
-            historyView.scrollBarAtBottom = historyView.atYEnd
+            // store whether we are at the bottom
+            historyView.bottomChanging = true;
+            historyView.scrollBarAtBottom = historyView.atYEnd;
         }
         onBottomChanged: {
-            if( historyView.scrollBarAtBottom ) {
-                historyView.positionViewAtIndex(historyView.count - 1, ListView.End)
+            // follow bottom if we were at the bottom
+            if (historyView.scrollBarAtBottom) {
+                historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
+            }
+            historyView.bottomChanging = false;
+        }
+    }
+
+    Connections {
+        target: scrollBar
+        onPositionChanged: {
+            if (!historyView.bottomChanging) {
+                // store whether we are at the bottom
+                historyView.scrollBarAtBottom = historyView.atYEnd;
             }
         }
     }
