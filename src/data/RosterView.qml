@@ -153,6 +153,7 @@ Item {
                     border.color: {
                         switch(model.status) {
                             // FIXME: enums values should come from C++
+                            case 0: return '#999999' // Offline
                             case 1: return '#006400' // Available
                             case 2: return '#c86400' // Away
                             case 4: return '#640000' // Busy
@@ -161,12 +162,13 @@ Item {
                     color: {
                         switch(model.status) {
                             // FIXME: enums values should come from C++
+                            case 0: return '#dfdfdf' // Offline
                             case 1: return '#64dd64' // Available
                             case 2: return '#ffc800' // Away
                             case 4: return '#ff6464' // Busy
                         }
                     }
-                    opacity: model.status ? 1 : 0
+                    opacity: (model.status != undefined) ? 1 : 0
                     radius: 20
                     smooth: true
                 }
