@@ -143,9 +143,10 @@ Item {
                 }
 
                 Rectangle {
+                    id: status
                     anchors.left: avatar.right
-                    anchors.bottom: avatar.bottom
-                    anchors.leftMargin: -5
+                    anchors.leftMargin: 3
+                    anchors.verticalCenter: parent.verticalCenter
                     width: 10
                     height: 10
                     border.width: 1
@@ -171,9 +172,9 @@ Item {
                 }
 
                 Text {
-                    anchors.left: avatar.right
-                    anchors.leftMargin: 6
+                    anchors.left: status.right
                     anchors.right: label.right
+                    anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     font.pixelSize: 12
