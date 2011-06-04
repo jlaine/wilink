@@ -142,6 +142,28 @@ Item {
 
                 }
 
+                // status gradients
+                Gradient { // Offline
+                    id: offlineGradient
+                    GradientStop { position: 0.0; color: '#dfdfdf' }
+                    GradientStop { position: 1.0; color: '#999999' }
+                }
+                Gradient { // Available
+                    id: availableGradient
+                    GradientStop { position: 0.0; color: '#64ff64' }
+                    GradientStop { position: 1.0; color: '#009600' }
+                }
+                Gradient { // Away
+                    id: awayGradient
+                    GradientStop { position: 0.0; color: '#ffc800' }
+                    GradientStop { position: 1.0; color: '#d28c00' }
+                }
+                Gradient { // Busy
+                    id: busyGradient
+                    GradientStop { position: 0.0; color: '#ff6464' }
+                    GradientStop { position: 1.0; color: '#dd0000' }
+                }
+
                 Rectangle {
                     id: status
                     anchors.left: avatar.right
@@ -159,13 +181,13 @@ Item {
                             case 4: return '#640000' // Busy
                         }
                     }
-                    color: {
+                    gradient: {
                         switch(model.status) {
                             // FIXME: enums values should come from C++
-                            case 0: return '#dfdfdf' // Offline
-                            case 1: return '#64dd64' // Available
-                            case 2: return '#ffc800' // Away
-                            case 4: return '#ff6464' // Busy
+                            case 0: return offlineGradient
+                            case 1: return availableGradient
+                            case 2: return awayGradient
+                            case 4: return busyGradient
                         }
                     }
                     opacity: (model.status != undefined) ? 1 : 0
