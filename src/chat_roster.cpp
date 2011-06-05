@@ -783,6 +783,8 @@ void VCardCache::setManager(QXmppVCardManager* manager)
     if (manager == m_manager)
         return;
 
+    QXmppClient *client = qobject_cast<QXmppClient*>(manager->parent());
+    Q_ASSERT(client);
     Q_ASSERT(manager);
     m_manager = manager;
 
@@ -790,7 +792,37 @@ void VCardCache::setManager(QXmppVCardManager* manager)
                     this, SLOT(vCardReceived(QXmppVCardIq)));
     Q_ASSERT(check);
 
+    check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                    this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
+
     emit managerChanged(m_manager);
+}
+
+void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
+{
+    if (disco.type() != QXmppIq::Result)
+        return;
+
+    int features = 0;
+    foreach (const QString &var, disco.features())
+    {
+        if (var == ns_chat_states)
+            features |= ChatRosterModel::ChatStatesFeature;
+        else if (var == ns_stream_initiation_file_transfer)
+            features |= ChatRosterModel::FileTransferFeature;
+        else if (var == ns_version)
+            features |= ChatRosterModel::VersionFeature;
+        else if (var == ns_jingle_rtp_audio)
+            features |= ChatRosterModel::VoiceFeature;
+        else if (var == ns_jingle_rtp_video)
+            features |= ChatRosterModel::VideoFeature;
+    }
+    foreach (const QXmppDiscoveryIq::Identity& id, disco.identities()) {
+        if (id.name() == "iChatAgent")
+            features |= ChatRosterModel::ChatStatesFeature;
+    }
+    m_features.insert(disco.from(), features);
 }
 
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)

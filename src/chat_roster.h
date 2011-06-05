@@ -167,10 +167,12 @@ public slots:
     QUrl profileUrl(const QString &jid);
 
 private slots:
+    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void vCardReceived(const QXmppVCardIq&);
 
 private:
     QNetworkDiskCache *m_cache;
+    QMap<QString, int> m_features;
     QXmppVCardManager *m_manager;
     QSet<QString> m_failed;
     QSet<QString> m_queue;
