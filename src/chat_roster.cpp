@@ -88,8 +88,6 @@ class ChatRosterItem : public ChatModelItem
 public:
     QString jid;
     int messages;
-    QString name;
-    QString nickName;
 };
 
 ChatRosterImageProvider::ChatRosterImageProvider()
@@ -153,11 +151,9 @@ class ChatRosterModelPrivate
 {
 public:
     int countPendingMessages();
-    void fetchVCard(const QString &jid);
     ChatRosterItem* find(const QString &id, ChatModelItem *parent = 0);
 
     ChatRosterModel *q;
-    QNetworkDiskCache *cache;
     ChatClient *client;
 };
 
@@ -171,18 +167,6 @@ int ChatRosterModelPrivate::countPendingMessages()
         pending += child->messages;
     }
     return pending;
-}
-
-/** Check whether the vCard for the given roster item is cached, otherwise
- *  request the vCard.
- *
- * @param item
- */
-void ChatRosterModelPrivate::fetchVCard(const QString &jid)
-{
-    QXmppVCardIq vCard;
-    if (VCardCache::instance()->get(jid, &vCard));
-        q->vCardReceived(vCard);
 }
 
 ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *parent)
@@ -220,8 +204,6 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
 
     // get cache
     VCardCache::instance()->addClient(xmppClient);
-    d->cache = new QNetworkDiskCache(this);
-    d->cache->setCacheDirectory(wApp->cacheDirectory());
 
     d->client = xmppClient;
 
@@ -252,10 +234,6 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
 
     check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
                     this, SLOT(rosterReceived()));
-    Q_ASSERT(check);
-
-    check = connect(&d->client->vCardManager(), SIGNAL(vCardReceived(QXmppVCardIq)),
-                    this, SLOT(vCardReceived(QXmppVCardIq)));
     Q_ASSERT(check);
 }
 
@@ -297,10 +275,12 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else if (role == MessagesRole) {
         return item->messages;
     } else if (role == NameRole) {
+        VCard card;
+        card.setJid(item->jid);
         if (index.column() == SortingColumn)
-            return contactStatus(index) + sortSeparator + item->name.toLower() + sortSeparator + item->jid.toLower();
+            return contactStatus(index) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
         else
-            return item->name;
+            return card.name();
     } else if (role == UrlRole) {
         return VCardCache::instance()->profileUrl(item->jid);
     } else if (role == StatusRole) {
@@ -345,7 +325,7 @@ bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, i
 void ChatRosterModel::_q_connected()
 {
     // request own vCard
-    d->fetchVCard(d->client->configuration().jidBare());
+    VCardCache::instance()->get(d->client->configuration().jidBare());
 }
 
 void ChatRosterModel::_q_disconnected()
@@ -378,14 +358,10 @@ void ChatRosterModel::itemAdded(const QString &jid)
     item = new ChatRosterItem;
     item->jid = jid;
     item->messages = 0;
-    if (!entry.name().isEmpty())
-        item->name = entry.name();
-    else
-        item->name = jidToUser(jid);
     ChatModel::addItem(item, rootItem);
 
     // fetch vCard
-    d->fetchVCard(item->jid);
+    VCardCache::instance()->get(item->jid);
 }
 
 /** Handles an item being changed in the roster.
@@ -396,15 +372,8 @@ void ChatRosterModel::itemChanged(const QString &jid)
     if (!item)
         return;
 
-    // update an existing entry
-    const QXmppRosterIq::Item entry = d->client->rosterManager()->getRosterEntry(jid);
-    if (!entry.name().isEmpty())
-        item->name = entry.name();
     emit dataChanged(createIndex(item, ContactColumn),
                      createIndex(item, SortingColumn));
-
-    // fetch vCard
-    d->fetchVCard(item->jid);
 }
 
 /** Handles an item being removed from the roster.
@@ -449,34 +418,6 @@ void ChatRosterModel::rosterReceived()
 
     // trigger resize
     emit rosterReady();
-}
-
-void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
-{
-    if (vcard.type() != QXmppIq::Result)
-        return;
-
-    const QString bareJid = vcard.from();
-    ChatRosterItem *item = d->find(bareJid);
-    if (!item)
-        return;
-
-    // store the nickName
-    if (!vcard.nickName().isEmpty())
-         item->nickName = vcard.nickName();
-
-    // store the nickName or fullName found in the vCard for display,
-    // unless the roster entry has a name
-    QXmppRosterIq::Item entry = d->client->rosterManager()->getRosterEntry(bareJid);
-    if (entry.name().isEmpty()) {
-        if (!vcard.nickName().isEmpty())
-            item->name = vcard.nickName();
-        else if (!vcard.fullName().isEmpty())
-            item->name = vcard.fullName();
-    }
-
-    emit dataChanged(createIndex(item, ContactColumn),
-                     createIndex(item, SortingColumn));
 }
 
 void ChatRosterModel::addPendingMessage(const QString &bareJid)
@@ -707,6 +648,14 @@ void VCardCache::addClient(ChatClient *client)
 
     check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
                     this, SLOT(presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
+
+    check = connect(client->rosterManager(), SIGNAL(itemAdded(QString)),
+                    this, SIGNAL(cardChanged(QString)));
+    Q_ASSERT(check);
+
+    check = connect(client->rosterManager(), SIGNAL(itemChanged(QString)),
+                    this, SIGNAL(cardChanged(QString)));
     Q_ASSERT(check);
 
     check = connect(&client->vCardManager(), SIGNAL(vCardReceived(QXmppVCardIq)),

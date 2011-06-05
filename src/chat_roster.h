@@ -80,7 +80,6 @@ private slots:
     void itemRemoved(const QString &jid);
     void presenceChanged(const QString& bareJid, const QString& resource);
     void rosterReceived();
-    void vCardReceived(const QXmppVCardIq&);
 
 private:
     friend class ChatRosterModelPrivate;
