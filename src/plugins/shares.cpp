@@ -738,6 +738,7 @@ void SharePanel::shareServerChanged(const QString &server)
     x.setTagName("x");
     x.setAttribute("xmlns", ns_shares);
 
+    VCard card;
     QXmppElement nickName;
     nickName.setTagName("nickName");
     nickName.setValue(chatWindow->rosterModel()->ownName());

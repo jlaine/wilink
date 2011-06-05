@@ -626,6 +626,13 @@ void VCard::update()
         } else {
             newAvatar = QUrl("qrc:/peer.png");
         }
+        foreach (ChatClient *client, m_cache->m_clients) {
+            const QString name = client->rosterManager()->getRosterEntry(jidToBareJid(m_jid)).name();
+            if (!name.isEmpty()) {
+                newName = name;
+                break;
+            }
+        }
         if (newName.isEmpty())
             newName = jidToUser(m_jid);
 
