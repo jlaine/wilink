@@ -54,14 +54,6 @@ public:
         StatusRole
     };
 
-    enum Feature {
-        ChatStatesFeature = 1,
-        FileTransferFeature = 2,
-        VersionFeature = 4,
-        VoiceFeature = 8,
-        VideoFeature = 16,
-    };
-
     ChatRosterModel(ChatClient *client, QObject *parent = 0);
     ~ChatRosterModel();
 
@@ -70,7 +62,6 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-    QStringList contactFeaturing(const QString &bareJid, ChatRosterModel::Feature) const;
     bool isOwnNameReceived() const;
     QString ownName() const;
 
@@ -85,21 +76,17 @@ public slots:
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
 
-protected slots:
+private slots:
     void _q_connected();
     void _q_disconnected();
-    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void itemAdded(const QString &jid);
     void itemChanged(const QString &jid);
     void itemRemoved(const QString &jid);
     void presenceChanged(const QString& bareJid, const QString& resource);
-    void presenceReceived(const QXmppPresence &presence);
     void rosterReceived();
     void vCardReceived(const QXmppVCardIq&);
 
 private:
-    void discoveryInfoFound(const QXmppDiscoveryIq &disco);
-
     friend class ChatRosterModelPrivate;
     ChatRosterModelPrivate * const d;
 };
@@ -142,6 +129,9 @@ signals:
     void nameChanged(const QString &name);
     void nickNameChanged(const QString &nickName);
     void urlChanged(const QUrl &url);
+
+public slots:
+    QString jidForFeature(Feature feature) const;
 
 private slots:
     void cardChanged(const QString &jid);

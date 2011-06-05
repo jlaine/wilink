@@ -161,7 +161,6 @@ public:
     ChatClient *client;
     ChatRosterItem *ownItem;
     bool nickNameReceived;
-    QMap<QString, int> clientFeatures;
 };
 
 /** Count the current number of pending messages.
@@ -241,14 +240,6 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
                     this, SLOT(_q_disconnected()));
     Q_ASSERT(check);
 
-    check = connect(d->client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                    this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
-    Q_ASSERT(check);
-
-    check = connect(d->client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(presenceReceived(QXmppPresence)));
-    Q_ASSERT(check);
-
     check = connect(d->client->rosterManager(), SIGNAL(itemAdded(QString)),
                     this, SLOT(itemAdded(QString)));
     Q_ASSERT(check);
@@ -283,29 +274,6 @@ int ChatRosterModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return MaxColumn;
-}
-
-/** Returns the full JID of an online contact which has the requested feature.
- *
- * @param bareJid
- * @param feature
- */
-QStringList ChatRosterModel::contactFeaturing(const QString &bareJid, ChatRosterModel::Feature feature) const
-{
-    QStringList jids;
-    if (bareJid.isEmpty())
-        return jids;
-
-    if (jidToResource(bareJid).isEmpty())
-    {
-        const QString sought = bareJid + "/";
-        foreach (const QString &key, d->clientFeatures.keys())
-            if (key.startsWith(sought) && (d->clientFeatures.value(key) & feature))
-                jids << key;
-    } else if (d->clientFeatures.value(bareJid) & feature) {
-        jids << bareJid;
-    }
-    return jids;
 }
 
 static QString contactStatus(const QModelIndex &index)
@@ -393,8 +361,6 @@ void ChatRosterModel::_q_connected()
 
 void ChatRosterModel::_q_disconnected()
 {
-    d->clientFeatures.clear();
-
     if (rootItem->children.size() > 0)
     {
         ChatModelItem *first = rootItem->children.first();
@@ -402,39 +368,6 @@ void ChatRosterModel::_q_disconnected()
         emit dataChanged(createIndex(first, ContactColumn),
                          createIndex(last, SortingColumn));
     }
-}
-
-void ChatRosterModel::discoveryInfoFound(const QXmppDiscoveryIq &disco)
-{
-    int features = 0;
-    foreach (const QString &var, disco.features())
-    {
-        if (var == ns_chat_states)
-            features |= ChatStatesFeature;
-        else if (var == ns_stream_initiation_file_transfer)
-            features |= FileTransferFeature;
-        else if (var == ns_version)
-            features |= VersionFeature;
-        else if (var == ns_jingle_rtp_audio)
-            features |= VoiceFeature;
-        else if (var == ns_jingle_rtp_video)
-            features |= VideoFeature;
-    }
-    ChatRosterItem *item = d->find(disco.from());
-    foreach (const QXmppDiscoveryIq::Identity& id, disco.identities()) {
-        if (id.name() == "iChatAgent")
-            features |= ChatStatesFeature;
-    }
-    d->clientFeatures.insert(disco.from(), features);
-}
-
-void ChatRosterModel::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
-{
-    if (disco.type() != QXmppIq::Result)
-        return;
-
-    writeIq(d->cache, QString("xmpp:%1?disco;type=get;request=info").arg(disco.from()), disco, 3600);
-    discoveryInfoFound(disco);
 }
 
 QModelIndex ChatRosterModel::findItem(const QString &bareJid, const QModelIndex &parent) const
@@ -511,30 +444,6 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
     if (item)
         emit dataChanged(createIndex(item, ContactColumn),
                          createIndex(item, SortingColumn));
-}
-
-void ChatRosterModel::presenceReceived(const QXmppPresence &presence)
-{
-    const QString jid = presence.from();
-    const QString bareJid = jidToBareJid(jid);
-    const QString resource = jidToResource(jid);
-
-    // handle features discovery
-    if (!resource.isEmpty())
-    {
-        if (presence.type() == QXmppPresence::Unavailable)
-            d->clientFeatures.remove(jid);
-        else if (presence.type() == QXmppPresence::Available && !d->clientFeatures.contains(jid)) {
-            QXmppDiscoveryIq disco;
-            if (readIq(d->cache, QString("xmpp:%1?disco;type=get;request=info").arg(jid), &disco) &&
-                (presence.capabilityVer().isEmpty() || presence.capabilityVer() == disco.verificationString()))
-            {
-                discoveryInfoFound(disco);
-            } else {
-                d->client->findExtension<QXmppDiscoveryManager>()->requestInfo(jid);
-            }
-        }
-    }
 }
 
 void ChatRosterModel::rosterReceived()
@@ -647,6 +556,24 @@ QString VCard::jid() const
     return m_jid;
 }
 
+/** Returns the full JID of an online contact which has the requested feature.
+ *
+ * @param feature
+ */
+QString VCard::jidForFeature(Feature feature) const
+{
+    if (m_jid.isEmpty() || !m_cache)
+        return m_jid;
+
+    if (jidToResource(m_jid).isEmpty()) {
+        foreach (const QString &key, m_cache->m_features.keys()) {
+            if (jidToBareJid(key) == m_jid)
+                return key;
+        }
+    }
+    return m_jid;
+}
+
 void VCard::setJid(const QString &jid)
 {
     if (jid != m_jid) {
@@ -703,7 +630,7 @@ void VCard::update()
             newName = jidToUser(m_jid);
 
         // features
-        if (m_jid.contains('/')) {
+        if (!jidToResource(m_jid).isEmpty()) {
             newFeatures = m_cache->m_features.value(m_jid);
         } else {
             foreach (const QString &jid, m_cache->m_features.keys()) {
@@ -818,7 +745,8 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
-    qDebug("received disco %s", qPrintable(disco.from()));
+    const QString jid = disco.from();
+    qDebug("received disco %s", qPrintable(jid));
     VCard::Features features = 0;
     foreach (const QString &var, disco.features())
     {
@@ -837,7 +765,9 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
         if (id.name() == "iChatAgent")
             features |= VCard::ChatStatesFeature;
     }
-    m_features.insert(disco.from(), features);
+    m_features.insert(jid, features);
+
+    emit cardChanged(jid);
 }
 
 void VCardCache::presenceReceived(const QXmppPresence &presence)
