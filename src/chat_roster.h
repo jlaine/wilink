@@ -50,8 +50,7 @@ class ChatRosterModel : public ChatModel
 
 public:
     enum Role {
-        NicknameRole = ChatModel::UserRole,
-        StatusRole
+        StatusRole = ChatModel::UserRole,
     };
 
     ChatRosterModel(ChatClient *client, QObject *parent = 0);
