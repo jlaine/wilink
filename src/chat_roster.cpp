@@ -339,12 +339,6 @@ void ChatRosterModel::_q_disconnected()
     }
 }
 
-QModelIndex ChatRosterModel::findItem(const QString &bareJid, const QModelIndex &parent) const
-{
-    ChatRosterItem *parentItem = static_cast<ChatRosterItem*>(parent.isValid() ? parent.internalPointer() : rootItem);
-    return createIndex(d->find(bareJid, parentItem), 0);
-}
-
 /** Handles an item being added to the roster.
  */
 void ChatRosterModel::itemAdded(const QString &jid)
