@@ -739,9 +739,11 @@ void SharePanel::shareServerChanged(const QString &server)
     x.setAttribute("xmlns", ns_shares);
 
     VCard card;
+    card.setJid(jidToBareJid(chatWindow->client()->jid()));
+
     QXmppElement nickName;
     nickName.setTagName("nickName");
-    nickName.setValue(chatWindow->rosterModel()->ownName());
+    nickName.setValue(card.name());
     x.appendChild(nickName);
 
     QXmppPresence presence;

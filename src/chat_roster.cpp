@@ -159,8 +159,6 @@ public:
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
     ChatClient *client;
-    ChatRosterItem *ownItem;
-    bool nickNameReceived;
 };
 
 /** Count the current number of pending messages.
@@ -226,10 +224,6 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
     d->cache->setCacheDirectory(wApp->cacheDirectory());
 
     d->client = xmppClient;
-    d->nickNameReceived = false;
-    d->ownItem = new ChatRosterItem;
-    d->ownItem->messages = 0;
-    ChatModel::addItem(d->ownItem, rootItem);
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
@@ -351,12 +345,7 @@ bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, i
 void ChatRosterModel::_q_connected()
 {
     // request own vCard
-    d->nickNameReceived = false;
-    d->ownItem->jid = d->client->configuration().jidBare();
-    d->ownItem->name = d->client->configuration().user();
-    d->ownItem->nickName = d->client->configuration().user();
-    d->fetchVCard(d->ownItem->jid);
-    emit dataChanged(createIndex(d->ownItem), createIndex(d->ownItem));
+    d->fetchVCard(d->client->configuration().jidBare());
 }
 
 void ChatRosterModel::_q_disconnected()
@@ -374,16 +363,6 @@ QModelIndex ChatRosterModel::findItem(const QString &bareJid, const QModelIndex 
 {
     ChatRosterItem *parentItem = static_cast<ChatRosterItem*>(parent.isValid() ? parent.internalPointer() : rootItem);
     return createIndex(d->find(bareJid, parentItem), 0);
-}
-
-bool ChatRosterModel::isOwnNameReceived() const
-{
-    return d->nickNameReceived;
-}
-
-QString ChatRosterModel::ownName() const
-{
-    return d->ownItem->nickName;
 }
 
 /** Handles an item being added to the roster.
@@ -464,7 +443,7 @@ void ChatRosterModel::rosterReceived()
     // remove obsolete entries
     foreach (const QString &jid, oldJids) {
         ChatRosterItem *item = d->find(jid);
-        if (item && item != d->ownItem)
+        if (item)
             removeItem(item);
     }
 
@@ -498,12 +477,6 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 
     emit dataChanged(createIndex(item, ContactColumn),
                      createIndex(item, SortingColumn));
-
-    // check if we got our own name
-    if (item == d->ownItem) {
-        d->nickNameReceived = true;
-        emit ownNameReceived();
-    }
 }
 
 void ChatRosterModel::addPendingMessage(const QString &bareJid)

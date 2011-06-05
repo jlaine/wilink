@@ -62,13 +62,9 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-    bool isOwnNameReceived() const;
-    QString ownName() const;
-
     QModelIndex findItem(const QString &jid, const QModelIndex &parent = QModelIndex()) const;
 
 signals:
-    void ownNameReceived();
     void pendingMessages(int messages);
     void rosterReady();
 
