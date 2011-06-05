@@ -216,7 +216,12 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
 {
     d->q = this;
 
-    /* get cache */
+    // set additionals role names
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(ChatRosterModel::StatusRole, "status");
+    setRoleNames(names);
+
+    // get cache
     VCardCache::instance()->setManager(&xmppClient->vCardManager());
     d->cache = new QNetworkDiskCache(this);
     d->cache->setCacheDirectory(wApp->cacheDirectory());
@@ -226,11 +231,6 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     d->ownItem = new ChatRosterItem;
     d->ownItem->messages = 0;
     ChatModel::addItem(d->ownItem, rootItem);
-
-    // set additionals role names
-    QHash<int, QByteArray> role = QHash<int, QByteArray>(roleNames());
-    role.insert(ChatRosterModel::StatusRole, "status");
-    setRoleNames(role);
 
     bool check;
     check = connect(d->client, SIGNAL(connected()),
