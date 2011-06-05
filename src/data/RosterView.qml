@@ -175,9 +175,6 @@ Item {
                     border.width: 1
                     border.color: {
                         switch(model.status) {
-                            case QXmppPresence.Offline:
-                            case QXmppPresence.Invisible:
-                                return '#999999';
                             case QXmppPresence.Online:
                             case QXmppPresence.Chat:
                                 return '#006400';
@@ -186,13 +183,14 @@ Item {
                                 return '#c86400';
                             case QXmppPresence.DND:
                                 return '#640000';
+                            case QXmppPresence.Offline:
+                            case QXmppPresence.Invisible:
+                            default:
+                                return '#999999';
                         }
                     }
                     gradient: {
                         switch(model.status) {
-                            case QXmppPresence.Offline:
-                            case QXmppPresence.Invisible:
-                                return offlineGradient;
                             case QXmppPresence.Online:
                             case QXmppPresence.Chat:
                                 return availableGradient;
@@ -201,6 +199,10 @@ Item {
                                 return awayGradient;
                             case QXmppPresence.DND:
                                 return busyGradient;
+                            case QXmppPresence.Offline:
+                            case QXmppPresence.Invisible:
+                            default:
+                                return offlineGradient;
                         }
                     }
                     opacity: (model.status != undefined) ? 1 : 0
