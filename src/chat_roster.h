@@ -151,6 +151,7 @@ private:
 
     VCardCache *m_cache;
     QUrl m_avatar;
+    Features m_features;
     QString m_jid;
     QString m_name;
     QString m_nickName;
@@ -186,6 +187,8 @@ private:
     QMap<QString, VCard::Features> m_features;
     QSet<QString> m_failed;
     QSet<QString> m_queue;
+
+    friend class VCard;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(VCard::Features)

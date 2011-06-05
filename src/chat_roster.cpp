@@ -639,7 +639,7 @@ void VCard::cardChanged(const QString &jid)
 
 VCard::Features VCard::features() const
 {
-    return FileTransferFeature | VoiceFeature;
+    return m_features;
 }
 
 QString VCard::jid() const
@@ -675,6 +675,7 @@ QUrl VCard::url() const
 void VCard::update()
 {
     QUrl newAvatar;
+    Features newFeatures = 0;
     QString newName;
     QString newNickName;
     QUrl newUrl;
@@ -700,12 +701,26 @@ void VCard::update()
         }
         if (newName.isEmpty())
             newName = jidToUser(m_jid);
+
+        // features
+        if (m_jid.contains('/')) {
+            newFeatures = m_cache->m_features.value(m_jid);
+        } else {
+            foreach (const QString &jid, m_cache->m_features.keys()) {
+                if (jidToBareJid(jid) == m_jid)
+                    newFeatures |= m_cache->m_features.value(jid);
+            }
+        }
     }
 
     // notify changes
     if (newAvatar != m_avatar) {
         m_avatar = newAvatar;
         emit avatarChanged(m_avatar);
+    }
+    if (newFeatures != m_features) {
+        m_features = newFeatures;
+        emit featuresChanged(m_features);
     }
     if (newName != m_name) {
         m_name = newName;
@@ -803,6 +818,7 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
+    qDebug("received disco %s", qPrintable(disco.from()));
     VCard::Features features = 0;
     foreach (const QString &var, disco.features())
     {
@@ -836,6 +852,7 @@ void VCardCache::presenceReceived(const QXmppPresence &presence)
         if (presence.type() == QXmppPresence::Unavailable)
             m_features.remove(jid);
         else if (presence.type() == QXmppPresence::Available && !m_features.contains(jid) && !m_clients.isEmpty()) {
+            qDebug("requesting disco %s", qPrintable(jid));
             QXmppDiscoveryIq disco;
             m_clients.first()->discoveryManager()->requestInfo(jid);
         }
