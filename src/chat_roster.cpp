@@ -539,6 +539,8 @@ void VCard::update()
             }
         }
         if (newName.isEmpty())
+            newName = jidToResource(m_jid);
+        if (newName.isEmpty())
             newName = jidToUser(m_jid);
 
         // features
