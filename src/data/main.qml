@@ -341,6 +341,7 @@ Item {
                             window.client.rosterManager.renameItem(item.jid, dialog.item.textValue);
                             dialog.item.hide();
                         });
+                        dialog.item.show();
                     } else if (item.action == 'remove') {
                         var box = window.messageBox();
                         box.windowTitle = qsTr("Remove contact");
