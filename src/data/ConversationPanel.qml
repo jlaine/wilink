@@ -78,7 +78,10 @@ Panel {
                 text: qsTr('Call')
                 visible: vcard.features & VCard.VoiceFeature
 
-                onClicked: window.client.callManager.call(vcard.jid)
+                onClicked: {
+                    var fullJid = vcard.jidForFeature(VCard.AudioFeature);
+                    window.client.callManager.call(fullJid);
+                }
 
                 Connections {
                     target: window.client.callManager
@@ -102,7 +105,8 @@ Panel {
                     if (dialog.exec()) {
                         for (var i in dialog.selectedFiles) {
                             var filePath = dialog.selectedFiles[i];
-                            window.client.transferManager.sendFile(vcard.jid, filePath);
+                            var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
+                            window.client.transferManager.sendFile(fullJid, filePath);
                         }
                     }
                 }
