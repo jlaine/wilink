@@ -76,6 +76,7 @@ Panel {
             ToolButton {
                 iconSource: 'call.png'
                 text: qsTr('Call')
+                visible: vcard.features & VCard.VoiceFeature
 
                 onClicked: window.client.callManager.call(vcard.jid)
 
@@ -92,6 +93,7 @@ Panel {
             ToolButton {
                 iconSource: 'upload.png'
                 text: qsTr('Send a file')
+                visible: vcard.features & VCard.FileTransferFeature
 
                 onClicked: {
                     var dialog = window.fileDialog();
