@@ -26,6 +26,7 @@
 #include <QSortFilterProxyModel>
 
 #include "QXmppMessage.h"
+#include "QXmppPresence.h"
 
 class QDeclarativeFileDialog : public QFileDialog
 {
@@ -65,6 +66,23 @@ public:
         Gone = QXmppMessage::Gone,
         Composing = QXmppMessage::Composing,
         Paused = QXmppMessage::Paused,
+    };
+};
+
+class QXmppDeclarativePresence : public QObject
+{
+    Q_OBJECT
+    Q_ENUMS(Status)
+
+public:
+    enum Status {
+        Offline = QXmppPresence::Status::Offline,
+        Online = QXmppPresence::Status::Online,
+        Away = QXmppPresence::Status::Away,
+        XA = QXmppPresence::Status::XA,
+        DND = QXmppPresence::Status::DND,
+        Chat = QXmppPresence::Status::Chat,
+        Invisible = QXmppPresence::Status::Invisible,
     };
 };
 

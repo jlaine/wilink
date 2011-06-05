@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 
 Item {
     id: block
@@ -174,20 +175,32 @@ Item {
                     border.width: 1
                     border.color: {
                         switch(model.status) {
-                            // FIXME: enums values should come from C++
-                            case 0: return '#999999' // Offline
-                            case 1: return '#006400' // Available
-                            case 2: return '#c86400' // Away
-                            case 4: return '#640000' // Busy
+                            case QXmppPresence.Offline:
+                            case QXmppPresence.Invisible:
+                                return '#999999';
+                            case QXmppPresence.Online:
+                            case QXmppPresence.Chat:
+                                return '#006400';
+                            case QXmppPresence.Away:
+                            case QXmppPresence.XA:
+                                return '#c86400';
+                            case QXmppPresence.DND:
+                                return '#640000';
                         }
                     }
                     gradient: {
                         switch(model.status) {
-                            // FIXME: enums values should come from C++
-                            case 0: return offlineGradient
-                            case 1: return availableGradient
-                            case 2: return awayGradient
-                            case 4: return busyGradient
+                            case QXmppPresence.Offline:
+                            case QXmppPresence.Invisible:
+                                return offlineGradient;
+                            case QXmppPresence.Online:
+                            case QXmppPresence.Chat:
+                                return availableGradient;
+                            case QXmppPresence.Away:
+                            case QXmppPresence.XA:
+                                return awayGradient;
+                            case QXmppPresence.DND:
+                                return busyGradient;
                         }
                     }
                     opacity: (model.status != undefined) ? 1 : 0
