@@ -30,7 +30,6 @@
 #include <QStringList>
 #include <QUrl>
 
-#include "QXmppClient.h"
 #include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
@@ -41,6 +40,7 @@
 #include "QXmppVCardManager.h"
 
 #include "application.h"
+#include "chat_client.h"
 #include "chat_roster.h"
 
 static const QChar sortSeparator('\0');
@@ -158,7 +158,7 @@ public:
 
     ChatRosterModel *q;
     QNetworkDiskCache *cache;
-    QXmppClient *client;
+    ChatClient *client;
     ChatRosterItem *ownItem;
     bool nickNameReceived;
     QMap<QString, int> clientFeatures;
@@ -210,7 +210,7 @@ ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *p
     return 0;
 }
 
-ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
+ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
     : ChatModel(parent),
     d(new ChatRosterModelPrivate)
 {
@@ -222,7 +222,7 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
     setRoleNames(names);
 
     // get cache
-    VCardCache::instance()->setManager(&xmppClient->vCardManager());
+    VCardCache::instance()->addClient(xmppClient);
     d->cache = new QNetworkDiskCache(this);
     d->cache->setCacheDirectory(wApp->cacheDirectory());
 
@@ -249,23 +249,23 @@ ChatRosterModel::ChatRosterModel(QXmppClient *xmppClient, QObject *parent)
                     this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(itemAdded(QString)),
+    check = connect(d->client->rosterManager(), SIGNAL(itemAdded(QString)),
                     this, SLOT(itemAdded(QString)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(itemChanged(QString)),
+    check = connect(d->client->rosterManager(), SIGNAL(itemChanged(QString)),
                     this, SLOT(itemChanged(QString)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
+    check = connect(d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
                     this, SLOT(itemRemoved(QString)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(presenceChanged(QString, QString)),
+    check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString, QString)),
                     this, SLOT(presenceChanged(QString, QString)));
     Q_ASSERT(check);
 
-    check = connect(&d->client->rosterManager(), SIGNAL(rosterReceived()),
+    check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
                     this, SLOT(rosterReceived()));
     Q_ASSERT(check);
 
@@ -347,7 +347,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         // condition upon disconnection, because the roster has not yet been cleared
         if (!d->client->isConnected())
             return statusType;
-        foreach (const QXmppPresence &presence, d->client->rosterManager().getAllPresencesForBareJid(item->jid)) {
+        foreach (const QXmppPresence &presence, d->client->rosterManager()->getAllPresencesForBareJid(item->jid)) {
             QXmppPresence::Status::Type type = presence.status().type();
             if (type == QXmppPresence::Status::Offline)
                 continue;
@@ -462,7 +462,7 @@ void ChatRosterModel::itemAdded(const QString &jid)
         return;
 
     // add a new entry
-    const QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
+    const QXmppRosterIq::Item entry = d->client->rosterManager()->getRosterEntry(jid);
     item = new ChatRosterItem;
     item->jid = jid;
     item->messages = 0;
@@ -485,7 +485,7 @@ void ChatRosterModel::itemChanged(const QString &jid)
         return;
 
     // update an existing entry
-    const QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(jid);
+    const QXmppRosterIq::Item entry = d->client->rosterManager()->getRosterEntry(jid);
     if (!entry.name().isEmpty())
         item->name = entry.name();
     emit dataChanged(createIndex(item, ContactColumn),
@@ -547,7 +547,7 @@ void ChatRosterModel::rosterReceived()
     }
 
     // process received entries
-    foreach (const QString &jid, d->client->rosterManager().getRosterBareJids()) {
+    foreach (const QString &jid, d->client->rosterManager()->getRosterBareJids()) {
         itemAdded(jid);
         oldJids.removeAll(jid);
     }
@@ -579,7 +579,7 @@ void ChatRosterModel::vCardReceived(const QXmppVCardIq& vcard)
 
     // store the nickName or fullName found in the vCard for display,
     // unless the roster entry has a name
-    QXmppRosterIq::Item entry = d->client->rosterManager().getRosterEntry(bareJid);
+    QXmppRosterIq::Item entry = d->client->rosterManager()->getRosterEntry(bareJid);
     if (entry.name().isEmpty()) {
         if (!vcard.nickName().isEmpty())
             item->name = vcard.nickName();
@@ -722,8 +722,7 @@ void VCard::update()
 }
 
 VCardCache::VCardCache(QObject *parent)
-    : QObject(parent),
-    m_manager(0)
+    : QObject(parent)
 {
     m_cache = new QNetworkDiskCache(this);
     m_cache->setCacheDirectory(wApp->cacheDirectory());
@@ -744,10 +743,11 @@ bool VCardCache::get(const QString &jid, QXmppVCardIq *iq)
 
     if (readIq(m_cache, QString("xmpp:%1?vcard").arg(jid), iq))
         return true;
-    if (m_manager) {
+    if (!m_clients.isEmpty()) {
+        ChatClient *client = m_clients.first();
         qDebug("requesting vCard %s", qPrintable(jid));
         m_queue.insert(jid);
-        m_manager->requestVCard(jid);
+        client->vCardManager().requestVCard(jid);
     }
     return false;
 }
@@ -776,32 +776,26 @@ VCardCache *VCardCache::instance()
     return vcardCache;
 }
 
-QXmppVCardManager *VCardCache::manager() const
-{
-    return m_manager;
-}
-
-void VCardCache::setManager(QXmppVCardManager* manager)
+void VCardCache::addClient(ChatClient *client)
 {
     bool check;
 
-    if (manager == m_manager)
+    if (!client || m_clients.contains(client))
         return;
 
-    QXmppClient *client = qobject_cast<QXmppClient*>(manager->parent());
-    Q_ASSERT(client);
-    Q_ASSERT(manager);
-    m_manager = manager;
+    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
 
-    check = connect(m_manager, SIGNAL(vCardReceived(QXmppVCardIq)),
+    check = connect(&client->vCardManager(), SIGNAL(vCardReceived(QXmppVCardIq)),
                     this, SLOT(vCardReceived(QXmppVCardIq)));
     Q_ASSERT(check);
 
-    check = connect(client->findExtension<QXmppDiscoveryManager>(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
+    check = connect(client->discoveryManager(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
-    emit managerChanged(m_manager);
+    m_clients << client;
 }
 
 void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
@@ -828,6 +822,24 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
             features |= VCard::ChatStatesFeature;
     }
     m_features.insert(disco.from(), features);
+}
+
+void VCardCache::presenceReceived(const QXmppPresence &presence)
+{
+    const QString jid = presence.from();
+    const QString bareJid = jidToBareJid(jid);
+    const QString resource = jidToResource(jid);
+
+    // handle features discovery
+    if (!resource.isEmpty())
+    {
+        if (presence.type() == QXmppPresence::Unavailable)
+            m_features.remove(jid);
+        else if (presence.type() == QXmppPresence::Available && !m_features.contains(jid) && !m_clients.isEmpty()) {
+            QXmppDiscoveryIq disco;
+            m_clients.first()->discoveryManager()->requestInfo(jid);
+        }
+    }
 }
 
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)

@@ -27,12 +27,12 @@
 #include "chat_model.h"
 
 class QNetworkDiskCache;
-class QXmppClient;
 class QXmppDiscoveryIq;
 class QXmppPresence;
 class QXmppVCardIq;
 class QXmppVCardManager;
 
+class ChatClient;
 class ChatRosterModel;
 class ChatRosterModelPrivate;
 class VCardCache;
@@ -62,7 +62,7 @@ public:
         VideoFeature = 16,
     };
 
-    ChatRosterModel(QXmppClient *client, QObject *parent = 0);
+    ChatRosterModel(ChatClient *client, QObject *parent = 0);
     ~ChatRosterModel();
 
     // QAbstractItemModel interface
@@ -160,33 +160,30 @@ private:
 class VCardCache : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QXmppVCardManager* manager READ manager WRITE setManager NOTIFY managerChanged)
 
 public:
-    VCardCache(QObject *parent = 0);
-
-    QXmppVCardManager *manager() const;
-    void setManager(QXmppVCardManager *manager);
-
     static VCardCache *instance();
 
 signals:
     void cardChanged(const QString &jid);
-    void managerChanged(QXmppVCardManager *manager);
 
 public slots:
+    void addClient(ChatClient *client);
     bool get(const QString &jid, QXmppVCardIq *iq = 0);
     QUrl imageUrl(const QString &jid);
     QUrl profileUrl(const QString &jid);
 
 private slots:
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
+    void presenceReceived(const QXmppPresence &presence);
     void vCardReceived(const QXmppVCardIq&);
 
 private:
+    VCardCache(QObject *parent = 0);
+
     QNetworkDiskCache *m_cache;
+    QList<ChatClient*> m_clients;
     QMap<QString, VCard::Features> m_features;
-    QXmppVCardManager *m_manager;
     QSet<QString> m_failed;
     QSet<QString> m_queue;
 };
