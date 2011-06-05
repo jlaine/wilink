@@ -637,6 +637,11 @@ void VCard::cardChanged(const QString &jid)
         update();
 }
 
+VCard::Features VCard::features() const
+{
+    return FileTransferFeature | VoiceFeature;
+}
+
 QString VCard::jid() const
 {
     return m_jid;
@@ -804,23 +809,23 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (disco.type() != QXmppIq::Result)
         return;
 
-    int features = 0;
+    VCard::Features features = 0;
     foreach (const QString &var, disco.features())
     {
         if (var == ns_chat_states)
-            features |= ChatRosterModel::ChatStatesFeature;
+            features |= VCard::ChatStatesFeature;
         else if (var == ns_stream_initiation_file_transfer)
-            features |= ChatRosterModel::FileTransferFeature;
+            features |= VCard::FileTransferFeature;
         else if (var == ns_version)
-            features |= ChatRosterModel::VersionFeature;
+            features |= VCard::VersionFeature;
         else if (var == ns_jingle_rtp_audio)
-            features |= ChatRosterModel::VoiceFeature;
+            features |= VCard::VoiceFeature;
         else if (var == ns_jingle_rtp_video)
-            features |= ChatRosterModel::VideoFeature;
+            features |= VCard::VideoFeature;
     }
     foreach (const QXmppDiscoveryIq::Identity& id, disco.identities()) {
         if (id.name() == "iChatAgent")
-            features |= ChatRosterModel::ChatStatesFeature;
+            features |= VCard::ChatStatesFeature;
     }
     m_features.insert(disco.from(), features);
 }

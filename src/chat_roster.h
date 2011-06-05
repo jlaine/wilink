@@ -107,16 +107,28 @@ private:
 class VCard : public QObject
 {
     Q_OBJECT
+    Q_FLAGS(Feature Features)
     Q_PROPERTY(QUrl avatar READ avatar NOTIFY avatarChanged)
+    Q_PROPERTY(Features features READ features NOTIFY featuresChanged)
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString nickName READ nickName NOTIFY nickNameChanged)
     Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
 
 public:
+    enum Feature {
+        ChatStatesFeature = 1,
+        FileTransferFeature = 2,
+        VersionFeature = 4,
+        VoiceFeature = 8,
+        VideoFeature = 16,
+    };
+    Q_DECLARE_FLAGS(Features, Feature)
+
     VCard(QObject *parent = 0);
 
     QUrl avatar() const;
+    Features features() const;
     QString jid() const;
     void setJid(const QString &jid);
     QString name() const;
@@ -125,6 +137,7 @@ public:
 
 signals:
     void avatarChanged(const QUrl &avatar);
+    void featuresChanged(Features features);
     void jidChanged(const QString &jid);
     void nameChanged(const QString &name);
     void nickNameChanged(const QString &nickName);
@@ -172,10 +185,12 @@ private slots:
 
 private:
     QNetworkDiskCache *m_cache;
-    QMap<QString, int> m_features;
+    QMap<QString, VCard::Features> m_features;
     QXmppVCardManager *m_manager;
     QSet<QString> m_failed;
     QSet<QString> m_queue;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(VCard::Features)
 
 #endif
