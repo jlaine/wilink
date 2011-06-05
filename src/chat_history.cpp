@@ -100,34 +100,8 @@ bool ChatMessage::isAction() const
 class ChatHistoryModelPrivate
 {
 public:
-    ChatHistoryModelPrivate(ChatHistoryModel *qq);
-    void rosterChanged(const QString &jid);
-
-    QAbstractItemModel *rosterModel;
-    QMap<QString, QString> rosterNames;
-
-private:
-    ChatHistoryModel *q;
+    QMap<QString, VCard*> rosterCards;
 };
-
-ChatHistoryModelPrivate::ChatHistoryModelPrivate(ChatHistoryModel *qq)
-    : rosterModel(0),
-    q(qq)
-{
-}
-
-/** Handles a roster update.
- *
- * @param jid
- */
-void ChatHistoryModelPrivate::rosterChanged(const QString &jid)
-{
-    foreach (ChatModelItem *it, q->rootItem->children) {
-        ChatHistoryItem *item = static_cast<ChatHistoryItem*>(it);
-        if (item->messages.first()->jid == jid)
-            emit q->dataChanged(q->createIndex(it), q->createIndex(it));
-    }
-}
 
 /** Constructs a new ChatHistoryModel.
  *
@@ -136,7 +110,7 @@ void ChatHistoryModelPrivate::rosterChanged(const QString &jid)
 ChatHistoryModel::ChatHistoryModel(QObject *parent)
     : ChatModel(parent)
 {
-    d = new ChatHistoryModelPrivate(this);
+    d = new ChatHistoryModelPrivate;
 
     // set role names
     QHash<int, QByteArray> roleNames;
@@ -258,6 +232,19 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         emit messageReceived(msg->jid, msg->body);
 }
 
+void ChatHistoryModel::cardChanged()
+{
+    VCard *card = qobject_cast<VCard*>(sender());
+    if (!card)
+        return;
+    const QString jid = card->jid();
+    foreach (ChatModelItem *it, rootItem->children) {
+        ChatHistoryItem *item = static_cast<ChatHistoryItem*>(it);
+        if (item->messages.first()->jid == jid)
+            emit dataChanged(createIndex(it), createIndex(it));
+    }
+}
+
 /** Clears all messages.
  */
 void ChatHistoryModel::clear()
@@ -303,20 +290,14 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         return msg->date;
     } else if (role == FromRole) {
         const QString jid = msg->jid;
-        if (!d->rosterNames.contains(jid)) {
-            // fallback for chat rooms
-            d->rosterNames[jid] = jidToResource(jid);
-            if (d->rosterModel) {
-                for (int i = 0; i < d->rosterModel->rowCount(); ++i) {
-                    const QModelIndex index = d->rosterModel->index(i, 0);
-                    if (index.data(ChatModel::JidRole).toString() == jid) {
-                        d->rosterNames[jid] = index.data(Qt::DisplayRole).toString();
-                        break;
-                    }
-                }
-            }
+        if (!d->rosterCards.contains(jid)) {
+            VCard *card = new VCard((QObject*)this);
+            card->setJid(jid);
+            connect(card, SIGNAL(nameChanged(QString)),
+                    this, SLOT(cardChanged()));
+            d->rosterCards.insert(jid, card);
         }
-        return d->rosterNames.value(jid);
+        return d->rosterCards.value(jid)->name();
     } else if (role == HtmlRole) {
         const QString meName = data(index, FromRole).toString();
         QString bodies;
@@ -330,59 +311,5 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
-}
-
-/** Handles a roster change.
- *
- * @param topLeft
- * @param bottomRight
- */
-void ChatHistoryModel::rosterChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
-{
-    Q_ASSERT(topLeft.parent() == bottomRight.parent());
-    const QModelIndex parent = topLeft.parent();
-    for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
-        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
-        d->rosterChanged(jid);
-    }
-}
-
-/** Handles a roster insertion.
- *
- * @param parent
- * @param start
- * @param end
- */
-void ChatHistoryModel::rosterInserted(const QModelIndex &parent, int start, int end)
-{
-    for (int i = start; i <= end; ++i) {
-        const QString jid = d->rosterModel->index(i, 0, parent).data(ChatModel::JidRole).toString();
-        d->rosterChanged(jid);
-    }
-}
-
-/** Returns the participant model.
- */
-QObject *ChatHistoryModel::participantModel()
-{
-    return d->rosterModel;
-}
-
-/** Sets the participant model.
- *
- * @param participantModel
- */
-void ChatHistoryModel::setParticipantModel(QObject *participantModel)
-{
-    QAbstractItemModel *itemModel = static_cast<QAbstractItemModel*>(participantModel);
-    if (itemModel != d->rosterModel) {
-        d->rosterModel = itemModel;
-        connect(d->rosterModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-                this, SLOT(rosterChanged(QModelIndex,QModelIndex)));
-        connect(d->rosterModel, SIGNAL(rowsInserted(QModelIndex,int,int)),
-                this, SLOT(rosterInserted(QModelIndex,int,int)));
-
-        emit participantModelChanged(d->rosterModel);
-    }
 }
 

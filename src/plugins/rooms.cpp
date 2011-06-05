@@ -208,7 +208,6 @@ RoomModel::RoomModel(QObject *parent)
     m_room(0)
 {
     m_historyModel = new ChatHistoryModel(this);
-    m_historyModel->setParticipantModel(this);
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(participantChanged(QString)));

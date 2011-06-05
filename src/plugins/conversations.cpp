@@ -84,19 +84,6 @@ ChatHistoryModel *Conversation::historyModel() const
     return m_historyModel;
 }
 
-ChatRosterModel *Conversation::rosterModel() const
-{
-    return qobject_cast<ChatRosterModel*>(m_historyModel->participantModel());
-}
-
-void Conversation::setRosterModel(ChatRosterModel *rosterModel)
-{
-    if (rosterModel != m_historyModel->participantModel()) {
-        m_historyModel->setParticipantModel(rosterModel);
-        emit rosterModelChanged(rosterModel);
-    }
-}
-
 QString Conversation::jid() const
 {
     return m_jid;

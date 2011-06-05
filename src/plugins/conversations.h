@@ -33,7 +33,6 @@ class Conversation : public QObject
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
-    Q_PROPERTY(ChatRosterModel* rosterModel READ rosterModel WRITE setRosterModel NOTIFY rosterModelChanged)
     Q_PROPERTY(int localState READ localState WRITE setLocalState NOTIFY localStateChanged)
     Q_PROPERTY(int remoteState READ remoteState NOTIFY remoteStateChanged)
 

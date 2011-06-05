@@ -31,7 +31,6 @@ Panel {
         id: conversation
 
         client: window.client
-        rosterModel: window.rosterModel
     }
 
     PanelHeader {
