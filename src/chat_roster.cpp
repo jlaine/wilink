@@ -353,9 +353,6 @@ void ChatRosterModel::itemAdded(const QString &jid)
     item->jid = jid;
     item->messages = 0;
     ChatModel::addItem(item, rootItem);
-
-    // fetch vCard
-    VCardCache::instance()->get(item->jid);
 }
 
 /** Handles an item being changed in the roster.
