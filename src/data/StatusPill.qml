@@ -21,9 +21,11 @@ import QtQuick 1.0
 import QXmpp 0.4
 
 Item {
-    opacity: (model.status != undefined) ? 1 : 0
+    property variant presenceStatus
+
+    opacity: (presenceStatus != undefined) ? 1 : 0
     state: {
-        switch(model.status) {
+        switch(presenceStatus) {
             case QXmppPresence.Online:
             case QXmppPresence.Chat:
                 return 'available';

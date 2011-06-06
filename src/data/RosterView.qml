@@ -18,7 +18,6 @@
  */
 
 import QtQuick 1.0
-import QXmpp 0.4
 
 Item {
     id: block
@@ -148,6 +147,7 @@ Item {
                     anchors.left: avatar.right
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
+                    presenceStatus: model.status
                     width: 10
                     height: 10
                 }
