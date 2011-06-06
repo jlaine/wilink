@@ -748,9 +748,12 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 void VCardCache::presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.from();
+    if (jidToResource(jid).isEmpty())
+        return;
 
-    if (!jidToResource(jid).isEmpty() && presence.type() == QXmppPresence::Unavailable)
-        d->features.remove(jid);
+    if ((presence.type() == QXmppPresence::Available && !d->features.contains(jid)) ||
+        (presence.type() == QXmppPresence::Unavailable && d->features.remove(jid)))
+        emit discoChanged(jidToBareJid(jid));
 }
 
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
