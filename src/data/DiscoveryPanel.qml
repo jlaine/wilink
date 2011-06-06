@@ -24,10 +24,6 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    ListModel {
-        id: crumbs
-    }
-
     PanelHeader {
         id: header
 
@@ -47,14 +43,9 @@ Panel {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')
-                enabled: crumbs.count > 0
+                enabled: crumbBar.model.count > 0
 
-                onClicked: {
-                    var crumb = crumbs.get(crumbs.count - 1);
-                    view.model.rootJid = crumb.jid;
-                    view.model.rootNode = crumb.node;
-                    crumbs.remove(crumbs.count - 1);
-                }
+                onClicked: crumbBar.goBack()
             }
 
             ToolButton {
@@ -74,15 +65,25 @@ Panel {
         }
     }
 
+    CrumbBar {
+        id: crumbBar
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: header.bottom
+        view: view
+    }
+
     ListView {
         id: view
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
+        anchors.top: crumbBar.bottom
         anchors.bottom: parent.bottom
 
         model: DiscoveryModel {
+            property string rootName: 'Wifirst'
             manager: window.client.discoveryManager
             rootJid: 'wifirst.net'
         }
@@ -109,7 +110,8 @@ Panel {
                 anchors.fill: parent
 
                 onClicked: {
-                    crumbs.append({'jid': view.model.rootJid, 'node': view.model.rootNode});
+                    crumbBar.model.append({'name': view.model.rootJid, 'jid': view.model.rootJid, 'node': view.model.rootNode});
+                    view.model.rootName = model.jid;
                     view.model.rootJid = model.jid;
                     view.model.rootNode = model.node;
                 }
