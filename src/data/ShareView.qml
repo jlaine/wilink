@@ -64,7 +64,7 @@ Item {
                 width: 24
                 height: 24
                 smooth: true
-                source: model.avatar
+                source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
             }
 
             Text {
@@ -90,9 +90,18 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
 
+                onDoubleClicked: {
+                    if (model.isDir) {
+                        crumbs.append({'jid': view.model.rootJid, 'node': view.model.rootNode});
+                        view.model.rootJid = model.jid;
+                        view.model.rootNode = model.node;
+                    }
+                }
+
                 onEntered: {
                     parent.state = 'hovered'
                 }
+
                 onExited: {
                     parent.state = ''
                 }

@@ -19,6 +19,7 @@
 
 #include <QDesktopServices>
 #include <QSettings>
+#include <QTimer>
 
 #include "QDjango.h"
 #include "QXmppClient.h"
@@ -96,8 +97,11 @@ public:
     void setShareClient(ChatClient *shareClient);
 
     ChatClient *client;
+    QString rootJid;
+    QString rootNode;
     ChatClient *shareClient;
     QString shareServer;
+    QTimer *timer;
 
 private:
     ShareModel *q;
@@ -151,10 +155,18 @@ ShareModel::ShareModel(QObject *parent)
 
     // set role names
     QHash<int, QByteArray> roleNames;
-    roleNames.insert(AvatarRole, "avatar");
+    roleNames.insert(IsDirRole, "isDir");
+    roleNames.insert(JidRole, "jid");
     roleNames.insert(NameRole, "name");
+    roleNames.insert(NodeRole, "node");
     roleNames.insert(SizeRole, "size");
     setRoleNames(roleNames);
+
+    // add timer
+    d->timer = new QTimer(this);
+    d->timer->setSingleShot(true);
+    d->timer->setInterval(100);
+    connect(d->timer, SIGNAL(timeout()), this, SLOT(refresh()));
 }
 
 ShareModel::~ShareModel()
@@ -185,6 +197,33 @@ void ShareModel::setClient(ChatClient *client)
     }
 }
 
+QString ShareModel::rootJid() const
+{
+    return d->rootJid;
+}
+
+void ShareModel::setRootJid(const QString &rootJid)
+{
+    if (rootJid != d->rootJid) {
+        d->rootJid = rootJid;
+        d->timer->start();
+        emit rootJidChanged(rootJid);
+    }
+}
+
+QString ShareModel::rootNode() const
+{
+    return d->rootNode;
+}
+
+void ShareModel::setRootNode(const QString &rootNode)
+{
+    if (rootNode != d->rootNode) {
+        d->rootNode = rootNode;
+        d->timer->start();
+        emit rootNodeChanged(rootNode);
+    }
+}
 
 void ShareModel::clear()
 {
@@ -212,18 +251,22 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == AvatarRole) {
-        if (item->type() == QXmppShareItem::CollectionItem) {
-            if (item->locations().size() == 1 && item->locations().first().node().isEmpty())
-                return "qrc:/peer.png";
-            else
-                return "qrc:/album.png";
-        } else {
-            return "qrc:/file.png";
-        }
+    if (role == IsDirRole)
+        return item->type() == QXmppShareItem::CollectionItem;
+    else if (role == JidRole) {
+        if (item->locations().isEmpty())
+            return QString();
+        else
+            return item->locations().first().jid();
     }
     else if (role == NameRole)
         return item->name();
+    else if (role == NodeRole) {
+        if (item->locations().isEmpty())
+            return QString();
+        else
+            return item->locations().first().node();
+    }
     else if (role == SizeRole)
         return item->fileSize();
     else if (role == ProgressRole) {
@@ -328,6 +371,19 @@ QModelIndex ShareModel::parent(const QModelIndex &index) const
     return createIndex(parentItem);
 }
 
+void ShareModel::refresh()
+{
+    if (!d->rootJid.isEmpty()) {
+        // browse files
+        QXmppShareExtension *shareManager = d->shareClient->findExtension<QXmppShareExtension>();
+        const QString requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, QString());
+#if 0
+        if (!requestId.isEmpty())
+            searches.insert(requestId, view);
+#endif
+    }
+}
+
 void ShareModel::refreshItem(QXmppShareItem *item)
 {
     emit dataChanged(createIndex(item), createIndex(item));
@@ -373,7 +429,7 @@ QModelIndex ShareModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newI
         oldItem->setName(newItem->name());
     oldItem->setType(newItem->type());
     if (oldItem != rootItem)
-        emit dataChanged(createIndex(oldItem), createIndex(oldItem));
+        emit dataChanged(oldIndex, oldIndex);
 
     // if we received an empty collection, stop here
     if (newItem->type() == QXmppShareItem::CollectionItem && !newItem->size())
@@ -493,6 +549,9 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
             Q_ASSERT(check);
 #endif
         }
+
+        setRootJid(d->shareServer);
+        setRootNode(QString());
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
@@ -549,51 +608,16 @@ void ShareModel::_q_serverChanged(const QString &server)
 
 void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
 {
-    if (shareIq.type() == QXmppIq::Get)
+    qDebug("got shareIq from %s", qPrintable(shareIq.from()));
+    if (shareIq.type() == QXmppIq::Get || shareIq.from() != d->rootJid)
         return;
-
-#if 0
-    // find target view(s)
-    ShareView *view = 0;
-    const QString requestId = shareIq.id();
-    if ((shareIq.type() == QXmppIq::Result || shareIq.type() == QXmppIq::Error) && searches.contains(requestId))
-        view = qobject_cast<ShareView*>(searches.take(requestId));
-    else if (shareIq.type() == QXmppIq::Set && shareIq.from() == shareServer && sharesFilter.isEmpty())
-        view = sharesView;
-    else
-        return;
-#endif
-
-    // FIXME : we are casting away constness
-    QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
-
-    // update all concerned views
-    QXmppShareItem *oldItem = get(Q_FIND_LOCATIONS(newItem->locations()),
-                                  ShareModel::QueryOptions(ShareModel::PostRecurse));
-
-    if (!oldItem && shareIq.from() != d->shareServer)
-    {
-        qWarning("Ignoring unwanted search result");
-        return;
-    }
 
     if (shareIq.type() == QXmppIq::Error)
     {
-        if ((shareIq.error().condition() == QXmppStanza::Error::ItemNotFound) && oldItem)
-            removeItem(oldItem);
+        removeRows(0, rootItem->size());
     } else {
-        QModelIndex index = updateItem(oldItem, newItem);
-#if 0
-        if (newItem->size())
-            view->setExpanded(index, true);
-#endif
+        updateItem(rootItem, (QXmppShareItem*)&shareIq.collection());
     }
-
-#if 0
-    // if we retrieved the contents of a download queue item, process queue
-    if (view == downloadsView)
-        processDownloadQueue();
-#endif
 }
 
 ShareModelQuery::ShareModelQuery()

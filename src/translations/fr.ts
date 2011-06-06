@@ -737,6 +737,10 @@ Acceptez-vous?</translation>
         <source>Received files are stored in your &lt;a href=&quot;%1&quot;&gt;downloads folder&lt;/a&gt;. Once a file is received, you can double click to open it.</source>
         <translation>Les fichiers reçus sont stockés dans votre &lt;a href=&quot;%1&quot;&gt;dossier de téléchargement&lt;/a&gt;. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
     </message>
+    <message>
+        <source>Go back</source>
+        <translation>Retour</translation>
+    </message>
 </context>
 <context>
     <name>SoundOptions</name>

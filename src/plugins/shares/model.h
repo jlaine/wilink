@@ -38,8 +38,10 @@ enum SharesColumns
 };
 
 enum SharesDataRoles {
-    AvatarRole = QXmppShareItem::MaxRole,
+    IsDirRole = QXmppShareItem::MaxRole,
+    JidRole,
     NameRole,
+    NodeRole,
     PacketId,
     ProgressRole,
     SizeRole,
@@ -94,6 +96,8 @@ class ShareModel : public QAbstractItemModel
     Q_OBJECT
     Q_ENUMS(Recurse)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
+    Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
+    Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
 
 public:
     enum Recurse
@@ -116,6 +120,12 @@ public:
     ChatClient *client() const;
     void setClient(ChatClient *client);
 
+    QString rootJid() const;
+    void setRootJid(const QString &rootJid);
+
+    QString rootNode() const;
+    void setRootNode(const QString &rootNode);
+
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -132,6 +142,11 @@ public:
 
 signals:
     void clientChanged(ChatClient *client);
+    void rootJidChanged(const QString &rootJid);
+    void rootNodeChanged(const QString &rootNode);
+
+public slots:
+    void refresh();
 
 private slots:
     void _q_disconnected();

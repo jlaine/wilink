@@ -23,6 +23,10 @@ import wiLink 1.2
 Panel {
     id: panel
 
+    ListModel {
+        id: crumbs
+    }
+
     PanelHeader {
         id: header
 
@@ -38,6 +42,19 @@ Panel {
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
+
+            ToolButton {
+                iconSource: 'back.png'
+                text: qsTr('Go back')
+                enabled: crumbs.count > 0
+
+                onClicked: {
+                    var crumb = crumbs.get(crumbs.count - 1);
+                    view.model.rootJid = crumb.jid;
+                    view.model.rootNode = crumb.node;
+                    crumbs.remove(crumbs.count - 1);
+                }
+            }
 
             ToolButton {
                 iconSource: 'options.png'
@@ -136,11 +153,12 @@ Panel {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: footer.top
+        anchors.bottom: parent.bottom
         text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
         z: 1
     }
 
+/*
     ShareView {
         id: footer
 
@@ -151,4 +169,5 @@ Panel {
         model: ShareModel {}
         z: 1
     }
+*/
 }
