@@ -436,7 +436,8 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
 
 VCard::VCard(QObject *parent)
     : QObject(parent),
-    m_cache(0)
+    m_cache(0),
+    m_features(0)
 {
 }
 
@@ -582,6 +583,19 @@ VCardCache::VCardCache(QObject *parent)
     m_cache->setCacheDirectory(wApp->cacheDirectory());
 }
 
+ChatClient *VCardCache::client(const QString &jid) const
+{
+    const QString domain = jidToDomain(jid);
+    foreach (ChatClient *client, m_clients) {
+        const QString clientDomain = client->configuration().domain();
+        if (domain == clientDomain || domain.endsWith("." + clientDomain))
+            return client;
+    }
+    if (!m_clients.isEmpty())
+        return m_clients.first();
+    return 0;
+}
+
 /** Tries to get the vCard for the given JID.
  *
  *  Returns true if the vCard was found, otherwise requests the card.
@@ -597,8 +611,8 @@ bool VCardCache::get(const QString &jid, QXmppVCardIq *iq)
 
     if (readIq(m_cache, QString("xmpp:%1?vcard").arg(jid), iq))
         return true;
-    if (!m_clients.isEmpty()) {
-        ChatClient *client = m_clients.first();
+    ChatClient *client = this->client(jid);
+    if (client) {
         qDebug("requesting vCard %s", qPrintable(jid));
         m_queue.insert(jid);
         client->vCardManager().requestVCard(jid);

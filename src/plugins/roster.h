@@ -163,6 +163,7 @@ private slots:
 
 private:
     VCardCache(QObject *parent = 0);
+    ChatClient *client(const QString &jid) const;
 
     QNetworkDiskCache *m_cache;
     QList<ChatClient*> m_clients;
