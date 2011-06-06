@@ -26,7 +26,6 @@
 
 #include "chat_model.h"
 
-class QNetworkDiskCache;
 class QXmppDiscoveryIq;
 class QXmppPresence;
 class QXmppVCardIq;
@@ -36,6 +35,7 @@ class ChatClient;
 class ChatRosterModel;
 class ChatRosterModelPrivate;
 class VCardCache;
+class VCardCachePrivate;
 
 class ChatRosterImageProvider : public QDeclarativeImageProvider
 {
@@ -146,6 +146,7 @@ class VCardCache : public QObject
 
 public:
     static VCardCache *instance();
+    ~VCardCache();
 
 signals:
     void cardChanged(const QString &jid);
@@ -165,12 +166,7 @@ private:
     VCardCache(QObject *parent = 0);
     ChatClient *client(const QString &jid) const;
 
-    QNetworkDiskCache *m_cache;
-    QList<ChatClient*> m_clients;
-    QMap<QString, VCard::Features> m_features;
-    QSet<QString> m_failed;
-    QSet<QString> m_queue;
-
+    VCardCachePrivate *d;
     friend class VCard;
 };
 

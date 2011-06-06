@@ -434,6 +434,16 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
+class VCardCachePrivate
+{
+public:
+    QNetworkDiskCache *cache;
+    QList<ChatClient*> clients;
+    QMap<QString, VCard::Features> features;
+    QSet<QString> vcardFailed;
+    QSet<QString> vcardQueue;
+};
+
 VCard::VCard(QObject *parent)
     : QObject(parent),
     m_cache(0),
@@ -472,7 +482,7 @@ QString VCard::jidForFeature(Feature feature) const
         return m_jid;
 
     if (jidToResource(m_jid).isEmpty()) {
-        foreach (const QString &key, m_cache->m_features.keys()) {
+        foreach (const QString &key, m_cache->d->features.keys()) {
             if (jidToBareJid(key) == m_jid)
                 return key;
         }
@@ -532,7 +542,7 @@ void VCard::update()
         } else {
             newAvatar = QUrl("qrc:/peer.png");
         }
-        foreach (ChatClient *client, m_cache->m_clients) {
+        foreach (ChatClient *client, m_cache->d->clients) {
             const QString name = client->rosterManager()->getRosterEntry(jidToBareJid(m_jid)).name();
             if (!name.isEmpty()) {
                 newName = name;
@@ -544,11 +554,11 @@ void VCard::update()
 
         // features
         if (!jidToResource(m_jid).isEmpty()) {
-            newFeatures = m_cache->m_features.value(m_jid);
+            newFeatures = m_cache->d->features.value(m_jid);
         } else {
-            foreach (const QString &jid, m_cache->m_features.keys()) {
+            foreach (const QString &jid, m_cache->d->features.keys()) {
                 if (jidToBareJid(jid) == m_jid)
-                    newFeatures |= m_cache->m_features.value(jid);
+                    newFeatures |= m_cache->d->features.value(jid);
             }
         }
     }
@@ -579,20 +589,26 @@ void VCard::update()
 VCardCache::VCardCache(QObject *parent)
     : QObject(parent)
 {
-    m_cache = new QNetworkDiskCache(this);
-    m_cache->setCacheDirectory(wApp->cacheDirectory());
+    d = new VCardCachePrivate;
+    d->cache = new QNetworkDiskCache(this);
+    d->cache->setCacheDirectory(wApp->cacheDirectory());
+}
+
+VCardCache::~VCardCache()
+{
+    delete d;
 }
 
 ChatClient *VCardCache::client(const QString &jid) const
 {
     const QString domain = jidToDomain(jid);
-    foreach (ChatClient *client, m_clients) {
+    foreach (ChatClient *client, d->clients) {
         const QString clientDomain = client->configuration().domain();
         if (domain == clientDomain || domain.endsWith("." + clientDomain))
             return client;
     }
-    if (!m_clients.isEmpty())
-        return m_clients.first();
+    if (!d->clients.isEmpty())
+        return d->clients.first();
     return 0;
 }
 
@@ -606,15 +622,15 @@ ChatClient *VCardCache::client(const QString &jid) const
 
 bool VCardCache::get(const QString &jid, QXmppVCardIq *iq)
 {
-    if (m_queue.contains(jid) || m_failed.contains(jid))
+    if (d->vcardQueue.contains(jid) || d->vcardFailed.contains(jid))
         return false;
 
-    if (readIq(m_cache, QString("xmpp:%1?vcard").arg(jid), iq))
+    if (readIq(d->cache, QString("xmpp:%1?vcard").arg(jid), iq))
         return true;
     ChatClient *client = this->client(jid);
     if (client) {
         qDebug("requesting vCard %s", qPrintable(jid));
-        m_queue.insert(jid);
+        d->vcardQueue.insert(jid);
         client->vCardManager().requestVCard(jid);
     }
     return false;
@@ -648,7 +664,7 @@ void VCardCache::addClient(ChatClient *client)
 {
     bool check;
 
-    if (!client || m_clients.contains(client))
+    if (!client || d->clients.contains(client))
         return;
 
     check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
@@ -671,7 +687,7 @@ void VCardCache::addClient(ChatClient *client)
                     this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
-    m_clients << client;
+    d->clients << client;
 }
 
 void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
@@ -699,7 +715,7 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
         if (id.name() == "iChatAgent")
             features |= VCard::ChatStatesFeature;
     }
-    m_features.insert(jid, features);
+    d->features.insert(jid, features);
 
     emit cardChanged(jid);
 }
@@ -711,14 +727,13 @@ void VCardCache::presenceReceived(const QXmppPresence &presence)
     const QString resource = jidToResource(jid);
 
     // handle features discovery
-    if (!resource.isEmpty())
-    {
+    if (!resource.isEmpty()) {
         if (presence.type() == QXmppPresence::Unavailable)
-            m_features.remove(jid);
-        else if (presence.type() == QXmppPresence::Available && !m_features.contains(jid) && !m_clients.isEmpty()) {
+            d->features.remove(jid);
+        else if (presence.type() == QXmppPresence::Available && !d->features.contains(jid) && !d->clients.isEmpty()) {
             qDebug("requesting disco %s", qPrintable(jid));
             QXmppDiscoveryIq disco;
-            m_clients.first()->discoveryManager()->requestInfo(jid);
+            d->clients.first()->discoveryManager()->requestInfo(jid);
         }
     }
 }
@@ -726,17 +741,17 @@ void VCardCache::presenceReceived(const QXmppPresence &presence)
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
 {
     const QString jid = vCard.from();
-    if (!m_queue.remove(jid))
+    if (!d->vcardQueue.remove(jid))
         return;
 
     if (vCard.type() == QXmppIq::Result) {
         qDebug("received vCard %s", qPrintable(jid));
-        m_failed.remove(jid);
-        writeIq(m_cache, QString("xmpp:%1?vcard").arg(jid), vCard, 3600);
+        d->vcardFailed.remove(jid);
+        writeIq(d->cache, QString("xmpp:%1?vcard").arg(jid), vCard, 3600);
         emit cardChanged(jid);
     } else if (vCard.type() == QXmppIq::Error) {
         qDebug("failed vCard %s", qPrintable(jid));
-        m_failed.insert(jid);
+        d->vcardFailed.insert(jid);
     }
 }
 
