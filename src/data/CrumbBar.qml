@@ -36,67 +36,74 @@ Item {
         crumbs.remove(crumbs.count - 1);
     }
 
-    ListView {
-        id: crumbView
-
+    Row {
+        id: row
         anchors.left: parent.left
         anchors.top:  parent.top
         anchors.bottom:  parent.bottom
-        orientation: Qt.Horizontal
-        width: model.count * 70
+        spacing: 4
 
-        model: ListModel {
-            id: crumbs
-        }
+        Repeater {
+            id: crumbView
 
-        delegate: Item {
-            height: crumbView.height
-            width: 70
-
-            Text {
-                anchors.fill:  parent
-                elide:  Text.ElideMiddle
-                text: model.name + " >"
+            model: ListModel {
+                id: crumbs
             }
 
-            MouseArea {
-                anchors.fill:  parent
-                onClicked: {
-                    console.log("clicked: " + model.name);
-                    var row = -1;
-                    for (var i = 0; i < crumbs.count; i++) {
-                        var obj = crumbs.get(i);
-                        if (obj.jid == model.jid && obj.node == model.node) {
-                            row = i;
-                            break;
+            delegate: Row {
+                spacing: 4
+
+                Rectangle {
+                    height: row.height
+                    width: name.width
+
+                    Text {
+                        id: name
+                        text: model.name
+                    }
+
+                    MouseArea {
+                        anchors.fill:  parent
+                        onClicked: {
+                            console.log("clicked: " + model.name);
+                            var row = -1;
+                            for (var i = 0; i < crumbs.count; i++) {
+                                var obj = crumbs.get(i);
+                                if (obj.jid == model.jid && obj.node == model.node) {
+                                    row = i;
+                                    break;
+                                }
+                            }
+                            if (row < 0) {
+                                console.log("unknown row clicked");
+                                return;
+                            }
+
+                            // navigate to the specified location
+                            view.model.rootJid = model.jid;
+                            view.model.rootNode = model.node;
+                            view.model.rootName = model.name;
+
+                            // remove crumbs below current location
+                            for (var i = crumbs.count - 1; i >= row; i--) {
+                                crumbs.remove(i);
+                            }
                         }
                     }
-                    if (row < 0) {
-                        console.log("unknown row clicked");
-                        return;
-                    }
 
-                    // navigate to the specified location
-                    view.model.rootJid = model.jid;
-                    view.model.rootNode = model.node;
-                    view.model.rootName = model.name;
+                }
 
-                    // remove crumbs below current location
-                    for (var i = crumbs.count - 1; i >= row; i--) {
-                        crumbs.remove(i);
-                    }
+                Text {
+                    text: '&rsaquo;'
+                    textFormat: Text.RichText
+                    font.bold: true
                 }
             }
         }
-    }
 
-    Text {
-        anchors.left: crumbView.right
-        anchors.top:  parent.top
-        anchors.bottom:  parent.bottom
-
-        text: view.model.rootName
-        width: 40
+        Text {
+            text: view.model.rootName
+        }
     }
 }
  
