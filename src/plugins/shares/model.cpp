@@ -97,6 +97,7 @@ public:
     void setShareClient(ChatClient *shareClient);
 
     ChatClient *client;
+    QString filter;
     QString rootJid;
     QString rootNode;
     ChatClient *shareClient;
@@ -197,6 +198,20 @@ void ShareModel::setClient(ChatClient *client)
     }
 }
 
+QString ShareModel::filter() const
+{
+    return d->filter;
+}
+
+void ShareModel::setFilter(const QString &filter)
+{
+    if (filter != d->filter) {
+        d->filter = filter;
+        d->timer->start();
+        emit filterChanged(d->filter);
+    }
+}
+
 QString ShareModel::rootJid() const
 {
     return d->rootJid;
@@ -207,7 +222,7 @@ void ShareModel::setRootJid(const QString &rootJid)
     if (rootJid != d->rootJid) {
         d->rootJid = rootJid;
         d->timer->start();
-        emit rootJidChanged(rootJid);
+        emit rootJidChanged(d->rootJid);
     }
 }
 
@@ -221,7 +236,7 @@ void ShareModel::setRootNode(const QString &rootNode)
     if (rootNode != d->rootNode) {
         d->rootNode = rootNode;
         d->timer->start();
-        emit rootNodeChanged(rootNode);
+        emit rootNodeChanged(d->rootNode);
     }
 }
 
@@ -376,7 +391,7 @@ void ShareModel::refresh()
     if (!d->rootJid.isEmpty()) {
         // browse files
         QXmppShareExtension *shareManager = d->shareClient->findExtension<QXmppShareExtension>();
-        const QString requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, QString());
+        const QString requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
 #if 0
         if (!requestId.isEmpty())
             searches.insert(requestId, view);

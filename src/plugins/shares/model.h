@@ -96,6 +96,7 @@ class ShareModel : public QAbstractItemModel
     Q_OBJECT
     Q_ENUMS(Recurse)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
+    Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
     Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
 
@@ -120,6 +121,9 @@ public:
     ChatClient *client() const;
     void setClient(ChatClient *client);
 
+    QString filter() const;
+    void setFilter(const QString &filter);
+
     QString rootJid() const;
     void setRootJid(const QString &rootJid);
 
@@ -142,6 +146,7 @@ public:
 
 signals:
     void clientChanged(ChatClient *client);
+    void filterChanged(const QString &filter);
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
 

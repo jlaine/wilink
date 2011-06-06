@@ -741,6 +741,10 @@ Acceptez-vous?</translation>
         <source>Go back</source>
         <translation>Retour</translation>
     </message>
+    <message>
+        <source>Home</source>
+        <translation>Accueil</translation>
+    </message>
 </context>
 <context>
     <name>SoundOptions</name>
