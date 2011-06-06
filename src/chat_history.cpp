@@ -290,6 +290,13 @@ QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
         return msg->date;
     } else if (role == FromRole) {
         const QString jid = msg->jid;
+
+        // chat rooms
+        const QString resource = jidToResource(jid);
+        if (!resource.isEmpty())
+            return resource;
+
+        // conversations
         if (!d->rosterCards.contains(jid)) {
             VCard *card = new VCard((QObject*)this);
             card->setJid(jid);
