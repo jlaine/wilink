@@ -110,10 +110,7 @@ Panel {
                 anchors.fill: parent
 
                 onClicked: {
-                    crumbBar.model.append({'name': view.model.rootJid, 'jid': view.model.rootJid, 'node': view.model.rootNode});
-                    view.model.rootName = model.jid;
-                    view.model.rootJid = model.jid;
-                    view.model.rootNode = model.node;
+                    crumbBar.goTo({'name': model.node ? model.node : model.jid, 'jid': model.jid, 'node': model.node});
                 }
             }
         }

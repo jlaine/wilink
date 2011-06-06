@@ -36,6 +36,18 @@ Item {
         crumbs.remove(crumbs.count - 1);
     }
 
+    function goTo(crumb) {
+        if (view.model.rootJid == crumb.jid &&
+            view.model.rootNode == crumb.node) {
+            return;
+        }
+
+        crumbBar.model.append({'name': view.model.rootName, 'jid': view.model.rootJid, 'node': view.model.rootNode});
+        view.model.rootJid = crumb.jid;
+        view.model.rootNode = crumb.node;
+        view.model.rootName = crumb.name;
+    }
+
     Row {
         id: row
         anchors.left: parent.left

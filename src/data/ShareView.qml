@@ -90,12 +90,9 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onDoubleClicked: {
+                onClicked: {
                     if (model.isDir) {
-                        crumbBar.model.append({'name': view.model.rootName, 'jid': view.model.rootJid, 'node': view.model.rootNode});
-                        view.model.rootName = model.name;
-                        view.model.rootJid = model.jid;
-                        view.model.rootNode = model.node;
+                        crumbBar.goTo(model);
                     }
                 }
 
