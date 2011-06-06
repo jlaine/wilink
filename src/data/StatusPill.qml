@@ -49,7 +49,7 @@ Item {
     Gradient { // Away
         id: awayGradient
         GradientStop { position: 0.0; color: '#ffc800' }
-        GradientStop { position: 1.0; color: '#d28c00' }
+        GradientStop { position: 1.0; color: '#c16100' }
     }
     Gradient { // Busy
         id: busyGradient
@@ -59,7 +59,7 @@ Item {
     Gradient { // Offline
         id: offlineGradient
         GradientStop { position: 0.0; color: '#dfdfdf' }
-        GradientStop { position: 1.0; color: '#999999' }
+        GradientStop { position: 1.0; color: '#777777' }
     }
 
     Rectangle {
@@ -86,7 +86,7 @@ Item {
             PropertyChanges {
                 target: status
                 gradient: awayGradient
-                border.color: '#c86400'
+                border.color: '#904800'
             }
         },
         State {
@@ -102,7 +102,7 @@ Item {
             PropertyChanges {
                 target: status
                 gradient: offlineGradient
-                border.color: '#999999'
+                border.color: '#444444'
             }
         }
     ]
