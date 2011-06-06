@@ -167,6 +167,7 @@ private slots:
 private:
     VCardCache(QObject *parent = 0);
     ChatClient *client(const QString &jid) const;
+    VCard::Features features(const QString &jid) const;
 
     VCardCachePrivate *d;
     friend class VCard;

@@ -466,11 +466,7 @@ void VCard::cardChanged(const QString &jid)
 void VCard::discoChanged(const QString &jid)
 {
     if (jid == m_jid) {
-        Features newFeatures = 0;
-        foreach (const QString &jid, m_cache->d->features.keys()) {
-            if (jidToBareJid(jid) == m_jid)
-                newFeatures |= m_cache->d->features.value(jid);
-        }
+        Features newFeatures = m_cache->features(m_jid);
         if (newFeatures != m_features) {
             m_features = newFeatures;
             emit featuresChanged(m_features);
@@ -480,20 +476,8 @@ void VCard::discoChanged(const QString &jid)
 
 VCard::Features VCard::features() const
 {
-    if (!m_features && !m_jid.isEmpty() && m_cache) {
-        foreach (ChatClient *client, m_cache->d->clients) {
-            foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(m_jid)) {
-                const QString fullJid = presence.from();
-                if (presence.type() == QXmppPresence::Available &&
-                    !m_cache->d->features.contains(fullJid) &&
-                    !m_cache->d->discoQueue.contains(fullJid)) {
-                    qDebug("requesting disco %s", qPrintable(fullJid));
-                    client->discoveryManager()->requestInfo(fullJid);
-                    m_cache->d->discoQueue.insert(fullJid);
-                }
-            }
-        }
-    }
+    if (!m_features && !m_jid.isEmpty() && m_cache)
+        return m_cache->features(m_jid);
     return m_features;
 }
 
@@ -628,6 +612,26 @@ ChatClient *VCardCache::client(const QString &jid) const
     if (!d->clients.isEmpty())
         return d->clients.first();
     return 0;
+}
+
+VCard::Features VCardCache::features(const QString &jid) const
+{
+    VCard::Features features = 0;
+    foreach (ChatClient *client, d->clients) {
+        foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
+            const QString fullJid = presence.from();
+            if (presence.type() == QXmppPresence::Available) {
+                if (d->features.contains(fullJid)) {
+                    features |= d->features.value(fullJid);
+                } else if (!d->discoQueue.contains(fullJid)) {
+                    qDebug("requesting disco %s", qPrintable(fullJid));
+                    client->discoveryManager()->requestInfo(fullJid);
+                    d->discoQueue.insert(fullJid);
+                }
+            }
+        }
+    }
+    return features;
 }
 
 /** Tries to get the vCard for the given JID.
