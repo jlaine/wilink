@@ -176,7 +176,7 @@ Panel {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onDoubleClicked: {
+                onClicked: {
                     crumbs.append({'url': view.model.rootUrl})
                     if (model.isDir) {
                         view.model.rootUrl = model.url;
