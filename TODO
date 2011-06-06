@@ -1,3 +1,11 @@
+HIGH PRIORITY
+
 - restore copy & paste in chat history
-- restore "find" feature
+- purge vCard cache upon upgrade
+- report BSSID in diagnostics
+
+LOW PRIORITY
+
 - add a "do not disturb" option for SIP
+- restore "find" feature
+- save / restore window size and position
