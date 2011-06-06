@@ -21,7 +21,6 @@ SOURCES += \
     ../chat_model.cpp \
     ../chat_panel.cpp \
     ../chat_preferences.cpp \
-    ../chat_roster.cpp \
     ../chat_search.cpp \
     ../chat_status.cpp \
     ../chat_utils.cpp \
@@ -39,6 +38,7 @@ SOURCES += \
     ../plugins/phone/sip.cpp \
     ../plugins/photos.cpp \
     ../plugins/rooms.cpp \
+    ../plugins/roster.cpp \
     main.cpp
 
 HEADERS += \
@@ -52,7 +52,6 @@ HEADERS += \
     ../chat_panel.h \
     ../chat_plugin.h \
     ../chat_preferences.h \
-    ../chat_roster.h \
     ../chat_search.h \
     ../chat_status.h \
     ../chat_utils.h \
@@ -71,6 +70,7 @@ HEADERS += \
     ../plugins/phone/sip.h \
     ../plugins/phone/sip_p.h \
     ../plugins/rooms.h \
+    ../plugins/roster.h \
     config.h
 
 mac {

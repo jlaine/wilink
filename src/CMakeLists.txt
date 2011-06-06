@@ -54,7 +54,6 @@ set(wiLink_SOURCES
     chat_model.cpp
     chat_panel.cpp
     chat_preferences.cpp
-    chat_roster.cpp
     chat_search.cpp
     chat_status.cpp
     chat_utils.cpp
@@ -74,6 +73,7 @@ set(wiLink_SOURCES
     plugins/phone/stun.cpp
     plugins/player.cpp
     plugins/rooms.cpp
+    plugins/roster.cpp
     plugins/shares.cpp
     plugins/shares/model.cpp
     plugins/shares/options.cpp
@@ -94,7 +94,6 @@ set(wiLink_MOC_HEADERS
     chat_panel.h
     chat_plugin.h
     chat_preferences.h
-    chat_roster.h
     chat_search.h
     chat_status.h
     updates.h
@@ -111,6 +110,7 @@ set(wiLink_MOC_HEADERS
     plugins/phone/stun.h
     plugins/player.h
     plugins/rooms.h
+    plugins/roster.h
     plugins/shares.h
     plugins/shares/options.h
     plugins/shares/model.h

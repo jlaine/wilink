@@ -51,7 +51,7 @@
 #include "chat_form.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
-#include "chat_roster.h"
+#include "roster.h"
 #include "chat_utils.h"
 
 #include "rooms.h"

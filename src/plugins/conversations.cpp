@@ -30,7 +30,7 @@
 #include "chat_client.h"
 #include "conversations.h"
 #include "chat_history.h"
-#include "chat_roster.h"
+#include "roster.h"
 
 #ifdef WILINK_EMBEDDED
 #define HISTORY_DAYS 7

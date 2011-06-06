@@ -48,7 +48,7 @@
 #include "chat.h"
 #include "chat_client.h"
 #include "chat_plugin.h"
-#include "chat_roster.h"
+#include "roster.h"
 #include "chat_search.h"
 #include "shares.h"
 #include "shares/model.h"

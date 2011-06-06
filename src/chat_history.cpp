@@ -20,7 +20,7 @@
 #include <QUrl>
 
 #include "chat_history.h"
-#include "chat_roster.h"
+#include "plugins/roster.h"
 
 #include "QXmppUtils.h"
 

@@ -41,7 +41,7 @@
 
 #include "application.h"
 #include "chat_client.h"
-#include "chat_roster.h"
+#include "roster.h"
 
 static const QChar sortSeparator('\0');
 
