@@ -52,7 +52,6 @@ set(wiLink_SOURCES
     chat_form.cpp
     chat_history.cpp
     chat_model.cpp
-    chat_panel.cpp
     chat_preferences.cpp
     chat_search.cpp
     chat_status.cpp
@@ -74,7 +73,6 @@ set(wiLink_SOURCES
     plugins/player.cpp
     plugins/rooms.cpp
     plugins/roster.cpp
-    plugins/shares.cpp
     plugins/shares/model.cpp
     plugins/shares/options.cpp
     plugins/shares/view.cpp)
@@ -91,7 +89,6 @@ set(wiLink_MOC_HEADERS
     chat_form.h
     chat_history.h
     chat_model.h
-    chat_panel.h
     chat_plugin.h
     chat_preferences.h
     chat_search.h
@@ -111,7 +108,6 @@ set(wiLink_MOC_HEADERS
     plugins/player.h
     plugins/rooms.h
     plugins/roster.h
-    plugins/shares.h
     plugins/shares/options.h
     plugins/shares/model.h
     plugins/shares/view.h)
