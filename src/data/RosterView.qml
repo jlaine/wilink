@@ -142,19 +142,9 @@ Item {
 
                 }
 
-                StatusPill {
-                    id: status
-                    anchors.left: avatar.right
-                    anchors.leftMargin: 3
-                    anchors.verticalCenter: parent.verticalCenter
-                    presenceStatus: model.status
-                    width: 10
-                    height: 10
-                }
-
                 Text {
-                    anchors.left: status.right
-                    anchors.right: label.right
+                    anchors.left: avatar.right
+                    anchors.right: bubble.right
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
@@ -162,35 +152,48 @@ Item {
                     text: model.name
                 }
 
-                    Rectangle {
+                Rectangle {
+                    id: bubble
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: status.left
+                    anchors.margins: 3
+                    border.color: '#597fbe'
+                    border.width: 1
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: '#66597fbe' }
+                        GradientStop { position: 0.6; color: '#597fbe' }
+                        GradientStop { position: 1.0; color: '#66597fbe' }
+                    }
+                    height: label.paintedHeight + 6
+                    width: label.paintedWidth + 6
+                    opacity: model.messages > 0 ? 1 : 0
+                    radius: 10
+                    smooth: true
+
+                    Text {
+                        id: label
+
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
-                        anchors.margins: 3
-                        border.color: '#597fbe'
-                        border.width: 1
-                        gradient: Gradient {
-                            GradientStop { position: 0.0; color: '#66597fbe' }
-                            GradientStop { position: 0.6; color: '#597fbe' }
-                            GradientStop { position: 1.0; color: '#66597fbe' }
-                        }
-                        height: label.paintedHeight + 6
-                        width: label.paintedWidth + 6
-                        opacity: model.messages > 0 ? 1 : 0
-                        radius: 10
-                        smooth: true
-
-                        Text {
-                            id: label
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            color: 'white'
-                            font.bold: true
-                            font.pixelSize: 10
-                            text: model.messages
-                            verticalAlignment: Text.AlignVCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: 'white'
+                        font.bold: true
+                        font.pixelSize: 10
+                        text: model.messages
+                        verticalAlignment: Text.AlignVCenter
                     }
                 }
+
+                StatusPill {
+                    id: status
+                    anchors.right: parent.right
+                    anchors.leftMargin: 3
+                    anchors.verticalCenter: parent.verticalCenter
+                    presenceStatus: model.status
+                    width: 10
+                    height: 10
+                }
+
 
                 MouseArea {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
