@@ -26,6 +26,8 @@
 #include "QXmppShareIq.h"
 
 class ChatClient;
+class QXmppPresence;
+class ShareModelPrivate;
 
 enum SharesColumns
 {
@@ -130,9 +132,16 @@ public:
 signals:
     void clientChanged(ChatClient *client);
 
+private slots:
+    void _q_disconnected();
+    void _q_presenceReceived(const QXmppPresence &presence);
+    void _q_serverChanged(const QString &server);
+
 private:
     QXmppShareItem *rootItem;
-    ChatClient *m_client;
+    ShareModelPrivate *d;
+
+    friend class ShareModelPrivate;
 
     // cached icons, to avoid reloading them whenever an item is added
     QIcon collectionIcon;

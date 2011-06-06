@@ -22,12 +22,16 @@
 
 #include "QDjango.h"
 #include "QXmppClient.h"
+#include "QXmppPresence.h"
 #include "QXmppShareExtension.h"
 #include "QXmppShareDatabase.h"
+#include "QXmppTransferManager.h"
+#include "QXmppUtils.h"
 
 #include "model.h"
 #include "chat_client.h"
 #include "chat_utils.h"
+#include "plugins/roster.h"
 
 // common queries
 #define Q ShareModelQuery
@@ -38,9 +42,9 @@ static int globalDatabaseRefs = 0;
 
 static QXmppShareDatabase *refDatabase()
 {
-    /* initialise database */
     if (!globalDatabase)
     {
+        // initialise database
         const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
         QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
         sharesDb.setDatabaseName(databaseName);
@@ -62,6 +66,7 @@ static QXmppShareDatabase *refDatabase()
         globalDatabase->setMappedDirectories(mappedDirectories);
     }
     globalDatabaseRefs++;
+    return globalDatabase;
 }
 
 static void unrefDatabase()
@@ -84,9 +89,64 @@ static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
     }
 }
 
+class ShareModelPrivate
+{
+public:
+    ShareModelPrivate(ShareModel *qq);
+    void setShareClient(ChatClient *shareClient);
+
+    ChatClient *client;
+    ChatClient *shareClient;
+    QString shareServer;
+
+private:
+    ShareModel *q;
+};
+
+ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
+    : client(0),
+      shareClient(0),
+      q(qq)
+{
+}
+
+void ShareModelPrivate::setShareClient(ChatClient *newClient)
+{
+    if (newClient == shareClient)
+        return;
+
+    // delete old share client
+    if (shareClient && shareClient != client)
+        shareClient->deleteLater();
+
+    // set new share client
+    shareClient = newClient;
+    if (shareClient) {
+        bool check;
+
+        check = q->connect(shareClient, SIGNAL(disconnected()),
+                           q, SLOT(_q_disconnected()));
+        Q_ASSERT(check);
+
+        check = q->connect(shareClient, SIGNAL(presenceReceived(const QXmppPresence&)),
+                           q, SLOT(_q_presenceReceived(const QXmppPresence&)));
+        Q_ASSERT(check);
+
+        check = q->connect(shareClient, SIGNAL(shareServerChanged(QString)),
+                           q, SLOT(_q_serverChanged(QString)));
+        Q_ASSERT(check);
+
+        // if we already know the server, register with it
+        const QString server = shareClient->shareServer();
+        if (!server.isEmpty())
+            q->_q_serverChanged(server);
+    }
+}
+
 ShareModel::ShareModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
+    d = new ShareModelPrivate(this);
     rootItem = new QXmppShareItem(QXmppShareItem::CollectionItem);
 
     // set role names
@@ -104,6 +164,7 @@ ShareModel::ShareModel(QObject *parent)
 ShareModel::~ShareModel()
 {
     delete rootItem;
+    delete d;
 }
 
 QXmppShareItem *ShareModel::addItem(const QXmppShareItem &item)
@@ -116,52 +177,16 @@ QXmppShareItem *ShareModel::addItem(const QXmppShareItem &item)
 
 ChatClient *ShareModel::client() const
 {
-    return m_client;
+    return d->client;
 }
 
 void ShareModel::setClient(ChatClient *client)
 {
-    bool check;
-
-    if (client == m_client)
-        return;
-
-    m_client = client;
-
-    check = connect(m_client, SIGNAL(disconnected()),
-                    this, SLOT(disconnected()));
-    Q_ASSERT(check);
-
-    check = connect(m_client, SIGNAL(presenceReceived(const QXmppPresence&)),
-                    this, SLOT(presenceReceived(const QXmppPresence&)));
-    Q_ASSERT(check);
-
-
-    // add shares extension
-    QXmppShareExtension *extension = new QXmppShareExtension(m_client, refDatabase());
-    m_client->addExtension(extension);
-
-    check = connect(extension, SIGNAL(getFailed(QString)),
-                    this, SLOT(getFailed(QString)));
-    Q_ASSERT(check);
-
-    check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
-                    this, SLOT(transferFinished(QXmppTransferJob*)));
-    Q_ASSERT(check);
-
-    check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
-                    this, SLOT(transferStarted(QXmppTransferJob*)));
-    Q_ASSERT(check);
-
-    check = connect(extension, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
-                    this, SLOT(shareSearchIqReceived(QXmppShareSearchIq)));
-    Q_ASSERT(check);
-
-    check = connect(m_client, SIGNAL(shareServerChanged(QString)),
-                    this, SLOT(shareServerChanged(QString)));
-    Q_ASSERT(check);
-
-    emit clientChanged(m_client);
+    if (client != d->client) {
+        d->client = client;
+        d->setShareClient(d->client);
+        emit clientChanged(d->client);
+    }
 }
 
 
@@ -446,6 +471,119 @@ QModelIndex ShareModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newI
     }
 
     return oldIndex;
+}
+
+void ShareModel::_q_disconnected()
+{
+
+}
+
+void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
+{
+    Q_ASSERT(d->shareClient);
+    if (d->shareServer.isEmpty() || presence.from() != d->shareServer)
+        return;
+
+    // find shares extension
+    QXmppElement shareExtension;
+    foreach (const QXmppElement &extension, presence.extensions())
+    {
+        if (extension.attribute("xmlns") == ns_shares)
+        {
+            shareExtension = extension;
+            break;
+        }
+    }
+    if (shareExtension.attribute("xmlns") != ns_shares)
+        return;
+
+    if (presence.type() == QXmppPresence::Available)
+    {
+        // configure transfer manager
+        const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
+        QXmppTransferManager *transferManager = d->shareClient->findExtension<QXmppTransferManager>();
+        if (forceProxy == "1" && !transferManager->proxyOnly())
+        {
+            qDebug("Forcing SOCKS5 proxy");
+            transferManager->setProxyOnly(true);
+        }
+
+        // add share manager
+        QXmppShareExtension *shareManager = d->shareClient->findExtension<QXmppShareExtension>();
+        if (!shareManager) {
+            shareManager = new QXmppShareExtension(d->shareClient, refDatabase());
+            d->shareClient->addExtension(shareManager);
+
+#if 0
+            check = connect(extension, SIGNAL(getFailed(QString)),
+                            this, SLOT(getFailed(QString)));
+            Q_ASSERT(check);
+
+            check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
+                            this, SLOT(transferFinished(QXmppTransferJob*)));
+            Q_ASSERT(check);
+
+            check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
+                            this, SLOT(transferStarted(QXmppTransferJob*)));
+            Q_ASSERT(check);
+
+            check = connect(extension, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
+                            this, SLOT(shareSearchIqReceived(QXmppShareSearchIq)));
+            Q_ASSERT(check);
+#endif
+        }
+    }
+    else if (presence.type() == QXmppPresence::Error &&
+        presence.error().type() == QXmppStanza::Error::Modify &&
+        presence.error().condition() == QXmppStanza::Error::Redirect)
+    {
+        const QString domain = shareExtension.firstChildElement("domain").value();
+        const QString server = shareExtension.firstChildElement("server").value();
+
+        qDebug("Redirecting to %s,%s", qPrintable(domain), qPrintable(server));
+
+        // reconnect to another server
+        QXmppConfiguration config = d->client->configuration();
+        config.setDomain(domain);
+        config.setHost(server);
+
+        ChatClient *newClient = new ChatClient(this);
+        newClient->setLogger(d->client->logger());
+
+        // replace client
+        d->setShareClient(newClient);
+        newClient->connectToServer(config);
+    }
+}
+
+void ShareModel::_q_serverChanged(const QString &server)
+{
+    Q_ASSERT(d->shareClient);
+
+    d->shareServer = server;
+    if (d->shareServer.isEmpty())
+        return;
+
+    qDebug("registering with %s", qPrintable(d->shareServer));
+
+    // register with server
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_shares);
+
+    VCard card;
+    card.setJid(jidToBareJid(d->client->jid()));
+
+    QXmppElement nickName;
+    nickName.setTagName("nickName");
+    nickName.setValue(card.name());
+    x.appendChild(nickName);
+
+    QXmppPresence presence;
+    presence.setTo(d->shareServer);
+    presence.setExtensions(x);
+    presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
+    d->shareClient->sendPacket(presence);
 }
 
 ShareModelQuery::ShareModelQuery()

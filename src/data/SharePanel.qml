@@ -126,7 +126,9 @@ Panel {
         anchors.top: searchBar.bottom
         anchors.bottom: queueHelp.top
 
-        model: ShareModel {}
+        model: ShareModel {
+            client: window.client
+        }
     }
 
     PanelHelp {

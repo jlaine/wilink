@@ -33,7 +33,7 @@
 #include "updatesdialog.h"
 
 Q_IMPORT_PLUGIN(calls)
-Q_IMPORT_PLUGIN(shares)
+//Q_IMPORT_PLUGIN(shares)
 
 static int aborted = 0;
 static void signal_handler(int sig)
