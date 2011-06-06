@@ -42,7 +42,7 @@ Item {
 
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         width: 240
 
         Rectangle {
@@ -418,7 +418,7 @@ Item {
         id: swapper
 
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: statusBar.top
         anchors.left: left.right
         anchors.right: parent.right
 
@@ -426,6 +426,15 @@ Item {
             target: application
             onMessageClicked: swapper.setCurrentItem(context)
         }
+    }
+
+    StatusBar {
+        id: statusBar
+
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 32
     }
 
     Loader {

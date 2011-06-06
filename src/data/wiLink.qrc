@@ -60,6 +60,7 @@
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
+    <file>ComboBox.qml</file>
     <file>ConversationPanel.qml</file>
     <file>DiagnosticPanel.qml</file>
     <file>Dialog.qml</file>
@@ -88,6 +89,7 @@
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
     <file>ShareView.qml</file>
+    <file>StatusBar.qml</file>
     <file>StatusPill.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
