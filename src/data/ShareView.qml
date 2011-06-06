@@ -92,7 +92,7 @@ Item {
 
                 onDoubleClicked: {
                     if (model.isDir) {
-                        crumbs.append({'name': view.model.rootName, 'jid': view.model.rootJid, 'node': view.model.rootNode});
+                        crumbBar.model.append({'name': view.model.rootName, 'jid': view.model.rootJid, 'node': view.model.rootNode});
                         view.model.rootName = model.name;
                         view.model.rootJid = model.jid;
                         view.model.rootNode = model.node;

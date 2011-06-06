@@ -42,15 +42,9 @@ Panel {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')
-                enabled: crumbs.count > 0
+                enabled: crumbBar.model.count > 0
 
-                onClicked: {
-                    var crumb = crumbs.get(crumbs.count - 1);
-                    view.model.rootJid = crumb.jid;
-                    view.model.rootNode = crumb.node;
-                    view.model.rootName = crumb.name;
-                    crumbs.remove(crumbs.count - 1);
-                }
+                onClicked: crumbBar.goBack()
             }
 
             ToolButton {
@@ -136,76 +130,13 @@ Panel {
         }
     }
 
-    Item {
+    CrumbBar {
         id: crumbBar
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: searchBar.bottom
-        height: 24
-
-        ListView {
-            id: crumbView
-
-            anchors.left: parent.left
-            anchors.top:  parent.top
-            anchors.bottom:  parent.bottom
-            orientation: Qt.Horizontal
-            width: model.count * 70
-
-            model: ListModel {
-                id: crumbs
-            }
-
-            delegate: Item {
-                height: crumbView.height
-                width: 70
-
-                Text {
-                    anchors.fill:  parent
-                    elide:  Text.ElideMiddle
-                    text: model.name + " >"
-                }
-
-                MouseArea {
-                    anchors.fill:  parent
-                    onClicked: {
-                        console.log("clicked: " + model.name);
-                        var row = -1;
-                        for (var i = 0; i < crumbs.count; i++) {
-                            var obj = crumbs.get(i);
-                            if (obj.jid == model.jid && obj.node == model.node) {
-                                row = i;
-                                break;
-                            }
-                        }
-                        if (row < 0) {
-                            console.log("unknown row clicked");
-                            return;
-                        }
-
-                        // navigate to the specified location
-                        view.model.rootJid = model.jid;
-                        view.model.rootNode = model.node;
-                        view.model.rootName = model.name;
-
-                        // remove crumbs below current location
-                        for (var i = crumbs.count - 1; i >= row; i--) {
-                            crumbs.remove(i);
-                        }
-                    }
-                }
-            }
-        }
-
-        Text {
-            anchors.left: crumbView.right
-            anchors.top:  parent.top
-            anchors.bottom:  parent.bottom
-
-            text: view.model.rootName
-            width: 40
-        }
+        view: view
     }
 
     ShareView {

@@ -1,0 +1,102 @@
+/*
+ * wiLink
+ * Copyright (C) 2009-2011 Bolloré telecom
+ * See AUTHORS file for a full list of contributors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import QtQuick 1.0
+import wiLink 1.2
+
+Item {
+    id: crumbBar
+
+    property alias model: crumbView.model
+    property Item view
+
+    height: 24
+
+    function goBack() {
+        var crumb = crumbs.get(crumbs.count - 1);
+        view.model.rootJid = crumb.jid;
+        view.model.rootNode = crumb.node;
+        view.model.rootName = crumb.name;
+        crumbs.remove(crumbs.count - 1);
+    }
+
+    ListView {
+        id: crumbView
+
+        anchors.left: parent.left
+        anchors.top:  parent.top
+        anchors.bottom:  parent.bottom
+        orientation: Qt.Horizontal
+        width: model.count * 70
+
+        model: ListModel {
+            id: crumbs
+        }
+
+        delegate: Item {
+            height: crumbView.height
+            width: 70
+
+            Text {
+                anchors.fill:  parent
+                elide:  Text.ElideMiddle
+                text: model.name + " >"
+            }
+
+            MouseArea {
+                anchors.fill:  parent
+                onClicked: {
+                    console.log("clicked: " + model.name);
+                    var row = -1;
+                    for (var i = 0; i < crumbs.count; i++) {
+                        var obj = crumbs.get(i);
+                        if (obj.jid == model.jid && obj.node == model.node) {
+                            row = i;
+                            break;
+                        }
+                    }
+                    if (row < 0) {
+                        console.log("unknown row clicked");
+                        return;
+                    }
+
+                    // navigate to the specified location
+                    view.model.rootJid = model.jid;
+                    view.model.rootNode = model.node;
+                    view.model.rootName = model.name;
+
+                    // remove crumbs below current location
+                    for (var i = crumbs.count - 1; i >= row; i--) {
+                        crumbs.remove(i);
+                    }
+                }
+            }
+        }
+    }
+
+    Text {
+        anchors.left: crumbView.right
+        anchors.top:  parent.top
+        anchors.bottom:  parent.bottom
+
+        text: view.model.rootName
+        width: 40
+    }
+}
+ 

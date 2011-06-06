@@ -61,6 +61,7 @@
     <file>ChatEdit.qml</file>
     <file>CallWidget.qml</file>
     <file>ComboBox.qml</file>
+    <file>CrumbBar.qml</file>
     <file>ConversationPanel.qml</file>
     <file>DiagnosticPanel.qml</file>
     <file>Dialog.qml</file>
