@@ -63,7 +63,8 @@ Item {
                 anchors.margins: 4
                 width: 24
                 height: 24
-                source: 'file.png'
+                smooth: true
+                source: model.avatar
             }
 
             Text {

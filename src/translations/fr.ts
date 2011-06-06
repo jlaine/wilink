@@ -635,22 +635,6 @@ Acceptez-vous?</translation>
         <source>Queued</source>
         <translation>En attente</translation>
     </message>
-    <message>
-        <source>Downloading at %1</source>
-        <translation>Téléchargement à %1</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Nom</translation>
-    </message>
-    <message>
-        <source>Progress</source>
-        <translation>Progrès</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Taille</translation>
-    </message>
 </context>
 <context>
     <name>ShareOptions</name>

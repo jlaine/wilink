@@ -38,7 +38,10 @@ enum SharesColumns
 };
 
 enum SharesDataRoles {
-    PacketId = QXmppShareItem::MaxRole,
+    AvatarRole = QXmppShareItem::MaxRole,
+    NameRole,
+    PacketId,
+    ProgressRole,
     SizeRole,
     TransferDone,
     TransferPainted,
@@ -48,7 +51,6 @@ enum SharesDataRoles {
     TransferError,
     UpdateTime,
 };
-
 
 class ShareModelQuery
 {
@@ -116,7 +118,6 @@ public:
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -136,17 +137,15 @@ private slots:
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence &presence);
     void _q_serverChanged(const QString &server);
+    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
 
 private:
+    QModelIndex createIndex(QXmppShareItem *item, int column = 0) const;
+
     QXmppShareItem *rootItem;
     ShareModelPrivate *d;
 
     friend class ShareModelPrivate;
-
-    // cached icons, to avoid reloading them whenever an item is added
-    QIcon collectionIcon;
-    QIcon fileIcon;
-    QIcon peerIcon;
 };
 
 #endif
