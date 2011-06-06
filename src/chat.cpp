@@ -80,7 +80,7 @@
 #include "plugins/player.h"
 #include "plugins/rooms.h"
 #include "plugins/roster.h"
-#include "plugins/shares/model.h"
+#include "plugins/shares.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 

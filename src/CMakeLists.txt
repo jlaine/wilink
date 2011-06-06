@@ -73,9 +73,8 @@ set(wiLink_SOURCES
     plugins/player.cpp
     plugins/rooms.cpp
     plugins/roster.cpp
-    plugins/shares/model.cpp
-    plugins/shares/options.cpp
-    plugins/shares/view.cpp)
+    plugins/shares.cpp
+    plugins/shares/options.cpp)
 
 if(APPLE)
     set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
@@ -108,9 +107,8 @@ set(wiLink_MOC_HEADERS
     plugins/player.h
     plugins/rooms.h
     plugins/roster.h
-    plugins/shares/options.h
-    plugins/shares/model.h
-    plugins/shares/view.h)
+    plugins/shares.h
+    plugins/shares/options.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)

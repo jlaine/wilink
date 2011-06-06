@@ -29,10 +29,10 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
-#include "model.h"
 #include "chat_client.h"
 #include "chat_utils.h"
-#include "plugins/roster.h"
+#include "roster.h"
+#include "shares.h"
 
 // common queries
 #define Q ShareModelQuery
