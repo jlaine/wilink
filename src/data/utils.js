@@ -19,22 +19,30 @@
 
 .pragma library
 
-function formatSize(size) {
+function formatNumber(size) {
     var KILO = 1000;
     var MEGA = KILO * 1000;
     var GIGA = MEGA * 1000;
     var TERA = GIGA * 1000;
 
     if (size < KILO)
-        return size + ' B';
+        return size + ' ';
     else if (size < MEGA)
-        return Math.floor(size / KILO) + ' KB';
+        return Math.floor(size / KILO) + ' K';
     else if (size < GIGA)
-        return Math.floor(size / MEGA) + ' MB';
+        return Math.floor(size / MEGA) + ' M';
     else if (size < TERA)
-        return Math.floor(size / GIGA) + ' GB';
+        return Math.floor(size / GIGA) + ' G';
     else
-        return Math.floor(size / TERA) + ' TB';
+        return Math.floor(size / TERA) + ' T';
+}
+
+function formatSpeed(size) {
+    return formatNumber(size * 8) + 'b/s';
+}
+
+function formatSize(size) {
+    return formatNumber(size) + 'B';
 }
 
 function jidToBareJid(jid) {
