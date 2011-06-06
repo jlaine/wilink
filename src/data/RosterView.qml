@@ -18,7 +18,6 @@
  */
 
 import QtQuick 1.0
-import QXmpp 0.4
 
 Item {
     id: block
@@ -143,71 +142,14 @@ Item {
 
                 }
 
-                // status gradients
-                Gradient { // Offline
-                    id: offlineGradient
-                    GradientStop { position: 0.0; color: '#dfdfdf' }
-                    GradientStop { position: 1.0; color: '#999999' }
-                }
-                Gradient { // Available
-                    id: availableGradient
-                    GradientStop { position: 0.0; color: '#64ff64' }
-                    GradientStop { position: 1.0; color: '#009600' }
-                }
-                Gradient { // Away
-                    id: awayGradient
-                    GradientStop { position: 0.0; color: '#ffc800' }
-                    GradientStop { position: 1.0; color: '#d28c00' }
-                }
-                Gradient { // Busy
-                    id: busyGradient
-                    GradientStop { position: 0.0; color: '#ff6464' }
-                    GradientStop { position: 1.0; color: '#dd0000' }
-                }
-
-                Rectangle {
+                StatusPill {
                     id: status
                     anchors.left: avatar.right
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
+                    presenceStatus: model.status
                     width: 10
                     height: 10
-                    border.width: 1
-                    border.color: {
-                        switch(model.status) {
-                            case QXmppPresence.Online:
-                            case QXmppPresence.Chat:
-                                return '#006400';
-                            case QXmppPresence.Away:
-                            case QXmppPresence.XA:
-                                return '#c86400';
-                            case QXmppPresence.DND:
-                                return '#640000';
-                            case QXmppPresence.Offline:
-                            case QXmppPresence.Invisible:
-                            default:
-                                return '#999999';
-                        }
-                    }
-                    gradient: {
-                        switch(model.status) {
-                            case QXmppPresence.Online:
-                            case QXmppPresence.Chat:
-                                return availableGradient;
-                            case QXmppPresence.Away:
-                            case QXmppPresence.XA:
-                                return awayGradient;
-                            case QXmppPresence.DND:
-                                return busyGradient;
-                            case QXmppPresence.Offline:
-                            case QXmppPresence.Invisible:
-                            default:
-                                return offlineGradient;
-                        }
-                    }
-                    opacity: (model.status != undefined) ? 1 : 0
-                    radius: 20
-                    smooth: true
                 }
 
                 Text {
