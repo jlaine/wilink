@@ -88,6 +88,7 @@
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
     <file>ShareView.qml</file>
+    <file>StatusPill.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
     <file>Wifirst.qml</file>
