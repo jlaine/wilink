@@ -127,6 +127,7 @@ public slots:
 
 private slots:
     void cardChanged(const QString &jid);
+    void discoChanged(const QString &jid);
 
 private:
     void update();
@@ -150,6 +151,7 @@ public:
 
 signals:
     void cardChanged(const QString &jid);
+    void discoChanged(const QString &jid);
 
 public slots:
     void addClient(ChatClient *client);

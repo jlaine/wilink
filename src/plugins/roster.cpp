@@ -439,6 +439,7 @@ class VCardCachePrivate
 public:
     QNetworkDiskCache *cache;
     QList<ChatClient*> clients;
+    QSet<QString> discoQueue;
     QMap<QString, VCard::Features> features;
     QSet<QString> vcardFailed;
     QSet<QString> vcardQueue;
@@ -462,8 +463,37 @@ void VCard::cardChanged(const QString &jid)
         update();
 }
 
+void VCard::discoChanged(const QString &jid)
+{
+    if (jid == m_jid) {
+        Features newFeatures = 0;
+        foreach (const QString &jid, m_cache->d->features.keys()) {
+            if (jidToBareJid(jid) == m_jid)
+                newFeatures |= m_cache->d->features.value(jid);
+        }
+        if (newFeatures != m_features) {
+            m_features = newFeatures;
+            emit featuresChanged(m_features);
+        }
+    }
+}
+
 VCard::Features VCard::features() const
 {
+    if (!m_features && !m_jid.isEmpty() && m_cache) {
+        foreach (ChatClient *client, m_cache->d->clients) {
+            foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(m_jid)) {
+                const QString fullJid = presence.from();
+                if (presence.type() == QXmppPresence::Available &&
+                    !m_cache->d->features.contains(fullJid) &&
+                    !m_cache->d->discoQueue.contains(fullJid)) {
+                    qDebug("requesting disco %s", qPrintable(fullJid));
+                    client->discoveryManager()->requestInfo(fullJid);
+                    m_cache->d->discoQueue.insert(fullJid);
+                }
+            }
+        }
+    }
     return m_features;
 }
 
@@ -497,6 +527,7 @@ void VCard::setJid(const QString &jid)
         emit jidChanged(m_jid);
 
         update();
+        emit featuresChanged(0);
     }
 }
 
@@ -518,7 +549,6 @@ QUrl VCard::url() const
 void VCard::update()
 {
     QUrl newAvatar;
-    Features newFeatures = 0;
     QString newName;
     QString newNickName;
     QUrl newUrl;
@@ -529,6 +559,8 @@ void VCard::update()
             m_cache = VCardCache::instance();
             connect(m_cache, SIGNAL(cardChanged(QString)),
                     this, SLOT(cardChanged(QString)));
+            connect(m_cache, SIGNAL(discoChanged(QString)),
+                    this, SLOT(discoChanged(QString)));
         }
 
         QXmppVCardIq vcard;
@@ -551,26 +583,12 @@ void VCard::update()
         }
         if (newName.isEmpty())
             newName = jidToUser(m_jid);
-
-        // features
-        if (!jidToResource(m_jid).isEmpty()) {
-            newFeatures = m_cache->d->features.value(m_jid);
-        } else {
-            foreach (const QString &jid, m_cache->d->features.keys()) {
-                if (jidToBareJid(jid) == m_jid)
-                    newFeatures |= m_cache->d->features.value(jid);
-            }
-        }
     }
 
     // notify changes
     if (newAvatar != m_avatar) {
         m_avatar = newAvatar;
         emit avatarChanged(m_avatar);
-    }
-    if (newFeatures != m_features) {
-        m_features = newFeatures;
-        emit featuresChanged(m_features);
     }
     if (newName != m_name) {
         m_name = newName;
@@ -692,10 +710,10 @@ void VCardCache::addClient(ChatClient *client)
 
 void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
-    if (disco.type() != QXmppIq::Result)
+    const QString jid = disco.from();
+    if (!d->discoQueue.remove(jid) || disco.type() != QXmppIq::Result)
         return;
 
-    const QString jid = disco.from();
     qDebug("received disco %s", qPrintable(jid));
     VCard::Features features = 0;
     foreach (const QString &var, disco.features())
@@ -717,25 +735,15 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     }
     d->features.insert(jid, features);
 
-    emit cardChanged(jid);
+    emit discoChanged(jidToBareJid(jid));
 }
 
 void VCardCache::presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.from();
-    const QString bareJid = jidToBareJid(jid);
-    const QString resource = jidToResource(jid);
 
-    // handle features discovery
-    if (!resource.isEmpty()) {
-        if (presence.type() == QXmppPresence::Unavailable)
-            d->features.remove(jid);
-        else if (presence.type() == QXmppPresence::Available && !d->features.contains(jid) && !d->clients.isEmpty()) {
-            qDebug("requesting disco %s", qPrintable(jid));
-            QXmppDiscoveryIq disco;
-            d->clients.first()->discoveryManager()->requestInfo(jid);
-        }
-    }
+    if (!jidToResource(jid).isEmpty() && presence.type() == QXmppPresence::Unavailable)
+        d->features.remove(jid);
 }
 
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
