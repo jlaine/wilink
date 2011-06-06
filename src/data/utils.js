@@ -19,6 +19,24 @@
 
 .pragma library
 
+function formatSize(size) {
+    var KILO = 1000;
+    var MEGA = KILO * 1000;
+    var GIGA = MEGA * 1000;
+    var TERA = GIGA * 1000;
+
+    if (size < KILO)
+        return size + ' B';
+    else if (size < MEGA)
+        return Math.floor(size / KILO) + ' KB';
+    else if (size < GIGA)
+        return Math.floor(size / MEGA) + ' MB';
+    else if (size < TERA)
+        return Math.floor(size / GIGA) + ' GB';
+    else
+        return Math.floor(size / TERA) + ' TB';
+}
+
 function jidToBareJid(jid) {
     var pos = jid.indexOf('/');
     if (pos < 0)

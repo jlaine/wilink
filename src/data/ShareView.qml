@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import 'utils.js' as Utils
 
 Item {
     id: block
@@ -83,7 +84,7 @@ Item {
                 anchors.right: parent.right
                 anchors.margins: 4
                 anchors.verticalCenter: parent.verticalCenter
-                text: model.size
+                text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
             }
 
             MouseArea {
