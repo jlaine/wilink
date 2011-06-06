@@ -399,11 +399,6 @@ void ShareModel::refresh()
     }
 }
 
-void ShareModel::refreshItem(QXmppShareItem *item)
-{
-    emit dataChanged(createIndex(item), createIndex(item));
-}
-
 void ShareModel::removeItem(QXmppShareItem *item)
 {
     if (!item || item == rootItem)

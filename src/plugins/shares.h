@@ -46,9 +46,7 @@ enum SharesDataRoles {
     ProgressRole,
     SizeRole,
     TransferDone,
-    TransferPainted,
     TransferPath,
-    TransferSpeed,
     TransferTotal,
     TransferError,
     UpdateTime,
@@ -136,14 +134,6 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
-    void clear();
-    QXmppShareItem *addItem(const QXmppShareItem &item);
-    QList<QXmppShareItem*> filter(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
-    QXmppShareItem *get(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
-    void refreshItem(QXmppShareItem *item);
-    void removeItem(QXmppShareItem *item);
-    QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
-
 signals:
     void clientChanged(ChatClient *client);
     void filterChanged(const QString &filter);
@@ -160,7 +150,14 @@ private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
 
 private:
+    QXmppShareItem *addItem(const QXmppShareItem &item);
+    void clear();
     QModelIndex createIndex(QXmppShareItem *item, int column = 0) const;
+    QList<QXmppShareItem*> filter(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
+    void removeItem(QXmppShareItem *item);
+    QXmppShareItem *get(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
+    QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
+
 
     QXmppShareItem *rootItem;
     ShareModelPrivate *d;
