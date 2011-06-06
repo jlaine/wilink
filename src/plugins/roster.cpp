@@ -511,7 +511,10 @@ void VCard::setJid(const QString &jid)
         emit jidChanged(m_jid);
 
         update();
-        emit featuresChanged(0);
+
+        // reset features
+        m_features = 0;
+        emit featuresChanged(m_features);
     }
 }
 
