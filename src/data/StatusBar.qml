@@ -47,14 +47,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.margins: 4
-        currentIndex: 3
-
-        model: ListModel {
-            ListElement { name: qsTr('Available'); status: QXmppPresence.Online }
-            ListElement { name: qsTr('Away'); status: QXmppPresence.Away }
-            ListElement { name: qsTr('Busy'); status: QXmppPresence.DND }
-            ListElement { name: qsTr('Offline'); status: QXmppPresence.Offline }
-        }
+        model: ListModel {}
         width: 200
     }
 
@@ -62,6 +55,14 @@ Rectangle {
         id: idle
 
         Component.onCompleted: idle.start()
+    }
+
+    Component.onCompleted: {
+        combo.model.append({'name': qsTr('Available'), 'status': QXmppPresence.Online});
+        combo.model.append({'name': qsTr('Away'), 'status': QXmppPresence.Away});
+        combo.model.append({'name': qsTr('Busy'), 'status': QXmppPresence.DND});
+        combo.model.append({'name': qsTr('Offline'), 'status': QXmppPresence.Offline});
+        combo.setStatusType(window.client.statusType)
     }
 
     Connections {
