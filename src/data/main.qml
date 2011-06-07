@@ -42,7 +42,7 @@ Item {
 
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.bottom: statusBar.top
+        anchors.bottom: parent.bottom
         width: 240
 
         Rectangle {
@@ -231,7 +231,7 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: splitter.bottom
-            anchors.bottom: parent.bottom
+            anchors.bottom: statusBar.bottom
             anchors.leftMargin: dockBackground.height
             currentJid: (Qt.isQtObject(swapper.currentItem) && swapper.currentItem.jid != undefined) ? swapper.currentItem.jid : ''
             model: SortFilterProxyModel {
@@ -356,6 +356,15 @@ Item {
             }
         }
 
+        StatusBar {
+            id: statusBar
+
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 32
+        }
+
         // FIXME : this is a hack to replay received messages after
         // adding the appropriate conversation
         Connections {
@@ -418,7 +427,7 @@ Item {
         id: swapper
 
         anchors.top: parent.top
-        anchors.bottom: statusBar.top
+        anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
 
@@ -426,15 +435,6 @@ Item {
             target: application
             onMessageClicked: swapper.setCurrentItem(context)
         }
-    }
-
-    StatusBar {
-        id: statusBar
-
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 32
     }
 
     Loader {
