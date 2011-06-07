@@ -69,6 +69,22 @@ QDateTime ChatClient::serverTime() const
     return QDateTime::currentDateTime().addSecs(timeOffset);
 }
 
+int ChatClient::statusType() const
+{
+    return clientPresence().status().type();
+}
+
+void ChatClient::setStatusType(int statusType)
+{
+    QXmppPresence presence = clientPresence();
+    if (statusType == QXmppPresence::Status::Offline)
+        presence.setType(QXmppPresence::Unavailable);
+    else
+        presence.setType(QXmppPresence::Available);
+    presence.status().setType(static_cast<QXmppPresence::Status::Type>(statusType));
+    setClientPresence(presence);
+}
+
 QXmppArchiveManager *ChatClient::archiveManager()
 {
     return getManager<QXmppArchiveManager>();

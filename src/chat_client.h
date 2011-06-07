@@ -40,6 +40,7 @@ class ChatClient : public QXmppClient
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
+    Q_PROPERTY(int statusType READ statusType WRITE setStatusType)
     Q_PROPERTY(QXmppLogger* logger READ logger CONSTANT)
     Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
@@ -56,6 +57,9 @@ public:
     ChatClient(QObject *parent);
     QString jid() const;
     QDateTime serverTime() const;
+
+    int statusType() const;
+    void setStatusType(int statusType);
 
     QXmppArchiveManager *archiveManager();
     QXmppCallManager *callManager();
