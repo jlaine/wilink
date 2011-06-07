@@ -31,12 +31,14 @@ Item {
 
     function push(crumb) {
         crumbs.append(crumb);
-        crumbBar.locationChanged(crumb);
+        crumbBar.locationChanged(crumbs.get(crumbs.count - 1));
     }
 
     function pop() {
-        if (crumbs.count > 1)
+        if (crumbs.count > 1) {
             crumbs.remove(crumbs.count - 1);
+            crumbBar.locationChanged(crumbs.get(crumbs.count - 1));
+        }
     }
 
     Row {

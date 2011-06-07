@@ -136,7 +136,6 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: searchBar.bottom
-        view: view
 
         Component.onCompleted: {
             crumbBar.push({'name': qsTr('Home'), 'jid': view.model.rootJid, 'node': ''});
