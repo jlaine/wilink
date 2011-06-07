@@ -109,6 +109,8 @@ Item {
 
                         onClicked: {
                             if (mouse.button == Qt.LeftButton) {
+                                parent.state = '';
+
                                 // remove crumbs below current location
                                 for (var i = crumbs.count - 1; i > model.index; i--) {
                                     crumbs.remove(i);
