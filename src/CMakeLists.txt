@@ -53,7 +53,6 @@ set(wiLink_SOURCES
     chat_history.cpp
     chat_model.cpp
     chat_preferences.cpp
-    chat_search.cpp
     chat_status.cpp
     chat_utils.cpp
     main.cpp
@@ -90,7 +89,6 @@ set(wiLink_MOC_HEADERS
     chat_model.h
     chat_plugin.h
     chat_preferences.h
-    chat_search.h
     chat_status.h
     updates.h
     updatesdialog.h
