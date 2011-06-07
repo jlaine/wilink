@@ -223,11 +223,11 @@ Panel {
     Rectangle {
         id: display
 
+        anchors.top: crumbBar.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: help.bottom
-        visible: false
+        opacity: 0
         z: 1
 
         Image {
@@ -259,6 +259,11 @@ Panel {
     state: image.source  != '' ? 'details' : ''
     states: State {
         name: 'details'
-        PropertyChanges { target: display; visible: true }
+        PropertyChanges { target: display; opacity: 1 }
+        PropertyChanges { target: view; opacity: 0 }
+    }
+
+    transitions: Transition {
+        PropertyAnimation { target: display; properties: 'opacity'; duration: 150 }
     }
 }
