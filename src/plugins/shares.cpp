@@ -95,6 +95,7 @@ class ShareModelPrivate
 public:
     ShareModelPrivate(ShareModel *qq);
     void setShareClient(ChatClient *shareClient);
+    QXmppShareExtension *shareManager();
 
     ChatClient *client;
     QString filter;
@@ -146,6 +147,14 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
         if (!server.isEmpty())
             q->_q_serverChanged(server);
     }
+}
+
+QXmppShareExtension *ShareModelPrivate::shareManager()
+{
+    if (shareClient)
+        return shareClient->findExtension<QXmppShareExtension>();
+    else
+        return 0;
 }
 
 ShareModel::ShareModel(QObject *parent)
@@ -238,6 +247,11 @@ void ShareModel::setRootNode(const QString &rootNode)
         d->timer->start();
         emit rootNodeChanged(d->rootNode);
     }
+}
+
+QString ShareModel::shareServer() const
+{
+    return d->shareManager() ? d->shareServer : QString();
 }
 
 void ShareModel::clear()
@@ -388,15 +402,12 @@ QModelIndex ShareModel::parent(const QModelIndex &index) const
 
 void ShareModel::refresh()
 {
-    if (!d->rootJid.isEmpty()) {
-        // browse files
-        QXmppShareExtension *shareManager = d->shareClient->findExtension<QXmppShareExtension>();
-        const QString requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
-#if 0
-        if (!requestId.isEmpty())
-            searches.insert(requestId, view);
-#endif
-    }
+    QXmppShareExtension *shareManager = d->shareManager();
+    if (!shareManager || d->rootJid.isEmpty())
+        return;
+
+    // browse files
+    shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
 }
 
 void ShareModel::removeItem(QXmppShareItem *item)
@@ -560,8 +571,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
 #endif
         }
 
-        setRootJid(d->shareServer);
-        setRootNode(QString());
+        emit shareServerChanged(d->shareServer);
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&

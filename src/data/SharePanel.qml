@@ -137,10 +137,6 @@ Panel {
         anchors.right: parent.right
         anchors.top: searchBar.bottom
 
-        Component.onCompleted: {
-            crumbBar.push({'name': qsTr('Home'), 'jid': view.model.rootJid, 'node': ''});
-        }
-
         onLocationChanged: {
             console.log("location changed" + location);
             view.model.rootJid = location.jid;
@@ -157,9 +153,13 @@ Panel {
         anchors.bottom: queueHelp.top
 
         model: ShareModel {
-            property string rootName: qsTr('Home')
-
             client: window.client
+
+            onShareServerChanged: {
+                if (!crumbBar.model.count) {
+                    crumbBar.push({'name': qsTr('Home'), 'jid': view.model.shareServer, 'node': ''});
+                }
+            }
         }
     }
 

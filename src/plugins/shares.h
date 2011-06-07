@@ -97,6 +97,7 @@ class ShareModel : public QAbstractItemModel
     Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
     Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
+    Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
 
 public:
     enum Recurse
@@ -128,6 +129,8 @@ public:
     QString rootNode() const;
     void setRootNode(const QString &rootNode);
 
+    QString shareServer() const;
+
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
@@ -139,6 +142,7 @@ signals:
     void filterChanged(const QString &filter);
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
+    void shareServerChanged(const QString &shareServer);
 
 public slots:
     void refresh();
