@@ -27,6 +27,17 @@ Rectangle {
     color: '#567dbc'
 
     ComboBox {
+        id: combo
+
+        function setStatusType(statusType) {
+            for (var i = 0; i < combo.model.count; i++) {
+                if (combo.model.get(i).status == statusType) {
+                    combo.currentIndex = i;
+                    break;
+                }
+            }
+        }
+
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.margins: 4
@@ -42,10 +53,20 @@ Rectangle {
     Idle {
         id: idle
 
-        Component.onCompleted: idle.start()
-
         onIdleTimeChanged: {
             // TODO
         }
+    }
+
+    Component.onCompleted: {
+        combo.setStatusType(QXmppPresence.Offline);
+        idle.start();
+    }
+
+    Connections {
+        target: window.client
+
+        onConnected: combo.setStatusType(window.client.statusType)
+        onDisconnected: combo.setStatusType(QXmppPresence.Offline)
     }
 }

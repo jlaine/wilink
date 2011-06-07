@@ -23,6 +23,8 @@ Rectangle {
     id: block
 
     property alias model: view.model
+    property alias currentIndex: view.currentIndex
+
     signal elementClicked(string name)
 
     border.width: 1
