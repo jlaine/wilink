@@ -32,6 +32,16 @@ Rectangle {
     radius: 3
     smooth: true
 
+    Text {
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.margins: 5
+        color: 'white'
+        opacity: block.state == 'expanded' ? 0 : 1
+        text: '<html>&#9167;</html>'
+        z: 1
+    }
+
     ListView {
         id: view
 
@@ -75,16 +85,6 @@ Rectangle {
                 anchors.margins: 5
                 color: 'white'
                 text: model.name
-            }
-
-            Text {
-                id: arrows
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 5
-                color: 'white'
-                opacity: block.state == 'expanded' ? 0 : 1
-                text: '<html>&#9167;</html>'
             }
 
             MouseArea {
