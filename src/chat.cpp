@@ -204,6 +204,7 @@ Chat::Chat(QWidget *parent)
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
+#if 0
     /* "Edit" menu */
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
 
@@ -214,6 +215,7 @@ Chat::Chat(QWidget *parent)
     d->findAgainAction = editMenu->addAction(tr("Find a&gain"));
     d->findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
     d->findAgainAction->setEnabled(false);
+#endif
 
     /* set up client */
     connect(d->client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
