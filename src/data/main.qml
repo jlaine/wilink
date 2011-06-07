@@ -82,6 +82,7 @@ Item {
                 id: control
                 anchors.top: parent.top
                 anchors.left: parent.left
+                spacing: 5
 
                 DockButton {
                     iconSource: 'diagnostics.png'
