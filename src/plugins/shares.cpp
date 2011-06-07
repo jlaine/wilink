@@ -34,10 +34,6 @@
 #include "roster.h"
 #include "shares.h"
 
-// common queries
-#define Q ShareModelQuery
-#define Q_FIND_LOCATIONS(locations)  Q(QXmppShareItem::LocationsRole, Q::Equals, QVariant::fromValue(locations))
-
 static QXmppShareDatabase *globalDatabase = 0;
 static int globalDatabaseRefs = 0;
 
@@ -96,6 +92,7 @@ public:
 
     ChatClient *client;
     QString filter;
+    QString requestId;
     QString rootJid;
     QString rootNode;
     ChatClient *shareClient;
@@ -303,7 +300,7 @@ void ShareModel::download(int row)
         return;
 
     QXmppShareItem *item = rootItem->child(row);
-    d->queueModel->queue(item);
+    d->queueModel->queue(item, d->filter);
 }
 
 QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
@@ -342,7 +339,7 @@ void ShareModel::refresh()
         return;
 
     // browse files
-    shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
+    d->requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
 }
 
 int ShareModel::rowCount(const QModelIndex &parent) const
@@ -476,8 +473,11 @@ void ShareModel::_q_serverChanged(const QString &server)
 
 void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
 {
-    qDebug("got shareIq from %s", qPrintable(shareIq.from()));
-    if (shareIq.type() == QXmppIq::Get || shareIq.from() != d->rootJid)
+    // filter requests
+    if (shareIq.from() != d->rootJid ||
+        shareIq.type() == QXmppIq::Get ||
+        (shareIq.type() == QXmppIq::Set && !d->rootNode.isEmpty()) ||
+        (shareIq.type() != QXmppIq::Set && shareIq.id() != d->requestId))
         return;
 
     if (shareIq.type() == QXmppIq::Error)
@@ -530,6 +530,7 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
 class ShareQueueItem : public ChatModelItem
 {
 public:
+    QString requestId;
     QXmppShareItem shareItem;
 };
 
@@ -558,11 +559,18 @@ ShareQueueModel::~ShareQueueModel()
     delete d;
 }
 
-void ShareQueueModel::queue(QXmppShareItem *shareItem)
+void ShareQueueModel::queue(QXmppShareItem *shareItem, const QString &filter)
 {
+    if (!shareItem || shareItem->locations().isEmpty() || !d->manager)
+        return;
+
     ShareQueueItem *item = new ShareQueueItem;
     copy(&item->shareItem, shareItem);
     addItem(item, rootItem);
+
+    if (shareItem->type() == QXmppShareItem::CollectionItem) {
+        item->requestId = d->manager->search(shareItem->locations().first(), 0, filter);
+    }
 }
 
 QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
@@ -609,6 +617,24 @@ void ShareQueueModel::setManager(QXmppShareExtension *manager)
 
 void ShareQueueModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
 {
+    // filter requests
+    if (shareIq.type() == QXmppIq::Get || shareIq.type() == QXmppIq::Set)
+        return;
 
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
+        if (item->requestId == shareIq.id()) {
+            qDebug("got folder resp");
+            if (shareIq.type() == QXmppIq::Result) {
+                QXmppShareItem *collection = (QXmppShareItem*)&shareIq.collection();
+                copy(&item->shareItem, collection);
+                foreach (QXmppShareItem *child, collection->children())
+                    item->shareItem.appendChild(*child);
+            } else {
+                removeItem(item);
+            }
+            return;
+        }
+    }
 }
 

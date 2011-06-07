@@ -118,7 +118,7 @@ public:
     ShareQueueModel(QObject *parent = 0);
     ~ShareQueueModel();
 
-    void queue(QXmppShareItem *item);
+    void queue(QXmppShareItem *item, const QString &filter);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     void setManager(QXmppShareExtension *manager);
 
