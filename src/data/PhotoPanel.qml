@@ -153,15 +153,11 @@ Panel {
             width: view.cellWidth
             height: view.cellHeight
 
-            Rectangle {
-                id: itemBackground
+            Highlight {
+                id: highlight
+
                 anchors.fill: parent
-                border.color: '#00ffffff'
-                border.width: 1
-                gradient: Gradient {
-                    GradientStop { id: stop1; position: 0.0; color: '#00ffffff'  }
-                    GradientStop { id: stop2; position: 1.0; color: '#00ffffff'  }
-                }
+                opacity: 0
             }
 
             Column {
@@ -205,9 +201,7 @@ Panel {
 
             states: State {
                 name: 'hovered'
-                PropertyChanges { target: itemBackground; border.color: '#b0e2ff' }
-                PropertyChanges { target: stop1;  color: '#ffffff' }
-                PropertyChanges { target: stop2;  color: '#b0e2ff' }
+                PropertyChanges { target: highlight; opacity: 0.5 }
             }
         }
     }

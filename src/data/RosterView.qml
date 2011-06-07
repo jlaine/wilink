@@ -200,17 +200,7 @@ Item {
             }
         }
 
-        highlight: Rectangle {
-            border.color: '#ffb0c4de'
-            border.width: 1
-            gradient: Gradient {
-                GradientStop { id:stop1; position:0.0; color: '#33b0c4de' }
-                GradientStop { id:stop2; position:0.5; color: '#ffb0c4de' }
-                GradientStop { id:stop3; position:1.0; color: '#33b0c4de' }
-            }
-            radius: 5
-            smooth: true
-        }
+        highlight: Highlight {}
 
         Connections {
             target: block
