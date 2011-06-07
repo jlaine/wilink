@@ -65,56 +65,93 @@ Item {
             delegate: Row {
                 spacing: 4
 
+                width: name.width + separator.width
+
                 Rectangle {
                     height: row.height
                     width: name.width
 
                     Text {
                         id: name
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        color: '#000000'
                         text: model.name
+                        verticalAlignment: Text.AlignVCenter
                     }
 
                     MouseArea {
-                        anchors.fill:  parent
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: {
+                            parent.state = 'hovered'
+                        }
+
+                        onExited: {
+                            parent.state = ''
+                        }
+
                         onClicked: {
-                            console.log("clicked: " + model.name);
-                            var row = -1;
-                            for (var i = 0; i < crumbs.count; i++) {
-                                var obj = crumbs.get(i);
-                                if (obj.jid == model.jid && obj.node == model.node) {
-                                    row = i;
-                                    break;
+                            if (mouse.button == Qt.LeftButton) {
+                                console.log("clicked: " + model.name);
+                                var row = -1;
+                                for (var i = 0; i < crumbs.count; i++) {
+                                    var obj = crumbs.get(i);
+                                    if (obj.jid == model.jid && obj.node == model.node) {
+                                        row = i;
+                                        break;
+                                    }
+                                }
+                                if (row < 0) {
+                                    console.log("unknown row clicked");
+                                    return;
+                                }
+
+                                // navigate to the specified location
+                                view.model.rootJid = model.jid;
+                                view.model.rootNode = model.node;
+                                view.model.rootName = model.name;
+
+                                // remove crumbs below current location
+                                for (var i = crumbs.count - 1; i >= row; i--) {
+                                    crumbs.remove(i);
                                 }
                             }
-                            if (row < 0) {
-                                console.log("unknown row clicked");
-                                return;
-                            }
+                        }
+                    }
 
-                            // navigate to the specified location
-                            view.model.rootJid = model.jid;
-                            view.model.rootNode = model.node;
-                            view.model.rootName = model.name;
-
-                            // remove crumbs below current location
-                            for (var i = crumbs.count - 1; i >= row; i--) {
-                                crumbs.remove(i);
-                            }
+                    states: State {
+                        name: 'hovered'
+                        PropertyChanges {
+                            target: name
+                            color: '#aaaaaa'
                         }
                     }
 
                 }
 
                 Text {
+                    id: separator
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: name.right
+                    font.bold: true
                     text: '&rsaquo;'
                     textFormat: Text.RichText
-                    font.bold: true
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
         }
 
         Text {
+            anchors.bottom: parent.bottom
+            anchors.top: parent.top
+            color: '#000000'
             text: view.model.rootName
+            verticalAlignment: Text.AlignVCenter
         }
     }
 }
