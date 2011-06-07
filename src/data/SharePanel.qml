@@ -44,7 +44,7 @@ Panel {
                 text: qsTr('Go back')
                 enabled: crumbBar.model.count > 0
 
-                onClicked: crumbBar.goBack()
+                onClicked: crumbBar.pop()
             }
 
             ToolButton {
@@ -137,6 +137,16 @@ Panel {
         anchors.right: parent.right
         anchors.top: searchBar.bottom
         view: view
+
+        Component.onCompleted: {
+            crumbBar.push({'name': qsTr('Home'), 'jid': view.model.rootJid, 'node': ''});
+        }
+
+        onLocationChanged: {
+            console.log("location changed" + location);
+            view.model.rootJid = location.jid;
+            view.model.rootNode = location.node;
+        }
     }
 
     ShareView {
@@ -150,7 +160,7 @@ Panel {
         model: ShareModel {
             property string rootName: qsTr('Home')
 
-            client: window.client            
+            client: window.client
         }
     }
 

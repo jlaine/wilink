@@ -119,13 +119,21 @@ Panel {
         z: 1
     }
 
+    CrumbBar {
+        id: crumbBar
+
+        anchors.top: help.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+    }
+
     GridView {
         id: view
 
+        anchors.top: crumbBar.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.top: help.bottom
         cellWidth: 130
         cellHeight: 150
 

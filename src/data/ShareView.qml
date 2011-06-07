@@ -93,7 +93,7 @@ Item {
 
                 onClicked: {
                     if (model.isDir) {
-                        crumbBar.goTo(model);
+                        crumbBar.push(model);
                     }
                 }
 

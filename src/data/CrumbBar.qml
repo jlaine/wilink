@@ -24,28 +24,19 @@ Item {
     id: crumbBar
 
     property alias model: crumbView.model
-    property Item view
+
+    signal locationChanged(variant location)
 
     height: 24
 
-    function goBack() {
-        var crumb = crumbs.get(crumbs.count - 1);
-        view.model.rootJid = crumb.jid;
-        view.model.rootNode = crumb.node;
-        view.model.rootName = crumb.name;
-        crumbs.remove(crumbs.count - 1);
+    function push(crumb) {
+        crumbs.append(crumb);
+        crumbBar.locationChanged(crumb);
     }
 
-    function goTo(crumb) {
-        if (view.model.rootJid == crumb.jid &&
-            view.model.rootNode == crumb.node) {
-            return;
-        }
-
-        crumbBar.model.append({'name': view.model.rootName, 'jid': view.model.rootJid, 'node': view.model.rootNode});
-        view.model.rootJid = crumb.jid;
-        view.model.rootNode = crumb.node;
-        view.model.rootName = crumb.name;
+    function pop() {
+        if (crumbs.count > 1)
+            crumbs.remove(crumbs.count - 1);
     }
 
     Row {
@@ -96,29 +87,14 @@ Item {
 
                         onClicked: {
                             if (mouse.button == Qt.LeftButton) {
-                                console.log("clicked: " + model.name);
-                                var row = -1;
-                                for (var i = 0; i < crumbs.count; i++) {
-                                    var obj = crumbs.get(i);
-                                    if (obj.jid == model.jid && obj.node == model.node) {
-                                        row = i;
-                                        break;
-                                    }
-                                }
-                                if (row < 0) {
-                                    console.log("unknown row clicked");
+                                if (model.index == crumbs.count - 1)
                                     return;
-                                }
-
-                                // navigate to the specified location
-                                view.model.rootJid = model.jid;
-                                view.model.rootNode = model.node;
-                                view.model.rootName = model.name;
 
                                 // remove crumbs below current location
-                                for (var i = crumbs.count - 1; i >= row; i--) {
+                                for (var i = crumbs.count - 1; i > model.index; i--) {
                                     crumbs.remove(i);
                                 }
+                                crumbBar.locationChanged(model);
                             }
                         }
                     }
@@ -144,14 +120,6 @@ Item {
                     verticalAlignment: Text.AlignVCenter
                 }
             }
-        }
-
-        Text {
-            anchors.bottom: parent.bottom
-            anchors.top: parent.top
-            color: '#000000'
-            text: view.model.rootName
-            verticalAlignment: Text.AlignVCenter
         }
     }
 }
