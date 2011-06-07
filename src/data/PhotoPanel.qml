@@ -261,9 +261,11 @@ Panel {
         name: 'details'
         PropertyChanges { target: display; opacity: 1 }
         PropertyChanges { target: view; opacity: 0 }
+        PropertyChanges { target: help; height: 0; opacity: 0 }
     }
 
     transitions: Transition {
         PropertyAnimation { target: display; properties: 'opacity'; duration: 150 }
+        PropertyAnimation { target: help; properties: 'height,opacity'; duration: 150 }
     }
 }
