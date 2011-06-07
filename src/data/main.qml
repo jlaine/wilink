@@ -361,6 +361,7 @@ Item {
 
             anchors.bottom: parent.bottom
             anchors.left: parent.left
+            anchors.leftMargin: dockBackground.height
             anchors.right: parent.right
             height: 32
         }
