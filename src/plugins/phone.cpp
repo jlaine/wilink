@@ -153,15 +153,10 @@ PhoneCallsModel::~PhoneCallsModel()
     m_ticker->stop();
     m_timer->stop();
 
-    // give SIP client 2s to exit cleanly
-    if (m_client->state() == SipClient::ConnectedState) {
-        QEventLoop loop;
-        QTimer::singleShot(2000, &loop, SLOT(quit()));
-        connect(m_client, SIGNAL(disconnected()), &loop, SLOT(quit()));
+    // try to exit SIP client cleanly
+    if (m_client->state() == SipClient::ConnectedState)
         QMetaObject::invokeMethod(m_client, "disconnectFromServer");
-        loop.exec();
-    }
-    delete m_client;
+    m_client->deleteLater();
 
     // delete items
     foreach (PhoneCallsItem *item, m_items)
