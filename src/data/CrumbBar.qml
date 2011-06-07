@@ -55,13 +55,18 @@ Item {
                 id: crumbs
             }
 
-            delegate: Row {
-                spacing: 4
+            delegate: Item {
+                property bool isLast: model.index == crumbs.count - 1
 
-                width: name.width + separator.width
+                height: row.height
+                width: crumb.width + row.spacing + separator.width
 
                 Rectangle {
-                    height: row.height
+                    id: crumb
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
                     width: name.width
 
                     Text {
@@ -77,6 +82,7 @@ Item {
                     MouseArea {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         anchors.fill: parent
+                        enabled: !isLast
                         hoverEnabled: true
 
                         onEntered: {
@@ -89,9 +95,6 @@ Item {
 
                         onClicked: {
                             if (mouse.button == Qt.LeftButton) {
-                                if (model.index == crumbs.count - 1)
-                                    return;
-
                                 // remove crumbs below current location
                                 for (var i = crumbs.count - 1; i > model.index; i--) {
                                     crumbs.remove(i);
@@ -113,10 +116,13 @@ Item {
 
                 Text {
                     id: separator
+
+                    anchors.left: crumb.right
+                    anchors.leftMargin: row.spacing
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    anchors.left: name.right
                     font.bold: true
+                    opacity: isLast ? 0 : 1
                     text: '&rsaquo;'
                     textFormat: Text.RichText
                     verticalAlignment: Text.AlignVCenter
