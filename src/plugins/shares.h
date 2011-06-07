@@ -112,7 +112,8 @@ public:
     enum Role {
         IsDirRole = ChatModel::UserRole,
         NodeRole,
-        SizeRole,
+        TotalBytesRole,
+        TotalFilesRole,
     };
 
     ShareQueueModel(QObject *parent = 0);

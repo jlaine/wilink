@@ -80,7 +80,7 @@ Item {
                 anchors.right: parent.right
                 anchors.margins: 4
                 anchors.verticalCenter: parent.verticalCenter
-                text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
+                text: (model.totalFiles > 1 ? qsTr('%1 files').replace('%1', model.totalFiles) + ', ' : '') + Utils.formatSize(model.totalBytes)
             }
 
             MouseArea {

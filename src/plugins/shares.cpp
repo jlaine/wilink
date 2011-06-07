@@ -573,7 +573,8 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
     QHash<int, QByteArray> names = roleNames();
     names.insert(IsDirRole, "isDir");
     names.insert(NodeRole, "node");
-    names.insert(SizeRole, "size");
+    names.insert(TotalBytesRole, "totalBytes");
+    names.insert(TotalFilesRole, "totalFiles");
     setRoleNames(names);
 }
 
@@ -622,8 +623,10 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
         else
             return shareItem->locations().first().node();
     }
-    else if (role == SizeRole)
+    else if (role == TotalBytesRole)
         return item->totalBytes;
+    else if (role == TotalFilesRole)
+        return item->totalFiles;
     return QVariant();
 }
 

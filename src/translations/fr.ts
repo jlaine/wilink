@@ -706,6 +706,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ShareQueueView</name>
+    <message>
+        <source>%1 files</source>
+        <translation>%1 fichiers</translation>
+    </message>
+</context>
+<context>
     <name>SoundOptions</name>
     <message>
         <source>Sound</source>

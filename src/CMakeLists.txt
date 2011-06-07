@@ -125,6 +125,7 @@ if(RELOAD_TRANSLATIONS)
         data/PhotoPanel.qml
         data/RoomPanel.qml
         data/SharePanel.qml
+        data/ShareQueueView.qml
         data/StatusBar.qml
         data/TransferWidget.qml
         translations/fr.ts)
