@@ -65,6 +65,8 @@ Item {
             delegate: Row {
                 spacing: 4
 
+                width: name.width + separator.width
+
                 Rectangle {
                     height: row.height
                     width: name.width
@@ -72,8 +74,11 @@ Item {
                     Text {
                         id: name
 
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
                         color: '#000000'
                         text: model.name
+                        verticalAlignment: Text.AlignVCenter
                     }
 
                     MouseArea {
@@ -129,15 +134,24 @@ Item {
                 }
 
                 Text {
+                    id: separator
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: name.right
+                    font.bold: true
                     text: '&rsaquo;'
                     textFormat: Text.RichText
-                    font.bold: true
+                    verticalAlignment: Text.AlignVCenter
                 }
             }
         }
 
         Text {
+            anchors.bottom: parent.bottom
+            anchors.top: parent.top
+            color: '#000000'
             text: view.model.rootName
+            verticalAlignment: Text.AlignVCenter
         }
     }
 }
