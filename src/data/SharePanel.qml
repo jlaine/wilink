@@ -142,6 +142,7 @@ Panel {
             view.model.rootJid = location.jid;
             view.model.rootNode = location.node;
         }
+        z: 1
     }
 
     ShareView {

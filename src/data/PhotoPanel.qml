@@ -131,6 +131,7 @@ Panel {
                 image.source = location.avatar
             }
         }
+        z: 1
     }
 
     GridView {
@@ -214,7 +215,7 @@ Panel {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: help.bottom
+        anchors.top: crumbBar.bottom
         anchors.bottom: footer.top
         anchors.right: parent.right
         flickableItem: view

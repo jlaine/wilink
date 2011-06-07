@@ -49,7 +49,7 @@ Item {
         border.color: '#e1eafa'
         gradient: Gradient {
             GradientStop { position: 0.0; color: '#e1eafa' }
-            GradientStop { position: 1.0; color: '#00e1eafa' }
+            GradientStop { position: 1.0; color: '#ffffff' }
         }
     }
 
