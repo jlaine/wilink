@@ -25,8 +25,6 @@ Rectangle {
     property alias model: view.model
     property alias currentIndex: view.currentIndex
 
-    signal elementClicked(string name)
-
     border.width: 1
     border.color: '#ffffff'
     color: '#567dbc'
@@ -107,11 +105,9 @@ Rectangle {
                     if (block.state != 'expanded') {
                         block.state = 'expanded'
                     } else {
-                        positionPressed = mapToItem(view, mouse.x, mouse.y)
-                        pressedIndex = view.indexAt(positionPressed.x, positionPressed.y)
+                        var pos = mapToItem(view, mouse.x, mouse.y)
+                        currentIndex = view.indexAt(pos.x, pos.y)
                         block.state = ''
-                        view.positionViewAtIndex(pressedIndex, ListView.Beginning)
-                        elementClicked(model.name)
                     }
                 }
             }
