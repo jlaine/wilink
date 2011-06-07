@@ -46,6 +46,19 @@ static void copy(QXmppShareItem *oldChild, QXmppShareItem *newChild)
     oldChild->setType(newChild->type());
 }
 
+static void totals(const QXmppShareItem *item, qint64 &bytes, qint64 &files)
+{
+    for (int i = 0; i < item->size(); ++i) {
+        const QXmppShareItem *child = item->child(i);
+        if (child->type() == QXmppShareItem::FileItem) {
+            bytes += child->fileSize();
+            files++;
+        } else {
+            totals(child, bytes, files);
+        }
+    }
+}
+
 static QXmppShareDatabase *refDatabase()
 {
     if (!globalDatabase)
@@ -530,9 +543,19 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
 class ShareQueueItem : public ChatModelItem
 {
 public:
+    ShareQueueItem();
+
     QString requestId;
     QXmppShareItem shareItem;
+    qint64 totalBytes;
+    qint64 totalFiles;
 };
+
+ShareQueueItem::ShareQueueItem()
+    : totalBytes(0),
+    totalFiles(0)
+{
+}
 
 class ShareQueueModelPrivate
 {
@@ -566,11 +589,14 @@ void ShareQueueModel::queue(QXmppShareItem *shareItem, const QString &filter)
 
     ShareQueueItem *item = new ShareQueueItem;
     copy(&item->shareItem, shareItem);
-    addItem(item, rootItem);
 
     if (shareItem->type() == QXmppShareItem::CollectionItem) {
         item->requestId = d->manager->search(shareItem->locations().first(), 0, filter);
+    } else {
+        item->totalBytes = item->shareItem.fileSize();
+        item->totalFiles = 1;
     }
+    addItem(item, rootItem);
 }
 
 QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
@@ -597,7 +623,7 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
             return shareItem->locations().first().node();
     }
     else if (role == SizeRole)
-        return shareItem->fileSize();
+        return item->totalBytes;
     return QVariant();
 }
 
@@ -624,12 +650,15 @@ void ShareQueueModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
     foreach (ChatModelItem *ptr, rootItem->children) {
         ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
         if (item->requestId == shareIq.id()) {
-            qDebug("got folder resp");
             if (shareIq.type() == QXmppIq::Result) {
+                const QString oldName = item->shareItem.name();
                 QXmppShareItem *collection = (QXmppShareItem*)&shareIq.collection();
                 copy(&item->shareItem, collection);
+                item->shareItem.setName(oldName);
                 foreach (QXmppShareItem *child, collection->children())
                     item->shareItem.appendChild(*child);
+                totals(&item->shareItem, item->totalBytes, item->totalFiles);
+                emit dataChanged(createIndex(item), createIndex(item));
             } else {
                 removeItem(item);
             }

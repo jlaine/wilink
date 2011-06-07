@@ -87,12 +87,6 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onClicked: {
-                    if (model.isDir) {
-                        crumbBar.push(model);
-                    }
-                }
-
                 onEntered: highlight.state = ''
                 onExited: highlight.state = 'inactive'
             }
