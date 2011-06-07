@@ -67,7 +67,6 @@
 #include "chat_client.h"
 #include "chat_history.h"
 #include "chat_plugin.h"
-#include "chat_status.h"
 #include "chat_utils.h"
 #include "idle/idle.h"
 #include "plugins/console.h"
@@ -165,13 +164,6 @@ Chat::Chat(QWidget *parent)
     logger->setLoggingType(QXmppLogger::SignalLogging);
     d->client->setLogger(logger);
 
-    // create gui
-    QWidget *centralWidget = new QWidget;
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(0);
-    layout->setSpacing(0);
-    centralWidget->setLayout(layout);
-
     // create declarative view
     d->rosterView = new QDeclarativeView;
     d->rosterView->setMinimumWidth(240);
@@ -189,9 +181,7 @@ Chat::Chat(QWidget *parent)
     context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
-    layout->addWidget(d->rosterView);
-    layout->addWidget(new ChatStatus(d->client));
-    setCentralWidget(centralWidget);
+    setCentralWidget(d->rosterView);
 
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
