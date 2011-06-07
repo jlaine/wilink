@@ -89,6 +89,7 @@
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
+    <file>ShareQueueView.qml</file>
     <file>ShareView.qml</file>
     <file>StatusBar.qml</file>
     <file>StatusPill.qml</file>

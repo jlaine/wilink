@@ -169,21 +169,18 @@ Panel {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: queueView.top
         text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
         z: 1
     }
 
-/*
-    ShareView {
-        id: footer
+    ShareQueueView {
+        id: queueView
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: model.count * 30
-        model: ShareModel {}
-        z: 1
+        height: 120
+        model: view.model.queue
     }
-*/
 }

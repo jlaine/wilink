@@ -97,13 +97,6 @@ Item {
                     }
                 }
 
-                onDoubleClicked: {
-                    if (model.isDir) {
-                    } else {
-                        view.model.queue.addFile(model.jid, model.node);
-                    }
-                }
-
                 onEntered: {
                     parent.state = 'hovered'
                 }

@@ -576,6 +576,8 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
                             this, SLOT(transferStarted(QXmppTransferJob*)));
             Q_ASSERT(check);
 #endif
+
+            d->queueModel->setManager(shareManager);
         }
 
         emit shareServerChanged(d->shareServer);
@@ -647,6 +649,12 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
     }
 }
 
+class ShareQueueItem : public ChatModelItem
+{
+public:
+    QXmppShareItem shareItem;
+};
+
 class ShareQueueModelPrivate
 {
 public:
@@ -665,8 +673,23 @@ ShareQueueModel::~ShareQueueModel()
     delete d;
 }
 
+void ShareQueueModel::addFile(const QString &jid, const QString &node)
+{
+    ShareQueueItem *item = new ShareQueueItem;
+    item->shareItem.setLocations(QXmppShareLocation(jid, node));
+    item->shareItem.setType(QXmppShareItem::FileItem);
+    addItem(item, rootItem);
+}
+
 QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
 {
+    ShareQueueItem *item = static_cast<ShareQueueItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == ChatModel::NameRole) {
+        return item->shareItem.name();
+    }
     return QVariant();
 }
 

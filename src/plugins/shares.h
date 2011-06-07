@@ -181,8 +181,10 @@ public:
     ~ShareQueueModel();
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-
     void setManager(QXmppShareExtension *manager);
+
+public slots:
+    void addFile(const QString &jid, const QString &node);
 
 private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
