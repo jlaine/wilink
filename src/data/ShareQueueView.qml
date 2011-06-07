@@ -64,14 +64,26 @@ Item {
                 source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
             }
 
-            Text {
-                id: text
+            Item {
+                id: main
 
                 anchors.left: thumbnail.right
                 anchors.right: sizeText.left
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 anchors.margins: 4
-                text: model.name
+
+                ProgressBar {
+                    anchors.fill: parent
+                    maximumValue: model.totalBytes
+                    value: model.doneBytes
+                    visible: model.doneBytes > 0
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: model.name
+                }
             }
 
             Text {

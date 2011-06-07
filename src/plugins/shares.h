@@ -112,6 +112,8 @@ public:
     enum Role {
         IsDirRole = ChatModel::UserRole,
         NodeRole,
+        DoneBytesRole,
+        DoneFilesRole,
         TotalBytesRole,
         TotalFilesRole,
     };

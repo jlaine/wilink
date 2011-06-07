@@ -547,12 +547,17 @@ public:
 
     QString requestId;
     QXmppShareItem shareItem;
+
+    qint64 doneBytes;
+    qint64 doneFiles;
     qint64 totalBytes;
     qint64 totalFiles;
 };
 
 ShareQueueItem::ShareQueueItem()
-    : totalBytes(0),
+    : doneBytes(0),
+    doneFiles(0),
+    totalBytes(0),
     totalFiles(0)
 {
 }
@@ -573,6 +578,8 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
     QHash<int, QByteArray> names = roleNames();
     names.insert(IsDirRole, "isDir");
     names.insert(NodeRole, "node");
+    names.insert(DoneBytesRole, "doneBytes");
+    names.insert(DoneFilesRole, "doneFiles");
     names.insert(TotalBytesRole, "totalBytes");
     names.insert(TotalFilesRole, "totalFiles");
     setRoleNames(names);
@@ -623,6 +630,10 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
         else
             return shareItem->locations().first().node();
     }
+    else if (role == DoneBytesRole)
+        return item->doneBytes;
+    else if (role == DoneFilesRole)
+        return item->doneFiles;
     else if (role == TotalBytesRole)
         return item->totalBytes;
     else if (role == TotalFilesRole)
