@@ -73,14 +73,14 @@ Idle::~Idle()
 	delete d;
 }
 
+int Idle::idleTime() const
+{
+    return d->idleTime;
+}
+
 bool Idle::isActive() const
 {
 	return d->active;
-}
-
-bool Idle::usingPlatform() const
-{
-	return (platform ? true: false);
 }
 
 void Idle::start()
@@ -133,8 +133,8 @@ void Idle::doCheck()
 		// do nothing
 	}
 
-	// how long have we been idle?
-	int idleTime = d->startTime.secsTo(QDateTime::currentDateTime());
-
-	secondsIdle(idleTime);
+	// update idle time
+	d->idleTime = d->startTime.secsTo(QDateTime::currentDateTime());
+	emit idleTimeChanged(d->idleTime);
 }
+

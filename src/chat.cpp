@@ -69,6 +69,7 @@
 #include "chat_plugin.h"
 #include "chat_status.h"
 #include "chat_utils.h"
+#include "idle/idle.h"
 #include "plugins/console.h"
 #include "plugins/conversations.h"
 #include "plugins/declarative.h"
@@ -132,6 +133,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<Conversation>("wiLink", 1, 2, "Conversation");
     qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
+    qmlRegisterType<Idle>("wiLink", 1, 2, "Idle");
     qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
     qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
     qmlRegisterType<PhoneCallsModel>("wiLink", 1, 2, "PhoneCallsModel");

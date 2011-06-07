@@ -19,6 +19,7 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
+import wiLink 1.2
 
 Rectangle {
     id: statusBar
@@ -36,5 +37,15 @@ Rectangle {
             ListElement { name: 'Offline'; status: QXmppPresence.Offline }
         }
         width: 200
+    }
+
+    Idle {
+        id: idle
+
+        Component.onCompleted: idle.start()
+
+        onIdleTimeChanged: {
+            // TODO
+        }
     }
 }

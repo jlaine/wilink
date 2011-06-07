@@ -51,7 +51,7 @@ ChatStatus::ChatStatus(QXmppClient *client)
 
     /* set up idle monitor */
     m_idle = new Idle;
-    check = connect(m_idle, SIGNAL(secondsIdle(int)),
+    check = connect(m_idle, SIGNAL(idleTimeChanged(int)),
                     this, SLOT(secondsIdle(int)));
     Q_ASSERT(check);
     m_idle->start();
