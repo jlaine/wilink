@@ -41,6 +41,15 @@
 static QXmppShareDatabase *globalDatabase = 0;
 static int globalDatabaseRefs = 0;
 
+static void copy(QXmppShareItem *oldChild, QXmppShareItem *newChild)
+{
+    oldChild->setFileHash(newChild->fileHash());
+    oldChild->setFileSize(newChild->fileSize());
+    oldChild->setLocations(newChild->locations());
+    oldChild->setName(newChild->name());
+    oldChild->setType(newChild->type());
+}
+
 static QXmppShareDatabase *refDatabase()
 {
     if (!globalDatabase)
@@ -288,6 +297,15 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+void ShareModel::download(int row)
+{
+    if (row < 0 || row > rootItem->size() - 1)
+        return;
+
+    QXmppShareItem *item = rootItem->child(row);
+    d->queueModel->queue(item);
+}
+
 QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
@@ -469,13 +487,7 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
         QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
 
         // update own data
-        rootItem->setFileHash(newItem->fileHash());
-        rootItem->setFileSize(newItem->fileSize());
-        rootItem->setLocations(newItem->locations());
-        // root collections have empty names
-        if (!newItem->name().isEmpty())
-            rootItem->setName(newItem->name());
-        rootItem->setType(newItem->type());
+        copy(rootItem, newItem);
 
         // update children
         QList<QXmppShareItem*> removed = rootItem->children();
@@ -494,11 +506,7 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
                 }
 
                 // update data
-                oldChild->setFileHash(newChild->fileHash());
-                oldChild->setFileSize(newChild->fileSize());
-                oldChild->setLocations(newChild->locations());
-                oldChild->setName(newChild->name());
-                oldChild->setType(newChild->type());
+                copy(oldChild, newChild);
                 emit dataChanged(createIndex(oldChild), createIndex(oldChild));
 
                 removed.removeAll(oldChild);
@@ -550,11 +558,10 @@ ShareQueueModel::~ShareQueueModel()
     delete d;
 }
 
-void ShareQueueModel::addFile(const QString &jid, const QString &node)
+void ShareQueueModel::queue(QXmppShareItem *shareItem)
 {
     ShareQueueItem *item = new ShareQueueItem;
-    item->shareItem.setLocations(QXmppShareLocation(jid, node));
-    item->shareItem.setType(QXmppShareItem::FileItem);
+    copy(&item->shareItem, shareItem);
     addItem(item, rootItem);
 }
 

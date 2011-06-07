@@ -94,10 +94,7 @@ Item {
                 }
 
                 onDoubleClicked: {
-                    if (model.isDir) {
-                    } else {
-                        view.model.queue.addFile(model.jid, model.node);
-                    }
+                    view.model.download(model.index);
                 }
 
                 onEntered: highlight.state = ''

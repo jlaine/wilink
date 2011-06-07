@@ -86,6 +86,7 @@ signals:
     void shareServerChanged(const QString &shareServer);
 
 public slots:
+    void download(int row);
     void refresh();
 
 private slots:
@@ -117,11 +118,9 @@ public:
     ShareQueueModel(QObject *parent = 0);
     ~ShareQueueModel();
 
+    void queue(QXmppShareItem *item);
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     void setManager(QXmppShareExtension *manager);
-
-public slots:
-    void addFile(const QString &jid, const QString &node);
 
 private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
