@@ -31,29 +31,6 @@ class ShareModelPrivate;
 class ShareQueueModel;
 class ShareQueueModelPrivate;
 
-enum SharesColumns
-{
-    NameColumn,
-    ProgressColumn,
-    SizeColumn,
-    MaxColumn,
-};
-
-enum SharesDataRoles {
-    IsDirRole = QXmppShareItem::MaxRole,
-    JidRole,
-    NameRole,
-    NodeRole,
-    PacketId,
-    ProgressRole,
-    SizeRole,
-    TransferDone,
-    TransferPath,
-    TransferTotal,
-    TransferError,
-    UpdateTime,
-};
-
 class ShareModelQuery
 {
 public:
@@ -110,6 +87,14 @@ public:
         PostRecurse,
     };
 
+    enum Role {
+        IsDirRole = QXmppShareItem::MaxRole,
+        JidRole,
+        NameRole,
+        NodeRole,
+        SizeRole,
+    };
+
     class QueryOptions
     {
     public:
@@ -159,13 +144,15 @@ private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
 
 private:
-    QXmppShareItem *addItem(const QXmppShareItem &item);
     void clear();
     QModelIndex createIndex(QXmppShareItem *item, int column = 0) const;
+/*
+    QXmppShareItem *addItem(const QXmppShareItem &item);
     QList<QXmppShareItem*> filter(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
     void removeItem(QXmppShareItem *item);
     QXmppShareItem *get(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
     QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
+*/
 
     QXmppShareItem *rootItem;
     ShareModelPrivate *d;
@@ -177,6 +164,12 @@ class ShareQueueModel : public ChatModel
     Q_OBJECT
 
 public:
+    enum Role {
+        IsDirRole = ChatModel::UserRole,
+        NodeRole,
+        SizeRole,
+    };
+
     ShareQueueModel(QObject *parent = 0);
     ~ShareQueueModel();
 

@@ -78,18 +78,6 @@ static void unrefDatabase()
     }
 }
 
-/** Update collection timestamps.
- */
-static void updateTime(QXmppShareItem *oldItem, const QDateTime &stamp)
-{
-    if (oldItem->type() == QXmppShareItem::CollectionItem && oldItem->size() > 0)
-    {
-        oldItem->setData(UpdateTime, QDateTime::currentDateTime());
-        for (int i = 0; i < oldItem->size(); i++)
-            updateTime(oldItem->child(i), stamp);
-    }
-}
-
 class ShareModelPrivate
 {
 public:
@@ -185,14 +173,6 @@ ShareModel::~ShareModel()
 {
     delete rootItem;
     delete d;
-}
-
-QXmppShareItem *ShareModel::addItem(const QXmppShareItem &item)
-{
-   beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
-   QXmppShareItem *child = rootItem->appendChild(item);
-   endInsertRows();
-   return child;
 }
 
 ChatClient *ShareModel::client() const
@@ -305,25 +285,16 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
     }
     else if (role == SizeRole)
         return item->fileSize();
-    else if (role == ProgressRole) {
-        const QString localPath = item->data(TransferPath).toString();
-        qint64 done = item->data(TransferDone).toLongLong();
-        if (!localPath.isEmpty())
-            return tr("Downloaded");
-        else if (item->data(TransferError).toInt())
-            return tr("Failed");
-        else if (done > 0)
-        {
-            qint64 total = index.data(TransferTotal).toLongLong();
-            int progress = total ? ((done * 100) / total) : 0;
-            return QString::number(progress) + "%";
-        }
-        else if (!item->data(PacketId).toString().isEmpty())
-            return tr("Requested");
-        else
-            return tr("Queued");
-    }
-    return item->data(role);
+    return QVariant();
+}
+
+#if 0
+QXmppShareItem *ShareModel::addItem(const QXmppShareItem &item)
+{
+   beginInsertRows(QModelIndex(), rootItem->size(), rootItem->size());
+   QXmppShareItem *child = rootItem->appendChild(item);
+   endInsertRows();
+   return child;
 }
 
 QList<QXmppShareItem *> ShareModel::filter(const ShareModelQuery &query, const ShareModel::QueryOptions &options, QXmppShareItem *parent, int limit)
@@ -378,45 +349,6 @@ QXmppShareItem *ShareModel::get(const ShareModelQuery &query, const ShareModel::
     return 0;
 }
 
-QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    QXmppShareItem *parentItem;
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
-
-    QXmppShareItem *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(childItem);
-    else
-        return QModelIndex();
-}
-
-QModelIndex ShareModel::parent(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
-
-    QXmppShareItem *childItem = static_cast<QXmppShareItem*>(index.internalPointer());
-    QXmppShareItem *parentItem = childItem->parent();
-
-    return createIndex(parentItem);
-}
-
-void ShareModel::refresh()
-{
-    QXmppShareExtension *shareManager = d->shareManager();
-    if (!shareManager || d->rootJid.isEmpty())
-        return;
-
-    // browse files
-    shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
-}
-
 void ShareModel::removeItem(QXmppShareItem *item)
 {
     if (!item || item == rootItem)
@@ -426,16 +358,6 @@ void ShareModel::removeItem(QXmppShareItem *item)
     beginRemoveRows(createIndex(parentItem), item->row(), item->row());
     parentItem->removeChild(item);
     endRemoveRows();
-}
-
-int ShareModel::rowCount(const QModelIndex &parent) const
-{
-    QXmppShareItem *parentItem;
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
-    return parentItem->size();
 }
 
 QModelIndex ShareModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem)
@@ -475,9 +397,6 @@ QModelIndex ShareModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newI
         return oldIndex;
     }
 
-    // update own timestamp
-    oldItem->setData(UpdateTime, stamp);
-
     // update existing children
     QList<QXmppShareItem*> removed = oldItem->children();
     for (int newRow = 0; newRow < newItem->size(); newRow++)
@@ -500,7 +419,6 @@ QModelIndex ShareModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newI
             // insert new child
             beginInsertRows(oldIndex, newRow, newRow);
             QXmppShareItem *item = oldItem->insertChild(newRow, *newChild);
-            updateTime(item, stamp);
             endInsertRows();
         }
     }
@@ -514,6 +432,56 @@ QModelIndex ShareModel::updateItem(QXmppShareItem *oldItem, QXmppShareItem *newI
     }
 
     return oldIndex;
+}
+#endif
+
+QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    QXmppShareItem *parentItem;
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
+
+    QXmppShareItem *childItem = parentItem->child(row);
+    if (childItem)
+        return createIndex(childItem);
+    else
+        return QModelIndex();
+}
+
+QModelIndex ShareModel::parent(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return QModelIndex();
+
+    QXmppShareItem *childItem = static_cast<QXmppShareItem*>(index.internalPointer());
+    QXmppShareItem *parentItem = childItem->parent();
+
+    return createIndex(parentItem);
+}
+
+void ShareModel::refresh()
+{
+    QXmppShareExtension *shareManager = d->shareManager();
+    if (!shareManager || d->rootJid.isEmpty())
+        return;
+
+    // browse files
+    shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
+}
+
+int ShareModel::rowCount(const QModelIndex &parent) const
+{
+    QXmppShareItem *parentItem;
+    if (!parent.isValid())
+        parentItem = rootItem;
+    else
+        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
+    return parentItem->size();
 }
 
 void ShareModel::_q_disconnected()
@@ -645,7 +613,56 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
     {
         removeRows(0, rootItem->size());
     } else {
-        updateItem(rootItem, (QXmppShareItem*)&shareIq.collection());
+        QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
+
+        // update own data
+        rootItem->setFileHash(newItem->fileHash());
+        rootItem->setFileSize(newItem->fileSize());
+        rootItem->setLocations(newItem->locations());
+        // root collections have empty names
+        if (!newItem->name().isEmpty())
+            rootItem->setName(newItem->name());
+        rootItem->setType(newItem->type());
+
+        // update children
+        QList<QXmppShareItem*> removed = rootItem->children();
+        for (int newRow = 0; newRow < newItem->size(); newRow++) {
+            QXmppShareItem *newChild = newItem->child(newRow);
+            QXmppShareItem *oldChild = 0; //get(Q_FIND_LOCATIONS(newChild->locations()), QueryOptions(DontRecurse), rootItem);
+            if (oldChild)
+            {
+                // update existing child
+                const int oldRow = oldChild->row();
+                if (oldRow != newRow)
+                {
+                    beginMoveRows(QModelIndex(), oldRow, oldRow, QModelIndex(), newRow);
+                    rootItem->moveChild(oldRow, newRow);
+                    endMoveRows();
+                }
+
+                // update data
+                oldChild->setFileHash(newChild->fileHash());
+                oldChild->setFileSize(newChild->fileSize());
+                oldChild->setLocations(newChild->locations());
+                oldChild->setName(newChild->name());
+                oldChild->setType(newChild->type());
+                emit dataChanged(createIndex(oldChild), createIndex(oldChild));
+
+                removed.removeAll(oldChild);
+            } else {
+                // insert new child
+                beginInsertRows(QModelIndex(), newRow, newRow);
+                rootItem->insertChild(newRow, *newChild);
+                endInsertRows();
+            }
+        }
+
+        // remove old children
+        foreach (QXmppShareItem *oldChild, removed) {
+            beginRemoveRows(QModelIndex(), oldChild->row(), oldChild->row());
+            rootItem->removeChild(oldChild);
+            endRemoveRows();
+        }
     }
 }
 
@@ -666,6 +683,13 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
 {
     d = new ShareQueueModelPrivate;
     d->manager = 0;
+
+    // set role names
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(IsDirRole, "isDir");
+    names.insert(NodeRole, "node");
+    names.insert(SizeRole, "size");
+    setRoleNames(names);
 }
 
 ShareQueueModel::~ShareQueueModel()
@@ -687,9 +711,25 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == ChatModel::NameRole) {
-        return item->shareItem.name();
+    const QXmppShareItem *shareItem = &item->shareItem;
+    if (role == IsDirRole)
+        return shareItem->type() == QXmppShareItem::CollectionItem;
+    else if (role == JidRole) {
+        if (shareItem->locations().isEmpty())
+            return QString();
+        else
+            return shareItem->locations().first().jid();
     }
+    else if (role == NameRole)
+        return shareItem->name();
+    else if (role == NodeRole) {
+        if (shareItem->locations().isEmpty())
+            return QString();
+        else
+            return shareItem->locations().first().node();
+    }
+    else if (role == SizeRole)
+        return shareItem->fileSize();
     return QVariant();
 }
 

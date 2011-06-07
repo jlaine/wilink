@@ -596,25 +596,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ShareModel</name>
-    <message>
-        <source>Downloaded</source>
-        <translation>Téléchargé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation>Echoué</translation>
-    </message>
-    <message>
-        <source>Requested</source>
-        <translation>Demandé</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation>En attente</translation>
-    </message>
-</context>
-<context>
     <name>ShareOptions</name>
     <message>
         <source>Shared folders</source>
