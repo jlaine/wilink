@@ -41,11 +41,24 @@ Item {
         }
     }
 
+    Rectangle {
+        id: background
+
+        anchors.fill:  parent
+        border.width: 1
+        border.color: '#e1eafa'
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: '#e1eafa' }
+            GradientStop { position: 1.0; color: '#00e1eafa' }
+        }
+    }
+
     Row {
         id: row
         anchors.left: parent.left
         anchors.top:  parent.top
         anchors.bottom:  parent.bottom
+        anchors.margins: 4
         spacing: 4
 
         Repeater {
@@ -61,6 +74,7 @@ Item {
                 width: name.width + separator.width
 
                 Rectangle {
+                    color: 'transparent'
                     height: row.height
                     width: name.width
 
