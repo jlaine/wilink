@@ -49,7 +49,7 @@ Item {
                 id: highlight
 
                 anchors.fill: parent
-                opacity: 0
+                state: 'inactive'
             }
 
             Column {
@@ -102,17 +102,8 @@ Item {
                         menu.show(mousePress.x, mousePress.y);
                     }
                 }
-                onEntered: {
-                    parent.state = 'hovered'
-                }
-                onExited: {
-                    parent.state = ''
-                }
-            }
-
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: highlight; opacity: 0.5 }
+                onEntered: highlight.state = ''
+                onExited: highlight.state = 'inactive'
             }
         }
     }

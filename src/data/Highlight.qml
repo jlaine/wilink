@@ -20,6 +20,8 @@
 import QtQuick 1.0
 
 Rectangle {
+    id: highlight
+
     border.color: '#ffb0c4de'
     border.width: 1
     gradient: Gradient {
@@ -29,5 +31,14 @@ Rectangle {
     }
     radius: 5
     smooth: true
+
+    states: State {
+        name: 'inactive'
+        PropertyChanges { target: highlight; opacity: 0 }
+    }
+
+    transitions: Transition {
+        PropertyAnimation { target: highlight; properties: 'opacity'; duration: 150 }
+    }
 }
 

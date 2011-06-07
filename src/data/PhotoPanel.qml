@@ -157,7 +157,7 @@ Panel {
                 id: highlight
 
                 anchors.fill: parent
-                opacity: 0
+                state: 'inactive'
             }
 
             Column {
@@ -187,21 +187,10 @@ Panel {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onClicked: {
-                    crumbBar.push(model);
-                }
 
-                onEntered: {
-                    parent.state = 'hovered'
-                }
-                onExited: {
-                    parent.state = ''
-                }
-            }
-
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: highlight; opacity: 0.5 }
+                onClicked: crumbBar.push(model)
+                onEntered: highlight.state = ''
+                onExited: highlight.state = 'inactive'
             }
         }
     }
