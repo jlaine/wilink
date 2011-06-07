@@ -23,10 +23,10 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    property alias url: photoModel.rootUrl
+    property variant url
 
-    ListModel {
-        id: crumbs
+    onUrlChanged: {
+        crumbBar.push({'name': qsTr('Home'), 'isDir': true, 'url': panel.url});
     }
 
     PanelHeader {
@@ -46,22 +46,17 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                enabled: crumbs.count > 0
+                enabled: crumbBar.model.count > 1
                 iconSource: 'back.png'
                 text: qsTr('Go back')
 
-                onClicked: {
-                    var crumb = crumbs.get(crumbs.count - 1);
-                    view.model.rootUrl = crumb.url;
-                    image.source = '';
-                    crumbs.remove(crumbs.count - 1);
-                }
+                onClicked: crumbBar.pop()
             }
 
             ToolButton {
                 iconSource: 'upload.png'
                 text: qsTr('Upload')
-                enabled: crumbs.count > 0
+                enabled: crumbBar.model.count > 1
 
                 onClicked: {
                     var dialog = window.fileDialog();
@@ -84,7 +79,7 @@ Panel {
             ToolButton {
                 iconSource: 'add.png'
                 text: qsTr('Create an album')
-                enabled: crumbs.count == 0
+                enabled: crumbBar.model.count == 1
 
                 onClicked: {
                     dialog.source = 'InputDialog.qml';
@@ -125,6 +120,15 @@ Panel {
         anchors.top: help.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+
+        onLocationChanged: {
+            if (location.isDir) {
+                photoModel.rootUrl = location.url;
+                image.source = '';
+            } else {
+                image.source = location.avatar
+            }
+        }
     }
 
     GridView {
@@ -185,12 +189,7 @@ Panel {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    crumbs.append({'url': view.model.rootUrl})
-                    if (model.isDir) {
-                        view.model.rootUrl = model.url;
-                    } else {
-                        image.source = model.avatar
-                    }
+                    crumbBar.push(model);
                 }
 
                 onEntered: {
