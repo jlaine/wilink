@@ -231,32 +231,6 @@
     </message>
 </context>
 <context>
-    <name>ChatSearchBar</name>
-    <message>
-        <source>Match case</source>
-        <translation>Sensible à la casse</translation>
-    </message>
-</context>
-<context>
-    <name>ChatStatus</name>
-    <message>
-        <source>Available</source>
-        <translation>Disponible</translation>
-    </message>
-    <message>
-        <source>Busy</source>
-        <translation>Occupé</translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation>Absent</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Déconnecté</translation>
-    </message>
-</context>
-<context>
     <name>ConversationPanel</name>
     <message>
         <source>Close</source>
@@ -683,15 +657,15 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation>Télécharger</translation>
+        <translation type="obsolete">Télécharger</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation>Retirer</translation>
+        <translation type="obsolete">Retirer</translation>
     </message>
     <message>
         <source>downloads folder</source>
-        <translation>dossier de téléchargement</translation>
+        <translation type="obsolete">dossier de téléchargement</translation>
     </message>
     <message>
         <source>You can select the folders you want to share with other users from the shares options.</source>
@@ -699,31 +673,31 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
-        <translation>Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
+        <translation type="obsolete">Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
     </message>
     <message>
         <source>Downloaded</source>
-        <translation>Téléchargé</translation>
+        <translation type="obsolete">Téléchargé</translation>
     </message>
     <message>
         <source>Failed</source>
-        <translation>Echoué</translation>
+        <translation type="obsolete">Echoué</translation>
     </message>
     <message>
         <source>Transfer</source>
-        <translation>Transfert</translation>
+        <translation type="obsolete">Transfert</translation>
     </message>
     <message>
         <source>Indexed %1 files in %2s</source>
-        <translation>%1 fichiers indexés en %2s</translation>
+        <translation type="obsolete">%1 fichiers indexés en %2s</translation>
     </message>
     <message>
         <source>Indexing files</source>
-        <translation>Indexation des fichiers</translation>
+        <translation type="obsolete">Indexation des fichiers</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation>En attente</translation>
+        <translation type="obsolete">En attente</translation>
     </message>
     <message>
         <source>Options</source>
@@ -787,6 +761,25 @@ Acceptez-vous?</translation>
     <message>
         <source>Outgoing message</source>
         <translation>Message envoyé</translation>
+    </message>
+</context>
+<context>
+    <name>StatusBar</name>
+    <message>
+        <source>Available</source>
+        <translation>Disponible</translation>
+    </message>
+    <message>
+        <source>Away</source>
+        <translation>Absent</translation>
+    </message>
+    <message>
+        <source>Busy</source>
+        <translation>Occupé</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation>Déconnecté</translation>
     </message>
 </context>
 <context>

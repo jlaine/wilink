@@ -50,10 +50,10 @@ Rectangle {
         currentIndex: 3
 
         model: ListModel {
-            ListElement { name: 'Available'; status: QXmppPresence.Online }
-            ListElement { name: 'Away'; status: QXmppPresence.Away }
-            ListElement { name: 'Busy'; status: QXmppPresence.DND }
-            ListElement { name: 'Offline'; status: QXmppPresence.Offline }
+            ListElement { name: qsTr('Available'); status: QXmppPresence.Online }
+            ListElement { name: qsTr('Away'); status: QXmppPresence.Away }
+            ListElement { name: qsTr('Busy'); status: QXmppPresence.DND }
+            ListElement { name: qsTr('Offline'); status: QXmppPresence.Offline }
         }
         width: 200
     }
