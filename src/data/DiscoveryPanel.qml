@@ -43,7 +43,7 @@ Panel {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')
-                enabled: crumbBar.model.count > 0
+                enabled: crumbBar.model.count > 1
 
                 onClicked: crumbBar.pop()
             }

@@ -26,7 +26,9 @@ Panel {
     property variant url
 
     onUrlChanged: {
-        crumbBar.push({'name': qsTr('Home'), 'isDir': true, 'url': panel.url});
+        if (!crumbBar.model.count) {
+            crumbBar.push({'name': qsTr('Home'), 'isDir': true, 'url': url});
+        }
     }
 
     PanelHeader {
