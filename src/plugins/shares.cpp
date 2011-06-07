@@ -104,6 +104,7 @@ public:
     ChatClient *shareClient;
     QString shareServer;
     QTimer *timer;
+    ShareQueueModel *queueModel;
 
 private:
     ShareModel *q;
@@ -114,6 +115,7 @@ ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
       shareClient(0),
       q(qq)
 {
+    queueModel = new ShareQueueModel(q);
 }
 
 void ShareModelPrivate::setShareClient(ChatClient *newClient)
@@ -219,6 +221,11 @@ void ShareModel::setFilter(const QString &filter)
         d->timer->start();
         emit filterChanged(d->filter);
     }
+}
+
+ShareQueueModel* ShareModel::queue() const
+{
+    return d->queueModel;
 }
 
 QString ShareModel::rootJid() const
@@ -640,6 +647,48 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
     }
 }
 
+class ShareQueueModelPrivate
+{
+public:
+    QXmppShareExtension *manager;
+};
+
+ShareQueueModel::ShareQueueModel(QObject *parent)
+    : ChatModel(parent)
+{
+    d = new ShareQueueModelPrivate;
+    d->manager = 0;
+}
+
+ShareQueueModel::~ShareQueueModel()
+{
+    delete d;
+}
+
+QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
+{
+    return QVariant();
+}
+
+void ShareQueueModel::setManager(QXmppShareExtension *manager)
+{
+    if (manager != d->manager) {
+        d->manager = manager;
+        if (d->manager) {
+            bool check;
+
+            check = connect(d->manager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
+                            this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
+            Q_ASSERT(check);
+        }
+    }
+}
+
+void ShareQueueModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
+{
+
+}
+
 ShareModelQuery::ShareModelQuery()
     :  m_role(0), m_operation(None), m_combine(NoCombine)
 {
@@ -702,5 +751,4 @@ ShareModel::QueryOptions::QueryOptions(Recurse recurse_)
     : recurse(recurse_)
 {
 }
-
 
