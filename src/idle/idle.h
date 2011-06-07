@@ -28,17 +28,21 @@ class IdlePlatform;
 class Idle : public QObject
 {
 	Q_OBJECT
+    Q_PROPERTY(int idleTime READ idleTime NOTIFY idleTimeChanged)
+
 public:
 	Idle();
 	~Idle();
 
+    int idleTime() const;
 	bool isActive() const;
-	bool usingPlatform() const;
-	void start();
-	void stop();
 
 signals:
-	void secondsIdle(int);
+	void idleTimeChanged(int idleTime);
+
+public slots:
+	void start();
+	void stop();
 
 private slots:
 	void doCheck();
