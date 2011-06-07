@@ -453,6 +453,10 @@ Acceptez-vous?</translation>
         <source>Upload</source>
         <translation>Envoyer</translation>
     </message>
+    <message>
+        <source>Home</source>
+        <translation>Accueil</translation>
+    </message>
 </context>
 <context>
     <name>PluginOptions</name>
