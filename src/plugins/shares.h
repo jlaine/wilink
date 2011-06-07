@@ -31,41 +31,6 @@ class ShareModelPrivate;
 class ShareQueueModel;
 class ShareQueueModelPrivate;
 
-class ShareModelQuery
-{
-public:
-    enum Operation
-    {
-        None,
-        Equals,
-        NotEquals,
-        // Contains,
-    };
-
-    ShareModelQuery();
-    ShareModelQuery(int role, ShareModelQuery::Operation operation, QVariant data);
-
-    bool match(QXmppShareItem *item) const;
-
-    ShareModelQuery operator&&(const ShareModelQuery &other) const;
-    ShareModelQuery operator||(const ShareModelQuery &other) const;
-
-private:
-    enum Combine
-    {
-        NoCombine,
-        AndCombine,
-        OrCombine,
-    };
-
-    int m_role;
-    ShareModelQuery::Operation m_operation;
-    QVariant m_data;
-
-    QList<ShareModelQuery> m_children;
-    ShareModelQuery::Combine m_combine;
-};
-
 /** Model representing a tree of share items (collections and files).
  */
 class ShareModel : public QAbstractItemModel
@@ -80,26 +45,12 @@ class ShareModel : public QAbstractItemModel
     Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
 
 public:
-    enum Recurse
-    {
-        DontRecurse,
-        PreRecurse,
-        PostRecurse,
-    };
-
     enum Role {
         IsDirRole = QXmppShareItem::MaxRole,
         JidRole,
         NameRole,
         NodeRole,
         SizeRole,
-    };
-
-    class QueryOptions
-    {
-    public:
-        QueryOptions(Recurse recurse = PreRecurse);
-        Recurse recurse;
     };
 
     ShareModel(QObject *parent = 0);
@@ -146,13 +97,6 @@ private slots:
 private:
     void clear();
     QModelIndex createIndex(QXmppShareItem *item, int column = 0) const;
-/*
-    QXmppShareItem *addItem(const QXmppShareItem &item);
-    QList<QXmppShareItem*> filter(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
-    void removeItem(QXmppShareItem *item);
-    QXmppShareItem *get(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
-    QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
-*/
 
     QXmppShareItem *rootItem;
     ShareModelPrivate *d;
