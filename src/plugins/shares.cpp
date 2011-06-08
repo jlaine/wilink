@@ -818,6 +818,8 @@ void ShareQueueModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
                     item->shareItem.appendChild(*child);
                 totals(&item->shareItem, item->totalBytes, item->totalFiles);
                 emit dataChanged(createIndex(item), createIndex(item));
+
+                d->process();
             } else {
                 removeItem(item);
             }
