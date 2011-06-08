@@ -82,7 +82,7 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    text: model.name + (model.speed > 0 ? ' ' + Utils.formatSpeed(model.speed) : '')
+                    text: model.name + (model.speed > 0 ? ' - ' + Utils.formatSpeed(model.speed) : '')
                 }
             }
 
