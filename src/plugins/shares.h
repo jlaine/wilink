@@ -46,7 +46,7 @@ class ShareModel : public QAbstractItemModel
 
 public:
     enum Role {
-        IsDirRole = QXmppShareItem::MaxRole,
+        IsDirRole = ChatModel::UserRole,
         JidRole,
         NameRole,
         NodeRole,
