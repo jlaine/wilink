@@ -72,6 +72,13 @@ Item {
                     height: 24
                     smooth: true
                     source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+
+                    Text {
+                        anchors.centerIn: parent
+                        color: '#444444'
+                        font.pixelSize: 10
+                        text: model.popularity > 0 ? model.popularity : ''
+                    }
                 }
 
                 Text {
@@ -114,8 +121,8 @@ Item {
                 anchors.rightMargin: 4
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                enabled: model.canDownload
                 iconSource: 'download.png'
+                visible: model.canDownload
 
                 onClicked: {
                     view.model.download(model.index);
