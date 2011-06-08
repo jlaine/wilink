@@ -24,7 +24,7 @@
 #include "QDjango.h"
 #include "QXmppClient.h"
 #include "QXmppPresence.h"
-#include "QXmppShareExtension.h"
+#include "QXmppShareManager.h"
 #include "QXmppShareDatabase.h"
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
@@ -105,7 +105,7 @@ public:
     ShareModelPrivate(ShareModel *qq);
     bool canDownload(const QXmppShareItem *item) const;
     void setShareClient(ChatClient *shareClient);
-    QXmppShareExtension *shareManager();
+    QXmppShareManager *shareManager();
 
     ChatClient *client;
     QString filter;
@@ -176,10 +176,10 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
     }
 }
 
-QXmppShareExtension *ShareModelPrivate::shareManager()
+QXmppShareManager *ShareModelPrivate::shareManager()
 {
     if (shareClient)
-        return shareClient->findExtension<QXmppShareExtension>();
+        return shareClient->findExtension<QXmppShareManager>();
     else
         return 0;
 }
@@ -374,7 +374,7 @@ QModelIndex ShareModel::parent(const QModelIndex &index) const
 
 void ShareModel::refresh()
 {
-    QXmppShareExtension *shareManager = d->shareManager();
+    QXmppShareManager *shareManager = d->shareManager();
     if (!shareManager || d->rootJid.isEmpty())
         return;
 
@@ -428,19 +428,18 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         }
 
         // add share manager
-        QXmppShareExtension *shareManager = d->shareClient->findExtension<QXmppShareExtension>();
+        QXmppShareManager *shareManager = d->shareClient->findExtension<QXmppShareManager>();
         if (!shareManager) {
             bool check;
 
-            shareManager = new QXmppShareExtension(d->shareClient, refDatabase());
+            shareManager = new QXmppShareManager(d->shareClient, refDatabase());
             d->shareClient->addExtension(shareManager);
 
             check = connect(shareManager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
             Q_ASSERT(check);
-
-            d->queueModel->setManager(shareManager);
         }
+        d->queueModel->setManager(shareManager);
 
         emit shareServerChanged(d->shareServer);
     }
@@ -602,7 +601,7 @@ public:
     void process();
     qint64 transfers() const;
 
-    QXmppShareExtension *manager;
+    QXmppShareManager *manager;
     QTimer *timer;
 
 private:
@@ -628,6 +627,8 @@ qint64 ShareQueueModelPrivate::transfers() const
 
 void ShareQueueModelPrivate::process()
 {
+    Q_ASSERT(manager);
+
     // check how many downloads are active
     qint64 activeDownloads = transfers();
     if (activeDownloads >= parallelDownloadLimit)
@@ -768,7 +769,7 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void ShareQueueModel::setManager(QXmppShareExtension *manager)
+void ShareQueueModel::setManager(QXmppShareManager *manager)
 {
     if (manager != d->manager) {
         d->manager = manager;

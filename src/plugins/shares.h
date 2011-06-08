@@ -26,7 +26,7 @@
 
 class ChatClient;
 class QXmppPresence;
-class QXmppShareExtension;
+class QXmppShareManager;
 class ShareModelPrivate;
 class ShareQueueModel;
 class ShareQueueModelPrivate;
@@ -127,7 +127,7 @@ public:
     void add(const QXmppShareItem &item, const QString &filter);
     bool contains(const QXmppShareItem &item) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    void setManager(QXmppShareExtension *manager);
+    void setManager(QXmppShareManager *manager);
 
 private slots:
     void _q_refresh();

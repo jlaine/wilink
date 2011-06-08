@@ -57,7 +57,7 @@ Panel {
             ToolButton {
                 iconSource: 'close.png'
                 text: qsTr('Close')
-                onClicked: panel.close()
+                onClicked: panel.hide();
             }
         }
     }
