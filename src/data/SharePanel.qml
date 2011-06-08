@@ -154,6 +154,7 @@ Panel {
 
         model: ShareModel {
             client: window.client
+            filter: searchEdit.text
 
             onShareServerChanged: {
                 if (!crumbBar.model.count) {
