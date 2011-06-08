@@ -45,61 +45,83 @@ Item {
             width: view.width - 1
             height: 24
 
-            Highlight {
-                id: highlight
+            Item {
+                id: main
 
-                anchors.fill: parent
-                state: 'inactive'
-            }
-
-            Image {
-                id: thumbnail
-
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 anchors.left: parent.left
-                anchors.margins: 4
-                width: 24
-                height: 24
-                smooth: true
-                source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+                anchors.leftMargin: 4
+                anchors.right: downloadButton.left
+                anchors.rightMargin: 4
+
+                Highlight {
+                    id: highlight
+
+                    anchors.fill: parent
+                    state: 'inactive'
+                }
+
+                Image {
+                    id: thumbnail
+
+                    anchors.left: parent.left
+                    anchors.margins: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 24
+                    height: 24
+                    smooth: true
+                    source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+                }
+
+                Text {
+                    id: text
+
+                    anchors.left: thumbnail.right
+                    anchors.right: sizeText.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.margins: 4
+                    text: model.name
+                }
+
+                Text {
+                    id: sizeText
+
+                    anchors.right: parent.right
+                    anchors.margins: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+
+                    onClicked: {
+                        if (model.isDir) {
+                            crumbBar.push(model);
+                        }
+                    }
+
+                    onEntered: highlight.state = ''
+                    onExited: highlight.state = 'inactive'
+                }
             }
 
-            Text {
-                id: text
-
-                anchors.left: thumbnail.right
-                anchors.right: sizeText.left
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 4
-                text: model.name
-            }
-
-            Text {
-                id: sizeText
-        
+            Button {
+                id: downloadButton
                 anchors.right: parent.right
-                anchors.margins: 4
-                anchors.verticalCenter: parent.verticalCenter
-                text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
+                anchors.rightMargin: 4
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                enabled: model.canDownload
+                iconSource: 'download.png'
 
                 onClicked: {
-                    if (model.isDir) {
-                        crumbBar.push(model);
-                    }
-                }
-
-                onDoubleClicked: {
                     view.model.download(model.index);
                 }
-
-                onEntered: highlight.state = ''
-                onExited: highlight.state = 'inactive'
             }
+
         }
     }
 

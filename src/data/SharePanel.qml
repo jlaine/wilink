@@ -138,7 +138,6 @@ Panel {
         anchors.top: searchBar.bottom
 
         onLocationChanged: {
-            console.log("location changed" + location);
             view.model.rootJid = location.jid;
             view.model.rootNode = location.node;
         }

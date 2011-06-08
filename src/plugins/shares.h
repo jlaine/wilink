@@ -46,7 +46,8 @@ class ShareModel : public QAbstractItemModel
 
 public:
     enum Role {
-        IsDirRole = ChatModel::UserRole,
+        CanDownloadRole = ChatModel::UserRole,
+        IsDirRole,
         JidRole,
         NameRole,
         NodeRole,
@@ -123,7 +124,8 @@ public:
     ShareQueueModel(QObject *parent = 0);
     ~ShareQueueModel();
 
-    void queue(QXmppShareItem *item, const QString &filter);
+    void add(const QXmppShareItem &item, const QString &filter);
+    bool contains(const QXmppShareItem &item) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     void setManager(QXmppShareExtension *manager);
 

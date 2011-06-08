@@ -38,7 +38,7 @@ static QXmppShareDatabase *globalDatabase = 0;
 static int globalDatabaseRefs = 0;
 static const int parallelDownloadLimit = 2;
 
-static void copy(QXmppShareItem *oldChild, QXmppShareItem *newChild)
+static void copy(QXmppShareItem *oldChild, const QXmppShareItem *newChild)
 {
     oldChild->setFileDate(newChild->fileDate());
     oldChild->setFileHash(newChild->fileHash());
@@ -103,6 +103,7 @@ class ShareModelPrivate
 {
 public:
     ShareModelPrivate(ShareModel *qq);
+    bool canDownload(const QXmppShareItem *item) const;
     void setShareClient(ChatClient *shareClient);
     QXmppShareExtension *shareManager();
 
@@ -126,6 +127,20 @@ ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
       q(qq)
 {
     queueModel = new ShareQueueModel(q);
+}
+
+bool ShareModelPrivate::canDownload(const QXmppShareItem *item) const
+{
+    if (item->locations().isEmpty())
+        return false;
+
+    // don't download from self
+    foreach (const QXmppShareLocation &location, item->locations()) {
+        if (location.jid() == shareClient->configuration().jid())
+            return false;
+    }
+
+    return !queueModel->contains(*item);
 }
 
 void ShareModelPrivate::setShareClient(ChatClient *newClient)
@@ -177,6 +192,7 @@ ShareModel::ShareModel(QObject *parent)
 
     // set role names
     QHash<int, QByteArray> roleNames;
+    roleNames.insert(CanDownloadRole, "canDownload");
     roleNames.insert(IsDirRole, "isDir");
     roleNames.insert(JidRole, "jid");
     roleNames.insert(NameRole, "name");
@@ -290,7 +306,9 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == IsDirRole)
+    if (role == CanDownloadRole)
+        return d->canDownload(item);
+    else if (role == IsDirRole)
         return item->type() == QXmppShareItem::CollectionItem;
     else if (role == JidRole) {
         if (item->locations().isEmpty())
@@ -318,14 +336,11 @@ void ShareModel::download(int row)
     if (row < 0 || row > rootItem->size() - 1)
         return;
 
-    // don't download from self
     QXmppShareItem *item = rootItem->child(row);
-    foreach (const QXmppShareLocation &location, item->locations()) {
-        if (location.jid() == d->shareClient->configuration().jid())
-            return;
+    if (d->canDownload(item)) {
+        d->queueModel->add(*item, d->filter);
+        emit dataChanged(createIndex(item), createIndex(item));
     }
-
-    d->queueModel->queue(item, d->filter);
 }
 
 QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
@@ -681,22 +696,32 @@ ShareQueueModel::~ShareQueueModel()
     delete d;
 }
 
-void ShareQueueModel::queue(QXmppShareItem *shareItem, const QString &filter)
+void ShareQueueModel::add(const QXmppShareItem &shareItem, const QString &filter)
 {
-    if (!shareItem || shareItem->locations().isEmpty() || !d->manager)
+    if (!d->manager || shareItem.locations().isEmpty())
         return;
 
     ShareQueueItem *item = new ShareQueueItem;
-    copy(&item->shareItem, shareItem);
+    copy(&item->shareItem, &shareItem);
 
-    if (shareItem->type() == QXmppShareItem::CollectionItem) {
-        item->requestId = d->manager->search(shareItem->locations().first(), 0, filter);
+    if (item->shareItem.type() == QXmppShareItem::CollectionItem) {
+        item->requestId = d->manager->search(item->shareItem.locations().first(), 0, filter);
     } else {
         item->totalBytes = item->shareItem.fileSize();
         item->totalFiles = 1;
     }
     addItem(item, rootItem);
     d->process();
+}
+
+bool ShareQueueModel::contains(const QXmppShareItem &shareItem) const
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ShareQueueItem *item  = static_cast<ShareQueueItem*>(ptr);
+        if (item->shareItem.locations() == shareItem.locations())
+            return true;
+    }
+    return false;
 }
 
 QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
