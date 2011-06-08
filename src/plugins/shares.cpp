@@ -518,9 +518,15 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
         QList<QXmppShareItem*> removed = rootItem->children();
         for (int newRow = 0; newRow < newItem->size(); newRow++) {
             QXmppShareItem *newChild = newItem->child(newRow);
-            QXmppShareItem *oldChild = 0; //get(Q_FIND_LOCATIONS(newChild->locations()), QueryOptions(DontRecurse), rootItem);
-            if (oldChild)
-            {
+            QXmppShareItem *oldChild = 0;
+            foreach (QXmppShareItem *ptr, removed) {
+                if (ptr->locations() == newChild->locations()) {
+                    oldChild = ptr;
+                    break;
+                }
+            }
+
+            if (oldChild) {
                 // update existing child
                 const int oldRow = oldChild->row();
                 if (oldRow != newRow)
