@@ -81,7 +81,10 @@ Item {
                 }
 
                 Text {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
                     text: model.name + (model.speed > 0 ? ' - ' + Utils.formatSpeed(model.speed) : '')
                 }
             }
