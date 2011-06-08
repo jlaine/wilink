@@ -95,13 +95,15 @@ Panel {
         }
 
         Rectangle {
+            id: searchRect
+
             anchors.left: searchIcon.right
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             border.color: '#c3c3c3'
-            color: '#aaffffff'
+            color: '#ffffff'
             height: 22
 
             TextEdit {
@@ -114,8 +116,8 @@ Panel {
                 focus: true
                 text: ''
 
-                Timer {
-                    id: searchTimer
+                Keys.onReturnPressed: {
+                    // prevent new line
                 }
             }
 
@@ -126,6 +128,11 @@ Panel {
                 color: '#999999'
                 opacity: searchEdit.text == '' ? 1 : 0
                 text: qsTr('Enter the name of the file you are looking for.');
+            }
+
+            states: State {
+                name: 'noresults'
+                PropertyChanges { target: searchRect; color: '#ffaaaa' }
             }
         }
     }
@@ -162,6 +169,14 @@ Panel {
                 }
             }
         }
+
+        onCountChanged: {
+            if (count == 0 && searchEdit.text.length > 0)
+                searchRect.state = 'noresults';
+            else
+                searchRect.state = '';
+        }
+
     }
 
     PanelHelp {
