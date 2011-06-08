@@ -24,28 +24,33 @@ Item {
     id: crumbBar
 
     property alias model: crumbView.model
-    property Item view
+
+    signal locationChanged(variant location)
 
     height: 24
 
-    function goBack() {
-        var crumb = crumbs.get(crumbs.count - 1);
-        view.model.rootJid = crumb.jid;
-        view.model.rootNode = crumb.node;
-        view.model.rootName = crumb.name;
-        crumbs.remove(crumbs.count - 1);
+    function push(crumb) {
+        crumbs.append(crumb);
+        crumbBar.locationChanged(crumbs.get(crumbs.count - 1));
     }
 
-    function goTo(crumb) {
-        if (view.model.rootJid == crumb.jid &&
-            view.model.rootNode == crumb.node) {
-            return;
+    function pop() {
+        if (crumbs.count > 1) {
+            crumbs.remove(crumbs.count - 1);
+            crumbBar.locationChanged(crumbs.get(crumbs.count - 1));
         }
+    }
 
-        crumbBar.model.append({'name': view.model.rootName, 'jid': view.model.rootJid, 'node': view.model.rootNode});
-        view.model.rootJid = crumb.jid;
-        view.model.rootNode = crumb.node;
-        view.model.rootName = crumb.name;
+    Rectangle {
+        id: background
+
+        anchors.fill:  parent
+        border.width: 1
+        border.color: '#e1eafa'
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: '#e1eafa' }
+            GradientStop { position: 1.0; color: '#ffffff' }
+        }
     }
 
     Row {
@@ -53,6 +58,7 @@ Item {
         anchors.left: parent.left
         anchors.top:  parent.top
         anchors.bottom:  parent.bottom
+        anchors.margins: 4
         spacing: 4
 
         Repeater {
@@ -62,13 +68,19 @@ Item {
                 id: crumbs
             }
 
-            delegate: Row {
-                spacing: 4
+            delegate: Item {
+                property bool isLast: model.index == crumbs.count - 1
 
-                width: name.width + separator.width
+                height: row.height
+                width: crumb.width + row.spacing + separator.width
 
                 Rectangle {
-                    height: row.height
+                    id: crumb
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    color: 'transparent'
                     width: name.width
 
                     Text {
@@ -84,6 +96,7 @@ Item {
                     MouseArea {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         anchors.fill: parent
+                        enabled: !isLast
                         hoverEnabled: true
 
                         onEntered: {
@@ -96,29 +109,13 @@ Item {
 
                         onClicked: {
                             if (mouse.button == Qt.LeftButton) {
-                                console.log("clicked: " + model.name);
-                                var row = -1;
-                                for (var i = 0; i < crumbs.count; i++) {
-                                    var obj = crumbs.get(i);
-                                    if (obj.jid == model.jid && obj.node == model.node) {
-                                        row = i;
-                                        break;
-                                    }
-                                }
-                                if (row < 0) {
-                                    console.log("unknown row clicked");
-                                    return;
-                                }
-
-                                // navigate to the specified location
-                                view.model.rootJid = model.jid;
-                                view.model.rootNode = model.node;
-                                view.model.rootName = model.name;
+                                parent.state = '';
 
                                 // remove crumbs below current location
-                                for (var i = crumbs.count - 1; i >= row; i--) {
+                                for (var i = crumbs.count - 1; i > model.index; i--) {
                                     crumbs.remove(i);
                                 }
+                                crumbBar.locationChanged(model);
                             }
                         }
                     }
@@ -135,23 +132,18 @@ Item {
 
                 Text {
                     id: separator
+
+                    anchors.left: crumb.right
+                    anchors.leftMargin: row.spacing
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    anchors.left: name.right
                     font.bold: true
+                    opacity: isLast ? 0 : 1
                     text: '&rsaquo;'
                     textFormat: Text.RichText
                     verticalAlignment: Text.AlignVCenter
                 }
             }
-        }
-
-        Text {
-            anchors.bottom: parent.bottom
-            anchors.top: parent.top
-            color: '#000000'
-            text: view.model.rootName
-            verticalAlignment: Text.AlignVCenter
         }
     }
 }

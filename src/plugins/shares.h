@@ -20,72 +20,16 @@
 #ifndef __WILINK_SHARES_MODEL_H__
 #define __WILINK_SHARES_MODEL_H__
 
-#include <QAbstractItemModel>
-#include <QIcon>
-
 #include "QXmppShareIq.h"
+
+#include "chat_model.h"
 
 class ChatClient;
 class QXmppPresence;
+class QXmppShareExtension;
 class ShareModelPrivate;
-
-enum SharesColumns
-{
-    NameColumn,
-    ProgressColumn,
-    SizeColumn,
-    MaxColumn,
-};
-
-enum SharesDataRoles {
-    IsDirRole = QXmppShareItem::MaxRole,
-    JidRole,
-    NameRole,
-    NodeRole,
-    PacketId,
-    ProgressRole,
-    SizeRole,
-    TransferDone,
-    TransferPath,
-    TransferTotal,
-    TransferError,
-    UpdateTime,
-};
-
-class ShareModelQuery
-{
-public:
-    enum Operation
-    {
-        None,
-        Equals,
-        NotEquals,
-        // Contains,
-    };
-
-    ShareModelQuery();
-    ShareModelQuery(int role, ShareModelQuery::Operation operation, QVariant data);
-
-    bool match(QXmppShareItem *item) const;
-
-    ShareModelQuery operator&&(const ShareModelQuery &other) const;
-    ShareModelQuery operator||(const ShareModelQuery &other) const;
-
-private:
-    enum Combine
-    {
-        NoCombine,
-        AndCombine,
-        OrCombine,
-    };
-
-    int m_role;
-    ShareModelQuery::Operation m_operation;
-    QVariant m_data;
-
-    QList<ShareModelQuery> m_children;
-    ShareModelQuery::Combine m_combine;
-};
+class ShareQueueModel;
+class ShareQueueModelPrivate;
 
 /** Model representing a tree of share items (collections and files).
  */
@@ -95,22 +39,18 @@ class ShareModel : public QAbstractItemModel
     Q_ENUMS(Recurse)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
+    Q_PROPERTY(ShareQueueModel *queue READ queue CONSTANT)
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
     Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
+    Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
 
 public:
-    enum Recurse
-    {
-        DontRecurse,
-        PreRecurse,
-        PostRecurse,
-    };
-
-    class QueryOptions
-    {
-    public:
-        QueryOptions(Recurse recurse = PreRecurse);
-        Recurse recurse;
+    enum Role {
+        IsDirRole = QXmppShareItem::MaxRole,
+        JidRole,
+        NameRole,
+        NodeRole,
+        SizeRole,
     };
 
     ShareModel(QObject *parent = 0);
@@ -122,11 +62,15 @@ public:
     QString filter() const;
     void setFilter(const QString &filter);
 
+    ShareQueueModel *queue() const;
+
     QString rootJid() const;
     void setRootJid(const QString &rootJid);
 
     QString rootNode() const;
     void setRootNode(const QString &rootNode);
+
+    QString shareServer() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -139,8 +83,10 @@ signals:
     void filterChanged(const QString &filter);
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
+    void shareServerChanged(const QString &shareServer);
 
 public slots:
+    void download(int row);
     void refresh();
 
 private slots:
@@ -150,19 +96,40 @@ private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
 
 private:
-    QXmppShareItem *addItem(const QXmppShareItem &item);
     void clear();
     QModelIndex createIndex(QXmppShareItem *item, int column = 0) const;
-    QList<QXmppShareItem*> filter(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0, int limit = 0);
-    void removeItem(QXmppShareItem *item);
-    QXmppShareItem *get(const ShareModelQuery &query, const QueryOptions &options = QueryOptions(), QXmppShareItem *parent = 0);
-    QModelIndex updateItem(QXmppShareItem *oldItem, QXmppShareItem *newItem);
-
 
     QXmppShareItem *rootItem;
     ShareModelPrivate *d;
-
     friend class ShareModelPrivate;
+};
+
+class ShareQueueModel : public ChatModel
+{
+    Q_OBJECT
+
+public:
+    enum Role {
+        IsDirRole = ChatModel::UserRole,
+        NodeRole,
+        DoneBytesRole,
+        DoneFilesRole,
+        TotalBytesRole,
+        TotalFilesRole,
+    };
+
+    ShareQueueModel(QObject *parent = 0);
+    ~ShareQueueModel();
+
+    void queue(QXmppShareItem *item, const QString &filter);
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    void setManager(QXmppShareExtension *manager);
+
+private slots:
+    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
+
+private:
+    ShareQueueModelPrivate *d;
 };
 
 #endif

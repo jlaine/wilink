@@ -453,6 +453,10 @@ Acceptez-vous?</translation>
         <source>Upload</source>
         <translation>Envoyer</translation>
     </message>
+    <message>
+        <source>Home</source>
+        <translation>Accueil</translation>
+    </message>
 </context>
 <context>
     <name>PluginOptions</name>
@@ -592,25 +596,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ShareModel</name>
-    <message>
-        <source>Downloaded</source>
-        <translation>Téléchargé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation>Echoué</translation>
-    </message>
-    <message>
-        <source>Requested</source>
-        <translation>Demandé</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation>En attente</translation>
-    </message>
-</context>
-<context>
     <name>ShareOptions</name>
     <message>
         <source>Shared folders</source>
@@ -718,6 +703,13 @@ Acceptez-vous?</translation>
     <message>
         <source>Home</source>
         <translation>Accueil</translation>
+    </message>
+</context>
+<context>
+    <name>ShareQueueView</name>
+    <message>
+        <source>%1 files</source>
+        <translation>%1 fichiers</translation>
     </message>
 </context>
 <context>

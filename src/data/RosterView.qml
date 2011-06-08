@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Item {
     id: block
@@ -30,6 +31,11 @@ Item {
     signal addClicked
     signal itemClicked(variant model)
     signal itemContextMenu(variant model, variant point)
+
+    ListHelper {
+        id: listHelper
+        model: view.model
+    }
 
     Rectangle {
         id: background
@@ -107,27 +113,10 @@ Item {
 
             width: parent.width
             height: 30
-            state: currentJid == model.jid ? 'selected' : ''
 
             Item {
                 anchors.fill: parent
                 anchors.margins: 2
-
-                Rectangle {
-                    id: highlight
-
-                    anchors.fill: parent
-                    border.color: '#ffb0c4de'
-                    border.width: 1
-                    gradient: Gradient {
-                        GradientStop { id:stop1; position:0.0; color: '#33b0c4de' }
-                        GradientStop { id:stop2; position:0.5; color: '#ffb0c4de' }
-                        GradientStop { id:stop3; position:1.0; color: '#33b0c4de' }
-                    }
-                    opacity: 0
-                    radius: 5
-                    smooth: true
-                }
 
                 Image {
                     id: avatar
@@ -187,6 +176,7 @@ Item {
                 StatusPill {
                     id: status
                     anchors.right: parent.right
+                    anchors.rightMargin: 5
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     presenceStatus: model.status
@@ -208,14 +198,21 @@ Item {
                     }
                 }
             }
+        }
 
-            states: State {
-                name: 'selected'
-                PropertyChanges { target: highlight; opacity: 1.0 }
-            }
+        highlight: Highlight {}
 
-            transitions: Transition {
-                PropertyAnimation { target: highlight; properties: 'opacity'; duration: 300 }
+        Connections {
+            target: block
+
+            onCurrentJidChanged: {
+                for (var i = 0; i < listHelper.count; i++) {
+                    if (listHelper.get(i).jid == currentJid) {
+                        view.currentIndex = i;
+                        return;
+                    }
+                }
+                view.currentIndex = -1;
             }
         }
     }

@@ -23,10 +23,12 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    property alias url: photoModel.rootUrl
+    property variant url
 
-    ListModel {
-        id: crumbs
+    onUrlChanged: {
+        if (!crumbBar.model.count) {
+            crumbBar.push({'name': qsTr('Home'), 'isDir': true, 'url': url});
+        }
     }
 
     PanelHeader {
@@ -46,22 +48,17 @@ Panel {
             anchors.right: parent.right
 
             ToolButton {
-                enabled: crumbs.count > 0
+                enabled: crumbBar.model.count > 1
                 iconSource: 'back.png'
                 text: qsTr('Go back')
 
-                onClicked: {
-                    var crumb = crumbs.get(crumbs.count - 1);
-                    view.model.rootUrl = crumb.url;
-                    image.source = '';
-                    crumbs.remove(crumbs.count - 1);
-                }
+                onClicked: crumbBar.pop()
             }
 
             ToolButton {
                 iconSource: 'upload.png'
                 text: qsTr('Upload')
-                enabled: crumbs.count > 0
+                enabled: crumbBar.model.count > 1
 
                 onClicked: {
                     var dialog = window.fileDialog();
@@ -84,7 +81,7 @@ Panel {
             ToolButton {
                 iconSource: 'add.png'
                 text: qsTr('Create an album')
-                enabled: crumbs.count == 0
+                enabled: crumbBar.model.count == 1
 
                 onClicked: {
                     dialog.source = 'InputDialog.qml';
@@ -119,13 +116,31 @@ Panel {
         z: 1
     }
 
+    CrumbBar {
+        id: crumbBar
+
+        anchors.top: help.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        onLocationChanged: {
+            if (location.isDir) {
+                photoModel.rootUrl = location.url;
+                image.source = '';
+            } else {
+                image.source = location.avatar
+            }
+        }
+        z: 1
+    }
+
     GridView {
         id: view
 
+        anchors.top: crumbBar.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.top: help.bottom
         cellWidth: 130
         cellHeight: 150
 
@@ -138,15 +153,11 @@ Panel {
             width: view.cellWidth
             height: view.cellHeight
 
-            Rectangle {
-                id: itemBackground
+            Highlight {
+                id: highlight
+
                 anchors.fill: parent
-                border.color: '#00ffffff'
-                border.width: 1
-                gradient: Gradient {
-                    GradientStop { id: stop1; position: 0.0; color: '#00ffffff'  }
-                    GradientStop { id: stop2; position: 1.0; color: '#00ffffff'  }
-                }
+                state: 'inactive'
             }
 
             Column {
@@ -176,28 +187,10 @@ Panel {
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
-                onClicked: {
-                    crumbs.append({'url': view.model.rootUrl})
-                    if (model.isDir) {
-                        view.model.rootUrl = model.url;
-                    } else {
-                        image.source = model.avatar
-                    }
-                }
 
-                onEntered: {
-                    parent.state = 'hovered'
-                }
-                onExited: {
-                    parent.state = ''
-                }
-            }
-
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: itemBackground; border.color: '#b0e2ff' }
-                PropertyChanges { target: stop1;  color: '#ffffff' }
-                PropertyChanges { target: stop2;  color: '#b0e2ff' }
+                onClicked: crumbBar.push(model)
+                onEntered: highlight.state = ''
+                onExited: highlight.state = 'inactive'
             }
         }
     }
@@ -205,7 +198,7 @@ Panel {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: help.bottom
+        anchors.top: crumbBar.bottom
         anchors.bottom: footer.top
         anchors.right: parent.right
         flickableItem: view
@@ -214,11 +207,11 @@ Panel {
     Rectangle {
         id: display
 
+        anchors.top: crumbBar.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: help.bottom
-        visible: false
+        opacity: 0
         z: 1
 
         Image {
@@ -250,6 +243,13 @@ Panel {
     state: image.source  != '' ? 'details' : ''
     states: State {
         name: 'details'
-        PropertyChanges { target: display; visible: true }
+        PropertyChanges { target: display; opacity: 1 }
+        PropertyChanges { target: view; opacity: 0 }
+        PropertyChanges { target: help; height: 0; opacity: 0 }
+    }
+
+    transitions: Transition {
+        PropertyAnimation { target: display; properties: 'opacity'; duration: 150 }
+        PropertyAnimation { target: help; properties: 'height,opacity'; duration: 150 }
     }
 }

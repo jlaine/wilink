@@ -43,9 +43,9 @@ Panel {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')
-                enabled: crumbBar.model.count > 0
+                enabled: crumbBar.model.count > 1
 
-                onClicked: crumbBar.goBack()
+                onClicked: crumbBar.pop()
             }
 
             ToolButton {
@@ -71,7 +71,15 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: header.bottom
-        view: view
+
+        Component.onCompleted: {
+            crumbBar.push({'name': 'Wifirst', 'jid': 'wifirst.net', 'node': ''})
+        }
+
+        onLocationChanged: {
+            view.model.rootJid = location.jid;
+            view.model.rootNode = location.node;
+        }
     }
 
     ListView {
@@ -83,9 +91,7 @@ Panel {
         anchors.bottom: parent.bottom
 
         model: DiscoveryModel {
-            property string rootName: 'Wifirst'
             manager: window.client.discoveryManager
-            rootJid: 'wifirst.net'
         }
 
         delegate: Rectangle {
@@ -110,7 +116,7 @@ Panel {
                 anchors.fill: parent
 
                 onClicked: {
-                    crumbBar.goTo({'name': model.node ? model.node : model.jid, 'jid': model.jid, 'node': model.node});
+                    crumbBar.push({'name': model.node ? model.node : model.jid, 'jid': model.jid, 'node': model.node});
                 }
             }
         }

@@ -45,15 +45,11 @@ Item {
             width: view.cellWidth
             height: view.cellHeight
 
-            Rectangle {
-                id: itemBackground
+            Highlight {
+                id: highlight
+
                 anchors.fill: parent
-                border.color: '#ffffff'
-                color: '#ffffff'
-                gradient: Gradient {
-                    GradientStop { id: stop1; position: 0.0; color: '#ffffff'  }
-                    GradientStop { id: stop2; position: 1.0; color: '#ffffff'  }
-                }
+                state: 'inactive'
             }
 
             Column {
@@ -106,19 +102,8 @@ Item {
                         menu.show(mousePress.x, mousePress.y);
                     }
                 }
-                onEntered: {
-                    parent.state = 'hovered'
-                }
-                onExited: {
-                    parent.state = ''
-                }
-            }
-
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: itemBackground; border.color: '#b0e2ff' }
-                PropertyChanges { target: stop1;  color: '#ffffff' }
-                PropertyChanges { target: stop2;  color: '#b0e2ff' }
+                onEntered: highlight.state = ''
+                onExited: highlight.state = 'inactive'
             }
         }
     }

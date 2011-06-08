@@ -42,9 +42,9 @@ Panel {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')
-                enabled: crumbBar.model.count > 0
+                enabled: crumbBar.model.count > 1
 
-                onClicked: crumbBar.goBack()
+                onClicked: crumbBar.pop()
             }
 
             ToolButton {
@@ -136,7 +136,13 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: searchBar.bottom
-        view: view
+
+        onLocationChanged: {
+            console.log("location changed" + location);
+            view.model.rootJid = location.jid;
+            view.model.rootNode = location.node;
+        }
+        z: 1
     }
 
     ShareView {
@@ -148,9 +154,13 @@ Panel {
         anchors.bottom: queueHelp.top
 
         model: ShareModel {
-            property string rootName: qsTr('Home')
+            client: window.client
 
-            client: window.client            
+            onShareServerChanged: {
+                if (!crumbBar.model.count) {
+                    crumbBar.push({'name': qsTr('Home'), 'jid': view.model.shareServer, 'node': ''});
+                }
+            }
         }
     }
 
@@ -159,21 +169,18 @@ Panel {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.bottom: queueView.top
         text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
         z: 1
     }
 
-/*
-    ShareView {
-        id: footer
+    ShareQueueView {
+        id: queueView
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: model.count * 30
-        model: ShareModel {}
-        z: 1
+        height: 120
+        model: view.model.queue
     }
-*/
 }

@@ -167,9 +167,7 @@ Panel {
 
         Keys.onPressed: {
             if (event.key == Qt.Key_Backspace && event.modifiers == Qt.NoModifier) {
-                var oldIndex = visualModel.rootIndex;
                 visualModel.rootIndex = visualModel.parentModelIndex();
-                currentIndex = playerModel.row(oldIndex, visualModel.rootIndex);
             }
             else if (event.key == Qt.Key_Delete ||
                     (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {

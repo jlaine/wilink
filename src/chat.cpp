@@ -145,6 +145,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterType<ShareModel>("wiLink", 1, 2, "ShareModel");
+    qmlRegisterType<ShareQueueModel>("wiLink", 1, 2, "ShareQueueModel");
     qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
@@ -204,6 +205,7 @@ Chat::Chat(QWidget *parent)
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
 
+#if 0
     /* "Edit" menu */
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
 
@@ -214,6 +216,7 @@ Chat::Chat(QWidget *parent)
     d->findAgainAction = editMenu->addAction(tr("Find a&gain"));
     d->findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
     d->findAgainAction->setEnabled(false);
+#endif
 
     /* set up client */
     connect(d->client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
