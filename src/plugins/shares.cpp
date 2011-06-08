@@ -661,6 +661,7 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
     QHash<int, QByteArray> names = roleNames();
     names.insert(IsDirRole, "isDir");
     names.insert(NodeRole, "node");
+    names.insert(SpeedRole, "speed");
     names.insert(DoneBytesRole, "doneBytes");
     names.insert(DoneFilesRole, "doneFiles");
     names.insert(TotalBytesRole, "totalBytes");
@@ -713,6 +714,12 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
             return QString();
         else
             return shareItem->locations().first().node();
+    }
+    else if (role == SpeedRole) {
+        qint64 speed = 0;
+        foreach (QXmppShareTransfer *transfer, item->transfers.values())
+            speed += transfer->speed();
+        return speed;
     }
     else if (role == DoneBytesRole) {
         qint64 done = item->doneBytes;
