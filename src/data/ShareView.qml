@@ -32,103 +32,133 @@ Item {
         color: '#ffffff'
     }
 
-    ListView {
+    GridView {
         id: view
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        cellHeight: 128
+        cellWidth: 128
 
         delegate: Item {
             id: item
-            width: view.width - 1
-            height: 24
+            width: view.cellWidth
+            height: view.cellHeight
 
-            Item {
-                id: main
+            Highlight {
+                id: highlight
+
+                anchors.fill: parent
+                state: 'inactive'
+            }
+
+            Image {
+                id: thumbnail
 
                 anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                anchors.right: downloadButton.left
-                anchors.rightMargin: 4
-
-                Highlight {
-                    id: highlight
-
-                    anchors.fill: parent
-                    state: 'inactive'
-                }
-
-                Image {
-                    id: thumbnail
-
-                    anchors.left: parent.left
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 80
+                height: 80
+                smooth: true
+                source: model.isDir ? (model.node.length ? 'album-128.png' : 'peer-128.png') : 'file-128.png'
+/*
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.left: parent.right
                     anchors.margins: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 24
-                    height: 24
+                    border.color: '#597fbe'
+                    border.width: 1
+                    gradient: Gradient {
+                        GradientStop { position: 0.0; color: '#66597fbe' }
+                        GradientStop { position: 0.6; color: '#597fbe' }
+                        GradientStop { position: 1.0; color: '#66597fbe' }
+                    }
+                    height: popularity.paintedHeight + 4
+                    width: popularity.paintedWidth + 4
+                    radius: 9
                     smooth: true
-                    source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+                    visible: model.popularity != 0
 
                     Text {
+                        id: popularity
+
                         anchors.centerIn: parent
-                        color: '#444444'
-                        font.pixelSize: 10
+                        color: '#ffffff'
+                        font.pixelSize: 14
+                        font.bold: true
                         text: model.popularity > 0 ? model.popularity : ''
                     }
                 }
+*/
+            }
 
-                Text {
-                    id: text
+            Text {
+                id: text
 
-                    anchors.left: thumbnail.right
-                    anchors.right: sizeText.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.margins: 4
-                    text: model.name
-                }
+                anchors.top: thumbnail.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
 
-                Text {
-                    id: sizeText
+                text: model.name
+            }
 
-                    anchors.right: parent.right
-                    anchors.margins: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
-                }
 
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
+            Text {
+                id: sizeText
 
-                    onClicked: {
-                        if (model.isDir) {
-                            crumbBar.push(model);
-                        }
+                anchors.centerIn: thumbnail
+                elide: Text.ElideLeft
+                font.pixelSize: 12
+                text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
+            }
+
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onClicked: {
+                    if (model.isDir) {
+                        crumbBar.push(model);
                     }
+                }
 
-                    onEntered: highlight.state = ''
-                    onExited: highlight.state = 'inactive'
+                onEntered: {
+                    highlight.state = ''
+                    downloadButton.state = ''
+                }
+                onExited: {
+                    highlight.state = 'inactive'
+                    downloadButton.state = 'inactive'
                 }
             }
 
             Button {
                 id: downloadButton
-                anchors.right: parent.right
-                anchors.rightMargin: 4
-                anchors.top: parent.top
+
                 anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.margins: 4
+                height: 20
                 iconSource: 'download.png'
+                state: 'inactive'
+                text: model.isDir ? qsTr('Download folder') : qsTr('Download')
                 visible: model.canDownload
 
                 onClicked: {
                     view.model.download(model.index);
                 }
-            }
 
+                states: State {
+                    name: 'inactive'
+                    PropertyChanges { target: downloadButton; opacity: 0 }
+                }
+            }
         }
     }
 
