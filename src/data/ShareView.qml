@@ -111,6 +111,7 @@ Item {
                 id: sizeText
 
                 anchors.centerIn: thumbnail
+                color: (model.isDir && !model.node.length) ? '#ffffff' : '#000000'
                 elide: Text.ElideLeft
                 font.pixelSize: 12
                 text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
