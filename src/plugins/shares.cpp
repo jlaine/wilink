@@ -40,10 +40,12 @@ static const int parallelDownloadLimit = 2;
 
 static void copy(QXmppShareItem *oldChild, QXmppShareItem *newChild)
 {
+    oldChild->setFileDate(newChild->fileDate());
     oldChild->setFileHash(newChild->fileHash());
     oldChild->setFileSize(newChild->fileSize());
     oldChild->setLocations(newChild->locations());
     oldChild->setName(newChild->name());
+    oldChild->setPopularity(newChild->popularity());
     oldChild->setType(newChild->type());
 }
 
@@ -179,6 +181,7 @@ ShareModel::ShareModel(QObject *parent)
     roleNames.insert(JidRole, "jid");
     roleNames.insert(NameRole, "name");
     roleNames.insert(NodeRole, "node");
+    roleNames.insert(PopularityRole, "popularity");
     roleNames.insert(SizeRole, "size");
     setRoleNames(roleNames);
 
@@ -303,6 +306,8 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
         else
             return item->locations().first().node();
     }
+    else if (role == PopularityRole)
+        return item->popularity();
     else if (role == SizeRole)
         return item->fileSize();
     return QVariant();
@@ -574,8 +579,10 @@ class ShareQueueModelPrivate
 public:
     ShareQueueModelPrivate(ShareQueueModel *qq);
     void process();
+    qint64 transfers() const;
 
     QXmppShareExtension *manager;
+    QTimer *timer;
 
 private:
     ShareQueueModel *q;
@@ -583,39 +590,25 @@ private:
 
 ShareQueueModelPrivate::ShareQueueModelPrivate(ShareQueueModel *qq)
     : manager(0),
+    timer(0),
     q(qq)
 {
 }
 
-ShareQueueModel::ShareQueueModel(QObject *parent)
-    : ChatModel(parent)
+qint64 ShareQueueModelPrivate::transfers() const
 {
-    d = new ShareQueueModelPrivate(this);
-
-    // set role names
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(IsDirRole, "isDir");
-    names.insert(NodeRole, "node");
-    names.insert(DoneBytesRole, "doneBytes");
-    names.insert(DoneFilesRole, "doneFiles");
-    names.insert(TotalBytesRole, "totalBytes");
-    names.insert(TotalFilesRole, "totalFiles");
-    setRoleNames(names);
-}
-
-ShareQueueModel::~ShareQueueModel()
-{
-    delete d;
+    qint64 transfers = 0;
+    foreach (ChatModelItem *ptr, q->rootItem->children) {
+        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
+        transfers += item->transfers.size();
+    }
+    return transfers;
 }
 
 void ShareQueueModelPrivate::process()
 {
     // check how many downloads are active
-    int activeDownloads = 0;
-    foreach (ChatModelItem *ptr, q->rootItem->children) {
-        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
-        activeDownloads += item->transfers.size();
-    }
+    qint64 activeDownloads = transfers();
     if (activeDownloads >= parallelDownloadLimit)
         return;
 
@@ -639,11 +632,45 @@ void ShareQueueModelPrivate::process()
 
                 item->transfers.insert(file, transfer);
                 activeDownloads++;
+
+                // start periodic refresh
+                if (!timer->isActive())
+                    timer->start();
             } else {
                 item->done.insert(file);
             }
         }
     }
+}
+
+ShareQueueModel::ShareQueueModel(QObject *parent)
+    : ChatModel(parent)
+{
+    bool check;
+
+    d = new ShareQueueModelPrivate(this);
+
+    // timer to refresh progress
+    d->timer = new QTimer(this);
+    d->timer->setInterval(1000);
+    check = connect(d->timer, SIGNAL(timeout()),
+                    this, SLOT(_q_refresh()));
+    Q_ASSERT(check);
+
+    // set role names
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(IsDirRole, "isDir");
+    names.insert(NodeRole, "node");
+    names.insert(DoneBytesRole, "doneBytes");
+    names.insert(DoneFilesRole, "doneFiles");
+    names.insert(TotalBytesRole, "totalBytes");
+    names.insert(TotalFilesRole, "totalFiles");
+    setRoleNames(names);
+}
+
+ShareQueueModel::~ShareQueueModel()
+{
+    delete d;
 }
 
 void ShareQueueModel::queue(QXmppShareItem *shareItem, const QString &filter)
@@ -687,8 +714,12 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
         else
             return shareItem->locations().first().node();
     }
-    else if (role == DoneBytesRole)
-        return item->doneBytes;
+    else if (role == DoneBytesRole) {
+        qint64 done = item->doneBytes;
+        foreach (QXmppShareTransfer *transfer, item->transfers.values())
+            done += transfer->doneBytes();
+        return done;
+    }
     else if (role == DoneFilesRole)
         return item->done.size();
     else if (role == TotalBytesRole)
@@ -709,6 +740,17 @@ void ShareQueueModel::setManager(QXmppShareExtension *manager)
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
             Q_ASSERT(check);
         }
+    }
+}
+
+/** Periodically refresh transfer progress.
+ */
+void ShareQueueModel::_q_refresh()
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
+        if (item->transfers.size())
+            emit dataChanged(createIndex(item), createIndex(item));
     }
 }
 
@@ -752,6 +794,10 @@ void ShareQueueModel::_q_transferFinished()
             item->doneBytes += file->fileSize();
             item->transfers.remove(file);
             transfer->deleteLater();
+
+            // stop periodic refresh
+            if (!d->transfers())
+                d->timer->stop();
 
             emit dataChanged(createIndex(item), createIndex(item));
             break;

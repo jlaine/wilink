@@ -50,6 +50,7 @@ public:
         JidRole,
         NameRole,
         NodeRole,
+        PopularityRole,
         SizeRole,
     };
 
@@ -126,6 +127,7 @@ public:
     void setManager(QXmppShareExtension *manager);
 
 private slots:
+    void _q_refresh();
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
     void _q_transferFinished();
 
