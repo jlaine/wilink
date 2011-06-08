@@ -127,6 +127,7 @@ public:
 
 private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
+    void _q_transferFinished();
 
 private:
     ShareQueueModelPrivate *d;

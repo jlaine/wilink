@@ -533,9 +533,11 @@ public:
     ShareQueueItem();
     QXmppShareItem *nextFile(QXmppShareItem *item) const;
 
-    QList<QXmppShareTransfer*> transfers;
     QString requestId;
     QXmppShareItem shareItem;
+
+    QSet<QXmppShareItem*> done;
+    QMap<QXmppShareItem*, QXmppShareTransfer*> transfers;
 
     qint64 doneBytes;
     qint64 doneFiles;
@@ -553,7 +555,9 @@ ShareQueueItem::ShareQueueItem()
 
 QXmppShareItem *ShareQueueItem::nextFile(QXmppShareItem *item) const
 {
-    if (item->type() == QXmppShareItem::FileItem)
+    if (item->type() == QXmppShareItem::FileItem &&
+        !done.contains(item) &&
+        !transfers.contains(item))
         return item;
 
     foreach (QXmppShareItem *child, item->children()) {
@@ -627,15 +631,16 @@ void ShareQueueModelPrivate::process()
 
             QXmppShareTransfer *transfer = manager->get(*file);
             if (transfer) {
-                item->transfers << transfer;
+                bool check;
+
+                check = q->connect(transfer, SIGNAL(finished()),
+                                   q, SLOT(_q_transferFinished()));
+                Q_ASSERT(check);
+
+                item->transfers.insert(file, transfer);
                 activeDownloads++;
             } else {
-                if (file->parent()) {
-                    file->parent()->removeChild(file);
-                } else {
-                    q->removeItem(item);
-                    break;
-                }
+                item->done.insert(file);
             }
         }
     }
@@ -656,6 +661,7 @@ void ShareQueueModel::queue(QXmppShareItem *shareItem, const QString &filter)
         item->totalFiles = 1;
     }
     addItem(item, rootItem);
+    d->process();
 }
 
 QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
@@ -684,7 +690,7 @@ QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
     else if (role == DoneBytesRole)
         return item->doneBytes;
     else if (role == DoneFilesRole)
-        return item->doneFiles;
+        return item->done.size();
     else if (role == TotalBytesRole)
         return item->totalBytes;
     else if (role == TotalFilesRole)
@@ -702,20 +708,6 @@ void ShareQueueModel::setManager(QXmppShareExtension *manager)
             check = connect(d->manager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
             Q_ASSERT(check);
-
-#if 0
-            check = connect(extension, SIGNAL(getFailed(QString)),
-                            this, SLOT(getFailed(QString)));
-            Q_ASSERT(check);
-
-            check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
-                            this, SLOT(transferFinished(QXmppTransferJob*)));
-            Q_ASSERT(check);
-
-            check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
-                            this, SLOT(transferStarted(QXmppTransferJob*)));
-            Q_ASSERT(check);
-#endif
         }
     }
 }
@@ -746,3 +738,24 @@ void ShareQueueModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
     }
 }
 
+void ShareQueueModel::_q_transferFinished()
+{
+    QXmppShareTransfer *transfer = qobject_cast<QXmppShareTransfer*>(sender());
+    if (!transfer)
+        return;
+
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
+        QXmppShareItem *file = item->transfers.key(transfer);
+        if (file) {
+            item->done.insert(file);
+            item->doneBytes += file->fileSize();
+            item->transfers.remove(file);
+            transfer->deleteLater();
+
+            emit dataChanged(createIndex(item), createIndex(item));
+            break;
+        }
+    }
+
+}
