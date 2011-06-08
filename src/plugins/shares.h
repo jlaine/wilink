@@ -130,6 +130,7 @@ private slots:
 
 private:
     ShareQueueModelPrivate *d;
+    friend class ShareQueueModelPrivate;
 };
 
 #endif

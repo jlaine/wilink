@@ -36,6 +36,7 @@
 
 static QXmppShareDatabase *globalDatabase = 0;
 static int globalDatabaseRefs = 0;
+static const int parallelDownloadLimit = 2;
 
 static void copy(QXmppShareItem *oldChild, QXmppShareItem *newChild)
 {
@@ -412,20 +413,6 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
             Q_ASSERT(check);
 
-#if 0
-            check = connect(extension, SIGNAL(getFailed(QString)),
-                            this, SLOT(getFailed(QString)));
-            Q_ASSERT(check);
-
-            check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
-                            this, SLOT(transferFinished(QXmppTransferJob*)));
-            Q_ASSERT(check);
-
-            check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
-                            this, SLOT(transferStarted(QXmppTransferJob*)));
-            Q_ASSERT(check);
-#endif
-
             d->queueModel->setManager(shareManager);
         }
 
@@ -544,7 +531,9 @@ class ShareQueueItem : public ChatModelItem
 {
 public:
     ShareQueueItem();
+    QXmppShareItem *nextFile(QXmppShareItem *item) const;
 
+    QList<QXmppShareTransfer*> transfers;
     QString requestId;
     QXmppShareItem shareItem;
 
@@ -562,17 +551,42 @@ ShareQueueItem::ShareQueueItem()
 {
 }
 
+QXmppShareItem *ShareQueueItem::nextFile(QXmppShareItem *item) const
+{
+    if (item->type() == QXmppShareItem::FileItem)
+        return item;
+
+    foreach (QXmppShareItem *child, item->children()) {
+        QXmppShareItem *file = nextFile(child);
+        if (file)
+            return file;
+    }
+
+    return 0;
+}
+
 class ShareQueueModelPrivate
 {
 public:
+    ShareQueueModelPrivate(ShareQueueModel *qq);
+    void process();
+
     QXmppShareExtension *manager;
+
+private:
+    ShareQueueModel *q;
 };
+
+ShareQueueModelPrivate::ShareQueueModelPrivate(ShareQueueModel *qq)
+    : manager(0),
+    q(qq)
+{
+}
 
 ShareQueueModel::ShareQueueModel(QObject *parent)
     : ChatModel(parent)
 {
-    d = new ShareQueueModelPrivate;
-    d->manager = 0;
+    d = new ShareQueueModelPrivate(this);
 
     // set role names
     QHash<int, QByteArray> names = roleNames();
@@ -588,6 +602,43 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
 ShareQueueModel::~ShareQueueModel()
 {
     delete d;
+}
+
+void ShareQueueModelPrivate::process()
+{
+    // check how many downloads are active
+    int activeDownloads = 0;
+    foreach (ChatModelItem *ptr, q->rootItem->children) {
+        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
+        activeDownloads += item->transfers.size();
+    }
+    if (activeDownloads >= parallelDownloadLimit)
+        return;
+
+    // start downloads
+    foreach (ChatModelItem *ptr, q->rootItem->children) {
+        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
+
+        while (activeDownloads < parallelDownloadLimit) {
+            // find next item
+            QXmppShareItem *file = item->nextFile(&item->shareItem);
+            if (!file)
+                break;
+
+            QXmppShareTransfer *transfer = manager->get(*file);
+            if (transfer) {
+                item->transfers << transfer;
+                activeDownloads++;
+            } else {
+                if (file->parent()) {
+                    file->parent()->removeChild(file);
+                } else {
+                    q->removeItem(item);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void ShareQueueModel::queue(QXmppShareItem *shareItem, const QString &filter)
@@ -651,6 +702,20 @@ void ShareQueueModel::setManager(QXmppShareExtension *manager)
             check = connect(d->manager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
             Q_ASSERT(check);
+
+#if 0
+            check = connect(extension, SIGNAL(getFailed(QString)),
+                            this, SLOT(getFailed(QString)));
+            Q_ASSERT(check);
+
+            check = connect(extension, SIGNAL(transferFinished(QXmppTransferJob*)),
+                            this, SLOT(transferFinished(QXmppTransferJob*)));
+            Q_ASSERT(check);
+
+            check = connect(extension, SIGNAL(transferStarted(QXmppTransferJob*)),
+                            this, SLOT(transferStarted(QXmppTransferJob*)));
+            Q_ASSERT(check);
+#endif
         }
     }
 }
