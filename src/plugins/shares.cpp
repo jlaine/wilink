@@ -321,7 +321,7 @@ void ShareModel::download(int row)
     // don't download from self
     QXmppShareItem *item = rootItem->child(row);
     foreach (const QXmppShareLocation &location, item->locations()) {
-        if (location.jid() == d->client->configuration().jid())
+        if (location.jid() == d->shareClient->configuration().jid())
             return;
     }
 
