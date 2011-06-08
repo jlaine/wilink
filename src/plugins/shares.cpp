@@ -758,4 +758,5 @@ void ShareQueueModel::_q_transferFinished()
         }
     }
 
+    d->process();
 }
