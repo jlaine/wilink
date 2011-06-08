@@ -77,12 +77,12 @@ Item {
                     anchors.fill: parent
                     maximumValue: model.totalBytes
                     value: model.doneBytes
-                    visible: model.doneBytes > 0
+                    //visible: model.doneBytes > 0
                 }
 
                 Text {
                     anchors.centerIn: parent
-                    text: model.name
+                    text: model.name + (model.speed > 0 ? ' ' + Utils.formatSpeed(model.speed) : '')
                 }
             }
 

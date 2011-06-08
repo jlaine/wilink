@@ -639,6 +639,7 @@ void ShareQueueModelPrivate::process()
             } else {
                 item->done.insert(file);
             }
+            emit q->dataChanged(q->createIndex(item), q->createIndex(item));
         }
     }
 }
@@ -652,7 +653,7 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
 
     // timer to refresh progress
     d->timer = new QTimer(this);
-    d->timer->setInterval(1000);
+    d->timer->setInterval(500);
     check = connect(d->timer, SIGNAL(timeout()),
                     this, SLOT(_q_refresh()));
     Q_ASSERT(check);
