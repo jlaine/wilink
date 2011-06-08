@@ -25,6 +25,7 @@ Item {
 
     property alias count: view.count
     property alias model: view.model
+    property bool itemHovered: false
 
     Rectangle {
         id: background
@@ -107,34 +108,42 @@ Item {
                 text: model.name
             }
 
-
             Text {
                 id: sizeText
 
                 anchors.centerIn: thumbnail
+                color: (model.isDir && !model.node.length) ? '#ffffff' : '#000000'
                 elide: Text.ElideLeft
                 font.pixelSize: 12
                 text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
             }
-
 
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
 
                 onClicked: {
+                    itemHovered = false
                     if (model.isDir) {
                         crumbBar.push(model);
                     }
                 }
 
                 onEntered: {
-                    highlight.state = ''
                     downloadButton.state = ''
+                    highlight.state = ''
+                    itemHovered = true
+                    textLabel.text = text.text
                 }
                 onExited: {
                     highlight.state = 'inactive'
                     downloadButton.state = 'inactive'
+                    itemHovered = false
+                }
+                onPositionChanged: {
+                    textLabel.x = mapToItem(view,mouse.x + 15, mouse.y).x
+                    textLabel.y = mapToItem(view,mouse.x + 15, mouse.y).y
+                    textLabel.opacity = 0
                 }
             }
 
@@ -161,6 +170,35 @@ Item {
                 }
             }
         }
+    }
+
+    Rectangle {
+        id: textLabel
+
+        property alias text: label.text
+
+        border.color: '#ffffff'
+        border.width: 1
+        color: '#b0c4de'
+        height: label.paintedHeight + 4
+        width: label.paintedWidth + 4
+        opacity: 0
+        z: 10
+
+        Text {
+            id: label
+            anchors.centerIn: parent
+        }
+    }
+
+    Timer {
+        id: showLabelTimer
+
+        interval: 1000
+        repeat: true
+        running: itemHovered
+
+        onTriggered: textLabel.opacity = 1
     }
 
     ScrollBar {
