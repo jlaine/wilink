@@ -48,7 +48,6 @@ set(wiLink_SOURCES
     application.cpp
     chat.cpp
     chat_accounts.cpp
-    chat_client.cpp
     chat_form.cpp
     chat_history.cpp
     chat_model.cpp
@@ -59,6 +58,7 @@ set(wiLink_SOURCES
     updates.cpp
     updatesdialog.cpp
     plugins/calls.cpp
+    plugins/client.cpp
     plugins/console.cpp
     plugins/conversations.cpp
     plugins/declarative.cpp
@@ -82,7 +82,6 @@ set(wiLink_MOC_HEADERS
     application.h
     chat.h
     chat_accounts.h
-    chat_client.h
     chat_form.h
     chat_history.h
     chat_model.h
@@ -90,6 +89,7 @@ set(wiLink_MOC_HEADERS
     updates.h
     updatesdialog.h
     plugins/calls.h
+    plugins/client.h
     plugins/console.h
     plugins/conversations.h
     plugins/declarative.h

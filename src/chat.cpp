@@ -64,7 +64,6 @@
 #include "application.h"
 #include "chat.h"
 #include "chat_accounts.h"
-#include "chat_client.h"
 #include "chat_history.h"
 #include "chat_utils.h"
 #include "idle/idle.h"

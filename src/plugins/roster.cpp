@@ -40,7 +40,7 @@
 #include "QXmppVCardManager.h"
 
 #include "application.h"
-#include "chat_client.h"
+#include "client.h"
 #include "roster.h"
 
 static const QChar sortSeparator('\0');

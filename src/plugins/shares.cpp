@@ -29,7 +29,7 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
-#include "chat_client.h"
+#include "client.h"
 #include "chat_utils.h"
 #include "roster.h"
 #include "shares.h"

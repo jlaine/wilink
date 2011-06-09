@@ -32,7 +32,7 @@
 #include "QXmppSrvInfo.h"
 #include "QXmppTransferManager.h"
 
-#include "chat_client.h"
+#include "client.h"
 #include "plugins/diagnostics.h"
 
 ChatClient::ChatClient(QObject *parent)
