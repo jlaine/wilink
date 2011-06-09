@@ -23,6 +23,7 @@ import 'utils.js' as Utils
 Item {
     id: block
 
+    property alias count: view.count
     property alias model: view.model
 
     Rectangle {
