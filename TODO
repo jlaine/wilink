@@ -5,6 +5,8 @@ HIGH PRIORITY
 - fix focus handling after using a QML dialog
 - restore shares initial config dialog
 - auto-join bookmarked rooms
+- fix crash on account add / remove
+- fix faulty contact ordering
 
 LOW PRIORITY
 
