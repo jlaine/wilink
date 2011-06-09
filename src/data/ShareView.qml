@@ -42,7 +42,7 @@ Item {
         anchors.left: parent.left
         anchors.right: scrollBar.left
         cellHeight: 128
-        cellWidth: 128
+        cellWidth: 170
 
         delegate: Item {
             id: item
