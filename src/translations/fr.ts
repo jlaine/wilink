@@ -175,6 +175,85 @@
     </message>
 </context>
 <context>
+    <name>ChatPanel</name>
+    <message>
+        <source>My rooms</source>
+        <translation>Mes salons</translation>
+    </message>
+    <message>
+        <source>My contacts</source>
+        <translation>Mes contacts</translation>
+    </message>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Do you want to remove %1 from your contact list?</source>
+        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
+    </message>
+    <message>
+        <source>Enter the name for this contact.</source>
+        <translation>Saisissez le nom pour ce contact.</translation>
+    </message>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
+    </message>
+    <message>
+        <source>%1 has asked to add you to his or her contact list.
+
+Do you accept?</source>
+        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Call from %1</source>
+        <translation>Appel de %1</translation>
+    </message>
+    <message>
+        <source>%1 wants to talk to you.
+
+Do you accept?</source>
+        <translation>%1 souhaite vous parler.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>File from %1</source>
+        <translation>Fichier de %1</translation>
+    </message>
+    <message>
+        <source>%1 wants to send you a file called &apos;%2&apos; (%3).
+
+Do you accept?</source>
+        <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Tip&lt;/b&gt;: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to &lt;a href=&quot;%1&quot;&gt;add them as wAmis&lt;/a&gt;</source>
+        <translation>&lt;b&gt;Astuce&lt;/b&gt; : vos wAmis sont automatiquement ajoutés à vos contacts de chat, donc le plus simple pour ajouter des contacts Wifirst est de &lt;a href=&quot;%1&quot;&gt;les ajouter comme wAmis&lt;/a&gt; !</translation>
+    </message>
+    <message>
+        <source>Enter the address of the contact you want to add.</source>
+        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
+    </message>
+</context>
+<context>
     <name>ChatPasswordPrompt</name>
     <message>
         <source>Password</source>
@@ -753,85 +832,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Your version of %1 is up to date.</source>
         <translation>Votre version de %1 est à jour.</translation>
-    </message>
-</context>
-<context>
-    <name>main</name>
-    <message>
-        <source>My rooms</source>
-        <translation>Mes salons</translation>
-    </message>
-    <message>
-        <source>My contacts</source>
-        <translation>Mes contacts</translation>
-    </message>
-    <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
-    <message>
-        <source>Rename contact</source>
-        <translation>Renommer contact</translation>
-    </message>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
-    </message>
-    <message>
-        <source>Do you want to remove %1 from your contact list?</source>
-        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
-    </message>
-    <message>
-        <source>Enter the name for this contact.</source>
-        <translation>Saisissez le nom pour ce contact.</translation>
-    </message>
-    <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-    <message>
-        <source>%1 has asked to add you to his or her contact list.
-
-Do you accept?</source>
-        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Call from %1</source>
-        <translation>Appel de %1</translation>
-    </message>
-    <message>
-        <source>%1 wants to talk to you.
-
-Do you accept?</source>
-        <translation>%1 souhaite vous parler.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>File from %1</source>
-        <translation>Fichier de %1</translation>
-    </message>
-    <message>
-        <source>%1 wants to send you a file called &apos;%2&apos; (%3).
-
-Do you accept?</source>
-        <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Add a contact</source>
-        <translation>Ajouter un contact</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Tip&lt;/b&gt;: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to &lt;a href=&quot;%1&quot;&gt;add them as wAmis&lt;/a&gt;</source>
-        <translation>&lt;b&gt;Astuce&lt;/b&gt; : vos wAmis sont automatiquement ajoutés à vos contacts de chat, donc le plus simple pour ajouter des contacts Wifirst est de &lt;a href=&quot;%1&quot;&gt;les ajouter comme wAmis&lt;/a&gt; !</translation>
-    </message>
-    <message>
-        <source>Enter the address of the contact you want to add.</source>
-        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
     </message>
 </context>
 </TS>
