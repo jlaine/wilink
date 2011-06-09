@@ -63,7 +63,6 @@
 
 #include "application.h"
 #include "chat_accounts.h"
-#include "chat_history.h"
 #include "chat_utils.h"
 #include "idle/idle.h"
 #include "calls.h"
@@ -72,6 +71,7 @@
 #include "declarative.h"
 #include "diagnostics.h"
 #include "discovery.h"
+#include "history.h"
 #include "phone.h"
 #include "phone/sip.h"
 #include "photos.h"

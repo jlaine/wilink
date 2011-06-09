@@ -26,7 +26,7 @@
 #include "diagnostics/iq.h"
 #include "chat_utils.h"
 #include "tests.h"
-#include "updates.h"
+#include "plugins/updates.h"
 
 template <class T>
 static void parsePacket(T &packet, const QByteArray &xml)

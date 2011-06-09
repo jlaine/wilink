@@ -48,13 +48,11 @@ set(wiLink_SOURCES
     application.cpp
     chat_accounts.cpp
     chat_form.cpp
-    chat_history.cpp
     chat_model.cpp
     chat_preferences.cpp
     chat_utils.cpp
     main.cpp
     systeminfo.cpp
-    updates.cpp
     updatesdialog.cpp
     plugins/calls.cpp
     plugins/client.cpp
@@ -63,6 +61,7 @@ set(wiLink_SOURCES
     plugins/declarative.cpp
     plugins/diagnostics.cpp
     plugins/discovery.cpp
+    plugins/history.cpp
     plugins/photos.cpp
     plugins/phone.cpp
     plugins/phone/sip.cpp
@@ -72,6 +71,7 @@ set(wiLink_SOURCES
     plugins/roster.cpp
     plugins/shares.cpp
     plugins/shares/options.cpp
+    plugins/updates.cpp
     plugins/window.cpp)
 
 if(APPLE)
@@ -82,10 +82,8 @@ set(wiLink_MOC_HEADERS
     application.h
     chat_accounts.h
     chat_form.h
-    chat_history.h
     chat_model.h
     chat_preferences.h
-    updates.h
     updatesdialog.h
     plugins/calls.h
     plugins/client.h
@@ -94,6 +92,7 @@ set(wiLink_MOC_HEADERS
     plugins/declarative.h
     plugins/diagnostics.h
     plugins/discovery.h
+    plugins/history.h
     plugins/photos.h
     plugins/phone.h
     plugins/phone/sip.h
@@ -103,6 +102,7 @@ set(wiLink_MOC_HEADERS
     plugins/roster.h
     plugins/shares.h
     plugins/shares/options.h
+    plugins/updates.h
     plugins/window.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)

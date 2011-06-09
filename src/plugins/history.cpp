@@ -19,10 +19,10 @@
 
 #include <QUrl>
 
-#include "chat_history.h"
-#include "plugins/roster.h"
-
 #include "QXmppUtils.h"
+
+#include "history.h"
+#include "roster.h"
 
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;

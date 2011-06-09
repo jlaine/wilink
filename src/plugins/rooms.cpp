@@ -47,11 +47,11 @@
 #include "QXmppUtils.h"
 
 #include "application.h"
-#include "window.h"
 #include "chat_form.h"
-#include "chat_history.h"
+#include "history.h"
 #include "roster.h"
 #include "chat_utils.h"
+#include "window.h"
 
 #include "rooms.h"
 

@@ -29,7 +29,7 @@
 #include "application.h"
 #include "client.h"
 #include "conversations.h"
-#include "chat_history.h"
+#include "history.h"
 #include "roster.h"
 
 #ifdef WILINK_EMBEDDED

@@ -34,7 +34,7 @@
 
 #include "application.h"
 #include "declarative.h"
-#include "chat_history.h"
+#include "history.h"
 #include "phone.h"
 #include "phone/sip.h"
 
