@@ -562,11 +562,12 @@ class ShareQueueItem : public ChatModelItem
 {
 public:
     ShareQueueItem();
-    QXmppShareItem *nextFile(QXmppShareItem *item) const;
+    QXmppShareItem *nextFile(QXmppShareItem *item = 0) const;
 
     QString requestId;
     QXmppShareItem shareItem;
 
+    bool aborted;
     QSet<QXmppShareItem*> done;
     QMap<QXmppShareItem*, QXmppShareTransfer*> transfers;
 
@@ -577,7 +578,8 @@ public:
 };
 
 ShareQueueItem::ShareQueueItem()
-    : doneBytes(0),
+    : aborted(false),
+    doneBytes(0),
     doneFiles(0),
     totalBytes(0),
     totalFiles(0)
@@ -586,12 +588,19 @@ ShareQueueItem::ShareQueueItem()
 
 QXmppShareItem *ShareQueueItem::nextFile(QXmppShareItem *item) const
 {
+    if (aborted)
+        return 0;
+
+    if (!item)
+        item = (QXmppShareItem*)&shareItem;
+
     if (item->type() == QXmppShareItem::FileItem &&
         !done.contains(item) &&
         !transfers.contains(item))
         return item;
 
     foreach (QXmppShareItem *child, item->children()) {
+        Q_ASSERT(child);
         QXmppShareItem *file = nextFile(child);
         if (file)
             return file;
@@ -646,7 +655,7 @@ void ShareQueueModelPrivate::process()
 
         while (activeDownloads < parallelDownloadLimit) {
             // find next item
-            QXmppShareItem *file = item->nextFile(&item->shareItem);
+            QXmppShareItem *file = item->nextFile();
             if (!file)
                 break;
 
@@ -719,6 +728,19 @@ void ShareQueueModel::add(const QXmppShareItem &shareItem, const QString &filter
     }
     addItem(item, rootItem);
     d->process();
+}
+
+void ShareQueueModel::cancel(int row)
+{
+    if (row < 0 || row > rootItem->children.size() - 1)
+        return;
+
+    ShareQueueItem *item = static_cast<ShareQueueItem*>(rootItem->children.at(row));
+    if (!item->aborted) {
+        item->aborted = true;
+        foreach (QXmppShareTransfer *transfer, item->transfers.values())
+            transfer->abort();
+    }
 }
 
 bool ShareQueueModel::contains(const QXmppShareItem &shareItem) const
@@ -847,7 +869,11 @@ void ShareQueueModel::_q_transferFinished()
             if (!d->transfers())
                 d->timer->stop();
 
-            emit dataChanged(createIndex(item), createIndex(item));
+            // check for completion
+            if (item->transfers.isEmpty() && !item->nextFile())
+                removeItem(item);
+            else
+                emit dataChanged(createIndex(item), createIndex(item));
             break;
         }
     }

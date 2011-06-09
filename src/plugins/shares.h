@@ -129,6 +129,9 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     void setManager(QXmppShareManager *manager);
 
+public slots:
+    void cancel(int row);
+
 private slots:
     void _q_refresh();
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
