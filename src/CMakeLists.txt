@@ -86,7 +86,6 @@ set(wiLink_MOC_HEADERS
     chat_form.h
     chat_history.h
     chat_model.h
-    chat_plugin.h
     chat_preferences.h
     updates.h
     updatesdialog.h

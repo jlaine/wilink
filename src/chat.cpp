@@ -66,7 +66,6 @@
 #include "chat_accounts.h"
 #include "chat_client.h"
 #include "chat_history.h"
-#include "chat_plugin.h"
 #include "chat_utils.h"
 #include "idle/idle.h"
 #include "plugins/calls.h"
@@ -104,8 +103,6 @@ public:
     ChatRosterModel *rosterModel;
     QDeclarativeView *rosterView;
     QString windowTitle;
-
-    QList<ChatPlugin*> plugins;
 };
 
 Chat::Chat(QWidget *parent)
@@ -244,11 +241,6 @@ Chat::~Chat()
 {
     // disconnect
     d->client->disconnectFromServer();
-
-    // unload plugins
-    for (int i = d->plugins.size() - 1; i >= 0; i--)
-        d->plugins[i]->finalize(this);
-
     delete d;
 }
 
@@ -391,18 +383,6 @@ bool Chat::open(const QString &jid)
     /* connect to server */
     d->client->connectToServer(config);
 
-    /* load plugins */
-    QObjectList plugins = QPluginLoader::staticInstances();
-    foreach (QObject *object, plugins)
-    {
-        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
-        if (plugin)
-        {
-            plugin->initialize(this);
-            d->plugins << plugin;
-        }
-    }
-
     /* Create "Help" menu here, so that it remains last */
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
 
@@ -486,8 +466,6 @@ void Chat::showPreferences(const QString &focusTab)
 
     dialog->addTab(new ChatOptions);
     dialog->addTab(new SoundOptions);
-    foreach (ChatPlugin *plugin, d->plugins)
-        plugin->preferences(dialog);
 
     dialog->setCurrentTab(focusTab);
 #ifdef WILINK_EMBEDDED
@@ -536,28 +514,6 @@ bool ChatOptions::save()
         wApp->setOpenAtLogin(openAtLogin->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
     return true;
-}
-
-PluginOptions::PluginOptions()
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-
-    QGroupBox *group = new QGroupBox(tr("Plugins"));
-    QVBoxLayout *box = new QVBoxLayout;
-    group->setLayout(box);
-    QObjectList plugins = QPluginLoader::staticInstances();
-    foreach (QObject *object, plugins)
-    {
-        ChatPlugin *plugin = qobject_cast<ChatPlugin*>(object);
-        if (plugin) {
-            box->addWidget(new QLabel(plugin->name()));
-        }
-    }
-    layout->addWidget(group);
-
-    setLayout(layout);
-    setWindowIcon(QIcon(":/plugin.png"));
-    setWindowTitle(tr("Plugins"));
 }
 
 #define SOUND_TEST_SECONDS 5
