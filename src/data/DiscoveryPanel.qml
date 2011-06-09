@@ -80,13 +80,14 @@ Panel {
             view.model.rootJid = location.jid;
             view.model.rootNode = location.node;
         }
+        z: 1
     }
 
     ListView {
         id: view
 
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         anchors.top: crumbBar.bottom
         anchors.bottom: parent.bottom
 
@@ -120,6 +121,15 @@ Panel {
                 }
             }
         }
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: view.top
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: view
     }
 }
 
