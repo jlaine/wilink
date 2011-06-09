@@ -6,6 +6,6 @@ SUBDIRS = \
     qnetio \
     qsound \
     qxmpp \
-    mobile
+    plugins
 
 CONFIG += ordered
