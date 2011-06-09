@@ -331,10 +331,6 @@ Acceptez-vous?</translation>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">Fermer</translation>
-    </message>
 </context>
 <context>
     <name>Dialog</name>
@@ -495,10 +491,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Go back</source>
         <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">Fermer</translation>
     </message>
     <message>
         <source>Create an album</source>

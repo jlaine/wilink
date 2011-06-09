@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 
-Rectangle {
+FocusScope {
     id: panel
 
     signal close
@@ -27,5 +27,10 @@ Rectangle {
 
     anchors.fill: parent
     opacity: 0
+
+    Rectangle {
+        anchors.fill: parent
+        z: -1
+    }
 }
 

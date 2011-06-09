@@ -131,10 +131,12 @@ Item {
             return;
 
         // show new item
-        if (panel)
+        if (panel) {
             panel.opacity = 1;
-        else
+            panel.focus = true;
+        } else {
             background.opacity = 1;
+        }
 
         // hide old item
         if (currentItem)
