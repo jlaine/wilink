@@ -7,9 +7,9 @@ include(../qxmpp/qxmpp.pri)
 QT += declarative network xml
 
 TARGET = wiLink
-VERSION = 1.1.4
+VERSION = $$WILINK_VERSION
 
-DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED
+DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
 
 SOURCES += \
     application.cpp \
@@ -43,7 +43,6 @@ HEADERS += \
     application.h \
     calls.h \
     client.h \
-    config.h \
     console.h \
     conversations.h \
     declarative.h \

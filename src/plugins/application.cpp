@@ -40,7 +40,6 @@
 
 #include "accounts.h"
 #include "application.h"
-#include "config.h"
 #include "utils.h"
 #include "window.h"
 
