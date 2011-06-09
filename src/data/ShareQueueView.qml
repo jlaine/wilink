@@ -92,12 +92,26 @@ Item {
             Text {
                 id: sizeText
         
-                anchors.right: parent.right
+                anchors.right: cancelButton.left
                 anchors.margins: 4
                 anchors.verticalCenter: parent.verticalCenter
                 text: (model.totalFiles > 1 ? qsTr('%1 files').replace('%1', model.totalFiles) + ', ' : '') + Utils.formatSize(model.totalBytes)
             }
 
+            Button {
+                id: cancelButton
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.rightMargin: 4
+                iconSource: 'close.png'
+                text: qsTr('Cancel')
+
+                onClicked: view.model.cancel(model.index)
+            }
+
+/*
             MouseArea {
                 anchors.fill: parent
                 hoverEnabled: true
@@ -105,6 +119,7 @@ Item {
                 onEntered: highlight.state = ''
                 onExited: highlight.state = 'inactive'
             }
+*/
         }
     }
 
