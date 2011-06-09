@@ -24,6 +24,7 @@ Dialog {
     id: dialog
 
     property alias model: view.model
+    property QtObject panel: null
 
     title: qsTr('Join or create a chat room')
     minWidth: 320
@@ -34,7 +35,7 @@ Dialog {
     onAccepted: {
         if (roomEdit.text.length) {
             dialog.hide();
-            showRoom(roomEdit.text + '@' + view.model.rootJid);
+            panel.showRoom(roomEdit.text + '@' + view.model.rootJid);
         }
     }
 
@@ -120,7 +121,7 @@ Dialog {
                 anchors.fill: parent
                 onClicked: {
                     dialog.hide();
-                    showRoom(model.jid);
+                    panel.showRoom(model.jid);
                 }
             }
         }

@@ -64,6 +64,7 @@ Panel {
             Connections {
                 onAddClicked: {
                     dialog.source = 'RoomJoinDialog.qml';
+                    dialog.item.panel = chatPanel;
                     dialog.item.show();
                 }
 
