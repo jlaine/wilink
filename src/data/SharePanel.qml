@@ -195,7 +195,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: Math.min(120, 25*queueView.count)
+        height: queueView.count > 0 ? 120 : 0
         model: view.model.queue
     }
 }
