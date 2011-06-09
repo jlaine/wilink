@@ -41,7 +41,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        spacing: 5
+        spacing: 1
 
         delegate: Item {
             id: item
@@ -63,10 +63,10 @@ Item {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.margins: 4
-                width: 32
-                height: 32
+                width: 24
+                height: 24
                 smooth: true
-                source: model.isDir ? (model.node.length ? 'album-128.png' : 'peer-128.png') : 'file-128.png'
+                source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
 
                 Rectangle {
                     anchors.top: parent.top
@@ -120,7 +120,6 @@ Item {
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
                     elide: Text.ElideLeft
-                    font.pixelSize: 12
                     text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
                 }
             }
@@ -154,7 +153,7 @@ Item {
                 anchors.margins: 4
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                height: 32
+                height: thumbnail.height
                 iconSource: 'download.png'
                 state: 'inactive'
                 visible: model.canDownload
