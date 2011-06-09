@@ -30,7 +30,6 @@
 #include "QXmppClient.h"
 
 #include "chat.h"
-#include "chat_plugin.h"
 #include "photos.h"
 
 static const QSize UPLOAD_SIZE(2048, 2048);

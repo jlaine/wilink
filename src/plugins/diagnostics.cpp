@@ -37,10 +37,8 @@
 #include "QXmppUtils.h"
 
 #include "chat.h"
-#include "chat_plugin.h"
-#include "systeminfo.h"
-
 #include "diagnostics.h"
+#include "systeminfo.h"
 
 static const QHostAddress serverAddress("213.91.4.201");
 

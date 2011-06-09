@@ -26,7 +26,6 @@
 #include "qnetio/wallet.h"
 
 #include "chat.h"
-#include "chat_plugin.h"
 #include "declarative.h"
 
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
