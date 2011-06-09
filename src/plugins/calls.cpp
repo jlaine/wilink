@@ -43,7 +43,6 @@
 #include "application.h"
 #include "calls.h"
 #include "chat.h"
-#include "chat_plugin.h"
 
 static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 {
@@ -399,28 +398,4 @@ void CallVideoItem::setRadius(qreal radius)
         emit radiusChanged(radius);
     }
 }
-
-// PLUGIN
-
-class CallsPlugin : public ChatPlugin
-{
-public:
-    bool initialize(Chat *chat);
-    QString name() const { return "Calls"; };
-};
-
-bool CallsPlugin::initialize(Chat *chat)
-{
-    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
-    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
-
-    qmlRegisterType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper");
-    qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
-    qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
-    qmlRegisterUncreatableType<DeclarativePen>("wiLink", 1, 2, "DeclarativePen", "");
-
-    return true;
-}
-
-Q_EXPORT_STATIC_PLUGIN2(calls, CallsPlugin)
 

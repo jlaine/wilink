@@ -23,8 +23,6 @@
 #include "application.h"
 #include "updatesdialog.h"
 
-Q_IMPORT_PLUGIN(phone)
-
 int main(int argc, char *argv[])
 {
     /* Create application */

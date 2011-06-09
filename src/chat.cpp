@@ -69,6 +69,7 @@
 #include "chat_plugin.h"
 #include "chat_utils.h"
 #include "idle/idle.h"
+#include "plugins/calls.h"
 #include "plugins/console.h"
 #include "plugins/conversations.h"
 #include "plugins/declarative.h"
@@ -127,7 +128,11 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
     qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
     qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
+    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
+    qmlRegisterType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper");
+    qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
+    qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
     qmlRegisterUncreatableType<ChatClient>("wiLink", 1, 2, "Client", "");
     qmlRegisterType<Conversation>("wiLink", 1, 2, "Conversation");
     qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
@@ -151,6 +156,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
 
     // crutches for Qt..
+    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
     qmlRegisterUncreatableType<QAbstractItemModel>("wiLink", 1, 2, "QAbstractItemModel", "");
     qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
     qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
