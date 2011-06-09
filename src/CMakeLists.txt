@@ -46,7 +46,6 @@ endif(NOT APPLE)
 
 set(wiLink_SOURCES
     application.cpp
-    chat.cpp
     chat_accounts.cpp
     chat_form.cpp
     chat_history.cpp
@@ -72,7 +71,8 @@ set(wiLink_SOURCES
     plugins/rooms.cpp
     plugins/roster.cpp
     plugins/shares.cpp
-    plugins/shares/options.cpp)
+    plugins/shares/options.cpp
+    plugins/window.cpp)
 
 if(APPLE)
     set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
@@ -80,7 +80,6 @@ endif(APPLE)
 
 set(wiLink_MOC_HEADERS
     application.h
-    chat.h
     chat_accounts.h
     chat_form.h
     chat_history.h
@@ -103,7 +102,8 @@ set(wiLink_MOC_HEADERS
     plugins/rooms.h
     plugins/roster.h
     plugins/shares.h
-    plugins/shares/options.h)
+    plugins/shares/options.h
+    plugins/window.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)

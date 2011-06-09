@@ -40,9 +40,9 @@
 
 #include "application.h"
 #include "config.h"
-#include "chat.h"
 #include "chat_accounts.h"
 #include "chat_utils.h"
+#include "plugins/window.h"
 
 Application *wApp = 0;
 

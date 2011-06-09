@@ -47,7 +47,7 @@
 #include "QXmppUtils.h"
 
 #include "application.h"
-#include "chat.h"
+#include "window.h"
 #include "chat_form.h"
 #include "chat_history.h"
 #include "roster.h"

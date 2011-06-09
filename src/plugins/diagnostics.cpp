@@ -36,7 +36,7 @@
 
 #include "QXmppUtils.h"
 
-#include "chat.h"
+#include "window.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
 
