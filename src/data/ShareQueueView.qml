@@ -45,13 +45,6 @@ Item {
             width: view.width - 1
             height: 24
 
-            Highlight {
-                id: highlight
-
-                anchors.fill: parent
-                state: 'inactive'
-            }
-
             Image {
                 id: thumbnail
 
@@ -68,7 +61,7 @@ Item {
                 id: main
 
                 anchors.left: thumbnail.right
-                anchors.right: sizeText.left
+                anchors.right: cancelButton.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.margins: 4
@@ -85,17 +78,16 @@ Item {
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
-                    text: model.name + (model.speed > 0 ? ' - ' + Utils.formatSpeed(model.speed) : '')
+                    text: {
+                        var text = model.name + ' - ';
+                        if (model.totalFiles > 1)
+                            text +=  qsTr('%1 files').replace('%1', model.totalFiles) + ', ';
+                        text += Utils.formatSize(model.totalBytes);
+                        if (model.speed > 0)
+                            text += ' - ' + Utils.formatSpeed(model.speed);
+                        return text;
+                    }
                 }
-            }
-
-            Text {
-                id: sizeText
-        
-                anchors.right: cancelButton.left
-                anchors.margins: 4
-                anchors.verticalCenter: parent.verticalCenter
-                text: (model.totalFiles > 1 ? qsTr('%1 files').replace('%1', model.totalFiles) + ', ' : '') + Utils.formatSize(model.totalBytes)
             }
 
             Button {
@@ -111,15 +103,6 @@ Item {
                 onClicked: view.model.cancel(model.index)
             }
 
-/*
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onEntered: highlight.state = ''
-                onExited: highlight.state = 'inactive'
-            }
-*/
         }
     }
 
