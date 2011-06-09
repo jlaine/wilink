@@ -96,14 +96,7 @@ Panel {
                     });
                 }
             }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: panel.close()
-            }
         }
-
     }
 
     PanelHelp {

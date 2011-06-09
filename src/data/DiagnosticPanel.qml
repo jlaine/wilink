@@ -46,12 +46,6 @@ Panel {
 
                 onClicked: window.client.diagnosticManager.refresh();
             }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: panel.close()
-            }
         }
     }
 
