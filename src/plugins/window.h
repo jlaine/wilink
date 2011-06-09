@@ -24,7 +24,7 @@
 #include <QMainWindow>
 
 #include "client.h"
-#include "chat_preferences.h"
+#include "preferences.h"
 
 class Application;
 class ChatPrivate;

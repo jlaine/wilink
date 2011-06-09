@@ -23,7 +23,7 @@
 #include <QAbstractProxyModel>
 #include <QDialog>
 
-#include "chat_preferences.h"
+#include "plugins/preferences.h"
 
 class FoldersModel;
 class QFileSystemModel;

@@ -706,11 +706,11 @@ Acceptez-vous?</translation>
     <name>ShareView</name>
     <message>
         <source>Download folder</source>
-        <translation>Télécharger le dossier</translation>
+        <translation type="obsolete">Télécharger le dossier</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation>Télécharger</translation>
+        <translation type="obsolete">Télécharger</translation>
     </message>
 </context>
 <context>

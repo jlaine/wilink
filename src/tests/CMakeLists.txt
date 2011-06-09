@@ -10,7 +10,7 @@ set(tests_MOC_HEADERS
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 qt4_add_resources(tests_RCC_SOURCES tones.qrc)
 add_executable(tests
-    ../systeminfo.cpp
+    ../plugins/systeminfo.cpp
     ../plugins/updates.cpp
     ../plugins/utils.cpp
     tests.cpp

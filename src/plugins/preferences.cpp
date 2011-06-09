@@ -23,7 +23,7 @@
 #include <QSplitter>
 #include <QStackedWidget>
 
-#include "chat_preferences.h"
+#include "preferences.h"
 
 class ChatPreferencesList : public QListWidget
 {

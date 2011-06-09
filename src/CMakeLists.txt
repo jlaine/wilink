@@ -45,8 +45,6 @@ if(NOT APPLE)
 endif(NOT APPLE)
 
 set(wiLink_SOURCES
-    chat_preferences.cpp
-    systeminfo.cpp
     plugins/accounts.cpp
     plugins/application.cpp
     plugins/calls.cpp
@@ -64,10 +62,12 @@ set(wiLink_SOURCES
     plugins/phone/sip.cpp
     plugins/phone/stun.cpp
     plugins/player.cpp
+    plugins/preferences.cpp
     plugins/rooms.cpp
     plugins/roster.cpp
     plugins/shares.cpp
     plugins/shares/options.cpp
+    plugins/systeminfo.cpp
     plugins/utils.cpp
     plugins/updates.cpp
     plugins/updatesdialog.cpp
@@ -78,7 +78,6 @@ if(APPLE)
 endif(APPLE)
 
 set(wiLink_MOC_HEADERS
-    chat_preferences.h
     plugins/accounts.h
     plugins/application.h
     plugins/calls.h
@@ -95,6 +94,7 @@ set(wiLink_MOC_HEADERS
     plugins/phone/sip.h
     plugins/phone/stun.h
     plugins/player.h
+    plugins/preferences.h
     plugins/rooms.h
     plugins/roster.h
     plugins/shares.h
