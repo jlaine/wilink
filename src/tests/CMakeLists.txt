@@ -3,6 +3,8 @@ set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
+add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
+
 # tests
 set(tests_MOC_HEADERS
     ../plugins/updates.h

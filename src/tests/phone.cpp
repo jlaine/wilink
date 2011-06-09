@@ -29,7 +29,6 @@
 
 #include "../plugins/phone/sip.h"
 
-#include "config.h"
 #include "phone.h"
 
 static PhoneTester tester;
