@@ -264,7 +264,7 @@ Item {
                     dialog.item.accepted.connect(function() {
                         var jid = dialog.item.textValue;
                         if (jid.match(/^[^@/]+@[^@/]+$/)) {
-                            console.log("add " + jid);
+                            console.log("Add contact " + jid);
                             window.client.rosterManager.subscribe(jid);
                             dialog.item.hide();
                         }
@@ -338,7 +338,7 @@ Item {
                         dialog.item.labelText = qsTr("Enter the name for this contact.");
                         dialog.item.textValue = item.name;
                         dialog.item.accepted.connect(function() {
-                            console.log("rename " + item.jid + ": " + dialog.item.textValue);
+                            console.log("Rename contact " + item.jid + ": " + dialog.item.textValue);
                             window.client.rosterManager.renameItem(item.jid, dialog.item.textValue);
                             dialog.item.hide();
                         });
@@ -349,7 +349,7 @@ Item {
                         box.text = qsTr('Do you want to remove %1 from your contact list?').replace('%1', item.name);
                         box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                         if (box.exec() == QMessageBox.Yes) {
-                            console.log("remove " + item.jid);
+                            console.log("Remove contact " + item.jid);
                             window.client.rosterManager.removeItem(item.jid);
                         }
                     }
@@ -416,8 +416,11 @@ Item {
                 box.text = qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
+                    // FIXME: this silently overwrite existing files!
+                    var path = application.downloadsLocation + '/' + job.fileName;
+                    console.log("File accepted: " + path);
                     showConversation(job.jid);
-                    job.accept();
+                    job.accept(path);
                 } else {
                     job.abort();
                 }
