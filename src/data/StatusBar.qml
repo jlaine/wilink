@@ -46,9 +46,9 @@ Rectangle {
 
         anchors.bottom: parent.bottom
         anchors.right: parent.right
+        anchors.left: parent.left
         anchors.margins: 4
         model: ListModel {}
-        width: 200
     }
 
     Idle {
