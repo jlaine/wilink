@@ -85,9 +85,11 @@ Panel {
                 Connections {
                     target: window.client.callManager
                     onCallStarted: {
-                        var component = Qt.createComponent('CallWidget.qml');
-                        var widget = component.createObject(widgetBar);
-                        widget.call = call;
+                        if (Utils.jidToBareJid(call.jid) == conversation.jid) {
+                            var component = Qt.createComponent('CallWidget.qml');
+                            var widget = component.createObject(widgetBar);
+                            widget.call = call;
+                        }
                     }
                 }
             }
@@ -113,9 +115,11 @@ Panel {
                 Connections {
                     target: window.client.transferManager
                     onJobStarted: {
-                        var component = Qt.createComponent('TransferWidget.qml');
-                        var widget = component.createObject(widgetBar);
-                        widget.job = job;
+                        if (Utils.jidToBareJid(job.jid) == conversation.jid) {
+                            var component = Qt.createComponent('TransferWidget.qml');
+                            var widget = component.createObject(widgetBar);
+                            widget.job = job;
+                        }
                     }
                 }
             }
