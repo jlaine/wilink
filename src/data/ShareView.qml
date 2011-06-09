@@ -67,10 +67,10 @@ Item {
                 height: 32
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album-128.png' : 'peer-128.png') : 'file-128.png'
-/*
+
                 Rectangle {
                     anchors.top: parent.top
-                    anchors.left: parent.right
+                    anchors.left: parent.left
                     anchors.margins: 4
                     border.color: '#597fbe'
                     border.width: 1
@@ -90,12 +90,11 @@ Item {
 
                         anchors.centerIn: parent
                         color: '#ffffff'
-                        font.pixelSize: 14
+                        font.pixelSize: 10
                         font.bold: true
                         text: model.popularity > 0 ? model.popularity : ''
                     }
                 }
-*/
             }
 
             Item {
