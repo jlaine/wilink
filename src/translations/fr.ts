@@ -152,21 +152,6 @@
     </message>
 </context>
 <context>
-    <name>ChatHistoryWidget</name>
-    <message>
-        <source>Clear</source>
-        <translation type="obsolete">Effacer</translation>
-    </message>
-    <message>
-        <source>&amp;Copy</source>
-        <translation type="obsolete">&amp;Copier</translation>
-    </message>
-    <message>
-        <source>Select &amp;All</source>
-        <translation type="obsolete">&amp;Tout sélectionner</translation>
-    </message>
-</context>
-<context>
     <name>ChatOptions</name>
     <message>
         <source>Open at login</source>
@@ -245,10 +230,6 @@
         <translation>Envoyer un fichier</translation>
     </message>
     <message>
-        <source>Received files are stored in your %1 folder. Once a file is received, you can double click to open it.</source>
-        <translation type="obsolete">Les fichiers reçus sont stockés dans votre dossier %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
         <source>Sorry, but you cannot send files bigger than %1.</source>
         <translation type="obsolete">Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
     </message>
@@ -304,6 +285,37 @@
     <message>
         <source>Close</source>
         <translation>Fermer</translation>
+    </message>
+</context>
+<context>
+    <name>Dock</name>
+    <message>
+        <source>Diagnostics</source>
+        <translation>Diagnostics</translation>
+    </message>
+    <message>
+        <source>Debugging</source>
+        <translation>Débogage</translation>
+    </message>
+    <message>
+        <source>Discovery</source>
+        <translation>Découverte de services</translation>
+    </message>
+    <message>
+        <source>Media</source>
+        <translation>Lecteur de musique</translation>
+    </message>
+    <message>
+        <source>Phone</source>
+        <translation>Téléphone</translation>
+    </message>
+    <message>
+        <source>Photos</source>
+        <translation>Photos</translation>
+    </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
     </message>
 </context>
 <context>
@@ -422,28 +434,8 @@ Acceptez-vous?</translation>
         <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation type="obsolete">Supprimer</translation>
-    </message>
-    <message>
-        <source>Cancelling upload..</source>
-        <translation type="obsolete">Annulation du transfert..</translation>
-    </message>
-    <message>
         <source>Album name:</source>
         <translation>Nom de l&apos;album :</translation>
-    </message>
-    <message>
-        <source>Deleting %1</source>
-        <translation type="obsolete">Suppression de %1</translation>
-    </message>
-    <message>
-        <source>Photos upload complete.</source>
-        <translation type="obsolete">Envoi de photos terminé.</translation>
-    </message>
-    <message>
-        <source>Your photos have been uploaded.</source>
-        <translation type="obsolete">Vos photos ont été envoyées.</translation>
     </message>
     <message>
         <source>Upload photos</source>
@@ -627,48 +619,8 @@ Acceptez-vous?</translation>
         <translation>Saisissez le nom du fichier que vous cherchez.</translation>
     </message>
     <message>
-        <source>Download</source>
-        <translation type="obsolete">Télécharger</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="obsolete">Retirer</translation>
-    </message>
-    <message>
-        <source>downloads folder</source>
-        <translation type="obsolete">dossier de téléchargement</translation>
-    </message>
-    <message>
         <source>You can select the folders you want to share with other users from the shares options.</source>
         <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
-    </message>
-    <message>
-        <source>Received files are stored in your %1. Once a file is received, you can double click to open it.</source>
-        <translation type="obsolete">Les fichiers reçus sont stockés dans votre %1. Une fois un fichier reçu, vous pouvez double cliquer pour l&apos;ouvrir.</translation>
-    </message>
-    <message>
-        <source>Downloaded</source>
-        <translation type="obsolete">Téléchargé</translation>
-    </message>
-    <message>
-        <source>Failed</source>
-        <translation type="obsolete">Echoué</translation>
-    </message>
-    <message>
-        <source>Transfer</source>
-        <translation type="obsolete">Transfert</translation>
-    </message>
-    <message>
-        <source>Indexed %1 files in %2s</source>
-        <translation type="obsolete">%1 fichiers indexés en %2s</translation>
-    </message>
-    <message>
-        <source>Indexing files</source>
-        <translation type="obsolete">Indexation des fichiers</translation>
-    </message>
-    <message>
-        <source>Queued</source>
-        <translation type="obsolete">En attente</translation>
     </message>
     <message>
         <source>Options</source>
@@ -696,21 +648,6 @@ Acceptez-vous?</translation>
     <message>
         <source>%1 files</source>
         <translation>%1 fichiers</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-</context>
-<context>
-    <name>ShareView</name>
-    <message>
-        <source>Download folder</source>
-        <translation type="obsolete">Télécharger le dossier</translation>
-    </message>
-    <message>
-        <source>Download</source>
-        <translation type="obsolete">Télécharger</translation>
     </message>
 </context>
 <context>
@@ -883,34 +820,6 @@ Do you accept?</source>
         <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
 
 Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Phone</source>
-        <translation>Téléphone</translation>
-    </message>
-    <message>
-        <source>Photos</source>
-        <translation>Photos</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>Diagnostics</source>
-        <translation>Diagnostics</translation>
-    </message>
-    <message>
-        <source>Debugging</source>
-        <translation>Console de débogage</translation>
-    </message>
-    <message>
-        <source>Discovery</source>
-        <translation>Découverte de services</translation>
-    </message>
-    <message>
-        <source>Media</source>
-        <translation>Lecteur de musique</translation>
     </message>
     <message>
         <source>Add a contact</source>

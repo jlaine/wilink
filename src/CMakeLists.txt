@@ -114,6 +114,7 @@ if(RELOAD_TRANSLATIONS)
         data/DiagnosticPanel.qml
         data/Dialog.qml
         data/DiscoveryPanel.qml
+        data/Dock.qml
         data/LogPanel.qml
         data/RoomInviteDialog.qml
         data/RoomJoinDialog.qml

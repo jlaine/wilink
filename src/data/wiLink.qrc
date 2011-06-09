@@ -66,6 +66,7 @@
     <file>DiagnosticPanel.qml</file>
     <file>Dialog.qml</file>
     <file>DiscoveryPanel.qml</file>
+    <file>Dock.qml</file>
     <file>DockButton.qml</file>
     <file>Highlight.qml</file>
     <file>HistoryView.qml</file>
