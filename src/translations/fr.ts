@@ -459,13 +459,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>QObject</name>
-    <message>
-        <source>Downloads</source>
-        <translation>Téléchargements</translation>
-    </message>
-</context>
-<context>
     <name>RoomInviteDialog</name>
     <message>
         <source>Invite your contacts</source>

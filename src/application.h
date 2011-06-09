@@ -43,9 +43,10 @@ class ApplicationPrivate;
 class Application : public QApplication
 {
     Q_OBJECT
-    Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
+    Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound)
+    Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
 
 public:
@@ -67,6 +68,7 @@ public:
     bool isInstalled();
 
     // preferences
+    QString downloadsLocation() const;
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
     QString incomingMessageSound() const;

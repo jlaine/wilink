@@ -513,6 +513,21 @@ void Application::setAudioOutputDevice(const QAudioDeviceInfo &device)
     emit audioOutputDeviceChanged(device);
 }
 
+QString Application::downloadsLocation() const
+{
+    QStringList dirNames = QStringList() << "Downloads" << "Download";
+    foreach (const QString &dirName, dirNames)
+    {
+        QDir downloads(QDir::home().filePath(dirName));
+        if (downloads.exists())
+            return downloads.absolutePath();
+    }
+#ifdef Q_OS_WIN
+    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+#endif
+    return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+}
+
 #ifdef USE_LIBNOTIFY
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {

@@ -17,37 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDesktopServices>
 #include <QDir>
 #include <QProcess>
 
 #include "systeminfo.h"
-
-QString SystemInfo::displayName(SystemInfo::StorageLocation type)
-{
-    if (type == SystemInfo::DownloadsLocation)
-        return QObject::tr("Downloads");
-    return QString();
-}
-
-QString SystemInfo::storageLocation(SystemInfo::StorageLocation type)
-{
-    if (type == SystemInfo::DownloadsLocation)
-    {
-        QStringList dirNames = QStringList() << "Downloads" << "Download";
-        foreach (const QString &dirName, dirNames)
-        {
-            QDir downloads(QDir::home().filePath(dirName));
-            if (downloads.exists())
-                return downloads.absolutePath();
-        }
-    #ifdef Q_OS_WIN
-        return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-    #endif
-        return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-    }
-    return QString();
-}
 
 QString SystemInfo::osName()
 {
