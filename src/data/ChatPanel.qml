@@ -44,7 +44,7 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 240
+        width: 200
 
         RosterView {
             id: rooms

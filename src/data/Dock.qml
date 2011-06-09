@@ -62,28 +62,6 @@ Rectangle {
         }
 
         DockButton {
-            iconSource: 'diagnostics.png'
-            text: qsTr('Diagnostics')
-            onClicked: swapper.showPanel('DiagnosticPanel.qml')
-        }
-
-        DockButton {
-            iconSource: 'options.png'
-            shortcut: Qt.ControlModifier + Qt.Key_L
-            text: qsTr('Debugging')
-            visible: false
-            onClicked: swapper.showPanel('LogPanel.qml')
-        }
-
-        DockButton {
-            iconSource: 'peer.png'
-            shortcut: Qt.ControlModifier + Qt.Key_B
-            text: qsTr('Discovery')
-            visible: false
-            onClicked: swapper.showPanel('DiscoveryPanel.qml')
-        }
-
-        DockButton {
             iconSource: 'start.png'
             shortcut: Qt.ControlModifier + Qt.Key_M
             text: qsTr('Media')
@@ -106,6 +84,20 @@ Rectangle {
         }
 
         DockButton {
+            id: shareButton
+
+            iconSource: 'share.png'
+            text: qsTr('Shares')
+            visible: window.client.shareServer != ''
+            onClicked: swapper.showPanel('SharePanel.qml')
+            onVisibleChanged: {
+                if (shareButton.visible) {
+                    swapper.addPanel('SharePanel.qml');
+                }
+            }
+        }
+
+        DockButton {
             iconSource: 'photos.png'
             text: qsTr('Photos')
             onClicked: {
@@ -118,17 +110,26 @@ Rectangle {
         }
 
         DockButton {
-            id: shareButton
+            iconSource: 'diagnostics.png'
+            shortcut: Qt.ControlModifier + Qt.Key_I
+            text: qsTr('Diagnostics')
+            onClicked: swapper.showPanel('DiagnosticPanel.qml')
+        }
 
-            iconSource: 'share.png'
-            text: qsTr('Shares')
-            visible: window.client.shareServer != ''
-            onClicked: swapper.showPanel('SharePanel.qml')
-            onVisibleChanged: {
-                if (shareButton.visible) {
-                    swapper.addPanel('SharePanel.qml');
-                }
-            }
+        DockButton {
+            iconSource: 'options.png'
+            shortcut: Qt.ControlModifier + Qt.Key_L
+            text: qsTr('Debugging')
+            visible: false
+            onClicked: swapper.showPanel('LogPanel.qml')
+        }
+
+        DockButton {
+            iconSource: 'peer.png'
+            shortcut: Qt.ControlModifier + Qt.Key_B
+            text: qsTr('Discovery')
+            visible: false
+            onClicked: swapper.showPanel('DiscoveryPanel.qml')
         }
     }
 
