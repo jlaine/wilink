@@ -46,8 +46,8 @@ Item {
         z: 1
     }
 
-    ChatPanel {
-        id: chatPanel
+    PanelSwapper {
+        id: swapper
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom

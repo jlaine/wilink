@@ -396,6 +396,10 @@ Acceptez-vous?</translation>
         <source>Shares</source>
         <translation>Partages</translation>
     </message>
+    <message>
+        <source>Chat</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LogPanel</name>

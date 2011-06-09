@@ -56,6 +56,12 @@ Rectangle {
         spacing: 5
 
         DockButton {
+            iconSource: 'chat.png'
+            text: qsTr('Chat')
+            onClicked: swapper.showPanel('ChatPanel.qml')
+        }
+
+        DockButton {
             iconSource: 'diagnostics.png'
             text: qsTr('Diagnostics')
             onClicked: swapper.showPanel('DiagnosticPanel.qml')
