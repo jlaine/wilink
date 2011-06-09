@@ -19,10 +19,7 @@ SOURCES += \
     ../chat_form.cpp \
     ../chat_history.cpp \
     ../chat_model.cpp \
-    ../chat_panel.cpp \
     ../chat_preferences.cpp \
-    ../chat_search.cpp \
-    ../chat_status.cpp \
     ../chat_utils.cpp \
     ../systeminfo.cpp \
     ../updates.cpp \
@@ -34,11 +31,12 @@ SOURCES += \
     ../plugins/diagnostics.cpp \
     ../plugins/discovery.cpp \
     ../plugins/phone.cpp \
-    ../plugins/phone/models.cpp \
     ../plugins/phone/sip.cpp \
     ../plugins/photos.cpp \
+    ../plugins/player.cpp \
     ../plugins/rooms.cpp \
     ../plugins/roster.cpp \
+    ../plugins/shares.cpp \
     main.cpp
 
 HEADERS += \
@@ -49,11 +47,7 @@ HEADERS += \
     ../chat_form.h \
     ../chat_history.h \
     ../chat_model.h \
-    ../chat_panel.h \
-    ../chat_plugin.h \
     ../chat_preferences.h \
-    ../chat_search.h \
-    ../chat_status.h \
     ../chat_utils.h \
     ../systeminfo.h \
     ../updates.h \
@@ -66,11 +60,12 @@ HEADERS += \
     ../plugins/discovery.h \
     ../plugins/photos.h \
     ../plugins/phone.h \
-    ../plugins/phone/models.h \
+    ../plugins/player.h \
     ../plugins/phone/sip.h \
     ../plugins/phone/sip_p.h \
     ../plugins/rooms.h \
     ../plugins/roster.h \
+    ../plugins/shares.h \
     config.h
 
 mac {
