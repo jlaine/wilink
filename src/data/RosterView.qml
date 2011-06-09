@@ -45,6 +45,8 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: -parent.width
+        border.color: '#597fbe'
+        border.width: 1
 
         gradient: Gradient {
             GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
@@ -106,6 +108,8 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        anchors.leftMargin: 2
+        anchors.rightMargin: 2
         focus: true
 
         delegate: Item {
