@@ -24,7 +24,7 @@
 #include <QTextCursor>
 #include <QTextDocument>
 
-#include "chat_model.h"
+#include "model.h"
 
 class QUrl;
 

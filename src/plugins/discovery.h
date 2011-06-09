@@ -26,7 +26,7 @@ class QXmppDiscoveryManager;
 
 #include "QXmppDiscoveryIq.h"
 
-#include "chat_model.h"
+#include "model.h"
 
 /** The DiscoveryModel class represents a set of service discovery results.
  */

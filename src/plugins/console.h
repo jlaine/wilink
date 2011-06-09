@@ -22,7 +22,7 @@
 
 #include "QXmppLogger.h"
 
-#include "chat_model.h"
+#include "model.h"
 
 class LogModel : public ChatModel
 {

@@ -22,7 +22,7 @@
 
 #include "QXmppShareIq.h"
 
-#include "chat_model.h"
+#include "model.h"
 
 class ChatClient;
 class QXmppPresence;

@@ -22,7 +22,7 @@
 
 #include <QUrl>
 
-#include "chat_model.h"
+#include "model.h"
 
 class Chat;
 class QSoundPlayer;

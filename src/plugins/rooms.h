@@ -24,7 +24,7 @@
 
 #include "QXmppMucIq.h"
 //#include "QXmppMucManager.h"
-#include "chat_model.h"
+#include "model.h"
 
 class ChatClient;
 class ChatHistoryModel;

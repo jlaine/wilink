@@ -24,7 +24,7 @@
 #include <QSet>
 #include <QUrl>
 
-#include "chat_model.h"
+#include "model.h"
 
 class QXmppDiscoveryIq;
 class QXmppPresence;

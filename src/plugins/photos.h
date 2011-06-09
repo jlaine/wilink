@@ -24,7 +24,7 @@
 #include <QSet>
 #include <QUrl>
 
-#include "chat_model.h"
+#include "model.h"
 #include "qnetio/filesystem.h"
 
 using namespace QNetIO;
