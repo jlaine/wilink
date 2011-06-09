@@ -113,7 +113,7 @@ Item {
                             width: rect.width - 20
                             text: model.html
                             textFormat: Qt.RichText
-                            wrapMode: Text.WordWrap
+                            wrapMode: Text.Wrap
                             onLinkActivated: Qt.openUrlExternally(link)
                         }
                     }
