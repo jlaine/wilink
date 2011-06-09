@@ -45,7 +45,6 @@ if(NOT APPLE)
 endif(NOT APPLE)
 
 set(wiLink_SOURCES
-    chat_form.cpp
     chat_preferences.cpp
     systeminfo.cpp
     plugins/accounts.cpp
@@ -79,7 +78,6 @@ if(APPLE)
 endif(APPLE)
 
 set(wiLink_MOC_HEADERS
-    chat_form.h
     chat_preferences.h
     plugins/accounts.h
     plugins/application.h

@@ -22,8 +22,8 @@
 
 #include <QDialog>
 
+#include "QXmppDataForm.h"
 #include "QXmppMucIq.h"
-//#include "QXmppMucManager.h"
 #include "model.h"
 
 class ChatClient;
@@ -111,6 +111,21 @@ private:
     QString m_jid;
     QXmppMucManager *m_manager;
     QXmppMucRoom *m_room;
+};
+
+class ChatForm : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ChatForm(const QXmppDataForm &form, QWidget *parent);
+    QXmppDataForm form() const;
+
+protected slots:
+    void submit();
+
+private:
+    QXmppDataForm chatForm;
 };
 
 class RoomPermissionDialog : public QDialog
