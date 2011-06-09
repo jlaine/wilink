@@ -22,7 +22,7 @@
 
 #include <QDialog>
 
-#include "plugins/updates.h"
+#include "updates.h"
 
 class QAbstractButton;
 class QDialogButtonBox;

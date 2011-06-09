@@ -20,7 +20,7 @@
 #include <QDateTime>
 
 #include "console.h"
-#include "chat_utils.h"
+#include "utils.h"
 
 enum LogRole {
     ContentRole = ChatModel::UserRole,

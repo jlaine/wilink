@@ -23,7 +23,7 @@
 #include <QAudioDeviceInfo>
 #include <QMainWindow>
 
-#include "plugins/client.h"
+#include "client.h"
 #include "chat_preferences.h"
 
 class Application;

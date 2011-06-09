@@ -19,7 +19,7 @@
 
 #include <QRegExp>
 
-#include "chat_utils.h"
+#include "utils.h"
 
 bool isBareJid(const QString &jid)
 {

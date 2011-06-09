@@ -30,7 +30,7 @@
 #include "QXmppUtils.h"
 
 #include "client.h"
-#include "chat_utils.h"
+#include "utils.h"
 #include "roster.h"
 #include "shares.h"
 

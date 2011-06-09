@@ -24,9 +24,9 @@
 #include "QSoundFile.h"
 
 #include "diagnostics/iq.h"
-#include "chat_utils.h"
-#include "tests.h"
 #include "plugins/updates.h"
+#include "plugins/utils.h"
+#include "tests.h"
 
 template <class T>
 static void parsePacket(T &packet, const QByteArray &xml)

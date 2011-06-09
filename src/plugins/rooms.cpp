@@ -50,7 +50,7 @@
 #include "chat_form.h"
 #include "history.h"
 #include "roster.h"
-#include "chat_utils.h"
+#include "utils.h"
 #include "window.h"
 
 #include "rooms.h"

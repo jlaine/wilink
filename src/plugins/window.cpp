@@ -61,9 +61,9 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
+#include "accounts.h"
 #include "application.h"
-#include "chat_accounts.h"
-#include "chat_utils.h"
+#include "utils.h"
 #include "idle/idle.h"
 #include "calls.h"
 #include "console.h"
@@ -79,7 +79,6 @@
 #include "rooms.h"
 #include "roster.h"
 #include "shares.h"
-#include "systeminfo.h"
 #include "updatesdialog.h"
 #include "window.h"
 

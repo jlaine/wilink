@@ -38,11 +38,11 @@
 #include "QSoundPlayer.h"
 #include "QXmppUtils.h"
 
+#include "accounts.h"
 #include "application.h"
 #include "config.h"
-#include "chat_accounts.h"
-#include "chat_utils.h"
-#include "plugins/window.h"
+#include "utils.h"
+#include "window.h"
 
 Application *wApp = 0;
 

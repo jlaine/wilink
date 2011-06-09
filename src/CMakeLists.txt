@@ -45,14 +45,11 @@ if(NOT APPLE)
 endif(NOT APPLE)
 
 set(wiLink_SOURCES
-    application.cpp
-    chat_accounts.cpp
     chat_form.cpp
     chat_preferences.cpp
-    chat_utils.cpp
-    main.cpp
     systeminfo.cpp
-    updatesdialog.cpp
+    plugins/accounts.cpp
+    plugins/application.cpp
     plugins/calls.cpp
     plugins/client.cpp
     plugins/console.cpp
@@ -61,6 +58,7 @@ set(wiLink_SOURCES
     plugins/diagnostics.cpp
     plugins/discovery.cpp
     plugins/history.cpp
+    plugins/main.cpp
     plugins/model.cpp
     plugins/photos.cpp
     plugins/phone.cpp
@@ -71,19 +69,20 @@ set(wiLink_SOURCES
     plugins/roster.cpp
     plugins/shares.cpp
     plugins/shares/options.cpp
+    plugins/utils.cpp
     plugins/updates.cpp
+    plugins/updatesdialog.cpp
     plugins/window.cpp)
 
 if(APPLE)
-    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
+    set(wiLink_SOURCES ${wiLink_SOURCES} plugins/application_mac.mm)
 endif(APPLE)
 
 set(wiLink_MOC_HEADERS
-    application.h
-    chat_accounts.h
     chat_form.h
     chat_preferences.h
-    updatesdialog.h
+    plugins/accounts.h
+    plugins/application.h
     plugins/calls.h
     plugins/client.h
     plugins/console.h
@@ -103,6 +102,7 @@ set(wiLink_MOC_HEADERS
     plugins/shares.h
     plugins/shares/options.h
     plugins/updates.h
+    plugins/updatesdialog.h
     plugins/window.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)

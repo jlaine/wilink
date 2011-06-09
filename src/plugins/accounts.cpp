@@ -33,8 +33,8 @@
 #include "qnetio/wallet.h"
 
 #include "application.h"
-#include "chat_accounts.h"
-#include "chat_utils.h"
+#include "accounts.h"
+#include "utils.h"
 
 static const char *accountsKey = "ChatAccounts";
 
