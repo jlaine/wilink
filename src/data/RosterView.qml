@@ -108,8 +108,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.leftMargin: 2
-        anchors.rightMargin: 2
+        anchors.margins: 2
         focus: true
 
         delegate: Item {
