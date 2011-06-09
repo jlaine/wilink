@@ -9,7 +9,7 @@ QT += declarative network xml
 TARGET = wiLink
 VERSION = 1.1.4
 
-DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED
+DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED WILINK_VERSION=\\\"$${VERSION}\\\"
 
 SOURCES += \
     application.cpp \

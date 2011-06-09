@@ -39,6 +39,7 @@ endif()
 
 # wiLink
 
+add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 add_definitions(-DQT_STATICPLUGIN)
 if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
