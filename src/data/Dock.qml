@@ -98,10 +98,12 @@ Rectangle {
         }
 
         DockButton {
+            property string domain: Utils.jidToDomain(window.client.jid)
+
             iconSource: 'photos.png'
             text: qsTr('Photos')
+            visible: domain == 'wifirst.net' || domain == 'gmail.com'
             onClicked: {
-                var domain = Utils.jidToDomain(window.client.jid);
                 if (domain == 'wifirst.net')
                     swapper.showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
                 else if (domain == 'gmail.com')
