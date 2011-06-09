@@ -24,17 +24,17 @@ import 'utils.js' as Utils
 Panel {
     id: chatPanel
 
-    property alias swapper: chatSwapper
-
     /** Convenience method to show a conversation panel.
      */
     function showConversation(jid) {
+        swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
     }
 
     /** Convenience method to show a chat room panel.
      */
     function showRoom(jid) {
+        swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
     }
 
