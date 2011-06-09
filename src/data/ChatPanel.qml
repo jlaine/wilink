@@ -121,7 +121,7 @@ Panel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: splitter.bottom
-            anchors.bottom: statusBar.bottom
+            anchors.bottom: statusBar.top
             currentJid: (Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             model: SortFilterProxyModel {
                 dynamicSortFilter: true
