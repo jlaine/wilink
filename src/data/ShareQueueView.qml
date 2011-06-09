@@ -40,6 +40,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        spacing: 4
 
         delegate: Item {
             id: item
@@ -97,9 +98,8 @@ Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                anchors.rightMargin: 4
+                anchors.margins: 2
                 iconSource: 'close.png'
-                text: qsTr('Cancel')
 
                 onClicked: view.model.cancel(model.index)
             }
