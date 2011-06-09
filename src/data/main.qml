@@ -25,18 +25,6 @@ Item {
     id: root
     focus: true
 
-    /** Convenience method to show a conversation panel.
-     */
-    function showConversation(jid) {
-        chatPanel.showConversation(jid);
-    }
-
-    /** Convenience method to show a chat room panel.
-     */
-    function showRoom(jid) {
-        chatPanel.showRoom(jid);
-    }
-
     Dock {
         id: dock
 
@@ -64,16 +52,6 @@ Item {
         z: 10
     }
 
-    Loader {
-        id: wifirst
-
-        Connections {
-            target: window.client
-            onConnected: {
-                wifirst.source = (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : '';
-            }
-        }
-    }
-
+    Component.onCompleted: swapper.showPanel('ChatPanel.qml')
     Keys.forwardTo: dock
 }

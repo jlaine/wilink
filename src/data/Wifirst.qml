@@ -46,7 +46,7 @@ Item {
                         var roomCap = link.match(/xmpp:([^?]+)\?join/);
                         if (roomCap) {
                             var jid = roomCap[1];
-                            if (!chatPanel.swapper.findPanel('RoomPanel.qml', {'jid': jid})) {
+                            if (!chatSwapper.findPanel('RoomPanel.qml', {'jid': jid})) {
                                 chatPanel.showRoom(jid);
                             }
                         }
