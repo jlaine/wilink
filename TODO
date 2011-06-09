@@ -2,7 +2,9 @@ HIGH PRIORITY
 
 - restore copy & paste in chat history
 - purge vCard cache upon upgrade
-- report BSSID in diagnostics
+- fix focus handling after using a QML dialog
+- restore shares initial config dialog
+- auto-join bookmarked rooms
 
 LOW PRIORITY
 
