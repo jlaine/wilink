@@ -34,20 +34,21 @@ Item {
         color: '#ffffff'
     }
 
-    GridView {
+    ListView {
         id: view
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        cellHeight: 128
-        cellWidth: 170
+        spacing: 5
 
         delegate: Item {
             id: item
-            width: view.cellWidth
-            height: view.cellHeight
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: thumbnail.height + 8
 
             Highlight {
                 id: highlight
@@ -59,10 +60,11 @@ Item {
             Image {
                 id: thumbnail
 
+                anchors.left: parent.left
                 anchors.top: parent.top
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 80
-                height: 80
+                anchors.margins: 4
+                width: 32
+                height: 32
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album-128.png' : 'peer-128.png') : 'file-128.png'
 /*
@@ -96,26 +98,32 @@ Item {
 */
             }
 
-            Text {
-                id: text
+            Item {
+                anchors.left: thumbnail.right
+                anchors.right: downloadButton.left
+                anchors.verticalCenter: parent.verticalCenter
+                height: model.size > 0 ? text.height + sizeText.height : text.height
 
-                anchors.top: thumbnail.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
+                Text {
+                    id: text
 
-                text: model.name
-            }
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    elide: Text.ElideRight
 
-            Text {
-                id: sizeText
+                    text: model.name
+                }
 
-                anchors.centerIn: thumbnail
-                color: (model.isDir && !model.node.length) ? '#ffffff' : '#000000'
-                elide: Text.ElideLeft
-                font.pixelSize: 12
-                text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
+                Text {
+                    id: sizeText
+
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+                    elide: Text.ElideLeft
+                    font.pixelSize: 12
+                    text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
+                }
             }
 
             MouseArea {
@@ -133,31 +141,23 @@ Item {
                     downloadButton.state = ''
                     highlight.state = ''
                     itemHovered = true
-                    textLabel.text = text.text
                 }
                 onExited: {
                     highlight.state = 'inactive'
                     downloadButton.state = 'inactive'
                     itemHovered = false
                 }
-                onPositionChanged: {
-                    textLabel.x = mapToItem(view,mouse.x + 15, mouse.y).x
-                    textLabel.y = mapToItem(view,mouse.x + 15, mouse.y).y
-                    textLabel.opacity = 0
-                }
             }
 
             Button {
                 id: downloadButton
 
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
                 anchors.margins: 4
-                height: 20
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                height: 32
                 iconSource: 'download.png'
                 state: 'inactive'
-                text: model.isDir ? qsTr('Download folder') : qsTr('Download')
                 visible: model.canDownload
 
                 onClicked: {
@@ -166,39 +166,10 @@ Item {
 
                 states: State {
                     name: 'inactive'
-                    PropertyChanges { target: downloadButton; opacity: 0 }
+                    PropertyChanges { target: downloadButton; opacity: 0.5 }
                 }
             }
         }
-    }
-
-    Rectangle {
-        id: textLabel
-
-        property alias text: label.text
-
-        border.color: '#ffffff'
-        border.width: 1
-        color: '#b0c4de'
-        height: label.paintedHeight + 4
-        width: label.paintedWidth + 4
-        opacity: 0
-        z: 10
-
-        Text {
-            id: label
-            anchors.centerIn: parent
-        }
-    }
-
-    Timer {
-        id: showLabelTimer
-
-        interval: 1000
-        repeat: true
-        running: itemHovered
-
-        onTriggered: textLabel.opacity = 1
     }
 
     ScrollBar {
