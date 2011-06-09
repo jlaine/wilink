@@ -23,7 +23,6 @@ Rectangle {
     id: panel
 
     signal close
-    signal hide
     signal notify(string title, string text)
 
     anchors.fill: parent

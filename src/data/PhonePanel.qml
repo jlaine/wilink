@@ -65,19 +65,6 @@ Panel {
         anchors.top: parent.top
         iconSource: 'phone.png'
         title: '<b>' + qsTr('Phone') + '</b><br />' + (historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : '')
-
-        Row {
-            id: toolBar
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: panel.hide()
-            }
-        }
     }
 
     PanelHelp {

@@ -53,12 +53,6 @@ Panel {
 
                 onClicked: window.showPreferences('shares')
             }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: panel.hide();
-            }
         }
     }
 

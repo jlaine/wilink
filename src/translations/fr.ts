@@ -485,10 +485,6 @@ Acceptez-vous?</translation>
         <source>Enter the number you want to call</source>
         <translation>Saisissez le numéro à appeler</translation>
     </message>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
 </context>
 <context>
     <name>PhotoPanel</name>
@@ -708,10 +704,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Options</source>
         <translation>Options</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
     </message>
     <message>
         <source>Received files are stored in your &lt;a href=&quot;%1&quot;&gt;downloads folder&lt;/a&gt;. Once a file is received, you can double click to open it.</source>

@@ -82,14 +82,6 @@ Item {
                 }
             }
         });
-        panel.hide.connect(function() {
-            for (var i = 0; i < panels.count; i += 1) {
-                if (panels.get(i).panel == panel) {
-                    hidePanel(i);
-                    break;
-                }
-            }
-        });
         panel.notify.connect(function(title, text) {
             // show notification
             application.showMessage(panel, title, text);
