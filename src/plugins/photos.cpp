@@ -39,7 +39,8 @@ static QCache<QUrl, QImage> photoImageCache;
 
 enum PhotoRole
 {
-    IsDirRole = ChatModel::UserRole,
+    ImageRole = ChatModel::UserRole,
+    IsDirRole,
     ProgressRole,
     SizeRole,
 };
@@ -169,6 +170,7 @@ PhotoModel::PhotoModel(QObject *parent)
     m_fs(0)
 {
     QHash<int, QByteArray> names = roleNames();
+    names.insert(ImageRole, "image");
     names.insert(IsDirRole, "isDir");
     names.insert(SizeRole, "size");
     setRoleNames(names);
@@ -227,9 +229,17 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
         if (item->isDir()) {
             return QUrl("qrc:/album-128.png");
         } else {
-            return PhotoCache::instance()->imageUrl(item->url(), FileSystem::MediumSize, m_fs);
+            return PhotoCache::instance()->imageUrl(item->url(), FileSystem::SmallSize, m_fs);
         }
-    } else if (role == IsDirRole)
+    }
+    else if (role == ImageRole) {
+        if (item->isDir()) {
+            return QUrl("qrc:/album-128.png");
+        } else {
+            return PhotoCache::instance()->imageUrl(item->url(), FileSystem::LargeSize, m_fs);
+        }
+    }
+    else if (role == IsDirRole)
         return item->isDir();
     else if (role == NameRole)
         return item->name();

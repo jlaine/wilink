@@ -121,7 +121,7 @@ Panel {
                 photoModel.rootUrl = location.url;
                 image.source = '';
             } else {
-                image.source = location.avatar
+                image.source = location.image;
             }
         }
         z: 1
@@ -164,6 +164,7 @@ Panel {
                     width: 128
                     height: 128
                     source: model.avatar
+                    smooth: true
                 }
 
                 Text {
