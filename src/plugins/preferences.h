@@ -20,10 +20,21 @@
 #ifndef __WILINK_CHAT_PREFERENCES_H__
 #define __WILINK_CHAT_PREFERENCES_H__
 
+#include <QAudioDeviceInfo>
 #include <QDialog>
 
 class ChatPreferencesPrivate;
 class ChatPreferencesTab;
+class QAudioInput;
+class QAudioOutput;
+class QBuffer;
+class QCheckBox;
+class QComboBox;
+class QFileDialog;
+class QLabel;
+class QMessageBox;
+class QModelIndex;
+class QSoundMeterBar;
 
 /** ChatPreferences is the base class for all settings tabs.
  */
@@ -52,6 +63,52 @@ class ChatPreferencesTab : public QWidget
 public:
     ChatPreferencesTab();
     virtual bool save() { return true; };
+};
+
+class ChatOptions : public ChatPreferencesTab
+{
+    Q_OBJECT
+
+public:
+    ChatOptions();
+    bool save();
+
+private:
+    QCheckBox *openAtLogin;
+    QCheckBox *showOfflineContacts;
+};
+
+class SoundOptions : public ChatPreferencesTab
+{
+    Q_OBJECT
+
+public:
+    SoundOptions();
+    bool save();
+
+private slots:
+    void startInput();
+    void startOutput();
+    void stopOutput();
+
+private:
+    // devices
+    QComboBox *inputCombo;
+    QList<QAudioDeviceInfo> inputDevices;
+    QComboBox *outputCombo;
+    QList<QAudioDeviceInfo> outputDevices;
+
+    // notifications
+    QCheckBox *incomingMessageSound;
+    QCheckBox *outgoingMessageSound;
+
+    // test
+    QSoundMeterBar *testBar;
+    QBuffer *testBuffer;
+    QPushButton *testButton;
+    QLabel *testLabel;
+    QAudioInput *testInput;
+    QAudioOutput *testOutput;
 };
 
 #endif

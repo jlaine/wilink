@@ -67,11 +67,11 @@ private slots:
     void audioModeChanged(QIODevice::OpenMode mode);
 
 private:
-    QXmppCall *m_call;
     QAudioInput *m_audioInput;
     QSoundMeter *m_audioInputMeter;
     QAudioOutput *m_audioOutput;
     QSoundMeter *m_audioOutputMeter;
+    QXmppCall *m_call;
 };
 
 class CallVideoHelper : public QObject
@@ -111,8 +111,8 @@ private:
     QXmppCall *m_call;
     QXmppVideoFrame *m_videoConversion;
     QVideoGrabber *m_videoGrabber;
-    CallVideoItem *m_videoOutput;
     CallVideoItem *m_videoMonitor;
+    CallVideoItem *m_videoOutput;
     QTimer *m_videoTimer;
 };
 

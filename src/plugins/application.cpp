@@ -128,8 +128,8 @@ Application::Application(int &argc, char **argv)
     if (css.open(QIODevice::ReadOnly))
        setStyleSheet(QString::fromUtf8(css.readAll()));
 
-    /* register URL handler */
-    QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
+    // FIXME: register URL handler
+    //QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
 
     /* initialise sound player */
     d->soundThread = new QThread(this);
@@ -381,6 +381,7 @@ void Application::setOpenAtLogin(bool run)
     }
 }
 
+#if 0
 /** Open an XMPP URI using the appropriate account.
  *
  * @param url
@@ -396,6 +397,7 @@ void Application::openUrl(const QUrl &url)
         }
     }
 }
+#endif
 
 QString Application::incomingMessageSound() const
 {

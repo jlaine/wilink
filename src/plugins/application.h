@@ -90,7 +90,6 @@ signals:
     void showOfflineContactsChanged(bool show);
 
 public slots:
-    void openUrl(const QUrl &url);
     void showMessage(QObject *context, const QString &title, const QString &message);
 
 private slots:

@@ -165,8 +165,9 @@ Panel {
             target: historyView.model
             onMessageReceived: {
                 if (!window.isActiveWindow || panel.opacity == 0) {
-                    window.rosterModel.addPendingMessage(jid);
                     panel.notify(vcard.name, text);
+                    if (panel.opacity == 0)
+                        window.rosterModel.addPendingMessage(jid);
                 }
             }
         }

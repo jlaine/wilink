@@ -20,26 +20,16 @@
 #ifndef __WILINK_CHAT_H__
 #define __WILINK_CHAT_H__
 
-#include <QAudioDeviceInfo>
 #include <QMainWindow>
 
 #include "client.h"
-#include "preferences.h"
 
 class Application;
 class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
-class QAudioInput;
-class QAudioOutput;
-class QBuffer;
-class QCheckBox;
-class QComboBox;
 class QFileDialog;
-class QLabel;
 class QMessageBox;
-class QModelIndex;
-class QSoundMeterBar;
 
 /** Chat represents the user interface's main window.
  */
@@ -63,13 +53,8 @@ public:
 signals:
     void isActiveWindowChanged();
 
-    /** Plugins should connect to this signal to handle XMPP URIs.
-     */
-    void urlClick(const QUrl &url);
-
 public slots:
     void alert();
-    void openUrl(const QUrl &url);
     QFileDialog *fileDialog();
     QMessageBox *messageBox();
     void showPreferences(const QString &focusTab = QString());
@@ -86,52 +71,6 @@ protected:
 
 private:
     ChatPrivate * const d;
-};
-
-class ChatOptions : public ChatPreferencesTab
-{
-    Q_OBJECT
-
-public:
-    ChatOptions();
-    bool save();
-
-private:
-    QCheckBox *openAtLogin;
-    QCheckBox *showOfflineContacts;
-};
-
-class SoundOptions : public ChatPreferencesTab
-{
-    Q_OBJECT
-
-public:
-    SoundOptions();
-    bool save();
-
-private slots:
-    void startInput();
-    void startOutput();
-    void stopOutput();
-
-private:
-    // devices
-    QComboBox *inputCombo;
-    QList<QAudioDeviceInfo> inputDevices;
-    QComboBox *outputCombo;
-    QList<QAudioDeviceInfo> outputDevices;
-
-    // notifications
-    QCheckBox *incomingMessageSound;
-    QCheckBox *outgoingMessageSound;
-
-    // test
-    QSoundMeterBar *testBar;
-    QBuffer *testBuffer;
-    QPushButton *testButton;
-    QLabel *testLabel;
-    QAudioInput *testInput;
-    QAudioOutput *testOutput;
 };
 
 #endif
