@@ -394,7 +394,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>Chat</translation>
     </message>
 </context>
 <context>
